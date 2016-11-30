@@ -9,27 +9,15 @@ If you add or update a translation run `grunt check-translations` to update the 
 <!-- START langtable -->
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 6)     | Close Modal Dialog                                                                  |
+| ar.json (missing 7)     | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | , opens descriptions settings dialog                                                |
-| ba.json (missing 14)    | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-| bg.json (missing 14)    | Close Modal Dialog                                                                  |
+| ba.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -43,7 +31,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| ca.json (missing 14)    | Close Modal Dialog                                                                  |
+| bg.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -57,7 +46,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| cs.json (missing 14)    | Close Modal Dialog                                                                  |
+| ca.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -71,7 +61,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| da.json (missing 14)    | Close Modal Dialog                                                                  |
+| cs.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -85,9 +76,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| de.json (Complete)      |                                                                                     |
-| el.json (Complete)      |                                                                                     |
-| es.json (missing 14)    | Close Modal Dialog                                                                  |
+| da.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -101,7 +91,10 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fa.json (missing 14)    | Close Modal Dialog                                                                  |
+| de.json (missing 1)     | Replay                                                                              |
+| el.json (missing 1)     | Replay                                                                              |
+| es.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -115,7 +108,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fi.json (missing 14)    | Close Modal Dialog                                                                  |
+| fa.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -129,8 +123,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fr.json (Complete)      |                                                                                     |
-| hr.json (missing 14)    | Close Modal Dialog                                                                  |
+| fi.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -144,7 +138,9 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| hu.json (missing 14)    | Close Modal Dialog                                                                  |
+| fr.json (missing 1)     | Replay                                                                              |
+| hr.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -158,7 +154,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| it.json (missing 14)    | Close Modal Dialog                                                                  |
+| hu.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -172,7 +169,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| ja.json (missing 14)    | Close Modal Dialog                                                                  |
+| it.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -186,7 +184,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| ko.json (missing 14)    | Close Modal Dialog                                                                  |
+| ja.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -200,7 +199,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| nb.json (missing 14)    | Close Modal Dialog                                                                  |
+| ko.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -214,10 +214,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| nl.json (missing 3)     | Close Modal Dialog                                                                  |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-| nn.json (missing 14)    | Close Modal Dialog                                                                  |
+| nb.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -231,29 +229,12 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| pl.json (missing 7)     | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
+| nl.json (missing 4)     | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Audio Track                                                                         |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | , opens descriptions settings dialog                                                |
-| pt-BR.json (missing 14) | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-| ru.json (Complete)      |                                                                                     |
-| sr.json (missing 14)    | Close Modal Dialog                                                                  |
+| nn.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -267,7 +248,16 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| sv.json (missing 14)    | Close Modal Dialog                                                                  |
+| pl.json (missing 8)     | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | , opens descriptions settings dialog                                                |
+| pt-BR.json (missing 15) | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -281,14 +271,9 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| tr.json (missing 6)     | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | , opens descriptions settings dialog                                                |
-| uk.json (Complete)      |                                                                                     |
-| vi.json (missing 14)    | Close Modal Dialog                                                                  |
+| ru.json (missing 1)     | Replay                                                                              |
+| sr.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -302,7 +287,46 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| zh-CN.json (missing 13) | Close Modal Dialog                                                                  |
+| sv.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+| tr.json (missing 7)     | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | , opens descriptions settings dialog                                                |
+| uk.json (missing 1)     | Replay                                                                              |
+| vi.json (missing 15)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+| zh-CN.json (missing 14) | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
@@ -315,5 +339,5 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| zh-TW.json (Complete)   |                                                                                     |
+| zh-TW.json (missing 1)  | Replay                                                                              |
 <!-- END langtable -->
