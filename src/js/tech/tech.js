@@ -795,6 +795,29 @@ class Tech extends Component {
     return '';
   }
 
+  /**
+   * Check if the tech can support the given type
+   *
+   * The base tech does not support any type, but source handlers might
+   * overwrite this.
+   *
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  static canPlayType() {
+    return '';
+  }
+
+  /**
+   * Check if the tech can support the given source
+   * @param  {Object} srcObj  The source object
+   * @param  {Object} options The options passed to the tech
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  static canPlaySource(srcObj, options) {
+    return Tech.canPlayType(srcObj.type);
+  }
+
   /*
    * Return whether the argument is a Tech or not.
    * Can be passed either a Class like `Html5` or a instance like `player.tech_`

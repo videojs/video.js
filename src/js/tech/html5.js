@@ -832,6 +832,29 @@ Html5.isSupported = function() {
 };
 
 /**
+ * Check if the tech can support the given type
+ *
+ * The base tech does not support any type, but source handlers might
+ * overwrite this.
+ *
+ * @param  {String} type    The mimetype to check
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.canPlayType = function(type) {
+  return Html5.TEST_VID.canPlayType(type);
+}
+
+/**
+ * Check if the tech can support the given source
+ * @param  {Object} srcObj  The source object
+ * @param  {Object} options The options passed to the tech
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.canPlaySource = function(srcObj, options) {
+  return Html5.canPlayType(srcObj.type);
+}
+
+/**
  * Check if the volume can be changed in this browser/device.
  * Volume cannot be changed in a lot of mobile devices.
  * Specifically, it can't be changed from 1 on iOS.
