@@ -1,13 +1,20 @@
 # Text Tracks
-Text tracks are a feature of HTML5 video for displaying time-triggered text to the viewer. Video.js offers a cross-browser implementation of audio tracks.
+Text tracks are a feature of HTML5 video for displaying time-triggered text to the viewer. Video.js offers a cross-browser implementation of text tracks.
+
+## A Note on "Remote" Text Tracks
+Video.js refers to so-called "remote" text tracks. This is a convenient term for tracks that have an associated `<track>` element rather than those that do not.
+
+Either can be created programmatically, but _only remote text tracks can be removed from a player._ For that reason, we recommend _only_ using remote text tracks.
 
 ## Creating the Text File
 Timed text requires a text file in [WebVTT](http://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, an end time, and text to display. [Microsoft has a builder](https://dev.modern.ie/testdrive/demos/captionmaker/) that can help you get started on the file.
 
-When creating captions, there are additional [caption formatting techniques](http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) to make captions more meaningful, like brackets around sound effects (e.g. `[ birds chirping ]`). For a more in depth style guide for captioning, see the [Captioning Key](http://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
+> **Note:** When creating captions, there are additional [caption formatting techniques](http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) to make captions more meaningful, like brackets around sound effects (e.g. `[ birds chirping ]`).
+>
+> For a more in depth style guide for captioning, see the [Captioning Key](http://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
 
 ## Adding Text Tracks to Video.js
-Once you have your WebVTT file created, you can add it to Video.js using the `<track>` tag. Put your `<track>` tag(s) after all the source elements and before any fallback content.
+Once you have your WebVTT files created, you can add them to your `video` element using the `track` tag. Similar to `source` elements, `track` elements should be added as children of the `video` element:
 
 ```html
 <video
@@ -17,13 +24,44 @@ Once you have your WebVTT file created, you can add it to Video.js using the `<t
   width="640"
   height="264"
   data-setup='{}'>
- <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
- <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
- <track kind="captions" src="//example.com/path/to/captions.vtt" srclang="en" label="English" default>
+  <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+  <track kind="captions" src="//example.com/path/to/captions.vtt" srclang="en" label="English" default>
 </video>
 ```
 
-You can also add tracks [programmatically](#api).
+Video.js will automatically read `track` elements from the `video` element. Tracks (remote and non-remote) can also be added programmatically.
+
+### `track` Attributes
+#### `kind`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#text-track-kind)
+
+One of the track types supported by Video.js:
+
+- `"subtitles"` (default): Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.
+- `"captions"`: Transcription of the dialogue, sound effects, musical cues, and other audio information for viewer who are deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
+- `"chapters"`: Chapter titles that are used to create navigation within the video. Typically, these are in the form of a list of chapters that the viewer can use to navigate the video.
+- `"descriptions"`: Text descriptions of the action in the content for when the video portion isn't available or because the viewer is blind or not using a screen. Descriptions are read by a screen reader or turned into a separate audio track.
+- `"metadata"`: Tracks that have data meant for JavaScript to parse and do something with. These aren't shown to the user.
+
+#### `label`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#text-track-label)
+
+Short descriptive text for the track that will used in the user interface. For example, in a menu for selecting a captions language.
+
+#### `default`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-track-default)
+
+The boolean `default` attribute can be used to indicate that a track's mode should start as `"showing"`. Otherwise, the viewer would need to select their language from a captions or subtitles menu.
+
+> **Note:** For chapters, `default` is required if you want the chapters menu to show.
+
+#### `srclang`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-track-srclang)
+
+The valid [BCP 47](https://tools.ietf.org/html/bcp47) code for the language of the text track, e.g. `"en"` for English or `"es"` for Spanish.
+
+For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the Video.js root and refer to the [languages guide](./languages.md) for more information on languages in Video.js.
 
 ### Text Tracks from Another Domain
 Because Video.js loads the text track file via JavaScript, the [same-origin policy](http://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain, but the text track served from another, you'll need to [enable CORS](http://enable-cors.org/) on the server that is serving your text tracks.
@@ -138,64 +176,28 @@ In general, `"descriptions"` tracks are of lower precedence than `"captions"` an
   - For native text tracks, this behavior depends on the browser. Some browsers will allow multiple text tracks, but others will disable all other tracks when a new one is selected.
 
 ## API
-### `videojs.TextTrack`
-This class can be used to create new text track objects. Each property below is available as an option to the `TextTrack` constructor, as a property of the created `TextTrack` object, or as a DOM attribute.
+For more complete information, refer to the [Video.js API docs](http://docs.videojs.com/docs/api/index.html).
 
-#### `kind`
-One of the track types supported by Video.js:
+### Remote Text Tracks
+As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represent the recommended API offered by Video.js as they can be removed.
 
-- `"subtitles"`: Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.
-- `"captions"`: Transcription of the dialogue, sound effects, musical cues, and other audio information for viewer who are deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
-- `"chapters"`: Chapter titles that are used to create navigation within the video. Typically, these are in the form of a list of chapters that the viewer can use to navigate the video.
-- `"descriptions"`: Text descriptions of the action in the content for when the video portion isn't available or because the viewer is blind or not using a screen. Descriptions are read by a screen reader or turned into a separate audio track.
-- `"metadata"`: Tracks that have data meant for JavaScript to parse and do something with. These aren't shown to the user.
+- `Player#remoteTextTracks()`
+- `Player#remoteTextTrackEls()`
+- `Player#addRemoteTextTrack(Object options)`
 
-Defaults to `"subtitles"`.
+  Available options are the same as the [available `track` attributes](#track-attributes). And `language` is a supported option as an alias for the `srclang` attribute - either works here.
 
-#### `label`
-Short descriptive text for the track that will used in the user interface. For example, in a menu for selecting a captions language.
+- `Player#removeRemoteTextTrack(HTMLTrackElement|TextTrack)`
 
-#### `default`
-The boolean `default` attribute can be used to indicate that a track's mode should start as `"showing"`. Otherwise, the viewer would need to select their language from a captions or subtitles menu.
+### Text Tracks
+It is generally recommended that you use _remote_ text tracks rather than these purely programmatic text tracks for the majority of use-cases.
 
-> **Note:** For chapters, `default` is required if you want the chapters menu to show.
+- `Player#textTracks()`
+- `Player#addTextTrack(String kind, [String label [, String language]])`
 
-#### `srclang`
-The valid BCP 47 code for the language of the text track, e.g. `"en"` for English or `"es"` for Spanish. For supported language translations, please see the [Languages Folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the Video.js root.
+  > **Note:** Non-remote text tracks are intended for _purely programmatic usage_ of tracks and have the important limitation that they _cannot be removed once created_.
+  >
+  > The standard `addTextTrack` does **not** have a corresponding `removeTextTrack` method; so, we actually discourage the use of this method!
 
-### Player Methods
-#### `player.textTracks()`
-This is the main interface into the text tracks of a player. It returns a `TextTrackList`, which is an array-like object that contains all the `TextTrack`s associated with the player.
-
-#### `player.remoteTextTracks()`
-This method returns a `TextTrackList` of all the tracks that were created from `<track>` elements or that were added to the player using the `addRemoteTextTrack` method.
-
-These are distinct from the list returned by `textTracks()` because all these tracks are _removeable_, whereas tracks from `textTracks()` are not necessarily removeable.
-
-#### `player.remoteTextTrackEls()`
-This methods returns a `HTMLTrackElementList` of all the `<track>` elements - both emulated and native - associated with the player.
-
-#### `player.addTextTrack(String kind, [String label [, String language]]) -> TextTrack`
-Based on the [W3C spec API](http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack), this method takes a `kind` and optional `label` and `language` arguments and creates a new `TextTrack`.
-
-> **Note:** This method is intended for _purely programmatic usage_ of tracks and has one important limitation:
->
-> Tracks created using this method _cannot be removed_. The native `addTextTrack` does not have a corresponding `removeTextTrack`; so, we actually discourage the usage of this method.
-
-#### `player.addRemoteTextTrack(Object options)`
-This method takes an `options` object that looks pretty similar to the `<track>` element and returns a `HTMLTrackElement` object.
-
-The `HTMLTrackElement` object has a `track` property on it which is the actual `TextTrack` object. This object is equivalent to the one that can be returned from `addTextTrack()` with the added benefit that it can be removed from the player.
-
-Internally, Video.js will either add a `<track>` element for you or emulate one depending on whether native text tracks are supported or not.
-
-The options available are:
-
-- `kind`
-- `label`
-- `language` (also `srclang`)
-- `id`
-- `src`
-
-#### `player.removeRemoteTextTrack(HTMLTrackElement|TextTrack)`
-This method takes either an `HTMLTrackElement` or a `TextTrack` object and removes it from the player.
+- `TextTrackList()`
+- `TextTrack()`
