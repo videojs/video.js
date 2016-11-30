@@ -17,6 +17,7 @@ import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
+import * as middleware from './middleware.js';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -853,6 +854,15 @@ class Tech extends Component {
     if (!Tech.isTech(tech)) {
       throw new Error(`Tech ${name} must be a Tech`);
     }
+
+    if (!Tech.canPlayType) {
+      throw new Error('Techs must have a static canPlayType method on them');
+    }
+    if (!Tech.canPlaySource) {
+      throw new Error('Techs must have a static canPlaySource method on them');
+    }
+
+    middleware.use('*', {name, tech});
 
     Tech.techs_[name] = tech;
     return tech;
