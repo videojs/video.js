@@ -29,12 +29,19 @@ Additionally, these actions are recursively applied to _all_ the player's child 
 > **Note**: Do _not_ remove players via standard DOM removal methods: this will leave listeners and other objects in memory that you might not be able to clean up!
 
 ### Signs of an Undisposed Player
+Seeing an error such as:
 
 ```
 TypeError: this.el_.vjs_getProperty is not a function
 ```
 
-Seeing an error such as the above indicates that a player or component was removed from the DOM without using `dispose()`.
+or
+
+```
+TypeError: Cannot read property 'vdata1234567890' of null
+```
+
+Suggests that a player or component was removed from the DOM without using `dispose()`. It usually means something tried to trigger an event on it or call a method on it.
 
 ## Showing and Hiding a Player
 
@@ -56,3 +63,11 @@ modal.on('hide', function() {
   modal.player.dispose();
 });
 ```
+
+## Using Video.js with...
+Coming soon...
+
+### jQuery
+### React
+### Ember
+### Angular
