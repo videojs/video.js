@@ -72,7 +72,7 @@ function ssh(src = {}, middleware = [], next, acc = []) {
   } else if (mwrest.length) {
     ssh(src, mwrest, next, acc);
   } else {
-    const techs = middlewares['*'];
+    const techs = [].concat(middlewares['*']);
     const tech = techs.filter((tech) => !!tech.canPlayType(src.type))[0].name;
 
     next(tech, src, acc);
