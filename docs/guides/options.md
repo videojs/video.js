@@ -178,7 +178,9 @@ Although, since the `plugins` option is an object, the order of initialization i
 See [the plugins guide](plugins.md) for more information on Video.js plugins.
 
 ### `sourceOrder`
-> Type: `Array`
+> Type: `boolean`, Default: `false`
+
+> **Note:** In video.js 6.0, this option will default to `true`.
 
 Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techOrder) in selecting a source and playback tech.
 
@@ -253,6 +255,8 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 
 Allows overriding the default URL to vtt.js, which may be loaded asynchronously to polyfill support for `WebVTT`.
 
+This option will be used in the "novtt" build of video.js (i.e. `video.novtt.js`). Otherwise, vtt.js is bundled with video.js.
+
 ## Component Options
 
 The Video.js player is a component. Like all components, you can define what children it includes, what order they appear in, and what options are passed to them.
@@ -290,7 +294,6 @@ videojs('my-player', {
 ```
 
 ### `${componentName}`
-
 > Type: `Object`
 
 Components can be given custom options via the _lower-camel-case variant of the component name_ (e.g. `controlBar` for `ControlBar`). These can be nested in a representation of grandchild relationships. For example, to disable the fullscreen control:
@@ -304,9 +307,7 @@ videojs('my-player', {
 ```
 
 ## Tech Options
-
 ### `${techName}`
-
 > Type: `Object`
 
 Video.js playback technologies (i.e. "techs") can be given custom options as part of the options passed to the `videojs` function. They should be passed under the _lower-case variant of the tech name_ (e.g. `"flash"` or `"html5"`).
@@ -327,23 +328,15 @@ However, this is a case where changing the global defaults is more useful:
 videojs.options.flash.swf = '//path/to/videojs.swf'
 ```
 
-#### `nativeCaptions`
-
-> Type: `boolean`
-
-Can be set to `false` to force emulation of text tracks instead of native support.
-
 #### `nativeControlsForTouch`
-
 > Type: `boolean`
 
 Only supported by the `Html5` tech, this option can be set to `true` to force native controls for touch devices.
 
 #### `nativeTextTracks`
-
 > Type: `boolean`
 
-Can be set to `false` to force emulation of text tracks instead of native support.
+Can be set to `false` to force emulation of text tracks instead of native support. The `nativeCaptions` option also exists, but is simply an alias to `nativeTextTracks`.
 
 
 [ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
