@@ -1,50 +1,62 @@
 # FAQ
 
 ## Q: What is video.js?
-video.js is an extendable wrapper around the native video element. It does the following:
+video.js is an extendable framework/library around the native video element. It does the following:
   * Offers a plugin API so that different types of video can be handed to the native
     video element. IE:  HLS, Flash, or HTML5 video.
   * Unifies the native video api across browsers (polyfilling support for features
-  * if necessary)
+    if necessary)
   * Offers an extendable and themable UI
   * Takes care of accessibility for the user (in-progress)
+  * Has a set of core plugins that offer support for tons of additional video formats.
+    * [videojs-contrib-hls](http://github.com/videojs/videojs-contrib-hls)
+    * [videojs-contrib-dash](http://github.com/videojs/videojs-contrib-hls)
+  * Support for DRM video via a core plugin
+    * [videojs-contrib-eme](https://github.com/videojs/videojs-contrib-eme)
+  * Lots of plugins which offer support for all kinds of features. See the [plugin list on videojs.com](http://videojs.com/plugins)
 
 ## Q: How do I install video.js?
-Currently video.js can be installed using bower, npm, or by serving a release file from
-a github tag. For information on doing any of those see the [install guide](http://videojs.com/getting-started/).
+Currently video.js can be installed using bower, npm, serving a release file from
+a github tag, or even using a CDN hosted version. For information on doing any of those
+see the [install guide](http://videojs.com/getting-started/).
 
 ## Q: What do video.js version numbers mean?
 video.js follows [semver](http://semver.org/) which means that the API should not change
-out from under a userunless there is a major version increase.
+out from under a user unless there is a major version increase.
 
 ## Q: How can I troubleshoot playback issues?
 See the [troubleshooting guide](/docs/guides/troubleshooting.md) for information on troubleshooting playback issues
 
 ## Q: A video does not play in a specific browser. Why?
-Chrome and Safari both rely on byte-range requests for playing back video. So It is important to
-Make sure that the location which is serving your video files supports byte-range requests.
-Often PHP serving video is an issue as it does not support byte-range requests by default.
+See the [troubleshooting guide](/docs/guides/troubleshooting.md) for information on
+why this might be happening. Open an [issue on the video.js repo](https://github.com/videojs/video.js/issues).
+Make sure that you follow the [issue template](/.github/ISSUE_TEMPLATE.md) and the
+[contributing guide](/CONTRIBUTING.md#filing-issues) so that we can better assist you
+with your issue.
 
 ## Q: Why does the entire video download before playback? Why does the video load for a long time?
-This could mean that your video is not encoded with the metadata -- things like duration,
-video dimensions, etc -- at the beginning of the video. This means that the browser will
-need to load the entire video before it know how long the video is and what to do with
-the video.
+See the [troubleshooting guide](/docs/guides/troubleshooting.md) for information on
+why this might be happening. Open an [issue on the video.js repo](https://github.com/videojs/video.js/issues).
+Make sure that you follow the [issue template](/.github/ISSUE_TEMPLATE.md) and the
+[contributing guide](/CONTRIBUTING.md#filing-issues) so that we can better assist you
 
 ## Q: I see an error thrown that mentions `vdata12345`. What is that?
-This error is thrown when an element that is associated with a component is removed
-from the DOM but the event handlers associated with the element are not removed. This
-is almost always due to event listeners not being disposed when dispose is called on
-a component.
+See the [troubleshooting guide](/docs/guides/troubleshooting.md) for information on
+why this might be happening. Open an [issue on the video.js repo](https://github.com/videojs/video.js/issues).
+Make sure that you follow the [issue template](/.github/ISSUE_TEMPLATE.md) and the
+[contributing guide](/CONTRIBUTING.md#filing-issues) so that we can better assist you
 
 ## Q: What media formats does video.js support?
-This depends on the browsers support, video.js will work off of that. If Flash is
-avialable Flash videos can also be played but only if the Flash tech is included with
-video.js.
+This depends on the formats supported by the browser's HTML5 video element, and the playback
+techs made available to video.js. For example, video.js 5 includes the Flash tech by default which
+enables the playback of FLV video where the Flash plugin is available.
 
 ## Q: How can I hide the links to my video/subtitles/audio/tracks?
-This is outside of the scope of video.js and there are things that can be done to make
-it harder, but it will never be completely possible.
+It's impossible to hide the network requests a browser makes and difficult to
+sufficiently obfuscate URLs in the source. Techniques such as token authentication may
+help but are outside of the scope of video.js.
+
+For content that must be highly secure [videojs-contrib-eme](https://github.com/videojs/videojs-contrib-eme) adds DRM support.
 
 ## Q: I think I found a bug with video.js or I want to add a feature. What should I do?
 ### if you think that you can fix the issue or add the feature
@@ -64,7 +76,12 @@ problem that you are facing in isolation. Think of it as example page that repro
 the issue in the least amount of possible code. We have a [starter example](http://jsbin.com/axedog/edit?html,output)
 for reduced test cases.
 
-## Q: How do a make a plugin for video.js?
+## Q: What is a plugin?
+A plugin is a group of reusable functionality that can be re-used by others. For instance a plugin could add
+a button to video.js that makes the video replay 10 times in a row before it stops playback for good. If such
+a plugin existed and was published users could include it on their page to share that functionality.
+
+## Q: How do I make a plugin for video.js?
 See the [plugin guide](/docs/guides/plugins.md) for information on making a plugin for video.js.
 
 ## Q: How do I add a button to video.js?
@@ -83,7 +100,7 @@ See the [video.js github wiki](https://github.com/videojs/video.js/wiki/Skins).
 ## Q: Does video.js work as an audio only player?
 Yes! It can be used to play audio only files in a `<video>` or `<audio>` tag. The
 difference being that the `<audio>` tag will not have a blank display area and the `<video>`
-tag will.
+tag will. Note that audio only will not work with the Flash playback tech.
 
 ## Q: Does video.js support audio tracks?
 Yes! See the [audio tracks guide](/docs/guides/audio-tracks.md) for information on using audio tracks.
@@ -105,7 +122,9 @@ video.js itself does not support MPEG DASH, but a project called [videojs-contri
 which is maintained by the video.js organization.
 
 ## Q: Does video.js support live video?
-Yes! Video.js adds support for live videos.
+Yes! Video.js adds support for live videos via the Flash tech which supports RTMP streams.
+[videojs-contrib-hls](http://github.com/videojs/videojs-contrib-hls) will add support for live HLS video
+if you add it to your page with video.js.
 
 ## Q: Can video.js be required in node.js?
 Yes! Please submit an issue if this does not work. See the question on submiting issues
