@@ -1,44 +1,56 @@
 # Troubleshooting
 
 ## Problems with media formats
-Make sure you are using formats that video.js can play:
-* Does your browser/OS support the type of video that you are trying to play?
-* Do you have a plugin that will add support for that video format?
-* Verify that you are using the correct mime-type/content-type for your videos. This used to determine if video.js can play a video.
 
-Make sure that the codec for that is being used in the file container is supported:
-* MP4 in browsers typically only supports h264 video and MP3 or AAC audio
-* Some low end phones save video in 3GP format but give it an MP4 extension. These files will not play.
-
-
-Make sure that Flash is installed and that the Flash tech is included with video.js:
-* Flash videos include RTMP streams and FLV format videos.
-* SWF is not a video format
-
-### Commonly used formats:
-
+### Choosing a video format
 #### I want to have a single source and don't care about live/adaptive streaming:
 Most browsers now play MP4 with h264 video. If you want to have a single source, and neither live streaming
 nor adaptive streaming is a consideration, MP4 is a good choice.
 
 #### I need adaptive streaming or live streaming
-Use HLS with [videojs-contrib-hls]()https://github.com/videojs/videojs-contrib-dash or
-Use Dash with [videojs-contrib-dash](https://github.com/videojs/videojs-contrib-dash).
+Use HLS with [videojs-contrib-hls][hls] or
+Use Dash with [videojs-contrib-dash][dash].
 HLS is more convenient as mobile browsers have native support.
 
-## Problems when hosting video
-* Your server must support byte-range requests as Chrome and Safari rely on it. Most servers support this by default, but we have seen many issues with PHP as it does not support byte-range by default.
-* If you are proxying the media files via a server side script (PHP), this script must implement ranges. The impact of not doing this ranges from seeking being broken to no playback at all (on iOS).
-* Your server must return the correct mime-type/content-type for the video formats.
-* If you are using HLS or DASH your server must implement CORS headers if the video is served from a different domain than your page. This is also true for text tracks such as captions.
+### Make sure you are using formats that video.js can play:
+* Does your browser/OS support the type of media that you are trying to play?
+* Do you have a video.js plugin that will add support for a media format to video.js? For Example:
+  * [videojs-contrib-hls][hls]
+  * [videojs-contrib-dash][dash]
+  * [videojs-contrib-youtube][youtube]
+* Verify that you are using the correct [mime-type/content-type][media-types] for your videos.
+  This is used to determine if video.js can play a certain type of media.
+
+### Make sure that the codec for that is being used in the file container is supported:
+* MP4 in browsers typically only supports h264 video and MP3 or AAC audio
+* Some low end phones save video in 3GP format but give it an MP4 extension. These files will not play.
+
+### If you are using Flash videos:
+* Make sure that Flash is installed
+* Make sure the Flash tech is included with video.js (in video.js it won't be, see [videojs-flash][flash])
+* Flash media include RTMP streams and FLV format media.
+* SWF is not a media format
+
+## Problems when hosting media
+* Your server must support byte-range requests as Chrome and Safari rely on them:
+  * Most servers support this by default.
+  * If you are proxying the media files via a server side script (PHP), this script must implement ranges. PHP does not do this by default.
+  * The impact of not doing this ranges from seeking being broken to no playback at all (on iOS).
+* Your server must return the correct [mime-type/content-type][media-types] for the media being sent.
+* Your server must implement [CORS (cross-origin resource)][cors] headers if:
+  * You are using [videojs-contrib-hls][hls], [videojs-contrib-dash][dash] and your media is served from a different domain than your page.
+  * You are using [text tracks][text-tracks] (captions, subtitles, etc.) and they are being served from a different domain than your page.
 
 ## Problems with Fullscreen
-* If your player is in an iframe, make sure it and any parent iframes have the fullscreen attributes allowfullscreen webkitallowfullscreen mozallowfullscreen. Without these, the browser will not allow fullscreen mode.
+* If your player is in an iframe, the parent iframes must have the following attributes for fullscreen to be allowed:
+  * `allowfullscreen`
+  * `webkitallowfullscreen`
+  * `mozallowfullscreen`
 
 ## Problems with playback
-* Make sure that the video host supports byte-range requests, this could be breaking playback.
-* If your video is taking a long time to start playback or the entire video downloads before playback:
-  * It is likely that metadata for the video has not been included at the start of the video. In MP4 terms this is called
+* Make sure that the media host supports byte-range requests, this could be breaking playback. See [Problems when Hosting media][hosting-media] for more info.
+* If your media is taking a long time to start playback or the entire mediadownloads before playback:
+  * It is likely that metadata for the media has not been included at the start of the media. In MP4 terms this is called
     the "moov atom". Many encoders are configured to do this by default, others may require you to choose
     a "fast start" or "optimize for streaming" option.
 
@@ -51,3 +63,18 @@ a component.
 
 To fix this issue please make sure that all event listeners are cleaned up on dispose.
 
+<!-- same-page -->
+[hosting-problems]: #problems-when-hosting-media
+
+<!-- guides -->
+[text-tracks]: /docs/guides/text-tracks.md
+
+<!-- official projects -->
+[hls]: https://github.com/videojs/videojs-contrib-hls
+[dash]: https://github.com/videojs/videojs-contrib-dash
+[youtube]: https://github.com/videojs/videojs-contrib-youtube
+[flash]: https://github.com/videojs/videojs-flash
+
+<!-- External links -->
+[media-types]: http://www.iana.org/assignments/media-types/media-types.xhtml#video
+[cors]: http://enable-cors.org/
