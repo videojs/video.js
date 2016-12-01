@@ -61,7 +61,8 @@ const parseCues = function(srcContent, track) {
  */
 const loadTrack = function(src, track) {
   const opts = {
-    uri: src
+    uri: src,
+    responseType: 'arraybuffer'
   };
   const crossOrigin = isCrossOrigin(src);
 
