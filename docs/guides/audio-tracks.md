@@ -1,69 +1,111 @@
 # Audio Tracks
+Audio tracks are a feature of HTML5 video for providing alternate audio track selections to the user, so that a track other than the main track can be played. Video.js offers a cross-browser implementation of audio tracks.
 
-Audio Tracks are a function of HTML5 video for providing alternative audio track selections to the user, so that a track other than the main track can be played. Video.js makes audio tracks work across all browsers. There are currently five types of tracks:
+## Caveats
+- It is not possible to add audio tracks through HTML like you can with text tracks. They must be added programmatically.
+- Video.js only stores track representations. Switching audio tracks for playback is _not handled by Video.js_ and must be handled elsewhere - for example, videojs-contrib-hls handles switching audio tracks to support track selection through the UI.
 
-- **Alternative**: alternative audio for the main video track
-- **Descriptions**: descriptions of what is happening in the video track
-- **Main**: the main audio track for this video
-- **Translation**: a translation of the main audio track
-- **Commentary**: commentary on the video, usually the director of the content talking about design choices
-
-## Missing Funtionality
-- It is currently impossible to add AudioTracks in a non-programtic way
-- Literal switching of AudioTracks for playback is not handled by video.js and must be handled by something else. video.js only stores the track representation
-
-## Adding to Video.js
-
-> Right now adding audio tracks in the HTML is unsupported. Audio Tracks must be added programatically.
-
-You must add audio tracks [programatically](#api) for the time being.
-
-## Attributes
-Audio Track propertites and settings
-
-### kind
-One of the five track types listed above. Kind defaults to empty string if no kind is included, or an invalid kind is used.
-
-### label
-The label for the track that will be show to the user, for example in a menu that list the different languages available for audio tracks.
-
-### language
-The two-letter code (valid BCP 47 language tag) for the language of the audio track, for example "en" for English. A list of language codes is [available here](languages.md#language-codes).
-
-### enabled
-If this track should be playing or not. In video.js we only allow one track to be enabled at a time. so if you enable more than one the last one to be enabled will end up being the only one.
-
-## Interacting with Audio Tracks
-### Doing something when a track becomes enabled
-When a new track is enabled (other than the main track) an event is fired on the `AudioTrackList` called `change` you can listen to that event and do something with it.
-Here's an example:
+## Working with Audio Tracks
+### Add an Audio Track to the Player
 ```js
-// get the current players AudioTrackList object
-let tracks = player.audioTracks();
+// Create a player.
+var player = videojs('my-player');
 
-// listen to the change event
-tracks.addEventListener('change', function() {
+// Create a track object.
+var track = new videojs.AudioTrack({
+  id: 'my-spanish-audio-track',
+  kind: 'translation',
+  label: 'Spanish',
+  language: 'es'
+});
 
-  // print the currently enabled AudioTrack label
-  for (let i = 0; i < tracks.length; i++) {
-    let track = tracks[i];
+// Add the track to the player's audio track list.
+player.audioTracks().addTrack(track);
+```
+
+### Listen for a Video Track Becoming Enabled
+When a track is enabled or disabled on an `AudioTrackList`, a `change` event will be fired. You can listen for that event and do something with it.
+
+> NOTE: The initial `AudioTrack` selection (usually the main track that is selected) should not fire a `change` event.
+
+```js
+// Get the current player's AudioTrackList object.
+var audioTrackList = player.audioTracks();
+
+// Listen to the "change" event.
+audioTrackList.addEventListener('change', function() {
+
+  // Log the currently enabled AudioTrack label.
+  for (var i = 0; i < audioTrackList.length; i++) {
+    var track = audioTrackList[i];
 
     if (track.enabled) {
-      console.log(track.label);
+      videojs.log(track.label);
       return;
     }
   }
 });
 ```
 
+### Removing an Audio Track from the Player
+Assuming a player already exists and has an audio track that you want to remove, you might do something like the following:
+
+```js
+// Get the track we created in an earlier example.
+var track = player.audioTracks().getTrackById('my-spanish-audio-track');
+
+// Remove it from the audio track list.
+player.audioTracks().removeTrack(track);
+```
+
 ## API
+For more complete information, refer to the [Video.js API docs](http://docs.videojs.com/docs/api/index.html), specifically:
 
-### `player.audioTracks() -> AudioTrackList`
-This is the main interface into the audio tracks of the player.
-It returns an AudioTrackList which is an array like object that contains all the `AudioTrack` on the player.
+- `Player#audioTracks`
+- `AudioTrackList`
+- `AudioTrack`
 
-### `player.audioTracks().addTrack(AudioTrack)`
-Add an existing AudioTrack to the players internal list of AudioTracks.
+### `videojs.AudioTrack`
+This class is based on [the `AudioTrack` standard][spec-audiotrack] and can be used to create new audio track objects.
 
-### `player.audioTracks().removeTrack(AudioTrack)`
-Remove a track from the AudioTrackList currently on the player. if no track exists this will do nothing.
+Each property below is available as an option to the `AudioTrack` constructor.
+
+#### `id`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-id)
+
+A unique identifier for this track. Video.js will generate one if not given.
+
+#### `kind`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-kind)
+
+Video.js supports standard `kind` values for `AudioTracks`:
+
+- `"alternative"`: A possible alternative to the main track.
+- `"descriptions"`: An audio description of a video track.
+- `"main"`: The primary audio track for this video.
+- `"main-desc"`: The primary audio track, mixed with audio descriptions.
+- `"translation"`: A translated version of the main audio track.
+- `"commentary"`: Commentary on the primary audio track, e.g. a director's commentary.
+- `""` (default): No explicit kind, or the kind given by the track's metadata is not recognized by the user agent.
+
+#### `label`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-label)
+
+The label for the track that will be shown to the user. For example, in a menu that lists the different languages available as alternate audio tracks.
+
+#### `language`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-language)
+
+The valid [BCP 47](https://tools.ietf.org/html/bcp47) code for the language of the audio track, e.g. `"en"` for English or `"es"` for Spanish.
+
+For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the Video.js root and refer to the [languages guide](./languages.md) for more information on languages in Video.js.
+
+#### `enabled`
+> [standard definition](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-enabled)
+
+Whether or not this track should be playing.
+
+In Video.js, we only allow one track to be enabled at a time; so, if you enable more than one, the last one to be enabled will end up being the only one. While the spec allows for more than one track to be enabled, Safari and most implementations only allow one audio track to be enabled at a time.
+
+
+[spec-audiotrack]: https://html.spec.whatwg.org/multipage/embedded-content.html#audiotrack

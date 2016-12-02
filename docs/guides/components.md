@@ -1,79 +1,101 @@
-Components
-===
-The Video.js player is built on top of a simple, custom UI components architecture. The player class and all control classes inherit from the `Component` class, or a subclass of `Component`.
+# Components
+The architecture of the Video.js player is centered around components. The `Player` class and all classes representing player controls and other UI elements inherit from the `Component` class. This architecture makes it easy to construct the user interface of the Video.js player in a tree-like structure that mirrors the DOM.
+
+## What is a Component?
+A component is a JavaScript object that has the following features:
+
+- An associated DOM element.
+- An association to a `Player` object.
+- The ability to manage any number of child components.
+- The ability to listen for and trigger events.
+- A lifecycle of initialization and disposal.
+
+For more specifics on the programmatic interface of a component, see [the component API docs](http://docs.videojs.com/docs/api/component.html).
+
+## Creating a Component
+Video.js components can be inherited and registered with Video.js to add new features and UI to the player.
+
+For a working example, [we have a JSBin](http://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
+
+In addition, there are a couple methods worth recognizing:
+
+- `videojs.getComponent(String name)`: Retrieves component constructors from Video.js.
+- `videojs.registerComponent(String name, Function Comp)`: Registers component constructors with Video.js.
+- `videojs.extend(Function component, Object properties)`: Provides prototype inheritance. Can be used to extend a component's constructor, returning a new constructor with the given properties.
+
+## Component Children
+When child component is added to a parent component, Video.js inserts the element of the child into the element of the parent. For example, adding a component like this:
 
 ```js
-videojs.registerComponent('Control', videojs.extend(Component));
-videojs.registerComponent('Button', videojs.extend(videojs.getComponent('Control')));
-videojs.registerComponent('PlayToggle', videojs.extend(videojs.getComponent('Button')));
+// Add a "BigPlayButton" component to the player. Its element will be appended to the player's element.
+player.addChild('BigPlayButton');
 ```
 
-The UI component architecture makes it easier to add child components to a parent component and build up an entire user interface, like the controls for the Video.js player.
-
-```js
-// Adding a new control to the player
-myPlayer.addChild('BigPlayButton');
-```
-
-Every component has an associated DOM element, and when you add a child component, it inserts the element of that child into the element of the parent.
-
-```js
-myPlayer.addChild('BigPlayButton');
-```
-
-Results in:
+Results in a DOM that looks like this:
 
 ```html
-    <!-- Player Element -->
-    <div class="video-js">
-      <!-- BigPlayButton Element -->
-      <div class="vjs-big-play-button"></div>
-    </div>
+<!-- Player Element -->
+<div class="video-js">
+  <!-- BigPlayButton Element -->
+  <div class="vjs-big-play-button"></div>
+</div>
 ```
 
-The actual default component structure of the Video.js player looks something like this:
+Conversely, removing child components will remove the child component's element from the DOM:
+
+```js
+player.removeChild('BigPlayButton');
+```
+
+Results in a DOM that looks like this:
+
+```html
+<!-- Player Element -->
+<div class="video-js">
+</div>
+```
+
+Again, refer to [the component API docs](http://docs.videojs.com/docs/api/component.html) for complete details on methods available for managing component structures.
+
+## Default Component Tree
+The default component structure of the Video.js player looks something like this:
 
 ```
 Player
-    PosterImage
-    TextTrackDisplay
-    LoadingSpinner
-    BigPlayButton
-    ControlBar
-        PlayToggle
-        VolumeMenuButton
-        CurrentTimeDisplay (Hidden by default)
-        TimeDivider (Hidden by default)
-        DurationDisplay (Hidden by default)
-        ProgressControl
-            SeekBar
-              LoadProgressBar
-              MouseTimeDisplay
-              PlayProgressBar
-        LiveDisplay (Hidden by default)
-        RemainingTimeDisplay
-        CustomControlsSpacer (No UI)
-        ChaptersButton (Hidden by default)
-        SubtitlesButton (Hidden by default)
-        CaptionsButton (Hidden by default)
-        FullscreenToggle
-    ErrorDisplay
-    TextTrackSettings
+├── PosterImage
+├── TextTrackDisplay
+├── LoadingSpinner
+├── BigPlayButton
+├─┬ ControlBar
+│ ├── PlayToggle
+│ ├── VolumeMenuButton
+│ ├── CurrentTimeDisplay (hidden by default)
+│ ├── TimeDivider (hidden by default)
+│ ├── DurationDisplay (hidden by default)
+│ ├─┬ ProgressControl (hidden during live playback)
+│ │ └─┬ SeekBar
+│ │   ├── LoadProgressBar
+│ │   ├── MouseTimeDisplay
+│ │   └── PlayProgressBar
+│ ├── LiveDisplay (hidden during VOD playback)
+│ ├── RemainingTimeDisplay
+│ ├── CustomControlSpacer (has no UI)
+│ ├── PlaybackRateMenuButton (hidden, unless playback tech supports rate changes)
+│ ├── ChaptersButton (hidden, unless there are relevant tracks)
+│ ├── DescriptionsButton (hidden, unless there are relevant tracks)
+│ ├── SubtitlesButton (hidden, unless there are relevant tracks)
+│ ├── CaptionsButton (hidden, unless there are relevant tracks)
+│ ├── AudioTrackButton (hidden, unless there are relevant tracks)
+│ └── FullscreenToggle
+├── ErrorDisplay (hidden, until there is an error)
+└── TextTrackSettings
 ```
 
-## Progress Control
-The progress control is made up of the SeekBar. The seekbar contains the load progress bar
-and the play progress bar. In addition, it contains the Mouse Time Display which
-is used to display the time tooltip that follows the mouse cursor.
-The play progress bar also has a time tooltip that show the current time.
+## Specific Component Details
+### Progress Control
+The progress control has a grandchild component, the mouse time display, which shows a time tooltip that follows the mouse cursor.
 
-By default, the progress control is sandwiched between the volume menu button and
-the remaining time display inside the control bar, but in some cases, a skin would
-want to move the progress control above the control bar and have it span the full
-width of the player, in those cases, it is less than ideal to have the tooltips
-get cut off or leave the bounds of the player. This can be prevented by setting the
-`keepTooltipsInside` option on the progress control. This also makes the tooltips use 
-a real element instead of pseudo elements so targetting them with css will be different.
+By default, the progress control is sandwiched inside the control bar between the volume menu button and the remaining time display. Some skins attempt to move the it above the control bar and have it span the full width of the player. In these cases, it is less than ideal to have the tooltips leave the bounds of the player. This can be prevented by setting the `keepTooltipsInside` option on the progress control.
 
 ```js
 let player = videojs('myplayer', {
@@ -84,3 +106,8 @@ let player = videojs('myplayer', {
   }
 });
 ```
+
+> **Note:** This makes the tooltips use a real element instead of pseudo-elements so targeting them with CSS is different.
+
+### Text Track Settings
+The text track settings component is only available when using emulated text tracks.
