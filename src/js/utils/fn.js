@@ -27,7 +27,7 @@ export const bind = function(context, fn, uid) {
   }
 
   // Create the new function that changes the context
-  const ret = function() {
+  const bound = function() {
     return fn.apply(context, arguments);
   };
 
@@ -37,7 +37,34 @@ export const bind = function(context, fn, uid) {
   // it will remove both because they both have the same guid.
   // when using this, you need to use the bind method when you remove the listener as well.
   // currently used in text tracks
-  ret.guid = (uid) ? uid + '_' + fn.guid : fn.guid;
+  bound.guid = (uid) ? uid + '_' + fn.guid : fn.guid;
 
-  return ret;
+  return bound;
+};
+
+/**
+ * Wraps the given function, `fn`, with a new function that only invokes `fn`
+ * at most once per every `wait` milliseconds.
+ *
+ * @param  {Function} fn
+ *         The function to be throttled.
+ *
+ * @param  {Number}   wait
+ *         The number of milliseconds by which to throttle.
+ *
+ * @return {Function}
+ */
+export const throttle = function(fn, wait) {
+  let last;
+
+  const throttled = function(...args) {
+    const now = Date.now();
+
+    if (now - last >= wait) {
+      fn(...args);
+      last = now;
+    }
+  };
+
+  return throttled;
 };

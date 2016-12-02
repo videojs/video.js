@@ -1,4 +1,4 @@
-import _ from 'lodash-compat';
+import _ from 'lodash';
 /**
  * Customizes _.merge behavior in `gruntOptions` to concatenate
  * arrays. This can be overridden on a per-call basis to

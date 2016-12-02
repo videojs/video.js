@@ -29,7 +29,6 @@ import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
 import extendFn from './extend.js';
-import merge from 'lodash-compat/object/merge';
 import xhr from 'xhr';
 
 // Include the built-in techs
@@ -498,7 +497,13 @@ videojs.plugin = plugin;
  */
 videojs.addLanguage = function(code, data) {
   code = ('' + code).toLowerCase();
-  return merge(videojs.options.languages, { [code]: data })[code];
+
+  videojs.options.languages = mergeOptions(
+    videojs.options.languages,
+    {[code]: data}
+  );
+
+  return videojs.options.languages[code];
 };
 
 /**

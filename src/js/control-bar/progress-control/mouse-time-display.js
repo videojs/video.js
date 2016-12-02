@@ -5,7 +5,6 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import throttle from 'lodash-compat/function/throttle';
 import computedStyle from '../../utils/computed-style.js';
 
 /**
@@ -44,7 +43,7 @@ class MouseTimeDisplay extends Component {
     this.update(0, 0);
 
     player.on('ready', () => {
-      this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 25));
+      this.on(player.controlBar.progressControl.el(), 'mousemove', Fn.throttle(Fn.bind(this, this.handleMouseMove), 25));
     });
   }
 
