@@ -5,15 +5,21 @@ import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 
 /**
- * A button class with a popup control
+ * A button class for use with {@link Popup} controls
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends ClickableComponent
- * @class PopupButton
  */
 class PopupButton extends ClickableComponent {
 
+  /**
+   * Create an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options = {}) {
     super(player, options);
 
@@ -21,9 +27,7 @@ class PopupButton extends ClickableComponent {
   }
 
   /**
-   * Update popup
-   *
-   * @method update
+   * Update the `Popup` that this button is attached to.
    */
   update() {
     const popup = this.createPopup();
@@ -43,18 +47,17 @@ class PopupButton extends ClickableComponent {
   }
 
   /**
-   * Create popup - Override with specific functionality for component
+   * Create a `Popup`. - Override with specific functionality for component
    *
-   * @return {Popup} The constructed popup
-   * @method createPopup
+   * @abstract
    */
   createPopup() {}
 
   /**
-   * Create the component's DOM element
+   * Create the `PopupButton`s DOM element.
    *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl() {
     return super.createEl('div', {
@@ -63,10 +66,10 @@ class PopupButton extends ClickableComponent {
   }
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     let menuButtonClass = 'vjs-menu-button';
@@ -80,7 +83,6 @@ class PopupButton extends ClickableComponent {
 
     return `vjs-menu-button ${menuButtonClass} ${super.buildCSSClass()}`;
   }
-
 }
 
 Component.registerComponent('PopupButton', PopupButton);
