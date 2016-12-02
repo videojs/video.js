@@ -250,37 +250,24 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   player.dispose();
 });
 
-QUnit.test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function(assert) {
+QUnit.test('emulated tracks are always used, except in safari', function(assert) {
   const oldTestVid = Html5.TEST_VID;
-
-  Html5.TEST_VID = {
-    textTracks: [{
-      mode: 0
-    }]
-  };
-
-  assert.ok(!Html5.supportsNativeTextTracks(),
-           'native text tracks are not supported if mode is a number');
-
-  Html5.TEST_VID = oldTestVid;
-});
-
-QUnit.test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function(assert) {
-  const oldTestVid = Html5.TEST_VID;
-  const oldIsFirefox = browser.IS_FIREFOX;
+  const oldIsAnySafari = browser.IS_ANY_SAFARI;
 
   Html5.TEST_VID = {
     textTracks: []
   };
 
-  browser.IS_FIREFOX = true;
+  browser.IS_ANY_SAFARI = false;
 
-  assert.ok(!Html5.supportsNativeTextTracks(),
-           'if textTracks are available on video element,' +
-           ' native text tracks are supported');
+  assert.ok(!Html5.supportsNativeTextTracks(), 'Html5 does not support native text tracks, in non-safari');
+
+  browser.IS_ANY_SAFARI = true;
+
+  assert.ok(Html5.supportsNativeTextTracks(), 'Html5 does support native text tracks in safari');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_FIREFOX = oldIsFirefox;
+  browser.IS_ANY_SAFARI = oldIsAnySafari;
 });
 
 QUnit.test('when switching techs, we should not get a new text track', function(assert) {

@@ -878,25 +878,7 @@ Html5.canControlPlaybackRate = function() {
  *         - False otherwise
  */
 Html5.supportsNativeTextTracks = function() {
-  let supportsTextTracks;
-
-  // Figure out native text track support
-  // If mode is a number, we cannot change it because it'll disappear from view.
-  // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
-  // Firefox isn't playing nice either with modifying the mode
-  // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
-  supportsTextTracks = !!Html5.TEST_VID.textTracks;
-  if (supportsTextTracks && Html5.TEST_VID.textTracks.length > 0) {
-    supportsTextTracks = typeof Html5.TEST_VID.textTracks[0].mode !== 'number';
-  }
-  if (supportsTextTracks && browser.IS_FIREFOX) {
-    supportsTextTracks = false;
-  }
-  if (supportsTextTracks && !('onremovetrack' in Html5.TEST_VID.textTracks)) {
-    supportsTextTracks = false;
-  }
-
-  return supportsTextTracks;
+  return browser.IS_ANY_SAFARI;
 };
 
 /**
