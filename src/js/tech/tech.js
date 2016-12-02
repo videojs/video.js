@@ -5,13 +5,7 @@
  */
 
 import Component from '../component';
-import HTMLTrackElement from '../tracks/html-track-element';
-import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
-import TextTrack from '../tracks/text-track';
-import TextTrackList from '../tracks/text-track-list';
-import VideoTrackList from '../tracks/video-track-list';
-import AudioTrackList from '../tracks/audio-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
@@ -19,6 +13,7 @@ import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
+import * as TRACK_TYPES from '../tracks/track-types';
 
 function createTrackHelper(self, kind, label, language, options = {}) {
   const tracks = self.textTracks();
@@ -33,9 +28,9 @@ function createTrackHelper(self, kind, label, language, options = {}) {
   }
   options.tech = self;
 
-  const track = new TextTrack(options);
+  const track = new TRACK_TYPES.ALL.text.TrackClass(options);
 
-  tracks.addTrack_(track);
+  tracks.addTrack(track);
 
   return track;
 }
@@ -66,9 +61,13 @@ class Tech extends Component {
       this.hasStarted_ = false;
     });
 
-    this.textTracks_ = options.textTracks;
-    this.videoTracks_ = options.videoTracks;
-    this.audioTracks_ = options.audioTracks;
+    TRACK_TYPES.ALL.names.forEach((name) => {
+      const props = TRACK_TYPES.ALL[name];
+
+      if (options && options[props.getterName]) {
+        this[props.privateName] = options[props.getterName];
+      }
+    });
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
@@ -94,9 +93,8 @@ class Tech extends Component {
       this.emulateTextTracks();
     }
 
-    this.autoRemoteTextTracks_ = new TextTrackList();
+    this.autoRemoteTextTracks_ = new TRACK_TYPES.ALL.text.ListClass();
 
-    this.initTextTrackListeners();
     this.initTrackListeners();
 
     // Turn on component tap events
@@ -256,7 +254,7 @@ class Tech extends Component {
   dispose() {
 
     // clear out all tracks because we can't reuse them between techs
-    this.clearTracks(['audio', 'video', 'text']);
+    this.clearTracks(TRACK_TYPES.NORMAL.names);
 
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) {
@@ -294,7 +292,7 @@ class Tech extends Component {
         if (type === 'text') {
           this.removeRemoteTextTrack(track);
         }
-        list.removeTrack_(track);
+        list.removeTrack(track);
       }
     });
   }
@@ -369,44 +367,19 @@ class Tech extends Component {
   }
 
   /**
-   * Initialize texttrack listeners
-   *
-   * @method initTextTrackListeners
-   */
-  initTextTrackListeners() {
-    const textTrackListChanges = Fn.bind(this, function() {
-      this.trigger('texttrackchange');
-    });
-
-    const tracks = this.textTracks();
-
-    if (!tracks) {
-      return;
-    }
-
-    tracks.addEventListener('removetrack', textTrackListChanges);
-    tracks.addEventListener('addtrack', textTrackListChanges);
-
-    this.on('dispose', Fn.bind(this, function() {
-      tracks.removeEventListener('removetrack', textTrackListChanges);
-      tracks.removeEventListener('addtrack', textTrackListChanges);
-    }));
-  }
-
-  /**
-   * Initialize audio and video track listeners
+   * Initialize audio, video, and text track list listeners
    *
    * @method initTrackListeners
    */
   initTrackListeners() {
-    const trackTypes = ['video', 'audio'];
 
-    trackTypes.forEach((type) => {
+    TRACK_TYPES.NORMAL.names.forEach((name) => {
+      const props = TRACK_TYPES.NORMAL[name];
       const trackListChanges = () => {
-        this.trigger(`${type}trackchange`);
+        this.trigger(`${name}trackchange`);
       };
 
-      const tracks = this[`${type}Tracks`]();
+      const tracks = this[props.getterName]();
 
       tracks.addEventListener('removetrack', trackListChanges);
       tracks.addEventListener('addtrack', trackListChanges);
@@ -458,11 +431,11 @@ class Tech extends Component {
     }
 
     this.remoteTextTracks().on('addtrack', (e) => {
-      this.textTracks().addTrack_(e.track);
+      this.textTracks().addTrack(e.track);
     });
 
     this.remoteTextTracks().on('removetrack', (e) => {
-      this.textTracks().removeTrack_(e.track);
+      this.textTracks().removeTrack(e.track);
     });
 
     // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
@@ -490,67 +463,6 @@ class Tech extends Component {
     this.on('dispose', function() {
       tracks.removeEventListener('change', textTracksChanges);
     });
-  }
-
-  /**
-   * Get videotracks
-   *
-   * @returns {VideoTrackList}
-   * @method videoTracks
-   */
-  videoTracks() {
-    this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
-    return this.videoTracks_;
-  }
-
-  /**
-   * Get audiotracklist
-   *
-   * @returns {AudioTrackList}
-   * @method audioTracks
-   */
-  audioTracks() {
-    this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
-    return this.audioTracks_;
-  }
-
-  /*
-   * Provide default methods for text tracks.
-   *
-   * Html5 tech overrides these.
-   */
-
-  /**
-   * Get texttracks
-   *
-   * @returns {TextTrackList}
-   * @method textTracks
-   */
-  textTracks() {
-    this.textTracks_ = this.textTracks_ || new TextTrackList();
-    return this.textTracks_;
-  }
-
-  /**
-   * Get remote texttracks
-   *
-   * @returns {TextTrackList}
-   * @method remoteTextTracks
-   */
-  remoteTextTracks() {
-    this.remoteTextTracks_ = this.remoteTextTracks_ || new TextTrackList();
-    return this.remoteTextTracks_;
-  }
-
-  /**
-   * Get remote htmltrackelements
-   *
-   * @returns {HTMLTrackElementList}
-   * @method remoteTextTrackEls
-   */
-  remoteTextTrackEls() {
-    this.remoteTextTrackEls_ = this.remoteTextTrackEls_ || new HTMLTrackElementList();
-    return this.remoteTextTrackEls_;
   }
 
   /**
@@ -585,7 +497,7 @@ class Tech extends Component {
       tech: this
     });
 
-    return new HTMLTrackElement(track);
+    return new TRACK_TYPES.REMOTE.remoteTextEl.TrackClass(track);
   }
 
   /**
@@ -611,11 +523,11 @@ class Tech extends Component {
 
     // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+    this.remoteTextTracks().addTrack(htmlTrackElement.track);
 
     if (manualCleanup !== true) {
       // create the TextTrackList if it doesn't exist
-      this.autoRemoteTextTracks_.addTrack_(htmlTrackElement.track);
+      this.autoRemoteTextTracks_.addTrack(htmlTrackElement.track);
     }
 
     return htmlTrackElement;
@@ -632,8 +544,8 @@ class Tech extends Component {
 
     // remove HTMLTrackElement and TextTrack from remote list
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
-    this.remoteTextTracks().removeTrack_(track);
-    this.autoRemoteTextTracks_.removeTrack_(track);
+    this.remoteTextTracks().removeTrack(track);
+    this.autoRemoteTextTracks_.removeTrack(track);
   }
 
   /**
@@ -713,28 +625,72 @@ class Tech extends Component {
 }
 
 /**
+ * Get videotracks
+ *
+ * @returns {VideoTrackList}
+ * @method Tech.prototype.videoTracks
+ */
+
+/**
+ * Get audiotracklist
+ *
+ * @returns {AudioTrackList}
+ * @method Tech.prototype.audioTracks
+ */
+
+/**
+ * Get texttracks
+ *
+ * @returns {TextTrackList}
+ * @method Tech.prototype.textTracks
+ */
+
+/**
+ * Get remote texttracks
+ *
+ * @returns {TextTrackList}
+ * @method Tech.prototype.remoteTextTracks
+ */
+
+/**
+ * Get remote htmltrackelements
+ *
+ * @returns {HTMLTrackElementList}
+ * @method Tech.prototype.remoteTextTrackEls
+ */
+
+TRACK_TYPES.ALL.names.forEach(function(name) {
+  const props = TRACK_TYPES.ALL[name];
+
+  Tech.prototype[props.getterName] = function() {
+    this[props.privateName] = this[props.privateName] || new props.ListClass();
+    return this[props.privateName];
+  };
+});
+
+/**
  * List of associated text tracks
  *
  * @type {TextTrackList}
  * @private
+ * @property Tech#textTracks_
  */
-Tech.prototype.textTracks_; // eslint-disable-line
 
 /**
  * List of associated audio tracks
  *
  * @type {AudioTrackList}
  * @private
+ * @property Tech#audioTracks_
  */
-Tech.prototype.audioTracks_; // eslint-disable-line
 
 /**
  * List of associated video tracks
  *
  * @type {VideoTrackList}
  * @private
+ * @property Tech#videotracks_
  */
-Tech.prototype.videoTracks_; // eslint-disable-line
 
 Tech.prototype.featuresVolumeControl = true;
 

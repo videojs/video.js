@@ -49,68 +49,11 @@ class TextTrackList extends TrackList {
     return list;
   }
 
-  addTrack_(track) {
-    super.addTrack_(track);
+  addTrack(track) {
+    super.addTrack(track);
     track.addEventListener('modechange', Fn.bind(this, function() {
       this.trigger('change');
     }));
-  }
-
-  /**
-   * Remove TextTrack from TextTrackList
-   * NOTE: Be mindful of what is passed in as it may be a HTMLTrackElement
-   *
-   * @param {TextTrack} rtrack
-   * @method removeTrack_
-   * @private
-   */
-  removeTrack_(rtrack) {
-    let track;
-
-    for (let i = 0, l = this.length; i < l; i++) {
-      if (this[i] === rtrack) {
-        track = this[i];
-        if (track.off) {
-          track.off();
-        }
-
-        this.tracks_.splice(i, 1);
-
-        break;
-      }
-    }
-
-    if (!track) {
-      return;
-    }
-
-    this.trigger({
-      track,
-      type: 'removetrack'
-    });
-  }
-
-  /**
-   * Get a TextTrack from TextTrackList by a tracks id
-   *
-   * @param {String} id - the id of the track to get
-   * @method getTrackById
-   * @return {TextTrack}
-   * @private
-   */
-  getTrackById(id) {
-    let result = null;
-
-    for (let i = 0, l = this.length; i < l; i++) {
-      const track = this[i];
-
-      if (track.id === id) {
-        result = track;
-        break;
-      }
-    }
-
-    return result;
   }
 }
 export default TextTrackList;

@@ -42,6 +42,7 @@ const disableOthers = function(list, track) {
  * @class AudioTrackList
  */
 class AudioTrackList extends TrackList {
+
   constructor(tracks = []) {
     let list;
 
@@ -76,12 +77,12 @@ class AudioTrackList extends TrackList {
     return list;
   }
 
-  addTrack_(track) {
+  addTrack(track) {
     if (track.enabled) {
       disableOthers(this, track);
     }
 
-    super.addTrack_(track);
+    super.addTrack(track);
     // native tracks don't have this
     if (!track.addEventListener) {
       return;
@@ -100,15 +101,6 @@ class AudioTrackList extends TrackList {
       this.trigger('change');
     });
   }
-
-  addTrack(track) {
-    this.addTrack_(track);
-  }
-
-  removeTrack(track) {
-    super.removeTrack_(track);
-  }
-
 }
 
 export default AudioTrackList;

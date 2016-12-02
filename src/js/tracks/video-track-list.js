@@ -89,12 +89,12 @@ class VideoTrackList extends TrackList {
     return list;
   }
 
-  addTrack_(track) {
+  addTrack(track) {
     if (track.selected) {
       disableOthers(this, track);
     }
 
-    super.addTrack_(track);
+    super.addTrack(track);
     // native tracks don't have this
     if (!track.addEventListener) {
       return;
@@ -108,14 +108,6 @@ class VideoTrackList extends TrackList {
       this.changing_ = false;
       this.trigger('change');
     });
-  }
-
-  addTrack(track) {
-    this.addTrack_(track);
-  }
-
-  removeTrack(track) {
-    super.removeTrack_(track);
   }
 
 }
