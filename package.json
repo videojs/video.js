@@ -24,7 +24,8 @@
     "lint": "vjsstandard",
     "start": "grunt watchAll",
     "test": "grunt test",
-    "toc": "doctoc"
+    "toc": "doctoc",
+    "docs": "jsdoc -r src/js -d docs/api -c .jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -87,6 +88,7 @@
     "grunt-version": "~0.3.0",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.10.2",
+    "jsdoc": "^3.4.2",
     "karma": "^1.2.0",
     "karma-browserify": "^5.1.0",
     "karma-browserstack-launcher": "^1.0.1",

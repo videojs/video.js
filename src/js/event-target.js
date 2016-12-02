@@ -1,12 +1,73 @@
 /**
- * @file event-target.js
+ * @file src/js/event-target.js
  */
 import * as Events from './utils/events.js';
 
+/**
+ * `EventTarget` is a class that can have the same API as the DOM `EventTarget`. It
+ * adds shorthand functions that wrap around lengthy functions. For example:
+ * the `on` function is a wrapper around `addEventListener`.
+ *
+ * @see [EventTarget Spec]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget}
+ * @class EventTarget
+ */
 const EventTarget = function() {};
 
+/**
+ * A Custom DOM event.
+ *
+ * @typedef {Object} EventTarget~Event
+ * @see [Properties]{@link https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent}
+ */
+
+/**
+ * All event listeners should follow the following format.
+ *
+ * @callback EventTarget~EventListener
+ * @this {EventTarget}
+ *
+ * @param {EventTarget~Event} event
+ *        the event that triggered this function
+ *
+ * @param {Object} [hash]
+ *        hash of data sent during the event
+ */
+
+/**
+ * An object containing event names as keys and booleans as values.
+ *
+ * > NOTE: If an event name is set to a true value here {@link EventTarget#trigger}
+ *         will have extra functionality. See that function for more information.
+ *
+ * @property EventTarget.prototype.allowedEvents_
+ * @private
+ */
 EventTarget.prototype.allowedEvents_ = {};
 
+/**
+ * Adds an `event listener` to an instance of an `EventTarget`. An `event listener` is a
+ * function that will get called when an event with a certain name gets triggered.
+ *
+ * ```js
+ *   var foo = new EventTarget();
+ *   var handleBar = function() {
+ *     console.log('bar was triggered');
+ *   };
+ *
+ *   foo.on('bar', handleBar);
+ *
+ *   // This causes any `event listeners` for the `bar` event to get called
+ *   // see {@link EventTarget#trigger} for more information
+ *   foo.trigger('bar');
+ *   // logs 'bar was triggered'
+ * ```
+ *
+ * @param {string|string[]} type
+ *        An event name or an array of event names.
+ *
+ * @param {EventTarget~EventListener} fn
+ *        The function to call with `EventTarget`s
+ */
 EventTarget.prototype.on = function(type, fn) {
   // Remove the addEventListener alias before calling Events.on
   // so we don't get into an infinite type loop
@@ -17,16 +78,105 @@ EventTarget.prototype.on = function(type, fn) {
   this.addEventListener = ael;
 };
 
+/**
+ * An alias of {@link EventTarget#on}. Allows `EventTarget` to mimic
+ * the standard DOM API.
+ *
+ * @function
+ * @see {@link EventTarget#on}
+ */
 EventTarget.prototype.addEventListener = EventTarget.prototype.on;
 
+/**
+ * Removes an `event listener` for a specific event from an instance of `EventTarget`.
+ * This makes it so that the `event listener` will no longer get called when the
+ * named event happens.
+ *
+ * ```js
+ *   var foo = new EventTarget();
+ *   var handleBar = function() {
+ *     console.log('bar was triggered');
+ *   };
+ *
+ *   // adds an `event listener` for the `bar` event
+ *   // see {@link EventTarget#on} for more info
+ *   foo.on('bar', handleBar);
+ *
+ *   // runs all `event listeners` for the `bar` event
+ *   // see {@link EventTarget#trigger} for more info
+ *   foo.trigger('bar');
+ *   // logs 'bar was triggered'
+ *
+ *   foo.off('bar', handleBar);
+ *   foo.trigger('bar');
+ *   // does nothing
+ * ```
+ *
+ * @param {string|string[]} type
+ *        An event name or an array of event names.
+ *
+ * @param {EventTarget~EventListener} fn
+ *        The function to remove.
+ */
 EventTarget.prototype.off = function(type, fn) {
   Events.off(this, type, fn);
 };
 
+/**
+ * An alias of {@link EventTarget#off}. Allows `EventTarget` to mimic
+ * the standard DOM API.
+ *
+ * @function
+ * @see {@link EventTarget#off}
+ */
 EventTarget.prototype.removeEventListener = EventTarget.prototype.off;
 
+/**
+ * This function will add an `event listener` that gets triggered only once. After the
+ * first trigger it will get removed. This is like adding an `event listener`
+ * with {@link EventTarget#on} that calls {@link EventTarget#off} on itself.
+ *
+ * Using {@link EventTarget#on} and {@link EventTarget#off} to mimic {@link EventTarget#one}
+ * ```js
+ *   var foo = new EventTarget();
+ *   var handleBar = function() {
+ *     console.log('bar was triggered');
+ *     // after the first trigger remove this handler
+ *     foo.off('bar', handleBar);
+ *   };
+ *
+ *   foo.on('bar', handleBar);
+ *   foo.trigger('bar');
+ *   // logs 'bar was triggered'
+ *
+ *   foo.trigger('bar');
+ *   // does nothing
+ * ```
+ *
+ * Using {@link EventTarget#one}
+ * ```js
+ *   var foo = new EventTarget();
+ *   var handleBar = function() {
+ *     console.log('bar was triggered');
+ *   };
+ *
+ *   // removed after the first trigger
+ *   foo.one('bar', handleBar);
+ *   foo.trigger('bar');
+ *   // logs 'bar was triggered'
+ *
+ *   foo.trigger('bar');
+ *   // does nothing
+ * ```
+ *
+ * @param {string|string[]} type
+ *        An event name or an array of event names.
+ *
+ * @param {EventTarget~EventListener} fn
+ *        The function to be called once for each event name.
+ */
 EventTarget.prototype.one = function(type, fn) {
-  // Remove the addEventListener alias before calling Events.on
+  // Remove the addEventListener alialing Events.on
   // so we don't get into an infinite type loop
   const ael = this.addEventListener;
 
@@ -35,6 +185,39 @@ EventTarget.prototype.one = function(type, fn) {
   this.addEventListener = ael;
 };
 
+/**
+ * This function causes an event to happen. This will then cause any `event listeners`
+ * that are waiting for that event, to get called. If there are no `event listeners`
+ * for an event then nothing will happen.
+ *
+ * If the name of the `Event` that is being triggered is in `EventTarget.allowedEvents_`.
+ * Trigger will also call the `on` + `uppercaseEventName` function.
+ *
+ * Example:
+ * 'click' is in `EventTarget.allowedEvents_`, so, trigger will attempt to call
+ * `onClick` if it exists.
+ *
+ * ```js
+ *   var foo = new EventTarget();
+ *   var handleBar = function() {
+ *     console.log('bar was triggered');
+ *   };
+ *
+ *   foo.on('bar', handleBar);
+ *   foo.trigger('bar');
+ *   // logs 'bar was triggered'
+ *
+ *   foo.trigger('bar');
+ *   // logs 'bar was triggered'
+ *
+ *   foo.trigger('foo');
+ *   // does nothing
+ * ```
+ *
+ * @param {string|EventTarget~Event|Object} event
+ *        The name of the event, an `Event`, or an object with a key of type set to
+ *        an event name.
+ */
 EventTarget.prototype.trigger = function(event) {
   const type = event.type || event;
 
@@ -50,7 +233,13 @@ EventTarget.prototype.trigger = function(event) {
   Events.trigger(this, event);
 };
 
-// The standard DOM EventTarget.dispatchEvent() is aliased to trigger()
+/**
+ * An alias of {@link EventTarget#trigger}. Allows `EventTarget` to mimic
+ * the standard DOM API.
+ *
+ * @function
+ * @see {@link EventTarget#trigger}
+ */
 EventTarget.prototype.dispatchEvent = EventTarget.prototype.trigger;
 
 export default EventTarget;
