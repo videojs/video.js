@@ -50,8 +50,8 @@
  * @throws {Error} if the timeRanges provided are over the maxIndex
  */
 function rangeCheck(fnName, index, maxIndex) {
-  if (index < 0 || index > maxIndex) {
-    throw new Error(`Failed to execute '${fnName}' on 'TimeRanges': The index provided (${index}) is greater than or equal to the maximum bound (${maxIndex}).`);
+  if (typeof index !== 'number' || index < 0 || index > maxIndex) {
+    throw new Error(`Failed to execute '${fnName}' on 'TimeRanges': The index provided (${index}) is non-numeric or out of bounds (0-${maxIndex}).`);
   }
 }
 

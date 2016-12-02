@@ -43,3 +43,22 @@ QUnit.test('should create a fake multiple timerange', function(assert) {
                 /Failed to execute 'end'/,
                 'fails if end is called with with an invalid index');
 });
+
+QUnit.test('should throw without being given an index', function(assert) {
+  const tr = createTimeRanges([
+    [0, 10],
+    [11, 20]
+  ]);
+
+  assert.throws(
+    () => tr.start(),
+    /Failed to execute 'start'/,
+    'start throws if no index is given'
+  );
+
+  assert.throws(
+    () => tr.end(),
+    /Failed to execute 'end'/,
+    'end throws if no index is given'
+  );
+});
