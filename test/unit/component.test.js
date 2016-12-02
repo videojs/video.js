@@ -44,9 +44,17 @@ const getFakePlayer = function() {
 QUnit.test('registerComponent() throws with bad arguments', function(assert) {
   assert.throws(
     function() {
-      Component.registerComponent(' \t \r\n  ');
+      Component.registerComponent(null);
     },
-    new Error('illegal "name"; must be non-empty string'),
+    new Error('illegal component name, "null"; must be a non-empty string'),
+    'component names must be non-empty strings'
+  );
+
+  assert.throws(
+    function() {
+      Component.registerComponent('');
+    },
+    new Error('illegal component name, ""; must be a non-empty string'),
     'component names must be non-empty strings'
   );
 
@@ -54,7 +62,7 @@ QUnit.test('registerComponent() throws with bad arguments', function(assert) {
     function() {
       Component.registerComponent('TestComponent5', function() {});
     },
-    new Error('illegal "Comp"; must be a subclass of Component'),
+    new Error('illegal component constructor, "TestComponent5"; must be a subclass of Component'),
     'components must be subclasses of Component'
   );
 });
