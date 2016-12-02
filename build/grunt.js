@@ -25,7 +25,7 @@ module.exports = function(grunt) {
     plugin: [
       ['bundle-collapser/plugin'],
       ['browserify-derequire']
-    ],
+    ]
   };
 
   const browserifyTransform = function(options) {
