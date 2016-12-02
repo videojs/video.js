@@ -44,7 +44,7 @@ const isValidEventType = (type) =>
  */
 const validateTarget = (target) => {
   if (!target.nodeName && !isEvented(target)) {
-    throw new Error('invalid target; must be a DOM node or evented object');
+    throw new Error('Invalid target; must be a DOM node or evented object.');
   }
 };
 
@@ -59,7 +59,7 @@ const validateTarget = (target) => {
  */
 const validateEventType = (type) => {
   if (!isValidEventType(type)) {
-    throw new Error('invalid event type; must be a non-empty string or array');
+    throw new Error('Invalid event type; must be a non-empty string or array.');
   }
 };
 
@@ -74,7 +74,7 @@ const validateEventType = (type) => {
  */
 const validateListener = (listener) => {
   if (typeof listener !== 'function') {
-    throw new Error('invalid listener; must be a function');
+    throw new Error('Invalid listener; must be a function.');
   }
 };
 
@@ -365,7 +365,7 @@ function evented(target, options = {}) {
   // Set or create the eventBusEl_.
   if (eventBusKey) {
     if (!target[eventBusKey].nodeName) {
-      throw new Error(`eventBusKey "${eventBusKey}" does not refer to an element`);
+      throw new Error(`The eventBusKey "${eventBusKey}" does not refer to an element.`);
     }
     target.eventBusEl_ = target[eventBusKey];
   } else {

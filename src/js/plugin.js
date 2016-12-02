@@ -142,7 +142,7 @@ class Plugin {
     this.player = player;
 
     if (this.constructor === Plugin) {
-      throw new Error('Plugin must be sub-classed; not directly instantiated');
+      throw new Error('Plugin must be sub-classed; not directly instantiated.');
     }
 
     // Make this object evented, but remove the added `trigger` method so we
@@ -266,7 +266,7 @@ class Plugin {
     this.player = this.state = null;
 
     this.dispose = () => {
-      throw new Error('cannot call methods on a disposed object');
+      throw new Error('Cannot call methods on a disposed object.');
     };
 
     this.setState = this.off = this.on = this.one = this.trigger = this.dispose;
@@ -309,15 +309,15 @@ class Plugin {
    */
   static registerPlugin(name, plugin) {
     if (typeof name !== 'string') {
-      throw new Error(`illegal plugin name, "${name}", must be a string, was ${typeof name}`);
+      throw new Error(`Illegal plugin name, "${name}", must be a string, was ${typeof name}.`);
     }
 
     if (pluginExists(name) || Player.prototype.hasOwnProperty(name)) {
-      throw new Error(`illegal plugin name, "${name}", already exists`);
+      throw new Error(`Illegal plugin name, "${name}", already exists.`);
     }
 
     if (typeof plugin !== 'function') {
-      throw new Error(`illegal plugin for "${name}", must be a function, was ${typeof plugin}`);
+      throw new Error(`Illegal plugin for "${name}", must be a function, was ${typeof plugin}.`);
     }
 
     pluginStorage[name] = plugin;
@@ -343,7 +343,7 @@ class Plugin {
    */
   static deregisterPlugin(name) {
     if (name === BASE_PLUGIN_NAME) {
-      throw new Error('cannot de-register base plugin');
+      throw new Error('Cannot de-register base plugin.');
     }
     if (pluginExists(name)) {
       delete pluginStorage[name];
