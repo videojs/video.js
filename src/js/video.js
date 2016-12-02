@@ -626,4 +626,6 @@ videojs.insertContent = Dom.insertContent;
  */
 videojs.computedStyle = computedStyle;
 
-export default videojs;
+// We use Node-style module.exports here instead of ES6 because it is more
+// compatible with different module systems.
+module.exports = videojs;
