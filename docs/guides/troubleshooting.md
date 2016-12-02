@@ -15,7 +15,9 @@ HLS is more convenient as mobile browsers have native support.
 ### Make sure you are using formats that video.js can play:
 * Does your browser/OS support the type of media that you are trying to play?
 * Do you have a video.js plugin that will add support for a media format to video.js? For Example:
-  * [videojs-contrib-youtube][youtube]
+  * [videojs-youtube][youtube]
+  * [videojs-contrib-hls][hls]
+  * [videojs-contrib-dash][dash]
 * Verify that you are using the correct [mime-type/content-type][media-types] for your videos.
   This is used to determine if video.js can play a certain type of media.
 
@@ -70,7 +72,7 @@ To fix this issue please make sure that all event listeners are cleaned up on di
 <!-- official projects -->
 [hls]: https://github.com/videojs/videojs-contrib-hls
 [dash]: https://github.com/videojs/videojs-contrib-dash
-[youtube]: https://github.com/videojs/videojs-contrib-youtube
+[youtube]: https://github.com/videojs/videojs-youtube
 [flash]: https://github.com/videojs/videojs-flash
 
 <!-- External links -->
