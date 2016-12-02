@@ -9,13 +9,19 @@ import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends MenuButton
- * @class TextTrackButton
  */
 class TextTrackButton extends TrackButton {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options={}]
+   *        The key/value store of player options.
+   */
   constructor(player, options = {}) {
     options.tracks = player.textTracks();
 
@@ -25,8 +31,11 @@ class TextTrackButton extends TrackButton {
   /**
    * Create a menu item for each text track
    *
-   * @return {Array} Array of menu items
-   * @method createItems
+   * @param {TextTrackMenuItem[]} [items=[]]
+   *        Existing array of items to use during creation
+   *
+   * @return {TextTrackMenuItem[]}
+   *         Array of menu items that were created
    */
   createItems(items = []) {
     // Add an OFF menu item to turn all tracks off

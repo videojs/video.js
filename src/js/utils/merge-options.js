@@ -1,8 +1,16 @@
 /**
  * @file merge-options.js
+ * @module merge-options
  */
 import merge from 'lodash-compat/object/merge';
 
+/**
+ * Check if an object direct descentant of Object and
+ * not of Array or RegExp.
+ *
+ * @param {Mixed} obj
+ *        The object to check
+ */
 function isPlain(obj) {
   return !!obj &&
     typeof obj === 'object' &&
@@ -13,6 +21,16 @@ function isPlain(obj) {
 /**
  * Merge customizer. video.js simply overwrites non-simple objects
  * (like arrays) instead of attempting to overlay them.
+ *
+ * @param {Mixed} destination
+ *        The merge destination
+ *
+ * @param {Mixed} source
+ *        A merge source.
+ *
+ * @retun {Mixed}
+ *        The source and destination merged.
+ *
  * @see https://lodash.com/docs#merge
  */
 function customizer(destination, source) {
@@ -36,10 +54,11 @@ function customizer(destination, source) {
  * Merge one or more options objects, recursively merging **only**
  * plain object properties.  Previously `deepMerge`.
  *
- * @param  {...Object} source One or more objects to merge
- * @returns {Object}          a new object that is the union of all
- * provided objects
- * @function mergeOptions
+ * @param  {Object[]} source
+ *         One or more objects to merge
+ *
+ * @returns {Object}
+ *          a new object that is the union of all
  */
 export default function mergeOptions(...objects) {
 

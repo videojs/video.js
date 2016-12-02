@@ -8,13 +8,19 @@ import * as Fn from '../../utils/fn.js';
 /**
  * The chapter track menu item
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends MenuItem
- * @class ChaptersTrackMenuItem
  */
 class ChaptersTrackMenuItem extends MenuItem {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     const track = options.track;
     const cue = options.cue;
@@ -32,11 +38,17 @@ class ChaptersTrackMenuItem extends MenuItem {
   }
 
   /**
-   * Handle click on menu item
+   * This gets called when an `ChaptersTrackMenuItem` is "clicked". See
+   * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} [event]
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens tap
+   * @listens click
    */
-  handleClick() {
+  handleClick(event) {
     super.handleClick();
     this.player_.currentTime(this.cue.startTime);
     this.update(this.cue.startTime);
@@ -45,9 +57,12 @@ class ChaptersTrackMenuItem extends MenuItem {
   /**
    * Update chapter menu item
    *
-   * @method update
+   * @param {EventTarget~Event} [event]
+   *        The `cuechange` event that caused this function to run.
+   *
+   * @listens TextTrack#cuechange
    */
-  update() {
+  update(event) {
     const cue = this.cue;
     const currentTime = this.player_.currentTime();
 

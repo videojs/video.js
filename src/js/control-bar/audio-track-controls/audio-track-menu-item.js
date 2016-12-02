@@ -6,14 +6,21 @@ import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
- * The audio track menu item
+ * An {@link AudioTrack} {@link MenuItem}
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends MenuItem
- * @class AudioTrackMenuItem
  */
 class AudioTrackMenuItem extends MenuItem {
+
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     const track = options.track;
     const tracks = player.audioTracks();
@@ -37,9 +44,15 @@ class AudioTrackMenuItem extends MenuItem {
   }
 
   /**
-   * Handle click on audio track
+   * This gets called when an `AudioTrackMenuItem is "clicked". See {@link ClickableComponent}
+   * for more detailed information on what a click can be.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} [event]
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens tap
+   * @listens click
    */
   handleClick(event) {
     const tracks = this.player_.audioTracks();
@@ -58,9 +71,12 @@ class AudioTrackMenuItem extends MenuItem {
   }
 
   /**
-   * Handle audio track change
+   * Handle any {@link AudioTrack} change.
    *
-   * @method handleTracksChange
+   * @param {EventTarget~Event} [event]
+   *        The {@link AudioTrackList#change} event that caused this to run.
+   *
+   * @listens AudioTrackList#change
    */
   handleTracksChange(event) {
     this.selected(this.track.enabled);

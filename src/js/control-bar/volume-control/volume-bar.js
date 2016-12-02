@@ -11,13 +11,19 @@ import './volume-level.js';
 /**
  * The bar that contains the volume level and can be clicked on to adjust the level
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Slider
- * @class VolumeBar
  */
 class VolumeBar extends Slider {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
     this.on(player, 'volumechange', this.updateARIAAttributes);
@@ -25,10 +31,10 @@ class VolumeBar extends Slider {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
@@ -39,15 +45,21 @@ class VolumeBar extends Slider {
   }
 
   /**
-   * Handle mouse move on volume bar
+   * Handle movement events on the {@link VolumeMenuButton}.
    *
-   * @method handleMouseMove
+   * @param {EventTarget~Event} event
+   *        The event that caused this function to run.
+   *
+   * @listens mousemove
    */
   handleMouseMove(event) {
     this.checkMuted();
     this.player_.volume(this.calculateDistance(event));
   }
 
+  /**
+   * If the player is muted unmute it.
+   */
   checkMuted() {
     if (this.player_.muted()) {
       this.player_.muted(false);
@@ -57,8 +69,8 @@ class VolumeBar extends Slider {
   /**
    * Get percent of volume level
    *
-   * @retun {Number} Volume level percent
-   * @method getPercent
+   * @return {number}
+   *         Volume level percent as a decimal number.
    */
   getPercent() {
     if (this.player_.muted()) {
@@ -69,8 +81,6 @@ class VolumeBar extends Slider {
 
   /**
    * Increase volume level for keyboard users
-   *
-   * @method stepForward
    */
   stepForward() {
     this.checkMuted();
@@ -79,8 +89,6 @@ class VolumeBar extends Slider {
 
   /**
    * Decrease volume level for keyboard users
-   *
-   * @method stepBack
    */
   stepBack() {
     this.checkMuted();
@@ -90,9 +98,12 @@ class VolumeBar extends Slider {
   /**
    * Update ARIA accessibility attributes
    *
-   * @method updateARIAAttributes
+   * @param {EventTarget~Event} [event]
+   *        The `volumechange` event that caused this function to run.
+   *
+   * @listens Player#volumechange
    */
-  updateARIAAttributes() {
+  updateARIAAttributes(event) {
     // Current value of volume bar as a percentage
     const volume = (this.player_.volume() * 100).toFixed(2);
 
@@ -102,6 +113,12 @@ class VolumeBar extends Slider {
 
 }
 
+/**
+ * Default options for the `VolumeBar`
+ *
+ * @type {Object}
+ * @private
+ */
 VolumeBar.prototype.options_ = {
   children: [
     'volumeLevel'
@@ -109,6 +126,11 @@ VolumeBar.prototype.options_ = {
   barName: 'volumeLevel'
 };
 
+/**
+ * Call the update event for this Slider when this event happens on the player.
+ *
+ * @type {string}
+ */
 VolumeBar.prototype.playerEvent = 'volumechange';
 
 Component.registerComponent('VolumeBar', VolumeBar);

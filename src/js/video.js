@@ -1,5 +1,6 @@
 /**
  * @file video.js
+ * @module videojs
  */
 
 /* global define */
@@ -47,15 +48,22 @@ if (typeof HTMLVideoElement === 'undefined' &&
  * the main library object.
  * The `videojs` function can be used to initialize or retrieve a player.
  * ```js
- *     var myPlayer = videojs('my_video_id');
+ *   var myPlayer = videojs('my_video_id');
  * ```
  *
- * @param  {String|Element} id      Video element or video element ID
- * @param  {Object=} options        Optional options object for config/settings
- * @param  {Function=} ready        Optional ready callback
- * @return {Player}                 A player instance
+ * @param {string|Element} id
+ *        Video element or video element ID
+ *
+ * @param {Object} [options]
+ *        Optional options object for config/settings
+ *
+ * @param {Component~ReadyCallback} [ready]
+ *        Optional ready callback
+ *
+ * @return {Player}
+ *         A player instance
+ *
  * @mixes videojs
- * @method videojs
  */
 function videojs(id, options, ready) {
   let tag;
@@ -135,9 +143,14 @@ videojs.hooks_ = {};
 /**
  * Get a list of hooks for a specific lifecycle
  *
- * @param {String} type the lifecyle to get hooks from
- * @param {Function=} optionally add a hook to the lifecycle that your are getting
- * @return {Array} an array of hooks, or an empty array if there are none
+ * @param {string} type
+ *        the lifecyle to get hooks from
+ *
+ * @param {Function} [fn]
+ *        Optionally add a hook to the lifecycle that your are getting.
+ *
+ * @return {Array}
+ *         an array of hooks, or an empty array if there are none.
  */
 videojs.hooks = function(type, fn) {
   videojs.hooks_[type] = videojs.hooks_[type] || [];
@@ -148,21 +161,29 @@ videojs.hooks = function(type, fn) {
 };
 
 /**
- * Add a function hook to a specific videojs lifecycle
+ * Add a function hook to a specific videojs lifecycle.
  *
- * @param {String} type the lifecycle to hook the function to
- * @param {Function|Array} fn the function to attach
+ * @param {string} type
+ *        the lifecycle to hook the function to.
+ *
+ * @param {Function|Function[]}
+ *        The function or array of functions to attach.
  */
 videojs.hook = function(type, fn) {
   videojs.hooks(type, fn);
 };
 
 /**
- * Remove a hook from a specific videojs lifecycle
+ * Remove a hook from a specific videojs lifecycle.
  *
- * @param {String} type the lifecycle that the function hooked to
- * @param {Function} fn the hooked function to remove
- * @return {Boolean} the function that was removed or undef
+ * @param {string} type
+ *        the lifecycle that the function hooked to
+ *
+ * @param {Function} fn
+ *        The hooked function to remove
+ *
+ * @return {boolean}
+ *         The function that was removed or undef
  */
 videojs.removeHook = function(type, fn) {
   const index = videojs.hooks(type).indexOf(fn);
@@ -206,10 +227,10 @@ if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
 // video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
 
-/*
- * Current software version (semver)
+/**
+ * Current software version. Follows semver.
  *
- * @type {String}
+ * @type {string}
  */
 videojs.VERSION = require('../../package.json').version;
 
@@ -229,9 +250,8 @@ videojs.options = Player.prototype.options_;
 /**
  * Get an object with the currently created players, keyed by player ID
  *
- * @return {Object} The created players
- * @mixes videojs
- * @method getPlayers
+ * @return {Object}
+ *         The created players
  */
 videojs.getPlayers = () => Player.players;
 
@@ -251,9 +271,7 @@ videojs.players = Player.players;
  *     var myButton = new VjsButton(myPlayer);
  * ```
  *
- * @return {Component} Component identified by name
- * @mixes videojs
- * @method getComponent
+ * @borrows Component.getComponent as videojs.getComponent
  */
 videojs.getComponent = Component.getComponent;
 
@@ -265,23 +283,26 @@ videojs.getComponent = Component.getComponent;
  * or through default children options
  * `{ children: ['myComponent'] }`.
  * ```js
- *     // Get a component to subclass
- *     var VjsButton = videojs.getComponent('Button');
- *     // Subclass the component (see 'extend' doc for more info)
- *     var MySpecialButton = videojs.extend(VjsButton, {});
- *     // Register the new component
- *     VjsButton.registerComponent('MySepcialButton', MySepcialButton);
- *     // (optionally) add the new component as a default player child
- *     myPlayer.addChild('MySepcialButton');
+ *   // Get a component to subclass
+ *   var VjsButton = videojs.getComponent('Button');
+ *   // Subclass the component (see 'extend' doc for more info)
+ *   var MySpecialButton = videojs.extend(VjsButton, {});
+ *   // Register the new component
+ *   VjsButton.registerComponent('MySepcialButton', MySepcialButton);
+ *   // (optionally) add the new component as a default player child
+ *   myPlayer.addChild('MySepcialButton');
  * ```
- * NOTE: You could also just initialize the component before adding.
+ * > NOTE: You could also just initialize the component before adding.
  * `component.addChild(new MyComponent());`
  *
- * @param {String} The class name of the component
- * @param {Component} The component class
- * @return {Component} The newly registered component
- * @mixes videojs
- * @method registerComponent
+ * @param {string} name
+ *        The class name of the component
+ *
+ * @param {Component} comp
+ *        The component class
+ *
+ * @return {Component}
+ *         The newly registered component
  */
 videojs.registerComponent = (name, comp) => {
   if (Tech.isTech(comp)) {
@@ -294,14 +315,12 @@ videojs.registerComponent = (name, comp) => {
 /**
  * Get a Tech class object by name
  * ```js
- *     var Html5 = videojs.getTech('Html5');
- *     // Create a new instance of the component
- *     var html5 = new Html5(options);
+ *   var Html5 = videojs.getTech('Html5');
+ *   // Create a new instance of the component
+ *   var html5 = new Html5(options);
  * ```
  *
- * @return {Tech} Tech identified by name
- * @mixes videojs
- * @method getComponent
+ * @borrows Tech.getTech as videojs.getTech
  */
 videojs.getTech = Tech.getTech;
 
@@ -320,16 +339,12 @@ videojs.getTech = Tech.getTech;
  *     });
  * ```
  *
- * @param {String} The class name of the tech
- * @param {Tech} The tech class
- * @return {Tech} The newly registered Tech
- * @mixes videojs
- * @method registerTech
+ * @borrows Tech.registerTech as videojs.registerTech
  */
 videojs.registerTech = Tech.registerTech;
 
 /**
- * A suite of browser and device tests
+ * A suite of browser and device tests from {@link browser}.
  *
  * @type {Object}
  * @private
@@ -341,8 +356,8 @@ videojs.browser = browser;
  * compatibility with 4.x, but deprecated. Use `videojs.browser.TOUCH_ENABLED`
  * instead going forward.
  *
- * @deprecated
- * @type {Boolean}
+ * @deprecated since version 5.0
+ * @type {boolean}
  */
 videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
@@ -372,12 +387,7 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
  *     myInstance.sayMyName(); // -> should alert "John"
  * ```
  *
- * @param {Function} The Class to subclass
- * @param {Object} An object including instace methods for the new class
- *                   Optionally including a `constructor` function
- * @return {Function} The newly created subclass
- * @mixes videojs
- * @method extend
+ * @borrows extend:extendFn as videojs.extend
  */
 videojs.extend = extendFn;
 
@@ -406,35 +416,28 @@ videojs.extend = extendFn;
  *     // result.bar.b = [4,5,6];
  * ```
  *
- * @param {Object} defaults  The options object whose values will be overriden
- * @param {Object} overrides The options object with values to override the first
- * @param {Object} etc       Any number of additional options objects
- *
- * @return {Object} a new object with the merged values
- * @mixes videojs
- * @method mergeOptions
+ * @borrows merge-options:mergeOptions as videojs.mergeOptions
  */
 videojs.mergeOptions = mergeOptions;
 
 /**
  * Change the context (this) of a function
  *
+ * ``` js
  *     videojs.bind(newContext, function() {
  *       this === newContext
  *     });
+ * ```
  *
- * NOTE: as of v5.0 we require an ES5 shim, so you should use the native
+ * > NOTE: as of v5.0 we require an ES5 shim, so you should use the native
  * `function() {}.bind(newContext);` instead of this.
  *
- * @param  {*}        context The object to bind as scope
- * @param  {Function} fn      The function to be bound to a scope
- * @param  {Number=}  uid     An optional unique ID for the function to be set
- * @return {Function}
+ * @borrows fn:bind as videojs.bind
  */
 videojs.bind = Fn.bind;
 
 /**
- * Create a Video.js player plugin
+ * Create a Video.js player plugin.
  * Plugins are only initialized when options for the plugin are included
  * in the player options, or the plugin function on the player instance is
  * called.
@@ -473,24 +476,24 @@ videojs.bind = Fn.bind;
  *     // --> Should alert 'Plugin added later!'
  * ```
  *
- * @param {String} name The plugin name
- * @param {Function} fn The plugin function that will be called with options
- * @mixes videojs
- * @method plugin
+ * @borrows plugin:plugin as videojs.plugin
  */
 videojs.plugin = plugin;
 
 /**
  * Adding languages so that they're available to all players.
  * ```js
- *     videojs.addLanguage('es', { 'Hello': 'Hola' });
+ *   videojs.addLanguage('es', { 'Hello': 'Hola' });
  * ```
  *
- * @param  {String} code The language code or dictionary property
- * @param  {Object} data The data values to be translated
- * @return {Object} The resulting language dictionary object
- * @mixes videojs
- * @method addLanguage
+ * @param {string} code
+ *        The language code or dictionary property
+ *
+ * @param {Object} data
+ *        The data values to be translated
+ *
+ * @return {Object}
+ *         The resulting language dictionary object
  */
 videojs.addLanguage = function(code, data) {
   code = ('' + code).toLowerCase();
@@ -498,19 +501,19 @@ videojs.addLanguage = function(code, data) {
 };
 
 /**
- * Log debug messages.
+ * Log messages
  *
- * @param {...Object} messages One or more messages to log
+ * @borrows log:log as videojs.log
  */
 videojs.log = log;
 
 /**
  * Creates an emulated TimeRange object.
  *
- * @param  {Number|Array} start Start time in seconds or an array of ranges
- * @param  {Number} end   End time in seconds
- * @return {Object}       Fake TimeRange object
- * @method createTimeRange
+ * @borrows time-ranges:createTimeRanges as videojs.createTimeRange
+ */
+/**
+ * @borrows time-ranges:createTimeRanges as videojs.createTimeRanges
  */
 videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
 
@@ -519,35 +522,28 @@ videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
  * Supplying a guide (in seconds) will force a number of leading zeros
  * to cover the length of the guide
  *
- * @param  {Number} seconds Number of seconds to be turned into a string
- * @param  {Number} guide   Number (in seconds) to model the string after
- * @return {String}         Time formatted as H:MM:SS or M:SS
- * @method formatTime
+ * @borrows format-time:formatTime as videojs.formatTime
  */
 videojs.formatTime = formatTime;
 
 /**
  * Resolve and parse the elements of a URL
  *
- * @param  {String} url The url to parse
- * @return {Object}     An object of url details
- * @method parseUrl
+ * @borrows url:parseUrl as videojs.parseUrl
  */
 videojs.parseUrl = Url.parseUrl;
 
 /**
  * Returns whether the url passed is a cross domain request or not.
  *
- * @param {String} url The url to check
- * @return {Boolean}   Whether it is a cross domain request or not
- * @method isCrossOrigin
+ * @borrows url:isCrossOrigin as videojs.isCrossOrigin
  */
 videojs.isCrossOrigin = Url.isCrossOrigin;
 
 /**
  * Event target class.
  *
- * @type {Function}
+ * @borrows EventTarget as videojs.EventTarget
  */
 videojs.EventTarget = EventTarget;
 
@@ -557,47 +553,35 @@ videojs.EventTarget = EventTarget;
  * and adds a generic handler to the element's event,
  * along with a unique id (guid) to the element.
  *
- * @param  {Element|Object}   elem Element or object to bind listeners to
- * @param  {String|Array}   type Type of event to bind to.
- * @param  {Function} fn   Event listener.
- * @method on
+ * @borrows events:on as videojs.on
  */
 videojs.on = Events.on;
 
 /**
  * Trigger a listener only once for an event
  *
- * @param  {Element|Object}   elem Element or object to
- * @param  {String|Array}   type Name/type of event
- * @param  {Function} fn Event handler function
- * @method one
+ * @borrows events:one as videojs.one
  */
 videojs.one = Events.one;
 
 /**
  * Removes event listeners from an element
  *
- * @param  {Element|Object}   elem Object to remove listeners from
- * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
- * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
- * @method off
+ * @borrows events:off as videojs.off
  */
 videojs.off = Events.off;
 
 /**
  * Trigger an event for an element
  *
- * @param  {Element|Object}      elem  Element to trigger an event on
- * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
- * @param  {Object} [hash] data hash to pass along with the event
- * @return {Boolean=} Returned only if default was prevented
- * @method trigger
+ * @borrows events:trigger as videojs.trigger
  */
 videojs.trigger = Events.trigger;
 
 /**
  * A cross-browser XMLHttpRequest wrapper. Here's a simple example:
  *
+ * ```js
  *     videojs.xhr({
  *       body: someJSONString,
  *       uri: "/foo",
@@ -607,13 +591,14 @@ videojs.trigger = Events.trigger;
  *     }, function (err, resp, body) {
  *       // check resp.statusCode
  *     });
+ * ```
  *
- * Check out the [full
- * documentation](https://github.com/Raynos/xhr/blob/v2.1.0/README.md)
- * for more options.
+ * @param {Object} options
+ *        settings for the request.
  *
- * @param {Object} options settings for the request.
- * @return {XMLHttpRequest|XDomainRequest} the request object.
+ * @return {XMLHttpRequest|XDomainRequest}
+ *         The request object.
+ *
  * @see https://github.com/Raynos/xhr
  */
 videojs.xhr = xhr;
@@ -621,7 +606,7 @@ videojs.xhr = xhr;
 /**
  * TextTrack class
  *
- * @type {Function}
+ * @borrows TextTrack as videojs.TextTrack
  */
 videojs.TextTrack = TextTrack;
 
@@ -629,7 +614,7 @@ videojs.TextTrack = TextTrack;
  * export the AudioTrack class so that source handlers can create
  * AudioTracks and then add them to the players AudioTrackList
  *
- * @type {Function}
+ * @borrows AudioTrack as videojs.AudioTrack
  */
 videojs.AudioTrack = AudioTrack;
 
@@ -637,63 +622,49 @@ videojs.AudioTrack = AudioTrack;
  * export the VideoTrack class so that source handlers can create
  * VideoTracks and then add them to the players VideoTrackList
  *
- * @type {Function}
+ * @borrows VideoTrack as videojs.VideoTrack
  */
 videojs.VideoTrack = VideoTrack;
 
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
- * @method isEl
- * @param  {Mixed} value
- * @return {Boolean}
+ * @borrows dom:isEl as videojs.isEl
  */
 videojs.isEl = Dom.isEl;
 
 /**
  * Determines, via duck typing, whether or not a value is a text node.
  *
- * @method isTextNode
- * @param  {Mixed} value
- * @return {Boolean}
+ * @borrows dom:isTextNode as videojs.isTextNode
  */
 videojs.isTextNode = Dom.isTextNode;
 
 /**
  * Creates an element and applies properties.
  *
- * @method createEl
- * @param  {String} [tagName='div'] Name of tag to be created.
- * @param  {Object} [properties={}] Element properties to be applied.
- * @param  {Object} [attributes={}] Element attributes to be applied.
- * @return {Element}
+ * @borrows dom:createEl as videojs.createEl
  */
 videojs.createEl = Dom.createEl;
 
 /**
  * Check if an element has a CSS class
  *
- * @method hasClass
- * @param {Element} element Element to check
- * @param {String} classToCheck Classname to check
+ * @borrows dom:hasElClass as videojs.hasClass
  */
 videojs.hasClass = Dom.hasElClass;
 
 /**
  * Add a CSS class name to an element
  *
- * @method addClass
- * @param {Element} element    Element to add class name to
- * @param {String} classToAdd Classname to add
+ * @borrows dom:addElClass as videojs.addClass
  */
 videojs.addClass = Dom.addElClass;
 
 /**
  * Remove a CSS class name from an element
  *
- * @method removeClass
- * @param {Element} element    Element to remove from class name
- * @param {String} classToRemove Classname to remove
+ * @borrows dom:removeElClass as videojs.removeClass
  */
 videojs.removeClass = Dom.removeElClass;
 
@@ -701,22 +672,14 @@ videojs.removeClass = Dom.removeElClass;
  * Adds or removes a CSS class name on an element depending on an optional
  * condition or the presence/absence of the class name.
  *
- * @method toggleElClass
- * @param  {Element} element
- * @param  {String} classToToggle
- * @param  {Boolean|Function} [predicate]
- *         Can be a function that returns a Boolean. If `true`, the class
- *         will be added; if `false`, the class will be removed. If not
- *         given, the class will be added if not present and vice versa.
+ * @borrows dom:toggleElClass as videojs.toggleClass
  */
 videojs.toggleClass = Dom.toggleElClass;
 
 /**
  * Apply attributes to an HTML element.
  *
- * @method setAttributes
- * @param  {Element} el         Target element.
- * @param  {Object=} attributes Element attributes to be applied.
+ * @borrows dom:setElAttributes as videojs.setAttribute
  */
 videojs.setAttributes = Dom.setElAttributes;
 
@@ -726,18 +689,14 @@ videojs.setAttributes = Dom.setElAttributes;
  * or with setAttribute (which shouldn't be used with HTML)
  * This will return true or false for boolean attributes.
  *
- * @method getAttributes
- * @param  {Element} tag Element from which to get tag attributes
- * @return {Object}
+ * @borrows dom:getElAttributes as videojs.getAttributes
  */
 videojs.getAttributes = Dom.getElAttributes;
 
 /**
  * Empties the contents of an element.
  *
- * @method emptyEl
- * @param  {Element} el
- * @return {Element}
+ * @borrows dom:emptyEl as videojs.emptyEl
  */
 videojs.emptyEl = Dom.emptyEl;
 
@@ -761,10 +720,7 @@ videojs.emptyEl = Dom.emptyEl;
  *   If the sole argument, is expected to produce a string, element,
  *   node, or array.
  *
- * @method appendContent
- * @param  {Element} el
- * @param  {String|Element|TextNode|Array|Function} content
- * @return {Element}
+ * @borrows dom:appendContents as videojs.appendContet
  */
 videojs.appendContent = Dom.appendContent;
 
@@ -789,10 +745,7 @@ videojs.appendContent = Dom.appendContent;
  *   If the sole argument, is expected to produce a string, element,
  *   node, or array.
  *
- * @method insertContent
- * @param  {Element} el
- * @param  {String|Element|TextNode|Array|Function} content
- * @return {Element}
+ * @borrows dom:insertContent as videojs.insertContent
  */
 videojs.insertContent = Dom.insertContent;
 
@@ -804,9 +757,7 @@ videojs.insertContent = Dom.insertContent;
  * that the player doesn't break in these cases.
  * See https://bugzilla.mozilla.org/show_bug.cgi?id=548397 for more details.
  *
- * @function computedStyle
- * @param el the element you want the computed style of
- * @param prop the property name you want
+ * @borrows computed-style:computedStyle as videojs.computedStyle
  */
 videojs.computedStyle = computedStyle;
 

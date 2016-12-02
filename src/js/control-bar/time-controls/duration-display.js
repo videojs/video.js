@@ -8,13 +8,19 @@ import formatTime from '../../utils/format-time.js';
 /**
  * Displays the duration
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Component
- * @class DurationDisplay
  */
 class DurationDisplay extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -28,10 +34,10 @@ class DurationDisplay extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     const el = super.createEl('div', {
@@ -52,11 +58,17 @@ class DurationDisplay extends Component {
   }
 
   /**
-   * Update duration time display
+   * Update duration time display.
    *
-   * @method updateContent
+   * @param {EventTarget~Event} [event]
+   *        The `durationchange`, `timeupdate`, or `loadedmetadata` event that caused
+   *        this function to be called.
+   *
+   * @listens Player#durationchange
+   * @listens Player#timeupdate
+   * @listens Player#loadedmetadata
    */
-  updateContent() {
+  updateContent(event) {
     const duration = this.player_.duration();
 
     if (duration && this.duration_ !== duration) {

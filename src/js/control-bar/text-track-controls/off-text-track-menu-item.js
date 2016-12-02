@@ -7,13 +7,19 @@ import Component from '../../component.js';
 /**
  * A special menu item for turning of a specific type of text track
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends TextTrackMenuItem
- * @class OffTextTrackMenuItem
  */
 class OffTextTrackMenuItem extends TextTrackMenuItem {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     // Create pseudo track info
     // Requires options['kind']
@@ -35,8 +41,8 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
   /**
    * Handle text track change
    *
-   * @param {Object} event Event object
-   * @method handleTracksChange
+   * @param {EventTarget~Event} event
+   *        The event that caused this function to run
    */
   handleTracksChange(event) {
     const tracks = this.player().textTracks();
