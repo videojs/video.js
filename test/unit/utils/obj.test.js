@@ -4,6 +4,23 @@ import * as Obj from '../../../src/js/utils/obj';
 
 QUnit.module('utils/obj');
 
+class Foo {
+  constructor() {}
+  toString() {
+    return 'I am a Foo!';
+  }
+}
+
+const passFail = (assert, fn, descriptor, passes, failures) => {
+  Object.keys(passes).forEach(key => {
+    assert.ok(fn(passes[key]), `${key} IS ${descriptor}`);
+  });
+
+  Object.keys(failures).forEach(key => {
+    assert.notOk(fn(failures[key]), `${key} IS NOT ${descriptor}`);
+  });
+};
+
 QUnit.test('each', function(assert) {
   const spy = sinon.spy();
 
@@ -55,4 +72,36 @@ QUnit.test('reduce', function(assert) {
   assert.strictEqual(third.b, -2);
   assert.strictEqual(third.c, -3);
   assert.strictEqual(third.d, -4);
+});
+
+QUnit.test('isObject', function(assert) {
+  passFail(assert, Obj.isObject, 'an object', {
+    'plain object': {},
+    'constructed object': new Foo(),
+    'array': [],
+    'regex': new RegExp('.'),
+    'date': new Date()
+  }, {
+    null: null,
+    function() {},
+    boolean: true,
+    number: 1,
+    string: 'xyz'
+  });
+});
+
+QUnit.test('isPlain', function(assert) {
+  passFail(assert, Obj.isPlain, 'a plain object', {
+    'plain object': {}
+  }, {
+    'constructed object': new Foo(),
+    'null': null,
+    'array': [],
+    'function'() {},
+    'regex': new RegExp('.'),
+    'date': new Date(),
+    'boolean': true,
+    'number': 1,
+    'string': 'xyz'
+  });
 });

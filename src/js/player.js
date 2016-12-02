@@ -19,7 +19,7 @@ import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import assign from 'object.assign';
+import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';

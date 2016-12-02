@@ -4,7 +4,7 @@
 import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
-import assign from 'object.assign';
+import {assign} from './utils/obj';
 
 /**
  * Base class for all buttons.

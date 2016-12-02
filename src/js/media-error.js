@@ -1,7 +1,7 @@
 /**
  * @file media-error.js
  */
-import assign from 'object.assign';
+import {assign, isObject} from './utils/obj';
 
 /**
  * A Custom `MediaError` class which mimics the standard HTML5 `MediaError` class.
@@ -33,7 +33,7 @@ function MediaError(value) {
   } else if (typeof value === 'string') {
     // default code is zero, so this is a custom error
     this.message = value;
-  } else if (typeof value === 'object') {
+  } else if (isObject(value)) {
 
     // We assign the `code` property manually because native `MediaError` objects
     // do not expose it as an own/enumerable property of the object.

@@ -3,7 +3,7 @@
  */
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 
 /**
  * The base functionality for a slider. Can be vertical or horizontal.

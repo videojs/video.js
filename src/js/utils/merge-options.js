@@ -3,20 +3,7 @@
  * @module merge-options
  */
 import merge from 'lodash-compat/object/merge';
-
-/**
- * Check if an object direct descentant of Object and
- * not of Array or RegExp.
- *
- * @param {Mixed} obj
- *        The object to check
- */
-function isPlain(obj) {
-  return !!obj &&
-    typeof obj === 'object' &&
-    obj.toString() === '[object Object]' &&
-    obj.constructor === Object;
-}
+import {isPlain} from './obj';
 
 /**
  * Merge customizer. video.js simply overwrites non-simple objects

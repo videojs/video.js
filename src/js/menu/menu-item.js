@@ -3,7 +3,7 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 
 /**
  * The component for a menu item. `<li>`

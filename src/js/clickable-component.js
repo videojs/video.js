@@ -7,7 +7,7 @@ import * as Events from './utils/events.js';
 import * as Fn from './utils/fn.js';
 import log from './utils/log.js';
 import document from 'global/document';
-import assign from 'object.assign';
+import {assign} from './utils/obj';
 
 /**
  * Clickable Component which is clickable or keyboard actionable,

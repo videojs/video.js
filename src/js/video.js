@@ -26,6 +26,7 @@ import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
+import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
 import extendFn from './extend.js';
 import merge from 'lodash-compat/object/merge';
@@ -117,7 +118,7 @@ function videojs(id, options, ready) {
   videojs.hooks('beforesetup').forEach(function(hookFunction) {
     const opts = hookFunction(tag, mergeOptions(options));
 
-    if (!opts || typeof opts !== 'object' || Array.isArray(opts)) {
+    if (!isObject(opts) || Array.isArray(opts)) {
       videojs.log.error('please return an object in beforesetup hooks');
       return;
     }

@@ -28,6 +28,7 @@
  * @return {Mixed}
  *         The new accumulated value.
  */
+const toString = Object.prototype.toString;
 
 /**
  * Array-like iteration for objects.
@@ -62,4 +63,56 @@ export function each(object, fn) {
 export function reduce(object, fn, initial = 0) {
   return Object.keys(object).reduce(
     (accum, key) => fn(accum, object[key], key), initial);
+}
+
+/**
+ * Object.assign-style object shallow merge/extend.
+ *
+ * @param  {Object} target
+ * @param  {Object} ...sources
+ * @return {Object}
+ */
+export function assign(target, ...sources) {
+  if (Object.assign) {
+    return Object.assign(target, ...sources);
+  }
+
+  sources.forEach(source => {
+    if (!source) {
+      return;
+    }
+
+    each(source, (value, key) => {
+      target[key] = value;
+    });
+  });
+
+  return target;
+}
+
+/**
+ * Returns whether a value is an object of any kind - including DOM nodes,
+ * arrays, regular expressions, etc. Not functions, though.
+ *
+ * This avoids the gotcha where using `typeof` on a `null` value
+ * results in `'object'`.
+ *
+ * @param  {Object} value
+ * @return {Boolean}
+ */
+export function isObject(value) {
+  return !!value && typeof value === 'object';
+}
+
+/**
+ * Returns whether an object appears to be a "plain" object - that is, a
+ * direct instance of `Object`.
+ *
+ * @param  {Object} value
+ * @return {Boolean}
+ */
+export function isPlain(value) {
+  return isObject(value) &&
+    toString.call(value) === '[object Object]' &&
+    value.constructor === Object;
 }
