@@ -1443,7 +1443,13 @@ class Component {
     if (name === 'Player' && Component.components_[name]) {
       const Player = Component.components_[name];
 
-      if (Player.players && Object.keys(Player.players).length > 0) {
+      // If we have players that were disposed, then their name will still be
+      // in Players.players. So, we must loop through and verify that the value
+      // for each item is not null. This allows registration of the Player component
+      // after all players have been disposed or before any were created.
+      if (Player.players &&
+          Object.keys(Player.players).length > 0 &&
+          Object.keys(Player.players).map((playerName) => Player.players[playerName]).every(Boolean)) {
         throw new Error('Can not register Player component after player has been created');
       }
     }
