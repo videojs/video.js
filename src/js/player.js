@@ -25,6 +25,8 @@ import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
+import TextTrackList from './tracks/text-track-list.js';
+import HTMLTrackElementList from './tracks/html-track-element-list';
 import AudioTrackList from './tracks/audio-track-list.js';
 import VideoTrackList from './tracks/video-track-list.js';
 
@@ -818,6 +820,8 @@ class Player extends Component {
       'techId': `${this.id()}_${techName}_api`,
       'videoTracks': this.videoTracks_,
       'textTracks': this.textTracks_,
+      'remoteTextTracks': this.remoteTextTracks_,
+      'remoteTextTrackEls_': this.remoteTextTrackEls_,
       'audioTracks': this.audioTracks_,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
@@ -839,10 +843,6 @@ class Player extends Component {
       if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
         techOptions.startTime = this.cache_.currentTime;
       }
-
-      this.cache_.sources = null;
-      this.cache_.source = source;
-      this.cache_.src = source.src;
     }
 
     // Initialize tech instance
@@ -911,6 +911,8 @@ class Player extends Component {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
     this.videoTracks_ = this.videoTracks();
     this.textTracks_ = this.textTracks();
+    this.remoteTextTracks_ = this.remoteTextTracks();
+    this.remoteTextTrackEls_ = this.remoteTextTrackEls();
     this.audioTracks_ = this.audioTracks();
     this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
 
@@ -2189,15 +2191,75 @@ class Player extends Component {
     this.cache_.source = src;
     this.cache_.src = src.src;
 
-    middleware.setSource(src, (techName, src_, mws) => {
+    middleware.setSource(src, (src_, mws) => {
       this.middleware_ = mws;
-      this.loadTech_(techName, src_);
+
+      const err = this.src_(src_);
+
+      if (err) {
+        if (Array.isArray(source) && source.length > 1) {
+          return this.src(source.slice(1));
+        }
+
+        // We need to wrap this in a timeout to give folks a chance to add error event handlers
+        this.setTimeout(function() {
+          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+        }, 0);
+
+        // we could not find an appropriate tech, but let's still notify the delegate that this is it
+        // this needs a better comment about why this is needed
+        this.triggerReady();
+
+        return;
+      }
+
       middleware.setTech(mws, this.tech_);
+      this.middleware_.push(this.tech_);
     });
 
     return this;
+  }
 
-    /*
+  src_(source) {
+    const sourceTech = this.selectSource([source]);
+
+    if (sourceTech) {
+      if (sourceTech.tech === this.techName_) {
+
+        // wait until the tech is ready to set the source
+        this.ready(function() {
+
+          // The setSource tech method was added with source handlers
+          // so older techs won't support it
+          // We need to check the direct prototype for the case where subclasses
+          // of the tech do not support source handlers
+          if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
+            this.techCall_('setSource', source);
+          } else {
+            this.techCall_('src', source.src);
+          }
+
+          if (this.options_.preload === 'auto') {
+            this.load();
+          }
+
+          if (this.options_.autoplay) {
+            this.play();
+          }
+
+        // Set the source synchronously if possible (#2326)
+        }, true);
+      } else {
+        // load this technology with the chosen source
+        this.loadTech_(sourceTech.tech, sourceTech.source);
+      }
+
+    } else {
+      return true;
+    }
+
+    return;
+
     let currentTech = Tech.getTech(this.techName_);
 
     // Support old behavior of techs being registered as components.
@@ -2230,34 +2292,10 @@ class Player extends Component {
 
         this.currentType_ = source.type || '';
 
-        // wait until the tech is ready to set the source
-        this.ready(function() {
-
-          // The setSource tech method was added with source handlers
-          // so older techs won't support it
-          // We need to check the direct prototype for the case where subclasses
-          // of the tech do not support source handlers
-          if (currentTech.prototype.hasOwnProperty('setSource')) {
-            this.techCall_('setSource', source);
-          } else {
-            this.techCall_('src', source.src);
-          }
-
-          if (this.options_.preload === 'auto') {
-            this.load();
-          }
-
-          if (this.options_.autoplay) {
-            this.play();
-          }
-
-        // Set the source synchronously if possible (#2326)
-        }, true);
       }
     }
 
     return this;
-    */
   }
 
   /**
@@ -2914,11 +2952,12 @@ class Player extends Component {
    *         or undefined if we don't have a tech
    */
   textTracks() {
-    // cannot use techGet_ directly because it checks to see whether the tech is ready.
-    // Flash is unlikely to be ready in time but textTracks should still work.
-    if (this.tech_) {
-      return this.tech_.textTracks();
+    if (!this.tech_) {
+      this.textTracks_ = this.textTracks_ || new TextTrackList();
+      return this.textTracks_;
     }
+
+    return this.tech_.textTracks();
   }
 
   /**
@@ -2932,9 +2971,12 @@ class Player extends Component {
    *         if we don't have a tech
    */
   remoteTextTracks() {
-    if (this.tech_) {
-      return this.tech_.remoteTextTracks();
+    if (!this.tech_) {
+      this.remoteTextTracks_ = this.remoteTextTracks_ || new TextTrackList();
+      return this.remoteTextTracks_;
     }
+
+    return this.tech_.remoteTextTracks();
   }
 
   /**
@@ -2947,9 +2989,12 @@ class Player extends Component {
    *         or undefined if we don't have a tech
    */
   remoteTextTrackEls() {
-    if (this.tech_) {
-      return this.tech_.remoteTextTrackEls();
+    if (!this.tech_) {
+      this.remoteTextTrackEls_ = this.remoteTextTrackEls_ || new HTMLTrackElementList();
+      return this.remoteTextTrackEls_;
     }
+
+    return this.tech_.remoteTextTrackEls();
   }
 
   /**
