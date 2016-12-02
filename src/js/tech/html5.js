@@ -873,12 +873,16 @@ Html5.canControlPlaybackRate = function() {
 /**
  * Check to see if native `TextTrack`s are supported by this browser/device.
  *
+ * edge only supports the `addtrack` event, so it
+ * does not technically have native support, but we want to use the support
+ * that it does have.
+ *
  * @return {boolean}
  *         - True if native `TextTrack`s are supported.
  *         - False otherwise
  */
 Html5.supportsNativeTextTracks = function() {
-  return browser.IS_ANY_SAFARI;
+  return browser.IS_ANY_SAFARI || browser.IS_EDGE;
 };
 
 /**
