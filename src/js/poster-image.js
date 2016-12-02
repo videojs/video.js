@@ -8,15 +8,21 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 
 /**
- * The component that handles showing the poster image.
+ * A `ClickableComponent` that handles showing the poster image for the player.
  *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Button
- * @class PosterImage
+ * @extends ClickableComponent
  */
 class PosterImage extends ClickableComponent {
 
+  /**
+   * Create an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should attach to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -25,9 +31,7 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Clean up the poster image
-   *
-   * @method dispose
+   * Clean up and dispose of the `PosterImage`.
    */
   dispose() {
     this.player().off('posterchange', this.update);
@@ -35,10 +39,10 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Create the poster's image element
+   * Create the `PosterImage`s DOM element.
    *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl() {
     const el = Dom.createEl('div', {
@@ -61,11 +65,14 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Event handler for updates to the player's poster source
+   * An {@link EventTarget~EventListener} for {@link Player#posterchange} events.
    *
-   * @method update
+   * @listens Player#posterchange
+   *
+   * @param {EventTarget~Event} [event]
+   *        The `Player#posterchange` event that triggered this function.
    */
-  update() {
+  update(event) {
     const url = this.player().poster();
 
     this.setSrc(url);
@@ -80,10 +87,10 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Set the poster source depending on the display method
+   * Set the source of the `PosterImage` depending on the display method.
    *
-   * @param {String} url The URL to the poster source
-   * @method setSrc
+   * @param {String} url
+   *        The URL to the source for the `PosterImage`.
    */
   setSrc(url) {
     if (this.fallbackImg_) {
@@ -102,11 +109,17 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Event handler for clicks on the poster image
+   * An {@link EventTarget~EventListener} for clicks on the `PosterImage`. See
+   * {@link ClickableComponent#handleClick} for instances where this will be triggered.
    *
-   * @method handleClick
+   * @listens tap
+   * @listens click
+   * @listens keydown
+   *
+   * @param {EventTarget~Event} event
+   +        The `click`, `tap` or `keydown` event that caused this function to be called.
    */
-  handleClick() {
+  handleClick(event) {
     // We don't want a click to trigger playback when controls are disabled
     // but CSS should be hiding the poster to prevent that from happening
     if (this.player_.paused()) {
