@@ -1,4 +1,4 @@
-# Troubleshooting
+ Troubleshooting
 
 ## Problems with media formats
 
@@ -15,8 +15,6 @@ HLS is more convenient as mobile browsers have native support.
 ### Make sure you are using formats that video.js can play:
 * Does your browser/OS support the type of media that you are trying to play?
 * Do you have a video.js plugin that will add support for a media format to video.js? For Example:
-  * [videojs-contrib-hls][hls]
-  * [videojs-contrib-dash][dash]
   * [videojs-contrib-youtube][youtube]
 * Verify that you are using the correct [mime-type/content-type][media-types] for your videos.
   This is used to determine if video.js can play a certain type of media.
@@ -27,7 +25,7 @@ HLS is more convenient as mobile browsers have native support.
 
 ### If you are using Flash videos:
 * Make sure that Flash is installed
-* Make sure the Flash tech is included with video.js (in video.js it won't be, see [videojs-flash][flash])
+* Make sure the Flash tech is included with video.js (in `video.js >= v6.0.0` it won't be, see [videojs-flash][flash])
 * Flash media include RTMP streams and FLV format media.
 * SWF is not a media format
 
