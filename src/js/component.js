@@ -4,6 +4,7 @@
  * @file component.js
  */
 import window from 'global/window';
+import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
 import * as DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
@@ -82,6 +83,8 @@ class Component {
     } else if (options.createEl !== false) {
       this.el_ = this.createEl();
     }
+
+    stateful(this, this.constructor.defaultState);
 
     this.children_ = [];
     this.childIndex_ = {};

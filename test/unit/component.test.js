@@ -4,6 +4,7 @@ import Component from '../../src/js/component.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import * as DomData from '../../src/js/utils/dom-data';
 import * as Events from '../../src/js/utils/events.js';
+import * as Obj from '../../src/js/utils/obj';
 import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
 import sinon from 'sinon';
@@ -905,4 +906,14 @@ QUnit.test('$ and $$ functions', function(assert) {
 
   assert.strictEqual(comp.$('div'), children[0], '$ defaults to contentEl as scope');
   assert.strictEqual(comp.$$('div').length, children.length, '$$ defaults to contentEl as scope');
+});
+
+QUnit.test('should use the stateful mixin', function(assert) {
+  const comp = new Component(getFakePlayer(), {});
+
+  assert.ok(Obj.isPlain(comp.state), '`state` is a plain object');
+  assert.strictEqual(typeof comp.setState, 'function', '`setState` is a function');
+
+  comp.setState({foo: 'bar'});
+  assert.strictEqual(comp.state.foo, 'bar', 'the component passes a basic stateful test');
 });
