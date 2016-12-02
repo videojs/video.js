@@ -49,25 +49,25 @@ QUnit.test('registerPlugin() works with class-based plugins', function(assert) {
 QUnit.test('registerPlugin() illegal arguments', function(assert) {
   assert.throws(
     () => Plugin.registerPlugin(),
-    new Error('illegal plugin name, "undefined", must be a string, was undefined'),
+    new Error('Illegal plugin name, "undefined", must be a string, was undefined.'),
     'plugins must have a name'
   );
 
   assert.throws(
     () => Plugin.registerPlugin('play'),
-    new Error('illegal plugin name, "play", already exists'),
+    new Error('Illegal plugin name, "play", already exists.'),
     'plugins cannot share a name with an existing player method'
   );
 
   assert.throws(
     () => Plugin.registerPlugin('foo'),
-    new Error('illegal plugin for "foo", must be a function, was undefined'),
+    new Error('Illegal plugin for "foo", must be a function, was undefined.'),
     'plugins require both arguments'
   );
 
   assert.throws(
     () => Plugin.registerPlugin('foo', {}),
-    new Error('illegal plugin for "foo", must be a function, was object'),
+    new Error('Illegal plugin for "foo", must be a function, was object.'),
     'plugins must be functions'
   );
 });
@@ -105,7 +105,7 @@ QUnit.test('deregisterPlugin()', function(assert) {
 
   assert.throws(
     () => Plugin.deregisterPlugin('plugin'),
-    new Error('cannot de-register base plugin'),
+    new Error('Cannot de-register base plugin.'),
     'the base plugin cannot be de-registered'
   );
 });

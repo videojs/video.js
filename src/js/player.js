@@ -3351,8 +3351,6 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
   };
 });
 
-/* document methods */
-
 /**
  * Fired when the player has initial duration and dimension information
  *

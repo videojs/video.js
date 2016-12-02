@@ -6,9 +6,9 @@ import * as Obj from '../../../src/js/utils/obj';
 
 // Common errors thrown by evented objects.
 const errors = {
-  type: new Error('invalid event type; must be a non-empty string or array'),
-  listener: new Error('invalid listener; must be a function'),
-  target: new Error('invalid target; must be a DOM node or evented object')
+  type: new Error('Invalid event type; must be a non-empty string or array.'),
+  listener: new Error('Invalid listener; must be a function.'),
+  target: new Error('Invalid target; must be a DOM node or evented object.')
 };
 
 const validateListenerCall = (call, thisValue, eventExpectation) => {
@@ -56,7 +56,7 @@ QUnit.test('evented() with custom element', function(assert) {
 
   assert.throws(
     () => evented({foo: {}}, {eventBusKey: 'foo'}),
-    new Error('eventBusKey "foo" does not refer to an element'),
+    new Error('The eventBusKey "foo" does not refer to an element.'),
     'throws if the target does not have an element at the supplied key'
   );
 });

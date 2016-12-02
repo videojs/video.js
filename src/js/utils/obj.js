@@ -2,7 +2,6 @@
  * @file obj.js
  * @module obj
  */
-import objectAssign from 'object.assign';
 
 /**
  * @callback obj:EachCallback
@@ -116,41 +115,4 @@ export function isPlain(value) {
   return isObject(value) &&
     toString.call(value) === '[object Object]' &&
     value.constructor === Object;
-}
-
-/**
- * Object.assign polyfill
- *
- * @param  {Object} target
- * @param  {Object} ...sources
- * @return {Object}
- */
-export function assign(...args) {
-
-  // This exists primarily to isolate our dependence on this third-party
-  // polyfill. If we decide to move away from it, we can do so in one place.
-  return objectAssign(...args);
-}
-
-/**
- * Returns whether an object appears to be a non-function/non-array object.
- *
- * This avoids gotchas like `typeof null === 'object'`.
- *
- * @param  {Object} object
- * @return {Boolean}
- */
-export function isObject(object) {
-  return Object.prototype.toString.call(object) === '[object Object]';
-}
-
-/**
- * Returns whether an object appears to be a "plain" object - that is, a
- * direct instance of `Object`.
- *
- * @param  {Object} object
- * @return {Boolean}
- */
-export function isPlain(object) {
-  return isObject(object) && object.constructor === Object;
 }

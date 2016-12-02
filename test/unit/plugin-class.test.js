@@ -62,7 +62,7 @@ QUnit.test('setup', function(assert) {
 
   assert.throws(
     () => new Plugin(this.player),
-    new Error('Plugin must be sub-classed; not directly instantiated'),
+    new Error('Plugin must be sub-classed; not directly instantiated.'),
     'the Plugin class cannot be directly instantiated'
   );
 });
@@ -112,7 +112,7 @@ QUnit.test('dispose', function(assert) {
   ['dispose', 'setState', 'off', 'on', 'one', 'trigger'].forEach(n => {
     assert.throws(
       () => instance[n](),
-      new Error('cannot call methods on a disposed object'),
+      new Error('Cannot call methods on a disposed object.'),
       `the "${n}" method now throws`
     );
   });
