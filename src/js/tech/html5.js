@@ -842,7 +842,7 @@ Html5.isSupported = function() {
  */
 Html5.canPlayType = function(type) {
   return Html5.TEST_VID.canPlayType(type);
-}
+};
 
 /**
  * Check if the tech can support the given source
@@ -852,7 +852,7 @@ Html5.canPlayType = function(type) {
  */
 Html5.canPlaySource = function(srcObj, options) {
   return Html5.canPlayType(srcObj.type);
-}
+};
 
 /**
  * Check if the volume can be changed in this browser/device.

@@ -1,4 +1,3 @@
-import toTitleCase from '../utils/to-title-case.js';
 import assign from 'object.assign';
 
 const middlewares = {};
@@ -65,15 +64,15 @@ function ssh(src = {}, middleware = [], next, acc = []) {
       // if it's the same time, continue does the current chain
       // otherwise, we want to go down the new chain
       ssh(_src,
-          src.type === _src.type ?  mwrest : middlewares[_src.type],
+          src.type === _src.type ? mwrest : middlewares[_src.type],
           next,
           acc);
     });
   } else if (mwrest.length) {
     ssh(src, mwrest, next, acc);
   } else {
-    //const techs = [].concat(middlewares['*']);
-    //const tech = techs.filter((tech) => !!tech.tech.canPlayType(src.type))[0].name;
+    // const techs = [].concat(middlewares['*']);
+    // const tech = techs.filter((tech) => !!tech.tech.canPlayType(src.type))[0].name;
 
     next(src, acc);
   }

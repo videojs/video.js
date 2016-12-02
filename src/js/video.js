@@ -31,7 +31,6 @@ import xhr from 'xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
-import Flash from './tech/flash.js';
 import { use as middlewareUse } from './tech/middleware.js';
 
 // HTML5 Element Shim for IE8
@@ -302,8 +301,7 @@ videojs.getTech = Tech.getTech;
  */
 videojs.registerTech = function(name, tech) {
   Tech.registerTech(name, tech);
-}
-
+};
 
 /**
  * A suite of browser and device tests from {@link browser}.
