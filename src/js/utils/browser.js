@@ -1,5 +1,6 @@
 /**
  * @file browser.js
+ * @module browser
  */
 import document from 'global/document';
 import window from 'global/window';

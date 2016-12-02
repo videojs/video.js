@@ -21,12 +21,18 @@ const fontMap = {
 };
 
 /**
- * Add cue HTML to display
+ * Construct an rgba color from a given hex color code.
  *
- * @param {Number} color Hex number for color, like #f0e
- * @param {Number} opacity Value for opacity,0.0 - 1.0
- * @return {RGBAColor} In the form 'rgba(255, 0, 0, 0.3)'
- * @method constructColor
+ * @param {number} color
+ *        Hex number for color, like #f0e.
+ *
+ * @param {number} opacity
+ *        Value for opacity, 0.0 - 1.0.
+ *
+ * @return {string}
+ *         The rgba color that was created, like 'rgba(255, 0, 0, 0.3)'.
+ *
+ * @private
  */
 function constructColor(color, opacity) {
   return 'rgba(' +
@@ -38,13 +44,17 @@ function constructColor(color, opacity) {
 }
 
 /**
- * Try to update style
- * Some style changes will throw an error, particularly in IE8. Those should be noops.
+ * Try to update the style of a DOM element. Some style changes will throw an error,
+ * particularly in IE8. Those should be noops.
  *
- * @param {Element} el The element to be styles
- * @param {CSSProperty} style The CSS property to be styled
- * @param {CSSStyle} rule The actual style to be applied to the property
- * @method tryUpdateStyle
+ * @param {Element} el
+ *        The DOM element to be styled.
+ *
+ * @param {string} style
+ *        The CSS property on the element that should be styled.
+ *
+ * @param {string} rule
+ *        The style rule that should be applied to the property.
  */
 function tryUpdateStyle(el, style, rule) {
   try {
@@ -57,16 +67,24 @@ function tryUpdateStyle(el, style, rule) {
 }
 
 /**
- * The component for displaying text track cues
+ * The component for displaying text track cues.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready    Ready callback function
  * @extends Component
- * @class TextTrackDisplay
  */
 class TextTrackDisplay extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @param {Component~ReadyCallback} [ready]
+   *        The function to call when `TextTrackDisplay` is ready.
+   */
   constructor(player, options, ready) {
     super(player, options, ready);
 
@@ -123,9 +141,12 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Toggle display texttracks
+   * Turn display of {@link TextTrack}'s from the current state into the other state.
+   * There are only two states:
+   * - 'shown'
+   * - 'hidden'
    *
-   * @method toggleDisplay
+   * @listens Player#loadstart
    */
   toggleDisplay() {
     if (this.player_.tech_ && this.player_.tech_.featuresNativeTextTracks) {
@@ -136,10 +157,10 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the {@link Component}'s DOM element.
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
@@ -151,9 +172,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Clear display texttracks
-   *
-   * @method clearDisplay
+   * Clear all displayed {@link TextTrack}s.
    */
   clearDisplay() {
     if (typeof window.WebVTT === 'function') {
@@ -162,9 +181,11 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Update display texttracks
+   * Update the displayed TextTrack when a either a {@link Player#texttrackchange} or
+   * a {@link Player#fullscreenchange} is fired.
    *
-   * @method updateDisplay
+   * @listens Player#texttrackchange
+   * @listens Player#fullscreenchange
    */
   updateDisplay() {
     const tracks = this.player_.textTracks();
@@ -210,10 +231,10 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add texttrack to texttrack list
+   * Add an {@link Texttrack} to to the {@link Tech}s {@link TextTrackList}.
    *
-   * @param {TextTrackObject} track Texttrack object to be added to list
-   * @method updateForTrack
+   * @param {TextTrack} track
+   *        Text track object to be added to the list.
    */
   updateForTrack(track) {
     if (typeof window.WebVTT !== 'function' || !track.activeCues) {

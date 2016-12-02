@@ -6,11 +6,16 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /**
- * anywhere we call this function we diverge from the spec
+ * Anywhere we call this function we diverge from the spec
  * as we only support one enabled audiotrack at a time
  *
- * @param {Array|AudioTrackList} list list to work on
- * @param {AudioTrack} track the track to skip
+ * @param {AudioTrackList} list
+ *        list to work on
+ *
+ * @param {AudioTrack} track
+ *        The track to skip
+ *
+ * @private
  */
 const disableOthers = function(list, track) {
   for (let i = 0; i < list.length; i++) {
@@ -23,25 +28,19 @@ const disableOthers = function(list, track) {
 };
 
 /**
- * A list of possible audio tracks. All functionality is in the
- * base class Tracklist and the spec for AudioTrackList is located at:
- * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
+ * The current list of {@link AudioTrack} for a media file.
  *
- * interface AudioTrackList : EventTarget {
- *   readonly attribute unsigned long length;
- *   getter AudioTrack (unsigned long index);
- *   AudioTrack? getTrackById(DOMString id);
- *
- *   attribute EventHandler onchange;
- *   attribute EventHandler onaddtrack;
- *   attribute EventHandler onremovetrack;
- * };
- *
- * @param {AudioTrack[]} tracks a list of audio tracks to instantiate the list with
+ * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist}
  * @extends TrackList
- * @class AudioTrackList
  */
 class AudioTrackList extends TrackList {
+
+  /**
+   * Create an instance of this class.
+   *
+   * @param {AudioTrack[]} [tracks=[]]
+   *        A list of `AudioTrack` to instantiate the list with.
+   */
   constructor(tracks = []) {
     let list;
 
@@ -76,6 +75,15 @@ class AudioTrackList extends TrackList {
     return list;
   }
 
+  /**
+   * Add an {@link AudioTrack} to the `AudioTrackList`.
+   *
+   * @param {AudioTrack} track
+   *        The AudioTrack to add to the list
+   *
+   * @fires Track#addtrack
+   * @private
+   */
   addTrack_(track) {
     if (track.enabled) {
       disableOthers(this, track);
@@ -87,6 +95,10 @@ class AudioTrackList extends TrackList {
       return;
     }
 
+    /**
+     * @listens AudioTrack#enabledchange
+     * @fires TrackList#change
+     */
     track.addEventListener('enabledchange', () => {
       // when we are disabling other tracks (since we don't support
       // more than one track at a time) we will set changing_
@@ -101,10 +113,26 @@ class AudioTrackList extends TrackList {
     });
   }
 
+  /**
+   * Add an {@link AudioTrack} to the `AudioTrackList`.
+   *
+   * @param {AudioTrack} track
+   *        The AudioTrack to add to the list
+   *
+   * @fires Track#addtrack
+   */
   addTrack(track) {
     this.addTrack_(track);
   }
 
+  /**
+   * Remove an {@link AudioTrack} from the `AudioTrackList`.
+   *
+   * @param {AudioTrack} track
+   *        The AudioTrack to remove from the list
+   *
+   * @fires Track#removetrack
+   */
   removeTrack(track) {
     super.removeTrack_(track);
   }
