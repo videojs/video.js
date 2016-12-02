@@ -20,6 +20,9 @@ Currently video.js can be installed using bower, npm, serving a release file fro
 a github tag, or even using a CDN hosted version. For information on doing any of those
 see the [install guide][install-guide].
 
+## Q: Is video.js on bower?
+Yes! See the [install guide][install-guide] for more information.
+
 ## Q: What do video.js version numbers mean?
 video.js follows [semver][semver] which means that the API should not change
 out from under a user unless there is a major version increase.
@@ -142,17 +145,14 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 ## Q: Does video.js work with webpack?
 Yes! Please [submit an issue or open a pull request][pr-issue-question] if this does not work.
 
-## Q: Is video.js on bower?
-Yes! See the [install guide][install-guide] for more information.
-
 <!-- guides -->
-[plugin-guide]: /docs/guides/plugins
+[plugin-guide]: /docs/guides/plugins.md
 [install-guide]: http://videojs.com/getting-started/
-[troubleshooting]: /docs/guides/troubleshooting
-[video-tracks]: /docs/guides/video-tracks
-[audio-tracks]: /docs/guides/audio-tracks
-[text-tracks]:  /docs/guides/text-tracks
-[pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
+[troubleshooting]: /docs/guides/troubleshooting.md
+[video-tracks]: /docs/guides/video-tracks.md
+[audio-tracks]: /docs/guides/audio-tracks.md
+[text-tracks]:  /docs/guides/text-tracks.md
+[pr-issue-question]: /docs/guides/faq.md#q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
 
 <!-- official projects -->
 [hls]: http://github.com/videojs/videojs-contrib-hls
