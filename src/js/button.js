@@ -29,23 +29,13 @@ class Button extends ClickableComponent {
    *         The element that gets created.
    */
   createEl(tag = 'button', props = {}, attributes = {}) {
+    if (tag !== 'button') {
+      throw new Error('Buttons must be created with a "button" tag.');
+    }
+
     props = assign({
       className: this.buildCSSClass()
     }, props);
-
-    if (tag !== 'button') {
-      log.warn(`Creating a Button with an HTML element of ${tag} is deprecated; use ClickableComponent instead.`);
-
-      // Add properties for clickable element which is not a native HTML button
-      props = assign({
-        tabIndex: 0
-      }, props);
-
-      // Add ARIA attributes for clickable element which is not a native HTML button
-      attributes = assign({
-        role: 'button'
-      }, attributes);
-    }
 
     // Add attributes for button element
     attributes = assign({
