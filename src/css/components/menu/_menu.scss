@@ -37,7 +37,6 @@
 
 .vjs-menu li.vjs-menu-item:focus,
 .vjs-menu li.vjs-menu-item:hover {
-  outline: 0;
   @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
 }
 

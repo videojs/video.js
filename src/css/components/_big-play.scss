@@ -36,7 +36,6 @@
 
 .video-js:hover .vjs-big-play-button,
 .video-js .vjs-big-play-button:focus {
-  outline: 0;
   border-color: $primary-foreground-color;
 
   @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
