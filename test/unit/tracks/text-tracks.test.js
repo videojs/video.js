@@ -410,9 +410,9 @@ QUnit.test('should return correct remote text track values', function(assert) {
 
   fixture.innerHTML += html;
   const tag = document.getElementById('example_1');
-  const player = TestHelpers.makePlayer({techOrder: ['html5']}, tag);
+  const player = TestHelpers.makePlayer({}, tag);
 
-  this.clock.tick(1);
+  this.clock.tick(10);
 
   assert.equal(player.remoteTextTracks().length, 1, 'add text track via html');
   assert.equal(player.remoteTextTrackEls().length, 1, 'add html track element via html');
