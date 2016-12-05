@@ -106,7 +106,6 @@
     "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "npm-run": "^4.1.0",
-    "permute": "^1.0.0",
     "proxyquireify": "^3.0.0",
     "qunitjs": "1.23.1",
     "remark-cli": "^2.1.0",
