@@ -104,6 +104,7 @@ module.exports = function(config) {
         'chrome_bs',
         'firefox_bs',
         'safari_bs',
+        'edge_bs',
         'ie11_bs',
         'ie10_bs',
         'ie9_bs',
@@ -138,6 +139,14 @@ function getCustomLaunchers(){
       browser: 'safari',
       os: 'OS X',
       os_version: 'Yosemite'
+    },
+
+    edge_bs: {
+      base: 'BrowserStack',
+      browser: 'edge',
+      browser_version: '14',
+      os: 'Windows',
+      os_version: '10'
     },
 
     ie11_bs: {
