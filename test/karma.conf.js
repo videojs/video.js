@@ -144,7 +144,6 @@ function getCustomLaunchers(){
     edge_bs: {
       base: 'BrowserStack',
       browser: 'edge',
-      browser_version: '14',
       os: 'Windows',
       os_version: '10'
     },
