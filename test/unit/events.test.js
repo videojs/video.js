@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import * as Events from '../../src/js/utils/events.js';
 import document from 'global/document';
+import log from '../../src/js/utils/log.js';
 
 QUnit.module('Events');
 
@@ -263,6 +264,10 @@ QUnit.test('should have relatedTarget correctly set on the event', function(asse
 QUnit.test('should execute remaining handlers after an exception in an event handler', function(assert) {
   assert.expect(1);
 
+  const oldLogError = log.error;
+
+  log.error = function() {};
+
   const el = document.createElement('div');
   const listener1 = function() {
     throw new Error('GURU MEDITATION ERROR');
@@ -276,4 +281,6 @@ QUnit.test('should execute remaining handlers after an exception in an event han
 
   // 1 click
   Events.trigger(el, 'click');
+
+  log.error = oldLogError;
 });
