@@ -55,7 +55,7 @@ export const bind = function(context, fn, uid) {
  * @return {Function}
  */
 export const throttle = function(fn, wait) {
-  let last;
+  let last = Date.now();
 
   const throttled = function(...args) {
     const now = Date.now();
