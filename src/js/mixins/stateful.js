@@ -63,6 +63,9 @@ const setState = function(next) {
  * arbitrary keys/values and a `setState` method which will trigger state
  * changes if the object has a `trigger` method.
  *
+ * If the target object has a `handleStateChanged` method, it will be
+ * automatically bound to the `statechanged` event on itself.
+ *
  * @param  {Object} target
  *         The object to be made stateful.
  *
@@ -76,6 +79,12 @@ const setState = function(next) {
 function stateful(target, defaultState) {
   target.state = Obj.assign({}, defaultState);
   target.setState = Fn.bind(target, setState);
+
+  // Auto-bind the `handleStateChanged` method of the target object if it exists.
+  if (typeof target.handleStateChanged === 'function' && typeof target.on === 'function') {
+    target.on('statechanged', target.handleStateChanged);
+  }
+
   return target;
 }
 

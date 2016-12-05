@@ -160,7 +160,7 @@ class Plugin {
       }
     });
 
-    this.on('statechanged', this.handleStateChanged);
+    // If the player is disposed, dispose the plugin.
     player.on('dispose', this.dispose);
 
     /**

@@ -69,3 +69,19 @@ QUnit.test('setState() without changes does not trigger the "statechanged" event
   assert.strictEqual(changes, undefined, 'no changes were returned');
   assert.strictEqual(spy.callCount, 0, 'no event was triggered');
 });
+
+QUnit.test('handleStateChanged() is automatically bound to "statechanged" event', function(assert) {
+  const target = new EventTarget();
+
+  target.handleStateChanged = sinon.spy();
+  stateful(target, {foo: 'bar'});
+
+  const changes = target.setState({foo: true});
+
+  assert.ok(target.handleStateChanged.called, 'the "statechanged" event occurred');
+
+  const event = target.handleStateChanged.firstCall.args[0];
+
+  assert.strictEqual(event.type, 'statechanged', 'the event had the expected type');
+  assert.strictEqual(event.changes, changes, 'the handleStateChanged() method was called');
+});

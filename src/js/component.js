@@ -1646,6 +1646,19 @@ class Component {
   }
 
   /**
+   * Handles "statechanged" events on the component. No-op by default, override
+   * by subclassing.
+   *
+   * @param {Event} e
+   *        An event object provided by a "statechanged" event.
+   *
+   * @param {Object} e.changes
+   *        An object describing changes that occurred with the "statechanged"
+   *        event.
+   */
+  handleStateChanged(e) {}
+
+  /**
    * Register a `Component` with `videojs` given the name and the component.
    *
    * > NOTE: {@link Tech}s should not be registered as a `Component`. {@link Tech}s
