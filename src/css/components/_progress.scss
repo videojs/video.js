@@ -71,6 +71,7 @@
     display: none;
   }
 }
+
 .video-js .vjs-play-progress {
   background-color: $primary-foreground-color;
   @extend .vjs-icon-circle;
@@ -86,9 +87,7 @@
 
 // Current Time "tooltip"
 // By default this is hidden and only shown when hovering over the progress control
-.video-js .vjs-time-tooltip,
-.video-js .vjs-mouse-display:after,
-.video-js .vjs-play-progress:after {
+.video-js .vjs-time-tooltip {
   visibility: hidden;
   pointer-events: none;
   position: absolute;
@@ -106,10 +105,6 @@
 .video-js .vjs-play-progress:before,
 .video-js .vjs-play-progress:after {
   z-index: 1;
-}
-
-.video-js .vjs-progress-control .vjs-keep-tooltips-inside:after {
-  display: none;
 }
 
 .video-js .vjs-load-progress {

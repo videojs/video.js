@@ -4,7 +4,6 @@
 import Component from '../../component.js';
 
 import './seek-bar.js';
-import './mouse-time-display.js';
 
 /**
  * The Progress Control component contains the seek bar, load progress,

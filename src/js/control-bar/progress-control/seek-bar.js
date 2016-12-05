@@ -10,6 +10,7 @@ import computedStyle from '../../utils/computed-style.js';
 import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './tooltip-progress-bar.js';
+import './mouse-time-display.js';
 
 /**
  * Seek Bar and holder for the progress bars
@@ -29,20 +30,10 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-    this.on(player, 'timeupdate', this.updateProgress);
-    this.on(player, 'ended', this.updateProgress);
-    player.ready(Fn.bind(this, this.updateProgress));
-
-    if (options.playerOptions &&
-        options.playerOptions.controlBar &&
-        options.playerOptions.controlBar.progressControl &&
-        options.playerOptions.controlBar.progressControl.keepTooltipsInside) {
-      this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
-    }
-
-    if (this.keepTooltipsInside) {
-      this.tooltipProgressBar = this.addChild('TooltipProgressBar');
-    }
+    this.updateProgress = Fn.bind(this, this.updateProgress);
+    this.on(player, ['timeupdate', 'ended'], this.updateProgress);
+    player.ready(this.updateProgress);
+    this.tooltipProgressBar = this.addChild('TooltipProgressBar');
   }
 
   /**
@@ -70,19 +61,16 @@ class SeekBar extends Slider {
    */
   updateProgress(event) {
     this.updateAriaAttributes(this.el_);
+    this.updateAriaAttributes(this.tooltipProgressBar.el_);
+    this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
 
-    if (this.keepTooltipsInside) {
-      this.updateAriaAttributes(this.tooltipProgressBar.el_);
-      this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
+    const playerWidth = parseFloat(computedStyle(this.player_.el(), 'width'));
+    const tooltipWidth = parseFloat(computedStyle(this.tooltipProgressBar.tooltip, 'width'));
+    const tooltipStyle = this.tooltipProgressBar.el().style;
 
-      const playerWidth = parseFloat(computedStyle(this.player().el(), 'width'));
-      const tooltipWidth = parseFloat(computedStyle(this.tooltipProgressBar.tooltip, 'width'));
-      const tooltipStyle = this.tooltipProgressBar.el().style;
-
-      tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
-      tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';
-      tooltipStyle.right = `-${tooltipWidth / 2}px`;
-    }
+    tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
+    tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';
+    tooltipStyle.right = `-${tooltipWidth / 2}px`;
   }
 
   /**
@@ -97,6 +85,7 @@ class SeekBar extends Slider {
 
     // machine readable value of progress bar (percentage complete)
     el.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2));
+
     // human readable value of progress bar (time complete)
     el.setAttribute('aria-valuetext', formatTime(time, this.player_.duration()));
   }

@@ -27,23 +27,20 @@ class MouseTimeDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
-    if (options.playerOptions &&
-        options.playerOptions.controlBar &&
-        options.playerOptions.controlBar.progressControl &&
-        options.playerOptions.controlBar.progressControl.keepTooltipsInside) {
-      this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
-    }
-
-    if (this.keepTooltipsInside) {
-      this.tooltip = Dom.createEl('div', {className: 'vjs-time-tooltip'});
-      this.el().appendChild(this.tooltip);
-      this.addClass('vjs-keep-tooltips-inside');
-    }
+    this.tooltip = Dom.createEl('div', {className: 'vjs-time-tooltip'});
+    this.el().appendChild(this.tooltip);
 
     this.update(0, 0);
 
     player.on('ready', () => {
-      this.on(player.controlBar.progressControl.el(), 'mousemove', Fn.throttle(Fn.bind(this, this.handleMouseMove), 25));
+      const progressControlEl = player.
+        getChild('controlBar').
+        getChild('progressControl').
+        el();
+
+      const listener = Fn.throttle(Fn.bind(this, this.handleProgressMouseMove), 25);
+
+      this.on(progressControlEl, 'mousemove', listener);
     });
   }
 
@@ -60,28 +57,43 @@ class MouseTimeDisplay extends Component {
   }
 
   /**
-   * Handle the mouse move event on the `MouseTimeDisplay`.
+   * Handle the mouse move event on the grandparent progress control.
    *
    * @param {EventTarget~Event} event
    *        The `mousemove` event that caused this to event to run.
    *
    * @listen mousemove
    */
-  handleMouseMove(event) {
+  handleProgressMouseMove(event) {
+    const referenceEl = this.el().parentNode;
     const duration = this.player_.duration();
     const newTime = this.calculateDistance(event) * duration;
-    const position = event.pageX - Dom.findElPosition(this.el().parentNode).left;
+
+    let position = event.pageX - Dom.findElPosition(referenceEl).left;
+
+    // Because the event is targeting the grandparent of this component, we
+    // need to ensure that the position remains within the actual reference
+    // element (the parent, i.e. the seek-bar). On the left, this means
+    // ensuring that position is always 0 or above.
+    if (position < 0) {
+      position = 0;
+
+    // On the right, this means ensuring the position is always less than or
+    // equal to the seek bar's client width.
+    } else if (position > referenceEl.clientWidth) {
+      position = referenceEl.clientWidth;
+    }
 
     this.update(newTime, position);
   }
 
   /**
-   * Update the time and posistion of the `MouseTimeDisplay`.
+   * Update the time and position of the `MouseTimeDisplay`.
    *
    * @param {number} newTime
    *        Time to change the `MouseTimeDisplay` to.
    *
-   * @param {nubmer} position
+   * @param {number} position
    *        Postion from the left of the in pixels.
    */
   update(newTime, position) {
@@ -90,15 +102,13 @@ class MouseTimeDisplay extends Component {
     this.el().style.left = position + 'px';
     this.el().setAttribute('data-current-time', time);
 
-    if (this.keepTooltipsInside) {
-      const clampedPosition = this.clampPosition_(position);
-      const difference = position - clampedPosition + 1;
-      const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
-      const tooltipWidthHalf = tooltipWidth / 2;
+    const clampedPosition = this.clampPosition_(position);
+    const difference = position - clampedPosition + 1;
+    const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
+    const tooltipWidthHalf = tooltipWidth / 2;
 
-      this.tooltip.innerHTML = time;
-      this.tooltip.style.right = `-${tooltipWidthHalf - difference}px`;
-    }
+    this.tooltip.innerHTML = time;
+    this.tooltip.style.right = `-${tooltipWidthHalf - difference}px`;
   }
 
   /**
@@ -116,10 +126,10 @@ class MouseTimeDisplay extends Component {
   }
 
   /**
-   * This takes in a horizontal position for the bar and returns a clamped position.
-   * Clamped position means that it will keep the position greater than half the width
-   * of the tooltip and smaller than the player width minus half the width o the tooltip.
-   * It will only clamp the position if `keepTooltipsInside` option is set.
+   * This takes in a horizontal position for the bar and returns a clamped
+   * position. Clamped position means that it will keep the position greater
+   * than half the width of the tooltip and smaller than the player width minus
+   * half the width of the tooltip.
    *
    * @param {number} position
    *        The position the bar wants to be
@@ -130,14 +140,12 @@ class MouseTimeDisplay extends Component {
    * @private
    */
   clampPosition_(position) {
-    if (!this.keepTooltipsInside) {
-      return position;
-    }
-
     const playerWidth = parseFloat(computedStyle(this.player().el(), 'width'));
     const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
     const tooltipWidthHalf = tooltipWidth / 2;
     let actualPosition = position;
+
+    // need to account for the width of the progress-holder element
 
     if (position < tooltipWidthHalf) {
       actualPosition = Math.ceil(tooltipWidthHalf);
