@@ -223,6 +223,7 @@ module.exports = function(grunt) {
       chrome_bs:    { browsers: ['chrome_bs'] },
       firefox_bs:   { browsers: ['firefox_bs'] },
       safari_bs:    { browsers: ['safari_bs'] },
+      edge_bs:      { browsers: ['edge_bs'] },
       ie11_bs:      { browsers: ['ie11_bs'] },
       ie10_bs:      { browsers: ['ie10_bs'] },
       ie9_bs:       { browsers: ['ie9_bs'] },
