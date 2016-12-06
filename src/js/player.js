@@ -1271,12 +1271,14 @@ class Player extends Component {
    *
    * @fires Player#firstplay
    * @listens Tech#firstplay
+   * @deprecated In 6.0 passing the `starttime` option to the player will be deprecated
    * @private
    */
   handleTechFirstPlay_() {
     // If the first starttime attribute is specified
     // then we will start at the given offset in seconds
     if (this.options_.starttime) {
+      log.warn('Passing the `starttime` option to the player will be deprecated in 6.0');
       this.currentTime(this.options_.starttime);
     }
 
