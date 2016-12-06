@@ -9,7 +9,6 @@ import computedStyle from '../../utils/computed-style.js';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
-import './tooltip-progress-bar.js';
 import './mouse-time-display.js';
 
 /**
@@ -33,7 +32,6 @@ class SeekBar extends Slider {
     this.updateProgress = Fn.bind(this, this.updateProgress);
     this.on(player, ['timeupdate', 'ended'], this.updateProgress);
     player.ready(this.updateProgress);
-    this.tooltipProgressBar = this.addChild('TooltipProgressBar');
   }
 
   /**
@@ -60,13 +58,14 @@ class SeekBar extends Slider {
    * @listens Player#ended
    */
   updateProgress(event) {
+    const playProgressBar = this.getChild('playProgressBar');
+
     this.updateAriaAttributes(this.el_);
-    this.updateAriaAttributes(this.tooltipProgressBar.el_);
-    this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
+    this.updateAriaAttributes(playProgressBar.el_);
 
     const playerWidth = parseFloat(computedStyle(this.player_.el(), 'width'));
-    const tooltipWidth = parseFloat(computedStyle(this.tooltipProgressBar.tooltip, 'width'));
-    const tooltipStyle = this.tooltipProgressBar.el().style;
+    const tooltipWidth = parseFloat(computedStyle(playProgressBar.tooltip, 'width'));
+    const tooltipStyle = playProgressBar.el_.style;
 
     tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
     tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';

@@ -23,9 +23,11 @@ class PlayProgressBar extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.updateDataAttr();
-    this.on(player, 'timeupdate', this.updateDataAttr);
-    player.ready(Fn.bind(this, this.updateDataAttr));
+    this.tooltip = this.el_.querySelector('.vjs-time-tooltip');
+    this.update = Fn.bind(this, this.update);
+    this.on(player, 'timeupdate', this.update);
+    player.ready(this.update);
+    this.update();
   }
 
   /**
@@ -37,24 +39,26 @@ class PlayProgressBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-play-progress vjs-slider-bar',
-      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
+      innerHTML: `<div class="vjs-time-tooltip"></div><span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
     });
   }
 
   /**
-   * Update the data-current-time attribute on the `PlayProgressBar`.
+   * Update the data-current-time attribute on the `PlayProgressBar` and
+   * the contents of the tooltip.
    *
    * @param {EventTarget~Event} [event]
    *        The `timeupdate` event that caused this to run.
    *
    * @listens Player#timeupdate
    */
-  updateDataAttr(event) {
+  update(event) {
     const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    const formattedTime = formatTime(time, this.player_.duration());
 
-    this.el_.setAttribute('data-current-time', formatTime(time, this.player_.duration()));
+    this.el_.setAttribute('data-current-time', formattedTime);
+    this.tooltip.innerHTML = formattedTime;
   }
-
 }
 
 Component.registerComponent('PlayProgressBar', PlayProgressBar);

@@ -50,7 +50,6 @@
 // Progress Bars
 .video-js .vjs-progress-holder .vjs-play-progress,
 .video-js .vjs-progress-holder .vjs-load-progress,
-.video-js .vjs-progress-holder .vjs-tooltip-progress-bar,
 .video-js .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
@@ -133,10 +132,6 @@
   position: relative;
   float: right;
   right: -1.9em;
-}
-
-.vjs-tooltip-progress-bar {
-  visibility: hidden;
 }
 
 .video-js .vjs-progress-control .vjs-mouse-display {
