@@ -14,12 +14,12 @@ export function setTech(middleware, tech) {
   middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
 }
 
-export function get(middleware, method) {
-  return middleware.reduceRight(middlewareIterator(method), undefined);
+export function get(middleware, tech, method) {
+  return middleware.reduceRight(middlewareIterator(method), tech[method]());
 }
 
-export function set(middleware, method, arg) {
-  return middleware.reduce(middlewareIterator(method), arg);
+export function set(middleware, tech, method, arg) {
+  return tech[method](middleware.reduce(middlewareIterator(method), arg));
 }
 
 export const allowedGetters = {
