@@ -1193,6 +1193,21 @@ Html5.resetMediaElement = function(el) {
   'muted',
 
   /**
+   * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
+   * that the volume for the media should be set to silent when the video first starts.
+   * This does not actually change the `volume` attribute. After playback has started `muted`
+   * will indicate the current status of the volume and `defaultMuted` will not.
+   *
+   * @method Html5.prototype.defaultMuted
+   * @return {boolean}
+   *         - True if the value of `volume` should be ignored and the audio set to silent.
+   *         - False if the value of `volume` should be used.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
+   */
+  'defaultMuted',
+
+  /**
    * Get the value of `poster` from the media element. `poster` indicates
    * that the url of an image file that can/will be shown when no media data is available.
    *
@@ -1327,7 +1342,7 @@ Html5.resetMediaElement = function(el) {
   /**
    * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
    * whether the media should start muted or not. Only changes the default state of the
-   * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
+   * media. `muted` and `defaultMuted` can have different values. {@link Html5#muted} indicates the
    * current state.
    *
    * @method Html5.prototype.defaultMuted
@@ -1354,6 +1369,24 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-playbackrate}
    */
   'playbackRate',
+
+  /**
+   * Get the value of `defaultPlaybackRate` from the media element. `defaultPlaybackRate` indicates
+   * the rate at which the media is currently playing back. This value will not indicate the current
+   * `playbackRate` after playback has started, use {@link Html5#playbackRate} for that.
+   *
+   * Examples:
+   *   - if defaultPlaybackRate is set to 2, media will play twice as fast.
+   *   - if defaultPlaybackRate is set to 0.5, media will play half as fast.
+   *
+   * @method Html5.prototype.defaultPlaybackRate
+   * @return {number}
+   *         The value of `defaultPlaybackRate` from the media element. A number indicating
+   *         the current playback speed of the media, where 1 is normal speed.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-playbackrate}
+   */
+  'defaultPlaybackRate',
 
   /**
    * Get the value of `played` from the media element. `played` returns a `TimeRange`
@@ -1452,7 +1485,7 @@ Html5.resetMediaElement = function(el) {
   'volume',
 
   /**
-   * Set the value of `muted` on the media element. `muted` indicates the current
+   * Set the value of `muted` on the media element. `muted` indicates that the current
    * audio level should be silent.
    *
    * @method Html5.prototype.setMuted
@@ -1463,6 +1496,19 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
    */
   'muted',
+
+  /**
+   * Set the value of `defaultMuted` on the media element. `defaultMuted` indicates that the current
+   * audio level should be silent, but will only effect the muted level on intial playback..
+   *
+   * @method Html5.prototype.setDefaultMuted
+   * @param {boolean} defaultMuted
+   *        - True if the audio should be set to silent
+   *        - False otherwise
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
+   */
+  'defaultMuted',
 
   /**
    * Set the value of `src` on the media element. `src` indicates the current
@@ -1550,7 +1596,26 @@ Html5.resetMediaElement = function(el) {
    *
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-playbackrate}
    */
-  'playbackRate'
+  'playbackRate',
+
+  /**
+   * Set the value of `defaultPlaybackRate` on the media element. `defaultPlaybackRate` indicates
+   * the rate at which the media should play back upon initial startup. Changing this value
+   * after a video has started will do nothing. Instead you should used {@link Html5#setPlaybackRate}.
+   *
+   * Example Values:
+   *   - if playbackRate is set to 2, media will play twice as fast.
+   *   - if playbackRate is set to 0.5, media will play half as fast.
+   *
+   * @method Html5.prototype.setDefaultPlaybackRate
+   * @return {number}
+   *         The value of `defaultPlaybackRate` from the media element. A number indicating
+   *         the current playback speed of the media, where 1 is normal speed.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultplaybackrate}
+   */
+  'defaultPlaybackRate'
+
 ].forEach(function(prop) {
   Html5.prototype['set' + toTitleCase(prop)] = function(v) {
     this.el_[prop] = v;
