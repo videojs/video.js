@@ -373,6 +373,8 @@ class Player extends Component {
 
     this.options_.playerOptions = playerOptionsCopy;
 
+    this.middleware_ = [];
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
