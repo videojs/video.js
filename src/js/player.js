@@ -1271,7 +1271,7 @@ class Player extends Component {
    *
    * @fires Player#firstplay
    * @listens Tech#firstplay
-   * @deprecated In 6.0 passing the `starttime` option to the player will be deprecated
+   * @deprecated As of 6.0 passing the `starttime` option to the player will be deprecated
    * @private
    */
   handleTechFirstPlay_() {
