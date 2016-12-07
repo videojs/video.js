@@ -6,7 +6,7 @@ export function use(type, middleware) {
   (middlewares[type] = middlewares[type] || []).push(middleware);
 }
 
-export function setSource(src, next) {
+export function setSource(setTimeout, src, next) {
   setTimeout(() => ssh(src, middlewares[src.type], next), 1);
 }
 

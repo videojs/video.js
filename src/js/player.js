@@ -2191,7 +2191,7 @@ class Player extends Component {
     this.cache_.source = src;
     this.cache_.src = src.src;
 
-    middleware.setSource(src, (src_, mws) => {
+    middleware.setSource(Fn.bind(this, this.setTimeout), src, (src_, mws) => {
       this.middleware_ = mws;
 
       const err = this.src_(src_);
