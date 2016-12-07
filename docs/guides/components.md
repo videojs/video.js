@@ -1,29 +1,43 @@
 # Components
+
 The architecture of the Video.js player is centered around components. The `Player` class and all classes representing player controls and other UI elements inherit from the `Component` class. This architecture makes it easy to construct the user interface of the Video.js player in a tree-like structure that mirrors the DOM.
 
+## Table of Contents
+
+* [What is a Component?](#what-is-a-component)
+* [Creating a Component](#creating-a-component)
+* [Component Children](#component-children)
+* [Default Component Tree](#default-component-tree)
+* [Specific Component Details](#specific-component-details)
+  * [Progress Control](#progress-control)
+  * [Text Track Settings](#text-track-settings)
+
 ## What is a Component?
+
 A component is a JavaScript object that has the following features:
 
-- An associated DOM element.
-- An association to a `Player` object.
-- The ability to manage any number of child components.
-- The ability to listen for and trigger events.
-- A lifecycle of initialization and disposal.
+* An associated DOM element.
+* An association to a `Player` object.
+* The ability to manage any number of child components.
+* The ability to listen for and trigger events.
+* A lifecycle of initialization and disposal.
 
 For more specifics on the programmatic interface of a component, see [the component API docs](http://docs.videojs.com/docs/api/component.html).
 
 ## Creating a Component
+
 Video.js components can be inherited and registered with Video.js to add new features and UI to the player.
 
 For a working example, [we have a JSBin](http://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
 
 In addition, there are a couple methods worth recognizing:
 
-- `videojs.getComponent(String name)`: Retrieves component constructors from Video.js.
-- `videojs.registerComponent(String name, Function Comp)`: Registers component constructors with Video.js.
-- `videojs.extend(Function component, Object properties)`: Provides prototype inheritance. Can be used to extend a component's constructor, returning a new constructor with the given properties.
+* `videojs.getComponent(String name)`: Retrieves component constructors from Video.js.
+* `videojs.registerComponent(String name, Function Comp)`: Registers component constructors with Video.js.
+* `videojs.extend(Function component, Object properties)`: Provides prototype inheritance. Can be used to extend a component's constructor, returning a new constructor with the given properties.
 
 ## Component Children
+
 When child component is added to a parent component, Video.js inserts the element of the child into the element of the parent. For example, adding a component like this:
 
 ```js
@@ -58,9 +72,10 @@ Results in a DOM that looks like this:
 Again, refer to [the component API docs](http://docs.videojs.com/docs/api/component.html) for complete details on methods available for managing component structures.
 
 ## Default Component Tree
+
 The default component structure of the Video.js player looks something like this:
 
-```
+```tree
 Player
 ├── PosterImage
 ├── TextTrackDisplay
@@ -92,7 +107,9 @@ Player
 ```
 
 ## Specific Component Details
+
 ### Progress Control
+
 The progress control has a grandchild component, the mouse time display, which shows a time tooltip that follows the mouse cursor.
 
 By default, the progress control is sandwiched inside the control bar between the volume menu button and the remaining time display. Some skins attempt to move the it above the control bar and have it span the full width of the player. In these cases, it is less than ideal to have the tooltips leave the bounds of the player. This can be prevented by setting the `keepTooltipsInside` option on the progress control.
@@ -110,4 +127,5 @@ let player = videojs('myplayer', {
 > **Note:** This makes the tooltips use a real element instead of pseudo-elements so targeting them with CSS is different.
 
 ### Text Track Settings
+
 The text track settings component is only available when using emulated text tracks.

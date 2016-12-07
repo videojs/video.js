@@ -25,7 +25,9 @@
     "start": "grunt watchAll",
     "test": "grunt test",
     "toc": "doctoc",
-    "docs": "jsdoc -r src/js -d docs/api -c .jsdoc.json"
+    "docs": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
+    "guides:lint": "remark --no-stdout --rc-path remark.config.js --ignore-path ./CHANGELOG.md ./.github/*.md ./docs/**/**/*.md ./*.md",
+    "guides:fix": "remark --output --rc-path remark.config.js --ignore-path ./CHANGELOG.md ./.github/*.md ./docs/**/**/*.md ./*.md"
   },
   "repository": {
     "type": "git",
@@ -105,6 +107,10 @@
     "npm-run": "^4.1.0",
     "proxyquireify": "^3.0.0",
     "qunitjs": "^1.23.1",
+    "remark-cli": "^2.1.0",
+    "remark-lint": "^5.2.0",
+    "remark-toc": "^3.1.0",
+    "remark-validate-links": "^5.0.0",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.7.3",

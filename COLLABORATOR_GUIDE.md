@@ -4,23 +4,23 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Issues and Pull Requests](#issues-and-pull-requests)
-- [Accepting changes](#accepting-changes)
-  - [Involving the TSC](#involving-the-tsc)
-- [Landing a PR](#landing-a-pr)
-  - [Landing a PR manually](#landing-a-pr-manually)
-    - [Landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
-    - [I just made a mistake](#i-just-made-a-mistake)
-      - [I accidentally pushed a broken commit or incorrect commit to master](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-master)
-      - [I lost changes](#i-lost-changes)
-      - [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
-- [video.js releases](#videojs-releases)
-  - [Getting dependencies](#getting-dependencies)
-    - [Install contrib](#install-contrib)
-    - [npm access](#npm-access)
-    - [GitHub personal access token](#github-personal-access-token)
-  - [Doing a release](#doing-a-release)
-- [Doc credit](#doc-credit)
+* [Issues and Pull Requests](#issues-and-pull-requests)
+* [Accepting changes](#accepting-changes)
+  * [Involving the TSC](#involving-the-tsc)
+* [Landing a PR](#landing-a-pr)
+  * [Landing a PR manually](#landing-a-pr-manually)
+    * [Landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
+    * [I just made a mistake](#i-just-made-a-mistake)
+      * [I accidentally pushed a broken commit or incorrect commit to master](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-master)
+      * [I lost changes](#i-lost-changes)
+      * [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
+* [video.js releases](#videojs-releases)
+  * [Getting dependencies](#getting-dependencies)
+    * [Install contrib](#install-contrib)
+    * [npm access](#npm-access)
+    * [GitHub personal access token](#github-personal-access-token)
+  * [Doing a release](#doing-a-release)
+* [Doc credit](#doc-credit)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -77,13 +77,11 @@ The footer should contain things like whether this is a breaking change or what 
 
 Here's an example:
 
-```
-fix(html5): a regression with html5 tech
+    fix(html5): a regression with html5 tech
 
-This is where you'd explain what the regression is.
+    This is where you'd explain what the regression is.
 
-Fixes #123
-```
+    Fixes #123
 
 ### Landing a PR manually
 
@@ -110,6 +108,7 @@ $ git checkout -t {{name of branch}}
 ```
 
 > For example:
+>
 > ```sh
 > $ git fetch upstream pull/123/head:gkatsev-html5-fix
 > $ git checkout -t gkatsev-html5-fix
@@ -139,13 +138,13 @@ Now get the author from the original commit:
 ```sh
 $ git log -n 1 --pretty=short gkatsev-html5-fix
 ```
-Which shows:
-```
-commit 433c58224f5be34480c8e067ca6c5406ba1c1e9c
-Author: Gary Katsevman <git@gkatsev.com>
 
-    Update TOC
-```
+Which shows:
+
+    commit 433c58224f5be34480c8e067ca6c5406ba1c1e9c
+    Author: Gary Katsevman <git@gkatsev.com>
+
+        Update TOC
 
 Now you can commit the change the change with the author, following our commit guidelines
 
@@ -162,6 +161,7 @@ $ git push upstream master
 Congratulate yourself for a job well done and the contributor for having his change landed in master.
 
 #### Landing a PR manually with several changes
+
 Follow the same steps as before but when you rebase against master, you want to do an interactive rebase and then squash the changes into just a few commits.
 
 ```sh
@@ -170,48 +170,44 @@ $ git rebase -i master
 
 This will give you an output like the following:
 
-```
-pick b4dc15d Update CONTRIBUTING.md with latest info
-pick 8592149 Add Dev certificate of origin
-pick 259dee6 Add grunt and doctoc npm scripts
-pick f12af12 Add conventional-changelog-videojs link
-pick ae4613a Update node's CONTRIBUTING.md url
-pick 433c582 Update TOC
+    pick b4dc15d Update CONTRIBUTING.md with latest info
+    pick 8592149 Add Dev certificate of origin
+    pick 259dee6 Add grunt and doctoc npm scripts
+    pick f12af12 Add conventional-changelog-videojs link
+    pick ae4613a Update node's CONTRIBUTING.md url
+    pick 433c582 Update TOC
 
-# Rebase f599ef4..433c582 onto f599ef4 (6 command(s))
-#
-# Commands:
-# p, pick = use commit
-# r, reword = use commit, but edit the commit message
-# e, edit = use commit, but stop for amending
-# s, squash = use commit, but meld into previous commit
-# f, fixup = like "squash", but discard this commit's log message
-# x, exec = run command (the rest of the line) using shell
-# d, drop = remove commit
-#
-# These lines can be re-ordered; they are executed from top to bottom.
-#
-# If you remove a line here THAT COMMIT WILL BE LOST.
-#
-# However, if you remove everything, the rebase will be aborted.
-#
-# Note that empty commits are commented out
-```
+    # Rebase f599ef4..433c582 onto f599ef4 (6 command(s))
+    #
+    # Commands:
+    # p, pick = use commit
+    # r, reword = use commit, but edit the commit message
+    # e, edit = use commit, but stop for amending
+    # s, squash = use commit, but meld into previous commit
+    # f, fixup = like "squash", but discard this commit's log message
+    # x, exec = run command (the rest of the line) using shell
+    # d, drop = remove commit
+    #
+    # These lines can be re-ordered; they are executed from top to bottom.
+    #
+    # If you remove a line here THAT COMMIT WILL BE LOST.
+    #
+    # However, if you remove everything, the rebase will be aborted.
+    #
+    # Note that empty commits are commented out
 
 Replace `pick` to `fixup` or `edit` depending on how you want the output to look. You can also re-order the commits, if necessary.
 
 > `fixup` will squash the commit it's infront of up into the commit above it
-
+>
 > `edit` will allow you to edit the commit message before continuing
 
-```
-edit b4dc15d Update CONTRIBUTING.md with latest info
-fixup 8592149 Add Dev certificate of origin
-fixup f12af12 Add conventional-changelog-videojs link
-fixup ae4613a Update node's CONTRIBUTING.md url
-fixup 433c582 Update TOC
-edit 259dee6 Add grunt and doctoc npm scripts
-```
+    edit b4dc15d Update CONTRIBUTING.md with latest info
+    fixup 8592149 Add Dev certificate of origin
+    fixup f12af12 Add conventional-changelog-videojs link
+    fixup ae4613a Update node's CONTRIBUTING.md url
+    fixup 433c582 Update TOC
+    edit 259dee6 Add grunt and doctoc npm scripts
 
 When you get to the edit commits, git will give more information, but you'd want to run ammend the current commit while following our commit guidelines
 
@@ -226,11 +222,10 @@ $ git rebase gkatsev-html5-fix
 ```
 
 This will put our two commits into master:
-```
-b4dc15d chore(contributing.md): Update CONTRIBUTING.md with latest info <Gary Katsevman>
-259dee6 chore(package.json): Add grunt and doctoc npm scripts <Gary Katsevman>
-9e20386 v5.12.6 <Gary Katsevman>
-```
+
+    b4dc15d chore(contributing.md): Update CONTRIBUTING.md with latest info <Gary Katsevman>
+    259dee6 chore(package.json): Add grunt and doctoc npm scripts <Gary Katsevman>
+    9e20386 v5.12.6 <Gary Katsevman>
 
 Now you're ready to push to master as in the normal instructions.
 
@@ -312,7 +307,8 @@ After it's done, verify that the GitHub release has the correct changelog output
 
 This collaborator guide was heavily inspired by [node.js's guide](https://github.com/nodejs/node/blob/master/COLLABORATOR_GUIDE.md)
 
-
 [issue template]: /.github/ISSUE_TEMPLATE.md
+
 [pr template]: /.github/PULL_REQUEST_TEMPLATE.md
+
 [conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md

@@ -4,6 +4,23 @@ There are two categories of docs: [Guides][guides] and [API docs][api].
 
 Guides explain general topics and use cases (e.g. setup). API docs are automatically generated from the codebase and give specific details about functions, properties, and events.
 
+## Table of Contents
+
+* [Guides](#guides)
+  * [Getting Started](#getting-started)
+
+    * [Setup](#setup)
+    * [Options](#options)
+    * [Tracks](#tracks)
+
+  * [Customizing](#customizing)
+
+    * [Skins](#skins)
+    * [Plugins](#plugins)
+    * [Components](#components)
+    * [Tech](#tech)
+* [API Docs](#api-docs)
+
 ## Guides
 
 ### Getting Started
@@ -42,23 +59,40 @@ A "tech" is the shorthand we're using to describe any video playback technology 
 
 You can refer to the [full list of API docs][api], but the most relevant API doc is for the [Player][api-player].
 
-
 [api]: http://docs.videojs.com/docs/api/index.html
+
 [api-player]: http://docs.videojs.com/docs/api/player.html
+
 [guides]: ./guides/
+
 [guides-api]: ./guides/api.md
+
 [guides-audio]: ./guides/audio.md
+
 [guides-components]: ./guides/components.md
+
 [guides-glossary]: ./guides/glossary.md
+
 [guides-languages]: ./guides/languages.md
+
 [guides-options]: ./guides/options.md
+
 [guides-plugins]: ./guides/plugins.md
+
 [guides-removing]: ./guides/removing.md
+
 [guides-setup]: ./guides/setup.md
+
 [guides-skins]: ./guides/skins.md
+
 [guides-tech]: ./guides/tech.md
+
 [guides-text-tracks]: ./guides/text-tracks.md
+
 [guides-tracks]: ./guides/tracks.md
+
 [guides-video-tracks]: ./guides/video-tracks.md
+
 [guides-workflow]: ./guides/player-workflows.md
+
 [vjs]: http://videojs.com
