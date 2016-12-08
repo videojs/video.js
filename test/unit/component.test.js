@@ -826,6 +826,10 @@ QUnit.test('should provide interval methods that automatically get cleared on co
   assert.ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });
 
+QUnit.test('should provide *AnimationFrame methods that automaticallyget cleared on component disposal', function(assert) {
+
+});
+
 QUnit.test('$ and $$ functions', function(assert) {
   const comp = new Component(getFakePlayer());
   const contentEl = document.createElement('div');

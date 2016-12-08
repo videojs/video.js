@@ -2,14 +2,18 @@
  * @file mouse-time-display.js
  */
 import Component from '../../component.js';
-import * as Dom from '../../utils/dom.js';
+// import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import computedStyle from '../../utils/computed-style.js';
+// import computedStyle from '../../utils/computed-style.js';
+
+import './time-tooltip';
 
 /**
- * The Mouse Time Display component shows the time you will seek to
- * when hovering over the progress bar
+ * The {@link MouseTimeDisplay} component tracks mouse movement over the
+ * {@link ProgressControl}. It displays an indicator and a {@link TimeTooltip}
+ * indicating the time which is represented by a given point in the
+ * {@link ProgressControl}.
  *
  * @extends Component
  */
@@ -19,33 +23,18 @@ class MouseTimeDisplay extends Component {
    * Creates an instance of this class.
    *
    * @param {Player} player
-   *        The `Player` that this class should be attached to.
+   *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    */
   constructor(player, options) {
     super(player, options);
-
-    this.tooltip = Dom.createEl('div', {className: 'vjs-time-tooltip'});
-    this.el().appendChild(this.tooltip);
-
-    this.update(0, 0);
-
-    player.on('ready', () => {
-      const progressControlEl = player.
-        getChild('controlBar').
-        getChild('progressControl').
-        el();
-
-      const listener = Fn.throttle(Fn.bind(this, this.handleProgressMouseMove), 25);
-
-      this.on(progressControlEl, 'mousemove', listener);
-    });
+    this.update = Fn.throttle(Fn.bind(this, this.update), 25);
   }
 
   /**
-   * Create the `Component`'s DOM element
+   * Create the the DOM element for this class.
    *
    * @return {Element}
    *         The element that was created.
@@ -57,105 +46,44 @@ class MouseTimeDisplay extends Component {
   }
 
   /**
-   * Handle the mouse move event on the grandparent progress control.
+   * Enqueues updates to its own DOM as well as the DOM of its
+   * {@link TimeTooltip} child.
    *
-   * @param {EventTarget~Event} event
-   *        The `mousemove` event that caused this to event to run.
+   * @param {number} seekBarWidth
+   *        The width of the {@link SeekBar} in pixels.
    *
-   * @listen mousemove
+   * @param {number} seekBarPoint
+   *        A number from 0 to 1, representing a horizontal reference point
+   *        from the left edge of the {@link SeekBar}
    */
-  handleProgressMouseMove(event) {
-    const referenceEl = this.el().parentNode;
-    const duration = this.player_.duration();
-    const newTime = this.calculateDistance(event) * duration;
+  update(seekBarWidth, seekBarPoint) {
 
-    let position = event.pageX - Dom.findElPosition(referenceEl).left;
-
-    // Because the event is targeting the grandparent of this component, we
-    // need to ensure that the position remains within the actual reference
-    // element (the parent, i.e. the seek-bar). On the left, this means
-    // ensuring that position is always 0 or above.
-    if (position < 0) {
-      position = 0;
-
-    // On the right, this means ensuring the position is always less than or
-    // equal to the seek bar's client width.
-    } else if (position > referenceEl.clientWidth) {
-      position = referenceEl.clientWidth;
+    // If there is an existing rAF ID, cancel it so we don't over-queue.
+    if (this.rafId_) {
+      this.cancelAnimationFrame(this.rafId_);
     }
 
-    this.update(newTime, position);
-  }
+    this.rafId_ = this.requestAnimationFrame(() => {
+      const duration = this.player_.duration();
+      const content = formatTime(seekBarPoint * duration, duration);
 
-  /**
-   * Update the time and position of the `MouseTimeDisplay`.
-   *
-   * @param {number} newTime
-   *        Time to change the `MouseTimeDisplay` to.
-   *
-   * @param {number} position
-   *        Postion from the left of the in pixels.
-   */
-  update(newTime, position) {
-    const time = formatTime(newTime, this.player_.duration());
-
-    this.el().style.left = position + 'px';
-    this.el().setAttribute('data-current-time', time);
-
-    const clampedPosition = this.clampPosition_(position);
-    const difference = position - clampedPosition + 1;
-    const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
-    const tooltipWidthHalf = tooltipWidth / 2;
-
-    this.tooltip.innerHTML = time;
-    this.tooltip.style.right = `-${tooltipWidthHalf - difference}px`;
-  }
-
-  /**
-   * Get the mouse pointers x coordinate in pixels.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `mousemove` event that was passed to this function by
-   *        {@link MouseTimeDisplay#handleMouseMove}
-   *
-   * @return {number}
-   *         THe x position in pixels of the mouse pointer.
-   */
-  calculateDistance(event) {
-    return Dom.getPointerPosition(this.el().parentNode, event).x;
-  }
-
-  /**
-   * This takes in a horizontal position for the bar and returns a clamped
-   * position. Clamped position means that it will keep the position greater
-   * than half the width of the tooltip and smaller than the player width minus
-   * half the width of the tooltip.
-   *
-   * @param {number} position
-   *        The position the bar wants to be
-   *
-   * @return {number}
-   *         The (potentially) new clamped position.
-   *
-   * @private
-   */
-  clampPosition_(position) {
-    const playerWidth = parseFloat(computedStyle(this.player().el(), 'width'));
-    const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
-    const tooltipWidthHalf = tooltipWidth / 2;
-    let actualPosition = position;
-
-    // need to account for the width of the progress-holder element
-
-    if (position < tooltipWidthHalf) {
-      actualPosition = Math.ceil(tooltipWidthHalf);
-    } else if (position > (playerWidth - tooltipWidthHalf)) {
-      actualPosition = Math.floor(playerWidth - tooltipWidthHalf);
-    }
-
-    return actualPosition;
+      this.el_.style.left = `${seekBarWidth * seekBarPoint}px`;
+      this.getChild('timeTooltip').update(seekBarWidth, seekBarPoint, content);
+    });
   }
 }
+
+/**
+ * Default options for `MouseTimeDisplay`
+ *
+ * @type {Object}
+ * @private
+ */
+MouseTimeDisplay.prototype.options_ = {
+  children: [
+    'timeTooltip'
+  ]
+};
 
 Component.registerComponent('MouseTimeDisplay', MouseTimeDisplay);
 export default MouseTimeDisplay;

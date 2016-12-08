@@ -2,11 +2,13 @@
  * @file play-progress-bar.js
  */
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 
+import './time-tooltip';
+
 /**
- * Shows play progress
+ * Used by {@link SeekBar} to display media playback progress as part of the
+ * {@link ProgressControl}.
  *
  * @extends Component
  */
@@ -16,22 +18,17 @@ class PlayProgressBar extends Component {
    * Creates an instance of this class.
    *
    * @param {Player} player
-   *        The `Player` that this class should be attached to.
+   *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    */
   constructor(player, options) {
     super(player, options);
-    this.tooltip = this.el_.querySelector('.vjs-time-tooltip');
-    this.update = Fn.bind(this, this.update);
-    this.on(player, 'timeupdate', this.update);
-    player.ready(this.update);
-    this.update();
   }
 
   /**
-   * Create the `Component`'s DOM element
+   * Create the the DOM element for this class.
    *
    * @return {Element}
    *         The element that was created.
@@ -39,27 +36,51 @@ class PlayProgressBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-play-progress vjs-slider-bar',
-      innerHTML: `<div class="vjs-time-tooltip"></div><span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
+      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
     });
   }
 
   /**
-   * Update the data-current-time attribute on the `PlayProgressBar` and
-   * the contents of the tooltip.
+   * Enqueues updates to its own DOM as well as the DOM of its
+   * {@link TimeTooltip} child.
    *
-   * @param {EventTarget~Event} [event]
-   *        The `timeupdate` event that caused this to run.
+   * @param {number} seekBarWidth
+   *        The width of the {@link SeekBar} in pixels.
    *
-   * @listens Player#timeupdate
+   * @param {number} seekBarPoint
+   *        A number from 0 to 1, representing a horizontal reference point
+   *        from the left edge of the {@link SeekBar}
    */
-  update(event) {
-    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    const formattedTime = formatTime(time, this.player_.duration());
+  update(seekBarWidth, seekBarPoint) {
 
-    this.el_.setAttribute('data-current-time', formattedTime);
-    this.tooltip.innerHTML = formattedTime;
+    // If there is an existing rAF ID, cancel it so we don't over-queue.
+    if (this.rafId_) {
+      this.cancelAnimationFrame(this.rafId_);
+    }
+
+    this.rafId_ = this.requestAnimationFrame(() => {
+      const time = (this.player_.scrubbing()) ?
+        this.player_.getCache().currentTime :
+        this.player_.currentTime();
+
+      const content = formatTime(time, this.player_.duration());
+
+      this.getChild('timeTooltip').update(seekBarWidth, seekBarPoint, content);
+    });
   }
 }
+
+/**
+ * Default options for {@link PlayProgressBar}.
+ *
+ * @type {Object}
+ * @private
+ */
+PlayProgressBar.prototype.options_ = {
+  children: [
+    'timeTooltip'
+  ]
+};
 
 Component.registerComponent('PlayProgressBar', PlayProgressBar);
 export default PlayProgressBar;
