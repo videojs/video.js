@@ -25,9 +25,9 @@
     "start": "grunt watchAll",
     "test": "grunt test",
     "toc": "doctoc",
-    "docs": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
-    "guides:lint": "remark --no-stdout --rc-path remark.config.js --ignore-path ./CHANGELOG.md ./.github/*.md ./docs/**/**/*.md ./*.md",
-    "guides:fix": "remark --output --rc-path remark.config.js --ignore-path ./CHANGELOG.md ./.github/*.md ./docs/**/**/*.md ./*.md"
+    "docs:api": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
+    "docs:lint": "remark -- './**/*.md'" ,
+    "docs:fix": "remark --output -- './**/*.md'"
   },
   "repository": {
     "type": "git",

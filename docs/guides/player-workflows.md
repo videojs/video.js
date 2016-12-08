@@ -33,8 +33,8 @@ player.on('ended', function() {
 Calling `dispose()` will have a few effects:
 
 1. Trigger a `"dispose"` event on the player, allowing for any custom cleanup tasks that need to be run by your integration.
-2. Remove all event listeners from the player.
-3. Remove the player's DOM element(s).
+1. Remove all event listeners from the player.
+1. Remove the player's DOM element(s).
 
 Additionally, these actions are recursively applied to _all_ the player's child components.
 

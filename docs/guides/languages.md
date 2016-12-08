@@ -65,10 +65,10 @@ Finally, each file's extension is always `.json`.
 If there is a [missing translation](../translations-needed.md), mistake, or room for improvement in an existing translation, don't hesitate to open a pull request!
 
 1. Edit the relevant JSON file and make the necessary changes.
-2. Verify the language compiles by running `grunt dist`.
-3. Verify the translation appears properly in the player UI.
-4. Run `grunt check-translations` to update the [missing translation document](../translations-needed.md).
-5. Commit and open a pull request on GitHub.
+1. Verify the language compiles by running `grunt dist`.
+1. Verify the translation appears properly in the player UI.
+1. Run `grunt check-translations` to update the [missing translation document](../translations-needed.md).
+1. Commit and open a pull request on GitHub.
 
 ### Writing a New Translation
 

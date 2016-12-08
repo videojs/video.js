@@ -4,7 +4,6 @@ Include a [reduced test case](https://css-tricks.com/reduced-test-cases/), we ha
 
 ## Steps to reproduce
 Explain in detail the exact steps necessary to reproduce the issue.
-
 1.
 2.
 3.

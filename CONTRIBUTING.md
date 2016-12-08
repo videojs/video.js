@@ -2,9 +2,7 @@
 
 So you want to help out? Great! There's a number of ways you can get involved.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+## Table of Contents
 
 * [Other repositories where issues could be filed](#other-repositories-where-issues-could-be-filed)
 * [Filing issues](#filing-issues)
@@ -12,6 +10,7 @@ So you want to help out? Great! There's a number of ways you can get involved.
   * [Requesting a Feature](#requesting-a-feature)
 * [Contributing code](#contributing-code)
   * [Building video.js locally](#building-videojs-locally)
+
     * [Forking and cloning the repository](#forking-and-cloning-the-repository)
     * [Installing local dependencies](#installing-local-dependencies)
     * [Running tests](#running-tests)
@@ -20,18 +19,19 @@ So you want to help out? Great! There's a number of ways you can get involved.
     * [Sandbox test directory](#sandbox-test-directory)
     * [Running a local web server](#running-a-local-web-server)
     * [Watching source and test changes](#watching-source-and-test-changes)
+
   * [Making Changes](#making-changes)
+
     * [Step 1: Verify](#step-1-verify)
     * [Step 2: Update remote](#step-2-update-remote)
     * [Step 3: Branch](#step-3-branch)
     * [Step 4: Commit](#step-4-commit)
     * [Step 5: Test](#step-5-test)
     * [Step 6: Push](#step-6-push)
+
   * [Code Style Guide](#code-style-guide)
 * [Developer's Certificate of Origin 1.1](#developers-certificate-of-origin-11)
 * [Doc Credit](#doc-credit)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Other repositories where issues could be filed
 
@@ -51,7 +51,7 @@ There's also other Video.js projects where you can help. (check the [video.js or
 
 [GitHub Issues](https://github.com/videojs/video.js/issues) are used for all discussions around the codebase, including **bugs**, **features**, and other **enhancements**.
 
-When filling out an issue, make sure to fill out the questions in the 
+When filling out an issue, make sure to fill out the questions in the
 
 ### Reporting a Bug
 
@@ -60,14 +60,10 @@ When filling out an issue, make sure to fill out the questions in the
 Guidelines for bug reports:
 
 1. If your issue is with a particular video.js plugin or subproject, please open an issue against that project. See [list of some potential other projects above](#other-repositories-where-issues-could-be-filed)
-
-2. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) — check if the issue has already been reported.
-
-3. Check if the issue has already been fixed — try to reproduce it using the latest `master` branch in the repository.
-
-4. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/edit) as a starting point -- don't forget to update it to the videojs version you use.
-
-5. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
+1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) — check if the issue has already been reported.
+1. Check if the issue has already been fixed — try to reproduce it using the latest `master` branch in the repository.
+1. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/edit) as a starting point -- don't forget to update it to the videojs version you use.
+1. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
 
@@ -76,12 +72,9 @@ A good bug report should be as detailed as possible, so that others won't have t
 ### Requesting a Feature
 
 1. [Check the plugin list](http://videojs.com/plugins/) for any plugins that may already support the feature.
-
-2. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
-
-3. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
-
-4. Once again, be as details as possible and follow the [issue template][]
+1. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
+1. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
+1. Once again, be as details as possible and follow the [issue template][]
 
 **[Request a feature](https://github.com/videojs/video.js/issues/new)**
 
@@ -96,11 +89,11 @@ To contibute code you'll need to be able to build a copy of Video.js and run tes
   Optionally, install `grunt-cli` globally to use grunt directly. It can always be run via an npm script:
 
 ```sh
-$ npm run grunt
+npm run grunt
 ```
 
 ```sh
-$ npm install -g grunt-cli
+npm install -g grunt-cli
 ```
 
 Depending on how you have node and npm set up, you may need to run the global install (`-g`) as a superuser by prepending `sudo`.
@@ -114,25 +107,27 @@ First, [fork](http://help.github.com/fork-a-repo/) the video.js git repository. 
 Clone your fork of the repo into your code directory
 
 ```sh
-$ git clone https://github.com/<your-username>/video.js.git
+git clone https://github.com/<your-username>/video.js.git
 ```
 
 Navigate to the newly cloned directory
 
 ```sh
-$ cd video.js
+cd video.js
 ```
 
 Assign the original repo to a remote called "upstream"
 
-    git remote add upstream https://github.com/videojs/video.js.git
+```sh
+git remote add upstream https://github.com/videojs/video.js.git
+```
 
 > In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
 >
 > ```sh
-> $ git remote update
-> $ git checkout master
-> $ git pull upstream master
+> git remote update
+> git checkout master
+> git pull upstream master
 > ```
 
 #### Installing local dependencies
@@ -140,7 +135,7 @@ Assign the original repo to a remote called "upstream"
 Install the required node.js modules using node package manager
 
 ```sh
-$ npm install
+npm install
 ```
 
 > A note to Windows developers: If you run npm commands, and you find that your command prompt colors have suddenly reversed, you can configure npm to set color to false to prevent this from happening.
@@ -152,7 +147,7 @@ $ npm install
 To run the tests all you need to do is run
 
 ```sh
-$ npm test
+npm test
 ```
 
 This will build video.js locally and run the tests using [Karma](https://karma-runner.github.io/1.0/index.html) which runs our tests in actual browsers.
@@ -162,7 +157,7 @@ This will build video.js locally and run the tests using [Karma](https://karma-r
 To build video.js, simply run
 
 ```sh
-$ npm run build
+npm run build
 ```
 
 This outputs an `es5/` and `dist/` folder. The `es5/` folder is used by bundling tools like browserify and webpack to package video.js into projects. The `dist/` folder has pre-compiled versions of video.js, including a minified version and the CSS file. This file can be included in page via a `<script></script>` tag.
@@ -176,7 +171,7 @@ Besides running automated tests, you often want to run video.js manually and pla
 There's a sandbox directory where you can add any file and it won't get tracked in git. To start you can copy the example index file.
 
 ```sh
-$ cp sandbox/index.html.example sandbox/index.html
+cp sandbox/index.html.example sandbox/index.html
 ```
 
 See [the following section](#running-a-local-web-server) for how to open the page in a browser.
@@ -191,17 +186,17 @@ This ties in nicely with the sandbox directory. You can always open the `sandbox
 To run the local webserver, you can run it in a couple of ways.
 
 ```sh
-$ grunt connect
-$ open http://localhost:9999/sandbox/index.html
+grunt connect
+open http://localhost:9999/sandbox/index.html
 ```
 
 or
 
 ```sh
-$ npm start
+npm start
 ```
 
-The latter does some extra work which will be described in the [next section]
+The latter does some extra work which will be described in the next section.
 
 #### Watching source and test changes
 
@@ -209,7 +204,7 @@ As you're developing, you want the build to re-run and update itself, and potent
 To do so, you just need to run
 
 ```sh
-$ npm start
+npm start
 ```
 
 This sets up the local webserver using connect and then watches source files, test files, and CSS files for you and rebuilds things as they happen.
@@ -225,9 +220,9 @@ Whether you're adding something new, making something better, or fixing a bug, y
 Before starting work, you want to update your local repository to have all the latest changes.
 
 ```sh
-$ git remote update
-$ git checkout master
-$ git rebase upstream/master
+git remote update
+git checkout master
+git rebase upstream/master
 ```
 
 #### Step 3: Branch
@@ -235,7 +230,7 @@ $ git rebase upstream/master
 You want to do your work in a separate branch.
 
 ```sh
-$ git checkout -b my-branch
+git checkout -b my-branch
 ```
 
 #### Step 4: Commit
@@ -245,29 +240,29 @@ For more information see our [conventional changelog guidelines for video.js](ht
 Follow these guidelines:
 
 1. The first line should be less than 50 characters and contain a short description of the commit.
-2. The body should contain a more detailed description. It can contain things like reasoning for the change and specifics of what changed.
-3. A footer can be added if this fixes a particular issue on GitHub.
+1. The body should contain a more detailed description. It can contain things like reasoning for the change and specifics of what changed.
+1. A footer can be added if this fixes a particular issue on GitHub.
 
 ```sh
-$ git add src/js/player.js
-$ git commit
+git add src/js/player.js
+git commit
 ```
 
-An example commit message:
+An example of the first line of a commit message: `fix: changed the footer to correctly display foo`
 
-    fix: one line commit explanation
+In the body of the commit message, we can talk about why we made the change. What the change entails.
+Any testing considerations or things to think about when looking at the commit. For Example:
 
-    In the body of the commit message, we can talk about why we made the change. What the change entails.
-
-    Any testing considerations or things to think about when looking at the commit.
-
-    Fixes #123. The footer can contain Fixes messages.
+```txt
+* Fixes #123. The footer now contains foo.
+* Updated unit tests to reflect corrected footer value of foo.
+```
 
 > Make sure that git knows your name and email:
 >
 > ```sh
-> $ git config --global user.name "Random User"
-> $ git config --global user.email "random.user@example.com"
+> git config --global user.name "Random User"
+> git config --global user.email "random.user@example.com"
 > ```
 
 #### Step 5: Test
@@ -276,13 +271,13 @@ Any code change should come with corresponding test changes. Especially bug fixe
 Tests attached to bug fixes should fail before the change and succeed with it.
 
 ```sh
-$ npm test
+npm test
 ```
 
 #### Step 6: Push
 
 ```sh
-$ git push origin my-branch
+git push origin my-branch
 ```
 
 Then go to the [repo page](http://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)

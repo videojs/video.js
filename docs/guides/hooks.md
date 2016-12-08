@@ -27,31 +27,31 @@ Currently, the following hooks are avialable:
 
 * take two arguments
   1. videoEl: dom video element that video.js is going to use to create a player
-  2. options: options that video.js was intialized with and will later pass to the player during creation
+  1. options: options that video.js was intialized with and will later pass to the player during creation
 * return options that will merge and override options that video.js with intialized with
 
 Example: adding beforesetup hook
 
 ```js
-    var beforeSetup = function(videoEl, options) {
-        // videoEl.id will be some-id here, since that is what video.js
-        // was created with
+var beforeSetup = function(videoEl, options) {
+  // videoEl.id will be some-id here, since that is what video.js
+  // was created with
 
-        videoEl.className += ' some-super-class';
+  videoEl.className += ' some-super-class';
 
-        // autoplay will be true here, since we passed in as such
-        (options.autoplay) {
-            options.autoplay = false
-        }
+  // autoplay will be true here, since we passed in as such
+  (options.autoplay) {
+    options.autoplay = false
+  }
 
-        // options that are returned here will be merged with old options
-        // in this example options will now be
-        // {autoplay: false, controls: true}
-        return options;
-    };
+  // options that are returned here will be merged with old options
+  // in this example options will now be
+  // {autoplay: false, controls: true}
+  return options;
+};
 
-    videojs.hook('beforesetup', beforeSetup);
-    videojs('some-id', {autoplay: true, controls: true});
+videojs.hook('beforesetup', beforeSetup);
+videojs('some-id', {autoplay: true, controls: true});
 ```
 
 ### setup
@@ -90,15 +90,16 @@ In order to use hooks you must first include video.js in the page or script that
 Example: adding hooks
 
 ```js
-    videojs.hook('beforesetup', function(videoEl, options) {
-        // videoEl will be the element with id=vid1
-        // options will contain {autoplay: false}
-    });
-    videojs.hook('setup', function(player) {
-        // player will be the same player that is defined below
-        // as `var player`
-    });
-    var player = videojs('vid1', {autoplay: false});
+videojs.hook('beforesetup', function(videoEl, options) {
+  // videoEl will be the element with id=vid1
+  // options will contain {autoplay: false}
+});
+videojs.hook('setup', function(player) {
+  // player will be the same player that is defined below
+  // as `var player`
+});
+
+var player = videojs('vid1', {autoplay: false});
 ```
 
 After adding your hooks they will automatically be run at the correct time in the video.js lifecycle.
@@ -110,8 +111,8 @@ To access the array of hooks that currently exists and will be run on the video.
 Example: getting all hooks attached to video.js
 
 ```js
-    var beforeSetupHooks = videojs.hooks('beforesetup');
-    var setupHooks = videojs.hooks('setup');
+var beforeSetupHooks = videojs.hooks('beforesetup');
+var setupHooks = videojs.hooks('setup');
 ```
 
 ### Removing
@@ -121,13 +122,13 @@ To stop hooks from being executed during the video.js lifecycle you will remove 
 Example: remove a hook that was defined by you
 
 ```js
-    var beforeSetup = function(videoEl, options) {};
+var beforeSetup = function(videoEl, options) {};
 
-    // add the hook
-    videojs.hook('beforesetup', beforeSetup);
+// add the hook
+videojs.hook('beforesetup', beforeSetup);
 
-    // remove that same hook
-    videojs.removeHook('beforesetup', beforeSetup);
+// remove that same hook
+videojs.removeHook('beforesetup', beforeSetup);
 ```
 
 You can also use `videojs.hooks` in conjunction with `videojs.removeHook` but it may have unexpected results if used during an asynchronous callbacks as other plugins/functionality may have added hooks.
@@ -135,11 +136,11 @@ You can also use `videojs.hooks` in conjunction with `videojs.removeHook` but it
 Example: using `videojs.hooks` and `videojs.removeHook` to remove a hook
 
 ```js
-    // add the hook
-    videojs.hook('setup', function(videoEl, options) {});
+// add the hook
+videojs.hook('setup', function(videoEl, options) {});
 
-    var setupHooks = videojs.hooks('setup');
+var setupHooks = videojs.hooks('setup');
 
-    // remove the hook you just added
-    videojs.removeHook('setup', setupHooks[setupHooks.length - 1]);
+// remove the hook you just added
+videojs.removeHook('setup', setupHooks[setupHooks.length - 1]);
 ```

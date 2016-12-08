@@ -1,28 +1,29 @@
 # Collaborator Guide
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+## Table of Contents
 
 * [Issues and Pull Requests](#issues-and-pull-requests)
 * [Accepting changes](#accepting-changes)
   * [Involving the TSC](#involving-the-tsc)
 * [Landing a PR](#landing-a-pr)
   * [Landing a PR manually](#landing-a-pr-manually)
+
     * [Landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
+
     * [I just made a mistake](#i-just-made-a-mistake)
+
       * [I accidentally pushed a broken commit or incorrect commit to master](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-master)
       * [I lost changes](#i-lost-changes)
       * [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
 * [video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
+
     * [Install contrib](#install-contrib)
     * [npm access](#npm-access)
     * [GitHub personal access token](#github-personal-access-token)
+
   * [Doing a release](#doing-a-release)
 * [Doc credit](#doc-credit)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Issues and Pull Requests
 
@@ -77,85 +78,89 @@ The footer should contain things like whether this is a breaking change or what 
 
 Here's an example:
 
-    fix(html5): a regression with html5 tech
+```commit
+fix(html5): a regression with html5 tech
 
-    This is where you'd explain what the regression is.
+This is where you'd explain what the regression is.
 
-    Fixes #123
+Fixes #123
+```
 
 ### Landing a PR manually
 
 _Optional:_ ensure you're not in a weird rebase or merge state:
 
 ```sh
-$ git am --abort
-$ git rebase --abort
+git am --abort
+git rebase --abort
 ```
 
 Checkout and update the master branch:
 
 ```sh
-$ git checkout master
-$ git remote update
-$ git rebase upstream/master
+git checkout master
+git remote update
+git rebase upstream/master
 ```
 
 Check out the PR:
 
 ```sh
-$ git fetch upstream pull/{{PR Number}}/head:{{name of branch}}
-$ git checkout -t {{name of branch}}
+git fetch upstream pull/{{PR Number}}/head:{{name of branch}}
+git checkout -t {{name of branch}}
 ```
 
 > For example:
 >
 > ```sh
-> $ git fetch upstream pull/123/head:gkatsev-html5-fix
-> $ git checkout -t gkatsev-html5-fix
+> git fetch upstream pull/123/head:gkatsev-html5-fix
+> git checkout -t gkatsev-html5-fix
 > ```
 
 _Optional:_ If necessary, rebase against master. If you have multiple features in the PR, [landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
 
 ```sh
-$ git rebase master
+git rebase master
 ```
 
 Fix up any issues that arise from the rebase, change back to the master branch and squash merge:
 
 ```sh
-$ git checkout master
-$ git merge --squash --no-commit gkatsev-html5-fix
+git checkout master
+git merge --squash --no-commit gkatsev-html5-fix
 ```
 
 The `--no-commit` tells git not to make a commit on your behalf. It does stage everything for you, so, you can instead it:
 
 ```sh
-$ git diff --cached
+git diff --cached
 ```
 
 Now get the author from the original commit:
 
 ```sh
-$ git log -n 1 --pretty=short gkatsev-html5-fix
+git log -n 1 --pretty=short gkatsev-html5-fix
 ```
 
 Which shows:
 
-    commit 433c58224f5be34480c8e067ca6c5406ba1c1e9c
-    Author: Gary Katsevman <git@gkatsev.com>
+```txt
+  commit 433c58224f5be34480c8e067ca6c5406ba1c1e9c
+  Author: Gary Katsevman <git@gkatsev.com>
 
-        Update TOC
+      Update TOC
+```
 
 Now you can commit the change the change with the author, following our commit guidelines
 
 ```sh
-$ git commit --author "Gary Katsevman <git@gkatsev.com>"
+git commit --author "Gary Katsevman <git@gkatsev.com>"
 ```
 
 Now that it's committed, push to master
 
 ```sh
-$ git push upstream master
+git push upstream master
 ```
 
 Congratulate yourself for a job well done and the contributor for having his change landed in master.
@@ -165,36 +170,38 @@ Congratulate yourself for a job well done and the contributor for having his cha
 Follow the same steps as before but when you rebase against master, you want to do an interactive rebase and then squash the changes into just a few commits.
 
 ```sh
-$ git rebase -i master
+git rebase -i master
 ```
 
 This will give you an output like the following:
 
-    pick b4dc15d Update CONTRIBUTING.md with latest info
-    pick 8592149 Add Dev certificate of origin
-    pick 259dee6 Add grunt and doctoc npm scripts
-    pick f12af12 Add conventional-changelog-videojs link
-    pick ae4613a Update node's CONTRIBUTING.md url
-    pick 433c582 Update TOC
+```txt
+pick b4dc15d Update CONTRIBUTING.md with latest info
+pick 8592149 Add Dev certificate of origin
+pick 259dee6 Add grunt and doctoc npm scripts
+pick f12af12 Add conventional-changelog-videojs link
+pick ae4613a Update node's CONTRIBUTING.md url
+pick 433c582 Update TOC
 
-    # Rebase f599ef4..433c582 onto f599ef4 (6 command(s))
-    #
-    # Commands:
-    # p, pick = use commit
-    # r, reword = use commit, but edit the commit message
-    # e, edit = use commit, but stop for amending
-    # s, squash = use commit, but meld into previous commit
-    # f, fixup = like "squash", but discard this commit's log message
-    # x, exec = run command (the rest of the line) using shell
-    # d, drop = remove commit
-    #
-    # These lines can be re-ordered; they are executed from top to bottom.
-    #
-    # If you remove a line here THAT COMMIT WILL BE LOST.
-    #
-    # However, if you remove everything, the rebase will be aborted.
-    #
-    # Note that empty commits are commented out
+# Rebase f599ef4..433c582 onto f599ef4 (6 command(s))
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+```
 
 Replace `pick` to `fixup` or `edit` depending on how you want the output to look. You can also re-order the commits, if necessary.
 
@@ -202,30 +209,34 @@ Replace `pick` to `fixup` or `edit` depending on how you want the output to look
 >
 > `edit` will allow you to edit the commit message before continuing
 
-    edit b4dc15d Update CONTRIBUTING.md with latest info
-    fixup 8592149 Add Dev certificate of origin
-    fixup f12af12 Add conventional-changelog-videojs link
-    fixup ae4613a Update node's CONTRIBUTING.md url
-    fixup 433c582 Update TOC
-    edit 259dee6 Add grunt and doctoc npm scripts
+```txt
+edit b4dc15d Update CONTRIBUTING.md with latest info
+fixup 8592149 Add Dev certificate of origin
+fixup f12af12 Add conventional-changelog-videojs link
+fixup ae4613a Update node's CONTRIBUTING.md url
+fixup 433c582 Update TOC
+edit 259dee6 Add grunt and doctoc npm scripts
+```
 
 When you get to the edit commits, git will give more information, but you'd want to run ammend the current commit while following our commit guidelines
 
 ```sh
-$ git commit --amend
+git commit --amend
 ```
 
 After going through and making the commits you want, you want to change back to master and then rebase the branch onto master so we get a clean history
 
 ```sh
-$ git rebase gkatsev-html5-fix
+git rebase gkatsev-html5-fix
 ```
 
 This will put our two commits into master:
 
-    b4dc15d chore(contributing.md): Update CONTRIBUTING.md with latest info <Gary Katsevman>
-    259dee6 chore(package.json): Add grunt and doctoc npm scripts <Gary Katsevman>
-    9e20386 v5.12.6 <Gary Katsevman>
+```txt
+b4dc15d chore(contributing.md): Update CONTRIBUTING.md with latest info <Gary Katsevman>
+259dee6 chore(package.json): Add grunt and doctoc npm scripts <Gary Katsevman>
+9e20386 v5.12.6 <Gary Katsevman>
+```
 
 Now you're ready to push to master as in the normal instructions.
 
@@ -248,7 +259,7 @@ This is a great time to discover that something is broken. Because it hasn't bee
 To do so, just reset the branch against master.
 
 ```sh
-$ git reset --hard upstream/master
+git reset --hard upstream/master
 ```
 
 ## video.js releases
@@ -290,7 +301,7 @@ After generating one, make sure to keep it safe because GitHub will not show the
 To do a release, check out the master branch
 
 ```sh
-$ git checkout master
+git checkout master
 ```
 
 Then run the contrib command to do the next release. Don't forget to provide your GitHub token so the GitHub release goes through.

@@ -85,13 +85,9 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [browserstack]: https://browserstack.com
 
-[buildwith]: https://trends.builtwith.com/media/VideoJS
+[builtwith]: https://trends.builtwith.com/media/VideoJS
 
 [contributing]: CONTRIBUTING.md
-
-[contributing-building]: CONTRIBUTING.md#building-your-own-copy-of-videojs
-
-[contributing-code]: CONTRIBUTING.md#contributing-code
 
 [coveralls-icon]: https://coveralls.io/repos/github/videojs/video.js/badge.svg?branch=master
 
@@ -111,7 +107,7 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [npm-link]: https://nodei.co/npm/video.js/
 
-[options]: docs/options.md
+[options]: docs/guides/options.md
 
 [plugins]: http://videojs.com/plugins/
 
