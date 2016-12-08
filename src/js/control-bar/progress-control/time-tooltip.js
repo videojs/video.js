@@ -3,7 +3,6 @@
  */
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
-import computedStyle from '../../utils/computed-style.js';
 
 /**
  * Time tooltips display a time above the progress bar.
@@ -27,18 +26,44 @@ class TimeTooltip extends Component {
   /**
    * Updates the position of the time tooltip relative to the `SeekBar`.
    *
-   * @param {number} seekBarWidth
-   *        The width of the {@link SeekBar} in pixels.
+   * @param {Object} seekBarRect
+   *        The `ClientRect` for the {@link SeekBar} element.
    *
    * @param {number} seekBarPoint
    *        A number from 0 to 1, representing a horizontal reference point
    *        from the left edge of the {@link SeekBar}
    */
-  update(seekBarWidth, seekBarPoint, content) {
-    const tooltipWidth = parseFloat(computedStyle(this.el_, 'width'));
-    const leftPosition = tooltipWidth / 2;
+  update(seekBarRect, seekBarPoint, content) {
+    const tooltipRect = Dom.getBoundingClientRect(this.el_);
+    const playerRect = Dom.getBoundingClientRect(this.player_.el());
+    const seekBarPointPx = seekBarRect.width * seekBarPoint;
 
-    this.el_.style.left = leftPosition + 'px';
+    // This is the space left of the `seekBarPoint` available within the bounds
+    // of the player. We calculate any gap between the left edge of the player
+    // and the left edge of the `SeekBar` and add the number of pixels in the
+    // `SeekBar` before hitting the `seekBarPoint`
+    const spaceLeftOfPoint = (seekBarRect.left - playerRect.left) + seekBarPointPx;
+
+    // This is the space right of the `seekBarPoint` available within the bounds
+    // of the player. We calculate the number of pixels from the `seekBarPoint`
+    // to the right edge of the `SeekBar` and add to that any gap between the
+    // right edge of the `SeekBar` and the player.
+    const spaceRightOfPoint = (seekBarRect.width - seekBarPointPx) +
+      (playerRect.right - seekBarRect.right);
+
+    // This is the number of pixels by which the tooltip will need to be pulled
+    // further to the right to center it over the `seekBarPoint`.
+    let pullTooltipBy = tooltipRect.width / 2;
+
+    // Adjust the `pullTooltipBy` distance to the left or right depending on
+    // the results of the space calculations above.
+    if (spaceLeftOfPoint < pullTooltipBy) {
+      pullTooltipBy += pullTooltipBy - spaceLeftOfPoint;
+    } else if (spaceRightOfPoint < pullTooltipBy) {
+      pullTooltipBy = spaceRightOfPoint;
+    }
+
+    this.el_.style.right = `-${pullTooltipBy}px`;
     Dom.textContent(this.el_, content);
   }
 }

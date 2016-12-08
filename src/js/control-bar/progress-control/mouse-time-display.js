@@ -49,14 +49,14 @@ class MouseTimeDisplay extends Component {
    * Enqueues updates to its own DOM as well as the DOM of its
    * {@link TimeTooltip} child.
    *
-   * @param {number} seekBarWidth
-   *        The width of the {@link SeekBar} in pixels.
+   * @param {Object} seekBarRect
+   *        The `ClientRect` for the {@link SeekBar} element.
    *
    * @param {number} seekBarPoint
    *        A number from 0 to 1, representing a horizontal reference point
    *        from the left edge of the {@link SeekBar}
    */
-  update(seekBarWidth, seekBarPoint) {
+  update(seekBarRect, seekBarPoint) {
 
     // If there is an existing rAF ID, cancel it so we don't over-queue.
     if (this.rafId_) {
@@ -67,8 +67,8 @@ class MouseTimeDisplay extends Component {
       const duration = this.player_.duration();
       const content = formatTime(seekBarPoint * duration, duration);
 
-      this.el_.style.left = `${seekBarWidth * seekBarPoint}px`;
-      this.getChild('timeTooltip').update(seekBarWidth, seekBarPoint, content);
+      this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
+      this.getChild('timeTooltip').update(seekBarRect, seekBarPoint, content);
     });
   }
 }

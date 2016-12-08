@@ -4,7 +4,6 @@
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import * as Dom from '../../utils/dom.js';
-import computedStyle from '../../utils/computed-style.js';
 
 import './seek-bar.js';
 
@@ -55,10 +54,21 @@ class ProgressControl extends Component {
   handleMouseMove(event) {
     const seekBar = this.getChild('seekBar');
     const seekBarEl = seekBar.el();
-    const seekBarWidth = parseFloat(computedStyle(seekBarEl, 'width'));
-    const seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
+    const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
+    let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
 
-    seekBar.getChild('mouseTimeDisplay').update(seekBarWidth, seekBarPoint);
+    // The default skin has a gap on either side of the `SeekBar`. This means
+    // that it's possible to trigger this behavior outside the boundaries of
+    // the `SeekBar`. This ensures we stay within it at all times.
+    if (seekBarPoint > 1) {
+      seekBarPoint = 1;
+    } else if (seekBarPoint < 0) {
+      seekBarPoint = 0;
+    }
+
+    console.log('mousemove', {seekBarPoint}); // eslint-disable-line
+
+    seekBar.getChild('mouseTimeDisplay').update(seekBarRect, seekBarPoint);
   }
 }
 

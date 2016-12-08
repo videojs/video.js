@@ -3,8 +3,8 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
+import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
-import computedStyle from '../../utils/computed-style.js';
 import formatTime from '../../utils/format-time.js';
 
 import './load-progress-bar.js';
@@ -63,7 +63,6 @@ class SeekBar extends Slider {
   update() {
     const percent = super.update();
     const duration = this.player_.duration();
-    const width = parseFloat(computedStyle(this.el_, 'width'));
 
     // Allows for smooth scrubbing, when player can't keep up.
     const time = (this.player_.scrubbing()) ?
@@ -77,7 +76,7 @@ class SeekBar extends Slider {
     this.el_.setAttribute('aria-valuetext', formatTime(time, duration));
 
     // Update the `PlayProgressBar`.
-    this.bar.update(width, percent);
+    this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
 
     return percent;
   }
