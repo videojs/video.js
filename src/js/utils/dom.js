@@ -600,15 +600,17 @@ export function getBoundingClientRect(el) {
     const result = {};
 
     ['bottom', 'height', 'left', 'right', 'top', 'width'].forEach(k => {
-      result[k] = rect[k];
+      if (rect[k] !== undefined) {
+        result[k] = rect[k];
+      }
     });
 
     if (!result.height) {
-      result.height = parseFloat(computedStyle(this.el_, 'height'));
+      result.height = parseFloat(computedStyle(el, 'height'));
     }
 
     if (!result.width) {
-      result.width = parseFloat(computedStyle(this.el_, 'width'));
+      result.width = parseFloat(computedStyle(el, 'width'));
     }
 
     return result;

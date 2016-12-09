@@ -12,9 +12,6 @@ import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import mergeOptions from './utils/merge-options.js';
 
-const supportsRAF = typeof window.requestAnimationFrame === 'function' &&
-  typeof window.cancelAnimationFrame === 'function';
-
 /**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
@@ -1471,7 +1468,7 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
-    if (supportsRAF) {
+    if (this.supportsRaf_) {
       fn = Fn.bind(this, fn);
 
       const id = window.requestAnimationFrame(fn);
@@ -1504,7 +1501,7 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
    */
   cancelAnimationFrame(id) {
-    if (supportsRAF) {
+    if (this.supportsRaf_) {
       window.cancelAnimationFrame(id);
 
       const disposeFn = function() {};
@@ -1617,6 +1614,17 @@ class Component {
     }
   }
 }
+
+/**
+ * Whether or not this component supports `requestAnimationFrame`.
+ *
+ * This is exposed primarily for testing purposes.
+ *
+ * @private
+ * @type {Boolean}
+ */
+Component.prototype.supportsRaf_ = typeof window.requestAnimationFrame === 'function' &&
+  typeof window.cancelAnimationFrame === 'function';
 
 Component.registerComponent('Component', Component);
 
