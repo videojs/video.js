@@ -66,8 +66,6 @@ class ProgressControl extends Component {
       seekBarPoint = 0;
     }
 
-    console.log('mousemove', {seekBarPoint}); // eslint-disable-line
-
     seekBar.getChild('mouseTimeDisplay').update(seekBarRect, seekBarPoint);
   }
 }

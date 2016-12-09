@@ -63,6 +63,15 @@ class TimeTooltip extends Component {
       pullTooltipBy = spaceRightOfPoint;
     }
 
+    // Due to the imprecision of decimal/ratio based calculations and varying
+    // rounding behaviors, there are cases where the spacing adjustment is off
+    // by a pixel or two. This adds insurance to these calculations.
+    if (pullTooltipBy < 0) {
+      pullTooltipBy = 0;
+    } else if (pullTooltipBy > tooltipRect.width) {
+      pullTooltipBy = tooltipRect.width;
+    }
+
     this.el_.style.right = `-${pullTooltipBy}px`;
     Dom.textContent(this.el_, content);
   }
