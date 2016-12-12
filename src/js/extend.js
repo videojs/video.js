@@ -31,19 +31,6 @@ const _inherits = function(subClass, superClass) {
 /*
  * Function for subclassing using the same inheritance that
  * videojs uses internally
- * ```js
- * var Button = videojs.getComponent('Button');
- * ```
- * ```js
- * var MyButton = videojs.extend(Button, {
- *   constructor: function(player, options) {
- *     Button.call(this, player, options);
- *   },
- *   onClick: function() {
- *     // doSomething
- *   }
- * });
- * ```
  */
 const extendFn = function(superClass, subClassMethods = {}) {
   let subClass = function() {
