@@ -104,8 +104,7 @@ function FlashRtmpDecorator(Flash) {
   /**
    * Regular expression used to check if the source is an rtmp source.
    *
-   * @property
-   * @type {RegExp}
+   * @property {RegExp} Flash.RTMP_RE
    */
   Flash.RTMP_RE = /^rtmp[set]?:\/\//i;
 

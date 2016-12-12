@@ -89,7 +89,7 @@ class PosterImage extends ClickableComponent {
   /**
    * Set the source of the `PosterImage` depending on the display method.
    *
-   * @param {String} url
+   * @param {string} url
    *        The URL to the source for the `PosterImage`.
    */
   setSrc(url) {

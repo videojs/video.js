@@ -5,9 +5,6 @@
 import Player from './player.js';
 
 /**
- *
- */
-/**
  * The method for registering a video.js plugin. {@link videojs:videojs.registerPlugin].
  *
  * @param {string} name

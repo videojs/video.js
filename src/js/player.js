@@ -57,7 +57,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `progress` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechProgress_
+   * @method Player#handleTechProgress_
    * @fires Player#progress
    * @listens Tech#progress
    */
@@ -73,7 +73,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `abort` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechAbort_
+   * @method Player#handleTechAbort_
    * @fires Player#abort
    * @listens Tech#abort
    */
@@ -89,7 +89,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `suspend` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechSuspend_
+   * @method Player#handleTechSuspend_
    * @fires Player#suspend
    * @listens Tech#suspend
    */
@@ -105,7 +105,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `emptied` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechEmptied_
+   * @method Player#handleTechEmptied_
    * @fires Player#emptied
    * @listens Tech#emptied
    */
@@ -120,7 +120,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `stalled` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechStalled_
+   * @method Player#handleTechStalled_
    * @fires Player#stalled
    * @listens Tech#stalled
    */
@@ -136,7 +136,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `stalled` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechLoadedmetadata_
+   * @method Player#handleTechLoadedmetadata_
    * @fires Player#loadedmetadata
    * @listens Tech#loadedmetadata
    */
@@ -152,7 +152,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `loadeddata` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechLoaddeddata_
+   * @method Player#handleTechLoaddeddata_
    * @fires Player#loadeddata
    * @listens Tech#loadeddata
    */
@@ -168,7 +168,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `timeupdate` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechTimeUpdate_
+   * @method Player#handleTechTimeUpdate_
    * @fires Player#timeupdate
    * @listens Tech#timeupdate
    */
@@ -184,7 +184,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechRatechange_
+   * @method Player#handleTechRatechange_
    * @fires Player#ratechange
    * @listens Tech#ratechange
    */
@@ -200,7 +200,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `volumechange` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechVolumechange_
+   * @method Player#handleTechVolumechange_
    * @fires Player#volumechange
    * @listens Tech#volumechange
    */
@@ -216,7 +216,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `texttrackchange` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechTexttrackchange_
+   * @method Player#handleTechTexttrackchange_
    * @fires Player#texttrackchange
    * @listens Tech#texttrackchange
    */
@@ -3240,14 +3240,14 @@ Player.prototype.options_ = {
    * Returns whether or not the player is in the "ended" state.
    *
    * @return {Boolean} True if the player is in the ended state, false if not.
-   * @method Player.prototype.ended
+   * @method Player#ended
    */
   'ended',
   /**
    * Returns whether or not the player is in the "seeking" state.
    *
    * @return {Boolean} True if the player is in the seeking state, false if not.
-   * @method Player.prototype.seeking
+   * @method Player#seeking
    */
   'seeking',
   /**
@@ -3255,7 +3255,7 @@ Player.prototype.options_ = {
    * for seeking to.
    *
    * @return {TimeRanges} the seekable intervals of the media timeline
-   * @method Player.prototype.seekable
+   * @method Player#seekable
    */
   'seekable',
   /**
@@ -3276,7 +3276,7 @@ Player.prototype.options_ = {
    *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
    * @return {number} the current network activity state
-   * @method Player.prototype.networkState
+   * @method Player#networkState
    */
   'networkState',
   /**
@@ -3300,7 +3300,7 @@ Player.prototype.options_ = {
    *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
    * @return {number} the current playback rendering state
-   * @method Player.prototype.readyState
+   * @method Player#readyState
    */
   'readyState'
 ].forEach(function(fn) {

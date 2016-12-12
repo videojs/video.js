@@ -1,11 +1,10 @@
 /**
- * @file events.js
- * @module events
- *
- * Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
+ * @file events.js. An Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
  * (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
  * This should work very similarly to jQuery's events, however it's based off the book version which isn't as
  * robust as jquery's, so there's probably some differences.
+ *
+ * @module events
  */
 
 import * as Dom from './dom.js';
