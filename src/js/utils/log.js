@@ -8,6 +8,9 @@ import {isObject} from './obj';
 
 let log;
 
+// This is the private tracking variable for logging level.
+let level = 'debug';
+
 /**
  * Log messages to the console and history based on the type of message
  *
@@ -22,17 +25,19 @@ let log;
  *         but this is exposed as a parameter to facilitate testing.
  */
 export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
+  const lvl = log.levels[level];
+  const lvlRegExp = new RegExp(`^(${lvl})$`);
 
   if (type !== 'log') {
 
-    // add the type to the front of the message when it's not "log"
+    // Add the type to the front of the message when it's not "log".
     args.unshift(type.toUpperCase() + ':');
   }
 
-  // add to history
-  log.history.push(args);
+  // Add a clone of the args at this point to history.
+  log.history.push([].concat(args));
 
-  // add console prefix after adding to history
+  // Add console prefix after adding to history.
   args.unshift('VIDEOJS:');
 
   // If there's no console then don't try to output messages, but they will
@@ -43,8 +48,9 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   // when the module is executed.
   const fn = window.console && window.console[type];
 
-  // Bail out if there's no console.
-  if (!fn) {
+  // Bail out if there's no console or if this type is not allowed by the
+  // current logging level.
+  if (!fn || !lvl || !lvlRegExp.test(type)) {
     return;
   }
 
@@ -91,6 +97,76 @@ log = function(...args) {
  * @type {Array}
  */
 log.history = [];
+
+/**
+ * Enumeration of available logging levels, where the keys are the level names
+ * and the values are `|`-separated strings containing logging methods allowed
+ * in that logging level.
+ *
+ * This allows users to define their own logging levels if desired. Levels are
+ * used to create a regular expression matching the function name being called.
+ *
+ * Levels provided by video.js are:
+ *
+ * - `off`: Matches no calls. Any value that can be cast to `false` will have
+ *   this effect. The most restrictive.
+ * - `debug` (default): Matches only Video.js-provided functions (`log`,
+ *   `log.warn`, and `log.error`).
+ * - `warn`: Matches `log.warn` and `log.error` calls.
+ * - `error`: Matches only `log.error` calls.
+ *
+ * @type {Object}
+ */
+log.levels = {};
+
+Object.defineProperties(log.levels, {
+  debug: {
+    enumerable: true,
+    value: 'log|warn|error'
+  },
+  error: {
+    enumerable: true,
+    value: 'error'
+  },
+  off: {
+    enumerable: true,
+    value: ''
+  },
+  warn: {
+    enumerable: true,
+    value: 'warn|error'
+  }
+});
+
+if (window.VIDEOJS_DEFAULT_LOG_LEVEL &&
+    log.levels.hasOwnProperty(window.VIDEOJS_DEFAULT_LOG_LEVEL)) {
+  level = window.VIDEOJS_DEFAULT_LOG_LEVEL;
+}
+
+// DEFAULT is non-enumerable so it doesn't show up as an available level. This
+// needs to be set _after_ the check for window.VIDEOJS_DEFAULT_LOG_LEVEL.
+Object.defineProperty(log.levels, 'DEFAULT', {value: level});
+
+/**
+ * Get or set the current logging level. If a string matching a key from
+ * {@see log.levels} is provided, acts as a setter. Regardless of argument,
+ * returns the current logging level.
+ *
+ * @param  {String} [lvl]
+ *         Pass to set a new logging level.
+ *
+ * @return {String}
+ *         The current logging level.
+ */
+log.level = (lvl) => {
+  if (typeof lvl === 'string') {
+    if (!log.levels.hasOwnProperty(lvl)) {
+      throw new Error(`"${lvl}" in not a valid log level. try one of: "${Object.keys(log.levels).join('", "')}"`);
+    }
+    level = lvl;
+  }
+  return level;
+};
 
 /**
  * Log error messages
