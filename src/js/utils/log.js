@@ -9,11 +9,12 @@ import {isObject} from './obj';
 let log;
 
 // This is the private tracking variable for logging level.
-let level = 'debug';
+let level = 'all';
 
 /**
  * Log messages to the console and history based on the type of message
  *
+ * @private
  * @param  {string} type
  *         The name of the console method to use.
  *
@@ -82,17 +83,24 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
 };
 
 /**
- * Log plain debug messages
+ * Logs plain debug messages. Similar to `console.log`.
  *
- * @param {Mixed[]} args
- *        One or more messages or objects that should be logged.
+ * @class
+ * @param    {Mixed[]} args
+ *           One or more messages or objects that should be logged.
  */
 log = function(...args) {
   logByType('log', args);
 };
 
 /**
- * Keep a history of log messages
+ * Retains a history of all arguments passed to logging functions.
+ *
+ * These records are retained regardless of logging level.
+ *
+ * Whether logging is enabled or not, users would be wise to think carefully
+ * about what they pass to video.js' logging functions. Because values passed
+ * are stored here, they could lead to memory leaks.
  *
  * @type {Array}
  */
@@ -101,17 +109,16 @@ log.history = [];
 /**
  * Enumeration of available logging levels, where the keys are the level names
  * and the values are `|`-separated strings containing logging methods allowed
- * in that logging level.
- *
- * This allows users to define their own logging levels if desired. Levels are
- * used to create a regular expression matching the function name being called.
+ * in that logging level. These strings are used to create a regular expression
+ * matching the function name being called.
  *
  * Levels provided by video.js are:
  *
  * - `off`: Matches no calls. Any value that can be cast to `false` will have
  *   this effect. The most restrictive.
- * - `debug` (default): Matches only Video.js-provided functions (`log`,
+ * - `all` (default): Matches only Video.js-provided functions (`log`,
  *   `log.warn`, and `log.error`).
+ * - `log`: Matches `log` calls only.
  * - `warn`: Matches `log.warn` and `log.error` calls.
  * - `error`: Matches only `log.error` calls.
  *
@@ -119,37 +126,53 @@ log.history = [];
  */
 log.levels = {};
 
-Object.defineProperties(log.levels, {
-  debug: {
-    enumerable: true,
-    value: 'log|warn|error'
-  },
-  error: {
-    enumerable: true,
-    value: 'error'
-  },
-  off: {
-    enumerable: true,
-    value: ''
-  },
-  warn: {
-    enumerable: true,
-    value: 'warn|error'
-  }
-});
+if (Object.defineProperties) {
+  Object.defineProperties(log.levels, {
+    all: {
+      enumerable: true,
+      value: 'log|warn|error'
+    },
+    error: {
+      enumerable: true,
+      value: 'error'
+    },
+    log: {
+      enumerable: true,
+      value: 'log'
+    },
+    off: {
+      enumerable: true,
+      value: ''
+    },
+    warn: {
+      enumerable: true,
+      value: 'warn|error'
+    }
+  });
+} else {
+  log.levels = {
+    all: 'log|warn|error',
+    error: 'error',
+    log: 'log',
+    off: '',
+    warn: 'warn|error'
+  };
+}
 
 if (window.VIDEOJS_DEFAULT_LOG_LEVEL &&
     log.levels.hasOwnProperty(window.VIDEOJS_DEFAULT_LOG_LEVEL)) {
   level = window.VIDEOJS_DEFAULT_LOG_LEVEL;
 }
 
-// DEFAULT is non-enumerable so it doesn't show up as an available level. This
-// needs to be set _after_ the check for window.VIDEOJS_DEFAULT_LOG_LEVEL.
-Object.defineProperty(log.levels, 'DEFAULT', {value: level});
+if (Object.defineProperty) {
+  Object.defineProperty(log.levels, 'DEFAULT', {value: level});
+} else {
+  log.levels.DEFAULT = level;
+}
 
 /**
  * Get or set the current logging level. If a string matching a key from
- * {@see log.levels} is provided, acts as a setter. Regardless of argument,
+ * {@link log.levels} is provided, acts as a setter. Regardless of argument,
  * returns the current logging level.
  *
  * @param  {String} [lvl]
@@ -161,7 +184,7 @@ Object.defineProperty(log.levels, 'DEFAULT', {value: level});
 log.level = (lvl) => {
   if (typeof lvl === 'string') {
     if (!log.levels.hasOwnProperty(lvl)) {
-      throw new Error(`"${lvl}" in not a valid log level. try one of: "${Object.keys(log.levels).join('", "')}"`);
+      throw new Error(`"${lvl}" in not a valid log level`);
     }
     level = lvl;
   }
@@ -169,7 +192,7 @@ log.level = (lvl) => {
 };
 
 /**
- * Log error messages
+ * Logs error messages. Similar to `console.error`.
  *
  * @param {Mixed[]} args
  *        One or more messages or objects that should be logged as an error
@@ -177,7 +200,7 @@ log.level = (lvl) => {
 log.error = (...args) => logByType('error', args);
 
 /**
- * Log warning messages
+ * Logs warning messages. Similar to `console.warn`.
  *
  * @param {Mixed[]} args
  *        One or more messages or objects that should be logged as a warning.

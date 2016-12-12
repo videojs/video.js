@@ -169,6 +169,13 @@ help but are outside of the scope of video.js.
 
 For content that must be highly secure [videojs-contrib-eme][eme] adds DRM support.
 
+## Q: Can I turn off video.js logging?
+Yes! This can be achieved by adding the following code _before_ including video.js:
+
+```js
+window.VIDEOJS_DEFAULT_LOG_LEVEL = 'off';
+```
+
 ## Q: What is a plugin?
 
 A plugin is a group of reusable functionality that can be re-used by others. For instance a plugin could add
@@ -197,6 +204,15 @@ the [plugins guide][plugin-guide] for more information.
 ## Q: Where can I find a list of video.js skins?
 
 See the [video.js github wiki][skins-list].
+
+## Q: Can I disable the `<style>` elements video.js adds by default?
+Yes! You can add the following code _before_ including video.js:
+
+```js
+window.VIDEOJS_NO_DYNAMIC_STYLE = true;
+```
+
+For more information, see the [skins guide][skin-style-els].
 
 ## Q: Does video.js work as an audio only player?
 
@@ -307,3 +323,5 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 [semver]: http://semver.org/
 
 [starter-example]: http://jsbin.com/axedog/edit?html,output
+
+[skin-style-els]: /docs/guides/skins.md#additional-style-elements

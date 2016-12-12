@@ -127,7 +127,7 @@ QUnit.test('setting the log level changes what is actually logged', function(ass
 
   assert.throws(
     () => log.level('foobar'),
-    new Error(`"foobar" in not a valid log level. try one of: "${Object.keys(log.levels).join('", "')}"`),
+    new Error('"foobar" in not a valid log level'),
     'log.level() only accepts valid log levels when used as a setter'
   );
 });
