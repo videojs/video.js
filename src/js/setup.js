@@ -1,6 +1,6 @@
 /**
  * @file setup.js - Functions for setting up a player without
- * user insteraction based on the data-setup `attribute` of the video tag.
+ * user interaction based on the data-setup `attribute` of the video tag.
  *
  * @module setup
  */
