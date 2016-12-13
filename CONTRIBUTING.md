@@ -254,8 +254,13 @@ In the body of the commit message, we can talk about why we made the change. Wha
 Any testing considerations or things to think about when looking at the commit. For Example:
 
 ```txt
-* Fixes #123. The footer now contains foo.
-* Updated unit tests to reflect corrected footer value of foo.
+fix: one line commit explanation
+
+In the body of the commit message, we can talk about why we made the change. What the change entails.
+
+Any testing considerations or things to think about when looking at the commit.
+
+Fixes #123. The footer can contain Fixes messages.
 ```
 
 > Make sure that git knows your name and email:
