@@ -2023,8 +2023,7 @@ class Player extends Component {
    */
   defaultMuted(defaultMuted) {
     if (defaultMuted !== undefined) {
-      this.techCall_('setDefaultMuted', defaultMuted);
-      return this;
+      return this.techCall_('setDefaultMuted', defaultMuted);
     }
     return this.techGet_('defaultMuted') || false;
   }
@@ -3091,8 +3090,7 @@ class Player extends Component {
    */
   defaultPlaybackRate(rate) {
     if (rate !== undefined) {
-      this.techCall_('setDefaultPlaybackRate', rate);
-      return this;
+      return this.techCall_('setDefaultPlaybackRate', rate);
     }
 
     if (this.tech_ && this.tech_.featuresPlaybackRate) {
