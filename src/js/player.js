@@ -490,8 +490,15 @@ class Player extends Component {
    *         The DOM element that gets created.
    */
   createEl() {
-    const el = this.el_ = super.createEl('div');
     const tag = this.tag;
+    let el;
+    const playerElIngest = this.playerElIngest_ = tag.parentNode.hasAttribute('data-vjs-player');
+
+    if (playerElIngest) {
+      el = this.el_ = tag.parentNode;
+    } else {
+      el = this.el_ = super.createEl('div');
+    }
 
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
@@ -505,7 +512,7 @@ class Player extends Component {
       // workaround so we don't totally break IE7
       // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
       if (attr === 'class') {
-        el.className = attrs[attr];
+        el.className += ' ' + attrs[attr];
       } else {
         el.setAttribute(attr, attrs[attr]);
       }
@@ -555,7 +562,7 @@ class Player extends Component {
     tag.initNetworkState_ = tag.networkState;
 
     // Wrap video tag in div (el/box) container
-    if (tag.parentNode) {
+    if (tag.parentNode && !playerElIngest) {
       tag.parentNode.insertBefore(el, tag);
     }
 
@@ -836,6 +843,7 @@ class Player extends Component {
       'muted': this.options_.muted,
       'poster': this.poster(),
       'language': this.language(),
+      'playerElIngest': this.playerElIngest_,
       'vtt.js': this.options_['vtt.js']
     }, this.options_[techName.toLowerCase()]);
 
