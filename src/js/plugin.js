@@ -269,12 +269,6 @@ class Plugin {
     player[PLUGIN_CACHE_KEY][name] = false;
     this.player = this.state = null;
 
-    this.dispose = () => {
-      throw new Error('Cannot call methods on a disposed object.');
-    };
-
-    this.setState = this.off = this.on = this.one = this.trigger = this.dispose;
-
     // Finally, replace the plugin name on the player with a new factory
     // function, so that the plugin is ready to be set up again.
     player[name] = createPluginFactory(name, pluginStorage[name]);

@@ -108,14 +108,6 @@ QUnit.test('dispose', function(assert) {
   assert.notStrictEqual(instance, this.player.mock, 'instance is replaced by factory');
   assert.strictEqual(instance.player, null, 'instance no longer has a reference to the player');
   assert.strictEqual(instance.state, null, 'state is now null');
-
-  ['dispose', 'setState', 'off', 'on', 'one', 'trigger'].forEach(n => {
-    assert.throws(
-      () => instance[n](),
-      new Error('Cannot call methods on a disposed object.'),
-      `the "${n}" method now throws`
-    );
-  });
 });
 
 QUnit.test('"dispose" event', function(assert) {
