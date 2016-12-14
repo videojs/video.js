@@ -186,7 +186,9 @@ class Html5 extends Tech {
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
     // If we ingested the player div, we do not need to move the media element.
-    if (!el || !this.options_.playerElIngest || this.movingMediaElementInDOM === false) {
+    if (!el ||
+        ('playerElIngest' in this.options_ && !this.options_.playerElIngest) ||
+        this.movingMediaElementInDOM === false) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
