@@ -181,7 +181,9 @@ QUnit.test('ingest player div if data-vjs-player attribute is present on video p
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
 
-  const player = videojs(vid, {});
+  const player = videojs(vid, {
+    techOrder: ['html5']
+  });
 
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
@@ -204,7 +206,9 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
 
-  const player = videojs(vid, {});
+  const player = videojs(vid, {
+    techOrder: ['html5']
+  });
 
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
   assert.equal(player.tech_.el(), vid, 'we re-used the video element');
@@ -230,7 +234,9 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
 
-  const player = videojs(vid, {});
+  const player = videojs(vid, {
+    techOrder: ['html5']
+  });
 
   assert.notEqual(player.el(), playerDiv, 'we used a new div');
   assert.notEqual(player.tech_.el(), vid, 'we a new video element');
