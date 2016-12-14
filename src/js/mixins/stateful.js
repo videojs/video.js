@@ -8,7 +8,7 @@ import * as Obj from '../utils/obj';
 /**
  * Set the state of an object by mutating its `state` object in place.
  *
- * @param  {Object|Function} next
+ * @param  {Object|Function} stateUpdates
  *         A new set of properties to shallow-merge into the plugin state. Can
  *         be a plain object or a function returning a plain object.
  *
@@ -16,21 +16,21 @@ import * as Obj from '../utils/obj';
  *         An object containing changes that occurred. If no changes occurred,
  *         returns `undefined`.
  */
-const setState = function(next) {
+const setState = function(stateUpdates) {
 
-  // Support providing the `next` state as a function.
-  if (typeof next === 'function') {
-    next = next();
+  // Support providing the `stateUpdates` state as a function.
+  if (typeof stateUpdates === 'function') {
+    stateUpdates = stateUpdates();
   }
 
-  if (!Obj.isPlain(next)) {
-    log.warn('non-plain object passed to `setState`', next);
+  if (!Obj.isPlain(stateUpdates)) {
+    log.warn('non-plain object passed to `setState`', stateUpdates);
     return;
   }
 
   let changes;
 
-  Obj.each(next, (value, key) => {
+  Obj.each(stateUpdates, (value, key) => {
 
     // Record the change if the value is different from what's in the
     // current state.
@@ -63,8 +63,9 @@ const setState = function(next) {
  * arbitrary keys/values and a `setState` method which will trigger state
  * changes if the object has a `trigger` method.
  *
- * If the target object has a `handleStateChanged` method, it will be
- * automatically bound to the `statechanged` event on itself.
+ * If the target object is evented (that is, uses the evented mixin) and has a
+ * `handleStateChanged` method, it will be automatically bound to the
+ * `statechanged` event on itself.
  *
  * @param  {Object} target
  *         The object to be made stateful.

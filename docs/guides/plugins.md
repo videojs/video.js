@@ -80,15 +80,15 @@ After that, any player will automatically have an `examplePlugin` method on its 
 
 ## Writing a Advanced Plugin
 
-As of Video.js 6, there is an additional type of plugin supported: advanced plugins.
+Video.js 6 introduces advanced plugins: these are plugins that share a similar API with basic plugins, but are class-based and offer a range of extra features out of the box.
 
-At any time, you may want to refer to the [Plugin API docs][api-plugin] for more detail.
+While reading the following sections, you may want to refer to the [Plugin API docs][api-plugin] for more detail.
 
 ### Write a JavaScript Class/Constructor
 
 If you're familiar with creating [components](components.md), this process is similar. A advanced plugin starts with a JavaScript class (a.k.a. a constructor function).
 
-This can be achieved with ES6 classes:
+If you're using ES6 already, you can use that syntax with your transpiler/language of choice (Babel, TypeScript, etc):
 
 ```js
 const Plugin = videojs.getPlugin('plugin');
@@ -177,7 +177,7 @@ Up to this point, our example advanced plugin is functionally identical to our e
 
 Like components, advanced plugins offer an implementation of events. This includes:
 
-- The ability to listen for events on the plugin instance using `on` or `one` and stop listening for events using `off`:
+- The ability to listen for events on the plugin instance using `on` or `one`:
 
   ```js
   player.examplePlugin().on('example-event', function() {
@@ -191,11 +191,17 @@ Like components, advanced plugins offer an implementation of events. This includ
   player.examplePlugin().trigger('example-event');
   ```
 
+- The ability to stop listening to custom events on a plugin instance using `off`:
+
+  ```js
+  player.examplePlugin().off('example-event');
+  ```
+
 By offering a built-in events system, advanced plugins offer a wider range of options for code structure with a pattern familiar to most web developers.
 
 #### Statefulness
 
-A new concept introduced in Video.js 6 for advanced plugins is _statefulness_. This is similar to React components' `state` property and `setState` method.
+A new concept introduced for advanced plugins is _statefulness_. This is similar to React components' `state` property and `setState` method.
 
 Advanced plugin instances each have a `state` property, which is a plain JavaScript object - it can contain any keys and values the plugin author wants.
 
@@ -236,7 +242,7 @@ player.examplePlugin().dispose();
 The `dispose` method has several effects:
 
 - Triggers a `"dispose"` event on the plugin instance.
-- Cleans up all event listeners on the plugin instance.
+- Cleans up all event listeners on the plugin instance, which helps avoid errors caused by events being triggered after an object is cleaned up.
 - Removes plugin state and references to the player to avoid memory leaks.
 - Reverts the player's named property (e.g. `player.examplePlugin`) _back_ to the original factory function, so the plugin can be set up again.
 

@@ -8,6 +8,32 @@ import * as Fn from './utils/fn';
 import Player from './player';
 
 /**
+ * @typedef {Object} plugin:AdvancedEventHash
+ *
+ * @property {string} instance
+ *           The plugin instance on which the event is fired.
+ *
+ * @property {string} name
+ *           The name of the plugin.
+ *
+ * @property {string} plugin
+ *           The plugin class/constructor.
+ */
+
+/**
+ * @typedef {Object} plugin:BasicEventHash
+ *
+ * @property {string} instance
+ *           The return value of the plugin function.
+ *
+ * @property {string} name
+ *           The name of the plugin.
+ *
+ * @property {string} plugin
+ *           The plugin function.
+ */
+
+/**
  * The base plugin name.
  *
  * @private
@@ -139,6 +165,7 @@ class Plugin {
    *
    * Subclasses should call `super` to ensure plugins are properly initialized.
    *
+   * @fires Plugin#pluginsetup
    * @param {Player} player
    *        A Video.js player instance.
    */
@@ -171,17 +198,8 @@ class Plugin {
      * Signals that a plugin (both basic and advanced) has just been set up
      * on a player.
      *
-     * In all cases, an object containing the following properties is passed as a
-     * second argument to event listeners:
-     *
-     * - `name`: The name of the plugin that was set up.
-     * - `plugin`: The raw plugin function.
-     * - `instance`: For advanced plugins, the instance of the plugin sub-class,
-     *   but, for basic plugins, the return value of the plugin invocation.
-     *
-     * @event pluginsetup
-     * @memberof Player
-     * @instance
+     * @event Plugin#pluginsetup
+     * @type {EventTarget~Event}
      */
     player.trigger('pluginsetup', this.getEventHash_());
   }
@@ -196,12 +214,8 @@ class Plugin {
    * @param  {Object} [hash={}]
    *         An object to be used as event an event hash.
    *
-   * @return {Object}
-   *         The event hash object with, at least, the following properties:
-   *
-   *         - `instance`: The plugin instance on which the event is fired.
-   *         - `name`: The name of the plugin.
-   *         - `plugin`: The plugin class/constructor.
+   * @return {plugin:AdvancedEventHash}
+   *         An event hash object with provided properties mixed-in.
    */
   getEventHash_(hash = {}) {
     hash.name = this.name;
@@ -216,13 +230,8 @@ class Plugin {
    * @param  {Event|Object|string} event
    *         A string (the type) or an event object with a type attribute.
    *
-   * @param  {Object} [hash={}]
-   *         Additional data hash to pass along with the event. For plugins,
-   *         several properties are added to the hash:
-   *
-   *         - `instance`: The plugin instance on which the event is fired.
-   *         - `name`: The name of the plugin.
-   *         - `plugin`: The plugin class/constructor.
+   * @param  {plugin:AdvancedEventHash} [hash={}]
+   *         Additional data hash to pass along with the event.
    *
    * @return {boolean}
    *         Whether or not default was prevented.
@@ -235,6 +244,7 @@ class Plugin {
    * Handles "statechanged" events on the plugin. No-op by default, override by
    * subclassing.
    *
+   * @abstract
    * @param {Event} e
    *        An event object provided by a "statechanged" event.
    *
@@ -249,6 +259,8 @@ class Plugin {
    *
    * Subclasses can override this if they want, but for the sake of safety,
    * it's probably best to subscribe the "dispose" event.
+   *
+   * @fires Plugin#dispose
    */
   dispose() {
     const {name, player} = this;
@@ -256,9 +268,8 @@ class Plugin {
     /**
      * Signals that a advanced plugin is about to be disposed.
      *
-     * @event dispose
-     * @memberof Plugin
-     * @instance
+     * @event Plugin#dispose
+     * @type {EventTarget~Event}
      */
     this.trigger('dispose');
     this.off();

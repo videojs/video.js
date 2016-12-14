@@ -1649,6 +1649,7 @@ class Component {
    * Handles "statechanged" events on the component. No-op by default, override
    * by subclassing.
    *
+   * @abstract
    * @param {Event} e
    *        An event object provided by a "statechanged" event.
    *
