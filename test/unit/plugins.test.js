@@ -178,6 +178,8 @@ QUnit.test('Plugins should not get events after stopImmediatePropagation is call
 
 QUnit.test('Plugin that does not exist logs an error', function(assert) {
 
+  const origConsole = window.console;
+
   // stub the global log functions
   const console = window.console = {
     log() {},
@@ -186,7 +188,6 @@ QUnit.test('Plugin that does not exist logs an error', function(assert) {
   };
   const log = sinon.stub(console, 'log');
   const error = sinon.stub(console, 'error');
-  const origConsole = window.console;
 
   // enable a non-existing plugin
   TestHelpers.makePlayer({
