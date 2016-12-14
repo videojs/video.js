@@ -123,8 +123,12 @@ const createPluginFactory = (name, PluginSubClass) => {
   PluginSubClass.prototype.name = name;
 
   return function(...args) {
-    this[name] = new PluginSubClass(...[this, ...args]);
-    return this[name];
+    const instance = new PluginSubClass(...[this, ...args]);
+
+    // The plugin is replaced by a function that returns the current instance.
+    this[name] = () => instance;
+
+    return instance;
   };
 };
 

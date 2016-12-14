@@ -49,7 +49,7 @@ QUnit.test('setup', function(assert) {
   assert.ok(this.player.usingPlugin('mock'), 'player now recognizes that the plugin was set up');
   assert.ok(this.player.hasPlugin('mock'), 'player has the plugin available');
   assert.ok(instance instanceof this.MockPlugin, 'plugin instance has the correct constructor');
-  assert.strictEqual(instance, this.player.mock, 'instance replaces the factory');
+  assert.strictEqual(instance, this.player.mock(), 'factory is replaced by method returning the instance');
   assert.strictEqual(instance.player, this.player, 'instance has a reference to the player');
   assert.strictEqual(instance.name, 'mock', 'instance knows its name');
   assert.strictEqual(typeof instance.state, 'object', 'instance is stateful');
