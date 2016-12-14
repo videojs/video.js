@@ -1099,9 +1099,6 @@ Tech.withSourceHandlers = function(_Tech) {
    *
    * @param {Tech~SourceObject} source
    *        A source object with src and type keys
-   *
-   * @return {Tech}
-   *         Returns itself; this method is chainable
    */
   _Tech.prototype.setSource = function(source) {
     let sh = _Tech.selectSourceHandler(source, this.options_);
@@ -1132,8 +1129,6 @@ Tech.withSourceHandlers = function(_Tech) {
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
     this.on('dispose', this.disposeSourceHandler);
-
-    return this;
   };
 
   /**

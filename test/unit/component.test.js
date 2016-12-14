@@ -557,13 +557,13 @@ QUnit.test('dimension() should treat NaN and null as zero', function(assert) {
   newWidth = comp.dimension('width', null);
 
   assert.notEqual(newWidth, width, 'new width and old width are not the same');
-  assert.equal(newWidth, comp, 'we set a value, so, return value is component');
+  assert.equal(newWidth, undefined, 'we set a value, so, return value is undefined');
   assert.equal(comp.width(), 0, 'the new width is zero');
 
   const newHeight = comp.dimension('height', NaN);
 
   assert.notEqual(newHeight, height, 'new height and old height are not the same');
-  assert.equal(newHeight, comp, 'we set a value, so, return value is component');
+  assert.equal(newHeight, undefined, 'we set a value, so, return value is undefined');
   assert.equal(comp.height(), 0, 'the new height is zero');
 
   comp.width(width);

@@ -588,9 +588,6 @@ class Component {
    *        The event handler if `first` is a `Component` and `second` is an event name
    *        or an Array of event names.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @listens Component#dispose
    */
   on(first, second, third) {
@@ -633,8 +630,6 @@ class Component {
         target.on('dispose', cleanRemover);
       }
     }
-
-    return this;
   }
 
   /**
@@ -650,9 +645,6 @@ class Component {
    * @param {EventTarget~EventListener} [third]
    *        The event handler if `first` is a `Component` and `second` is an event name
    *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   off(first, second, third) {
     if (!first || typeof first === 'string' || Array.isArray(first)) {
@@ -677,8 +669,6 @@ class Component {
         target.off('dispose', fn);
       }
     }
-
-    return this;
   }
 
   /**
@@ -693,9 +683,6 @@ class Component {
    * @param {EventTarget~EventListener} [third]
    *        The event handler if `first` is a `Component` and `second` is an event name
    *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   one(first, second, third) {
     if (typeof first === 'string' || Array.isArray(first)) {
@@ -715,8 +702,6 @@ class Component {
 
       this.on(target, type, newFunc);
     }
-
-    return this;
   }
 
   /**
@@ -728,13 +713,9 @@ class Component {
    *
    * @param {Object} [hash]
    *        Data hash to pass along with the event
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   trigger(event, hash) {
     Events.trigger(this.el_, event, hash);
-    return this;
   }
 
   /**
@@ -746,9 +727,6 @@ class Component {
    *
    * @param  {boolean} [sync=false]
    *         Execute the listener synchronously if `Component` is ready.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   ready(fn, sync = false) {
     if (fn) {
@@ -764,7 +742,6 @@ class Component {
         this.readyQueue_.push(fn);
       }
     }
-    return this;
   }
 
   /**
@@ -862,13 +839,9 @@ class Component {
    *
    * @param {string} classToAdd
    *        CSS class name to add
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   addClass(classToAdd) {
     Dom.addElClass(this.el_, classToAdd);
-    return this;
   }
 
   /**
@@ -876,13 +849,9 @@ class Component {
    *
    * @param {string} classToRemove
    *        CSS class name to remove
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   removeClass(classToRemove) {
     Dom.removeElClass(this.el_, classToRemove);
-    return this;
   }
 
   /**
@@ -895,65 +864,45 @@ class Component {
    *
    * @param  {boolean|Dom~predicate} [predicate]
    *         An {@link Dom~predicate} function or a boolean
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   toggleClass(classToToggle, predicate) {
     Dom.toggleElClass(this.el_, classToToggle, predicate);
-    return this;
   }
 
   /**
    * Show the `Component`s element if it is hidden by removing the
    * 'vjs-hidden' class name from it.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   show() {
     this.removeClass('vjs-hidden');
-    return this;
   }
 
   /**
    * Hide the `Component`s element if it is currently showing by adding the
    * 'vjs-hidden` class name to it.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   hide() {
     this.addClass('vjs-hidden');
-    return this;
   }
 
   /**
    * Lock a `Component`s element in its visible state by adding the 'vjs-lock-showing'
    * class name to it. Used during fadeIn/fadeOut.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @private
    */
   lockShowing() {
     this.addClass('vjs-lock-showing');
-    return this;
   }
 
   /**
    * Unlock a `Component`s element from its visible state by removing the 'vjs-lock-showing'
    * class name from it. Used during fadeIn/fadeOut.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @private
    */
   unlockShowing() {
     this.removeClass('vjs-lock-showing');
-    return this;
   }
 
   /**
@@ -984,14 +933,10 @@ class Component {
    * @param {string} value
    *        Value to set the attribute to.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute}
    */
   setAttribute(attribute, value) {
     Dom.setAttribute(this.el_, attribute, value);
-    return this;
   }
 
   /**
@@ -1000,14 +945,10 @@ class Component {
    * @param {string} attribute
    *        Name of the attribute to remove.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute}
    */
   removeAttribute(attribute) {
     Dom.removeAttribute(this.el_, attribute);
-    return this;
   }
 
   /**
@@ -1020,10 +961,9 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the resize event trigger
    *
-   * @return {Component|number|string}
-   *         - The width when getting, zero if there is no width. Can be a string
+   * @return {number|string}
+   *         The width when getting, zero if there is no width. Can be a string
    *           postpixed with '%' or 'px'.
-   *         - Returns itself when setting; method can be chained.
    */
   width(num, skipListeners) {
     return this.dimension('width', num, skipListeners);
@@ -1039,10 +979,9 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the resize event trigger
    *
-   * @return {Component|number|string}
-   *         - The width when getting, zero if there is no width. Can be a string
-   *           postpixed with '%' or 'px'.
-   *         - Returns itself when setting; method can be chained.
+   * @return {number|string}
+   *         The width when getting, zero if there is no width. Can be a string
+   *         postpixed with '%' or 'px'.
    */
   height(num, skipListeners) {
     return this.dimension('height', num, skipListeners);
@@ -1056,13 +995,11 @@ class Component {
    *
    * @param  {number|string} height
    *         Height to set the `Component`s element to.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   dimensions(width, height) {
     // Skip resize listeners on width for optimization
-    return this.width(width, true).height(height);
+    this.width(width, true);
+    this.height(height);
   }
 
   /**
@@ -1090,9 +1027,8 @@ class Component {
    * @param  {boolean} [skipListeners]
    *         Skip resize event trigger
    *
-   * @return {Component}
-   *         - the dimension when getting or 0 if unset
-   *         - Returns itself when setting; method can be chained.
+   * @return {number}
+   *         The dimension when getting or 0 if unset
    */
   dimension(widthOrHeight, num, skipListeners) {
     if (num !== undefined) {
@@ -1121,8 +1057,7 @@ class Component {
         this.trigger('resize');
       }
 
-      // Return component
-      return this;
+      return;
     }
 
     // Not setting a value, so getting it

@@ -567,7 +567,7 @@ class Player extends Component {
    *        The value to set the `Player's width to.
    *
    * @return {number}
-   *         The current width of the `Player`.
+   *         The current width of the `Player` when getting.
    */
   width(value) {
     return this.dimension('width', value);
@@ -580,7 +580,7 @@ class Player extends Component {
    *        The value to set the `Player's heigth to.
    *
    * @return {number}
-   *         The current heigth of the `Player`.
+   *         The current heigth of the `Player` when getting.
    */
   height(value) {
     return this.dimension('height', value);
@@ -597,9 +597,8 @@ class Player extends Component {
    * @param {number} [value]
    *        Value for dimension specified in the first argument.
    *
-   * @return {Player|number}
-   *         - Returns itself when setting; method can be chained.
-   *         - The dimension arguments value when getting (width/height).
+   * @return {number}
+   *         The dimension arguments value when getting (width/height).
    */
   dimension(dimension, value) {
     const privDimension = dimension + '_';
@@ -616,14 +615,14 @@ class Player extends Component {
 
       if (isNaN(parsedVal)) {
         log.error(`Improper value "${value}" supplied for for ${dimension}`);
-        return this;
+        return;
       }
 
       this[privDimension] = parsedVal;
     }
 
     this.updateStyleEl_();
-    return this;
+    return;
   }
 
   /**
@@ -1104,7 +1103,7 @@ class Player extends Component {
           this.removeClass('vjs-has-started');
         }
       }
-      return this;
+      return;
     }
     return !!this.hasStarted_;
   }
@@ -1582,8 +1581,6 @@ class Player extends Component {
         this.play();
       });
     }
-
-    return this;
   }
 
   /**
@@ -1594,7 +1591,6 @@ class Player extends Component {
    */
   pause() {
     this.techCall_('pause');
-    return this;
   }
 
   /**
@@ -1617,24 +1613,20 @@ class Player extends Component {
    * @param {boolean} [isScrubbing]
    *        wether the user is or is not scrubbing
    *
-   * @return {boolean|Player}
-   *         A instance of the player that called this function when setting,
-   *         and the value of scrubbing when getting
+   * @return {boolean}
+   *         The value of scrubbing when getting
    */
   scrubbing(isScrubbing) {
-    if (isScrubbing !== undefined) {
-      this.scrubbing_ = !!isScrubbing;
-
-      if (isScrubbing) {
-        this.addClass('vjs-scrubbing');
-      } else {
-        this.removeClass('vjs-scrubbing');
-      }
-
-      return this;
+    if (typeof isScrubbing === 'undefined') {
+      return this.scrubbing_;
     }
+    this.scrubbing_ = !!isScrubbing;
 
-    return this.scrubbing_;
+    if (isScrubbing) {
+      this.addClass('vjs-scrubbing');
+    } else {
+      this.removeClass('vjs-scrubbing');
+    }
   }
 
   /**
@@ -1643,17 +1635,13 @@ class Player extends Component {
    * @param {number|string} [seconds]
    *        The time to seek to in seconds
    *
-   * @return {Player|number}
+   * @return {number}
    *         - the current time in seconds when getting
-   *         - a reference to the current player object when
-   *           getting
    */
   currentTime(seconds) {
-    if (seconds !== undefined) {
-
+    if (typeof seconds !== 'undefined') {
       this.techCall_('setCurrentTime', seconds);
-
-      return this;
+      return;
     }
 
     // cache last currentTime and return. default to 0 seconds
@@ -1679,10 +1667,8 @@ class Player extends Component {
    * @param {number} [seconds]
    *        The duration of the video to set in seconds
    *
-   * @return {number|Player}
+   * @return {number}
    *         - The duration of the video in seconds when getting
-   *         - A reference to the player that called this function
-   *           when setting
    */
   duration(seconds) {
     if (seconds === undefined) {
@@ -1711,8 +1697,6 @@ class Player extends Component {
        */
       this.trigger('durationchange');
     }
-
-    return this;
   }
 
   /**
@@ -1789,9 +1773,8 @@ class Player extends Component {
    *         - 1.0 is 100%/full
    *         - 0.5 is half volume or 50%
    *
-   * @return {Player|number}
-   *         a reference to the calling player when setting and the
-   *         current volume as a percent when getting
+   * @return {number}
+   *         The current volume as a percent when getting
    */
   volume(percentAsDecimal) {
     let vol;
@@ -1802,7 +1785,7 @@ class Player extends Component {
       this.cache_.volume = vol;
       this.techCall_('setVolume', vol);
 
-      return this;
+      return;
     }
 
     // Default to 1 when returning current volume.
@@ -1817,15 +1800,14 @@ class Player extends Component {
    *        - true to mute
    *        - false to unmute
    *
-   * @return {boolean|Player}
+   * @return {boolean}
    *         - true if mute is on and getting
    *         - false if mute is off and getting
-   *         - A reference to the current player when setting
    */
   muted(muted) {
     if (muted !== undefined) {
       this.techCall_('setMuted', muted);
-      return this;
+      return;
     }
     return this.techGet_('muted') || false;
   }
@@ -1852,15 +1834,14 @@ class Player extends Component {
    * @param  {boolean} [isFS]
    *         Set the players current fullscreen state
    *
-   * @return {boolean|Player}
+   * @return {boolean}
    *         - true if fullscreen is on and getting
    *         - false if fullscreen is off and getting
-   *         - A reference to the current player when setting
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
       this.isFullscreen_ = !!isFS;
-      return this;
+      return;
     }
     return !!this.isFullscreen_;
   }
@@ -1875,8 +1856,6 @@ class Player extends Component {
    * Safari.
    *
    * @fires Player#fullscreenchange
-   * @return {Player}
-   *         A reference to the current player
    */
   requestFullscreen() {
     const fsApi = FullscreenApi;
@@ -1922,17 +1901,12 @@ class Player extends Component {
        */
       this.trigger('fullscreenchange');
     }
-
-    return this;
   }
 
   /**
    * Return the video to its normal size after having been in full screen mode
    *
    * @fires Player#fullscreenchange
-   *
-   * @return {Player}
-   *         A reference to the current player
    */
   exitFullscreen() {
     const fsApi = FullscreenApi;
@@ -1952,8 +1926,6 @@ class Player extends Component {
        */
       this.trigger('fullscreenchange');
     }
-
-    return this;
   }
 
   /**
@@ -2153,9 +2125,8 @@ class Player extends Component {
    * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
    *        One SourceObject or an array of SourceObjects
    *
-   * @return {string|Player}
-   *         - The current video source when getting
-   *         - The player when setting
+   * @return {string}
+   *         The current video source when getting
    */
   src(source) {
     if (source === undefined) {
@@ -2219,8 +2190,6 @@ class Player extends Component {
         }, true);
       }
     }
-
-    return this;
   }
 
   /**
@@ -2258,26 +2227,18 @@ class Player extends Component {
 
   /**
    * Begin loading the src data.
-   *
-   * @return {Player}
-   *         A reference to the player
    */
   load() {
     this.techCall_('load');
-    return this;
   }
 
   /**
    * Reset the player. Loads the first tech in the techOrder,
    * and calls `reset` on the tech`.
-   *
-   * @return {Player}
-   *         A reference to the player
    */
   reset() {
     this.loadTech_(toTitleCase(this.options_.techOrder[0]), null);
     this.techCall_('reset');
-    return this;
   }
 
   /**
@@ -2345,15 +2306,14 @@ class Player extends Component {
    *        - true means that we should preload
    *        - false maens that we should not preload
    *
-   * @return {string|Player}
-   *         - the preload attribute value when getting
-   *         - the player when setting
+   * @return {string}
+   *         The preload attribute value when getting
    */
   preload(value) {
     if (value !== undefined) {
       this.techCall_('setPreload', value);
       this.options_.preload = value;
-      return this;
+      return;
     }
     return this.techGet_('preload');
   }
@@ -2363,17 +2323,16 @@ class Player extends Component {
    *
    * @param {boolean} [value]
    *        - true means that we should autoplay
-   *        - false maens that we should not autoplay
+   *        - false means that we should not autoplay
    *
-   * @return {string|Player}
-   *         - the current value of autoplay
-   *         - the player when setting
+   * @return {string}
+   *         The current value of autoplay when getting
    */
   autoplay(value) {
     if (value !== undefined) {
       this.techCall_('setAutoplay', value);
       this.options_.autoplay = value;
-      return this;
+      return;
     }
     return this.techGet_('autoplay', value);
   }
@@ -2385,15 +2344,14 @@ class Player extends Component {
    *        - true means that we should loop the video
    *        - false means that we should not loop the video
    *
-   * @return {string|Player}
-   *         - the current value of loop when getting
-   *         - the player when setting
+   * @return {string}
+   *         The current value of loop when getting
    */
   loop(value) {
     if (value !== undefined) {
       this.techCall_('setLoop', value);
       this.options_.loop = value;
-      return this;
+      return;
     }
     return this.techGet_('loop');
   }
@@ -2406,9 +2364,8 @@ class Player extends Component {
    * @param {string} [src]
    *        Poster image source URL
    *
-   * @return {string|Player}
-   *         - the current value of poster when getting
-   *         - the player when setting
+   * @return {string}
+   *         The current value of poster when getting
    */
   poster(src) {
     if (src === undefined) {
@@ -2435,8 +2392,6 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('posterchange');
-
-    return this;
   }
 
   /**
@@ -2469,9 +2424,8 @@ class Player extends Component {
    *        - true to turn controls on
    *        - false to turn controls off
    *
-   * @return {boolean|Player}
-   *         - the current value of controls when getting
-   *         - the player when setting
+   * @return {boolean}
+   *         The current value of controls when getting
    */
   controls(bool) {
     if (bool !== undefined) {
@@ -2511,7 +2465,7 @@ class Player extends Component {
           }
         }
       }
-      return this;
+      return;
     }
     return !!this.controls_;
   }
@@ -2530,9 +2484,8 @@ class Player extends Component {
    *        - true to turn native controls on
    *        - false to turn native controls off
    *
-   * @return {boolean|Player}
-   *         - the current value of native controls when getting
-   *         - the player when setting
+   * @return {boolean}
+   *         The current value of native controls when getting
    */
   usingNativeControls(bool) {
     if (bool !== undefined) {
@@ -2563,7 +2516,7 @@ class Player extends Component {
           this.trigger('usingcustomcontrols');
         }
       }
-      return this;
+      return;
     }
     return !!this.usingNativeControls_;
   }
@@ -2577,9 +2530,8 @@ class Player extends Component {
    *         A MediaError or a string/number to be turned
    *         into a MediaError
    *
-   * @return {MediaError|null|Player}
-   *         - The current MediaError when getting (or null)
-   *         - The player when setting
+   * @return {MediaError|null}
+   *         The current MediaError when getting (or null)
    */
   error(err) {
     if (err === undefined) {
@@ -2593,7 +2545,7 @@ class Player extends Component {
       if (this.errorDisplay) {
         this.errorDisplay.close();
       }
-      return this;
+      return;
     }
 
     this.error_ = new MediaError(err);
@@ -2611,7 +2563,7 @@ class Player extends Component {
      */
     this.trigger('error');
 
-    return this;
+    return;
   }
 
   /**
@@ -2633,9 +2585,9 @@ class Player extends Component {
    * @param {boolean} [bool]
    *        - true if the user is active
    *        - false if the user is inactive
-   * @return {boolean|Player}
-   *         - the current value of userActive when getting
-   *         - the player when setting
+   *
+   * @return {boolean}
+   *         The current value of userActive when getting
    */
   userActive(bool) {
     if (bool !== undefined) {
@@ -2682,7 +2634,7 @@ class Player extends Component {
           this.trigger('userinactive');
         }
       }
-      return this;
+      return;
     }
     return this.userActive_;
   }
@@ -2783,14 +2735,13 @@ class Player extends Component {
    * @param {number} [rate]
    *       New playback rate to set.
    *
-   * @return {number|Player}
-   *         - The current playback rate when getting or 1.0
-   *         - the player when setting
+   * @return {number}
+   *         The current playback rate when getting or 1.0
    */
   playbackRate(rate) {
     if (rate !== undefined) {
       this.techCall_('setPlaybackRate', rate);
-      return this;
+      return;
     }
 
     if (this.tech_ && this.tech_.featuresPlaybackRate) {
@@ -2806,14 +2757,13 @@ class Player extends Component {
    *        - true signals that this is an audio player
    *        - false signals that this is not an audio player
    *
-   * @return {Player|boolean}
-   *         - the current value of isAudio when getting
-   *         - the player if setting
+   * @return {boolean}
+   *         The current value of isAudio when getting
    */
   isAudio(bool) {
     if (bool !== undefined) {
       this.isAudio_ = !!bool;
-      return this;
+      return;
     }
 
     return !!this.isAudio_;
@@ -3022,9 +2972,8 @@ class Player extends Component {
    * @param {string} [code]
    *        the language code to set the player to
    *
-   * @return {string|Player}
-   *         - The current language code when getting
-   *         - A reference to the player when setting
+   * @return {string}
+   *         The current language code when getting
    */
   language(code) {
     if (code === undefined) {
@@ -3032,7 +2981,6 @@ class Player extends Component {
     }
 
     this.language_ = String(code).toLowerCase();
-    return this;
   }
 
   /**
@@ -3099,7 +3047,8 @@ class Player extends Component {
       this.removeChild(modal);
     });
 
-    return modal.open();
+    modal.open();
+    return modal;
   }
 
   /**
