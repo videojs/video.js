@@ -187,8 +187,8 @@ class Html5 extends Tech {
     // So we have to create a brand new element.
     // If we ingested the player div, we do not need to move the media element.
     if (!el ||
-        ('playerElIngest' in this.options_ && !this.options_.playerElIngest) ||
-        this.movingMediaElementInDOM === false) {
+        !(this.options_.playerElIngest ||
+          this.movingMediaElementInDOM)) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {

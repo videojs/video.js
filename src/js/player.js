@@ -843,7 +843,7 @@ class Player extends Component {
       'muted': this.options_.muted,
       'poster': this.poster(),
       'language': this.language(),
-      'playerElIngest': this.playerElIngest_,
+      'playerElIngest': this.playerElIngest_ || false,
       'vtt.js': this.options_['vtt.js']
     }, this.options_[techName.toLowerCase()]);
 
