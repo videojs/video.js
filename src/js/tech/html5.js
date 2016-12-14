@@ -194,9 +194,12 @@ class Html5 extends Tech {
       if (el) {
         const clone = el.cloneNode(true);
 
-        el.parentNode.insertBefore(clone, el);
+        if (el.parentNode) {
+          el.parentNode.insertBefore(clone, el);
+        }
         Html5.disposeMediaElement(el);
         el = clone;
+
       } else {
         el = document.createElement('video');
 
