@@ -492,7 +492,7 @@ class Player extends Component {
   createEl() {
     const tag = this.tag;
     let el;
-    const playerElIngest = this.playerElIngest_ = tag.parentNode.hasAttribute('data-vjs-player');
+    const playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute('data-vjs-player');
 
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
