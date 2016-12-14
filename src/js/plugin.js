@@ -92,7 +92,7 @@ const createBasicPlugin = (name, plugin) => function() {
   markPluginAsActive(this, name);
 
   // We trigger the "pluginsetup" event on the player regardless, but we want
-  // the hash to be consistent with the hash provided for class-based plugins.
+  // the hash to be consistent with the hash provided for advanced plugins.
   // The only potentially counter-intuitive thing here is the `instance` is the
   // value returned by the `plugin` function.
   this.trigger('pluginsetup', {name, plugin, instance});
@@ -111,7 +111,7 @@ const createBasicPlugin = (name, plugin) => function() {
  *         The name of the plugin.
  *
  * @param  {Plugin} PluginSubClass
- *         The class-based plugin.
+ *         The advanced plugin.
  *
  * @return {Function}
  *         A factory function for the plugin sub-class.
@@ -168,7 +168,7 @@ class Plugin {
     player.on('dispose', this.dispose);
 
     /**
-     * Signals that a plugin (both basic and class-based) has just been set up
+     * Signals that a plugin (both basic and advanced) has just been set up
      * on a player.
      *
      * In all cases, an object containing the following properties is passed as a
@@ -176,7 +176,7 @@ class Plugin {
      *
      * - `name`: The name of the plugin that was set up.
      * - `plugin`: The raw plugin function.
-     * - `instance`: For class-based plugins, the instance of the plugin sub-class,
+     * - `instance`: For advanced plugins, the instance of the plugin sub-class,
      *   but, for basic plugins, the return value of the plugin invocation.
      *
      * @event pluginsetup
@@ -254,7 +254,7 @@ class Plugin {
     const {name, player} = this;
 
     /**
-     * Signals that a class-based plugin is about to be disposed.
+     * Signals that a advanced plugin is about to be disposed.
      *
      * @event dispose
      * @memberof Plugin
@@ -302,7 +302,7 @@ class Plugin {
    *         A sub-class of `Plugin` or a function for basic plugins.
    *
    * @return {Function}
-   *         For class-based plugins, a factory function for that plugin. For
+   *         For advanced plugins, a factory function for that plugin. For
    *         basic plugins, a wrapper function that initializes the plugin.
    */
   static registerPlugin(name, plugin) {

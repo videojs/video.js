@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import Plugin from '../../src/js/plugin';
 import TestHelpers from './test-helpers';
 
-QUnit.module('Plugin: class-based', {
+QUnit.module('Plugin: advanced', {
 
   beforeEach() {
     this.player = TestHelpers.makePlayer();

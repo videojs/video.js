@@ -362,7 +362,7 @@ videojs.bind = Fn.bind;
  *         A sub-class of `Plugin` or a function for basic plugins.
  *
  * @return {Function}
- *         For class-based plugins, a factory function for that plugin. For
+ *         For advanced plugins, a factory function for that plugin. For
  *         basic plugins, a wrapper function that initializes the plugin.
  */
 videojs.registerPlugin = Plugin.registerPlugin;

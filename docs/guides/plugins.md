@@ -7,17 +7,17 @@
 - [Writing a Basic Plugin](#writing-a-basic-plugin)
   - [Write a JavaScript Function](#write-a-javascript-function)
   - [Register a Basic Plugin](#register-a-basic-plugin)
-- [Writing a Class-Based Plugin](#writing-a-class-based-plugin)
+- [Writing a Advanced Plugin](#writing-a-advanced-plugin)
   - [Write a JavaScript Class/Constructor](#write-a-javascript-classconstructor)
-  - [Register a Class-Based Plugin](#register-a-class-based-plugin)
+  - [Register a Advanced Plugin](#register-a-advanced-plugin)
   - [Key Differences from Basic Plugins](#key-differences-from-basic-plugins)
     - [The Value of `this`](#the-value-of-this)
     - [The Player Plugin Name Property](#the-player-plugin-name-property)
-  - [Advanced Features of Class-based Plugins](#advanced-features-of-class-based-plugins)
+  - [Advanced Features of Advanced Plugins](#advanced-features-of-advanced-plugins)
     - [Events](#events)
     - [Statefulness](#statefulness)
     - [Lifecycle](#lifecycle)
-  - [Advanced Example Class-based Plugin](#advanced-example-class-based-plugin)
+  - [Advanced Example Advanced Plugin](#advanced-example-advanced-plugin)
 - [Setting up a Plugin](#setting-up-a-plugin)
 - [References](#references)
 
@@ -74,17 +74,19 @@ Now that we have a function that does something with a player, all that's left i
 videojs.registerPlugin('examplePlugin', examplePlugin);
 ```
 
-The only stipulation with the name of the plugin is that it cannot conflict with any existing player method. After that, any player will automatically have an `examplePlugin` method on its prototype!
+After that, any player will automatically have an `examplePlugin` method on its prototype!
 
-## Writing a Class-Based Plugin
+> **Note:** The only stipulation with the name of the plugin is that it cannot conflict with any existing plugin or player method.
 
-As of Video.js 6, there is an additional type of plugin supported: class-based plugins.
+## Writing a Advanced Plugin
+
+As of Video.js 6, there is an additional type of plugin supported: advanced plugins.
 
 At any time, you may want to refer to the [Plugin API docs][api-plugin] for more detail.
 
 ### Write a JavaScript Class/Constructor
 
-If you're familiar with creating [components](components.md), this process is similar. A class-based plugin starts with a JavaScript class (a.k.a. a constructor function).
+If you're familiar with creating [components](components.md), this process is similar. A advanced plugin starts with a JavaScript class (a.k.a. a constructor function).
 
 This can be achieved with ES6 classes:
 
@@ -128,11 +130,11 @@ var ExamplePlugin = videojs.extend(Plugin, {
 });
 ```
 
-For now, this example class-based plugin does the exact same thing as the basic plugin described above - not to worry, we will make it more interesting as we continue!
+For now, this example advanced plugin does the exact same thing as the basic plugin described above - not to worry, we will make it more interesting as we continue!
 
-### Register a Class-Based Plugin
+### Register a Advanced Plugin
 
-The registration process for class-based plugins is identical to [the process for basic plugins](#register-a-basic-plugin).
+The registration process for advanced plugins is identical to [the process for basic plugins](#register-a-basic-plugin).
 
 ```js
 videojs.registerPlugin('examplePlugin', ExamplePlugin);
@@ -142,19 +144,19 @@ videojs.registerPlugin('examplePlugin', ExamplePlugin);
 
 ### Key Differences from Basic Plugins
 
-Class-based plugins have two key differences from basic plugins that are important to understand before describing their advanced features.
+Advanced plugins have two key differences from basic plugins that are important to understand before describing their advanced features.
 
 #### The Value of `this`
 
 With basic plugins, the value of `this` in the plugin function will be the _player_.
 
-With class-based plugins, the value of `this` is the _instance of the plugin class_. The player is passed to the plugin constructor as its first argument (and is automatically applied to the plugin instance as the `player` property) and any further arguments are passed after that.
+With advanced plugins, the value of `this` is the _instance of the plugin class_. The player is passed to the plugin constructor as its first argument (and is automatically applied to the plugin instance as the `player` property) and any further arguments are passed after that.
 
 #### The Player Plugin Name Property
 
-Both basic plugins and class-based plugins are set up by calling a method on a player with a name matching the plugin (e.g., `player.examplePlugin()`).
+Both basic plugins and advanced plugins are set up by calling a method on a player with a name matching the plugin (e.g., `player.examplePlugin()`).
 
-However, with class-based plugins, this method acts like a factory function and it is _replaced_ for the current player by a new function which returns the plugin instance:
+However, with advanced plugins, this method acts like a factory function and it is _replaced_ for the current player by a new function which returns the plugin instance:
 
 ```js
 // `examplePlugin` has not been called, so it is a factory function.
@@ -167,13 +169,13 @@ player.examplePlugin().someMethodName();
 
 With basic plugins, the method does not change - it is always the same function. It is up to the authors of basic plugins to deal with multiple calls to their plugin function.
 
-### Advanced Features of Class-based Plugins
+### Features of Advanced Plugins
 
-Up to this point, our example class-based plugin is functionally identical to our example basic plugin. However, class-based plugins bring with them a great deal of benefit that is not built into basic plugins.
+Up to this point, our example advanced plugin is functionally identical to our example basic plugin. However, advanced plugins bring with them a great deal of benefit that is not built into basic plugins.
 
 #### Events
 
-Like components, class-based plugins offer an implementation of events. This includes:
+Like components, advanced plugins offer an implementation of events. This includes:
 
 - The ability to listen for events on the plugin instance using `on` or `one` and stop listening for events using `off`:
 
@@ -189,13 +191,13 @@ Like components, class-based plugins offer an implementation of events. This inc
   player.examplePlugin().trigger('example-event');
   ```
 
-By offering a built-in events system, class-based plugins offer a wider range of options for code structure with a pattern familiar to most web developers.
+By offering a built-in events system, advanced plugins offer a wider range of options for code structure with a pattern familiar to most web developers.
 
 #### Statefulness
 
-A new concept introduced in Video.js 6 for class-based plugins is _statefulness_. This is similar to React components' `state` property and `setState` method.
+A new concept introduced in Video.js 6 for advanced plugins is _statefulness_. This is similar to React components' `state` property and `setState` method.
 
-Class-based plugin instances each have a `state` property, which is a plain JavaScript object - it can contain any keys and values the plugin author wants.
+Advanced plugin instances each have a `state` property, which is a plain JavaScript object - it can contain any keys and values the plugin author wants.
 
 A default `state` can be provided by adding a static property to a plugin constructor:
 
@@ -221,7 +223,7 @@ player.examplePlugin().setState({customClass: 'another-custom-class'});
 
 #### Lifecycle
 
-Like components, class-based plugins have a lifecycle. They can be created with their factory function and they can be destroyed using their `dispose` method:
+Like components, advanced plugins have a lifecycle. They can be created with their factory function and they can be destroyed using their `dispose` method:
 
 ```js
 // set up a example plugin instance
@@ -238,11 +240,11 @@ The `dispose` method has several effects:
 - Removes plugin state and references to the player to avoid memory leaks.
 - Reverts the player's named property (e.g. `player.examplePlugin`) _back_ to the original factory function, so the plugin can be set up again.
 
-In addition, if the player is disposed, the disposal of all its class-based plugin instances will be triggered as well.
+In addition, if the player is disposed, the disposal of all its advanced plugin instances will be triggered as well.
 
-### Advanced Example Class-based Plugin
+### Advanced Example Advanced Plugin
 
-What follows is a complete ES6 class-based plugin that logs a custom message when the player's state changes between playing and paused. It uses all the described advanced features:
+What follows is a complete ES6 advanced plugin that logs a custom message when the player's state changes between playing and paused. It uses all the described advanced features:
 
 ```js
 import videojs from 'video.js';
@@ -295,11 +297,11 @@ player.advanced().dispose();
 player.play();
 ```
 
-This example may be a bit pointless in reality, but it demonstrates the sort of flexibility offered by class-based plugins over basic plugins.
+This example may be a bit pointless in reality, but it demonstrates the sort of flexibility offered by advanced plugins over basic plugins.
 
 ## Setting up a Plugin
 
-There are two ways to set up (or initialize) a plugin on a player. Both ways work identically for both basic and class-based plugins.
+There are two ways to set up (or initialize) a plugin on a player. Both ways work identically for both basic and advanced plugins.
 
 The first way is during creation of the player. Using the `plugins` option, a plugin can be automatically set up on a player:
 

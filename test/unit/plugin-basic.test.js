@@ -27,7 +27,7 @@ QUnit.test('pre-setup interface', function(assert) {
   assert.strictEqual(typeof this.player.basic, 'function', 'basic plugins are a function on a player');
   assert.ok(this.player.hasPlugin('basic'), 'player has the plugin available');
   assert.notStrictEqual(this.player.basic, this.basic, 'basic plugins are wrapped');
-  assert.strictEqual(this.player.basic.dispose, undefined, 'unlike class-based plugins, basic plugins do not have a dispose method');
+  assert.strictEqual(this.player.basic.dispose, undefined, 'unlike advanced plugins, basic plugins do not have a dispose method');
   assert.notOk(this.player.usingPlugin('basic'), 'the player is not using the plugin');
 });
 
