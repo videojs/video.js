@@ -193,6 +193,7 @@ QUnit.test('ingest player div if data-vjs-player attribute is present on video p
 
 QUnit.test('ingested player div should not create a new tag for movingMediaElementInDOM', function(assert) {
   const Html5 = videojs.getTech('Html5');
+  const oldIS = Html5.isSupported;
   const oldMoving = Html5.prototype.movingMediaElementInDOM;
   const fixture = document.querySelector('#qunit-fixture');
 
@@ -204,6 +205,7 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
     </div>
   `;
   Html5.prototype.movingMediaElementInDOM = false;
+  Html5.isSupported = () => true;
 
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
@@ -218,12 +220,14 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
 
   player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
+  Html5.isSupported = oldIS;
 });
 
 QUnit.test('should create a new tag for movingMediaElementInDOM', function(assert) {
   const Html5 = videojs.getTech('Html5');
   const oldMoving = Html5.prototype.movingMediaElementInDOM;
   const fixture = document.querySelector('#qunit-fixture');
+  const oldIS = Html5.isSupported;
 
   fixture.innerHTML = `
     <div class="foo">
@@ -233,6 +237,7 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
     </div>
   `;
   Html5.prototype.movingMediaElementInDOM = false;
+  Html5.isSupported = () => true;
 
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
@@ -246,4 +251,5 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
 
   player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
+  Html5.isSupported = oldIS;
 });
