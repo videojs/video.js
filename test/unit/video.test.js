@@ -40,6 +40,9 @@ QUnit.test('should return a video player instance', function(assert) {
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {
@@ -66,6 +69,9 @@ QUnit.test('should return a video player instance from el html5 tech', function(
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should return a video player instance from el techfaker', function(assert) {
@@ -91,6 +97,9 @@ QUnit.test('should return a video player instance from el techfaker', function(a
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should add the value to the languages object', function(assert) {
