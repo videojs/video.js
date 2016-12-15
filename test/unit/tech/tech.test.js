@@ -13,6 +13,7 @@ import AudioTrackList from '../../../src/js/tracks/audio-track-list';
 import VideoTrackList from '../../../src/js/tracks/video-track-list';
 import TextTrackList from '../../../src/js/tracks/text-track-list';
 import sinon from 'sinon';
+import log from '../../../src/js/utils/log.js';
 
 QUnit.module('Media Tech', {
   beforeEach(assert) {
@@ -135,8 +136,8 @@ QUnit.test('dispose() should clear all tracks that are passed when its created',
 QUnit.test('dispose() should clear all tracks that are added after creation', function(assert) {
   const tech = new Tech();
 
-  tech.addRemoteTextTrack({});
-  tech.addRemoteTextTrack({});
+  tech.addRemoteTextTrack({}, true);
+  tech.addRemoteTextTrack({}, true);
 
   tech.audioTracks().addTrack_(new AudioTrack());
   tech.audioTracks().addTrack_(new AudioTrack());
@@ -168,6 +169,14 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
 });
 
 QUnit.test('switching sources should clear all remote tracks that are added with manualCleanup = false', function(assert) {
+
+  const oldLogWarn = log.warn;
+  let warning;
+
+  log.warn = function(wrning) {
+    warning = wrning;
+  };
+
   // Define a new tech class
   const MyTech = extendFn(Tech);
 
@@ -194,6 +203,11 @@ QUnit.test('switching sources should clear all remote tracks that are added with
 
   // default value for manualCleanup is true
   tech.addRemoteTextTrack({});
+
+  assert.equal(warning,
+               'Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js',
+               'we log a warning when `addRemoteTextTrack` is called without a manualCleanup argument');
+
   // should be automatically cleaned up when source changes
   tech.addRemoteTextTrack({}, false);
 
@@ -221,6 +235,8 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   assert.equal(tech.autoRemoteTextTracks_.length,
                0,
                'should have zero auto-cleanup remote text tracks');
+
+  log.warn = oldLogWarn;
 });
 
 QUnit.test('should add the source handler interface to a tech', function(assert) {
@@ -335,8 +351,8 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
                     '',
                     'the Tech returned an empty string for the invalid source');
 
-  tech.addRemoteTextTrack({});
-  tech.addRemoteTextTrack({});
+  tech.addRemoteTextTrack({}, true);
+  tech.addRemoteTextTrack({}, true);
 
   tech.audioTracks().addTrack_(new AudioTrack());
   tech.audioTracks().addTrack_(new AudioTrack());
