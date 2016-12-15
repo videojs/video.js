@@ -1020,31 +1020,22 @@ Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
 Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-let canPlayType;
+const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
 const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX) {
-    if (!canPlayType) {
-      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
-    }
-
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mpegurlRE.test(type)) {
         return 'maybe';
       }
       return canPlayType.call(this, type);
     };
-  }
 
   // Override Android 2.2 and less canPlayType method which is broken
-  if (browser.IS_OLD_ANDROID) {
-    if (!canPlayType) {
-      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
-    }
-
+  } else if (browser.IS_OLD_ANDROID) {
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mp4RE.test(type)) {
         return 'maybe';
@@ -1058,7 +1049,6 @@ Html5.unpatchCanPlayType = function() {
   const r = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
-  canPlayType = null;
   return r;
 };
 
