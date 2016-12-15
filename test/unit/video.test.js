@@ -173,7 +173,7 @@ QUnit.test('ingest player div if data-vjs-player attribute is present on video p
   fixture.innerHTML = `
     <div data-vjs-player class="foo">
       <video id="test_vid_id">
-        <source type="video/mp4"></source>
+        <source src="http://example.com/video.mp4" type="video/mp4"></source>
       </video>
     </div>
   `;
@@ -187,6 +187,8 @@ QUnit.test('ingest player div if data-vjs-player attribute is present on video p
 
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
+
+  player.dispose();
 });
 
 QUnit.test('ingested player div should not create a new tag for movingMediaElementInDOM', function(assert) {
@@ -197,7 +199,7 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   fixture.innerHTML = `
     <div data-vjs-player class="foo">
       <video id="test_vid_id">
-        <source type="video/mp4"></source>
+        <source src="http://example.com/video.mp4" type="video/mp4"></source>
       </video>
     </div>
   `;
@@ -214,6 +216,7 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   assert.equal(player.tech_.el(), vid, 'we re-used the video element');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
 
+  player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
 });
 
@@ -225,7 +228,7 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   fixture.innerHTML = `
     <div class="foo">
       <video id="test_vid_id">
-        <source type="video/mp4"></source>
+        <source src="http://example.com/video.mp4" type="video/mp4"></source>
       </video>
     </div>
   `;
@@ -241,5 +244,6 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   assert.notEqual(player.el(), playerDiv, 'we used a new div');
   assert.notEqual(player.tech_.el(), vid, 'we a new video element');
 
+  player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
 });
