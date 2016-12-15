@@ -87,7 +87,7 @@ class PlayToggle extends Button {
     // change the button text to "Play"
     this.controlText('Play');
   }
-  
+
   /**
    * Add the vjs-ended class to the element so it can change appearance
    *
