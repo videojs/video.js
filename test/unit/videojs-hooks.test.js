@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import videojs from '../../src/js/video.js';
 import document from 'global/document';
+import log from '../../src/js/utils/log.js';
 
 QUnit.module('video.js:hooks ', {
   beforeEach() {
@@ -112,6 +113,8 @@ QUnit.test('should trigger beforesetup and setup during videojs setup', function
     assert.equal(setupCalled, false, 'setup should be called after beforesetup');
     assert.deepEqual(options, vjsOptions, 'options should be the same');
     assert.equal(video.id, 'test_vid_id', 'video id should be correct');
+
+    return options;
   };
   const setup = function(player) {
     setupCalled = true;
@@ -140,8 +143,13 @@ QUnit.test('should trigger beforesetup and setup during videojs setup', function
 });
 
 QUnit.test('beforesetup returns dont break videojs options', function(assert) {
+  const oldLogError = log.error;
   const vjsOptions = {techOrder: ['techFaker']};
   const fixture = document.getElementById('qunit-fixture');
+
+  log.error = function(err) {
+    assert.equal(err, 'please return an object in beforesetup hooks', 'we have the correct error');
+  };
 
   fixture.innerHTML += '<video id="test_vid_id"><source type="video/mp4"></video>';
 
@@ -161,6 +169,8 @@ QUnit.test('beforesetup returns dont break videojs options', function(assert) {
 
   assert.ok(player.options_, 'beforesetup should not destory options');
   assert.equal(player.options_.techOrder, vjsOptions.techOrder, 'options set by user should exist');
+
+  log.error = oldLogError;
 });
 
 QUnit.test('beforesetup options override videojs options', function(assert) {
