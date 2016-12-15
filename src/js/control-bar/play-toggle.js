@@ -65,7 +65,11 @@ class PlayToggle extends Button {
    *
    * @listens Player#play
    */
+<<<<<<< HEAD
   handlePlay(event) {
+=======
+  handlePlay() {
+>>>>>>> d2c57642e4787e142297aaa80556ae55519bf98d
     this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
@@ -93,7 +97,11 @@ class PlayToggle extends Button {
    *
    * @method handleEnded
    */
+<<<<<<< HEAD
   handleEnded(event) {
+=======
+  handleEnded() {
+>>>>>>> d2c57642e4787e142297aaa80556ae55519bf98d
     this.removeClass('vjs-playing');
     this.addClass('vjs-ended');
     // change the button text to "Replay"
