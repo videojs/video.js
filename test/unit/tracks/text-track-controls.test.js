@@ -35,7 +35,7 @@ QUnit.test('should be displayed when text tracks list is not empty', function(as
 QUnit.test('should be displayed when a text track is added to an empty track list', function(assert) {
   const player = TestHelpers.makePlayer();
 
-  player.addRemoteTextTrack(track);
+  player.addRemoteTextTrack(track, true);
 
   assert.ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'),
            'control is displayed');
@@ -94,7 +94,7 @@ QUnit.test('menu should update with addRemoteTextTrack', function(assert) {
 
   this.clock.tick(1000);
 
-  player.addRemoteTextTrack(track);
+  player.addRemoteTextTrack(track, true);
 
   assert.equal(player.controlBar.captionsButton.items.length,
               4,
@@ -143,7 +143,7 @@ QUnit.test('descriptions should be displayed when text tracks list is not empty'
 QUnit.test('descriptions should be displayed when a text track is added to an empty track list', function(assert) {
   const player = TestHelpers.makePlayer();
 
-  player.addRemoteTextTrack(descriptionstrack);
+  player.addRemoteTextTrack(descriptionstrack, true);
 
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'),
            'control is displayed');
@@ -421,7 +421,7 @@ test('chapters should be displayed when remote track added and load event fired'
 
   this.clock.tick(1000);
 
-  const chaptersEl = player.addRemoteTextTrack(chaptersTrack);
+  const chaptersEl = player.addRemoteTextTrack(chaptersTrack, true);
 
   chaptersEl.track.addCue({
     startTime: 0,

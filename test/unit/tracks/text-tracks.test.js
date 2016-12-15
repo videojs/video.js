@@ -420,7 +420,7 @@ QUnit.test('should return correct remote text track values', function(assert) {
   const htmlTrackElement = player.addRemoteTextTrack({
     kind: 'captions',
     label: 'label'
-  });
+  }, true);
 
   assert.equal(player.remoteTextTracks().length, 2, 'add text track via method');
   assert.equal(player.remoteTextTrackEls().length, 2, 'add html track element via method');
@@ -447,7 +447,7 @@ QUnit.test('should uniformly create html track element when adding text track', 
 
   assert.equal(player.remoteTextTrackEls().length, 0, 'no html text tracks');
 
-  const htmlTrackElement = player.addRemoteTextTrack(track);
+  const htmlTrackElement = player.addRemoteTextTrack(track, true);
 
   assert.equal(htmlTrackElement.kind,
               htmlTrackElement.track.kind,
@@ -539,7 +539,7 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
     label: 'label',
     default: 'default'
   };
-  let htmlTrackElement = player.addRemoteTextTrack(track);
+  let htmlTrackElement = player.addRemoteTextTrack(track, true);
 
   assert.equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
 
@@ -549,7 +549,7 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
               0,
               'the track element was removed correctly');
 
-  htmlTrackElement = player.addRemoteTextTrack(track);
+  htmlTrackElement = player.addRemoteTextTrack(track, true);
   assert.equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
 
   player.removeRemoteTextTrack(htmlTrackElement.track);

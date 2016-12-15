@@ -135,8 +135,8 @@ QUnit.test('dispose() should clear all tracks that are passed when its created',
 QUnit.test('dispose() should clear all tracks that are added after creation', function(assert) {
   const tech = new Tech();
 
-  tech.addRemoteTextTrack({});
-  tech.addRemoteTextTrack({});
+  tech.addRemoteTextTrack({}, true);
+  tech.addRemoteTextTrack({}, true);
 
   tech.audioTracks().addTrack_(new AudioTrack());
   tech.audioTracks().addTrack_(new AudioTrack());
@@ -335,8 +335,8 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
                     '',
                     'the Tech returned an empty string for the invalid source');
 
-  tech.addRemoteTextTrack({});
-  tech.addRemoteTextTrack({});
+  tech.addRemoteTextTrack({}, true);
+  tech.addRemoteTextTrack({}, true);
 
   tech.audioTracks().addTrack_(new AudioTrack());
   tech.audioTracks().addTrack_(new AudioTrack());
