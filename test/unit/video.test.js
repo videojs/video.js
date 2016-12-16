@@ -204,6 +204,7 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   const Html5 = videojs.getTech('Html5');
   const oldIS = Html5.isSupported;
   const oldMoving = Html5.prototype.movingMediaElementInDOM;
+  const oldCPT = Html5.nativeSourceHandler.canPlayType;
   const fixture = document.querySelector('#qunit-fixture');
 
   fixture.innerHTML = `
@@ -215,6 +216,7 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   `;
   Html5.prototype.movingMediaElementInDOM = false;
   Html5.isSupported = () => true;
+  Html5.nativeSourceHandler.canPlayType = () => true;
 
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
@@ -224,17 +226,19 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   });
 
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
-  assert.equal(player.$('.vjs-tech'), vid, 'we re-used the video element');
+  assert.equal(player.tech_.el(), vid, 'we re-used the video element');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
 
   player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
   Html5.isSupported = oldIS;
+  Html5.nativeSourceHandler.canPlayType = oldCPT;
 });
 
 QUnit.test('should create a new tag for movingMediaElementInDOM', function(assert) {
   const Html5 = videojs.getTech('Html5');
   const oldMoving = Html5.prototype.movingMediaElementInDOM;
+  const oldCPT = Html5.nativeSourceHandler.canPlayType;
   const fixture = document.querySelector('#qunit-fixture');
   const oldIS = Html5.isSupported;
 
@@ -247,6 +251,7 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   `;
   Html5.prototype.movingMediaElementInDOM = false;
   Html5.isSupported = () => true;
+  Html5.nativeSourceHandler.canPlayType = () => true;
 
   const playerDiv = document.querySelector('.foo');
   const vid = document.querySelector('#test_vid_id');
@@ -256,9 +261,10 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   });
 
   assert.notEqual(player.el(), playerDiv, 'we used a new div');
-  assert.notEqual(player.$('.vjs-tech'), vid, 'we a new video element');
+  assert.notEqual(player.tech_.el(), vid, 'we a new video element');
 
   player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
   Html5.isSupported = oldIS;
+  Html5.nativeSourceHandler.canPlayType = oldCPT;
 });
