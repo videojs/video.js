@@ -429,21 +429,6 @@ class Component {
     if (typeof child === 'string') {
       componentName = toTitleCase(child);
 
-      // Options can also be specified as a boolean,
-      // so convert to an empty object if false.
-      if (!options) {
-        options = {};
-      }
-
-      // Same as above, but true is deprecated so show a warning.
-      if (options === true) {
-        log.warn('Initializing a child component with `true` is deprecated.' +
-          'Children should be defined in an array when possible, ' +
-          'but if necessary use an object instead of `true`.'
-        );
-        options = {};
-      }
-
       const componentClassName = options.componentClass || componentName;
 
       // Set name through options
