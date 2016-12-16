@@ -224,7 +224,7 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   });
 
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
-  assert.equal(player.tech_.el(), vid, 'we re-used the video element');
+  assert.equal(player.$('.vjs-tech'), vid, 'we re-used the video element');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
 
   player.dispose();
@@ -256,7 +256,7 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   });
 
   assert.notEqual(player.el(), playerDiv, 'we used a new div');
-  assert.notEqual(player.tech_.el(), vid, 'we a new video element');
+  assert.notEqual(player.$('.vjs-tech'), vid, 'we a new video element');
 
   player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
