@@ -86,6 +86,7 @@
     "grunt-version": "~1.1.1",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.17.1",
+    "istanbul": "^0.4.5",
     "jsdoc": "^3.4.2",
     "karma": "^1.2.0",
     "karma-browserify": "^5.1.0",
