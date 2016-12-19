@@ -185,15 +185,21 @@ class Html5 extends Tech {
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
-    if (!el || this.movingMediaElementInDOM === false) {
+    // If we ingested the player div, we do not need to move the media element.
+    if (!el ||
+        !(this.options_.playerElIngest ||
+          this.movingMediaElementInDOM)) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
         const clone = el.cloneNode(true);
 
-        el.parentNode.insertBefore(clone, el);
+        if (el.parentNode) {
+          el.parentNode.insertBefore(clone, el);
+        }
         Html5.disposeMediaElement(el);
         el = clone;
+
       } else {
         el = document.createElement('video');
 

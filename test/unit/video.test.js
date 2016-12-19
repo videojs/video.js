@@ -40,6 +40,9 @@ QUnit.test('should return a video player instance', function(assert) {
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {
@@ -66,6 +69,9 @@ QUnit.test('should return a video player instance from el html5 tech', function(
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should return a video player instance from el techfaker', function(assert) {
@@ -91,6 +97,9 @@ QUnit.test('should return a video player instance from el techfaker', function(a
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should add the value to the languages object', function(assert) {
@@ -165,4 +174,97 @@ QUnit.test('should expose DOM functions', function(assert) {
                       Dom[domName],
                       `videojs.${vjsName} is a reference to Dom.${domName}`);
   });
+});
+
+QUnit.test('ingest player div if data-vjs-player attribute is present on video parentNode', function(assert) {
+  const fixture = document.querySelector('#qunit-fixture');
+
+  fixture.innerHTML = `
+    <div data-vjs-player class="foo">
+      <video id="test_vid_id">
+        <source src="http://example.com/video.mp4" type="video/mp4"></source>
+      </video>
+    </div>
+  `;
+
+  const playerDiv = document.querySelector('.foo');
+  const vid = document.querySelector('#test_vid_id');
+
+  const player = videojs(vid, {
+    techOrder: ['html5']
+  });
+
+  assert.equal(player.el(), playerDiv, 'we re-used the given div');
+  assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
+
+  player.dispose();
+});
+
+QUnit.test('ingested player div should not create a new tag for movingMediaElementInDOM', function(assert) {
+  const Html5 = videojs.getTech('Html5');
+  const oldIS = Html5.isSupported;
+  const oldMoving = Html5.prototype.movingMediaElementInDOM;
+  const oldCPT = Html5.nativeSourceHandler.canPlayType;
+  const fixture = document.querySelector('#qunit-fixture');
+
+  fixture.innerHTML = `
+    <div data-vjs-player class="foo">
+      <video id="test_vid_id">
+        <source src="http://example.com/video.mp4" type="video/mp4"></source>
+      </video>
+    </div>
+  `;
+  Html5.prototype.movingMediaElementInDOM = false;
+  Html5.isSupported = () => true;
+  Html5.nativeSourceHandler.canPlayType = () => true;
+
+  const playerDiv = document.querySelector('.foo');
+  const vid = document.querySelector('#test_vid_id');
+
+  const player = videojs(vid, {
+    techOrder: ['html5']
+  });
+
+  assert.equal(player.el(), playerDiv, 'we re-used the given div');
+  assert.equal(player.tech_.el(), vid, 'we re-used the video element');
+  assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
+
+  player.dispose();
+  Html5.prototype.movingMediaElementInDOM = oldMoving;
+  Html5.isSupported = oldIS;
+  Html5.nativeSourceHandler.canPlayType = oldCPT;
+});
+
+QUnit.test('should create a new tag for movingMediaElementInDOM', function(assert) {
+  const Html5 = videojs.getTech('Html5');
+  const oldMoving = Html5.prototype.movingMediaElementInDOM;
+  const oldCPT = Html5.nativeSourceHandler.canPlayType;
+  const fixture = document.querySelector('#qunit-fixture');
+  const oldIS = Html5.isSupported;
+
+  fixture.innerHTML = `
+    <div class="foo">
+      <video id="test_vid_id">
+        <source src="http://example.com/video.mp4" type="video/mp4"></source>
+      </video>
+    </div>
+  `;
+  Html5.prototype.movingMediaElementInDOM = false;
+  Html5.isSupported = () => true;
+  Html5.nativeSourceHandler.canPlayType = () => true;
+
+  const playerDiv = document.querySelector('.foo');
+  const vid = document.querySelector('#test_vid_id');
+
+  const player = videojs(vid, {
+    techOrder: ['html5']
+  });
+
+  assert.notEqual(player.el(), playerDiv, 'we used a new div');
+  assert.notEqual(player.tech_.el(), vid, 'we a new video element');
+
+  player.dispose();
+  Html5.prototype.movingMediaElementInDOM = oldMoving;
+  Html5.isSupported = oldIS;
+  Html5.nativeSourceHandler.canPlayType = oldCPT;
 });
