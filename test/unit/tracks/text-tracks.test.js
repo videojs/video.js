@@ -250,37 +250,24 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   player.dispose();
 });
 
-QUnit.test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function(assert) {
+QUnit.test('emulated tracks are always used, except in safari', function(assert) {
   const oldTestVid = Html5.TEST_VID;
-
-  Html5.TEST_VID = {
-    textTracks: [{
-      mode: 0
-    }]
-  };
-
-  assert.ok(!Html5.supportsNativeTextTracks(),
-           'native text tracks are not supported if mode is a number');
-
-  Html5.TEST_VID = oldTestVid;
-});
-
-QUnit.test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function(assert) {
-  const oldTestVid = Html5.TEST_VID;
-  const oldIsFirefox = browser.IS_FIREFOX;
+  const oldIsAnySafari = browser.IS_ANY_SAFARI;
 
   Html5.TEST_VID = {
     textTracks: []
   };
 
-  browser.IS_FIREFOX = true;
+  browser.IS_ANY_SAFARI = false;
 
-  assert.ok(!Html5.supportsNativeTextTracks(),
-           'if textTracks are available on video element,' +
-           ' native text tracks are supported');
+  assert.ok(!Html5.supportsNativeTextTracks(), 'Html5 does not support native text tracks, in non-safari');
+
+  browser.IS_ANY_SAFARI = true;
+
+  assert.ok(Html5.supportsNativeTextTracks(), 'Html5 does support native text tracks in safari');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_FIREFOX = oldIsFirefox;
+  browser.IS_ANY_SAFARI = oldIsAnySafari;
 });
 
 QUnit.test('when switching techs, we should not get a new text track', function(assert) {
@@ -433,7 +420,7 @@ QUnit.test('should return correct remote text track values', function(assert) {
   const htmlTrackElement = player.addRemoteTextTrack({
     kind: 'captions',
     label: 'label'
-  });
+  }, true);
 
   assert.equal(player.remoteTextTracks().length, 2, 'add text track via method');
   assert.equal(player.remoteTextTrackEls().length, 2, 'add html track element via method');
@@ -460,7 +447,7 @@ QUnit.test('should uniformly create html track element when adding text track', 
 
   assert.equal(player.remoteTextTrackEls().length, 0, 'no html text tracks');
 
-  const htmlTrackElement = player.addRemoteTextTrack(track);
+  const htmlTrackElement = player.addRemoteTextTrack(track, true);
 
   assert.equal(htmlTrackElement.kind,
               htmlTrackElement.track.kind,
@@ -552,7 +539,7 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
     label: 'label',
     default: 'default'
   };
-  let htmlTrackElement = player.addRemoteTextTrack(track);
+  let htmlTrackElement = player.addRemoteTextTrack(track, true);
 
   assert.equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
 
@@ -562,7 +549,7 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
               0,
               'the track element was removed correctly');
 
-  htmlTrackElement = player.addRemoteTextTrack(track);
+  htmlTrackElement = player.addRemoteTextTrack(track, true);
   assert.equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
 
   player.removeRemoteTextTrack(htmlTrackElement.track);

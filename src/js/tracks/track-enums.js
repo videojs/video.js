@@ -3,17 +3,11 @@
  */
 
 /**
- * https://html.spec.whatwg.org/multipage/embedded-content.html#dom-videotrack-kind
+ * All possible `VideoTrackKind`s
  *
- * enum VideoTrackKind {
- *   "alternative",
- *   "captions",
- *   "main",
- *   "sign",
- *   "subtitles",
- *   "commentary",
- *   "",
- * };
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-videotrack-kind
+ * @typedef VideoTrack~Kind
+ * @enum
  */
 export const VideoTrackKind = {
   alternative: 'alternative',
@@ -25,17 +19,11 @@ export const VideoTrackKind = {
 };
 
 /**
- * https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-kind
+ * All possible `AudioTrackKind`s
  *
- * enum AudioTrackKind {
- *   "alternative",
- *   "descriptions",
- *   "main",
- *   "main-desc",
- *   "translation",
- *   "commentary",
- *   "",
- * };
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-audiotrack-kind
+ * @typedef AudioTrack~Kind
+ * @enum
  */
 export const AudioTrackKind = {
   'alternative': 'alternative',
@@ -47,15 +35,11 @@ export const AudioTrackKind = {
 };
 
 /**
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackkind
+ * All possible `TextTrackKind`s
  *
- * enum TextTrackKind {
- *   "subtitles",
- *   "captions",
- *   "descriptions",
- *   "chapters",
- *   "metadata"
- * };
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-texttrack-kind
+ * @typedef TextTrack~Kind
+ * @enum
  */
 export const TextTrackKind = {
   subtitles: 'subtitles',
@@ -66,9 +50,11 @@ export const TextTrackKind = {
 };
 
 /**
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
+ * All possible `TextTrackMode`s
  *
- * enum TextTrackMode { "disabled",  "hidden",  "showing" };
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
+ * @typedef TextTrack~Mode
+ * @enum
  */
 export const TextTrackMode = {
   disabled: 'disabled',

@@ -1,54 +1,77 @@
-Skins
-=====
+# Skins
+## Default Skin
+When you include the Video.js CSS file (`video-js.min.css`), the default Video.js skin is applied. That means that customizing the look of a Video.js player is a matter of taking advantage of the cascading aspect of CSS to override styles.
 
-## Base Skin
-The base Video.js skin is made using HTML and CSS (although we use the [Sass preprocessor](http://sass-lang.com)),
-and by default these styles are added to the DOM for you!
-That means you can build a custom skin by simply taking advantage of the cascading aspect of CSS and overriding
-the styles you'd like to change.
+## Additional `<style>` Elements
+In addition to the Video.js CSS file, there are some styles generated automatically by JavaScript and included in the `<head>` as `<style>` elements.
 
-If you don't want Video.js to inject the base styles for you, you can disable it by setting `window.VIDEOJS_NO_BASE_THEME = true` before Video.js is loaded.
-Keep in mind that without these base styles enabled, you'll need to manually include them.
+- The `"vjs-styles-defaults"` element sets default dimensions for all Video.js players on the page.
+- A `"vjs-styles-dimensions"` element is created for _each_ player on the page and is used to adjust its size. This styling is handled in this manner to allow you to override it with custom CSS without relying on scripting or `!important` to overcome inline styles.
 
-Video.js does not currently include the base skin automatically yet, so, this option isn't necessary.
+### Disabling Additional `<style>` Elements
+In some cases, particularly with web applications using frameworks that may manage the `<head>` element (e.g. React, Ember, Angular, etc), these `<style>` elements are not desirable. They can be suppressed by setting `window.VIDEOJS_NO_DYNAMIC_STYLE = true` before including Video.js.
 
-## Default style elements
-Video.js uses a couple of style elements dynamically, specifically, there's a default styles element as well as a player dimensions style element.
-They are used to provide extra default flexiblity with styling the player. However, in some cases, like if a user has the HEAD tag managed by React, users do not want this.
-When `window.VIDEOJS_NO_DYNAMIC_STYLE` is set to `true`, video.js will *not* include these element in the page.
-This means that default dimensions and configured player dimensions will *not* be applied.
-For example, the following player will end up having a width and height of 0 when initialized if `window.VIDEOJS_NO_DYNAMIC_STYLE === true`:
-```html
-<video width="600" height="300"></video>
-```
+_This disables all CSS-based player sizing. Players will have no `height` or `width` by default!_ Even dimensional attributes, such as `width="600" height="300"` will be _ignored_. When using this global, you will need to set their own dimensions in a way that makes sense for their website or web app.
 
-### `Player#width` and `Player#height`
-When `VIDEOJS_NO_DYNAMIC_STYLE` is set, `Player#width` and `Player#height` will apply any width and height
-that is set directly to the video element (or whatever element the current tech uses).
-
+#### Effect on `Player#width()` and `Player#height()`
+When `VIDEOJS_NO_DYNAMIC_STYLE` is set, `Player#width()` and `Player#height()` will apply any width and height that is set directly to the `<video>` element (or whichever element the current tech uses).
 
 ## Icons
+Video.js ships with a number of icons built into the skin via an icon font.
 
-You can view all of the icons available in the base theme by renaming and viewing
-[`icons.html.example`](https://github.com/videojs/video.js/blob/master/sandbox/icons.html.example) in the sandbox directory.
+You can view all of the icons available in the default skin by renaming [`sandbox/icons.html.example`](https://github.com/videojs/video.js/blob/master/sandbox/icons.html.example) to `sandbox/icons.html`, building Video.js with `npm run build`, and opening `sandbox/icons.html` in your browser of choice.
 
-## Customization
+## Creating a Skin
+The recommended process for creating a skin is to override the styles provided by the default skin. In this way, you don't need to start from scratch.
 
-When you create a new skin, the easiest way to get started is to simply override the base Video.js theme.
-You should include a new class matching the name of your theme, then just start overriding!
+### Add a Custom Class to the Player
+The most convenient way to create a hook in the player for your skin is to add a class to it. You can do this by adding a class to the initial `<video>` element:
 
-```css
-.vjs-skin-hotdog-stand { color: #FF0000; }
-.vjs-skin-hotdog-stand .vjs-control-bar { background: #FFFF00; }
-.vjs-skin-hotdog-stand .vjs-play-progress { background: #FF0000; }
+```html
+<video class="vjs-matrix video-js">...</video>
 ```
 
-This would take care of the major areas of the skin (play progress, the control bar background, and icon colors),
-but you can skin any other aspect.
-Our suggestion is to use a browser such as Firefox and Chrome,
-and use the developer tools to inspect the different elements and see what you'd like to change and what classes
-to target when you do so.
+Or via JavaScript:
 
-More custom skins will be available for download soon.
-If you have one you like you can share it by forking [this example on CodePen.io](http://codepen.io/heff/pen/EarCt),
-and adding a link on the [Skins wiki page](https://github.com/videojs/video.js/wiki/Skins).
+```js
+var player = videojs('my-player');
+
+player.addClass('vjs-matrix');
+```
+
+> **Note:** The `vjs-` prefix is a convention for all classes that are contained in a Video.js player.
+
+### Customize Styles
+The first step in overriding default styles with custom ones is to determine which selectors and properties need overriding. As an example, let's say we don't like the default color of controls (white) and we want to change them to a bright green (say, `#00ff00`).
+
+To do this, we'll use your browser's developer tools to inspect the player and figure out which selectors we need to use to adjust those styles - and we'll add our custom `.vjs-matrix` selector to ensure our final selectors are specific enough to override the default skin.
+
+In this case, we'll need the following:
+
+```css
+/* Change all text and icon colors in the player. */
+.vjs-matrix.video-js {
+  color: #00ff00;
+}
+
+/* Change the border of the big play button. */
+.vjs-matrix .vjs-big-play-button {
+  border-color: #00ff00;
+}
+
+/* Change the color of various "bars". */
+.vjs-matrix .vjs-volume-level,
+.vjs-matrix .vjs-play-progress,
+.vjs-matrix .vjs-slider-bar {
+  background: #00ff00;
+}
+```
+
+Finally, we can save that as a `videojs-matrix.css` file and include it _after_ the Video.js CSS:
+
+```html
+<link rel="stylesheet" type="text/css" href="path/to/video-js.min.css">
+<link rel="stylesheet" type="text/css" href="path/to/videojs-matrix.css">
+```
+
+If you create a skin you're particularly proud of, you can share it by adding a link on the [Skins wiki page](https://github.com/videojs/video.js/wiki/Skins). One way to create shareable skins is by forking [this example on CodePen](http://codepen.io/heff/pen/EarCt).

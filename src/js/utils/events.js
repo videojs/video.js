@@ -1,5 +1,6 @@
 /**
  * @file events.js
+ * @module events
  *
  * Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
  * (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
@@ -15,11 +16,12 @@ import document from 'global/document';
 
 /**
  * Clean up the listener cache and dispatchers
-*
- * @param  {Element|Object} elem Element to clean up
- * @param  {String} type Type of event to clean up
- * @private
- * @method _cleanUpEvents
+ *
+ * @param {Element|Object} elem
+ *        Element to clean up
+ *
+ * @param {string} type
+ *        Type of event to clean up
  */
 function _cleanUpEvents(elem, type) {
   const data = Dom.getElData(elem);
@@ -54,12 +56,17 @@ function _cleanUpEvents(elem, type) {
 /**
  * Loops through an array of event types and calls the requested method for each type.
  *
- * @param  {Function} fn   The event method we want to use.
- * @param  {Element|Object} elem Element or object to bind listeners to
- * @param  {String}   type Type of event to bind to.
- * @param  {Function} callback   Event listener.
- * @private
- * @function _handleMultipleEvents
+ * @param {Function} fn
+ *        The event method we want to use.
+ *
+ * @param {Element|Object} elem
+ *        Element or object to bind listeners to
+ *
+ * @param {string} type
+ *        Type of event to bind to.
+ *
+ * @param {EventTarget~EventListener} callback
+ *        Event listener.
  */
 function _handleMultipleEvents(fn, elem, types, callback) {
   types.forEach(function(type) {
@@ -71,10 +78,11 @@ function _handleMultipleEvents(fn, elem, types, callback) {
 /**
  * Fix a native event to have standard property values
  *
- * @param  {Object} event Event object to fix
+ * @param {Object} event
+ *        Event object to fix.
+ *
  * @return {Object}
- * @private
- * @method fixEvent
+ *         Fixed event object.
  */
 export function fixEvent(event) {
 
@@ -201,10 +209,14 @@ export function fixEvent(event) {
  * and adds a generic handler to the element's event,
  * along with a unique id (guid) to the element.
  *
- * @param  {Element|Object}   elem Element or object to bind listeners to
- * @param  {String|Array}   type Type of event to bind to.
- * @param  {Function} fn   Event listener.
- * @method on
+ * @param {Element|Object} elem
+ *        Element or object to bind listeners to
+ *
+ * @param {string|string[]} type
+ *        Type of event to bind to.
+ *
+ * @param {EventTarget~EventListener} fn
+ *        Event listener.
  */
 export function on(elem, type, fn) {
   if (Array.isArray(type)) {
@@ -272,10 +284,15 @@ export function on(elem, type, fn) {
 /**
  * Removes event listeners from an element
  *
- * @param  {Element|Object}   elem Object to remove listeners from
- * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
- * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
- * @method off
+ * @param {Element|Object} elem
+ *        Object to remove listeners from.
+ *
+ * @param {string|string[]} [type]
+ *        Type of listener to remove. Don't include to remove all events from element.
+ *
+ * @param {EventTarget~EventListener} [fn]
+ *        Specific listener to remove. Don't include to remove listeners for an event
+ *        type.
  */
 export function off(elem, type, fn) {
   // Don't want to add a cache object through getElData if not needed
@@ -336,11 +353,18 @@ export function off(elem, type, fn) {
 /**
  * Trigger an event for an element
  *
- * @param  {Element|Object}      elem  Element to trigger an event on
- * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
- * @param  {Object} [hash] data hash to pass along with the event
- * @return {Boolean=} Returned only if default was prevented
- * @method trigger
+ * @param {Element|Object} elem
+ *        Element to trigger an event on
+ *
+ * @param {EventTarget~Event|string} event
+ *        A string (the type) or an event object with a type attribute
+ *
+ * @param {Object} [hash]
+ *        data hash to pass along with the event
+ *
+ * @return {boolean|undefined}
+ *         - Returns the opposite of `defaultPrevented` if default was prevented
+ *         - Otherwise returns undefined
  */
 export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
@@ -392,10 +416,14 @@ export function trigger(elem, event, hash) {
 /**
  * Trigger a listener only once for an event
  *
- * @param  {Element|Object}   elem Element or object to
- * @param  {String|Array}   type Name/type of event
- * @param  {Function} fn Event handler function
- * @method one
+ * @param {Element|Object} elem
+ *        Element or object to bind to.
+ *
+ * @param {string|string[]} type
+ *        Name/type of event
+ *
+ * @param {Event~EventListener} fn
+ *        Event Listener function
  */
 export function one(elem, type, fn) {
   if (Array.isArray(type)) {

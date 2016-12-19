@@ -8,24 +8,32 @@ import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 /**
  * The button component for toggling and selecting captions
  *
- * @param {Object} player  Player object
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready    Ready callback function
  * @extends TextTrackButton
- * @class CaptionsButton
  */
 class CaptionsButton extends TextTrackButton {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @param {Component~ReadyCallback} [ready]
+   *        The function to call when this component is ready.
+   */
   constructor(player, options, ready) {
     super(player, options, ready);
     this.el_.setAttribute('aria-label', 'Captions Menu');
   }
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     return `vjs-captions-button ${super.buildCSSClass()}`;
@@ -34,9 +42,14 @@ class CaptionsButton extends TextTrackButton {
   /**
    * Update caption menu items
    *
-   * @method update
+   * @param {EventTarget~Event} [event]
+   *        The `addtrack` or `removetrack` event that caused this function to be
+   *        called.
+   *
+   * @listens TextTrackList#addtrack
+   * @listens TextTrackList#removetrack
    */
-  update() {
+  update(event) {
     let threshold = 2;
 
     super.update();
@@ -56,8 +69,8 @@ class CaptionsButton extends TextTrackButton {
   /**
    * Create caption menu items
    *
-   * @return {Array} Array of menu items
-   * @method createItems
+   * @return {CaptionSettingsMenuItem[]}
+   *         The array of current menu items.
    */
   createItems() {
     const items = [];
@@ -71,7 +84,20 @@ class CaptionsButton extends TextTrackButton {
 
 }
 
+/**
+ * `kind` of TextTrack to look for to associate it with this menu.
+ *
+ * @type {string}
+ * @private
+ */
 CaptionsButton.prototype.kind_ = 'captions';
+
+/**
+ * The text that should display over the `CaptionsButton`s controls. Added for localization.
+ *
+ * @type {string}
+ * @private
+ */
 CaptionsButton.prototype.controlText_ = 'Captions';
 
 Component.registerComponent('CaptionsButton', CaptionsButton);

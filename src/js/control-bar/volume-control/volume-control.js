@@ -9,13 +9,19 @@ import './volume-bar.js';
 /**
  * The component for controlling the volume level
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Component
- * @class VolumeControl
  */
 class VolumeControl extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options={}]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -33,10 +39,10 @@ class VolumeControl extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
@@ -46,6 +52,12 @@ class VolumeControl extends Component {
 
 }
 
+/**
+ * Default options for the `VolumeControl`
+ *
+ * @type {Object}
+ * @private
+ */
 VolumeControl.prototype.options_ = {
   children: [
     'volumeBar'

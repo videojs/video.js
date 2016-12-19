@@ -5,20 +5,25 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import throttle from 'lodash-compat/function/throttle';
 import computedStyle from '../../utils/computed-style.js';
 
 /**
  * The Mouse Time Display component shows the time you will seek to
  * when hovering over the progress bar
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Component
- * @class MouseTimeDisplay
  */
 class MouseTimeDisplay extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -38,15 +43,15 @@ class MouseTimeDisplay extends Component {
     this.update(0, 0);
 
     player.on('ready', () => {
-      this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 25));
+      this.on(player.controlBar.progressControl.el(), 'mousemove', Fn.throttle(Fn.bind(this, this.handleMouseMove), 25));
     });
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
@@ -54,6 +59,14 @@ class MouseTimeDisplay extends Component {
     });
   }
 
+  /**
+   * Handle the mouse move event on the `MouseTimeDisplay`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mousemove` event that caused this to event to run.
+   *
+   * @listen mousemove
+   */
   handleMouseMove(event) {
     const duration = this.player_.duration();
     const newTime = this.calculateDistance(event) * duration;
@@ -62,6 +75,15 @@ class MouseTimeDisplay extends Component {
     this.update(newTime, position);
   }
 
+  /**
+   * Update the time and posistion of the `MouseTimeDisplay`.
+   *
+   * @param {number} newTime
+   *        Time to change the `MouseTimeDisplay` to.
+   *
+   * @param {nubmer} position
+   *        Postion from the left of the in pixels.
+   */
   update(newTime, position) {
     const time = formatTime(newTime, this.player_.duration());
 
@@ -79,6 +101,16 @@ class MouseTimeDisplay extends Component {
     }
   }
 
+  /**
+   * Get the mouse pointers x coordinate in pixels.
+   *
+   * @param {EventTarget~Event} [event]
+   *        The `mousemove` event that was passed to this function by
+   *        {@link MouseTimeDisplay#handleMouseMove}
+   *
+   * @return {number}
+   *         THe x position in pixels of the mouse pointer.
+   */
   calculateDistance(event) {
     return Dom.getPointerPosition(this.el().parentNode, event).x;
   }
@@ -89,9 +121,13 @@ class MouseTimeDisplay extends Component {
    * of the tooltip and smaller than the player width minus half the width o the tooltip.
    * It will only clamp the position if `keepTooltipsInside` option is set.
    *
-   * @param {Number} position the position the bar wants to be
-   * @return {Number} newPosition the (potentially) clamped position
-   * @method clampPosition_
+   * @param {number} position
+   *        The position the bar wants to be
+   *
+   * @return {number}
+   *         The (potentially) new clamped position.
+   *
+   * @private
    */
   clampPosition_(position) {
     if (!this.keepTooltipsInside) {

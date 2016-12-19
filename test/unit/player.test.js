@@ -16,6 +16,13 @@ import TechFaker from './tech/tech-faker.js';
 QUnit.module('Player', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
+    // reset players storage
+    for (const playerId in Player.players) {
+      if (Player.players[playerId] !== null) {
+        Player.players[playerId].dispose();
+      }
+      delete Player.players[playerId];
+    }
   },
   afterEach() {
     this.clock.restore();
@@ -137,6 +144,8 @@ QUnit.test('should get current source from source tag', function(assert) {
 
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
+
+  player.dispose();
 });
 
 QUnit.test('should get current sources from source tag', function(assert) {
@@ -165,6 +174,8 @@ QUnit.test('should get current sources from source tag', function(assert) {
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === undefined);
   assert.ok(player.currentSources()[1] === undefined);
+
+  player.dispose();
 });
 
 QUnit.test('should get current source from src set', function(assert) {
@@ -201,6 +212,7 @@ QUnit.test('should get current source from src set', function(assert) {
 
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
+  player.dispose();
 });
 
 QUnit.test('should get current sources from src set', function(assert) {
@@ -248,6 +260,8 @@ QUnit.test('should get current sources from src set', function(assert) {
   assert.ok(player.currentSources()[0].src === 'http://hugo.com');
   assert.ok(player.currentSources()[0].type === undefined);
   assert.ok(player.currentSources()[1] === undefined);
+
+  player.dispose();
 });
 
 QUnit.test('should asynchronously fire error events during source selection', function(assert) {
@@ -327,6 +341,8 @@ QUnit.test('should default to 16:9 when fluid', function(assert) {
 
   // IE8 rounds 0.5625 up to 0.563
   assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
+
+  player.dispose();
 });
 
 QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
@@ -337,6 +353,8 @@ QUnit.test('should set fluid to true if element has vjs-fluid class', function(a
   const player = TestHelpers.makePlayer({}, tag);
 
   assert.ok(player.fluid(), 'fluid is true with vjs-fluid class');
+
+  player.dispose();
 });
 
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
@@ -812,6 +830,93 @@ QUnit.test('should restore attributes from the original video tag when creating 
   assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
 
+QUnit.test('if tag exists and movingMediaElementInDOM, re-use the tag', function(assert) {
+  // simulate attributes stored from the original tag
+  const tag = Dom.createEl('video');
+
+  tag.setAttribute('preload', 'auto');
+  tag.setAttribute('autoplay', '');
+  tag.setAttribute('webkit-playsinline', '');
+
+  const html5Mock = {
+    options_: {
+      tag,
+      playerElIngest: false
+    },
+    movingMediaElementInDOM: true
+  };
+
+  // set options that should override tag attributes
+  html5Mock.options_.preload = 'none';
+
+  // create the element
+  const el = Html5.prototype.createEl.call(html5Mock);
+
+  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+
+  assert.equal(el, tag, 'we have re-used the tag as expected');
+});
+
+QUnit.test('if tag exists and *not* movingMediaElementInDOM, create a new tag', function(assert) {
+  // simulate attributes stored from the original tag
+  const tag = Dom.createEl('video');
+
+  tag.setAttribute('preload', 'auto');
+  tag.setAttribute('autoplay', '');
+  tag.setAttribute('webkit-playsinline', '');
+
+  const html5Mock = {
+    options_: {
+      tag,
+      playerElIngest: false
+    },
+    movingMediaElementInDOM: false
+  };
+
+  // set options that should override tag attributes
+  html5Mock.options_.preload = 'none';
+
+  // create the element
+  const el = Html5.prototype.createEl.call(html5Mock);
+
+  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+
+  assert.notEqual(el, tag, 'we have not re-used the tag as expected');
+});
+
+QUnit.test('if tag exists and *not* movingMediaElementInDOM, but playerElIngest re-use tag', function(assert) {
+  // simulate attributes stored from the original tag
+  const tag = Dom.createEl('video');
+
+  tag.setAttribute('preload', 'auto');
+  tag.setAttribute('autoplay', '');
+  tag.setAttribute('webkit-playsinline', '');
+
+  const html5Mock = {
+    options_: {
+      tag,
+      playerElIngest: true
+    },
+    movingMediaElementInDOM: false
+  };
+
+  // set options that should override tag attributes
+  html5Mock.options_.preload = 'none';
+
+  // create the element
+  const el = Html5.prototype.createEl.call(html5Mock);
+
+  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+
+  assert.equal(el, tag, 'we have re-used the tag as expected');
+});
+
 QUnit.test('should honor default inactivity timeout', function(assert) {
   const clock = sinon.useFakeTimers();
 
@@ -1251,4 +1356,34 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   assert.equal(player.tech_.el().width, 600, 'the width is equal to 600');
   assert.equal(player.tech_.el().height, 300, 'the height is equal 300');
   player.dispose();
+});
+
+QUnit.test('should allow to register custom player when any player has not been created', function(assert) {
+  class CustomPlayer extends Player {}
+  videojs.registerComponent('Player', CustomPlayer);
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  assert.equal(player instanceof CustomPlayer, true, 'player is custom');
+  player.dispose();
+
+  // reset the Player to the original value;
+  videojs.registerComponent('Player', Player);
+});
+
+QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  class CustomPlayer extends Player {}
+
+  assert.throws(function() {
+    videojs.registerComponent('Player', CustomPlayer);
+  }, 'Can not register Player component after player has been created');
+
+  player.dispose();
+
+  // reset the Player to the original value;
+  videojs.registerComponent('Player', Player);
 });

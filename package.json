@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "5.13.1",
+  "version": "5.14.1",
   "main": "./es5/video.js",
   "style": "./dist/video-js.css",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
@@ -24,7 +24,8 @@
     "lint": "vjsstandard",
     "start": "grunt watchAll",
     "test": "grunt test",
-    "toc": "doctoc"
+    "toc": "doctoc",
+    "docs": "jsdoc -r src/js -d docs/api -c .jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -33,8 +34,7 @@
   "dependencies": {
     "babel-runtime": "^6.9.2",
     "global": "4.3.1",
-    "lodash-compat": "3.10.2",
-    "object.assign": "^4.0.4",
+    "global": "4.3.0",
     "safe-json-parse": "4.0.0",
     "tsml": "1.0.1",
     "videojs-font": "2.0.0",
@@ -87,6 +87,7 @@
     "grunt-version": "~1.1.1",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.17.1",
+    "jsdoc": "^3.4.2",
     "karma": "^1.2.0",
     "karma-browserify": "^5.1.0",
     "karma-browserstack-launcher": "^1.0.1",
@@ -100,6 +101,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sinon": "^1.0.5",
     "load-grunt-tasks": "^3.1.0",
+    "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "npm-run": "^4.1.0",
     "proxyquireify": "^3.0.0",

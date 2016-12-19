@@ -11,13 +11,19 @@ import VolumeBar from './volume-control/volume-bar.js';
 /**
  * Button for volume popup
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends PopupButton
- * @class VolumeMenuButton
  */
 class VolumeMenuButton extends PopupButton {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options={}]
+   *        The key/value store of player options.
+   */
   constructor(player, options = {}) {
     // Default to inline
     if (options.inline === undefined) {
@@ -76,10 +82,10 @@ class VolumeMenuButton extends PopupButton {
   }
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     let orientationClass = '';
@@ -94,10 +100,7 @@ class VolumeMenuButton extends PopupButton {
   }
 
   /**
-   * Allow sub components to stack CSS class names
-   *
-   * @return {Popup} The volume popup button
-   * @method createPopup
+   * Create the VolumeMenuButton popup
    */
   createPopup() {
     const popup = new Popup(this.player_, {
@@ -117,30 +120,67 @@ class VolumeMenuButton extends PopupButton {
   }
 
   /**
-   * Handle click on volume popup and calls super
+   * This gets called when an `VolumeMenuButton` is "clicked". See
+   * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} [event]
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens tap
+   * @listens click
    */
-  handleClick() {
+  handleClick(event) {
     MuteToggle.prototype.handleClick.call(this);
     super.handleClick();
   }
 
+  /**
+   * Add events listeners to the created `VolumeBar`.
+   */
   attachVolumeBarEvents() {
     this.menuContent.on(['mousedown', 'touchdown'], Fn.bind(this, this.handleMouseDown));
   }
 
+  /**
+   * Handle the `mousedown` and `touchdown` events on the `VolumeBar`
+   *
+   * @param {EventTarget~Event} [event]
+   *        The `mousedown` or `touchdown` event that caused this to run.
+   *
+   * @listens mousedown
+   * @listens touchdown
+   */
   handleMouseDown(event) {
     this.on(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
     this.on(this.el_.ownerDocument, ['mouseup', 'touchend'], this.handleMouseUp);
   }
 
+  /**
+   * Handle the `mouseup` and `touchend` events on the `VolumeBar`
+   *
+   * @param {EventTarget~Event} [event]
+   *        The `mouseup` or `touchend` event that caused this to run.
+   *
+   * @listens mouseup
+   * @listens touchend
+   */
   handleMouseUp(event) {
     this.off(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
   }
 }
 
+/**
+ * @borrows MuteToggle#update as VolumeMenuButton#volumeUpdate
+ */
 VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;
+
+/**
+ * The text that should display over the `VolumeMenuButton`s controls. Added for localization.
+ *
+ * @type {string}
+ * @private
+ */
 VolumeMenuButton.prototype.controlText_ = 'Mute';
 
 Component.registerComponent('VolumeMenuButton', VolumeMenuButton);

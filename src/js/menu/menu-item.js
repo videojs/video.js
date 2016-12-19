@@ -3,18 +3,25 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 
 /**
  * The component for a menu item. `<li>`
  *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Button
- * @class MenuItem
+ * @extends ClickableComponent
  */
 class MenuItem extends ClickableComponent {
 
+  /**
+   * Creates an instance of the this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options={}]
+   *        The key/value store of player options.
+   *
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -32,12 +39,19 @@ class MenuItem extends ClickableComponent {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `MenuItem's DOM element
    *
-   * @param {String=} type Desc
-   * @param {Object=} props Desc
+   * @param {string} [type=li]
+   *        Element's node type, not actually used, always set to `li`.
+   *
+   * @param {Object} [props={}]
+   *        An object of properties that should be set on the element
+   *
+   * @param {Object} [attrs={}]
+   *        An object of attributes that should be set on the element
+   *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl(type, props, attrs) {
     return super.createEl('li', assign({
@@ -48,19 +62,25 @@ class MenuItem extends ClickableComponent {
   }
 
   /**
-   * Handle a click on the menu item, and set it to selected
+   * Any click on a `MenuItem` puts int into the selected state.
+   * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} event
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens tap
+   * @listens click
    */
-  handleClick() {
+  handleClick(event) {
     this.selected(true);
   }
 
   /**
-   * Set this menu item as selected or not
+   * Set the state for this menu item as selected or not.
    *
-   * @param  {Boolean} selected
-   * @method selected
+   * @param {boolean} selected
+   *        if the menu item is selected or not
    */
   selected(selected) {
     if (this.selectable) {

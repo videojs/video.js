@@ -1,124 +1,181 @@
-Setup
-=====
-
-Video.js is pretty easy to set up. It can take a matter of seconds to get the player up and working on your web page.
-
-Step 1: Include the Video.js Javascript and CSS files in the head of your page.
-------------------------------------------------------------------------------
-
-You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. As of Video.js 5.0, the source is [transpiled from ES2015](http://babeljs.io/) (formerly known as ES6) to [ES5](https://es5.github.io/), but IE8 only supports ES3. In order to continue to support IE8, we've bundled an [ES5 shim and sham](https://github.com/es-shims/es5-shim) together and hosted it on the CDN.
-
-```html
-<script src="//vjs.zencdn.net/ie8/1.1.1/videojs-ie8.min.js"></script>
-```
-
-### CDN Version ###
-```html
-<link href="//vjs.zencdn.net/5.4.6/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/5.4.6/video.min.js"></script>
-```
-
-Alternatively you can always [go here](http://videojs.com/getting-started/) to get the latest URL for videojs CDN.
-
-We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global **before** including Video.js:
-
-```js
-window.HELP_IMPROVE_VIDEOJS = false;
-```
-
-## Install via package manager
-
-### NPM
-```
-$ npm install --save video.js
-```
-
-### Bower
-```
-$ bower install --save video.js
-```
+# Video.js Setup
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-### Self Hosted. ###
-To entirely self-host, you'll need to pull in the font files and let Video.js know where the swf is located. If you simply copy the dist folder or zip file contents into your project everything
-should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file. Additionally include the [videojs-vtt.js](https://www.npmjs.com/package/videojs-vtt.js) source, which adds the `WebVTT` object to the global scope.
+- [Getting Video.js](#getting-videojs)
+- [Creating a Player](#creating-a-player)
+  - [Automatic Setup](#automatic-setup)
+  - [Manual Setup](#manual-setup)
+- [Options](#options)
+  - [Global Defaults](#global-defaults)
+  - [A Note on `<video>` Tag Attributes](#a-note-on-video-tag-attributes)
+- [Player Readiness](#player-readiness)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Getting Video.js
+Video.js is officially available via CDN, npm, and Bower.
+
+Video.js works out of the box with not only HTML `<script>` and `<link>` tags, but also all major bundlers/packagers/builders, such as Browserify, Node, WebPack, etc.
+
+Please refer to the [Getting Started][getting-started] document for details.
+
+## Creating a Player
+> **Note:** Video.js works with `<video>` _and_ `<audio>` elements, but for simplicity we'll refer only to `<video>` elements going forward.
+
+Once you have Video.js [loaded on your page][getting-started], you're ready to create a player!
+
+The core strength of Video.js is that it decorates a [standard `<video>` element][w3c-video] and emulates its associated [events and APIs][w3c-media-events], while providing a customizable DOM-based UI.
+
+Video.js supports all attributes of the `<video>` element (such as `controls`, `preload`, etc), but it also supports [its own options](#options). There are two ways to create a Video.js player and pass it options, but they both start with a standard `<video>` element with the attribute `class="video-js"`:
 
 ```html
-<link href="//example.com/path/to/video-js.min.css" rel="stylesheet">
-<script src="//example.com/path/to/videojs-vtt.js"></script>
-<script src="//example.com/path/to/video.min.js"></script>
-<script>
-  videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
-</script>
-```
-
-
-Step 2: Add an HTML5 video tag to your page.
---------------------------------------------
-With Video.js you just use an HTML5 video tag to embed a video. Video.js will then read the tag and make it work in all browsers, not just ones that support HTML5 video. Beyond the basic markup, Video.js needs a few extra pieces.
-
-> Note: The `data-setup` attribute described here should not be used if you use the alternative setup described in the next section.
-
-  1. The 'data-setup' Attribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see [options](./options.md)). There are other methods for initializing the player, but this is the easiest.
-
-  2. The 'id' Attribute: Should be used and unique for every video on the same page.
-
-  3. The 'class' attribute contains two classes:
-    - `video-js` applies styles that are required for Video.js functionality, like fullscreen and subtitles.
-    - `vjs-default-skin` applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.
-
-Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.*
-```html
-<video id="example_video_1" class="video-js vjs-default-skin"
-  controls preload="auto" width="640" height="264"
-  poster="http://video-js.zencoder.com/oceans-clip.png"
-  data-setup='{"example_option":true}'>
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4" />
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm" />
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg" />
- <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+<video class="video-js">
+  <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
 </video>
 ```
 
-By default, the big play button is located in the upper left hand corner so it doesn't cover up the interesting parts of the poster. If you'd prefer to center the big play button, you can add an additional `vjs-big-play-centered` class to your video element. For example:
+### Automatic Setup
+By default, when your web page finishes loading, Video.js will scan for media elements that have the `data-setup` attribute. The `data-setup` attribute is used to pass options to Video.js. A minimal example looks like this:
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin vjs-big-play-centered"
-  controls preload="auto" width="640" height="264"
-  poster="http://video-js.zencoder.com/oceans-clip.png"
-  data-setup='{"example_option":true}'>
-  ...
+<video class="video-js" data-setup='{}'>
+  <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
 </video>
 ```
 
-Alternative Setup for Dynamically Loaded HTML
----------------------------------------------
-If your web page or application loads the video tag dynamically (ajax, appendChild, etc.), so that it may not exist when the page loads, you'll want to manually set up the player instead of relying on the data-setup attribute. To do this, first remove the data-setup attribute from the tag so there's no confusion around when the player is initialized. Next, run the following javascript some time after the Video.js javascript library has loaded, and after the video tag has been loaded into the DOM.
-```js
-videojs("example_video_1", {}, function(){
-  // Player (this) is initialized and ready.
-});
-```
+> **Note:** You _must_ use single-quotes with `data-setup` as it is expected to contain JSON.
 
-The first argument in the `videojs` function is the ID of your video tag. Replace it with your own.
+### Manual Setup
+On the modern web, a `<video>` element often does not exist when the page finishes loading. In these cases, automatic setup is not possible, but manual setup is available via [the `videojs` function][videojs].
 
-The second argument is an options object. It allows you to set additional options like you can with the data-setup attribute.
+One way to call this function is by providing it a string matching a `<video>` element's `id` attribute:
 
-The third argument is a 'ready' callback. Once Video.js has initialized it will call this function.
-
-Instead of using an element ID, you can also pass a reference to the element itself.
-
-```js
-videojs(document.getElementById('example_video_1'), {}, function() {
-  // This is functionally the same as the previous example.
-});
+```html
+<video id="my-player" class="video-js">
+  <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+</video>
 ```
 
 ```js
-videojs(document.getElementsByClassName('awesome_video_class')[0], {}, function() {
-  // You can grab an element by class if you'd like, just make sure
-  // if it's an array that you pick one (here we chose the first).
+videojs('my-player');
+```
+
+However, using an `id` attribute isn't always practical; so, the `videojs` function accepts a DOM element instead:
+
+```html
+<video class="video-js">
+  <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+</video>
+```
+
+```js
+videojs(document.querySelector('.video-js'));
+```
+
+## Options
+> **Note:** This guide only covers how to pass options during player setup. For a complete reference on _all_ available options, see the [options guide](options.md).
+
+There are three ways to pass options to Video.js. Because Video.js decorates an HTML5 `<video>` element, many of the options available are also available as [standard `<video>` tag attributes][video-attrs]:
+
+```html
+<video controls autoplay preload="auto" ...>
+```
+
+Alternatively, you can use the `data-setup` attribute to pass options as [JSON][json]. This is also how you would set options that aren't standard to the `<video>` element:
+
+```html
+<video data-setup='{"controls": true, "autoplay": false, "preload": "auto"}'...>
+```
+
+Finally, if you're not using the `data-setup` attribute to trigger the player setup, you can pass in an object of player options as the second argument to the `videojs` function:
+
+```js
+videojs('my-player', {
+  controls: true,
+  autoplay: false,
+  preload: 'auto'
 });
 ```
 
-\* If you have trouble playing back content you know is in the [correct format](http://blog.zencoder.com/2013/09/13/what-formats-do-i-need-for-html5-video/), your HTTP server might not be delivering the content with the correct [MIME type](http://en.wikipedia.org/wiki/Internet_media_type#Type_video). Please double check your content's headers before opening an [issue](/CONTRIBUTING.md).
+### Global Defaults
+Default options for all players can be found at `videojs.options` and can be changed directly. For example, to set `{autoplay: true}` for all future players:
+
+```js
+videojs.options.autoplay = true;
+```
+
+### A Note on `<video>` Tag Attributes
+
+Many attributes are so-called [boolean attributes][boolean-attrs]. This means they are either on or off. In these cases, the attribute _should have no value_ (or should have its name as its value) - its presence implies a true value and its absence implies a false value.
+
+_These are incorrect:_
+
+```html
+<video controls="true" ...>
+<video loop="true" ...>
+<video controls="false" ...>
+```
+
+> **Note:** The example with `controls="false"` can be a point of confusion for new developers - it will actually turn controls _on_!
+
+These are correct:
+
+```html
+<video controls ...>
+<video loop="loop" ...>
+<video ...>
+```
+
+## Player Readiness
+Because Video.js techs have the potential to be loaded asynchronously, it isn't always safe to interact with a player immediately upon setup. For this reason, Video.js players have a concept of "readiness" which will be familiar to anyone who has used jQuery before.
+
+Essentially, any number of ready callbacks can be defined for a Video.js player. There are three ways to pass these callbacks. In each example, we'll add an identical class to the player:
+
+Pass a callback to the `videojs()` function as a third argument:
+
+```js
+// Passing `null` for the options argument.
+videojs('my-player', null, function() {
+  this.addClass('my-example');
+});
+```
+
+Pass a callback to a player's `ready()` method:
+
+```js
+var player = videojs('my-player');
+
+player.ready(function() {
+  this.addClass('my-example');
+});
+```
+
+Listen for the player's `"ready"` event:
+
+```js
+var player = videojs('my-player');
+
+player.on('ready', function() {
+  this.addClass('my-example');
+});
+```
+
+In each case, the callback is called asynchronously - _even if the player is already ready!_
+
+## Advanced Player Workflows
+For a discussion of more advanced player workflows, see the [player workflows guide](player-workflows.md).
+
+
+[boolean-attrs]: https://www.w3.org/TR/2011/WD-html5-20110525/common-microsyntaxes.html#boolean-attributes
+[getting-started]: http://videojs.com/getting-started/
+[json]: http://json.org/example.html
+[video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes
+[videojs]: http://docs.videojs.com/docs/api/video.html
+[w3c-media-events]: https://www.w3.org/2010/05/video/mediaevents.html
+[w3c-video]: http://www.w3.org/TR/html5/embedded-content-0.html#the-video-element

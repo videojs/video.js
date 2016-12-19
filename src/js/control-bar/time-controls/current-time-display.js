@@ -8,13 +8,19 @@ import formatTime from '../../utils/format-time.js';
 /**
  * Displays the current time
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Component
- * @class CurrentTimeDisplay
  */
 class CurrentTimeDisplay extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -22,10 +28,10 @@ class CurrentTimeDisplay extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     const el = super.createEl('div', {
@@ -48,9 +54,12 @@ class CurrentTimeDisplay extends Component {
   /**
    * Update current time display
    *
-   * @method updateContent
+   * @param {EventTarget~Event} [event]
+   *        The `timeupdate` event that caused this function to run.
+   *
+   * @listens Player#timeupdate
    */
-  updateContent() {
+  updateContent(event) {
     // Allows for smooth scrubbing, when player can't keep up.
     const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     const localizedText = this.localize('Current Time');
