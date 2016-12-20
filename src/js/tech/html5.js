@@ -185,15 +185,21 @@ class Html5 extends Tech {
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
-    if (!el || this.movingMediaElementInDOM === false) {
+    // If we ingested the player div, we do not need to move the media element.
+    if (!el ||
+        !(this.options_.playerElIngest ||
+          this.movingMediaElementInDOM)) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
         const clone = el.cloneNode(true);
 
-        el.parentNode.insertBefore(clone, el);
+        if (el.parentNode) {
+          el.parentNode.insertBefore(clone, el);
+        }
         Html5.disposeMediaElement(el);
         el = clone;
+
       } else {
         el = document.createElement('video');
 
@@ -1020,31 +1026,22 @@ Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
 Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-let canPlayType;
+const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
 const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX) {
-    if (!canPlayType) {
-      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
-    }
-
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mpegurlRE.test(type)) {
         return 'maybe';
       }
       return canPlayType.call(this, type);
     };
-  }
 
   // Override Android 2.2 and less canPlayType method which is broken
-  if (browser.IS_OLD_ANDROID) {
-    if (!canPlayType) {
-      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
-    }
-
+  } else if (browser.IS_OLD_ANDROID) {
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mp4RE.test(type)) {
         return 'maybe';
@@ -1058,7 +1055,6 @@ Html5.unpatchCanPlayType = function() {
   const r = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
-  canPlayType = null;
   return r;
 };
 

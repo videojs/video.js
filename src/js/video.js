@@ -118,7 +118,7 @@ function videojs(id, options, ready) {
     const opts = hookFunction(tag, mergeOptions(options));
 
     if (!isObject(opts) || Array.isArray(opts)) {
-      videojs.log.error('please return an object in beforesetup hooks');
+      log.error('please return an object in beforesetup hooks');
       return;
     }
 

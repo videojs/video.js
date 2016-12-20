@@ -106,7 +106,7 @@ class TextTrackDisplay extends Component {
       const tracks = this.options_.playerOptions.tracks || [];
 
       for (let i = 0; i < tracks.length; i++) {
-        this.player_.addRemoteTextTrack(tracks[i]);
+        this.player_.addRemoteTextTrack(tracks[i], true);
       }
 
       const modes = {captions: 1, subtitles: 1};

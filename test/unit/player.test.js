@@ -830,6 +830,93 @@ QUnit.test('should restore attributes from the original video tag when creating 
   assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
 
+QUnit.test('if tag exists and movingMediaElementInDOM, re-use the tag', function(assert) {
+  // simulate attributes stored from the original tag
+  const tag = Dom.createEl('video');
+
+  tag.setAttribute('preload', 'auto');
+  tag.setAttribute('autoplay', '');
+  tag.setAttribute('webkit-playsinline', '');
+
+  const html5Mock = {
+    options_: {
+      tag,
+      playerElIngest: false
+    },
+    movingMediaElementInDOM: true
+  };
+
+  // set options that should override tag attributes
+  html5Mock.options_.preload = 'none';
+
+  // create the element
+  const el = Html5.prototype.createEl.call(html5Mock);
+
+  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+
+  assert.equal(el, tag, 'we have re-used the tag as expected');
+});
+
+QUnit.test('if tag exists and *not* movingMediaElementInDOM, create a new tag', function(assert) {
+  // simulate attributes stored from the original tag
+  const tag = Dom.createEl('video');
+
+  tag.setAttribute('preload', 'auto');
+  tag.setAttribute('autoplay', '');
+  tag.setAttribute('webkit-playsinline', '');
+
+  const html5Mock = {
+    options_: {
+      tag,
+      playerElIngest: false
+    },
+    movingMediaElementInDOM: false
+  };
+
+  // set options that should override tag attributes
+  html5Mock.options_.preload = 'none';
+
+  // create the element
+  const el = Html5.prototype.createEl.call(html5Mock);
+
+  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+
+  assert.notEqual(el, tag, 'we have not re-used the tag as expected');
+});
+
+QUnit.test('if tag exists and *not* movingMediaElementInDOM, but playerElIngest re-use tag', function(assert) {
+  // simulate attributes stored from the original tag
+  const tag = Dom.createEl('video');
+
+  tag.setAttribute('preload', 'auto');
+  tag.setAttribute('autoplay', '');
+  tag.setAttribute('webkit-playsinline', '');
+
+  const html5Mock = {
+    options_: {
+      tag,
+      playerElIngest: true
+    },
+    movingMediaElementInDOM: false
+  };
+
+  // set options that should override tag attributes
+  html5Mock.options_.preload = 'none';
+
+  // create the element
+  const el = Html5.prototype.createEl.call(html5Mock);
+
+  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+
+  assert.equal(el, tag, 'we have re-used the tag as expected');
+});
+
 QUnit.test('should honor default inactivity timeout', function(assert) {
   const clock = sinon.useFakeTimers();
 
