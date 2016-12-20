@@ -216,6 +216,7 @@ See [the plugins guide](plugins.md) for more information on Video.js plugins.
 ### `sourceOrder`
 
 > Type: `boolean`, Default: `false`
+>
 > **Note:** In video.js 6.0, this option will default to `true`.
 
 Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techorder) in selecting a source and playback tech.
