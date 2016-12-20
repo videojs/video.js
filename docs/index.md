@@ -11,14 +11,11 @@ Guides explain general topics and use cases (e.g. setup). API docs are automatic
   * [Troubleshooting](#troubleshooting)
 * [Guides](#guides)
   * [Getting Started](#getting-started)
-
     * [Setup](#setup)
     * [Player Workflows](#player-workflows)
     * [Options](#options)
     * [Tracks](#tracks)
-
   * [Customizing](#customizing)
-
     * [Skins](#skins)
     * [Plugins](#plugins)
     * [Components](#components)

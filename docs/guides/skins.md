@@ -5,7 +5,6 @@
 * [Default Skin](#default-skin)
 * [Additional &lt;style> Elements](#additional-style-elements)
   * [Disabling Additional &lt;style> Elements](#disabling-additional-style-elements)
-
     * [Effect on Player#width() and Player#height()](#effect-on-playerwidth-and-playerheight)
 * [Icons](#icons)
 * [Creating a Skin](#creating-a-skin)

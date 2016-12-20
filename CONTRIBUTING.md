@@ -10,7 +10,6 @@ So you want to help out? Great! There's a number of ways you can get involved.
   * [Requesting a Feature](#requesting-a-feature)
 * [Contributing code](#contributing-code)
   * [Building video.js locally](#building-videojs-locally)
-
     * [Forking and cloning the repository](#forking-and-cloning-the-repository)
     * [Installing local dependencies](#installing-local-dependencies)
     * [Running tests](#running-tests)
@@ -19,16 +18,13 @@ So you want to help out? Great! There's a number of ways you can get involved.
     * [Sandbox test directory](#sandbox-test-directory)
     * [Running a local web server](#running-a-local-web-server)
     * [Watching source and test changes](#watching-source-and-test-changes)
-
   * [Making Changes](#making-changes)
-
     * [Step 1: Verify](#step-1-verify)
     * [Step 2: Update remote](#step-2-update-remote)
     * [Step 3: Branch](#step-3-branch)
     * [Step 4: Commit](#step-4-commit)
     * [Step 5: Test](#step-5-test)
     * [Step 6: Push](#step-6-push)
-
   * [Code Style Guide](#code-style-guide)
 * [Developer's Certificate of Origin 1.1](#developers-certificate-of-origin-11)
 * [Doc Credit](#doc-credit)

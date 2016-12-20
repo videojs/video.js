@@ -4,14 +4,10 @@
 
 * [Problems with media formats](#problems-with-media-formats)
   * [Choosing a video format](#choosing-a-video-format)
-
     * [I want to have a single source and don't care about live/adaptive streaming:](#i-want-to-have-a-single-source-and-dont-care-about-liveadaptive-streaming)
     * [I need adaptive streaming or live streaming](#i-need-adaptive-streaming-or-live-streaming)
-
   * [Make sure you are using formats that video.js can play:](#make-sure-you-are-using-formats-that-videojs-can-play)
-
   * [Make sure that the codec for that is being used in the file container is supported:](#make-sure-that-the-codec-for-that-is-being-used-in-the-file-container-is-supported)
-
   * [If you are using Flash videos:](#if-you-are-using-flash-videos)
 * [Problems when hosting media](#problems-when-hosting-media)
 * [Problems with Fullscreen](#problems-with-fullscreen)

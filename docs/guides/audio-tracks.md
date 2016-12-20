@@ -13,7 +13,6 @@ cross-browser implementation of audio tracks.
   * [Removing an Audio Track from the Player](#removing-an-audio-track-from-the-player)
 * [API](#api)
   * [videojs.AudioTrack](#videojsaudiotrack)
-
     * [id](#id)
     * [kind](#kind)
     * [label](#label)

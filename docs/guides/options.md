@@ -6,25 +6,16 @@
 
 * [Standard &lt;video> Element Options](#standard-video-element-options)
   * [autoplay](#autoplay)
-
   * [controls](#controls)
-
   * [height](#height)
-
   * [loop](#loop)
-
   * [muted](#muted)
-
   * [poster](#poster)
-
   * [preload](#preload)
-
     * ['auto'](#auto)
     * ['metadata'](#metadata)
     * ['none'](#none)
-
   * [src](#src)
-
   * [width](#width)
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
@@ -45,7 +36,6 @@
   * [${componentName}](#componentname)
 * [Tech Options](#tech-options)
   * [${techName}](#techname)
-
     * [nativeControlsForTouch](#nativecontrolsfortouch-1)
     * [nativeTextTracks](#nativetexttracks)
 

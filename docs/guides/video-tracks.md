@@ -13,7 +13,6 @@ Video tracks are a feature of HTML5 video for providing alternate video tracks t
   * [Removing an Video Track from the Player](#removing-an-video-track-from-the-player)
 * [API](#api)
   * [videojs.VideoTrack](#videojsvideotrack)
-
     * [id](#id)
     * [kind](#kind)
     * [label](#label)

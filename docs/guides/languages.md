@@ -14,13 +14,9 @@ For an up-to-date list of the languages Video.js supports, see the [languages fo
   * [Writing a New Translation](#writing-a-new-translation)
 * [Advanced Language Usage](#advanced-language-usage)
   * [Adding Languages via the API](#adding-languages-via-the-api)
-
   * [Per-Player Languages](#per-player-languages)
-
   * [Setting Default Player Language](#setting-default-player-language)
-
   * [Determining Player Language](#determining-player-language)
-
     * [Internal Language Selection](#internal-language-selection)
 * [References](#references)
 

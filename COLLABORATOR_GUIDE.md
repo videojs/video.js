@@ -7,21 +7,16 @@
   * [Involving the TSC](#involving-the-tsc)
 * [Landing a PR](#landing-a-pr)
   * [Landing a PR manually](#landing-a-pr-manually)
-
     * [Landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
-
     * [I just made a mistake](#i-just-made-a-mistake)
-
       * [I accidentally pushed a broken commit or incorrect commit to master](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-master)
       * [I lost changes](#i-lost-changes)
       * [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
 * [video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
-
     * [Install contrib](#install-contrib)
     * [npm access](#npm-access)
     * [GitHub personal access token](#github-personal-access-token)
-
   * [Doing a release](#doing-a-release)
 * [Doc credit](#doc-credit)
 

@@ -8,12 +8,10 @@ Text tracks are a feature of HTML5 video for displaying time-triggered text to t
 * [Creating the Text File](#creating-the-text-file)
 * [Adding Text Tracks to Video.js](#adding-text-tracks-to-videojs)
   * [track Attributes](#track-attributes)
-
     * [kind](#kind)
     * [label](#label)
     * [default](#default)
     * [srclang](#srclang)
-
   * [Text Tracks from Another Domain](#text-tracks-from-another-domain)
 * [Working with Text Tracks](#working-with-text-tracks)
   * [Showing Tracks Programmatically](#showing-tracks-programmatically)
