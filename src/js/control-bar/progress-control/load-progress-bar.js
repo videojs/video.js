@@ -5,15 +5,21 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
 /**
- * Shows load progress
+ * Shows loading progress
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Component
- * @class LoadProgressBar
  */
 class LoadProgressBar extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
     this.partEls_ = [];
@@ -21,10 +27,10 @@ class LoadProgressBar extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
@@ -36,9 +42,12 @@ class LoadProgressBar extends Component {
   /**
    * Update progress bar
    *
-   * @method update
+   * @param {EventTarget~Event} [event]
+   *        The `progress` event that caused this function to run.
+   *
+   * @listens Player#progress
    */
-  update() {
+  update(event) {
     const buffered = this.player_.buffered();
     const duration = this.player_.duration();
     const bufferedEnd = this.player_.bufferedEnd();

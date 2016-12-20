@@ -1,19 +1,23 @@
 /**
  * @file log.js
+ * @module log
  */
 import window from 'global/window';
 import {IE_VERSION} from './browser';
+import {isObject} from './obj';
 
 let log;
 
 /**
  * Log messages to the console and history based on the type of message
  *
- * @param  {String} type
+ * @param  {string} type
  *         The name of the console method to use.
+ *
  * @param  {Array} args
  *         The arguments to be passed to the matching console method.
- * @param  {Boolean} [stringify]
+ *
+ * @param  {boolean} [stringify]
  *         By default, only old IEs should get console argument stringification,
  *         but this is exposed as a parameter to facilitate testing.
  */
@@ -48,7 +52,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   // objects and arrays for those less-capable browsers.
   if (stringify) {
     args = args.map(a => {
-      if (a && typeof a === 'object' || Array.isArray(a)) {
+      if (isObject(a) || Array.isArray(a)) {
         try {
           return JSON.stringify(a);
         } catch (x) {
@@ -74,7 +78,8 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
 /**
  * Log plain debug messages
  *
- * @function log
+ * @param {Mixed[]} args
+ *        One or more messages or objects that should be logged.
  */
 log = function(...args) {
   logByType('log', args);
@@ -90,14 +95,16 @@ log.history = [];
 /**
  * Log error messages
  *
- * @method error
+ * @param {Mixed[]} args
+ *        One or more messages or objects that should be logged as an error
  */
 log.error = (...args) => logByType('error', args);
 
 /**
  * Log warning messages
  *
- * @method warn
+ * @param {Mixed[]} args
+ *        One or more messages or objects that should be logged as a warning.
  */
 log.warn = (...args) => logByType('warn', args);
 

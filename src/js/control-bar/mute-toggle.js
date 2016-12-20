@@ -6,15 +6,21 @@ import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
- * A button component for muting the audio
+ * A button component for muting the audio.
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Button
- * @class MuteToggle
  */
 class MuteToggle extends Button {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -38,30 +44,40 @@ class MuteToggle extends Button {
   }
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     return `vjs-mute-control ${super.buildCSSClass()}`;
   }
 
   /**
-   * Handle click on mute
+   * This gets called when an `MuteToggle` is "clicked". See
+   * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} [event]
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens tap
+   * @listens click
    */
-  handleClick() {
+  handleClick(event) {
     this.player_.muted(this.player_.muted() ? false : true);
   }
 
   /**
-   * Update volume
+   * Update the state of volume.
    *
-   * @method update
+   * @param {EventTarget~Event} [event]
+   *        The {@link Player#loadstart} event if this function was called through an
+   *        event.
+   *
+   * @listens Player#loadstart
    */
-  update() {
+  update(event) {
     const vol = this.player_.volume();
     let level = 3;
 
@@ -91,6 +107,12 @@ class MuteToggle extends Button {
 
 }
 
+/**
+ * The text that should display over the `MuteToggle`s controls. Added for localization.
+ *
+ * @type {string}
+ * @private
+ */
 MuteToggle.prototype.controlText_ = 'Mute';
 
 Component.registerComponent('MuteToggle', MuteToggle);

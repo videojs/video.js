@@ -24,18 +24,17 @@ import './playback-rate-menu/playback-rate-menu-button.js';
 import './spacer-controls/custom-control-spacer.js';
 
 /**
- * Container of main controls
+ * Container of main controls.
  *
  * @extends Component
- * @class ControlBar
  */
 class ControlBar extends Component {
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
@@ -48,6 +47,12 @@ class ControlBar extends Component {
   }
 }
 
+/**
+ * Default options for `ControlBar`
+ *
+ * @type {Object}
+ * @private
+ */
 ControlBar.prototype.options_ = {
   children: [
     'playToggle',

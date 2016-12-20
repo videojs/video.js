@@ -8,13 +8,19 @@ import formatTime from '../../utils/format-time.js';
 /**
  * Displays the time left in the video
  *
- * @param {Player|Object} player
- * @param {Object=} options
  * @extends Component
- * @class RemainingTimeDisplay
  */
 class RemainingTimeDisplay extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -23,10 +29,10 @@ class RemainingTimeDisplay extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     const el = super.createEl('div', {
@@ -47,11 +53,15 @@ class RemainingTimeDisplay extends Component {
   }
 
   /**
-   * Update remaining time display
+   * Update remaining time display.
    *
-   * @method updateContent
+   * @param {EventTarget~Event} [event]
+   *        The `timeupdate` or `durationchange` event that caused this to run.
+   *
+   * @listens Player#timeupdate
+   * @listens Player#durationchange
    */
-  updateContent() {
+  updateContent(event) {
     if (this.player_.duration()) {
       const localizedText = this.localize('Remaining Time');
       const formattedTime = formatTime(this.player_.remainingTime());

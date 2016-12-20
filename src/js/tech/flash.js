@@ -12,20 +12,28 @@ import { createTimeRange } from '../utils/time-ranges.js';
 import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 
 const navigator = window.navigator;
 
 /**
- * Flash Media Controller - Wrapper for fallback SWF API
+ * Flash Media Controller - Wrapper for Flash Media API
  *
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready Ready callback function
+ * @mixes FlashRtmpDecorator
+ * @mixes Tech~SouceHandlerAdditions
  * @extends Tech
- * @class Flash
  */
 class Flash extends Tech {
 
+ /**
+  * Create an instance of this Tech.
+  *
+  * @param {Object} [options]
+  *        The key/value store of player options.
+  *
+  * @param {Component~ReadyCallback} ready
+  *        Callback function to call when the `Flash` Tech is ready.
+  */
   constructor(options, ready) {
     super(options, ready);
 
@@ -59,13 +67,14 @@ class Flash extends Tech {
     this.on('seeked', function() {
       this.lastSeekTarget_ = undefined;
     });
+
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Flash` Tech's DOM element.
    *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl() {
     const options = this.options_;
@@ -122,9 +131,7 @@ class Flash extends Tech {
   }
 
   /**
-   * Play for flash tech
-   *
-   * @method play
+   * Called by {@link Player#play} to play using the `Flash` `Tech`.
    */
   play() {
     if (this.ended()) {
@@ -134,20 +141,24 @@ class Flash extends Tech {
   }
 
   /**
-   * Pause for flash tech
-   *
-   * @method pause
+   * Called by {@link Player#pause} to pause using the `Flash` `Tech`.
    */
   pause() {
     this.el_.vjs_pause();
   }
 
   /**
-   * Get/set video
+   * A getter/setter for the `Flash` Tech's source object.
+   * > Note: Please use {@link Flash#setSource}
    *
-   * @param {Object=} src Source object
-   * @return {Object}
-   * @method src
+   * @param {Tech~SourceObject} [src]
+   *        The source object you want to set on the `Flash` techs.
+   *
+   * @return {Tech~SourceObject|undefined}
+   *         - The current source object when a source is not passed in.
+   *         - undefined when setting
+   *
+   * @deprecated Since version 5.
    */
   src(src) {
     if (src === undefined) {
@@ -159,11 +170,14 @@ class Flash extends Tech {
   }
 
   /**
-   * Set video
+   * A getter/setter for the `Flash` Tech's source object.
    *
-   * @param {Object=} src Source object
-   * @deprecated
-   * @method setSrc
+   * @param {Tech~SourceObject} [src]
+   *        The source object you want to set on the `Flash` techs.
+   *
+   * @return {Tech~SourceObject|undefined}
+   *         - The current source object when a source is not passed in.
+   *         - undefined when setting
    */
   setSrc(src) {
     // Make sure source URL is absolute.
@@ -178,18 +192,21 @@ class Flash extends Tech {
   }
 
   /**
-   * Returns true if the tech is currently seeking.
-   * @return {boolean} true if seeking
+   * Indicates whether the media is currently seeking to a new position or not.
+   *
+   * @return {boolean}
+   *         - True if seeking to a new position
+   *         - False otherwise
    */
   seeking() {
     return this.lastSeekTarget_ !== undefined;
   }
 
   /**
-   * Set current time
+   * Returns the current time in seconds that the media is at in playback.
    *
-   * @param {Number} time Current time of video
-   * @method setCurrentTime
+   * @param {number} time
+   *        Current playtime of the media in seconds.
    */
   setCurrentTime(time) {
     const seekable = this.seekable();
@@ -207,13 +224,12 @@ class Flash extends Tech {
   }
 
   /**
-   * Get current time
+   * Get the current playback time in seconds
    *
-   * @param {Number=} time Current time of video
-   * @return {Number} Current time
-   * @method currentTime
+   * @return {number}
+   *         The current time of playback in seconds.
    */
-  currentTime(time) {
+  currentTime() {
     // when seeking make the reported time keep up with the requested time
     // by reading the time we're seeking to
     if (this.seeking()) {
@@ -223,9 +239,11 @@ class Flash extends Tech {
   }
 
   /**
-   * Get current source
+   * Get the current source
    *
    * @method currentSrc
+   * @return {Tech~SourceObject}
+   *         The current source
    */
   currentSrc() {
     if (this.currentSource_) {
@@ -235,9 +253,10 @@ class Flash extends Tech {
   }
 
   /**
-   * Get media duration
+   * Get the total duration of the current media.
    *
-   * @returns {Number} Media duration
+   * @return {number}
+   8          The total duration of the current media.
    */
   duration() {
     if (this.readyState() === 0) {
@@ -249,35 +268,29 @@ class Flash extends Tech {
   }
 
   /**
-   * Load media into player
-   *
-   * @method load
+   * Load media into Tech.
    */
   load() {
     this.el_.vjs_load();
   }
 
   /**
-   * Get poster
-   *
-   * @method poster
+   * Get the poster image that was set on the tech.
    */
   poster() {
     this.el_.vjs_getProperty('poster');
   }
 
   /**
-   * Poster images are not handled by the Flash tech so make this a no-op
-   *
-   * @method setPoster
+   * Poster images are not handled by the Flash tech so make this is a no-op.
    */
   setPoster() {}
 
   /**
-   * Determine if can seek in media
+   * Determine the time ranges that can be seeked to in the media.
    *
-   * @return {TimeRangeObject}
-   * @method seekable
+   * @return {TimeRange}
+   *         Returns the time ranges that can be seeked to.
    */
   seekable() {
     const duration = this.duration();
@@ -289,10 +302,10 @@ class Flash extends Tech {
   }
 
   /**
-   * Get buffered time range
+   * Get and create a `TimeRange` object for buffering.
    *
-   * @return {TimeRangeObject}
-   * @method buffered
+   * @return {TimeRange}
+   *         The time range object that was created.
    */
   buffered() {
     const ranges = this.el_.vjs_getProperty('buffered');
@@ -305,11 +318,12 @@ class Flash extends Tech {
 
   /**
    * Get fullscreen support -
-   * Flash does not allow fullscreen through javascript
-   * so always returns false
    *
-   * @return {Boolean} false
-   * @method supportsFullScreen
+   * Flash does not allow fullscreen through javascript
+   * so this always returns false.
+   *
+   * @return {boolean}
+   *         The Flash tech does not support fullscreen, so it will always return false.
    */
   supportsFullScreen() {
     // Flash does not allow fullscreen through javascript
@@ -317,12 +331,11 @@ class Flash extends Tech {
   }
 
   /**
-   * Request to enter fullscreen
    * Flash does not allow fullscreen through javascript
-   * so always returns false
+   * so this always returns false.
    *
-   * @return {Boolean} false
-   * @method enterFullScreen
+   * @return {boolean}
+   *         The Flash tech does not support fullscreen, so it will always return false.
    */
   enterFullScreen() {
     return false;
@@ -360,8 +373,392 @@ for (let i = 0; i < _readOnly.length; i++) {
   _createGetter(_readOnly[i]);
 }
 
+/** ------------------------------ Getters ------------------------------ **/
+/**
+ * Get the value of `rtmpConnection` from the swf.
+ *
+ * @method Flash.prototype.rtmpConnection
+ * @return {string}
+ *         The current value of `rtmpConnection` on the swf.
+ */
+
+/**
+ * Get the value of `rtmpStream` from the swf.
+ *
+ * @method Flash.prototype.rtmpStream
+ * @return {string}
+ *         The current value of `rtmpStream` on the swf.
+ */
+
+/**
+ * Get the value of `preload` from the swf. `preload` indicates
+ * what should download before the media is interacted with. It can have the following
+ * values:
+ * - none: nothing should be downloaded
+ * - metadata: poster and the first few frames of the media may be downloaded to get
+ *   media dimensions and other metadata
+ * - auto: allow the media and metadata for the media to be downloaded before
+ *    interaction
+ *
+ * @method Flash.prototype.preload
+ * @return {string}
+ *         The value of `preload` from the swf. Will be 'none', 'metadata',
+ *         or 'auto'.
+ */
+
+/**
+ * Get the value of `defaultPlaybackRate` from the swf.
+ *
+ * @method Flash.prototype.defaultPlaybackRate
+ * @return {number}
+ *         The current value of `defaultPlaybackRate` on the swf.
+ */
+
+/**
+ * Get the value of `playbackRate` from the swf. `playbackRate` indicates
+ * the rate at which the media is currently playing back. Examples:
+ *   - if playbackRate is set to 2, media will play twice as fast.
+ *   - if playbackRate is set to 0.5, media will play half as fast.
+ *
+ * @method Flash.prototype.playbackRate
+ * @return {number}
+ *         The value of `playbackRate` from the swf. A number indicating
+ *         the current playback speed of the media, where 1 is normal speed.
+ */
+
+/**
+ * Get the value of `autoplay` from the swf. `autoplay` indicates
+ * that the media should start to play as soon as the page is ready.
+ *
+ * @method Flash.prototype.autoplay
+ * @return {boolean}
+ *         - The value of `autoplay` from the swf.
+ *         - True indicates that the media ashould start as soon as the page loads.
+ *         - False indicates that the media should not start as soon as the page loads.
+ */
+
+/**
+ * Get the value of `loop` from the swf. `loop` indicates
+ * that the media should return to the start of the media and continue playing once
+ * it reaches the end.
+ *
+ * @method Flash.prototype.loop
+ * @return {boolean}
+ *         - The value of `loop` from the swf.
+ *         - True indicates that playback should seek back to start once
+ *           the end of a media is reached.
+ *         - False indicates that playback should not loop back to the start when the
+ *           end of the media is reached.
+ */
+
+/**
+ * Get the value of `mediaGroup` from the swf.
+ *
+ * @method Flash.prototype.mediaGroup
+ * @return {string}
+ *         The current value of `mediaGroup` on the swf.
+ */
+
+/**
+ * Get the value of `controller` from the swf.
+ *
+ * @method Flash.prototype.controller
+ * @return {string}
+ *         The current value of `controller` on the swf.
+ */
+
+/**
+ * Get the value of `controls` from the swf. `controls` indicates
+ * whether the native flash controls should be shown or hidden.
+ *
+ * @method Html5.prototype.controls
+ * @return {boolean}
+ *         - The value of `controls` from the swf.
+ *         - True indicates that native controls should be showing.
+ *         - False indicates that native controls should be hidden.
+ */
+
+/**
+ * Get the value of the `volume` from the swf. `volume` indicates the current
+ * audio level as a percentage in decimal form. This means that 1 is 100%, 0.5 is 50%, and
+ * so on.
+ *
+ * @method Flash.prototype.volume
+ * @return {number}
+ *         The volume percent as a decimal. Value will be between 0-1.
+ */
+
+/**
+ * Get the value of the `muted` from the swf. `muted` indicates the current
+ * audio level should be silent.
+ *
+ * @method Flash.prototype.muted
+ * @return {boolean}
+ *         - True if the audio should be set to silent
+ *         - False otherwise
+ */
+
+/**
+ * Get the value of `defaultMuted` from the swf. `defaultMuted` indicates
+ * whether the media should start muted or not. Only changes the default state of the
+ * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
+ * current state.
+ *
+ * @method Flash.prototype.defaultMuted
+ * @return {boolean}
+ *         - The value of `defaultMuted` from the swf.
+ *         - True indicates that the media should start muted.
+ *         - False indicates that the media should not start muted.
+ */
+
+/**
+ * Get the value of `networkState` from the swf. `networkState` indicates
+ * the current network state. It returns an enumeration from the following list:
+ * - 0: NETWORK_EMPTY
+ * - 1: NEWORK_IDLE
+ * - 2: NETWORK_LOADING
+ * - 3: NETWORK_NO_SOURCE
+ *
+ * @method Flash.prototype.networkState
+ * @return {number}
+ *         The value of `networkState` from the swf. This will be a number
+ *         from the list in the description.
+ */
+
+/**
+ * Get the value of `readyState` from the swf. `readyState` indicates
+ * the current state of the media element. It returns an enumeration from the
+ * following list:
+ * - 0: HAVE_NOTHING
+ * - 1: HAVE_METADATA
+ * - 2: HAVE_CURRENT_DATA
+ * - 3: HAVE_FUTURE_DATA
+ * - 4: HAVE_ENOUGH_DATA
+ *
+ * @method Flash.prototype.readyState
+ * @return {number}
+ *         The value of `readyState` from the swf. This will be a number
+ *         from the list in the description.
+ */
+
+/**
+ * Get the value of `readyState` from the swf. `readyState` indicates
+ * the current state of the media element. It returns an enumeration from the
+ * following list:
+ * - 0: HAVE_NOTHING
+ * - 1: HAVE_METADATA
+ * - 2: HAVE_CURRENT_DATA
+ * - 3: HAVE_FUTURE_DATA
+ * - 4: HAVE_ENOUGH_DATA
+ *
+ * @method Flash.prototype.readyState
+ * @return {number}
+ *         The value of `readyState` from the swf. This will be a number
+ *         from the list in the description.
+ */
+
+/**
+ * Get the value of `initialTime` from the swf.
+ *
+ * @method Flash.prototype.initialTime
+ * @return {number}
+ *         The `initialTime` proprety on the swf.
+ */
+
+/**
+ * Get the value of `startOffsetTime` from the swf.
+ *
+ * @method Flash.prototype.startOffsetTime
+ * @return {number}
+ *         The `startOffsetTime` proprety on the swf.
+ */
+
+/**
+ * Get the value of `paused` from the swf. `paused` indicates whether the swf
+ * is current paused or not.
+ *
+ * @method Flash.prototype.paused
+ * @return {boolean}
+ *         The value of `paused` from the swf.
+ */
+
+/**
+ * Get the value of `ended` from the swf. `ended` indicates whether
+ * the media has reached the end or not.
+ *
+ * @method Flash.prototype.ended
+ * @return {boolean}
+ *         - True indicates that the media has ended.
+ *         - False indicates that the media has not ended.
+ *
+ * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-ended}
+ */
+
+/**
+ * Get the value of `videoWidth` from the swf. `videoWidth` indicates
+ * the current width of the media in css pixels.
+ *
+ * @method Flash.prototype.videoWidth
+ * @return {number}
+ *         The value of `videoWidth` from the swf. This will be a number
+ *         in css pixels.
+ */
+
+/**
+ * Get the value of `videoHeight` from the swf. `videoHeigth` indicates
+ * the current height of the media in css pixels.
+ *
+ * @method Flassh.prototype.videoHeight
+ * @return {number}
+ *         The value of `videoHeight` from the swf. This will be a number
+ *         in css pixels.
+ */
+/** ------------------------------ Setters ------------------------------ **/
+
+/**
+ * Set the value of `rtmpConnection` on the swf.
+ *
+ * @method Flash.prototype.setRtmpConnection
+ * @param {string} rtmpConnection
+ *        New value to set the `rtmpConnection` property to.
+ */
+
+/**
+ * Set the value of `rtmpStream` on the swf.
+ *
+ * @method Flash.prototype.setRtmpStream
+ * @param {string} rtmpStream
+ *        New value to set the `rtmpStream` property to.
+ */
+
+/**
+ * Set the value of `preload` on the swf. `preload` indicates
+ * what should download before the media is interacted with. It can have the following
+ * values:
+ * - none: nothing should be downloaded
+ * - metadata: poster and the first few frames of the media may be downloaded to get
+ *   media dimensions and other metadata
+ * - auto: allow the media and metadata for the media to be downloaded before
+ *    interaction
+ *
+ * @method Flash.prototype.setPreload
+ * @param {string} preload
+ *        The value of `preload` to set on the swf. Should be 'none', 'metadata',
+ *        or 'auto'.
+ */
+
+/**
+ * Set the value of `defaultPlaybackRate` on the swf.
+ *
+ * @method Flash.prototype.setDefaultPlaybackRate
+ * @param {number} defaultPlaybackRate
+ *        New value to set the `defaultPlaybackRate` property to.
+ */
+
+/**
+ * Set the value of `playbackRate` on the swf. `playbackRate` indicates
+ * the rate at which the media is currently playing back. Examples:
+ *   - if playbackRate is set to 2, media will play twice as fast.
+ *   - if playbackRate is set to 0.5, media will play half as fast.
+ *
+ * @method Flash.prototype.setPlaybackRate
+ * @param {number} playbackRate
+ *        New value of `playbackRate` on the swf. A number indicating
+ *        the current playback speed of the media, where 1 is normal speed.
+ */
+
+/**
+ * Set the value of `autoplay` on the swf. `autoplay` indicates
+ * that the media should start to play as soon as the page is ready.
+ *
+ * @method Flash.prototype.setAutoplay
+ * @param {boolean} autoplay
+ *        - The value of `autoplay` from the swf.
+ *        - True indicates that the media ashould start as soon as the page loads.
+ *        - False indicates that the media should not start as soon as the page loads.
+ */
+
+/**
+ * Set the value of `loop` on the swf. `loop` indicates
+ * that the media should return to the start of the media and continue playing once
+ * it reaches the end.
+ *
+ * @method Flash.prototype.setLoop
+ * @param {boolean} loop
+ *        - True indicates that playback should seek back to start once
+ *          the end of a media is reached.
+ *        - False indicates that playback should not loop back to the start when the
+ *          end of the media is reached.
+ */
+
+/**
+ * Set the value of `mediaGroup` on the swf.
+ *
+ * @method Flash.prototype.setMediaGroup
+ * @param {string} mediaGroup
+ *        New value of `mediaGroup` to set on the swf.
+ */
+
+/**
+ * Set the value of `controller` on the swf.
+ *
+ * @method Flash.prototype.setController
+ * @param {string} controller
+ *        New value the current value of `controller` on the swf.
+ */
+
+/**
+ * Get the value of `controls` from the swf. `controls` indicates
+ * whether the native flash controls should be shown or hidden.
+ *
+ * @method Flash.prototype.controls
+ * @return {boolean}
+ *         - The value of `controls` from the swf.
+ *         - True indicates that native controls should be showing.
+ *         - False indicates that native controls should be hidden.
+ */
+
+/**
+ * Set the value of the `volume` on the swf. `volume` indicates the current
+ * audio level as a percentage in decimal form. This means that 1 is 100%, 0.5 is 50%, and
+ * so on.
+ *
+ * @method Flash.prototype.setVolume
+ * @param {number} percentAsDecimal
+ *         The volume percent as a decimal. Value will be between 0-1.
+ */
+
+/**
+ * Set the value of the `muted` on the swf. `muted` indicates that the current
+ * audio level should be silent.
+ *
+ * @method Flash.prototype.setMuted
+ * @param {boolean} muted
+ *         - True if the audio should be set to silent
+ *         - False otherwise
+ */
+
+/**
+ * Set the value of `defaultMuted` on the swf. `defaultMuted` indicates
+ * whether the media should start muted or not. Only changes the default state of the
+ * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
+ * current state.
+ *
+ * @method Flash.prototype.setDefaultMuted
+ * @param {boolean} defaultMuted
+ *         - True indicates that the media should start muted.
+ *         - False indicates that the media should not start muted.
+ */
+
 /* Flash Support Testing -------------------------------------------------------- */
 
+/**
+ * Check if the Flash tech is currently supported.
+ *
+ * @return {boolean}
+ *          - True if the flash tech is supported.
+ *          - False otherwise.
+ */
 Flash.isSupported = function() {
   return Flash.version()[0] >= 10;
   // return swfobject.hasFlashPlayerVersion('10');
@@ -371,18 +768,24 @@ Flash.isSupported = function() {
 Tech.withSourceHandlers(Flash);
 
 /*
- * The default native source handler.
- * This simply passes the source to the video element. Nothing fancy.
+ * Native source handler for flash,  simply passes the source to the swf element.
  *
- * @param  {Object} source   The source object
- * @param  {Flash} tech  The instance of the Flash tech
+ * @property {Tech~SourceObject} source
+ *           The source object
+ *
+ * @property {Flash} tech
+ *           The instance of the Flash tech
  */
 Flash.nativeSourceHandler = {};
 
 /**
- * Check if Flash can play the given videotype
- * @param  {String} type    The mimetype to check
- * @return {String}         'probably', 'maybe', or '' (empty string)
+ * Check if the Flash can play the given mime type.
+ *
+ * @param {string} type
+ *        The mimetype to check
+ *
+ * @return {string}
+ *         'maybe', or '' (empty string)
  */
 Flash.nativeSourceHandler.canPlayType = function(type) {
   if (type in Flash.formats) {
@@ -392,12 +795,17 @@ Flash.nativeSourceHandler.canPlayType = function(type) {
   return '';
 };
 
-/*
- * Check Flash can handle the source natively
+/**
+ * Check if the media element can handle a source natively.
  *
- * @param  {Object} source  The source object
- * @param  {Object} options The options passed to the tech
- * @return {String}         'probably', 'maybe', or '' (empty string)
+ * @param {Tech~SourceObject} source
+ *         The source object
+ *
+ * @param {Object} [options]
+ *         Options to be passed to the tech.
+ *
+ * @return {string}
+ *         'maybe', or '' (empty string).
  */
 Flash.nativeSourceHandler.canHandleSource = function(source, options) {
   let type;
@@ -421,28 +829,35 @@ Flash.nativeSourceHandler.canHandleSource = function(source, options) {
   return Flash.nativeSourceHandler.canPlayType(type);
 };
 
-/*
- * Pass the source to the flash object
- * Adaptive source handlers will have more complicated workflows before passing
- * video data to the video element
+/**
+ * Pass the source to the swf.
  *
- * @param  {Object} source   The source object
- * @param  {Flash}  tech     The instance of the Flash tech
- * @param  {Object} options  The options to pass to the source
+ * @param {Tech~SourceObject} source
+ *        The source object
+ *
+ * @param {Flash} tech
+ *        The instance of the Flash tech
+ *
+ * @param {Object} [options]
+ *        The options to pass to the source
  */
 Flash.nativeSourceHandler.handleSource = function(source, tech, options) {
   tech.setSrc(source.src);
 };
 
-/*
- * Clean up the source handler when disposing the player or switching sources..
- * (no cleanup is needed when supporting the format natively)
+/**
+ * noop for native source handler dispose, as cleanup will happen automatically.
  */
 Flash.nativeSourceHandler.dispose = function() {};
 
 // Register the native source handler
 Flash.registerSourceHandler(Flash.nativeSourceHandler);
 
+/**
+ * Flash supported mime types.
+ *
+ * @constant {Object}
+ */
 Flash.formats = {
   'video/flv': 'FLV',
   'video/x-flv': 'FLV',
@@ -450,6 +865,10 @@ Flash.formats = {
   'video/m4v': 'MP4'
 };
 
+/**
+ * Called when the the swf is "ready", and makes sure that the swf is really
+ * ready using {@link Flash#checkReady}
+ */
 Flash.onReady = function(currSwf) {
   const el = Dom.getEl(currSwf);
   const tech = el && el.tech;
@@ -462,8 +881,14 @@ Flash.onReady = function(currSwf) {
   }
 };
 
-// The SWF isn't always ready when it says it is. Sometimes the API functions still need to be added to the object.
-// If it's not ready, we set a timeout to check again shortly.
+/**
+ * The SWF isn't always ready when it says it is. Sometimes the API functions still
+ * need to be added to the object. If it's not ready, we set a timeout to check again
+ * shortly.
+ *
+ * @param {Flash} tech
+ *        The instance of the flash tech to check.
+ */
 Flash.checkReady = function(tech) {
   // stop worrying if the tech has been disposed
   if (!tech.el()) {
@@ -482,7 +907,15 @@ Flash.checkReady = function(tech) {
   }
 };
 
-// Trigger events from the swf on the player
+/**
+ * Trigger events from the swf on the Flash Tech.
+ *
+ * @param {number} swfID
+ *        The id of the swf that had the event
+ *
+ * @param {string} eventName
+ *        The name of the event to trigger
+ */
 Flash.onEvent = function(swfID, eventName) {
   const tech = Dom.getEl(swfID).tech;
   const args = Array.prototype.slice.call(arguments, 2);
@@ -497,7 +930,19 @@ Flash.onEvent = function(swfID, eventName) {
   }, 1);
 };
 
-// Log errors from the swf
+/**
+ * Log errors from the swf on the Flash tech.
+ *
+ * @param {number} swfID
+ *        The id of the swf that had an error.
+ *
+ * @param {string} The error string
+ *        The error to set on the Flash Tech.
+ *
+ * @return {MediaError|undefined}
+ *          - Returns a MediaError when err is 'srcnotfound'
+ *          - Returns undefined otherwise.
+ */
 Flash.onError = function(swfID, err) {
   const tech = Dom.getEl(swfID).tech;
 
@@ -510,7 +955,12 @@ Flash.onError = function(swfID, err) {
   tech.error('FLASH: ' + err);
 };
 
-// Flash Version Check
+/**
+ * Get the current version of Flash that is in use on the page.
+ *
+ * @return {Array}
+ *          an array of versions that are available.
+ */
 Flash.version = function() {
   let version = '0,0,0';
 
@@ -531,7 +981,24 @@ Flash.version = function() {
   return version.split(',');
 };
 
-// Flash embedding method. Only used in non-iframe mode
+/**
+ * Only use for non-iframe embeds.
+ *
+ * @param {Object} swf
+ *        The videojs-swf object.
+ *
+ * @param {Object} flashVars
+ *        Names and values to use as flash option variables.
+ *
+ * @param {Object} params
+ *        Style parameters to set on the object.
+ *
+ * @param {Object} attributes
+ *        Attributes to set on the element.
+ *
+ * @return {Element}
+ *          The embeded Flash DOM element.
+ */
 Flash.embed = function(swf, flashVars, params, attributes) {
   const code = Flash.getEmbedCode(swf, flashVars, params, attributes);
 
@@ -541,6 +1008,24 @@ Flash.embed = function(swf, flashVars, params, attributes) {
   return obj;
 };
 
+/**
+ * Only use for non-iframe embeds.
+ *
+ * @param {Object} swf
+ *        The videojs-swf object.
+ *
+ * @param {Object} flashVars
+ *        Names and values to use as flash option variables.
+ *
+ * @param {Object} params
+ *        Style parameters to set on the object.
+ *
+ * @param {Object} attributes
+ *        Attributes to set on the element.
+ *
+ * @return {Element}
+ *          The embeded Flash DOM element.
+ */
 Flash.getEmbedCode = function(swf, flashVars, params, attributes) {
   const objTag = '<object type="application/x-shockwave-flash" ';
   let flashVarsString = '';

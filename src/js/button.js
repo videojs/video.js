@@ -4,26 +4,29 @@
 import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
-import assign from 'object.assign';
+import {assign} from './utils/obj';
 
 /**
- * Base class for all buttons
+ * Base class for all buttons.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
  * @extends ClickableComponent
- * @class Button
  */
 class Button extends ClickableComponent {
 
   /**
-   * Create the component's DOM element
+   * Create the `Button`s DOM element.
    *
-   * @param {String=} type Element's node type. e.g. 'div'
-   * @param {Object=} props An object of properties that should be set on the element
-   * @param {Object=} attributes An object of attributes that should be set on the element
+   * @param {string} [tag=button]
+   *        Element's node type. e.g. 'button'
+   *
+   * @param {Object} [props={}]
+   *        An object of properties that should be set on the element.
+   *
+   * @param {Object} [attributes={}]
+   *        An object of attributes that should be set on the element.
+   *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl(tag = 'button', props = {}, attributes = {}) {
     props = assign({
@@ -62,13 +65,20 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Adds a child component inside this button
+   * Add a child `Component` inside of this `Button`.
    *
-   * @param {String|Component} child The class name or instance of a child to add
-   * @param {Object=} options Options, including options to be passed to children of the child.
-   * @return {Component} The child component (created by this process if a string was used)
-   * @deprecated
-   * @method addChild
+   * @param {string|Component} child
+   *        The name or instance of a child to add.
+   *
+   * @param {Object} [options={}]
+   *        The key/value store of options that will get passed to children of
+   *        the child.
+   *
+   * @return {Component}
+   *         The `Component` that gets added as a child. When using a string the
+   *         `Component` will get created by this process.
+   *
+   * @deprecated since version 5
    */
   addChild(child, options = {}) {
     const className = this.constructor.name;
@@ -80,10 +90,11 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Enable the button element
+   * Enable the `Button` element so that it can be activated or clicked. Use this with
+   * {@link Button#disable}.
    *
    * @return {Component}
-   * @method enable
+   *         Returns itself; method is chainable.
    */
   enable() {
     super.enable();
@@ -91,10 +102,11 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Disable the button element
+   * Enable the `Button` element so that it cannot be activated or clicked. Use this with
+   * {@link Button#enable}.
    *
    * @return {Component}
-   * @method disable
+   *         Returns itself; method is chainable.
    */
   disable() {
     super.disable();
@@ -102,9 +114,13 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Handle KeyPress (document level) - Extend with specific functionality for button
+   * This gets called when a `Button` has focus and `keydown` is triggered via a key
+   * press.
    *
-   * @method handleKeyPress
+   * @param {EventTarget~Event} event
+   *        The event that caused this function to get called.
+   *
+   * @listens keydown
    */
   handleKeyPress(event) {
 

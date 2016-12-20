@@ -1,8 +1,6 @@
 /**
  * @file html5.js
- * HTML5 Media Controller - Wrapper for HTML5 Media API
  */
-
 import Tech from './tech.js';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
@@ -13,19 +11,27 @@ import tsml from 'tsml';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 import mergeOptions from '../utils/merge-options.js';
 import toTitleCase from '../utils/to-title-case.js';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  *
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready Ready callback function
- * @class Html5
+ * @mixes Tech~SouceHandlerAdditions
+ * @extends Tech
  */
 class Html5 extends Tech {
 
+ /**
+  * Create an instance of this Tech.
+  *
+  * @param {Object} [options]
+  *        The key/value store of player options.
+  *
+  * @param {Component~ReadyCallback} ready
+  *        Callback function to call when the `HTML5` Tech is ready.
+  */
   constructor(options, ready) {
     super(options, ready);
 
@@ -100,6 +106,7 @@ class Html5 extends Tech {
           srcElement: techTracks
         });
       };
+
       this[`handle${capitalType}TrackAdd_`] = (e) => techTracks.addTrack(e.track);
       this[`handle${capitalType}TrackRemove_`] = (e) => techTracks.removeTrack(e.track);
 
@@ -141,7 +148,7 @@ class Html5 extends Tech {
   }
 
   /**
-   * Dispose of html5 media element
+   * Dispose of `HTML5` media element and remove all tracks.
    */
   dispose() {
     // Un-ProxyNativeTracks
@@ -167,9 +174,10 @@ class Html5 extends Tech {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Html5` Tech's DOM element.
    *
    * @return {Element}
+   *         The element that gets created.
    */
   createEl() {
     let el = this.options_.tag;
@@ -177,15 +185,21 @@ class Html5 extends Tech {
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
-    if (!el || this.movingMediaElementInDOM === false) {
+    // If we ingested the player div, we do not need to move the media element.
+    if (!el ||
+        !(this.options_.playerElIngest ||
+          this.movingMediaElementInDOM)) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
         const clone = el.cloneNode(true);
 
-        el.parentNode.insertBefore(clone, el);
+        if (el.parentNode) {
+          el.parentNode.insertBefore(clone, el);
+        }
         Html5.disposeMediaElement(el);
         el = clone;
+
       } else {
         el = document.createElement('video');
 
@@ -222,13 +236,21 @@ class Html5 extends Tech {
     }
 
     return el;
-    // jenniisawesome = true;
   }
 
-  // If we're loading the playback object after it has started loading
-  // or playing the video (often with autoplay on) then the loadstart event
-  // has already fired and we need to fire it manually because many things
-  // rely on it.
+  /**
+   * This will be triggered if the loadstart event has already fired, before videojs was
+   * ready. Two known examples of when this can happen are:
+   * 1. If we're loading the playback object after it has started loading
+   * 2. The media is already playing the (often with autoplay on) then
+   *
+   * This function will fire another loadstart so that videojs can catchup.
+   *
+   * @fires Tech#loadstart
+   *
+   * @return {undefined}
+   *         returns nothing.
+   */
   handleLateInit_(el) {
     if (el.networkState === 0 || el.networkState === 3) {
       // The video element hasn't started loading the source yet
@@ -309,6 +331,10 @@ class Html5 extends Tech {
     });
   }
 
+  /**
+   * Add event listeners to native text track events. This adds the native text tracks
+   * to our emulated {@link TextTrackList}.
+   */
   proxyNativeTextTracks_() {
     const tt = this.el().textTracks;
 
@@ -330,6 +356,14 @@ class Html5 extends Tech {
     }
   }
 
+  /**
+   * Handle any {@link TextTrackList} `change` event.
+   *
+   * @param {EventTarget~Event} e
+   *        The `change` event that caused this to run.
+   *
+   * @listens TextTrackList#change
+   */
   handleTextTrackChange(e) {
     const tt = this.textTracks();
 
@@ -341,23 +375,44 @@ class Html5 extends Tech {
     });
   }
 
+  /**
+   * Handle any {@link TextTrackList} `addtrack` event.
+   *
+   * @param {EventTarget~Event} e
+   *        The `addtrack` event that caused this to run.
+   *
+   * @listens TextTrackList#addtrack
+   */
   handleTextTrackAdd(e) {
     this.textTracks().addTrack_(e.track);
   }
 
+  /**
+   * Handle any {@link TextTrackList} `removetrack` event.
+   *
+   * @param {EventTarget~Event} e
+   *        The `removetrack` event that caused this to run.
+   *
+   * @listens TextTrackList#removetrack
+   */
   handleTextTrackRemove(e) {
     this.textTracks().removeTrack_(e.track);
   }
 
   /**
-   * This is a helper function that is used in removeOldTextTracks_, removeOldAudioTracks_ and
-   * removeOldVideoTracks_
-   * @param {Track[]} techTracks Tracks for this tech
-   * @param {Track[]} elTracks Tracks for the HTML5 video element
+   * This function removes any {@link AudioTrack}s, {@link VideoTrack}s, or
+   * {@link TextTrack}s that are not in the media elements TrackList.
+   *
+   * @param {TrackList} techTracks
+   *        HTML5 Tech's TrackList to search through
+   *
+   * @param {TrackList} elTracks
+   *        HTML5 media elements TrackList to search trough.
+   *
    * @private
    */
   removeOldTracks_(techTracks, elTracks) {
-    // This will loop over the techTracks and check if they are still used by the HTML5 video element
+    // This will loop over the techTracks and check if they are still used by the HTML5 media element
     // If not, they will be removed from the emulated list
     const removeTracks = [];
 
@@ -388,7 +443,13 @@ class Html5 extends Tech {
     }
   }
 
-  removeOldTextTracks_() {
+  /**
+   * Remove {@link TextTrack}s that dont exist in the native track list from our
+   * emulated {@link TextTrackList}.
+   *
+   * @listens Tech#loadstart
+   */
+  removeOldTextTracks_(e) {
     const techTracks = this.textTracks();
     const elTracks = this.el().textTracks;
 
@@ -396,7 +457,7 @@ class Html5 extends Tech {
   }
 
   /**
-   * Play for html5 tech
+   * Called by {@link Player#play} to play using the `Html5` `Tech`.
    */
   play() {
     const playPromise = this.el_.play();
@@ -409,9 +470,10 @@ class Html5 extends Tech {
   }
 
   /**
-   * Set current time
+   * Set current time for the `HTML5` tech.
    *
-   * @param {Number} seconds Current time of video
+   * @param {number} seconds
+   *        Set the current time of the media to this.
    */
   setCurrentTime(seconds) {
     try {
@@ -423,9 +485,10 @@ class Html5 extends Tech {
   }
 
   /**
-   * Get duration
+   * Get the current duration of the HTML5 media element.
    *
-   * @return {Number}
+   * @return {number}
+   *         The duration of the media or 0 if there is no duration.
    */
   duration() {
     // Android Chrome will report duration as Infinity for VOD HLS until after
@@ -443,11 +506,11 @@ class Html5 extends Tech {
             if (this.el_.duration === Infinity) {
               this.trigger('durationchange');
             }
-            this.off(this.player_, 'timeupdate', checkProgress);
+            this.off('timeupdate', checkProgress);
           }
         };
 
-        this.on(this.player_, 'timeupdate', checkProgress);
+        this.on('timeupdate', checkProgress);
         return NaN;
       }
     }
@@ -455,18 +518,20 @@ class Html5 extends Tech {
   }
 
   /**
-   * Get player width
+   * Get the current width of the HTML5 media element.
    *
-   * @return {Number}
+   * @return {number}
+   *         The width of the HTML5 media element.
    */
   width() {
     return this.el_.offsetWidth;
   }
 
   /**
-   * Get player height
+   * Get the current height of the HTML5 media element.
    *
-   * @return {Number}
+   * @return {number}
+   *         The heigth of the HTML5 media element.
    */
   height() {
     return this.el_.offsetHeight;
@@ -474,10 +539,13 @@ class Html5 extends Tech {
 
   /**
    * Proxy iOS `webkitbeginfullscreen` and `webkitendfullscreen` into
-   * `fullscreenchange` event
+   * `fullscreenchange` event.
    *
    * @private
-   * @method proxyWebkitFullscreen_
+   * @fires fullscreenchange
+   * @listens webkitendfullscreen
+   * @listens webkitbeginfullscreen
+   * @listens webkitbeginfullscreen
    */
   proxyWebkitFullscreen_() {
     if (!('webkitDisplayingFullscreen' in this.el_)) {
@@ -502,9 +570,11 @@ class Html5 extends Tech {
   }
 
   /**
-   * Get if there is fullscreen support
+   * Check if fullscreen is supported on the current playback device.
    *
-   * @return {Boolean}
+   * @return {boolean}
+   *         - True if fullscreen is supported.
+   *         - False if fullscreen is not supported.
    */
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
@@ -519,7 +589,7 @@ class Html5 extends Tech {
   }
 
   /**
-   * Request to enter fullscreen
+   * Request that the `HTML5` Tech enter fullscreen.
    */
   enterFullScreen() {
     const video = this.el_;
@@ -541,17 +611,24 @@ class Html5 extends Tech {
   }
 
   /**
-   * Request to exit fullscreen
+   * Request that the `HTML5` Tech exit fullscreen.
    */
   exitFullScreen() {
     this.el_.webkitExitFullScreen();
   }
 
   /**
-   * Get/set video
+   * A getter/setter for the `Html5` Tech's source object.
+   * > Note: Please use {@link Html5#setSource}
    *
-   * @param {Object=} src Source object
-   * @return {Object}
+   * @param {Tech~SourceObject} [src]
+   *        The source object you want to set on the `HTML5` techs element.
+   *
+   * @return {Tech~SourceObject|undefined}
+   *         - The current source object when a source is not passed in.
+   *         - undefined when setting
+   *
+   * @deprecated Since version 5.
    */
   src(src) {
     if (src === undefined) {
@@ -563,16 +640,20 @@ class Html5 extends Tech {
   }
 
   /**
-   * Reset the tech. Removes all sources and calls `load`.
+   * Reset the tech by removing all sources and then calling
+   * {@link Html5.resetMediaElement}.
    */
   reset() {
     Html5.resetMediaElement(this.el_);
   }
 
   /**
-   * Get current source
+   * Get the current source on the `HTML5` Tech. Falls back to returning the source from
+   * the HTML5 media element.
    *
-   * @return {Object}
+   * @return {Tech~SourceObject}
+   *         The current source object from the HTML5 tech. With a fallback to the
+   *         elements source.
    */
   currentSrc() {
     if (this.currentSource_) {
@@ -582,22 +663,29 @@ class Html5 extends Tech {
   }
 
   /**
-   * Set controls attribute
+   * Set controls attribute for the HTML5 media Element.
    *
-   * @param {String} val Value for controls attribute
+   * @param {string} val
+   *        Value to set the controls attribute to
    */
   setControls(val) {
     this.el_.controls = !!val;
   }
 
   /**
-   * Creates and returns a text track object
+   * Create and returns a remote {@link TextTrack} object.
    *
-   * @param {String} kind Text track kind (subtitles, captions, descriptions
-   *                                       chapters and metadata)
-   * @param {String=} label Label to identify the text track
-   * @param {String=} language Two letter language abbreviation
-   * @return {TextTrackObject}
+   * @param {string} kind
+   *        `TextTrack` kind (subtitles, captions, descriptions, chapters, or metadata)
+   *
+   * @param {string} [label]
+   *        Label to identify the text track
+   *
+   * @param {string} [language]
+   *        Two letter language abbreviation
+   *
+   * @return {TextTrack}
+   *         The TextTrack that gets created.
    */
   addTextTrack(kind, label, language) {
     if (!this.featuresNativeTextTracks) {
@@ -611,8 +699,29 @@ class Html5 extends Tech {
    * Creates either native TextTrack or an emulated TextTrack depending
    * on the value of `featuresNativeTextTracks`
    *
-   * @param {Object} options The object should contain values for
-   * kind, language, label and src (location of the WebVTT file)
+   * @param {Object} options
+   *        The object should contain the options to intialize the TextTrack with.
+   *
+   * @param {string} [options.kind]
+   *        `TextTrack` kind (subtitles, captions, descriptions, chapters, or metadata).
+   *
+   * @param {string} [options.label].
+   *        Label to identify the text track
+   *
+   * @param {string} [options.language]
+   *        Two letter language abbreviation.
+   *
+   * @param {boolean} [options.default]
+   *        Default this track to on.
+   *
+   * @param {string} [options.id]
+   *        The internal id to assign this track.
+   *
+   * @param {string} [options.src]
+   *        A source url for the track.
+   *
+   * @return {HTMLTrackElement}
+   *         The track element that gets created.
    */
   createRemoteTextTrack(options) {
     if (!this.featuresNativeTextTracks) {
@@ -665,9 +774,10 @@ class Html5 extends Tech {
   }
 
   /**
-   * Remove remote text track from TextTrackList object
+   * Remove remote `TextTrack` from `TextTrackList` object
    *
-   * @param {TextTrackObject} track Texttrack object to remove
+   * @param {TextTrack} track
+   *        `TextTrack` object to remove
    */
   removeRemoteTextTrack(track) {
     super.removeRemoteTextTrack(track);
@@ -684,13 +794,12 @@ class Html5 extends Tech {
       }
     }
   }
-
 }
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 /**
- * Element for testing browser HTML5 video capabilities
+ * Element for testing browser HTML5 media capabilities
  *
  * @type {Element}
  * @constant
@@ -705,9 +814,11 @@ track.label = 'English';
 Html5.TEST_VID.appendChild(track);
 
 /**
- * Check if HTML5 video is supported by this browser/device
+ * Check if HTML5 media is supported by this browser/device.
  *
- * @return {Boolean}
+ * @return {boolean}
+ *         - True if HTML5 media is supported.
+ *         - False if HTML5 media is not supported.
  */
 Html5.isSupported = function() {
   // IE9 with no Media Player is a LIAR! (#984)
@@ -725,7 +836,9 @@ Html5.isSupported = function() {
  * Volume cannot be changed in a lot of mobile devices.
  * Specifically, it can't be changed from 1 on iOS.
  *
- * @return {Boolean}
+ * @return {boolean}
+ *         - True if volume can be controlled
+ *         - False otherwise
  */
 Html5.canControlVolume = function() {
   // IE will error if Windows Media Player not installed #3315
@@ -740,9 +853,11 @@ Html5.canControlVolume = function() {
 };
 
 /**
- * Check if playbackRate is supported in this browser/device.
+ * Check if the playback rate can be changed in this browser/device.
  *
- * @return {Boolean}
+ * @return {boolean}
+ *         - True if playback rate can be controlled
+ *         - False otherwise
  */
 Html5.canControlPlaybackRate = function() {
   // Playback rate API is implemented in Android Chrome, but doesn't do anything
@@ -762,36 +877,22 @@ Html5.canControlPlaybackRate = function() {
 };
 
 /**
- * Check to see if native text tracks are supported by this browser/device
+ * Check to see if native `TextTrack`s are supported by this browser/device.
  *
- * @return {Boolean}
+ * @return {boolean}
+ *         - True if native `TextTrack`s are supported.
+ *         - False otherwise
  */
 Html5.supportsNativeTextTracks = function() {
-  let supportsTextTracks;
-
-  // Figure out native text track support
-  // If mode is a number, we cannot change it because it'll disappear from view.
-  // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
-  // Firefox isn't playing nice either with modifying the mode
-  // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
-  supportsTextTracks = !!Html5.TEST_VID.textTracks;
-  if (supportsTextTracks && Html5.TEST_VID.textTracks.length > 0) {
-    supportsTextTracks = typeof Html5.TEST_VID.textTracks[0].mode !== 'number';
-  }
-  if (supportsTextTracks && browser.IS_FIREFOX) {
-    supportsTextTracks = false;
-  }
-  if (supportsTextTracks && !('onremovetrack' in Html5.TEST_VID.textTracks)) {
-    supportsTextTracks = false;
-  }
-
-  return supportsTextTracks;
+  return browser.IS_ANY_SAFARI;
 };
 
 /**
- * Check to see if native video tracks are supported by this browser/device
+ * Check to see if native `VideoTrack`s are supported by this browser/device
  *
- * @return {Boolean}
+ * @return {boolean}
+ *        - True if native `VideoTrack`s are supported.
+ *        - False otherwise
  */
 Html5.supportsNativeVideoTracks = function() {
   const supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
@@ -800,9 +901,11 @@ Html5.supportsNativeVideoTracks = function() {
 };
 
 /**
- * Check to see if native audio tracks are supported by this browser/device
+ * Check to see if native `AudioTrack`s are supported by this browser/device
  *
- * @return {Boolean}
+ * @return {boolean}
+ *        - True if native `AudioTrack`s are supported.
+ *        - False otherwise
  */
 Html5.supportsNativeAudioTracks = function() {
   const supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
@@ -842,93 +945,103 @@ Html5.Events = [
 ];
 
 /**
- * Set the tech's volume control support status
+ * Boolean indicating whether the `Tech` supports volume control.
  *
- * @type {Boolean}
+ * @type {boolean}
+ * @default {@link Html5.canControlVolume}
  */
 Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 
 /**
- * Set the tech's playbackRate support status
+ * Boolean indicating whether the `Tech` supports changing the speed at which the media
+ * plays. Examples:
+ *   - Set player to play 2x (twice) as fast
+ *   - Set player to play 0.5x (half) as fast
  *
- * @type {Boolean}
+ * @type {boolean}
+ * @default {@link Html5.canControlPlaybackRate}
  */
 Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
 /**
- * Set the tech's status on moving the video element.
- * In iOS, if you move a video element in the DOM, it breaks video playback.
+ * Boolean indicating whether the `HTML5` tech currently supports the media element
+ * moving in the DOM. iOS breaks if you move the media element, so this is set this to
+ * false there. Everywhere else this should be true.
  *
- * @type {Boolean}
+ * @type {boolean}
+ * @default
  */
 Html5.prototype.movingMediaElementInDOM = !browser.IS_IOS;
 
+// TODO: Previous comment: No longer appears to be used. Can probably be removed.
+//       Is this true?
 /**
- * Set the the tech's fullscreen resize support status.
- * HTML video is able to automatically resize when going to fullscreen.
- * (No longer appears to be used. Can probably be removed.)
+ * Boolean indicating whether the `HTML5` tech currently supports automatic media resize
+ * when going into fullscreen.
+ *
+ * @type {boolean}
+ * @default
  */
 Html5.prototype.featuresFullscreenResize = true;
 
 /**
- * Set the tech's progress event support status
- * (this disables the manual progress events of the Tech)
+ * Boolean indicating whether the `HTML5` tech currently supports the progress event.
+ * If this is false, manual `progress` events will be triggred instead.
+ *
+ * @type {boolean}
+ * @default
  */
 Html5.prototype.featuresProgressEvents = true;
 
 /**
- * Set the tech's timeupdate event support status
- * (this disables the manual timeupdate events of the Tech)
+ * Boolean indicating whether the `HTML5` tech currently supports the timeupdate event.
+ * If this is false, manual `timeupdate` events will be triggred instead.
+ *
+ * @default
  */
 Html5.prototype.featuresTimeupdateEvents = true;
 
 /**
- * Sets the tech's status on native text track support
+ * Boolean indicating whether the `HTML5` tech currently supports native `TextTrack`s.
  *
- * @type {Boolean}
+ * @type {boolean}
+ * @default {@link Html5.supportsNativeTextTracks}
  */
 Html5.prototype.featuresNativeTextTracks = Html5.supportsNativeTextTracks();
 
 /**
- * Sets the tech's status on native text track support
+ * Boolean indicating whether the `HTML5` tech currently supports native `VideoTrack`s.
  *
- * @type {Boolean}
+ * @type {boolean}
+ * @default {@link Html5.supportsNativeVideoTracks}
  */
 Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
 
 /**
- * Sets the tech's status on native audio track support
+ * Boolean indicating whether the `HTML5` tech currently supports native `AudioTrack`s.
  *
- * @type {Boolean}
+ * @type {boolean}
+ * @default {@link Html5.supportsNativeAudioTracks}
  */
 Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-let canPlayType;
+const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
 const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX) {
-    if (!canPlayType) {
-      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
-    }
-
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mpegurlRE.test(type)) {
         return 'maybe';
       }
       return canPlayType.call(this, type);
     };
-  }
 
   // Override Android 2.2 and less canPlayType method which is broken
-  if (browser.IS_OLD_ANDROID) {
-    if (!canPlayType) {
-      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
-    }
-
+  } else if (browser.IS_OLD_ANDROID) {
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mp4RE.test(type)) {
         return 'maybe';
@@ -942,11 +1055,10 @@ Html5.unpatchCanPlayType = function() {
   const r = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
-  canPlayType = null;
   return r;
 };
 
-// by default, patch the video element
+// by default, patch the media element
 Html5.patchCanPlayType();
 
 Html5.disposeMediaElement = function(el) {
@@ -1013,172 +1125,304 @@ Html5.resetMediaElement = function(el) {
 // Wrap native properties with a getter
 [
   /**
-   * Paused for html5 tech
+   * Get the value of `paused` from the media element. `paused` indicates whether the media element
+   * is currently paused or not.
    *
    * @method Html5.prototype.paused
-   * @return {Boolean}
+   * @return {boolean}
+   *         The value of `paused` from the media element.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-paused}
    */
   'paused',
+
   /**
-   * Get current time
+   * Get the value of `currentTime` from the media element. `currentTime` indicates
+   * the current second that the media is at in playback.
    *
    * @method Html5.prototype.currentTime
-   * @return {Number}
+   * @return {number}
+   *         The value of `currentTime` from the media element.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-currenttime}
    */
   'currentTime',
+
   /**
-   * Get a TimeRange object that represents the intersection
-   * of the time ranges for which the user agent has all
-   * relevant media
+   * Get the value of `buffered` from the media element. `buffered` is a `TimeRange`
+   * object that represents the parts of the media that are already downloaded and
+   * available for playback.
    *
-   * @return {TimeRangeObject}
    * @method Html5.prototype.buffered
+   * @return {TimeRange}
+   *         The value of `buffered` from the media element.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-buffered}
    */
   'buffered',
+
   /**
-   * Get volume level
+   * Get the value of `volume` from the media element. `volume` indicates
+   * the current playback volume of audio for a media. `volume` will be a value from 0
+   * (silent) to 1 (loudest and default).
    *
-   * @return {Number}
    * @method Html5.prototype.volume
+   * @return {number}
+   *         The value of `volume` from the media element. Value will be between 0-1.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-a-volume}
    */
   'volume',
+
   /**
-   * Get if muted
+   * Get the value of `muted` from the media element. `muted` indicates
+   * that the volume for the media should be set to silent. This does not actually change
+   * the `volume` attribute.
    *
-   * @return {Boolean}
    * @method Html5.prototype.muted
+   * @return {boolean}
+   *         - True if the value of `volume` should be ignored and the audio set to silent.
+   *         - False if the value of `volume` should be used.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
    */
   'muted',
+
   /**
-   * Get poster
+   * Get the value of `poster` from the media element. `poster` indicates
+   * that the url of an image file that can/will be shown when no media data is available.
    *
-   * @return {String}
    * @method Html5.prototype.poster
+   * @return {string}
+   *         The value of `poster` from the media element. Value will be a url to an
+   *         image.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-video-poster}
    */
   'poster',
+
   /**
-   * Get preload attribute
+   * Get the value of `preload` from the media element. `preload` indicates
+   * what should download before the media is interacted with. It can have the following
+   * values:
+   * - none: nothing should be downloaded
+   * - metadata: poster and the first few frames of the media may be downloaded to get
+   *   media dimensions and other metadata
+   * - auto: allow the media and metadata for the media to be downloaded before
+   *    interaction
    *
-   * @return {String}
    * @method Html5.prototype.preload
+   * @return {string}
+   *         The value of `preload` from the media element. Will be 'none', 'metadata',
+   *         or 'auto'.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-preload}
    */
   'preload',
+
   /**
-   * Get autoplay attribute
+   * Get the value of `autoplay` from the media element. `autoplay` indicates
+   * that the media should start to play as soon as the page is ready.
    *
-   * @return {String}
    * @method Html5.prototype.autoplay
+   * @return {boolean}
+   *         - The value of `autoplay` from the media element.
+   *         - True indicates that the media should start as soon as the page loads.
+   *         - False indicates that the media should not start as soon as the page loads.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
    */
   'autoplay',
+
   /**
-   * Get controls attribute
+   * Get the value of `controls` from the media element. `controls` indicates
+   * whether the native media controls should be shown or hidden.
    *
-   * @return {String}
    * @method Html5.prototype.controls
+   * @return {boolean}
+   *         - The value of `controls` from the media element.
+   *         - True indicates that native controls should be showing.
+   *         - False indicates that native controls should be hidden.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-controls}
    */
   'controls',
+
   /**
-   * Get loop attribute
+   * Get the value of `loop` from the media element. `loop` indicates
+   * that the media should return to the start of the media and continue playing once
+   * it reaches the end.
    *
-   * @return {String}
    * @method Html5.prototype.loop
+   * @return {boolean}
+   *         - The value of `loop` from the media element.
+   *         - True indicates that playback should seek back to start once
+   *           the end of a media is reached.
+   *         - False indicates that playback should not loop back to the start when the
+   *           end of the media is reached.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-loop}
    */
   'loop',
+
   /**
-   * Get error value
+   * Get the value of the `error` from the media element. `error` indicates any
+   * MediaError that may have occured during playback. If error returns null there is no
+   * current error.
    *
-   * @return {String}
    * @method Html5.prototype.error
+   * @return {MediaError|null}
+   *         The value of `error` from the media element. Will be `MediaError` if there
+   *         is a current error and null otherwise.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-error}
    */
   'error',
+
   /**
-   * Get whether or not the player is in the "seeking" state
+   * Get the value of `seeking` from the media element. `seeking` indicates whether the
+   * media is currently seeking to a new position or not.
    *
-   * @return {Boolean}
    * @method Html5.prototype.seeking
+   * @return {boolean}
+   *         - The value of `seeking` from the media element.
+   *         - True indicates that the media is currently seeking to a new position.
+   *         - Flase indicates that the media is not seeking to a new position at this time.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-seeking}
    */
   'seeking',
+
   /**
-   * Get a TimeRanges object that represents the
-   * ranges of the media resource to which it is possible
-   * for the user agent to seek.
+   * Get the value of `seekable` from the media element. `seekable` returns a
+   * `TimeRange` object indicating ranges of time that can currently be `seeked` to.
    *
-   * @return {TimeRangeObject}
    * @method Html5.prototype.seekable
+   * @return {TimeRange}
+   *         The value of `seekable` from the media element. A `TimeRange` object
+   *         indicating the current ranges of time that can be seeked to.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-seekable}
    */
   'seekable',
+
   /**
-   * Get if video ended
+   * Get the value of `ended` from the media element. `ended` indicates whether
+   * the media has reached the end or not.
    *
-   * @return {Boolean}
    * @method Html5.prototype.ended
+   * @return {boolean}
+   *         - The value of `ended` from the media element.
+   *         - True indicates that the media has ended.
+   *         - False indicates that the media has not ended.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-ended}
    */
   'ended',
+
   /**
-   * Get the value of the muted content attribute
-   * This attribute has no dynamic effect, it only
-   * controls the default state of the element
+   * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
+   * whether the media should start muted or not. Only changes the default state of the
+   * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
+   * current state.
    *
-   * @return {Boolean}
    * @method Html5.prototype.defaultMuted
+   * @return {boolean}
+   *         - The value of `defaultMuted` from the media element.
+   *         - True indicates that the media should start muted.
+   *         - False indicates that the media should not start muted
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
    */
   'defaultMuted',
+
   /**
-   * Get desired speed at which the media resource is to play
+   * Get the value of `playbackRate` from the media element. `playbackRate` indicates
+   * the rate at which the media is currently playing back. Examples:
+   *   - if playbackRate is set to 2, media will play twice as fast.
+   *   - if playbackRate is set to 0.5, media will play half as fast.
    *
-   * @return {Number}
    * @method Html5.prototype.playbackRate
+   * @return {number}
+   *         The value of `playbackRate` from the media element. A number indicating
+   *         the current playback speed of the media, where 1 is normal speed.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-playbackrate}
    */
   'playbackRate',
+
   /**
-   * Returns a TimeRanges object that represents the ranges of the
-   * media resource that the user agent has played.
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-played
+   * Get the value of `played` from the media element. `played` returns a `TimeRange`
+   * object representing points in the media timeline that have been played.
    *
-   * @return {TimeRangeObject} the range of points on the media
-   *                           timeline that has been reached through
-   *                           normal playback
    * @method Html5.prototype.played
+   * @return {TimeRange}
+   *         The value of `played` from the media element. A `TimeRange` object indicating
+   *         the ranges of time that have been played.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-played}
    */
   'played',
+
   /**
-   * Get the current state of network activity for the element, from
-   * the list below
-   * - NETWORK_EMPTY (numeric value 0)
-   * - NETWORK_IDLE (numeric value 1)
-   * - NETWORK_LOADING (numeric value 2)
-   * - NETWORK_NO_SOURCE (numeric value 3)
+   * Get the value of `networkState` from the media element. `networkState` indicates
+   * the current network state. It returns an enumeration from the following list:
+   * - 0: NETWORK_EMPTY
+   * - 1: NEWORK_IDLE
+   * - 2: NETWORK_LOADING
+   * - 3: NETWORK_NO_SOURCE
    *
-   * @return {Number}
    * @method Html5.prototype.networkState
+   * @return {number}
+   *         The value of `networkState` from the media element. This will be a number
+   *         from the list in the description.
+   *
+   * @see [Spec] {@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-networkstate}
    */
   'networkState',
+
   /**
-   * Get a value that expresses the current state of the element
-   * with respect to rendering the current playback position, from
-   * the codes in the list below
-   * - HAVE_NOTHING (numeric value 0)
-   * - HAVE_METADATA (numeric value 1)
-   * - HAVE_CURRENT_DATA (numeric value 2)
-   * - HAVE_FUTURE_DATA (numeric value 3)
-   * - HAVE_ENOUGH_DATA (numeric value 4)
+   * Get the value of `readyState` from the media element. `readyState` indicates
+   * the current state of the media element. It returns an enumeration from the
+   * following list:
+   * - 0: HAVE_NOTHING
+   * - 1: HAVE_METADATA
+   * - 2: HAVE_CURRENT_DATA
+   * - 3: HAVE_FUTURE_DATA
+   * - 4: HAVE_ENOUGH_DATA
    *
-   * @return {Number}
    * @method Html5.prototype.readyState
+   * @return {number}
+   *         The value of `readyState` from the media element. This will be a number
+   *         from the list in the description.
+   *
+   * @see [Spec] {@link https://www.w3.org/TR/html5/embedded-content-0.html#ready-states}
    */
   'readyState',
+
   /**
-   * Get width of video
+   * Get the value of `videoWidth` from the video element. `videoWidth` indicates
+   * the current width of the video in css pixels.
    *
-   * @return {Number}
    * @method Html5.prototype.videoWidth
+   * @return {number}
+   *         The value of `videoWidth` from the video element. This will be a number
+   *         in css pixels.
+   *
+   * @see [Spec] {@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-video-videowidth}
    */
   'videoWidth',
+
   /**
-   * Get height of video
+   * Get the value of `videoHeight` from the video element. `videoHeigth` indicates
+   * the current height of the video in css pixels.
    *
-   * @return {Number}
    * @method Html5.prototype.videoHeight
+   * @return {number}
+   *         The value of `videoHeight` from the video element. This will be a number
+   *         in css pixels.
+   *
+   * @see [Spec] {@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-video-videowidth}
    */
   'videoHeight'
 ].forEach(function(prop) {
@@ -1191,60 +1435,116 @@ Html5.resetMediaElement = function(el) {
 // set + toTitleCase(name)
 [
   /**
-   * Set volume level
+   * Set the value of `volume` on the media element. `volume` indicates the current
+   * audio level as a percentage in decimal form. This means that 1 is 100%, 0.5 is 50%, and
+   * so on.
    *
-   * @param {Number} percentAsDecimal Volume percent as a decimal
    * @method Html5.prototype.setVolume
+   * @param {number} percentAsDecimal
+   *        The volume percent as a decimal. Valid range is from 0-1.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-a-volume}
    */
   'volume',
+
   /**
-   * Set muted
+   * Set the value of `muted` on the media element. `muted` indicates the current
+   * audio level should be silent.
    *
-   * @param {Boolean} muted If player is to be muted or note
    * @method Html5.prototype.setMuted
+   * @param {boolean} muted
+   *        - True if the audio should be set to silent
+   *        - False otherwise
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
    */
   'muted',
+
   /**
-   * Set video source
+   * Set the value of `src` on the media element. `src` indicates the current
+   * {@link Tech~SourceObject} for the media.
    *
-   * @param {Object} src Source object
-   * @deprecated since version 5
    * @method Html5.prototype.setSrc
+   * @param {Tech~SourceObject} src
+   *        The source object to set as the current source.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-src}
    */
   'src',
+
   /**
-   * Set poster
+   * Set the value of `poster` on the media element. `poster` is the url to
+   * an image file that can/will be shown when no media data is available.
    *
-   * @param {String} val URL to poster image
    * @method Html5.prototype.setPoster
+   * @param {string} poster
+   *        The url to an image that should be used as the `poster` for the media
+   *        element.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-poster}
    */
   'poster',
+
   /**
-   * Set preload attribute
+   * Set the value of `preload` on the media element. `preload` indicates
+   * what should download before the media is interacted with. It can have the following
+   * values:
+   * - none: nothing should be downloaded
+   * - metadata: poster and the first few frames of the media may be downloaded to get
+   *   media dimensions and other metadata
+   * - auto: allow the media and metadata for the media to be downloaded before
+   *    interaction
    *
-   * @param {String} val Value for the preload attribute
-   * @method Htm5.prototype.setPreload
+   * @method Html5.prototype.setPreload
+   * @param {string} preload
+   *         The value of `preload` to set on the media element. Must be 'none', 'metadata',
+   *         or 'auto'.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-preload}
    */
   'preload',
+
   /**
-   * Set autoplay attribute
+   * Set the value of `autoplay` on the media element. `autoplay` indicates
+   * that the media should start to play as soon as the page is ready.
    *
-   * @param {Boolean} autoplay Value for the autoplay attribute
-   * @method setAutoplay
+   * @method Html5.prototype.setAutoplay
+   * @param {boolean} autoplay
+   *         - True indicates that the media should start as soon as the page loads.
+   *         - False indicates that the media should not start as soon as the page loads.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
    */
   'autoplay',
+
   /**
-   * Set loop attribute
+   * Set the value of `loop` on the media element. `loop` indicates
+   * that the media should return to the start of the media and continue playing once
+   * it reaches the end.
    *
-   * @param {Boolean} loop Value for the loop attribute
    * @method Html5.prototype.setLoop
+   * @param {boolean} loop
+   *         - True indicates that playback should seek back to start once
+   *           the end of a media is reached.
+   *         - False indicates that playback should not loop back to the start when the
+   *           end of the media is reached.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-loop}
    */
   'loop',
+
   /**
-   * Set desired speed at which the media resource is to play
+   * Set the value of `playbackRate` on the media element. `playbackRate` indicates
+   * the rate at which the media should play back. Examples:
+   *   - if playbackRate is set to 2, media will play twice as fast.
+   *   - if playbackRate is set to 0.5, media will play half as fast.
    *
-   * @param {Number} val Speed at which the media resource is to play
    * @method Html5.prototype.setPlaybackRate
+   * @return {number}
+   *         The value of `playbackRate` from the media element. A number indicating
+   *         the current playback speed of the media, where 1 is normal speed.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-playbackrate}
    */
   'playbackRate'
 ].forEach(function(prop) {
@@ -1256,15 +1556,20 @@ Html5.resetMediaElement = function(el) {
 // wrap native functions with a function
 [
   /**
-   * Pause for html5 tech
+   * A wrapper around the media elements `pause` function. This will call the `HTML5`
+   * media elements `pause` function.
    *
    * @method Html5.prototype.pause
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-pause}
    */
   'pause',
+
   /**
-   * Load media into player
+   * A wrapper around the media elements `load` function. This will call the `HTML5`s
+   * media element `load` function.
    *
    * @method Html5.prototype.load
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-load}
    */
   'load'
 ].forEach(function(prop) {
@@ -1273,23 +1578,27 @@ Html5.resetMediaElement = function(el) {
   };
 });
 
-// Add Source Handler pattern functions to this tech
 Tech.withSourceHandlers(Html5);
 
 /**
- * The default native source handler.
- * This simply passes the source to the video element. Nothing fancy.
+ * Native source handler for Html5, simply passes the source to the media element.
  *
- * @param  {Object} source   The source object
- * @param  {Html5} tech  The instance of the HTML5 tech
+ * @proprety {Tech~SourceObject} source
+ *        The source object
+ *
+ * @proprety {Html5} tech
+ *        The instance of the HTML5 tech.
  */
 Html5.nativeSourceHandler = {};
 
 /**
- * Check if the video element can play the given videotype
+ * Check if the media element can play the given mime type.
  *
- * @param  {String} type    The mimetype to check
- * @return {String}         'probably', 'maybe', or '' (empty string)
+ * @param {string} type
+ *        The mimetype to check
+ *
+ * @return {string}
+ *         'probably', 'maybe', or '' (empty string)
  */
 Html5.nativeSourceHandler.canPlayType = function(type) {
   // IE9 on Windows 7 without MediaPlayer throws an error here
@@ -1302,11 +1611,16 @@ Html5.nativeSourceHandler.canPlayType = function(type) {
 };
 
 /**
- * Check if the video element can handle the source natively
+ * Check if the media element can handle a source natively.
  *
- * @param  {Object} source  The source object
- * @param  {Object} options The options passed to the tech
- * @return {String}         'probably', 'maybe', or '' (empty string)
+ * @param {Tech~SourceObject} source
+ *         The source object
+ *
+ * @param {Object} [options]
+ *         Options to be passed to the tech.
+ *
+ * @return {string}
+ *         'probably', 'maybe', or '' (empty string).
  */
 Html5.nativeSourceHandler.canHandleSource = function(source, options) {
 
@@ -1325,21 +1639,23 @@ Html5.nativeSourceHandler.canHandleSource = function(source, options) {
 };
 
 /**
- * Pass the source to the video element
- * Adaptive source handlers will have more complicated workflows before passing
- * video data to the video element
+ * Pass the source to the native media element.
  *
- * @param  {Object} source   The source object
- * @param  {Html5}  tech     The instance of the Html5 tech
- * @param  {Object} options  The options to pass to the source
+ * @param {Tech~SourceObject} source
+ *        The source object
+ *
+ * @param {Html5} tech
+ *        The instance of the Html5 tech
+ *
+ * @param {Object} [options]
+ *        The options to pass to the source
  */
 Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
   tech.setSrc(source.src);
 };
 
-/*
- * Clean up the source handler when disposing the player or switching sources..
- * (no cleanup is needed when supporting the format natively)
+/**
+ * A noop for the native dispose function, as cleanup is not needed.
  */
 Html5.nativeSourceHandler.dispose = function() {};
 
