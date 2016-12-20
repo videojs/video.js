@@ -30,7 +30,7 @@ foo.trigger('bar');
 // logs 'bar was triggered'
 ```
 
-## `off()` and `removeEventListener`
+## `off()` and `removeEventListener()`
 
 This function is used to remove an listener function from an EventTarget.
 
@@ -93,7 +93,7 @@ foo.trigger('bar');
 // does nothing
 ```
 
-## `trigger()` and `dispatchEvent`
+## `trigger()` and `dispatchEvent()`
 
 This function is used to trigger an event on an EventTarget which will cause all listeners to run.
 
