@@ -23,8 +23,8 @@ This document outlines many considerations for using Video.js for advanced playe
 ## Accessing a player that has already been created on a page
 
 After an instance has been created it can be accessed globally in two ways:
-1\. By calling `videojs('example_video_id');`
-2\. By using it directly via  `videojs.players.example_video_id;`
+1. By calling `videojs('example_video_id');`
+1. By using it directly via  `videojs.players.example_video_id;`
 
 ## Removing Players
 
