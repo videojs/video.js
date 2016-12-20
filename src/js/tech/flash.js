@@ -377,7 +377,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `rtmpConnection` from the swf.
  *
- * @method Flash.prototype.rtmpConnection
+ * @method Flash#rtmpConnection
  * @return {string}
  *         The current value of `rtmpConnection` on the swf.
  */
@@ -385,7 +385,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `rtmpStream` from the swf.
  *
- * @method Flash.prototype.rtmpStream
+ * @method Flash#rtmpStream
  * @return {string}
  *         The current value of `rtmpStream` on the swf.
  */
@@ -400,7 +400,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * - auto: allow the media and metadata for the media to be downloaded before
  *    interaction
  *
- * @method Flash.prototype.preload
+ * @method Flash#preload
  * @return {string}
  *         The value of `preload` from the swf. Will be 'none', 'metadata',
  *         or 'auto'.
@@ -409,7 +409,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `defaultPlaybackRate` from the swf.
  *
- * @method Flash.prototype.defaultPlaybackRate
+ * @method Flash#defaultPlaybackRate
  * @return {number}
  *         The current value of `defaultPlaybackRate` on the swf.
  */
@@ -420,7 +420,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  *   - if playbackRate is set to 2, media will play twice as fast.
  *   - if playbackRate is set to 0.5, media will play half as fast.
  *
- * @method Flash.prototype.playbackRate
+ * @method Flash#playbackRate
  * @return {number}
  *         The value of `playbackRate` from the swf. A number indicating
  *         the current playback speed of the media, where 1 is normal speed.
@@ -430,7 +430,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of `autoplay` from the swf. `autoplay` indicates
  * that the media should start to play as soon as the page is ready.
  *
- * @method Flash.prototype.autoplay
+ * @method Flash#autoplay
  * @return {boolean}
  *         - The value of `autoplay` from the swf.
  *         - True indicates that the media ashould start as soon as the page loads.
@@ -442,7 +442,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * that the media should return to the start of the media and continue playing once
  * it reaches the end.
  *
- * @method Flash.prototype.loop
+ * @method Flash#loop
  * @return {boolean}
  *         - The value of `loop` from the swf.
  *         - True indicates that playback should seek back to start once
@@ -454,7 +454,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `mediaGroup` from the swf.
  *
- * @method Flash.prototype.mediaGroup
+ * @method Flash#mediaGroup
  * @return {string}
  *         The current value of `mediaGroup` on the swf.
  */
@@ -462,7 +462,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `controller` from the swf.
  *
- * @method Flash.prototype.controller
+ * @method Flash#controller
  * @return {string}
  *         The current value of `controller` on the swf.
  */
@@ -471,7 +471,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of `controls` from the swf. `controls` indicates
  * whether the native flash controls should be shown or hidden.
  *
- * @method Html5.prototype.controls
+ * @method Flash#controls
  * @return {boolean}
  *         - The value of `controls` from the swf.
  *         - True indicates that native controls should be showing.
@@ -483,7 +483,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * audio level as a percentage in decimal form. This means that 1 is 100%, 0.5 is 50%, and
  * so on.
  *
- * @method Flash.prototype.volume
+ * @method Flash#volume
  * @return {number}
  *         The volume percent as a decimal. Value will be between 0-1.
  */
@@ -492,7 +492,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of the `muted` from the swf. `muted` indicates the current
  * audio level should be silent.
  *
- * @method Flash.prototype.muted
+ * @method Flash#muted
  * @return {boolean}
  *         - True if the audio should be set to silent
  *         - False otherwise
@@ -504,7 +504,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
  * current state.
  *
- * @method Flash.prototype.defaultMuted
+ * @method Flash#defaultMuted
  * @return {boolean}
  *         - The value of `defaultMuted` from the swf.
  *         - True indicates that the media should start muted.
@@ -519,7 +519,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * - 2: NETWORK_LOADING
  * - 3: NETWORK_NO_SOURCE
  *
- * @method Flash.prototype.networkState
+ * @method Flash#networkState
  * @return {number}
  *         The value of `networkState` from the swf. This will be a number
  *         from the list in the description.
@@ -535,7 +535,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * - 3: HAVE_FUTURE_DATA
  * - 4: HAVE_ENOUGH_DATA
  *
- * @method Flash.prototype.readyState
+ * @method Flash#readyState
  * @return {number}
  *         The value of `readyState` from the swf. This will be a number
  *         from the list in the description.
@@ -551,7 +551,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * - 3: HAVE_FUTURE_DATA
  * - 4: HAVE_ENOUGH_DATA
  *
- * @method Flash.prototype.readyState
+ * @method Flash#readyState
  * @return {number}
  *         The value of `readyState` from the swf. This will be a number
  *         from the list in the description.
@@ -560,7 +560,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `initialTime` from the swf.
  *
- * @method Flash.prototype.initialTime
+ * @method Flash#initialTime
  * @return {number}
  *         The `initialTime` proprety on the swf.
  */
@@ -568,7 +568,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Get the value of `startOffsetTime` from the swf.
  *
- * @method Flash.prototype.startOffsetTime
+ * @method Flash#startOffsetTime
  * @return {number}
  *         The `startOffsetTime` proprety on the swf.
  */
@@ -577,7 +577,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of `paused` from the swf. `paused` indicates whether the swf
  * is current paused or not.
  *
- * @method Flash.prototype.paused
+ * @method Flash#paused
  * @return {boolean}
  *         The value of `paused` from the swf.
  */
@@ -586,7 +586,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of `ended` from the swf. `ended` indicates whether
  * the media has reached the end or not.
  *
- * @method Flash.prototype.ended
+ * @method Flash#ended
  * @return {boolean}
  *         - True indicates that the media has ended.
  *         - False indicates that the media has not ended.
@@ -598,7 +598,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of `videoWidth` from the swf. `videoWidth` indicates
  * the current width of the media in css pixels.
  *
- * @method Flash.prototype.videoWidth
+ * @method Flash#videoWidth
  * @return {number}
  *         The value of `videoWidth` from the swf. This will be a number
  *         in css pixels.
@@ -618,7 +618,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Set the value of `rtmpConnection` on the swf.
  *
- * @method Flash.prototype.setRtmpConnection
+ * @method Flash#setRtmpConnection
  * @param {string} rtmpConnection
  *        New value to set the `rtmpConnection` property to.
  */
@@ -626,7 +626,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Set the value of `rtmpStream` on the swf.
  *
- * @method Flash.prototype.setRtmpStream
+ * @method Flash#setRtmpStream
  * @param {string} rtmpStream
  *        New value to set the `rtmpStream` property to.
  */
@@ -641,7 +641,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * - auto: allow the media and metadata for the media to be downloaded before
  *    interaction
  *
- * @method Flash.prototype.setPreload
+ * @method Flash#setPreload
  * @param {string} preload
  *        The value of `preload` to set on the swf. Should be 'none', 'metadata',
  *        or 'auto'.
@@ -650,7 +650,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Set the value of `defaultPlaybackRate` on the swf.
  *
- * @method Flash.prototype.setDefaultPlaybackRate
+ * @method Flash#setDefaultPlaybackRate
  * @param {number} defaultPlaybackRate
  *        New value to set the `defaultPlaybackRate` property to.
  */
@@ -661,7 +661,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  *   - if playbackRate is set to 2, media will play twice as fast.
  *   - if playbackRate is set to 0.5, media will play half as fast.
  *
- * @method Flash.prototype.setPlaybackRate
+ * @method Flash#setPlaybackRate
  * @param {number} playbackRate
  *        New value of `playbackRate` on the swf. A number indicating
  *        the current playback speed of the media, where 1 is normal speed.
@@ -671,7 +671,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Set the value of `autoplay` on the swf. `autoplay` indicates
  * that the media should start to play as soon as the page is ready.
  *
- * @method Flash.prototype.setAutoplay
+ * @method Flash#setAutoplay
  * @param {boolean} autoplay
  *        - The value of `autoplay` from the swf.
  *        - True indicates that the media ashould start as soon as the page loads.
@@ -683,7 +683,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * that the media should return to the start of the media and continue playing once
  * it reaches the end.
  *
- * @method Flash.prototype.setLoop
+ * @method Flash#setLoop
  * @param {boolean} loop
  *        - True indicates that playback should seek back to start once
  *          the end of a media is reached.
@@ -694,7 +694,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Set the value of `mediaGroup` on the swf.
  *
- * @method Flash.prototype.setMediaGroup
+ * @method Flash#setMediaGroup
  * @param {string} mediaGroup
  *        New value of `mediaGroup` to set on the swf.
  */
@@ -702,7 +702,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 /**
  * Set the value of `controller` on the swf.
  *
- * @method Flash.prototype.setController
+ * @method Flash#setController
  * @param {string} controller
  *        New value the current value of `controller` on the swf.
  */
@@ -711,7 +711,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Get the value of `controls` from the swf. `controls` indicates
  * whether the native flash controls should be shown or hidden.
  *
- * @method Flash.prototype.controls
+ * @method Flash#controls
  * @return {boolean}
  *         - The value of `controls` from the swf.
  *         - True indicates that native controls should be showing.
@@ -723,7 +723,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * audio level as a percentage in decimal form. This means that 1 is 100%, 0.5 is 50%, and
  * so on.
  *
- * @method Flash.prototype.setVolume
+ * @method Flash#setVolume
  * @param {number} percentAsDecimal
  *         The volume percent as a decimal. Value will be between 0-1.
  */
@@ -732,7 +732,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * Set the value of the `muted` on the swf. `muted` indicates that the current
  * audio level should be silent.
  *
- * @method Flash.prototype.setMuted
+ * @method Flash#setMuted
  * @param {boolean} muted
  *         - True if the audio should be set to silent
  *         - False otherwise
@@ -744,7 +744,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
  * current state.
  *
- * @method Flash.prototype.setDefaultMuted
+ * @method Flash#setDefaultMuted
  * @param {boolean} defaultMuted
  *         - True indicates that the media should start muted.
  *         - False indicates that the media should not start muted.

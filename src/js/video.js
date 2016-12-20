@@ -47,10 +47,7 @@ if (typeof HTMLVideoElement === 'undefined' &&
  * Doubles as the main function for users to create a player instance and also
  * the main library object.
  * The `videojs` function can be used to initialize or retrieve a player.
- * ```js
- *   var myPlayer = videojs('my_video_id');
- * ```
- *
+  *
  * @param {string|Element} id
  *        Video element or video element ID
  *
@@ -238,11 +235,6 @@ videojs.VERSION = require('../../package.json').version;
  * The global options object. These are the settings that take effect
  * if no overrides are specified when the player is created.
  *
- * ```js
- *     videojs.options.autoplay = true
- *     // -> all players will autoplay by default
- * ```
- *
  * @type {Object}
  */
 videojs.options = Player.prototype.options_;
@@ -265,33 +257,16 @@ videojs.players = Player.players;
 
 /**
  * Get a component class object by name
- * ```js
- *     var VjsButton = videojs.getComponent('Button');
- *     // Create a new instance of the component
- *     var myButton = new VjsButton(myPlayer);
- * ```
  *
  * @borrows Component.getComponent as videojs.getComponent
  */
 videojs.getComponent = Component.getComponent;
 
 /**
- * Register a component so it can referred to by name
- * Used when adding to other
- * components, either through addChild
- * `component.addChild('myComponent')`
- * or through default children options
- * `{ children: ['myComponent'] }`.
- * ```js
- *   // Get a component to subclass
- *   var VjsButton = videojs.getComponent('Button');
- *   // Subclass the component (see 'extend' doc for more info)
- *   var MySpecialButton = videojs.extend(VjsButton, {});
- *   // Register the new component
- *   VjsButton.registerComponent('MySepcialButton', MySepcialButton);
- *   // (optionally) add the new component as a default player child
- *   myPlayer.addChild('MySepcialButton');
- * ```
+ * Register a component so it can referred to by name. Used when adding to other
+ * components, either through addChild `component.addChild('myComponent')` or through
+ * default children options  `{ children: ['myComponent'] }`.
+ *
  * > NOTE: You could also just initialize the component before adding.
  * `component.addChild(new MyComponent());`
  *
@@ -314,11 +289,6 @@ videojs.registerComponent = (name, comp) => {
 
 /**
  * Get a Tech class object by name
- * ```js
- *   var Html5 = videojs.getTech('Html5');
- *   // Create a new instance of the component
- *   var html5 = new Html5(options);
- * ```
  *
  * @borrows Tech.getTech as videojs.getTech
  */
@@ -327,17 +297,6 @@ videojs.getTech = Tech.getTech;
 /**
  * Register a Tech so it can referred to by name.
  * This is used in the tech order for the player.
- *
- * ```js
- *     // get the Html5 Tech
- *     var Html5 = videojs.getTech('Html5');
- *     var MyTech = videojs.extend(Html5, {});
- *     // Register the new Tech
- *     VjsButton.registerTech('Tech', MyTech);
- *     var player = videojs('myplayer', {
- *       techOrder: ['myTech', 'html5']
- *     });
- * ```
  *
  * @borrows Tech.registerTech as videojs.registerTech
  */
@@ -364,28 +323,6 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 /**
  * Subclass an existing class
  * Mimics ES6 subclassing with the `extend` keyword
- * ```js
- *     // Create a basic javascript 'class'
- *     function MyClass(name) {
- *       // Set a property at initialization
- *       this.myName = name;
- *     }
- *     // Create an instance method
- *     MyClass.prototype.sayMyName = function() {
- *       alert(this.myName);
- *     };
- *     // Subclass the exisitng class and change the name
- *     // when initializing
- *     var MySubClass = videojs.extend(MyClass, {
- *       constructor: function(name) {
- *         // Call the super class constructor for the subclass
- *         MyClass.call(this, name)
- *       }
- *     });
- *     // Create an instance of the new sub class
- *     var myInstance = new MySubClass('John');
- *     myInstance.sayMyName(); // -> should alert "John"
- * ```
  *
  * @borrows extend:extendFn as videojs.extend
  */
@@ -396,25 +333,6 @@ videojs.extend = extendFn;
  * Performs a deep merge like lodash.merge but **only merges plain objects**
  * (not arrays, elements, anything else)
  * Other values will be copied directly from the second object.
- * ```js
- *     var defaultOptions = {
- *       foo: true,
- *       bar: {
- *         a: true,
- *         b: [1,2,3]
- *       }
- *     };
- *     var newOptions = {
- *       foo: false,
- *       bar: {
- *         b: [4,5,6]
- *       }
- *     };
- *     var result = videojs.mergeOptions(defaultOptions, newOptions);
- *     // result.foo = false;
- *     // result.bar.a = true;
- *     // result.bar.b = [4,5,6];
- * ```
  *
  * @borrows merge-options:mergeOptions as videojs.mergeOptions
  */
@@ -422,12 +340,6 @@ videojs.mergeOptions = mergeOptions;
 
 /**
  * Change the context (this) of a function
- *
- * ``` js
- *     videojs.bind(newContext, function() {
- *       this === newContext
- *     });
- * ```
  *
  * > NOTE: as of v5.0 we require an ES5 shim, so you should use the native
  * `function() {}.bind(newContext);` instead of this.
@@ -441,40 +353,6 @@ videojs.bind = Fn.bind;
  * Plugins are only initialized when options for the plugin are included
  * in the player options, or the plugin function on the player instance is
  * called.
- * **See the plugin guide in the docs for a more detailed example**
- * ```js
- *     // Make a plugin that alerts when the player plays
- *     videojs.plugin('myPlugin', function(myPluginOptions) {
- *       myPluginOptions = myPluginOptions || {};
- *
- *       var player = this;
- *       var alertText = myPluginOptions.text || 'Player is playing!'
- *
- *       player.on('play', function() {
- *         alert(alertText);
- *       });
- *     });
- *     // USAGE EXAMPLES
- *     // EXAMPLE 1: New player with plugin options, call plugin immediately
- *     var player1 = videojs('idOne', {
- *       myPlugin: {
- *         text: 'Custom text!'
- *       }
- *     });
- *     // Click play
- *     // --> Should alert 'Custom text!'
- *     // EXAMPLE 3: New player, initialize plugin later
- *     var player3 = videojs('idThree');
- *     // Click play
- *     // --> NO ALERT
- *     // Click pause
- *     // Initialize plugin using the plugin function on the player instance
- *     player3.myPlugin({
- *       text: 'Plugin added later!'
- *     });
- *     // Click play
- *     // --> Should alert 'Plugin added later!'
- * ```
  *
  * @borrows plugin:plugin as videojs.plugin
  */
@@ -482,9 +360,7 @@ videojs.plugin = plugin;
 
 /**
  * Adding languages so that they're available to all players.
- * ```js
- *   videojs.addLanguage('es', { 'Hello': 'Hola' });
- * ```
+ * Example: `videojs.addLanguage('es', { 'Hello': 'Hola' });`
  *
  * @param {string} code
  *        The language code or dictionary property
@@ -586,18 +462,6 @@ videojs.trigger = Events.trigger;
 
 /**
  * A cross-browser XMLHttpRequest wrapper. Here's a simple example:
- *
- * ```js
- *     videojs.xhr({
- *       body: someJSONString,
- *       uri: "/foo",
- *       headers: {
- *         "Content-Type": "application/json"
- *       }
- *     }, function (err, resp, body) {
- *       // check resp.statusCode
- *     });
- * ```
  *
  * @param {Object} options
  *        settings for the request.

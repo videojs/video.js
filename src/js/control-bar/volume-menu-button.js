@@ -101,6 +101,9 @@ class VolumeMenuButton extends PopupButton {
 
   /**
    * Create the VolumeMenuButton popup
+   *
+   * @return {Popup}
+   *         The popup that was created
    */
   createPopup() {
     const popup = new Popup(this.player_, {

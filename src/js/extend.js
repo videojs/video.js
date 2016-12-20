@@ -1,12 +1,23 @@
 import log from './utils/log';
 import {isObject} from './utils/obj';
 
-/*
+/**
  * @file extend.js
- *
+ * @module extend
+ */
+
+/**
  * A combination of node inherits and babel's inherits (after transpile).
  * Both work the same but node adds `super_` to the subClass
  * and Bable adds the superClass as __proto__. Both seem useful.
+ *
+ * @param {Object} subClass
+ *        The class to inherit to
+ *
+ * @param {Object} superClass
+ *        The class to inherit from
+ *
+ * @private
  */
 const _inherits = function(subClass, superClass) {
   if (typeof superClass !== 'function' && superClass !== null) {
@@ -28,22 +39,18 @@ const _inherits = function(subClass, superClass) {
   }
 };
 
-/*
+/**
  * Function for subclassing using the same inheritance that
  * videojs uses internally
- * ```js
- * var Button = videojs.getComponent('Button');
- * ```
- * ```js
- * var MyButton = videojs.extend(Button, {
- *   constructor: function(player, options) {
- *     Button.call(this, player, options);
- *   },
- *   onClick: function() {
- *     // doSomething
- *   }
- * });
- * ```
+ *
+ * @param {Object} superClass
+ *        The class to inherit from
+ *
+ * @param {Object} [subClassMethods={}]
+ *        The class to inherit to
+ *
+ * @return {Object}
+ *         The new object with subClassMethods that inherited superClass.
  */
 const extendFn = function(superClass, subClassMethods = {}) {
   let subClass = function() {
