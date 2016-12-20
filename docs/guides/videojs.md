@@ -35,7 +35,7 @@ var VjsButton = videojs.getComponent('Button');
 var myButton = new VjsButton(myPlayer);
 ```
 
-## `registerComponent`
+## `registerComponent()`
 
 ```js
 // Get a component to subclass
@@ -56,7 +56,7 @@ var Html5 = videojs.getTech('Html5');
 var html5 = new Html5(options);
 ```
 
-## `registerTech`
+## `registerTech()`
 
 ```js
 // get the Html5 Tech
@@ -164,7 +164,7 @@ player3.myPlugin({
 // --> Should alert 'Plugin added later!'
 ```
 
-## `xhr`
+## `xhr()`
 
 ```js
 videojs.xhr({

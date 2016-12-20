@@ -54,7 +54,7 @@ var button = new Component(player);
 console.log(button.el());
 ```
 
-The Above code will output
+The above code will output
 
 ```html
 <div class="video-js">
@@ -126,7 +126,7 @@ var myButton = myComponent.addChild('MyButton', {
 });
 ```
 
-Childern can also be added via options when a component is intialized.
+Children can also be added via options when a component is initialized.
 
 > Note: Include a 'name' key which will be used if two child components of the same
 >       type that need different options.
@@ -146,7 +146,7 @@ var myComp = new MyComponent(player, {
 
 ## Event Listening
 
-### using `on`
+### Using `on`
 
 ```js
 var player = videojs('some-player-id');
@@ -195,8 +195,8 @@ myComponent.trigger('eventType');
 // does nothing
 ```
 
-If myFunc gets excluded, ALL listeners for the event type will get removed. If
-eventType gets excluded, ALL listeners will get removed from the component.
+If myFunc gets excluded, *all* listeners for the event type will get removed. If
+eventType gets excluded, *all* listeners will get removed from the component.
 You can use `off` to remove listeners that get added to other elements or
 components using:
 
