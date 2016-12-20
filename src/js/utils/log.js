@@ -9,7 +9,7 @@ import {isObject} from './obj';
 let log;
 
 // This is the private tracking variable for logging level.
-let level = 'all';
+let level;
 
 /**
  * Log messages to the console and history based on the type of message
@@ -158,6 +158,9 @@ if (Object.defineProperties) {
     warn: 'warn|error'
   };
 }
+
+// Determine the default logging level.
+level = 'all';
 
 if (window.VIDEOJS_DEFAULT_LOG_LEVEL &&
     log.levels.hasOwnProperty(window.VIDEOJS_DEFAULT_LOG_LEVEL)) {
