@@ -23,6 +23,7 @@ This document outlines many considerations for using Video.js for advanced playe
 ## Accessing a player that has already been created on a page
 
 After an instance has been created it can be accessed globally in two ways:
+
 1. By calling `videojs('example_video_id');`
 1. By using it directly via  `videojs.players.example_video_id;`
 
@@ -96,31 +97,31 @@ Volume for a player can be changed through the `volume` function on a player. Th
 Example
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    // get
-    var howLoudIsIt = myPlayer.volume();
-    // set
-    myPlayer.volume(0.5); // Set volume to half
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  // get
+  var howLoudIsIt = myPlayer.volume();
+  // set
+  myPlayer.volume(0.5); // Set volume to half
+});
 ```
 
-Volume can also be muted (without actually changing the volume value) using the `muted` funciton. Calling it without an argument will return the current status of muted on the player.
+Volume can also be muted (without actually changing the volume value) using the `muted` function. Calling it without an argument will return the current status of muted on the player.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    // get, should be false
-    console.log(myPlayer.muted());
-    // set to true
-    myPlayer.muted(true);
-    // get should be true
-    console.log(myPlayer.muted());
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  // get, should be false
+  console.log(myPlayer.muted());
+  // set to true
+  myPlayer.muted(true);
+  // get should be true
+  console.log(myPlayer.muted());
+});
 ```
 
 ## Making the player fullscreen
@@ -128,42 +129,42 @@ Volume can also be muted (without actually changing the volume value) using the 
 To check if the player is currently fullscreen call the `isFullscreen` function on a player like so.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    // get, should be false
-    console.log(myPlayer.isFullscreen());
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  // get, should be false
+  console.log(myPlayer.isFullscreen());
 
-    // set, tell the player it's in fullscreen
-    myPlayer.isFullscreen(true);
+  // set, tell the player it's in fullscreen
+  myPlayer.isFullscreen(true);
 
-    // get, should be true
-    console.log(myPlayer.isFullscreen());
-  });
+  // get, should be true
+  console.log(myPlayer.isFullscreen());
+});
 ```
 
 To request that the player enter fullscreen call `requestFullscreen`.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    myPlayer.requestFullscreen();
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  myPlayer.requestFullscreen();
+});
 ```
 
 To exit fullscreen call `exitFullscreen`
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    myPlayer.requestFullscreen();
-    myPlayer.exitFullscreen();
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  myPlayer.requestFullscreen();
+  myPlayer.exitFullscreen();
+});
 ```
 
 ## Using Playback information functions
@@ -171,127 +172,127 @@ To exit fullscreen call `exitFullscreen`
 `play` can be used to start playback on a player that has a source.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    myPlayer.play();
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  myPlayer.play();
+});
 ```
 
 `pause` can be used to pause playback on a player that is playing.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    myPlayer.play();
-    myPlayer.pause();
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  myPlayer.play();
+  myPlayer.pause();
+});
 ```
 
 `paused` can be used to determine if a player is currently paused.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src("http://www.example.com/path/to/video.mp4");
 
-  myPlayer.ready(function() {
-    // true
-    console.log(myPlayer.paused());
-    // false
-    console.log(!myPlayer.paused());
+myPlayer.ready(function() {
+  // true
+  console.log(myPlayer.paused());
+  // false
+  console.log(!myPlayer.paused());
 
-    myPlayer.play();
-    // false
-    console.log(myPlayer.paused());
-    // true
-    console.log(!myPlayer.paused());
+  myPlayer.play();
+  // false
+  console.log(myPlayer.paused());
+  // true
+  console.log(!myPlayer.paused());
 
-    myPlayer.pause();
-    // true
-    console.log(myPlayer.paused());
-    // false
-    console.log(!myPlayer.paused());
-  });
+  myPlayer.pause();
+  // true
+  console.log(myPlayer.paused());
+  // false
+  console.log(!myPlayer.paused());
+});
 ```
 
 `currentTime` will give you the currentTime (in seconds) that playback is currently occuring at.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    // set current time to 2 minutes into the video
-    myPlayer.currentTime(120);
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  // set current time to 2 minutes into the video
+  myPlayer.currentTime(120);
 
-    // get the current time, should be 120 seconds
-    var whereYouAt = myPlayer.currentTime();
-  });
+  // get the current time, should be 120 seconds
+  var whereYouAt = myPlayer.currentTime();
+});
 ```
 
 `duration` will give you the total duration of the video that is playing
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    var lengthOfVideo = myPlayer.duration();
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  var lengthOfVideo = myPlayer.duration();
+});
 ```
 
 `remainingTime` will give you the seconds that are remaing in the video.
 
 ```js
-  var myPlayer = videojs('some-player-id');
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-     myPlayer.currentTime(10);
+var myPlayer = videojs('some-player-id');
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+   myPlayer.currentTime(10);
 
-     // should be 10 seconds less than duration
-     console.log(myPlayer.remainingTime());
-  });
+   // should be 10 seconds less than duration
+   console.log(myPlayer.remainingTime());
+});
 ```
 
 `buffered` will give you a timeRange object representing the current ranges of time that are ready to be played at a future time.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    var bufferedTimeRange = myPlayer.buffered();
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  var bufferedTimeRange = myPlayer.buffered();
 
-    // number of different ranges of time have been buffered.
-    // Usually 1
-    var numberOfRanges = bufferedTimeRange.length,
+  // number of different ranges of time have been buffered.
+  // Usually 1
+  var numberOfRanges = bufferedTimeRange.length,
 
-    // Time in seconds when the first range starts.
-    // Usually 0
-    var firstRangeStart = bufferedTimeRange.start(0),
+  // Time in seconds when the first range starts.
+  // Usually 0
+  var firstRangeStart = bufferedTimeRange.start(0),
 
-    // Time in seconds when the first range ends
-    var firstRangeEnd = bufferedTimeRange.end(0),
+  // Time in seconds when the first range ends
+  var firstRangeEnd = bufferedTimeRange.end(0),
 
-    // Length in seconds of the first time range
-    var firstRangeLength = firstRangeEnd - firstRangeStart;
-  });
+  // Length in seconds of the first time range
+  var firstRangeLength = firstRangeEnd - firstRangeStart;
+});
 ```
 
 `bufferedPercent` will give you the the current percentage of the video that is buffered.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-    // example 0.11 aka 11%
-    var howMuchIsDownloaded = myPlayer.bufferedPercent();
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+  // example 0.11 aka 11%
+  var howMuchIsDownloaded = myPlayer.bufferedPercent();
+});
 ```
 
 ## Dealing with the source or the poster on the player
@@ -299,9 +300,9 @@ To exit fullscreen call `exitFullscreen`
 Passing a source to the player via the API. (this can also be done using options)
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src("http://www.example.com/path/to/video.mp4");
 ```
 
 **Source Object (or element):** A javascript object containing information
@@ -309,9 +310,9 @@ about the source file. Use this method if you want the player to determine if
 it can support the file using the type information.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src({type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"});
+myPlayer.src({type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"});
 ```
 
 **Array of Source Objects:** To provide multiple versions of the source so
@@ -320,26 +321,26 @@ source objects. Video.js will detect which version is supported and load that
 file.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src([
-    {type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"},
-    {type: "video/webm", src: "http://www.example.com/path/to/video.webm"},
-    {type: "video/ogg", src: "http://www.example.com/path/to/video.ogv"}
-  ]);
+myPlayer.src([
+  {type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"},
+  {type: "video/webm", src: "http://www.example.com/path/to/video.webm"},
+  {type: "video/ogg", src: "http://www.example.com/path/to/video.ogv"}
+]);
 ```
 
 Changing or setting the poster via the API. (this can also be done with options)
 
 ```js
-  var myPlayer = videojs('example_video_1');
+var myPlayer = videojs('example_video_1');
 
-  // set
-  myPlayer.poster('http://example.com/myImage.jpg');
+// set
+myPlayer.poster('http://example.com/myImage.jpg');
 
-  // get
-  console.log(myPlayer.poster());
-  // 'http://example.com/myImage.jpg'
+// get
+console.log(myPlayer.poster());
+// 'http://example.com/myImage.jpg'
 ```
 
 ## Accesing the Tech on the player
@@ -348,14 +349,14 @@ The tech on the player can only be accesed by pasing `{IWillNotUseThisInPlugins:
 function on the player.
 
 ```js
-  var myPlayer = videojs('some-player-id');
+var myPlayer = videojs('some-player-id');
 
-  myPlayer.src("http://www.example.com/path/to/video.mp4");
-  myPlayer.ready(function() {
-     // function call throws an error if we
-      // dont add {IWillNotUseThisInPlugins: true}
-     var tech = myPlayer.tech({IWillNotUseThisInPlugins: true});
-  });
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.ready(function() {
+   // function call throws an error if we
+    // dont add {IWillNotUseThisInPlugins: true}
+   var tech = myPlayer.tech({IWillNotUseThisInPlugins: true});
+});
 ```
 
 ## Using Video.js with...
