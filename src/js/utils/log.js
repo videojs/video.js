@@ -178,10 +178,10 @@ if (Object.defineProperty) {
  * {@link log.levels} is provided, acts as a setter. Regardless of argument,
  * returns the current logging level.
  *
- * @param  {String} [lvl]
+ * @param  {string} [lvl]
  *         Pass to set a new logging level.
  *
- * @return {String}
+ * @return {string}
  *         The current logging level.
  */
 log.level = (lvl) => {
