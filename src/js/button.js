@@ -16,8 +16,9 @@ class Button extends ClickableComponent {
   /**
    * Create the `Button`s DOM element.
    *
-   * @param {string} [tag=button]
-   *        Element's node type. e.g. 'button'
+   * @param {string} [tag="button"]
+   *        The element's node type. This argument is IGNORED: no matter what
+   *        is passed, it will always create a `button` element.
    *
    * @param {Object} [props={}]
    *        An object of properties that should be set on the element.
@@ -28,10 +29,8 @@ class Button extends ClickableComponent {
    * @return {Element}
    *         The element that gets created.
    */
-  createEl(tag = 'button', props = {}, attributes = {}) {
-    if (tag !== 'button') {
-      throw new Error('Buttons must be created with a "button" tag.');
-    }
+  createEl(tag, props = {}, attributes = {}) {
+    tag = 'button';
 
     props = assign({
       className: this.buildCSSClass()
