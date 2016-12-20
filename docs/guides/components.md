@@ -8,7 +8,7 @@ The architecture of the Video.js player is centered around components. The `Play
 * [Creating a Component](#creating-a-component)
 * [Component Children](#component-children)
   * [Basic Example](#basic-example)
-  * [Using Opitons](#using-opitons)
+  * [Using Options](#using-options)
 * [Event Listening](#event-listening)
   * [using on](#using-on)
   * [Using off](#using-off)
@@ -110,7 +110,7 @@ Results in a DOM that looks like this:
 </div>
 ```
 
-### Using Opitons
+### Using Options
 
 Pass in options for child constructors and options for children of the child.
 
