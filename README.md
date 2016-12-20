@@ -83,25 +83,40 @@ _Video.js uses [BrowserStack][browserstack] for compatibility testing._
 
 Video.js is [licensed][license] under the Apache License, Version 2.0.
 
-
 [browserstack]: https://browserstack.com
-[buildwith]: https://trends.builtwith.com/media/VideoJS
+
+[builtwith]: https://trends.builtwith.com/media/VideoJS
+
 [contributing]: CONTRIBUTING.md
-[contributing-building]: CONTRIBUTING.md#building-your-own-copy-of-videojs
-[contributing-code]: CONTRIBUTING.md#contributing-code
+
 [coveralls-icon]: https://coveralls.io/repos/github/videojs/video.js/badge.svg?branch=master
+
 [coveralls-link]: https://coveralls.io/github/videojs/video.js?branch=master
+
 [docs]: http://docs.videojs.com
+
 [fastly]: http://www.fastly.com/
+
 [getting-started]: http://videojs.com/getting-started/
+
 [license]: LICENSE
+
 [logo]: http://videojs.com/img/logo.png
+
 [npm-icon]: https://nodei.co/npm/video.js.png?downloads=true&downloadRank=true
+
 [npm-link]: https://nodei.co/npm/video.js/
-[options]: docs/options.md
+
+[options]: docs/guides/options.md
+
 [plugins]: http://videojs.com/plugins/
+
 [slack-icon]: http://slack.videojs.com/badge.svg
+
 [slack-link]: http://slack.videojs.com
+
 [travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=master
+
 [travis-link]: https://travis-ci.org/videojs/video.js
+
 [vjs]: http://videojs.com

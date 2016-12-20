@@ -1,10 +1,25 @@
 # Player Workflows
+
 This document outlines many considerations for using Video.js for advanced player workflows. Be sure to read [the setup guide](setup.md) first!
 
+## Table of Contents
+
+* [Removing Players](#removing-players)
+  * [dispose()](#dispose)
+  * [Signs of an Undisposed Player](#signs-of-an-undisposed-player)
+* [Showing and Hiding a Player](#showing-and-hiding-a-player)
+* [Using Video.js with...](#using-videojs-with)
+  * [jQuery](#jquery)
+  * [React](#react)
+  * [Ember](#ember)
+  * [Angular](#angular)
+
 ## Removing Players
+
 No matter the term used for it, web applications are becoming common. Not everything is a static, load-once-and-done web page anymore! This means that developers need to be able to manage the full lifecycle of a video player - from creation to destruction. Video.js supports player removal through the `dispose()` method.
 
 ### [`dispose()`](http://docs.videojs.com/docs/api/player.html#Methodsdispose)
+
 This method is available on all Video.js players and [components](http://docs.videojs.com/docs/api/component.html#Methodsdispose). It is _the only_ supported method of removing a Video.js player from both the DOM and memory. For example, the following code sets up a player and then disposes it when media playback is complete:
 
 ```js
@@ -26,15 +41,16 @@ Additionally, these actions are recursively applied to _all_ the player's child 
 > **Note**: Do _not_ remove players via standard DOM removal methods: this will leave listeners and other objects in memory that you might not be able to clean up!
 
 ### Signs of an Undisposed Player
+
 Seeing an error such as:
 
-```
+```console
 TypeError: this.el_.vjs_getProperty is not a function
 ```
 
 or
 
-```
+```console
 TypeError: Cannot read property 'vdata1234567890' of null
 ```
 
@@ -62,9 +78,13 @@ modal.on('hide', function() {
 ```
 
 ## Using Video.js with...
+
 Coming soon...
 
 ### jQuery
+
 ### React
+
 ### Ember
+
 ### Angular
