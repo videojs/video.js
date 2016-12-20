@@ -46,31 +46,31 @@ In addition, there are a couple methods worth recognizing:
 Creation:
 
 ```js
-  // adding a button to the player
-  var player = videojs('some-video-id');
-  var Component = videojs.getComponent('Component');
-  var button = new Component(player);
+// adding a button to the player
+var player = videojs('some-video-id');
+var Component = videojs.getComponent('Component');
+var button = new Component(player);
 
-  console.log(button.el());
+console.log(button.el());
 ```
 
 The Above code will output
 
 ```html
-  <div class="video-js">
-    <div class="vjs-button">Button</div>
-  </div>
+<div class="video-js">
+  <div class="vjs-button">Button</div>
+</div>
 ```
 
 Adding the new button to the player
 
 ```js
- // adding a button to the player
- var player = videojs('some-video-id');
- var button = player.addChild('button');
+// adding a button to the player
+var player = videojs('some-video-id');
+var button = player.addChild('button');
 
- console.log(button.el());
- // will have the same html result as the previous example
+console.log(button.el());
+// will have the same html result as the previous example
 ```
 
 ## Component Children
@@ -115,15 +115,15 @@ Results in a DOM that looks like this:
 Pass in options for child constructors and options for children of the child.
 
 ```js
-  var player = videojs('some-vid-id');
-  var Component = videojs.getComponent('Component');
-  var myComponent = new Component(player);
-  var myButton = myComponent.addChild('MyButton', {
-    text: 'Press Me',
-    buttonChildExample: {
-      buttonChildOption: true
-    }
-  });
+var player = videojs('some-vid-id');
+var Component = videojs.getComponent('Component');
+var myComponent = new Component(player);
+var myButton = myComponent.addChild('MyButton', {
+  text: 'Press Me',
+  buttonChildExample: {
+    buttonChildOption: true
+  }
+});
 ```
 
 Childern can also be added via options when a component is intialized.
@@ -132,16 +132,16 @@ Childern can also be added via options when a component is intialized.
 >       type that need different options.
 
 ```js
-  // MyComponent is from the above example
-  var myComp = new MyComponent(player, {
-    children: ['button', {
-      name: 'button',
-      someOtherOption: true
-    }, {
-      name: 'button',
-      someOtherOption: false
-    }]
-  });
+// MyComponent is from the above example
+var myComp = new MyComponent(player, {
+  children: ['button', {
+    name: 'button',
+    someOtherOption: true
+  }, {
+    name: 'button',
+    someOtherOption: false
+  }]
+});
 ```
 
 ## Event Listening
@@ -149,50 +149,50 @@ Childern can also be added via options when a component is intialized.
 ### using `on`
 
 ```js
-  var player = videojs('some-player-id');
-  var Component = videojs.getComponent('Component');
-  var myComponent = new Component(player);
-  var myFunc = function() {
-    var myComponent = this;
-    console.log('myFunc called');
-  };
+var player = videojs('some-player-id');
+var Component = videojs.getComponent('Component');
+var myComponent = new Component(player);
+var myFunc = function() {
+  var myComponent = this;
+  console.log('myFunc called');
+};
 
-  myComponent.on('eventType', myFunc);
-  myComponent.trigger('eventType');
-  // logs 'myFunc called'
+myComponent.on('eventType', myFunc);
+myComponent.trigger('eventType');
+// logs 'myFunc called'
 ```
 
 The context of `myFunc` will be `myComponent` unless it is bound. You can add
 a listener to another element or component.
 
 ```js
-  var otherComponent = new Component(player);
+var otherComponent = new Component(player);
 
-  // myComponent/myFunc is from the above example
-  myComponent.on(otherComponent.el(), 'eventName', myFunc);
-  myComponent.on(otherComponent, 'eventName', myFunc);
+// myComponent/myFunc is from the above example
+myComponent.on(otherComponent.el(), 'eventName', myFunc);
+myComponent.on(otherComponent, 'eventName', myFunc);
 
-  otherComponent.trigger('eventName');
-  // logs 'myFunc called' twice
+otherComponent.trigger('eventName');
+// logs 'myFunc called' twice
 ```
 
 ### Using `off`
 
 ```js
-  var player = videojs('some-player-id');
-  var Component = videojs.getComponent('Component');
-  var myComponent = new Component(player);
-  var myFunc = function() {
-    var myComponent = this;
-    console.log('myFunc called');
-  };
-  myComponent.on('eventType', myFunc);
-  myComponent.trigger('eventType');
-  // logs 'myFunc called'
+var player = videojs('some-player-id');
+var Component = videojs.getComponent('Component');
+var myComponent = new Component(player);
+var myFunc = function() {
+  var myComponent = this;
+  console.log('myFunc called');
+};
+myComponent.on('eventType', myFunc);
+myComponent.trigger('eventType');
+// logs 'myFunc called'
 
-  myComponent.off('eventType', myFunc);
-  myComponent.trigger('eventType');
-  // does nothing
+myComponent.off('eventType', myFunc);
+myComponent.trigger('eventType');
+// does nothing
 ```
 
 If myFunc gets excluded, ALL listeners for the event type will get removed. If
@@ -205,78 +205,78 @@ components using:
 In this case both the event type and listener function are **REQUIRED**.
 
 ```js
-  var otherComponent = new Component(player);
+var otherComponent = new Component(player);
 
-  // myComponent/myFunc is from the above example
-  myComponent.on(otherComponent.el(), 'eventName', myFunc);
-  myComponent.on(otherComponent, 'eventName', myFunc);
+// myComponent/myFunc is from the above example
+myComponent.on(otherComponent.el(), 'eventName', myFunc);
+myComponent.on(otherComponent, 'eventName', myFunc);
 
-  otherComponent.trigger('eventName');
-  // logs 'myFunc called' twice
-  myComponent.off(ootherComponent.el(), 'eventName', myFunc);
-  myComponent.off(otherComponent, 'eventName', myFunc);
-  otherComponent.trigger('eventName');
-  // does nothing
+otherComponent.trigger('eventName');
+// logs 'myFunc called' twice
+myComponent.off(ootherComponent.el(), 'eventName', myFunc);
+myComponent.off(otherComponent, 'eventName', myFunc);
+otherComponent.trigger('eventName');
+// does nothing
 ```
 
 ### Using `one`
 
 ```js
-  var player = videojs('some-player-id');
-  var Component = videojs.getComponent('Component');
-  var myComponent = new Component(player);
-  var myFunc = function() {
-    var myComponent = this;
-    console.log('myFunc called');
-  };
-  myComponent.one('eventName', myFunc);
-  myComponent.trigger('eventName');
-  // logs 'myFunc called'
+var player = videojs('some-player-id');
+var Component = videojs.getComponent('Component');
+var myComponent = new Component(player);
+var myFunc = function() {
+  var myComponent = this;
+  console.log('myFunc called');
+};
+myComponent.one('eventName', myFunc);
+myComponent.trigger('eventName');
+// logs 'myFunc called'
 
-  myComponent.trigger('eventName');
-  // does nothing
+myComponent.trigger('eventName');
+// does nothing
 ```
 
 You can also add a listener to another element or component that will get
 triggered only once.
 
 ```js
-  var otherComponent = new Component(player);
+var otherComponent = new Component(player);
 
-  // myComponent/myFunc is from the above example
-  myComponent.one(otherComponent.el(), 'eventName', myFunc);
-  myComponent.one(otherComponent, 'eventName', myFunc);
+// myComponent/myFunc is from the above example
+myComponent.one(otherComponent.el(), 'eventName', myFunc);
+myComponent.one(otherComponent, 'eventName', myFunc);
 
-  otherComponent.trigger('eventName');
-  // logs 'myFunc called' twice
+otherComponent.trigger('eventName');
+// logs 'myFunc called' twice
 
-  otherComponent.trigger('eventName');
-  // does nothing
+otherComponent.trigger('eventName');
+// does nothing
 ```
 
 ### Using `trigger`
 
 ```js
-  var player = videojs('some-player-id');
-  var Component = videojs.getComponent('Component');
-  var myComponent = new Component(player);
-  var myFunc = function(data) {
-    var myComponent = this;
-    console.log('myFunc called');
-    console.log(data);
-  };
-  myComponent.one('eventName', myFunc);
-  myComponent.trigger('eventName');
-  // logs 'myFunc called' and 'undefined'
+var player = videojs('some-player-id');
+var Component = videojs.getComponent('Component');
+var myComponent = new Component(player);
+var myFunc = function(data) {
+  var myComponent = this;
+  console.log('myFunc called');
+  console.log(data);
+};
+myComponent.one('eventName', myFunc);
+myComponent.trigger('eventName');
+// logs 'myFunc called' and 'undefined'
 
-  myComponent.trigger({'type':'eventName'});
-  // logs 'myFunc called' and 'undefined'
+myComponent.trigger({'type':'eventName'});
+// logs 'myFunc called' and 'undefined'
 
-  myComponent.trigger('eventName', {data: 'some data'});
-  // logs 'myFunc called' and "{data: 'some data'}"
+myComponent.trigger('eventName', {data: 'some data'});
+// logs 'myFunc called' and "{data: 'some data'}"
 
-  myComponent.trigger({'type':'eventName'}, {data: 'some data'});
-  // logs 'myFunc called' and "{data: 'some data'}"
+myComponent.trigger({'type':'eventName'}, {data: 'some data'});
+// logs 'myFunc called' and "{data: 'some data'}"
 ```
 
 ## Default Component Tree
