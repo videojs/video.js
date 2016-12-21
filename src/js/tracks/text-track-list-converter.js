@@ -1,8 +1,7 @@
 /**
- * Utilities for capturing text track state and re-creating tracks
- * based on a capture.
+ * @file text-track-list-converter.js Utilities for capturing text track state and
+ * re-creating tracks based on a capture.
  *
- * @file text-track-list-converter.js
  * @module text-track-list-converter
  */
 

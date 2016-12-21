@@ -57,7 +57,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `progress` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechProgress_
+   * @method Player#handleTechProgress_
    * @fires Player#progress
    * @listens Tech#progress
    */
@@ -73,7 +73,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `abort` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechAbort_
+   * @method Player#handleTechAbort_
    * @fires Player#abort
    * @listens Tech#abort
    */
@@ -89,7 +89,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `suspend` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechSuspend_
+   * @method Player#handleTechSuspend_
    * @fires Player#suspend
    * @listens Tech#suspend
    */
@@ -105,7 +105,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `emptied` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechEmptied_
+   * @method Player#handleTechEmptied_
    * @fires Player#emptied
    * @listens Tech#emptied
    */
@@ -120,7 +120,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `stalled` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechStalled_
+   * @method Player#handleTechStalled_
    * @fires Player#stalled
    * @listens Tech#stalled
    */
@@ -136,7 +136,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `stalled` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechLoadedmetadata_
+   * @method Player#handleTechLoadedmetadata_
    * @fires Player#loadedmetadata
    * @listens Tech#loadedmetadata
    */
@@ -152,7 +152,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `loadeddata` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechLoaddeddata_
+   * @method Player#handleTechLoaddeddata_
    * @fires Player#loadeddata
    * @listens Tech#loadeddata
    */
@@ -168,7 +168,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `timeupdate` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechTimeUpdate_
+   * @method Player#handleTechTimeUpdate_
    * @fires Player#timeupdate
    * @listens Tech#timeupdate
    */
@@ -184,7 +184,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechRatechange_
+   * @method Player#handleTechRatechange_
    * @fires Player#ratechange
    * @listens Tech#ratechange
    */
@@ -200,7 +200,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `volumechange` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechVolumechange_
+   * @method Player#handleTechVolumechange_
    * @fires Player#volumechange
    * @listens Tech#volumechange
    */
@@ -216,7 +216,7 @@ const TECH_EVENTS_RETRIGGER = [
    * Retrigger the `texttrackchange` event that was triggered by the {@link Tech}.
    *
    * @private
-   * @method Player.prototype.handleTechTexttrackchange_
+   * @method Player#handleTechTexttrackchange_
    * @fires Player#texttrackchange
    * @listens Tech#texttrackchange
    */
@@ -226,17 +226,6 @@ const TECH_EVENTS_RETRIGGER = [
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
  * are used to initialize a video.
- * ```js
- *   var myPlayer = videojs('example_video_1');
- * ```
- *
- * In the following example, the `data-setup` attribute tells the Video.js library to
- * create a player instance when the library is ready.
- * ```html
- *   <video id="example_video_1" data-setup='{}' controls>
- *     <source src="my-source.mp4" type="video/mp4">
- *   </video>
- * ```
  *
  * After an instance has been created it can be accessed globally in two ways:
  * 1. By calling `videojs('example_video_1');`
@@ -437,14 +426,6 @@ class Player extends Component {
   /**
    * Destroys the video player and does any necessary cleanup.
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     myPlayer.dispose();
-   *   });
-   * ```
    * This is especially helpful if you are dynamically adding and removing videos
    * to/from the DOM.
    *
@@ -942,17 +923,6 @@ class Player extends Component {
    * Return a reference to the current {@link Tech}, but only if given an object with the
    * `IWillNotUseThisInPlugins` property having a true value. This is try and prevent misuse
    * of techs by plugins.
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *      // function call throws an error if we
-   *       // dont add {IWillNotUseThisInPlugins: true}
-   *      var tech = myPlayer.tech({IWillNotUseThisInPlugins: true});
-   *   });
-   * ```
    *
    * @param {Object} safety
    *        An object that must contain `{IWillNotUseThisInPlugins: true}`
@@ -1597,14 +1567,6 @@ class Player extends Component {
 
   /**
    * start media playback
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     myPlayer.play();
-   *   });
-   * ```
    *
    * @return {Player}
    *         A reference to the player object this function was called on
@@ -1625,16 +1587,6 @@ class Player extends Component {
   /**
    * Pause the video playback
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     myPlayer.play();
-   *     myPlayer.pause();
-   *   });
-   * ```
-   *
    * @return {Player}
    *         A reference to the player object this function was called on
    */
@@ -1645,32 +1597,6 @@ class Player extends Component {
 
   /**
    * Check if the player is paused or has yet to play
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *
-   *   myPlayer.ready(function() {
-   *     // true
-   *     console.log(myPlayer.paused());
-   *     // false
-   *     console.log(!myPlayer.paused());
-   *
-   *     myPlayer.play();
-   *     // false
-   *     console.log(myPlayer.paused());
-   *     // true
-   *     console.log(!myPlayer.paused());
-   *
-   *     myPlayer.pause();
-   *     // true
-   *     console.log(myPlayer.paused());
-   *     // false
-   *     console.log(!myPlayer.paused());
-   *   });
-   *
-   * ```
    *
    * @return {boolean}
    *         - false: if the media is currently playing
@@ -1712,19 +1638,6 @@ class Player extends Component {
   /**
    * Get or set the current time (in seconds)
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     // set current time to 2 minutes into the video
-   *     myPlayer.currentTime(120);
-   *
-   *     // get the current time, should be 120 seconds
-   *     var whereYouAt = myPlayer.currentTime();
-   *   });
-   * ```
-   *
    * @param {number|string} [seconds]
    *        The time to seek to in seconds
    *
@@ -1755,14 +1668,6 @@ class Player extends Component {
    * Normally gets the length in time of the video in seconds;
    * in all but the rarest use cases an argument will NOT be passed to the method
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     var lengthOfVideo = myPlayer.duration();
-   *   });
-   * ```
    * > **NOTE**: The video must have started loading before the duration can be
    * known, and in the case of Flash, may not be known until the video starts
    * playing.
@@ -1812,17 +1717,6 @@ class Player extends Component {
    * Calculates how much time is left in the video. Not part
    * of the native video API.
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *      myPlayer.currentTime(10);
-   *
-   *      // should be 10 seconds less than duration
-   *      console.log(myPlayer.remainingTime());
-   *   });
-   * ```
-   *
    * @return {number}
    *         The time remaining in seconds
    */
@@ -1837,29 +1731,6 @@ class Player extends Component {
    * Get a TimeRange object with an array of the times of the video
    * that have been downloaded. If you just want the percent of the
    * video that's been downloaded, use bufferedPercent.
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     var bufferedTimeRange = myPlayer.buffered();
-   *
-   *     // number of different ranges of time have been buffered.
-   *     // Usually 1
-   *     var numberOfRanges = bufferedTimeRange.length,
-   *
-   *     // Time in seconds when the first range starts.
-   *     // Usually 0
-   *     var firstRangeStart = bufferedTimeRange.start(0),
-   *
-   *     // Time in seconds when the first range ends
-   *     var firstRangeEnd = bufferedTimeRange.end(0),
-   *
-   *     // Length in seconds of the first time range
-   *     var firstRangeLength = firstRangeEnd - firstRangeStart;
-   *   });
-   * ```
    *
    * @see [Buffered Spec]{@link http://dev.w3.org/html5/spec/video.html#dom-media-buffered}
    *
@@ -1879,16 +1750,6 @@ class Player extends Component {
   /**
    * Get the percent (as a decimal) of the video that's been downloaded.
    * This method is not a part of the native HTML video API.
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     // example 0.11 aka 11%
-   *     var howMuchIsDownloaded = myPlayer.bufferedPercent();
-   *   });
-   * ```
    *
    * @return {number}
    *         A decimal between 0 and 1 representing the percent
@@ -1920,18 +1781,6 @@ class Player extends Component {
   /**
    * Get or set the current volume of the media
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     // get
-   *     var howLoudIsIt = myPlayer.volume();
-   *     // set
-   *     myPlayer.volume(0.5); // Set volume to half
-   *   });
-   * ```
-   *
    * @param  {number} [percentAsDecimal]
    *         The new volume as a decimal percent:
    *         - 0 is muted/0%/off
@@ -1961,19 +1810,6 @@ class Player extends Component {
 
   /**
    * Get the current muted state, or turn mute on or off
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     // get, should be false
-   *     console.log(myPlayer.muted());
-   *     // set to true
-   *     myPlayer.muted(true);
-   *     // get should be true
-   *     console.log(myPlayer.muted());
-   *   });
-   * ```
    *
    * @param {boolean} [muted]
    *        - true to mute
@@ -2007,21 +1843,6 @@ class Player extends Component {
    * Check if the player is in fullscreen mode or tell the player that it
    * is or is not in fullscreen mode.
    *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     // get, should be false
-   *     console.log(myPlayer.isFullscreen());
-   *
-   *     // set, tell the player it's in fullscreen
-   *     myPlayer.isFullscreen(true);
-   *
-   *     // get, should be true
-   *     console.log(myPlayer.isFullscreen());
-   *   });
-   * ```
    * > NOTE: As of the latest HTML5 spec, isFullscreen is no longer an official
    * property and instead document.fullscreenElement is used. But isFullscreen is
    * still a valuable property for internal player workings.
@@ -2044,14 +1865,6 @@ class Player extends Component {
 
   /**
    * Increase the size of the video to full screen
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     myPlayer.requestFullscreen();
-   *   });
-   * ```
    * In some browsers, full screen is not supported natively, so it enters
    * "full window mode", where the video fills the browser window.
    * In browsers and devices that support native full screen, sometimes the
@@ -2113,16 +1926,6 @@ class Player extends Component {
 
   /**
    * Return the video to its normal size after having been in full screen mode
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *   myPlayer.ready(function() {
-   *     myPlayer.requestFullscreen();
-   *     myPlayer.exitFullscreen();
-   *   });
-   * ```
    *
    * @fires Player#fullscreenchange
    *
@@ -2344,37 +2147,6 @@ class Player extends Component {
    * **URL string**: A URL to the the video file. Use this method if you are sure
    * the current playback technology (HTML5/Flash) can support the source you
    * provide. Currently only MP4 files can be used in both HTML5 and Flash.
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
-   * ```
-   *
-   * **Source Object (or element):* * A javascript object containing information
-   * about the source file. Use this method if you want the player to determine if
-   * it can support the file using the type information.
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src({type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"});
-   * ```
-   *
-   * **Array of Source Objects:* * To provide multiple versions of the source so
-   * that it can be played using HTML5 across browsers you can use an array of
-   * source objects. Video.js will detect which version is supported and load that
-   * file.
-   *
-   * ```js
-   *   var myPlayer = videojs('some-player-id');
-   *
-   *   myPlayer.src([
-   *     {type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"},
-   *     {type: "video/webm", src: "http://www.example.com/path/to/video.webm"},
-   *     {type: "video/ogg", src: "http://www.example.com/path/to/video.ogv"}
-   *   ]);
-   * ```
    *
    * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
    *        One SourceObject or an array of SourceObjects
@@ -2626,18 +2398,6 @@ class Player extends Component {
 
   /**
    * Get or set the poster image source url
-   *
-   * EXAMPLE
-   * ```js
-   *   var myPlayer = videojs('example_video_1');
-   *
-   *   // set
-   *   myPlayer.poster('http://example.com/myImage.jpg');
-   *
-   *   // get
-   *   console.log(myPlayer.poster());
-   *   // 'http://example.com/myImage.jpg'
-   * ```
    *
    * @fires Player#posterchange
    *
@@ -3480,14 +3240,14 @@ Player.prototype.options_ = {
    * Returns whether or not the player is in the "ended" state.
    *
    * @return {Boolean} True if the player is in the ended state, false if not.
-   * @method Player.prototype.ended
+   * @method Player#ended
    */
   'ended',
   /**
    * Returns whether or not the player is in the "seeking" state.
    *
    * @return {Boolean} True if the player is in the seeking state, false if not.
-   * @method Player.prototype.seeking
+   * @method Player#seeking
    */
   'seeking',
   /**
@@ -3495,7 +3255,7 @@ Player.prototype.options_ = {
    * for seeking to.
    *
    * @return {TimeRanges} the seekable intervals of the media timeline
-   * @method Player.prototype.seekable
+   * @method Player#seekable
    */
   'seekable',
   /**
@@ -3516,7 +3276,7 @@ Player.prototype.options_ = {
    *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
    * @return {number} the current network activity state
-   * @method Player.prototype.networkState
+   * @method Player#networkState
    */
   'networkState',
   /**
@@ -3540,7 +3300,7 @@ Player.prototype.options_ = {
    *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
    * @return {number} the current playback rendering state
-   * @method Player.prototype.readyState
+   * @method Player#readyState
    */
   'readyState'
 ].forEach(function(fn) {

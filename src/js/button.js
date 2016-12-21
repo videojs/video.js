@@ -92,9 +92,6 @@ class Button extends ClickableComponent {
   /**
    * Enable the `Button` element so that it can be activated or clicked. Use this with
    * {@link Button#disable}.
-   *
-   * @return {Component}
-   *         Returns itself; method is chainable.
    */
   enable() {
     super.enable();
@@ -104,9 +101,6 @@ class Button extends ClickableComponent {
   /**
    * Enable the `Button` element so that it cannot be activated or clicked. Use this with
    * {@link Button#enable}.
-   *
-   * @return {Component}
-   *         Returns itself; method is chainable.
    */
   disable() {
     super.disable();

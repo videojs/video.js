@@ -18,33 +18,6 @@ import mergeOptions from './utils/merge-options.js';
  * in the DOM. They can be children of other components, and can have
  * children themselves.
  *
- * Creating a button component.
- * ``` js
- *   // adding a button to the player
- *   var player = videojs('some-video-id');
- *   var Component = videojs.getComponent('Component');
- *   var button = new Component(player);
- *
- *   console.log(button.el());
- * ```
- *
- * Above code will log this html.
- * ```html
- *   <div class="video-js">
- *     <div class="vjs-button">Button</div>
- *   </div>
- * ```
- *
- * Adding a button to the player
- * ``` js
- *   // adding a button to the player
- *   var player = videojs('some-video-id');
- *   var button = player.addChild('button');
- *
- *   console.log(button.el());
- *   // will have the same html result as the previous example
- * ```
- *
  * Components can also use methods from {@link EventTarget}
  */
 class Component {
@@ -64,7 +37,12 @@ class Component {
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
-   *         The key/value store of player options.
+   *        The key/value store of player options.
+   #
+   * @param {Object[]} [options.children]
+   *        An array of children objects to intialize this component with. Children objects have
+   *        a name property that will be used if more than one component of the same type needs to be
+   *        added.
    *
    * @param {Component~ReadyCallback} [ready]
    *        Function that gets called when the `Component` is ready.
@@ -181,41 +159,6 @@ class Component {
    * Deep merge of options objects with new options.
    * > Note: When both `obj` and `options` contain properties whose values are objects.
    *         The two properties get merged using {@link module:mergeOptions}
-   *
-   * Example
-   * ```js
-   *   var player = videojs('some-vid-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var component = new Component(player, {
-   *     optionSet: {
-   *       childOne: {foo: 'bar', asdf: 'fdsa'},
-   *       childTwo: {},
-   *       childThree: {}
-   *     }
-   *   });
-   *
-   *   const newOptions = {
-   *     optionSet: {
-   *       childOne: {foo: 'baz', abc: '123'}
-   *       childTwo: null,
-   *       childFour: {}
-   *     }
-   *   };
-   *
-   *   console.log(component.options(newOptions));
-   * ```
-   *
-   * Result
-   * ```js
-   *   {
-   *     optionSet: {
-   *       childOne: {foo: 'baz', asdf: 'fdsa', abc: '123' },
-   *       childTwo: null,
-   *       childThree: {},
-   *       childFour: {}
-   *     }
-   *   }
-   * ```
    *
    * @param {Object} obj
    *        The object that contains new options.
@@ -375,37 +318,6 @@ class Component {
   /**
    * Add a child `Component` inside the current `Component`.
    *
-   * Example:
-   * ```js
-   *   var player = videojs('some-vid-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *
-   *   console.log(myComponent.el());
-   *   // -> <div class='my-component'></div>
-   *   console.log(myComponent.children());
-   *   // [empty array]
-   *
-   *   var myButton = myComponent.addChild('MyButton');
-   *
-   *   console.log(myComponent.el());
-   *   // -> <div class='my-component'><div class="my-button">myButton<div></div>
-   *   console.log(myComponent.children());
-   *   // -> myButton === myComponent.children()[0];
-   * ```
-   *
-   * Pass in options for child constructors and options for children of the child.
-   * ```js
-   *   var player = videojs('some-vid-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myButton = myComponent.addChild('MyButton', {
-   *     text: 'Press Me',
-   *     buttonChildExample: {
-   *       buttonChildOption: true
-   *     }
-   *   });
-   * ```
    *
    * @param {string|Component} child
    *        The name or instance of a child to add.
@@ -541,48 +453,6 @@ class Component {
 
   /**
    * Add and initialize default child `Component`s based upon options.
-   *
-   * Example.
-   * ```js
-   *   var MyComponent = videojs.extend(videojs.getComponent('Component'));
-   *   // when an instance of MyComponent is created, all children in options
-   *   // will be added to the instance by their name strings and options
-   *   MyComponent.prototype.options_ = {
-   *     children: [
-   *       'myChildComponent'
-   *     ],
-   *     myChildComponent: {
-   *       myChildOption: true
-   *     }
-   *   };
-   *
-   *   // Or when creating the component
-   *   var player = videojs('some-player-id');
-   *   var myComp = new MyComponent(player, {
-   *     children: [
-   *       'myChildComponent'
-   *     ],
-   *     myChildComponent: {
-   *       myChildOption: true
-   *     }
-   *   });
-   * ```
-   *
-   * The children option can also be an array of child options objects
-   * (that also include a 'name' key). This will get used if you have two child
-   * components of the same type that need different options.
-   * ```js
-   *   // MyComponent is from the above example
-   *   var myComp = new MyComponent(player, {
-   *     children: ['button', {
-   *       name: 'button',
-   *       someOtherOption: true
-   *     }, {
-   *       name: 'button',
-   *       someOtherOption: false
-   *     }]
-   *   });
-   * ```
    */
   initChildren() {
     const children = this.options_.children;
@@ -696,46 +566,17 @@ class Component {
   /**
    * Add an `event listener` to this `Component`s element.
    *
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function() {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *   };
-   *
-   *   myComponent.on('eventType', myFunc);
-   *   myComponent.trigger('eventType');
-   *   // logs 'myFunc called'
-   * ```
-   *
-   * The context of `myFunc` will be `myComponent` unless it is bound. You can add
-   * a listener to another element or component.
-   * ```js
-   *   var otherComponent = new Component(player);
-   *
-   *   // myComponent/myFunc is from the above example
-   *   myComponent.on(otherComponent.el(), 'eventName', myFunc);
-   *   myComponent.on(otherComponent, 'eventName', myFunc);
-   *
-   *   otherComponent.trigger('eventName');
-   *   // logs 'myFunc called' twice
-   * ```
-   *
    * The benefit of using this over the following:
    * - `VjsEvents.on(otherElement, 'eventName', myFunc)`
    * - `otherComponent.on('eventName', myFunc)`
-   * Is that the listeners will get cleaned up when either component gets disposed.
-   * It will also bind `myComponent` as the context of `myFunc`.
+   *
+   * 1. Is that the listeners will get cleaned up when either component gets disposed.
+   * 1. It will also bind `myComponent` as the context of `myFunc`.
    * > NOTE: If you remove the element from the DOM that has used `on` you need to
-   *             clean up references using:
-   *
-   *             `myComponent.trigger(el, 'dispose')`
-   *
-   *             This will also allow the browser to garbage collect it. In special
-   *             cases such as with `window` and `document`, which are both permanent,
-   *             this is not necessary.
+   *         clean up references using: `myComponent.trigger(el, 'dispose')`
+   *         This will also allow the browser to garbage collect it. In special
+   *         cases such as with `window` and `document`, which are both permanent,
+   *         this is not necessary.
    *
    * @param {string|Component|string[]} [first]
    *        The event name, and array of event names, or another `Component`.
@@ -797,47 +638,8 @@ class Component {
   }
 
   /**
-   * Remove an event listener from this `Component`s element.
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function() {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *   };
-   *   myComponent.on('eventType', myFunc);
-   *   myComponent.trigger('eventType');
-   *   // logs 'myFunc called'
-   *
-   *   myComponent.off('eventType', myFunc);
-   *   myComponent.trigger('eventType');
-   *   // does nothing
-   * ```
-   *
-   * If myFunc gets excluded, ALL listeners for the event type will get removed. If
-   * eventType gets excluded, ALL listeners will get removed from the component.
-   * You can use `off` to remove listeners that get added to other elements or
-   * components using:
-   *
-   *  `myComponent.on(otherComponent...`
-   *
-   * In this case both the event type and listener function are **REQUIRED**.
-   *
-   * ```js
-   *   var otherComponent = new Component(player);
-   *
-   *   // myComponent/myFunc is from the above example
-   *   myComponent.on(otherComponent.el(), 'eventName', myFunc);
-   *   myComponent.on(otherComponent, 'eventName', myFunc);
-   *
-   *   otherComponent.trigger('eventName');
-   *   // logs 'myFunc called' twice
-   *   myComponent.off(ootherComponent.el(), 'eventName', myFunc);
-   *   myComponent.off(otherComponent, 'eventName', myFunc);
-   *   otherComponent.trigger('eventName');
-   *   // does nothing
-   * ```
+   * Remove an event listener from this `Component`s element. If the second argument is
+   * exluded all listeners for the type passed in as the first argument will be removed.
    *
    * @param {string|Component|string[]} [first]
    *        The event name, and array of event names, or another `Component`.
@@ -881,38 +683,6 @@ class Component {
 
   /**
    * Add an event listener that gets triggered only once and then gets removed.
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function() {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *   };
-   *   myComponent.one('eventName', myFunc);
-   *   myComponent.trigger('eventName');
-   *   // logs 'myFunc called'
-   *
-   *   myComponent.trigger('eventName');
-   *   // does nothing
-   *
-   * ```
-   *
-   * You can also add a listener to another element or component that will get
-   * triggered only once.
-   * ```js
-   *   var otherComponent = new Component(player);
-   *
-   *   // myComponent/myFunc is from the above example
-   *   myComponent.one(otherComponent.el(), 'eventName', myFunc);
-   *   myComponent.one(otherComponent, 'eventName', myFunc);
-   *
-   *   otherComponent.trigger('eventName');
-   *   // logs 'myFunc called' twice
-   *
-   *   otherComponent.trigger('eventName');
-   *   // does nothing
-   * ```
    *
    * @param {string|Component|string[]} [first]
    *        The event name, and array of event names, or another `Component`.
@@ -951,29 +721,6 @@ class Component {
 
   /**
    * Trigger an event on an element.
-   *
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function(data) {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *     console.log(data);
-   *   };
-   *   myComponent.one('eventName', myFunc);
-   *   myComponent.trigger('eventName');
-   *   // logs 'myFunc called' and 'undefined'
-   *
-   *   myComponent.trigger({'type':'eventName'});
-   *   // logs 'myFunc called' and 'undefined'
-   *
-   *   myComponent.trigger('eventName', {data: 'some data'});
-   *   // logs 'myFunc called' and "{data: 'some data'}"
-   *
-   *   myComponent.trigger({'type':'eventName'}, {data: 'some data'});
-   *   // logs 'myFunc called' and "{data: 'some data'}"
-   * ```
    *
    * @param {EventTarget~Event|Object|string} event
    *        The event name, and Event, or an event-like object with a type attribute

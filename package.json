@@ -24,8 +24,10 @@
     "lint": "vjsstandard",
     "start": "grunt watchAll",
     "test": "grunt test",
-    "toc": "doctoc",
-    "docs": "jsdoc -r src/js -d docs/api -c .jsdoc.json"
+    "docs": "npm run docs:lint && npm run docs:api",
+    "docs:api": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
+    "docs:lint": "remark -- './**/*.md'",
+    "docs:fix": "remark --output -- './**/*.md'"
   },
   "repository": {
     "type": "git",
@@ -63,7 +65,6 @@
     "chg": "^0.3.2",
     "conventional-changelog-cli": "^1.2.0",
     "conventional-changelog-videojs": "^3.0.0",
-    "doctoc": "^1.2.0",
     "envify": "^3.4.1",
     "es5-shim": "^4.1.3",
     "es6-shim": "^0.35.1",
@@ -111,12 +112,16 @@
     "npm-run": "^4.1.0",
     "proxyquireify": "^3.0.0",
     "qunitjs": "1.23.1",
+    "remark-cli": "^2.1.0",
+    "remark-lint": "^5.2.0",
+    "remark-toc": "^3.1.0",
+    "remark-validate-links": "^5.0.0",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.7.3",
     "unreachable-branch-transform": "^0.5.1",
     "videojs-doc-generator": "0.0.1",
-    "videojs-standard": "^5.2.0",
+    "videojs-standard": "^6.0.1",
     "webpack": "^1.13.2"
   },
   "vjsstandard": {

@@ -1,8 +1,7 @@
 /**
- * Functions for setting up a player without user insteraction based on the data-setup
- * `attribute` of the video tag.
+ * @file setup.js - Functions for setting up a player without
+ * user interaction based on the data-setup `attribute` of the video tag.
  *
- * @file setup.js
  * @module setup
  */
 import * as Events from './utils/events.js';
@@ -78,6 +77,12 @@ const autoSetup = function() {
 /**
  * Wait until the page is loaded before running autoSetup. This will be called in
  * autoSetup if `hasLoaded` returns false.
+ *
+ * @param {number} wait
+ *        How long to wait in ms
+ *
+ * @param {videojs} [vjs]
+ *        The videojs library function
  */
 function autoSetupTimeout(wait, vjs) {
   if (vjs) {
