@@ -280,6 +280,8 @@ QUnit.test('should asynchronously fire error events during source selection', fu
     assert.ok(player.error().code === 4, 'Source could not be played error thrown');
   });
 
+  // The first one is for player initialization
+  // The second one is the setTimeout for triggering the error
   this.clock.tick(1);
   this.clock.tick(1);
 
