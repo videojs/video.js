@@ -462,7 +462,7 @@ class Tech extends Component {
 
     const tracks = this.textTracks();
 
-    if (!tracks) {
+    if (!tracks || !tracks.length) {
       return;
     }
 
@@ -564,7 +564,7 @@ class Tech extends Component {
   emulateTextTracks() {
     const tracks = this.textTracks();
 
-    if (!tracks) {
+    if (!tracks || !tracks.length) {
       return;
     }
 
