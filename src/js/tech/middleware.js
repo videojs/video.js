@@ -3,7 +3,8 @@ import { assign } from '../utils/obj.js';
 const middlewares = {};
 
 export function use(type, middleware) {
-  (middlewares[type] = middlewares[type] || []).push(middleware);
+  middlewares[type] = middlewares[type] || []
+  middlewares[type].push(middleware);
 }
 
 export function setSource(setTimeout, src, next) {
