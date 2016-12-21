@@ -2223,42 +2223,41 @@ class Player extends Component {
   src_(source) {
     const sourceTech = this.selectSource([source]);
 
-    if (sourceTech) {
-      if (sourceTech.tech === this.techName_) {
-
-        // wait until the tech is ready to set the source
-        this.ready(function() {
-
-          // The setSource tech method was added with source handlers
-          // so older techs won't support it
-          // We need to check the direct prototype for the case where subclasses
-          // of the tech do not support source handlers
-          if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
-            this.techCall_('setSource', source);
-          } else {
-            this.techCall_('src', source.src);
-          }
-
-          if (this.options_.preload === 'auto') {
-            this.load();
-          }
-
-          if (this.options_.autoplay) {
-            this.play();
-          }
-
-        // Set the source synchronously if possible (#2326)
-        }, true);
-      } else {
-        // load this technology with the chosen source
-        this.loadTech_(sourceTech.tech, sourceTech.source);
-      }
-
-    } else {
+    if (!sourceTech) {
       return true;
     }
 
-    return;
+    if (sourceTech.tech !== this.techName_) {
+      // load this technology with the chosen source
+      this.loadTech_(sourceTech.tech, sourceTech.source);
+      return false;
+    }
+
+    // wait until the tech is ready to set the source
+    this.ready(function() {
+
+      // The setSource tech method was added with source handlers
+      // so older techs won't support it
+      // We need to check the direct prototype for the case where subclasses
+      // of the tech do not support source handlers
+      if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
+        this.techCall_('setSource', source);
+      } else {
+        this.techCall_('src', source.src);
+      }
+
+      if (this.options_.preload === 'auto') {
+        this.load();
+      }
+
+      if (this.options_.autoplay) {
+        this.play();
+      }
+
+    // Set the source synchronously if possible (#2326)
+    }, true);
+
+    return false;
 
     /*
     let currentTech = Tech.getTech(this.techName_);
