@@ -342,10 +342,11 @@ class Flash extends Tech {
   }
 
   /**
-   * Chek if the type is supported by this tech.
+   * Check if the type is supported by this tech.
    *
-   * @param {String} type The media type to check
-   * @return {String} Returns the native video element's response
+   * @param {string} type
+   *        The media type to check
+   * @return {string} Returns the native video element's response
    */
   static canPlayType(type) {
     return Flash.nativeSourceHandler.canPlayType(type);
@@ -353,9 +354,11 @@ class Flash extends Tech {
 
   /**
    * Check if the tech can support the given source
-   * @param  {Object} srcObj  The source object
-   * @param  {Object} options The options passed to the tech
-   * @return {String}         'probably', 'maybe', or '' (empty string)
+   * @param {Object} srcObj
+   *        The source object
+   * @param {Object} options
+   *        The options passed to the tech
+   * @return {string} 'probably', 'maybe', or '' (empty string)
    */
   static canPlaySource(srcObj, options) {
     return Flash.canPlayType(srcObj.type);

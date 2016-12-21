@@ -799,13 +799,14 @@ class Tech extends Component {
   }
 
   /**
-   * Check if the tech can support the given type
+   * Check if the type is supported by this tech.
    *
    * The base tech does not support any type, but source handlers might
    * overwrite this.
    *
-   * @param  {String} type    The mimetype to check
-   * @return {String}         'probably', 'maybe', or '' (empty string)
+   * @param {string} type
+   *        The media type to check
+   * @return {string} Returns the native video element's response
    */
   static canPlayType() {
     return '';
@@ -813,9 +814,11 @@ class Tech extends Component {
 
   /**
    * Check if the tech can support the given source
-   * @param  {Object} srcObj  The source object
-   * @param  {Object} options The options passed to the tech
-   * @return {String}         'probably', 'maybe', or '' (empty string)
+   * @param {Object} srcObj
+   *        The source object
+   * @param {Object} options
+   *        The options passed to the tech
+   * @return {string} 'probably', 'maybe', or '' (empty string)
    */
   static canPlaySource(srcObj, options) {
     return Tech.canPlayType(srcObj.type);
