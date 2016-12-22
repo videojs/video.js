@@ -140,8 +140,10 @@ class Tech extends Component {
     this.initTextTrackListeners();
     this.initTrackListeners();
 
-    // Turn on component tap events
-    this.emitTapEvents();
+    // Turn on component tap events only if not using native controls
+    if (!options.nativeControlsForTouch) {
+      this.emitTapEvents();
+    }
   }
 
   /* Fallbacks for unsupported event types
