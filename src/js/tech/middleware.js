@@ -8,7 +8,7 @@ export function use(type, middleware) {
 }
 
 export function setSource(setTimeout, src, next) {
-  setTimeout(() => ssh(src, middlewares[src.type], next), 1);
+  setTimeout(() => setSourceHelper(src, middlewares[src.type], next), 1);
 }
 
 export function setTech(middleware, tech) {
@@ -42,12 +42,12 @@ function middlewareIterator(method) {
   };
 }
 
-function ssh(src = {}, middleware = [], next, acc = []) {
+function setSourceHelper(src = {}, middleware = [], next, acc = []) {
   const [mw, ...mwrest] = middleware;
 
   // if mw is a string, then we're at a fork in the road
   if (typeof mw === 'string') {
-    ssh(src, middlewares[mw], next, acc);
+    setSourceHelper(src, middlewares[mw], next, acc);
 
   // if we have an mw, call its setSource method
   } else if (mw) {
@@ -56,7 +56,7 @@ function ssh(src = {}, middleware = [], next, acc = []) {
       // something happened, try the next middleware on the current level
       // make sure to use the old src
       if (err) {
-        return ssh(src, mwrest, next, acc);
+        return setSourceHelper(src, mwrest, next, acc);
       }
 
       // we've succeeded, now we need to go deeper
@@ -64,13 +64,13 @@ function ssh(src = {}, middleware = [], next, acc = []) {
 
       // if it's the same time, continue does the current chain
       // otherwise, we want to go down the new chain
-      ssh(_src,
+      setSourceHelper(_src,
           src.type === _src.type ? mwrest : middlewares[_src.type],
           next,
           acc);
     });
   } else if (mwrest.length) {
-    ssh(src, mwrest, next, acc);
+    setSourceHelper(src, mwrest, next, acc);
   } else {
     // const techs = [].concat(middlewares['*']);
     // const tech = techs.filter((tech) => !!tech.tech.canPlayType(src.type))[0].name;
