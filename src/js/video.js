@@ -2,6 +2,7 @@
  * @file video.js
  * @module videojs
  */
+/* global define:false */
 
 import window from 'global/window';
 import document from 'global/document';
