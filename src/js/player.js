@@ -1516,18 +1516,12 @@ class Player extends Component {
    */
   techCall_(method, arg) {
     // If it's not ready yet, call method when it is
-    if (method in middleware.allowedSetters) {
-      return middleware.set(this.middleware_, this.tech_, method, arg);
-    }
 
-    if (this.tech_ && !this.tech_.isReady_) {
+    this.ready(function() {
+      if (method in middleware.allowedSetters) {
+        return middleware.set(this.middleware_, this.tech_, method, arg);
+      }
 
-      this.tech_.ready(function() {
-        this[method](arg);
-      }, true);
-
-    // Otherwise call method now
-    } else {
       try {
         if (this.tech_) {
           this.tech_[method](arg);
@@ -1536,7 +1530,7 @@ class Player extends Component {
         log(e);
         throw e;
       }
-    }
+    });
   }
 
   /**
