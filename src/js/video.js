@@ -303,6 +303,8 @@ videojs.getTech = Tech.getTech;
  */
 videojs.registerTech = Tech.registerTech;
 
+videojs.use = middlewareUse;
+
 /**
  * A suite of browser and device tests from {@link browser}.
  *
@@ -648,5 +650,3 @@ if (typeof define === 'function' && define.amd) {
 }
 
 export default videojs;
-
-videojs.use = middlewareUse;
