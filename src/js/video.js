@@ -2,7 +2,8 @@
  * @file video.js
  * @module videojs
  */
-/* global define:false */
+
+/* global define */
 
 import window from 'global/window';
 import document from 'global/document';
@@ -300,9 +301,7 @@ videojs.getTech = Tech.getTech;
  *
  * @borrows Tech.registerTech as videojs.registerTech
  */
-videojs.registerTech = function(name, tech) {
-  Tech.registerTech(name, tech);
-};
+videojs.registerTech = Tech.registerTech;
 
 /**
  * A suite of browser and device tests from {@link browser}.
