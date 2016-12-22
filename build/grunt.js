@@ -5,7 +5,7 @@ import npmRun from 'npm-run';
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
-  let _ = require('lodash');
+  let _ = require('lodash-compat');
   let pkg = grunt.file.readJSON('package.json');
   let license = grunt.file.read('build/license-header.txt');
   let bannerCommonData = _.pick(pkg, ['version', 'copyright']);
@@ -223,7 +223,6 @@ module.exports = function(grunt) {
       chrome_bs:    { browsers: ['chrome_bs'] },
       firefox_bs:   { browsers: ['firefox_bs'] },
       safari_bs:    { browsers: ['safari_bs'] },
-      edge_bs:      { browsers: ['edge_bs'] },
       ie11_bs:      { browsers: ['ie11_bs'] },
       ie10_bs:      { browsers: ['ie10_bs'] },
       ie9_bs:       { browsers: ['ie9_bs'] },
@@ -265,25 +264,25 @@ module.exports = function(grunt) {
         options: {
           release: 'major'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       minor: {
         options: {
           release: 'minor'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       patch: {
         options: {
           release: 'patch'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       prerelease: {
         options: {
           release: 'prerelease'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       css: {
         options: {
