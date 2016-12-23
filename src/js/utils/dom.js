@@ -56,6 +56,15 @@ function classRegExp(className) {
 }
 
 /**
+ * Whether the current DOM interface appears to be real.
+ *
+ * @return {Boolean}
+ */
+export function isReal() {
+  return document === window.document && typeof document.createElement === 'function';
+}
+
+/**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
  * @param {Mixed} value
