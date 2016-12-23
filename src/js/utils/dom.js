@@ -61,7 +61,14 @@ function classRegExp(className) {
  * @return {Boolean}
  */
 export function isReal() {
-  return document === window.document && typeof document.createElement === 'function';
+  return (
+
+    // Both document and window will never be undefined thanks to `global`.
+    document === window.document &&
+
+    // In IE < 9, DOM methods return "object" as their type, so all we can
+    // confidently check is that it exists.
+    typeof document.createElement !== 'undefined');
 }
 
 /**
