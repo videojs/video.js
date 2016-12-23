@@ -2,6 +2,7 @@
 import videojs from '../../src/js/video.js';
 import TestHelpers from './test-helpers.js';
 import * as Dom from '../../src/js/utils/dom.js';
+import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
 QUnit.module('video.js');
@@ -43,6 +44,42 @@ QUnit.test('should return a video player instance', function(assert) {
 
   player.dispose();
   player2.dispose();
+});
+
+QUnit.test('should log about already initalized players if options already passed',
+function(assert) {
+  const origWarnLog = log.warn;
+  const fixture = document.getElementById('qunit-fixture');
+  const warnLogs = [];
+
+  log.warn = (args) => {
+    warnLogs.push(args);
+  };
+
+  fixture.innerHTML += '<video id="test_vid_id"></video>';
+
+  const player = videojs('test_vid_id', { techOrder: ['techFaker'] });
+
+  assert.ok(player, 'created player from tag');
+  assert.ok(player.id() === 'test_vid_id');
+  assert.ok(!warnLogs.length, 'no warn logs');
+
+  const playerAgain = videojs('test_vid_id');
+
+  assert.ok(player === playerAgain, 'did not create a second player from same tag');
+  assert.ok(!warnLogs.length, 'no warn logs');
+
+  const playerAgainWithOptions = videojs('test_vid_id', { techOrder: ['techFaker'] });
+
+  assert.ok(player === playerAgainWithOptions,
+            'did not create a second player from same tag');
+  assert.equal(warnLogs.length, 1, 'logged a warning');
+  assert.equal(warnLogs[0],
+               'Player "test_vid_id" is already initialised. ' +
+                 'Options will not be applied.',
+               'logged the right message');
+
+  log.warn = origWarnLog;
 });
 
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {

@@ -80,7 +80,7 @@ function videojs(id, options, ready) {
     if (videojs.getPlayers()[id]) {
 
       // If options or ready funtion are passed, warn
-      if (options) {
+      if (Object.keys(options).length) {
         log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
       }
 
