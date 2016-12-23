@@ -61,25 +61,27 @@ function(assert) {
   const player = videojs('test_vid_id', { techOrder: ['techFaker'] });
 
   assert.ok(player, 'created player from tag');
-  assert.ok(player.id() === 'test_vid_id');
-  assert.ok(!warnLogs.length, 'no warn logs');
+  assert.equal(player.id(), 'test_vid_id', 'player has the right ID');
+  assert.equal(warnLogs.length, 0, 'no warn logs');
 
   const playerAgain = videojs('test_vid_id');
 
-  assert.ok(player === playerAgain, 'did not create a second player from same tag');
-  assert.ok(!warnLogs.length, 'no warn logs');
+  assert.equal(player, playerAgain, 'did not create a second player from same tag');
+  assert.equal(warnLogs.length, 0, 'no warn logs');
 
   const playerAgainWithOptions = videojs('test_vid_id', { techOrder: ['techFaker'] });
 
-  assert.ok(player === playerAgainWithOptions,
-            'did not create a second player from same tag');
+  assert.equal(player,
+               playerAgainWithOptions,
+               'did not create a second player from same tag');
   assert.equal(warnLogs.length, 1, 'logged a warning');
   assert.equal(warnLogs[0],
-               'Player "test_vid_id" is already initialised. ' +
-                 'Options will not be applied.',
+               'Player "test_vid_id" is already initialised. Options will not be applied.',
                'logged the right message');
 
   log.warn = origWarnLog;
+
+  player.dispose();
 });
 
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {
