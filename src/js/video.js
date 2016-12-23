@@ -65,8 +65,6 @@ if (typeof HTMLVideoElement === 'undefined' &&
 function videojs(id, options, ready) {
   let tag;
 
-  options = options || {};
-
   // Allow for element or ID to be passed in
   // String ID
   if (typeof id === 'string') {
@@ -110,6 +108,8 @@ function videojs(id, options, ready) {
   if (tag.player || Player.players[tag.playerId]) {
     return tag.player || Player.players[tag.playerId];
   }
+
+  options = options || {};
 
   videojs.hooks('beforesetup').forEach(function(hookFunction) {
     const opts = hookFunction(tag, mergeOptions(options));
