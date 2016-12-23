@@ -1030,9 +1030,6 @@ const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
 const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
-  if (!canPlayType) {
-    return;
-  }
 
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX) {
