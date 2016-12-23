@@ -35,9 +35,7 @@ import xhr from 'xhr';
 import Tech from './tech/tech.js';
 
 // HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined' &&
-    window.document &&
-    window.document.createElement) {
+if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
   document.createElement('video');
   document.createElement('audio');
   document.createElement('track');
@@ -196,7 +194,7 @@ videojs.removeHook = function(type, fn) {
 };
 
 // Add default styles
-if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
+if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
   let style = Dom.$('.vjs-styles-defaults');
 
   if (!style) {

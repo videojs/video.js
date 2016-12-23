@@ -798,20 +798,23 @@ class Html5 extends Tech {
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 
-/**
- * Element for testing browser HTML5 media capabilities
- *
- * @type {Element}
- * @constant
- * @private
- */
-Html5.TEST_VID = document.createElement('video');
-const track = document.createElement('track');
+if (Dom.isReal()) {
 
-track.kind = 'captions';
-track.srclang = 'en';
-track.label = 'English';
-Html5.TEST_VID.appendChild(track);
+  /**
+   * Element for testing browser HTML5 media capabilities
+   *
+   * @type {Element}
+   * @constant
+   * @private
+   */
+  Html5.TEST_VID = document.createElement('video');
+  const track = document.createElement('track');
+
+  track.kind = 'captions';
+  track.srclang = 'en';
+  track.label = 'English';
+  Html5.TEST_VID.appendChild(track);
+}
 
 /**
  * Check if HTML5 media is supported by this browser/device.
@@ -828,7 +831,7 @@ Html5.isSupported = function() {
     return false;
   }
 
-  return !!Html5.TEST_VID.canPlayType;
+  return !!(Html5.TEST_VID && Html5.TEST_VID.canPlayType);
 };
 
 /**
@@ -895,9 +898,7 @@ Html5.supportsNativeTextTracks = function() {
  *        - False otherwise
  */
 Html5.supportsNativeVideoTracks = function() {
-  const supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
-
-  return supportsVideoTracks;
+  return !!(Html5.TEST_VID && Html5.TEST_VID.videoTracks);
 };
 
 /**
@@ -908,9 +909,7 @@ Html5.supportsNativeVideoTracks = function() {
  *        - False otherwise
  */
 Html5.supportsNativeAudioTracks = function() {
-  const supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
-
-  return supportsAudioTracks;
+  return !!(Html5.TEST_VID && Html5.TEST_VID.audioTracks);
 };
 
 /**
@@ -1026,11 +1025,15 @@ Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
 Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
+const canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
 const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
+  if (!canPlayType) {
+    return;
+  }
+
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX) {
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
