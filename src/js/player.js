@@ -426,6 +426,8 @@ class Player extends Component {
 
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
+
+    this.changingSrc_ = false;
   }
 
   /**
@@ -1582,8 +1584,13 @@ class Player extends Component {
    *         A reference to the player object this function was called on
    */
   play() {
+    if (this.changingSrc_) {
+      this.ready(function() {
+        this.techCall_('play');
+      });
+
     // Only calls the tech's play if we already have a src loaded
-    if (this.src() || this.currentSrc()) {
+    } else if (this.src() || this.currentSrc()) {
       this.techCall_('play');
     } else {
       this.tech_.one('loadstart', function() {
@@ -2170,6 +2177,8 @@ class Player extends Component {
       return this.techGet_('src');
     }
 
+    this.changingSrc_ = true;
+
     let src = source;
 
     if (Array.isArray(source)) {
@@ -2222,6 +2231,8 @@ class Player extends Component {
     }
 
     if (sourceTech.tech !== this.techName_) {
+      this.changingSrc_ = true;
+
       // load this technology with the chosen source
       this.loadTech_(sourceTech.tech, sourceTech.source);
       return false;
