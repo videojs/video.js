@@ -3341,6 +3341,13 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  */
 
 /**
+ * Fired when video playback ends
+ *
+ * @event ended
+ */
+Player.prototype.handleTechEnded_;
+
+/**
  * Fired when the volume changes
  *
  * @event Player#volumechange
