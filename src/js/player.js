@@ -841,12 +841,8 @@ class Player extends Component {
       techOptions.tag = this.tag;
     }
 
-    if (source) {
-      this.currentType_ = source.type;
-
-      if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
-        techOptions.startTime = this.cache_.currentTime;
-      }
+    if (source && source.src === this.cache_.src && this.cache_.currentTime > 0) {
+      techOptions.startTime = this.cache_.currentTime;
     }
 
     // Initialize tech instance
@@ -2174,7 +2170,7 @@ class Player extends Component {
    */
   src(source) {
     if (source === undefined) {
-      return this.techGet_('src');
+      return this.cache_.src;
     }
 
     this.changingSrc_ = true;
@@ -2193,7 +2189,8 @@ class Player extends Component {
     }
 
     this.cache_.source = src;
-    this.cache_.src = src.src;
+
+    this.currentType_ = src.type;
 
     middleware.setSource(Fn.bind(this, this.setTimeout), src, (src_, mws) => {
       this.middleware_ = mws;
@@ -2217,6 +2214,7 @@ class Player extends Component {
         return;
       }
 
+      this.cache_.src = src_.src;
       middleware.setTech(mws, this.tech_);
     });
 
@@ -2365,7 +2363,7 @@ class Player extends Component {
    *         The current source
    */
   currentSrc() {
-    return this.techGet_('currentSrc') || this.cache_.src || '';
+    return this.cache_.source && this.cache_.source.src || '';
   }
 
   /**
