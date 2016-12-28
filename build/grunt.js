@@ -127,15 +127,6 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      dist: {
-        files: [
-          'build/temp/video.js',
-          'build/temp/alt/video.novtt.js',
-          'build/temp/video-js.css',
-          'build/temp/alt/video-js-cdn.css'
-        ],
-        tasks: ['copy:dist']
-      },
       novtt: {
         files: ['build/temp/video.js'],
         tasks: ['concat:novtt']
@@ -151,6 +142,10 @@ module.exports = function(grunt) {
       babel: {
         files: ['src/js/**/*.js'],
         tasks: ['babel:es5']
+      },
+      jshint: {
+        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
+        tasks: 'jshint'
       }
     },
     connect: {
@@ -410,14 +405,6 @@ module.exports = function(grunt) {
         'watch:babel',
         'browserify:tests'
       ],
-      dev: [
-        'browserify:watch',
-        'browserify:tests',
-        'watch:novtt',
-        'watch:skin',
-        'watch:dist',
-        'shell:babel'
-      ],
       // Run multiple watch tasks in parallel
       // Needed so watchify can cache intelligently
       watchAll: [
@@ -450,12 +437,6 @@ module.exports = function(grunt) {
       }
     },
     shell: {
-      babel: {
-        command: 'npm run babel -- --w',
-        options: {
-          preferLocal: true
-        }
-      },
       lint: {
         command: 'npm run lint',
         options: {
@@ -560,7 +541,7 @@ module.exports = function(grunt) {
     'test-a11y'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
-  grunt.registerTask('dev', ['connect:dev', 'concurrent:dev']);
+  grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
 
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
 

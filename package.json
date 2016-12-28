@@ -22,13 +22,12 @@
     "clean": "grunt clean",
     "grunt": "grunt",
     "lint": "vjsstandard",
-    "start": "grunt dev",
+    "start": "grunt watchAll",
     "test": "grunt test",
     "docs": "npm run docs:lint && npm run docs:api",
     "docs:api": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
     "docs:lint": "remark -- './**/*.md'",
-    "docs:fix": "remark --output -- './**/*.md'",
-    "babel": "babel src/js -d es5"
+    "docs:fix": "remark --output -- './**/*.md'"
   },
   "repository": {
     "type": "git",
