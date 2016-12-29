@@ -15,6 +15,7 @@
   * [If you don't think you can fix the issue or add the feature](#if-you-dont-think-you-can-fix-the-issue-or-add-the-feature)
 * [Q: What is a reduced test case?](#q-what-is-a-reduced-test-case)
 * [Q: What media formats does video.js support?](#q-what-media-formats-does-videojs-support)
+* [Q: How can I play RTMP video in video.js?](#q-how-can-i-play-rtmp-video-in-videojs)
 * [Q: How can I hide the links to my video/subtitles/audio/tracks?](#q-how-can-i-hide-the-links-to-my-videosubtitlesaudiotracks)
 * [Q: What is a plugin?](#q-what-is-a-plugin)
 * [Q: How do I make a plugin for video.js?](#q-how-do-i-make-a-plugin-for-videojs)
@@ -115,6 +116,13 @@ This depends on the formats supported by the browser's HTML5 video element, and 
 techs made available to video.js. For example, video.js 5 includes the Flash tech by default which
 enables the playback of FLV video where the Flash plugin is available. For more information
 on media formats see the [troubleshooting guide][troubleshooting].
+
+## Q: How can I play RTMP video in video.js?
+
+Make sure that the Flash tech is available. Then, just set the rtmp source with
+an appropriate type like `rtmp/mp4`.
+The main thing to be aware of is that video.js splits the connection url and stream name with the `&` character.
+So, you'd want to update the url to follow that format. For example: `http://example.com/live&foo`.
 
 ## Q: How can I hide the links to my video/subtitles/audio/tracks?
 
