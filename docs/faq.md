@@ -140,9 +140,10 @@ player.autoplay(true);
 ### Q: How can I autoplay a video on a mobile device?
 
 Most mobile devices have blocked autoplaying videos until recently.
-For mobile devices that don't support autoplaying, there's nothing that can be done.
-For those devices that support autoplaying, like iOS10, you must mute the video
-or have a video without audio tracks to be able to play it. For example:
+For mobile devices that don't support autoplaying, autoplay isn't supported by video.js.
+For those devices that support autoplaying, like iOS10 and Chrome for Android 53+,
+you must mute the video or have a video without audio tracks to be able to play it.
+For example:
 
 ```html
 <video muted autoplay playsinline>
