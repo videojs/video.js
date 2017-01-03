@@ -1580,6 +1580,8 @@ class Player extends Component {
         this.play();
       });
     }
+
+    return this;
   }
 
   /**
