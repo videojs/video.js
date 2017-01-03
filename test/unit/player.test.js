@@ -1066,6 +1066,84 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
   player.dispose();
 });
 
+if (typeof window.Promise !== 'undefined') {
+  QUnit.test('play should return a promise if they are supported', function(assert) {
+    const player = TestHelpers.makePlayer({});
+    const p = player.play();
+
+    assert.ok(p, 'play returns something');
+    assert.equal(typeof p.then, 'function', 'play returns a promise');
+
+    player.dispose();
+  });
+
+  QUnit.test('play promise should resolve to native promise if returned', function(assert) {
+    const player = TestHelpers.makePlayer({});
+    const done = assert.async();
+
+    player.tech_.play = () => window.Promise.resolve('foo');
+    const p = player.play();
+
+    assert.ok(p, 'play returns something');
+    assert.equal(typeof p.then, 'function', 'play returns a promise');
+    p.then(function(val) {
+      assert.equal(val, 'foo', 'should resolve to native promise value');
+
+      player.dispose();
+      done();
+    });
+
+  });
+
+  QUnit.test('play promise should resolve to native value if returned', function(assert) {
+    const player = TestHelpers.makePlayer({});
+    const done = assert.async();
+
+    player.tech_.play = () => 'foo';
+    const p = player.play();
+
+    assert.ok(p, 'play returns something');
+    assert.equal(typeof p.then, 'function', 'play returns a promise');
+    p.then(function(val) {
+      assert.equal(val, 'foo', 'should resolve to native promise value');
+
+      player.dispose();
+      done();
+    });
+  });
+
+  QUnit.test('play promise should resolve to undefined value if returned', function(assert) {
+    const player = TestHelpers.makePlayer({});
+    const done = assert.async();
+
+    player.tech_.play = () => undefined;
+    const p = player.play();
+
+    assert.ok(p, 'play returns something');
+    assert.equal(typeof p.then, 'function', 'play returns a promise');
+    p.then(function(val) {
+      assert.equal(val, undefined, 'should resolve to undefined');
+
+      player.dispose();
+      done();
+    });
+  });
+}
+
+QUnit.test('play should not return a promise if they are not supported', function(assert) {
+  const oldPromise = window.Promise;
+
+  window.Promise = null;
+
+  const player = TestHelpers.makePlayer({});
+  const p = player.play();
+
+  assert.notOk(p, 'play returns nothing');
+
+  player.dispose();
+  window.Promise = oldPromise;
+});
+
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
 
