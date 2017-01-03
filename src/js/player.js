@@ -580,7 +580,7 @@ class Player extends Component {
    *        The value to set the `Player's heigth to.
    *
    * @return {number}
-   *         The current heigth of the `Player` when getting.
+   *         The current height of the `Player` when getting.
    */
   height(value) {
     return this.dimension('height', value);
@@ -622,7 +622,6 @@ class Player extends Component {
     }
 
     this.updateStyleEl_();
-    return;
   }
 
   /**

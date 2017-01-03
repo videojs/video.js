@@ -155,50 +155,49 @@ class ModalDialog extends Component {
    * @fires ModalDialog#modalopen
    */
   open() {
-    if (this.opened_) {
-      return;
+    if (!this.opened_) {
+      const player = this.player();
+
+      /**
+        * Fired just before a `ModalDialog` is opened.
+        *
+        * @event ModalDialog#beforemodalopen
+        * @type {EventTarget~Event}
+        */
+      this.trigger('beforemodalopen');
+      this.opened_ = true;
+
+      // Fill content if the modal has never opened before and
+      // never been filled.
+      if (this.options_.fillAlways || !this.hasBeenOpened_ && !this.hasBeenFilled_) {
+        this.fill();
+      }
+
+      // If the player was playing, pause it and take note of its previously
+      // playing state.
+      this.wasPlaying_ = !player.paused();
+
+      if (this.wasPlaying_) {
+        player.pause();
+      }
+
+      if (this.closeable()) {
+        this.on(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
+      }
+
+      player.controls(false);
+      this.show();
+      this.el().setAttribute('aria-hidden', 'false');
+
+      /**
+        * Fired just after a `ModalDialog` is opened.
+        *
+        * @event ModalDialog#modalopen
+        * @type {EventTarget~Event}
+        */
+      this.trigger('modalopen');
+      this.hasBeenOpened_ = true;
     }
-    const player = this.player();
-
-    /**
-      * Fired just before a `ModalDialog` is opened.
-      *
-      * @event ModalDialog#beforemodalopen
-      * @type {EventTarget~Event}
-      */
-    this.trigger('beforemodalopen');
-    this.opened_ = true;
-
-    // Fill content if the modal has never opened before and
-    // never been filled.
-    if (this.options_.fillAlways || !this.hasBeenOpened_ && !this.hasBeenFilled_) {
-      this.fill();
-    }
-
-    // If the player was playing, pause it and take note of its previously
-    // playing state.
-    this.wasPlaying_ = !player.paused();
-
-    if (this.wasPlaying_) {
-      player.pause();
-    }
-
-    if (this.closeable()) {
-      this.on(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
-    }
-
-    player.controls(false);
-    this.show();
-    this.el().setAttribute('aria-hidden', 'false');
-
-    /**
-      * Fired just after a `ModalDialog` is opened.
-      *
-      * @event ModalDialog#modalopen
-      * @type {EventTarget~Event}
-      */
-    this.trigger('modalopen');
-    this.hasBeenOpened_ = true;
   }
 
   /**
