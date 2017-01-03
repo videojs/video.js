@@ -528,7 +528,12 @@ class Tech extends Component {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || '../node_modules/videojs-vtt.js/dist/vtt.js';
+      if (process.env.VTT === false) {
+        script.src = this.options_['vtt.js'] || 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.js';
+      }
+      if (process.env.VTT === true) {
+        script.src = this.options_['vtt.js'] || require('videojs-vtt.js');
+      }
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.

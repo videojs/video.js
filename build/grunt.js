@@ -1,6 +1,7 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import chg from 'chg';
 import npmRun from 'npm-run';
+import envify from 'envify/custom';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -25,6 +26,16 @@ module.exports = function(grunt) {
       ['bundle-collapser/plugin'],
       ['browserify-derequire']
     ]
+  };
+
+  const browserifyTransform = function(options) {
+    var transform = [
+      [envify({VTT: options.VTT})],
+      ['unreachable-branch-transform'],
+      ['browserify-shim']
+    ];
+
+    return transform;
   };
 
   const githubReleaseDefaults = {
@@ -127,10 +138,6 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      novtt: {
-        files: ['build/temp/video.js'],
-        tasks: ['concat:novtt']
-      },
       minify: {
         files: ['build/temp/video.js'],
         tasks: ['uglify']
@@ -320,23 +327,28 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
-      options: browserifyGruntOptions(),
       build: {
+        options: browserifyGruntOptions({transform: browserifyTransform({VTT: true})}),
         files: {
           'build/temp/video.js': ['es5/video.js']
         }
       },
+      buildnovtt: {
+        options: browserifyGruntOptions({transform: browserifyTransform({VTT: false})}),
+        files: {
+          'build/temp/alt/video.novtt.js': ['es5/video.js']
+        }
+      },
       dist: {
-        options: browserifyGruntOptions({
-          transform: [
-            ['browserify-versionify', {
-              placeholder: '../node_modules/videojs-vtt.js/dist/vtt.js',
-              version: 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js'
-            }],
-          ]
-        }),
+        options: browserifyGruntOptions({transform: browserifyTransform({VTT: true})}),
         files: {
           'build/temp/video.js': ['es5/video.js']
+        }
+      },
+      distnovtt: {
+        options: browserifyGruntOptions({transform: browserifyTransform({VTT: false})}),
+        files: {
+          'build/temp/alt/video.novtt.js': ['es5/video.js']
         }
       },
       watch: {
@@ -348,6 +360,16 @@ module.exports = function(grunt) {
           'build/temp/video.js': ['es5/video.js']
         }
       },
+      watchnovtt: {
+        options: {
+          watch: true,
+          keepAlive: true
+        },
+        files: {
+          'build/temp/alt/video.novtt.js': ['es5/video.js']
+        }
+      },
+
       tests: {
         options: {
           browserifyOptions: {
@@ -384,14 +406,6 @@ module.exports = function(grunt) {
       options: {
         separator: '\n'
       },
-      novtt: {
-        src: ['build/temp/video.js'],
-        dest: 'build/temp/alt/video.novtt.js'
-      },
-      vtt: {
-        src: ['build/temp/video.js', 'node_modules/videojs-vtt.js/dist/vtt.js'],
-        dest: 'build/temp/video.js'
-      },
       ie8_addition: {
         src: ['build/temp/video-js.css', 'src/css/ie8.css'],
         dest: 'build/temp/video-js.css'
@@ -410,12 +424,14 @@ module.exports = function(grunt) {
       watchAll: [
         'watch',
         'browserify:watch',
+        'browserify:watchnovtt',
         'browserify:tests',
         'karma:watch'
       ],
       watchSandbox: [
         'watch',
-        'browserify:watch'
+        'browserify:watch',
+        'browserify:watchnovtt',
       ]
     },
     usebanner: {
@@ -494,8 +510,7 @@ module.exports = function(grunt) {
 
     'babel:es5',
     'browserify:build',
-    'concat:novtt',
-    'concat:vtt',
+    'browserify:buildnovtt',
     'usebanner:novtt',
     'usebanner:vtt',
     'uglify',
@@ -514,7 +529,14 @@ module.exports = function(grunt) {
 
   grunt.registerTask(
     'build:dist',
-    buildDependents.map(task => task === 'browserify:build' ? 'browserify:dist' : task)
+    buildDependents.map(task => {
+      if (task === 'browserify:build') {
+        return 'browserify:dist';
+      } else if (task === 'browserify:buildnovtt') {
+        return 'browserify:distnovtt';
+      }
+      return task;
+    })
   );
 
   grunt.registerTask('dist', [
