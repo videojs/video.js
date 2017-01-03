@@ -808,7 +808,7 @@ class Player extends Component {
     this.isReady_ = false;
 
     // Grab tech-specific options from player options and add source and parent element to use.
-    let techOptions = {
+    const techOptions = {
       source,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
@@ -829,7 +829,7 @@ class Player extends Component {
       techOptions[props.getterName] = this[props.privateName];
     });
 
-    techOptions = assign(techOptions, this.options_[techName.toLowerCase()]);
+    assign(techOptions, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
       techOptions.tag = this.tag;
@@ -3161,7 +3161,7 @@ TRACK_TYPES.names.forEach(function(name) {
       return this.tech_[props.getterName]();
     }
 
-    // if we have not yet loadTech_, we create videoTracks_
+    // if we have not yet loadTech_, we create {video,audio,text}Tracks_
     // these will be passed to the tech during loading
     this[props.privateName] = this[props.privateName] || new props.ListClass();
     return this[props.privateName];

@@ -7,10 +7,13 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import proxyquireify from 'proxyquireify';
 import sinon from 'sinon';
+import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 
 const proxyquire = proxyquireify(require);
 const defaultTech = {
-  textTracks() {},
+  textTracks() {
+    return new TextTrackList();
+  },
   on() {},
   off() {},
   currentTime() {}

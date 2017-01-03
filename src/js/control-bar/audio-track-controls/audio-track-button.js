@@ -22,7 +22,7 @@ class AudioTrackButton extends TrackButton {
    *        The key/value store of player options.
    */
   constructor(player, options = {}) {
-    options.tracks = player.audioTracks && player.audioTracks();
+    options.tracks = player.audioTracks();
 
     super(player, options);
 
@@ -49,11 +49,7 @@ class AudioTrackButton extends TrackButton {
    *         An array of menu items
    */
   createItems(items = []) {
-    const tracks = this.player_.audioTracks && this.player_.audioTracks();
-
-    if (!tracks) {
-      return items;
-    }
+    const tracks = this.player_.audioTracks();
 
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
