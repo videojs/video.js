@@ -1,6 +1,7 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import chg from 'chg';
 import npmRun from 'npm-run';
+import isDocsOnly from './docs-only.js';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -550,13 +551,27 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['test']);
 
   // The test script includes coveralls only when the TRAVIS env var is set.
-  grunt.registerTask('test', [
-    'build',
-    'shell:noderequire',
-    'shell:browserify',
-    'shell:webpack',
-    'karma:defaults',
-    'test-a11y'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
+  grunt.registerTask('test', function() {
+    const tasks = [
+      'build',
+      'shell:noderequire',
+      'shell:browserify',
+      'shell:webpack',
+      'karma:defaults',
+      'test-a11y'
+    ];
+
+    if (process.env.TRAVIS) {
+      if (isDocsOnly(process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE)) {
+        grunt.log.write('Not running any tests because only docs were changed');
+        return;
+      }
+
+      tasks.concat(process.env.TRAVIS && 'coveralls').filter(Boolean);
+    }
+
+    grunt.task.run(tasks);
+  });
 
   // Run while developing
   grunt.registerTask('dev', ['connect:dev', 'concurrent:dev']);
