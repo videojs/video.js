@@ -112,6 +112,7 @@
     "remark-lint": "^5.2.0",
     "remark-toc": "^3.1.0",
     "remark-validate-links": "^5.0.0",
+    "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.7.3",
