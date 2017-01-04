@@ -372,7 +372,7 @@ function evented(target, options = {}) {
     target.eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
   }
 
-  ['off', 'on', 'one', 'trigger'].forEach(name => {
+  Object.keys(mixin).forEach(name => {
     target[name] = Fn.bind(target, mixin[name]);
   });
 

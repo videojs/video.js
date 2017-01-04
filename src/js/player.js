@@ -3103,40 +3103,6 @@ class Player extends Component {
   }
 
   /**
-   * Reports whether or not a player has a plugin available.
-   *
-   * This does not report whether or not the plugin has ever been initialized
-   * on this player. For that, [usingPlugin]{@link Player#usingPlugin}.
-   *
-   * @param  {string}  name
-   *         The name of a plugin.
-   *
-   * @return {boolean}
-   *         Whether or not this player has the requested plugin available.
-   */
-  hasPlugin(name) {
-    // While a no-op by default, this method is created in plugin.js to avoid
-    // circular dependencies.
-  }
-
-  /**
-   * Reports whether or not a player is using a plugin by name.
-   *
-   * For basic plugins, this only reports whether the plugin has _ever_ been
-   * initialized on this player.
-   *
-   * @param  {string} name
-   *         The name of a plugin.
-   *
-   * @return {boolean}
-   *         Whether or not this player is using the requested plugin.
-   */
-  usingPlugin(name) {
-    // While a no-op by default, this method is created in plugin.js to avoid
-    // circular dependencies.
-  }
-
-  /**
    * Gets tag settings
    *
    * @param {Element} tag
@@ -3379,6 +3345,34 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  *
  * @event Player#volumechange
  * @type {EventTarget~Event}
+ */
+
+/**
+ * Reports whether or not a player has a plugin available.
+ *
+ * This does not report whether or not the plugin has ever been initialized
+ * on this player. For that, [usingPlugin]{@link Player#usingPlugin}.
+ *
+ * @method hasPlugin
+ * @param  {string}  name
+ *         The name of a plugin.
+ *
+ * @return {boolean}
+ *         Whether or not this player has the requested plugin available.
+ */
+
+/**
+ * Reports whether or not a player is using a plugin by name.
+ *
+ * For basic plugins, this only reports whether the plugin has _ever_ been
+ * initialized on this player.
+ *
+ * @method usingPlugin
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {boolean}
+ *         Whether or not this player is using the requested plugin.
  */
 
 Component.registerComponent('Player', Player);

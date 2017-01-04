@@ -1,8 +1,6 @@
 /**
  * @file mixins/stateful.js
  */
-import * as Fn from '../utils/fn';
-import log from '../utils/log';
 import * as Obj from '../utils/obj';
 
 /**
@@ -21,11 +19,6 @@ const setState = function(stateUpdates) {
   // Support providing the `stateUpdates` state as a function.
   if (typeof stateUpdates === 'function') {
     stateUpdates = stateUpdates();
-  }
-
-  if (!Obj.isPlain(stateUpdates)) {
-    log.warn('non-plain object passed to `setState`', stateUpdates);
-    return;
   }
 
   let changes;
@@ -79,7 +72,7 @@ const setState = function(stateUpdates) {
  */
 function stateful(target, defaultState) {
   target.state = Obj.assign({}, defaultState);
-  target.setState = Fn.bind(target, setState);
+  target.setState = setState;
 
   // Auto-bind the `handleStateChanged` method of the target object if it exists.
   if (typeof target.handleStateChanged === 'function' && typeof target.on === 'function') {

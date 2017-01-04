@@ -4,7 +4,6 @@
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Events from './utils/events';
-import * as Fn from './utils/fn';
 import Player from './player';
 
 /**
@@ -183,13 +182,6 @@ class Plugin {
 
     stateful(this, this.constructor.defaultState);
     markPluginAsActive(player, this.name);
-
-    // Bind all plugin prototype methods to this object.
-    Object.keys(Plugin.prototype).forEach(k => {
-      if (typeof this[k] === 'function') {
-        this[k] = Fn.bind(this, this[k]);
-      }
-    });
 
     // If the player is disposed, dispose the plugin.
     player.on('dispose', this.dispose);
@@ -387,19 +379,6 @@ class Plugin {
   }
 
   /**
-   * Gets a plugin by name if it exists.
-   *
-   * @param  {string} name
-   *         The name of a plugin.
-   *
-   * @return {Function|undefined}
-   *         The plugin (or `undefined`).
-   */
-  static getPlugin(name) {
-    return getPlugin(name);
-  }
-
-  /**
    * Gets a plugin's version, if available
    *
    * @param  {string} name
@@ -415,7 +394,16 @@ class Plugin {
   }
 }
 
-Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
+/**
+ * Gets a plugin by name if it exists.
+ *
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {Function|undefined}
+ *         The plugin (or `undefined`).
+ */
+Plugin.getPlugin = getPlugin;
 
 /**
  * The name of the base plugin class as it is registered.
@@ -423,6 +411,8 @@ Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
  * @type {string}
  */
 Plugin.BASE_PLUGIN_NAME = BASE_PLUGIN_NAME;
+
+Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
 
 /**
  * Documented in player.js

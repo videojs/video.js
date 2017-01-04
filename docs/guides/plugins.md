@@ -78,7 +78,7 @@ After that, any player will automatically have an `examplePlugin` method on its 
 
 > **Note:** The only stipulation with the name of the plugin is that it cannot conflict with any existing plugin or player method.
 
-## Writing a Advanced Plugin
+## Writing an Advanced Plugin
 
 Video.js 6 introduces advanced plugins: these are plugins that share a similar API with basic plugins, but are class-based and offer a range of extra features out of the box.
 
@@ -86,7 +86,7 @@ While reading the following sections, you may want to refer to the [Plugin API d
 
 ### Write a JavaScript Class/Constructor
 
-If you're familiar with creating [components](components.md), this process is similar. A advanced plugin starts with a JavaScript class (a.k.a. a constructor function).
+If you're familiar with creating [components](components.md), this process is similar. An advanced plugin starts with a JavaScript class (a.k.a. a constructor function).
 
 If you're using ES6 already, you can use that syntax with your transpiler/language of choice (Babel, TypeScript, etc):
 
@@ -96,7 +96,7 @@ const Plugin = videojs.getPlugin('plugin');
 class ExamplePlugin extends Plugin {
 
   constructor(player, options) {
-    super(player);
+    super(player, options);
 
     if (options.customClass) {
       player.addClass(options.customClass);
