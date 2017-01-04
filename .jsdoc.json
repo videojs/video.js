@@ -1,4 +1,16 @@
 {
+  "source": {
+    "include": [ "src/js/" ],
+    "includePattern": ".js$"
+ },
+  "opts": {
+    "destination": "docs/api",
+    "readme": "docs/index.md",
+    "template": "node_modules/tui-jsdoc-template",
+    "recurse": true,
+    "tutorials": "docs/guides",
+    "encoding": "utf8"
+  },
   "plugins": ["plugins/markdown"],
   "markdown": {
     "tags": ["example"]

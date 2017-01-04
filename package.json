@@ -25,7 +25,8 @@
     "start": "grunt dev",
     "test": "grunt test",
     "docs": "npm run docs:lint && npm run docs:api",
-    "docs:api": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
+    "jsdoc": "jsdoc",
+    "docs:api": "jsdoc -c .jsdoc.json",
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
     "babel": "babel src/js -d es5"
@@ -114,6 +115,7 @@
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
+    "tui-jsdoc-template": "^1.0.5",
     "uglify-js": "~2.7.3",
     "videojs-doc-generator": "0.0.1",
     "videojs-standard": "^6.0.1",
