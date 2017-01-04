@@ -920,32 +920,27 @@ class Player extends Component {
   }
 
   /**
-   * Return a reference to the current {@link Tech}, but only if given an object with the
-   * `IWillNotUseThisInPlugins` property having a true value. This is try and prevent misuse
-   * of techs by plugins.
+   * Return a reference to the current {@link Tech}.
+   * It will print a warning by default about the danger of using the tech directly
+   * but any argument that is passed in will silence the warning.
    *
-   * @param {Object} safety
-   *        An object that must contain `{IWillNotUseThisInPlugins: true}`
-   *
-   * @param {boolean} safety.IWillNotUseThisInPlugins
-   *        Must be set to true or else this function will throw an error.
+   * @param {Any} safety
+   *        Anything passed in to silence the warning
    *
    * @return {Tech}
    *         The Tech
    */
   tech(safety) {
-    if (safety && safety.IWillNotUseThisInPlugins) {
-      return this.tech_;
-    }
-    const errorText = `
-      Please make sure that you are not using this inside of a plugin.
-      To disable this alert and error, please pass in an object with
-      \`IWillNotUseThisInPlugins\` to the \`tech\` method. See
-      https://github.com/videojs/video.js/issues/2617 for more info.
-    `;
+    if (!safety) {
+      const warnText = `
+        Using the tech directly can be dangerous. I hope you know what you're doing.
+        See https://github.com/videojs/video.js/issues/2617 for more info.
+      `;
 
-    window.alert(errorText);
-    throw new Error(errorText);
+      log.warn(warnText);
+    }
+
+    return this.tech_;
   }
 
   /**
