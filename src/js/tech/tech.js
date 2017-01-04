@@ -1187,9 +1187,9 @@ Tech.withSourceHandlers = function(_Tech) {
 
 };
 
+// The base Tech class needs to be registered as a Component. It is the only
+// Tech that can be registered as a Component.
 Component.registerComponent('Tech', Tech);
-// Old name for Tech
-// @deprecated
-Component.registerComponent('MediaTechController', Tech);
 Tech.registerTech('Tech', Tech);
+
 export default Tech;

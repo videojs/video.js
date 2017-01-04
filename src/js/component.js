@@ -1542,13 +1542,27 @@ class Component {
    *         The `Component` that was registered.
    */
   static registerComponent(name, ComponentToRegister) {
-    if (typeof name !== 'string' || !name.length) {
-      throw new Error(`illegal component name, "${name}"; must be a non-empty string`);
+    if (typeof name !== 'string' || !name) {
+      throw new Error(`Illegal component name, "${name}"; must be a non-empty string.`);
     }
 
-    if (!Component.prototype.isPrototypeOf(ComponentToRegister.prototype) &&
-        Component !== ComponentToRegister) {
-      throw new Error(`illegal component constructor, "${name}"; must be a subclass of Component`);
+    const Tech = Component.getComponent('Tech');
+
+    // We need to make sure this check is only done if Tech has been registered.
+    const isTech = Tech && Tech.isTech(ComponentToRegister);
+    const isComp = Component === ComponentToRegister ||
+      Component.prototype.isPrototypeOf(ComponentToRegister.prototype);
+
+    if (isTech || !isComp) {
+      let reason;
+
+      if (isTech) {
+        reason = 'techs must be registered using Tech.registerTech()';
+      } else {
+        reason = 'must be a Component subclass';
+      }
+
+      throw new Error(`Illegal component, "${name}"; ${reason}.`);
     }
 
     name = toTitleCase(name);
@@ -1567,7 +1581,7 @@ class Component {
       if (players &&
           Object.keys(players).length > 0 &&
           Object.keys(players).map((playerName) => players[playerName]).every(Boolean)) {
-        throw new Error('Can not register Player component after player has been created');
+        throw new Error('Can not register Player component after player has been created.');
       }
     }
 
