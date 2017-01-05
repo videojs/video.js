@@ -925,14 +925,14 @@ class Player extends Component {
    * It will print a warning by default about the danger of using the tech directly
    * but any argument that is passed in will silence the warning.
    *
-   * @param {Any} safety
+   * @param {*} [safety]
    *        Anything passed in to silence the warning
    *
    * @return {Tech}
    *         The Tech
    */
   tech(safety) {
-    if (!safety) {
+    if (safety === undefined) {
       log.warn(tsml`
         Using the tech directly can be dangerous. I hope you know what you're doing.
         See https://github.com/videojs/video.js/issues/2617 for more info.
