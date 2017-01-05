@@ -17,6 +17,7 @@ import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
+import {isPlain} from '../utils/obj';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -522,13 +523,25 @@ class Tech extends Component {
    *
    * @fires Tech#vttjsloaded
    * @fires Tech#vttjserror
-   * @fires Tech#texttrackchange
    */
   addWebVttScript_() {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
+      const vtt = require('videojs-vtt.js');
+
+      // load via require if avialable and vtt.js script location
+      // was not passed in
+      if (!this.options_['vtt.js'] && isPlain(vtt) && Object.keys(vtt).length > 0) {
+        Object.keys(vtt).forEach(function(k) {
+          window[k] = vtt[k];
+        });
+        this.trigger('vttjsloaded');
+        return;
+      }
+
+      // otherwise load via the cdn or script location option
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || '../node_modules/videojs-vtt.js/dist/vtt.js';
+      script.src = this.options_['vtt.js'] || 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js';
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.
