@@ -1209,29 +1209,38 @@ QUnit.test('you can clear error in the error event', function(assert) {
 });
 
 QUnit.test('Player#tech will return tech given the appropriate input', function(assert) {
+  const oldLogWarn = log.warn;
+  let warning;
+
+  log.warn = function(_warning) {
+    warning = _warning;
+  };
+
   const tech_ = {};
-  const returnedTech = Player.prototype.tech.call({tech_}, {IWillNotUseThisInPlugins: true});
+  const returnedTech = Player.prototype.tech.call({tech_}, true);
 
   assert.equal(returnedTech, tech_, 'We got back the tech we wanted');
+  assert.notOk(warning, 'no warning was logged');
+
+  log.warn = oldLogWarn;
 });
 
-QUnit.test('Player#tech alerts and throws without the appropriate input', function(assert) {
-  let alertCalled;
-  const oldAlert = window.alert;
+QUnit.test('Player#tech logs a warning when called without a safety argument', function(assert) {
+  const oldLogWarn = log.warn;
+  const warningRegex = new RegExp('https://github.com/videojs/video.js/issues/2617');
+  let warning;
 
-  window.alert = () => {
-    alertCalled = true;
+  log.warn = function(_warning) {
+    warning = _warning;
   };
 
   const tech_ = {};
 
-  assert.throws(function() {
-    Player.prototype.tech.call({tech_});
-  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
-  'we threw an error');
+  Player.prototype.tech.call({tech_});
 
-  assert.ok(alertCalled, 'we called an alert');
-  window.alert = oldAlert;
+  assert.ok(warningRegex.test(warning), 'we logged a warning');
+
+  log.warn = oldLogWarn;
 });
 
 QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
