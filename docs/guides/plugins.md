@@ -1,28 +1,5 @@
 # Video.js Plugins
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [Writing a Basic Plugin](#writing-a-basic-plugin)
-  - [Write a JavaScript Function](#write-a-javascript-function)
-  - [Register a Basic Plugin](#register-a-basic-plugin)
-- [Writing a Advanced Plugin](#writing-a-advanced-plugin)
-  - [Write a JavaScript Class/Constructor](#write-a-javascript-classconstructor)
-  - [Register a Advanced Plugin](#register-a-advanced-plugin)
-  - [Key Differences from Basic Plugins](#key-differences-from-basic-plugins)
-    - [The Value of `this`](#the-value-of-this)
-    - [The Player Plugin Name Property](#the-player-plugin-name-property)
-  - [Advanced Features of Advanced Plugins](#advanced-features-of-advanced-plugins)
-    - [Events](#events)
-    - [Statefulness](#statefulness)
-    - [Lifecycle](#lifecycle)
-  - [Advanced Example Advanced Plugin](#advanced-example-advanced-plugin)
-- [Setting up a Plugin](#setting-up-a-plugin)
-- [References](#references)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 One of the great strengths of Video.js is its ecosystem of plugins that allow authors from all over the world to share their video player customizations. This includes everything from the simplest UI tweaks to new [playback technologies and source handlers](tech.md)!
 
 Because we view plugins as such an important part of Video.js, the organization is committed to maintaining a robust set of tools for plugin authorship:

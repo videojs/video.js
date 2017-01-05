@@ -566,46 +566,17 @@ class Component {
   /**
    * Add an `event listener` to this `Component`s element.
    *
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function() {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *   };
-   *
-   *   myComponent.on('eventType', myFunc);
-   *   myComponent.trigger('eventType');
-   *   // logs 'myFunc called'
-   * ```
-   *
-   * The context of `myFunc` will be `myComponent` unless it is bound. You can add
-   * a listener to another element or component.
-   * ```js
-   *   var otherComponent = new Component(player);
-   *
-   *   // myComponent/myFunc is from the above example
-   *   myComponent.on(otherComponent.el(), 'eventName', myFunc);
-   *   myComponent.on(otherComponent, 'eventName', myFunc);
-   *
-   *   otherComponent.trigger('eventName');
-   *   // logs 'myFunc called' twice
-   * ```
-   *
    * The benefit of using this over the following:
    * - `VjsEvents.on(otherElement, 'eventName', myFunc)`
    * - `otherComponent.on('eventName', myFunc)`
-   * Is that the listeners will get cleaned up when either component gets disposed.
-   * It will also bind `myComponent` as the context of `myFunc`.
+   *
+   * 1. Is that the listeners will get cleaned up when either component gets disposed.
+   * 1. It will also bind `myComponent` as the context of `myFunc`.
    * > NOTE: If you remove the element from the DOM that has used `on` you need to
-   *             clean up references using:
-   *
-   *             `myComponent.trigger(el, 'dispose')`
-   *
-   *             This will also allow the browser to garbage collect it. In special
-   *             cases such as with `window` and `document`, which are both permanent,
-   *             this is not necessary.
+   *         clean up references using: `myComponent.trigger(el, 'dispose')`
+   *         This will also allow the browser to garbage collect it. In special
+   *         cases such as with `window` and `document`, which are both permanent,
+   *         this is not necessary.
    *
    * @param {string|Component|string[]} [first]
    *        The event name, and array of event names, or another `Component`.
@@ -667,47 +638,8 @@ class Component {
   }
 
   /**
-   * Remove an event listener from this `Component`s element.
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function() {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *   };
-   *   myComponent.on('eventType', myFunc);
-   *   myComponent.trigger('eventType');
-   *   // logs 'myFunc called'
-   *
-   *   myComponent.off('eventType', myFunc);
-   *   myComponent.trigger('eventType');
-   *   // does nothing
-   * ```
-   *
-   * If myFunc gets excluded, ALL listeners for the event type will get removed. If
-   * eventType gets excluded, ALL listeners will get removed from the component.
-   * You can use `off` to remove listeners that get added to other elements or
-   * components using:
-   *
-   *  `myComponent.on(otherComponent...`
-   *
-   * In this case both the event type and listener function are **REQUIRED**.
-   *
-   * ```js
-   *   var otherComponent = new Component(player);
-   *
-   *   // myComponent/myFunc is from the above example
-   *   myComponent.on(otherComponent.el(), 'eventName', myFunc);
-   *   myComponent.on(otherComponent, 'eventName', myFunc);
-   *
-   *   otherComponent.trigger('eventName');
-   *   // logs 'myFunc called' twice
-   *   myComponent.off(ootherComponent.el(), 'eventName', myFunc);
-   *   myComponent.off(otherComponent, 'eventName', myFunc);
-   *   otherComponent.trigger('eventName');
-   *   // does nothing
-   * ```
+   * Remove an event listener from this `Component`s element. If the second argument is
+   * exluded all listeners for the type passed in as the first argument will be removed.
    *
    * @param {string|Component|string[]} [first]
    *        The event name, and array of event names, or another `Component`.
@@ -751,38 +683,6 @@ class Component {
 
   /**
    * Add an event listener that gets triggered only once and then gets removed.
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function() {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *   };
-   *   myComponent.one('eventName', myFunc);
-   *   myComponent.trigger('eventName');
-   *   // logs 'myFunc called'
-   *
-   *   myComponent.trigger('eventName');
-   *   // does nothing
-   *
-   * ```
-   *
-   * You can also add a listener to another element or component that will get
-   * triggered only once.
-   * ```js
-   *   var otherComponent = new Component(player);
-   *
-   *   // myComponent/myFunc is from the above example
-   *   myComponent.one(otherComponent.el(), 'eventName', myFunc);
-   *   myComponent.one(otherComponent, 'eventName', myFunc);
-   *
-   *   otherComponent.trigger('eventName');
-   *   // logs 'myFunc called' twice
-   *
-   *   otherComponent.trigger('eventName');
-   *   // does nothing
-   * ```
    *
    * @param {string|Component|string[]} [first]
    *        The event name, and array of event names, or another `Component`.
@@ -821,29 +721,6 @@ class Component {
 
   /**
    * Trigger an event on an element.
-   *
-   * ```js
-   *   var player = videojs('some-player-id');
-   *   var Component = videojs.getComponent('Component');
-   *   var myComponent = new Component(player);
-   *   var myFunc = function(data) {
-   *     var myComponent = this;
-   *     console.log('myFunc called');
-   *     console.log(data);
-   *   };
-   *   myComponent.one('eventName', myFunc);
-   *   myComponent.trigger('eventName');
-   *   // logs 'myFunc called' and 'undefined'
-   *
-   *   myComponent.trigger({'type':'eventName'});
-   *   // logs 'myFunc called' and 'undefined'
-   *
-   *   myComponent.trigger('eventName', {data: 'some data'});
-   *   // logs 'myFunc called' and "{data: 'some data'}"
-   *
-   *   myComponent.trigger({'type':'eventName'}, {data: 'some data'});
-   *   // logs 'myFunc called' and "{data: 'some data'}"
-   * ```
    *
    * @param {EventTarget~Event|Object|string} event
    *        The event name, and Event, or an event-like object with a type attribute
@@ -1644,20 +1521,6 @@ class Component {
 
     return intervalId;
   }
-
-  /**
-   * Handles "statechanged" events on the component. No-op by default, override
-   * by subclassing.
-   *
-   * @abstract
-   * @param {Event} e
-   *        An event object provided by a "statechanged" event.
-   *
-   * @param {Object} e.changes
-   *        An object describing changes that occurred with the "statechanged"
-   *        event.
-   */
-  handleStateChanged(e) {}
 
   /**
    * Register a `Component` with `videojs` given the name and the component.
