@@ -6,6 +6,7 @@ import Component from './component.js';
 
 import document from 'global/document';
 import window from 'global/window';
+import tsml from 'tsml';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -932,7 +933,7 @@ class Player extends Component {
    */
   tech(safety) {
     if (!safety) {
-      log.warn(`
+      log.warn(tsml`
         Using the tech directly can be dangerous. I hope you know what you're doing.
         See https://github.com/videojs/video.js/issues/2617 for more info.
       `);
