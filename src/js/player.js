@@ -932,12 +932,10 @@ class Player extends Component {
    */
   tech(safety) {
     if (!safety) {
-      const warnText = `
+      log.warn(`
         Using the tech directly can be dangerous. I hope you know what you're doing.
         See https://github.com/videojs/video.js/issues/2617 for more info.
-      `;
-
-      log.warn(warnText);
+      `);
     }
 
     return this.tech_;
