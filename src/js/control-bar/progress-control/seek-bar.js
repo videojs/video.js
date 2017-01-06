@@ -127,10 +127,7 @@ class SeekBar extends Slider {
     this.player_.scrubbing(true);
 
     this.videoWasPlaying = !this.player_.paused();
-
-    this.pauseTimer_ = this.setTimeout(function() {
-      this.player_.pause();
-    }, 100);
+    this.player_.pause();
   }
 
   /**
@@ -151,11 +148,6 @@ class SeekBar extends Slider {
 
     // Set new time (tell player to seek to new time)
     this.player_.currentTime(newTime);
-
-    if (event.type === 'mousemove') {
-      this.clearTimeout(this.pauseTimer_);
-      this.player_.pause();
-    }
   }
 
   /**
@@ -168,8 +160,6 @@ class SeekBar extends Slider {
    */
   handleMouseUp(event) {
     super.handleMouseUp(event);
-
-    this.clearTimeout(this.pauseTimer_);
 
     this.player_.scrubbing(false);
     if (this.videoWasPlaying) {
