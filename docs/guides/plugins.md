@@ -4,13 +4,13 @@ One of the great strengths of Video.js is its ecosystem of plugins that allow au
 
 Because we view plugins as such an important part of Video.js, the organization is committed to maintaining a robust set of tools for plugin authorship:
 
-- [generator-videojs-plugin][generator]
+* [generator-videojs-plugin][generator]
 
   A [Yeoman][yeoman] generator for scaffolding a Video.js plugin project. Additionally, it offers a set of [conventions for plugin authorship][standards] that, if followed, make authorship, contribution, and usage consistent and predictable.
 
   In short, the generator sets up plugin authors to focus on writing their plugin - not messing with tools.
 
-- [videojs-spellbook][spellbook]
+* [videojs-spellbook][spellbook]
 
   As of version 3, the plugin generator includes a new dependency: [videojs-spellbook][spellbook]. Spellbook is a kitchen sink plugin development tool: it builds plugins, creates tags, runs a development server, and more.
 
@@ -154,7 +154,7 @@ Up to this point, our example advanced plugin is functionally identical to our e
 
 Like components, advanced plugins offer an implementation of events. This includes:
 
-- The ability to listen for events on the plugin instance using `on` or `one`:
+* The ability to listen for events on the plugin instance using `on` or `one`:
 
   ```js
   player.examplePlugin().on('example-event', function() {
@@ -162,13 +162,13 @@ Like components, advanced plugins offer an implementation of events. This includ
   });
   ```
 
-- The ability to `trigger` custom events on a plugin instance:
+* The ability to `trigger` custom events on a plugin instance:
 
   ```js
   player.examplePlugin().trigger('example-event');
   ```
 
-- The ability to stop listening to custom events on a plugin instance using `off`:
+* The ability to stop listening to custom events on a plugin instance using `off`:
 
   ```js
   player.examplePlugin().off('example-event');
@@ -218,10 +218,10 @@ player.examplePlugin().dispose();
 
 The `dispose` method has several effects:
 
-- Triggers a `"dispose"` event on the plugin instance.
-- Cleans up all event listeners on the plugin instance, which helps avoid errors caused by events being triggered after an object is cleaned up.
-- Removes plugin state and references to the player to avoid memory leaks.
-- Reverts the player's named property (e.g. `player.examplePlugin`) _back_ to the original factory function, so the plugin can be set up again.
+* Triggers a `"dispose"` event on the plugin instance.
+* Cleans up all event listeners on the plugin instance, which helps avoid errors caused by events being triggered after an object is cleaned up.
+* Removes plugin state and references to the player to avoid memory leaks.
+* Reverts the player's named property (e.g. `player.examplePlugin`) _back_ to the original factory function, so the plugin can be set up again.
 
 In addition, if the player is disposed, the disposal of all its advanced plugin instances will be triggered as well.
 
@@ -309,10 +309,10 @@ These two methods are functionally identical - use whichever you prefer!
 
 ## References
 
-- [Player API][api-player]
-- [Plugin API][api-plugin]
-- [Plugin Generator][generator]
-- [Plugin Conventions][standards]
+* [Player API][api-player]
+* [Plugin API][api-plugin]
+* [Plugin Generator][generator]
+* [Plugin Conventions][standards]
 
 [api-player]: http://docs.videojs.com/docs/api/player.html
 [api-plugin]: http://docs.videojs.com/docs/api/plugin.html

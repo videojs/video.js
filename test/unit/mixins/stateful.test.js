@@ -1,6 +1,6 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
-import EventTarget from '../../../src/js/event-target';
+import evented from '../../../src/js/mixins/evented';
 import stateful from '../../../src/js/mixins/stateful';
 import * as Obj from '../../../src/js/utils/obj';
 
@@ -31,7 +31,7 @@ QUnit.test('stateful() without default state passed in', function(assert) {
 });
 
 QUnit.test('setState() works as expected', function(assert) {
-  const target = stateful(new EventTarget(), {foo: 'bar', abc: 'xyz'});
+  const target = stateful(evented({}), {foo: 'bar', abc: 'xyz'});
   const spy = sinon.spy();
 
   target.on('statechanged', spy);
@@ -59,7 +59,7 @@ QUnit.test('setState() works as expected', function(assert) {
 });
 
 QUnit.test('setState() without changes does not trigger the "statechanged" event', function(assert) {
-  const target = stateful(new EventTarget(), {foo: 'bar'});
+  const target = stateful(evented({}), {foo: 'bar'});
   const spy = sinon.spy();
 
   target.on('statechanged', spy);
@@ -71,7 +71,7 @@ QUnit.test('setState() without changes does not trigger the "statechanged" event
 });
 
 QUnit.test('handleStateChanged() is automatically bound to "statechanged" event', function(assert) {
-  const target = new EventTarget();
+  const target = evented({});
 
   target.handleStateChanged = sinon.spy();
   stateful(target, {foo: 'bar'});

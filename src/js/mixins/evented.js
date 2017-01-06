@@ -1,14 +1,15 @@
 /**
  * @file mixins/evented.js
+ * @module evented
  */
 import * as Dom from '../utils/dom';
-import * as Fn from '../utils/fn';
 import * as Events from '../utils/events';
+import * as Fn from '../utils/fn';
+import * as Obj from '../utils/obj';
 
 /**
  * Returns whether or not an object has had the evented mixin applied.
  *
- * @private
  * @param  {Object} object
  *         An object to test.
  *
@@ -158,12 +159,12 @@ const listen = (target, method, type, listener) => {
 };
 
 /**
- * Methods that can be mixed-in with any object to provide event capabilities.
+ * Contains methods that provide event capabilites to an object which is passed
+ * to {@link module:evented|evented}.
  *
- * @name mixins/evented
- * @type {Object}
+ * @mixin EventedMixin
  */
-const mixin = {
+const EventedMixin = {
 
   /**
    * Add a listener to an event (or events) on this object or another evented
@@ -187,9 +188,6 @@ const mixin = {
    * @param  {Function} [listener]
    *         If the first argument was another evented object, this will be
    *         the listener function.
-   *
-   * @return {Object}
-   *         Returns this object.
    */
   on(...args) {
     const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
@@ -242,9 +240,6 @@ const mixin = {
    * @param  {Function} [listener]
    *         If the first argument was another evented object, this will be
    *         the listener function.
-   *
-   * @return {Object}
-   *         Returns this object.
    */
   one(...args) {
     const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
@@ -285,9 +280,6 @@ const mixin = {
    *         If the first argument was another evented object, this will be
    *         the listener function; otherwise, _all_ listeners bound to the
    *         event type(s) will be removed.
-   *
-   * @return {Object}
-   *         Returns the object itself.
    */
   off(targetOrType, typeOrListener, listener) {
 
@@ -325,25 +317,22 @@ const mixin = {
   /**
    * Fire an event on this evented object, causing its listeners to be called.
    *
-   * @param  {string|Object} event
-   *         An event type or an object with a type property.
+   * @param   {string|Object} event
+   *          An event type or an object with a type property.
    *
-   * @param  {Object} [hash]
-   *         An additional object to pass along to listeners.
+   * @param   {Object} [hash]
+   *          An additional object to pass along to listeners.
    *
-   * @return {Object}
-   *         Returns this object.
+   * @returns {boolean}
+   *          Whether or not the default behavior was prevented.
    */
   trigger(event, hash) {
-    Events.trigger(this.eventBusEl_, event, hash);
+    return Events.trigger(this.eventBusEl_, event, hash);
   }
 };
 
 /**
- * Makes an object "evented" - granting it methods from the `Events` utility.
- *
- * By default, this adds the `off`, `on`, `one`, and `trigger` methods, but
- * exclusions can optionally be made.
+ * Applies {@link module:evented~EventedMixin|EventedMixin} to a target object.
  *
  * @param  {Object} target
  *         The object to which to add event methods.
@@ -372,9 +361,7 @@ function evented(target, options = {}) {
     target.eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
   }
 
-  Object.keys(mixin).forEach(name => {
-    target[name] = Fn.bind(target, mixin[name]);
-  });
+  Obj.assign(target, EventedMixin);
 
   // When any evented object is disposed, it removes all its listeners.
   target.on('dispose', () => target.off());
@@ -383,3 +370,4 @@ function evented(target, options = {}) {
 }
 
 export default evented;
+export {isEvented};
