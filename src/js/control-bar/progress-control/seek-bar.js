@@ -122,12 +122,12 @@ class SeekBar extends Slider {
    * @listens mousedown
    */
   handleMouseDown(event) {
-    super.handleMouseDown(event);
-
     this.player_.scrubbing(true);
 
     this.videoWasPlaying = !this.player_.paused();
     this.player_.pause();
+
+    super.handleMouseDown(event);
   }
 
   /**
