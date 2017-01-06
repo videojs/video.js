@@ -9,7 +9,7 @@ import {isObject} from './obj';
 let log;
 
 // This is the private tracking variable for logging level.
-let level;
+let level = 'all';
 
 /**
  * Log messages to the console and history based on the type of message
@@ -124,54 +124,14 @@ log.history = [];
  *
  * @type {Object}
  */
-log.levels = {};
-
-if (Object.defineProperties) {
-  Object.defineProperties(log.levels, {
-    all: {
-      enumerable: true,
-      value: 'log|warn|error'
-    },
-    error: {
-      enumerable: true,
-      value: 'error'
-    },
-    log: {
-      enumerable: true,
-      value: 'log'
-    },
-    off: {
-      enumerable: true,
-      value: ''
-    },
-    warn: {
-      enumerable: true,
-      value: 'warn|error'
-    }
-  });
-} else {
-  log.levels = {
-    all: 'log|warn|error',
-    error: 'error',
-    log: 'log',
-    off: '',
-    warn: 'warn|error'
-  };
-}
-
-// Determine the default logging level.
-level = 'all';
-
-if (window.VIDEOJS_DEFAULT_LOG_LEVEL &&
-    log.levels.hasOwnProperty(window.VIDEOJS_DEFAULT_LOG_LEVEL)) {
-  level = window.VIDEOJS_DEFAULT_LOG_LEVEL;
-}
-
-if (Object.defineProperty) {
-  Object.defineProperty(log.levels, 'DEFAULT', {value: level});
-} else {
-  log.levels.DEFAULT = level;
-}
+log.levels = {
+  all: 'log|warn|error',
+  error: 'error',
+  log: 'log',
+  off: '',
+  warn: 'warn|error',
+  DEFAULT: level
+};
 
 /**
  * Get or set the current logging level. If a string matching a key from

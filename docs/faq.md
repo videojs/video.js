@@ -170,10 +170,10 @@ help but are outside of the scope of video.js.
 For content that must be highly secure [videojs-contrib-eme][eme] adds DRM support.
 
 ## Q: Can I turn off video.js logging?
-Yes! This can be achieved by adding the following code _before_ including video.js:
+Yes! This can be achieved by adding the following code _after_ including Video.js, but _before_ creating any player(s):
 
 ```js
-window.VIDEOJS_DEFAULT_LOG_LEVEL = 'off';
+videojs.log.level('off');
 ```
 
 ## Q: What is a plugin?
