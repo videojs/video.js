@@ -205,15 +205,6 @@ the [plugins guide][plugin-guide] for more information.
 
 See the [video.js github wiki][skins-list].
 
-## Q: Can I disable the `<style>` elements video.js adds by default?
-Yes! You can add the following code _before_ including video.js:
-
-```js
-window.VIDEOJS_NO_DYNAMIC_STYLE = true;
-```
-
-For more information, see the [skins guide][skin-style-els].
-
 ## Q: Does video.js work as an audio only player?
 
 Yes! It can be used to play audio only files in a `<video>` or `<audio>` tag. The
@@ -323,5 +314,3 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 [semver]: http://semver.org/
 
 [starter-example]: http://jsbin.com/axedog/edit?html,output
-
-[skin-style-els]: /docs/guides/skins.md#additional-style-elements
