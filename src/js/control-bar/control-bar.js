@@ -13,7 +13,6 @@ import './live-display.js';
 import './progress-control/progress-control.js';
 import './fullscreen-toggle.js';
 import './volume-control/volume-control.js';
-import './volume-menu-button.js';
 import './mute-toggle.js';
 import './text-track-controls/chapters-button.js';
 import './text-track-controls/descriptions-button.js';
@@ -56,7 +55,8 @@ class ControlBar extends Component {
 ControlBar.prototype.options_ = {
   children: [
     'playToggle',
-    'volumeMenuButton',
+    'muteToggle',
+    'volumeControl',
     'currentTimeDisplay',
     'timeDivider',
     'durationDisplay',

@@ -19,10 +19,19 @@
 }
 
 .video-js .vjs-volume-control {
-  width: 5em;
+  margin-right: 1em;
+  width: auto;
   @include flex(none);
   @include display-flex(center);
+  @include transition(all 0.4s);
 }
+
+// Don't transition when tabbing in reverse to the volume menu
+// because it looks weird
+/*
+.video-js .vjs-volume-vontrol.vjs-slider-active {
+  @include transition(none);
+}*/
 
 .video-js .vjs-volume-bar {
   margin: 1.35em 0.45em;

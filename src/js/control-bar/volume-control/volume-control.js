@@ -36,6 +36,23 @@ class VolumeControl extends Component {
         this.removeClass('vjs-hidden');
       }
     });
+
+    this.on(this.volumeBar, ['focus', 'slideractive'], () => {
+      this.lock_ = true;
+    });
+    this.on(this.volumeBar, ['blur', 'sliderinactive'], () => {
+      this.lock_ = false;
+      if (this.shouldHide_) {
+        this.hide();
+      }
+    });
+
+    this.on(this.volumeBar, ['focus'], () => this.show());
+    this.on(this.volumeBar, ['blur'], () => this.hide());
+    this.on(['mouseenter', 'touchstart', 'focus'], () => this.show());
+    this.on(['mouseleave', 'touchend', 'blur'], () => this.hide());
+
+    this.hide();
   }
 
   /**
@@ -50,6 +67,20 @@ class VolumeControl extends Component {
     });
   }
 
+  show() {
+    this.removeAttribute('style');
+    this.shouldHide_ = false;
+  }
+
+  hide() {
+    if (this.lock_) {
+      this.shouldHide_ = true;
+      return;
+    }
+    // animate hiding the bar via transitions
+    // todo: turn this into a class
+    this.setAttribute('style', 'width:1px; margin: 0; overflow:hidden; opacity: 0');
+  }
 }
 
 /**

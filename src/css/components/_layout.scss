@@ -133,9 +133,10 @@ body.vjs-full-window {
 .video-js .vjs-offscreen {
   height: 1px;
   left: -9999px;
-  position: absolute;
+  position: absolute !important;
   top: 0;
   width: 1px;
+  overflow: hidden;
 }
 
 .vjs-lock-showing {
