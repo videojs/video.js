@@ -457,19 +457,6 @@ class Html5 extends Tech {
   }
 
   /**
-   * Called by {@link Player#play} to play using the `Html5` `Tech`.
-   */
-  play() {
-    const playPromise = this.el_.play();
-
-    // Catch/silence error when a pause interrupts a play request
-    // on browsers which return a promise
-    if (playPromise !== undefined && typeof playPromise.then === 'function') {
-      playPromise.then(null, (e) => {});
-    }
-  }
-
-  /**
    * Set current time for the `HTML5` tech.
    *
    * @param {number} seconds
@@ -1571,7 +1558,16 @@ Html5.resetMediaElement = function(el) {
    * @method Html5#load
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-load}
    */
-  'load'
+  'load',
+
+  /**
+   * A wrapper around the media elements `play` function. This will call the `HTML5`s
+   * media element `play` function.
+   *
+   * @method Html5#play
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-play}
+   */
+  'play'
 ].forEach(function(prop) {
   Html5.prototype[prop] = function() {
     return this.el_[prop]();

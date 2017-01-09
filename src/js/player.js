@@ -1571,35 +1571,23 @@ class Player extends Component {
    * start media playback
    *
    * @return {Promise|undefined}
-   *         Returns a `Promise` if the browser supports it or a Promise library was
-   *         passed in as an option. This will return the native play `Promise` if play()
-   *         returns a `Promise` for this browser.
+   *         Returns a `Promise` if the browser returns one, for most browsers this will
+   *         return undefined.
    */
   play() {
-    const Promise_ = this.options_.Promise || window.Promise;
-
-    const play_ = (resolve) => {
-      // Only calls the tech's play if we already have a src loaded
-      if (this.src() || this.currentSrc()) {
-        return resolve(this.techGet_('play'));
-      }
-
-      this.tech_.one('loadstart', function() {
-        // if resolve is actually the resolution to a promise
-        // it will resolve here, otherwise this will do nothing
-        resolve(this.play());
-      });
-    };
-
-    // return a Promise if the browser supports it
-    if (typeof Promise_ === 'function') {
-      return new Promise_((resolve, reject) => {
-        play_(resolve);
-      });
+    // Only calls the tech's play if we already have a src loaded
+    if (this.src() || this.currentSrc()) {
+      return this.techGet_('play');
     }
 
-    // return the native value of play, which is probably undefined
-    return play_((val) => val);
+    this.tech_.one('loadstart', function() {
+      const retval = this.play();
+
+      // silence errors (unhandled promise from play)
+      if (retval !== undefined && typeof retval.then === 'function') {
+        retval.then(null, (e) => {});
+      }
+    });
   }
 
   /**
