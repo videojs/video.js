@@ -29,6 +29,10 @@ QUnit.test('test streamToParts', function(assert) {
   assert.ok(parts.connection === 'http://myurl.com/');
   assert.ok(parts.stream === 'really?streaming=fun&really=fun');
 
+  parts = Flash.streamToParts('http://myurl.com/really?streaming=fun&really=fun');
+  ok(parts.connection === 'http://myurl.com/');
+  ok(parts.stream === 'really?streaming=fun&really=fun');
+
   parts = Flash.streamToParts('http://myurl.com/streaming/is/fun');
   assert.ok(parts.connection === 'http://myurl.com/streaming/is/');
   assert.ok(parts.stream === 'fun');
