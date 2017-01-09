@@ -5,7 +5,7 @@ import {logByType} from '../../../src/js/utils/log.js';
 import window from 'global/window';
 import sinon from 'sinon';
 
-QUnit.module('log', {
+QUnit.module('utils/log', {
 
   beforeEach() {
 
@@ -33,7 +33,7 @@ QUnit.module('log', {
     log.level(log.levels.DEFAULT);
 
     // Empty the logger's history.
-    log.history.length = 0;
+    log.history.clear();
   }
 });
 
@@ -44,7 +44,7 @@ QUnit.test('logging functions should work', function(assert) {
 
   // Need to reset history here because there are extra messages logged
   // when running via Karma.
-  log.history.length = 0;
+  log.history.clear();
 
   log('log1', 'log2');
   log.warn('warn1', 'warn2');
@@ -68,17 +68,19 @@ QUnit.test('logging functions should work', function(assert) {
     getConsoleArgs('VIDEOJS:', 'ERROR:', 'error1', 'error2')
   );
 
-  assert.equal(log.history.length, 3, 'there should be three messages in the log history');
-  assert.deepEqual(log.history[0], ['log1', 'log2'], 'history recorded the correct arguments');
-  assert.deepEqual(log.history[1], ['WARN:', 'warn1', 'warn2'], 'history recorded the correct arguments');
-  assert.deepEqual(log.history[2], ['ERROR:', 'error1', 'error2'], 'history recorded the correct arguments');
+  const history = log.history();
+
+  assert.equal(history.length, 3, 'there should be three messages in the log history');
+  assert.deepEqual(history[0], ['log1', 'log2'], 'history recorded the correct arguments');
+  assert.deepEqual(history[1], ['WARN:', 'warn1', 'warn2'], 'history recorded the correct arguments');
+  assert.deepEqual(history[2], ['ERROR:', 'error1', 'error2'], 'history recorded the correct arguments');
 });
 
 QUnit.test('in IE pre-11 (or when requested) objects and arrays are stringified', function(assert) {
 
   // Need to reset history here because there are extra messages logged
   // when running via Karma.
-  log.history.length = 0;
+  log.history.clear();
 
   // Run a custom log call, explicitly requesting object/array stringification.
   logByType('log', [
@@ -99,7 +101,7 @@ QUnit.test('setting the log level changes what is actually logged', function(ass
 
   // Need to reset history here because there are extra messages logged
   // when running via Karma.
-  log.history.length = 0;
+  log.history.clear();
 
   log.level('error');
 
@@ -111,9 +113,11 @@ QUnit.test('setting the log level changes what is actually logged', function(ass
   assert.notOk(window.console.warn.called, 'console.warn was not called');
   assert.ok(window.console.error.called, 'console.error was called');
 
-  assert.deepEqual(log.history[0], ['log1', 'log2'], 'history is maintained even when logging is not performed');
-  assert.deepEqual(log.history[1], ['WARN:', 'warn1', 'warn2'], 'history is maintained even when logging is not performed');
-  assert.deepEqual(log.history[2], ['ERROR:', 'error1', 'error2'], 'history is maintained even when logging is not performed');
+  const history = log.history();
+
+  assert.deepEqual(history[0], ['log1', 'log2'], 'history is maintained even when logging is not performed');
+  assert.deepEqual(history[1], ['WARN:', 'warn1', 'warn2'], 'history is maintained even when logging is not performed');
+  assert.deepEqual(history[2], ['ERROR:', 'error1', 'error2'], 'history is maintained even when logging is not performed');
 
   log.level('off');
 
@@ -130,4 +134,29 @@ QUnit.test('setting the log level changes what is actually logged', function(ass
     new Error('"foobar" in not a valid log level'),
     'log.level() only accepts valid log levels when used as a setter'
   );
+});
+
+QUnit.test('history can be enabled/disabled', function(assert) {
+
+  // Need to reset history here because there are extra messages logged
+  // when running via Karma.
+  log.history.clear();
+
+  log.history.disable();
+  log('log1');
+  log.warn('warn1');
+  log.error('error1');
+
+  let history = log.history();
+
+  assert.strictEqual(history.length, 0, 'no history was tracked');
+
+  log.history.enable();
+  log('log1');
+  log.warn('warn1');
+  log.error('error1');
+
+  history = log.history();
+
+  assert.strictEqual(history.length, 3, 'history was tracked');
 });

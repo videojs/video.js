@@ -11,6 +11,9 @@ let log;
 // This is the private tracking variable for logging level.
 let level = 'all';
 
+// This is the private tracking variable for the logging history.
+let history = [];
+
 /**
  * Log messages to the console and history based on the type of message
  *
@@ -36,13 +39,15 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   }
 
   // Add a clone of the args at this point to history.
-  log.history.push([].concat(args));
+  if (history) {
+    history.push([].concat(args));
+  }
 
   // Add console prefix after adding to history.
   args.unshift('VIDEOJS:');
 
   // If there's no console then don't try to output messages, but they will
-  // still be stored in `log.history`.
+  // still be stored in history.
   //
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
@@ -94,19 +99,6 @@ log = function(...args) {
 };
 
 /**
- * Retains a history of all arguments passed to logging functions.
- *
- * These records are retained regardless of logging level.
- *
- * Whether logging is enabled or not, users would be wise to think carefully
- * about what they pass to video.js' logging functions. Because values passed
- * are stored here, they could lead to memory leaks.
- *
- * @type {Array}
- */
-log.history = [];
-
-/**
  * Enumeration of available logging levels, where the keys are the level names
  * and the values are `|`-separated strings containing logging methods allowed
  * in that logging level. These strings are used to create a regular expression
@@ -118,7 +110,6 @@ log.history = [];
  *   this effect. The most restrictive.
  * - `all` (default): Matches only Video.js-provided functions (`log`,
  *   `log.warn`, and `log.error`).
- * - `log`: Matches `log` calls only.
  * - `warn`: Matches `log.warn` and `log.error` calls.
  * - `error`: Matches only `log.error` calls.
  *
@@ -127,7 +118,6 @@ log.history = [];
 log.levels = {
   all: 'log|warn|error',
   error: 'error',
-  log: 'log',
   off: '',
   warn: 'warn|error',
   DEFAULT: level
@@ -152,6 +142,46 @@ log.level = (lvl) => {
     level = lvl;
   }
   return level;
+};
+
+/**
+ * Returns an array containing everything that has been logged to the history.
+ *
+ * This array is a shallow clone of the internal history record. However, its
+ * contents are _not_ cloned; so, mutating objects inside this array will
+ * mutate them in history.
+ *
+ * @return {Array}
+ */
+log.history = () => history ? [].concat(history) : [];
+
+/**
+ * Clears the internal history tracking, but does not prevent further history
+ * tracking.
+ */
+log.history.clear = () => {
+  if (history) {
+    history.length = 0;
+  }
+};
+
+/**
+ * Disable history tracking if it is currently enabled.
+ */
+log.history.disable = () => {
+  if (history !== null) {
+    history.length = 0;
+    history = null;
+  }
+};
+
+/**
+ * Enable history tracking if it is currently disabled.
+ */
+log.history.enable = () => {
+  if (history === null) {
+    history = [];
+  }
 };
 
 /**
