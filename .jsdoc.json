@@ -2,7 +2,7 @@
   "source": {
     "include": [ "src/js/" ],
     "includePattern": ".js$"
- },
+  },
   "opts": {
     "destination": "docs/api",
     "readme": "docs/index.md",
@@ -10,6 +10,14 @@
     "recurse": true,
     "tutorials": "docs/guides",
     "encoding": "utf8"
+  },
+  "templates": {
+    "logo": {
+      "url": "//videojs.com/img/logo.png",
+      "height": "30px",
+      "width": "214px"
+    },
+    "name": "Video.js Documentation"
   },
   "plugins": ["plugins/markdown"],
   "markdown": {
