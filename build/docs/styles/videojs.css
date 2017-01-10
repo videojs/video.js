@@ -1,0 +1,29 @@
+#resizer,
+footer {
+  background-color: #ECEEF1;
+  color: #868688;
+  padding: 3px 10px;
+}
+
+.footer-text {
+  padding: 3px;
+  display: block; 
+}
+
+footer .copyright {
+  float: left;
+}
+
+footer .other-links {
+  margin: 0;
+  padding: 0;
+  float: right;
+}
+
+footer .other-links li {
+  display: inline;
+}
+
+footer .logo {
+  display: none;
+}
