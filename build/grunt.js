@@ -326,7 +326,7 @@ module.exports = function(grunt) {
       },
       buildnovtt: {
         options: browserifyGruntOptions({transform: [
-          ['aliasify', {aliases: {'videojs-vtt.js': false}}],
+          ['aliasify', {aliases: {'videojs-vtt.js': false}}]
         ]}),
         files: {
           'build/temp/alt/video.novtt.js': ['es5/video.js']
@@ -344,7 +344,7 @@ module.exports = function(grunt) {
       watchnovtt: {
         options: browserifyGruntOptions({
           transform: [
-            ['aliasify', {aliases: {'videojs-vtt.js': false}}],
+            ['aliasify', {aliases: {'videojs-vtt.js': false}}]
           ],
           watch: true,
           keepAlive: true,
@@ -500,7 +500,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('grunt-accessibility');
 
-  const buildDependents = [
+  grunt.registerTask('build', [
     'shell:lint',
     'clean:build',
 
@@ -519,13 +519,11 @@ module.exports = function(grunt) {
     'copy:swf',
     'copy:ie8',
     'vjslanguages'
-  ];
+  ]);
 
-  grunt.registerTask('build', buildDependents);
-  grunt.registerTask('build:dist', buildDependents.map(task => task));
   grunt.registerTask('dist', [
     'clean:dist',
-    'build:dist',
+    'build',
     'copy:dist',
     'copy:examples',
     'zip:dist'

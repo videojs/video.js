@@ -528,8 +528,9 @@ class Tech extends Component {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
       const vtt = require('videojs-vtt.js');
 
-      // load via require if avialable and vtt.js script location
-      // was not passed in
+      // load via require if available and vtt.js script location was not passed in
+      // as an option. novtt builds will turn the above require call into an empty object
+      // which will cause this if check to always fail.
       if (!this.options_['vtt.js'] && isPlain(vtt) && Object.keys(vtt).length > 0) {
         Object.keys(vtt).forEach(function(k) {
           window[k] = vtt[k];
@@ -538,7 +539,8 @@ class Tech extends Component {
         return;
       }
 
-      // otherwise load via the cdn or script location option
+      // load vtt.js via the script location option or the cdn of no location was
+      // passed in
       const script = document.createElement('script');
 
       script.src = this.options_['vtt.js'] || 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js';
