@@ -46,6 +46,7 @@
     "xhr": "2.2.2"
   },
   "devDependencies": {
+    "aliasify": "^2.1.0",
     "babel-cli": "^6.11.4",
     "babel-plugin-inline-json": "^1.1.1",
     "babel-plugin-transform-es3-member-expression-literals": "^6.8.0",

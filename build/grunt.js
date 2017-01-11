@@ -137,10 +137,6 @@ module.exports = function(grunt) {
         ],
         tasks: ['copy:dist']
       },
-      novtt: {
-        files: ['build/temp/video.js'],
-        tasks: ['concat:novtt']
-      },
       minify: {
         files: ['build/temp/video.js'],
         tasks: ['uglify']
@@ -149,10 +145,6 @@ module.exports = function(grunt) {
         files: ['src/css/**/*'],
         tasks: ['skin']
       },
-      babel: {
-        files: ['src/js/**/*.js'],
-        tasks: ['babel:es5']
-      }
     },
     connect: {
       dev: {
@@ -326,32 +318,39 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
-      options: browserifyGruntOptions(),
       build: {
+        options: browserifyGruntOptions(),
         files: {
           'build/temp/video.js': ['es5/video.js']
         }
       },
-      dist: {
+      buildnovtt: {
+        options: browserifyGruntOptions({transform: [
+          ['aliasify', {aliases: {'videojs-vtt.js': false}}]
+        ]}),
+        files: {
+          'build/temp/alt/video.novtt.js': ['es5/video.js']
+        }
+      },
+      watch: {
         options: browserifyGruntOptions({
-          transform: [
-            ['browserify-versionify', {
-              placeholder: '../node_modules/videojs-vtt.js/dist/vtt.js',
-              version: 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js'
-            }],
-          ]
+          watch: true,
+          keepAlive: true,
         }),
         files: {
           'build/temp/video.js': ['es5/video.js']
         }
       },
-      watch: {
-        options: {
+      watchnovtt: {
+        options: browserifyGruntOptions({
+          transform: [
+            ['aliasify', {aliases: {'videojs-vtt.js': false}}]
+          ],
           watch: true,
-          keepAlive: true
-        },
+          keepAlive: true,
+        }),
         files: {
-          'build/temp/video.js': ['es5/video.js']
+          'build/temp/alt/video.novtt.js': ['es5/video.js']
         }
       },
       tests: {
@@ -390,14 +389,6 @@ module.exports = function(grunt) {
       options: {
         separator: '\n'
       },
-      novtt: {
-        src: ['build/temp/video.js'],
-        dest: 'build/temp/alt/video.novtt.js'
-      },
-      vtt: {
-        src: ['build/temp/video.js', 'node_modules/videojs-vtt.js/dist/vtt.js'],
-        dest: 'build/temp/video.js'
-      },
       ie8_addition: {
         src: ['build/temp/video-js.css', 'src/css/ie8.css'],
         dest: 'build/temp/video-js.css'
@@ -408,22 +399,23 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       tests: [
-        'watch:babel',
+        'shell:babel',
         'browserify:tests'
       ],
       dev: [
+        'shell:babel',
         'browserify:watch',
+        'browserify:watchnovtt',
         'browserify:tests',
-        'watch:novtt',
         'watch:skin',
-        'watch:dist',
-        'shell:babel'
+        'watch:dist'
       ],
       // Run multiple watch tasks in parallel
       // Needed so watchify can cache intelligently
       watchAll: [
         'watch',
         'browserify:watch',
+        'browserify:watchnovtt',
         'browserify:tests',
         'karma:watch'
       ],
@@ -508,14 +500,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('grunt-accessibility');
 
-  const buildDependents = [
+  grunt.registerTask('build', [
     'shell:lint',
     'clean:build',
 
     'babel:es5',
     'browserify:build',
-    'concat:novtt',
-    'concat:vtt',
+    'browserify:buildnovtt',
     'usebanner:novtt',
     'usebanner:vtt',
     'uglify',
@@ -528,18 +519,11 @@ module.exports = function(grunt) {
     'copy:swf',
     'copy:ie8',
     'vjslanguages'
-  ];
-
-  grunt.registerTask('build', buildDependents);
-
-  grunt.registerTask(
-    'build:dist',
-    buildDependents.map(task => task === 'browserify:build' ? 'browserify:dist' : task)
-  );
+  ]);
 
   grunt.registerTask('dist', [
     'clean:dist',
-    'build:dist',
+    'build',
     'copy:dist',
     'copy:examples',
     'zip:dist'
@@ -575,9 +559,7 @@ module.exports = function(grunt) {
 
   // Run while developing
   grunt.registerTask('dev', ['connect:dev', 'concurrent:dev']);
-
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
-
   grunt.registerTask('test-a11y', ['copy:a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
