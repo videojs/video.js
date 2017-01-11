@@ -36,12 +36,6 @@
   display: block;
 }
 
-// Hide the poster when controls are disabled because it's clickable
-// and the native poster can take over
-.vjs-controls-disabled .vjs-poster {
-  display: none;
-}
-
 // Hide the poster when native controls are used otherwise it covers them
 .vjs-using-native-controls .vjs-poster {
   display: none;
