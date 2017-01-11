@@ -15,6 +15,9 @@
   * [If you don't think you can fix the issue or add the feature](#if-you-dont-think-you-can-fix-the-issue-or-add-the-feature)
 * [Q: What is a reduced test case?](#q-what-is-a-reduced-test-case)
 * [Q: What media formats does video.js support?](#q-what-media-formats-does-videojs-support)
+* [Q: How to I autoplay the video?](#q-how-to-i-autoplay-the-video)
+  * [Q: How can I autoplay a video on a mobile device?](#q-how-can-i-autoplay-a-video-on-a-mobile-device)
+* [Q: How can I play RTMP video in video.js?](#q-how-can-i-play-rtmp-video-in-videojs)
 * [Q: How can I hide the links to my video/subtitles/audio/tracks?](#q-how-can-i-hide-the-links-to-my-videosubtitlesaudiotracks)
 * [Q: What is a plugin?](#q-what-is-a-plugin)
 * [Q: How do I make a plugin for video.js?](#q-how-do-i-make-a-plugin-for-videojs)
@@ -115,6 +118,48 @@ This depends on the formats supported by the browser's HTML5 video element, and 
 techs made available to video.js. For example, video.js 5 includes the Flash tech by default which
 enables the playback of FLV video where the Flash plugin is available. For more information
 on media formats see the [troubleshooting guide][troubleshooting].
+
+## Q: How to I autoplay the video?
+
+Video.js supports the standard html5 `autoplay` attribute on the video element.
+It also supports it as an option to video.js or as a method invocation on the player.
+
+```html
+<video autoplay controls class="video-js">
+```
+
+```js
+var player = videojs('my-video', {
+  autoplay: true
+});
+
+// or
+
+player.autoplay(true);
+```
+
+### Q: How can I autoplay a video on a mobile device?
+
+Most mobile devices have blocked autoplaying videos until recently.
+For mobile devices that don't support autoplaying, autoplay isn't supported by video.js.
+For those devices that support autoplaying, like iOS10 and Chrome for Android 53+,
+you must mute the video or have a video without audio tracks to be able to play it.
+For example:
+
+```html
+<video muted autoplay playsinline>
+```
+
+Will make an inline, muted, autoplaying video on an iPhone with iOS10.
+
+## Q: How can I play RTMP video in video.js?
+
+Make sure that the Flash tech is available -- RTMP is not playable on browsers without Flash including mobile. Then, just set the rtmp source with
+an appropriate type -- `rtmp/mp4` or `rtmp/flv`.
+The main thing to be aware of is that video.js splits the connection url and stream name with the `&` character.
+So, you'd want to update the url to follow that format. For example: `rtmp://example.com/live&foo` or `rtmp://example.com/fms&mp4:path/to/file.mp4`.
+
+If the server requires query parameters for authentication, these should be added to the connection part url, for example `rtmp://example.com/live?token=1234&foo`.
 
 ## Q: How can I hide the links to my video/subtitles/audio/tracks?
 

@@ -56,6 +56,22 @@ function classRegExp(className) {
 }
 
 /**
+ * Whether the current DOM interface appears to be real.
+ *
+ * @return {Boolean}
+ */
+export function isReal() {
+  return (
+
+    // Both document and window will never be undefined thanks to `global`.
+    document === window.document &&
+
+    // In IE < 9, DOM methods return "object" as their type, so all we can
+    // confidently check is that it exists.
+    typeof document.createElement !== 'undefined');
+}
+
+/**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
  * @param {Mixed} value

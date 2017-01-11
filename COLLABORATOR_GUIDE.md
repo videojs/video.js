@@ -22,7 +22,7 @@
 
 ## Issues and Pull Requests
 
-Full courtesey should always be shown in video.js projects.
+Full courtesy should always be shown in video.js projects.
 
 Collaborators may manage issues they feel qualified to handle, being mindful of our guidelines.
 

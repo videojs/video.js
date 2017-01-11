@@ -2,7 +2,7 @@
  * @file browser.js
  * @module browser
  */
-import document from 'global/document';
+import * as Dom from './dom';
 import window from 'global/window';
 
 const USER_AGENT = window.navigator && window.navigator.userAgent || '';
@@ -70,5 +70,11 @@ export const IE_VERSION = (function(result) {
 export const IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE;
 export const IS_ANY_SAFARI = IS_SAFARI || IS_IOS;
 
-export const TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
-export const BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in document.createElement('video').style;
+export const TOUCH_ENABLED = Dom.isReal() && (
+  'ontouchstart' in window ||
+  window.DocumentTouch &&
+  window.document instanceof window.DocumentTouch);
+
+export const BACKGROUND_SIZE_SUPPORTED = (
+  Dom.isReal() &&
+  'backgroundSize' in window.document.createElement('video').style);

@@ -121,7 +121,10 @@ class PosterImage extends ClickableComponent {
    */
   handleClick(event) {
     // We don't want a click to trigger playback when controls are disabled
-    // but CSS should be hiding the poster to prevent that from happening
+    if (!this.player_.controls()) {
+      return;
+    }
+
     if (this.player_.paused()) {
       this.player_.play();
     } else {

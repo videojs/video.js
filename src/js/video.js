@@ -36,9 +36,7 @@ import Tech from './tech/tech.js';
 import { use as middlewareUse } from './tech/middleware.js';
 
 // HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined' &&
-    window.document &&
-    window.document.createElement) {
+if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
   document.createElement('video');
   document.createElement('audio');
   document.createElement('track');
@@ -65,8 +63,6 @@ if (typeof HTMLVideoElement === 'undefined' &&
  */
 function videojs(id, options, ready) {
   let tag;
-
-  options = options || {};
 
   // Allow for element or ID to be passed in
   // String ID
@@ -111,6 +107,8 @@ function videojs(id, options, ready) {
   if (tag.player || Player.players[tag.playerId]) {
     return tag.player || Player.players[tag.playerId];
   }
+
+  options = options || {};
 
   videojs.hooks('beforesetup').forEach(function(hookFunction) {
     const opts = hookFunction(tag, mergeOptions(options));
@@ -197,7 +195,7 @@ videojs.removeHook = function(type, fn) {
 };
 
 // Add default styles
-if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
+if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
   let style = Dom.$('.vjs-styles-defaults');
 
   if (!style) {
