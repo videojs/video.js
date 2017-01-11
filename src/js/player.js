@@ -1580,13 +1580,15 @@ class Player extends Component {
       return this.techGet_('play');
     }
 
-    this.tech_.one('loadstart', function() {
-      const retval = this.play();
+    this.ready(function() {
+      this.tech_.one('loadstart', function() {
+        const retval = this.play();
 
-      // silence errors (unhandled promise from play)
-      if (retval !== undefined && typeof retval.then === 'function') {
-        retval.then(null, (e) => {});
-      }
+        // silence errors (unhandled promise from play)
+        if (retval !== undefined && typeof retval.then === 'function') {
+          retval.then(null, (e) => {});
+        }
+      });
     });
   }
 
