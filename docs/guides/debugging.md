@@ -7,6 +7,7 @@
   * [Log Safely](#log-safely)
   * [Log Objects Usefully](#log-objects-usefully)
   * [Log Levels](#log-levels)
+  * [Available Log Levels](#available-log-levels)
   * [History](#history)
 
 ## Logging
@@ -73,7 +74,7 @@ videojs.log.warn('foo'); // does nothing
 videojs.log.error('foo'); // logs "foo" as an error
 ```
 
-Available logging levels are:
+### Available Log Levels
 
 * **all** (default): enables all logging methods
 * **error**: only show `log.error` messages
