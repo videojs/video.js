@@ -145,6 +145,10 @@ class Tech extends Component {
     if (!options.nativeControlsForTouch) {
       this.emitTapEvents();
     }
+
+    if (this.constructor) {
+      this.name_ = this.constructor.name || 'Unknown Tech';
+    }
   }
 
   /* Fallbacks for unsupported event types
