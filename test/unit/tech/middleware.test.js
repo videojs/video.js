@@ -1,4 +1,7 @@
+/* eslint-env qunit */
 import * as middleware from '../../../src/js/tech/middleware.js';
+import sinon from 'sinon';
+import window from 'global/window';
 
 QUnit.module('Middleware', {
   beforeEach(assert) {
@@ -10,18 +13,18 @@ QUnit.module('Middleware', {
 });
 
 QUnit.test('middleware can be added with the use method', function(assert) {
-  var myMw = {};
+  const myMw = {};
+
   middleware.use('foo', myMw);
 
   assert.equal(middleware.getMiddleware('foo').pop(), myMw, 'we are able to add middleware');
 });
 
 QUnit.test('middleware get iterates through the middleware array the right order', function(assert) {
-  let cts = [];
-  let durs = [];
-  let foos = [];
-
-  let mws = [
+  const cts = [];
+  const durs = [];
+  const foos = [];
+  const mws = [
     {
       currentTime(ct) {
         cts.push(ct);
@@ -51,7 +54,7 @@ QUnit.test('middleware get iterates through the middleware array the right order
       }
     }
   ];
-  let tech = {
+  const tech = {
     currentTime(ct) {
       return 5;
     },
@@ -63,11 +66,11 @@ QUnit.test('middleware get iterates through the middleware array the right order
     }
   };
 
-  let ct = middleware.get(mws, tech, 'currentTime');
-  let dur = middleware.get(mws, tech, 'duration');
-  let foo = middleware.get(mws, tech, 'foo');
+  const ct = middleware.get(mws, tech, 'currentTime');
+  const dur = middleware.get(mws, tech, 'duration');
+  const foo = middleware.get(mws, tech, 'foo');
 
-  let assertion = (actual, expected, actualArr, expectedArr, type) => {
+  const assertion = (actual, expected, actualArr, expectedArr, type) => {
     assert.equal(actual, expected, `our middleware chain return currectly for ${type}`);
     assert.deepEqual(actualArr, expectedArr, `we got called in the correct order for ${type}`);
   };
@@ -78,11 +81,10 @@ QUnit.test('middleware get iterates through the middleware array the right order
 });
 
 QUnit.test('middleware set iterates through the middleware array the right order', function(assert) {
-  let cts = [];
-  let durs = [];
-  let foos = [];
-
-  let mws = [
+  const cts = [];
+  const durs = [];
+  const foos = [];
+  const mws = [
     {
       currentTime(ct) {
         cts.push(ct);
@@ -112,14 +114,14 @@ QUnit.test('middleware set iterates through the middleware array the right order
       }
     }
   ];
-  let tech = {
+  const tech = {
     currentTime(ct) {
       cts.push(ct);
       return ct / 2;
     },
     duration(dur) {
       durs.push(dur);
-      return dur ;
+      return dur;
     },
     foo(f) {
       foos.push(f);
@@ -127,11 +129,11 @@ QUnit.test('middleware set iterates through the middleware array the right order
     }
   };
 
-  let ct = middleware.set(mws, tech, 'currentTime', 10);
-  let dur = middleware.set(mws, tech, 'duration', 10);
-  let foo = middleware.set(mws, tech, 'foo', 10);
+  const ct = middleware.set(mws, tech, 'currentTime', 10);
+  const dur = middleware.set(mws, tech, 'duration', 10);
+  const foo = middleware.set(mws, tech, 'foo', 10);
 
-  let assertion = (actual, expected, actualArr, expectedArr, type) => {
+  const assertion = (actual, expected, actualArr, expectedArr, type) => {
     assert.equal(actual, expected, `our middleware chain return currectly for ${type}`);
     assert.deepEqual(actualArr, expectedArr, `we got called in the correct order for ${type}`);
   };
@@ -163,11 +165,11 @@ QUnit.test('setSource selects a source based on the middleware given', function(
   let src;
   let acc;
   const mw = {
-    setSource(src, next) {
+    setSource(_src, next) {
       next(null, {
         src: 'http://example.com/video.mp4',
         type: 'video/mp4'
-      })
+      });
     }
   };
 
@@ -192,21 +194,21 @@ QUnit.test('setSource can select multiple middleware from multiple types', funct
   let src;
   let acc;
   const foomw = {
-    setSource(src, next) {
+    setSource(_src, next) {
       next(null, {
         src: 'bar',
         type: 'video/bar'
-      })
+      });
     }
   };
   const barmw = {
-    setSource(src, next) {
+    setSource(_src, next) {
       next(null, {
         src: 'http://example.com/video.mp4',
         type: 'video/mp4'
-      })
+      });
     }
-  }
+  };
 
   middleware.use('video/foo', foomw);
   middleware.use('video/bar', barmw);
@@ -232,27 +234,27 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   let src;
   let acc;
   const foomw1 = {
-    setSource(src, next) {
+    setSource(_src, next) {
       next(null, {
         src: 'bar',
         type: 'video/foo'
-      })
+      });
     }
   };
   const foomw2 = {
-    setSource(src, next) {
+    setSource(_src, next) {
       next(null, {
         src: 'http://example.com/video.mp4',
         type: 'video/mp4'
-      })
+      });
     }
   };
   const foomw3 = {
-    setSource(src, next) {
+    setSource(_src, next) {
       next(null, {
         src: 'http://example.com/video.mp4',
         type: 'video/mp4'
-      })
+      });
     }
   };
 

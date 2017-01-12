@@ -9,7 +9,7 @@ export function use(type, middleware) {
 
 export function getMiddleware(type) {
   if (type) {
-    return middlewares[type]
+    return middlewares[type];
   }
 
   return middlewares;
