@@ -7,6 +7,14 @@ export function use(type, middleware) {
   middlewares[type].push(middleware);
 }
 
+export function getMiddleware(type) {
+  if (type) {
+    return middlewares[type]
+  }
+
+  return middlewares;
+}
+
 export function setSource(setTimeout, src, next) {
   setTimeout(() => setSourceHelper(src, middlewares[src.type], next), 1);
 }
