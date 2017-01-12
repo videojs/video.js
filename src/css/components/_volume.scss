@@ -1,20 +1,16 @@
-.video-js .vjs-mute-control,
-.video-js .vjs-volume-menu-button {
+.video-js .vjs-mute-control {
   cursor: pointer;
   @include flex(none);
   @extend .vjs-icon-volume-high;
 }
 
-.video-js .vjs-mute-control.vjs-vol-0,
-.video-js .vjs-volume-menu-button.vjs-vol-0 {
+.video-js .vjs-mute-control.vjs-vol-0 {
   @extend .vjs-icon-volume-mute;
 }
-.video-js .vjs-mute-control.vjs-vol-1,
-.video-js .vjs-volume-menu-button.vjs-vol-1 {
+.video-js .vjs-mute-control.vjs-vol-1 {
   @extend .vjs-icon-volume-low;
 }
-.video-js .vjs-mute-control.vjs-vol-2,
-.video-js .vjs-volume-menu-button.vjs-vol-2 {
+.video-js .vjs-mute-control.vjs-vol-2 {
   @extend .vjs-icon-volume-mid;
 }
 
@@ -28,13 +24,6 @@
   @include flex(none);
   @include display-flex(center);
 }
-
-// Don't transition when tabbing in reverse to the volume menu
-// because it looks weird
-/*
-.video-js .vjs-volume-vontrol.vjs-slider-active {
-  @include transition(none);
-}*/
 
 .video-js .vjs-volume-bar {
   margin: 1.35em 0.45em;
@@ -95,33 +84,12 @@
   width: 100%;
 }
 
-// The volume menu button is like menu buttons (captions/subtitles) but works
-// a little differently. It needs to be possible to tab to the volume slider
-// without hitting space bar on the menu button. To do this we're not using
-// display:none to hide the slider menu by default, and instead setting the
-// width and height to zero.
-.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu {
-  display: block;
-  width: 0;
-  height: 0;
-  border-top-color: transparent;
-}
-
 .vjs-menu-button-popup.vjs-volume-menu-button-vertical .vjs-menu {
   left: 0.5em;
   height: 8em;
 }
 .vjs-menu-button-popup.vjs-volume-menu-button-horizontal .vjs-menu {
   left: -2em;
-}
-
-.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu-content {
-  height: 0;
-  width: 0;
-
-  // Avoids unnecessary scrollbars in the menu content. Primarily noticed in Chrome on Linux.
-  overflow-x: hidden;
-  overflow-y: hidden;
 }
 
 .vjs-volume-menu-button-vertical:hover .vjs-menu-content,
@@ -138,10 +106,4 @@
 .vjs-volume-menu-button-horizontal .vjs-lock-showing .vjs-menu-content {
   height: 2.9em;
   width: 8em;
-}
-
-.vjs-volume-menu-button.vjs-menu-button-inline .vjs-menu-content {
-  // An inline volume should never have a menu background color.
-  //  This protects it from external changes to background colors.
-  background-color: transparent !important;
 }

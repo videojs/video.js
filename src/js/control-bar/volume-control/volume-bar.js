@@ -35,6 +35,7 @@ class VolumeBar extends Slider {
     // while the slider is active (the mouse has been pressed down and
     // is dragging) we do not want to hide the VolumeBar
     this.on(['slideractive'], () => {
+      this.addClass('vjs-slider-active');
       this.lockShowing_ = true;
     });
 
@@ -42,6 +43,7 @@ class VolumeBar extends Slider {
     // the VolumeBar, but only if we tried to hide when
     // lockShowing_ was true. see the VolumeBar#hide function.
     this.on(['sliderinactive'], () => {
+      this.removeClass('vjs-slider-active');
       this.lockShowing_ = false;
 
       if (this.shouldHide_) {
