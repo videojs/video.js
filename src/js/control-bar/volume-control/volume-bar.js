@@ -74,11 +74,19 @@ class VolumeBar extends Slider {
     });
   }
 
+  /**
+   * Remove the visual hidden state from the `VolumeBar`.
+   */
   show() {
-    this.removeAttribute('style');
     this.shouldHide_ = false;
+    this.removeClass('vjs-visual-hide');
   }
 
+  /**
+   * Hide the `VolumeBar` visually but not from screen-readers unless
+   * showing is locked (due to the slider being active). If showing is locked
+   * hide will be called when the slider becomes inactive.
+   */
   hide() {
     // if we are currently locked to the showing state
     // don't hide, but store that we should hide when
@@ -89,7 +97,7 @@ class VolumeBar extends Slider {
     }
     // animate hiding the bar via transitions
     // todo: turn this into a class
-    this.setAttribute('style', 'width:1px; margin: 0; overflow:hidden; opacity: 0');
+    this.addClass('vjs-visual-hide');
   }
 
   /**
