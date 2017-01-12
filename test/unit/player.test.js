@@ -10,6 +10,7 @@ import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
 import window from 'global/window';
+import * as middleware from '../../src/js/tech/middleware.js';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -1350,4 +1351,71 @@ QUnit.test('should not allow to register custom player when any player has been 
 
   // reset the Player to the original value;
   videojs.registerComponent('Player', Player);
+});
+
+QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
+  let cts = 0;
+  let durs = 0;
+  let ps = 0;
+
+  videojs.use('video/foo', {
+    currentTime() {
+      cts++;
+    },
+    duration() {
+      durs++;
+    },
+    paused() {
+      ps++;
+    }
+  });
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  player.middleware_ = middleware.getMiddleware('video/foo');
+
+  player.techGet_('currentTime');
+  player.techGet_('duration');
+  player.techGet_('paused');
+
+  assert.equal(cts, 1, 'currentTime is allowed');
+  assert.equal(durs, 1, 'duration is allowed');
+  assert.equal(ps, 0, 'paused is not allowed');
+
+  middleware.getMiddleware('video/foo').pop();
+  player.dispose();
+});
+
+QUnit.test('techCall runs through middleware if allowedSetter', function(assert) {
+  let cts = 0;
+  let vols = 0;
+
+  videojs.use('video/foo', {
+    setCurrentTime(ct) {
+      cts++;
+      return ct;
+    },
+    setVolume() {
+      vols++;
+    }
+  });
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  player.middleware_ = middleware.getMiddleware('video/foo');
+
+  this.clock.tick(1);
+
+  player.techCall_('setCurrentTime', 10);
+  player.techCall_('setVolume', 0.5);
+
+  this.clock.tick(1);
+
+  assert.equal(cts, 1, 'setCurrentTime is allowed');
+  assert.equal(vols, 0, 'setVolume is not allowed');
+
+  middleware.getMiddleware('video/foo').pop();
+  player.dispose();
 });
