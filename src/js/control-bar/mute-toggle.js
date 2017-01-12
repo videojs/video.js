@@ -95,7 +95,7 @@ class MuteToggle extends Button {
     // Don't rewrite the button text if the actual text doesn't change.
     // This causes unnecessary and confusing information for screen reader users.
     // This check is needed because this function gets called every time the volume level is changed.
-    const toMute = this.player_.muted() ? 'Mute Toggle Unmute' : 'Mute Toggle Mute';
+    const toMute = this.player_.muted() ? 'Unmute' : 'Mute';
 
     if (this.controlText() !== toMute) {
       this.controlText(toMute);
@@ -116,7 +116,7 @@ class MuteToggle extends Button {
  * @type {string}
  * @private
  */
-MuteToggle.prototype.controlText_ = 'Mute Toggle Mute';
+MuteToggle.prototype.controlText_ = 'Mute';
 
 Component.registerComponent('MuteToggle', MuteToggle);
 export default MuteToggle;

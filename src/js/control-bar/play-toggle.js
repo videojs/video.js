@@ -70,7 +70,7 @@ class PlayToggle extends Button {
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
     // change the button text to "Pause"
-    this.controlText('Play Toggle Pause');
+    this.controlText('Pause');
   }
 
   /**
@@ -85,7 +85,7 @@ class PlayToggle extends Button {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
     // change the button text to "Play"
-    this.controlText('Play Toggle Play');
+    this.controlText('Play');
   }
 
   /**
@@ -107,7 +107,7 @@ class PlayToggle extends Button {
  * @type {string}
  * @private
  */
-PlayToggle.prototype.controlText_ = 'Play Toggle';
+PlayToggle.prototype.controlText_ = 'Play';
 
 Component.registerComponent('PlayToggle', PlayToggle);
 export default PlayToggle;
