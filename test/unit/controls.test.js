@@ -1,6 +1,6 @@
 /* eslint-env qunit */
 import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
-import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
+import MuteToggle from '../../src/js/control-bar/volume-control/mute-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
