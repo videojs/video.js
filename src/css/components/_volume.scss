@@ -18,12 +18,15 @@
   @extend .vjs-icon-volume-mid;
 }
 
+.video-js .vjs-volume-control .vjs-volume-bar {
+  margin-right: 1.5em;
+  @include transition(all 0.4s);
+}
+
 .video-js .vjs-volume-control {
-  margin-right: 1em;
   width: auto;
   @include flex(none);
   @include display-flex(center);
-  @include transition(all 0.4s);
 }
 
 // Don't transition when tabbing in reverse to the volume menu

@@ -3,7 +3,7 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
+import checkVolumeSupport from './check-volume-support';
 
 // Required children
 import './volume-level.js';
@@ -27,7 +27,36 @@ class VolumeBar extends Slider {
   constructor(player, options) {
     super(player, options);
     this.on(player, 'volumechange', this.updateARIAAttributes);
-    player.ready(Fn.bind(this, this.updateARIAAttributes));
+    player.ready(() => this.updateARIAAttributes);
+
+    // hide this control if volume support is missing
+    checkVolumeSupport(this, player);
+
+    // while the slider is active (the mouse has been pressed down and
+    // is dragging) we do not want to hide the VolumeBar
+    this.on(['slideractive'], () => {
+      this.lockShowing_ = true;
+    });
+
+    // when the slider becomes inactive again we want to hide
+    // the VolumeBar, but only if we tried to hide when
+    // lockShowing_ was true. see the VolumeBar#hide function.
+    this.on(['sliderinactive'], () => {
+      this.lockShowing_ = false;
+
+      if (this.shouldHide_) {
+        this.hide();
+      }
+    });
+
+    // show/hide the VolumeBar on focus/blur
+    // happens in VolumeControl but if we want to use the
+    // VolumeBar by itself we will need this
+    this.on(['focus'], () => this.show());
+    this.on(['blur'], () => this.hide());
+
+    // default to hidden state
+    this.hide();
   }
 
   /**
@@ -43,6 +72,24 @@ class VolumeBar extends Slider {
       'aria-label': 'volume level',
       'aria-live': 'polite'
     });
+  }
+
+  show() {
+    this.removeAttribute('style');
+    this.shouldHide_ = false;
+  }
+
+  hide() {
+    // if we are currently locked to the showing state
+    // don't hide, but store that we should hide when
+    // lockShowing_ turns to a false value.
+    if (this.lockShowing_) {
+      this.shouldHide_ = true;
+      return;
+    }
+    // animate hiding the bar via transitions
+    // todo: turn this into a class
+    this.setAttribute('style', 'width:1px; margin: 0; overflow:hidden; opacity: 0');
   }
 
   /**

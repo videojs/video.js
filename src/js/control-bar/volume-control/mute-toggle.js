@@ -1,9 +1,10 @@
 /**
  * @file mute-toggle.js
  */
-import Button from '../button';
-import Component from '../component';
-import * as Dom from '../utils/dom.js';
+import Button from '../../button';
+import Component from '../../component';
+import * as Dom from '../../utils/dom.js';
+import checkVolumeSupport from './check-volume-support';
 
 /**
  * A button component for muting the audio.
@@ -24,26 +25,14 @@ class MuteToggle extends Button {
   constructor(player, options) {
     super(player, options);
 
+    // hide this control if volume support is missing
+    checkVolumeSupport(this, player);
+
+    // We need to update the button to account for a default muted state.
+    this.on(player, 'loadstart', this.update);
+
+    // update muted icon on volumechange
     this.on(player, 'volumechange', this.update);
-
-    // hide mute toggle if the current tech doesn't support volume control
-    if (player.tech_ && player.tech_.featuresVolumeControl === false) {
-      this.addClass('vjs-hidden');
-    }
-
-    this.on(player, 'loadstart', function() {
-      // We need to update the button to account for a default muted state.
-      this.update();
-
-      if (player.tech_.featuresVolumeControl === false) {
-        this.addClass('vjs-hidden');
-      } else {
-        this.removeClass('vjs-hidden');
-      }
-    });
-
-    this.on(['mouseleave', 'touchend'], () => player.controlBar.volumeControl.hide());
-    this.on(['mouseenter', 'touchstart'], () => player.controlBar.volumeControl.show());
   }
 
   /**

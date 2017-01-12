@@ -2,9 +2,11 @@
  * @file volume-control.js
  */
 import Component from '../../component.js';
+import checkVolumeSupport from './check-volume-support';
 
 // Required children
 import './volume-bar.js';
+import './mute-toggle.js';
 
 /**
  * The component for controlling the volume level
@@ -25,34 +27,19 @@ class VolumeControl extends Component {
   constructor(player, options) {
     super(player, options);
 
-    // hide volume controls when they're not supported by the current tech
-    if (player.tech_ && player.tech_.featuresVolumeControl === false) {
-      this.addClass('vjs-hidden');
-    }
-    this.on(player, 'loadstart', function() {
-      if (player.tech_.featuresVolumeControl === false) {
-        this.addClass('vjs-hidden');
-      } else {
-        this.removeClass('vjs-hidden');
-      }
-    });
+    // hide this control if volume support is missing
+    checkVolumeSupport(this, player);
 
-    this.on(this.volumeBar, ['focus', 'slideractive'], () => {
-      this.lock_ = true;
-    });
-    this.on(this.volumeBar, ['blur', 'sliderinactive'], () => {
-      this.lock_ = false;
-      if (this.shouldHide_) {
-        this.hide();
-      }
-    });
+    // when the mouse leaves the VolumeControl area hide the volumeBar
+    this.on(['mouseenter', 'touchstart'], () => this.volumeBar.show());
+    this.on(['mouseleave', 'touchend'], () => this.volumeBar.hide());
 
-    this.on(this.volumeBar, ['focus'], () => this.show());
-    this.on(this.volumeBar, ['blur'], () => this.hide());
-    this.on(['mouseenter', 'touchstart', 'focus'], () => this.show());
-    this.on(['mouseleave', 'touchend', 'blur'], () => this.hide());
-
-    this.hide();
+    // when any child of the VolumeControl gets or loses focus
+    // show/hide the VolumeBar
+    this.children().forEach((child) => {
+      this.on(child, ['focus'], () => this.volumeBar.show());
+      this.on(child, ['blur'], () => this.volumeBar.hide());
+    });
   }
 
   /**
@@ -67,20 +54,6 @@ class VolumeControl extends Component {
     });
   }
 
-  show() {
-    this.removeAttribute('style');
-    this.shouldHide_ = false;
-  }
-
-  hide() {
-    if (this.lock_) {
-      this.shouldHide_ = true;
-      return;
-    }
-    // animate hiding the bar via transitions
-    // todo: turn this into a class
-    this.setAttribute('style', 'width:1px; margin: 0; overflow:hidden; opacity: 0');
-  }
 }
 
 /**
@@ -91,6 +64,7 @@ class VolumeControl extends Component {
  */
 VolumeControl.prototype.options_ = {
   children: [
+    'muteToggle',
     'volumeBar'
   ]
 };
