@@ -1371,7 +1371,9 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
   });
 
   const tag = TestHelpers.makeTag();
-  const player = videojs(tag);
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
 
   player.middleware_ = middleware.getMiddleware('video/foo');
 
@@ -1402,7 +1404,9 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
   });
 
   const tag = TestHelpers.makeTag();
-  const player = videojs(tag);
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
 
   player.middleware_ = middleware.getMiddleware('video/foo');
 
