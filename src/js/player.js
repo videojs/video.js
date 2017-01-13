@@ -1645,8 +1645,7 @@ class Player extends Component {
    *
    * @return {Player|number}
    *         - the current time in seconds when getting
-   *         - a reference to the current player object when
-   *           getting
+   *         - a reference to the current player object when setting
    */
   currentTime(seconds) {
     if (seconds !== undefined) {
