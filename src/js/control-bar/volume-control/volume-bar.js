@@ -25,73 +25,18 @@ class VolumeBar extends Slider {
    *        The key/value store of player options.
    */
   constructor(player, options) {
-    if (options.vertical) {
-      options.inline = false;
+    if (options.inline === false) {
+      options.vertical = true;
     }
 
     super(player, options);
-    this.on(player, 'volumechange', this.updateARIAAttributes);
-    player.ready(() => this.updateARIAAttributes);
 
     // hide this control if volume support is missing
     checkVolumeSupport(this, player);
 
-    // while the slider is active (the mouse has been pressed down and
-    // is dragging) we do not want to hide the VolumeBar
-    this.on(['slideractive'], () => {
-      this.addClass('vjs-slider-active');
-      this.lockShowing_ = true;
-    });
-
-    // when the slider becomes inactive again we want to hide
-    // the VolumeBar, but only if we tried to hide when
-    // lockShowing_ was true. see the VolumeBar#hide function.
-    this.on(['sliderinactive'], () => {
-      this.removeClass('vjs-slider-active');
-      this.lockShowing_ = false;
-
-      if (this.shouldHide_) {
-        this.hide();
-      }
-    });
-
-    // show/hide the VolumeBar on focus/blur
-    // happens in VolumeControl but if we want to use the
-    // VolumeBar by itself we will need this
-    this.on(['focus'], () => this.show());
-    this.on(['blur'], () => this.hide());
-
-    // default to hidden state
-    this.hide();
-
+    this.on(player, 'volumechange', this.updateARIAAttributes);
+    player.ready(() => this.updateARIAAttributes);
   }
-
-  /**
-   * Remove the visual hidden state from the `VolumeBar`.
-   */
-  show() {
-    this.shouldHide_ = false;
-    this.removeClass('vjs-visual-hide');
-  }
-
-  /**
-   * Hide the `VolumeBar` visually but not from screen-readers unless
-   * showing is locked (due to the slider being active). If showing is locked
-   * hide will be called when the slider becomes inactive.
-   */
-  hide() {
-    // if we are currently locked to the showing state
-    // don't hide, but store that we should hide when
-    // lockShowing_ turns to a false value.
-    if (this.lockShowing_) {
-      this.shouldHide_ = true;
-      return;
-    }
-    // animate hiding the bar via transitions
-    // todo: turn this into a class
-    this.addClass('vjs-visual-hide');
-  }
-
 
   /**
    * Create the `Component`'s DOM element

@@ -3,13 +3,15 @@
  */
 import Component from '../component.js';
 import checkVolumeSupport from './volume-control/check-volume-support';
+import {isPlain} from '../utils/obj';
 
 // Required children
 import './volume-control/volume-control.js';
 import './mute-toggle.js';
 
 /**
- * The component for controlling the volume level
+ * A Component to contain the MuteToggle and VolumeControl so that
+ * they can work together.
  *
  * @extends Component
  */
@@ -25,6 +27,14 @@ class VolumePanel extends Component {
    *        The key/value store of player options.
    */
   constructor(player, options) {
+
+    // pass the inline option down to the VolumeControl if
+    // the VolumeControl is on.
+    if (options.inline === false && (!options.volumeControl || isPlain(options.volumeControl))) {
+      options.volumeControl = options.volumeControl || {};
+      options.volumeControl.inline = options.inline;
+    }
+
     super(player, options);
 
     // hide this control if volume support is missing
@@ -49,8 +59,14 @@ class VolumePanel extends Component {
    *         The element that was created.
    */
   createEl() {
+    let orientationClass = 'vjs-volume-panel-horizontal';
+
+    if (this.options_.inline === false) {
+      orientationClass = 'vjs-volume-panel-vertical';
+    }
+
     return super.createEl('div', {
-      className: 'vjs-volume-control vjs-control'
+      className: `vjs-volume-panel vjs-control ${orientationClass}`
     });
   }
 

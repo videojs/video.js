@@ -28,7 +28,7 @@ class MuteToggle extends Button {
     // hide this control if volume support is missing
     checkVolumeSupport(this, player);
 
-    this.on(player, ['loadstart','volumechange'], this.update);
+    this.on(player, ['loadstart', 'volumechange'], this.update);
   }
 
   /**

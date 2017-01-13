@@ -14,15 +14,19 @@
   @extend .vjs-icon-volume-mid;
 }
 
-.video-js .vjs-volume-control .vjs-volume-bar {
-  margin-right: 1.5em;
+.video-js .vjs-volume-control {
+  width: auto;
+  margin-right: 1em;
+  @include flex(none);
+  @include display-flex(center);
   @include transition(all 0.4s);
 }
 
-.video-js .vjs-volume-control {
+.video-js .vjs-volume-panel {
   width: auto;
   @include flex(none);
   @include display-flex(center);
+  @include transition(all 0.4s);
 }
 
 .video-js .vjs-volume-bar {
@@ -75,6 +79,10 @@
   }
 }
 
+.video-js .vjs-volume-panel.vjs-volume-panel-vertical {
+  width: 4em;
+}
+
 // Assumes volume starts at 1.0.
 .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level {
   height: 100%;
@@ -85,25 +93,14 @@
 }
 
 .video-js .vjs-volume-vertical {
-  left: 0.5em;
+  width: 2.9em;
   height: 8em;
+  bottom: 5.5em;
+  left: -3.5em;
+
+  @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }
+
 .video-js .vjs-volume-horizontal .vjs-menu {
   left: -2em;
-}
-
-.vjs-volume-vertical:hover .vjs-menu-content,
-.vjs-volume-vertical:focus .vjs-menu-content,
-.vjs-volume-vertical.vjs-slider-active .vjs-menu-content,
-.vjs-volume-vertical .vjs-lock-showing .vjs-menu-content {
-  height: 8em;
-  width: 2.9em;
-}
-
-.vjs-volume-horizontal:hover .vjs-menu-content,
-.vjs-volume-horizontal:focus .vjs-menu-content,
-.vjs-volume-horizontal .vjs-slider-active .vjs-menu-content,
-.vjs-volume-horizontal .vjs-lock-showing .vjs-menu-content {
-  height: 2.9em;
-  width: 8em;
 }
