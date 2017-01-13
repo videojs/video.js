@@ -84,26 +84,26 @@
   width: 100%;
 }
 
-.vjs-menu-button-popup.vjs-volume-menu-button-vertical .vjs-menu {
+.video-js .vjs-volume-vertical {
   left: 0.5em;
   height: 8em;
 }
-.vjs-menu-button-popup.vjs-volume-menu-button-horizontal .vjs-menu {
+.video-js .vjs-volume-horizontal .vjs-menu {
   left: -2em;
 }
 
-.vjs-volume-menu-button-vertical:hover .vjs-menu-content,
-.vjs-volume-menu-button-vertical:focus .vjs-menu-content,
-.vjs-volume-menu-button-vertical.vjs-slider-active .vjs-menu-content,
-.vjs-volume-menu-button-vertical .vjs-lock-showing .vjs-menu-content {
+.vjs-volume-vertical:hover .vjs-menu-content,
+.vjs-volume-vertical:focus .vjs-menu-content,
+.vjs-volume-vertical.vjs-slider-active .vjs-menu-content,
+.vjs-volume-vertical .vjs-lock-showing .vjs-menu-content {
   height: 8em;
   width: 2.9em;
 }
 
-.vjs-volume-menu-button-horizontal:hover .vjs-menu-content,
-.vjs-volume-menu-button-horizontal:focus .vjs-menu-content,
-.vjs-volume-menu-button-horizontal .vjs-slider-active .vjs-menu-content,
-.vjs-volume-menu-button-horizontal .vjs-lock-showing .vjs-menu-content {
+.vjs-volume-horizontal:hover .vjs-menu-content,
+.vjs-volume-horizontal:focus .vjs-menu-content,
+.vjs-volume-horizontal .vjs-slider-active .vjs-menu-content,
+.vjs-volume-horizontal .vjs-lock-showing .vjs-menu-content {
   height: 2.9em;
   width: 8em;
 }

@@ -3,6 +3,8 @@
  */
 import Component from '../../component.js';
 import checkVolumeSupport from './check-volume-support';
+import mergeOptions from '../../utils/merge-options';
+import log from '../../utils/log';
 
 // Required children
 import './volume-bar.js';
@@ -25,21 +27,26 @@ class VolumeControl extends Component {
    *        The key/value store of player options.
    */
   constructor(player, options) {
-    super(player, options);
+    const settings = mergeOptions({}, options);
+
+    if (settings.inline === true) {
+      settings.vertical = false;
+    } else {
+      settings.vertical = true;
+    }
+
+    super(player, settings);
 
     // hide this control if volume support is missing
     checkVolumeSupport(this, player);
+  }
 
-    // when the mouse leaves the VolumeControl area hide the volumeBar
-    this.on(['mouseenter', 'touchstart'], () => this.volumeBar.show());
-    this.on(['mouseleave', 'touchend'], () => this.volumeBar.hide());
+  show() {
+    this.volumeBar.show();
+  }
 
-    // when any child of the VolumeControl gets or loses focus
-    // show/hide the VolumeBar
-    this.children().forEach((child) => {
-      this.on(child, ['focus'], () => this.volumeBar.show());
-      this.on(child, ['blur'], () => this.volumeBar.hide());
-    });
+  hide() {
+    this.volumeBar.hide()
   }
 
   /**
@@ -49,8 +56,14 @@ class VolumeControl extends Component {
    *         The element that was created.
    */
   createEl() {
+    let orientationClass = 'vjs-volume-horizonal';
+
+    if (this.options_.vertical === true) {
+      orientationClass = 'vjs-volume-vertical';
+    }
+
     return super.createEl('div', {
-      className: 'vjs-volume-control vjs-control'
+      className: `vjs-volume-control vjs-control ${orientationClass}`
     });
   }
 
@@ -64,7 +77,6 @@ class VolumeControl extends Component {
  */
 VolumeControl.prototype.options_ = {
   children: [
-    'muteToggle',
     'volumeBar'
   ]
 };

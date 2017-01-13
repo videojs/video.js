@@ -25,6 +25,10 @@ class VolumeBar extends Slider {
    *        The key/value store of player options.
    */
   constructor(player, options) {
+    if (options.vertical) {
+      options.inline = false;
+    }
+
     super(player, options);
     this.on(player, 'volumechange', this.updateARIAAttributes);
     player.ready(() => this.updateARIAAttributes);
@@ -59,21 +63,7 @@ class VolumeBar extends Slider {
 
     // default to hidden state
     this.hide();
-  }
 
-  /**
-   * Create the `Component`'s DOM element
-   *
-   * @return {Element}
-   *         The element that was created.
-   */
-  createEl() {
-    return super.createEl('div', {
-      className: 'vjs-volume-bar vjs-slider-bar'
-    }, {
-      'aria-label': 'volume level',
-      'aria-live': 'polite'
-    });
   }
 
   /**
@@ -100,6 +90,22 @@ class VolumeBar extends Slider {
     // animate hiding the bar via transitions
     // todo: turn this into a class
     this.addClass('vjs-visual-hide');
+  }
+
+
+  /**
+   * Create the `Component`'s DOM element
+   *
+   * @return {Element}
+   *         The element that was created.
+   */
+  createEl() {
+    return super.createEl('div', {
+      className: 'vjs-volume-bar vjs-slider-bar'
+    }, {
+      'aria-label': 'volume level',
+      'aria-live': 'polite'
+    });
   }
 
   /**
