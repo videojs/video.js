@@ -6,6 +6,7 @@ import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
 import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
+import Tech from '../../src/js/tech/tech.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
@@ -1425,8 +1426,13 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
 });
 
 QUnit.test('src selects tech based on middleware', function(assert) {
-  const tag = TestHelpers.makeTag();
-  const player = videojs(tag);
+  class BarTech extends Html5 {}
+
+  BarTech.isSupported = () => true;
+  BarTech.canPlayType = (type) => type === 'video/flv';
+  BarTech.canPlaySource = (src) => BarTech.canPlayType(src.type);
+
+  videojs.registerTech('BarTech', BarTech);
 
   videojs.use('video/foo', {
     setSource(src, next) {
@@ -1446,6 +1452,11 @@ QUnit.test('src selects tech based on middleware', function(assert) {
     }
   });
 
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag, {
+    techOrder: ['html5', 'barTech']
+  });
+
   player.src({
     src: 'foo',
     type: 'video/foo'
@@ -1462,9 +1473,10 @@ QUnit.test('src selects tech based on middleware', function(assert) {
 
   this.clock.tick(1);
 
-  assert.equal(player.techName_, 'Flash', 'the html5 tech is chosen');
+  assert.equal(player.techName_, 'BarTech', 'the html5 tech is chosen');
 
   middleware.getMiddleware('video/foo').pop();
   middleware.getMiddleware('video/bar').pop();
   player.dispose();
+  delete Tech.techst_.BarTech;
 });
