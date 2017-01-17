@@ -1423,3 +1423,48 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
   middleware.getMiddleware('video/foo').pop();
   player.dispose();
 });
+
+QUnit.test('src selects tech based on middleware', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  videojs.use('video/foo', {
+    setSource(src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  });
+
+  videojs.use('video/bar', {
+    setSource(src, next) {
+      next(null, {
+        src: 'http://example.com/video.flv',
+        type: 'video/flv'
+      });
+    }
+  });
+
+  player.src({
+    src: 'foo',
+    type: 'video/foo'
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(player.techName_, 'Html5', 'the html5 tech is chosen');
+
+  player.src({
+    src: 'bar',
+    type: 'video/bar'
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(player.techName_, 'Flash', 'the html5 tech is chosen');
+
+  middleware.getMiddleware('video/foo').pop();
+  middleware.getMiddleware('video/bar').pop();
+  player.dispose();
+});
