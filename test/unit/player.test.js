@@ -1478,5 +1478,5 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   middleware.getMiddleware('video/foo').pop();
   middleware.getMiddleware('video/bar').pop();
   player.dispose();
-  delete Tech.techst_.BarTech;
+  delete Tech.techs_.BarTech;
 });
