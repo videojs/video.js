@@ -26,13 +26,18 @@ class VolumePanel extends Component {
    * @param {Object} [options={}]
    *        The key/value store of player options.
    */
-  constructor(player, options) {
+  constructor(player, options = {}) {
+    if (typeof options.inline !== 'undefined') {
+      options.inline = options.inline;
+    } else {
+      options.inline = true;
+    }
 
     // pass the inline option down to the VolumeControl as vertical if
     // the VolumeControl is on.
-    if (options.inline === false && (!options.volumeControl || isPlain(options.volumeControl))) {
+    if (typeof options.volumeControl === 'undefined' || isPlain(options.volumeControl)) {
       options.volumeControl = options.volumeControl || {};
-      options.volumeControl.vertical = true;
+      options.volumeControl.vertical = !options.inline;
     }
 
     super(player, options);
@@ -61,7 +66,7 @@ class VolumePanel extends Component {
   createEl() {
     let orientationClass = 'vjs-volume-panel-horizontal';
 
-    if (this.options_.inline === false) {
+    if (!this.options_.inline) {
       orientationClass = 'vjs-volume-panel-vertical';
     }
 
