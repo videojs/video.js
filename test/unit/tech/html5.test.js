@@ -100,6 +100,21 @@ QUnit.test('test defaultPlaybackRate', function(assert) {
   assert.strictEqual(tech.defaultPlaybackRate(), 0.75, 'can be changed from the API');
 });
 
+QUnit.test('test volume', function(assert) {
+  if (!Html5.canControlVolume()) {
+    assert.ok(true, 'Volume is not supported');
+    return;
+  }
+
+  tech.createEl();
+
+  tech.el().volume = 0.5;
+  assert.strictEqual(tech.volume(), 0.5, 'can be changed from the element');
+
+  tech.setVolume(1);
+  assert.strictEqual(tech.volume(), 1, 'can be changed from the API');
+});
+
 QUnit.test('test defaultMuted', function(assert) {
   tech.createEl();
 
