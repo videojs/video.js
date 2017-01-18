@@ -153,20 +153,17 @@ class ModalDialog extends Component {
    *
    * @fires ModalDialog#beforemodalopen
    * @fires ModalDialog#modalopen
-   *
-   * @return {ModalDialog}
-   *         Returns itself; method can be chained.
    */
   open() {
     if (!this.opened_) {
       const player = this.player();
 
       /**
-       * Fired just before a `ModalDialog` is opened.
-       *
-       * @event ModalDialog#beforemodalopen
-       * @type {EventTarget~Event}
-       */
+        * Fired just before a `ModalDialog` is opened.
+        *
+        * @event ModalDialog#beforemodalopen
+        * @type {EventTarget~Event}
+        */
       this.trigger('beforemodalopen');
       this.opened_ = true;
 
@@ -193,15 +190,14 @@ class ModalDialog extends Component {
       this.el().setAttribute('aria-hidden', 'false');
 
       /**
-       * Fired just after a `ModalDialog` is opened.
-       *
-       * @event ModalDialog#modalopen
-       * @type {EventTarget~Event}
-       */
+        * Fired just after a `ModalDialog` is opened.
+        *
+        * @event ModalDialog#modalopen
+        * @type {EventTarget~Event}
+        */
       this.trigger('modalopen');
       this.hasBeenOpened_ = true;
     }
-    return this;
   }
 
   /**
@@ -226,48 +222,45 @@ class ModalDialog extends Component {
    *
    * @fires ModalDialog#beforemodalclose
    * @fires ModalDialog#modalclose
-   *
-   * @return {ModalDialog}
-   *         Returns itself; method can be chained.
    */
   close() {
-    if (this.opened_) {
-      const player = this.player();
-
-      /**
-       * Fired just before a `ModalDialog` is closed.
-       *
-       * @event ModalDialog#beforemodalclose
-       * @type {EventTarget~Event}
-       */
-      this.trigger('beforemodalclose');
-      this.opened_ = false;
-
-      if (this.wasPlaying_) {
-        player.play();
-      }
-
-      if (this.closeable()) {
-        this.off(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
-      }
-
-      player.controls(true);
-      this.hide();
-      this.el().setAttribute('aria-hidden', 'true');
-
-      /**
-       * Fired just after a `ModalDialog` is closed.
-       *
-       * @event ModalDialog#modalclose
-       * @type {EventTarget~Event}
-       */
-      this.trigger('modalclose');
-
-      if (this.options_.temporary) {
-        this.dispose();
-      }
+    if (!this.opened_) {
+      return;
     }
-    return this;
+    const player = this.player();
+
+    /**
+      * Fired just before a `ModalDialog` is closed.
+      *
+      * @event ModalDialog#beforemodalclose
+      * @type {EventTarget~Event}
+      */
+    this.trigger('beforemodalclose');
+    this.opened_ = false;
+
+    if (this.wasPlaying_) {
+      player.play();
+    }
+
+    if (this.closeable()) {
+      this.off(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
+    }
+
+    player.controls(true);
+    this.hide();
+    this.el().setAttribute('aria-hidden', 'true');
+
+    /**
+      * Fired just after a `ModalDialog` is closed.
+      *
+      * @event ModalDialog#modalclose
+      * @type {EventTarget~Event}
+      */
+    this.trigger('modalclose');
+
+    if (this.options_.temporary) {
+      this.dispose();
+    }
   }
 
   /**
@@ -310,12 +303,9 @@ class ModalDialog extends Component {
   /**
    * Fill the modal's content element with the modal's "content" option.
    * The content element will be emptied before this change takes place.
-   *
-   * @return {ModalDialog}
-   *         Returns itself; method can be chained.
    */
   fill() {
-    return this.fillWith(this.content());
+    this.fillWith(this.content());
   }
 
   /**
@@ -325,11 +315,8 @@ class ModalDialog extends Component {
    * @fires ModalDialog#beforemodalfill
    * @fires ModalDialog#modalfill
    *
-   * @param  {Mixed} [content]
-   *         The same rules apply to this as apply to the `content` option.
-   *
-   * @return {ModalDialog}
-   *         Returns itself; method can be chained.
+   * @param {Mixed} [content]
+   *        The same rules apply to this as apply to the `content` option.
    */
   fillWith(content) {
     const contentEl = this.contentEl();
@@ -364,8 +351,6 @@ class ModalDialog extends Component {
     } else {
       parentEl.appendChild(contentEl);
     }
-
-    return this;
   }
 
   /**
@@ -373,9 +358,6 @@ class ModalDialog extends Component {
    *
    * @fires ModalDialog#beforemodalempty
    * @fires ModalDialog#modalempty
-   *
-   * @return {ModalDialog}
-   *         Returns itself; method can be chained.
    */
   empty() {
    /**
@@ -394,7 +376,6 @@ class ModalDialog extends Component {
     * @type {EventTarget~Event}
     */
     this.trigger('modalempty');
-    return this;
   }
 
   /**

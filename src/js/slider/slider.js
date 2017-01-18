@@ -281,10 +281,9 @@ class Slider extends Component {
    *        - true if slider is vertical,
    *        - false is horizontal
    *
-   * @return {boolean|Slider}
+   * @return {boolean}
    *         - true if slider is vertical, and getting
-   *         - false is horizontal, and getting
-   *         - a reference to this object when setting
+   *         - false if the slider is horizontal, and getting
    */
   vertical(bool) {
     if (bool === undefined) {
@@ -298,8 +297,6 @@ class Slider extends Component {
     } else {
       this.addClass('vjs-slider-horizontal');
     }
-
-    return this;
   }
 }
 
