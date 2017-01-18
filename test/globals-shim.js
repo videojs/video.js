@@ -1,6 +1,6 @@
 /* eslint-env qunit */
-// import 'es5-shim';
-// import 'es6-shim';
+import 'es5-shim';
+import 'es6-shim';
 import document from 'global/document';
 import window from 'global/window';
 import sinon from 'sinon';
