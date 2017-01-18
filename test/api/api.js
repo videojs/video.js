@@ -124,12 +124,9 @@ QUnit.test('should be able to access expected MediaTech API methods', function(a
   const mediaProto = media.prototype;
   const html5 = videojs.getComponent('Html5');
   const html5Proto = html5.prototype;
-  const flash = videojs.getComponent('Flash');
-  const flashProto = flash.prototype;
 
   assert.ok(mediaProto.setPoster, 'setPoster should exist on the Media tech');
   assert.ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
-  assert.ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
 
   assert.ok(html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
   assert.ok(html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
@@ -143,13 +140,6 @@ QUnit.test('should be able to access expected MediaTech API methods', function(a
   assert.ok(html5.prototype.setSource, 'setSource should exist for Html5');
   assert.ok(html5.prototype.disposeSourceHandler,
            'disposeSourceHandler should exist for Html5');
-
-  assert.ok(flash.canPlaySource, 'canPlaySource should exist for Flash');
-  assert.ok(flash.registerSourceHandler, 'registerSourceHandler should exist for Flash');
-  assert.ok(flash.selectSourceHandler, 'selectSourceHandler should exist for Flash');
-  assert.ok(flash.prototype.setSource, 'setSource should exist for Flash');
-  assert.ok(flash.prototype.disposeSourceHandler,
-           'disposeSourceHandler should exist for Flash');
 });
 
 QUnit.test('should export ready api call to public', function(assert) {

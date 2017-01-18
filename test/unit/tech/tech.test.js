@@ -1,7 +1,6 @@
 /* eslint-env qunit */
 import Tech from '../../../src/js/tech/tech.js';
 import Html5 from '../../../src/js/tech/html5.js';
-import Flash from '../../../src/js/tech/flash.js';
 import Button from '../../../src/js/button.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 import extendFn from '../../../src/js/extend.js';
@@ -498,7 +497,6 @@ QUnit.test('Tech.isTech returns correct answers for techs and components', funct
   assert.ok(isTech(Tech), 'Tech is a Tech');
   assert.ok(isTech(Html5), 'Html5 is a Tech');
   assert.ok(isTech(new Html5({}, {})), 'An html5 instance is a Tech');
-  assert.ok(isTech(Flash), 'Flash is a Tech');
   assert.ok(!isTech(5), 'A number is not a Tech');
   assert.ok(!isTech('this is a tech'), 'A string is not a Tech');
   assert.ok(!isTech(Button), 'A Button is not a Tech');
