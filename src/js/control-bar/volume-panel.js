@@ -61,7 +61,7 @@ class VolumePanel extends Component {
   createEl() {
     let orientationClass = 'vjs-volume-panel-horizontal';
 
-    if (this.options_.inline === false) {
+    if (!this.options_.inline) {
       orientationClass = 'vjs-volume-panel-vertical';
     }
 
