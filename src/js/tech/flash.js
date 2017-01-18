@@ -10,7 +10,6 @@ import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import { createTimeRange } from '../utils/time-ranges.js';
 import FlashRtmpDecorator from './flash-rtmp';
-import Component from '../component';
 import window from 'global/window';
 import {assign} from '../utils/obj';
 
@@ -1075,6 +1074,5 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes) {
 // Run Flash through the RTMP decorator
 FlashRtmpDecorator(Flash);
 
-Component.registerComponent('Flash', Flash);
 Tech.registerTech('Flash', Flash);
 export default Flash;

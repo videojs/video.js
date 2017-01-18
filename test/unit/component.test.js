@@ -41,6 +41,44 @@ const getFakePlayer = function() {
   };
 };
 
+QUnit.test('registerComponent() throws with bad arguments', function(assert) {
+  assert.throws(
+    function() {
+      Component.registerComponent(null);
+    },
+    new Error('Illegal component name, "null"; must be a non-empty string.'),
+    'component names must be non-empty strings'
+  );
+
+  assert.throws(
+    function() {
+      Component.registerComponent('');
+    },
+    new Error('Illegal component name, ""; must be a non-empty string.'),
+    'component names must be non-empty strings'
+  );
+
+  assert.throws(
+    function() {
+      Component.registerComponent('TestComponent5', function() {});
+    },
+    new Error('Illegal component, "TestComponent5"; must be a Component subclass.'),
+    'components must be subclasses of Component'
+  );
+
+  assert.throws(
+    function() {
+      const Tech = Component.getComponent('Tech');
+
+      class DummyTech extends Tech {}
+
+      Component.registerComponent('TestComponent5', DummyTech);
+    },
+    new Error('Illegal component, "TestComponent5"; techs must be registered using Tech.registerTech().'),
+    'components must be subclasses of Component'
+  );
+});
+
 QUnit.test('should create an element', function(assert) {
   const comp = new Component(getFakePlayer(), {});
 
@@ -635,7 +673,7 @@ QUnit.test('should use a defined content el for appending children', function(as
   class CompWithContent extends Component {}
 
   CompWithContent.prototype.createEl = function() {
-    // Create the main componenent element
+    // Create the main component element
     const el = Dom.createEl('div');
 
     // Create the element where children will be appended

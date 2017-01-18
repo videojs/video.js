@@ -2,7 +2,6 @@
  * @file html5.js
  */
 import Tech from './tech.js';
-import Component from '../component';
 import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import * as Fn from '../utils/fn.js';
@@ -1662,6 +1661,5 @@ Html5.nativeSourceHandler.dispose = function() {};
 // Register the native source handler
 Html5.registerSourceHandler(Html5.nativeSourceHandler);
 
-Component.registerComponent('Html5', Html5);
 Tech.registerTech('Html5', Html5);
 export default Html5;

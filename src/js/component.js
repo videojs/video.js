@@ -1520,15 +1520,34 @@ class Component {
    * @param {string} name
    *        The name of the `Component` to register.
    *
-   * @param {Component} comp
+   * @param {Component} ComponentToRegister
    *        The `Component` class to register.
    *
    * @return {Component}
    *         The `Component` that was registered.
    */
-  static registerComponent(name, comp) {
-    if (!name) {
-      return;
+  static registerComponent(name, ComponentToRegister) {
+    if (typeof name !== 'string' || !name) {
+      throw new Error(`Illegal component name, "${name}"; must be a non-empty string.`);
+    }
+
+    const Tech = Component.getComponent('Tech');
+
+    // We need to make sure this check is only done if Tech has been registered.
+    const isTech = Tech && Tech.isTech(ComponentToRegister);
+    const isComp = Component === ComponentToRegister ||
+      Component.prototype.isPrototypeOf(ComponentToRegister.prototype);
+
+    if (isTech || !isComp) {
+      let reason;
+
+      if (isTech) {
+        reason = 'techs must be registered using Tech.registerTech()';
+      } else {
+        reason = 'must be a Component subclass';
+      }
+
+      throw new Error(`Illegal component, "${name}"; ${reason}.`);
     }
 
     name = toTitleCase(name);
@@ -1537,23 +1556,26 @@ class Component {
       Component.components_ = {};
     }
 
-    if (name === 'Player' && Component.components_[name]) {
-      const Player = Component.components_[name];
+    const Player = Component.getComponent('Player');
+
+    if (name === 'Player' && Player) {
+      const players = Player.players;
+      const playerNames = Object.keys(players);
 
       // If we have players that were disposed, then their name will still be
       // in Players.players. So, we must loop through and verify that the value
       // for each item is not null. This allows registration of the Player component
       // after all players have been disposed or before any were created.
-      if (Player.players &&
-          Object.keys(Player.players).length > 0 &&
-          Object.keys(Player.players).map((playerName) => Player.players[playerName]).every(Boolean)) {
-        throw new Error('Can not register Player component after player has been created');
+      if (players &&
+          playerNames.length > 0 &&
+          playerNames.map((pname) => players[pname]).every(Boolean)) {
+        throw new Error('Can not register Player component after player has been created.');
       }
     }
 
-    Component.components_[name] = comp;
+    Component.components_[name] = ComponentToRegister;
 
-    return comp;
+    return ComponentToRegister;
   }
 
   /**
@@ -1580,14 +1602,9 @@ class Component {
     if (Component.components_ && Component.components_[name]) {
       return Component.components_[name];
     }
-
-    if (window && window.videojs && window.videojs[name]) {
-      log.warn(`The ${name} component was added to the videojs object when it should be registered using videojs.registerComponent(name, component)`);
-
-      return window.videojs[name];
-    }
   }
 }
 
 Component.registerComponent('Component', Component);
+
 export default Component;
