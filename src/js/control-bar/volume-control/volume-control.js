@@ -77,7 +77,7 @@ class VolumeControl extends Component {
     // animate hiding the bar via transitions
     let hideClass = 'vjs-visual-hide-horizontal';
 
-    if (this.options_.inline === false) {
+    if (this.options_.vertical) {
       hideClass = 'vjs-visual-hide-vertical';
     }
 
@@ -109,7 +109,7 @@ class VolumeControl extends Component {
     // animate hiding the bar via transitions
     let hideClass = 'vjs-visual-hide-horizontal';
 
-    if (this.options_.inline === false) {
+    if (this.options_.vertical) {
       hideClass = 'vjs-visual-hide-vertical';
     }
 
