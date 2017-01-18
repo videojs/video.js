@@ -3204,9 +3204,6 @@ Player.prototype.options_ = {
   html5: {},
   flash: {},
 
-  // defaultVolume: 0.85,
-  defaultVolume: 0.00,
-
   // default inactivity timeout
   inactivityTimeout: 2000,
 
