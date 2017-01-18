@@ -1066,6 +1066,34 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
   player.dispose();
 });
 
+if (window.Promise) {
+  QUnit.test('play promise should resolve to native promise if returned', function(assert) {
+    const player = TestHelpers.makePlayer({});
+    const done = assert.async();
+
+    player.tech_.play = () => window.Promise.resolve('foo');
+    const p = player.play();
+
+    assert.ok(p, 'play returns something');
+    assert.equal(typeof p.then, 'function', 'play returns a promise');
+    p.then(function(val) {
+      assert.equal(val, 'foo', 'should resolve to native promise value');
+
+      player.dispose();
+      done();
+    });
+  });
+}
+
+QUnit.test('play promise should resolve to native value if returned', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.tech_.play = () => 'foo';
+  const p = player.play();
+
+  assert.equal(p, 'foo', 'play returns foo');
+});
+
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
 

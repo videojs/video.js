@@ -1564,20 +1564,26 @@ class Player extends Component {
   /**
    * start media playback
    *
-   * @return {Player}
-   *         A reference to the player object this function was called on
+   * @return {Promise|undefined}
+   *         Returns a `Promise` if the browser returns one, for most browsers this will
+   *         return undefined.
    */
   play() {
     // Only calls the tech's play if we already have a src loaded
     if (this.src() || this.currentSrc()) {
-      this.techCall_('play');
-    } else {
-      this.tech_.one('loadstart', function() {
-        this.play();
-      });
+      return this.techGet_('play');
     }
 
-    return this;
+    this.ready(function() {
+      this.tech_.one('loadstart', function() {
+        const retval = this.play();
+
+        // silence errors (unhandled promise from play)
+        if (retval !== undefined && typeof retval.then === 'function') {
+          retval.then(null, (e) => {});
+        }
+      });
+    });
   }
 
   /**
