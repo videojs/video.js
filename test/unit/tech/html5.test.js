@@ -101,8 +101,8 @@ QUnit.test('test defaultPlaybackRate', function(assert) {
 });
 
 QUnit.test('test volume', function(assert) {
-  if (!Html5.isSupported() && !Html5.canControlVolume()) {
-    assert.ok(true, 'Html5 or Volume is not supported');
+  if (!Html5.canControlVolume()) {
+    assert.ok(true, 'Volume is not supported');
     return;
   }
 
