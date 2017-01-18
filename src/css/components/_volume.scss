@@ -2,6 +2,11 @@
   cursor: pointer;
   @include flex(none);
   @extend .vjs-icon-volume-high;
+  // padding here is for IE < 9, it doesn't do width: auto from
+  // another style correctly
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-bottom: 3em;
 }
 
 .video-js .vjs-mute-control.vjs-vol-0 {
@@ -21,6 +26,12 @@
   @include flex(none);
   @include display-flex(center);
   @include transition(all 0.4s);
+}
+
+.video-js .vjs-volume-control.vjs-control.vjs-volume-vertical {
+  left: 0.6em;
+  bottom: 3em;
+  position: absolute;
 }
 
 .video-js .vjs-volume-panel {
