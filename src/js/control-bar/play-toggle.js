@@ -25,6 +25,7 @@ class PlayToggle extends Button {
 
     this.on(player, 'play', this.handlePlay);
     this.on(player, 'pause', this.handlePause);
+    this.on(player, 'ended', this.handleEnded);
   }
 
   /**
@@ -65,6 +66,7 @@ class PlayToggle extends Button {
    * @listens Player#play
    */
   handlePlay(event) {
+    this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
     // change the button text to "Pause"
@@ -86,6 +88,17 @@ class PlayToggle extends Button {
     this.controlText('Play');
   }
 
+  /**
+   * Add the vjs-ended class to the element so it can change appearance
+   *
+   * @method handleEnded
+   */
+  handleEnded(event) {
+    this.removeClass('vjs-playing');
+    this.addClass('vjs-ended');
+    // change the button text to "Replay"
+    this.controlText('Replay');
+  }
 }
 
 /**
