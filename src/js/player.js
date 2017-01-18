@@ -1607,6 +1607,18 @@ class Player extends Component {
   }
 
   /**
+   * Get a TimeRange object representing the current ranges of time that the user
+   * has played.
+   *
+   * @return {TimeRange}
+   *         A time range object that represents all the increments of time that have
+   *         been played.
+   */
+  played() {
+    return this.techGet_('played') || createTimeRange(0, 0);
+  }
+
+  /**
    * Returns whether or not the user is "scrubbing". Scrubbing is
    * when the user has clicked the progress bar handle and is
    * dragging it along the progress bar.
@@ -1811,6 +1823,39 @@ class Player extends Component {
       return;
     }
     return this.techGet_('muted') || false;
+  }
+
+  /**
+   * Get the current defaultMuted state, or turn defaultMuted on or off. defaultMuted
+   * indicates the state of muted on intial playback.
+   *
+   * ```js
+   *   var myPlayer = videojs('some-player-id');
+   *
+   *   myPlayer.src("http://www.example.com/path/to/video.mp4");
+   *
+   *   // get, should be false
+   *   console.log(myPlayer.defaultMuted());
+   *   // set to true
+   *   myPlayer.defaultMuted(true);
+   *   // get should be true
+   *   console.log(myPlayer.defaultMuted());
+   * ```
+   *
+   * @param {boolean} [defaultMuted]
+   *        - true to mute
+   *        - false to unmute
+   *
+   * @return {boolean|Player}
+   *         - true if defaultMuted is on and getting
+   *         - false if defaultMuted is off and getting
+   *         - A reference to the current player when setting
+   */
+  defaultMuted(defaultMuted) {
+    if (defaultMuted !== undefined) {
+      return this.techCall_('setDefaultMuted', defaultMuted);
+    }
+    return this.techGet_('defaultMuted') || false;
   }
 
   /**
@@ -2752,6 +2797,32 @@ class Player extends Component {
   }
 
   /**
+   * Gets or sets the current default playback rate. A default playback rate of
+   * 1.0 represents normal speed and 0.5 would indicate half-speed playback, for instance.
+   * defaultPlaybackRate will only represent what the intial playbackRate of a video was, not
+   * not the current playbackRate.
+   *
+   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-defaultplaybackrate
+   *
+   * @param {number} [rate]
+   *       New default playback rate to set.
+   *
+   * @return {number|Player}
+   *         - The default playback rate when getting or 1.0
+   *         - the player when setting
+   */
+  defaultPlaybackRate(rate) {
+    if (rate !== undefined) {
+      return this.techCall_('setDefaultPlaybackRate', rate);
+    }
+
+    if (this.tech_ && this.tech_.featuresPlaybackRate) {
+      return this.techGet_('defaultPlaybackRate');
+    }
+    return 1.0;
+  }
+
+  /**
    * Gets or sets the audio flag
    *
    * @param {boolean} bool
@@ -2956,13 +3027,6 @@ class Player extends Component {
   videoHeight() {
     return this.tech_ && this.tech_.videoHeight && this.tech_.videoHeight() || 0;
   }
-
-  // Methods to add support for
-  // initialTime: function() { return this.techCall_('initialTime'); },
-  // startOffsetTime: function() { return this.techCall_('startOffsetTime'); },
-  // played: function() { return this.techCall_('played'); },
-  // defaultPlaybackRate: function() { return this.techCall_('defaultPlaybackRate'); },
-  // defaultMuted: function() { return this.techCall_('defaultMuted'); }
 
   /**
    * The player's language code
