@@ -195,8 +195,8 @@ myComponent.trigger('eventType');
 // does nothing
 ```
 
-If myFunc gets excluded, *all* listeners for the event type will get removed. If
-eventType gets excluded, *all* listeners will get removed from the component.
+If myFunc gets excluded, _all_ listeners for the event type will get removed. If
+eventType gets excluded, _all_ listeners will get removed from the component.
 You can use `off` to remove listeners that get added to other elements or
 components using:
 
