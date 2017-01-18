@@ -2,7 +2,6 @@
  * @file time-ranges.js
  * @module time-ranges
  */
-import log from './log.js';
 
 /**
  * Returns the time for the specified index at the start or end
@@ -51,8 +50,8 @@ import log from './log.js';
  * @throws {Error} if the timeRanges provided are over the maxIndex
  */
 function rangeCheck(fnName, index, maxIndex) {
-  if (index < 0 || index > maxIndex) {
-    throw new Error(`Failed to execute '${fnName}' on 'TimeRanges': The index provided (${index}) is greater than or equal to the maximum bound (${maxIndex}).`);
+  if (typeof index !== 'number' || index < 0 || index > maxIndex) {
+    throw new Error(`Failed to execute '${fnName}' on 'TimeRanges': The index provided (${index}) is non-numeric or out of bounds (0-${maxIndex}).`);
   }
 }
 
@@ -79,10 +78,6 @@ function rangeCheck(fnName, index, maxIndex) {
  * @throws {Error} if rangeIndex is more than the length of ranges
  */
 function getRange(fnName, valueIndex, ranges, rangeIndex) {
-  if (rangeIndex === undefined) {
-    log.warn(`DEPRECATED: Function '${fnName}' on 'TimeRanges' called without an index argument.`);
-    rangeIndex = 0;
-  }
   rangeCheck(fnName, rangeIndex, ranges.length - 1);
   return ranges[rangeIndex][valueIndex];
 }
