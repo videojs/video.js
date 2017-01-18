@@ -109,7 +109,7 @@ class VolumeControl extends Component {
   createEl() {
     let orientationClass = 'vjs-volume-horizonal vjs-visual-hide-horizontal';
 
-    if (this.options_.inline === false) {
+    if (this.options_.vertical === true) {
       orientationClass = 'vjs-volume-vertical vjs-visual-hide-vertical';
     }
 
