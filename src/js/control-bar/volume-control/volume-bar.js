@@ -3,7 +3,6 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
-import checkVolumeSupport from './check-volume-support';
 
 // Required children
 import './volume-level.js';
@@ -30,9 +29,6 @@ class VolumeBar extends Slider {
     }
 
     super(player, options);
-
-    // hide this control if volume support is missing
-    checkVolumeSupport(this, player);
 
     this.on(player, 'volumechange', this.updateARIAAttributes);
     player.ready(() => this.updateARIAAttributes);
