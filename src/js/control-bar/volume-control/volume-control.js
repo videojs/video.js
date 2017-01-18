@@ -26,11 +26,11 @@ class VolumeControl extends Component {
    */
   constructor(player, options = {}) {
 
-    // pass the inline option down to the VolumeBar if
-    // the VolumeControl is on.
-    if (options.inline === false && (!options.volumeBar || isPlain(options.volumeBar))) {
+    // Pass the vertical option down to the VolumeBar if
+    // the VolumeBar is turned on.
+    if (typeof options.vertical !== 'undefined' && (!options.volumeBar || isPlain(options.volumeBar))) {
       options.volumeBar = options.volumeBar || {};
-      options.volumeBar.inline = options.inline;
+      options.volumeBar.vertical = options.vertical;
     }
 
     super(player, options);
@@ -70,7 +70,7 @@ class VolumeControl extends Component {
   show() {
     this.shouldHide_ = false;
 
-    if (this.options_.inline === false) {
+    if (this.options_.vertical === true) {
       this.removeClass('vjs-visual-hide-vertical');
     } else {
       this.removeClass('vjs-visual-hide-horizontal');
@@ -93,7 +93,7 @@ class VolumeControl extends Component {
     }
 
     // animate hiding the bar via transitions
-    if (this.options_.inline === false) {
+    if (this.options_.vertical === true) {
       this.addClass('vjs-visual-hide-vertical');
     } else {
       this.addClass('vjs-visual-hide-horizontal');

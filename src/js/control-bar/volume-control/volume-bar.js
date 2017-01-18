@@ -24,10 +24,6 @@ class VolumeBar extends Slider {
    *        The key/value store of player options.
    */
   constructor(player, options) {
-    if (options.inline === false) {
-      options.vertical = true;
-    }
-
     super(player, options);
 
     this.on(player, 'volumechange', this.updateARIAAttributes);

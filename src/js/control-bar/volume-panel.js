@@ -28,11 +28,11 @@ class VolumePanel extends Component {
    */
   constructor(player, options) {
 
-    // pass the inline option down to the VolumeControl if
+    // pass the inline option down to the VolumeControl as vertical if
     // the VolumeControl is on.
     if (options.inline === false && (!options.volumeControl || isPlain(options.volumeControl))) {
       options.volumeControl = options.volumeControl || {};
-      options.volumeControl.inline = options.inline;
+      options.volumeControl.vertical = true;
     }
 
     super(player, options);
