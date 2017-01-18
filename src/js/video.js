@@ -2,9 +2,6 @@
  * @file video.js
  * @module videojs
  */
-
-/* global define */
-
 import window from 'global/window';
 import document from 'global/document';
 import * as setup from './setup';
@@ -629,19 +626,6 @@ videojs.insertContent = Dom.insertContent;
  */
 videojs.computedStyle = computedStyle;
 
-/*
- * Custom Universal Module Definition (UMD)
- *
- * Video.js will never be a non-browser lib so we can simplify UMD a bunch and
- * still support requirejs and browserify. This also needs to be closure
- * compiler compatible, so string keys are used.
- */
-if (typeof define === 'function' && define.amd) {
-  define('videojs', [], () => videojs);
-
-// checking that module is an object too because of umdjs/umd#35
-} else if (typeof exports === 'object' && typeof module === 'object') {
-  module.exports = videojs;
-}
-
-export default videojs;
+// We use Node-style module.exports here instead of ES6 because it is more
+// compatible with different module systems.
+module.exports = videojs;

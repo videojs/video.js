@@ -17,6 +17,7 @@ import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
+import {isPlain} from '../utils/obj';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -143,6 +144,10 @@ class Tech extends Component {
     // Turn on component tap events only if not using native controls
     if (!options.nativeControlsForTouch) {
       this.emitTapEvents();
+    }
+
+    if (this.constructor) {
+      this.name_ = this.constructor.name || 'Unknown Tech';
     }
   }
 
@@ -522,13 +527,27 @@ class Tech extends Component {
    *
    * @fires Tech#vttjsloaded
    * @fires Tech#vttjserror
-   * @fires Tech#texttrackchange
    */
   addWebVttScript_() {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
+      const vtt = require('videojs-vtt.js');
+
+      // load via require if available and vtt.js script location was not passed in
+      // as an option. novtt builds will turn the above require call into an empty object
+      // which will cause this if check to always fail.
+      if (!this.options_['vtt.js'] && isPlain(vtt) && Object.keys(vtt).length > 0) {
+        Object.keys(vtt).forEach(function(k) {
+          window[k] = vtt[k];
+        });
+        this.trigger('vttjsloaded');
+        return;
+      }
+
+      // load vtt.js via the script location option or the cdn of no location was
+      // passed in
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || '../node_modules/videojs-vtt.js/dist/vtt.js';
+      script.src = this.options_['vtt.js'] || 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js';
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.
@@ -1119,36 +1138,10 @@ Tech.withSourceHandlers = function(_Tech) {
 
     if (sh !== _Tech.nativeSourceHandler) {
       this.currentSource_ = source;
-
-      // Catch if someone replaced the src without calling setSource.
-      // If they do, set currentSource_ to null and dispose our source handler.
-      this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
-      this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
-      this.one(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
     }
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
     this.on('dispose', this.disposeSourceHandler);
-  };
-
-  /**
-   * Called once for the first loadstart of a video.
-   *
-   * @listens Tech#loadstart
-   */
-  _Tech.prototype.firstLoadStartListener_ = function() {
-    this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
-  };
-
-  // On successive loadstarts when setSource has not been called again
-  /**
-   * Called after the first loadstart for a video occurs.
-   *
-   * @listens Tech#loadstart
-   */
-  _Tech.prototype.successiveLoadStartListener_ = function() {
-    this.disposeSourceHandler();
-    this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
   };
 
   /**
@@ -1169,8 +1162,6 @@ Tech.withSourceHandlers = function(_Tech) {
     this.cleanupAutoTextTracks();
 
     if (this.sourceHandler_) {
-      this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
-      this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
 
       if (this.sourceHandler_.dispose) {
         this.sourceHandler_.dispose();

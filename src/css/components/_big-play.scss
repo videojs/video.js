@@ -50,3 +50,8 @@
 .vjs-error .vjs-big-play-button {
   display: none;
 }
+
+// Show big play button if video is paused and .vjs-show-big-play-button-on-pause is set on video element
+.vjs-has-started.vjs-paused.vjs-show-big-play-button-on-pause .vjs-big-play-button {
+  display: block;
+}

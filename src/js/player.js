@@ -6,6 +6,7 @@ import Component from './component.js';
 
 import document from 'global/document';
 import window from 'global/window';
+import tsml from 'tsml';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -473,7 +474,7 @@ class Player extends Component {
   createEl() {
     const tag = this.tag;
     let el;
-    const playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute('data-vjs-player');
+    const playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
 
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
@@ -918,32 +919,25 @@ class Player extends Component {
   }
 
   /**
-   * Return a reference to the current {@link Tech}, but only if given an object with the
-   * `IWillNotUseThisInPlugins` property having a true value. This is try and prevent misuse
-   * of techs by plugins.
+   * Return a reference to the current {@link Tech}.
+   * It will print a warning by default about the danger of using the tech directly
+   * but any argument that is passed in will silence the warning.
    *
-   * @param {Object} safety
-   *        An object that must contain `{IWillNotUseThisInPlugins: true}`
-   *
-   * @param {boolean} safety.IWillNotUseThisInPlugins
-   *        Must be set to true or else this function will throw an error.
+   * @param {*} [safety]
+   *        Anything passed in to silence the warning
    *
    * @return {Tech}
    *         The Tech
    */
   tech(safety) {
-    if (safety && safety.IWillNotUseThisInPlugins) {
-      return this.tech_;
+    if (safety === undefined) {
+      log.warn(tsml`
+        Using the tech directly can be dangerous. I hope you know what you're doing.
+        See https://github.com/videojs/video.js/issues/2617 for more info.
+      `);
     }
-    const errorText = `
-      Please make sure that you are not using this inside of a plugin.
-      To disable this alert and error, please pass in an object with
-      \`IWillNotUseThisInPlugins\` to the \`tech\` method. See
-      https://github.com/videojs/video.js/issues/2617 for more info.
-    `;
 
-    window.alert(errorText);
-    throw new Error(errorText);
+    return this.tech_;
   }
 
   /**
@@ -3154,9 +3148,6 @@ Player.prototype.options_ = {
 
   html5: {},
   flash: {},
-
-  // defaultVolume: 0.85,
-  defaultVolume: 0.00,
 
   // default inactivity timeout
   inactivityTimeout: 2000,
