@@ -80,9 +80,6 @@ function setSourceHelper(src = {}, middleware = [], next, acc = []) {
   } else if (mwrest.length) {
     setSourceHelper(src, mwrest, next, acc);
   } else {
-    // const techs = [].concat(middlewares['*']);
-    // const tech = techs.filter((tech) => !!tech.tech.canPlayType(src.type))[0].name;
-
     next(src, acc);
   }
 }
