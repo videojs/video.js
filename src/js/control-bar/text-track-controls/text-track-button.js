@@ -38,14 +38,14 @@ class TextTrackButton extends TrackButton {
    *         Array of menu items that were created
    */
   createItems(items = []) {
-    // Add an OFF menu item to turn all tracks off
-    items.push(new OffTextTrackMenuItem(this.player_, {kind: this.kind_}));
-
     const tracks = this.player_.textTracks();
 
-    if (!tracks) {
+    if (!tracks || !tracks.length) {
       return items;
     }
+
+    // Add an OFF menu item to turn all tracks off
+    items.push(new OffTextTrackMenuItem(this.player_, {kind: this.kind_}));
 
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
