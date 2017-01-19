@@ -30,6 +30,8 @@ class TechFaker extends Tech {
 
   setControls(val) {}
 
+  setVolume(newVolume) {}
+
   currentTime() {
     return 0;
   }

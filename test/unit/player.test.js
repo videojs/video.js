@@ -7,12 +7,12 @@ import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
 import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
+import Tech from '../../src/js/tech/tech.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
 import window from 'global/window';
-import Tech from '../../src/js/tech/tech.js';
-import TechFaker from './tech/tech-faker.js';
+import * as middleware from '../../src/js/tech/middleware.js';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -283,6 +283,9 @@ QUnit.test('should asynchronously fire error events during source selection', fu
     assert.ok(player.error().code === 4, 'Source could not be played error thrown');
   });
 
+  // The first one is for player initialization
+  // The second one is the setTimeout for triggering the error
+  this.clock.tick(1);
   this.clock.tick(1);
 
   player.dispose();
@@ -594,49 +597,6 @@ QUnit.test('make sure that controls listeners do not get added too many times', 
   player.controls(true);
   assert.equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
 
-  player.dispose();
-});
-
-QUnit.test('should select the proper tech based on the the sourceOrder option', function(assert) {
-  const fixture = document.getElementById('qunit-fixture');
-  const html =
-        '<video id="example_1">' +
-          '<source src="fake.foo1" type="video/unsupported-format">' +
-          '<source src="fake.foo2" type="video/foo-format">' +
-        '</video>';
-
-  // Extend TechFaker to create a tech that plays the only mime-type that TechFaker
-  // will not play
-  class PlaysUnsupported extends TechFaker {
-    constructor(options, handleReady) {
-      super(options, handleReady);
-    }
-    // Support ONLY "video/unsupported-format"
-    static isSupported() {
-      return true;
-    }
-    static canPlayType(type) {
-      return (type === 'video/unsupported-format' ? 'maybe' : '');
-    }
-    static canPlaySource(srcObj) {
-      return srcObj.type === 'video/unsupported-format';
-    }
-    }
-  Tech.registerTech('PlaysUnsupported', PlaysUnsupported);
-
-  fixture.innerHTML += html;
-  let tag = document.getElementById('example_1');
-
-  let player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported'], sourceOrder: true });
-
-  assert.equal(player.techName_, 'PlaysUnsupported', 'selected the PlaysUnsupported tech when sourceOrder is truthy');
-  player.dispose();
-
-  fixture.innerHTML += html;
-  tag = document.getElementById('example_1');
-
-  player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported']});
-  assert.equal(player.techName_, 'TechFaker', 'selected the TechFaker tech when sourceOrder is falsey');
   player.dispose();
 });
 
@@ -974,11 +934,17 @@ QUnit.test('should clear pending errors on disposal', function(assert) {
 
   const player = TestHelpers.makePlayer();
 
+  clock.tick(1);
+
   player.src({
     src: 'http://example.com/movie.unsupported-format',
     type: 'video/unsupported-format'
   });
+
+  clock.tick(1);
+
   player.dispose();
+
   try {
     clock.tick(5000);
   } catch (e) {
@@ -1072,6 +1038,13 @@ if (window.Promise) {
     const player = TestHelpers.makePlayer({});
     const done = assert.async();
 
+    player.src({
+      src: 'http://example.com/video.mp4',
+      type: 'video/mp4'
+    });
+
+    this.clock.tick(1);
+
     player.tech_.play = () => window.Promise.resolve('foo');
     const p = player.play();
 
@@ -1088,6 +1061,13 @@ if (window.Promise) {
 
 QUnit.test('play promise should resolve to native value if returned', function(assert) {
   const player = TestHelpers.makePlayer({});
+
+  player.src({
+    src: 'http://example.com/video.mp4',
+    type: 'video/mp4'
+  });
+
+  this.clock.tick(1);
 
   player.tech_.play = () => 'foo';
   const p = player.play();
@@ -1424,6 +1404,140 @@ QUnit.test('should not allow to register custom player when any player has been 
 
   // reset the Player to the original value;
   videojs.registerComponent('Player', Player);
+});
+
+QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
+  let cts = 0;
+  let durs = 0;
+  let ps = 0;
+
+  videojs.use('video/foo', {
+    currentTime() {
+      cts++;
+    },
+    duration() {
+      durs++;
+    },
+    paused() {
+      ps++;
+    }
+  });
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
+
+  player.middleware_ = middleware.getMiddleware('video/foo');
+
+  player.techGet_('currentTime');
+  player.techGet_('duration');
+  player.techGet_('paused');
+
+  assert.equal(cts, 1, 'currentTime is allowed');
+  assert.equal(durs, 1, 'duration is allowed');
+  assert.equal(ps, 0, 'paused is not allowed');
+
+  middleware.getMiddleware('video/foo').pop();
+  player.dispose();
+});
+
+QUnit.test('techCall runs through middleware if allowedSetter', function(assert) {
+  let cts = 0;
+  let vols = 0;
+
+  videojs.use('video/foo', {
+    setCurrentTime(ct) {
+      cts++;
+      return ct;
+    },
+    setVolume() {
+      vols++;
+    }
+  });
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
+
+  player.middleware_ = middleware.getMiddleware('video/foo');
+
+  this.clock.tick(1);
+
+  player.techCall_('setCurrentTime', 10);
+  player.techCall_('setVolume', 0.5);
+
+  this.clock.tick(1);
+
+  assert.equal(cts, 1, 'setCurrentTime is allowed');
+  assert.equal(vols, 0, 'setVolume is not allowed');
+
+  middleware.getMiddleware('video/foo').pop();
+  player.dispose();
+});
+
+QUnit.test('src selects tech based on middleware', function(assert) {
+  class FooTech extends Html5 {}
+  class BarTech extends Html5 {}
+
+  FooTech.isSupported = () => true;
+  FooTech.canPlayType = (type) => type === 'video/mp4';
+  FooTech.canPlaySource = (src) => FooTech.canPlayType(src.type);
+
+  BarTech.isSupported = () => true;
+  BarTech.canPlayType = (type) => type === 'video/flv';
+  BarTech.canPlaySource = (src) => BarTech.canPlayType(src.type);
+
+  videojs.registerTech('FooTech', FooTech);
+  videojs.registerTech('BarTech', BarTech);
+
+  videojs.use('video/foo', {
+    setSource(src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  });
+
+  videojs.use('video/bar', {
+    setSource(src, next) {
+      next(null, {
+        src: 'http://example.com/video.flv',
+        type: 'video/flv'
+      });
+    }
+  });
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag, {
+    techOrder: ['fooTech', 'barTech']
+  });
+
+  player.src({
+    src: 'foo',
+    type: 'video/foo'
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(player.techName_, 'FooTech', 'the FooTech (html5) tech is chosen');
+
+  player.src({
+    src: 'bar',
+    type: 'video/bar'
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(player.techName_, 'BarTech', 'the BarTech (Flash) tech is chosen');
+
+  middleware.getMiddleware('video/foo').pop();
+  middleware.getMiddleware('video/bar').pop();
+  player.dispose();
+  delete Tech.techs_.FooTech;
+  delete Tech.techs_.BarTech;
 });
 
 QUnit.test('options: plugins', function(assert) {

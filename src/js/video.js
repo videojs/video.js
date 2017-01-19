@@ -30,6 +30,7 @@ import xhr from 'xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
+import { use as middlewareUse } from './tech/middleware.js';
 
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
@@ -297,6 +298,8 @@ videojs.getTech = Tech.getTech;
  * @borrows Tech.registerTech as videojs.registerTech
  */
 videojs.registerTech = Tech.registerTech;
+
+videojs.use = middlewareUse;
 
 /**
  * A suite of browser and device tests from {@link browser}.

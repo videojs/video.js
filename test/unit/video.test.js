@@ -3,8 +3,16 @@ import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
+import sinon from 'sinon';
 
-QUnit.module('video.js');
+QUnit.module('video.js', {
+  beforeEach() {
+    this.clock = sinon.useFakeTimers();
+  },
+  afterEach() {
+    this.clock.restore();
+  }
+});
 
 QUnit.test('should create a video tag and have access children in old IE', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
@@ -276,6 +284,8 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
     techOrder: ['html5']
   });
 
+  this.clock.tick(1);
+
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
   assert.equal(player.tech_.el(), vid, 'we re-used the video element');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
@@ -310,6 +320,8 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   const player = videojs(vid, {
     techOrder: ['html5']
   });
+
+  this.clock.tick(1);
 
   assert.notEqual(player.el(), playerDiv, 'we used a new div');
   assert.notEqual(player.tech_.el(), vid, 'we a new video element');

@@ -11,6 +11,7 @@ import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
+import * as middleware from './middleware.js';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
 
@@ -729,6 +730,32 @@ class Tech extends Component {
     return '';
   }
 
+  /**
+   * Check if the type is supported by this tech.
+   *
+   * The base tech does not support any type, but source handlers might
+   * overwrite this.
+   *
+   * @param {string} type
+   *        The media type to check
+   * @return {string} Returns the native video element's response
+   */
+  static canPlayType() {
+    return '';
+  }
+
+  /**
+   * Check if the tech can support the given source
+   * @param {Object} srcObj
+   *        The source object
+   * @param {Object} options
+   *        The options passed to the tech
+   * @return {string} 'probably', 'maybe', or '' (empty string)
+   */
+  static canPlaySource(srcObj, options) {
+    return Tech.canPlayType(srcObj.type);
+  }
+
   /*
    * Return whether the argument is a Tech or not.
    * Can be passed either a Class like `Html5` or a instance like `player.tech_`
@@ -764,6 +791,15 @@ class Tech extends Component {
     if (!Tech.isTech(tech)) {
       throw new Error(`Tech ${name} must be a Tech`);
     }
+
+    if (!Tech.canPlayType) {
+      throw new Error('Techs must have a static canPlayType method on them');
+    }
+    if (!Tech.canPlaySource) {
+      throw new Error('Techs must have a static canPlaySource method on them');
+    }
+
+    middleware.use('*', {name, tech});
 
     Tech.techs_[name] = tech;
     return tech;

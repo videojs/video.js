@@ -25,6 +25,7 @@ import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
+import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 
 // The following imports are used only to ensure that the corresponding modules
@@ -369,6 +370,8 @@ class Player extends Component {
 
     this.options_.playerOptions = playerOptionsCopy;
 
+    this.middleware_ = [];
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -420,6 +423,8 @@ class Player extends Component {
 
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
+
+    this.changingSrc_ = false;
   }
 
   /**
@@ -834,16 +839,8 @@ class Player extends Component {
       techOptions.tag = this.tag;
     }
 
-    if (source) {
-      this.currentType_ = source.type;
-
-      if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
-        techOptions.startTime = this.cache_.currentTime;
-      }
-
-      this.cache_.sources = null;
-      this.cache_.source = source;
-      this.cache_.src = source.src;
+    if (source && source.src === this.cache_.src && this.cache_.currentTime > 0) {
+      techOptions.startTime = this.cache_.currentTime;
     }
 
     // Initialize tech instance
@@ -1508,13 +1505,12 @@ class Player extends Component {
    */
   techCall_(method, arg) {
     // If it's not ready yet, call method when it is
-    if (this.tech_ && !this.tech_.isReady_) {
-      this.tech_.ready(function() {
-        this[method](arg);
-      }, true);
 
-    // Otherwise call method now
-    } else {
+    this.ready(function() {
+      if (method in middleware.allowedSetters) {
+        return middleware.set(this.middleware_, this.tech_, method, arg);
+      }
+
       try {
         if (this.tech_) {
           this.tech_[method](arg);
@@ -1523,7 +1519,7 @@ class Player extends Component {
         log(e);
         throw e;
       }
-    }
+    });
   }
 
   /**
@@ -1539,6 +1535,10 @@ class Player extends Component {
    */
   techGet_(method) {
     if (this.tech_ && this.tech_.isReady_) {
+
+      if (method in middleware.allowedGetters) {
+        return middleware.get(this.middleware_, this.tech_, method);
+      }
 
       // Flash likes to die and reload when you hide or reposition it.
       // In these cases the object methods go away and we get errors.
@@ -1572,21 +1572,26 @@ class Player extends Component {
    *         return undefined.
    */
   play() {
-    // Only calls the tech's play if we already have a src loaded
-    if (this.src() || this.currentSrc()) {
-      return this.techGet_('play');
-    }
-
-    this.ready(function() {
-      this.tech_.one('loadstart', function() {
-        const retval = this.play();
-
-        // silence errors (unhandled promise from play)
-        if (retval !== undefined && typeof retval.then === 'function') {
-          retval.then(null, (e) => {});
-        }
+    if (this.changingSrc_) {
+      this.ready(function() {
+        this.techCall_('play');
       });
-    });
+
+    // Only calls the tech's play if we already have a src loaded
+    } else if (this.src() || this.currentSrc()) {
+      return this.techGet_('play');
+    } else {
+      this.ready(function() {
+        this.tech_.one('loadstart', function() {
+          const retval = this.play();
+
+          // silence errors (unhandled promise from play)
+          if (retval !== undefined && typeof retval.then === 'function') {
+            retval.then(null, (e) => {});
+          }
+        });
+      });
+    }
   }
 
   /**
@@ -2181,66 +2186,96 @@ class Player extends Component {
    */
   src(source) {
     if (source === undefined) {
-      return this.techGet_('src');
+      return this.cache_.src;
     }
 
-    let currentTech = Tech.getTech(this.techName_);
+    this.changingSrc_ = true;
 
-    // Support old behavior of techs being registered as components.
-    // Remove once that deprecated behavior is removed.
-    if (!currentTech) {
-      currentTech = Component.getComponent(this.techName_);
-    }
+    let src = source;
 
-    // case: Array of source objects to choose from and pick the best to play
     if (Array.isArray(source)) {
-      this.sourceList_(source);
-
-    // case: URL String (http://myvideo...)
+      this.cache_.sources = source;
+      src = source[0];
     } else if (typeof source === 'string') {
-      // create a source object from the string
-      this.src({ src: source });
+      src = {
+        src: source
+      };
 
-    // case: Source object { src: '', type: '' ... }
-    } else if (source instanceof Object) {
-      // check if the source has a type and the loaded tech cannot play the source
-      // if there's no type we'll just try the current tech
-      if (source.type && !currentTech.canPlaySource(source, this.options_[this.techName_.toLowerCase()])) {
-        // create a source list with the current source and send through
-        // the tech loop to check for a compatible technology
-        this.sourceList_([source]);
-      } else {
-        this.cache_.sources = null;
-        this.cache_.source = source;
-        this.cache_.src = source.src;
-
-        this.currentType_ = source.type || '';
-
-        // wait until the tech is ready to set the source
-        this.ready(function() {
-
-          // The setSource tech method was added with source handlers
-          // so older techs won't support it
-          // We need to check the direct prototype for the case where subclasses
-          // of the tech do not support source handlers
-          if (currentTech.prototype.hasOwnProperty('setSource')) {
-            this.techCall_('setSource', source);
-          } else {
-            this.techCall_('src', source.src);
-          }
-
-          if (this.options_.preload === 'auto') {
-            this.load();
-          }
-
-          if (this.options_.autoplay) {
-            this.play();
-          }
-
-        // Set the source synchronously if possible (#2326)
-        }, true);
-      }
+      this.cache_.sources = [src];
     }
+
+    this.cache_.source = src;
+
+    this.currentType_ = src.type;
+
+    middleware.setSource(Fn.bind(this, this.setTimeout), src, (src_, mws) => {
+      this.middleware_ = mws;
+
+      const err = this.src_(src_);
+
+      if (err) {
+        if (Array.isArray(source) && source.length > 1) {
+          return this.src(source.slice(1));
+        }
+
+        // We need to wrap this in a timeout to give folks a chance to add error event handlers
+        this.setTimeout(function() {
+          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+        }, 0);
+
+        // we could not find an appropriate tech, but let's still notify the delegate that this is it
+        // this needs a better comment about why this is needed
+        this.triggerReady();
+
+        return;
+      }
+
+      this.changingSrc_ = false;
+      this.cache_.src = src_.src;
+      middleware.setTech(mws, this.tech_);
+    });
+  }
+
+  src_(source) {
+    const sourceTech = this.selectSource([source]);
+
+    if (!sourceTech) {
+      return true;
+    }
+
+    if (sourceTech.tech !== this.techName_) {
+      this.changingSrc_ = true;
+
+      // load this technology with the chosen source
+      this.loadTech_(sourceTech.tech, sourceTech.source);
+      return false;
+    }
+
+    // wait until the tech is ready to set the source
+    this.ready(function() {
+
+      // The setSource tech method was added with source handlers
+      // so older techs won't support it
+      // We need to check the direct prototype for the case where subclasses
+      // of the tech do not support source handlers
+      if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
+        this.techCall_('setSource', source);
+      } else {
+        this.techCall_('src', source.src);
+      }
+
+      if (this.options_.preload === 'auto') {
+        this.load();
+      }
+
+      if (this.options_.autoplay) {
+        this.play();
+      }
+
+    // Set the source synchronously if possible (#2326)
+    }, true);
+
+    return false;
   }
 
   /**
@@ -2335,7 +2370,7 @@ class Player extends Component {
    *         The current source
    */
   currentSrc() {
-    return this.techGet_('currentSrc') || this.cache_.src || '';
+    return this.cache_.source && this.cache_.source.src || '';
   }
 
   /**
