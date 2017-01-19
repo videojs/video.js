@@ -1,25 +1,30 @@
-.video-js .vjs-mute-control,
-.video-js .vjs-volume-menu-button {
+.video-js .vjs-mute-control {
   cursor: pointer;
   @include flex(none);
   @extend .vjs-icon-volume-high;
 }
 
-.video-js .vjs-mute-control.vjs-vol-0,
-.video-js .vjs-volume-menu-button.vjs-vol-0 {
+.video-js .vjs-mute-control.vjs-vol-0 {
   @extend .vjs-icon-volume-mute;
 }
-.video-js .vjs-mute-control.vjs-vol-1,
-.video-js .vjs-volume-menu-button.vjs-vol-1 {
+.video-js .vjs-mute-control.vjs-vol-1 {
   @extend .vjs-icon-volume-low;
 }
-.video-js .vjs-mute-control.vjs-vol-2,
-.video-js .vjs-volume-menu-button.vjs-vol-2 {
+.video-js .vjs-mute-control.vjs-vol-2 {
   @extend .vjs-icon-volume-mid;
 }
 
+
 .video-js .vjs-volume-control {
-  width: 5em;
+  width: auto;
+  margin-right: 1em;
+  @include flex(none);
+  @include display-flex(center);
+  @include transition(all 0.4s);
+}
+
+.video-js .vjs-volume-panel {
+  width: auto;
   @include flex(none);
   @include display-flex(center);
 }
@@ -74,6 +79,10 @@
   }
 }
 
+.video-js .vjs-volume-panel.vjs-volume-panel-vertical {
+  width: 4em;
+}
+
 // Assumes volume starts at 1.0.
 .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level {
   height: 100%;
@@ -83,53 +92,15 @@
   width: 100%;
 }
 
-// The volume menu button is like menu buttons (captions/subtitles) but works
-// a little differently. It needs to be possible to tab to the volume slider
-// without hitting space bar on the menu button. To do this we're not using
-// display:none to hide the slider menu by default, and instead setting the
-// width and height to zero.
-.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu {
-  display: block;
-  width: 0;
-  height: 0;
-  border-top-color: transparent;
-}
-
-.vjs-menu-button-popup.vjs-volume-menu-button-vertical .vjs-menu {
-  left: 0.5em;
-  height: 8em;
-}
-.vjs-menu-button-popup.vjs-volume-menu-button-horizontal .vjs-menu {
-  left: -2em;
-}
-
-.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu-content {
-  height: 0;
-  width: 0;
-
-  // Avoids unnecessary scrollbars in the menu content. Primarily noticed in Chrome on Linux.
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-
-.vjs-volume-menu-button-vertical:hover .vjs-menu-content,
-.vjs-volume-menu-button-vertical:focus .vjs-menu-content,
-.vjs-volume-menu-button-vertical.vjs-slider-active .vjs-menu-content,
-.vjs-volume-menu-button-vertical .vjs-lock-showing .vjs-menu-content {
-  height: 8em;
+.video-js .vjs-volume-vertical {
   width: 2.9em;
+  height: 8em;
+  bottom: 5.5em;
+  left: -3.5em;
+
+  @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }
 
-.vjs-volume-menu-button-horizontal:hover .vjs-menu-content,
-.vjs-volume-menu-button-horizontal:focus .vjs-menu-content,
-.vjs-volume-menu-button-horizontal .vjs-slider-active .vjs-menu-content,
-.vjs-volume-menu-button-horizontal .vjs-lock-showing .vjs-menu-content {
-  height: 2.9em;
-  width: 8em;
-}
-
-.vjs-volume-menu-button.vjs-menu-button-inline .vjs-menu-content {
-  // An inline volume should never have a menu background color.
-  //  This protects it from external changes to background colors.
-  background-color: transparent !important;
+.video-js .vjs-volume-horizontal .vjs-menu {
+  left: -2em;
 }

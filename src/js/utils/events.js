@@ -7,7 +7,7 @@
  * @module events
  */
 
-import * as Dom from './dom.js';
+import * as DomData from './dom-data';
 import * as Guid from './guid.js';
 import log from './log.js';
 import window from 'global/window';
@@ -23,7 +23,7 @@ import document from 'global/document';
  *        Type of event to clean up
  */
 function _cleanUpEvents(elem, type) {
-  const data = Dom.getElData(elem);
+  const data = DomData.getData(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -48,7 +48,7 @@ function _cleanUpEvents(elem, type) {
 
   // Finally remove the element data if there is no data left
   if (Object.getOwnPropertyNames(data).length === 0) {
-    Dom.removeElData(elem);
+    DomData.removeData(elem);
   }
 }
 
@@ -222,7 +222,7 @@ export function on(elem, type, fn) {
     return _handleMultipleEvents(on, elem, type, fn);
   }
 
-  const data = Dom.getElData(elem);
+  const data = DomData.getData(elem);
 
   // We need a place to store all our handler data
   if (!data.handlers) {
@@ -295,11 +295,11 @@ export function on(elem, type, fn) {
  */
 export function off(elem, type, fn) {
   // Don't want to add a cache object through getElData if not needed
-  if (!Dom.hasElData(elem)) {
+  if (!DomData.hasData(elem)) {
     return;
   }
 
-  const data = Dom.getElData(elem);
+  const data = DomData.getData(elem);
 
   // If no events exist, nothing to unbind
   if (!data.handlers) {
@@ -369,7 +369,7 @@ export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasElData first.
-  const elemData = (Dom.hasElData(elem)) ? Dom.getElData(elem) : {};
+  const elemData = (DomData.hasData(elem)) ? DomData.getData(elem) : {};
   const parent = elem.parentNode || elem.ownerDocument;
       // type = event.type || event,
       // handler;
@@ -393,7 +393,7 @@ export function trigger(elem, event, hash) {
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
-    const targetData = Dom.getElData(event.target);
+    const targetData = DomData.getData(event.target);
 
     // Checks if the target has a default action for this event.
     if (event.target[event.type]) {

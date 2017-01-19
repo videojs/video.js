@@ -87,7 +87,7 @@ QUnit.test('should accept options from multiple sources and override in correct 
 });
 
 QUnit.test('should get tag, source, and track settings', function(assert) {
-  // Partially tested in lib->getElAttributes
+  // Partially tested in lib->getAttributes
 
   const fixture = document.getElementById('qunit-fixture');
 
