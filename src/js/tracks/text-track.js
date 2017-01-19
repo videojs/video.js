@@ -331,11 +331,9 @@ class TextTrack extends Track {
   addCue(cue) {
     const tracks = this.tech_.textTracks();
 
-    if (tracks) {
-      for (let i = 0; i < tracks.length; i++) {
-        if (tracks[i] !== this) {
-          tracks[i].removeCue(cue);
-        }
+    for (let i = 0; i < tracks.length; i++) {
+      if (tracks[i] !== this) {
+        tracks[i].removeCue(cue);
       }
     }
 

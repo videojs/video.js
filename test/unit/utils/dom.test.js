@@ -1,5 +1,7 @@
 /* eslint-env qunit */
+import window from 'global/window';
 import document from 'global/document';
+import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
 
 QUnit.module('dom');
@@ -516,4 +518,58 @@ QUnit.test('$() and $$()', function(assert) {
   assert.strictEqual(Dom.$$('div', children[0]).length,
                     0,
                     'returns 0 for missing elements');
+});
+
+QUnit.test('getBoundingClientRect() returns an object for elements that support it', function(assert) {
+  const mockEl = {
+    getBoundingClientRect: sinon.spy(() => {
+      return {
+        bottom: 3,
+        height: 10,
+        left: 4,
+        right: 2,
+        top: 1,
+        width: 20
+      };
+    }),
+    parentNode: true
+  };
+
+  const actual = Dom.getBoundingClientRect(mockEl);
+
+  // The expected result is what is returned by the mock element.
+  const expected = mockEl.getBoundingClientRect.firstCall.returnValue;
+
+  assert.notStrictEqual(actual, expected, 'the object returned by the mock element was cloned and not returned directly');
+
+  Object.keys(expected).forEach(k => {
+    assert.strictEqual(actual[k], expected[k], `the "${k}" returned by the Dom util matches what was returned by the mock element`);
+  });
+});
+
+QUnit.test('getBoundingClientRect() shims only width and height for elements that do not return them', function(assert) {
+  const oldGCS = window.getComputedStyle;
+
+  // This is done so that we fall back to looking for the `currentStyle`
+  // property on the mock element.
+  window.getComputedStyle = null;
+
+  const mockEl = {
+    currentStyle: {
+      height: '123',
+      width: '456'
+    },
+    getBoundingClientRect: sinon.spy(() => {
+      return {};
+    }),
+    parentNode: true
+  };
+
+  const actual = Dom.getBoundingClientRect(mockEl);
+
+  assert.deepEqual(Object.keys(actual).sort(), ['height', 'width'], 'only "height" and "width" were shimmed');
+  assert.strictEqual(actual.height, 123, '"height" was shimmed because it was missing');
+  assert.strictEqual(actual.width, 456, '"width" was shimmed because it was missing');
+
+  window.getComputedStyle = oldGCS;
 });

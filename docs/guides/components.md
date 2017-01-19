@@ -316,24 +316,6 @@ Player
 
 ## Specific Component Details
 
-### Progress Control
-
-The progress control has a grandchild component, the mouse time display, which shows a time tooltip that follows the mouse cursor.
-
-By default, the progress control is sandwiched inside the control bar between the volume menu button and the remaining time display. Some skins attempt to move the it above the control bar and have it span the full width of the player. In these cases, it is less than ideal to have the tooltips leave the bounds of the player. This can be prevented by setting the `keepTooltipsInside` option on the progress control.
-
-```js
-let player = videojs('myplayer', {
-  controlBar: {
-    progressControl: {
-      keepTooltipsInside: true
-    }
-  }
-});
-```
-
-> **Note:** This makes the tooltips use a real element instead of pseudo-elements so targeting them with CSS is different.
-
 ### Text Track Settings
 
 The text track settings component is only available when using emulated text tracks.

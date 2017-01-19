@@ -43,10 +43,6 @@ class TextTrackButton extends TrackButton {
 
     const tracks = this.player_.textTracks();
 
-    if (!tracks) {
-      return items;
-    }
-
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
 

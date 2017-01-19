@@ -1444,6 +1444,81 @@ class Component {
   }
 
   /**
+   * Queues up a callback to be passed to requestAnimationFrame (rAF), but
+   * with a few extra bonuses:
+   *
+   * - Supports browsers that do not support rAF by falling back to
+   *   {@link Component#setTimeout}.
+   *
+   * - The callback is turned into a {@link Component~GenericCallback} (i.e.
+   *   bound to the component).
+   *
+   * - Automatic cancellation of the rAF callback is handled if the component
+   *   is disposed before it is called.
+   *
+   * @param  {Component~GenericCallback} fn
+   *         A function that will be bound to this component and executed just
+   *         before the browser's next repaint.
+   *
+   * @return {number}
+   *         Returns an rAF ID that gets used to identify the timeout. It can
+   *         also be used in {@link Component#cancelAnimationFrame} to cancel
+   *         the animation frame callback.
+   *
+   * @listens Component#dispose
+   * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
+   */
+  requestAnimationFrame(fn) {
+    if (this.supportsRaf_) {
+      fn = Fn.bind(this, fn);
+
+      const id = window.requestAnimationFrame(fn);
+      const disposeFn = () => this.cancelAnimationFrame(id);
+
+      disposeFn.guid = `vjs-raf-${id}`;
+      this.on('dispose', disposeFn);
+
+      return id;
+    }
+
+    // Fall back to using a timer.
+    return this.setTimeout(fn, 1000 / 60);
+  }
+
+  /**
+   * Cancels a queued callback passed to {@link Component#requestAnimationFrame}
+   * (rAF).
+   *
+   * If you queue an rAF callback via {@link Component#requestAnimationFrame},
+   * use this function instead of `window.cancelAnimationFrame`. If you don't,
+   * your dispose listener will not get cleaned up until {@link Component#dispose}!
+   *
+   * @param {number} id
+   *        The rAF ID to clear. The return value of {@link Component#requestAnimationFrame}.
+   *
+   * @return {number}
+   *         Returns the rAF ID that was cleared.
+   *
+   * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
+   */
+  cancelAnimationFrame(id) {
+    if (this.supportsRaf_) {
+      window.cancelAnimationFrame(id);
+
+      const disposeFn = function() {};
+
+      disposeFn.guid = `vjs-raf-${id}`;
+
+      this.off('dispose', disposeFn);
+
+      return id;
+    }
+
+    // Fall back to using a timer.
+    return this.clearTimeout(id);
+  }
+
+  /**
    * Register a `Component` with `videojs` given the name and the component.
    *
    * > NOTE: {@link Tech}s should not be registered as a `Component`. {@link Tech}s
@@ -1540,6 +1615,17 @@ class Component {
     }
   }
 }
+
+/**
+ * Whether or not this component supports `requestAnimationFrame`.
+ *
+ * This is exposed primarily for testing purposes.
+ *
+ * @private
+ * @type {Boolean}
+ */
+Component.prototype.supportsRaf_ = typeof window.requestAnimationFrame === 'function' &&
+  typeof window.cancelAnimationFrame === 'function';
 
 Component.registerComponent('Component', Component);
 

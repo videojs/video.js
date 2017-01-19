@@ -7,6 +7,7 @@ import window from 'global/window';
 import log from './log.js';
 import tsml from 'tsml';
 import {isObject} from './obj';
+import computedStyle from './computed-style';
 
 /**
  * Detect if a value is a string with any non-whitespace characters.
@@ -461,6 +462,48 @@ export function unblockTextSelection() {
   document.onselectstart = function() {
     return true;
   };
+}
+
+/**
+ * Identical to the native `getBoundingClientRect` function, but ensures that
+ * the method is supported at all (it is in all browsers we claim to support)
+ * and that the element is in the DOM before continuing.
+ *
+ * This wrapper function also shims properties which are not provided by some
+ * older browsers (namely, IE8).
+ *
+ * Additionally, some browsers do not support adding properties to a
+ * `ClientRect`/`DOMRect` object; so, we shallow-copy it with the standard
+ * properties (except `x` and `y` which are not widely supported). This helps
+ * avoid implementations where keys are non-enumerable.
+ *
+ * @param  {Element} el
+ *         Element whose `ClientRect` we want to calculate.
+ *
+ * @return {Object|undefined}
+ *         Always returns a plain
+ */
+export function getBoundingClientRect(el) {
+  if (el.getBoundingClientRect && el.parentNode) {
+    const rect = el.getBoundingClientRect();
+    const result = {};
+
+    ['bottom', 'height', 'left', 'right', 'top', 'width'].forEach(k => {
+      if (rect[k] !== undefined) {
+        result[k] = rect[k];
+      }
+    });
+
+    if (!result.height) {
+      result.height = parseFloat(computedStyle(el, 'height'));
+    }
+
+    if (!result.width) {
+      result.width = parseFloat(computedStyle(el, 'width'));
+    }
+
+    return result;
+  }
 }
 
 /**

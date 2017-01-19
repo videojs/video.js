@@ -2,9 +2,12 @@
 import TechFaker from '../tech/tech-faker';
 import TrackBaseline from './track-baseline';
 import Track from '../../../src/js/tracks/track.js';
+import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 
 const defaultTech = {
-  textTracks() {},
+  textTracks() {
+    return new TextTrackList();
+  },
   on() {},
   off() {},
   currentTime() {}

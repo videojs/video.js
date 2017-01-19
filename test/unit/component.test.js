@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import window from 'global/window';
 import Component from '../../src/js/component.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import * as DomData from '../../src/js/utils/dom-data';
@@ -825,6 +826,70 @@ QUnit.test('should provide interval methods that automatically get cleared on co
   this.clock.tick(1200);
 
   assert.ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
+});
+
+QUnit.test('should provide *AnimationFrame methods that automatically get cleared on component disposal', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  const spyRAF = sinon.spy();
+
+  comp.requestAnimationFrame(spyRAF);
+
+  assert.strictEqual(spyRAF.callCount, 0, 'rAF callback was not called immediately');
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was called after a "repaint"');
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was not called after a second "repaint"');
+
+  comp.cancelAnimationFrame(comp.requestAnimationFrame(spyRAF));
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'second rAF callback was not called because it was cancelled');
+
+  comp.requestAnimationFrame(spyRAF);
+  comp.dispose();
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
+QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  const rAF = window.requestAnimationFrame = sinon.spy();
+  const cAF = window.cancelAnimationFrame = sinon.spy();
+
+  // Make sure the component thinks it does not support rAF.
+  comp.supportsRaf_ = false;
+
+  sinon.spy(comp, 'setTimeout');
+  sinon.spy(comp, 'clearTimeout');
+
+  comp.cancelAnimationFrame(comp.requestAnimationFrame(() => {}));
+
+  assert.strictEqual(rAF.callCount, 0, 'window.requestAnimationFrame was not called');
+  assert.strictEqual(cAF.callCount, 0, 'window.cancelAnimationFrame was not called');
+  assert.strictEqual(comp.setTimeout.callCount, 1, 'Component#setTimeout was called');
+  assert.strictEqual(comp.clearTimeout.callCount, 1, 'Component#clearTimeout was called');
+
+  comp.dispose();
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
 });
 
 QUnit.test('$ and $$ functions', function(assert) {
