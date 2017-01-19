@@ -3,7 +3,6 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 
 // Required children
 import './volume-level.js';
@@ -26,8 +25,9 @@ class VolumeBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
+
     this.on(player, 'volumechange', this.updateARIAAttributes);
-    player.ready(Fn.bind(this, this.updateARIAAttributes));
+    player.ready(() => this.updateARIAAttributes);
   }
 
   /**
@@ -40,7 +40,8 @@ class VolumeBar extends Slider {
     return super.createEl('div', {
       className: 'vjs-volume-bar vjs-slider-bar'
     }, {
-      'aria-label': 'volume level'
+      'aria-label': 'volume level',
+      'aria-live': 'polite'
     });
   }
 
