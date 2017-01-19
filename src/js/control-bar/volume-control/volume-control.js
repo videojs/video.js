@@ -41,8 +41,8 @@ class VolumeControl extends Component {
     checkVolumeSupport(this, player);
 
     // while the slider is active (the mouse has been pressed down and
-    // is dragging) we do not want to hide the VolumeBar
-    this.on(this.volumeBar, ['slideractive'], () => {
+    // is dragging) or in focus we do not want to hide the VolumeBar
+    this.on(this.volumeBar, ['focus', 'slideractive'], () => {
       this.volumeBar.addClass('vjs-slider-active');
       this.lockShowing_ = true;
     });
@@ -50,7 +50,7 @@ class VolumeControl extends Component {
     // when the slider becomes inactive again we want to hide
     // the VolumeBar, but only if we tried to hide when
     // lockShowing_ was true. see the VolumeBar#hide function.
-    this.on(this.volumeBar, ['sliderinactive'], () => {
+    this.on(this.volumeBar, ['blur', 'sliderinactive'], () => {
       this.volumeBar.removeClass('vjs-slider-active');
       this.lockShowing_ = false;
 
