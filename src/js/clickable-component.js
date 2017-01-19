@@ -108,9 +108,8 @@ class ClickableComponent extends Component {
    * @param {Element} [el=this.el()]
    *        Element to set the title on.
    *
-   * @return {string|ClickableComponent}
+   * @return {string}
    *         - The control text when getting
-   *         - Returns itself when setting; method can be chained.
    */
   controlText(text, el = this.el()) {
     if (!text) {
@@ -122,8 +121,6 @@ class ClickableComponent extends Component {
     this.controlText_ = text;
     this.controlTextEl_.innerHTML = localizedText;
     el.setAttribute('title', localizedText);
-
-    return this;
   }
 
   /**
@@ -138,9 +135,6 @@ class ClickableComponent extends Component {
 
   /**
    * Enable this `Component`s element.
-   *
-   * @return {ClickableComponent}
-   *         Returns itself; method can be chained.
    */
   enable() {
     this.removeClass('vjs-disabled');
@@ -152,14 +146,10 @@ class ClickableComponent extends Component {
     this.on('click', this.handleClick);
     this.on('focus', this.handleFocus);
     this.on('blur', this.handleBlur);
-    return this;
   }
 
   /**
    * Disable this `Component`s element.
-   *
-   * @return {ClickableComponent}
-   *         Returns itself; method can be chained.
    */
   disable() {
     this.addClass('vjs-disabled');
@@ -171,7 +161,6 @@ class ClickableComponent extends Component {
     this.off('click', this.handleClick);
     this.off('focus', this.handleFocus);
     this.off('blur', this.handleBlur);
-    return this;
   }
 
   /**

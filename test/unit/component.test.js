@@ -41,6 +41,44 @@ const getFakePlayer = function() {
   };
 };
 
+QUnit.test('registerComponent() throws with bad arguments', function(assert) {
+  assert.throws(
+    function() {
+      Component.registerComponent(null);
+    },
+    new Error('Illegal component name, "null"; must be a non-empty string.'),
+    'component names must be non-empty strings'
+  );
+
+  assert.throws(
+    function() {
+      Component.registerComponent('');
+    },
+    new Error('Illegal component name, ""; must be a non-empty string.'),
+    'component names must be non-empty strings'
+  );
+
+  assert.throws(
+    function() {
+      Component.registerComponent('TestComponent5', function() {});
+    },
+    new Error('Illegal component, "TestComponent5"; must be a Component subclass.'),
+    'components must be subclasses of Component'
+  );
+
+  assert.throws(
+    function() {
+      const Tech = Component.getComponent('Tech');
+
+      class DummyTech extends Tech {}
+
+      Component.registerComponent('TestComponent5', DummyTech);
+    },
+    new Error('Illegal component, "TestComponent5"; techs must be registered using Tech.registerTech().'),
+    'components must be subclasses of Component'
+  );
+});
+
 QUnit.test('should create an element', function(assert) {
   const comp = new Component(getFakePlayer(), {});
 
@@ -557,13 +595,13 @@ QUnit.test('dimension() should treat NaN and null as zero', function(assert) {
   newWidth = comp.dimension('width', null);
 
   assert.notEqual(newWidth, width, 'new width and old width are not the same');
-  assert.equal(newWidth, comp, 'we set a value, so, return value is component');
+  assert.equal(newWidth, undefined, 'we set a value, so, return value is undefined');
   assert.equal(comp.width(), 0, 'the new width is zero');
 
   const newHeight = comp.dimension('height', NaN);
 
   assert.notEqual(newHeight, height, 'new height and old height are not the same');
-  assert.equal(newHeight, comp, 'we set a value, so, return value is component');
+  assert.equal(newHeight, undefined, 'we set a value, so, return value is undefined');
   assert.equal(comp.height(), 0, 'the new height is zero');
 
   comp.width(width);
@@ -635,7 +673,7 @@ QUnit.test('should use a defined content el for appending children', function(as
   class CompWithContent extends Component {}
 
   CompWithContent.prototype.createEl = function() {
-    // Create the main componenent element
+    // Create the main component element
     const el = Dom.createEl('div');
 
     // Create the element where children will be appended

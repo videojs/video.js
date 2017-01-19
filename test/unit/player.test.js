@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import Plugin from '../../src/js/plugin';
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
@@ -1032,6 +1033,34 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
   player.dispose();
 });
 
+if (window.Promise) {
+  QUnit.test('play promise should resolve to native promise if returned', function(assert) {
+    const player = TestHelpers.makePlayer({});
+    const done = assert.async();
+
+    player.tech_.play = () => window.Promise.resolve('foo');
+    const p = player.play();
+
+    assert.ok(p, 'play returns something');
+    assert.equal(typeof p.then, 'function', 'play returns a promise');
+    p.then(function(val) {
+      assert.equal(val, 'foo', 'should resolve to native promise value');
+
+      player.dispose();
+      done();
+    });
+  });
+}
+
+QUnit.test('play promise should resolve to native value if returned', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.tech_.play = () => 'foo';
+  const p = player.play();
+
+  assert.equal(p, 'foo', 'play returns foo');
+});
+
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
 
@@ -1175,29 +1204,38 @@ QUnit.test('you can clear error in the error event', function(assert) {
 });
 
 QUnit.test('Player#tech will return tech given the appropriate input', function(assert) {
+  const oldLogWarn = log.warn;
+  let warning;
+
+  log.warn = function(_warning) {
+    warning = _warning;
+  };
+
   const tech_ = {};
-  const returnedTech = Player.prototype.tech.call({tech_}, {IWillNotUseThisInPlugins: true});
+  const returnedTech = Player.prototype.tech.call({tech_}, true);
 
   assert.equal(returnedTech, tech_, 'We got back the tech we wanted');
+  assert.notOk(warning, 'no warning was logged');
+
+  log.warn = oldLogWarn;
 });
 
-QUnit.test('Player#tech alerts and throws without the appropriate input', function(assert) {
-  let alertCalled;
-  const oldAlert = window.alert;
+QUnit.test('Player#tech logs a warning when called without a safety argument', function(assert) {
+  const oldLogWarn = log.warn;
+  const warningRegex = new RegExp('https://github.com/videojs/video.js/issues/2617');
+  let warning;
 
-  window.alert = () => {
-    alertCalled = true;
+  log.warn = function(_warning) {
+    warning = _warning;
   };
 
   const tech_ = {};
 
-  assert.throws(function() {
-    Player.prototype.tech.call({tech_});
-  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
-  'we threw an error');
+  Player.prototype.tech.call({tech_});
 
-  assert.ok(alertCalled, 'we called an alert');
-  window.alert = oldAlert;
+  assert.ok(warningRegex.test(warning), 'we logged a warning');
+
+  log.warn = oldLogWarn;
 });
 
 QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
@@ -1486,4 +1524,38 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   player.dispose();
   delete Tech.techs_.FooTech;
   delete Tech.techs_.BarTech;
+});
+
+QUnit.test('options: plugins', function(assert) {
+  const optionsSpy = sinon.spy();
+
+  Plugin.registerPlugin('foo', (options) => {
+    optionsSpy(options);
+  });
+
+  const player = TestHelpers.makePlayer({
+    plugins: {
+      foo: {
+        bar: 1
+      }
+    }
+  });
+
+  assert.strictEqual(optionsSpy.callCount, 1, 'the plugin was set up');
+  assert.deepEqual(optionsSpy.getCall(0).args[0], {bar: 1}, 'the plugin got the expected options');
+
+  assert.throws(
+    () => {
+      TestHelpers.makePlayer({
+        plugins: {
+          nope: {}
+        }
+      });
+    },
+    new Error('plugin "nope" does not exist'),
+    'plugins that do not exist cause the player to throw'
+  );
+
+  player.dispose();
+  Plugin.deregisterPlugin('foo');
 });

@@ -19,6 +19,7 @@
   * [Q: How can I autoplay a video on a mobile device?](#q-how-can-i-autoplay-a-video-on-a-mobile-device)
 * [Q: How can I play RTMP video in video.js?](#q-how-can-i-play-rtmp-video-in-videojs)
 * [Q: How can I hide the links to my video/subtitles/audio/tracks?](#q-how-can-i-hide-the-links-to-my-videosubtitlesaudiotracks)
+* [Q: Can I turn off video.js logging?](#q-can-i-turn-off-videojs-logging)
 * [Q: What is a plugin?](#q-what-is-a-plugin)
 * [Q: How do I make a plugin for video.js?](#q-how-do-i-make-a-plugin-for-videojs)
 * [Q: Where can I find a list of video.js plugins?](#q-where-can-i-find-a-list-of-videojs-plugins)
@@ -169,6 +170,16 @@ help but are outside of the scope of video.js.
 
 For content that must be highly secure [videojs-contrib-eme][eme] adds DRM support.
 
+## Q: Can I turn off video.js logging?
+
+Yes! This can be achieved by adding the following code _after_ including Video.js, but _before_ creating any player(s):
+
+```js
+videojs.log.level('off');
+```
+
+For more information, including which logging levels are available, check out the [debugging guide][debug-guide].
+
 ## Q: What is a plugin?
 
 A plugin is a group of reusable functionality that can be re-used by others. For instance a plugin could add
@@ -307,3 +318,5 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 [semver]: http://semver.org/
 
 [starter-example]: http://jsbin.com/axedog/edit?html,output
+
+[debug-guide]: ./guides/debug.md

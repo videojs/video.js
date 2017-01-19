@@ -30,5 +30,5 @@ QUnit.test('defaults when items not provided', function(assert) {
   assert.equal(track.kind, '', 'kind defaulted to empty string');
   assert.equal(track.label, '', 'label defaults to empty string');
   assert.equal(track.language, '', 'language defaults to empty string');
-  assert.ok(track.id.match(/vjs_track_\d{5}/), 'id defaults to vjs_track_GUID');
+  assert.ok(track.id.match(/vjs_track_\d+/), 'id defaults to vjs_track_GUID');
 });

@@ -1,6 +1,5 @@
 /* eslint-env qunit */
 import videojs from '../../src/js/video.js';
-import TestHelpers from './test-helpers.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
@@ -173,19 +172,16 @@ QUnit.test('should add the value to the languages object with lower case lang co
                   'should also match');
 });
 
-QUnit.test('should expose plugin registry function', function(assert) {
-  const pluginName = 'foo';
-  const pluginFunction = function(options) {};
-
-  assert.ok(videojs.plugin, 'should exist');
-
-  videojs.plugin(pluginName, pluginFunction);
-
-  const player = TestHelpers.makePlayer();
-
-  assert.ok(player.foo, 'should exist');
-  assert.equal(player.foo, pluginFunction, 'should be equal');
-  player.dispose();
+QUnit.test('should expose plugin functions', function(assert) {
+  [
+    'registerPlugin',
+    'plugin',
+    'getPlugins',
+    'getPlugin',
+    'getPluginVersion'
+  ].forEach(name => {
+    assert.strictEqual(typeof videojs[name], 'function', `videojs.${name} is a function`);
+  });
 });
 
 QUnit.test('should expose options and players properties for backward-compatibility', function(assert) {

@@ -506,50 +506,6 @@ QUnit.test('Tech.isTech returns correct answers for techs and components', funct
   assert.ok(!isTech(isTech), 'A function is not a Tech');
 });
 
-QUnit.test('Tech#setSource clears currentSource_ after repeated loadstart', function(assert) {
-  let disposed = false;
-  const MyTech = extendFn(Tech);
-
-  Tech.withSourceHandlers(MyTech);
-  const tech = new MyTech();
-
-  const sourceHandler = {
-    canPlayType(type) {
-      return true;
-    },
-    canHandleSource(source, options) {
-      return true;
-    },
-    handleSource(source, tech_, options) {
-      return {
-        dispose() {
-          disposed = true;
-        }
-      };
-    }
-  };
-
-  // Test registering source handlers
-  MyTech.registerSourceHandler(sourceHandler);
-
-  // First loadstart
-  tech.setSource('test');
-  tech.currentSource_ = 'test';
-  tech.trigger('loadstart');
-  assert.equal(tech.currentSource_, 'test', 'Current source is test');
-
-  // Second loadstart
-  tech.trigger('loadstart');
-  assert.equal(tech.currentSource_, null, 'Current source is null');
-  assert.equal(disposed, true, 'disposed is true');
-
-  // Third loadstart
-  tech.currentSource_ = 'test';
-  tech.trigger('loadstart');
-  assert.equal(tech.currentSource_, null, 'Current source is still null');
-
-});
-
 QUnit.test('setSource after tech dispose should dispose source handler once', function(assert) {
   const MyTech = extendFn(Tech);
 

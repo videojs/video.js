@@ -2,9 +2,6 @@
  * @file video.js
  * @module videojs
  */
-
-/* global define */
-
 import window from 'global/window';
 import document from 'global/document';
 import * as setup from './setup';
@@ -13,7 +10,7 @@ import Component from './component';
 import EventTarget from './event-target';
 import * as Events from './utils/events.js';
 import Player from './player';
-import plugin from './plugins.js';
+import Plugin from './plugin';
 import mergeOptions from './utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
@@ -350,14 +347,77 @@ videojs.mergeOptions = mergeOptions;
 videojs.bind = Fn.bind;
 
 /**
- * Create a Video.js player plugin.
- * Plugins are only initialized when options for the plugin are included
- * in the player options, or the plugin function on the player instance is
- * called.
+ * Register a Video.js plugin.
  *
- * @borrows plugin:plugin as videojs.plugin
+ * @borrows plugin:registerPlugin as videojs.registerPlugin
+ * @mixes videojs
+ * @method registerPlugin
+ *
+ * @param  {string} name
+ *         The name of the plugin to be registered. Must be a string and
+ *         must not match an existing plugin or a method on the `Player`
+ *         prototype.
+ *
+ * @param  {Function} plugin
+ *         A sub-class of `Plugin` or a function for basic plugins.
+ *
+ * @return {Function}
+ *         For advanced plugins, a factory function for that plugin. For
+ *         basic plugins, a wrapper function that initializes the plugin.
  */
-videojs.plugin = plugin;
+videojs.registerPlugin = Plugin.registerPlugin;
+
+/**
+ * Deprecated method to register a plugin with Video.js
+ *
+ * @deprecated
+ *        videojs.plugin() is deprecated; use videojs.registerPlugin() instead
+ *
+ * @param {string} name
+ *        The plugin name
+ *
+ * @param {Plugin|Function} plugin
+ *         The plugin sub-class or function
+ */
+videojs.plugin = (name, plugin) => {
+  log.warn('videojs.plugin() is deprecated; use videojs.registerPlugin() instead');
+  return Plugin.registerPlugin(name, plugin);
+};
+
+/**
+ * Gets an object containing multiple Video.js plugins.
+ *
+ * @param  {Array} [names]
+ *         If provided, should be an array of plugin names. Defaults to _all_
+ *         plugin names.
+ *
+ * @return {Object|undefined}
+ *         An object containing plugin(s) associated with their name(s) or
+ *         `undefined` if no matching plugins exist).
+ */
+videojs.getPlugins = Plugin.getPlugins;
+
+/**
+ * Gets a plugin by name if it exists.
+ *
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {Function|undefined}
+ *         The plugin (or `undefined`).
+ */
+videojs.getPlugin = Plugin.getPlugin;
+
+/**
+ * Gets a plugin's version, if available
+ *
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {string}
+ *         The plugin's version or an empty string.
+ */
+videojs.getPluginVersion = Plugin.getPluginVersion;
 
 /**
  * Adding languages so that they're available to all players.
@@ -632,19 +692,6 @@ videojs.insertContent = Dom.insertContent;
  */
 videojs.computedStyle = computedStyle;
 
-/*
- * Custom Universal Module Definition (UMD)
- *
- * Video.js will never be a non-browser lib so we can simplify UMD a bunch and
- * still support requirejs and browserify. This also needs to be closure
- * compiler compatible, so string keys are used.
- */
-if (typeof define === 'function' && define.amd) {
-  define('videojs', [], () => videojs);
-
-// checking that module is an object too because of umdjs/umd#35
-} else if (typeof exports === 'object' && typeof module === 'object') {
-  module.exports = videojs;
-}
-
-export default videojs;
+// We use Node-style module.exports here instead of ES6 because it is more
+// compatible with different module systems.
+module.exports = videojs;

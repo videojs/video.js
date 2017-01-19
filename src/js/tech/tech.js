@@ -1156,9 +1156,6 @@ Tech.withSourceHandlers = function(_Tech) {
    *
    * @param {Tech~SourceObject} source
    *        A source object with src and type keys
-   *
-   * @return {Tech}
-   *         Returns itself; this method is chainable
    */
   _Tech.prototype.setSource = function(source) {
     let sh = _Tech.selectSourceHandler(source, this.options_);
@@ -1179,38 +1176,10 @@ Tech.withSourceHandlers = function(_Tech) {
 
     if (sh !== _Tech.nativeSourceHandler) {
       this.currentSource_ = source;
-
-      // Catch if someone replaced the src without calling setSource.
-      // If they do, set currentSource_ to null and dispose our source handler.
-      this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
-      this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
-      this.one(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
     }
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
     this.on('dispose', this.disposeSourceHandler);
-
-    return this;
-  };
-
-  /**
-   * Called once for the first loadstart of a video.
-   *
-   * @listens Tech#loadstart
-   */
-  _Tech.prototype.firstLoadStartListener_ = function() {
-    this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
-  };
-
-  // On successive loadstarts when setSource has not been called again
-  /**
-   * Called after the first loadstart for a video occurs.
-   *
-   * @listens Tech#loadstart
-   */
-  _Tech.prototype.successiveLoadStartListener_ = function() {
-    this.disposeSourceHandler();
-    this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
   };
 
   /**
@@ -1231,8 +1200,6 @@ Tech.withSourceHandlers = function(_Tech) {
     this.cleanupAutoTextTracks();
 
     if (this.sourceHandler_) {
-      this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
-      this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
 
       if (this.sourceHandler_.dispose) {
         this.sourceHandler_.dispose();
@@ -1244,9 +1211,9 @@ Tech.withSourceHandlers = function(_Tech) {
 
 };
 
+// The base Tech class needs to be registered as a Component. It is the only
+// Tech that can be registered as a Component.
 Component.registerComponent('Tech', Tech);
-// Old name for Tech
-// @deprecated
-Component.registerComponent('MediaTechController', Tech);
 Tech.registerTech('Tech', Tech);
+
 export default Tech;

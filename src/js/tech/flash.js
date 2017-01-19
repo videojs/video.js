@@ -10,7 +10,6 @@ import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import { createTimeRange } from '../utils/time-ranges.js';
 import FlashRtmpDecorator from './flash-rtmp';
-import Component from '../component';
 import window from 'global/window';
 import {assign} from '../utils/obj';
 
@@ -368,7 +367,7 @@ class Flash extends Tech {
 
 // Create setters and getters for attributes
 const _api = Flash.prototype;
-const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
+const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,controls,volume,muted,defaultMuted'.split(',');
 const _readOnly = 'networkState,readyState,initialTime,startOffsetTime,paused,ended,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr) {
@@ -1098,6 +1097,5 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes) {
 // Run Flash through the RTMP decorator
 FlashRtmpDecorator(Flash);
 
-Component.registerComponent('Flash', Flash);
 Tech.registerTech('Flash', Flash);
 export default Flash;

@@ -71,17 +71,58 @@ QUnit.test('should detect whether the volume can be changed', function(assert) {
 QUnit.test('test playbackRate', function(assert) {
   // Android 2.3 always returns 0 for playback rate
   if (!Html5.canControlPlaybackRate()) {
-    assert.ok('Playback rate is not supported');
+    assert.ok(true, 'Playback rate is not supported');
     return;
   }
 
   tech.createEl();
 
   tech.el().playbackRate = 1.25;
-  assert.strictEqual(tech.playbackRate(), 1.25);
+  assert.strictEqual(tech.playbackRate(), 1.25, 'can be changed from the element');
 
   tech.setPlaybackRate(0.75);
-  assert.strictEqual(tech.playbackRate(), 0.75);
+  assert.strictEqual(tech.playbackRate(), 0.75, 'can be changed from the API');
+});
+
+QUnit.test('test defaultPlaybackRate', function(assert) {
+  // Android 2.3 always returns 0 for playback rate
+  if (!Html5.canControlPlaybackRate()) {
+    assert.ok(true, 'Playback rate is not supported');
+    return;
+  }
+
+  tech.createEl();
+
+  tech.el().defaultPlaybackRate = 1.25;
+  assert.strictEqual(tech.defaultPlaybackRate(), 1.25, 'can be changed from the element');
+
+  tech.setDefaultPlaybackRate(0.75);
+  assert.strictEqual(tech.defaultPlaybackRate(), 0.75, 'can be changed from the API');
+});
+
+QUnit.test('test volume', function(assert) {
+  if (!Html5.canControlVolume()) {
+    assert.ok(true, 'Volume is not supported');
+    return;
+  }
+
+  tech.createEl();
+
+  tech.el().volume = 0.5;
+  assert.strictEqual(tech.volume(), 0.5, 'can be changed from the element');
+
+  tech.setVolume(1);
+  assert.strictEqual(tech.volume(), 1, 'can be changed from the API');
+});
+
+QUnit.test('test defaultMuted', function(assert) {
+  tech.createEl();
+
+  tech.el().defaultMuted = true;
+  assert.strictEqual(tech.defaultMuted(), true, 'can be changed from the element');
+
+  tech.setDefaultMuted(false);
+  assert.strictEqual(tech.defaultMuted(), false, 'can be changed from the API');
 });
 
 QUnit.test('should export played', function(assert) {

@@ -341,21 +341,6 @@ class Component {
     if (typeof child === 'string') {
       componentName = toTitleCase(child);
 
-      // Options can also be specified as a boolean,
-      // so convert to an empty object if false.
-      if (!options) {
-        options = {};
-      }
-
-      // Same as above, but true is deprecated so show a warning.
-      if (options === true) {
-        log.warn('Initializing a child component with `true` is deprecated.' +
-          'Children should be defined in an array when possible, ' +
-          'but if necessary use an object instead of `true`.'
-        );
-        options = {};
-      }
-
       const componentClassName = options.componentClass || componentName;
 
       // Set name through options
@@ -588,9 +573,6 @@ class Component {
    *        The event handler if `first` is a `Component` and `second` is an event name
    *        or an Array of event names.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @listens Component#dispose
    */
   on(first, second, third) {
@@ -633,8 +615,6 @@ class Component {
         target.on('dispose', cleanRemover);
       }
     }
-
-    return this;
   }
 
   /**
@@ -650,9 +630,6 @@ class Component {
    * @param {EventTarget~EventListener} [third]
    *        The event handler if `first` is a `Component` and `second` is an event name
    *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   off(first, second, third) {
     if (!first || typeof first === 'string' || Array.isArray(first)) {
@@ -677,8 +654,6 @@ class Component {
         target.off('dispose', fn);
       }
     }
-
-    return this;
   }
 
   /**
@@ -693,9 +668,6 @@ class Component {
    * @param {EventTarget~EventListener} [third]
    *        The event handler if `first` is a `Component` and `second` is an event name
    *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   one(first, second, third) {
     if (typeof first === 'string' || Array.isArray(first)) {
@@ -715,8 +687,6 @@ class Component {
 
       this.on(target, type, newFunc);
     }
-
-    return this;
   }
 
   /**
@@ -728,13 +698,9 @@ class Component {
    *
    * @param {Object} [hash]
    *        Data hash to pass along with the event
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   trigger(event, hash) {
     Events.trigger(this.el_, event, hash);
-    return this;
   }
 
   /**
@@ -746,9 +712,6 @@ class Component {
    *
    * @param  {boolean} [sync=false]
    *         Execute the listener synchronously if `Component` is ready.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   ready(fn, sync = false) {
     if (fn) {
@@ -764,7 +727,6 @@ class Component {
         this.readyQueue_.push(fn);
       }
     }
-    return this;
   }
 
   /**
@@ -862,13 +824,9 @@ class Component {
    *
    * @param {string} classToAdd
    *        CSS class name to add
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   addClass(classToAdd) {
     Dom.addElClass(this.el_, classToAdd);
-    return this;
   }
 
   /**
@@ -876,13 +834,9 @@ class Component {
    *
    * @param {string} classToRemove
    *        CSS class name to remove
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   removeClass(classToRemove) {
     Dom.removeElClass(this.el_, classToRemove);
-    return this;
   }
 
   /**
@@ -895,65 +849,45 @@ class Component {
    *
    * @param  {boolean|Dom~predicate} [predicate]
    *         An {@link Dom~predicate} function or a boolean
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   toggleClass(classToToggle, predicate) {
     Dom.toggleElClass(this.el_, classToToggle, predicate);
-    return this;
   }
 
   /**
    * Show the `Component`s element if it is hidden by removing the
    * 'vjs-hidden' class name from it.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   show() {
     this.removeClass('vjs-hidden');
-    return this;
   }
 
   /**
    * Hide the `Component`s element if it is currently showing by adding the
    * 'vjs-hidden` class name to it.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   hide() {
     this.addClass('vjs-hidden');
-    return this;
   }
 
   /**
    * Lock a `Component`s element in its visible state by adding the 'vjs-lock-showing'
    * class name to it. Used during fadeIn/fadeOut.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @private
    */
   lockShowing() {
     this.addClass('vjs-lock-showing');
-    return this;
   }
 
   /**
    * Unlock a `Component`s element from its visible state by removing the 'vjs-lock-showing'
    * class name from it. Used during fadeIn/fadeOut.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @private
    */
   unlockShowing() {
     this.removeClass('vjs-lock-showing');
-    return this;
   }
 
   /**
@@ -984,14 +918,10 @@ class Component {
    * @param {string} value
    *        Value to set the attribute to.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute}
    */
   setAttribute(attribute, value) {
     Dom.setAttribute(this.el_, attribute, value);
-    return this;
   }
 
   /**
@@ -1000,14 +930,10 @@ class Component {
    * @param {string} attribute
    *        Name of the attribute to remove.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute}
    */
   removeAttribute(attribute) {
     Dom.removeAttribute(this.el_, attribute);
-    return this;
   }
 
   /**
@@ -1020,10 +946,9 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the resize event trigger
    *
-   * @return {Component|number|string}
-   *         - The width when getting, zero if there is no width. Can be a string
+   * @return {number|string}
+   *         The width when getting, zero if there is no width. Can be a string
    *           postpixed with '%' or 'px'.
-   *         - Returns itself when setting; method can be chained.
    */
   width(num, skipListeners) {
     return this.dimension('width', num, skipListeners);
@@ -1039,10 +964,9 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the resize event trigger
    *
-   * @return {Component|number|string}
-   *         - The width when getting, zero if there is no width. Can be a string
-   *           postpixed with '%' or 'px'.
-   *         - Returns itself when setting; method can be chained.
+   * @return {number|string}
+   *         The width when getting, zero if there is no width. Can be a string
+   *         postpixed with '%' or 'px'.
    */
   height(num, skipListeners) {
     return this.dimension('height', num, skipListeners);
@@ -1056,13 +980,11 @@ class Component {
    *
    * @param  {number|string} height
    *         Height to set the `Component`s element to.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   dimensions(width, height) {
     // Skip resize listeners on width for optimization
-    return this.width(width, true).height(height);
+    this.width(width, true);
+    this.height(height);
   }
 
   /**
@@ -1090,9 +1012,8 @@ class Component {
    * @param  {boolean} [skipListeners]
    *         Skip resize event trigger
    *
-   * @return {Component}
-   *         - the dimension when getting or 0 if unset
-   *         - Returns itself when setting; method can be chained.
+   * @return {number}
+   *         The dimension when getting or 0 if unset
    */
   dimension(widthOrHeight, num, skipListeners) {
     if (num !== undefined) {
@@ -1121,8 +1042,7 @@ class Component {
         this.trigger('resize');
       }
 
-      // Return component
-      return this;
+      return;
     }
 
     // Not setting a value, so getting it
@@ -1535,15 +1455,34 @@ class Component {
    * @param {string} name
    *        The name of the `Component` to register.
    *
-   * @param {Component} comp
+   * @param {Component} ComponentToRegister
    *        The `Component` class to register.
    *
    * @return {Component}
    *         The `Component` that was registered.
    */
-  static registerComponent(name, comp) {
-    if (!name) {
-      return;
+  static registerComponent(name, ComponentToRegister) {
+    if (typeof name !== 'string' || !name) {
+      throw new Error(`Illegal component name, "${name}"; must be a non-empty string.`);
+    }
+
+    const Tech = Component.getComponent('Tech');
+
+    // We need to make sure this check is only done if Tech has been registered.
+    const isTech = Tech && Tech.isTech(ComponentToRegister);
+    const isComp = Component === ComponentToRegister ||
+      Component.prototype.isPrototypeOf(ComponentToRegister.prototype);
+
+    if (isTech || !isComp) {
+      let reason;
+
+      if (isTech) {
+        reason = 'techs must be registered using Tech.registerTech()';
+      } else {
+        reason = 'must be a Component subclass';
+      }
+
+      throw new Error(`Illegal component, "${name}"; ${reason}.`);
     }
 
     name = toTitleCase(name);
@@ -1552,23 +1491,26 @@ class Component {
       Component.components_ = {};
     }
 
-    if (name === 'Player' && Component.components_[name]) {
-      const Player = Component.components_[name];
+    const Player = Component.getComponent('Player');
+
+    if (name === 'Player' && Player && Player.players) {
+      const players = Player.players;
+      const playerNames = Object.keys(players);
 
       // If we have players that were disposed, then their name will still be
       // in Players.players. So, we must loop through and verify that the value
       // for each item is not null. This allows registration of the Player component
       // after all players have been disposed or before any were created.
-      if (Player.players &&
-          Object.keys(Player.players).length > 0 &&
-          Object.keys(Player.players).map((playerName) => Player.players[playerName]).every(Boolean)) {
-        throw new Error('Can not register Player component after player has been created');
+      if (players &&
+          playerNames.length > 0 &&
+          playerNames.map((pname) => players[pname]).every(Boolean)) {
+        throw new Error('Can not register Player component after player has been created.');
       }
     }
 
-    Component.components_[name] = comp;
+    Component.components_[name] = ComponentToRegister;
 
-    return comp;
+    return ComponentToRegister;
   }
 
   /**
@@ -1595,70 +1537,9 @@ class Component {
     if (Component.components_ && Component.components_[name]) {
       return Component.components_[name];
     }
-
-    if (window && window.videojs && window.videojs[name]) {
-      log.warn(`The ${name} component was added to the videojs object when it should be registered using videojs.registerComponent(name, component)`);
-
-      return window.videojs[name];
-    }
-  }
-
-  /**
-   * Sets up the constructor using the supplied init method or uses the init of the
-   * parent object.
-   *
-   * @param {Object} [props={}]
-   *        An object of properties.
-   *
-   * @return {Object}
-   *         the extended object.
-   *
-   * @deprecated since version 5
-   */
-  static extend(props) {
-    props = props || {};
-
-    log.warn('Component.extend({}) has been deprecated, ' +
-      ' use videojs.extend(Component, {}) instead'
-    );
-
-    // Set up the constructor using the supplied init method
-    // or using the init of the parent object
-    // Make sure to check the unobfuscated version for external libs
-    const init = props.init || props.init || this.prototype.init ||
-                 this.prototype.init || function() {};
-    // In Resig's simple class inheritance (previously used) the constructor
-    //  is a function that calls `this.init.apply(arguments)`
-    // However that would prevent us from using `ParentObject.call(this);`
-    //  in a Child constructor because the `this` in `this.init`
-    //  would still refer to the Child and cause an infinite loop.
-    // We would instead have to do
-    //    `ParentObject.prototype.init.apply(this, arguments);`
-    //  Bleh. We're not creating a _super() function, so it's good to keep
-    //  the parent constructor reference simple.
-    const subObj = function() {
-      init.apply(this, arguments);
-    };
-
-    // Inherit from this object's prototype
-    subObj.prototype = Object.create(this.prototype);
-    // Reset the constructor property for subObj otherwise
-    // instances of subObj would have the constructor of the parent Object
-    subObj.prototype.constructor = subObj;
-
-    // Make the class extendable
-    subObj.extend = Component.extend;
-
-    // Extend subObj's prototype with functions and other properties from props
-    for (const name in props) {
-      if (props.hasOwnProperty(name)) {
-        subObj.prototype[name] = props[name];
-      }
-    }
-
-    return subObj;
   }
 }
 
 Component.registerComponent('Component', Component);
+
 export default Component;

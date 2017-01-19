@@ -245,9 +245,6 @@ class MenuButton extends ClickableComponent {
 
   /**
    * Disable the `MenuButton`. Don't allow it to be clicked.
-   *
-   * @return {MenuButton}
-   *         Returns itself; method can be chained.
    */
   disable() {
     // Unpress, but don't force focus on this button
@@ -257,19 +254,15 @@ class MenuButton extends ClickableComponent {
 
     this.enabled_ = false;
 
-    return super.disable();
+    super.disable();
   }
 
   /**
    * Enable the `MenuButton`. Allow it to be clicked.
-   *
-   * @return {MenuButton}
-   *         Returns itself; method can be chained.
    */
   enable() {
     this.enabled_ = true;
-
-    return super.enable();
+    super.enable();
   }
 }
 

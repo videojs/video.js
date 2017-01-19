@@ -87,15 +87,6 @@ QUnit.test('should create a close button by default', function(assert) {
   assert.strictEqual(btn.el().parentNode, this.el, 'close button is a child of el');
 });
 
-QUnit.test('returns `this` for expected methods', function(assert) {
-  const methods = ['close', 'empty', 'fill', 'fillWith', 'open'];
-
-  assert.expect(methods.length);
-  methods.forEach(function(method) {
-    assert.strictEqual(this[method](), this, '`' + method + '()` returns `this`');
-  }, this.modal);
-});
-
 QUnit.test('open() triggers events', function(assert) {
   const modal = this.modal;
   const beforeModalOpenSpy = sinon.spy(function() {
@@ -108,10 +99,9 @@ QUnit.test('open() triggers events', function(assert) {
 
   assert.expect(4);
 
-  modal.
-    on('beforemodalopen', beforeModalOpenSpy).
-    on('modalopen', modalOpenSpy).
-    open();
+  modal.on('beforemodalopen', beforeModalOpenSpy);
+  modal.on('modalopen', modalOpenSpy);
+  modal.open();
 
   assert.strictEqual(beforeModalOpenSpy.callCount, 1, 'beforemodalopen spy was called');
   assert.strictEqual(modalOpenSpy.callCount, 1, 'modalopen spy was called');
@@ -127,7 +117,9 @@ QUnit.test('open() removes "vjs-hidden" class', function(assert) {
 QUnit.test('open() cannot be called on an opened modal', function(assert) {
   const spy = sinon.spy();
 
-  this.modal.on('modalopen', spy).open().open();
+  this.modal.on('modalopen', spy);
+  this.modal.open();
+  this.modal.open();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only opened once');
@@ -145,11 +137,10 @@ QUnit.test('close() triggers events', function(assert) {
 
   assert.expect(4);
 
-  modal.
-    on('beforemodalclose', beforeModalCloseSpy).
-    on('modalclose', modalCloseSpy).
-    open().
-    close();
+  modal.on('beforemodalclose', beforeModalCloseSpy);
+  modal.on('modalclose', modalCloseSpy);
+  modal.open();
+  modal.close();
 
   assert.strictEqual(beforeModalCloseSpy.callCount, 1, 'beforemodalclose spy was called');
   assert.strictEqual(modalCloseSpy.callCount, 1, 'modalclose spy was called');
@@ -157,18 +148,21 @@ QUnit.test('close() triggers events', function(assert) {
 
 QUnit.test('close() adds the "vjs-hidden" class', function(assert) {
   assert.expect(1);
-  this.modal.open().close();
+  this.modal.open();
+  this.modal.close();
   assert.ok(this.modal.hasClass('vjs-hidden'), 'modal is hidden upon close');
 });
 
 QUnit.test('pressing ESC triggers close(), but only when the modal is opened', function(assert) {
   const spy = sinon.spy();
 
-  this.modal.on('modalclose', spy).handleKeyPress({which: ESC});
+  this.modal.on('modalclose', spy);
+  this.modal.handleKeyPress({which: ESC});
   assert.expect(2);
   assert.strictEqual(spy.callCount, 0, 'ESC did not close the closed modal');
 
-  this.modal.open().handleKeyPress({which: ESC});
+  this.modal.open();
+  this.modal.handleKeyPress({which: ESC});
   assert.strictEqual(spy.callCount, 1, 'ESC closed the now-opened modal');
 });
 
@@ -176,7 +170,9 @@ QUnit.test('close() cannot be called on a closed modal', function(assert) {
   const spy = sinon.spy();
 
   this.modal.on('modalclose', spy);
-  this.modal.open().close().close();
+  this.modal.open();
+  this.modal.close();
+  this.modal.close();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only closed once');
@@ -227,11 +223,10 @@ QUnit.test('opened()', function(assert) {
   this.modal.open();
   assert.strictEqual(this.modal.opened(), true, 'the modal is open');
 
-  this.modal.
-    close().
-    on('modalopen', openSpy).
-    on('modalclose', closeSpy).
-    opened(true);
+  this.modal.close();
+  this.modal.on('modalopen', openSpy);
+  this.modal.on('modalclose', closeSpy);
+  this.modal.opened(true);
 
   this.modal.opened(true);
   this.modal.opened(false);
@@ -260,10 +255,9 @@ QUnit.test('fillWith()', function(assert) {
     contentEl.appendChild(el);
   });
 
-  this.modal.
-    on('beforemodalfill', beforeFillSpy).
-    on('modalfill', fillSpy).
-    fillWith(children);
+  this.modal.on('beforemodalfill', beforeFillSpy);
+  this.modal.on('modalfill', fillSpy);
+  this.modal.fillWith(children);
 
   assert.expect(5 + children.length);
   assert.strictEqual(contentEl.children.length, children.length, 'has the right number of children');
@@ -282,11 +276,10 @@ QUnit.test('empty()', function(assert) {
   const beforeEmptySpy = sinon.spy();
   const emptySpy = sinon.spy();
 
-  this.modal.
-    fillWith([Dom.createEl(), Dom.createEl()]).
-    on('beforemodalempty', beforeEmptySpy).
-    on('modalempty', emptySpy).
-    empty();
+  this.modal.fillWith([Dom.createEl(), Dom.createEl()]);
+  this.modal.on('beforemodalempty', beforeEmptySpy);
+  this.modal.on('modalempty', emptySpy);
+  this.modal.empty();
 
   assert.expect(5);
   assert.strictEqual(this.modal.contentEl().children.length, 0, 'removed all `contentEl()` children');
@@ -302,7 +295,8 @@ QUnit.test('closeable()', function(assert) {
   assert.expect(8);
   assert.strictEqual(this.modal.closeable(), true, 'the modal is closed');
 
-  this.modal.open().closeable(false);
+  this.modal.open();
+  this.modal.closeable(false);
   assert.notOk(this.modal.getChild('closeButton'), 'the close button is no longer a child of the modal');
   assert.notOk(initialCloseButton.el(), 'the initial close button was disposed');
 
@@ -312,13 +306,15 @@ QUnit.test('closeable()', function(assert) {
   this.modal.close();
   assert.notOk(this.modal.opened(), 'the modal was closed programmatically');
 
-  this.modal.open().closeable(true);
+  this.modal.open();
+  this.modal.closeable(true);
   assert.ok(this.modal.getChild('closeButton'), 'a new close button was created');
 
   this.modal.getChild('closeButton').trigger('click');
   assert.notOk(this.modal.opened(), 'the modal was closed by the new close button');
 
-  this.modal.open().handleKeyPress({which: ESC});
+  this.modal.open();
+  this.modal.handleKeyPress({which: ESC});
   assert.notOk(this.modal.opened(), 'the modal was closed by the ESC key');
 });
 
@@ -331,7 +327,9 @@ QUnit.test('"content" option (fills on first open() invocation)', function(asser
   const spy = sinon.spy();
 
   modal.on('modalfill', spy);
-  modal.open().close().open();
+  modal.open();
+  modal.close();
+  modal.open();
 
   assert.expect(3);
   assert.strictEqual(modal.content(), modal.options_.content, 'has the expected content');
@@ -347,8 +345,10 @@ QUnit.test('"temporary" option', function(assert) {
 
   temp.on('dispose', tempSpy);
   perm.on('dispose', permSpy);
-  temp.open().close();
-  perm.open().close();
+  temp.open();
+  temp.close();
+  perm.open();
+  perm.close();
 
   assert.expect(2);
   assert.strictEqual(tempSpy.callCount, 1, 'temporary modals are disposed');
@@ -365,7 +365,9 @@ QUnit.test('"fillAlways" option', function(assert) {
   const spy = sinon.spy();
 
   modal.on('modalfill', spy);
-  modal.open().close().open();
+  modal.open();
+  modal.close();
+  modal.open();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 2, 'the modal was filled on each open call');
@@ -393,6 +395,7 @@ QUnit.test('"uncloseable" option', function(assert) {
   assert.strictEqual(modal.closeable(), false, 'the modal is uncloseable');
   assert.notOk(modal.getChild('closeButton'), 'the close button is not present');
 
-  modal.open().handleKeyPress({which: ESC});
+  modal.open();
+  modal.handleKeyPress({which: ESC});
   assert.strictEqual(spy.callCount, 0, 'ESC did not close the modal');
 });
