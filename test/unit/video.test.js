@@ -1,7 +1,6 @@
 /* eslint-env qunit */
 import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
-import TestHelpers from './test-helpers.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
@@ -183,6 +182,13 @@ QUnit.test('should expose options and players properties for backward-compatibil
 });
 
 QUnit.test('should expose DOM functions', function(assert) {
+  const origWarnLog = log.warn;
+  const warnLogs = [];
+
+  log.warn = (args) => {
+    warnLogs.push(args);
+  };
+
   const methods = [
     'isEl',
     'isTextNode',
@@ -199,8 +205,26 @@ QUnit.test('should expose DOM functions', function(assert) {
   ];
 
   methods.forEach(name => {
-    assert.strictEqual(typeof videojs[name], 'function');
+    assert.strictEqual(typeof videojs[name], 'function', `function videojs.${name}`);
+    assert.strictEqual(typeof Dom[name], 'function', `Dom.${name} function exists`);
+
+    const oldMethod = Dom[name];
+    let domCalls = 0;
+
+    Dom[name] = () => domCalls++;
+
+    videojs[name]();
+
+    assert.equal(domCalls, 1, `Dom.${name} was called when videojs.${name} is run.`);
+    assert.equal(warnLogs.length, 1, `videojs.${name} logs a deprecation warning`);
+
+    // reset
+    warnLogs.length = 0;
+    Dom[name] = oldMethod;
   });
+
+  // reset log
+  log.warn = origWarnLog;
 });
 
 QUnit.test('ingest player div if data-vjs-player attribute is present on video parentNode', function(assert) {

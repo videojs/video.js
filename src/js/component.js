@@ -828,7 +828,6 @@ class Component {
    */
   addClass(classToAdd) {
     Dom.addClass(this.el_, classToAdd);
-    return this;
   }
 
   /**
@@ -839,7 +838,6 @@ class Component {
    */
   removeClass(classToRemove) {
     Dom.removeClass(this.el_, classToRemove);
-    return this;
   }
 
   /**
@@ -855,7 +853,6 @@ class Component {
    */
   toggleClass(classToToggle, predicate) {
     Dom.toggleClass(this.el_, classToToggle, predicate);
-    return this;
   }
 
   /**
