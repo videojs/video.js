@@ -182,33 +182,49 @@ QUnit.test('should expose options and players properties for backward-compatibil
 });
 
 QUnit.test('should expose DOM functions', function(assert) {
+  const origWarnLog = log.warn;
+  const warnLogs = [];
 
-  // Keys are videojs methods, values are Dom methods.
-  const methods = {
-    isEl: 'isEl',
-    isTextNode: 'isTextNode',
-    createEl: 'createEl',
-    hasClass: 'hasElClass',
-    addClass: 'addElClass',
-    removeClass: 'removeElClass',
-    toggleClass: 'toggleElClass',
-    setAttributes: 'setElAttributes',
-    getAttributes: 'getElAttributes',
-    emptyEl: 'emptyEl',
-    insertContent: 'insertContent',
-    appendContent: 'appendContent'
+  log.warn = (args) => {
+    warnLogs.push(args);
   };
 
-  const keys = Object.keys(methods);
+  const methods = [
+    'isEl',
+    'isTextNode',
+    'createEl',
+    'hasClass',
+    'addClass',
+    'removeClass',
+    'toggleClass',
+    'setAttributes',
+    'getAttributes',
+    'emptyEl',
+    'insertContent',
+    'appendContent'
+  ];
 
-  assert.expect(keys.length);
-  keys.forEach(function(vjsName) {
-    const domName = methods[vjsName];
+  methods.forEach(name => {
+    assert.strictEqual(typeof videojs[name], 'function', `function videojs.${name}`);
+    assert.strictEqual(typeof Dom[name], 'function', `Dom.${name} function exists`);
 
-    assert.strictEqual(videojs[vjsName],
-                      Dom[domName],
-                      `videojs.${vjsName} is a reference to Dom.${domName}`);
+    const oldMethod = Dom[name];
+    let domCalls = 0;
+
+    Dom[name] = () => domCalls++;
+
+    videojs[name]();
+
+    assert.equal(domCalls, 1, `Dom.${name} was called when videojs.${name} is run.`);
+    assert.equal(warnLogs.length, 1, `videojs.${name} logs a deprecation warning`);
+
+    // reset
+    warnLogs.length = 0;
+    Dom[name] = oldMethod;
   });
+
+  // reset log
+  log.warn = origWarnLog;
 });
 
 QUnit.test('ingest player div if data-vjs-player attribute is present on video parentNode', function(assert) {

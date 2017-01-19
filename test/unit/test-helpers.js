@@ -108,7 +108,7 @@ const TestHelpers = {
         const msg = `el should have the "${c}" class in its ` +
                     `className, which is "${el.className}"`;
 
-        assert.ok(Dom.hasElClass(el, c), msg);
+        assert.ok(Dom.hasClass(el, c), msg);
       });
 
       props.forEach(p => {
