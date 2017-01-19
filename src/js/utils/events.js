@@ -295,7 +295,7 @@ export function on(elem, type, fn) {
  */
 export function off(elem, type, fn) {
   // Don't want to add a cache object through getElData if not needed
-  if (!Dom.hasElData(elem)) {
+  if (!elem || !Dom.hasElData(elem)) {
     return;
   }
 
