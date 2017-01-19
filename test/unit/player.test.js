@@ -1038,6 +1038,13 @@ if (window.Promise) {
     const player = TestHelpers.makePlayer({});
     const done = assert.async();
 
+    player.src({
+      src: 'http://example.com/video.mp4',
+      type: 'video/mp4'
+    });
+
+    this.clock.tick(1);
+
     player.tech_.play = () => window.Promise.resolve('foo');
     const p = player.play();
 
@@ -1054,6 +1061,13 @@ if (window.Promise) {
 
 QUnit.test('play promise should resolve to native value if returned', function(assert) {
   const player = TestHelpers.makePlayer({});
+
+  player.src({
+    src: 'http://example.com/video.mp4',
+    type: 'video/mp4'
+  });
+
+  this.clock.tick(1);
 
   player.tech_.play = () => 'foo';
   const p = player.play();
