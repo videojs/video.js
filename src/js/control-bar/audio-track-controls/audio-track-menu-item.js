@@ -33,14 +33,12 @@ class AudioTrackMenuItem extends MenuItem {
 
     this.track = track;
 
-    if (tracks) {
-      const changeHandler = Fn.bind(this, this.handleTracksChange);
+    const changeHandler = Fn.bind(this, this.handleTracksChange);
 
-      tracks.addEventListener('change', changeHandler);
-      this.on('dispose', () => {
-        tracks.removeEventListener('change', changeHandler);
-      });
-    }
+    tracks.addEventListener('change', changeHandler);
+    this.on('dispose', () => {
+      tracks.removeEventListener('change', changeHandler);
+    });
   }
 
   /**
@@ -58,10 +56,6 @@ class AudioTrackMenuItem extends MenuItem {
     const tracks = this.player_.audioTracks();
 
     super.handleClick(event);
-
-    if (!tracks) {
-      return;
-    }
 
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];

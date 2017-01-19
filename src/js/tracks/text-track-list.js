@@ -50,10 +50,9 @@ class TextTrackList extends TrackList {
    *        The text track to add to the list.
    *
    * @fires TrackList#addtrack
-   * @private
    */
-  addTrack_(track) {
-    super.addTrack_(track);
+  addTrack(track) {
+    super.addTrack(track);
 
     /**
      * @listens TextTrack#modechange

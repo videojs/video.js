@@ -1,17 +1,6 @@
+// .vjs-progress-control / ProgressControl
 //
-// Let's talk pixel math!
-// Start with a base font size of 10px (assuming that hasn't changed)
-// No Hover:
-// - Progress holder is 3px
-// - Progress handle is 9px
-// - Progress handle is pulled up 3px to center it.
-//
-// Hover:
-// - Progress holder becomes 5px
-// - Progress handle becomes 15px
-// - Progress handle is pulled up 5px to center it
-//
-
+// This is the container for all progress bar-related components/elements.
 .video-js .vjs-progress-control {
   @include flex(auto);
   @include display-flex(center);
@@ -22,35 +11,32 @@
   display: none;
 }
 
-// Box containing play and load progresses. Also acts as seek scrubber.
+.vjs-no-flex .vjs-progress-control {
+  width: auto;
+}
+
+// .vjs-progress-holder / SeekBar
+//
+// Box containing play and load progress bars. It also acts as seek scrubber.
 .video-js .vjs-progress-holder {
   @include flex(auto);
   @include transition(all 0.2s);
   height: 0.3em;
 }
 
-// We need an increased hit area on hover
+// This increases the size of the progress holder so there is an increased
+// hit area for clicks/touches.
 .video-js .vjs-progress-control:hover .vjs-progress-holder {
   font-size: 1.666666666666666666em;
 }
 
-/* If we let the font size grow as much as everything else, the current time tooltip ends up
- ginormous. If you'd like to enable the current time tooltip all the time, this should be disabled
- to avoid a weird hitch when you roll off the hover. */
-
-// Also show the current time tooltip
-.video-js .vjs-progress-control:hover .vjs-time-tooltip,
-.video-js .vjs-progress-control:hover .vjs-mouse-display:after,
-.video-js .vjs-progress-control:hover .vjs-play-progress:after {
-  font-family: $text-font-family;
-  visibility: visible;
-  font-size: 0.6em;
-}
-
-// Progress Bars
+// .vjs-play-progress / PlayProgressBar and .vjs-load-progress / LoadProgressBar
+//
+// These are bars that appear within the progress control to communicate the
+// amount of media that has played back and the amount of media that has
+// loaded, respectively.
 .video-js .vjs-progress-holder .vjs-play-progress,
 .video-js .vjs-progress-holder .vjs-load-progress,
-.video-js .vjs-progress-holder .vjs-tooltip-progress-bar,
 .video-js .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
@@ -64,86 +50,80 @@
   top: 0;
 }
 
-.video-js .vjs-mouse-display {
-  @extend .vjs-icon-circle;
-
-  &:before {
-    display: none;
-  }
-}
 .video-js .vjs-play-progress {
   background-color: $primary-foreground-color;
   @extend .vjs-icon-circle;
 
   // Progress handle
   &:before {
-    position: absolute;
-    top: -0.333333333333333em;
-    right: -0.5em;
     font-size: 0.9em;
+    position: absolute;
+    right: -0.5em;
+    top: -0.333333333333333em;
+    z-index: 1;
   }
 }
 
-// Current Time "tooltip"
-// By default this is hidden and only shown when hovering over the progress control
-.video-js .vjs-time-tooltip,
-.video-js .vjs-mouse-display:after,
-.video-js .vjs-play-progress:after {
-  visibility: hidden;
-  pointer-events: none;
-  position: absolute;
-  top: -3.4em;
-  right: -1.9em;
-  font-size: 0.9em;
-  color: #000;
-  content: attr(data-current-time);
-  padding: 6px 8px 8px 8px;
-  @include background-color-with-alpha(#fff, 0.8);
-  @include border-radius(0.3em);
-}
-
-.video-js .vjs-time-tooltip,
-.video-js .vjs-play-progress:before,
-.video-js .vjs-play-progress:after {
-  z-index: 1;
-}
-
-.video-js .vjs-progress-control .vjs-keep-tooltips-inside:after {
-  display: none;
-}
-
 .video-js .vjs-load-progress {
-  // For IE8 we'll lighten the color
+  // For IE8, we'll lighten the color
   background: lighten($secondary-background-color, 25%);
-  // Otherwise we'll rely on stacked opacities
+  // Otherwise, we'll rely on stacked opacities
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
 
-// there are child elements of the load progress bar that represent the
-// specific time ranges that have been buffered
+// There are child elements of the load progress bar that represent the
+// specific time ranges that have been buffered.
 .video-js .vjs-load-progress div {
-  // For IE8 we'll lighten the color
+  // For IE8, we'll lighten the color
   background: lighten($secondary-background-color, 50%);
-  // Otherwise we'll rely on stacked opacities
+  // Otherwise, we'll rely on stacked opacities
   background: rgba($secondary-background-color, 0.75);
 }
 
-.video-js.vjs-no-flex .vjs-progress-control {
-  width: auto;
-}
-
+// .vjs-time-tooltip
+//
+// These elements are displayed above the progress bar. They are not components
+// themselves, but they are managed by the MouseTimeDisplay and PlayProgressBar
+// components individually.
+//
+// By default, they are hidden and only shown when hovering over the progress
+// control.
 .video-js .vjs-time-tooltip {
+  @include background-color-with-alpha(#fff, 0.8);
+  @include border-radius(0.3em);
+  color: #000;
   display: inline-block;
-  height: 2.4em;
-  position: relative;
+
+  // By floating the tooltips to the right, their right edge becomes aligned
+  // with the right edge of their parent element. However, in order to have them
+  // centered, they must be pulled further to the right via positioning (e.g.
+  // `right: -10px;`. This part is left to JavaScript.
   float: right;
-  right: -1.9em;
-}
+  font-family: $text-font-family;
 
-.vjs-tooltip-progress-bar {
+  // The font-size should translate to a consistent 10px for time tooltips in
+  // all states. This is tricky because the .vjs-progress-holder element
+  // changes its font-size when the .vjs-progress-control is hovered.
+  font-size: 1em;
+  padding: 6px 8px 8px 8px;
+  pointer-events: none;
+  position: relative;
+  top: -3.4em;
   visibility: hidden;
+  z-index: 1;
 }
 
+.video-js .vjs-progress-control:hover .vjs-time-tooltip {
+
+  // Ensure that we maintain a font-size of ~10px.
+  font-size: 0.6em;
+  visibility: visible;
+}
+
+// .vjs-mouse-display / MouseTimeDisplay
+//
+// This element tracks the mouse position along the progress control and
+// includes a tooltip, which displays the time at that point in the media.
 .video-js .vjs-progress-control .vjs-mouse-display {
   display: none;
   position: absolute;
@@ -152,25 +132,27 @@
   background-color: #000;
   z-index: 1;
 }
+
 .vjs-no-flex .vjs-progress-control .vjs-mouse-display {
   z-index: 0;
 }
+
 .video-js .vjs-progress-control:hover .vjs-mouse-display {
   display: block;
 }
-.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display,
-.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display:after {
+
+.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display {
   visibility: hidden;
   opacity: 0;
   $trans: visibility 1.0s, opacity 1.0s;
   @include transition($trans);
 }
-.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display,
-.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display:after {
+
+.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display {
   display: none;
 }
-.vjs-mouse-display .vjs-time-tooltip,
-.video-js .vjs-progress-control .vjs-mouse-display:after {
+
+.vjs-mouse-display .vjs-time-tooltip {
   color: #fff;
   @include background-color-with-alpha(#000, 0.8);
 }
