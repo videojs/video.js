@@ -108,11 +108,11 @@ QUnit.test('test volume', function(assert) {
 
   tech.createEl();
 
-  tech.el().volume = 0.7;
-  assert.strictEqual(tech.volume(), 0.7, 'can be changed from the element');
+  tech.el().volume = 0.5;
+  assert.strictEqual(tech.volume(), 0.5, 'can be changed from the element');
 
-  tech.setVolume(0.2);
-  assert.strictEqual(tech.volume(), 0.2, 'can be changed from the API');
+  tech.setVolume(1);
+  assert.strictEqual(tech.volume(), 1, 'can be changed from the API');
 });
 
 QUnit.test('test defaultMuted', function(assert) {

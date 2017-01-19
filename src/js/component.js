@@ -1493,7 +1493,7 @@ class Component {
 
     const Player = Component.getComponent('Player');
 
-    if (name === 'Player' && Player) {
+    if (name === 'Player' && Player && Player.players) {
       const players = Player.players;
       const playerNames = Object.keys(players);
 
