@@ -3,16 +3,20 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
+import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import computedStyle from '../../utils/computed-style.js';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
-import './tooltip-progress-bar.js';
+import './mouse-time-display.js';
+
+// The number of seconds the `step*` functions move the timeline.
+const STEP_SECONDS = 5;
 
 /**
- * Seek Bar and holder for the progress bars
+ * Seek bar and container for the progress bars. Uses {@link PlayProgressBar}
+ * as its `bar`.
  *
  * @extends Slider
  */
@@ -29,20 +33,8 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-    this.on(player, 'timeupdate', this.updateProgress);
-    this.on(player, 'ended', this.updateProgress);
-    player.ready(Fn.bind(this, this.updateProgress));
-
-    if (options.playerOptions &&
-        options.playerOptions.controlBar &&
-        options.playerOptions.controlBar.progressControl &&
-        options.playerOptions.controlBar.progressControl.keepTooltipsInside) {
-      this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
-    }
-
-    if (this.keepTooltipsInside) {
-      this.tooltipProgressBar = this.addChild('TooltipProgressBar');
-    }
+    this.update = Fn.throttle(Fn.bind(this, this.update), 50);
+    this.on(player, ['timeupdate', 'ended'], this.update);
   }
 
   /**
@@ -60,7 +52,7 @@ class SeekBar extends Slider {
   }
 
   /**
-   * Update the seek bars tooltip and width.
+   * Update the seek bar's UI.
    *
    * @param {EventTarget~Event} [event]
    *        The `timeupdate` or `ended` event that caused this to run.
@@ -68,47 +60,41 @@ class SeekBar extends Slider {
    * @listens Player#timeupdate
    * @listens Player#ended
    */
-  updateProgress(event) {
-    this.updateAriaAttributes(this.el_);
+  update() {
+    const percent = super.update();
+    const duration = this.player_.duration();
 
-    if (this.keepTooltipsInside) {
-      this.updateAriaAttributes(this.tooltipProgressBar.el_);
-      this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
-
-      const playerWidth = parseFloat(computedStyle(this.player().el(), 'width'));
-      const tooltipWidth = parseFloat(computedStyle(this.tooltipProgressBar.tooltip, 'width'));
-      const tooltipStyle = this.tooltipProgressBar.el().style;
-
-      tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
-      tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';
-      tooltipStyle.right = `-${tooltipWidth / 2}px`;
-    }
-  }
-
-  /**
-   * Update ARIA accessibility attributes
-   *
-   * @param {Element} el
-   *        The element to update with aria accessibility attributes.
-   */
-  updateAriaAttributes(el) {
     // Allows for smooth scrubbing, when player can't keep up.
-    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    const time = (this.player_.scrubbing()) ?
+      this.player_.getCache().currentTime :
+      this.player_.currentTime();
 
     // machine readable value of progress bar (percentage complete)
-    el.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2));
+    this.el_.setAttribute('aria-valuenow', (percent * 100).toFixed(2));
+
     // human readable value of progress bar (time complete)
-    el.setAttribute('aria-valuetext', formatTime(time, this.player_.duration()));
+    this.el_.setAttribute('aria-valuetext', formatTime(time, duration));
+
+    // Update the `PlayProgressBar`.
+    this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
+
+    return percent;
   }
 
   /**
-   * Get percentage of video played
+   * Get the percentage of media played so far.
    *
    * @return {number}
-   *         The percentage played
+   *         The percentage of media played so far (0 to 1).
    */
   getPercent() {
-    const percent = this.player_.currentTime() / this.player_.duration();
+
+    // Allows for smooth scrubbing, when player can't keep up.
+    const time = (this.player_.scrubbing()) ?
+      this.player_.getCache().currentTime :
+      this.player_.currentTime();
+
+    const percent = time / this.player_.duration();
 
     return percent >= 1 ? 1 : percent;
   }
@@ -171,18 +157,15 @@ class SeekBar extends Slider {
    * Move more quickly fast forward for keyboard-only users
    */
   stepForward() {
-    // more quickly fast forward for keyboard-only users
-    this.player_.currentTime(this.player_.currentTime() + 5);
+    this.player_.currentTime(this.player_.currentTime() + STEP_SECONDS);
   }
 
   /**
    * Move more quickly rewind for keyboard-only users
    */
   stepBack() {
-    // more quickly rewind for keyboard-only users
-    this.player_.currentTime(this.player_.currentTime() - 5);
+    this.player_.currentTime(this.player_.currentTime() - STEP_SECONDS);
   }
-
 }
 
 /**
