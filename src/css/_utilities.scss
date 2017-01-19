@@ -17,6 +17,8 @@
   -webkit-transition: $string;
   -moz-transition: $string;
   -o-transition: $string;
+  // added for ie10
+  -ms-transition: $string;
   transition: $string;
 }
 

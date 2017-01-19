@@ -25,10 +25,9 @@
   @include flex(none);
   @include display-flex(center);
 
-  transition-property: height, opacity, margin-right;
-  transition-duration: 0.4s;
-  transition-timing-function: initial;
-  transition-delay: initial;
+  // var needed due to comma
+  $transition-property: height 0.4s, opacity 0.4s, margin-right 0.4s;
+  @include transition($transition-property)
 }
 
 .video-js .vjs-volume-control.vjs-control.vjs-volume-vertical {
