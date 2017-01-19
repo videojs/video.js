@@ -19,13 +19,16 @@
   @extend .vjs-icon-volume-mid;
 }
 
-
 .video-js .vjs-volume-control {
   width: auto;
   margin-right: 1em;
   @include flex(none);
   @include display-flex(center);
-  @include transition(all 0.4s);
+
+  transition-property: height, opacity, margin-right;
+  transition-duration: 0.4s;
+  transition-timing-function: initial;
+  transition-delay: initial;
 }
 
 .video-js .vjs-volume-control.vjs-control.vjs-volume-vertical {
