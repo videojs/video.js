@@ -1,8 +1,11 @@
 /* eslint-env qunit */
 import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
+import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 
 const defaultTech = {
-  textTracks() {},
+  textTracks() {
+    return new TextTrackList();
+  },
   on() {},
   off() {},
   currentTime() {}

@@ -40,7 +40,7 @@ QUnit.test('only one track is ever enabled', function(assert) {
   assert.equal(track.enabled, true, 'track is enabled');
   assert.equal(track2.enabled, false, 'track2 is disabled');
 
-  list.addTrack_(track3);
+  list.addTrack(track3);
   assert.equal(track.enabled, false, 'track is disabled');
   assert.equal(track2.enabled, false, 'track2 is disabled');
   assert.equal(track3.enabled, true, 'track3 is enabled');
@@ -50,7 +50,7 @@ QUnit.test('only one track is ever enabled', function(assert) {
   assert.equal(track2.enabled, false, 'track2 is disabled');
   assert.equal(track3.enabled, false, 'track3 is disabled');
 
-  list.addTrack_(track4);
+  list.addTrack(track4);
   assert.equal(track.enabled, true, 'track is enabled');
   assert.equal(track2.enabled, false, 'track2 is disabled');
   assert.equal(track3.enabled, false, 'track3 is disabled');
@@ -92,7 +92,7 @@ QUnit.test('trigger a change event per enabled change', function(assert) {
   track.enabled = true;
   assert.equal(change, 1, 'one change triggered');
 
-  list.addTrack_(track3);
+  list.addTrack(track3);
   assert.equal(change, 2, 'another change triggered by adding an enabled track');
 
   track.enabled = true;
@@ -101,7 +101,7 @@ QUnit.test('trigger a change event per enabled change', function(assert) {
   track.enabled = false;
   assert.equal(change, 4, 'another change trigger by changing enabled');
 
-  list.addTrack_(track4);
+  list.addTrack(track4);
   assert.equal(change, 4, 'no change triggered by adding a disabled track');
 
 });

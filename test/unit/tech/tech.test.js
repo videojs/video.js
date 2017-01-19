@@ -139,11 +139,11 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
   tech.addRemoteTextTrack({}, true);
   tech.addRemoteTextTrack({}, true);
 
-  tech.audioTracks().addTrack_(new AudioTrack());
-  tech.audioTracks().addTrack_(new AudioTrack());
+  tech.audioTracks().addTrack(new AudioTrack());
+  tech.audioTracks().addTrack(new AudioTrack());
 
-  tech.videoTracks().addTrack_(new VideoTrack());
-  tech.videoTracks().addTrack_(new VideoTrack());
+  tech.videoTracks().addTrack(new VideoTrack());
+  tech.videoTracks().addTrack(new VideoTrack());
 
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
@@ -354,11 +354,11 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   tech.addRemoteTextTrack({}, true);
   tech.addRemoteTextTrack({}, true);
 
-  tech.audioTracks().addTrack_(new AudioTrack());
-  tech.audioTracks().addTrack_(new AudioTrack());
+  tech.audioTracks().addTrack(new AudioTrack());
+  tech.audioTracks().addTrack(new AudioTrack());
 
-  tech.videoTracks().addTrack_(new VideoTrack());
-  tech.videoTracks().addTrack_(new VideoTrack());
+  tech.videoTracks().addTrack(new VideoTrack());
+  tech.videoTracks().addTrack(new VideoTrack());
 
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
@@ -586,4 +586,3 @@ QUnit.test('setSource after previous setSource should dispose source handler onc
   assert.equal(disposeCount, 2, 'did dispose for third setSource');
 
 });
-

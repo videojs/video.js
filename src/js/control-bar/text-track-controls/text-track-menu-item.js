@@ -34,15 +34,12 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
+    const changeHandler = Fn.bind(this, this.handleTracksChange);
 
-    if (tracks) {
-      const changeHandler = Fn.bind(this, this.handleTracksChange);
-
-      tracks.addEventListener('change', changeHandler);
-      this.on('dispose', function() {
-        tracks.removeEventListener('change', changeHandler);
-      });
-    }
+    tracks.addEventListener('change', changeHandler);
+    this.on('dispose', function() {
+      tracks.removeEventListener('change', changeHandler);
+    });
 
     // iOS7 doesn't dispatch change events to TextTrackLists when an
     // associated track's mode changes. Without something like
@@ -50,7 +47,7 @@ class TextTrackMenuItem extends MenuItem {
     // possible to detect changes to the mode attribute and polyfill
     // the change event. As a poor substitute, we manually dispatch
     // change events whenever the controls modify the mode.
-    if (tracks && tracks.onchange === undefined) {
+    if (tracks.onchange === undefined) {
       let event;
 
       this.on(['tap', 'click'], function() {
