@@ -2230,6 +2230,8 @@ class Player extends Component {
 
         return;
       }
+
+      this.changingSrc_ = false;
       this.cache_.src = src_.src;
       middleware.setTech(mws, this.tech_);
     });
