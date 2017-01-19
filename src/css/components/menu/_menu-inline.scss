@@ -18,11 +18,6 @@
   // This width is currently specific to the inline volume bar.
   width: 12em;
 }
-// Don't transition when tabbing in reverse to the volume menu
-// because it looks weird
-.video-js .vjs-menu-button-inline.vjs-slider-active {
-  @include transition(none);
-}
 
 .vjs-menu-button-inline .vjs-menu {
   opacity: 0;

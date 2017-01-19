@@ -7,7 +7,7 @@
 
   .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
   .vjs-playback-rate, .vjs-progress-control,
-  .vjs-mute-control, .vjs-volume-control, .vjs-volume-menu-button,
+  .vjs-mute-control, .vjs-volume-control,
   .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
   .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }
@@ -19,7 +19,7 @@
 .video-js.vjs-layout-x-small:not(.vjs-fullscreen) {
   .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
   .vjs-playback-rate,
-  .vjs-mute-control, .vjs-volume-control, .vjs-volume-menu-button,
+  .vjs-mute-control, .vjs-volume-control,
   .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
   .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }

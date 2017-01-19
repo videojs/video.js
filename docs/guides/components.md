@@ -10,12 +10,13 @@ The architecture of the Video.js player is centered around components. The `Play
   * [Basic Example](#basic-example)
   * [Using Options](#using-options)
 * [Event Listening](#event-listening)
-  * [using on](#using-on)
+  * [Using on](#using-on)
   * [Using off](#using-off)
   * [Using one](#using-one)
   * [Using trigger](#using-trigger)
 * [Default Component Tree](#default-component-tree)
 * [Specific Component Details](#specific-component-details)
+  * [Volume Panel](#volume-panel)
   * [Progress Control](#progress-control)
   * [Text Track Settings](#text-track-settings)
 
@@ -315,6 +316,22 @@ Player
 ```
 
 ## Specific Component Details
+
+### Volume Panel
+
+The `VolumePanel` includes the `MuteToggle` and the `VolumeControl` Components, which will be hidden if volume changes are not supported. There is one important option for the `VolumePanel` which can make your `VolumeControl` appear vertically over the `MuteToggle`. This can be set by passing `VolumePanel` `{inline: false}` as the default behavior is a horizontal `VolumeControl` with `{inline: true}`.
+
+Example of a vertical `VolumeControl`
+
+```js
+let player = videojs('myplayer', {
+  controlBar: {
+    volumePanel: {
+      inline: false
+    }
+  }
+});
+```
 
 ### Progress Control
 
