@@ -118,7 +118,10 @@ class Html5 extends Tech {
       this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
     });
 
-    if (this.featuresNativeTextTracks) {
+    //  edge only supports the `addtrack` event, so it
+    //  does not technically have native support, but we want to use the support
+    // that it does have.
+    if (this.featuresNativeTextTracks || browser.IS_EDGE) {
       if (crossoriginTracks) {
         log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
             This may prevent text tracks from loading.`);
