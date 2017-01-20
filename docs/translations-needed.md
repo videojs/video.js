@@ -91,7 +91,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| de.json (missing 1)     | Replay                                                                              |
+| de.json (Complete)      |                                                                                     |
 | el.json (missing 1)     | Replay                                                                              |
 | es.json (missing 15)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
@@ -138,7 +138,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fr.json (missing 1)     | Replay                                                                              |
+| fr.json (Complete)      |                                                                                     |
 | hr.json (missing 15)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
