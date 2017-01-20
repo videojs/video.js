@@ -271,6 +271,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
+| pt-PT.json (Complete)   |                                                                                     |
 | ru.json (missing 1)     | Replay                                                                              |
 | sr.json (missing 15)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
