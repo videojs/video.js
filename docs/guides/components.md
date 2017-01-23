@@ -17,7 +17,6 @@ The architecture of the Video.js player is centered around components. The `Play
 * [Default Component Tree](#default-component-tree)
 * [Specific Component Details](#specific-component-details)
   * [Volume Panel](#volume-panel)
-  * [Progress Control](#progress-control)
   * [Text Track Settings](#text-track-settings)
 
 ## What is a Component?

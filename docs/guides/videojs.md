@@ -5,14 +5,14 @@
 * [videojs()](#videojs)
 * [options](#options)
 * [getComponent()](#getcomponent)
-* [registerComponent](#registercomponent)
+* [registerComponent()](#registercomponent)
 * [getTech()](#gettech)
-* [registerTech](#registertech)
+* [registerTech()](#registertech)
 * [extend()](#extend)
 * [mergeOptions()](#mergeoptions)
 * [bind()](#bind)
 * [plugin()](#plugin)
-* [xhr](#xhr)
+* [xhr()](#xhr)
 
 ## `videojs()`
 
