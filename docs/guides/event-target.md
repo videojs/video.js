@@ -4,9 +4,9 @@
 
 * [Overview](#overview)
 * [on() and addEventListener()](#on-and-addeventlistener)
-* [off() and removeEventListener](#off-and-removeeventlistener)
+* [off() and removeEventListener()](#off-and-removeeventlistener)
 * [one()](#one)
-* [trigger() and dispatchEvent](#trigger-and-dispatchevent)
+* [trigger() and dispatchEvent()](#trigger-and-dispatchevent)
 
 ## Overview
 

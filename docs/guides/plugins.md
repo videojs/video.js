@@ -315,8 +315,13 @@ These two methods are functionally identical - use whichever you prefer!
 * [Plugin Conventions][standards]
 
 [api-player]: http://docs.videojs.com/docs/api/player.html
+
 [api-plugin]: http://docs.videojs.com/docs/api/plugin.html
+
 [generator]: https://github.com/videojs/generator-videojs-plugin
+
 [spellbook]: https://github.com/videojs/spellbook
+
 [standards]: https://github.com/videojs/generator-videojs-plugin/blob/master/docs/standards.md
+
 [yeoman]: http://yeoman.io
