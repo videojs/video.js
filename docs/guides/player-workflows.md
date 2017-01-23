@@ -367,6 +367,8 @@ Coming soon...
 
 ### React
 
+See [ReactJS integration example](./react.md)
+
 ### Ember
 
 ### Angular
