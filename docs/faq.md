@@ -269,17 +269,17 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 
 Yes! Please [submit an issue or open a pull request][pr-issue-question] if this does not work.
 
-[plugin-guide]: plugins.md
+[plugin-guide]: ./guides/plugins.md
 
 [install-guide]: http://videojs.com/getting-started/
 
-[troubleshooting]: troubleshooting.md
+[troubleshooting]: ./guides/troubleshooting.md
 
-[video-tracks]: video-tracks.md
+[video-tracks]: ./guides/video-tracks.md
 
-[audio-tracks]: audio-tracks.md
+[audio-tracks]: ./guides/audio-tracks.md
 
-[text-tracks]: text-tracks.md
+[text-tracks]: ./guides/text-tracks.md
 
 [pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
 
