@@ -9,59 +9,50 @@ If you add or update a translation run `grunt check-translations` to update the 
 <!-- START langtable -->
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 7)     | Replay                                                                              |
+| ar.json (missing 43)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | , opens descriptions settings dialog                                                |
-| ba.json (missing 15)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-| bg.json (missing 15)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-| ca.json (missing 15)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-| cs.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| ba.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -76,7 +67,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| da.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| bg.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -91,9 +118,234 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| ca.json (missing 51)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| cs.json (missing 51)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| da.json (missing 51)    | Replay                                                                              |
+|                         | Close Modal Dialog                                                                  |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
 | de.json (Complete)      |                                                                                     |
-| el.json (missing 1)     | Replay                                                                              |
-| es.json (missing 15)    | Replay                                                                              |
+| el.json (missing 37)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| es.json (missing 20)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -108,7 +360,12 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fa.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| fa.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -123,7 +380,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fi.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| fi.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -138,8 +431,79 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fr.json (Complete)      |                                                                                     |
-| hr.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| fr.json (missing 36)    | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| hr.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -154,7 +518,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| hu.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| hu.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -169,7 +569,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| it.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| it.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -184,7 +620,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| ja.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| ja.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -199,7 +671,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| ko.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| ko.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -214,7 +722,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| nb.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| nb.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -229,11 +773,83 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| nl.json (missing 4)     | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| nl.json (missing 40)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Audio Track                                                                         |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-| nn.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| nn.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -248,7 +864,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| pl.json (missing 8)     | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| pl.json (missing 44)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -256,7 +908,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | , opens descriptions settings dialog                                                |
-| pt-BR.json (missing 15) | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| pt-BR.json (missing 51) | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -271,9 +959,116 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| pt-PT.json (Complete)   |                                                                                     |
-| ru.json (missing 1)     | Replay                                                                              |
-| sr.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| pt-PT.json (missing 36) | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| ru.json (missing 37)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| sr.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -288,7 +1083,43 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| sv.json (missing 15)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| sv.json (missing 51)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -303,16 +1134,159 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| tr.json (missing 7)     | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| tr.json (missing 43)    | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | , opens descriptions settings dialog                                                |
-| uk.json (missing 1)     | Replay                                                                              |
-| vi.json (Complete)      |                                                                                     |                      
-| zh-CN.json (missing 14) | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| uk.json (missing 37)    | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| vi.json (missing 36)    | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| zh-CN.json (missing 50) | Replay                                                                              |
 |                         | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
@@ -326,5 +1300,77 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| zh-TW.json (missing 1)  | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| zh-TW.json (missing 37) | Replay                                                                              |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
 <!-- END langtable -->
