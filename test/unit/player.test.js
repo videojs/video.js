@@ -1411,7 +1411,7 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
   let durs = 0;
   let ps = 0;
 
-  videojs.use('video/foo', {
+  videojs.use('video/foo', () => ({
     currentTime() {
       cts++;
     },
@@ -1421,14 +1421,14 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
     paused() {
       ps++;
     }
-  });
+  }));
 
   const tag = TestHelpers.makeTag();
   const player = videojs(tag, {
     techOrder: ['techFaker']
   });
 
-  player.middleware_ = middleware.getMiddleware('video/foo');
+  player.middleware_ = [middleware.getMiddleware('video/foo')[0](player)];
 
   player.techGet_('currentTime');
   player.techGet_('duration');
@@ -1446,7 +1446,7 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
   let cts = 0;
   let vols = 0;
 
-  videojs.use('video/foo', {
+  videojs.use('video/foo', () => ({
     setCurrentTime(ct) {
       cts++;
       return ct;
@@ -1454,14 +1454,14 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
     setVolume() {
       vols++;
     }
-  });
+  }));
 
   const tag = TestHelpers.makeTag();
   const player = videojs(tag, {
     techOrder: ['techFaker']
   });
 
-  player.middleware_ = middleware.getMiddleware('video/foo');
+  player.middleware_ = [middleware.getMiddleware('video/foo')[0](player)];
 
   this.clock.tick(1);
 
@@ -1492,23 +1492,23 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   videojs.registerTech('FooTech', FooTech);
   videojs.registerTech('BarTech', BarTech);
 
-  videojs.use('video/foo', {
+  videojs.use('video/foo', () => ({
     setSource(src, next) {
       next(null, {
         src: 'http://example.com/video.mp4',
         type: 'video/mp4'
       });
     }
-  });
+  }));
 
-  videojs.use('video/bar', {
+  videojs.use('video/bar', () => ({
     setSource(src, next) {
       next(null, {
         src: 'http://example.com/video.flv',
         type: 'video/flv'
       });
     }
-  });
+  }));
 
   const tag = TestHelpers.makeTag();
   const player = videojs(tag, {
