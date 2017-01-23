@@ -11,7 +11,6 @@ import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
-import * as middleware from './middleware.js';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
 
@@ -798,8 +797,6 @@ class Tech extends Component {
     if (!Tech.canPlaySource) {
       throw new Error('Techs must have a static canPlaySource method on them');
     }
-
-    middleware.use('*', {name, tech});
 
     Tech.techs_[name] = tech;
     return tech;
