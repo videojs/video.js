@@ -61,6 +61,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
   // then call the mw's setSource method
   } else if (mwFactory) {
     const mw = mwFactory(player);
+
     mw.setSource(assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level

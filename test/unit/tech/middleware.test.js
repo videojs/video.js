@@ -263,7 +263,7 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   };
   const fooFactory1 = () => foomw1;
   const fooFactory2 = () => foomw2;
-  const fooFactory3 = () => foomw1;
+  const fooFactory3 = () => foomw3;
 
   middleware.use('video/foo', fooFactory1);
   middleware.use('video/foo', fooFactory2);
