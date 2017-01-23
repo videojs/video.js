@@ -29,7 +29,8 @@
     "docs:api": "jsdoc -c .jsdoc.json",
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
-    "babel": "babel src/js -d es5"
+    "babel": "babel src/js -d es5",
+    "prepublish": "not-in-install && npm run docs:api || in-install"
   },
   "repository": {
     "type": "git",
@@ -88,6 +89,7 @@
     "grunt-version": "~1.1.1",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.17.1",
+    "in-publish": "^2.0.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.2",
     "karma": "^1.2.0",
