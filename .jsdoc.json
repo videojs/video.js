@@ -19,7 +19,7 @@
       }
     },
     "logo": {
-      "url": "//videojs.com/img/logo.png",
+      "url": "http://videojs.com/img/logo.png",
       "height": "30px",
       "width": "214px"
     },
