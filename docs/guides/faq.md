@@ -270,7 +270,7 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 
 Yes! Please [submit an issue or open a pull request][pr-issue-question] if this does not work.
 
-Use `require('!style-loader!css-loader!video.js/dist/video-js.css')` to inject video.js CSS.
+Be sure to use `require('!style-loader!css-loader!video.js/dist/video-js.css')` to inject video.js CSS.
 
 ## Q: Does video.js work with react?
 

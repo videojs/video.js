@@ -2,16 +2,13 @@
 
 Here's a basic ReactJS player implementation.
 
-It just instantiate the video.js player on `componentDidMount` and destroy it on `componentWillUnmount`.
+It just instantiates the video.js player on `componentDidMount` and destroys it on `componentWillUnmount`.
 
 ```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import videojs from 'video.js'
-
-// this loads video.js CSS using webpack loaders
-require('!style-loader!css-loader!video.js/dist/video-js.css')
 
 export default class VideoPlayer extends React.Component {
   componentDidMount() {
@@ -44,7 +41,7 @@ export default class VideoPlayer extends React.Component {
 }
 ```
 
-You can then use it like this :
+You can then use it like this:
 
 ```jsx
 // see https://github.com/videojs/video.js/blob/master/docs/guides/options.md
@@ -59,3 +56,7 @@ const videoJsOptions = {
 
 return <VideoPlayer { ...videoJsOptions } />
 ```
+
+If you use webpack, you can embed video.js CSS like this:
+
+`require('!style-loader!css-loader!video.js/dist/video-js.css')`
