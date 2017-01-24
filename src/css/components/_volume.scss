@@ -22,12 +22,37 @@
 .video-js .vjs-volume-control {
   width: auto;
   margin-right: 1em;
-  @include flex(none);
-  @include display-flex(center);
+  @include display-flex;
+
+  visibility: visible;
+  opacity: 1;
 
   // var needed due to comma
-  $transition-property: height 0.4s, opacity 0.4s, margin-right 0.4s;
+  /*$transition-property: height 0.1s, width 0.1s, opacity 0.1s, margin-right 0.1s;*/
+  /*@include transition($transition-property)*/
+  $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s;
   @include transition($transition-property)
+}
+
+.video-js .vjs-volume-hide {
+  visibility: visible;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.video-js .vjs-volume-vertical.vjs-volume-hide {
+  $transition-property: visibility 1s, opacity 1s, height 1s, width 1s 1s;
+  @include transition($transition-property)
+}
+.video-js .vjs-volume-horizontal.vjs-volume-hide {
+  $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s;
+  @include transition($transition-property)
+}
+
+.video-js .vjs-volume-control.vjs-visual-hide {
+  /*$transition-property: height 5s, width 5s, opacity 5s 5s, margin-top 5s 5s, margin-left 5s 5s, padding 5s 5s, visibility 5s 5s;*/
+  /*$transition-property: width 5s;*/
+  /*@include transition($transition-property)*/
 }
 
 .video-js .vjs-volume-control.vjs-control.vjs-volume-vertical {

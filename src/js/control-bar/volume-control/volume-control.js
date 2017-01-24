@@ -75,11 +75,13 @@ class VolumeControl extends Component {
     this.shouldHide_ = false;
 
     // animate hiding the bar via transitions
-    let hideClass = 'vjs-visual-hide-horizontal';
+    // let hideClass = 'vjs-visual-hide-horizontal';
 
-    if (this.options_.vertical) {
-      hideClass = 'vjs-visual-hide-vertical';
-    }
+    // if (this.options_.vertical) {
+      // hideClass = 'vjs-visual-hide-vertical';
+    // }
+
+    const hideClass = 'vjs-volume-hide';
 
     this.removeClass(hideClass);
 
@@ -107,11 +109,13 @@ class VolumeControl extends Component {
     }
 
     // animate hiding the bar via transitions
-    let hideClass = 'vjs-visual-hide-horizontal';
+    // let hideClass = 'vjs-visual-hide-horizontal';
 
-    if (this.options_.vertical) {
-      hideClass = 'vjs-visual-hide-vertical';
-    }
+    // if (this.options_.vertical) {
+      // hideClass = 'vjs-visual-hide-vertical';
+    // }
+
+    const hideClass = 'vjs-volume-hide';
 
     this.addClass(hideClass);
 
@@ -131,7 +135,7 @@ class VolumeControl extends Component {
    *         The element that was created.
    */
   createEl() {
-    let orientationClass = 'vjs-volume-horizonal';
+    let orientationClass = 'vjs-volume-horizontal';
 
     if (this.options_.vertical) {
       orientationClass = 'vjs-volume-vertical';
