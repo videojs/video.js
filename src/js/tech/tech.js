@@ -559,14 +559,12 @@ class Tech extends Component {
    */
   emulateTextTracks() {
     const tracks = this.textTracks();
+    const remoteTracks = this.remoteTextTracks();
+    const handleAddTrack = (e) => tracks.addTrack_(e.track);
+    const handleRemoveTrack = (e) => tracks.removeTrack_(e.track);
 
-    this.remoteTextTracks().on('addtrack', (e) => {
-      tracks.addTrack(e.track);
-    });
-
-    this.remoteTextTracks().on('removetrack', (e) => {
-      tracks.removeTrack(e.track);
-    });
+    remoteTracks.on('addtrack', handleAddTrack);
+    remoteTracks.on('removetrack', handleRemoveTrack);
 
     // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
     // signals that the Tech is ready at which point Tech.el_ is part of the DOM
@@ -574,6 +572,7 @@ class Tech extends Component {
     this.on('ready', this.addWebVttScript_);
 
     const updateDisplay = () => this.trigger('texttrackchange');
+
     const textTracksChanges = () => {
       updateDisplay();
 
@@ -591,7 +590,15 @@ class Tech extends Component {
     tracks.addEventListener('change', textTracksChanges);
 
     this.on('dispose', function() {
+      remoteTracks.off('addtrack', handleAddTrack);
+      remoteTracks.off('removetrack', handleRemoveTrack);
       tracks.removeEventListener('change', textTracksChanges);
+
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+
+        track.removeEventListener('cuechange', updateDisplay);
+      }
     });
   }
 
