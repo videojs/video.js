@@ -891,6 +891,29 @@ class Player extends Component {
     this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
     this.on(this.tech_, 'textdata', this.handleTechTextData_);
 
+    /**
+     * Fires when the video's intrinsic width and/or height has changed.
+     * This differs from Player#resize, which is triggered when the player
+     * is resized.
+     *
+     * @event player#videoresize
+     * @type {event}
+     */
+    /**
+     * Retrigger the `resize` event that was triggered by the {@link Tech}
+     * as `videoresize`.
+     *
+     * @private
+     * @method Player#handleTechResize_
+     * @fires Player#videoresize
+     * @listens Tech#resize
+     */
+    Player.prototype.handleTechResize_ = function(event) {
+      event.type = 'videoresize';
+      return this.trigger(event);
+    };
+    this.on(this.tech_, 'resize', this.handleTechResize_);
+
     this.usingNativeControls(this.techGet_('controls'));
 
     if (this.controls() && !this.usingNativeControls()) {
