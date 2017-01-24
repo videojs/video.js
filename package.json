@@ -25,10 +25,12 @@
     "start": "grunt dev",
     "test": "grunt test",
     "docs": "npm run docs:lint && npm run docs:api",
-    "docs:api": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
+    "jsdoc": "jsdoc",
+    "docs:api": "jsdoc -c .jsdoc.json",
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
-    "babel": "babel src/js -d es5"
+    "babel": "babel src/js -d es5",
+    "prepublish": "not-in-install && npm run docs:api || in-install"
   },
   "repository": {
     "type": "git",
@@ -87,6 +89,7 @@
     "grunt-version": "~1.1.1",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.17.1",
+    "in-publish": "^2.0.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.2",
     "karma": "^1.2.0",
@@ -114,6 +117,7 @@
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
+    "tui-jsdoc-template": "^1.1.0",
     "uglify-js": "~2.7.3",
     "videojs-doc-generator": "0.0.1",
     "videojs-standard": "^6.0.1",
