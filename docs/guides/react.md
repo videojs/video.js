@@ -6,17 +6,12 @@ It just instantiates the video.js player on `componentDidMount` and destroys it 
 
 ```jsx
 import React from 'react';
-import ReactDOM from 'react-dom';
-
 import videojs from 'video.js'
 
 export default class VideoPlayer extends React.Component {
   componentDidMount() {
-    // get the <video> DOM node
-    const videoNode = ReactDOM.findDOMNode(this).querySelector('video');
-
     // instantiate video.js
-    this.player = videojs(videoNode, this.props, function onPlayerReady() {
+    this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
       console.log('onPlayerReady', this)
     });
   }
@@ -34,7 +29,7 @@ export default class VideoPlayer extends React.Component {
   render() {
     return (
       <div data-vjs-player>
-        <video className="video-js"></video>
+        <video ref={ node => this.videoNode = node } className="video-js"></video>
       </div>
     )
   }
