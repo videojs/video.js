@@ -44,88 +44,15 @@ class VolumeControl extends Component {
     // is dragging) or in focus we do not want to hide the VolumeBar
     this.on(this.volumeBar, ['focus', 'slideractive'], () => {
       this.volumeBar.addClass('vjs-slider-active');
-      this.lockShowing_ = true;
+      this.addClass('vjs-slider-active');
+      this.trigger('slideractive');
     });
 
-    // when the slider becomes inactive again we want to hide
-    // the VolumeBar, but only if we tried to hide when
-    // lockShowing_ was true. see the VolumeBar#hide function.
     this.on(this.volumeBar, ['blur', 'sliderinactive'], () => {
       this.volumeBar.removeClass('vjs-slider-active');
-      this.lockShowing_ = false;
-
-      if (this.shouldHide_) {
-        this.hide();
-      }
+      this.removeClass('vjs-slider-active');
+      this.trigger('sliderinactive');
     });
-
-    // show/hide the VolumeBar on focus/blur
-    // happens in VolumeControl but if we want to use the
-    // VolumeBar by itself we will need this
-    this.on(this.volumeBar, ['focus'], () => this.show());
-    this.on(this.volumeBar, ['blur'], () => this.hide());
-
-    this.hide();
-  }
-
-  /**
-   * Remove the visual hidden state from the `VolumeControl`.
-   */
-  show() {
-    this.shouldHide_ = false;
-
-    // animate hiding the bar via transitions
-    // let hideClass = 'vjs-visual-hide-horizontal';
-
-    // if (this.options_.vertical) {
-      // hideClass = 'vjs-visual-hide-vertical';
-    // }
-
-    const hideClass = 'vjs-volume-hide';
-
-    this.removeClass(hideClass);
-
-    // IE < 9 doesn't calculate width correctly if everything inside
-    // the parent element is not hidden as well
-    if (IE_VERSION && IE_VERSION <= 9) {
-      this.children().forEach(function(child) {
-        child.removeClass(hideClass);
-      });
-    }
-  }
-
-  /**
-   * Hide the `VolumeControl` visually but not from screen-readers unless
-   * showing is locked (due to the slider being active). If showing is locked
-   * hide will be called when the slider becomes inactive.
-   */
-  hide() {
-    // if we are currently locked to the showing state
-    // don't hide, but store that we should hide when
-    // lockShowing_ turns to a false value.
-    if (this.lockShowing_) {
-      this.shouldHide_ = true;
-      return;
-    }
-
-    // animate hiding the bar via transitions
-    // let hideClass = 'vjs-visual-hide-horizontal';
-
-    // if (this.options_.vertical) {
-      // hideClass = 'vjs-visual-hide-vertical';
-    // }
-
-    const hideClass = 'vjs-volume-hide';
-
-    this.addClass(hideClass);
-
-    // IE < 9 doesn't calculate width correctly if everything inside
-    // the parent element is not hidden as well
-    if (IE_VERSION && IE_VERSION <= 9) {
-      this.children().forEach(function(child) {
-        child.addClass(hideClass);
-      });
-    }
   }
 
   /**
