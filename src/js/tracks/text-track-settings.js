@@ -297,7 +297,7 @@ class TextTrackSettings extends Component {
     return [
       createEl('label', {
         className: 'vjs-label',
-        textContent: config.label
+        textContent: this.localize(config.label)
       }, {
         for: id
       }),
@@ -442,7 +442,7 @@ class TextTrackSettings extends Component {
 
     const doneButton = createEl('button', {
       className: 'vjs-done-button',
-      textContent: 'Done'
+      textContent: this.localize('Done')
     });
 
     return createEl('div', {
@@ -468,7 +468,7 @@ class TextTrackSettings extends Component {
     const heading = createEl('div', {
       className: 'vjs-control-text',
       id: `TTsettingsDialogLabel-${this.id_}`,
-      textContent: 'Caption Settings Dialog'
+      textContent: this.localize('Caption Settings Dialog')
     }, {
       'aria-level': '1',
       'role': 'heading'
@@ -477,7 +477,7 @@ class TextTrackSettings extends Component {
     const description = createEl('div', {
       className: 'vjs-control-text',
       id: `TTsettingsDialogDescription-${this.id_}`,
-      textContent: 'Beginning of dialog window. Escape will cancel and close the window.'
+      textContent: this.localize('Beginning of dialog window. Escape will cancel and close the window.')
     });
 
     const doc = createEl('div', undefined, {
