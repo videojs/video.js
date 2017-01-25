@@ -32,8 +32,11 @@ export function set(middleware, tech, method, arg) {
 }
 
 export const allowedGetters = {
+  buffered: 1,
   currentTime: 1,
-  duration: 1
+  duration: 1,
+  seekable: 1,
+  played: 1
 };
 
 export const allowedSetters = {
