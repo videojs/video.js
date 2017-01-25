@@ -9,7 +9,7 @@ The `ModalDialog` component is part of Video.js core and provides a baked-in UI 
   * [Example Using the ModalDialog Constructor](#example-using-the-modaldialog-constructor)
 * [Styling Modals Independently](#styling-modals-independently)
 
-## Creating the ModalDialog
+## Creating a ModalDialog
 
 Aside from the [built-in Video.js component-creation methods][creating-component], the player includes a `createModal()` helper method.
 
