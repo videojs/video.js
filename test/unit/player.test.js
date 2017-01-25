@@ -1580,3 +1580,17 @@ QUnit.test('options: plugins', function(assert) {
   player.dispose();
   Plugin.deregisterPlugin('foo');
 });
+
+QUnit.test('should fire videoresize when tech fires resize', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({});
+
+  player.on('videoresize', function() {
+    assert.ok(true, 'videoresize event triggered');
+  });
+
+  // init firstplay listeners
+  player.tech_.trigger('resize');
+  player.dispose();
+});
