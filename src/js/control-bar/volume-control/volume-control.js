@@ -4,7 +4,6 @@
 import Component from '../../component.js';
 import checkVolumeSupport from './check-volume-support';
 import {isPlain} from '../../utils/obj';
-import {IE_VERSION} from '../../utils/browser';
 
 // Required children
 import './volume-bar.js';
