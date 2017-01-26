@@ -4,6 +4,7 @@
 import Component from '../../component.js';
 import checkVolumeSupport from './check-volume-support';
 import {isPlain} from '../../utils/obj';
+import { throttle, bind } from '../../utils/fn.js';
 
 // Required children
 import './volume-bar.js';
@@ -39,6 +40,11 @@ class VolumeControl extends Component {
     // hide this control if volume support is missing
     checkVolumeSupport(this, player);
 
+    this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
+
+    this.on('mousedown', this.handleMouseDown);
+    this.on('touchstart', this.handleMouseDown);
+
     // while the slider is active (the mouse has been pressed down and
     // is dragging) or in focus we do not want to hide the VolumeBar
     this.on(this.volumeBar, ['focus', 'slideractive'], () => {
@@ -72,6 +78,54 @@ class VolumeControl extends Component {
     });
   }
 
+  /**
+   * Handle `mousedown` or `touchstart` events on the `VolumeControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        `mousedown` or `touchstart` event that triggered this function
+   *
+   * @listens mousedown
+   * @listens touchstart
+   */
+  handleMouseDown(event) {
+    const doc = this.el_.ownerDocument;
+
+    this.on(doc, 'mousemove', this.throttledHandleMouseMove);
+    this.on(doc, 'touchmove', this.throttledHandleMouseMove);
+    this.on(doc, 'mouseup', this.handleMouseUp);
+    this.on(doc, 'touchend', this.handleMouseUp);
+  }
+
+  /**
+   * Handle `mouseup` or `touchend` events on the `VolumeControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        `mouseup` or `touchend` event that triggered this function.
+   *
+   * @listens touchend
+   * @listens mouseup
+   */
+  handleMouseUp(event) {
+    const doc = this.el_.ownerDocument;
+
+    this.off(doc, 'mousemove', this.throttledHandleMouseMove);
+    this.off(doc, 'touchmove', this.throttledHandleMouseMove);
+    this.off(doc, 'mouseup', this.handleMouseUp);
+    this.off(doc, 'touchend', this.handleMouseUp);
+  }
+
+  /**
+   * Handle `mousedown` or `touchstart` events on the `VolumeControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        `mousedown` or `touchstart` event that triggered this function
+   *
+   * @listens mousedown
+   * @listens touchstart
+   */
+  handleMouseMove(event) {
+    this.volumeBar.handleMouseMove(event);
+  }
 }
 
 /**
