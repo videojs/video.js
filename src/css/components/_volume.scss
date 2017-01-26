@@ -86,6 +86,17 @@
   @include transition($transition-property)
 }
 
+.video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
+  width: 5em;
+  height: 3em;
+
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+
+  @include transition(none);
+}
+
 .video-js.vjs-no-flex .vjs-volume-control.vjs-volume-vertical,
 .video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
   position: absolute;
