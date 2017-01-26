@@ -560,8 +560,8 @@ class Tech extends Component {
   emulateTextTracks() {
     const tracks = this.textTracks();
     const remoteTracks = this.remoteTextTracks();
-    const handleAddTrack = (e) => tracks.addTrack_(e.track);
-    const handleRemoveTrack = (e) => tracks.removeTrack_(e.track);
+    const handleAddTrack = (e) => tracks.addTrack(e.track);
+    const handleRemoveTrack = (e) => tracks.removeTrack(e.track);
 
     remoteTracks.on('addtrack', handleAddTrack);
     remoteTracks.on('removetrack', handleRemoveTrack);
