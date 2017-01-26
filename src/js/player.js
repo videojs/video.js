@@ -28,6 +28,7 @@ import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
+import {filterSource} from './utils/filter-source';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -2214,31 +2215,32 @@ class Player extends Component {
    * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
    *        One SourceObject or an array of SourceObjects
    *
-   * @return {string}
+   * @return {String}
    *         The current video source when getting
    */
   src(source) {
-    if (source === undefined) {
+    let src = source;
+
+    // remove invalid values from here and turn the source into an object
+    src = filterSource(src);
+
+    // if they pass a zero length array, or
+    // an undefined value, return the current source.
+    // aka make this function work as a getter
+    if ((Array.isArray(src) && !src.length) || !src) {
       return this.cache_.src;
     }
 
     this.changingSrc_ = true;
 
-    let src = source;
-
-    if (Array.isArray(source)) {
-      this.cache_.sources = source;
-      src = source[0];
-    } else if (typeof source === 'string') {
-      src = {
-        src: source
-      };
-
+    if (Array.isArray(src)) {
+      this.cache_.sources = src;
+      src = src[0];
+    } else {
       this.cache_.sources = [src];
     }
 
     this.cache_.source = src;
-
     this.currentType_ = src.type;
 
     middleware.setSource(this, src, (src_, mws) => {
@@ -2247,6 +2249,8 @@ class Player extends Component {
       const err = this.src_(src_);
 
       if (err) {
+        // if there was an error with this src
+        // try another
         if (Array.isArray(source) && source.length > 1) {
           return this.src(source.slice(1));
         }
@@ -2309,39 +2313,6 @@ class Player extends Component {
     }, true);
 
     return false;
-  }
-
-  /**
-   * Handle an array of source objects
-   *
-   * @param  {Tech~SourceObject[]} sources
-   *         Array of source objects
-   *
-   * @private
-   */
-  sourceList_(sources) {
-    const sourceTech = this.selectSource(sources);
-
-    if (sourceTech) {
-      if (sourceTech.tech === this.techName_) {
-        // if this technology is already loaded, set the source
-        this.src(sourceTech.source);
-      } else {
-        // load this technology with the chosen source
-        this.loadTech_(sourceTech.tech, sourceTech.source);
-      }
-
-      this.cache_.sources = sources;
-    } else {
-      // We need to wrap this in a timeout to give folks a chance to add error event handlers
-      this.setTimeout(function() {
-        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-      }, 0);
-
-      // we could not find an appropriate tech, but let's still notify the delegate that this is it
-      // this needs a better comment about why this is needed
-      this.triggerReady();
-    }
   }
 
   /**
