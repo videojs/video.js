@@ -802,6 +802,9 @@ class Tech extends Component {
     middleware.use('*', {name, tech});
 
     Tech.techs_[name] = tech;
+    if (name !== 'Tech') {
+      Tech.defaultTechs_.push(name.toLowerCase());
+    }
     return tech;
   }
 
@@ -1170,5 +1173,12 @@ Tech.withSourceHandlers = function(_Tech) {
 // Tech that can be registered as a Component.
 Component.registerComponent('Tech', Tech);
 Tech.registerTech('Tech', Tech);
+
+/**
+ * A list of techs that should be added to techOrder on Players
+ *
+ * @private
+ */
+Tech.defaultTechs_ = [];
 
 export default Tech;
