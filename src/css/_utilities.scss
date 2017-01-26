@@ -16,9 +16,8 @@
 @mixin transition($string: $transition--default) {
   -webkit-transition: $string;
   -moz-transition: $string;
-  -o-transition: $string;
-  // added for ie10
   -ms-transition: $string;
+  -o-transition: $string;
   transition: $string;
 }
 
@@ -117,11 +116,3 @@
   @extend %fill-parent;
   text-align: center;
 }
-
-// don't wrap whitespace for the time control and make the text container 0 width
-// fixes a bug with 'width: auto' in IE 8/9
-.vjs-ie-auto-width-fix {
-  width: 0px !important;
-  white-space: nowrap;
-}
-

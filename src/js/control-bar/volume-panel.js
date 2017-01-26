@@ -4,7 +4,6 @@
 import Component from '../component.js';
 import checkVolumeSupport from './volume-control/check-volume-support';
 import {isPlain} from '../utils/obj';
-import {IE_VERSION} from '../utils/browser';
 
 // Required children
 import './volume-control/volume-control.js';
@@ -69,12 +68,6 @@ class VolumePanel extends Component {
    *         The element that was created.
    */
   createEl() {
-    let ieFixClass = '';
-
-    if (IE_VERSION && IE_VERSION <= 9) {
-      ieFixClass = 'vjs-ie-auto-width-fix';
-    }
-
     let orientationClass = 'vjs-volume-panel-horizontal';
 
     if (!this.options_.inline) {
@@ -82,7 +75,7 @@ class VolumePanel extends Component {
     }
 
     return super.createEl('div', {
-      className: `vjs-volume-panel vjs-control ${orientationClass} ${ieFixClass}`
+      className: `vjs-volume-panel vjs-control ${orientationClass}`
     });
   }
 

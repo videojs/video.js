@@ -4,7 +4,6 @@
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
-import {IE_VERSION} from '../../utils/browser';
 
 /**
  * Displays the time left in the video
@@ -36,14 +35,8 @@ class RemainingTimeDisplay extends Component {
    *         The element that was created.
    */
   createEl() {
-    let ieFixClass = '';
-
-    if (IE_VERSION && IE_VERSION <= 9) {
-      ieFixClass = 'vjs-ie-auto-width-fix';
-    }
-
     const el = super.createEl('div', {
-      className: `vjs-remaining-time vjs-time-control vjs-control ${ieFixClass}`
+      className: 'vjs-remaining-time vjs-time-control vjs-control'
     });
 
     this.contentEl_ = Dom.createEl('div', {

@@ -35,28 +35,3 @@
   display: table-cell;
   vertical-align: middle;
 }
-
-// visually hide a control-bar component without changing the position
-// and without hiding it from screen readers. This also preserves
-// a transition animation.
-.video-js .vjs-control .vjs-visual-hide-vertical {
-  height: 1px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  opacity: 0;
-  margin-top: -1px;
-}
-
-// visually hide a control-bar component without changing the position
-// and without hiding it from screen readers. This also preserves
-// a transition animation.
-.video-js .vjs-control .vjs-visual-hide-horizontal {
-  width: 1px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  opacity: 0;
-  margin-left: -1px;
-}
-
