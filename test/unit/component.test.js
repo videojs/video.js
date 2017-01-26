@@ -912,7 +912,7 @@ QUnit.test('should use the stateful mixin', function(assert) {
   const comp = new Component(getFakePlayer(), {});
 
   assert.ok(Obj.isPlain(comp.state), '`state` is a plain object');
-  assert.strictEqual(typeof comp.setState, 'function', '`setState` is a function');
+  assert.strictEqual(Object.prototype.toString.call(comp.setState), '[object Function]', '`setState` is a function');
 
   comp.setState({foo: 'bar'});
   assert.strictEqual(comp.state.foo, 'bar', 'the component passes a basic stateful test');
