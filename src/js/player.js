@@ -3221,7 +3221,7 @@ const navigator = window.navigator;
  */
 Player.prototype.options_ = {
   // Default order of fallback technology
-  techOrder: ['html5'],
+  techOrder: Tech.defaultTechs_,
 
   html5: {},
   flash: {},
