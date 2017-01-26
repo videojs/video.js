@@ -52,6 +52,4 @@ const videoJsOptions = {
 return <VideoPlayer { ...videoJsOptions } />
 ```
 
-If you use webpack, you can embed video.js CSS like this:
-
-`require('!style-loader!css-loader!video.js/dist/video-js.css')`
+Dont forget to include the video.js CSS, located at `video.js/dist/video-js.css`.
