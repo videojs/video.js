@@ -803,7 +803,8 @@ class Tech extends Component {
 
     Tech.techs_[name] = tech;
     if (name !== 'Tech') {
-      Tech.defaultTechs_.push(name.toLowerCase());
+      // camel case the techName for use in techOrder
+      Tech.defaultTechs_.push(name.charAt(0).toLowerCase() + name.slice(1));
     }
     return tech;
   }
