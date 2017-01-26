@@ -73,7 +73,7 @@
   @include transition(width 1s);
 }
 
-.video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical  {
+.video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
   height: 8em;
   width: 3em;
   left: -3.5em;
@@ -84,6 +84,13 @@
 .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
   $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s, left 1s 1s, top 1s 1s;
   @include transition($transition-property)
+}
+
+.video-js.vjs-no-flex .vjs-volume-control.vjs-volume-vertical,
+.video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
+  position: absolute;
+  bottom: 3em;
+  left: 0.5em;
 }
 
 .video-js .vjs-volume-panel {
