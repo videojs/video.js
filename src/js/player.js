@@ -2212,7 +2212,7 @@ class Player extends Component {
 
     this.currentType_ = src.type;
 
-    middleware.setSource(Fn.bind(this, this.setTimeout), src, (src_, mws) => {
+    middleware.setSource(this, src, (src_, mws) => {
       this.middleware_ = mws;
 
       const err = this.src_(src_);

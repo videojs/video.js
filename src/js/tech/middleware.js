@@ -15,8 +15,8 @@ export function getMiddleware(type) {
   return middlewares;
 }
 
-export function setSource(setTimeout, src, next) {
-  setTimeout(() => setSourceHelper(src, middlewares[src.type], next), 1);
+export function setSource(player, src, next) {
+  player.setTimeout(() => setSourceHelper(src, middlewares[src.type], next, player), 1);
 }
 
 export function setTech(middleware, tech) {
@@ -32,8 +32,11 @@ export function set(middleware, tech, method, arg) {
 }
 
 export const allowedGetters = {
+  buffered: 1,
   currentTime: 1,
-  duration: 1
+  duration: 1,
+  seekable: 1,
+  played: 1
 };
 
 export const allowedSetters = {
@@ -50,21 +53,24 @@ function middlewareIterator(method) {
   };
 }
 
-function setSourceHelper(src = {}, middleware = [], next, acc = []) {
-  const [mw, ...mwrest] = middleware;
+function setSourceHelper(src = {}, middleware = [], next, player, acc = [], lastRun = false) {
+  const [mwFactory, ...mwrest] = middleware;
 
-  // if mw is a string, then we're at a fork in the road
-  if (typeof mw === 'string') {
-    setSourceHelper(src, middlewares[mw], next, acc);
+  // if mwFactory is a string, then we're at a fork in the road
+  if (typeof mwFactory === 'string') {
+    setSourceHelper(src, middlewares[mwFactory], next, player, acc, lastRun);
 
-  // if we have an mw, call its setSource method
-  } else if (mw) {
+  // if we have an mwFactory, call it with the player to get the mw,
+  // then call the mw's setSource method
+  } else if (mwFactory) {
+    const mw = mwFactory(player);
+
     mw.setSource(assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
       // make sure to use the old src
       if (err) {
-        return setSourceHelper(src, mwrest, next, acc);
+        return setSourceHelper(src, mwrest, next, player, acc, lastRun);
       }
 
       // we've succeeded, now we need to go deeper
@@ -75,11 +81,15 @@ function setSourceHelper(src = {}, middleware = [], next, acc = []) {
       setSourceHelper(_src,
           src.type === _src.type ? mwrest : middlewares[_src.type],
           next,
-          acc);
+          player,
+          acc,
+          lastRun);
     });
   } else if (mwrest.length) {
-    setSourceHelper(src, mwrest, next, acc);
-  } else {
+    setSourceHelper(src, mwrest, next, player, acc, lastRun);
+  } else if (lastRun) {
     next(src, acc);
+  } else {
+    setSourceHelper(src, middlewares['*'], next, player, acc, true);
   }
 }

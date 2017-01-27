@@ -14,10 +14,11 @@ QUnit.module('Middleware', {
 
 QUnit.test('middleware can be added with the use method', function(assert) {
   const myMw = {};
+  const mwFactory = () => myMw;
 
-  middleware.use('foo', myMw);
+  middleware.use('foo', mwFactory);
 
-  assert.equal(middleware.getMiddleware('foo').pop(), myMw, 'we are able to add middleware');
+  assert.equal(middleware.getMiddleware('foo').pop(), mwFactory, 'we are able to add middleware');
 });
 
 QUnit.test('middleware get iterates through the middleware array the right order', function(assert) {
@@ -147,7 +148,9 @@ QUnit.test('setSource is run asynchronously', function(assert) {
   let src;
   let acc;
 
-  middleware.setSource(window.setTimeout, { src: 'foo', type: 'video/foo' }, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, { src: 'foo', type: 'video/foo' }, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
@@ -172,10 +175,13 @@ QUnit.test('setSource selects a source based on the middleware given', function(
       });
     }
   };
+  const fooFactory = () => mw;
 
-  middleware.use('video/foo', mw);
+  middleware.use('video/foo', fooFactory);
 
-  middleware.setSource(window.setTimeout, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
@@ -209,11 +215,15 @@ QUnit.test('setSource can select multiple middleware from multiple types', funct
       });
     }
   };
+  const fooFactory = () => foomw;
+  const barFactory = () => barmw;
 
-  middleware.use('video/foo', foomw);
-  middleware.use('video/bar', barmw);
+  middleware.use('video/foo', fooFactory);
+  middleware.use('video/bar', barFactory);
 
-  middleware.setSource(window.setTimeout, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
@@ -257,12 +267,17 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
       });
     }
   };
+  const fooFactory1 = () => foomw1;
+  const fooFactory2 = () => foomw2;
+  const fooFactory3 = () => foomw3;
 
-  middleware.use('video/foo', foomw1);
-  middleware.use('video/foo', foomw2);
-  middleware.use('video/foo', foomw3);
+  middleware.use('video/foo', fooFactory1);
+  middleware.use('video/foo', fooFactory2);
+  middleware.use('video/foo', fooFactory3);
 
-  middleware.setSource(window.setTimeout, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
