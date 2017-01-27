@@ -335,6 +335,10 @@ class Player extends Component {
     // Set controls
     this.controls_ = !!options.controls;
 
+    // Set default values for lastVolume and volumeBeforeDrag
+    this.lastVolume_ = 1;
+    this.volumeBeforeDrag_ = 1;
+
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -1812,6 +1816,10 @@ class Player extends Component {
       this.cache_.volume = vol;
       this.techCall_('setVolume', vol);
 
+      if (vol > 0) {
+        this.lastVolume(vol);
+      }
+
       return;
     }
 
@@ -1870,6 +1878,48 @@ class Player extends Component {
       return this.techCall_('setDefaultMuted', defaultMuted);
     }
     return this.techGet_('defaultMuted') || false;
+  }
+
+  /**
+   * Get the last volume, or set it
+   *
+   * @param  {number} [percentAsDecimal]
+   *         The new last volume as a decimal percent:
+   *         - 0 is muted/0%/off
+   *         - 1.0 is 100%/full
+   *         - 0.5 is half volume or 50%
+   *
+   * @return {Player|number}
+   *         a reference to the calling player when setting and the
+   *         current volume as a percent when getting
+   */
+  lastVolume(percentAsDecimal) {
+    if (percentAsDecimal !== undefined) {
+      this.lastVolume_ = percentAsDecimal;
+      return this;
+    }
+    return this.lastVolume_;
+  }
+
+   /**
+    * Get the last volume before dragging the VolumeBar, or set it
+    *
+    * @param  {number} [percentAsDecimal]
+    *         The new last volume as a decimal percent:
+    *         - 0 is muted/0%/off
+    *         - 1.0 is 100%/full
+    *         - 0.5 is half volume or 50%
+    *
+    * @return {Player|number}
+    *         a reference to the calling player when setting and the
+    *         current volume as a percent when getting
+    */
+  volumeBeforeDrag(percentAsDecimal) {
+    if (percentAsDecimal !== undefined) {
+      this.volumeBeforeDrag_ = percentAsDecimal;
+      return this;
+    }
+    return this.volumeBeforeDrag_;
   }
 
   /**

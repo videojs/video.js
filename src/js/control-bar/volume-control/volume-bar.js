@@ -25,7 +25,8 @@ class VolumeBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-
+    this.on('slideractive', this.updateVolumeBeforeDrag);
+    this.on('sliderinactive', this.updateLastVolume);
     this.on(player, 'volumechange', this.updateARIAAttributes);
     player.ready(() => this.updateARIAAttributes);
   }
@@ -110,6 +111,39 @@ class VolumeBar extends Slider {
 
     this.el_.setAttribute('aria-valuenow', volume);
     this.el_.setAttribute('aria-valuetext', volume + '%');
+  }
+
+  /**
+   * Store value of volume in `volumeBeforeDrag` when user begins dragging the
+   * VolumeBar (so long as volume is above zero). This is used to restore
+   * volume to its starting level after dragging volume to zero and clicking
+   * MuteToggle.
+   *
+   * @listens slideractive
+   */
+  updateVolumeBeforeDrag() {
+    const vol = this.player_.volume();
+
+    if (vol > 0) {
+      this.player_.volumeBeforeDrag(vol);
+    }
+  }
+
+  /**
+   * After user finishes dragging the VolumeBar, if volume is zero, set
+   * `lastVolume` (the value used in setting the volume after clicking
+   * MuteToggle when volume is zero) to `volumeBeforeDrag`, so that volume will
+   * be restored to its starting level before the drag.
+   *
+   * @listens sliderinactive
+   */
+  updateLastVolume() {
+    const vol = this.player_.volume();
+    const volumeBeforeDrag = this.player_.volumeBeforeDrag();
+
+    if (vol === 0) {
+      this.player_.lastVolume(volumeBeforeDrag);
+    }
   }
 
 }

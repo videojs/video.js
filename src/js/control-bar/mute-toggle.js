@@ -53,7 +53,15 @@ class MuteToggle extends Button {
    * @listens click
    */
   handleClick(event) {
-    this.player_.muted(this.player_.muted() ? false : true);
+    const vol = this.player_.volume();
+    const lastVolume = this.player_.lastVolume();
+
+    if (vol === 0) {
+      this.player_.volume(lastVolume);
+      this.player_.muted(false);
+    } else {
+      this.player_.muted(this.player_.muted() ? false : true);
+    }
   }
 
   /**
