@@ -54,9 +54,22 @@ class VolumePanel extends Component {
     this.on(this.muteToggle, 'blur', this.sliderInactive_);
   }
 
+  /**
+   * Add vjs-slider-active class to the VolumePanel
+   *
+   * @listens VolumeControl#slideractive
+   * @private
+   */
   sliderActive_() {
     this.addClass('vjs-slider-active');
   }
+
+  /**
+   * Removes vjs-slider-active class to the VolumePanel
+   *
+   * @listens VolumeControl#sliderinactive
+   * @private
+   */
   sliderInactive_() {
     this.removeClass('vjs-slider-active');
   }
