@@ -1894,7 +1894,7 @@ class Player extends Component {
    *         current volume as a percent when getting
    */
   lastVolume(percentAsDecimal) {
-    if (percentAsDecimal !== undefined) {
+    if (percentAsDecimal !== undefined && percentAsDecimal !== 0) {
       this.lastVolume_ = percentAsDecimal;
       return this;
     }
