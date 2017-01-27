@@ -2,6 +2,11 @@
   cursor: pointer;
   @include flex(none);
   @extend .vjs-icon-volume-high;
+  // padding here is for IE < 9, it doesn't do width: auto from
+  // another style correctly
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-bottom: 3em;
 }
 
 .video-js .vjs-mute-control.vjs-vol-0 {
@@ -14,13 +19,21 @@
   @extend .vjs-icon-volume-mid;
 }
 
-
 .video-js .vjs-volume-control {
   width: auto;
   margin-right: 1em;
   @include flex(none);
   @include display-flex(center);
-  @include transition(all 0.4s);
+
+  // var needed due to comma
+  $transition-property: height 0.4s, opacity 0.4s, margin-right 0.4s;
+  @include transition($transition-property)
+}
+
+.video-js .vjs-volume-control.vjs-control.vjs-volume-vertical {
+  left: 0.6em;
+  bottom: 3em;
+  position: absolute;
 }
 
 .video-js .vjs-volume-panel {

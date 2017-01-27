@@ -4,6 +4,7 @@
 import Component from '../../component.js';
 import checkVolumeSupport from './check-volume-support';
 import {isPlain} from '../../utils/obj';
+import {IE_VERSION} from '../../utils/browser';
 
 // Required children
 import './volume-bar.js';
@@ -40,8 +41,8 @@ class VolumeControl extends Component {
     checkVolumeSupport(this, player);
 
     // while the slider is active (the mouse has been pressed down and
-    // is dragging) we do not want to hide the VolumeBar
-    this.on(this.volumeBar, ['slideractive'], () => {
+    // is dragging) or in focus we do not want to hide the VolumeBar
+    this.on(this.volumeBar, ['focus', 'slideractive'], () => {
       this.volumeBar.addClass('vjs-slider-active');
       this.lockShowing_ = true;
     });
@@ -49,7 +50,7 @@ class VolumeControl extends Component {
     // when the slider becomes inactive again we want to hide
     // the VolumeBar, but only if we tried to hide when
     // lockShowing_ was true. see the VolumeBar#hide function.
-    this.on(this.volumeBar, ['sliderinactive'], () => {
+    this.on(this.volumeBar, ['blur', 'sliderinactive'], () => {
       this.volumeBar.removeClass('vjs-slider-active');
       this.lockShowing_ = false;
 
@@ -63,6 +64,8 @@ class VolumeControl extends Component {
     // VolumeBar by itself we will need this
     this.on(this.volumeBar, ['focus'], () => this.show());
     this.on(this.volumeBar, ['blur'], () => this.hide());
+
+    this.hide();
   }
 
   /**
@@ -71,12 +74,22 @@ class VolumeControl extends Component {
   show() {
     this.shouldHide_ = false;
 
+    // animate hiding the bar via transitions
+    let hideClass = 'vjs-visual-hide-horizontal';
+
     if (this.options_.vertical) {
-      this.removeClass('vjs-visual-hide-vertical');
-    } else {
-      this.removeClass('vjs-visual-hide-horizontal');
+      hideClass = 'vjs-visual-hide-vertical';
     }
 
+    this.removeClass(hideClass);
+
+    // IE < 9 doesn't calculate width correctly if everything inside
+    // the parent element is not hidden as well
+    if (IE_VERSION && IE_VERSION <= 9) {
+      this.children().forEach(function(child) {
+        child.removeClass(hideClass);
+      });
+    }
   }
 
   /**
@@ -94,10 +107,20 @@ class VolumeControl extends Component {
     }
 
     // animate hiding the bar via transitions
+    let hideClass = 'vjs-visual-hide-horizontal';
+
     if (this.options_.vertical) {
-      this.addClass('vjs-visual-hide-vertical');
-    } else {
-      this.addClass('vjs-visual-hide-horizontal');
+      hideClass = 'vjs-visual-hide-vertical';
+    }
+
+    this.addClass(hideClass);
+
+    // IE < 9 doesn't calculate width correctly if everything inside
+    // the parent element is not hidden as well
+    if (IE_VERSION && IE_VERSION <= 9) {
+      this.children().forEach(function(child) {
+        child.addClass(hideClass);
+      });
     }
   }
 
@@ -108,10 +131,10 @@ class VolumeControl extends Component {
    *         The element that was created.
    */
   createEl() {
-    let orientationClass = 'vjs-volume-horizonal vjs-visual-hide-horizontal';
+    let orientationClass = 'vjs-volume-horizonal';
 
     if (this.options_.vertical) {
-      orientationClass = 'vjs-volume-vertical vjs-visual-hide-vertical';
+      orientationClass = 'vjs-volume-vertical';
     }
 
     return super.createEl('div', {
