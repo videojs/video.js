@@ -15,8 +15,8 @@ export function getMiddleware(type) {
   return middlewares;
 }
 
-export function setSource(player, setTimeout, src, next) {
-  setTimeout(() => setSourceHelper(src, middlewares[src.type], next, player), 1);
+export function setSource(player, src, next) {
+  player.setTimeout(() => setSourceHelper(src, middlewares[src.type], next, player), 1);
 }
 
 export function setTech(middleware, tech) {
