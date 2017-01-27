@@ -98,12 +98,12 @@ QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted prope
   const muteToggle = new MuteToggle(player);
 
   assert.equal(player.volume(), 1, 'volume is above 0');
-  assert.equal(player.muted(), false, 'player is muted');
+  assert.equal(player.muted(), false, 'player is not muted');
 
   muteToggle.handleClick();
 
   assert.equal(player.volume(), 1, 'volume is same');
-  assert.equal(player.muted(), true, 'player is not muted');
+  assert.equal(player.muted(), true, 'player is muted');
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
