@@ -38,6 +38,7 @@
 * [Q: Does video.js have any support for advertisement integrations?](#q-does-videojs-have-any-support-for-advertisement-integrations)
 * [Q: Can video.js be required in node.js?](#q-can-videojs-be-required-in-nodejs)
 * [Q: Does video.js work with webpack?](#q-does-videojs-work-with-webpack)
+* [Q: Does video.js work with react?](#q-does-videojs-work-with-react)
 
 ## Q: What is video.js?
 
@@ -268,6 +269,12 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 ## Q: Does video.js work with webpack?
 
 Yes! Please [submit an issue or open a pull request][pr-issue-question] if this does not work.
+
+Be sure to use `require('!style-loader!css-loader!video.js/dist/video-js.css')` to inject video.js CSS.
+
+## Q: Does video.js work with react?
+
+Yes! See [ReactJS integration example](./guides/react.md).
 
 [plugin-guide]: plugins.md
 
