@@ -38,6 +38,12 @@ class TimeTooltip extends Component {
     const playerRect = Dom.getBoundingClientRect(this.player_.el());
     const seekBarPointPx = seekBarRect.width * seekBarPoint;
 
+    // do nothing if either rect isn't available
+    // for example, if the player isn't in the DOM for testing
+    if (!playerRect || !tooltipRect) {
+      return;
+    }
+
     // This is the space left of the `seekBarPoint` available within the bounds
     // of the player. We calculate any gap between the left edge of the player
     // and the left edge of the `SeekBar` and add the number of pixels in the
