@@ -6,6 +6,7 @@ import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
+import EventTarget from '../event-target';
 
 /**
  * Returns whether or not an object has had the evented mixin applied.
@@ -17,6 +18,7 @@ import * as Obj from '../utils/obj';
  *         Whether or not the object appears to be evented.
  */
 const isEvented = (object) =>
+  object instanceof EventTarget ||
   !!object.eventBusEl_ &&
   ['on', 'one', 'off', 'trigger'].every(k => typeof object[k] === 'function');
 
