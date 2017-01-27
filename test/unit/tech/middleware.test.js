@@ -148,7 +148,9 @@ QUnit.test('setSource is run asynchronously', function(assert) {
   let src;
   let acc;
 
-  middleware.setSource({}, window.setTimeout, { src: 'foo', type: 'video/foo' }, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, { src: 'foo', type: 'video/foo' }, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
@@ -177,7 +179,9 @@ QUnit.test('setSource selects a source based on the middleware given', function(
 
   middleware.use('video/foo', fooFactory);
 
-  middleware.setSource({}, window.setTimeout, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
@@ -217,7 +221,9 @@ QUnit.test('setSource can select multiple middleware from multiple types', funct
   middleware.use('video/foo', fooFactory);
   middleware.use('video/bar', barFactory);
 
-  middleware.setSource({}, window.setTimeout, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
@@ -269,7 +275,9 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   middleware.use('video/foo', fooFactory2);
   middleware.use('video/foo', fooFactory3);
 
-  middleware.setSource({}, window.setTimeout, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+  middleware.setSource({
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
     acc = _acc;
   });
