@@ -1901,27 +1901,6 @@ class Player extends Component {
     return this.lastVolume_;
   }
 
-   /**
-    * Get the last volume before dragging the VolumeBar, or set it
-    *
-    * @param  {number} [percentAsDecimal]
-    *         The new last volume as a decimal percent:
-    *         - 0 is muted/0%/off
-    *         - 1.0 is 100%/full
-    *         - 0.5 is half volume or 50%
-    *
-    * @return {Player|number}
-    *         a reference to the calling player when setting and the
-    *         current volume as a percent when getting
-    */
-  volumeBeforeDrag(percentAsDecimal) {
-    if (percentAsDecimal !== undefined) {
-      this.volumeBeforeDrag_ = percentAsDecimal;
-      return this;
-    }
-    return this.volumeBeforeDrag_;
-  }
-
   /**
    * Check if current tech can support native fullscreen
    * (e.g. with built in controls like iOS, so not our flash swf)
