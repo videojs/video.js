@@ -1523,7 +1523,7 @@ class Player extends Component {
         log(e);
         throw e;
       }
-    });
+    }, true);
   }
 
   /**
