@@ -5,6 +5,7 @@
  */
 import window from 'global/window';
 import evented from './mixins/evented';
+import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
 import * as DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
@@ -85,6 +86,7 @@ class Component {
 
     // Make this an evented object and use `el_`, if available, as its event bus
     evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+    stateful(this, this.constructor.defaultState);
 
     this.children_ = [];
     this.childIndex_ = {};

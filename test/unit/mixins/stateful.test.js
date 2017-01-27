@@ -9,13 +9,13 @@ QUnit.module('mixins: stateful');
 QUnit.test('stateful() mutates an object as expected', function(assert) {
   const target = {};
 
-  assert.strictEqual(typeof stateful, 'function', 'the mixin is a function');
+  assert.strictEqual(Object.prototype.toString.call(stateful), '[object Function]', 'the mixin is a function');
   assert.strictEqual(stateful(target), target, 'returns the target object');
 
   assert.ok(Obj.isObject(target), 'the target is still an object');
   assert.ok(Obj.isPlain(target.state), 'the target has a state');
   assert.strictEqual(Object.keys(target.state).length, 0, 'the target state is empty by default');
-  assert.strictEqual(typeof target.setState, 'function', 'the target has a setState method');
+  assert.strictEqual(Object.prototype.toString.call(target.setState), '[object Function]', 'the target has a setState method');
 });
 
 QUnit.test('stateful() with default state passed in', function(assert) {
