@@ -335,9 +335,8 @@ class Player extends Component {
     // Set controls
     this.controls_ = !!options.controls;
 
-    // Set default values for lastVolume and volumeBeforeDrag
-    this.lastVolume_ = 1;
-    this.volumeBeforeDrag_ = 1;
+    // Set default values for lastVolume
+    this.cache_.lastVolume = 1;
 
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
@@ -1817,7 +1816,7 @@ class Player extends Component {
       this.techCall_('setVolume', vol);
 
       if (vol > 0) {
-        this.lastVolume(vol);
+        this.lastVolume_(vol);
       }
 
       return;
@@ -1889,16 +1888,15 @@ class Player extends Component {
    *         - 1.0 is 100%/full
    *         - 0.5 is half volume or 50%
    *
-   * @return {Player|number}
-   *         a reference to the calling player when setting and the
-   *         current volume as a percent when getting
+   * @return {number}
+   *         the current value of lastVolume as a percent when getting
    */
-  lastVolume(percentAsDecimal) {
+  lastVolume_(percentAsDecimal) {
     if (percentAsDecimal !== undefined && percentAsDecimal !== 0) {
-      this.lastVolume_ = percentAsDecimal;
-      return this;
+      this.cache_.lastVolume = percentAsDecimal;
+      return;
     }
-    return this.lastVolume_;
+    return this.cache_.lastVolume;
   }
 
   /**

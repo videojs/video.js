@@ -124,7 +124,7 @@ class VolumeBar extends Slider {
 
     this.on('sliderinactive', function setLastVolume() {
       if (this.player_.volume() === 0) {
-        this.player_.lastVolume(volumeBeforeDrag);
+        this.player_.lastVolume_(volumeBeforeDrag);
       }
       this.off('sliderinactive', setLastVolume);
     });
