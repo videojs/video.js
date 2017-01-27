@@ -2,6 +2,11 @@
   cursor: pointer;
   @include flex(none);
   @extend .vjs-icon-volume-high;
+  // padding here is for IE < 9, it doesn't do width: auto from
+  // another style correctly
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-bottom: 3em;
 }
 
 .video-js .vjs-mute-control.vjs-vol-0 {
@@ -14,19 +19,109 @@
   @extend .vjs-icon-volume-mid;
 }
 
-
 .video-js .vjs-volume-control {
-  width: auto;
   margin-right: 1em;
-  @include flex(none);
-  @include display-flex(center);
-  @include transition(all 0.4s);
+  @include display-flex;
+}
+.video-js .vjs-volume-control.vjs-volume-horizontal {
+  width: 5em;
+}
+
+.video-js .vjs-volume-panel .vjs-volume-control {
+  visibility: visible;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin-left: -1px;
+
+}
+.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  & .vjs-volume-bar,
+  & .vjs-volume-level {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  }
 }
 
 .video-js .vjs-volume-panel {
-  width: auto;
-  @include flex(none);
-  @include display-flex(center);
+  &:hover  .vjs-volume-control,
+  &:active .vjs-volume-control,
+  &:focus  .vjs-volume-control,
+  & .vjs-volume-control:hover  ,
+  & .vjs-volume-control:active ,
+  & .vjs-volume-control:focus  ,
+  & .vjs-mute-control:hover  ~ .vjs-volume-control,
+  & .vjs-mute-control:active ~ .vjs-volume-control,
+  & .vjs-mute-control:focus  ~ .vjs-volume-control,
+  & .vjs-volume-control.vjs-slider-active {
+    &.vjs-volume-horizontal {
+      width: 5em;
+      height: 3em;
+    }
+
+    visibility: visible;
+    opacity: 1;
+    position: relative;
+
+    &.vjs-volume-vertical {
+      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+      & .vjs-volume-bar,
+      & .vjs-volume-level {
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+      }
+    }
+
+    $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
+    @include transition($transition-property);
+  }
+
+  &.vjs-volume-panel-horizontal {
+    &:hover,
+    &:focus,
+    &:active,
+    &.vjs-slider-active {
+      width: 9em;
+
+      @include transition(width 0.1s);
+    }
+  }
+
+  @include transition(width 1s);
+}
+
+.video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
+  height: 8em;
+  width: 3em;
+  left: -3.5em;
+
+  $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s 1s, left 1s 1s, top 1s 1s;
+  @include transition($transition-property)
+}
+.video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
+  $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s, left 1s 1s, top 1s 1s;
+  @include transition($transition-property)
+}
+
+.video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
+  width: 5em;
+  height: 3em;
+
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+
+  @include transition(none);
+}
+
+.video-js.vjs-no-flex .vjs-volume-control.vjs-volume-vertical,
+.video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
+  position: absolute;
+  bottom: 3em;
+  left: 0.5em;
+}
+
+.video-js .vjs-volume-panel {
+  @include display-flex;
 }
 
 .video-js .vjs-volume-bar {
@@ -93,10 +188,9 @@
 }
 
 .video-js .vjs-volume-vertical {
-  width: 2.9em;
+  width: 3em;
   height: 8em;
-  bottom: 5.5em;
-  left: -3.5em;
+  bottom: 8em;
 
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }

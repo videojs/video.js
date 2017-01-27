@@ -16,6 +16,7 @@
 @mixin transition($string: $transition--default) {
   -webkit-transition: $string;
   -moz-transition: $string;
+  -ms-transition: $string;
   -o-transition: $string;
   transition: $string;
 }

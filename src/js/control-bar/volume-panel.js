@@ -45,16 +45,33 @@ class VolumePanel extends Component {
     // hide this control if volume support is missing
     checkVolumeSupport(this, player);
 
-    // when the mouse leaves the VolumePanel area hide the VolumeControl (slider/bar)
-    this.on(['mouseenter', 'touchstart'], () => this.volumeControl.show());
-    this.on(['mouseleave', 'touchend'], () => this.volumeControl.hide());
+    // while the slider is active (the mouse has been pressed down and
+    // is dragging) or in focus we do not want to hide the VolumeBar
+    this.on(this.volumeControl, ['slideractive'], this.sliderActive_);
+    this.on(this.muteToggle, 'focus', this.sliderActive_);
 
-    // when any child of the VolumePanel gets or loses focus
-    // show/hide the VolumeControl (slider/bar)
-    this.children().forEach((child) => {
-      this.on(child, ['focus'], () => this.volumeControl.show());
-      this.on(child, ['blur'], () => this.volumeControl.hide());
-    });
+    this.on(this.volumeControl, ['sliderinactive'], this.sliderInactive_);
+    this.on(this.muteToggle, 'blur', this.sliderInactive_);
+  }
+
+  /**
+   * Add vjs-slider-active class to the VolumePanel
+   *
+   * @listens VolumeControl#slideractive
+   * @private
+   */
+  sliderActive_() {
+    this.addClass('vjs-slider-active');
+  }
+
+  /**
+   * Removes vjs-slider-active class to the VolumePanel
+   *
+   * @listens VolumeControl#sliderinactive
+   * @private
+   */
+  sliderInactive_() {
+    this.removeClass('vjs-slider-active');
   }
 
   /**

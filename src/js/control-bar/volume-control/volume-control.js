@@ -40,65 +40,18 @@ class VolumeControl extends Component {
     checkVolumeSupport(this, player);
 
     // while the slider is active (the mouse has been pressed down and
-    // is dragging) we do not want to hide the VolumeBar
-    this.on(this.volumeBar, ['slideractive'], () => {
+    // is dragging) or in focus we do not want to hide the VolumeBar
+    this.on(this.volumeBar, ['focus', 'slideractive'], () => {
       this.volumeBar.addClass('vjs-slider-active');
-      this.lockShowing_ = true;
+      this.addClass('vjs-slider-active');
+      this.trigger('slideractive');
     });
 
-    // when the slider becomes inactive again we want to hide
-    // the VolumeBar, but only if we tried to hide when
-    // lockShowing_ was true. see the VolumeBar#hide function.
-    this.on(this.volumeBar, ['sliderinactive'], () => {
+    this.on(this.volumeBar, ['blur', 'sliderinactive'], () => {
       this.volumeBar.removeClass('vjs-slider-active');
-      this.lockShowing_ = false;
-
-      if (this.shouldHide_) {
-        this.hide();
-      }
+      this.removeClass('vjs-slider-active');
+      this.trigger('sliderinactive');
     });
-
-    // show/hide the VolumeBar on focus/blur
-    // happens in VolumeControl but if we want to use the
-    // VolumeBar by itself we will need this
-    this.on(this.volumeBar, ['focus'], () => this.show());
-    this.on(this.volumeBar, ['blur'], () => this.hide());
-  }
-
-  /**
-   * Remove the visual hidden state from the `VolumeControl`.
-   */
-  show() {
-    this.shouldHide_ = false;
-
-    if (this.options_.vertical) {
-      this.removeClass('vjs-visual-hide-vertical');
-    } else {
-      this.removeClass('vjs-visual-hide-horizontal');
-    }
-
-  }
-
-  /**
-   * Hide the `VolumeControl` visually but not from screen-readers unless
-   * showing is locked (due to the slider being active). If showing is locked
-   * hide will be called when the slider becomes inactive.
-   */
-  hide() {
-    // if we are currently locked to the showing state
-    // don't hide, but store that we should hide when
-    // lockShowing_ turns to a false value.
-    if (this.lockShowing_) {
-      this.shouldHide_ = true;
-      return;
-    }
-
-    // animate hiding the bar via transitions
-    if (this.options_.vertical) {
-      this.addClass('vjs-visual-hide-vertical');
-    } else {
-      this.addClass('vjs-visual-hide-horizontal');
-    }
   }
 
   /**
@@ -108,10 +61,10 @@ class VolumeControl extends Component {
    *         The element that was created.
    */
   createEl() {
-    let orientationClass = 'vjs-volume-horizonal vjs-visual-hide-horizontal';
+    let orientationClass = 'vjs-volume-horizontal';
 
     if (this.options_.vertical) {
-      orientationClass = 'vjs-volume-vertical vjs-visual-hide-vertical';
+      orientationClass = 'vjs-volume-vertical';
     }
 
     return super.createEl('div', {
