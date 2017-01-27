@@ -11,49 +11,23 @@ QUnit.module('Controls');
 
 QUnit.test('should hide volume control if it\'s not supported', function(assert) {
   assert.expect(2);
-  const noop = function() {};
-  const player = {
-    id: noop,
-    on: noop,
-    ready: noop,
-    tech_: {
-      featuresVolumeControl: false
-    },
-    volume() {},
-    muted() {},
-    reportUserActivity() {}
-  };
+
+  const player = TestHelpers.makePlayer();
+
+  player.tech_.featuresVolumeControl = false;
 
   const volumeControl = new VolumeControl(player);
   const muteToggle = new MuteToggle(player);
 
-  assert.ok(volumeControl.el().className.indexOf('vjs-hidden') >= 0, 'volumeControl is not hidden');
-  assert.ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0, 'muteToggle is not hidden');
+  assert.ok(volumeControl.hasClass('vjs-hidden'), 'volumeControl is not hidden');
+  assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
+  player.dispose();
 });
 
 QUnit.test('should test and toggle volume control on `loadstart`', function(assert) {
-  const noop = function() {};
-  const listeners = [];
-  const player = {
-    id: noop,
-    on(event, callback) {
-      // don't fire dispose listeners
-      if (event !== 'dispose') {
-        listeners.push(callback);
-      }
-    },
-    ready: noop,
-    volume() {
-      return 1;
-    },
-    muted() {
-      return false;
-    },
-    tech_: {
-      featuresVolumeControl: true
-    },
-    reportUserActivity() {}
-  };
+  const player = TestHelpers.makePlayer();
+
+  player.tech_.featuresVolumeControl = true;
 
   const volumeControl = new VolumeControl(player);
   const muteToggle = new MuteToggle(player);
@@ -62,30 +36,23 @@ QUnit.test('should test and toggle volume control on `loadstart`', function(asse
   assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle is hidden initially');
 
   player.tech_.featuresVolumeControl = false;
-  for (let i = 0; i < listeners.length; i++) {
-    listeners[i]();
-  }
+  player.trigger('loadstart');
 
   assert.equal(volumeControl.hasClass('vjs-hidden'), true, 'volumeControl does not hide itself');
   assert.equal(muteToggle.hasClass('vjs-hidden'), true, 'muteToggle does not hide itself');
 
   player.tech_.featuresVolumeControl = true;
-  for (let i = 0; i < listeners.length; i++) {
-    listeners[i]();
-  }
+  player.trigger('loadstart');
 
   assert.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl does not show itself');
   assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
 });
 
 QUnit.test('calculateDistance should use changedTouches, if available', function(assert) {
-  const noop = function() {};
-  const player = {
-    id: noop,
-    on: noop,
-    ready: noop,
-    reportUserActivity: noop
-  };
+  const player = TestHelpers.makePlayer();
+
+  player.tech_.featuresVolumeControl = true;
+
   const slider = new Slider(player);
 
   document.body.appendChild(slider.el_);
