@@ -1890,6 +1890,8 @@ class Player extends Component {
    *
    * @return {number}
    *         the current value of lastVolume as a percent when getting
+   *
+   * @private
    */
   lastVolume_(percentAsDecimal) {
     if (percentAsDecimal !== undefined && percentAsDecimal !== 0) {

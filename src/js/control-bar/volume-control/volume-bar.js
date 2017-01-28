@@ -118,6 +118,7 @@ class VolumeBar extends Slider {
    * set lastVolume to the stored volume.
    *
    * @listens slideractive
+   * @private
    */
   updateLastVolume_() {
     const volumeBeforeDrag = this.player_.volume();
