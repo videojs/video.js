@@ -123,11 +123,10 @@ class VolumeBar extends Slider {
   updateLastVolume_() {
     const volumeBeforeDrag = this.player_.volume();
 
-    this.on('sliderinactive', function setLastVolume() {
+    this.one('sliderinactive', () => {
       if (this.player_.volume() === 0) {
         this.player_.lastVolume_(volumeBeforeDrag);
       }
-      this.off('sliderinactive', setLastVolume);
     });
   }
 
