@@ -166,6 +166,44 @@ class SeekBar extends Slider {
   stepBack() {
     this.player_.currentTime(this.player_.currentTime() - STEP_SECONDS);
   }
+
+  /**
+   * Toggles the playback state of the player
+   * This gets called when enter or space is used on the seekbar
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called
+   *
+   */
+  handleAction(event) {
+    if (this.player_.paused()) {
+      this.player_.play();
+    } else {
+      this.player_.pause();
+    }
+  }
+
+  /**
+   * Called when this SeekBar has focus and a key gets pressed down. By
+   * default it will call `this.handleAction` when the key is space or enter.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+
+    // Support Space (32) or Enter (13) key operation to fire a click event
+    if (event.which === 32 || event.which === 13) {
+      event.preventDefault();
+      this.handleAction(event);
+    } else if (super.handleKeyPress) {
+
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(event);
+    }
+  }
 }
 
 /**
