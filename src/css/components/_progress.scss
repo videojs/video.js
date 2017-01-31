@@ -2,6 +2,7 @@
 //
 // This is the container for all progress bar-related components/elements.
 .video-js .vjs-progress-control {
+  cursor: pointer;
   @include flex(auto);
   @include display-flex(center);
   min-width: 4em;

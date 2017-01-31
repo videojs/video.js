@@ -4,6 +4,7 @@
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import * as Dom from '../../utils/dom.js';
+import { throttle, bind } from '../../utils/fn.js';
 
 import './seek-bar.js';
 
@@ -28,6 +29,9 @@ class ProgressControl extends Component {
     super(player, options);
     this.handleMouseMove = Fn.throttle(Fn.bind(this, this.handleMouseMove), 25);
     this.on(this.el_, 'mousemove', this.handleMouseMove);
+
+    this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseSeek), 25);
+    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
   }
 
   /**
@@ -67,6 +71,57 @@ class ProgressControl extends Component {
     }
 
     seekBar.getChild('mouseTimeDisplay').update(seekBarRect, seekBarPoint);
+  }
+
+  /**
+   * Handle `mousemove` or `touchmove` events on the `ProgressControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        `mousedown` or `touchstart` event that triggered this function
+   *
+   * @listens mousemove
+   * @listens touchmove
+   */
+  handleMouseSeek(event) {
+    const seekBar = this.getChild('seekBar');
+
+    seekBar.handleMouseMove(event);
+  }
+
+  /**
+   * Handle `mousedown` or `touchstart` events on the `ProgressControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        `mousedown` or `touchstart` event that triggered this function
+   *
+   * @listens mousedown
+   * @listens touchstart
+   */
+  handleMouseDown(event) {
+    const doc = this.el_.ownerDocument;
+
+    this.on(doc, 'mousemove', this.throttledHandleMouseMove);
+    this.on(doc, 'touchmove', this.throttledHandleMouseMove);
+    this.on(doc, 'mouseup', this.handleMouseUp);
+    this.on(doc, 'touchend', this.handleMouseUp);
+  }
+
+  /**
+   * Handle `mouseup` or `touchend` events on the `ProgressControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        `mouseup` or `touchend` event that triggered this function.
+   *
+   * @listens touchend
+   * @listens mouseup
+   */
+  handleMouseUp(event) {
+    const doc = this.el_.ownerDocument;
+
+    this.off(doc, 'mousemove', this.throttledHandleMouseMove);
+    this.off(doc, 'touchmove', this.throttledHandleMouseMove);
+    this.off(doc, 'mouseup', this.handleMouseUp);
+    this.off(doc, 'touchend', this.handleMouseUp);
   }
 }
 
