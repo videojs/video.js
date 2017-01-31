@@ -6,6 +6,7 @@ import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import Html5 from '../../src/js/tech/html5.js';
 
 QUnit.module('Controls');
 
@@ -93,43 +94,48 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   player.dispose();
 });
 
-QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
-  const muteToggle = new MuteToggle(player);
+// only run these tests if Html5 is supported.
+// IE8 can't run the Html5 tech and to test this functionality otherwith the the tech faker,
+// we'd need to implement volume functionality into tech faker
+if (Html5.isSupported()) {
+  QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
+    const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+    const muteToggle = new MuteToggle(player);
 
-  assert.equal(player.volume(), 1, 'volume is above 0');
-  assert.equal(player.muted(), false, 'player is not muted');
+    assert.equal(player.volume(), 1, 'volume is above 0');
+    assert.equal(player.muted(), false, 'player is not muted');
 
-  muteToggle.handleClick();
+    muteToggle.handleClick();
 
-  assert.equal(player.volume(), 1, 'volume is same');
-  assert.equal(player.muted(), true, 'player is muted');
-});
+    assert.equal(player.volume(), 1, 'volume is same');
+    assert.equal(player.muted(), true, 'player is muted');
+  });
 
-QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
-  const muteToggle = new MuteToggle(player);
+  QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
+    const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+    const muteToggle = new MuteToggle(player);
 
-  player.volume(0);
-  assert.equal(player.lastVolume_(), 1, 'lastVolume is set');
-  assert.equal(player.muted(), false, 'player is muted');
+    player.volume(0);
+    assert.equal(player.lastVolume_(), 1, 'lastVolume is set');
+    assert.equal(player.muted(), false, 'player is muted');
 
-  muteToggle.handleClick();
+    muteToggle.handleClick();
 
-  assert.equal(player.volume(), 1, 'volume is set to lastVolume');
-  assert.equal(player.muted(), false, 'muted remains false');
-});
+    assert.equal(player.volume(), 1, 'volume is set to lastVolume');
+    assert.equal(player.muted(), false, 'muted remains false');
+  });
 
-QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
-  const muteToggle = new MuteToggle(player);
+  QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
+    const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+    const muteToggle = new MuteToggle(player);
 
-  player.volume(0);
-  player.muted(true);
-  player.lastVolume_(0.5);
+    player.volume(0);
+    player.muted(true);
+    player.lastVolume_(0.5);
 
-  muteToggle.handleClick();
+    muteToggle.handleClick();
 
-  assert.equal(player.volume(), 0.5, 'volume is set to lastVolume');
-  assert.equal(player.muted(), false, 'muted is set to false');
-});
+    assert.equal(player.volume(), 0.5, 'volume is set to lastVolume');
+    assert.equal(player.muted(), false, 'muted is set to false');
+  });
+}

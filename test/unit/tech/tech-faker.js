@@ -32,6 +32,8 @@ class TechFaker extends Tech {
 
   setVolume(newVolume) {}
 
+  setMuted() {}
+
   currentTime() {
     return 0;
   }
