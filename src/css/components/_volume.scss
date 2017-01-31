@@ -20,6 +20,7 @@
 }
 
 .video-js .vjs-volume-control {
+  cursor: pointer;
   margin-right: 1em;
   @include display-flex;
 }
