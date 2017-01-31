@@ -1,11 +1,11 @@
-.video-js .vjs-play-control {
+.video-js .vjs-play-control .vjs-icon-placeholder {
   cursor: pointer;
   @include flex(none);
   @extend .vjs-icon-play;
 }
-.video-js .vjs-play-control.vjs-playing {
+.video-js .vjs-play-control.vjs-playing .vjs-icon-placeholder {
   @extend .vjs-icon-pause;
 }
-.video-js .vjs-play-control.vjs-ended {
+.video-js .vjs-play-control.vjs-ended .vjs-icon-placeholder {
   @extend .vjs-icon-replay;
 }
