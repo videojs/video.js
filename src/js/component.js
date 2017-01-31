@@ -790,7 +790,7 @@ class Component {
    *        The width that you want to set postfixed with '%', 'px' or nothing.
    *
    * @param {boolean} [skipListeners]
-   *        Skip the resize event trigger
+   *        Skip the componentresize event trigger
    *
    * @return {number|string}
    *         The width when getting, zero if there is no width. Can be a string
@@ -808,7 +808,7 @@ class Component {
    *        The height that you want to set postfixed with '%', 'px' or nothing.
    *
    * @param {boolean} [skipListeners]
-   *        Skip the resize event trigger
+   *        Skip the componentresize event trigger
    *
    * @return {number|string}
    *         The width when getting, zero if there is no width. Can be a string
@@ -828,7 +828,7 @@ class Component {
    *         Height to set the `Component`s element to.
    */
   dimensions(width, height) {
-    // Skip resize listeners on width for optimization
+    // Skip componentresize listeners on width for optimization
     this.width(width, true);
     this.height(height);
   }
@@ -847,7 +847,7 @@ class Component {
    * - If you want the computed style of the component, use {@link Component#currentWidth}
    *   and {@link {Component#currentHeight}
    *
-   * @fires Component#resize
+   * @fires Component#componentresize
    *
    * @param {string} widthOrHeight
    8        'width' or 'height'
@@ -856,7 +856,7 @@ class Component {
    8         New dimension
    *
    * @param  {boolean} [skipListeners]
-   *         Skip resize event trigger
+   *         Skip componentresize event trigger
    *
    * @return {number}
    *         The dimension when getting or 0 if unset
@@ -882,10 +882,10 @@ class Component {
         /**
          * Triggered when a component is resized.
          *
-         * @event Component#resize
+         * @event Component#componentresize
          * @type {EventTarget~Event}
          */
-        this.trigger('resize');
+        this.trigger('componentresize');
       }
 
       return;
