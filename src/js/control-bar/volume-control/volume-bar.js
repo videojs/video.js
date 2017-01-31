@@ -25,7 +25,7 @@ class VolumeBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-
+    this.on('slideractive', this.updateLastVolume_);
     this.on(player, 'volumechange', this.updateARIAAttributes);
     player.ready(() => this.updateARIAAttributes);
   }
@@ -110,6 +110,24 @@ class VolumeBar extends Slider {
 
     this.el_.setAttribute('aria-valuenow', volume);
     this.el_.setAttribute('aria-valuetext', volume + '%');
+  }
+
+  /**
+   * When user starts dragging the VolumeBar, store the volume and listen for
+   * the end of the drag. When the drag ends, if the volume was set to zero,
+   * set lastVolume to the stored volume.
+   *
+   * @listens slideractive
+   * @private
+   */
+  updateLastVolume_() {
+    const volumeBeforeDrag = this.player_.volume();
+
+    this.one('sliderinactive', () => {
+      if (this.player_.volume() === 0) {
+        this.player_.lastVolume_(volumeBeforeDrag);
+      }
+    });
   }
 
 }
