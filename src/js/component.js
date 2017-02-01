@@ -999,6 +999,20 @@ class Component {
   }
 
   /**
+   * Set the focus to this component
+   */
+  focus() {
+    this.el_.focus();
+  }
+
+  /**
+   * Remove the focus from this component
+   */
+  blur() {
+    this.el_.blur();
+  }
+
+  /**
    * Emit a 'tap' events when touch event support gets detected. This gets used to
    * support toggling the controls through a tap on the video. They get enabled
    * because every sub-component would have extra overhead otherwise.
