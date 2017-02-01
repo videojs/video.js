@@ -30,7 +30,7 @@ class ProgressControl extends Component {
     this.handleMouseMove = Fn.throttle(Fn.bind(this, this.handleMouseMove), 25);
     this.on(this.el_, 'mousemove', this.handleMouseMove);
 
-    this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseSeek), 25);
+    this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
     this.on(['mousedown', 'touchstart'], this.handleMouseDown);
   }
 
@@ -74,6 +74,17 @@ class ProgressControl extends Component {
   }
 
   /**
+   * A throttled version of the {@link ProgressControl#handleMouseSeek} listener.
+   *
+   * @method ProgressControl#throttledHandleMouseSeek
+   * @param {EventTarget~Event} event
+   *        The `mousemove` event that caused this function to run.
+   *
+   * @listen mousemove
+   * @listen touchmove
+   */
+
+  /**
    * Handle `mousemove` or `touchmove` events on the `ProgressControl`.
    *
    * @param {EventTarget~Event} event
@@ -100,8 +111,8 @@ class ProgressControl extends Component {
   handleMouseDown(event) {
     const doc = this.el_.ownerDocument;
 
-    this.on(doc, 'mousemove', this.throttledHandleMouseMove);
-    this.on(doc, 'touchmove', this.throttledHandleMouseMove);
+    this.on(doc, 'mousemove', this.throttledHandleMouseSeek);
+    this.on(doc, 'touchmove', this.throttledHandleMouseSeek);
     this.on(doc, 'mouseup', this.handleMouseUp);
     this.on(doc, 'touchend', this.handleMouseUp);
   }
@@ -118,8 +129,8 @@ class ProgressControl extends Component {
   handleMouseUp(event) {
     const doc = this.el_.ownerDocument;
 
-    this.off(doc, 'mousemove', this.throttledHandleMouseMove);
-    this.off(doc, 'touchmove', this.throttledHandleMouseMove);
+    this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
+    this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
     this.off(doc, 'mouseup', this.handleMouseUp);
     this.off(doc, 'touchend', this.handleMouseUp);
   }
