@@ -105,3 +105,117 @@ QUnit.test('isPlain', function(assert) {
     'string': 'xyz'
   });
 });
+
+QUnit.module('utils/obj.assign', function() {
+  const assignTests = ['mocked'];
+
+  // we only run "normal" tests where Object.assign is used when
+  // Object.assign is supported
+  if (Object.assign) {
+    assignTests.push('unmocked');
+  }
+
+  assignTests.forEach(function(k) {
+    QUnit.module(`with ${k} Object.assign`, {
+      before() {
+        if (k === 'mocked') {
+          this.oldObjectAssign = Object.assign;
+          Object.assign = null;
+        }
+      },
+      after() {
+        if (this.oldObjectAssign) {
+          Object.assign = this.oldObjectAssign;
+        }
+        this.oldObjectAssign = null;
+      }
+    });
+
+    QUnit.test('override object', function(assert) {
+      const foo = {foo: 'yellow'};
+
+      assert.deepEqual(Obj.assign(foo, {foo: 'blue'}), {foo: 'blue'}, 'Obj.assign should return overriden result');
+      assert.deepEqual(foo, {foo: 'blue'}, 'foo should be modified directly');
+    });
+
+    QUnit.test('new object', function(assert) {
+      const foo = {foo: 'yellow'};
+
+      assert.deepEqual(Obj.assign({}, foo, {foo: 'blue'}), {foo: 'blue'}, 'Obj.assign should return result');
+      assert.deepEqual(foo, {foo: 'yellow'}, 'foo should not be modified');
+    });
+
+    QUnit.test('empty override', function(assert) {
+      const foo = {foo: 'yellow'};
+
+      assert.deepEqual(Obj.assign(foo, {}), {foo: 'yellow'}, 'Obj.assign should return result');
+      assert.deepEqual(foo, {foo: 'yellow'}, 'foo should not be modified');
+    });
+
+    QUnit.test('multiple override object', function(assert) {
+      const foo = {foo: 'foo'};
+      const bar = {foo: 'bar'};
+      const baz = {foo: 'baz'};
+
+      assert.deepEqual(Obj.assign(foo, bar, baz), baz, 'Obj.assign should return result');
+      assert.deepEqual(foo, baz, 'foo should be overridden');
+    });
+
+    QUnit.test('additive properties', function(assert) {
+      const foo = {};
+      const expected = {one: 1, two: 2, three: 3};
+
+      assert.deepEqual(Obj.assign(foo, {one: 1}, {two: 2}, {three: 3}), expected, 'Obj.assign should return result');
+      assert.deepEqual(foo, expected, 'foo should be equal to result');
+    });
+
+    QUnit.test('deep override', function(assert) {
+      const foo = {
+        foo: {
+          bar: {
+            baz: 'buzz'
+          }
+        },
+        blue: [55, 56],
+        red: 'nope'
+      };
+
+      const baz = {
+        foo: {
+          bar: {
+            baz: 'red'
+          }
+        },
+        blue: [57]
+      };
+
+      const expected = {
+        foo: {
+          bar: {
+            baz: 'red'
+          }
+        },
+        blue: [57],
+        red: 'nope'
+      };
+
+      assert.deepEqual(Obj.assign(foo, baz), expected, 'Obj.assign should return result');
+      assert.deepEqual(foo, expected, 'foo is overridden');
+    });
+
+    QUnit.test('negative tests', function(assert) {
+      const expected = {foo: 11};
+
+      assert.deepEqual(Obj.assign({}, expected, undefined), expected, 'assign should undefined');
+      assert.deepEqual(Obj.assign({}, expected, null), expected, 'assign should ignore null');
+      assert.deepEqual(Obj.assign({}, expected, []), expected, 'assign should ignore Array');
+      assert.deepEqual(Obj.assign({}, expected, ''), expected, 'assign should ignore string');
+      assert.deepEqual(Obj.assign({}, expected, 11), expected, 'assign should ignore number');
+      assert.deepEqual(Obj.assign({}, expected, new RegExp()), expected, 'assign should ignore RegExp');
+      assert.deepEqual(Obj.assign({}, expected, new Date()), expected, 'assign should ignore Date');
+      assert.deepEqual(Obj.assign({}, expected, true), expected, 'assign should ignore boolean');
+      assert.deepEqual(Obj.assign({}, expected, () => {}), expected, 'assign should ignore function');
+    });
+  });
+});
+
