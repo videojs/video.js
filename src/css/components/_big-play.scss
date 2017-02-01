@@ -17,11 +17,11 @@
   @include border-radius(0.3em);
   @include transition(all 0.4s);
 
-  @extend .vjs-icon-play;
-
   // Since the big play button doesn't inherit from vjs-control, we need to specify a bit more than
   // other buttons for the icon.
   & .vjs-icon-placeholder:before {
+    @extend .vjs-icon-play;
+
     @extend %icon-default;
   }
 }
