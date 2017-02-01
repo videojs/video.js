@@ -10,6 +10,13 @@
   <!-- Load the source files -->
   <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
   <script src="../build/temp/video.js"></script>
+  <script src="../node_modules/videojs-flash/dist/videojs-flash.js"></script>
+
+  <!-- Set the location of the flash SWF -->
+  <script>
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
+  </script>
+
 </head>
 <body>
   <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
@@ -22,7 +29,7 @@
 
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://vjs.zencdn.net/v/oceans.png"
-      data-setup='{}'>
+      data-setup=''>
     <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
     <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
     <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
@@ -32,8 +39,7 @@
 
   <script>
     var vid = document.getElementById("vid1");
-    var player = videojs(vid);
-
+    var player = videojs(vid, {techOrder: ['flash', 'html5']});
   </script>
 
 </body>
