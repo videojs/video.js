@@ -33,6 +33,7 @@ class Button extends ClickableComponent {
     tag = 'button';
 
     props = assign({
+      innerHTML: '<span aria-hidden="true" class="vjs-icon-placeholder"></span>',
       className: this.buildCSSClass()
     }, props);
 
