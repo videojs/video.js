@@ -858,6 +858,10 @@ class Player extends Component {
     // Initialize tech instance
     const TechClass = Tech.getTech(techName);
 
+    if (!TechClass) {
+      throw new Error(`No Tech named '${titleTechName}' exists! '${titleTechName}' should be registered using videojs.registerTech()'`);
+    }
+
     this.tech_ = new TechClass(techOptions);
 
     // player.triggerReady is always async, so don't need this to be async
@@ -2147,9 +2151,6 @@ class Player extends Component {
     const techs =
       this.options_.techOrder
         .map((techName) => {
-          // `Component.getComponent(...)` is for support of old behavior of techs
-          // being registered as components.
-          // Remove once that deprecated behavior is removed.
           return [techName, Tech.getTech(techName)];
         })
         .filter(([techName, tech]) => {
