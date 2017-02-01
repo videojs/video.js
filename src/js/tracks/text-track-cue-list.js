@@ -51,8 +51,10 @@ class TextTrackCueList {
     TextTrackCueList.prototype.setCues_.call(list, cues);
 
     /**
+     * @memberof TextTrackCueList
      * @member {number} length
      *         The current number of `TextTrackCue`s in the TextTrackCueList.
+     * @instance
      */
     Object.defineProperty(list, 'length', {
       get() {

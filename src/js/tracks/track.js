@@ -60,30 +60,38 @@ class Track extends EventTarget {
     };
 
     /**
+     * @memberof Track
      * @member {string} id
      *         The id of this track. Cannot be changed after creation.
+     * @instance
      *
      * @readonly
      */
 
     /**
+     * @memberof Track
      * @member {string} kind
      *         The kind of track that this is. Cannot be changed after creation.
+     * @instance
      *
      * @readonly
      */
 
     /**
+     * @memberof Track
      * @member {string} label
      *         The label of this track. Cannot be changed after creation.
+     * @instance
      *
      * @readonly
      */
 
     /**
+     * @memberof Track
      * @member {string} language
      *         The two letter language code for this track. Cannot be changed after
      *         creation.
+     * @instance
      *
      * @readonly
      */

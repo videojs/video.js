@@ -55,6 +55,8 @@ function constructColor(color, opacity) {
  *
  * @param {string} rule
  *        The style rule that should be applied to the property.
+ *
+ * @private
  */
 function tryUpdateStyle(el, style, rule) {
   try {
