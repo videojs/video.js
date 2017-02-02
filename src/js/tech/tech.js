@@ -820,7 +820,7 @@ class Tech extends Component {
    * Get a `Tech` from the shared list by name.
    *
    * @param {string} name
-   *        Name of the component to get
+   *        `camelCase` or `TitleCase` name of the Tech to get
    *
    * @return {Tech|undefined}
    *         The `Tech` or undefined if there was no tech with the name requsted.
