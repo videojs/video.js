@@ -40,6 +40,7 @@ class BigPlayButton extends Button {
     const playToggle = cb && cb.getChild('playToggle');
 
     if (!playToggle) {
+      this.player_.focus();
       return;
     }
 
