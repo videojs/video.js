@@ -1272,7 +1272,7 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
 
   Player.prototype.reset.call(testPlayer);
 
-  assert.equal(loadedTech, 'Html5', 'we loaded the html5 tech');
+  assert.equal(loadedTech, 'html5', 'we loaded the html5 tech');
   assert.equal(loadedSource, null, 'with a null source');
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
@@ -1297,7 +1297,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 
   Player.prototype.reset.call(testPlayer);
 
-  assert.equal(loadedTech, 'Flash', 'we loaded the Flash tech');
+  assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
   assert.equal(loadedSource, null, 'with a null source');
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
@@ -1478,6 +1478,9 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
 });
 
 QUnit.test('src selects tech based on middleware', function(assert) {
+  const oldTechs = Tech.techs_;
+  const oldDefaultTechOrder = Tech.defaultTechOrder_;
+
   class FooTech extends Html5 {}
   class BarTech extends Html5 {}
 
@@ -1538,6 +1541,10 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   player.dispose();
   delete Tech.techs_.FooTech;
   delete Tech.techs_.BarTech;
+
+  Tech.defaultTechOrder_ = oldDefaultTechOrder;
+  Tech.techs_ = oldTechs;
+
 });
 
 QUnit.test('options: plugins', function(assert) {

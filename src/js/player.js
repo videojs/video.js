@@ -806,14 +806,17 @@ class Player extends Component {
       this.unloadTech_();
     }
 
+    const titleTechName = toTitleCase(techName);
+    const camelTechName = techName.charAt(0).toLowerCase() + techName.slice(1);
+
     // get rid of the HTML5 video tag as soon as we are using another tech
-    if (techName !== 'Html5' && this.tag) {
+    if (titleTechName !== 'Html5' && this.tag) {
       Tech.getTech('Html5').disposeMediaElement(this.tag);
       this.tag.player = null;
       this.tag = null;
     }
 
-    this.techName_ = techName;
+    this.techName_ = titleTechName;
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
@@ -823,7 +826,7 @@ class Player extends Component {
       source,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
-      'techId': `${this.id()}_${techName}_api`,
+      'techId': `${this.id()}_${titleTechName}_api`,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
@@ -840,6 +843,8 @@ class Player extends Component {
       techOptions[props.getterName] = this[props.privateName];
     });
 
+    assign(techOptions, this.options_[titleTechName]);
+    assign(techOptions, this.options_[camelTechName]);
     assign(techOptions, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
@@ -851,14 +856,13 @@ class Player extends Component {
     }
 
     // Initialize tech instance
-    let TechComponent = Tech.getTech(techName);
+    const TechClass = Tech.getTech(techName);
 
-    // Support old behavior of techs being registered as components.
-    // Remove once that deprecated behavior is removed.
-    if (!TechComponent) {
-      TechComponent = Component.getComponent(techName);
+    if (!TechClass) {
+      throw new Error(`No Tech named '${titleTechName}' exists! '${titleTechName}' should be registered using videojs.registerTech()'`);
     }
-    this.tech_ = new TechComponent(techOptions);
+
+    this.tech_ = new TechClass(techOptions);
 
     // player.triggerReady is always async, so don't need this to be async
     this.tech_.ready(Fn.bind(this, this.handleTechReady_), true);
@@ -895,7 +899,7 @@ class Player extends Component {
 
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
-    if (this.tech_.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
+    if (this.tech_.el().parentNode !== this.el() && (titleTechName !== 'Html5' || !this.tag)) {
       Dom.prependTo(this.tech_.el(), this.el());
     }
 
@@ -2102,7 +2106,7 @@ class Player extends Component {
 
     // Loop through each playback technology in the options order
     for (let i = 0, j = this.options_.techOrder; i < j.length; i++) {
-      const techName = toTitleCase(j[i]);
+      const techName = j[i];
       let tech = Tech.getTech(techName);
 
       // Support old behavior of techs being registered as components.
@@ -2146,12 +2150,8 @@ class Player extends Component {
     // current platform
     const techs =
       this.options_.techOrder
-        .map(toTitleCase)
         .map((techName) => {
-          // `Component.getComponent(...)` is for support of old behavior of techs
-          // being registered as components.
-          // Remove once that deprecated behavior is removed.
-          return [techName, Tech.getTech(techName) || Component.getComponent(techName)];
+          return [techName, Tech.getTech(techName)];
         })
         .filter(([techName, tech]) => {
           // Check if the current tech is defined before continuing
@@ -2356,7 +2356,7 @@ class Player extends Component {
    * and calls `reset` on the tech`.
    */
   reset() {
-    this.loadTech_(toTitleCase(this.options_.techOrder[0]), null);
+    this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
   }
 
@@ -3254,7 +3254,7 @@ const navigator = window.navigator;
  */
 Player.prototype.options_ = {
   // Default order of fallback technology
-  techOrder: Tech.defaultTechs_,
+  techOrder: Tech.defaultTechOrder_,
 
   html5: {},
   flash: {},

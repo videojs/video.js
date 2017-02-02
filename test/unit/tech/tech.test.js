@@ -27,6 +27,23 @@ QUnit.module('Media Tech', {
   }
 });
 
+QUnit.test('Tech.registerTech and Tech.getTech', function(assert) {
+  const MyTech = extendFn(Tech);
+  const oldTechs = Tech.techs_;
+  const oldDefaultTechOrder = Tech.defaultTechOrder_;
+
+  Tech.registerTech('MyTech', MyTech);
+
+  assert.ok(Tech.techs_.MyTech, 'Tech is stored in the global list');
+  assert.notEqual(Tech.defaultTechOrder_.indexOf('MyTech'), -1, 'Tech is stored in the defaultTechOrder array');
+  assert.strictEqual(Tech.getTech('myTech'), MyTech, 'can get a tech using `camelCase` name');
+  assert.strictEqual(Tech.getTech('MyTech'), MyTech, 'can get a tech using `titleCase` name');
+
+  // reset techs and defaultTechOrder
+  Tech.techs_ = oldTechs;
+  Tech.defaultTechOrder_ = oldDefaultTechOrder;
+});
+
 QUnit.test('should synthesize timeupdate events by default', function(assert) {
   let timeupdates = 0;
   const tech = new Tech();

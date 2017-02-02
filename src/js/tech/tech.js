@@ -13,6 +13,7 @@ import window from 'global/window';
 import document from 'global/document';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
+import toTitleCase from '../utils/to-title-case';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -806,10 +807,12 @@ class Tech extends Component {
       throw new Error('Techs must have a static canPlaySource method on them');
     }
 
+    name = toTitleCase(name);
+
     Tech.techs_[name] = tech;
     if (name !== 'Tech') {
       // camel case the techName for use in techOrder
-      Tech.defaultTechs_.push(name.charAt(0).toLowerCase() + name.slice(1));
+      Tech.defaultTechOrder_.push(name);
     }
     return tech;
   }
@@ -818,12 +821,18 @@ class Tech extends Component {
    * Get a `Tech` from the shared list by name.
    *
    * @param {string} name
-   *        Name of the component to get
+   *        `camelCase` or `TitleCase` name of the Tech to get
    *
    * @return {Tech|undefined}
    *         The `Tech` or undefined if there was no tech with the name requsted.
    */
   static getTech(name) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     if (Tech.techs_ && Tech.techs_[name]) {
       return Tech.techs_[name];
     }
@@ -1185,6 +1194,6 @@ Tech.registerTech('Tech', Tech);
  *
  * @private
  */
-Tech.defaultTechs_ = [];
+Tech.defaultTechOrder_ = [];
 
 export default Tech;
