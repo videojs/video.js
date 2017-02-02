@@ -78,8 +78,12 @@ class PlayProgressBar extends Component {
  * @private
  */
 PlayProgressBar.prototype.options_ = {
-  children: IE_VERSION && IE_VERSION < 9 ? [] : ['timeTooltip']
+  children: []
 };
+
+if (!IE_VERSION || IE_VERSION > 8) {
+  PlayProgressBar.prototype.options_.children.push('timeTooltip');
+}
 
 Component.registerComponent('PlayProgressBar', PlayProgressBar);
 export default PlayProgressBar;

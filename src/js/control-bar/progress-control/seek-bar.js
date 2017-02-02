@@ -184,7 +184,7 @@ SeekBar.prototype.options_ = {
 };
 
 if (!IE_VERSION || IE_VERSION > 8) {
-  SeekBar.prototype.options_.children.push('mouseTimeDisplay');
+  SeekBar.prototype.options_.children.splice(1, 0, 'mouseTimeDisplay');
 }
 
 /**
