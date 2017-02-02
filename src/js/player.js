@@ -192,13 +192,13 @@ const TECH_EVENTS_RETRIGGER = [
   'ratechange',
 
   /**
-   * Fires when the playing speed of the audio/video is changed
+   * Fires when the video's intrinsic dimensions change
    *
    * @event Player#resize
    * @type {event}
    */
   /**
-   * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
+   * Retrigger the `resize` event that was triggered by the {@link Tech}.
    *
    * @private
    * @method Player#handleTechResize_
