@@ -4,7 +4,7 @@
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import * as Dom from '../../utils/dom.js';
-import { throttle, bind } from '../../utils/fn.js';
+import {throttle, bind} from '../../utils/fn.js';
 
 import './seek-bar.js';
 

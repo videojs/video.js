@@ -3,6 +3,7 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
+import {IE_VERSION} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
@@ -177,11 +178,14 @@ class SeekBar extends Slider {
 SeekBar.prototype.options_ = {
   children: [
     'loadProgressBar',
-    'mouseTimeDisplay',
     'playProgressBar'
   ],
   barName: 'playProgressBar'
 };
+
+if (!IE_VERSION || IE_VERSION > 8) {
+  SeekBar.prototype.options_.children.push('mouseTimeDisplay');
+}
 
 /**
  * Call the update event for this Slider when this event happens on the player.

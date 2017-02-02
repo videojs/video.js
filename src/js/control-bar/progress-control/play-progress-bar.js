@@ -2,6 +2,7 @@
  * @file play-progress-bar.js
  */
 import Component from '../../component.js';
+import {IE_VERSION} from '../../utils/browser.js';
 import formatTime from '../../utils/format-time.js';
 
 import './time-tooltip';
@@ -77,9 +78,7 @@ class PlayProgressBar extends Component {
  * @private
  */
 PlayProgressBar.prototype.options_ = {
-  children: [
-    'timeTooltip'
-  ]
+  children: IE_VERSION && IE_VERSION < 9 ? [] : ['timeTooltip']
 };
 
 Component.registerComponent('PlayProgressBar', PlayProgressBar);
