@@ -127,7 +127,7 @@ class ModalDialog extends Component {
    *         the localized or raw label of this modal.
    */
   label() {
-    return this.options_.label || this.localize('Modal Window');
+    return this.localize(this.options_.label || 'Modal Window');
   }
 
   /**
