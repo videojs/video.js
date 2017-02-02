@@ -4,6 +4,7 @@
 import * as Dom from './utils/dom';
 import * as Fn from './utils/fn';
 import Component from './component';
+import document from 'global/document';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
@@ -187,6 +188,7 @@ class ModalDialog extends Component {
 
       player.controls(false);
       this.show();
+      this.conditionalFocus_();
       this.el().setAttribute('aria-hidden', 'false');
 
       /**
@@ -257,6 +259,7 @@ class ModalDialog extends Component {
       * @type {EventTarget~Event}
       */
     this.trigger('modalclose');
+    this.conditionalBlur_();
 
     if (this.options_.temporary) {
       this.dispose();
@@ -398,6 +401,36 @@ class ModalDialog extends Component {
       this.content_ = value;
     }
     return this.content_;
+  }
+
+  /**
+   * conditionally focus the modal dialog if focus was previously on the player.
+   *
+   * @private
+   */
+  conditionalFocus_() {
+    const activeEl = document.activeElement;
+    const playerEl = this.player_.el_;
+
+    this.previouslyActiveEl_ = null;
+
+    if (playerEl.contains(activeEl) || playerEl === activeEl) {
+      this.previouslyActiveEl_ = activeEl;
+
+      this.focus();
+    }
+  }
+
+  /**
+   * conditionally blur the element and refocus the last focused element
+   *
+   * @private
+   */
+  conditionalBlur_() {
+    if (this.previouslyActiveEl_) {
+      this.previouslyActiveEl_.focus();
+      this.previouslyActiveEl_ = null;
+    }
   }
 }
 
