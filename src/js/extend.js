@@ -1,4 +1,4 @@
-/*
+/**
  * @file extend.js
  * @module extend
  */
@@ -39,6 +39,9 @@ const _inherits = function(subClass, superClass) {
 /**
  * Function for subclassing using the same inheritance that
  * videojs uses internally
+ *
+ * @static
+ * @const
  *
  * @param {Object} superClass
  *        The class to inherit from

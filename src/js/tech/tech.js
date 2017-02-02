@@ -32,6 +32,8 @@ import * as TRACK_TYPES from '../tracks/track-types';
 /**
  * A function used by {@link Tech} to create a new {@link TextTrack}.
  *
+ * @private
+ *
  * @param {Tech} self
  *        An instance of the Tech class.
  *
@@ -554,7 +556,6 @@ class Tech extends Component {
   /**
    * Emulate texttracks
    *
-   * @method emulateTextTracks
    */
   emulateTextTracks() {
     const tracks = this.textTracks();

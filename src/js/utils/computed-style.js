@@ -18,6 +18,9 @@ import window from 'global/window';
  *        The property name you want
  *
  * @see https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+ *
+ * @static
+ * @const
  */
 export default function computedStyle(el, prop) {
   if (!el || !prop) {

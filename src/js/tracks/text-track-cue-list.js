@@ -5,7 +5,7 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /**
- * @typedef {Object} TextTrackCue
+ * @typedef {Object} TextTrackCueList~TextTrackCue
  *
  * @property {string} id
  *           The unique id for this text track cue
@@ -51,8 +51,10 @@ class TextTrackCueList {
     TextTrackCueList.prototype.setCues_.call(list, cues);
 
     /**
+     * @memberof TextTrackCueList
      * @member {number} length
      *         The current number of `TextTrackCue`s in the TextTrackCueList.
+     * @instance
      */
     Object.defineProperty(list, 'length', {
       get() {
@@ -107,7 +109,7 @@ class TextTrackCueList {
    * @param {string} id
    *        The id of the cue that should be searched for.
    *
-   * @return {TextTrackCue|null}
+   * @return {TextTrackCueList~TextTrackCue|null}
    *         A single cue or null if none was found.
    */
   getCueById(id) {

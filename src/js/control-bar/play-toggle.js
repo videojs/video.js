@@ -91,7 +91,6 @@ class PlayToggle extends Button {
   /**
    * Add the vjs-ended class to the element so it can change appearance
    *
-   * @method handleEnded
    */
   handleEnded(event) {
     this.removeClass('vjs-playing');

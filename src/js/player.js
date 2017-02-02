@@ -3404,7 +3404,7 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  * This does not report whether or not the plugin has ever been initialized
  * on this player. For that, [usingPlugin]{@link Player#usingPlugin}.
  *
- * @method hasPlugin
+ * @method Player#hasPlugin
  * @param  {string}  name
  *         The name of a plugin.
  *
@@ -3418,7 +3418,7 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  * For basic plugins, this only reports whether the plugin has _ever_ been
  * initialized on this player.
  *
- * @method usingPlugin
+ * @method Player#usingPlugin
  * @param  {string} name
  *         The name of a plugin.
  *

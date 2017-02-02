@@ -10,7 +10,7 @@ import HTMLTrackElement from './html-track-element';
 
 import mergeOptions from '../utils/merge-options';
 
-/**
+/*
  * This file contains all track properties that are used in
  * player.js, tech.js, html5.js and possibly other techs in the future.
  */

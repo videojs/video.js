@@ -202,9 +202,11 @@ class TextTrack extends Track {
     }
 
     /**
+     * @memberof TextTrack
      * @member {boolean} default
      *         If this track was set to be on or off by default. Cannot be changed after
      *         creation.
+     * @instance
      *
      * @readonly
      */
@@ -216,9 +218,11 @@ class TextTrack extends Track {
     });
 
     /**
+     * @memberof TextTrack
      * @member {string} mode
      *         Set the mode of this TextTrack to a valid {@link TextTrack~Mode}. Will
      *         not be set if setting to an invalid mode.
+     * @instance
      *
      * @fires TextTrack#modechange
      */
@@ -248,8 +252,10 @@ class TextTrack extends Track {
     });
 
     /**
+     * @memberof TextTrack
      * @member {TextTrackCueList} cues
      *         The text track cue list for this TextTrack.
+     * @instance
      */
     Object.defineProperty(tt, 'cues', {
       get() {
@@ -263,8 +269,10 @@ class TextTrack extends Track {
     });
 
     /**
+     * @memberof TextTrack
      * @member {TextTrackCueList} activeCues
      *         The list text track cues that are currently active for this TextTrack.
+     * @instance
      */
     Object.defineProperty(tt, 'activeCues', {
       get() {
