@@ -1160,6 +1160,23 @@ QUnit.test('inherits language from parent element', function(assert) {
   }
 });
 
+QUnit.test('sets lang attribute on player el', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+  const oldLang = fixture.getAttribute('lang');
+
+  fixture.setAttribute('lang', 'x-attr-test');
+  const player = TestHelpers.makePlayer();
+
+  assert.equal(player.el().getAttribute('lang'), 'x-attr-test', 'player sets lang attribute on self');
+
+  player.dispose();
+  if (oldLang) {
+    fixture.setAttribute('lang', oldLang);
+  } else {
+    fixture.removeAttribute('lang');
+  }
+});
+
 QUnit.test('should return correct values for canPlayType', function(assert) {
   const player = TestHelpers.makePlayer();
 

@@ -566,6 +566,10 @@ class Player extends Component {
     Dom.prependTo(tag, el);
     this.children_.unshift(tag);
 
+    // Set lang attr on player to ensure CSS :lang() in consistent with player
+    // if it's been set to something different to the doc
+    this.el_.setAttribute('lang', this.language_);
+
     this.el_ = el;
 
     return el;
