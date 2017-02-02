@@ -54,6 +54,9 @@ class MenuItem extends ClickableComponent {
    *         The element that gets created.
    */
   createEl(type, props, attrs) {
+    // The control is textual, not just an icon
+    this.nonIconControl = true;
+
     return super.createEl('li', assign({
       className: 'vjs-menu-item',
       innerHTML: this.localize(this.options_.label),
