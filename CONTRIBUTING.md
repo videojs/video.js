@@ -275,7 +275,11 @@ Fixes #123. The footer can contain Fixes messages.
 Any code change should come with corresponding test changes. Especially bug fixes.
 Tests attached to bug fixes should fail before the change and succeed with it.
 
-Tests can be run either from the shell (`npm test`) or from the browser(`npm start`; `http://localhost:9999/test`). See [Running tests](#running-tests) for more information.
+```sh
+npm test
+```
+
+See [Running tests](#running-tests) for more information.
 
 #### Step 6: Push
 
