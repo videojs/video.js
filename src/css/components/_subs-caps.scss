@@ -1,0 +1,21 @@
+// North America uses 'CC' icon
+.video-js:lang(en) .vjs-subs-caps-button .vjs-icon-placeholder,
+.video-js:lang(fr-CA) .vjs-subs-caps-button .vjs-icon-placeholder {
+  @extend .vjs-icon-captions;
+}
+
+// ROW uses 'subtitles'
+// Double selector because @extend puts these rules above the captions icon
+.video-js .vjs-subs-caps-button .vjs-icon-placeholder,
+.video-js.video-js:lang(en-GB) .vjs-subs-caps-button .vjs-icon-placeholder,
+.video-js.video-js:lang(en-IE) .vjs-subs-caps-button .vjs-icon-placeholder,
+.video-js.video-js:lang(en-AU) .vjs-subs-caps-button .vjs-icon-placeholder,
+.video-js.video-js:lang(en-NZ) .vjs-subs-caps-button .vjs-icon-placeholder {
+  @extend .vjs-icon-subtitles;
+}
+
+// Todo
+.video-js .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text:after {
+  content: " \f10d";
+  font-family: VideoJS;
+}

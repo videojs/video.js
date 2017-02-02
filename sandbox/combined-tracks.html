@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+
+  <!-- Add ES5 shim and sham for IE8 -->
+  <script src="../build/temp/ie8/videojs-ie8.js"></script>
+
+  <!-- Load the source files -->
+  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../build/temp/video.js"></script>
+  <script src="../node_modules/videojs-flash/dist/videojs-flash.js"></script>
+
+  <!-- Set the location of the flash SWF -->
+  <script>
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
+    videojs.addLanguage('de', {
+      'Captions settings': 'Amerikanisch',
+      'Subtitles settings': 'Global'
+    });
+  </script>
+  <style>
+  .video-js:lang(en-US) {
+    border: 3px solid red;
+  }
+  .vjs-control:focus {
+    box-shadow: inset 0 0 0 2px rgba(27,127,204,.8);
+    outline: none;
+  }
+  </style>
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started make a copy of index.html.example and rename it to index.html.</p>
+    <pre>cp sandbox/index.html.example sandbox/index.html</pre>
+    <pre>npm run start</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+
+  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="http://vjs.zencdn.net/v/oceans.png">
+    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="captions" src="../docs/examples/shared/example-captions-fr.vtt" srclang="fr" label="French"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="subtitles" src="../docs/examples/shared/example-subtitles-fr.vtt" srclang="fr" label="French"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="subtitles" src="../docs/examples/shared/example-subtitles-de.vtt" srclang="de" label="German"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video>
+
+  <script>
+    var vid = document.getElementById("vid1");
+    var player = videojs(vid, {
+      controlBar: {
+        children: [
+          'playToggle',
+          'volumePanel',
+          'currentTimeDisplay',
+          'timeDivider',
+          'durationDisplay',
+          'progressControl',
+          'liveDisplay',
+          'remainingTimeDisplay',
+          'customControlSpacer',
+          'playbackRateMenuButton',
+          'chaptersButton',
+          'descriptionsButton',
+          'subtitlesButton',
+          'captionsButton',
+          'subsCapsButton',
+          'audioTrackButton',
+          'fullscreenToggle'
+        ]
+      }
+    });
+    console.log(player.language());
+  </script>
+
+</body>
+</html>

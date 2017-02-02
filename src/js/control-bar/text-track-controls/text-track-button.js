@@ -26,6 +26,10 @@ class TextTrackButton extends TrackButton {
     options.tracks = player.textTracks();
 
     super(player, options);
+
+    if (!Array.isArray(this.kinds_)) {
+      this.kinds_ = [this.kind_];
+    }
   }
 
   /**
@@ -38,21 +42,36 @@ class TextTrackButton extends TrackButton {
    *         Array of menu items that were created
    */
   createItems(items = []) {
+
+    // Label is an overide for the [track] off label
+    // USed to localise captions/subtitles
+    let label;
+
+    if (this.label_) {
+      label = `${this.label_} off`;
+    }
     // Add an OFF menu item to turn all tracks off
-    items.push(new OffTextTrackMenuItem(this.player_, {kind: this.kind_}));
+    items.push(new OffTextTrackMenuItem(this.player_, {
+      kinds: this.kinds_,
+      kind: this.kind_,
+      label
+    }));
 
     const tracks = this.player_.textTracks();
 
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
 
-      // only add tracks that are of the appropriate kind and have a label
-      if (track.kind === this.kind_) {
-        items.push(new TextTrackMenuItem(this.player_, {
+      // only add tracks that are of an appropriate kind and have a label
+      if (this.kinds_.indexOf(track.kind) > -1) {
+        const item = new TextTrackMenuItem(this.player_, {
           track,
           // MenuItem is selectable
           selectable: true
-        }));
+        });
+
+        item.addClass(`vjs-${track.kind}-menu-item`);
+        items.push(item);
       }
     }
 

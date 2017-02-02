@@ -26,10 +26,20 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     options.track = {
       player,
       kind: options.kind,
-      label: options.kind + ' off',
+      kinds: options.kinds,
       default: false,
       mode: 'disabled'
     };
+
+    if (!options.kinds) {
+      options.kinds = [options.kind];
+    }
+
+    if (options.label) {
+      options.track.label = options.label;
+    } else {
+      options.track.label = options.kinds.join(' and ') + ' off';
+    }
 
     // MenuItem is selectable
     options.selectable = true;
@@ -51,7 +61,7 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     for (let i = 0, l = tracks.length; i < l; i++) {
       const track = tracks[i];
 
-      if (track.kind === this.track.kind && track.mode === 'showing') {
+      if ((this.options_.kinds.indexOf(track.kind) > -1) && track.mode === 'showing') {
         selected = false;
         break;
       }
