@@ -48,7 +48,7 @@ class SeekBar extends Slider {
     return super.createEl('div', {
       className: 'vjs-progress-holder'
     }, {
-      'aria-label': 'progress bar'
+      'aria-label': this.localize('progress bar')
     });
   }
 
