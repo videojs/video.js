@@ -2,7 +2,6 @@
  * @file progress-control.js
  */
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import * as Dom from '../../utils/dom.js';
 import {throttle, bind} from '../../utils/fn.js';
 
@@ -27,7 +26,7 @@ class ProgressControl extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.handleMouseMove = Fn.throttle(Fn.bind(this, this.handleMouseMove), 25);
+    this.handleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
     this.on(this.el_, 'mousemove', this.handleMouseMove);
 
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
@@ -57,6 +56,7 @@ class ProgressControl extends Component {
    */
   handleMouseMove(event) {
     const seekBar = this.getChild('seekBar');
+    const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
     const seekBarEl = seekBar.el();
     const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
     let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
@@ -70,7 +70,9 @@ class ProgressControl extends Component {
       seekBarPoint = 0;
     }
 
-    seekBar.getChild('mouseTimeDisplay').update(seekBarRect, seekBarPoint);
+    if (mouseTimeDisplay) {
+      mouseTimeDisplay.update(seekBarRect, seekBarPoint);
+    }
   }
 
   /**
