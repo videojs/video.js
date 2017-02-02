@@ -354,6 +354,13 @@ class ModalDialog extends Component {
     } else {
       parentEl.appendChild(contentEl);
     }
+
+    // make sure that the close button is last in the dialog DOM
+    const closeButton = this.getChild('closeButton');
+
+    if (closeButton) {
+      parentEl.appendChild(closeButton.el_);
+    }
   }
 
   /**
