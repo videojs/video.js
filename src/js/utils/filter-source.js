@@ -1,23 +1,30 @@
 import {isObject} from './obj';
 
 export const filterSource = function(src) {
+  // traverse array
   if (Array.isArray(src)) {
-    let i = src.length;
+    let newsrc = [];
 
-    while (i--) {
-      src[i] = filterSource(src[i]);
+    src.forEach(function(srcobj) {
+      srcobj = filterSource(srcobj);
 
-      if (!isObject(src[i])) {
-        src.splice(i, 1);
+      if (Array.isArray(srcobj)) {
+        newsrc = newsrc.concat(srcobj);
+      } else if (isObject(srcobj)) {
+        newsrc.push(srcobj);
       }
-    }
-    if (src.length === 0) {
+    });
+
+    if (newsrc.length === 0) {
       src = null;
+    } else {
+      src = newsrc;
     }
   } else if (typeof src === 'string' && src) {
+    // convert string into object
     src = {src};
   } else if (isObject(src) && typeof src.src === 'string' && src.src) {
-    src = src;
+    // do nothing, src is already valid
   } else {
     // invalid source
     src = null;

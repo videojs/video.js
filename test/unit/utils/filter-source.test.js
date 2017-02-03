@@ -9,6 +9,7 @@ QUnit.test('invalid sources', function(assert) {
   assert.equal(filterSource(''), null, 'empty string source is filtered to null');
   assert.equal(filterSource(1), null, 'number source is filtered to null');
   assert.equal(filterSource([]), null, 'empty array source is filtered to null');
+  assert.equal(filterSource([[]]), null, 'empty array source is filtered to null');
   assert.equal(filterSource(new Date()), null, 'Date source is filtered to null');
   assert.equal(filterSource(new RegExp()), null, 'RegExp source is filtered to null');
   assert.equal(filterSource(true), null, 'true boolean source is filtered to null');
@@ -24,18 +25,99 @@ QUnit.test('invalid sources', function(assert) {
 });
 
 QUnit.test('valid sources', function(assert) {
-  assert.deepEqual(filterSource('some-url'), {src: 'some-url'}, 'string source filters to object');
-  assert.deepEqual(filterSource({src: 'some-url'}), {src: 'some-url'}, 'valid source filters to itself');
-  assert.deepEqual(filterSource([{src: 'some-url'}]), [{src: 'some-url'}], 'valid source filters to itself');
-  assert.deepEqual(filterSource([{src: 'some-url'}, {src: 'some-url2'}]), [{src: 'some-url'}, {src: 'some-url2'}], 'valid source filters to itself');
-  assert.deepEqual(filterSource(['some-url', {src: 'some-url2'}]), [{src: 'some-url'}, {src: 'some-url2'}], 'mixed array filters to object array');
-  assert.deepEqual(filterSource(['some-url', undefined, {src: 'some-url2'}]), [{src: 'some-url'}, {src: 'some-url2'}], 'mostly-valid array filters to valid object array');
+  assert.deepEqual(
+    filterSource('some-url'),
+    {src: 'some-url'},
+    'string source filters to object'
+  );
+  assert.deepEqual(
+    filterSource({src: 'some-url'}),
+    {src: 'some-url'},
+    'valid source filters to itself'
+  );
+  assert.deepEqual(
+    filterSource([{src: 'some-url'}]),
+    [{src: 'some-url'}],
+    'valid source filters to itself'
+  );
+  assert.deepEqual(
+    filterSource([{src: 'some-url'}, {src: 'some-url2'}]),
+    [{src: 'some-url'}, {src: 'some-url2'}],
+    'valid source filters to itself'
+  );
+  assert.deepEqual(
+    filterSource(['some-url', {src: 'some-url2'}]),
+    [{src: 'some-url'}, {src: 'some-url2'}],
+    'mixed array filters to object array'
+  );
+  assert.deepEqual(
+    filterSource(['some-url', undefined, {src: 'some-url2'}]),
+    [{src: 'some-url'}, {src: 'some-url2'}],
+    'mostly-valid array filters to valid object array'
+  );
+  assert.deepEqual(
+    filterSource([[{src: 'some-url'}]]),
+    [{src: 'some-url'}],
+    'nested array filters to flattened array itself'
+  );
+
+  assert.deepEqual(
+    filterSource([[[{src: 'some-url'}]]]),
+    [{src: 'some-url'}],
+    'double nested array filters to flattened array'
+  );
+
+  assert.deepEqual(
+    filterSource([{src: 'some-url2'}, [{src: 'some-url'}], undefined]),
+    [{src: 'some-url2'}, {src: 'some-url'}],
+    'nested array filters to flattened array'
+  );
+
+  assert.deepEqual(
+    filterSource([[{src: 'some-url2'}], [[[{src: 'some-url'}]]], [undefined]]),
+    [{src: 'some-url2'}, {src: 'some-url'}],
+    'nested array filters to flattened array in correct order'
+  );
+});
+
+QUnit.test('Order is maintained', function(assert) {
+  assert.deepEqual(
+    filterSource([{src: 'one'}, {src: 'two'}, {src: 'three'}, undefined]),
+    [{src: 'one'}, {src: 'two'}, {src: 'three'}],
+    'source order is maintained for array'
+  );
+
+  assert.deepEqual(
+    filterSource([{src: 'one'}, {src: 'two'}, {src: 'three'}, undefined]),
+    [{src: 'one'}, {src: 'two'}, {src: 'three'}],
+    'source order is maintained for array'
+  );
+
+  assert.deepEqual(
+    filterSource([null, [{src: 'one'}], [[[{src: 'two'}]]], {src: 'three'}, undefined]),
+    [{src: 'one'}, {src: 'two'}, {src: 'three'}],
+    'source order is maintained for mixed nested arrays'
+  );
+
 });
 
 QUnit.test('Dont filter extra object properties', function(assert) {
   assert.deepEqual(
     filterSource({src: 'some-url', type: 'some-type'}),
     {src: 'some-url', type: 'some-type'},
-    'string source filters to object'
+    'type key is maintained'
   );
+
+  assert.deepEqual(
+    filterSource({src: 'some-url', type: 'some-type', foo: 'bar'}),
+    {src: 'some-url', type: 'some-type', foo: 'bar'},
+    'foo and bar keys are maintained'
+  );
+
+  assert.deepEqual(
+    filterSource([{src: 'some-url', type: 'some-type', foo: 'bar'}]),
+    [{src: 'some-url', type: 'some-type', foo: 'bar'}],
+    'foo and bar keys are not removed'
+  );
+
 });
