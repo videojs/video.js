@@ -1,5 +1,16 @@
 import {isObject} from './obj';
 
+/**
+ * Filter out single bad source objects or multiple source objects in an
+ * array. Also flattens nested source object arrays into a 1 dimensional
+ * array of source objects.
+ *
+ * @param {Tech~SourceObject|Tech~SourceObject[]} src
+ *        The src object to filter
+ *
+ * @return {Tech~SourceObject[]}
+ *         An array of sourceobjects containing only valid sources
+ */
 export const filterSource = function(src) {
   // traverse array
   if (Array.isArray(src)) {
@@ -15,19 +26,16 @@ export const filterSource = function(src) {
       }
     });
 
-    if (newsrc.length === 0) {
-      src = null;
-    } else {
-      src = newsrc;
-    }
+    src = newsrc;
   } else if (typeof src === 'string' && src) {
     // convert string into object
-    src = {src};
+    src = [{src}];
   } else if (isObject(src) && typeof src.src === 'string' && src.src) {
-    // do nothing, src is already valid
+    // src is already valid
+    src = [src];
   } else {
-    // invalid source
-    src = null;
+    // invalid source, turn it into an empty array
+    src = [];
   }
 
   return src;

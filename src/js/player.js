@@ -2221,24 +2221,18 @@ class Player extends Component {
   src(source) {
     let src = source;
 
-    // remove invalid values from here and turn the source into an object
+    // filter out invalid sources and turn our source into
+    // an array of source objects
     src = filterSource(src);
 
-    // if they pass a zero length array, or
-    // an undefined value, return the current source.
-    // aka make this function work as a getter
-    if ((Array.isArray(src) && !src.length) || !src) {
+    if (!src.length) {
       return this.cache_.src;
     }
 
-    this.changingSrc_ = true;
+    this.cache_.sources = src;
+    src = src[0];
 
-    if (Array.isArray(src)) {
-      this.cache_.sources = src;
-      src = src[0];
-    } else {
-      this.cache_.sources = [src];
-    }
+    this.changingSrc_ = true;
 
     this.cache_.source = src;
     this.currentType_ = src.type;
@@ -2249,8 +2243,6 @@ class Player extends Component {
       const err = this.src_(src_);
 
       if (err) {
-        // if there was an error with this src
-        // try another
         if (Array.isArray(source) && source.length > 1) {
           return this.src(source.slice(1));
         }
