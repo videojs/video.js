@@ -59,7 +59,7 @@ class MenuItem extends ClickableComponent {
 
     return super.createEl('li', assign({
       className: 'vjs-menu-item',
-      innerHTML: this.localize(this.options_.label),
+      innerHTML: `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}</span>`,
       tabIndex: -1
     }, props), attrs);
   }
