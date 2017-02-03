@@ -16,19 +16,6 @@ import './time-tooltip';
 class PlayProgressBar extends Component {
 
   /**
-   * Creates an instance of this class.
-   *
-   * @param {Player} player
-   *        The {@link Player} that this class should be attached to.
-   *
-   * @param {Object} [options]
-   *        The key/value store of player options.
-   */
-  constructor(player, options) {
-    super(player, options);
-  }
-
-  /**
    * Create the the DOM element for this class.
    *
    * @return {Element}

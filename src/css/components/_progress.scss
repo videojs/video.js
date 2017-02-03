@@ -92,9 +92,7 @@
 
 // .vjs-time-tooltip
 //
-// These elements are displayed above the progress bar. They are not components
-// themselves, but they are managed by the MouseTimeDisplay and PlayProgressBar
-// components individually.
+// These elements are displayed above the progress bar.
 //
 // By default, they are hidden and only shown when hovering over the progress
 // control.
@@ -102,7 +100,6 @@
   @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
   color: #000;
-  display: inline-block;
 
   // By floating the tooltips to the right, their right edge becomes aligned
   // with the right edge of their parent element. However, in order to have them
@@ -123,7 +120,13 @@
   z-index: 1;
 }
 
-.video-js .vjs-progress-control:hover .vjs-time-tooltip {
+.video-js .vjs-progress-holder:focus .vjs-time-tooltip {
+  display: none;
+}
+
+.video-js .vjs-progress-control:hover .vjs-time-tooltip,
+.video-js .vjs-progress-control:hover .vjs-progress-holder:focus .vjs-time-tooltip {
+  display: block;
 
   // Ensure that we maintain a font-size of ~10px.
   font-size: 0.6em;
