@@ -2227,25 +2227,31 @@ class Player extends Component {
 
     // no valid sources, return the current source
     if (!src.length) {
+      // if a source was passed in then it is invalid because
+      // it was filtered to a zero length Array. So we have to
+      // show an error
+      if (typeof source !== 'undefined') {
+        this.setTimeout(function() {
+          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+        }, 0);
+        return;
+      }
       return this.cache_.src;
     }
 
     this.cache_.sources = src;
-    src = src[0];
 
     this.changingSrc_ = true;
+    this.cache_.source = src[0];
 
-    this.cache_.source = src;
-    this.currentType_ = src.type;
-
-    middleware.setSource(this, src, (src_, mws) => {
+    middleware.setSource(this, src[0], (src_, mws) => {
       this.middleware_ = mws;
 
       const err = this.src_(src_);
 
       if (err) {
-        if (Array.isArray(source) && source.length > 1) {
-          return this.src(source.slice(1));
+        if (src.length > 1) {
+          return this.src(src.slice(1));
         }
 
         // We need to wrap this in a timeout to give folks a chance to add error event handlers
@@ -2261,7 +2267,9 @@ class Player extends Component {
       }
 
       this.changingSrc_ = false;
-      this.cache_.src = src_.src;
+      this.cache_.source = src[0];
+      this.cache_.src = src_;
+
       middleware.setTech(mws, this.tech_);
     });
   }
@@ -2349,14 +2357,7 @@ class Player extends Component {
    *         The current source object
    */
   currentSource() {
-    const source = {};
-    const src = this.currentSrc();
-
-    if (src) {
-      source.src = src;
-    }
-
-    return this.cache_.source || source;
+    return this.cache_.source || {};
   }
 
   /**
@@ -2367,7 +2368,7 @@ class Player extends Component {
    *         The current source
    */
   currentSrc() {
-    return this.cache_.source && this.cache_.source.src || '';
+    return this.currentSource() && this.currentSource().src || '';
   }
 
   /**
@@ -2379,7 +2380,7 @@ class Player extends Component {
    *         The source MIME type
    */
   currentType() {
-    return this.currentType_ || '';
+    return this.currentSource() && this.currentSource().type || '';
   }
 
   /**

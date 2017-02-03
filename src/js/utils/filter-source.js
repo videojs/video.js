@@ -32,10 +32,10 @@ const filterSource = function(src) {
     });
 
     src = newsrc;
-  } else if (typeof src === 'string' && src) {
+  } else if (typeof src === 'string' && src.trim()) {
     // convert string into object
     src = [{src}];
-  } else if (isObject(src) && typeof src.src === 'string' && src.src) {
+  } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
     // src is already valid
     src = [src];
   } else {
