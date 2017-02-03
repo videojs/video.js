@@ -848,6 +848,7 @@ Html5.Events = [
   'play',
   'pause',
   'ratechange',
+  'resize',
   'volumechange'
 ];
 
