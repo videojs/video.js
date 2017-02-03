@@ -2,10 +2,8 @@
  * @file mouse-time-display.js
  */
 import Component from '../../component.js';
-// import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-// import computedStyle from '../../utils/computed-style.js';
 
 import './time-tooltip';
 
@@ -34,7 +32,7 @@ class MouseTimeDisplay extends Component {
   }
 
   /**
-   * Create the the DOM element for this class.
+   * Create the DOM element for this class.
    *
    * @return {Element}
    *         The element that was created.
