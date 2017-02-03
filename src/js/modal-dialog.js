@@ -425,6 +425,8 @@ class ModalDialog extends Component {
       this.previouslyActiveEl_ = activeEl;
 
       this.focus();
+
+      this.on(document, 'keydown', this.handleKeyDown);
     }
   }
 
@@ -437,7 +439,63 @@ class ModalDialog extends Component {
     if (this.previouslyActiveEl_) {
       this.previouslyActiveEl_.focus();
       this.previouslyActiveEl_ = null;
+
+      this.off(document, 'keydown', this.handleKeyDown);
     }
+  }
+
+  /**
+   * Keydown handler. Attached when modal is focused.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    // exit early if it isn't a tab key
+    if (event.which !== 9) {
+      return;
+    }
+
+    const focusableEls = this.focusableEls_();
+    const activeEl = this.el_.querySelector(':focus');
+    let focusIndex;
+
+    for(let i = 0; i < focusableEls.length; i++) {
+      if (activeEl === focusableEls[i]) {
+        focusIndex = i;
+        break;
+      }
+    }
+
+    if (event.shiftKey && focusIndex === 0) {
+      focusableEls[focusableEls.length - 1].focus();
+      event.preventDefault();
+    } else if (focusIndex === focusableEls.length - 1) {
+      focusableEls[0].focus();
+      event.preventDefault();
+    }
+  }
+
+  /**
+   * get all focusable elements
+   *
+   * @private
+   */
+  focusableEls_() {
+    const allChildren = this.el_.querySelectorAll('*');
+
+    return Array.prototype.filter.call(allChildren, (child) => {
+      return ((child instanceof HTMLAnchorElement ||
+               child instanceof HTMLAreaElement) && child.hasAttribute('href')) ||
+             ((child instanceof HTMLInputElement ||
+               child instanceof HTMLSelectElement ||
+               child instanceof HTMLTextAreaElement ||
+               child instanceof HTMLButtonElement) && !child.hasAttribute('disabled')) ||
+             (child instanceof HTMLIFrameElement ||
+               child instanceof HTMLObjectElement ||
+               child instanceof HTMLEmbedElement) ||
+             (child.hasAttribute('tabindex') && child.getAttribute('tabindex') !== -1) ||
+             (child.hasAttribute('contenteditable'))
+    });
   }
 }
 
