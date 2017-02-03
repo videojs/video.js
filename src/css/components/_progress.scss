@@ -25,6 +25,15 @@
   height: 0.3em;
 }
 
+.video-js .vjs-progress-control .vjs-progress-holder {
+
+  // This is one of the rare cases where we are using a pixel dimension. The
+  // reason is that the progress holder font-size changes on hover. With the
+  // default em-based margins, this means it gets narrower and causes issues
+  // with mouseover behaviors/math.
+  margin: 0 10px;
+}
+
 // This increases the size of the progress holder so there is an increased
 // hit area for clicks/touches.
 .video-js .vjs-progress-control:hover .vjs-progress-holder {
