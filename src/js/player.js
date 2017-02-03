@@ -481,6 +481,9 @@ class Player extends Component {
       el = this.el_ = super.createEl('div');
     }
 
+    // set tabindex to -1 so we could focus on the player element
+    tag.setAttribute('tabindex', '-1');
+
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
     tag.removeAttribute('height');
