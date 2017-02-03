@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import {filterSource} from '../../../src/js/utils/filter-source';
+import filterSource from '../../../src/js/utils/filter-source';
 
 QUnit.module('utils/filter-source');
 

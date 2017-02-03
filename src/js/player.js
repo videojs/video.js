@@ -28,7 +28,7 @@ import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
-import {filterSource} from './utils/filter-source';
+import filterSource from './utils/filter-source';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -2215,7 +2215,7 @@ class Player extends Component {
    * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
    *        One SourceObject or an array of SourceObjects
    *
-   * @return {String}
+   * @return {string}
    *         The current video source when getting
    */
   src(source) {
@@ -2225,6 +2225,7 @@ class Player extends Component {
     // an array of source objects
     src = filterSource(src);
 
+    // no valid sources, return the current source
     if (!src.length) {
       return this.cache_.src;
     }

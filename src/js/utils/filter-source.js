@@ -1,3 +1,6 @@
+/**
+ * @module filter-source
+ */
 import {isObject} from './obj';
 
 /**
@@ -10,8 +13,10 @@ import {isObject} from './obj';
  *
  * @return {Tech~SourceObject[]}
  *         An array of sourceobjects containing only valid sources
+ *
+ * @private
  */
-export const filterSource = function(src) {
+const filterSource = function(src) {
   // traverse array
   if (Array.isArray(src)) {
     let newsrc = [];
@@ -40,3 +45,5 @@ export const filterSource = function(src) {
 
   return src;
 };
+
+export default filterSource;
