@@ -4,6 +4,7 @@
 import * as Dom from './utils/dom';
 import * as Fn from './utils/fn';
 import Component from './component';
+import window from 'global/window';
 import document from 'global/document';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
@@ -459,7 +460,7 @@ class ModalDialog extends Component {
     const activeEl = this.el_.querySelector(':focus');
     let focusIndex;
 
-    for(let i = 0; i < focusableEls.length; i++) {
+    for (let i = 0; i < focusableEls.length; i++) {
       if (activeEl === focusableEls[i]) {
         focusIndex = i;
         break;
@@ -484,17 +485,17 @@ class ModalDialog extends Component {
     const allChildren = this.el_.querySelectorAll('*');
 
     return Array.prototype.filter.call(allChildren, (child) => {
-      return ((child instanceof HTMLAnchorElement ||
-               child instanceof HTMLAreaElement) && child.hasAttribute('href')) ||
-             ((child instanceof HTMLInputElement ||
-               child instanceof HTMLSelectElement ||
-               child instanceof HTMLTextAreaElement ||
-               child instanceof HTMLButtonElement) && !child.hasAttribute('disabled')) ||
-             (child instanceof HTMLIFrameElement ||
-               child instanceof HTMLObjectElement ||
-               child instanceof HTMLEmbedElement) ||
+      return ((child instanceof window.HTMLAnchorElement ||
+               child instanceof window.HTMLAreaElement) && child.hasAttribute('href')) ||
+             ((child instanceof window.HTMLInputElement ||
+               child instanceof window.HTMLSelectElement ||
+               child instanceof window.HTMLTextAreaElement ||
+               child instanceof window.HTMLButtonElement) && !child.hasAttribute('disabled')) ||
+             (child instanceof window.HTMLIFrameElement ||
+               child instanceof window.HTMLObjectElement ||
+               child instanceof window.HTMLEmbedElement) ||
              (child.hasAttribute('tabindex') && child.getAttribute('tabindex') !== -1) ||
-             (child.hasAttribute('contenteditable'))
+             (child.hasAttribute('contenteditable'));
     });
   }
 }
