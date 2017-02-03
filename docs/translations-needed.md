@@ -351,7 +351,6 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
 |                         | Close                                                                               |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
