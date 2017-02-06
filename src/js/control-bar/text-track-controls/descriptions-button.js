@@ -26,7 +26,6 @@ class DescriptionsButton extends TextTrackButton {
    */
   constructor(player, options, ready) {
     super(player, options, ready);
-    this.el_.setAttribute('aria-label', 'Descriptions Menu');
 
     const tracks = player.textTracks();
     const changeHandler = Fn.bind(this, this.handleTracksChange);

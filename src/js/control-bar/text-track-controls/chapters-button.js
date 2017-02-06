@@ -29,7 +29,6 @@ class ChaptersButton extends TextTrackButton {
    */
   constructor(player, options, ready) {
     super(player, options, ready);
-    this.el_.setAttribute('aria-label', 'Chapters Menu');
   }
 
   /**
