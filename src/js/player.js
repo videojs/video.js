@@ -2266,7 +2266,7 @@ class Player extends Component {
       }
 
       this.changingSrc_ = false;
-      this.cache_.source = src[0];
+      this.cache_.source = src_.src;
       this.cache_.src = src_;
 
       middleware.setTech(mws, this.tech_);
