@@ -46,9 +46,9 @@ class Menu extends Component {
   addItem(component) {
     this.addChild(component);
     component.on('click', Fn.bind(this, function(event) {
-      this.unlockShowing();
-      // Move focus back to the associated MenuButton
-      if (this.menuButton_ && this.menuButton_.focus) {
+      // Unpress the associated MenuButton, and move focus back to it
+      if (this.menuButton_) {
+        this.menuButton_.unpressButton();
         this.menuButton_.focus();
       }
     }));

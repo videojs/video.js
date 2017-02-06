@@ -89,7 +89,7 @@ class MenuButton extends Component {
    *         The constructed menu
    */
   createMenu() {
-    const menu = new Menu(this.player_, { menuButton: this.menuButton_ });
+    const menu = new Menu(this.player_, { menuButton: this });
 
     // Add a title list item to the top
     if (this.options_.title) {
@@ -201,6 +201,20 @@ class MenuButton extends Component {
     } else {
       this.pressButton();
     }
+  }
+
+  /**
+   * Set the focus to the actual button, not to this element
+   */
+  focus() {
+    this.menuButton_.focus();
+  }
+
+  /**
+   * Remove the focus from the actual button, not this element
+   */
+  blur() {
+    this.menuButton_.blur();
   }
 
   /**
