@@ -2219,28 +2219,27 @@ class Player extends Component {
    *         The current video source when getting
    */
   src(source) {
+    // getter usage
+    if (typeof source !== 'undefined') {
+      return this.cache_.src;
+    }
     let src = source;
 
     // filter out invalid sources and turn our source into
     // an array of source objects
     src = filterSource(src);
 
-    // no valid sources, return the current source
+    // if a source was passed in then it is invalid because
+    // it was filtered to a zero length Array. So we have to
+    // show an error
     if (!src.length) {
-      // if a source was passed in then it is invalid because
-      // it was filtered to a zero length Array. So we have to
-      // show an error
-      if (typeof source !== 'undefined') {
-        this.setTimeout(function() {
-          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-        }, 0);
-        return;
-      }
-      return this.cache_.src;
+      this.setTimeout(function() {
+        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+      }, 0);
+      return;
     }
 
     this.cache_.sources = src;
-
     this.changingSrc_ = true;
     this.cache_.source = src[0];
 
