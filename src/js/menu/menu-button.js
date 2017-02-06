@@ -13,7 +13,7 @@ import document from 'global/document';
 /**
  * A `MenuButton` class for any popup {@link Menu}.
  *
- * @extends ClickableComponent
+ * @extends Component
  */
 class MenuButton extends Component {
 
@@ -45,10 +45,10 @@ class MenuButton extends Component {
 
     this.enabled_ = true;
 
-    this.menuButton_.on('tap', Fn.bind(this, this.handleClick));
-    this.menuButton_.on('click', Fn.bind(this, this.handleClick));
-    this.menuButton_.on('focus', Fn.bind(this, this.handleFocus));
-    this.menuButton_.on('blur', Fn.bind(this, this.handleBlur));
+    this.on(this.menuButton_, 'tap', this.handleClick);
+    this.on(this.menuButton_, 'click', this.handleClick);
+    this.on(this.menuButton_, 'focus', this.handleFocus);
+    this.on(this.menuButton_, 'blur', this.handleBlur);
 
     this.on('keydown', this.handleSubmenuKeyPress);
   }
@@ -218,18 +218,27 @@ class MenuButton extends Component {
   }
 
   /**
-   * Handle Focus - Add keyboard functionality to element
+   * This gets called when a `MenuButton` gains focus via a `focus` event.
+   * Turns on listening for `keydown` events. When they happen it
+   * calls `this.handleKeyPress`.
    *
-   * @method handleFocus
+   * @param {EventTarget~Event} event
+   *        The `focus` event that caused this function to be called.
+   *
+   * @listens focus
    */
   handleFocus() {
     Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }
 
   /**
-   * Handle Blur - Remove keyboard triggers
+   * Called when a `MenuButton` loses focus. Turns off the listener for
+   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
    *
-   * @method handleBlur
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
    */
   handleBlur() {
     Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
@@ -319,10 +328,7 @@ class MenuButton extends Component {
    * Disable the `MenuButton`. Don't allow it to be clicked.
    */
   disable() {
-    // Unpress, but don't force focus on this button
-    this.buttonPressed_ = false;
-    this.menu.unlockShowing();
-    this.menuButton_.el_.setAttribute('aria-expanded', 'false');
+    this.unpressButton();
 
     this.enabled_ = false;
     this.addClass('vjs-disabled');
