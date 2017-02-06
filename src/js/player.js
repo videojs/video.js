@@ -28,6 +28,7 @@ import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
+import filterSource from './utils/filter-source';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -2237,37 +2238,40 @@ class Player extends Component {
    *         The current video source when getting
    */
   src(source) {
-    if (source === undefined) {
+    // getter usage
+    if (typeof source === 'undefined') {
       return this.cache_.src;
     }
+    // filter out invalid sources and turn our source into
+    // an array of source objects
+    const sources = filterSource(source);
 
-    this.changingSrc_ = true;
-
-    let src = source;
-
-    if (Array.isArray(source)) {
-      this.cache_.sources = source;
-      src = source[0];
-    } else if (typeof source === 'string') {
-      src = {
-        src: source
-      };
-
-      this.cache_.sources = [src];
+    // if a source was passed in then it is invalid because
+    // it was filtered to a zero length Array. So we have to
+    // show an error
+    if (!sources.length) {
+      this.setTimeout(function() {
+        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+      }, 0);
+      return;
     }
 
-    this.cache_.source = src;
+    // intial sources
+    this.cache_.sources = sources;
+    this.changingSrc_ = true;
 
-    this.currentType_ = src.type;
+    // intial source
+    this.cache_.source = sources[0];
 
-    middleware.setSource(this, src, (src_, mws) => {
+    // middlewareSource is the source after it has been changed by middleware
+    middleware.setSource(this, sources[0], (middlewareSource, mws) => {
       this.middleware_ = mws;
 
-      const err = this.src_(src_);
+      const err = this.src_(middlewareSource);
 
       if (err) {
-        if (Array.isArray(source) && source.length > 1) {
-          return this.src(source.slice(1));
+        if (sources.length > 1) {
+          return this.src(sources.slice(1));
         }
 
         // We need to wrap this in a timeout to give folks a chance to add error event handlers
@@ -2283,11 +2287,26 @@ class Player extends Component {
       }
 
       this.changingSrc_ = false;
-      this.cache_.src = src_.src;
+      // video element listed source
+      this.cache_.src = middlewareSource.src;
+
       middleware.setTech(mws, this.tech_);
     });
   }
 
+  /**
+   * Set the source object on the tech, returns a boolean that indicates wether
+   * there is a tech that can play the source or not
+   *
+   * @param {Tech~SourceObject} source
+   *        The source object to set on the Tech
+   *
+   * @return {Boolean}
+   *         - True if there is no Tech to playback this source
+   *         - False otherwise
+   *
+   * @private
+   */
   src_(source) {
     const sourceTech = this.selectSource([source]);
 
@@ -2331,39 +2350,6 @@ class Player extends Component {
   }
 
   /**
-   * Handle an array of source objects
-   *
-   * @param  {Tech~SourceObject[]} sources
-   *         Array of source objects
-   *
-   * @private
-   */
-  sourceList_(sources) {
-    const sourceTech = this.selectSource(sources);
-
-    if (sourceTech) {
-      if (sourceTech.tech === this.techName_) {
-        // if this technology is already loaded, set the source
-        this.src(sourceTech.source);
-      } else {
-        // load this technology with the chosen source
-        this.loadTech_(sourceTech.tech, sourceTech.source);
-      }
-
-      this.cache_.sources = sources;
-    } else {
-      // We need to wrap this in a timeout to give folks a chance to add error event handlers
-      this.setTimeout(function() {
-        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-      }, 0);
-
-      // we could not find an appropriate tech, but let's still notify the delegate that this is it
-      // this needs a better comment about why this is needed
-      this.triggerReady();
-    }
-  }
-
-  /**
    * Begin loading the src data.
    */
   load() {
@@ -2404,14 +2390,7 @@ class Player extends Component {
    *         The current source object
    */
   currentSource() {
-    const source = {};
-    const src = this.currentSrc();
-
-    if (src) {
-      source.src = src;
-    }
-
-    return this.cache_.source || source;
+    return this.cache_.source || {};
   }
 
   /**
@@ -2422,7 +2401,7 @@ class Player extends Component {
    *         The current source
    */
   currentSrc() {
-    return this.cache_.source && this.cache_.source.src || '';
+    return this.currentSource() && this.currentSource().src || '';
   }
 
   /**
@@ -2434,7 +2413,7 @@ class Player extends Component {
    *         The source MIME type
    */
   currentType() {
-    return this.currentType_ || '';
+    return this.currentSource() && this.currentSource().type || '';
   }
 
   /**
