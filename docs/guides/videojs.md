@@ -43,9 +43,9 @@ var VjsButton = videojs.getComponent('Button');
 // Subclass the component (see 'extend' doc for more info)
 var MySpecialButton = videojs.extend(VjsButton, {});
 // Register the new component
-VjsButton.registerComponent('MySepcialButton', MySepcialButton);
+videojs.registerComponent('MySpecialButton', MySpecialButton);
 // (optionally) add the new component as a default player child
-myPlayer.addChild('MySepcialButton');
+myPlayer.addChild('MySpecialButton');
 ```
 
 ## `getTech()`
@@ -63,7 +63,7 @@ var html5 = new Html5(options);
 var Html5 = videojs.getTech('Html5');
 var MyTech = videojs.extend(Html5, {});
 // Register the new Tech
-VjsButton.registerTech('Tech', MyTech);
+videojs.registerTech('MyTech', MyTech);
 var player = videojs('myplayer', {
   techOrder: ['myTech', 'html5']
 });
