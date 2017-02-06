@@ -43,7 +43,7 @@ var VjsButton = videojs.getComponent('Button');
 // Subclass the component (see 'extend' doc for more info)
 var MySpecialButton = videojs.extend(VjsButton, {});
 // Register the new component
-VjsButton.registerComponent('MySpecialButton', MySpecialButton);
+videojs.registerComponent('MySpecialButton', MySpecialButton);
 // (optionally) add the new component as a default player child
 myPlayer.addChild('MySpecialButton');
 ```
