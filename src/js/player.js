@@ -2220,7 +2220,7 @@ class Player extends Component {
    */
   src(source) {
     // getter usage
-    if (typeof source !== 'undefined') {
+    if (typeof source === 'undefined') {
       return this.cache_.src;
     }
     let src = source;
