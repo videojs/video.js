@@ -45,7 +45,7 @@ QUnit.test('clicking should display the menu', function(assert) {
   const menuButton = new MenuButton(player, {
     title: 'testTitle'
   });
-  const el = menuButton.el();
+  const el = menuButton.menuButton_.el();
 
   assert.ok(menuButton.menu !== undefined, 'menu is created');
 
