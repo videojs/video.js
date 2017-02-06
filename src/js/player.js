@@ -2223,34 +2223,36 @@ class Player extends Component {
     if (typeof source === 'undefined') {
       return this.cache_.src;
     }
-    let src = source;
-
     // filter out invalid sources and turn our source into
     // an array of source objects
-    src = filterSource(src);
+    const sources = filterSource(source);
 
     // if a source was passed in then it is invalid because
     // it was filtered to a zero length Array. So we have to
     // show an error
-    if (!src.length) {
+    if (!sources.length) {
       this.setTimeout(function() {
         this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
       }, 0);
       return;
     }
 
-    this.cache_.sources = src;
+    // intial sources
+    this.cache_.sources = sources;
     this.changingSrc_ = true;
-    this.cache_.source = src[0];
 
-    middleware.setSource(this, src[0], (src_, mws) => {
+    // intial source
+    this.cache_.source = sources[0];
+
+    // middlewareSource is the source after it has been changed by middleware
+    middleware.setSource(this, sources[0], (middlewareSource, mws) => {
       this.middleware_ = mws;
 
-      const err = this.src_(src_);
+      const err = this.src_(middlewareSource);
 
       if (err) {
-        if (src.length > 1) {
-          return this.src(src.slice(1));
+        if (sources.length > 1) {
+          return this.src(sources.slice(1));
         }
 
         // We need to wrap this in a timeout to give folks a chance to add error event handlers
@@ -2266,8 +2268,8 @@ class Player extends Component {
       }
 
       this.changingSrc_ = false;
-      this.cache_.source = src_.src;
-      this.cache_.src = src_;
+      // video element listed source
+      this.cache_.src = middlewareSource.src;
 
       middleware.setTech(mws, this.tech_);
     });
