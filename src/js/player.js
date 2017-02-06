@@ -2273,6 +2273,19 @@ class Player extends Component {
     });
   }
 
+  /**
+   * Set the source object on the tech, returns a boolean that indicates wether
+   * there is a tech that can play the source or not
+   *
+   * @param {Tech~SourceObject} source
+   *        The source object to set on the Tech
+   *
+   * @return {Boolean}
+   *         - True if there is no Tech to playback this source
+   *         - False otherwise
+   *
+   * @private
+   */
   src_(source) {
     const sourceTech = this.selectSource([source]);
 
