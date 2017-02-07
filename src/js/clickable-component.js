@@ -121,7 +121,11 @@ class ClickableComponent extends Component {
 
     this.controlText_ = text;
     this.controlTextEl_.innerHTML = localizedText;
-    el.setAttribute('title', localizedText);
+
+    if (!this.nonIconControl) {
+      // Set title attribute if only an icon is shown
+      el.setAttribute('title', localizedText);
+    }
 
     return this;
   }
