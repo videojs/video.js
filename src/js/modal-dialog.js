@@ -470,7 +470,7 @@ class ModalDialog extends Component {
     if (event.shiftKey && focusIndex === 0) {
       focusableEls[focusableEls.length - 1].focus();
       event.preventDefault();
-    } else if (focusIndex === focusableEls.length - 1) {
+    } else if (!event.shiftKey && focusIndex === focusableEls.length - 1) {
       focusableEls[0].focus();
       event.preventDefault();
     }
