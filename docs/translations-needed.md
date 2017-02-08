@@ -9,18 +9,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 <!-- START langtable -->
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 51)    | audio player                                                                        |
-|                         | video player                                                                        |
+| ar.json (missing 46)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Close Modal Dialog                                                                  |
 |                         | , opens descriptions settings dialog                                                |
@@ -60,18 +55,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ba.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| ba.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -119,18 +109,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| bg.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| bg.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -178,18 +163,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ca.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| ca.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -237,18 +217,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| cs.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| cs.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -296,18 +271,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| da.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| da.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -355,23 +325,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| de.json (missing 8)     | audio player                                                                        |
-|                         | video player                                                                        |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
-| el.json (missing 45)    | audio player                                                                        |
-|                         | video player                                                                        |
+| de.json (missing 3)     | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+| el.json (missing 40)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -408,18 +368,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| es.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| es.json (missing 53)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Close                                                                               |
 |                         | Close Modal Dialog                                                                  |
@@ -466,18 +421,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| fa.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| fa.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -525,18 +475,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| fi.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| fi.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -584,14 +529,9 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| fr.json (missing 44)    | audio player                                                                        |
-|                         | video player                                                                        |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+| fr.json (missing 39)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -628,18 +568,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| hr.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| hr.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -687,18 +622,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| hu.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| hu.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -746,18 +676,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| it.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| it.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -805,18 +730,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ja.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| ja.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -864,18 +784,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ko.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| ko.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -923,18 +838,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| nb.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| nb.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -982,16 +892,11 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| nl.json (missing 48)    | audio player                                                                        |
-|                         | video player                                                                        |
+| nl.json (missing 43)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
+|                         | Progress Bar                                                                        |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Close Modal Dialog                                                                  |
 |                         | captions settings                                                                   |
@@ -1030,18 +935,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| nn.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| nn.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -1089,18 +989,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| pl.json (missing 52)    | audio player                                                                        |
-|                         | video player                                                                        |
+| pl.json (missing 47)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close Modal Dialog                                                                  |
@@ -1141,18 +1036,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| pt-BR.json (missing 59) | audio player                                                                        |
-|                         | video player                                                                        |
+| pt-BR.json (missing 54) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -1200,14 +1090,9 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| pt-PT.json (missing 44) | audio player                                                                        |
-|                         | video player                                                                        |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+| pt-PT.json (missing 39) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -1244,15 +1129,10 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ru.json (missing 45)    | audio player                                                                        |
-|                         | video player                                                                        |
+| ru.json (missing 40)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -1289,18 +1169,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| sr.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| sr.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -1348,18 +1223,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| sv.json (missing 59)    | audio player                                                                        |
-|                         | video player                                                                        |
+| sv.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
@@ -1407,23 +1277,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| tr.json (missing 8)     | audio player                                                                        |
-|                         | video player                                                                        |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
-| uk.json (missing 45)    | audio player                                                                        |
-|                         | video player                                                                        |
+| tr.json (missing 3)     | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+| uk.json (missing 40)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -1460,14 +1320,9 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| vi.json (missing 44)    | audio player                                                                        |
-|                         | video player                                                                        |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+| vi.json (missing 39)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -1504,18 +1359,13 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| zh-CN.json (missing 58) | audio player                                                                        |
-|                         | video player                                                                        |
+| zh-CN.json (missing 53) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
-|                         | Descriptions Menu                                                                   |
 |                         | Audio Track                                                                         |
-|                         | Audio Menu                                                                          |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
 |                         | Close Modal Dialog                                                                  |
@@ -1562,15 +1412,10 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| zh-TW.json (missing 45) | audio player                                                                        |
-|                         | video player                                                                        |
+| zh-TW.json (missing 40) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | progress bar                                                                        |
-|                         | Subtitles Menu                                                                      |
-|                         | Captions Menu                                                                       |
-|                         | Chapters Menu                                                                       |
-|                         | Descriptions Menu                                                                   |
-|                         | Audio Menu                                                                          |
+|                         | Progress Bar                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
