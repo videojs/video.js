@@ -412,9 +412,9 @@ class Player extends Component {
     // Set ARIA label and region role depending on player type
     this.el_.setAttribute('role', 'region');
     if (this.isAudio()) {
-      this.el_.setAttribute('aria-label', 'audio player');
+      this.el_.setAttribute('aria-label', this.localize('Audio Player'));
     } else {
-      this.el_.setAttribute('aria-label', 'video player');
+      this.el_.setAttribute('aria-label', this.localize('Video Player'));
     }
 
     if (this.isAudio()) {

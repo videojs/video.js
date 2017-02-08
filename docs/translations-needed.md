@@ -9,12 +9,16 @@ If you add or update a translation run `grunt check-translations` to update the 
 <!-- START langtable -->
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 43)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| ar.json (missing 47)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Close Modal Dialog                                                                  |
 |                         | , opens descriptions settings dialog                                                |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
@@ -52,14 +56,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ba.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| ba.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -103,14 +111,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| bg.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| bg.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -154,14 +166,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ca.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| ca.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -205,14 +221,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| cs.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| cs.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -256,14 +276,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| da.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| da.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -307,8 +331,15 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| de.json (Complete)      |                                                                                     |
-| el.json (missing 37)    | Replay                                                                              |
+| de.json (missing 4)     | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
+| el.json (missing 41)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -345,13 +376,17 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| es.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| es.json (missing 54)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -395,14 +430,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| fa.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| fa.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -446,14 +485,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| fi.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| fi.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -497,7 +540,11 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| fr.json (missing 36)    | captions settings                                                                   |
+| fr.json (missing 40)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
+|                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
 |                         | Text                                                                                |
@@ -533,14 +580,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| hr.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| hr.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -584,14 +635,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| hu.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| hu.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -635,14 +690,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| it.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| it.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -686,14 +745,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ja.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| ja.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -737,14 +800,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ko.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| ko.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -788,14 +855,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| nb.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| nb.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -839,10 +910,14 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| nl.json (missing 40)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| nl.json (missing 44)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Close Modal Dialog                                                                  |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -879,14 +954,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| nn.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| nn.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -930,13 +1009,17 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| pl.json (missing 44)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| pl.json (missing 48)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
+|                         | Close Modal Dialog                                                                  |
 |                         | , opens descriptions settings dialog                                                |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
@@ -974,14 +1057,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| pt-BR.json (missing 51) | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| pt-BR.json (missing 55) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -1025,43 +1112,10 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| pt-PT.json (missing 36) | captions settings                                                                   |
-|                         | subititles settings                                                                 |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| ru.json (missing 37)    | Replay                                                                              |
+| pt-PT.json (missing 40) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -1098,14 +1152,59 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| sr.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| ru.json (missing 41)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
+|                         | captions settings                                                                   |
+|                         | subititles settings                                                                 |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Defaults                                                                            |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+| sr.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -1149,14 +1248,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| sv.json (missing 51)    | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| sv.json (missing 55)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | The media is encrypted and we do not have the keys to decrypt it.                   |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -1200,8 +1303,15 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| tr.json (Complete)      |                                                                                     |
-| uk.json (missing 37)    | Replay                                                                              |
+| tr.json (missing 4)     | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
+| uk.json (missing 41)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
@@ -1238,7 +1348,11 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| vi.json (missing 36)    | captions settings                                                                   |
+| vi.json (missing 40)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
+|                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
 |                         | Text                                                                                |
@@ -1274,13 +1388,17 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| zh-CN.json (missing 50) | Replay                                                                              |
-|                         | Close Modal Dialog                                                                  |
+| zh-CN.json (missing 54) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
 |                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
 |                         | Play Video                                                                          |
 |                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
 |                         | Modal Window                                                                        |
 |                         | This is a modal window                                                              |
 |                         | This modal can be closed by pressing the Escape key or activating the close button. |
@@ -1324,7 +1442,11 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
-| zh-TW.json (missing 37) | Replay                                                                              |
+| zh-TW.json (missing 41) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Progress Bar                                                                        |
+|                         | Volume Level                                                                        |
 |                         | captions settings                                                                   |
 |                         | subititles settings                                                                 |
 |                         | descriptions settings                                                               |
