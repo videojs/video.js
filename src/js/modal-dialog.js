@@ -440,9 +440,9 @@ class ModalDialog extends Component {
     if (this.previouslyActiveEl_) {
       this.previouslyActiveEl_.focus();
       this.previouslyActiveEl_ = null;
-
-      this.off(document, 'keydown', this.handleKeyDown);
     }
+
+    this.off(document, 'keydown', this.handleKeyDown);
   }
 
   /**
