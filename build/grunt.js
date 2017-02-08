@@ -450,7 +450,7 @@ module.exports = function(grunt) {
         }
       },
       lint: {
-        command: 'npm run lint',
+        command: 'npm run lint -- --errors',
         options: {
           preferLocal: true
         }
