@@ -4,6 +4,8 @@
 import * as Dom from './utils/dom';
 import * as Fn from './utils/fn';
 import Component from './component';
+import window from 'global/window';
+import document from 'global/document';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
@@ -187,6 +189,7 @@ class ModalDialog extends Component {
 
       player.controls(false);
       this.show();
+      this.conditionalFocus_();
       this.el().setAttribute('aria-hidden', 'false');
 
       /**
@@ -257,6 +260,7 @@ class ModalDialog extends Component {
       * @type {EventTarget~Event}
       */
     this.trigger('modalclose');
+    this.conditionalBlur_();
 
     if (this.options_.temporary) {
       this.dispose();
@@ -351,6 +355,13 @@ class ModalDialog extends Component {
     } else {
       parentEl.appendChild(contentEl);
     }
+
+    // make sure that the close button is last in the dialog DOM
+    const closeButton = this.getChild('closeButton');
+
+    if (closeButton) {
+      parentEl.appendChild(closeButton.el_);
+    }
   }
 
   /**
@@ -398,6 +409,94 @@ class ModalDialog extends Component {
       this.content_ = value;
     }
     return this.content_;
+  }
+
+  /**
+   * conditionally focus the modal dialog if focus was previously on the player.
+   *
+   * @private
+   */
+  conditionalFocus_() {
+    const activeEl = document.activeElement;
+    const playerEl = this.player_.el_;
+
+    this.previouslyActiveEl_ = null;
+
+    if (playerEl.contains(activeEl) || playerEl === activeEl) {
+      this.previouslyActiveEl_ = activeEl;
+
+      this.focus();
+
+      this.on(document, 'keydown', this.handleKeyDown);
+    }
+  }
+
+  /**
+   * conditionally blur the element and refocus the last focused element
+   *
+   * @private
+   */
+  conditionalBlur_() {
+    if (this.previouslyActiveEl_) {
+      this.previouslyActiveEl_.focus();
+      this.previouslyActiveEl_ = null;
+    }
+
+    this.off(document, 'keydown', this.handleKeyDown);
+  }
+
+  /**
+   * Keydown handler. Attached when modal is focused.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    // exit early if it isn't a tab key
+    if (event.which !== 9) {
+      return;
+    }
+
+    const focusableEls = this.focusableEls_();
+    const activeEl = this.el_.querySelector(':focus');
+    let focusIndex;
+
+    for (let i = 0; i < focusableEls.length; i++) {
+      if (activeEl === focusableEls[i]) {
+        focusIndex = i;
+        break;
+      }
+    }
+
+    if (event.shiftKey && focusIndex === 0) {
+      focusableEls[focusableEls.length - 1].focus();
+      event.preventDefault();
+    } else if (!event.shiftKey && focusIndex === focusableEls.length - 1) {
+      focusableEls[0].focus();
+      event.preventDefault();
+    }
+  }
+
+  /**
+   * get all focusable elements
+   *
+   * @private
+   */
+  focusableEls_() {
+    const allChildren = this.el_.querySelectorAll('*');
+
+    return Array.prototype.filter.call(allChildren, (child) => {
+      return ((child instanceof window.HTMLAnchorElement ||
+               child instanceof window.HTMLAreaElement) && child.hasAttribute('href')) ||
+             ((child instanceof window.HTMLInputElement ||
+               child instanceof window.HTMLSelectElement ||
+               child instanceof window.HTMLTextAreaElement ||
+               child instanceof window.HTMLButtonElement) && !child.hasAttribute('disabled')) ||
+             (child instanceof window.HTMLIFrameElement ||
+               child instanceof window.HTMLObjectElement ||
+               child instanceof window.HTMLEmbedElement) ||
+             (child.hasAttribute('tabindex') && child.getAttribute('tabindex') !== -1) ||
+             (child.hasAttribute('contenteditable'));
+    });
   }
 }
 

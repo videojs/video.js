@@ -22,6 +22,82 @@ QUnit.module('ModalDialog', {
   }
 });
 
+const mockFocusableEls = function(Modal, focuscallback) {
+  Modal.prototype.oldFocusableEls = Modal.prototype.focusableEls_;
+
+  const focus = function() {
+    return focuscallback(this.i);
+  };
+  const els = [ {
+    i: 0,
+    focus
+  }, {
+    i: 1,
+    focus
+  }, {
+    i: 2,
+    focus
+  }, {
+    i: 3,
+    focus
+  }];
+
+  Modal.prototype.focusableEls_ = () => els;
+};
+
+const restoreFocusableEls = function(Modal) {
+  Modal.prototype.focusableEls_ = Modal.prototype.oldFocusableEls;
+};
+
+const mockActiveEl = function(modal, index) {
+  modal.oldEl = modal.el_;
+  modal.el_ = {
+    querySelector() {
+      const focusableEls = modal.focusableEls_();
+
+      return focusableEls[index];
+    }
+  };
+};
+
+const restoreActiveEl = function(modal) {
+  modal.el_ = modal.oldEl;
+};
+
+const tabTestHelper = function(assert, player) {
+  return function(from, to, shift = false) {
+    mockFocusableEls(ModalDialog, (focusIndex) => {
+      assert.equal(focusIndex, to, `we should focus back on the ${to} element, we got ${focusIndex}.`);
+    });
+    const modal = new ModalDialog(player, {});
+
+    mockActiveEl(modal, from);
+
+    let prevented = false;
+
+    modal.handleKeyDown({
+      which: 9,
+      shiftKey: shift,
+      preventDefault() {
+        prevented = true;
+      }
+    });
+
+    if (!prevented) {
+      const newIndex = shift ? from - 1 : from + 1;
+      const newEl = modal.focusableEls_()[newIndex];
+
+      if (newEl) {
+        newEl.focus(newEl.i);
+      }
+    }
+
+    restoreActiveEl(modal);
+    modal.dispose();
+    restoreFocusableEls(ModalDialog);
+  };
+};
+
 QUnit.test('should create the expected element', function(assert) {
   const elAssertions = TestHelpers.assertEl(assert, this.el, {
     tagName: 'div',
@@ -398,4 +474,20 @@ QUnit.test('"uncloseable" option', function(assert) {
   modal.open();
   modal.handleKeyPress({which: ESC});
   assert.strictEqual(spy.callCount, 0, 'ESC did not close the modal');
+});
+
+QUnit.test('handleKeyDown traps tab focus', function(assert) {
+  const tabTester = tabTestHelper(assert, this.player);
+
+  // tabbing forward from first element to last and cycling back to first
+  tabTester(0, 1, false);
+  tabTester(1, 2, false);
+  tabTester(2, 3, false);
+  tabTester(3, 0, false);
+
+  // tabbing backwards from last element to first and cycling back to last
+  tabTester(3, 2, true);
+  tabTester(2, 1, true);
+  tabTester(1, 0, true);
+  tabTester(0, 3, true);
 });
