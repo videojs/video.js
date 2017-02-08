@@ -219,7 +219,7 @@ class ClickableComponent extends Component {
     // Support Space (32) or Enter (13) key operation to fire a click event
     if (event.which === 32 || event.which === 13) {
       event.preventDefault();
-      this.handleClick(event);
+      this.trigger('click');
     } else if (super.handleKeyPress) {
 
       // Pass keypress handling up for unsupported keys
