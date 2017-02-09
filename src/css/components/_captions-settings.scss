@@ -1,4 +1,4 @@
-.vjs-caption-settings {
+.vjs-modal-dialog.vjs-text-track-settings {
   position: relative;
   top: 1em;
   background-color: $primary-background-color;
@@ -6,14 +6,13 @@
   color: $primary-foreground-color;
   margin: 0 auto;
   padding: 0.5em;
-  height: 16em;
-  font-size: 12px;
-  width: 40em;
+  height: 20em;
+  width: 48em;
 }
 
 .vjs-caption-settings .vjs-tracksettings {
   top: 0;
-  bottom: 1em;
+  bottom: 0;
   left: 0;
   right: 0;
   position: absolute;
