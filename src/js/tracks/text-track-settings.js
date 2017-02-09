@@ -262,6 +262,12 @@ class TextTrackSettings extends ModalDialog {
     this.fill();
     this.hasBeenOpened_ = this.hasBeenFilled_ = true;
 
+    this.endDialog = createEl('p', {
+      className: 'vjs-offscreen',
+      textContent: this.localize('End of dialog window.')
+    });
+    this.el().appendChild(this.endDialog);
+
     this.setDefaults();
 
     // Grab `persistTextTrackSettings` from the player options if not passed in child options
