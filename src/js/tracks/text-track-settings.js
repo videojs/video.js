@@ -258,7 +258,9 @@ class TextTrackSettings extends ModalDialog {
 
     this.updateDisplay = Fn.bind(this, this.updateDisplay);
 
+    // fill the modal and pretend we have opened it
     this.fill();
+    this.hasBeenOpened_ = this.hasBeenFilled_ = true;
 
     this.setDefaults();
 
@@ -443,7 +445,7 @@ class TextTrackSettings extends ModalDialog {
   createElControls_() {
     const defaultsButton = createEl('button', {
       className: 'vjs-default-button',
-      textContent: this.localize('Defaults')
+      innerHTML: `<span class='vjs-control-text'>${this.localize('Restore')}</span> ${this.localize('Defaults')}`
     });
 
     const doneButton = createEl('button', {
