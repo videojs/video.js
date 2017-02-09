@@ -3,6 +3,7 @@
  */
 import window from 'global/window';
 import Component from '../component';
+import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
@@ -236,9 +237,8 @@ function setSelectedOption(el, value, parser) {
 /**
  * Manipulate Text Tracks settings.
  *
- * @extends Component
  */
-class TextTrackSettings extends Component {
+class TextTrackSettings extends ModalDialog {
 
   /**
    * Creates an instance of this class.
@@ -250,11 +250,17 @@ class TextTrackSettings extends Component {
    *         The key/value store of player options.
    */
   constructor(player, options) {
+    options.temporary = false;
+
     super(player, options);
-    this.setDefaults();
-    this.hide();
+
+    this.contentEl().className += '  vjs-caption-settings';
 
     this.updateDisplay = Fn.bind(this, this.updateDisplay);
+
+    this.fill();
+
+    this.setDefaults();
 
     // Grab `persistTextTrackSettings` from the player options if not passed in child options
     if (options.persistTextTrackSettings === undefined) {
@@ -457,6 +463,10 @@ class TextTrackSettings extends Component {
    *         The element that was created.
    */
   createEl() {
+    return super.createEl();
+  }
+
+  content() {
     const settings = createEl('div', {
       className: 'vjs-tracksettings'
     }, undefined, [
@@ -465,33 +475,19 @@ class TextTrackSettings extends Component {
       this.createElControls_()
     ]);
 
-    const heading = createEl('div', {
-      className: 'vjs-control-text',
-      id: `TTsettingsDialogLabel-${this.id_}`,
-      textContent: this.localize('Caption Settings Dialog')
-    }, {
-      'aria-level': '1',
-      'role': 'heading'
-    });
+    return settings;
+  }
 
-    const description = createEl('div', {
-      className: 'vjs-control-text',
-      id: `TTsettingsDialogDescription-${this.id_}`,
-      textContent: this.localize('Beginning of dialog window. Escape will cancel and close the window.')
-    });
+  label() {
+    return this.localize('Caption Settings Dialog');
+  }
 
-    const doc = createEl('div', undefined, {
-      role: 'document'
-    }, [heading, description, settings]);
+  description() {
+    return this.localize('Beginning of dialog window. Escape will cancel and close the window.');
+  }
 
-    return createEl('div', {
-      className: 'vjs-caption-settings vjs-modal-overlay',
-      tabIndex: -1
-    }, {
-      'role': 'dialog',
-      'aria-labelledby': heading.id,
-      'aria-describedby': description.id
-    }, doc);
+  buildCSSClass() {
+    return super.buildCSSClass() + ' vjs-text-track-settings';
   }
 
   /**
