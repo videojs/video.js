@@ -2,6 +2,7 @@
  * @file text-track-settings.js
  */
 import window from 'global/window';
+import document from 'global/document';
 import Component from '../component';
 import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
@@ -277,7 +278,7 @@ class TextTrackSettings extends ModalDialog {
 
     this.on(this.$('.vjs-done-button'), 'click', () => {
       this.saveSettings();
-      this.hide();
+      this.close();
     });
 
     this.on(this.$('.vjs-default-button'), 'click', () => {
@@ -595,6 +596,18 @@ class TextTrackSettings extends ModalDialog {
 
     if (ttDisplay) {
       ttDisplay.updateDisplay();
+    }
+  }
+
+  conditionalBlur_() {
+    this.previouslyActiveEl_ = null;
+    this.off(document, 'keydown', this.handleKeyDown);
+
+    const cb = this.player_.controlBar;
+    const ccBtn = cb && cb.captionsButton;
+
+    if (ccBtn) {
+      ccBtn.focus();
     }
   }
 
