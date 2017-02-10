@@ -222,28 +222,28 @@ class Component {
    * @return {string}
    *         The localized string or if no localization exists the english string.
    */
-  localize(string) {
+  localize(string, tokens) {
     const code = this.player_.language && this.player_.language();
     const languages = this.player_.languages && this.player_.languages();
+    const language = languages && languages[code];
+    const primaryCode = code && code.split('-')[0];
+    const primaryLang = languages && languages[primaryCode];
 
-    if (!code || !languages) {
-      return string;
-    }
-
-    const language = languages[code];
+    let localizedString = string;
 
     if (language && language[string]) {
-      return language[string];
+      localizedString = language[string];
+    } else if (primaryLang && primaryLang[string]) {
+      localizedString = primaryLang[string];
     }
 
-    const primaryCode = code.split('-')[0];
-    const primaryLang = languages[primaryCode];
-
-    if (primaryLang && primaryLang[string]) {
-      return primaryLang[string];
+    if (tokens) {
+      localizedString = localizedString.replace(/\{(\d+)\}/g, function(match, index) {
+        return tokens[index - 1];
+      });
     }
 
-    return string;
+    return localizedString;
   }
 
   /**
