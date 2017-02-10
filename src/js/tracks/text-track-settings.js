@@ -263,7 +263,7 @@ class TextTrackSettings extends ModalDialog {
     this.hasBeenOpened_ = this.hasBeenFilled_ = true;
 
     this.endDialog = createEl('p', {
-      className: 'vjs-offscreen',
+      className: 'vjs-control-text',
       textContent: this.localize('End of dialog window.')
     });
     this.el().appendChild(this.endDialog);
