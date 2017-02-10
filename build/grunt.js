@@ -145,6 +145,10 @@ module.exports = function(grunt) {
         files: ['src/css/**/*'],
         tasks: ['skin']
       },
+      lang: {
+        files: ['lang/**/*.json'],
+        tasks: ['vjslanguages']
+      }
     },
     connect: {
       dev: {
@@ -408,6 +412,7 @@ module.exports = function(grunt) {
         'browserify:watchnovtt',
         'browserify:tests',
         'watch:skin',
+        'watch:lang',
         'watch:dist'
       ],
       // Run multiple watch tasks in parallel
