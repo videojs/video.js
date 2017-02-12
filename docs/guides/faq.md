@@ -237,7 +237,7 @@ project which adds support.
 
 ## Q: Does video.js support MPEG Dash video?
 
-video.js itself does not support MPEG DASH, however an offical project called [videojs-contrib-dash][dash]
+video.js itself does not support MPEG DASH, however an official project called [videojs-contrib-dash][dash]
 adds support for MPEG DASH video.
 
 ## Q: Does video.js support live video?
