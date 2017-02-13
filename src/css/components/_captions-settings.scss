@@ -6,7 +6,7 @@
   color: $primary-foreground-color;
   margin: 0 auto;
   padding: 0.5em;
-  height: 20em;
+  height: 22em;
   width: 48em;
 }
 
@@ -33,6 +33,21 @@
   position: absolute;
   bottom: 1em;
   right: 1em;
+}
+
+.vjs-tracksettings-controls button:focus,
+.vjs-tracksettings-controls button:active {
+  outline-style: solid;
+  outline-width: medium;
+}
+
+.vjs-tracksettings-controls button {
+  background-color: white;
+  color: #2B333F;
+  cursor: pointer;
+}
+.vjs-tracksettings-controls .vjs-default-button {
+  margin-right: 1em;
 }
 
 .vjs-caption-settings .vjs-tracksetting {
