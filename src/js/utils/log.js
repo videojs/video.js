@@ -80,7 +80,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
 
   // Old IE versions do not allow .apply() for console methods (they are
   // reported as objects rather than functions).
-  if (!fn.apply) {
+  if (typeof(fn.apply) == "unknow" || !fn.apply) {
     fn(args);
   } else {
     fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
