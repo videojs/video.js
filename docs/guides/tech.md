@@ -17,7 +17,7 @@ consistent API and skinning experience across all of them.
 
 ## Writing a new Tech
 
-When writing a Tech you will have to integrate your technologies API with the existing API. In the following examples
+When writing a Tech you will have to integrate your technology's API with the existing API. In the following examples
 we are going to make a clone of the base `Tech` class which would not actually play back any media.
 
 ES6 Example of a new Tech
