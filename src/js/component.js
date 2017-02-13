@@ -222,14 +222,14 @@ class Component {
    * @return {string}
    *         The localized string or if no localization exists the english string.
    */
-  localize(string, tokens) {
+  localize(string, tokens, defaultValue = string) {
     const code = this.player_.language && this.player_.language();
     const languages = this.player_.languages && this.player_.languages();
     const language = languages && languages[code];
     const primaryCode = code && code.split('-')[0];
     const primaryLang = languages && languages[primaryCode];
 
-    let localizedString = string;
+    let localizedString = defaultValue;
 
     if (language && language[string]) {
       localizedString = language[string];

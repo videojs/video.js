@@ -75,9 +75,10 @@ class SeekBar extends Slider {
 
     // human readable value of progress bar (time complete)
     this.el_.setAttribute('aria-valuetext',
-                          this.localize('{1} of {2}',
+                          this.localize('progress bar timing: currentTime={1} duration={2}',
                                         [formatTime(time, duration),
-                                         formatTime(duration, duration)]));
+                                         formatTime(duration, duration)],
+                                        '{1} of {2}'));
 
     // Update the `PlayProgressBar`.
     this.bar.update(Dom.getBoundingClientRect(this.el_), percent);

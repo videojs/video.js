@@ -4,6 +4,11 @@ The currently available translations are in the lang dir. This table shows the c
 
 If you add or update a translation run `grunt check-translations` to update the list and include this modified doc in the pull request.
 
+## Progress Bar Translations
+The progress bar as a translation with a few token replacements.
+They key is `progress bar timing: currentTime={1} duration={2}` and the default English value is `{1} of {2}`.
+This default value is hardcoded as a default to the localize method in the SeekBar component.
+
 ## Status of translations
 
 <!-- START langtable -->
