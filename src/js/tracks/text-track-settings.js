@@ -317,7 +317,7 @@ class TextTrackSettings extends ModalDialog {
       }, {
       }),
       createEl('select', {}, {
-        'aria-labeledby': `${legendId} ${id}`
+        'aria-labelledby': `${legendId} ${id}`
       }, config.options.map(o => {
         const optionId = id + '-' + o[1];
 
@@ -326,7 +326,7 @@ class TextTrackSettings extends ModalDialog {
           textContent: this.localize(o[1]),
           value: o[0]
         }, {
-          'aria-labeledby': `${legendId} ${id} ${optionId}`
+          'aria-labelledby': `${legendId} ${id} ${optionId}`
         });
       }))
     ];
