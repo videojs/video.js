@@ -239,7 +239,14 @@ class Component {
 
     if (tokens) {
       localizedString = localizedString.replace(/\{(\d+)\}/g, function(match, index) {
-        return tokens[index - 1];
+        const value = tokens[index - 1];
+        let ret = value;
+
+        if (typeof value === 'undefined') {
+          ret = match;
+        }
+
+        return ret;
       });
     }
 
