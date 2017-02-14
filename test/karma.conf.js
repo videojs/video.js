@@ -46,7 +46,7 @@ module.exports = function(config) {
       'karma-coverage',
       'karma-detect-browsers',
     ],
-
+    concurrency: 4,
     detectBrowsers: {
       enabled: false,
       usePhantomJS: false
