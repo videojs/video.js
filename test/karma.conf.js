@@ -62,7 +62,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
-    browserDisconnectTolerance: 1,
+    browserDisconnectTolerance: 0,
 
     browserStack: {
       name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
@@ -99,22 +99,23 @@ module.exports = function(config) {
   }
 
   if (process.env.TRAVIS) {
+    settings.browsers = settings.browsers || [];
+    settings.browsers = settings.browsers.concat(['travisChrome', 'Firefox']);
+
     if (process.env.BROWSER_STACK_USERNAME) {
-      settings.browsers = [
-        'chrome_bs',
-        'firefox_bs',
+      settings.browsers = settings.browsers.concat([
+        //'chrome_bs',
+        //'firefox_bs',
         'safari_bs',
         'edge_bs',
         'ie11_bs',
         'ie10_bs',
         'ie9_bs',
         'ie8_bs'
-      ];
+      ]);
 
-    // fix ie disconnect issues
-    settings.browserDisconnectTolerance = 3;
-    } else {
-      settings.browsers = ['Firefox'];
+      // fix ie disconnect issues
+      settings.browserDisconnectTolerance = 3;
     }
   }
 
@@ -123,6 +124,10 @@ module.exports = function(config) {
 
 function getCustomLaunchers(){
   return {
+    travisChrome: {
+      base: 'Chrome',
+      flags: ['--no-sandbox']
+    },
     chrome_bs: {
       base: 'BrowserStack',
       browser: 'chrome',
