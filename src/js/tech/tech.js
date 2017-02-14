@@ -529,7 +529,14 @@ class Tech extends Component {
    * @fires Tech#vttjserror
    */
   addWebVttScript_() {
-    if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
+    if (window.WebVTT) {
+      return;
+    }
+
+    // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
+    // signals that the Tech is ready at which point Tech.el_ is part of the DOM
+    // before inserting the WebVTT script
+    if (this.el().parentNode !== null && this.el().parentNode !== undefined) {
       const vtt = require('videojs-vtt.js');
 
       // load via require if available and vtt.js script location was not passed in
@@ -574,7 +581,10 @@ class Tech extends Component {
       // we don't overwrite the injected window.WebVTT if it loads right away
       window.WebVTT = true;
       this.el().parentNode.appendChild(script);
+    } else {
+      this.ready(this.addWebVttScript_);
     }
+
   }
 
   /**
@@ -596,10 +606,7 @@ class Tech extends Component {
     remoteTracks.on('addtrack', handleAddTrack);
     remoteTracks.on('removetrack', handleRemoveTrack);
 
-    // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
-    // signals that the Tech is ready at which point Tech.el_ is part of the DOM
-    // before inserting the WebVTT script
-    this.on('ready', this.addWebVttScript_);
+    this.addWebVttScript_();
 
     const updateDisplay = () => this.trigger('texttrackchange');
 
