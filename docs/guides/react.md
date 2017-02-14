@@ -41,7 +41,7 @@ You can then use it like this:
 ```jsx
 // see https://github.com/videojs/video.js/blob/master/docs/guides/options.md
 const videoJsOptions = {
-  autoPlay: true,
+  autoplay: true,
   controls: true,
   sources: [{
     src: '/path/to/video.mp4',
