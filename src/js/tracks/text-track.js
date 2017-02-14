@@ -79,6 +79,10 @@ const loadTrack = function(src, track) {
     opts.cors = crossOrigin;
   }
 
+  if (track.crossorigin === 'use-credentials') {
+    opts.withCredentials = true;
+  }
+
   XHR(opts, Fn.bind(this, function(err, response, responseBody) {
     if (err) {
       return log.error(err, response);
@@ -314,6 +318,7 @@ class TextTrack extends Track {
 
     if (settings.src) {
       tt.src = settings.src;
+      tt.crossorigin = settings.crossorigin;
       loadTrack(settings.src, tt);
     } else {
       tt.loaded_ = true;
