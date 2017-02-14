@@ -216,8 +216,37 @@ class Component {
   /**
    * Localize a string given the string in english.
    *
+   * If tokens are provided, it'll try and run a simple token replacement on the provided string.
+   * The tokens it loooks for look like `{1}` with the index being 1-indexed into the tokens array.
+   *
+   * If a `defaultValue` is provided, it'll use that over `string`,
+   * if a value isn't found in provided language files.
+   * This is useful if you want to have a descriptive key for token replacement
+   * but have a succinct localized string and not require `en.json` to be included.
+   *
+   * Currently, it is used for the progress bar timing.
+   * ```js
+   * {
+   *   "progress bar timing: currentTime={1} duration={2}": "{1} of {2}"
+   * }
+   * ```
+   * It is then used like so:
+   * ```js
+   * this.localize('progress bar timing: currentTime={1} duration{2}',
+   *               [this.player_.currentTime(), this.player_.duration()],
+   *               '{1} of {2}');
+   * ```
+   *
+   * Which outputs something like: `01:23 of 24:56`.
+   *
+   *
    * @param {string} string
-   *        The string to localize.
+   *        The string to localize and the key to lookup in the language files.
+   * @param {string[]} [tokens]
+   *        If the current item has token replacements, provide the tokens here.
+   * @param {string} [defaultValue]
+   *        Defaults to `string`. Can be a default value to use for token replacement
+   *        if the lookup key is needed to be separate.
    *
    * @return {string}
    *         The localized string or if no localization exists the english string.
