@@ -238,6 +238,7 @@ function setSelectedOption(el, value, parser) {
 /**
  * Manipulate Text Tracks settings.
  *
+ * @extends ModalDialog
  */
 class TextTrackSettings extends ModalDialog {
 
@@ -542,7 +543,7 @@ class TextTrackSettings extends ModalDialog {
   }
 
   /**
-   * Sets all <select> elements to their default values.
+   * Sets all `<select>` elements to their default values.
    */
   setDefaults() {
     Obj.each(selectConfigs, (config) => {
@@ -601,6 +602,11 @@ class TextTrackSettings extends ModalDialog {
     }
   }
 
+  /**
+   * conditionally blur the element and refocus the captions button
+   *
+   * @private
+   */
   conditionalBlur_() {
     this.previouslyActiveEl_ = null;
     this.off(document, 'keydown', this.handleKeyDown);
