@@ -63,7 +63,6 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
-    browserDisconnectTolerance: 3,
 
     browserStack: {
       name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
@@ -111,6 +110,9 @@ module.exports = function(config) {
         'ie9_bs',
         'ie8_bs'
       ];
+
+    // fix ie disconnect issues
+    settings.browserDisconnectTolerance = 3;
     } else {
       settings.browsers = ['Firefox'];
     }
