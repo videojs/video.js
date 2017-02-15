@@ -30,6 +30,18 @@
  */
 const toString = Object.prototype.toString;
 
+/**
+ * Get the keys of an Object
+ *
+ * @param {Object}
+ *        The Object to get the keys from
+ *
+ * @return {string[]}
+ *         An array of the keys from the object. Returns an empty array if the
+ *         object passed in was invalid or had no keys.
+ *
+ * @private
+ */
 const keys = function(object) {
   return isObject(object) ? Object.keys(object) : [];
 };
