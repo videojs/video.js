@@ -30,6 +30,10 @@
  */
 const toString = Object.prototype.toString;
 
+const keys = function(object) {
+  return isObject(object) ? Object.keys(object) : [];
+};
+
 /**
  * Array-like iteration for objects.
  *
@@ -40,7 +44,7 @@ const toString = Object.prototype.toString;
  *        The callback function which is called for each key in the object.
  */
 export function each(object, fn) {
-  Object.keys(object).forEach(key => fn(object[key], key));
+  keys(object).forEach(key => fn(object[key], key));
 }
 
 /**
@@ -61,7 +65,7 @@ export function each(object, fn) {
  *         The final accumulated value.
  */
 export function reduce(object, fn, initial = 0) {
-  return Object.keys(object).reduce(
+  return keys(object).reduce(
     (accum, key) => fn(accum, object[key], key), initial);
 }
 

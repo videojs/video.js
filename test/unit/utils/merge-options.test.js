@@ -2,6 +2,7 @@
 import mergeOptions from '../../../src/js/utils/merge-options.js';
 
 QUnit.module('merge-options');
+
 QUnit.test('should merge options objects', function(assert) {
   const ob1 = {
     a: true,
@@ -26,4 +27,10 @@ QUnit.test('should merge options objects', function(assert) {
     c: true,
     d: true
   }, 'options objects merged correctly');
+});
+
+QUnit.test('should ignore non-objects', function(assert) {
+  const obj = { a: 1 };
+
+  assert.deepEqual(mergeOptions(obj, true), obj, 'ignored non-object input');
 });
