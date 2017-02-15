@@ -60,13 +60,12 @@ module.exports = function(config) {
     runnerPort: 9100,
     colors: true,
     logLevel: config.LOG_INFO,
-    captureTimeout: 600000,
-    browserNoActivityTimeout: 600000,
-    browserDisconnectTolerance: 0,
+    captureTimeout: 300000,
+    browserNoActivityTimeout: 300000,
 
     browserStack: {
       name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
-      pollingTimeout: 60000
+      pollingTimeout: 30000
     },
     customLaunchers: getCustomLaunchers(),
 
@@ -113,9 +112,7 @@ module.exports = function(config) {
         'ie9_bs',
         'ie8_bs'
       ]);
-
-      // fix ie disconnect issues
-      settings.browserDisconnectTolerance = 3;
+      settings.concurrency = 5;
     }
   }
 
