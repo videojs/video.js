@@ -14,8 +14,9 @@
   @extend .vjs-icon-subtitles;
 }
 
-// Todo
 .video-js .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text:after {
   content: " \f10d";
   font-family: VideoJS;
+  vertical-align: bottom;
+  font-size: 1.5em;
 }
