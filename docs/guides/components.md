@@ -23,7 +23,7 @@ The architecture of the Video.js player is centered around components. The `Play
 
 A component is a JavaScript object that has the following features:
 
-* An associated DOM element.
+* An associated DOM element, in almost all cases.
 * An association to a `Player` object.
 * The ability to manage any number of child components.
 * The ability to listen for and trigger events.
@@ -285,7 +285,7 @@ The default component structure of the Video.js player looks something like this
 
 ```tree
 Player
-├── MediaLoader (has no UI)
+├── MediaLoader (has no DOM element)
 ├── PosterImage
 ├── TextTrackDisplay
 ├── LoadingSpinner

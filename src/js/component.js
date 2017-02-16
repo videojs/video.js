@@ -139,13 +139,15 @@ class Component {
     this.childIndex_ = null;
     this.childNameIndex_ = null;
 
-    // Remove element from DOM
-    if (this.el_.parentNode) {
-      this.el_.parentNode.removeChild(this.el_);
-    }
+    if (this.el_) {
+      // Remove element from DOM
+      if (this.el_.parentNode) {
+        this.el_.parentNode.removeChild(this.el_);
+      }
 
-    DomData.removeData(this.el_);
-    this.el_ = null;
+      DomData.removeData(this.el_);
+      this.el_ = null;
+    }
   }
 
   /**
