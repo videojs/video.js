@@ -20,6 +20,9 @@ const track = {
 
 QUnit.test('should be displayed when text tracks list is not empty', function(assert) {
   const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    },
     tracks: [track]
   });
 
@@ -33,7 +36,11 @@ QUnit.test('should be displayed when text tracks list is not empty', function(as
 });
 
 QUnit.test('should be displayed when a text track is added to an empty track list', function(assert) {
-  const player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    }
+  });
 
   player.addRemoteTextTrack(track, true);
 
@@ -45,7 +52,11 @@ QUnit.test('should be displayed when a text track is added to an empty track lis
 });
 
 QUnit.test('should not be displayed when text tracks list is empty', function(assert) {
-  const player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    }
+  });
 
   assert.ok(player.controlBar.captionsButton.hasClass('vjs-hidden'),
            'control is not displayed');
@@ -56,6 +67,9 @@ QUnit.test('should not be displayed when text tracks list is empty', function(as
 
 QUnit.test('should not be displayed when last text track is removed', function(assert) {
   const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    },
     tracks: [track]
   });
 
@@ -70,6 +84,9 @@ QUnit.test('should not be displayed when last text track is removed', function(a
 
 QUnit.test('menu should contain "Settings", "Off" and one track', function(assert) {
   const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    },
     tracks: [track]
   });
 
@@ -89,6 +106,9 @@ QUnit.test('menu should contain "Settings", "Off" and one track', function(asser
 
 QUnit.test('menu should update with addRemoteTextTrack', function(assert) {
   const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    },
     tracks: [track]
   });
 
@@ -106,6 +126,9 @@ QUnit.test('menu should update with addRemoteTextTrack', function(assert) {
 
 QUnit.test('menu should update with removeRemoteTextTrack', function(assert) {
   const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    },
     tracks: [track, track]
   });
 
@@ -198,6 +221,9 @@ QUnit.test('enabling a captions track should disable the descriptions menu butto
   assert.expect(14);
 
   const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true
+    },
     tracks: [track, descriptionstrack]
   });
 

@@ -182,7 +182,12 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
   track2.src = '#es.vtt';
   tag.appendChild(track2);
 
-  const player = TestHelpers.makePlayer({}, tag);
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      captionsButton: true,
+      subtitlesButton: true
+    }
+  }, tag);
 
   player.player_ = player;
 
