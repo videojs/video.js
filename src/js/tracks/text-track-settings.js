@@ -465,7 +465,7 @@ class TextTrackSettings extends ModalDialog {
     const defaultsButton = createEl('button', {
       className: 'vjs-default-button',
       title: defaultsDescription,
-      innerHTML: `${this.localize('Defaults')}<span class='vjs-control-text'> - ${defaultsDescription}</span>`
+      innerHTML: `${this.localize('Reset')}<span class='vjs-control-text'> - ${defaultsDescription}</span>`
     });
 
     const doneButton = createEl('button', {

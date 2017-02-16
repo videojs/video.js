@@ -6,7 +6,7 @@
   color: $primary-foreground-color;
   margin: 0 auto;
   padding: 0.5em;
-  height: 20em;
+  height: 22em;
   width: 48em;
 }
 
@@ -33,6 +33,29 @@
   position: absolute;
   bottom: 1em;
   right: 1em;
+}
+
+.vjs-tracksettings-controls button:focus,
+.vjs-tracksettings-controls button:active {
+  outline-style: solid;
+  outline-width: medium;
+  background-image: linear-gradient(0deg, $primary-foreground-color 88%, $secondary-background-color 100%);
+}
+
+.vjs-tracksettings-controls button:hover {
+  color: rgba(#2B333F, 0.75);
+}
+
+.vjs-tracksettings-controls button {
+  background-color: $primary-foreground-color;
+  background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
+  color: #2B333F;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.vjs-tracksettings-controls .vjs-default-button {
+  margin-right: 1em;
 }
 
 .vjs-caption-settings .vjs-tracksetting {
