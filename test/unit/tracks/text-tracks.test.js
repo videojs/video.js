@@ -3,6 +3,7 @@ import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chap
 import DescriptionsButton from '../../../src/js/control-bar/text-track-controls/descriptions-button.js';
 import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
 import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
+import SubsCapsButton from '../../../src/js/control-bar/text-track-controls/subs-caps-button.js';
 
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
@@ -130,6 +131,7 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
   const oldSubsUpdate = SubtitlesButton.prototype.update;
   const oldDescriptionsUpdate = DescriptionsButton.prototype.update;
   const oldChaptersUpdate = ChaptersButton.prototype.update;
+  const oldSubsCapsUpdate = SubsCapsButton.prototype.update;
 
   CaptionsButton.prototype.update = function() {
     update++;
@@ -146,6 +148,10 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
   ChaptersButton.prototype.update = function() {
     update++;
     oldChaptersUpdate.call(this);
+  };
+  SubsCapsButton.prototype.update = function() {
+    update++;
+    oldSubsCapsUpdate.call(this);
   };
 
   Tech.prototype.featuresNativeTextTracks = true;
@@ -191,25 +197,26 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
 
   player.player_ = player;
 
-  assert.equal(update, 4, 'update was called on the four buttons during init');
+  assert.equal(update, 5, 'update was called on the five buttons during init');
 
   for (let i = 0; i < events.removetrack.length; i++) {
     events.removetrack[i]();
   }
 
-  assert.equal(update, 8, 'update was called on the four buttons for remove track');
+  assert.equal(update, 10, 'update was called on the five buttons for remove track');
 
   for (let i = 0; i < events.addtrack.length; i++) {
     events.addtrack[i]();
   }
 
-  assert.equal(update, 12, 'update was called on the four buttons for remove track');
+  assert.equal(update, 15, 'update was called on the five buttons for remove track');
 
   Tech.prototype.textTracks = oldTextTracks;
   Tech.prototype.featuresNativeTextTracks = false;
   CaptionsButton.prototype.update = oldCaptionsUpdate;
   SubtitlesButton.prototype.update = oldSubsUpdate;
   ChaptersButton.prototype.update = oldChaptersUpdate;
+  SubsCapsButton.prototype.update = oldSubsCapsUpdate;
 
   player.dispose();
 });
