@@ -52,8 +52,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -109,8 +109,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -166,8 +166,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -223,8 +223,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -280,8 +280,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -337,17 +337,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
-| de.json (missing 6)     | Audio Player                                                                        |
+| de.json (missing 7)     | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Progress Bar                                                                        |
 |                         | Volume Level                                                                        |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | End of dialog window.                                                               |
 | el.json (missing 43)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -386,8 +387,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -442,8 +443,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -499,8 +500,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -556,14 +557,15 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
-| fr.json (missing 3)     | subtitles settings                                                                  |
-|                         | restore all settings to the default values                                          |
+| fr.json (missing 4)     | subtitles settings                                                                  |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | End of dialog window.                                                               |
 | hr.json (missing 57)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -616,8 +618,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -673,8 +675,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -730,8 +732,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -787,8 +789,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -844,8 +846,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -901,8 +903,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -947,8 +949,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1004,8 +1006,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1054,8 +1056,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1111,8 +1113,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1153,8 +1155,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1196,8 +1198,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1253,8 +1255,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1310,17 +1312,18 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
-| tr.json (missing 6)     | Audio Player                                                                        |
+| tr.json (missing 7)     | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Progress Bar                                                                        |
 |                         | Volume Level                                                                        |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | End of dialog window.                                                               |
 | uk.json (missing 43)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -1359,8 +1362,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1401,8 +1404,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1457,8 +1460,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1500,8 +1503,8 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Defaults                                                                            |
-|                         | restore all settings to the default values                                          |
+|                         | Reset                                                                               |
+|                         | all settings to the default values                                                  |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
