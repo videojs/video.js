@@ -170,6 +170,9 @@ if (Html5.isSupported()) {
 
     muteToggle.handleClick();
 
+    // Because `MuteToggle#handleClick` is async, the `volumechange` event
+    // doesn't end up getting fired on `player` in the test environment, so we
+    // run it manually.
     player.trigger('volumechange');
 
     assert.equal(player.volume(), 1, 'Volume remains 1');
