@@ -8,8 +8,16 @@ import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import Html5 from '../../src/js/tech/html5.js';
+import sinon from 'sinon';
 
-QUnit.module('Controls');
+QUnit.module('Controls', {
+  beforeEach(assert) {
+    this.clock = sinon.useFakeTimers();
+  },
+  afterEach(assert) {
+    this.clock.restore();
+  }
+});
 
 QUnit.test('should hide volume control if it\'s not supported', function(assert) {
   assert.expect(2);
@@ -144,7 +152,7 @@ if (Html5.isSupported()) {
     const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
     const volumeBar = new VolumeBar(player);
 
-    volumeBar.updateARIAAttributes();
+    this.clock.tick(1);
 
     assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
   });
@@ -153,8 +161,7 @@ if (Html5.isSupported()) {
     const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
     const volumeBar = new VolumeBar(player);
     const muteToggle = new MuteToggle(player);
-
-    volumeBar.updateARIAAttributes();
+    this.clock.tick(1);
 
     assert.equal(player.volume(), 1, 'Volume is 1');
     assert.equal(player.muted(), false, 'Muted is false');
