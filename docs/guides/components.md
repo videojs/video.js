@@ -285,6 +285,7 @@ The default component structure of the Video.js player looks something like this
 
 ```tree
 Player
+├── MediaLoader (has no UI)
 ├── PosterImage
 ├── TextTrackDisplay
 ├── LoadingSpinner

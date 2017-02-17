@@ -118,7 +118,8 @@ class MuteToggle extends Button {
    * @private
    */
   updateControlText_() {
-    const text = this.player_.muted() ? 'Unmute' : 'Mute';
+    const soundOff = this.player_.muted() || this.player_.volume() === 0;
+    const text = soundOff ? 'Unmute' : 'Mute';
 
     if (this.controlText() !== text) {
       this.controlText(text);
