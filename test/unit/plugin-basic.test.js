@@ -38,6 +38,13 @@ QUnit.test('setup', function(assert) {
   assert.deepEqual(this.basic.firstCall.args, [{foo: 'bar'}, 123], 'the plugin had the correct arguments');
   assert.ok(this.player.usingPlugin('basic'), 'the player now recognizes that the plugin was set up');
   assert.ok(this.player.hasPlugin('basic'), 'player has the plugin available');
+
+  this.player.basic({foo: 'bar'}, 123);
+  assert.strictEqual(this.basic.callCount, 2, 'the plugin was called twice');
+  assert.strictEqual(this.basic.firstCall.thisValue, this.player, 'the plugin `this` value was the player');
+  assert.deepEqual(this.basic.firstCall.args, [{foo: 'bar'}, 123], 'the plugin had the correct arguments');
+  assert.ok(this.player.usingPlugin('basic'), 'the player now recognizes that the plugin was set up');
+  assert.ok(this.player.hasPlugin('basic'), 'player has the plugin available');
 });
 
 QUnit.test('"pluginsetup" event', function(assert) {
@@ -57,4 +64,16 @@ QUnit.test('"pluginsetup" event', function(assert) {
     instance,
     plugin: this.basic
   }, 'the event hash object is correct');
+});
+
+QUnit.test('properties are copied', function(assert) {
+  const foo = () => {};
+
+  foo.someProp = () => {};
+  foo.VERSION = '9.9.9';
+
+  Plugin.registerPlugin('foo', foo);
+
+  assert.strictEqual(this.player.foo.VERSION, foo.VERSION, 'properties are copied');
+  assert.strictEqual(this.player.foo.someProp, foo.someProp, 'properties are copied');
 });

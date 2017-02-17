@@ -312,6 +312,9 @@ class Plugin {
     if (name !== BASE_PLUGIN_NAME) {
       if (Plugin.isBasic(plugin)) {
         Player.prototype[name] = createBasicPlugin(name, plugin);
+        Object.keys(plugin).forEach(function(prop) {
+          Player.prototype[name][prop] = plugin[prop];
+        });
       } else {
         Player.prototype[name] = createPluginFactory(name, plugin);
       }
