@@ -76,4 +76,9 @@ QUnit.test('properties are copied', function(assert) {
 
   assert.strictEqual(this.player.foo.VERSION, foo.VERSION, 'properties are copied');
   assert.strictEqual(this.player.foo.someProp, foo.someProp, 'properties are copied');
+
+  this.player.foo();
+
+  assert.strictEqual(this.player.foo.VERSION, foo.VERSION, 'properties still exist after init');
+  assert.strictEqual(this.player.foo.someProp, foo.someProp, 'properties still exist after init');
 });

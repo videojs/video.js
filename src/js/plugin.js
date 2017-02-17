@@ -88,17 +88,25 @@ const markPluginAsActive = (player, name) => {
  * @returns {Function}
  *          A wrapper function for the given plugin.
  */
-const createBasicPlugin = (name, plugin) => function() {
-  const instance = plugin.apply(this, arguments);
+const createBasicPlugin = function(name, plugin) {
+  const basicPluginWrapper = function() {
+    const instance = plugin.apply(this, arguments);
 
-  markPluginAsActive(this, name);
+    markPluginAsActive(this, name);
 
-  // We trigger the "pluginsetup" event on the player regardless, but we want
-  // the hash to be consistent with the hash provided for advanced plugins.
-  // The only potentially counter-intuitive thing here is the `instance` is the
-  // value returned by the `plugin` function.
-  this.trigger('pluginsetup', {name, plugin, instance});
-  return instance;
+    // We trigger the "pluginsetup" event on the player regardless, but we want
+    // the hash to be consistent with the hash provided for advanced plugins.
+    // The only potentially counter-intuitive thing here is the `instance` is the
+    // value returned by the `plugin` function.
+    this.trigger('pluginsetup', {name, plugin, instance});
+    return instance;
+  };
+
+  Object.keys(plugin).forEach(function(prop) {
+    basicPluginWrapper[prop] = plugin[prop];
+  });
+
+  return basicPluginWrapper;
 };
 
 /**
@@ -312,9 +320,6 @@ class Plugin {
     if (name !== BASE_PLUGIN_NAME) {
       if (Plugin.isBasic(plugin)) {
         Player.prototype[name] = createBasicPlugin(name, plugin);
-        Object.keys(plugin).forEach(function(prop) {
-          Player.prototype[name][prop] = plugin[prop];
-        });
       } else {
         Player.prototype[name] = createPluginFactory(name, plugin);
       }
