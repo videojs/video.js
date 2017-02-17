@@ -105,17 +105,19 @@ class VolumeBar extends Slider {
    * @listens Player#volumechange
    */
   updateARIAAttributes(event) {
-    // Current value of volume bar as a percentage
-    const volume = Math.round((this.player_.volume() * 100)).toString();
-    const muted = this.player_.muted();
+    const ariaValue = this.player_.muted() ? 0 : this.volumeAsPercentage_();
 
-    if (muted) {
-      this.el_.setAttribute('aria-valuenow', 0);
-      this.el_.setAttribute('aria-valuetext', 0 + '%');
-    } else {
-      this.el_.setAttribute('aria-valuenow', volume);
-      this.el_.setAttribute('aria-valuetext', volume + '%');
-    }
+    this.el_.setAttribute('aria-valuenow', ariaValue);
+    this.el_.setAttribute('aria-valuetext', ariaValue + '%');
+  }
+
+  /**
+   * Returns the current value of the player volume as a percentage
+   *
+   * @private
+   */
+  volumeAsPercentage_() {
+    return Math.round((this.player_.volume() * 100)).toString();
   }
 
   /**
