@@ -65,15 +65,33 @@ class MuteToggle extends Button {
   }
 
   /**
-   * Update the state of volume.
+   * Update the `MuteToggle` button based on the state of `volume` and `muted`
+   * on the player.
    *
    * @param {EventTarget~Event} [event]
-   *        The {@link Player#loadstart} event if this function was called through an
-   *        event.
+   *        The {@link Player#loadstart} event if this function was called
+   *        through an event.
    *
    * @listens Player#loadstart
+   * @listens Player#volumechange
    */
   update(event) {
+    this.updateIcon_();
+    this.updateControlText_();
+  }
+
+  /**
+   * Update the appearance of the `MuteToggle` icon.
+   *
+   * Possible states (given `level` variable below):
+   * - 0: crossed out
+   * - 1: zero bars of volume
+   * - 2: one bar of volume
+   * - 3: two bars of volume
+   *
+   * @private
+   */
+  updateIcon_() {
     const vol = this.player_.volume();
     let level = 3;
 
@@ -85,21 +103,27 @@ class MuteToggle extends Button {
       level = 2;
     }
 
-    // Don't rewrite the button text if the actual text doesn't change.
-    // This causes unnecessary and confusing information for screen reader users.
-    // This check is needed because this function gets called every time the volume level is changed.
-    const soundOff = this.player_.muted() || this.player_.volume() === 0;
-    const toMute = soundOff ? 'Unmute' : 'Mute';
-
-    if (this.controlText() !== toMute) {
-      this.controlText(toMute);
-    }
-
     // TODO improve muted icon classes
     for (let i = 0; i < 4; i++) {
       Dom.removeClass(this.el_, `vjs-vol-${i}`);
     }
     Dom.addClass(this.el_, `vjs-vol-${level}`);
+  }
+
+  /**
+   * If `muted` has changed on the player, update the control text
+   * (`title` attribute on `vjs-mute-control` element and content of
+   * `vjs-control-text` element).
+   *
+   * @private
+   */
+  updateControlText_() {
+    const soundOff = this.player_.muted() || this.player_.volume() === 0;
+    const text = soundOff ? 'Unmute' : 'Mute';
+
+    if (this.controlText() !== text) {
+      this.controlText(text);
+    }
   }
 
 }
