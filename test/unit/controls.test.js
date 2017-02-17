@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
 import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
+import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
@@ -138,4 +139,31 @@ if (Html5.isSupported()) {
     assert.equal(player.volume(), 0.5, 'volume is set to lastVolume');
     assert.equal(player.muted(), false, 'muted is set to false');
   });
+
+  QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
+    const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+    const volumeBar = new VolumeBar(player);
+    volumeBar.updateARIAAttributes();
+
+    assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
+  });
+
+  QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', function(assert) {
+    const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+    const volumeBar = new VolumeBar(player);
+    const muteToggle = new MuteToggle(player);
+    volumeBar.updateARIAAttributes();
+
+    assert.equal(player.volume(), 1, 'Volume is 1');
+    assert.equal(player.muted(), false, 'Muted is false');
+    assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
+
+    muteToggle.handleClick();
+    volumeBar.updateARIAAttributes();
+
+    assert.equal(player.volume(), 1, 'Volume remains 1');
+    assert.equal(player.muted(), true, 'Muted is true');
+    assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
+  });
+
 }
