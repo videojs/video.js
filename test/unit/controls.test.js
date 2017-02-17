@@ -170,7 +170,7 @@ if (Html5.isSupported()) {
 
     muteToggle.handleClick();
 
-    volumeBar.updateARIAAttributes();
+    player.trigger('volumechange');
 
     assert.equal(player.volume(), 1, 'Volume remains 1');
     assert.equal(player.muted(), true, 'Muted is true');
