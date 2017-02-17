@@ -117,7 +117,7 @@ class VolumeBar extends Slider {
    * @private
    */
   volumeAsPercentage_() {
-    return Math.round((this.player_.volume() * 100)).toString();
+    return Math.round(this.player_.volume() * 100);
   }
 
   /**
