@@ -45,7 +45,7 @@
     "videojs-font": "2.0.0",
     "videojs-ie8": "1.1.2",
     "videojs-vtt.js": "0.12.1",
-    "xhr": "2.3.3"
+    "xhr": "2.4.0"
   },
   "devDependencies": {
     "aliasify": "^2.1.0",
