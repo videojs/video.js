@@ -161,6 +161,7 @@ if (Html5.isSupported()) {
     const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
     const volumeBar = new VolumeBar(player);
     const muteToggle = new MuteToggle(player);
+
     this.clock.tick(1);
 
     assert.equal(player.volume(), 1, 'Volume is 1');
