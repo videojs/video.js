@@ -143,6 +143,7 @@ if (Html5.isSupported()) {
   QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
     const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
     const volumeBar = new VolumeBar(player);
+
     volumeBar.updateARIAAttributes();
 
     assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
@@ -152,6 +153,7 @@ if (Html5.isSupported()) {
     const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
     const volumeBar = new VolumeBar(player);
     const muteToggle = new MuteToggle(player);
+
     volumeBar.updateARIAAttributes();
 
     assert.equal(player.volume(), 1, 'Volume is 1');
@@ -159,6 +161,7 @@ if (Html5.isSupported()) {
     assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
 
     muteToggle.handleClick();
+
     volumeBar.updateARIAAttributes();
 
     assert.equal(player.volume(), 1, 'Volume remains 1');
