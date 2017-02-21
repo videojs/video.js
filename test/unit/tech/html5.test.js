@@ -647,23 +647,6 @@ QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function(ass
   Html5.resetMediaElement = oldResetMedia;
 });
 
-QUnit.test('Exception in play promise should be caught', function() {
-  const oldEl = tech.el_;
-
-  tech.el_ = {
-    play: () => {
-      return new Promise(function(resolve, reject) {
-        reject(new DOMException());
-      });
-    }
-  };
-
-  tech.play();
-  QUnit.ok(true, 'error was caught');
-
-  tech.el_ = oldEl;
-});
-
 test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function() {
   const oldIsAndroid = browser.IS_ANDROID;
   const oldIsChrome = browser.IS_CHROME;
