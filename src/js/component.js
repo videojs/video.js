@@ -418,7 +418,7 @@ class Component {
 
     // If a name wasn't used to create the component, check if we can use the
     // name function of the component
-    componentName = componentName || (component.name && component.name());
+    componentName = componentName || (component.name && toTitleCase(component.name()));
 
     if (componentName) {
       this.childNameIndex_[componentName] = component;
