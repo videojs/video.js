@@ -579,11 +579,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
-| fr.json (missing 5)     | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | subtitles settings                                                                  |
-|                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
-|                         | End of dialog window.                                                               |
+| fr.json (Complete)      |                                                                                     |
 | hr.json (missing 58)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
