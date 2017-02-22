@@ -4,7 +4,7 @@
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
-
+import toTitleCase from '../../utils/to-title-case.js';
 /**
  * The button component for toggling and selecting captions
  *
@@ -21,15 +21,8 @@ class SubsCapsButton extends TextTrackButton {
     if (['en', 'en-us', 'en-ca', 'fr-ca'].indexOf(this.player_.language_) > -1) {
       this.label_ = 'captions';
     }
+    this.menuButton_.controlText(toTitleCase(this.label_));
 
-    /**
-     * The text that should display over the `SubsCapsButton`s controls.
-     *
-     *
-     * @type {string}
-     * @private
-     */
-    SubsCapsButton.prototype.controlText_ = this.label_;
   }
 
   /**
@@ -95,6 +88,15 @@ class SubsCapsButton extends TextTrackButton {
  * @private
  */
 SubsCapsButton.prototype.kinds_ = ['captions', 'subtitles'];
+
+/**
+ * The text that should display over the `SubsCapsButton`s controls.
+ *
+ *
+ * @type {string}
+ * @private
+ */
+SubsCapsButton.prototype.controlText_ = 'Subtitles';
 
 Component.registerComponent('SubsCapsButton', SubsCapsButton);
 export default SubsCapsButton;
