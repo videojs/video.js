@@ -57,6 +57,8 @@ class TextTrackButton extends TrackButton {
       label
     }));
 
+    this.hideThreshold_ += 1;
+
     const tracks = this.player_.textTracks();
 
     for (let i = 0; i < tracks.length; i++) {
