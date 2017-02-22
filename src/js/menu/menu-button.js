@@ -177,6 +177,24 @@ class MenuButton extends Component {
   }
 
   /**
+   * Get or set the localized control text that will be used for accessibility.
+   *
+   * > NOTE: This will come from the internal `menuButton_` element.
+   *
+   * @param {string} [text]
+   *        Control text for element.
+   *
+   * @param {Element} [el=this.menuButton_.el()]
+   *        Element to set the title on.
+   *
+   * @return {string}
+   *         - The control text when getting
+   */
+  controlText(text, el = this.menuButton_.el()) {
+    return this.menuButton_.controlText(text, el);
+  }
+
+  /**
    * Handle a click on a `MenuButton`.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
