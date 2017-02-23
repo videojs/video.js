@@ -112,7 +112,7 @@
     "proxyquireify": "^3.0.0",
     "qunitjs": "1.23.1",
     "remark-cli": "^2.1.0",
-    "remark-lint": "^5.2.0",
+    "remark-lint": "^6.0.0",
     "remark-toc": "^3.1.0",
     "remark-validate-links": "^5.0.0",
     "shelljs": "^0.7.5",
