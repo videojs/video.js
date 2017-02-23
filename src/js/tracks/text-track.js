@@ -331,8 +331,8 @@ class TextTrack extends Track {
   addCue(_cue) {
     let cue = _cue;
 
-    if (!(_cue instanceof vttjs.VTTCue)) {
-      cue = new vttjs.VTTCue(_cue.startTime, _cue.endTime, _cue.text);
+    if (!(_cue instanceof window.vttjs.VTTCue)) {
+      cue = new window.vttjs.VTTCue(_cue.startTime, _cue.endTime, _cue.text);
 
       for (const prop in _cue) {
         cue[prop] = _cue[prop];
