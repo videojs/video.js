@@ -15,20 +15,7 @@
   <!-- Set the location of the flash SWF -->
   <script>
     videojs.options.flash.swf = '../build/temp/video-js.swf';
-    videojs.addLanguage('de', {
-      'Captions settings': 'Amerikanisch',
-      'Subtitles settings': 'Global'
-    });
   </script>
-  <style>
-  .video-js:lang(en-US) {
-    border: 3px solid red;
-  }
-  .vjs-control:focus {
-    box-shadow: inset 0 0 0 2px rgba(27,127,204,.8);
-    outline: none;
-  }
-  </style>
 </head>
 <body>
   <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
@@ -38,17 +25,17 @@
     <pre>open http://localhost:9999/sandbox/index.html</pre>
   </div>
 
-  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="http://vjs.zencdn.net/v/oceans.png">
-    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
-    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
-    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
-    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
-    <track kind="captions" src="../docs/examples/shared/example-captions-fr.vtt" srclang="fr" label="French"></track><!-- Tracks need an ending tag thanks to IE9 -->
-    <track kind="subtitles" src="../docs/examples/shared/example-subtitles-fr.vtt" srclang="fr" label="French"></track><!-- Tracks need an ending tag thanks to IE9 -->
-    <track kind="subtitles" src="../docs/examples/shared/example-subtitles-de.vtt" srclang="de" label="German"></track><!-- Tracks need an ending tag thanks to IE9 -->
+  <video id="vid1" class="video-js vjs-default-skin" lang="en" controls preload="auto" width="640" height="264" poster="http://vjs.zencdn.net/v/oceans.png">
+    <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
+    <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
+    <track kind="captions" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.en.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.ar.vtt" srclang="ar" label="Arabic"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.sv.vtt" srclang="sv" label="Swedish"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.ru.vtt" srclang="ru" label="Russian"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.ja.vtt" srclang="ja" label="Japanese"></track><!-- Tracks need an ending tag thanks to IE9 -->
     <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
-
+  <p>This player has the captions-only CpationsButton, the subtiles-only subtitlesButton and the subsCapsButton which shows both kinds. Typically you'll use either just the subsCapsButton alone, or one or both of the captionsButton and subtitlesButton.</p>
   <script>
     var vid = document.getElementById("vid1");
     var player = videojs(vid, {
