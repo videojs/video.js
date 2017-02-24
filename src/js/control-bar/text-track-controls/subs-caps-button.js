@@ -1,12 +1,12 @@
 /**
- * @file tracks-button.js
+ * @file sub-caps-button.js
  */
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 import toTitleCase from '../../utils/to-title-case.js';
 /**
- * The button component for toggling and selecting captions
+ * The button component for toggling and selecting captions and/or subtitles
  *
  * @extends TextTrackButton
  */
