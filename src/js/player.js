@@ -1616,7 +1616,7 @@ class Player extends Component {
       });
 
     // Only calls the tech's play if we already have a src loaded
-    } else if (this.src() || this.currentSrc()) {
+    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
     } else {
       this.ready(function() {
