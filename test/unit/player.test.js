@@ -2,11 +2,11 @@
 // import Plugin from '../../src/js/plugin';
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
-import * as Dom from '../../src/js/utils/dom.js';
-import * as browser from '../../src/js/utils/browser.js';
+// import * as Dom from '../../src/js/utils/dom.js';
+// import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
-import MediaError from '../../src/js/media-error.js';
-import Html5 from '../../src/js/tech/html5.js';
+// import MediaError from '../../src/js/media-error.js';
+// import Html5 from '../../src/js/tech/html5.js';
 // import Tech from '../../src/js/tech/tech.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
@@ -396,400 +396,400 @@ QUnit.test('should wrap the original tag in the player div', function(assert) {
   player.dispose();
 });
 
-QUnit.test('should set and update the poster value', function(assert) {
-  const poster = '#';
-  const updatedPoster = 'http://example.com/updated-poster.jpg';
-
-  const tag = TestHelpers.makeTag();
-
-  tag.setAttribute('poster', poster);
-
-  const player = TestHelpers.makePlayer({}, tag);
-
-  assert.equal(player.poster(), poster, 'the poster property should equal the tag attribute');
-
-  let pcEmitted = false;
-
-  player.on('posterchange', function() {
-    pcEmitted = true;
-  });
-
-  player.poster(updatedPoster);
-  assert.ok(pcEmitted, 'posterchange event was emitted');
-  assert.equal(player.poster(), updatedPoster, 'the updated poster is returned');
-
-  player.dispose();
-});
-
-// hasStarted() is equivalent to the "show poster flag" in the
-// standard, for the purpose of displaying the poster image
-// https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
-QUnit.test('should hide the poster when play is called', function(assert) {
-  const player = TestHelpers.makePlayer({
-    poster: 'https://example.com/poster.jpg'
-  });
-
-  assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
-  player.tech_.trigger('play');
-  assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
-
-  player.tech_.trigger('loadstart');
-  assert.equal(player.hasStarted(), false, 'the resource selection algorithm sets the show poster flag to true');
-
-  player.tech_.trigger('play');
-  assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
-  player.dispose();
-});
-
-QUnit.test('should load a media controller', function(assert) {
-  const player = TestHelpers.makePlayer({
-    preload: 'none',
-    sources: [
-      { src: 'http://google.com', type: 'video/mp4' },
-      { src: 'http://google.com', type: 'video/webm' }
-    ]
-  });
-
-  assert.ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
-
-  player.dispose();
-});
-
-QUnit.test('should be able to initialize player twice on the same tag using string reference', function(assert) {
-  let videoTag = TestHelpers.makeTag();
-  const id = videoTag.id;
-
-  const fixture = document.getElementById('qunit-fixture');
-
-  fixture.appendChild(videoTag);
-
-  let player = videojs(videoTag.id, { techOrder: ['techFaker'] });
-
-  assert.ok(player, 'player is created');
-  player.dispose();
-
-  assert.ok(!document.getElementById(id), 'element is removed');
-  videoTag = TestHelpers.makeTag();
-  fixture.appendChild(videoTag);
-
-  // here we receive cached version instead of real
-  player = videojs(videoTag.id, { techOrder: ['techFaker'] });
-  // here it triggers error, because player was destroyed already after first dispose
-  player.dispose();
-});
-
-QUnit.test('should set controls and trigger events', function(assert) {
-  const player = TestHelpers.makePlayer({ controls: false });
-
-  assert.ok(player.controls() === false, 'controls set through options');
-  const hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
-
-  assert.ok(hasDisabledClass !== -1, 'Disabled class added to player');
-
-  player.controls(true);
-  assert.ok(player.controls() === true, 'controls updated');
-  const hasEnabledClass = player.el().className.indexOf('vjs-controls-enabled');
-
-  assert.ok(hasEnabledClass !== -1, 'Disabled class added to player');
-
-  player.on('controlsenabled', function() {
-    assert.ok(true, 'enabled fired once');
-  });
-  player.on('controlsdisabled', function() {
-    assert.ok(true, 'disabled fired once');
-  });
-  player.controls(false);
-
-  player.dispose();
-});
-
-QUnit.test('should toggle user the user state between active and inactive', function(assert) {
-  const player = TestHelpers.makePlayer({});
-
-  assert.expect(9);
-
-  assert.ok(player.userActive(), 'User should be active at player init');
-
-  player.on('userinactive', function() {
-    assert.ok(true, 'userinactive event triggered');
-  });
-
-  player.on('useractive', function() {
-    assert.ok(true, 'useractive event triggered');
-  });
-
-  player.userActive(false);
-  assert.ok(player.userActive() === false, 'Player state changed to inactive');
-  assert.ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
-  assert.ok(player.el().className.indexOf('vjs-user-inactive') !== -1, 'Inactive class added');
-
-  player.userActive(true);
-  assert.ok(player.userActive() === true, 'Player state changed to active');
-  assert.ok(player.el().className.indexOf('vjs-user-inactive') === -1, 'Inactive class removed');
-  assert.ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
-
-  player.dispose();
-});
-
-QUnit.test('should add a touch-enabled classname when touch is supported', function(assert) {
-  assert.expect(1);
-
-  // Fake touch support. Real touch support isn't needed for this test.
-  const origTouch = browser.TOUCH_ENABLED;
-
-  browser.TOUCH_ENABLED = true;
-
-  const player = TestHelpers.makePlayer({});
-
-  assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
-
-  browser.TOUCH_ENABLED = origTouch;
-  player.dispose();
-});
-
-QUnit.test('should allow for tracking when native controls are used', function(assert) {
-  const player = TestHelpers.makePlayer({});
-
-  assert.expect(6);
-
-  // Make sure native controls is false before starting test
-  player.usingNativeControls(false);
-
-  player.on('usingnativecontrols', function() {
-    assert.ok(true, 'usingnativecontrols event triggered');
-  });
-
-  player.on('usingcustomcontrols', function() {
-    assert.ok(true, 'usingcustomcontrols event triggered');
-  });
-
-  player.usingNativeControls(true);
-  assert.ok(player.usingNativeControls() === true, 'Using native controls is true');
-  assert.ok(player.el().className.indexOf('vjs-using-native-controls') !== -1, 'Native controls class added');
-
-  player.usingNativeControls(false);
-  assert.ok(player.usingNativeControls() === false, 'Using native controls is false');
-  assert.ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
-
-  player.dispose();
-});
-
-QUnit.test('make sure that controls listeners do not get added too many times', function(assert) {
-  const player = TestHelpers.makePlayer({});
-  let listeners = 0;
-
-  player.addTechControlsListeners_ = function() {
-    listeners++;
-  };
-
-  // Make sure native controls is false before starting test
-  player.usingNativeControls(false);
-
-  player.usingNativeControls(true);
-
-  player.controls(true);
-
-  assert.equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
-
-  player.usingNativeControls(false);
-  player.controls(false);
-
-  player.controls(true);
-  assert.equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
-
-  player.dispose();
-});
-
-QUnit.test('should register players with generated ids', function(assert) {
-  const fixture = document.getElementById('qunit-fixture');
-
-  const video = document.createElement('video');
-
-  video.className = 'vjs-default-skin video-js';
-  fixture.appendChild(video);
-
-  const player = new Player(video, { techOrder: ['techFaker'] });
-  const id = player.el().id;
-
-  assert.equal(player.el().id, player.id(), 'the player and element ids are equal');
-  assert.ok(Player.players[id], 'the generated id is registered');
-  player.dispose();
-});
-
-QUnit.test('should not add multiple first play events despite subsequent loads', function(assert) {
-  assert.expect(1);
-
-  const player = TestHelpers.makePlayer({});
-
-  player.on('firstplay', function() {
-    assert.ok(true, 'First play should fire once.');
-  });
-
-  // Checking to make sure onLoadStart removes first play listener before adding a new one.
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  player.dispose();
-});
-
-QUnit.test('should fire firstplay after resetting the player', function(assert) {
-  const player = TestHelpers.makePlayer({});
-
-  let fpFired = false;
-
-  player.on('firstplay', function() {
-    fpFired = true;
-  });
-
-  // init firstplay listeners
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  assert.ok(fpFired, 'First firstplay fired');
-
-  // reset the player
-  player.tech_.trigger('loadstart');
-  fpFired = false;
-  player.tech_.trigger('play');
-  assert.ok(fpFired, 'Second firstplay fired');
-
-  // the play event can fire before the loadstart event.
-  // in that case we still want the firstplay even to fire.
-  player.tech_.paused = function() {
-    return false;
-  };
-  fpFired = false;
-  // reset the player
-  player.tech_.trigger('loadstart');
-  // player.tech_.trigger('play');
-  assert.ok(fpFired, 'Third firstplay fired');
-  player.dispose();
-});
-
-QUnit.test('should remove vjs-has-started class', function(assert) {
-  assert.expect(3);
-
-  const player = TestHelpers.makePlayer({});
-
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  assert.ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
-
-  player.tech_.trigger('loadstart');
-  assert.ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
-
-  player.tech_.trigger('play');
-
-  assert.ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
-  player.dispose();
-});
-
-QUnit.test('should add and remove vjs-ended class', function(assert) {
-  assert.expect(4);
-
-  const player = TestHelpers.makePlayer({});
-
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  player.tech_.trigger('ended');
-  assert.ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class added');
-
-  player.tech_.trigger('play');
-  assert.ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
-
-  player.tech_.trigger('ended');
-  assert.ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class re-added');
-
-  player.tech_.trigger('loadstart');
-  assert.ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
-  player.dispose();
-});
-
-QUnit.test('player should handle different error types', function(assert) {
-  assert.expect(8);
-  const player = TestHelpers.makePlayer({});
-  const testMsg = 'test message';
-
-  // prevent error log messages in the console
-  sinon.stub(log, 'error');
-
-  // error code supplied
-  function errCode() {
-    assert.equal(player.error().code, 1, 'error code is correct');
-  }
-  player.on('error', errCode);
-  player.error(1);
-  player.off('error', errCode);
-
-  // error instance supplied
-  function errInst() {
-    assert.equal(player.error().code, 2, 'MediaError code is correct');
-    assert.equal(player.error().message, testMsg, 'MediaError message is correct');
-  }
-  player.on('error', errInst);
-  player.error(new MediaError({ code: 2, message: testMsg }));
-  player.off('error', errInst);
-
-  // error message supplied
-  function errMsg() {
-    assert.equal(player.error().code, 0, 'error message code is correct');
-    assert.equal(player.error().message, testMsg, 'error message is correct');
-  }
-  player.on('error', errMsg);
-  player.error(testMsg);
-  player.off('error', errMsg);
-
-  // error config supplied
-  function errConfig() {
-    assert.equal(player.error().code, 3, 'error config code is correct');
-    assert.equal(player.error().message, testMsg, 'error config message is correct');
-  }
-  player.on('error', errConfig);
-  player.error({ code: 3, message: testMsg });
-  player.off('error', errConfig);
-
-  // check for vjs-error classname
-  assert.ok(player.el().className.indexOf('vjs-error') >= 0, 'player does not have vjs-error classname');
-
-  // restore error logging
-  log.error.restore();
-
-  player.dispose();
-});
-
-QUnit.test('Data attributes on the video element should persist in the new wrapper element', function(assert) {
-  const dataId = 123;
-
-  const tag = TestHelpers.makeTag();
-
-  tag.setAttribute('data-id', dataId);
-
-  const player = TestHelpers.makePlayer({}, tag);
-
-  assert.equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
-
-  player.dispose();
-});
-
-QUnit.test('should restore attributes from the original video tag when creating a new element', function(assert) {
-  // simulate attributes stored from the original tag
-  const tag = Dom.createEl('video');
-
-  tag.setAttribute('preload', 'auto');
-  tag.setAttribute('autoplay', '');
-  tag.setAttribute('webkit-playsinline', '');
-
-  const html5Mock = { options_: {tag} };
-
-  // set options that should override tag attributes
-  html5Mock.options_.preload = 'none';
-
-  // create the element
-  const el = Html5.prototype.createEl.call(html5Mock);
-
-  assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
-  assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
-  assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
-});
+// QUnit.test('should set and update the poster value', function(assert) {
+//   const poster = '#';
+//   const updatedPoster = 'http://example.com/updated-poster.jpg';
+//
+//   const tag = TestHelpers.makeTag();
+//
+//   tag.setAttribute('poster', poster);
+//
+//   const player = TestHelpers.makePlayer({}, tag);
+//
+//   assert.equal(player.poster(), poster, 'the poster property should equal the tag attribute');
+//
+//   let pcEmitted = false;
+//
+//   player.on('posterchange', function() {
+//     pcEmitted = true;
+//   });
+//
+//   player.poster(updatedPoster);
+//   assert.ok(pcEmitted, 'posterchange event was emitted');
+//   assert.equal(player.poster(), updatedPoster, 'the updated poster is returned');
+//
+//   player.dispose();
+// });
+//
+// // hasStarted() is equivalent to the "show poster flag" in the
+// // standard, for the purpose of displaying the poster image
+// // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
+// QUnit.test('should hide the poster when play is called', function(assert) {
+//   const player = TestHelpers.makePlayer({
+//     poster: 'https://example.com/poster.jpg'
+//   });
+//
+//   assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
+//   player.tech_.trigger('play');
+//   assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
+//
+//   player.tech_.trigger('loadstart');
+//   assert.equal(player.hasStarted(), false, 'the resource selection algorithm sets the show poster flag to true');
+//
+//   player.tech_.trigger('play');
+//   assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
+//   player.dispose();
+// });
+//
+// QUnit.test('should load a media controller', function(assert) {
+//   const player = TestHelpers.makePlayer({
+//     preload: 'none',
+//     sources: [
+//       { src: 'http://google.com', type: 'video/mp4' },
+//       { src: 'http://google.com', type: 'video/webm' }
+//     ]
+//   });
+//
+//   assert.ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should be able to initialize player twice on the same tag using string reference', function(assert) {
+//   let videoTag = TestHelpers.makeTag();
+//   const id = videoTag.id;
+//
+//   const fixture = document.getElementById('qunit-fixture');
+//
+//   fixture.appendChild(videoTag);
+//
+//   let player = videojs(videoTag.id, { techOrder: ['techFaker'] });
+//
+//   assert.ok(player, 'player is created');
+//   player.dispose();
+//
+//   assert.ok(!document.getElementById(id), 'element is removed');
+//   videoTag = TestHelpers.makeTag();
+//   fixture.appendChild(videoTag);
+//
+//   // here we receive cached version instead of real
+//   player = videojs(videoTag.id, { techOrder: ['techFaker'] });
+//   // here it triggers error, because player was destroyed already after first dispose
+//   player.dispose();
+// });
+//
+// QUnit.test('should set controls and trigger events', function(assert) {
+//   const player = TestHelpers.makePlayer({ controls: false });
+//
+//   assert.ok(player.controls() === false, 'controls set through options');
+//   const hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
+//
+//   assert.ok(hasDisabledClass !== -1, 'Disabled class added to player');
+//
+//   player.controls(true);
+//   assert.ok(player.controls() === true, 'controls updated');
+//   const hasEnabledClass = player.el().className.indexOf('vjs-controls-enabled');
+//
+//   assert.ok(hasEnabledClass !== -1, 'Disabled class added to player');
+//
+//   player.on('controlsenabled', function() {
+//     assert.ok(true, 'enabled fired once');
+//   });
+//   player.on('controlsdisabled', function() {
+//     assert.ok(true, 'disabled fired once');
+//   });
+//   player.controls(false);
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should toggle user the user state between active and inactive', function(assert) {
+//   const player = TestHelpers.makePlayer({});
+//
+//   assert.expect(9);
+//
+//   assert.ok(player.userActive(), 'User should be active at player init');
+//
+//   player.on('userinactive', function() {
+//     assert.ok(true, 'userinactive event triggered');
+//   });
+//
+//   player.on('useractive', function() {
+//     assert.ok(true, 'useractive event triggered');
+//   });
+//
+//   player.userActive(false);
+//   assert.ok(player.userActive() === false, 'Player state changed to inactive');
+//   assert.ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
+//   assert.ok(player.el().className.indexOf('vjs-user-inactive') !== -1, 'Inactive class added');
+//
+//   player.userActive(true);
+//   assert.ok(player.userActive() === true, 'Player state changed to active');
+//   assert.ok(player.el().className.indexOf('vjs-user-inactive') === -1, 'Inactive class removed');
+//   assert.ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should add a touch-enabled classname when touch is supported', function(assert) {
+//   assert.expect(1);
+//
+//   // Fake touch support. Real touch support isn't needed for this test.
+//   const origTouch = browser.TOUCH_ENABLED;
+//
+//   browser.TOUCH_ENABLED = true;
+//
+//   const player = TestHelpers.makePlayer({});
+//
+//   assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
+//
+//   browser.TOUCH_ENABLED = origTouch;
+//   player.dispose();
+// });
+//
+// QUnit.test('should allow for tracking when native controls are used', function(assert) {
+//   const player = TestHelpers.makePlayer({});
+//
+//   assert.expect(6);
+//
+//   // Make sure native controls is false before starting test
+//   player.usingNativeControls(false);
+//
+//   player.on('usingnativecontrols', function() {
+//     assert.ok(true, 'usingnativecontrols event triggered');
+//   });
+//
+//   player.on('usingcustomcontrols', function() {
+//     assert.ok(true, 'usingcustomcontrols event triggered');
+//   });
+//
+//   player.usingNativeControls(true);
+//   assert.ok(player.usingNativeControls() === true, 'Using native controls is true');
+//   assert.ok(player.el().className.indexOf('vjs-using-native-controls') !== -1, 'Native controls class added');
+//
+//   player.usingNativeControls(false);
+//   assert.ok(player.usingNativeControls() === false, 'Using native controls is false');
+//   assert.ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('make sure that controls listeners do not get added too many times', function(assert) {
+//   const player = TestHelpers.makePlayer({});
+//   let listeners = 0;
+//
+//   player.addTechControlsListeners_ = function() {
+//     listeners++;
+//   };
+//
+//   // Make sure native controls is false before starting test
+//   player.usingNativeControls(false);
+//
+//   player.usingNativeControls(true);
+//
+//   player.controls(true);
+//
+//   assert.equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
+//
+//   player.usingNativeControls(false);
+//   player.controls(false);
+//
+//   player.controls(true);
+//   assert.equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should register players with generated ids', function(assert) {
+//   const fixture = document.getElementById('qunit-fixture');
+//
+//   const video = document.createElement('video');
+//
+//   video.className = 'vjs-default-skin video-js';
+//   fixture.appendChild(video);
+//
+//   const player = new Player(video, { techOrder: ['techFaker'] });
+//   const id = player.el().id;
+//
+//   assert.equal(player.el().id, player.id(), 'the player and element ids are equal');
+//   assert.ok(Player.players[id], 'the generated id is registered');
+//   player.dispose();
+// });
+//
+// QUnit.test('should not add multiple first play events despite subsequent loads', function(assert) {
+//   assert.expect(1);
+//
+//   const player = TestHelpers.makePlayer({});
+//
+//   player.on('firstplay', function() {
+//     assert.ok(true, 'First play should fire once.');
+//   });
+//
+//   // Checking to make sure onLoadStart removes first play listener before adding a new one.
+//   player.tech_.trigger('loadstart');
+//   player.tech_.trigger('loadstart');
+//   player.tech_.trigger('play');
+//   player.dispose();
+// });
+//
+// QUnit.test('should fire firstplay after resetting the player', function(assert) {
+//   const player = TestHelpers.makePlayer({});
+//
+//   let fpFired = false;
+//
+//   player.on('firstplay', function() {
+//     fpFired = true;
+//   });
+//
+//   // init firstplay listeners
+//   player.tech_.trigger('loadstart');
+//   player.tech_.trigger('play');
+//   assert.ok(fpFired, 'First firstplay fired');
+//
+//   // reset the player
+//   player.tech_.trigger('loadstart');
+//   fpFired = false;
+//   player.tech_.trigger('play');
+//   assert.ok(fpFired, 'Second firstplay fired');
+//
+//   // the play event can fire before the loadstart event.
+//   // in that case we still want the firstplay even to fire.
+//   player.tech_.paused = function() {
+//     return false;
+//   };
+//   fpFired = false;
+//   // reset the player
+//   player.tech_.trigger('loadstart');
+//   // player.tech_.trigger('play');
+//   assert.ok(fpFired, 'Third firstplay fired');
+//   player.dispose();
+// });
+//
+// QUnit.test('should remove vjs-has-started class', function(assert) {
+//   assert.expect(3);
+//
+//   const player = TestHelpers.makePlayer({});
+//
+//   player.tech_.trigger('loadstart');
+//   player.tech_.trigger('play');
+//   assert.ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
+//
+//   player.tech_.trigger('loadstart');
+//   assert.ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
+//
+//   player.tech_.trigger('play');
+//
+//   assert.ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
+//   player.dispose();
+// });
+//
+// QUnit.test('should add and remove vjs-ended class', function(assert) {
+//   assert.expect(4);
+//
+//   const player = TestHelpers.makePlayer({});
+//
+//   player.tech_.trigger('loadstart');
+//   player.tech_.trigger('play');
+//   player.tech_.trigger('ended');
+//   assert.ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class added');
+//
+//   player.tech_.trigger('play');
+//   assert.ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
+//
+//   player.tech_.trigger('ended');
+//   assert.ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class re-added');
+//
+//   player.tech_.trigger('loadstart');
+//   assert.ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
+//   player.dispose();
+// });
+//
+// QUnit.test('player should handle different error types', function(assert) {
+//   assert.expect(8);
+//   const player = TestHelpers.makePlayer({});
+//   const testMsg = 'test message';
+//
+//   // prevent error log messages in the console
+//   sinon.stub(log, 'error');
+//
+//   // error code supplied
+//   function errCode() {
+//     assert.equal(player.error().code, 1, 'error code is correct');
+//   }
+//   player.on('error', errCode);
+//   player.error(1);
+//   player.off('error', errCode);
+//
+//   // error instance supplied
+//   function errInst() {
+//     assert.equal(player.error().code, 2, 'MediaError code is correct');
+//     assert.equal(player.error().message, testMsg, 'MediaError message is correct');
+//   }
+//   player.on('error', errInst);
+//   player.error(new MediaError({ code: 2, message: testMsg }));
+//   player.off('error', errInst);
+//
+//   // error message supplied
+//   function errMsg() {
+//     assert.equal(player.error().code, 0, 'error message code is correct');
+//     assert.equal(player.error().message, testMsg, 'error message is correct');
+//   }
+//   player.on('error', errMsg);
+//   player.error(testMsg);
+//   player.off('error', errMsg);
+//
+//   // error config supplied
+//   function errConfig() {
+//     assert.equal(player.error().code, 3, 'error config code is correct');
+//     assert.equal(player.error().message, testMsg, 'error config message is correct');
+//   }
+//   player.on('error', errConfig);
+//   player.error({ code: 3, message: testMsg });
+//   player.off('error', errConfig);
+//
+//   // check for vjs-error classname
+//   assert.ok(player.el().className.indexOf('vjs-error') >= 0, 'player does not have vjs-error classname');
+//
+//   // restore error logging
+//   log.error.restore();
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('Data attributes on the video element should persist in the new wrapper element', function(assert) {
+//   const dataId = 123;
+//
+//   const tag = TestHelpers.makeTag();
+//
+//   tag.setAttribute('data-id', dataId);
+//
+//   const player = TestHelpers.makePlayer({}, tag);
+//
+//   assert.equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should restore attributes from the original video tag when creating a new element', function(assert) {
+//   // simulate attributes stored from the original tag
+//   const tag = Dom.createEl('video');
+//
+//   tag.setAttribute('preload', 'auto');
+//   tag.setAttribute('autoplay', '');
+//   tag.setAttribute('webkit-playsinline', '');
+//
+//   const html5Mock = { options_: {tag} };
+//
+//   // set options that should override tag attributes
+//   html5Mock.options_.preload = 'none';
+//
+//   // create the element
+//   const el = Html5.prototype.createEl.call(html5Mock);
+//
+//   assert.equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+//   assert.equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
+//   assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+// });
 
 // QUnit.test('if tag exists and movingMediaElementInDOM, re-use the tag', function(assert) {
 //   // simulate attributes stored from the original tag
