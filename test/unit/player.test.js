@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import Plugin from '../../src/js/plugin';
+// import Plugin from '../../src/js/plugin';
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
@@ -7,12 +7,12 @@ import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
 import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
-import Tech from '../../src/js/tech/tech.js';
+// import Tech from '../../src/js/tech/tech.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
-import window from 'global/window';
-import * as middleware from '../../src/js/tech/middleware.js';
+// import window from 'global/window';
+// import * as middleware from '../../src/js/tech/middleware.js';
 
 QUnit.module('Player', {
   beforeEach() {
