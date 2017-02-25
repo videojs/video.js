@@ -4,7 +4,7 @@ import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
 // import * as Dom from '../../src/js/utils/dom.js';
 // import * as browser from '../../src/js/utils/browser.js';
-import log from '../../src/js/utils/log.js';
+// import log from '../../src/js/utils/log.js';
 // import MediaError from '../../src/js/media-error.js';
 // import Html5 from '../../src/js/tech/html5.js';
 // import Tech from '../../src/js/tech/tech.js';
@@ -149,74 +149,37 @@ QUnit.test('should get current source from source tag', function(assert) {
   player.dispose();
 });
 
-// QUnit.test('should get current sources from source tag', function(assert) {
-//   const fixture = document.getElementById('qunit-fixture');
-//
-//   const html = [
-//     '<video id="example_1" class="video-js" preload="none">',
-//     '<source src="http://google.com" type="video/mp4">',
-//     '<source src="http://hugo.com" type="video/webm">',
-//     '</video>'
-//   ].join('');
-//
-//   fixture.innerHTML += html;
-//
-//   const tag = document.getElementById('example_1');
-//   const player = TestHelpers.makePlayer({}, tag);
-//
-//   assert.ok(player.currentSources()[0].src === 'http://google.com');
-//   assert.ok(player.currentSources()[0].type === 'video/mp4');
-//   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-//   assert.ok(player.currentSources()[1].type === 'video/webm');
-//
-//   // when redefining src expect sources to update accordingly
-//   player.src('http://google.com');
-//
-//   assert.ok(player.currentSources()[0].src === 'http://google.com');
-//   assert.ok(player.currentSources()[0].type === undefined);
-//   assert.ok(player.currentSources()[1] === undefined);
-//
-//   player.dispose();
-// });
-//
-// QUnit.test('should get current source from src set', function(assert) {
-//   const fixture = document.getElementById('qunit-fixture');
-//
-//   const html = '<video id="example_1" class="video-js" preload="none"></video>';
-//
-//   fixture.innerHTML += html;
-//
-//   const tag = document.getElementById('example_1');
-//   const player = TestHelpers.makePlayer({}, tag);
-//
-//   player.loadTech_('Html5');
-//
-//   // check for matching undefined src
-//   assert.deepEqual(player.currentSource(), {});
-//
-//   player.src('http://google.com');
-//
-//   assert.ok(player.currentSource().src === 'http://google.com');
-//   assert.ok(player.currentSource().type === undefined);
-//
-//   player.src({
-//     src: 'http://google.com'
-//   });
-//
-//   assert.ok(player.currentSource().src === 'http://google.com');
-//   assert.ok(player.currentSource().type === undefined);
-//
-//   player.src({
-//     src: 'http://google.com',
-//     type: 'video/mp4'
-//   });
-//
-//   assert.ok(player.currentSource().src === 'http://google.com');
-//   assert.ok(player.currentSource().type === 'video/mp4');
-//   player.dispose();
-// });
+QUnit.test('should get current sources from source tag', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
 
-QUnit.test('should get current sources from src set', function(assert) {
+  const html = [
+    '<video id="example_1" class="video-js" preload="none">',
+    '<source src="http://google.com" type="video/mp4">',
+    '<source src="http://hugo.com" type="video/webm">',
+    '</video>'
+  ].join('');
+
+  fixture.innerHTML += html;
+
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === 'video/mp4');
+  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[1].type === 'video/webm');
+
+  // when redefining src expect sources to update accordingly
+  player.src('http://google.com');
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === undefined);
+  assert.ok(player.currentSources()[1] === undefined);
+
+  player.dispose();
+});
+
+QUnit.test('should get current source from src set', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
   const html = '<video id="example_1" class="video-js" preload="none"></video>';
@@ -229,68 +192,105 @@ QUnit.test('should get current sources from src set', function(assert) {
   player.loadTech_('Html5');
 
   // check for matching undefined src
-  assert.ok(player.currentSources(), []);
+  assert.deepEqual(player.currentSource(), {});
 
-  player.src([{
+  player.src('http://google.com');
+
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === undefined);
+
+  player.src({
     src: 'http://google.com'
-  }, {
-    src: 'http://hugo.com'
-  }]);
+  });
 
-  assert.ok(player.currentSources()[0].src === 'http://google.com');
-  assert.ok(player.currentSources()[0].type === undefined);
-  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-  assert.ok(player.currentSources()[1].type === undefined);
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === undefined);
 
-  player.src([{
+  player.src({
     src: 'http://google.com',
     type: 'video/mp4'
-  }, {
-    src: 'http://hugo.com',
-    type: 'video/webm'
-  }]);
+  });
 
-  assert.ok(player.currentSources()[0].src === 'http://google.com');
-  assert.ok(player.currentSources()[0].type === 'video/mp4');
-  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-  assert.ok(player.currentSources()[1].type === 'video/webm');
-
-  // when redefining src expect sources to update accordingly
-  player.src('http://hugo.com');
-
-  assert.ok(player.currentSources()[0].src === 'http://hugo.com');
-  assert.ok(player.currentSources()[0].type === undefined);
-  assert.ok(player.currentSources()[1] === undefined);
-
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === 'video/mp4');
   player.dispose();
 });
 
-QUnit.test('should asynchronously fire error events during source selection', function(assert) {
-  assert.expect(2);
-
-  sinon.stub(log, 'error');
-
-  const player = TestHelpers.makePlayer({
-    techOrder: ['foo'],
-    sources: [
-      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' }
-    ]
-  });
-
-  assert.ok(player.options_.techOrder[0] === 'foo', 'Foo listed as the only tech');
-
-  player.on('error', function(e) {
-    assert.ok(player.error().code === 4, 'Source could not be played error thrown');
-  });
-
-  // The first one is for player initialization
-  // The second one is the setTimeout for triggering the error
-  this.clock.tick(1);
-  this.clock.tick(1);
-
-  player.dispose();
-  log.error.restore();
-});
+// QUnit.test('should get current sources from src set', function(assert) {
+//   const fixture = document.getElementById('qunit-fixture');
+//
+//   const html = '<video id="example_1" class="video-js" preload="none"></video>';
+//
+//   fixture.innerHTML += html;
+//
+//   const tag = document.getElementById('example_1');
+//   const player = TestHelpers.makePlayer({}, tag);
+//
+//   player.loadTech_('Html5');
+//
+//   // check for matching undefined src
+//   assert.ok(player.currentSources(), []);
+//
+//   player.src([{
+//     src: 'http://google.com'
+//   }, {
+//     src: 'http://hugo.com'
+//   }]);
+//
+//   assert.ok(player.currentSources()[0].src === 'http://google.com');
+//   assert.ok(player.currentSources()[0].type === undefined);
+//   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+//   assert.ok(player.currentSources()[1].type === undefined);
+//
+//   player.src([{
+//     src: 'http://google.com',
+//     type: 'video/mp4'
+//   }, {
+//     src: 'http://hugo.com',
+//     type: 'video/webm'
+//   }]);
+//
+//   assert.ok(player.currentSources()[0].src === 'http://google.com');
+//   assert.ok(player.currentSources()[0].type === 'video/mp4');
+//   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+//   assert.ok(player.currentSources()[1].type === 'video/webm');
+//
+//   // when redefining src expect sources to update accordingly
+//   player.src('http://hugo.com');
+//
+//   assert.ok(player.currentSources()[0].src === 'http://hugo.com');
+//   assert.ok(player.currentSources()[0].type === undefined);
+//   assert.ok(player.currentSources()[1] === undefined);
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should asynchronously fire error events during source selection', function(assert) {
+//   assert.expect(2);
+//
+//   sinon.stub(log, 'error');
+//
+//   const player = TestHelpers.makePlayer({
+//     techOrder: ['foo'],
+//     sources: [
+//       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' }
+//     ]
+//   });
+//
+//   assert.ok(player.options_.techOrder[0] === 'foo', 'Foo listed as the only tech');
+//
+//   player.on('error', function(e) {
+//     assert.ok(player.error().code === 4, 'Source could not be played error thrown');
+//   });
+//
+//   // The first one is for player initialization
+//   // The second one is the setTimeout for triggering the error
+//   this.clock.tick(1);
+//   this.clock.tick(1);
+//
+//   player.dispose();
+//   log.error.restore();
+// });
 
 // QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
 //   const player = TestHelpers.makePlayer();
