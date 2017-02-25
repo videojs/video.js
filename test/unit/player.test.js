@@ -4,7 +4,7 @@ import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
 // import * as Dom from '../../src/js/utils/dom.js';
 // import * as browser from '../../src/js/utils/browser.js';
-// import log from '../../src/js/utils/log.js';
+import log from '../../src/js/utils/log.js';
 // import MediaError from '../../src/js/media-error.js';
 // import Html5 from '../../src/js/tech/html5.js';
 // import Tech from '../../src/js/tech/tech.js';
@@ -216,185 +216,185 @@ QUnit.test('should get current source from source tag', function(assert) {
 //   player.dispose();
 // });
 
-// QUnit.test('should get current sources from src set', function(assert) {
-//   const fixture = document.getElementById('qunit-fixture');
-//
-//   const html = '<video id="example_1" class="video-js" preload="none"></video>';
-//
-//   fixture.innerHTML += html;
-//
-//   const tag = document.getElementById('example_1');
-//   const player = TestHelpers.makePlayer({}, tag);
-//
-//   player.loadTech_('Html5');
-//
-//   // check for matching undefined src
-//   assert.ok(player.currentSources(), []);
-//
-//   player.src([{
-//     src: 'http://google.com'
-//   }, {
-//     src: 'http://hugo.com'
-//   }]);
-//
-//   assert.ok(player.currentSources()[0].src === 'http://google.com');
-//   assert.ok(player.currentSources()[0].type === undefined);
-//   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-//   assert.ok(player.currentSources()[1].type === undefined);
-//
-//   player.src([{
-//     src: 'http://google.com',
-//     type: 'video/mp4'
-//   }, {
-//     src: 'http://hugo.com',
-//     type: 'video/webm'
-//   }]);
-//
-//   assert.ok(player.currentSources()[0].src === 'http://google.com');
-//   assert.ok(player.currentSources()[0].type === 'video/mp4');
-//   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-//   assert.ok(player.currentSources()[1].type === 'video/webm');
-//
-//   // when redefining src expect sources to update accordingly
-//   player.src('http://hugo.com');
-//
-//   assert.ok(player.currentSources()[0].src === 'http://hugo.com');
-//   assert.ok(player.currentSources()[0].type === undefined);
-//   assert.ok(player.currentSources()[1] === undefined);
-//
-//   player.dispose();
-// });
-//
-// QUnit.test('should asynchronously fire error events during source selection', function(assert) {
-//   assert.expect(2);
-//
-//   sinon.stub(log, 'error');
-//
-//   const player = TestHelpers.makePlayer({
-//     techOrder: ['foo'],
-//     sources: [
-//       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' }
-//     ]
-//   });
-//
-//   assert.ok(player.options_.techOrder[0] === 'foo', 'Foo listed as the only tech');
-//
-//   player.on('error', function(e) {
-//     assert.ok(player.error().code === 4, 'Source could not be played error thrown');
-//   });
-//
-//   // The first one is for player initialization
-//   // The second one is the setTimeout for triggering the error
-//   this.clock.tick(1);
-//   this.clock.tick(1);
-//
-//   player.dispose();
-//   log.error.restore();
-// });
-
-QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
-  const player = TestHelpers.makePlayer();
-  const getStyleText = function(styleEl) {
-    return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
-  };
-
-  // NOTE: was using npm/css to parse the actual CSS ast
-  // but the css module doesn't support ie8
-  const confirmSetting = function(prop, val) {
-    let styleText = getStyleText(player.styleEl_);
-    const re = new RegExp(prop + ':\\s?' + val);
-
-    // Lowercase string for IE8
-    styleText = styleText.toLowerCase();
-
-    return !!re.test(styleText);
-  };
-
-  // Initial state
-  assert.ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
-
-  // Set only the width
-  player.width(100);
-  assert.ok(confirmSetting('width', '100px'), 'style width should equal the supplied width in pixels');
-  assert.ok(confirmSetting('height', '56.25px'), 'style height should match the default aspect ratio of the width');
-
-  // Set the height
-  player.height(200);
-  assert.ok(confirmSetting('height', '200px'), 'style height should match the supplied height in pixels');
-
-  // Reset the width and height to defaults
-  player.width('');
-  player.height('');
-  assert.ok(confirmSetting('width', '300px'), 'supplying an empty string should reset the width');
-  assert.ok(confirmSetting('height', '168.75px'), 'supplying an empty string should reset the height');
-
-  // Switch to fluid mode
-  player.fluid(true);
-  assert.ok(player.hasClass('vjs-fluid'), 'the vjs-fluid class should be added to the player');
-  assert.ok(confirmSetting('padding-top', '56.25%'), 'fluid aspect ratio should match the default aspect ratio');
-
-  // Change the aspect ratio
-  player.aspectRatio('4:1');
-  assert.ok(confirmSetting('padding-top', '25%'), 'aspect ratio percent should match the newly set aspect ratio');
-  player.dispose();
-});
-
-QUnit.test('should default to 16:9 when fluid', function(assert) {
-  const player = TestHelpers.makePlayer({fluid: true});
-  const ratio = player.currentHeight() / player.currentWidth();
-
-  // IE8 rounds 0.5625 up to 0.563
-  assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
-
-  player.dispose();
-});
-
-QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
-  const tag = TestHelpers.makeTag();
-
-  tag.className += ' vjs-fluid';
-
-  const player = TestHelpers.makePlayer({}, tag);
-
-  assert.ok(player.fluid(), 'fluid is true with vjs-fluid class');
-
-  player.dispose();
-});
-
-QUnit.test('should use an class name that begins with an alpha character', function(assert) {
-  const alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
-  const numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });
-
-  const getStyleText = function(styleEl) {
-    return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
-  };
-
-  alphaPlayer.width(100);
-  numericPlayer.width(100);
-
-  assert.ok(/\s*\.alpha1-dimensions\s*\{/.test(getStyleText(alphaPlayer.styleEl_)), 'appends -dimensions to an alpha player ID');
-  assert.ok(/\s*\.dimensions-1numeric\s*\{/.test(getStyleText(numericPlayer.styleEl_)), 'prepends dimensions- to a numeric player ID');
-  alphaPlayer.dispose();
-  numericPlayer.dispose();
-});
-
-QUnit.test('should wrap the original tag in the player div', function(assert) {
-  const tag = TestHelpers.makeTag();
-  const container = document.createElement('div');
+QUnit.test('should get current sources from src set', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
-  container.appendChild(tag);
-  fixture.appendChild(container);
+  const html = '<video id="example_1" class="video-js" preload="none"></video>';
 
-  const player = new Player(tag, { techOrder: ['techFaker'] });
-  const el = player.el();
+  fixture.innerHTML += html;
 
-  assert.ok(el.parentNode === container, 'player placed at same level as tag');
-  // Tag may be placed inside the player element or it may be removed from the DOM
-  assert.ok(tag.parentNode !== container, 'tag removed from original place');
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({}, tag);
+
+  player.loadTech_('Html5');
+
+  // check for matching undefined src
+  assert.ok(player.currentSources(), []);
+
+  player.src([{
+    src: 'http://google.com'
+  }, {
+    src: 'http://hugo.com'
+  }]);
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === undefined);
+  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[1].type === undefined);
+
+  player.src([{
+    src: 'http://google.com',
+    type: 'video/mp4'
+  }, {
+    src: 'http://hugo.com',
+    type: 'video/webm'
+  }]);
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === 'video/mp4');
+  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[1].type === 'video/webm');
+
+  // when redefining src expect sources to update accordingly
+  player.src('http://hugo.com');
+
+  assert.ok(player.currentSources()[0].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[0].type === undefined);
+  assert.ok(player.currentSources()[1] === undefined);
 
   player.dispose();
 });
+
+QUnit.test('should asynchronously fire error events during source selection', function(assert) {
+  assert.expect(2);
+
+  sinon.stub(log, 'error');
+
+  const player = TestHelpers.makePlayer({
+    techOrder: ['foo'],
+    sources: [
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' }
+    ]
+  });
+
+  assert.ok(player.options_.techOrder[0] === 'foo', 'Foo listed as the only tech');
+
+  player.on('error', function(e) {
+    assert.ok(player.error().code === 4, 'Source could not be played error thrown');
+  });
+
+  // The first one is for player initialization
+  // The second one is the setTimeout for triggering the error
+  this.clock.tick(1);
+  this.clock.tick(1);
+
+  player.dispose();
+  log.error.restore();
+});
+
+// QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
+//   const player = TestHelpers.makePlayer();
+//   const getStyleText = function(styleEl) {
+//     return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
+//   };
+//
+//   // NOTE: was using npm/css to parse the actual CSS ast
+//   // but the css module doesn't support ie8
+//   const confirmSetting = function(prop, val) {
+//     let styleText = getStyleText(player.styleEl_);
+//     const re = new RegExp(prop + ':\\s?' + val);
+//
+//     // Lowercase string for IE8
+//     styleText = styleText.toLowerCase();
+//
+//     return !!re.test(styleText);
+//   };
+//
+//   // Initial state
+//   assert.ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
+//
+//   // Set only the width
+//   player.width(100);
+//   assert.ok(confirmSetting('width', '100px'), 'style width should equal the supplied width in pixels');
+//   assert.ok(confirmSetting('height', '56.25px'), 'style height should match the default aspect ratio of the width');
+//
+//   // Set the height
+//   player.height(200);
+//   assert.ok(confirmSetting('height', '200px'), 'style height should match the supplied height in pixels');
+//
+//   // Reset the width and height to defaults
+//   player.width('');
+//   player.height('');
+//   assert.ok(confirmSetting('width', '300px'), 'supplying an empty string should reset the width');
+//   assert.ok(confirmSetting('height', '168.75px'), 'supplying an empty string should reset the height');
+//
+//   // Switch to fluid mode
+//   player.fluid(true);
+//   assert.ok(player.hasClass('vjs-fluid'), 'the vjs-fluid class should be added to the player');
+//   assert.ok(confirmSetting('padding-top', '56.25%'), 'fluid aspect ratio should match the default aspect ratio');
+//
+//   // Change the aspect ratio
+//   player.aspectRatio('4:1');
+//   assert.ok(confirmSetting('padding-top', '25%'), 'aspect ratio percent should match the newly set aspect ratio');
+//   player.dispose();
+// });
+//
+// QUnit.test('should default to 16:9 when fluid', function(assert) {
+//   const player = TestHelpers.makePlayer({fluid: true});
+//   const ratio = player.currentHeight() / player.currentWidth();
+//
+//   // IE8 rounds 0.5625 up to 0.563
+//   assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
+//   const tag = TestHelpers.makeTag();
+//
+//   tag.className += ' vjs-fluid';
+//
+//   const player = TestHelpers.makePlayer({}, tag);
+//
+//   assert.ok(player.fluid(), 'fluid is true with vjs-fluid class');
+//
+//   player.dispose();
+// });
+//
+// QUnit.test('should use an class name that begins with an alpha character', function(assert) {
+//   const alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
+//   const numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });
+//
+//   const getStyleText = function(styleEl) {
+//     return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
+//   };
+//
+//   alphaPlayer.width(100);
+//   numericPlayer.width(100);
+//
+//   assert.ok(/\s*\.alpha1-dimensions\s*\{/.test(getStyleText(alphaPlayer.styleEl_)), 'appends -dimensions to an alpha player ID');
+//   assert.ok(/\s*\.dimensions-1numeric\s*\{/.test(getStyleText(numericPlayer.styleEl_)), 'prepends dimensions- to a numeric player ID');
+//   alphaPlayer.dispose();
+//   numericPlayer.dispose();
+// });
+//
+// QUnit.test('should wrap the original tag in the player div', function(assert) {
+//   const tag = TestHelpers.makeTag();
+//   const container = document.createElement('div');
+//   const fixture = document.getElementById('qunit-fixture');
+//
+//   container.appendChild(tag);
+//   fixture.appendChild(container);
+//
+//   const player = new Player(tag, { techOrder: ['techFaker'] });
+//   const el = player.el();
+//
+//   assert.ok(el.parentNode === container, 'player placed at same level as tag');
+//   // Tag may be placed inside the player element or it may be removed from the DOM
+//   assert.ok(tag.parentNode !== container, 'tag removed from original place');
+//
+//   player.dispose();
+// });
 
 // QUnit.test('should set and update the poster value', function(assert) {
 //   const poster = '#';
