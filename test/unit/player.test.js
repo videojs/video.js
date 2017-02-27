@@ -3,7 +3,7 @@
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
 // import * as Dom from '../../src/js/utils/dom.js';
-import * as browser from '../../src/js/utils/browser.js';
+// import * as browser from '../../src/js/utils/browser.js';
 // import log from '../../src/js/utils/log.js';
 // import MediaError from '../../src/js/media-error.js';
 // import Html5 from '../../src/js/tech/html5.js';
