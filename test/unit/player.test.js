@@ -189,95 +189,95 @@ QUnit.test('should get current sources from source tag', function(assert) {
   player.dispose();
 });
 
-QUnit.test('should get current source from src set', function(assert) {
-  const fixture = document.getElementById('qunit-fixture');
+// QUnit.test('should get current source from src set', function(assert) {
+  // const fixture = document.getElementById('qunit-fixture');
 
-  const html = '<video id="example_1" class="video-js" preload="none"></video>';
+  // const html = '<video id="example_1" class="video-js" preload="none"></video>';
 
-  fixture.innerHTML += html;
+  // fixture.innerHTML += html;
 
-  const tag = document.getElementById('example_1');
-  const player = TestHelpers.makePlayer({}, tag);
+  // const tag = document.getElementById('example_1');
+  // const player = TestHelpers.makePlayer({}, tag);
 
-  this.clock.tick(1);
+  // this.clock.tick(1);
 
-  player.loadTech_('Html5');
+  // player.loadTech_('Html5');
 
-  // check for matching undefined src
-  assert.deepEqual(player.currentSource(), {});
+  // // check for matching undefined src
+  // assert.deepEqual(player.currentSource(), {});
 
-  player.src('http://google.com');
+  // player.src('http://google.com');
 
-  assert.ok(player.currentSource().src === 'http://google.com');
-  assert.ok(player.currentSource().type === undefined);
+  // assert.ok(player.currentSource().src === 'http://google.com');
+  // assert.ok(player.currentSource().type === undefined);
 
-  player.src({
-    src: 'http://google.com'
-  });
+  // player.src({
+    // src: 'http://google.com'
+  // });
 
-  assert.ok(player.currentSource().src === 'http://google.com');
-  assert.ok(player.currentSource().type === undefined);
+  // assert.ok(player.currentSource().src === 'http://google.com');
+  // assert.ok(player.currentSource().type === undefined);
 
-  player.src({
-    src: 'http://google.com',
-    type: 'video/mp4'
-  });
+  // player.src({
+    // src: 'http://google.com',
+    // type: 'video/mp4'
+  // });
 
-  assert.ok(player.currentSource().src === 'http://google.com');
-  assert.ok(player.currentSource().type === 'video/mp4');
-  player.dispose();
-});
+  // assert.ok(player.currentSource().src === 'http://google.com');
+  // assert.ok(player.currentSource().type === 'video/mp4');
+  // player.dispose();
+// });
 
-QUnit.test('should get current sources from src set', function(assert) {
-  const fixture = document.getElementById('qunit-fixture');
+// QUnit.test('should get current sources from src set', function(assert) {
+  // const fixture = document.getElementById('qunit-fixture');
 
-  const html = '<video id="example_1" class="video-js" preload="none"></video>';
+  // const html = '<video id="example_1" class="video-js" preload="none"></video>';
 
-  fixture.innerHTML += html;
+  // fixture.innerHTML += html;
 
-  const tag = document.getElementById('example_1');
-  const player = TestHelpers.makePlayer({}, tag);
+  // const tag = document.getElementById('example_1');
+  // const player = TestHelpers.makePlayer({}, tag);
 
-  this.clock.tick(1);
+  // this.clock.tick(1);
 
-  player.loadTech_('Html5');
+  // player.loadTech_('Html5');
 
-  // check for matching undefined src
-  assert.ok(player.currentSources(), []);
+  // // check for matching undefined src
+  // assert.ok(player.currentSources(), []);
 
-  player.src([{
-    src: 'http://google.com'
-  }, {
-    src: 'http://hugo.com'
-  }]);
+  // player.src([{
+    // src: 'http://google.com'
+  // }, {
+    // src: 'http://hugo.com'
+  // }]);
 
-  assert.ok(player.currentSources()[0].src === 'http://google.com');
-  assert.ok(player.currentSources()[0].type === undefined);
-  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-  assert.ok(player.currentSources()[1].type === undefined);
+  // assert.ok(player.currentSources()[0].src === 'http://google.com');
+  // assert.ok(player.currentSources()[0].type === undefined);
+  // assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  // assert.ok(player.currentSources()[1].type === undefined);
 
-  player.src([{
-    src: 'http://google.com',
-    type: 'video/mp4'
-  }, {
-    src: 'http://hugo.com',
-    type: 'video/webm'
-  }]);
+  // player.src([{
+    // src: 'http://google.com',
+    // type: 'video/mp4'
+  // }, {
+    // src: 'http://hugo.com',
+    // type: 'video/webm'
+  // }]);
 
-  assert.ok(player.currentSources()[0].src === 'http://google.com');
-  assert.ok(player.currentSources()[0].type === 'video/mp4');
-  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
-  assert.ok(player.currentSources()[1].type === 'video/webm');
+  // assert.ok(player.currentSources()[0].src === 'http://google.com');
+  // assert.ok(player.currentSources()[0].type === 'video/mp4');
+  // assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  // assert.ok(player.currentSources()[1].type === 'video/webm');
 
-  // when redefining src expect sources to update accordingly
-  player.src('http://hugo.com');
+  // // when redefining src expect sources to update accordingly
+  // player.src('http://hugo.com');
 
-  assert.ok(player.currentSources()[0].src === 'http://hugo.com');
-  assert.ok(player.currentSources()[0].type === undefined);
-  assert.ok(player.currentSources()[1] === undefined);
+  // assert.ok(player.currentSources()[0].src === 'http://hugo.com');
+  // assert.ok(player.currentSources()[0].type === undefined);
+  // assert.ok(player.currentSources()[1] === undefined);
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
 QUnit.test('should asynchronously fire error events during source selection', function(assert) {
   assert.expect(2);
@@ -1381,55 +1381,55 @@ QUnit.test('Player#tech will return tech given the appropriate input', function(
 //   log.warn = oldLogWarn;
 // });
 
-QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
-  let loadedTech;
-  let loadedSource;
-  let techCallMethod;
+// QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
+  // let loadedTech;
+  // let loadedSource;
+  // let techCallMethod;
 
-  const testPlayer = {
-    options_: {
-      techOrder: ['html5', 'flash']
-    },
-    loadTech_(tech, source) {
-      loadedTech = tech;
-      loadedSource = source;
-    },
-    techCall_(method) {
-      techCallMethod = method;
-    }
-  };
+  // const testPlayer = {
+    // options_: {
+      // techOrder: ['html5', 'flash']
+    // },
+    // loadTech_(tech, source) {
+      // loadedTech = tech;
+      // loadedSource = source;
+    // },
+    // techCall_(method) {
+      // techCallMethod = method;
+    // }
+  // };
 
-  Player.prototype.reset.call(testPlayer);
+  // Player.prototype.reset.call(testPlayer);
 
-  assert.equal(loadedTech, 'html5', 'we loaded the html5 tech');
-  assert.equal(loadedSource, null, 'with a null source');
-  assert.equal(techCallMethod, 'reset', 'we then reset the tech');
-});
+  // assert.equal(loadedTech, 'html5', 'we loaded the html5 tech');
+  // assert.equal(loadedSource, null, 'with a null source');
+  // assert.equal(techCallMethod, 'reset', 'we then reset the tech');
+// });
 
-QUnit.test('player#reset loads the first item in the techOrder and then techCalls reset', function(assert) {
-  let loadedTech;
-  let loadedSource;
-  let techCallMethod;
+// QUnit.test('player#reset loads the first item in the techOrder and then techCalls reset', function(assert) {
+  // let loadedTech;
+  // let loadedSource;
+  // let techCallMethod;
 
-  const testPlayer = {
-    options_: {
-      techOrder: ['flash', 'html5']
-    },
-    loadTech_(tech, source) {
-      loadedTech = tech;
-      loadedSource = source;
-    },
-    techCall_(method) {
-      techCallMethod = method;
-    }
-  };
+  // const testPlayer = {
+    // options_: {
+      // techOrder: ['flash', 'html5']
+    // },
+    // loadTech_(tech, source) {
+      // loadedTech = tech;
+      // loadedSource = source;
+    // },
+    // techCall_(method) {
+      // techCallMethod = method;
+    // }
+  // };
 
-  Player.prototype.reset.call(testPlayer);
+  // Player.prototype.reset.call(testPlayer);
 
-  assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
-  assert.equal(loadedSource, null, 'with a null source');
-  assert.equal(techCallMethod, 'reset', 'we then reset the tech');
-});
+  // assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
+  // assert.equal(loadedSource, null, 'with a null source');
+  // assert.equal(techCallMethod, 'reset', 'we then reset the tech');
+// });
 
 QUnit.test('Remove waiting class on timeupdate after tech waiting', function(assert) {
   const player = TestHelpers.makePlayer();
