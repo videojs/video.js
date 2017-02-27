@@ -615,7 +615,7 @@ QUnit.test('should register players with generated ids', function(assert) {
   assert.ok(Player.players[id], 'the generated id is registered');
   player.dispose();
 });
-//
+
 QUnit.test('should not add multiple first play events despite subsequent loads', function(assert) {
   assert.expect(1);
 
@@ -1073,8 +1073,10 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
 //   const p = player.play();
 //
 //   assert.equal(p, 'foo', 'play returns foo');
-// });
 //
+//   player.dispose();
+// });
+
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
 
@@ -1354,10 +1356,13 @@ QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE 
 
   window.VIDEOJS_NO_DYNAMIC_STYLE = false;
   tag = TestHelpers.makeTag();
-  TestHelpers.makePlayer({}, tag);
+  const player = TestHelpers.makePlayer({}, tag);
+
   styles = document.querySelectorAll('style');
   assert.equal(styles.length, 1, 'we should have one style element in the DOM');
   assert.equal(styles[0].className, 'vjs-styles-dimensions', 'the class name is the one we expected');
+
+  player.dispose();
 });
 
 QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the tech el', function(assert) {
