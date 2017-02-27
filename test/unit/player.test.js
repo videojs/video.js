@@ -33,6 +33,8 @@ QUnit.module('Player', {
 QUnit.test('should create player instance that inherits from component and dispose it', function(assert) {
   const player = TestHelpers.makePlayer();
 
+  this.clock.tick(1);
+
   assert.ok(player.el().nodeName === 'DIV');
   assert.ok(player.on, 'component function exists');
 
@@ -42,6 +44,8 @@ QUnit.test('should create player instance that inherits from component and dispo
 
 QUnit.test('dispose should not throw if styleEl is missing', function(assert) {
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
 
   player.styleEl_.parentNode.removeChild(player.styleEl_);
 
@@ -103,6 +107,8 @@ QUnit.test('should get tag, source, and track settings', function(assert) {
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   assert.equal(player.options_.autoplay, true, 'autoplay is set to true');
   assert.equal(player.options_.preload, 'none', 'preload is set to none');
   assert.equal(player.options_.id, 'example_1', 'id is set to example_1');
@@ -143,6 +149,8 @@ QUnit.test('should get current source from source tag', function(assert) {
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
 
@@ -163,6 +171,8 @@ QUnit.test('should get current sources from source tag', function(assert) {
 
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
 
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === 'video/mp4');
@@ -188,6 +198,8 @@ QUnit.test('should get current source from src set', function(assert) {
 
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
 
   player.loadTech_('Html5');
 
@@ -225,6 +237,8 @@ QUnit.test('should get current sources from src set', function(assert) {
 
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
 
   player.loadTech_('Html5');
 
@@ -277,6 +291,8 @@ QUnit.test('should asynchronously fire error events during source selection', fu
     ]
   });
 
+  this.clock.tick(1);
+
   assert.ok(player.options_.techOrder[0] === 'foo', 'Foo listed as the only tech');
 
   player.on('error', function(e) {
@@ -294,6 +310,9 @@ QUnit.test('should asynchronously fire error events during source selection', fu
 
 QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
   const getStyleText = function(styleEl) {
     return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
   };
@@ -341,6 +360,9 @@ QUnit.test('should set the width, height, and aspect ratio via a css class', fun
 
 QUnit.test('should default to 16:9 when fluid', function(assert) {
   const player = TestHelpers.makePlayer({fluid: true});
+
+  this.clock.tick(1);
+
   const ratio = player.currentHeight() / player.currentWidth();
 
   // IE8 rounds 0.5625 up to 0.563
@@ -356,6 +378,8 @@ QUnit.test('should set fluid to true if element has vjs-fluid class', function(a
 
   const player = TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   assert.ok(player.fluid(), 'fluid is true with vjs-fluid class');
 
   player.dispose();
@@ -364,6 +388,8 @@ QUnit.test('should set fluid to true if element has vjs-fluid class', function(a
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
   const alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
   const numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });
+
+  this.clock.tick(1);
 
   const getStyleText = function(styleEl) {
     return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
@@ -387,6 +413,9 @@ QUnit.test('should wrap the original tag in the player div', function(assert) {
   fixture.appendChild(container);
 
   const player = new Player(tag, { techOrder: ['techFaker'] });
+
+  this.clock.tick(1);
+
   const el = player.el();
 
   assert.ok(el.parentNode === container, 'player placed at same level as tag');
@@ -405,6 +434,8 @@ QUnit.test('should set and update the poster value', function(assert) {
   tag.setAttribute('poster', poster);
 
   const player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
 
   assert.equal(player.poster(), poster, 'the poster property should equal the tag attribute');
 
@@ -429,6 +460,8 @@ QUnit.test('should hide the poster when play is called', function(assert) {
     poster: 'https://example.com/poster.jpg'
   });
 
+  this.clock.tick(1);
+
   assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
   player.tech_.trigger('play');
   assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
@@ -450,6 +483,8 @@ QUnit.test('should load a media controller', function(assert) {
     ]
   });
 
+  this.clock.tick(1);
+
   assert.ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
 
   player.dispose();
@@ -464,6 +499,8 @@ QUnit.test('should be able to initialize player twice on the same tag using stri
   fixture.appendChild(videoTag);
 
   let player = videojs(videoTag.id, { techOrder: ['techFaker'] });
+
+  this.clock.tick(1);
 
   assert.ok(player, 'player is created');
   player.dispose();
@@ -480,6 +517,8 @@ QUnit.test('should be able to initialize player twice on the same tag using stri
 
 QUnit.test('should set controls and trigger events', function(assert) {
   const player = TestHelpers.makePlayer({ controls: false });
+
+  this.clock.tick(1);
 
   assert.ok(player.controls() === false, 'controls set through options');
   const hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
@@ -505,6 +544,8 @@ QUnit.test('should set controls and trigger events', function(assert) {
 
 QUnit.test('should toggle user the user state between active and inactive', function(assert) {
   const player = TestHelpers.makePlayer({});
+
+  this.clock.tick(1);
 
   assert.expect(9);
 
@@ -541,6 +582,8 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
 
   const player = TestHelpers.makePlayer({});
 
+  this.clock.tick(1);
+
   assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
 
   browser.TOUCH_ENABLED = origTouch;
@@ -549,6 +592,8 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
 
 QUnit.test('should allow for tracking when native controls are used', function(assert) {
   const player = TestHelpers.makePlayer({});
+
+  this.clock.tick(1);
 
   assert.expect(6);
 
@@ -576,6 +621,9 @@ QUnit.test('should allow for tracking when native controls are used', function(a
 
 QUnit.test('make sure that controls listeners do not get added too many times', function(assert) {
   const player = TestHelpers.makePlayer({});
+
+  this.clock.tick(1);
+
   let listeners = 0;
 
   player.addTechControlsListeners_ = function() {
@@ -609,6 +657,9 @@ QUnit.test('should register players with generated ids', function(assert) {
   fixture.appendChild(video);
 
   const player = new Player(video, { techOrder: ['techFaker'] });
+
+  this.clock.tick(1);
+
   const id = player.el().id;
 
   assert.equal(player.el().id, player.id(), 'the player and element ids are equal');
@@ -620,6 +671,8 @@ QUnit.test('should not add multiple first play events despite subsequent loads',
   assert.expect(1);
 
   const player = TestHelpers.makePlayer({});
+
+  this.clock.tick(1);
 
   player.on('firstplay', function() {
     assert.ok(true, 'First play should fire once.');
@@ -634,6 +687,8 @@ QUnit.test('should not add multiple first play events despite subsequent loads',
 
 QUnit.test('should fire firstplay after resetting the player', function(assert) {
   const player = TestHelpers.makePlayer({});
+
+  this.clock.tick(1);
 
   let fpFired = false;
 
@@ -670,6 +725,8 @@ QUnit.test('should remove vjs-has-started class', function(assert) {
 
   const player = TestHelpers.makePlayer({});
 
+  this.clock.tick(1);
+
   player.tech_.trigger('loadstart');
   player.tech_.trigger('play');
   assert.ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
@@ -687,6 +744,8 @@ QUnit.test('should add and remove vjs-ended class', function(assert) {
   assert.expect(4);
 
   const player = TestHelpers.makePlayer({});
+
+  this.clock.tick(1);
 
   player.tech_.trigger('loadstart');
   player.tech_.trigger('play');
@@ -708,6 +767,8 @@ QUnit.test('player should handle different error types', function(assert) {
   assert.expect(8);
   const player = TestHelpers.makePlayer({});
   const testMsg = 'test message';
+
+  this.clock.tick(1);
 
   // prevent error log messages in the console
   sinon.stub(log, 'error');
@@ -764,6 +825,8 @@ QUnit.test('Data attributes on the video element should persist in the new wrapp
   tag.setAttribute('data-id', dataId);
 
   const player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
 
   assert.equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
 
@@ -884,6 +947,8 @@ QUnit.test('should honor default inactivity timeout', function(assert) {
   // default timeout is 2000ms
   const player = TestHelpers.makePlayer({});
 
+  this.clock.tick(1);
+
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(1800);
   assert.equal(player.userActive(), true, 'User is still active');
@@ -901,6 +966,8 @@ QUnit.test('should honor configured inactivity timeout', function(assert) {
   const player = TestHelpers.makePlayer({
     inactivityTimeout: 200
   });
+
+  this.clock.tick(1);
 
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(150);
@@ -920,6 +987,8 @@ QUnit.test('should honor disabled inactivity timeout', function(assert) {
   const player = TestHelpers.makePlayer({
     inactivityTimeout: 0
   });
+
+  this.clock.tick(1);
 
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(5000);
@@ -956,6 +1025,9 @@ QUnit.test('should clear pending errors on disposal', function(assert) {
 QUnit.test('pause is called when player ended event is fired and player is not paused', function(assert) {
   const video = document.createElement('video');
   const player = TestHelpers.makePlayer({}, video);
+
+  this.clock.tick(1);
+
   let pauses = 0;
 
   player.paused = function() {
@@ -972,6 +1044,9 @@ QUnit.test('pause is called when player ended event is fired and player is not p
 QUnit.test('pause is not called if the player is paused and ended is fired', function(assert) {
   const video = document.createElement('video');
   const player = TestHelpers.makePlayer({}, video);
+
+  this.clock.tick(1);
+
   let pauses = 0;
 
   player.paused = function() {
@@ -991,6 +1066,8 @@ QUnit.test('should add an audio class if an audio el is used', function(assert) 
   const player = TestHelpers.makePlayer({}, audio);
   const audioClass = 'vjs-audio';
 
+  this.clock.tick(1);
+
   assert.ok(player.el().className.indexOf(audioClass) !== -1, 'added ' + audioClass + ' css class');
   player.dispose();
 });
@@ -998,6 +1075,8 @@ QUnit.test('should add an audio class if an audio el is used', function(assert) 
 QUnit.test('should add a video player region if a video el is used', function(assert) {
   const video = document.createElement('video');
   const player = TestHelpers.makePlayer({}, video);
+
+  this.clock.tick(1);
 
   assert.ok(player.el().getAttribute('role') === 'region', 'region role is present');
   assert.ok(player.el().getAttribute('aria-label') === 'Video Player', 'Video Player label present');
@@ -1008,6 +1087,8 @@ QUnit.test('should add an audio player region if an audio el is used', function(
   const audio = document.createElement('audio');
   const player = TestHelpers.makePlayer({}, audio);
 
+  this.clock.tick(1);
+
   assert.ok(player.el().getAttribute('role') === 'region', 'region role is present');
   assert.ok(player.el().getAttribute('aria-label') === 'Audio Player', 'Audio Player label present');
   player.dispose();
@@ -1015,6 +1096,8 @@ QUnit.test('should add an audio player region if an audio el is used', function(
 
 QUnit.test('should not be scrubbing while not seeking', function(assert) {
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
 
   assert.equal(player.scrubbing(), false, 'player is not scrubbing');
   assert.ok(player.el().className.indexOf('scrubbing') === -1, 'scrubbing class is not present');
@@ -1027,6 +1110,8 @@ QUnit.test('should not be scrubbing while not seeking', function(assert) {
 QUnit.test('should be scrubbing while seeking', function(assert) {
   const player = TestHelpers.makePlayer();
 
+  this.clock.tick(1);
+
   player.scrubbing(true);
   assert.equal(player.scrubbing(), true, 'player is scrubbing');
   assert.ok(player.el().className.indexOf('scrubbing') !== -1, 'scrubbing class is present');
@@ -1036,6 +1121,9 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
 // if (window.Promise) {
 //   QUnit.test('play promise should resolve to native promise if returned', function(assert) {
 //     const player = TestHelpers.makePlayer({});
+//
+//     this.clock.tick(1);
+//
 //     const done = assert.async();
 //
 //     player.src({
@@ -1061,6 +1149,8 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
 //
 // QUnit.test('play promise should resolve to native value if returned', function(assert) {
 //   const player = TestHelpers.makePlayer({});
+//
+//   this.clock.tick(1);
 //
 //   player.src({
 //     src: 'http://example.com/video.mp4',
@@ -1097,6 +1187,8 @@ QUnit.test('should have a sensible toJSON that is equivalent to player.options',
 
   const player = TestHelpers.makePlayer(playerOptions);
 
+  this.clock.tick(1);
+
   assert.deepEqual(player.toJSON(), player.options_, 'simple player options toJSON produces output equivalent to player.options_');
 
   const playerOptions2 = {
@@ -1109,6 +1201,8 @@ QUnit.test('should have a sensible toJSON that is equivalent to player.options',
   };
 
   const player2 = TestHelpers.makePlayer(playerOptions2);
+
+  this.clock.tick(1);
 
   playerOptions2.tracks[0].player = player2;
 
@@ -1137,6 +1231,8 @@ QUnit.test('should ignore case in language codes and try primary code', function
     }
   });
 
+  this.clock.tick(1);
+
   player.language('en-gb');
   assert.strictEqual(player.localize('Good'), 'Brilliant', 'Used subcode specific localisation');
   assert.strictEqual(player.localize('Error'), 'Problem', 'Used primary code localisation');
@@ -1151,6 +1247,8 @@ QUnit.test('inherits language from parent element', function(assert) {
 
   fixture.setAttribute('lang', 'x-test');
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
 
   assert.equal(player.language(), 'x-test', 'player inherits parent element language');
 
@@ -1169,6 +1267,8 @@ QUnit.test('inherits language from parent element', function(assert) {
 //   fixture.setAttribute('lang', 'x-attr-test');
 //   const player = TestHelpers.makePlayer();
 //
+//   this.clock.tick(1);
+//
 //   assert.equal(player.el().getAttribute('lang'), 'x-attr-test', 'player sets lang attribute on self');
 //
 //   player.dispose();
@@ -1182,6 +1282,8 @@ QUnit.test('inherits language from parent element', function(assert) {
 QUnit.test('should return correct values for canPlayType', function(assert) {
   const player = TestHelpers.makePlayer();
 
+  this.clock.tick(1);
+
   assert.equal(player.canPlayType('video/mp4'), 'maybe', 'player can play mp4 files');
   assert.equal(player.canPlayType('video/unsupported-format'), '', 'player can not play unsupported files');
 
@@ -1190,6 +1292,9 @@ QUnit.test('should return correct values for canPlayType', function(assert) {
 
 QUnit.test('createModal()', function(assert) {
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
   const modal = player.createModal('foo');
   const spy = sinon.spy();
 
@@ -1208,6 +1313,9 @@ QUnit.test('createModal()', function(assert) {
 
 QUnit.test('createModal() options object', function(assert) {
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
   const modal = player.createModal('foo', {content: 'bar', label: 'boo'});
 
   assert.expect(2);
@@ -1219,6 +1327,8 @@ QUnit.test('createModal() options object', function(assert) {
 
 QUnit.test('you can clear error in the error event', function(assert) {
   const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
 
   sinon.stub(log, 'error');
 
@@ -1324,6 +1434,8 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 QUnit.test('Remove waiting class on timeupdate after tech waiting', function(assert) {
   const player = TestHelpers.makePlayer();
 
+  this.clock.tick(1);
+
   player.tech_.trigger('waiting');
   assert.ok(/vjs-waiting/.test(player.el().className), 'vjs-waiting is added to the player el on tech waiting');
   player.trigger('timeupdate');
@@ -1351,12 +1463,16 @@ QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE 
   window.VIDEOJS_NO_DYNAMIC_STYLE = true;
   TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   styles = document.querySelectorAll('style');
   assert.equal(styles.length, 0, 'we should not get any style elements included in the DOM');
 
   window.VIDEOJS_NO_DYNAMIC_STYLE = false;
   tag = TestHelpers.makeTag();
   const player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
 
   styles = document.querySelectorAll('style');
   assert.equal(styles.length, 1, 'we should have one style element in the DOM');
@@ -1385,6 +1501,8 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   window.VIDEOJS_NO_DYNAMIC_STYLE = true;
   const player = TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   player.width(300);
   player.height(600);
   assert.equal(player.tech_.el().width, 300, 'the width is equal to 300');
@@ -1405,6 +1523,8 @@ QUnit.test('should allow to register custom player when any player has not been 
   const tag = TestHelpers.makeTag();
   const player = videojs(tag);
 
+  this.clock.tick(1);
+
   assert.equal(player instanceof CustomPlayer, true, 'player is custom');
   player.dispose();
 
@@ -1415,6 +1535,8 @@ QUnit.test('should allow to register custom player when any player has not been 
 QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
   const tag = TestHelpers.makeTag();
   const player = videojs(tag);
+
+  this.clock.tick(1);
 
   class CustomPlayer extends Player {}
 
@@ -1583,6 +1705,8 @@ QUnit.test('should not allow to register custom player when any player has been 
 //       }
 //     }
 //   });
+//
+//   this.clock.tick(1);
 //
 //   assert.strictEqual(optionsSpy.callCount, 1, 'the plugin was set up');
 //   assert.deepEqual(optionsSpy.getCall(0).args[0], {bar: 1}, 'the plugin got the expected options');
