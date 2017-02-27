@@ -17,6 +17,8 @@ import window from 'global/window';
 QUnit.module('Player', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
+  },
+  afterEach() {
     // reset players storage
     for (const playerId in Player.players) {
       if (Player.players[playerId] !== null) {
@@ -24,8 +26,6 @@ QUnit.module('Player', {
       }
       delete Player.players[playerId];
     }
-  },
-  afterEach() {
     this.clock.restore();
   }
 });
