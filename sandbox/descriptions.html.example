@@ -24,8 +24,8 @@
              useful way! -->
   <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none" width="640" height="360"
       data-setup='{ "html5" : { "nativeTextTracks" : false } }'>
-    <source src="https://archive.org/download/ElephantsDream/ed_hd.mp4" type="video/mp4">
-    <source src="https://archive.org/download/ElephantsDream/ed_hd.ogv" type="video/ogv">
+    <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
+    <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
 
     <track kind="captions" src="../docs/examples/elephantsdream/captions.en.vtt" srclang="en" label="English" default></track><!-- Tracks need an ending tag thanks to IE9 -->
     <track kind="captions" src="../docs/examples/elephantsdream/captions.sv.vtt" srclang="sv" label="Swedish"></track>
