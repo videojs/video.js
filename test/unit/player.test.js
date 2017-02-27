@@ -396,209 +396,209 @@ QUnit.test('should get current source from src set', function(assert) {
 //   player.dispose();
 // });
 
-QUnit.test('should set and update the poster value', function(assert) {
-  const poster = '#';
-  const updatedPoster = 'http://example.com/updated-poster.jpg';
+// QUnit.test('should set and update the poster value', function(assert) {
+  // const poster = '#';
+  // const updatedPoster = 'http://example.com/updated-poster.jpg';
 
-  const tag = TestHelpers.makeTag();
+  // const tag = TestHelpers.makeTag();
 
-  tag.setAttribute('poster', poster);
+  // tag.setAttribute('poster', poster);
 
-  const player = TestHelpers.makePlayer({}, tag);
+  // const player = TestHelpers.makePlayer({}, tag);
 
-  assert.equal(player.poster(), poster, 'the poster property should equal the tag attribute');
+  // assert.equal(player.poster(), poster, 'the poster property should equal the tag attribute');
 
-  let pcEmitted = false;
+  // let pcEmitted = false;
 
-  player.on('posterchange', function() {
-    pcEmitted = true;
-  });
+  // player.on('posterchange', function() {
+    // pcEmitted = true;
+  // });
 
-  player.poster(updatedPoster);
-  assert.ok(pcEmitted, 'posterchange event was emitted');
-  assert.equal(player.poster(), updatedPoster, 'the updated poster is returned');
+  // player.poster(updatedPoster);
+  // assert.ok(pcEmitted, 'posterchange event was emitted');
+  // assert.equal(player.poster(), updatedPoster, 'the updated poster is returned');
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
-// hasStarted() is equivalent to the "show poster flag" in the
-// standard, for the purpose of displaying the poster image
-// https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
-QUnit.test('should hide the poster when play is called', function(assert) {
-  const player = TestHelpers.makePlayer({
-    poster: 'https://example.com/poster.jpg'
-  });
+// // hasStarted() is equivalent to the "show poster flag" in the
+// // standard, for the purpose of displaying the poster image
+// // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
+// QUnit.test('should hide the poster when play is called', function(assert) {
+  // const player = TestHelpers.makePlayer({
+    // poster: 'https://example.com/poster.jpg'
+  // });
 
-  assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
-  player.tech_.trigger('play');
-  assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
+  // assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
+  // player.tech_.trigger('play');
+  // assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
 
-  player.tech_.trigger('loadstart');
-  assert.equal(player.hasStarted(), false, 'the resource selection algorithm sets the show poster flag to true');
+  // player.tech_.trigger('loadstart');
+  // assert.equal(player.hasStarted(), false, 'the resource selection algorithm sets the show poster flag to true');
 
-  player.tech_.trigger('play');
-  assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
-  player.dispose();
-});
+  // player.tech_.trigger('play');
+  // assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
+  // player.dispose();
+// });
 
-QUnit.test('should load a media controller', function(assert) {
-  const player = TestHelpers.makePlayer({
-    preload: 'none',
-    sources: [
-      { src: 'http://google.com', type: 'video/mp4' },
-      { src: 'http://google.com', type: 'video/webm' }
-    ]
-  });
+// QUnit.test('should load a media controller', function(assert) {
+  // const player = TestHelpers.makePlayer({
+    // preload: 'none',
+    // sources: [
+      // { src: 'http://google.com', type: 'video/mp4' },
+      // { src: 'http://google.com', type: 'video/webm' }
+    // ]
+  // });
 
-  assert.ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
+  // assert.ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
-QUnit.test('should be able to initialize player twice on the same tag using string reference', function(assert) {
-  let videoTag = TestHelpers.makeTag();
-  const id = videoTag.id;
+// QUnit.test('should be able to initialize player twice on the same tag using string reference', function(assert) {
+  // let videoTag = TestHelpers.makeTag();
+  // const id = videoTag.id;
 
-  const fixture = document.getElementById('qunit-fixture');
+  // const fixture = document.getElementById('qunit-fixture');
 
-  fixture.appendChild(videoTag);
+  // fixture.appendChild(videoTag);
 
-  let player = videojs(videoTag.id, { techOrder: ['techFaker'] });
+  // let player = videojs(videoTag.id, { techOrder: ['techFaker'] });
 
-  assert.ok(player, 'player is created');
-  player.dispose();
+  // assert.ok(player, 'player is created');
+  // player.dispose();
 
-  assert.ok(!document.getElementById(id), 'element is removed');
-  videoTag = TestHelpers.makeTag();
-  fixture.appendChild(videoTag);
+  // assert.ok(!document.getElementById(id), 'element is removed');
+  // videoTag = TestHelpers.makeTag();
+  // fixture.appendChild(videoTag);
 
-  // here we receive cached version instead of real
-  player = videojs(videoTag.id, { techOrder: ['techFaker'] });
-  // here it triggers error, because player was destroyed already after first dispose
-  player.dispose();
-});
+  // // here we receive cached version instead of real
+  // player = videojs(videoTag.id, { techOrder: ['techFaker'] });
+  // // here it triggers error, because player was destroyed already after first dispose
+  // player.dispose();
+// });
 
-QUnit.test('should set controls and trigger events', function(assert) {
-  const player = TestHelpers.makePlayer({ controls: false });
+// QUnit.test('should set controls and trigger events', function(assert) {
+  // const player = TestHelpers.makePlayer({ controls: false });
 
-  assert.ok(player.controls() === false, 'controls set through options');
-  const hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
+  // assert.ok(player.controls() === false, 'controls set through options');
+  // const hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
 
-  assert.ok(hasDisabledClass !== -1, 'Disabled class added to player');
+  // assert.ok(hasDisabledClass !== -1, 'Disabled class added to player');
 
-  player.controls(true);
-  assert.ok(player.controls() === true, 'controls updated');
-  const hasEnabledClass = player.el().className.indexOf('vjs-controls-enabled');
+  // player.controls(true);
+  // assert.ok(player.controls() === true, 'controls updated');
+  // const hasEnabledClass = player.el().className.indexOf('vjs-controls-enabled');
 
-  assert.ok(hasEnabledClass !== -1, 'Disabled class added to player');
+  // assert.ok(hasEnabledClass !== -1, 'Disabled class added to player');
 
-  player.on('controlsenabled', function() {
-    assert.ok(true, 'enabled fired once');
-  });
-  player.on('controlsdisabled', function() {
-    assert.ok(true, 'disabled fired once');
-  });
-  player.controls(false);
+  // player.on('controlsenabled', function() {
+    // assert.ok(true, 'enabled fired once');
+  // });
+  // player.on('controlsdisabled', function() {
+    // assert.ok(true, 'disabled fired once');
+  // });
+  // player.controls(false);
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
-QUnit.test('should toggle user the user state between active and inactive', function(assert) {
-  const player = TestHelpers.makePlayer({});
+// QUnit.test('should toggle user the user state between active and inactive', function(assert) {
+  // const player = TestHelpers.makePlayer({});
 
-  assert.expect(9);
+  // assert.expect(9);
 
-  assert.ok(player.userActive(), 'User should be active at player init');
+  // assert.ok(player.userActive(), 'User should be active at player init');
 
-  player.on('userinactive', function() {
-    assert.ok(true, 'userinactive event triggered');
-  });
+  // player.on('userinactive', function() {
+    // assert.ok(true, 'userinactive event triggered');
+  // });
 
-  player.on('useractive', function() {
-    assert.ok(true, 'useractive event triggered');
-  });
+  // player.on('useractive', function() {
+    // assert.ok(true, 'useractive event triggered');
+  // });
 
-  player.userActive(false);
-  assert.ok(player.userActive() === false, 'Player state changed to inactive');
-  assert.ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
-  assert.ok(player.el().className.indexOf('vjs-user-inactive') !== -1, 'Inactive class added');
+  // player.userActive(false);
+  // assert.ok(player.userActive() === false, 'Player state changed to inactive');
+  // assert.ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
+  // assert.ok(player.el().className.indexOf('vjs-user-inactive') !== -1, 'Inactive class added');
 
-  player.userActive(true);
-  assert.ok(player.userActive() === true, 'Player state changed to active');
-  assert.ok(player.el().className.indexOf('vjs-user-inactive') === -1, 'Inactive class removed');
-  assert.ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
+  // player.userActive(true);
+  // assert.ok(player.userActive() === true, 'Player state changed to active');
+  // assert.ok(player.el().className.indexOf('vjs-user-inactive') === -1, 'Inactive class removed');
+  // assert.ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
-QUnit.test('should add a touch-enabled classname when touch is supported', function(assert) {
-  assert.expect(1);
+// QUnit.test('should add a touch-enabled classname when touch is supported', function(assert) {
+  // assert.expect(1);
 
-  // Fake touch support. Real touch support isn't needed for this test.
-  const origTouch = browser.TOUCH_ENABLED;
+  // // Fake touch support. Real touch support isn't needed for this test.
+  // const origTouch = browser.TOUCH_ENABLED;
 
-  browser.TOUCH_ENABLED = true;
+  // browser.TOUCH_ENABLED = true;
 
-  const player = TestHelpers.makePlayer({});
+  // const player = TestHelpers.makePlayer({});
 
-  assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
+  // assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
 
-  browser.TOUCH_ENABLED = origTouch;
-  player.dispose();
-});
+  // browser.TOUCH_ENABLED = origTouch;
+  // player.dispose();
+// });
 
-QUnit.test('should allow for tracking when native controls are used', function(assert) {
-  const player = TestHelpers.makePlayer({});
+// QUnit.test('should allow for tracking when native controls are used', function(assert) {
+  // const player = TestHelpers.makePlayer({});
 
-  assert.expect(6);
+  // assert.expect(6);
 
-  // Make sure native controls is false before starting test
-  player.usingNativeControls(false);
+  // // Make sure native controls is false before starting test
+  // player.usingNativeControls(false);
 
-  player.on('usingnativecontrols', function() {
-    assert.ok(true, 'usingnativecontrols event triggered');
-  });
+  // player.on('usingnativecontrols', function() {
+    // assert.ok(true, 'usingnativecontrols event triggered');
+  // });
 
-  player.on('usingcustomcontrols', function() {
-    assert.ok(true, 'usingcustomcontrols event triggered');
-  });
+  // player.on('usingcustomcontrols', function() {
+    // assert.ok(true, 'usingcustomcontrols event triggered');
+  // });
 
-  player.usingNativeControls(true);
-  assert.ok(player.usingNativeControls() === true, 'Using native controls is true');
-  assert.ok(player.el().className.indexOf('vjs-using-native-controls') !== -1, 'Native controls class added');
+  // player.usingNativeControls(true);
+  // assert.ok(player.usingNativeControls() === true, 'Using native controls is true');
+  // assert.ok(player.el().className.indexOf('vjs-using-native-controls') !== -1, 'Native controls class added');
 
-  player.usingNativeControls(false);
-  assert.ok(player.usingNativeControls() === false, 'Using native controls is false');
-  assert.ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
+  // player.usingNativeControls(false);
+  // assert.ok(player.usingNativeControls() === false, 'Using native controls is false');
+  // assert.ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
-QUnit.test('make sure that controls listeners do not get added too many times', function(assert) {
-  const player = TestHelpers.makePlayer({});
-  let listeners = 0;
+// QUnit.test('make sure that controls listeners do not get added too many times', function(assert) {
+  // const player = TestHelpers.makePlayer({});
+  // let listeners = 0;
 
-  player.addTechControlsListeners_ = function() {
-    listeners++;
-  };
+  // player.addTechControlsListeners_ = function() {
+    // listeners++;
+  // };
 
-  // Make sure native controls is false before starting test
-  player.usingNativeControls(false);
+  // // Make sure native controls is false before starting test
+  // player.usingNativeControls(false);
 
-  player.usingNativeControls(true);
+  // player.usingNativeControls(true);
 
-  player.controls(true);
+  // player.controls(true);
 
-  assert.equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
+  // assert.equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
 
-  player.usingNativeControls(false);
-  player.controls(false);
+  // player.usingNativeControls(false);
+  // player.controls(false);
 
-  player.controls(true);
-  assert.equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
+  // player.controls(true);
+  // assert.equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
 
-  player.dispose();
-});
+  // player.dispose();
+// });
 
 // QUnit.test('should register players with generated ids', function(assert) {
 //   const fixture = document.getElementById('qunit-fixture');
