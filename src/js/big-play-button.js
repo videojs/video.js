@@ -35,6 +35,18 @@ class BigPlayButton extends Button {
    */
   handleClick(event) {
     this.player_.play();
+
+    const cb = this.player_.getChild('controlBar');
+    const playToggle = cb && cb.getChild('playToggle');
+
+    if (!playToggle) {
+      this.player_.focus();
+      return;
+    }
+
+    this.setTimeout(function() {
+      playToggle.focus();
+    }, 1);
   }
 }
 
