@@ -182,6 +182,8 @@ QUnit.test('should get current sources from source tag', function(assert) {
   // when redefining src expect sources to update accordingly
   player.src('http://google.com');
 
+  this.clock.tick(1);
+
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === undefined);
   assert.ok(player.currentSources()[1] === undefined);
