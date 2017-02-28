@@ -26,13 +26,11 @@ QUnit.test('can create a html track element with various properties', function(a
   const kind = 'chapters';
   const label = 'English';
   const language = 'en';
-  const src = 'http://www.example.com';
 
   const htmlTrackElement = new HTMLTrackElement({
     kind,
     label,
     language,
-    src,
     tech: this.tech
   });
 
@@ -40,9 +38,7 @@ QUnit.test('can create a html track element with various properties', function(a
   assert.equal(htmlTrackElement.kind, kind, 'we have a kind');
   assert.equal(htmlTrackElement.label, label, 'we have a label');
   assert.equal(htmlTrackElement.readyState, 0, 'we have a readyState');
-  assert.equal(htmlTrackElement.src, src, 'we have a src');
   assert.equal(htmlTrackElement.srclang, language, 'we have a srclang');
-  assert.equal(htmlTrackElement.track.cues, null, 'we have a track');
 });
 
 QUnit.test('defaults when items not provided', function(assert) {
