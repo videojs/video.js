@@ -67,12 +67,16 @@ QUnit.test('registerPlugin() illegal arguments', function(assert) {
     'plugins must be functions'
   );
 
+  assert.throws(
+    () => Plugin.registerPlugin('play', function() {}),
+    new Error('Illegal plugin name, "play", cannot share a name with an existing player method!'),
+    'plugins must be functions'
+  );
+
   sinon.spy(log, 'warn');
   Plugin.registerPlugin('foo', function() {});
   Plugin.registerPlugin('foo', function() {});
-  Plugin.registerPlugin('play', function() {});
-
-  assert.strictEqual(log.warn.callCount, 2, 'warn on re-registering a plugin or registering a plugin that shares the name of a player method');
+  assert.strictEqual(log.warn.callCount, 1, 'warn on re-registering a plugin');
   log.warn.restore();
 });
 

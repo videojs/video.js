@@ -306,12 +306,14 @@ class Plugin {
       throw new Error(`Illegal plugin name, "${name}", must be a string, was ${typeof name}.`);
     }
 
-    if (typeof plugin !== 'function') {
-      throw new Error(`Illegal plugin for "${name}", must be a function, was ${typeof plugin}.`);
+    if (pluginExists(name)) {
+      log.warn(`A plugin named "${name}" already exists. You may want to avoid re-registering plugins!`);
+    } else if (Player.prototype.hasOwnProperty(name)) {
+      throw new Error(`Illegal plugin name, "${name}", cannot share a name with an existing player method!`);
     }
 
-    if (pluginExists(name) || Player.prototype.hasOwnProperty(name)) {
-      log.warn(`A plugin named "${name}" already exists. You may want to avoid re-registering plugins!`);
+    if (typeof plugin !== 'function') {
+      throw new Error(`Illegal plugin for "${name}", must be a function, was ${typeof plugin}.`);
     }
 
     pluginStorage[name] = plugin;
