@@ -15,7 +15,7 @@ import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
 
-QUnit.module('Tracks', {
+QUnit.module('Text Tracks', {
   beforeEach(assert) {
     this.clock = sinon.useFakeTimers();
   },
