@@ -4,6 +4,7 @@ import TestHelpers from '../test-helpers.js';
 import * as Events from '../../../src/js/utils/events.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
+import Component from '../../../src/js/component.js';
 
 const tracks = [{
   kind: 'captions',
@@ -23,6 +24,14 @@ const defaultSettings = {
 QUnit.module('Text Track Settings', {
   beforeEach() {
     window.localStorage.clear();
+    this.oldComponentFocus = Component.prototype.focus;
+    this.oldComponentBlur = Component.prototype.blur;
+    Component.prototype.focus = function() {};
+    Component.prototype.blur = function() {};
+  },
+  afterEach() {
+    Component.prototype.focus = this.oldComponentFocus;
+    Component.prototype.blur = this.oldComponentBlur;
   }
 });
 
@@ -212,6 +221,7 @@ QUnit.test('if persist option is set, save settings when "done"', function(asser
     tracks,
     persistTextTrackSettings: true
   });
+
   const oldSaveSettings = TextTrackSettings.prototype.saveSettings;
   let save = 0;
 
