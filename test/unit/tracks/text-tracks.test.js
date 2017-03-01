@@ -365,6 +365,11 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
     mode: 'showing'
   });
 
+  const oldVttjs = window.vttjs;
+  window.vttjs = {
+    VTTCue: Object
+  };
+
   tt.addCue({
     id: '1',
     startTime: 2,
@@ -403,6 +408,8 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
   assert.equal(numTextTrackChanges, 4,
     'texttrackchange should be not be called since mode is hidden');
   player.dispose();
+
+  window.vttjs = oldVttjs;
 });
 
 QUnit.test('should return correct remote text track values', function(assert) {
