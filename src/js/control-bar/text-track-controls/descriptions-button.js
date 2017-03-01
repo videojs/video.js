@@ -76,6 +76,9 @@ class DescriptionsButton extends TextTrackButton {
     return `vjs-descriptions-button ${super.buildCSSClass()}`;
   }
 
+  buildWrapperCSSClass() {
+    return `vjs-descriptions-button ${super.buildWrapperCSSClass()}`;
+  }
 }
 
 /**

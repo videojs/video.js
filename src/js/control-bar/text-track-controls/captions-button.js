@@ -38,6 +38,10 @@ class CaptionsButton extends TextTrackButton {
     return `vjs-captions-button ${super.buildCSSClass()}`;
   }
 
+  buildWrapperCSSClass() {
+    return `vjs-captions-button ${super.buildWrapperCSSClass()}`;
+  }
+
   /**
    * Update caption menu items
    *

@@ -41,6 +41,10 @@ class ChaptersButton extends TextTrackButton {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
+  buildWrapperCSSClass() {
+    return `vjs-chapters-button ${super.buildWrapperCSSClass()}`;
+  }
+
   /**
    * Update the menu based on the current state of its items.
    *
