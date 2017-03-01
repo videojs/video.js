@@ -1,14 +1,16 @@
 /* eslint-env qunit */
 import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
+import TechFaker from '../tech/tech-faker';
 
-const defaultTech = {
-  textTracks() {},
-  on() {},
-  off() {},
-  currentTime() {}
-};
-
-QUnit.module('HTML Track Element');
+QUnit.module('HTML Track Element', {
+  beforeEach() {
+    this.tech = new TechFaker();
+  },
+  afterEach() {
+    this.tech.dispose();
+    this.tech = null;
+  }
+});
 
 QUnit.test('html track element requires a tech', function(assert) {
   assert.throws(
@@ -31,7 +33,7 @@ QUnit.test('can create a html track element with various properties', function(a
     label,
     language,
     src,
-    tech: defaultTech
+    tech: this.tech
   });
 
   assert.equal(typeof htmlTrackElement.default, 'undefined', 'we have a default');
@@ -45,7 +47,7 @@ QUnit.test('can create a html track element with various properties', function(a
 
 QUnit.test('defaults when items not provided', function(assert) {
   const htmlTrackElement = new HTMLTrackElement({
-    tech: defaultTech
+    tech: this.tech
   });
 
   assert.equal(typeof htmlTrackElement.default, 'undefined', 'we have a default');
