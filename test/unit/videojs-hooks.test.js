@@ -140,6 +140,8 @@ QUnit.test('should trigger beforesetup and setup during videojs setup', function
   assert.ok(player.options_, 'returning null in beforesetup does not lose options');
   assert.equal(beforeSetupCalled, true, 'beforeSetup was called');
   assert.equal(setupCalled, true, 'setup was called');
+
+  player.dispose();
 });
 
 QUnit.test('beforesetup returns dont break videojs options', function(assert) {
@@ -171,6 +173,8 @@ QUnit.test('beforesetup returns dont break videojs options', function(assert) {
   assert.equal(player.options_.techOrder, vjsOptions.techOrder, 'options set by user should exist');
 
   log.error = oldLogError;
+
+  player.dispose();
 });
 
 QUnit.test('beforesetup options override videojs options', function(assert) {
@@ -191,4 +195,6 @@ QUnit.test('beforesetup options override videojs options', function(assert) {
   assert.ok(player.options_, 'beforesetup should not destory options');
   assert.equal(player.options_.techOrder, vjsOptions.techOrder, 'options set by user should exist');
   assert.equal(player.options_.autoplay, true, 'autoplay should be set to true now');
+
+  player.dispose();
 });

@@ -311,6 +311,9 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+    // Turn off API access because we're loading a new tech that might load asynchronously
+    this.isReady_ = false;
+
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -1613,7 +1616,7 @@ class Player extends Component {
       });
 
     // Only calls the tech's play if we already have a src loaded
-    } else if (this.src() || this.currentSrc()) {
+    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
     } else {
       this.ready(function() {
