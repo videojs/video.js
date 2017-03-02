@@ -488,8 +488,8 @@ module.exports = function(grunt) {
           error: true
         },
         ignore: [
-          // Ignore the warning about needing <optgroup> elements
-          'WCAG2AA.Principle1.Guideline1_3.1_3_1.H85.2'
+          // Ignore warning about contrast of the "vjs-no-js" fallback link
+          'WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.BgImage'
         ]
 
       },
