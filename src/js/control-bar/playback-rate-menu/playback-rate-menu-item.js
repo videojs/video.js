@@ -27,6 +27,8 @@ class PlaybackRateMenuItem extends MenuItem {
     // Modify options for parent MenuItem class's init.
     options.label = label;
     options.selected = rate === 1;
+    options.selectable = true;
+
     super(player, options);
 
     this.label = label;
