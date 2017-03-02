@@ -70,7 +70,7 @@ class ModalDialog extends Component {
     });
 
     this.descEl_ = Dom.createEl('p', {
-      className: `${MODAL_CLASS_NAME}-description vjs-offscreen`,
+      className: `${MODAL_CLASS_NAME}-description vjs-control-text`,
       id: this.el().getAttribute('aria-describedby')
     });
 
@@ -465,6 +465,10 @@ class ModalDialog extends Component {
         focusIndex = i;
         break;
       }
+    }
+
+    if (document.activeElement === this.el_) {
+      focusIndex = 0;
     }
 
     if (event.shiftKey && focusIndex === 0) {

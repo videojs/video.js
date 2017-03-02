@@ -50,8 +50,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
    * @listens click
    */
   handleClick(event) {
-    this.player().getChild('textTrackSettings').show();
-    this.player().getChild('textTrackSettings').el_.focus();
+    this.player().getChild('textTrackSettings').open();
   }
 
 }

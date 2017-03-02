@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "6.0.0-RC.2",
+  "version": "6.0.0-RC.3",
   "main": "./es5/video.js",
   "style": "./dist/video-js.css",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
@@ -44,7 +44,7 @@
     "tsml": "1.0.1",
     "videojs-font": "2.0.0",
     "videojs-ie8": "1.1.2",
-    "videojs-vtt.js": "0.12.1",
+    "videojs-vtt.js": "0.12.2",
     "xhr": "2.4.0"
   },
   "devDependencies": {
@@ -111,10 +111,10 @@
     "npm-run": "^4.1.0",
     "proxyquireify": "^3.0.0",
     "qunitjs": "1.23.1",
-    "remark-cli": "^2.1.0",
-    "remark-lint": "^5.2.0",
-    "remark-toc": "^3.1.0",
-    "remark-validate-links": "^5.0.0",
+    "remark-cli": "^3.0.0",
+    "remark-lint": "^6.0.0",
+    "remark-toc": "^4.0.0",
+    "remark-validate-links": "^6.0.0",
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",

@@ -336,7 +336,19 @@ class TextTrack extends Track {
    * @param {TextTrack~Cue} cue
    *        The cue to add to our internal list
    */
-  addCue(cue) {
+  addCue(originalCue) {
+    let cue = originalCue;
+
+    if (!(originalCue instanceof window.vttjs.VTTCue)) {
+      cue = new window.vttjs.VTTCue(originalCue.startTime, originalCue.endTime, originalCue.text);
+
+      for (const prop in originalCue) {
+        if (!(prop in cue)) {
+          cue[prop] = originalCue[prop];
+        }
+      }
+    }
+
     const tracks = this.tech_.textTracks();
 
     for (let i = 0; i < tracks.length; i++) {

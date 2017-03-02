@@ -5,6 +5,7 @@ import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
+import log from './utils/log';
 import Player from './player';
 
 /**
@@ -88,17 +89,25 @@ const markPluginAsActive = (player, name) => {
  * @returns {Function}
  *          A wrapper function for the given plugin.
  */
-const createBasicPlugin = (name, plugin) => function() {
-  const instance = plugin.apply(this, arguments);
+const createBasicPlugin = function(name, plugin) {
+  const basicPluginWrapper = function() {
+    const instance = plugin.apply(this, arguments);
 
-  markPluginAsActive(this, name);
+    markPluginAsActive(this, name);
 
-  // We trigger the "pluginsetup" event on the player regardless, but we want
-  // the hash to be consistent with the hash provided for advanced plugins.
-  // The only potentially counter-intuitive thing here is the `instance` is the
-  // value returned by the `plugin` function.
-  this.trigger('pluginsetup', {name, plugin, instance});
-  return instance;
+    // We trigger the "pluginsetup" event on the player regardless, but we want
+    // the hash to be consistent with the hash provided for advanced plugins.
+    // The only potentially counter-intuitive thing here is the `instance` is the
+    // value returned by the `plugin` function.
+    this.trigger('pluginsetup', {name, plugin, instance});
+    return instance;
+  };
+
+  Object.keys(plugin).forEach(function(prop) {
+    basicPluginWrapper[prop] = plugin[prop];
+  });
+
+  return basicPluginWrapper;
 };
 
 /**
@@ -297,8 +306,10 @@ class Plugin {
       throw new Error(`Illegal plugin name, "${name}", must be a string, was ${typeof name}.`);
     }
 
-    if (pluginExists(name) || Player.prototype.hasOwnProperty(name)) {
-      throw new Error(`Illegal plugin name, "${name}", already exists.`);
+    if (pluginExists(name)) {
+      log.warn(`A plugin named "${name}" already exists. You may want to avoid re-registering plugins!`);
+    } else if (Player.prototype.hasOwnProperty(name)) {
+      throw new Error(`Illegal plugin name, "${name}", cannot share a name with an existing player method!`);
     }
 
     if (typeof plugin !== 'function') {

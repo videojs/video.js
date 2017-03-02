@@ -126,7 +126,7 @@ QUnit.test('should create the expected description element', function(assert) {
     innerHTML: this.modal.description(),
     classes: [
       'vjs-modal-dialog-description',
-      'vjs-offscreen'
+      'vjs-control-text'
     ],
     attrs: {
       id: this.el.getAttribute('aria-describedby')

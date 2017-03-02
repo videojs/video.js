@@ -342,19 +342,6 @@ class Html5 extends Tech {
   }
 
   /**
-   * Called by {@link Player#play} to play using the `Html5` `Tech`.
-   */
-  play() {
-    const playPromise = this.el_.play();
-
-    // Catch/silence error when a pause interrupts a play request
-    // on browsers which return a promise
-    if (playPromise !== undefined && typeof playPromise.then === 'function') {
-      playPromise.then(null, (e) => {});
-    }
-  }
-
-  /**
    * Set current time for the `HTML5` tech.
    *
    * @param {number} seconds
