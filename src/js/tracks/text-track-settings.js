@@ -612,9 +612,12 @@ class TextTrackSettings extends ModalDialog {
     this.off(document, 'keydown', this.handleKeyDown);
 
     const cb = this.player_.controlBar;
+    const subsCapsBtn = cb && cb.subsCapsButton;
     const ccBtn = cb && cb.captionsButton;
 
-    if (ccBtn) {
+    if (subsCapsBtn) {
+      subsCapsBtn.focus();
+    } else if (ccBtn) {
       ccBtn.focus();
     }
   }
