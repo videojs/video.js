@@ -14,7 +14,6 @@ import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
-import window from 'global/window';
 
 QUnit.module('Text Tracks', {
   beforeEach(assert) {
