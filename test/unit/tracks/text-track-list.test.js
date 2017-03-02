@@ -2,6 +2,7 @@
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import EventTarget from '../../../src/js/event-target.js';
+import TechFaker from '../tech/tech-faker';
 
 QUnit.module('Text Track List');
 QUnit.test('trigger "change" event when "modechange" is fired on a track', function(assert) {
@@ -23,11 +24,7 @@ QUnit.test('trigger "change" event when "modechange" is fired on a track', funct
 });
 
 QUnit.test('trigger "change" event when mode changes on a TextTrack', function(assert) {
-  const tt = new TextTrack({
-    tech: {
-      on() {}
-    }
-  });
+  const tt = new TextTrack({tech: new TechFaker()});
   const ttl = new TextTrackList([tt]);
   let changes = 0;
   const changeHandler = function() {

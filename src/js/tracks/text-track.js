@@ -198,7 +198,9 @@ class TextTrack extends Track {
     });
 
     if (mode !== 'disabled') {
-      tt.tech_.on('timeupdate', timeupdateHandler);
+      tt.tech_.ready(() => {
+        tt.tech_.on('timeupdate', timeupdateHandler);
+      }, true);
     }
 
     /**
@@ -236,7 +238,10 @@ class TextTrack extends Track {
         }
         mode = newMode;
         if (mode === 'showing') {
-          this.tech_.on('timeupdate', timeupdateHandler);
+
+          this.tech_.ready(() => {
+            this.tech_.on('timeupdate', timeupdateHandler);
+          }, true);
         }
         /**
          * An event that fires when mode changes on this track. This allows
@@ -339,7 +344,7 @@ class TextTrack extends Track {
   addCue(originalCue) {
     let cue = originalCue;
 
-    if (!(originalCue instanceof window.vttjs.VTTCue)) {
+    if (window.vttjs && !(originalCue instanceof window.vttjs.VTTCue)) {
       cue = new window.vttjs.VTTCue(originalCue.startTime, originalCue.endTime, originalCue.text);
 
       for (const prop in originalCue) {
@@ -347,6 +352,9 @@ class TextTrack extends Track {
           cue[prop] = originalCue[prop];
         }
       }
+
+      // make sure that `id` is copied over
+      cue.id = originalCue.id;
     }
 
     const tracks = this.tech_.textTracks();
