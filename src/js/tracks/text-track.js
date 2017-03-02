@@ -352,6 +352,9 @@ class TextTrack extends Track {
           cue[prop] = originalCue[prop];
         }
       }
+
+      // make sure that `id` is copied over
+      cue.id = originalCue.id;
     }
 
     const tracks = this.tech_.textTracks();
