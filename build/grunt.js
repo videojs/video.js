@@ -450,7 +450,7 @@ module.exports = function(grunt) {
         }
       },
       lint: {
-        command: 'npm run lint',
+        command: 'npm run lint -- --errors',
         options: {
           preferLocal: true
         }
@@ -468,7 +468,7 @@ module.exports = function(grunt) {
         }
       },
       webpack: {
-        command: 'webpack test/require/webpack.js build/temp/webpack.js',
+        command: 'webpack --hide-modules test/require/webpack.js build/temp/webpack.js',
         options: {
           preferLocal: true
         }
