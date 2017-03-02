@@ -13,13 +13,8 @@ const proxyquire = proxyquireify(require);
 QUnit.module('Text Track', {
   beforeEach() {
     this.tech = new TechFaker();
-    this.oldVttjs = window.vttjs;
-    window.vttjs = {
-      VTTCue: Object
-    };
   },
   afterEach() {
-    window.vttjs = this.oldVttjs;
     this.tech.dispose();
     this.tech = null;
   }
