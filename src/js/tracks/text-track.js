@@ -335,7 +335,9 @@ class TextTrack extends Track {
       cue = new window.vttjs.VTTCue(originalCue.startTime, originalCue.endTime, originalCue.text);
 
       for (const prop in originalCue) {
-        cue[prop] = originalCue[prop];
+        if (!(prop in cue)) {
+          cue[prop] = originalCue[prop];
+        }
       }
     }
 
