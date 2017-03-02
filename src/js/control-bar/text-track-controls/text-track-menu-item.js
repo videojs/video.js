@@ -83,7 +83,12 @@ class TextTrackMenuItem extends MenuItem {
    */
   handleClick(event) {
     const kind = this.track.kind;
+    let kinds = this.track.kinds;
     const tracks = this.player_.textTracks();
+
+    if (!kinds) {
+      kinds = [kind];
+    }
 
     super.handleClick(event);
 
@@ -94,11 +99,7 @@ class TextTrackMenuItem extends MenuItem {
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
 
-      if (track.kind !== kind) {
-        continue;
-      }
-
-      if (track === this.track) {
+      if (track === this.track && (kinds.indexOf(track.kind) > -1)) {
         track.mode = 'showing';
       } else {
         track.mode = 'disabled';
