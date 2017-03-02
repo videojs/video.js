@@ -35,6 +35,10 @@ class SubsCapsButton extends TextTrackButton {
     return `vjs-subs-caps-button ${super.buildCSSClass()}`;
   }
 
+  buildWrapperCSSClass() {
+    return `vjs-subs-caps-button ${super.buildWrapperCSSClass()}`;
+  }
+
   /**
    * Update caption menu items
    *
