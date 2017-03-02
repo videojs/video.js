@@ -114,7 +114,7 @@
     "remark-cli": "^3.0.0",
     "remark-lint": "^5.2.0",
     "remark-toc": "^4.0.0",
-    "remark-validate-links": "^5.0.0",
+    "remark-validate-links": "^6.0.0",
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
