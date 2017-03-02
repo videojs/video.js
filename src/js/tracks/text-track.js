@@ -341,6 +341,9 @@ class TextTrack extends Track {
       for (const prop in originalCue) {
         cue[prop] = originalCue[prop];
       }
+
+      // make sure that `id` is copied over
+      cue.id = originalCue.id;
     }
 
     const tracks = this.tech_.textTracks();
