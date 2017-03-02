@@ -520,9 +520,6 @@ class Tech extends Component {
       // as an option. novtt builds will turn the above require call into an empty object
       // which will cause this if check to always fail.
       if (!this.options_['vtt.js'] && isPlain(vtt) && Object.keys(vtt).length > 0) {
-        Object.keys(vtt).forEach(function(k) {
-          window[k] = vtt[k];
-        });
         this.trigger('vttjsloaded');
         return;
       }

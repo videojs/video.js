@@ -19,7 +19,17 @@ const defaultTech = {
   currentTime() {}
 };
 
-QUnit.module('Text Track');
+QUnit.module('Text Track', {
+  beforeEach() {
+    this.oldVttjs = window.vttjs;
+    window.vttjs = {
+      VTTCue: Object
+    };
+  },
+  afterEach() {
+    window.vttjs = this.oldVttjs;
+  }
+});
 
 // do baseline track testing
 TrackBaseline(TextTrack, {

@@ -5,6 +5,7 @@ import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
+import log from './utils/log';
 import Player from './player';
 
 /**
@@ -305,8 +306,10 @@ class Plugin {
       throw new Error(`Illegal plugin name, "${name}", must be a string, was ${typeof name}.`);
     }
 
-    if (pluginExists(name) || Player.prototype.hasOwnProperty(name)) {
-      throw new Error(`Illegal plugin name, "${name}", already exists.`);
+    if (pluginExists(name)) {
+      log.warn(`A plugin named "${name}" already exists. You may want to avoid re-registering plugins!`);
+    } else if (Player.prototype.hasOwnProperty(name)) {
+      throw new Error(`Illegal plugin name, "${name}", cannot share a name with an existing player method!`);
     }
 
     if (typeof plugin !== 'function') {
