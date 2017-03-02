@@ -14,9 +14,12 @@
   @extend .vjs-icon-subtitles;
 }
 
-.video-js .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text:after {
-  content: " \f10d";
+.video-js .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
+  position: absolute;
+}
+.video-js .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text .vjs-icon-placeholder:before {
   font-family: VideoJS;
-  vertical-align: bottom;
+  content: "\f10d";
   font-size: 1.5em;
+  line-height: inherit;
 }

@@ -41,7 +41,7 @@ class TextTrackButton extends TrackButton {
    * @return {TextTrackMenuItem[]}
    *         Array of menu items that were created
    */
-  createItems(items = []) {
+  createItems(items = [], TrackMenuItem = TextTrackMenuItem) {
 
     // Label is an overide for the [track] off label
     // USed to localise captions/subtitles
@@ -64,7 +64,7 @@ class TextTrackButton extends TrackButton {
 
       // only add tracks that are of an appropriate kind and have a label
       if (this.kinds_.indexOf(track.kind) > -1) {
-        const item = new TextTrackMenuItem(this.player_, {
+        const item = new TrackMenuItem(this.player_, {
           track,
           // MenuItem is selectable
           selectable: true
