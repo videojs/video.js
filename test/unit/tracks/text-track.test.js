@@ -49,7 +49,7 @@ QUnit.test('can create a TextTrack with a mode property', function(assert) {
 
 QUnit.test('defaults when items not provided', function(assert) {
   const tt = new TextTrack({
-    tech: TechFaker
+    tech: this.tech
   });
 
   assert.equal(tt.kind, 'subtitles', 'kind defaulted to subtitles');
