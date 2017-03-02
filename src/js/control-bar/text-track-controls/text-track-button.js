@@ -40,6 +40,7 @@ class TextTrackButton extends TrackButton {
   createItems(items = []) {
     // Add an OFF menu item to turn all tracks off
     items.push(new OffTextTrackMenuItem(this.player_, {kind: this.kind_}));
+    this.hideThreshold_ += 1;
 
     const tracks = this.player_.textTracks();
 
