@@ -1,3 +1,19 @@
+<a name="5.18.1"></a>
+## [5.18.1](https://github.com/videojs/video.js/compare/v5.18.0...v5.18.1) (2017-03-03)
+
+### Bug Fixes
+
+* **cues:** only copy cue props that don't exist ([#4146](https://github.com/videojs/video.js/issues/4146)) ([de08669](https://github.com/videojs/video.js/commit/de08669))
+* cue-points with a startTime of 0 ([#4148](https://github.com/videojs/video.js/issues/4148)) ([e7d4b47](https://github.com/videojs/video.js/commit/e7d4b47))
+* make sure that cues copy over their id ([#4154](https://github.com/videojs/video.js/issues/4154)) ([072c277](https://github.com/videojs/video.js/commit/072c277))
+* **MenuButton:** Unify behavior of showing/hiding ([#3993](https://github.com/videojs/video.js/issues/3993)) ([4367c69](https://github.com/videojs/video.js/commit/4367c69))
+* **playback rate menu:** playback rate menu items should be selectable ([#4150](https://github.com/videojs/video.js/issues/4150)) ([288edd1](https://github.com/videojs/video.js/commit/288edd1))
+
+### Chores
+
+* **build:** lint errors only and silence webpack ([#4153](https://github.com/videojs/video.js/issues/4153)) ([b1ca344](https://github.com/videojs/video.js/commit/b1ca344))
+* **package:** update video-js-swf to 5.3.0 ([#4161](https://github.com/videojs/video.js/issues/4161)) ([2bcfe21](https://github.com/videojs/video.js/commit/2bcfe21))
+
 <a name="5.18.0"></a>
 # [5.18.0](https://github.com/videojs/video.js/compare/v5.17.0...v5.18.0) (2017-02-27)
 
