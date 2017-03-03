@@ -1,3 +1,10 @@
+<a name="5.18.2"></a>
+## [5.18.2](https://github.com/videojs/video.js/compare/v5.18.1...v5.18.2) (2017-03-03)
+
+### Bug Fixes
+
+* **cues:** only copy cue props that don't exist ([#4146](https://github.com/videojs/video.js/issues/4146)) ([841d135](https://github.com/videojs/video.js/commit/841d135))
+
 <a name="5.18.1"></a>
 ## [5.18.1](https://github.com/videojs/video.js/compare/v5.18.0...v5.18.1) (2017-03-03)
 
