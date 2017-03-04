@@ -25,7 +25,7 @@
     <pre>open http://localhost:9999/sandbox/index.html</pre>
   </div>
 
-  <video id="vid1" class="video-js vjs-default-skin" lang="en" controls preload="auto" width="640" height="264" poster="http://vjs.zencdn.net/v/oceans.png">
+  <video id="vid1" class="video-js vjs-default-skin" lang="en" controls preload="auto" width="640" height="264">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
     <track kind="captions" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.en.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
@@ -35,7 +35,7 @@
     <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.ja.vtt" srclang="ja" label="Japanese"></track><!-- Tracks need an ending tag thanks to IE9 -->
     <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
-  <p>This player has the captions-only CpationsButton, the subtiles-only subtitlesButton and the subsCapsButton which shows both kinds. Typically you'll use either just the subsCapsButton alone, or one or both of the captionsButton and subtitlesButton.</p>
+  <p>This player has the captions-only captionsButton, the subtiles-only subtitlesButton and the subsCapsButton which shows both kinds. Typically you'll use either just the subsCapsButton alone, or one or both of the captionsButton and subtitlesButton.</p>
   <script>
     var vid = document.getElementById("vid1");
     var player = videojs(vid, {
