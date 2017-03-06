@@ -37,6 +37,10 @@ class AudioTrackButton extends TrackButton {
     return `vjs-audio-button ${super.buildCSSClass()}`;
   }
 
+  buildWrapperCSSClass() {
+    return `vjs-audio-button ${super.buildWrapperCSSClass()}`;
+  }
+
   /**
    * Create a menu item for each audio track
    *
