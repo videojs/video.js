@@ -10,7 +10,7 @@
   width: 4em;
   @include flex(none);
 
-  & .vjs-icon-placeholder:before {
+  & > .vjs-icon-placeholder:before {
     font-size: 1.8em;
     line-height: 1.67;
 
