@@ -73,7 +73,7 @@ QUnit.test('registerPlugin() illegal arguments', function(assert) {
     'plugins must be functions'
   );
 
-  sinon.spy(log, 'warn');
+  sinon.stub(log, 'warn');
   Plugin.registerPlugin('foo', function() {});
   Plugin.registerPlugin('foo', function() {});
   assert.strictEqual(log.warn.callCount, 1, 'warn on re-registering a plugin');
