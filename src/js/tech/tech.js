@@ -130,8 +130,10 @@ class Tech extends Component {
       }
     });
 
-    if (options.nativeCaptions === false) {
+    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
       this.featuresNativeTextTracks = false;
+    } else if (options.nativeCaptions === true || options.nativeTextTracks === true) {
+      this.featuresNativeTextTracks = true;
     }
 
     if (!this.featuresNativeTextTracks) {
