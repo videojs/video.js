@@ -52,8 +52,11 @@ class PlayProgressBar extends Component {
         this.player_.currentTime();
 
       const content = formatTime(time, this.player_.duration());
+      const timeTooltip = this.getChild('timeTooltip');
 
-      this.getChild('timeTooltip').update(seekBarRect, seekBarPoint, content);
+      if (timeTooltip) {
+        timeTooltip.update(seekBarRect, seekBarPoint, content);
+      }
     });
   }
 }
