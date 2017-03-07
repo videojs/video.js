@@ -23,7 +23,6 @@ class SubsCapsButton extends TextTrackButton {
       this.label_ = 'captions';
     }
     this.menuButton_.controlText(toTitleCase(this.label_));
-
   }
 
   /**

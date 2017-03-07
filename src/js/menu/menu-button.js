@@ -38,6 +38,7 @@ class MenuButton extends Component {
     const buttonClass = Button.prototype.buildCSSClass();
 
     this.menuButton_.el_.className = this.buildCSSClass() + ' ' + buttonClass;
+    this.menuButton_.removeClass('vjs-control');
 
     this.addChild(this.menuButton_);
 
