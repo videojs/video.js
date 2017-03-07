@@ -19,6 +19,10 @@
   overflow: auto;
 }
 
+.vjs-tracksettings legend {
+  color: $primary-foreground-color;
+}
+
 .vjs-caption-settings .vjs-tracksettings-colors,
 .vjs-caption-settings .vjs-tracksettings-font {
   float: left;
