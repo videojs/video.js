@@ -5,6 +5,12 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 import {assign} from '../../utils/obj';
 
+/**
+ * SubsCapsMenuItem has an [cc] icon to distinguish captions from subtitles
+ * in the SubsCapsMenu.
+ *
+ * @extends TextTrackMenuItem
+ */
 class SubsCapsMenuItem extends TextTrackMenuItem {
 
   createEl(type, props, attrs) {
