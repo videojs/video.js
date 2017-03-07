@@ -4,6 +4,7 @@
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
+import SubsCapsMenuItem from './subs-caps-menu-item.js';
 import toTitleCase from '../../utils/to-title-case.js';
 /**
  * The button component for toggling and selecting captions and/or subtitles
@@ -79,7 +80,7 @@ class SubsCapsButton extends TextTrackButton {
       items.push(new CaptionSettingsMenuItem(this.player_, {kind: this.label_}));
     }
 
-    items = super.createItems(items);
+    items = super.createItems(items, SubsCapsMenuItem);
     return items;
   }
 
