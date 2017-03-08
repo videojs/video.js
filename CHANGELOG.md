@@ -1,3 +1,10 @@
+<a name="5.18.4"></a>
+## [5.18.4](https://github.com/videojs/video.js/compare/v5.18.3...v5.18.4) (2017-03-08)
+
+### Bug Fixes
+
+* **vttjs:** wait till tech el in DOM before loading vttjs ([#4176](https://github.com/videojs/video.js/issues/4176)) ([ad86eec](https://github.com/videojs/video.js/commit/ad86eec))
+
 <a name="5.18.3"></a>
 ## [5.18.3](https://github.com/videojs/video.js/compare/v5.18.2...v5.18.3) (2017-03-06)
 
