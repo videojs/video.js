@@ -536,7 +536,7 @@ class Tech extends Component {
     // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
     // signals that the Tech is ready at which point Tech.el_ is part of the DOM
     // before inserting the WebVTT script
-    if (this.el().parentNode !== null && this.el().parentNode !== undefined) {
+    if (document.body.contains(this.el())) {
       const vtt = require('videojs-vtt.js');
 
       // load via require if available and vtt.js script location was not passed in
