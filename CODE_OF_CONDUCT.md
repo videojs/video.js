@@ -113,8 +113,9 @@ Additionally, as a project hosted on both GitHub and npm, [their own Codes of Co
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
 available at [http://contributor-covenant.org/version/1/4][version]
 
-The [Other Community Standards](#other-community-standard) and [Enforcement][#enforcement] sections
-are based on [weallbehave][weallbehave], which is based on the [WeAllJS Code of Conduct][wealljs].
+The [Other Community Standards](#other-community-standard), [Further Enforcement](#further-enforcement),
+and [Who Watches the Watchers?](#who-watches-the-watchers) sections are based on [weallbehave][weallbehave],
+which is based on the [WeAllJS Code of Conduct][wealljs].
 
 [homepage]: http://contributor-covenant.org
 
