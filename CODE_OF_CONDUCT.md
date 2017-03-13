@@ -1,5 +1,7 @@
 # Contributor Covenant Code of Conduct
 
+Please note that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
+
 ## Our Pledge
 
 In the interest of fostering an open and welcoming environment, we as

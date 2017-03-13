@@ -79,6 +79,10 @@ Video.js is a free and open source library, and we appreciate any help you're wi
 
 _Video.js uses [BrowserStack][browserstack] for compatibility testing._
 
+## [Code of Conduct][coc]
+
+Please note that this project is released with a [Contributor Code of Conduct][coc]. By participating in this project you agree to abide by its terms.
+
 ## [License][license]
 
 Video.js is [licensed][license] under the Apache License, Version 2.0.
@@ -120,3 +124,5 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 [travis-link]: https://travis-ci.org/videojs/video.js
 
 [vjs]: http://videojs.com
+
+[coc]: CODE_OF_CONDUCT.md
