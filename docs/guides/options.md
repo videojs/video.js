@@ -207,7 +207,7 @@ See [the plugins guide](plugins.md) for more information on Video.js plugins.
 
 > Type: `boolean`, Default: `false`
 >
-> **Note:** In video.js 6.0, this option will default to `true`.
+> **Note:** In video.js 6.0, this option will default to `true`. and that [videojs-flash](https://github.com/videojs/videojs-flash) will be required to use the flash tech.
 
 Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techorder) in selecting a source and playback tech.
 
@@ -275,9 +275,9 @@ Using `<source>` elements will have the same effect:
 
 ### `techOrder`
 
-> Type: `Array`, Default: `['html5', 'flash']`
+> Type: `Array`, Default: `['html5']`
 
-Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred, but Video.js will fall back to `Flash` if no `Html5`-compatible source can be found.
+Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other regisetered techs will be added after this tech in the order in which they are registered.
 
 ### `vtt.js`
 
