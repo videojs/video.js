@@ -2,6 +2,18 @@
 
 Please note that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
 
+## Table of Contents
+
+* [Our Pledge](#our-pledge)
+* [Our Standards](#our-standards)
+* [Our Responsibilities](#our-responsibilities)
+* [Scope](#scope)
+  * [Other Community Standards](#other-community-standards)
+* [Enforcement](#enforcement)
+  * [Further Enforcement](#further-enforcement)
+  * [Who Watches the Watchers?](#who-watches-the-watchers)
+* [Attribution](#attribution)
+
 ## Our Pledge
 
 In the interest of fostering an open and welcoming environment, we as
@@ -25,7 +37,7 @@ include:
 Examples of unacceptable behavior by participants include:
 
 * The use of sexualized language or imagery and unwelcome sexual attention or
-advances
+  advances
 * Trolling, insulting/derogatory comments, and personal or political attacks
 * Public or private harassment
 * Publishing others' private information, such as a physical or electronic
@@ -62,7 +74,6 @@ Additionally, as a project hosted on npm, is is covered by [npm, Inc's Code of C
 
 Enforcement of those guidelines after violations overlapping with the above are the responsibility of the entities, and enforcement may happen in any or all of the services/communities.
 
-
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
@@ -81,9 +92,9 @@ members of the project's leadership.
 If you've already followed the [initial enforcement steps](#enforcement), these are the steps maintainers will take for further enforcement, as needed:
 
 1. Repeat the request to stop.
-2. If the person doubles down, they will have offending messages removed or edited by a maintainers given an official warning. The PR or Issue may be locked.
-3. If the behavior continues or is repeated later, the person will be blocked from participating for 24 hours.
-4. If the behavior continues or is repeated after the temporary block, a long-term (6-12mo) ban will be used.
+1. If the person doubles down, they will have offending messages removed or edited by a maintainers given an official warning. The PR or Issue may be locked.
+1. If the behavior continues or is repeated later, the person will be blocked from participating for 24 hours.
+1. If the behavior continues or is repeated after the temporary block, a long-term (6-12mo) ban will be used.
 
 On top of this, maintainers may remove any offending messages, images, contributions, etc, as they deem necessary.
 
@@ -106,7 +117,11 @@ The [Other Community Standards](#other-community-standard) and [Enforcement][#en
 are based on [weallbehave][weallbehave], which is based on the [WeAllJS Code of Conduct][wealljs].
 
 [homepage]: http://contributor-covenant.org
+
 [version]: http://contributor-covenant.org/version/1/4/
+
 [wealljs]: https://wealljs.org/code-of-conduct
+
 [weallbehave]: https://npm.im/weallbehave
+
 [slack]: http://slack.videojs.com
