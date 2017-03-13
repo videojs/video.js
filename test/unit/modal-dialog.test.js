@@ -280,6 +280,35 @@ QUnit.test('open() pauses playback, close() resumes', function(assert) {
   assert.strictEqual(playSpy.callCount, 1, 'player is resumed when the modal closes');
 });
 
+QUnit.test('open() does not pause, close() does not play() with pauseOnOpen set to false', function(assert) {
+  const playSpy = sinon.spy();
+  const pauseSpy = sinon.spy();
+
+  // don't pause the video on modal open
+  this.modal.options_.pauseOnOpen = false;
+
+  // Quick and dirty; make it looks like the player is playing.
+  this.player.paused = function() {
+    return false;
+  };
+
+  this.player.play = function() {
+    playSpy();
+  };
+
+  this.player.pause = function() {
+    pauseSpy();
+  };
+
+  this.modal.open();
+
+  assert.expect(2);
+  assert.strictEqual(pauseSpy.callCount, 0, 'player remains playing when the modal opens');
+
+  this.modal.close();
+  assert.strictEqual(playSpy.callCount, 0, 'player is resumed when the modal closes');
+});
+
 QUnit.test('open() hides controls, close() shows controls', function(assert) {
   this.modal.open();
 
