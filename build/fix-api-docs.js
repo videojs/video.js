@@ -3,9 +3,9 @@ var path = require('path')
 var apiPath = path.join(__dirname, '..', 'docs', 'api');
 
 var replacements = [
-  {find: '\"/docs/guides/\"', replace: '"#"'},
-  {find: '\"/docs/guides/(.*)\.md\"', replace: '"tutorial-$1.html"'},
-  {find: '\"tutorial-tech.html\"', replace: '"tutorial-tech_.html"'}
+  {find: /\/docs\/guides\/(.+)\.md/, replace: 'tutorial-$1.html'},
+  {find: /tutorial-tech.html/, replace: 'tutorial-tech_.html'},
+  {find: /\/docs\/guides\//, replace: '#'}
 ];
 
 

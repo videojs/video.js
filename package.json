@@ -26,6 +26,7 @@
     "test": "grunt test",
     "docs": "npm run docs:lint && npm run docs:api",
     "jsdoc": "jsdoc",
+    "predocs:api": "node -e \"var s=require('shelljs'),d=['docs/api'];s.rm('-rf',d);\"",
     "docs:api": "jsdoc -c .jsdoc.json",
     "postdocs:api": "node ./build/fix-api-docs.js",
     "docs:lint": "remark -- './**/*.md'",
