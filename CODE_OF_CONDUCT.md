@@ -52,6 +52,15 @@ address, posting via an official social media account, or acting as an appointed
 representative at an online or offline event. Representation of a project may be
 further defined and clarified by project maintainers.
 
+### Other Community Standards
+
+As a project on GitHub, this project is additionally covered by the [GitHub Community Guidelines](https://help.github.com/articles/github-community-guidelines/).
+
+Additionally, as a project hosted on npm, is is covered by [npm, Inc's Code of Conduct](https://www.npmjs.com/policies/conduct).
+
+Enforcement of those guidelines after violations overlapping with the above are the responsibility of the entities, and enforcement may happen in any or all of the services/communities.
+
+
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
@@ -70,5 +79,9 @@ members of the project's leadership.
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
 available at [http://contributor-covenant.org/version/1/4][version]
 
+The [Other Community Standards](#other-community-standard) and [Enforcement][#enforcement] sections
+are based on the [WeAllJS Code of Conduct][weallbehave].
+
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/
+[weallbehave]: https://wealljs.org/code-of-conduct
