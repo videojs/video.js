@@ -66,7 +66,7 @@ Enforcement of those guidelines after violations overlapping with the above are 
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at gary@videojs.com. All
+reported by contacting the project team at gary@videojs.com or @gkatsev on [slack][]. All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
@@ -109,3 +109,4 @@ are based on [weallbehave][weallbehave], which is based on the [WeAllJS Code of 
 [version]: http://contributor-covenant.org/version/1/4/
 [wealljs]: https://wealljs.org/code-of-conduct
 [weallbehave]: https://npm.im/weallbehave
+[slack]: http://slack.videojs.com
