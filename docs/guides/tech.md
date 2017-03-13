@@ -2,8 +2,7 @@
 
 Playback Technology refers to the specific browser or plugin technology used to play the video or audio.
 When using HTML5, the playback technology is the video or audio element. When using Flash and the
-[videojs-flash project](http://github.com/videojs/videojs-flash), the playback technology is the specific Flash player used,
-e.g. Flowplayer, YouTube Player, video-js.swf, etc. (not just "Flash"). This could also include Silverlight,
+[videojs-flash project](http://github.com/videojs/videojs-flash) (which was builtin to Video.js prior to Video.js 6), the playback technology is the specific Flash player used, and in most cases that will be [video-js-swf](https://github.com/videojs/video-js-swf). This could also include Silverlight,
 Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it.
 
 Essentially we're using HTML5 and plugins only as video decoders, and using HTML and JavaScript to create a
@@ -31,7 +30,8 @@ class MyTech extnds Tech {
   }
 }
 
-// Add our new Tech to the internal Tech list and to the back of the default tech order list
+// Add our new Tech to the internal Tech list and to the end of the default tech order list
+// the techOrder will now look like this by default: `['html5', 'mytech']`
 videojs.registerTech('MyTech', MyTech);
 ```
 
@@ -46,7 +46,7 @@ var MyTech = videojs.extend(Tech, {
   }
 });
 
-// Add our new Tech to the internal Tech list and to the back of the default tech order list
+// Add our new Tech to the internal Tech list and to the end of the default `techOrder` list
 videojs.registerTech('MyTech', MyTech);
 ```
 
