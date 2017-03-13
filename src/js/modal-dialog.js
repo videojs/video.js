@@ -180,7 +180,7 @@ class ModalDialog extends Component {
       // playing state.
       this.wasPlaying_ = !player.paused();
 
-      if (this.wasPlaying_) {
+      if (this.options_.pauseOnOpen && this.wasPlaying_) {
         player.pause();
       }
 
@@ -243,7 +243,7 @@ class ModalDialog extends Component {
       this.trigger('beforemodalclose');
       this.opened_ = false;
 
-      if (this.wasPlaying_) {
+      if (this.wasPlaying_ && this.options_.pauseOnOpen) {
         player.play();
       }
 
@@ -427,6 +427,7 @@ class ModalDialog extends Component {
  * @private
  */
 ModalDialog.prototype.options_ = {
+  pauseOnOpen: true,
   temporary: true
 };
 
