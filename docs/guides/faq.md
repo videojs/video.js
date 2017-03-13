@@ -45,7 +45,7 @@
 video.js is an extendable framework/library around the native video element. It does the following:
 
 * Offers a plugin API so that different types of video can be handed to the native
-  video element (e.g. HLS, Flash, HTML5 video, etc).
+  video element (e.g. [HLS][hls], [Flash][flash], HTML5 video, etc).
 * Unifies the native video api across browsers (polyfilling support for features
   if necessary)
 * Offers an extendable and themable UI
@@ -117,9 +117,7 @@ about reduced test cases visit [css-tricks](https://css-tricks.com/reduced-test-
 ## Q: What media formats does video.js support?
 
 This depends on the formats supported by the browser's HTML5 video element, and the playback
-techs made available to video.js. For example, video.js 5 includes the Flash tech by default which
-enables the playback of FLV video where the Flash plugin is available. For more information
-on media formats see the [troubleshooting guide][troubleshooting].
+techs/plugins made available to video.js. For more information on media formats see the [troubleshooting guide][troubleshooting].
 
 ## Q: How to I autoplay the video?
 
@@ -156,8 +154,7 @@ Will make an inline, muted, autoplaying video on an iPhone with iOS10.
 
 ## Q: How can I play RTMP video in video.js?
 
-Make sure that the Flash tech is available -- RTMP is not playable on browsers without Flash including mobile. Then, just set the rtmp source with
-an appropriate type -- `rtmp/mp4` or `rtmp/flv`.
+Make sure that the Flash tech is available -- RTMP is not playable on browsers without Flash including mobile. Flash will only be available on video.js 6 with the [videojs-flash package][flash], in previous versions it was builtin to video.js. Then, just set the rtmp source with an appropriate type -- `rtmp/mp4` or `rtmp/flv`.
 The main thing to be aware of is that video.js splits the connection url and stream name with the `&` character.
 So, you'd want to update the url to follow that format. For example: `rtmp://example.com/live&foo` or `rtmp://example.com/fms&mp4:path/to/file.mp4`.
 
@@ -214,7 +211,7 @@ See the [video.js github wiki][skins-list].
 
 Yes! It can be used to play audio only files in a `<video>` or `<audio>` tag. The
 difference being that the `<audio>` tag will not have a blank display area and the `<video>`
-tag will. Note that audio only will not work with the Flash playback tech.
+tag will. Note that audio only will not work with the Flash playback tech. The Flash playback tech will only be included in versions of video.js before 6. In Video.js 6 you will need to use the [videojs-flash package][flash].
 
 ## Q: Does video.js support audio tracks?
 
@@ -242,8 +239,7 @@ adds support for MPEG DASH video.
 
 ## Q: Does video.js support live video?
 
-Yes! Video.js adds support for live videos via the Flash tech which supports RTMP streams.
-The official HLS tech, [videojs-contrib-hls][hls], will add support for live HLS video
+Yes! Video.js adds support for live videos via the Flash tech tech which supports RTMP streams. In Video.js 6 you will have to use [videojs-flash][flash] to get this. In previous versions the Flash tech was builtin. The official HLS tech, [videojs-contrib-hls][hls], will add support for live HLS video
 if you add it to your page with video.js.
 
 ## Q: Can video.js wrap around YouTube videos?
@@ -291,6 +287,8 @@ Yes! See [ReactJS integration example](./guides/react.md).
 [pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
 
 [hls]: http://github.com/videojs/videojs-contrib-hls
+
+[flash]: https://github.com/videojs/videojs-flash
 
 [dash]: http://github.com/videojs/videojs-contrib-dash
 
