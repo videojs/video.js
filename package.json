@@ -15,13 +15,8 @@
   ],
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
-  "contributors": [{
-    "name": "Gary Katsevman",
-    "email": "gary@videojs.com"
-  }],
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
-    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "build": "grunt dist",
     "change": "grunt chg-add",
     "clean": "grunt clean",
@@ -128,7 +123,6 @@
     "videojs-doc-generator": "0.0.1",
     "videojs-flash": "^1.0.0-RC.0",
     "videojs-standard": "^6.0.1",
-    "weallbehave": "^1.0.3",
     "webpack": "^1.13.2"
   },
   "vjsstandard": {
