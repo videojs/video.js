@@ -74,14 +74,36 @@ Project maintainers who do not follow or enforce the Code of Conduct in good
 faith may face temporary or permanent repercussions as determined by other
 members of the project's leadership.
 
+### Further Enforcement
+
+If you've already followed the [initial enforcement steps](#enforcement), these are the steps maintainers will take for further enforcement, as needed:
+
+1. Repeat the request to stop.
+2. If the person doubles down, they will have offending messages removed or edited by a maintainers given an official warning. The PR or Issue may be locked.
+3. If the behavior continues or is repeated later, the person will be blocked from participating for 24 hours.
+4. If the behavior continues or is repeated after the temporary block, a long-term (6-12mo) ban will be used.
+
+On top of this, maintainers may remove any offending messages, images, contributions, etc, as they deem necessary.
+
+Maintainers reserve full rights to skip any of these steps, at their discretion, if the violation is considered to be a serious and/or immediate threat to the health and well-being of members of the community. These include any threats, serious physical or verbal attacks, and other such behavior that would be completely unacceptable in any social setting that puts our members at risk.
+
+Members expelled from events or venues with any sort of paid attendance will not be refunded.
+
+### Who Watches the Watchers?
+
+Maintainers and other leaders who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of the project's leadership. These may include anything from removal from the maintainer team to a permanent ban from the community.
+
+Additionally, as a project hosted on both GitHub and npm, [their own Codes of Conducts may be applied against maintainers of this project](#other-community-standards), externally of this project's procedures.
+
 ## Attribution
 
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
 available at [http://contributor-covenant.org/version/1/4][version]
 
 The [Other Community Standards](#other-community-standard) and [Enforcement][#enforcement] sections
-are based on the [WeAllJS Code of Conduct][weallbehave].
+are based on [weallbehave][weallbehave], which is based on the [WeAllJS Code of Conduct][wealljs].
 
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/
-[weallbehave]: https://wealljs.org/code-of-conduct
+[wealljs]: https://wealljs.org/code-of-conduct
+[weallbehave]: https://npm.im/weallbehave
