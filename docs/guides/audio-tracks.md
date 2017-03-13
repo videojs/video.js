@@ -25,7 +25,7 @@ cross-browser implementation of audio tracks.
   They must be added programmatically.
 * Video.js only stores track representations. Switching audio tracks for playback is
   _not handled by Video.js_ and must be handled elsewhere - for example,
-  [videojs-contrib-hls](http://github.com/videojs/videojs-contrib-hls) handles switching
+  [videojs-contrib-hls][hls] handles switching
   audio tracks to support track selection through the UI.
 
 ## Working with Audio Tracks
@@ -91,7 +91,7 @@ player.audioTracks().removeTrack(track);
 ## API
 
 For more complete information, refer to the
-[Video.js API docs](http://docs.videojs.com/docs/api/index.html), specifically:
+[Video.js API docs](http://docs.videojs.com/), specifically:
 
 * `Player#audioTracks`
 * `AudioTrackList`
@@ -140,7 +140,7 @@ The valid [BCP 47](https://tools.ietf.org/html/bcp47) code for the language of t
 track, e.g. `"en"` for English or `"es"` for Spanish.
 
 For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/master/lang)
-located in the Video.js root and refer to the [languages guide](languages.md) for more
+located in the Video.js root and refer to the [languages guide][languages-guide] for more
 information on languages in Video.js.
 
 #### `enabled`
@@ -154,4 +154,8 @@ than one, the last one to be enabled will end up being the only one. While the s
 allows for more than one track to be enabled, Safari and most implementations only allow
 one audio track to be enabled at a time.
 
+[languages-guide]: /docs/guides/languages.md
+
 [spec-audiotrack]: https://html.spec.whatwg.org/multipage/embedded-content.html#audiotrack
+
+[hls]: http://github.com/videojs/videojs-contrib-hls

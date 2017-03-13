@@ -88,7 +88,7 @@ const autoSetup = function() {
  * @param {number} wait
  *        How long to wait in ms
  *
- * @param {videojs} [vjs]
+ * @param {module:videojs} [vjs]
  *        The videojs library function
  */
 function autoSetupTimeout(wait, vjs) {

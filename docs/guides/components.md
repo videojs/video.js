@@ -29,7 +29,7 @@ A component is a JavaScript object that has the following features:
 * The ability to listen for and trigger events.
 * A lifecycle of initialization and disposal.
 
-For more specifics on the programmatic interface of a component, see [the component API docs](http://docs.videojs.com/docs/api/component.html).
+For more specifics on the programmatic interface of a component, see [the component API docs][api].
 
 ## Creating a Component
 
@@ -75,7 +75,7 @@ console.log(button.el());
 
 ## Component Children
 
-Again, refer to [the component API docs](http://docs.videojs.com/docs/api/component.html) for complete details on methods available for managing component structures.
+Again, refer to [the component API docs][api] for complete details on methods available for managing component structures.
 
 ### Basic Example
 
@@ -336,3 +336,5 @@ let player = videojs('myplayer', {
 ### Text Track Settings
 
 The text track settings component is only available when using emulated text tracks.
+
+[api]: http://docs.videojs.com/Component.html

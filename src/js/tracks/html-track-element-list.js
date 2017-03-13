@@ -32,7 +32,7 @@ class HtmlTrackElementList {
     list.trackElements_ = [];
 
     /**
-     * @memberof HTMLTrackElementList
+     * @memberof HtmlTrackElementList
      * @member {number} length
      *         The current number of `Track`s in the this Trackist.
      * @instance
