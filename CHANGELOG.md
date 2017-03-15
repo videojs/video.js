@@ -1,4 +1,16 @@
 <a name="5.19.0"></a>
+# [5.19.0](https://github.com/videojs/video.js/compare/v5.18.4...v5.19.0) (2017-03-15)
+
+### Features
+
+* Make pause on open optional for ModalDialog via options ([#4187](https://github.com/videojs/video.js/issues/4187)) ([4ec3b56](https://github.com/videojs/video.js/commit/4ec3b56))
+
+### Bug Fixes
+
+* make load progress buffered regions height 100% ([#4191](https://github.com/videojs/video.js/issues/4191)) ([398c6e9](https://github.com/videojs/video.js/commit/398c6e9))
+* make sure audio track hides with one item ([#4203](https://github.com/videojs/video.js/issues/4203)) ([c069655](https://github.com/videojs/video.js/commit/c069655))
+
+<a name="5.19.0"></a>
 # [5.19.0](https://github.com/videojs/video.js/compare/v6.0.0-RC.5...v5.19.0) (2017-03-15)
 
 ### Features
