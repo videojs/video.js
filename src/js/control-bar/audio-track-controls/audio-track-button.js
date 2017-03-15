@@ -49,6 +49,9 @@ class AudioTrackButton extends TrackButton {
    *         An array of menu items
    */
   createItems(items = []) {
+    // if there's only one audio track, there no point in showing it
+    this.hideThreshold_ = 1;
+
     const tracks = this.player_.audioTracks && this.player_.audioTracks();
 
     if (!tracks) {
