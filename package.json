@@ -116,7 +116,7 @@
     "remark-toc": "^4.0.0",
     "remark-validate-links": "^6.0.0",
     "shelljs": "^0.7.5",
-    "sinon": "^1.16.1",
+    "sinon": "^2.1.0",
     "time-grunt": "^1.1.1",
     "tui-jsdoc-template": "^1.1.0",
     "uglify-js": "~2.8.8",
