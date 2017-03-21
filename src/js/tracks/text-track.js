@@ -163,6 +163,12 @@ class TextTrack extends Track {
     if (settings.kind === 'metadata' || settings.kind === 'chapters') {
       mode = 'hidden';
     }
+
+    if (settings.default) {
+      mode = 'showing';
+    }
+
+
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
     const tt = super(settings);
