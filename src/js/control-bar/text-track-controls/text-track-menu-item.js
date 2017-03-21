@@ -38,9 +38,11 @@ class TextTrackMenuItem extends MenuItem {
     if (tracks) {
       const changeHandler = Fn.bind(this, this.handleTracksChange);
 
+      player.on(['loadstart', 'texttrackchange'], changeHandler);
       tracks.addEventListener('change', changeHandler);
       this.on('dispose', function() {
         tracks.removeEventListener('change', changeHandler);
+        player.off(['loadstart', 'texttrackchange'], changeHandler);
       });
     }
 
