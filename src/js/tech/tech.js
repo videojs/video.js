@@ -879,9 +879,9 @@ class Tech extends Component {
  */
 
 /**
- * Get the remote element {@link HTMLTrackElementList}
+ * Get the remote element {@link HtmlTrackElementList}
  *
- * @returns {HTMLTrackElementList}
+ * @returns {HtmlTrackElementList}
  * @method Tech.prototype.remoteTextTrackEls
  */
 

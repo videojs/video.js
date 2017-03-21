@@ -112,7 +112,7 @@ with your issue.
 A reduced test case is an example of the problem that you are facing in isolation.
 Think of it as example page that reproduces the issue in the least amount of possible code.
 We have a [starter example][starter-example] for reduced test cases. To learn more
-about reduced test cases visit [css-tricks](https://css-tricks.com/reduced-test-cases/)
+about reduced test cases visit [css-tricks][reduced-test-case]
 
 ## Q: What media formats does video.js support?
 
@@ -270,19 +270,25 @@ Be sure to use `require('!style-loader!css-loader!video.js/dist/video-js.css')` 
 
 ## Q: Does video.js work with react?
 
-Yes! See [ReactJS integration example](./guides/react.md).
+Yes! See [ReactJS integration example][react-guide].
 
-[plugin-guide]: plugins.md
+[reduced-test-case]: https://css-tricks.com/reduced-test-cases/
+
+[react-guide]: /docs/guides/react.md
+
+[plugin-guide]: /docs/guides/plugins.md
 
 [install-guide]: http://videojs.com/getting-started/
 
-[troubleshooting]: troubleshooting.md
+[troubleshooting]: /docs/guides/troubleshooting.md
 
-[video-tracks]: video-tracks.md
+[video-tracks]: /docs/guides/video-tracks.md
 
-[audio-tracks]: audio-tracks.md
+[audio-tracks]: /docs/guides/audio-tracks.md
 
-[text-tracks]: text-tracks.md
+[text-tracks]: /docs/guides/text-tracks.md
+
+[debug-guide]: /docs/guides/debugging.md
 
 [pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
 
@@ -324,4 +330,3 @@ Yes! See [ReactJS integration example](./guides/react.md).
 
 [starter-example]: http://jsbin.com/axedog/edit?html,output
 
-[debug-guide]: ./guides/debug.md

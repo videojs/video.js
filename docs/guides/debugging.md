@@ -107,6 +107,6 @@ Finally, the history (if enabled) can be cleared at any time via:
 videojs.log.history.clear();
 ```
 
-[api]: http://docs.videojs.com/docs/api/index.html
+[api]: http://docs.videojs.com/
 
 [console]: https://developer.mozilla.org/en-US/docs/Web/API/Console

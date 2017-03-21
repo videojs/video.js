@@ -55,8 +55,6 @@ if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
  *
  * @return {Player}
  *         A player instance
- *
- * @mixes videojs
  */
 function videojs(id, options, ready) {
   let tag;
@@ -136,6 +134,7 @@ videojs.hooks_ = {};
 
 /**
  * Get a list of hooks for a specific lifecycle
+ * @function videojs.hooks
  *
  * @param {string} type
  *        the lifecyle to get hooks from
@@ -351,7 +350,6 @@ videojs.bind = Fn.bind;
  * Register a Video.js plugin.
  *
  * @borrows plugin:registerPlugin as videojs.registerPlugin
- * @mixes videojs
  * @method registerPlugin
  *
  * @param  {string} name

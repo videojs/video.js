@@ -1,6 +1,6 @@
 # Video.js Plugins
 
-One of the great strengths of Video.js is its ecosystem of plugins that allow authors from all over the world to share their video player customizations. This includes everything from the simplest UI tweaks to new [playback technologies and source handlers](tech.md)!
+One of the great strengths of Video.js is its ecosystem of plugins that allow authors from all over the world to share their video player customizations. This includes everything from the simplest UI tweaks to new [playback technologies and source handlers][tech]!
 
 Because we view plugins as such an important part of Video.js, the organization is committed to maintaining a robust set of tools for plugin authorship:
 
@@ -63,7 +63,7 @@ While reading the following sections, you may want to refer to the [Plugin API d
 
 ### Write a JavaScript Class/Constructor
 
-If you're familiar with creating [components](components.md), this process is similar. An advanced plugin starts with a JavaScript class (a.k.a. a constructor function).
+If you're familiar with creating [components][components], this process is similar. An advanced plugin starts with a JavaScript class (a.k.a. a constructor function).
 
 If you're using ES6 already, you can use that syntax with your transpiler/language of choice (Babel, TypeScript, etc):
 
@@ -314,9 +314,13 @@ These two methods are functionally identical - use whichever you prefer!
 * [Plugin Generator][generator]
 * [Plugin Conventions][standards]
 
-[api-player]: http://docs.videojs.com/docs/api/player.html
+[components]: /docs/guides/components.md
 
-[api-plugin]: http://docs.videojs.com/docs/api/plugin.html
+[tech]: /docs/guides/tech.md
+
+[api-player]: http://docs.videojs.com/Player.html
+
+[api-plugin]: http://docs.videojs.com/Plugin.html
 
 [generator]: https://github.com/videojs/generator-videojs-plugin
 

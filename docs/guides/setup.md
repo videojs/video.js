@@ -82,7 +82,7 @@ videojs(document.querySelector('.video-js'));
 
 ## Options
 
-> **Note:** This guide only covers how to pass options during player setup. For a complete reference on _all_ available options, see the [options guide](options.md).
+> **Note:** This guide only covers how to pass options during player setup. For a complete reference on _all_ available options, see the [options guide](/docs/guides/options.md).
 
 There are three ways to pass options to Video.js. Because Video.js decorates an HTML5 `<video>` element, many of the options available are also available as [standard `<video>` tag attributes][video-attrs]:
 
@@ -175,7 +175,9 @@ In each case, the callback is called asynchronously - _even if the player is alr
 
 ## Advanced Player Workflows
 
-For a discussion of more advanced player workflows, see the [player workflows guide](player-workflows.md).
+For a discussion of more advanced player workflows, see the [player workflows guide][player-workflows].
+
+[player-workflows]: /docs/guides/player-workflows.md
 
 [boolean-attrs]: https://www.w3.org/TR/2011/WD-html5-20110525/common-microsyntaxes.html#boolean-attributes
 
@@ -185,7 +187,7 @@ For a discussion of more advanced player workflows, see the [player workflows gu
 
 [video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes
 
-[videojs]: http://docs.videojs.com/docs/api/video.html
+[videojs]: http://docs.videojs.com/module-videojs.html
 
 [w3c-media-events]: https://www.w3.org/2010/05/video/mediaevents.html
 

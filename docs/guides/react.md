@@ -36,10 +36,9 @@ export default class VideoPlayer extends React.Component {
 }
 ```
 
-You can then use it like this:
+You can then use it like this: (see [options guide][options] for option information)
 
 ```jsx
-// see https://github.com/videojs/video.js/blob/master/docs/guides/options.md
 const videoJsOptions = {
   autoplay: true,
   controls: true,
@@ -53,3 +52,5 @@ return <VideoPlayer { ...videoJsOptions } />
 ```
 
 Dont forget to include the video.js CSS, located at `video.js/dist/video-js.css`.
+
+[options]: /docs/guides/options.md
