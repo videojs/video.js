@@ -34,7 +34,6 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
-
     const changeHandler = Fn.bind(this, this.handleTracksChange);
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
