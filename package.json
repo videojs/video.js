@@ -46,7 +46,7 @@
     "tsml": "1.0.1",
     "videojs-font": "2.0.0",
     "videojs-ie8": "1.1.2",
-    "videojs-vtt.js": "0.12.2",
+    "videojs-vtt.js": "0.12.3",
     "xhr": "2.4.0"
   },
   "devDependencies": {
