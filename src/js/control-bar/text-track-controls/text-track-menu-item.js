@@ -42,7 +42,6 @@ class TextTrackMenuItem extends MenuItem {
       tracks.addEventListener('change', changeHandler);
       this.on('dispose', function() {
         tracks.removeEventListener('change', changeHandler);
-        player.off(['loadstart', 'texttrackchange'], changeHandler);
       });
     }
 
