@@ -91,7 +91,7 @@ To fix this issue please make sure that all event listeners are cleaned up on di
 
 [hosting-media]: #problems-when-hosting-media
 
-[text-tracks]: text-tracks.md
+[text-tracks]: /docs/guides/text-tracks.md
 
 [hls]: https://github.com/videojs/videojs-contrib-hls
 

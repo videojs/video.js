@@ -130,8 +130,10 @@ class Tech extends Component {
       }
     });
 
-    if (options.nativeCaptions === false) {
+    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
       this.featuresNativeTextTracks = false;
+    } else if (options.nativeCaptions === true || options.nativeTextTracks === true) {
+      this.featuresNativeTextTracks = true;
     }
 
     if (!this.featuresNativeTextTracks) {
@@ -513,7 +515,7 @@ class Tech extends Component {
     // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
     // signals that the Tech is ready at which point Tech.el_ is part of the DOM
     // before inserting the WebVTT script
-    if (this.el().parentNode !== null && this.el().parentNode !== undefined) {
+    if (document.body.contains(this.el())) {
       const vtt = require('videojs-vtt.js');
 
       // load via require if available and vtt.js script location was not passed in
@@ -593,11 +595,15 @@ class Tech extends Component {
 
     textTracksChanges();
     tracks.addEventListener('change', textTracksChanges);
+    tracks.addEventListener('addtrack', textTracksChanges);
+    tracks.addEventListener('removetrack', textTracksChanges);
 
     this.on('dispose', function() {
       remoteTracks.off('addtrack', handleAddTrack);
       remoteTracks.off('removetrack', handleRemoveTrack);
       tracks.removeEventListener('change', textTracksChanges);
+      tracks.removeEventListener('addtrack', textTracksChanges);
+      tracks.removeEventListener('removetrack', textTracksChanges);
 
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
@@ -877,9 +883,9 @@ class Tech extends Component {
  */
 
 /**
- * Get the remote element {@link HTMLTrackElementList}
+ * Get the remote element {@link HtmlTrackElementList}
  *
- * @returns {HTMLTrackElementList}
+ * @returns {HtmlTrackElementList}
  * @method Tech.prototype.remoteTextTrackEls
  */
 

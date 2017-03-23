@@ -68,6 +68,7 @@ class Html5 extends Tech {
             // store HTMLTrackElement and TextTrack to remote list
             this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack(node.track);
+            this.textTracks().addTrack(node.track);
             if (!crossoriginTracks &&
                 !this.el_.hasAttribute('crossorigin') &&
                 Url.isCrossOrigin(node.src)) {

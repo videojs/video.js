@@ -2957,9 +2957,9 @@ class Player extends Component {
    *
    * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
    *
-   * @return {HTMLTrackElement}
+   * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
-   *         to the HTMLTrackElementList and the remote
+   *         to the HtmlTrackElementList and the remote
    *         TextTrackList
    *
    * @deprecated The default value of the "manualCleanup" parameter will default
@@ -2973,7 +2973,7 @@ class Player extends Component {
 
   /**
    * Remove a remote {@link TextTrack} from the respective
-   * {@link TextTrackList} and {@link HTMLTrackElementList}.
+   * {@link TextTrackList} and {@link HtmlTrackElementList}.
    *
    * @param {Object} track
    *        Remote {@link TextTrack} to remove
@@ -3217,9 +3217,9 @@ class Player extends Component {
  */
 
 /**
- * Get the remote {@link HTMLTrackElementList} tracks.
+ * Get the remote {@link HtmlTrackElementList} tracks.
  *
- * @return {HTMLTrackElementList}
+ * @return {HtmlTrackElementList}
  *         The current remote text track element list
  *
  * @method Player.prototype.remoteTextTrackEls

@@ -1,7 +1,7 @@
 import AudioTrackList from './audio-track-list';
 import VideoTrackList from './video-track-list';
 import TextTrackList from './text-track-list';
-import HTMLTrackElementList from './html-track-element-list';
+import HtmlTrackElementList from './html-track-element-list';
 
 import TextTrack from './text-track';
 import AudioTrack from './audio-track';
@@ -47,7 +47,7 @@ const REMOTE = {
     privateName: 'remoteTextTracks_'
   },
   remoteTextEl: {
-    ListClass: HTMLTrackElementList,
+    ListClass: HtmlTrackElementList,
     TrackClass: HTMLTrackElement,
     capitalName: 'RemoteTextTrackEls',
     getterName: 'remoteTextTrackEls',

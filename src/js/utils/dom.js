@@ -509,7 +509,7 @@ export function getBoundingClientRect(el) {
 /**
  * The postion of a DOM element on the page.
  *
- * @typedef {Object} Dom~Position
+ * @typedef {Object} module:dom~Position
  *
  * @property {number} left
  *           Pixels to the left
@@ -528,7 +528,7 @@ export function getBoundingClientRect(el) {
  * @param {Element} el
  *        Element from which to get offset
  *
- * @return {Dom~Position}
+ * @return {module:dom~Position}
  *         The position of the element that was passed in.
  */
 export function findPosition(el) {

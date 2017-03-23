@@ -4,6 +4,7 @@
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
+import SubsCapsMenuItem from './subs-caps-menu-item.js';
 import toTitleCase from '../../utils/to-title-case.js';
 /**
  * The button component for toggling and selecting captions and/or subtitles
@@ -22,7 +23,6 @@ class SubsCapsButton extends TextTrackButton {
       this.label_ = 'captions';
     }
     this.menuButton_.controlText(toTitleCase(this.label_));
-
   }
 
   /**
@@ -40,33 +40,6 @@ class SubsCapsButton extends TextTrackButton {
   }
 
   /**
-   * Update caption menu items
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `addtrack` or `removetrack` event that caused this function to be
-   *        called.
-   *
-   * @listens TextTrackList#addtrack
-   * @listens TextTrackList#removetrack
-   */
-  update(event) {
-    let threshold = 2;
-
-    super.update();
-
-    // if native, then threshold is 1 because no settings button
-    if (this.player().tech_ && this.player().tech_.featuresNativeTextTracks) {
-      threshold = 1;
-    }
-
-    if (this.items && this.items.length > threshold) {
-      this.show();
-    } else {
-      this.hide();
-    }
-  }
-
-  /**
    * Create caption/subtitles menu items
    *
    * @return {CaptionSettingsMenuItem[]}
@@ -77,9 +50,11 @@ class SubsCapsButton extends TextTrackButton {
 
     if (!(this.player().tech_ && this.player().tech_.featuresNativeTextTracks)) {
       items.push(new CaptionSettingsMenuItem(this.player_, {kind: this.label_}));
+
+      this.hideThreshold_ += 1;
     }
 
-    items = super.createItems(items);
+    items = super.createItems(items, SubsCapsMenuItem);
     return items;
   }
 

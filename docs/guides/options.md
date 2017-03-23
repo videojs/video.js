@@ -1,6 +1,6 @@
 # Video.js Options Reference
 
-> **Note:** This document is only a reference for available options. To learn about passing options to Video.js, see [the setup guide](setup.md#options).
+> **Note:** This document is only a reference for available options. To learn about passing options to Video.js, see [the setup guide](/docs/guides/setup.md#options).
 
 ## Table of Contents
 
@@ -41,7 +41,7 @@
 
 ## Standard `<video>` Element Options
 
-Each of these options is also available as a [standard `<video>` element attribute][video-attrs]; so, they can be defined in all three manners [outlined in the setup guide](setup.md#options). Typically, defaults are not listed as this is left to browser vendors.
+Each of these options is also available as a [standard `<video>` element attribute][video-attrs]; so, they can be defined in all three manners [outlined in the setup guide](/docs/guides/setup.md#options). Typically, defaults are not listed as this is left to browser vendors.
 
 ### `autoplay`
 
@@ -151,7 +151,7 @@ The `inactivityTimeout` determines how many milliseconds of inactivity is requir
 
 A [language code][lang-codes] matching one of the available languages in the player. This sets the initial language for a player, but it can always be changed.
 
-Learn more about [languages in Video.js](languages.md).
+Learn more about [languages in Video.js][languages].
 
 ### `languages`
 
@@ -159,7 +159,7 @@ Learn more about [languages in Video.js](languages.md).
 
 Customize which languages are available in a player. The keys of this object will be [language codes][lang-codes] and the values will be objects with English keys and translated values.
 
-Learn more about [languages in Video.js](languages.md).
+Learn more about [languages in Video.js][languages]
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
 
@@ -201,13 +201,13 @@ player.boo({baz: false});
 
 Although, since the `plugins` option is an object, the order of initialization is not guaranteed!
 
-See [the plugins guide](plugins.md) for more information on Video.js plugins.
+See [the plugins guide][plugins] for more information on Video.js plugins.
 
 ### `sourceOrder`
 
 > Type: `boolean`, Default: `false`
 >
-> **Note:** In video.js 6.0, this option will default to `true`.
+> **Note:** In video.js 6.0, this option will default to `true`. and that [videojs-flash](https://github.com/videojs/videojs-flash) will be required to use the flash tech.
 
 Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techorder) in selecting a source and playback tech.
 
@@ -275,9 +275,9 @@ Using `<source>` elements will have the same effect:
 
 ### `techOrder`
 
-> Type: `Array`, Default: `['html5', 'flash']`
+> Type: `Array`, Default: `['html5']`
 
-Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred, but Video.js will fall back to `Flash` if no `Html5`-compatible source can be found.
+Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other regisetered techs will be added after this tech in the order in which they are registered.
 
 ### `vtt.js`
 
@@ -291,7 +291,7 @@ This option will be used in the "novtt" build of video.js (i.e. `video.novtt.js`
 
 The Video.js player is a component. Like all components, you can define what children it includes, what order they appear in, and what options are passed to them.
 
-This is meant to be a quick reference; so, for more detailed information on components in Video.js, check out the [components guide](components.md).
+This is meant to be a quick reference; so, for more detailed information on components in Video.js, check out the [components guide](/docs/guides/components.md).
 
 ### `children`
 
@@ -373,6 +373,10 @@ Only supported by the `Html5` tech, this option can be set to `true` to force na
 > Type: `boolean`
 
 Can be set to `false` to force emulation of text tracks instead of native support. The `nativeCaptions` option also exists, but is simply an alias to `nativeTextTracks`.
+
+[plugins]: /docs/guides/plugins.md
+
+[languages]: /docs/guides/languages.md
 
 [ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
 

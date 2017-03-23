@@ -128,7 +128,7 @@ videojs.bind(someObj, function() {
 
 ## `plugin()`
 
-**See the [plugin guide](plugins.md) in the docs for a more detailed example**
+**See the [plugin guide](/docs/guides/plugins.md) in the docs for a more detailed example**
 
 ```js
 // Make a plugin that alerts when the player plays

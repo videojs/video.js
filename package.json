@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "6.0.0-RC.3",
+  "version": "6.0.0-RC.5",
   "main": "./es5/video.js",
   "style": "./dist/video-js.css",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
@@ -26,7 +26,9 @@
     "test": "grunt test",
     "docs": "npm run docs:lint && npm run docs:api",
     "jsdoc": "jsdoc",
+    "predocs:api": "node -e \"var s=require('shelljs'),d=['docs/api'];s.rm('-rf',d);\"",
     "docs:api": "jsdoc -c .jsdoc.json",
+    "postdocs:api": "node ./build/fix-api-docs.js",
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
     "babel": "babel src/js -d es5",
@@ -115,15 +117,16 @@
     "remark-lint": "^6.0.0",
     "remark-toc": "^4.0.0",
     "remark-validate-links": "^6.0.0",
+    "replace": "^0.3.0",
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "tui-jsdoc-template": "^1.1.0",
-    "uglify-js": "~2.7.3",
+    "uglify-js": "~2.8.8",
     "videojs-doc-generator": "0.0.1",
     "videojs-flash": "^1.0.0-RC.0",
     "videojs-standard": "^6.0.1",
-    "webpack": "^1.13.2"
+    "webpack": "^2.3.0"
   },
   "vjsstandard": {
     "ignore": [

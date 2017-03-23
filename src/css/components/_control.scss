@@ -10,12 +10,12 @@
   width: 4em;
   @include flex(none);
 
-  & .vjs-icon-placeholder:before {
-    font-size: 1.8em;
-    line-height: 1.67;
+}
+.vjs-button > .vjs-icon-placeholder:before {
+  font-size: 1.8em;
+  line-height: 1.67;
 
-    @extend %icon-default;
-  }
+  @extend %icon-default;
 }
 
 // Replacement for focus outline

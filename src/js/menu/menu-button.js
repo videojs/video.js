@@ -38,6 +38,7 @@ class MenuButton extends Component {
     const buttonClass = Button.prototype.buildCSSClass();
 
     this.menuButton_.el_.className = this.buildCSSClass() + ' ' + buttonClass;
+    this.menuButton_.removeClass('vjs-control');
 
     this.addChild(this.menuButton_);
 
@@ -75,9 +76,9 @@ class MenuButton extends Component {
     this.buttonPressed_ = false;
     this.menuButton_.el_.setAttribute('aria-expanded', 'false');
 
-    if (this.items && this.items.length === 0) {
+    if (this.items && this.items.length <= this.hideThreshold_) {
       this.hide();
-    } else if (this.items && this.items.length > 1) {
+    } else {
       this.show();
     }
   }
@@ -91,6 +92,16 @@ class MenuButton extends Component {
   createMenu() {
     const menu = new Menu(this.player_, { menuButton: this });
 
+    /**
+     * Hide the menu if the number of items is less than or equal to this threshold. This defaults
+     * to 0 and whenever we add items which can be hidden to the menu we'll increment it. We list
+     * it here because every time we run `createMenu` we need to reset the value.
+     *
+     * @protected
+     * @type {Number}
+     */
+    this.hideThreshold_ = 0;
+
     // Add a title list item to the top
     if (this.options_.title) {
       const title = Dom.createEl('li', {
@@ -98,6 +109,8 @@ class MenuButton extends Component {
         innerHTML: toTitleCase(this.options_.title),
         tabIndex: -1
       });
+
+      this.hideThreshold_ += 1;
 
       menu.children_.unshift(title);
       Dom.prependTo(title, menu.contentEl());
