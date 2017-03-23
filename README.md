@@ -10,6 +10,13 @@
 
 > Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins][plugins]). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ [400,000 websites][builtwith].
 
+## Table of Contents
+
+* [Quick Start](#quick-start)
+* [Contributing](#contributing)
+* [Code of Conduct](#code-of-conduct)
+* [License](#license)
+
 ## Quick Start
 
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
@@ -79,6 +86,10 @@ Video.js is a free and open source library, and we appreciate any help you're wi
 
 _Video.js uses [BrowserStack][browserstack] for compatibility testing._
 
+## [Code of Conduct][coc]
+
+Please note that this project is released with a [Contributor Code of Conduct][coc]. By participating in this project you agree to abide by its terms.
+
 ## [License][license]
 
 Video.js is [licensed][license] under the Apache License, Version 2.0.
@@ -120,3 +131,5 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 [travis-link]: https://travis-ci.org/videojs/video.js
 
 [vjs]: http://videojs.com
+
+[coc]: CODE_OF_CONDUCT.md
