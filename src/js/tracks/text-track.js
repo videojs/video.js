@@ -385,7 +385,7 @@ class TextTrack extends Track {
       if (cue === removeCue || (cue.originalCue_ && cue.originalCue_ === removeCue)) {
         this.cues_.splice(i, 1);
         this.cues.setCues_(this.cues_);
-        return;
+        break;
       }
     }
   }
