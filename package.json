@@ -33,7 +33,8 @@
     "docs:fix": "remark --output -- './**/*.md'",
     "babel": "babel src/js -d es5",
     "prepublish": "not-in-install && npm run docs:api || in-install",
-    "prepush": "npm run lint -- --errors"
+    "prepush": "npm run lint -- --errors",
+    "version": "node build/version.js && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",
@@ -118,6 +119,7 @@
     "remark-toc": "^4.0.0",
     "remark-validate-links": "^6.0.0",
     "replace": "^0.3.0",
+    "semver": "^5.3.0",
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
