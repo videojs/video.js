@@ -119,7 +119,6 @@
     "remark-toc": "^4.0.0",
     "remark-validate-links": "^6.0.0",
     "replace": "^0.3.0",
-    "semver": "^5.3.0",
     "shelljs": "^0.7.5",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",

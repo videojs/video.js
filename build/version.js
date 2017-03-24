@@ -1,7 +1,12 @@
-var semver = require('semver');
 var version = process.env.npm_package_version;
-var execSync = require('child_process').execSync;
+var prereleaseType = process.env.npm_config_arv['remain'][0];
+var sh = require('shelljs');
+var approvedTypes = {
+  'major': 1,
+  'minor': 1,
+  'patch': 1
+}
 
-if (!semver.prerelease(version)) {
-  execSync('npm run changelog');
+if (prereleaseType in approvedTypes) {
+  sh.exec('npm run changelog');
 }
