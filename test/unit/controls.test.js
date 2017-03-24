@@ -158,7 +158,8 @@ if (Html5.isSupported()) {
 
     muteToggle.handleClick();
 
-    assert.equal(player.volume(), 0.1, 'since lastVolume is less than 0.1, volume is set to 0.1');
+    // `Number.prototype.toFixed()` is used here to circumvent IE9 rounding issues
+    assert.equal(player.volume().toFixed(1), (0.1).toFixed(1), 'since lastVolume is less than 0.1, volume is set to 0.1');
     assert.equal(player.muted(), false, 'muted is set to false');
   });
 
