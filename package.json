@@ -32,7 +32,7 @@
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
     "babel": "babel src/js -d es5",
-    "prepublish": "not-in-install && npm run docs:api || in-install",
+    "prepublish": "not-in-install && run-p docs:api build || in-install",
     "prepush": "npm run lint -- --errors",
     "version": "node build/version.js && git add CHANGELOG.md"
   },
@@ -112,6 +112,7 @@
     "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "npm-run": "^4.1.0",
+    "npm-run-all": "^4.0.2",
     "proxyquireify": "^3.0.0",
     "qunitjs": "1.23.1",
     "remark-cli": "^3.0.0",
