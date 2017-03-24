@@ -530,7 +530,7 @@ class Tech extends Component {
       // passed in
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js';
+      script.src = this.options_['vtt.js'] || 'https://vjs.zencdn.net/vttjs/0.12.3/vtt.min.js';
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.
