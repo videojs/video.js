@@ -1,5 +1,5 @@
 var version = process.env.npm_package_version;
-var prereleaseType = process.env.npm_config_arv['remain'][0];
+var prereleaseType = process.env.npm_config_argv['remain'][0];
 var sh = require('shelljs');
 var approvedTypes = {
   'major': 1,
