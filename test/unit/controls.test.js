@@ -148,6 +148,20 @@ if (Html5.isSupported()) {
     assert.equal(player.muted(), false, 'muted is set to false');
   });
 
+  QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, and muted is true sets volume to 0.1 and muted to false', function(assert) {
+    const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+    const muteToggle = new MuteToggle(player);
+
+    player.volume(0);
+    player.muted(true);
+    player.lastVolume_(0.05);
+
+    muteToggle.handleClick();
+
+    assert.equal(player.volume(), 0.1, 'since lastVolume is less than 0.1, volume is set to 0.1');
+    assert.equal(player.muted(), false, 'muted is set to false');
+  });
+
   QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
     const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
     const volumeBar = new VolumeBar(player);
@@ -179,5 +193,4 @@ if (Html5.isSupported()) {
     assert.equal(player.muted(), true, 'Muted is true');
     assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
   });
-
 }
