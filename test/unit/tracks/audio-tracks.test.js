@@ -3,7 +3,7 @@ import Html5 from '../../../src/js/tech/html5.js';
 import TestHelpers from '../test-helpers.js';
 import sinon from 'sinon';
 
-QUnit.module('Tracks', {
+QUnit.module('Audio Tracks', {
   beforeEach(assert) {
     this.clock = sinon.useFakeTimers();
   },

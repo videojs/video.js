@@ -1,4 +1,6 @@
 /* eslint-env qunit */
+import sinon from 'sinon';
+import log from '../../src/js/utils/log';
 import Player from '../../src/js/player';
 import Plugin from '../../src/js/plugin';
 
@@ -54,12 +56,6 @@ QUnit.test('registerPlugin() illegal arguments', function(assert) {
   );
 
   assert.throws(
-    () => Plugin.registerPlugin('play'),
-    new Error('Illegal plugin name, "play", already exists.'),
-    'plugins cannot share a name with an existing player method'
-  );
-
-  assert.throws(
     () => Plugin.registerPlugin('foo'),
     new Error('Illegal plugin for "foo", must be a function, was undefined.'),
     'plugins require both arguments'
@@ -70,6 +66,18 @@ QUnit.test('registerPlugin() illegal arguments', function(assert) {
     new Error('Illegal plugin for "foo", must be a function, was object.'),
     'plugins must be functions'
   );
+
+  assert.throws(
+    () => Plugin.registerPlugin('play', function() {}),
+    new Error('Illegal plugin name, "play", cannot share a name with an existing player method!'),
+    'plugins must be functions'
+  );
+
+  sinon.stub(log, 'warn');
+  Plugin.registerPlugin('foo', function() {});
+  Plugin.registerPlugin('foo', function() {});
+  assert.strictEqual(log.warn.callCount, 1, 'warn on re-registering a plugin');
+  log.warn.restore();
 });
 
 QUnit.test('getPlugin()', function(assert) {

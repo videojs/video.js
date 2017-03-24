@@ -198,7 +198,9 @@ class TextTrack extends Track {
     });
 
     if (mode !== 'disabled') {
-      tt.tech_.on('timeupdate', timeupdateHandler);
+      tt.tech_.ready(() => {
+        tt.tech_.on('timeupdate', timeupdateHandler);
+      }, true);
     }
 
     /**
@@ -236,7 +238,10 @@ class TextTrack extends Track {
         }
         mode = newMode;
         if (mode === 'showing') {
-          this.tech_.on('timeupdate', timeupdateHandler);
+
+          this.tech_.ready(() => {
+            this.tech_.on('timeupdate', timeupdateHandler);
+          }, true);
         }
         /**
          * An event that fires when mode changes on this track. This allows
@@ -336,7 +341,23 @@ class TextTrack extends Track {
    * @param {TextTrack~Cue} cue
    *        The cue to add to our internal list
    */
-  addCue(cue) {
+  addCue(originalCue) {
+    let cue = originalCue;
+
+    if (window.vttjs && !(originalCue instanceof window.vttjs.VTTCue)) {
+      cue = new window.vttjs.VTTCue(originalCue.startTime, originalCue.endTime, originalCue.text);
+
+      for (const prop in originalCue) {
+        if (!(prop in cue)) {
+          cue[prop] = originalCue[prop];
+        }
+      }
+
+      // make sure that `id` is copied over
+      cue.id = originalCue.id;
+      cue.originalCue_ = originalCue;
+    }
+
     const tracks = this.tech_.textTracks();
 
     for (let i = 0; i < tracks.length; i++) {
@@ -356,19 +377,16 @@ class TextTrack extends Track {
    *        The cue to remove from our internal list
    */
   removeCue(removeCue) {
-    let removed = false;
+    let i = this.cues_.length;
 
-    for (let i = 0, l = this.cues_.length; i < l; i++) {
+    while (i--) {
       const cue = this.cues_[i];
 
-      if (cue === removeCue) {
+      if (cue === removeCue || (cue.originalCue_ && cue.originalCue_ === removeCue)) {
         this.cues_.splice(i, 1);
-        removed = true;
+        this.cues.setCues_(this.cues_);
+        break;
       }
-    }
-
-    if (removed) {
-      this.cues.setCues_(this.cues_);
     }
   }
 }

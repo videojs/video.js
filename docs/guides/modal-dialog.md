@@ -4,7 +4,7 @@ The `ModalDialog` component is part of Video.js core and provides a baked-in UI 
 
 ## Table of Contents
 
-* [Creating the ModalDialog](#creating-the-modaldialog)
+* [Creating a ModalDialog](#creating-a-modaldialog)
   * [Example Using createModal()](#example-using-createmodal)
   * [Example Using the ModalDialog Constructor](#example-using-the-modaldialog-constructor)
 * [Styling Modals Independently](#styling-modals-independently)
@@ -73,6 +73,6 @@ A common need for modals is to style them independently from one another. The re
 modal.addClass('vjs-my-fancy-modal');
 ```
 
-[api-doc]: http://docs.videojs.com/docs/api/modal-dialog.html
+[api-doc]: http://docs.videojs.com/ModalDialog.html
 
-[creating-component]: ./components.md#creating-a-component
+[creating-component]: /docs/guides/components.md#creating-a-component

@@ -1,17 +1,16 @@
 /* eslint-env qunit */
 import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
-import TextTrackList from '../../../src/js/tracks/text-track-list.js';
+import TechFaker from '../tech/tech-faker';
 
-const defaultTech = {
-  textTracks() {
-    return new TextTrackList();
+QUnit.module('HTML Track Element', {
+  beforeEach() {
+    this.tech = new TechFaker();
   },
-  on() {},
-  off() {},
-  currentTime() {}
-};
-
-QUnit.module('HTML Track Element');
+  afterEach() {
+    this.tech.dispose();
+    this.tech = null;
+  }
+});
 
 QUnit.test('html track element requires a tech', function(assert) {
   assert.throws(
@@ -27,28 +26,24 @@ QUnit.test('can create a html track element with various properties', function(a
   const kind = 'chapters';
   const label = 'English';
   const language = 'en';
-  const src = 'http://www.example.com';
 
   const htmlTrackElement = new HTMLTrackElement({
     kind,
     label,
     language,
-    src,
-    tech: defaultTech
+    tech: this.tech
   });
 
   assert.equal(typeof htmlTrackElement.default, 'undefined', 'we have a default');
   assert.equal(htmlTrackElement.kind, kind, 'we have a kind');
   assert.equal(htmlTrackElement.label, label, 'we have a label');
   assert.equal(htmlTrackElement.readyState, 0, 'we have a readyState');
-  assert.equal(htmlTrackElement.src, src, 'we have a src');
   assert.equal(htmlTrackElement.srclang, language, 'we have a srclang');
-  assert.equal(htmlTrackElement.track.cues, null, 'we have a track');
 });
 
 QUnit.test('defaults when items not provided', function(assert) {
   const htmlTrackElement = new HTMLTrackElement({
-    tech: defaultTech
+    tech: this.tech
   });
 
   assert.equal(typeof htmlTrackElement.default, 'undefined', 'we have a default');

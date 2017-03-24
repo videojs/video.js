@@ -145,6 +145,10 @@ module.exports = function(grunt) {
         files: ['src/css/**/*'],
         tasks: ['skin']
       },
+      lang: {
+        files: ['lang/**/*.json'],
+        tasks: ['vjslanguages']
+      }
     },
     connect: {
       dev: {
@@ -408,6 +412,7 @@ module.exports = function(grunt) {
         'browserify:watchnovtt',
         'browserify:tests',
         'watch:skin',
+        'watch:lang',
         'watch:dist'
       ],
       // Run multiple watch tasks in parallel
@@ -468,7 +473,7 @@ module.exports = function(grunt) {
         }
       },
       webpack: {
-        command: 'webpack test/require/webpack.js build/temp/webpack.js',
+        command: 'webpack --hide-modules test/require/webpack.js build/temp/webpack.js',
         options: {
           preferLocal: true
         }
@@ -483,8 +488,8 @@ module.exports = function(grunt) {
           error: true
         },
         ignore: [
-          // Ignore the warning about needing <optgroup> elements
-          'WCAG2AA.Principle1.Guideline1_3.1_3_1.H85.2'
+          // Ignore warning about contrast of the "vjs-no-js" fallback link
+          'WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.BgImage'
         ]
 
       },

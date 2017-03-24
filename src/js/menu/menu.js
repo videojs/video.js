@@ -49,7 +49,12 @@ class Menu extends Component {
       // Unpress the associated MenuButton, and move focus back to it
       if (this.menuButton_) {
         this.menuButton_.unpressButton();
-        this.menuButton_.focus();
+
+        // don't focus menu button if item is a caption settings item
+        // because focus will move elsewhere and it logs an error on IE8
+        if (component.name() !== 'CaptionSettingsMenuItem') {
+          this.menuButton_.focus();
+        }
       }
     }));
   }

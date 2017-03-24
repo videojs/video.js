@@ -70,7 +70,7 @@ class ModalDialog extends Component {
     });
 
     this.descEl_ = Dom.createEl('p', {
-      className: `${MODAL_CLASS_NAME}-description vjs-offscreen`,
+      className: `${MODAL_CLASS_NAME}-description vjs-control-text`,
       id: this.el().getAttribute('aria-describedby')
     });
 
@@ -179,7 +179,7 @@ class ModalDialog extends Component {
       // playing state.
       this.wasPlaying_ = !player.paused();
 
-      if (this.wasPlaying_) {
+      if (this.options_.pauseOnOpen && this.wasPlaying_) {
         player.pause();
       }
 
@@ -241,7 +241,7 @@ class ModalDialog extends Component {
     this.trigger('beforemodalclose');
     this.opened_ = false;
 
-    if (this.wasPlaying_) {
+    if (this.wasPlaying_ && this.options_.pauseOnOpen) {
       player.play();
     }
 
@@ -467,6 +467,10 @@ class ModalDialog extends Component {
       }
     }
 
+    if (document.activeElement === this.el_) {
+      focusIndex = 0;
+    }
+
     if (event.shiftKey && focusIndex === 0) {
       focusableEls[focusableEls.length - 1].focus();
       event.preventDefault();
@@ -507,6 +511,7 @@ class ModalDialog extends Component {
  * @private
  */
 ModalDialog.prototype.options_ = {
+  pauseOnOpen: true,
   temporary: true
 };
 

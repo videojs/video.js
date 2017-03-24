@@ -9,7 +9,9 @@ class TechFaker extends Tech {
 
   constructor(options, handleReady) {
     super(options, handleReady);
-    this.triggerReady();
+    if (!options || options.autoReady !== false) {
+      this.triggerReady();
+    }
   }
 
   createEl() {

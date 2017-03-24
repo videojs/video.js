@@ -7,19 +7,18 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import proxyquireify from 'proxyquireify';
 import sinon from 'sinon';
-import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 
 const proxyquire = proxyquireify(require);
-const defaultTech = {
-  textTracks() {
-    return new TextTrackList();
-  },
-  on() {},
-  off() {},
-  currentTime() {}
-};
 
-QUnit.module('Text Track');
+QUnit.module('Text Track', {
+  beforeEach() {
+    this.tech = new TechFaker();
+  },
+  afterEach() {
+    this.tech.dispose();
+    this.tech = null;
+  }
+});
 
 // do baseline track testing
 TrackBaseline(TextTrack, {
@@ -28,7 +27,7 @@ TrackBaseline(TextTrack, {
   mode: 'disabled',
   label: 'English',
   language: 'en',
-  tech: defaultTech
+  tech: new TechFaker()
 });
 
 QUnit.test('requires a tech', function(assert) {
@@ -42,7 +41,7 @@ QUnit.test('can create a TextTrack with a mode property', function(assert) {
   const mode = 'disabled';
   const tt = new TextTrack({
     mode,
-    tech: defaultTech
+    tech: this.tech
   });
 
   assert.equal(tt.mode, mode, 'we have a mode');
@@ -50,7 +49,7 @@ QUnit.test('can create a TextTrack with a mode property', function(assert) {
 
 QUnit.test('defaults when items not provided', function(assert) {
   const tt = new TextTrack({
-    tech: TechFaker
+    tech: this.tech
   });
 
   assert.equal(tt.kind, 'subtitles', 'kind defaulted to subtitles');
@@ -61,7 +60,7 @@ QUnit.test('defaults when items not provided', function(assert) {
 
 QUnit.test('kind can only be one of several options, defaults to subtitles', function(assert) {
   let tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     kind: 'foo'
   });
 
@@ -69,35 +68,35 @@ QUnit.test('kind can only be one of several options, defaults to subtitles', fun
   assert.notEqual(tt.kind, 'foo', 'the kind is set to subtitles, not foo');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     kind: 'subtitles'
   });
 
   assert.equal(tt.kind, 'subtitles', 'the kind is set to subtitles');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     kind: 'captions'
   });
 
   assert.equal(tt.kind, 'captions', 'the kind is set to captions');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     kind: 'descriptions'
   });
 
   assert.equal(tt.kind, 'descriptions', 'the kind is set to descriptions');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     kind: 'chapters'
   });
 
   assert.equal(tt.kind, 'chapters', 'the kind is set to chapters');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     kind: 'metadata'
   });
 
@@ -106,7 +105,7 @@ QUnit.test('kind can only be one of several options, defaults to subtitles', fun
 
 QUnit.test('mode can only be one of several options, defaults to disabled', function(assert) {
   let tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     mode: 'foo'
   });
 
@@ -114,21 +113,21 @@ QUnit.test('mode can only be one of several options, defaults to disabled', func
   assert.notEqual(tt.mode, 'foo', 'the mode is set to disabld, not foo');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     mode: 'disabled'
   });
 
   assert.equal(tt.mode, 'disabled', 'the mode is set to disabled');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     mode: 'hidden'
   });
 
   assert.equal(tt.mode, 'hidden', 'the mode is set to hidden');
 
   tt = new TextTrack({
-    tech: defaultTech,
+    tech: this.tech,
     mode: 'showing'
   });
 
@@ -139,7 +138,7 @@ QUnit.test('cue and activeCues are read only', function(assert) {
   const mode = 'disabled';
   const tt = new TextTrack({
     mode,
-    tech: defaultTech
+    tech: this.tech
   });
 
   tt.cues = 'foo';
@@ -151,7 +150,7 @@ QUnit.test('cue and activeCues are read only', function(assert) {
 
 QUnit.test('mode can only be set to a few options', function(assert) {
   const tt = new TextTrack({
-    tech: defaultTech
+    tech: this.tech
   });
 
   tt.mode = 'foo';
@@ -176,7 +175,7 @@ QUnit.test('mode can only be set to a few options', function(assert) {
 
 QUnit.test('cues and activeCues return a TextTrackCueList', function(assert) {
   const tt = new TextTrack({
-    tech: defaultTech
+    tech: this.tech
   });
 
   assert.ok(tt.cues.getCueById, 'cues are a TextTrackCueList');
@@ -185,7 +184,7 @@ QUnit.test('cues and activeCues return a TextTrackCueList', function(assert) {
 
 QUnit.test('cues can be added and removed from a TextTrack', function(assert) {
   const tt = new TextTrack({
-    tech: defaultTech
+    tech: this.tech
   });
   const cues = tt.cues;
 
@@ -204,6 +203,89 @@ QUnit.test('cues can be added and removed from a TextTrack', function(assert) {
   tt.addCue({id: '3'});
 
   assert.equal(cues.length, 3, 'we now have 3 cues');
+});
+
+QUnit.test('original cue can be used to remove cue from cues list', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+  const Cue = window.VTTCue ||
+              window.vttjs && window.vttjs.VTTCue ||
+              window.TextTrackCue;
+
+  const cue1 = new Cue(0, 1, 'some-cue');
+
+  assert.equal(tt.cues.length, 0, 'start with zero cues');
+  tt.addCue(cue1);
+  assert.equal(tt.cues.length, 1, 'we have one cue');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 0, 'we have removed cue1');
+});
+
+QUnit.test('can only remove one cue at a time', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+  const Cue = window.VTTCue ||
+              window.vttjs && window.vttjs.VTTCue ||
+              window.TextTrackCue;
+
+  const cue1 = new Cue(0, 1, 'some-cue');
+
+  assert.equal(tt.cues.length, 0, 'start with zero cues');
+  tt.addCue(cue1);
+  tt.addCue(cue1);
+  assert.equal(tt.cues.length, 2, 'we have two cues');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 1, 'we have removed one instance of cue1');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 0, 'we have removed the other instance of cue1');
+});
+
+QUnit.test('does not fire cuechange before Tech is ready', function(assert) {
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({techfaker: {autoReady: false}});
+  let changes = 0;
+  const tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'showing'
+  });
+  const cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.addCue({
+    id: '1',
+    startTime: 0,
+    endTime: 5
+  });
+
+  tt.oncuechange = cuechangeHandler;
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.tech_.currentTime = function() {
+    return 0;
+  };
+
+  player.tech_.trigger('timeupdate');
+  assert.equal(changes, 0, 'a cuechange event is not triggered');
+
+  player.tech_.on('ready', function() {
+    player.tech_.currentTime = function() {
+      return 0.2;
+    };
+
+    player.tech_.trigger('timeupdate');
+
+    assert.equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
+
+    player.dispose();
+    done();
+  });
+  player.tech_.triggerReady();
 });
 
 QUnit.test('fires cuechange when cues become active and inactive', function(assert) {
@@ -273,7 +355,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
 
   /* eslint-disable no-unused-vars */
   const tt = new TextTrack_({
-    tech: defaultTech,
+    tech: this.tech,
     src: 'http://example.com'
   });
   /* eslint-enable no-unused-vars */

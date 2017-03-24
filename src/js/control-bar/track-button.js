@@ -38,6 +38,7 @@ class TrackButton extends MenuButton {
 
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);
+    this.player_.on('ready', updateHandler);
 
     this.player_.on('dispose', function() {
       tracks.removeEventListener('removetrack', updateHandler);

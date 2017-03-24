@@ -62,6 +62,10 @@ class PlaybackRateMenuButton extends MenuButton {
     return `vjs-playback-rate ${super.buildCSSClass()}`;
   }
 
+  buildWrapperCSSClass() {
+    return `vjs-playback-rate ${super.buildWrapperCSSClass()}`;
+  }
+
   /**
    * Create the playback rate menu
    *

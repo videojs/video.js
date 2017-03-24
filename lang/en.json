@@ -12,6 +12,7 @@
   "Loaded": "Loaded",
   "Progress": "Progress",
   "Progress Bar": "Progress Bar",
+  "progress bar timing: currentTime={1} duration={2}": "{1} of {2}",
   "Fullscreen": "Fullscreen",
   "Non-Fullscreen": "Non-Fullscreen",
   "Mute": "Mute",
@@ -74,8 +75,10 @@
   "Casual": "Casual",
   "Script": "Script",
   "Small Caps": "Small Caps",
-  "Defaults": "Defaults",
+  "Reset": "Reset",
+  "all settings to the default values": "all settings to the default values",
   "Done": "Done",
   "Caption Settings Dialog": "Caption Settings Dialog",
-  "Beginning of dialog window. Escape will cancel and close the window.": "Beginning of dialog window. Escape will cancel and close the window."
+  "Beginning of dialog window. Escape will cancel and close the window.": "Beginning of dialog window. Escape will cancel and close the window.",
+  "End of dialog window.": "End of dialog window."
 }

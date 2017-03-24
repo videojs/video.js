@@ -130,8 +130,10 @@ class Tech extends Component {
       }
     });
 
-    if (options.nativeCaptions === false) {
+    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
       this.featuresNativeTextTracks = false;
+    } else if (options.nativeCaptions === true || options.nativeTextTracks === true) {
+      this.featuresNativeTextTracks = true;
     }
 
     if (!this.featuresNativeTextTracks) {
@@ -506,16 +508,20 @@ class Tech extends Component {
    * @fires Tech#vttjserror
    */
   addWebVttScript_() {
-    if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
+    if (window.WebVTT) {
+      return;
+    }
+
+    // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
+    // signals that the Tech is ready at which point Tech.el_ is part of the DOM
+    // before inserting the WebVTT script
+    if (document.body.contains(this.el())) {
       const vtt = require('videojs-vtt.js');
 
       // load via require if available and vtt.js script location was not passed in
       // as an option. novtt builds will turn the above require call into an empty object
       // which will cause this if check to always fail.
       if (!this.options_['vtt.js'] && isPlain(vtt) && Object.keys(vtt).length > 0) {
-        Object.keys(vtt).forEach(function(k) {
-          window[k] = vtt[k];
-        });
         this.trigger('vttjsloaded');
         return;
       }
@@ -551,7 +557,10 @@ class Tech extends Component {
       // we don't overwrite the injected window.WebVTT if it loads right away
       window.WebVTT = true;
       this.el().parentNode.appendChild(script);
+    } else {
+      this.ready(this.addWebVttScript_);
     }
+
   }
 
   /**
@@ -567,10 +576,7 @@ class Tech extends Component {
     remoteTracks.on('addtrack', handleAddTrack);
     remoteTracks.on('removetrack', handleRemoveTrack);
 
-    // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
-    // signals that the Tech is ready at which point Tech.el_ is part of the DOM
-    // before inserting the WebVTT script
-    this.on('ready', this.addWebVttScript_);
+    this.addWebVttScript_();
 
     const updateDisplay = () => this.trigger('texttrackchange');
 
@@ -589,11 +595,15 @@ class Tech extends Component {
 
     textTracksChanges();
     tracks.addEventListener('change', textTracksChanges);
+    tracks.addEventListener('addtrack', textTracksChanges);
+    tracks.addEventListener('removetrack', textTracksChanges);
 
     this.on('dispose', function() {
       remoteTracks.off('addtrack', handleAddTrack);
       remoteTracks.off('removetrack', handleRemoveTrack);
       tracks.removeEventListener('change', textTracksChanges);
+      tracks.removeEventListener('addtrack', textTracksChanges);
+      tracks.removeEventListener('removetrack', textTracksChanges);
 
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
@@ -873,9 +883,9 @@ class Tech extends Component {
  */
 
 /**
- * Get the remote element {@link HTMLTrackElementList}
+ * Get the remote element {@link HtmlTrackElementList}
  *
- * @returns {HTMLTrackElementList}
+ * @returns {HtmlTrackElementList}
  * @method Tech.prototype.remoteTextTrackEls
  */
 

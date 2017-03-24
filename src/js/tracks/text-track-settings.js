@@ -2,7 +2,9 @@
  * @file text-track-settings.js
  */
 import window from 'global/window';
+import document from 'global/document';
 import Component from '../component';
+import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
@@ -236,9 +238,9 @@ function setSelectedOption(el, value, parser) {
 /**
  * Manipulate Text Tracks settings.
  *
- * @extends Component
+ * @extends ModalDialog
  */
-class TextTrackSettings extends Component {
+class TextTrackSettings extends ModalDialog {
 
   /**
    * Creates an instance of this class.
@@ -250,11 +252,25 @@ class TextTrackSettings extends Component {
    *         The key/value store of player options.
    */
   constructor(player, options) {
+    options.temporary = false;
+
     super(player, options);
-    this.setDefaults();
-    this.hide();
+
+    this.contentEl().className += '  vjs-caption-settings';
 
     this.updateDisplay = Fn.bind(this, this.updateDisplay);
+
+    // fill the modal and pretend we have opened it
+    this.fill();
+    this.hasBeenOpened_ = this.hasBeenFilled_ = true;
+
+    this.endDialog = createEl('p', {
+      className: 'vjs-control-text',
+      textContent: this.localize('End of dialog window.')
+    });
+    this.el().appendChild(this.endDialog);
+
+    this.setDefaults();
 
     // Grab `persistTextTrackSettings` from the player options if not passed in child options
     if (options.persistTextTrackSettings === undefined) {
@@ -263,7 +279,7 @@ class TextTrackSettings extends Component {
 
     this.on(this.$('.vjs-done-button'), 'click', () => {
       this.saveSettings();
-      this.hide();
+      this.close();
     });
 
     this.on(this.$('.vjs-default-button'), 'click', () => {
@@ -290,21 +306,28 @@ class TextTrackSettings extends Component {
    *         The DOM element that gets created.
    * @private
    */
-  createElSelect_(key) {
+  createElSelect_(key, legendId = '') {
     const config = selectConfigs[key];
     const id = config.id.replace('%s', this.id_);
 
     return [
       createEl('label', {
+        id,
         className: 'vjs-label',
         textContent: this.localize(config.label)
       }, {
-        for: id
       }),
-      createEl('select', {id}, undefined, config.options.map(o => {
+      createEl('select', {}, {
+        'aria-labelledby': `${legendId} ${id}`
+      }, config.options.map(o => {
+        const optionId = id + '-' + o[1];
+
         return createEl('option', {
+          id: optionId,
           textContent: this.localize(o[1]),
           value: o[0]
+        }, {
+          'aria-labelledby': `${legendId} ${id} ${optionId}`
         });
       }))
     ];
@@ -320,14 +343,15 @@ class TextTrackSettings extends Component {
    */
   createElFgColor_() {
     const legend = createEl('legend', {
+      id: `captions-text-legend-${this.id_}`,
       textContent: this.localize('Text')
     });
 
-    const select = this.createElSelect_('color');
+    const select = this.createElSelect_('color', legend.id);
 
     const opacity = createEl('span', {
       className: 'vjs-text-opacity vjs-opacity'
-    }, undefined, this.createElSelect_('textOpacity'));
+    }, undefined, this.createElSelect_('textOpacity', legend.id));
 
     return createEl('fieldset', {
       className: 'vjs-fg-color vjs-tracksetting'
@@ -344,14 +368,15 @@ class TextTrackSettings extends Component {
    */
   createElBgColor_() {
     const legend = createEl('legend', {
+      id: `captions-background-${this.id_}`,
       textContent: this.localize('Background')
     });
 
-    const select = this.createElSelect_('backgroundColor');
+    const select = this.createElSelect_('backgroundColor', legend.id);
 
     const opacity = createEl('span', {
       className: 'vjs-bg-opacity vjs-opacity'
-    }, undefined, this.createElSelect_('backgroundOpacity'));
+    }, undefined, this.createElSelect_('backgroundOpacity', legend.id));
 
     return createEl('fieldset', {
       className: 'vjs-bg-color vjs-tracksetting'
@@ -368,14 +393,15 @@ class TextTrackSettings extends Component {
    */
   createElWinColor_() {
     const legend = createEl('legend', {
+      id: `captions-window-${this.id_}`,
       textContent: this.localize('Window')
     });
 
-    const select = this.createElSelect_('windowColor');
+    const select = this.createElSelect_('windowColor', legend.id);
 
     const opacity = createEl('span', {
       className: 'vjs-window-opacity vjs-opacity'
-    }, undefined, this.createElSelect_('windowOpacity'));
+    }, undefined, this.createElSelect_('windowOpacity', legend.id));
 
     return createEl('fieldset', {
       className: 'vjs-window-color vjs-tracksetting'
@@ -435,9 +461,11 @@ class TextTrackSettings extends Component {
    * @private
    */
   createElControls_() {
+    const defaultsDescription = this.localize('restore all settings to the default values');
     const defaultsButton = createEl('button', {
       className: 'vjs-default-button',
-      textContent: this.localize('Defaults')
+      title: defaultsDescription,
+      innerHTML: `${this.localize('Reset')}<span class='vjs-control-text'> ${defaultsDescription}</span>`
     });
 
     const doneButton = createEl('button', {
@@ -457,6 +485,10 @@ class TextTrackSettings extends Component {
    *         The element that was created.
    */
   createEl() {
+    return super.createEl();
+  }
+
+  content() {
     const settings = createEl('div', {
       className: 'vjs-tracksettings'
     }, undefined, [
@@ -465,33 +497,19 @@ class TextTrackSettings extends Component {
       this.createElControls_()
     ]);
 
-    const heading = createEl('div', {
-      className: 'vjs-control-text',
-      id: `TTsettingsDialogLabel-${this.id_}`,
-      textContent: this.localize('Caption Settings Dialog')
-    }, {
-      'aria-level': '1',
-      'role': 'heading'
-    });
+    return settings;
+  }
 
-    const description = createEl('div', {
-      className: 'vjs-control-text',
-      id: `TTsettingsDialogDescription-${this.id_}`,
-      textContent: this.localize('Beginning of dialog window. Escape will cancel and close the window.')
-    });
+  label() {
+    return this.localize('Caption Settings Dialog');
+  }
 
-    const doc = createEl('div', undefined, {
-      role: 'document'
-    }, [heading, description, settings]);
+  description() {
+    return this.localize('Beginning of dialog window. Escape will cancel and close the window.');
+  }
 
-    return createEl('div', {
-      className: 'vjs-caption-settings vjs-modal-overlay',
-      tabIndex: -1
-    }, {
-      'role': 'dialog',
-      'aria-labelledby': heading.id,
-      'aria-describedby': description.id
-    }, doc);
+  buildCSSClass() {
+    return super.buildCSSClass() + ' vjs-text-track-settings';
   }
 
   /**
@@ -525,7 +543,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Sets all <select> elements to their default values.
+   * Sets all `<select>` elements to their default values.
    */
   setDefaults() {
     Obj.each(selectConfigs, (config) => {
@@ -581,6 +599,26 @@ class TextTrackSettings extends Component {
 
     if (ttDisplay) {
       ttDisplay.updateDisplay();
+    }
+  }
+
+  /**
+   * conditionally blur the element and refocus the captions button
+   *
+   * @private
+   */
+  conditionalBlur_() {
+    this.previouslyActiveEl_ = null;
+    this.off(document, 'keydown', this.handleKeyDown);
+
+    const cb = this.player_.controlBar;
+    const subsCapsBtn = cb && cb.subsCapsButton;
+    const ccBtn = cb && cb.captionsButton;
+
+    if (subsCapsBtn) {
+      subsCapsBtn.focus();
+    } else if (ccBtn) {
+      ccBtn.focus();
     }
   }
 

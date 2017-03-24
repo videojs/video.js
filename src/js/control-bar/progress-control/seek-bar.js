@@ -3,7 +3,7 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
-import {IE_VERSION} from '../../utils/browser.js';
+import {IE_VERSION, IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
@@ -74,7 +74,11 @@ class SeekBar extends Slider {
     this.el_.setAttribute('aria-valuenow', (percent * 100).toFixed(2));
 
     // human readable value of progress bar (time complete)
-    this.el_.setAttribute('aria-valuetext', formatTime(time, duration));
+    this.el_.setAttribute('aria-valuetext',
+                          this.localize('progress bar timing: currentTime={1} duration={2}',
+                                        [formatTime(time, duration),
+                                         formatTime(duration, duration)],
+                                        '{1} of {2}'));
 
     // Update the `PlayProgressBar`.
     this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
@@ -221,7 +225,8 @@ SeekBar.prototype.options_ = {
   barName: 'playProgressBar'
 };
 
-if (!IE_VERSION || IE_VERSION > 8) {
+// MouseTimeDisplay tooltips should not be added to a player on mobile devices or IE8
+if ((!IE_VERSION || IE_VERSION > 8) && !IS_IOS && !IS_ANDROID) {
   SeekBar.prototype.options_.children.splice(1, 0, 'mouseTimeDisplay');
 }
 

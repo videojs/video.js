@@ -68,6 +68,7 @@ class Html5 extends Tech {
             // store HTMLTrackElement and TextTrack to remote list
             this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack(node.track);
+            this.textTracks().addTrack(node.track);
             if (!crossoriginTracks &&
                 !this.el_.hasAttribute('crossorigin') &&
                 Url.isCrossOrigin(node.src)) {
@@ -339,19 +340,6 @@ class Html5 extends Tech {
         this.trigger(type);
       }, this);
     });
-  }
-
-  /**
-   * Called by {@link Player#play} to play using the `Html5` `Tech`.
-   */
-  play() {
-    const playPromise = this.el_.play();
-
-    // Catch/silence error when a pause interrupts a play request
-    // on browsers which return a promise
-    if (playPromise !== undefined && typeof playPromise.then === 'function') {
-      playPromise.then(null, (e) => {});
-    }
   }
 
   /**

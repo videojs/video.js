@@ -140,6 +140,19 @@ QUnit.test('addChild should throw if the child does not exist', function(assert)
 
 });
 
+QUnit.test('addChild with instance should allow getting child correctly', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const comp2 = new Component(getFakePlayer());
+
+  comp2.name = function() {
+    return 'foo';
+  };
+
+  comp.addChild(comp2);
+  assert.ok(comp.getChild('foo'), 'we can get child with camelCase');
+  assert.ok(comp.getChild('Foo'), 'we can get child with TitleCase');
+});
+
 QUnit.test('should add a child component with title case name', function(assert) {
   const comp = new Component(getFakePlayer());
 
