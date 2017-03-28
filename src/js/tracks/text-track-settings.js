@@ -306,14 +306,14 @@ class TextTrackSettings extends ModalDialog {
    *         The DOM element that gets created.
    * @private
    */
-  createElSelect_(key, legendId = '') {
+  createElSelect_(key, legendId = '', type='label') {
     const config = selectConfigs[key];
     const id = config.id.replace('%s', this.id_);
 
     return [
-      createEl('label', {
+      createEl(type, {
         id,
-        className: 'vjs-label',
+        className: type === 'label' ? 'vjs-label' : '',
         textContent: this.localize(config.label)
       }, {
       }),
@@ -435,17 +435,17 @@ class TextTrackSettings extends ModalDialog {
    * @private
    */
   createElFont_() {
-    const fontPercent = createEl('div', {
+    const fontPercent = createEl('fieldset', {
       className: 'vjs-font-percent vjs-tracksetting'
-    }, undefined, this.createElSelect_('fontPercent'));
+    }, undefined, this.createElSelect_('fontPercent', '', 'legend'));
 
-    const edgeStyle = createEl('div', {
+    const edgeStyle = createEl('fieldset', {
       className: 'vjs-edge-style vjs-tracksetting'
-    }, undefined, this.createElSelect_('edgeStyle'));
+    }, undefined, this.createElSelect_('edgeStyle', '', 'legend'));
 
-    const fontFamily = createEl('div', {
+    const fontFamily = createEl('fieldset', {
       className: 'vjs-font-family vjs-tracksetting'
-    }, undefined, this.createElSelect_('fontFamily'));
+    }, undefined, this.createElSelect_('fontFamily', '', 'legend'));
 
     return createEl('div', {
       className: 'vjs-tracksettings-font'
