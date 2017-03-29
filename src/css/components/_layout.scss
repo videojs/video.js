@@ -33,6 +33,10 @@
   }
 }
 
+.video-js[tabindex="-1"] {
+  outline: none;
+}
+
 // All elements inherit border-box sizing
 .video-js *,
 .video-js *:before,
