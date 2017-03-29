@@ -44,6 +44,7 @@ import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
+import './resize-manager.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -3471,7 +3472,8 @@ Player.prototype.options_ = {
     'bigPlayButton',
     'controlBar',
     'errorDisplay',
-    'textTrackSettings'
+    'textTrackSettings',
+    'resizeManager'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
