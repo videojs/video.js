@@ -306,7 +306,7 @@ class TextTrackSettings extends ModalDialog {
    *         The DOM element that gets created.
    * @private
    */
-  createElSelect_(key, legendId = '', type='label') {
+  createElSelect_(key, legendId = '', type = 'label') {
     const config = selectConfigs[key];
     const id = config.id.replace('%s', this.id_);
 
