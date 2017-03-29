@@ -16,8 +16,19 @@
   display: block;
   padding: 0;
   margin: 0;
-  overflow: auto;
   font-family: $text-font-family;
+
+  // This allows scrolling of content if need be.
+  overflow: auto;
+
+  // When combined with `overflow: auto;`, this fixes gaps left by
+  // scrollbars in older IE versions.
+  box-sizing: content-box;
+}
+
+// Reset box-sizing inside the menu.
+.vjs-menu .vjs-menu-content > * {
+  box-sizing: border-box;
 }
 
 // prevent menus from opening while scrubbing (FF, IE)

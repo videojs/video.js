@@ -1,111 +1,50 @@
 .vjs-modal-dialog.vjs-text-track-settings {
-  position: relative;
-  top: 1em;
   background-color: $primary-background-color;
   background-color: rgba($primary-background-color, 0.75);
   color: $primary-foreground-color;
-  margin: 0 auto;
-  padding: 0.5em;
-  height: 22em;
-  width: 48em;
+  height: 70%;
 }
 
-.vjs-caption-settings .vjs-tracksettings {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
-  overflow: auto;
+// Layout divs
+.vjs-text-track-settings .vjs-modal-dialog-content {
+  display: table;
 }
 
-.vjs-tracksettings legend {
-  color: $primary-foreground-color;
+.vjs-text-track-settings .vjs-track-settings-colors,
+.vjs-text-track-settings .vjs-track-settings-font,
+.vjs-text-track-settings .vjs-track-settings-controls {
+  display: table-cell;
 }
 
-.vjs-caption-settings .vjs-tracksettings-colors,
-.vjs-caption-settings .vjs-tracksettings-font {
-  float: left;
-}
-.vjs-caption-settings .vjs-tracksettings-colors:after,
-.vjs-caption-settings .vjs-tracksettings-font:after,
-.vjs-caption-settings .vjs-tracksettings-controls:after {
-  clear: both;
+.vjs-text-track-settings .vjs-track-settings-controls {
+  text-align: right;
+  vertical-align: bottom;
 }
 
-.vjs-caption-settings .vjs-tracksettings-controls {
-  position: absolute;
-  bottom: 1em;
-  right: 1em;
-}
-
-.vjs-tracksettings-controls button:focus,
-.vjs-tracksettings-controls button:active {
-  outline-style: solid;
-  outline-width: medium;
-  background-image: linear-gradient(0deg, $primary-foreground-color 88%, $secondary-background-color 100%);
-}
-
-.vjs-tracksettings-controls button:hover {
-  color: rgba(#2B333F, 0.75);
-}
-
-.vjs-tracksettings-controls button {
-  background-color: $primary-foreground-color;
-  background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
-  color: #2B333F;
-  cursor: pointer;
-  border-radius: 2px;
-}
-
-.vjs-tracksettings-controls .vjs-default-button {
-  margin-right: 1em;
-}
-
-.vjs-caption-settings .vjs-tracksetting {
+// Form elements
+.vjs-text-track-settings fieldset {
   margin: 5px;
   padding: 3px;
-  min-height: 40px;
   border: none;
 }
-.vjs-caption-settings .vjs-tracksetting label,
-.vjs-caption-settings .vjs-tracksetting legend {
-  display: block;
-  margin-bottom: 5px;
-}
 
-.vjs-caption-settings .vjs-tracksetting span {
-  display: inline;
+.vjs-text-track-settings fieldset span {
+  display: inline-block;
   margin-left: 5px;
-  vertical-align: top;
-  float: right;
 }
 
-.vjs-caption-settings .vjs-tracksetting > div {
-  margin-bottom: 5px;
-  min-height: 20px;
+.vjs-text-track-settings legend {
+  color: $primary-foreground-color;
+  margin: 0 0 5px 0;
 }
 
-.vjs-caption-settings .vjs-tracksetting > div:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  min-height: 0;
-}
-
-.vjs-caption-settings label > input {
-  margin-right: 10px;
-}
-
-.vjs-caption-settings fieldset {
-  margin-top: 1em;
-  margin-left: .5em;
-}
-
-// Hide labels within fieldsets, so they are only for screen reader users
-.vjs-caption-settings fieldset .vjs-label {
+// Hide labels, so they are only for screen reader users
+.vjs-text-track-settings .vjs-label {
   position: absolute;
-  clip: rect(1px 1px 1px 1px); /* for Internet Explorer */
+  clip: rect(1px 1px 1px 1px); // for Internet Explorer
   clip: rect(1px, 1px, 1px, 1px);
+  display: block;
+  margin: 0 0 5px 0;
   padding: 0;
   border: 0;
   height: 1px;
@@ -113,7 +52,25 @@
   overflow: hidden;
 }
 
-.vjs-caption-settings input[type="button"] {
-  width: 40px;
-  height: 40px;
+.vjs-track-settings-controls button:focus,
+.vjs-track-settings-controls button:active {
+  outline-style: solid;
+  outline-width: medium;
+  background-image: linear-gradient(0deg, $primary-foreground-color 88%, $secondary-background-color 100%);
+}
+
+.vjs-track-settings-controls button:hover {
+  color: rgba(#2B333F, 0.75);
+}
+
+.vjs-track-settings-controls button {
+  background-color: $primary-foreground-color;
+  background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
+  color: #2B333F;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.vjs-track-settings-controls .vjs-default-button {
+  margin-right: 1em;
 }
