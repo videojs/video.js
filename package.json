@@ -143,5 +143,11 @@
       "**/test/coverage/**",
       "**/test/karma.conf.js"
     ]
+  },
+  "greenkeeper": {
+    "ignore": [
+      "qunitjs",
+      "sinon"
+    ]
   }
 }
