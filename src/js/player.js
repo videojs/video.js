@@ -1612,7 +1612,12 @@ class Player extends Component {
   play() {
     if (this.changingSrc_) {
       this.ready(function() {
-        this.techCall_('play');
+        const retval = this.techGet_('play');
+
+        // silence errors (unhandled promise from play)
+        if (retval !== undefined && typeof retval.then === 'function') {
+          retval.then(null, (e) => {});
+        }
       });
 
     // Only calls the tech's play if we already have a src loaded
