@@ -255,9 +255,6 @@ class TextTrackSettings extends ModalDialog {
     options.temporary = false;
 
     super(player, options);
-
-    this.contentEl().className += '  vjs-caption-settings';
-
     this.updateDisplay = Fn.bind(this, this.updateDisplay);
 
     // fill the modal and pretend we have opened it
@@ -306,14 +303,14 @@ class TextTrackSettings extends ModalDialog {
    *         The DOM element that gets created.
    * @private
    */
-  createElSelect_(key, legendId = '') {
+  createElSelect_(key, legendId = '', type = 'label') {
     const config = selectConfigs[key];
     const id = config.id.replace('%s', this.id_);
 
     return [
-      createEl('label', {
+      createEl(type, {
         id,
-        className: 'vjs-label',
+        className: type === 'label' ? 'vjs-label' : '',
         textContent: this.localize(config.label)
       }, {
       }),
@@ -354,7 +351,7 @@ class TextTrackSettings extends ModalDialog {
     }, undefined, this.createElSelect_('textOpacity', legend.id));
 
     return createEl('fieldset', {
-      className: 'vjs-fg-color vjs-tracksetting'
+      className: 'vjs-fg-color vjs-track-setting'
     }, undefined, [legend].concat(select, opacity));
   }
 
@@ -379,7 +376,7 @@ class TextTrackSettings extends ModalDialog {
     }, undefined, this.createElSelect_('backgroundOpacity', legend.id));
 
     return createEl('fieldset', {
-      className: 'vjs-bg-color vjs-tracksetting'
+      className: 'vjs-bg-color vjs-track-setting'
     }, undefined, [legend].concat(select, opacity));
   }
 
@@ -404,7 +401,7 @@ class TextTrackSettings extends ModalDialog {
     }, undefined, this.createElSelect_('windowOpacity', legend.id));
 
     return createEl('fieldset', {
-      className: 'vjs-window-color vjs-tracksetting'
+      className: 'vjs-window-color vjs-track-setting'
     }, undefined, [legend].concat(select, opacity));
   }
 
@@ -418,7 +415,7 @@ class TextTrackSettings extends ModalDialog {
    */
   createElColors_() {
     return createEl('div', {
-      className: 'vjs-tracksettings-colors'
+      className: 'vjs-track-settings-colors'
     }, undefined, [
       this.createElFgColor_(),
       this.createElBgColor_(),
@@ -435,20 +432,20 @@ class TextTrackSettings extends ModalDialog {
    * @private
    */
   createElFont_() {
-    const fontPercent = createEl('div', {
-      className: 'vjs-font-percent vjs-tracksetting'
-    }, undefined, this.createElSelect_('fontPercent'));
+    const fontPercent = createEl('fieldset', {
+      className: 'vjs-font-percent vjs-track-setting'
+    }, undefined, this.createElSelect_('fontPercent', '', 'legend'));
 
-    const edgeStyle = createEl('div', {
-      className: 'vjs-edge-style vjs-tracksetting'
-    }, undefined, this.createElSelect_('edgeStyle'));
+    const edgeStyle = createEl('fieldset', {
+      className: 'vjs-edge-style vjs-track-setting'
+    }, undefined, this.createElSelect_('edgeStyle', '', 'legend'));
 
-    const fontFamily = createEl('div', {
-      className: 'vjs-font-family vjs-tracksetting'
-    }, undefined, this.createElSelect_('fontFamily'));
+    const fontFamily = createEl('fieldset', {
+      className: 'vjs-font-family vjs-track-setting'
+    }, undefined, this.createElSelect_('fontFamily', '', 'legend'));
 
     return createEl('div', {
-      className: 'vjs-tracksettings-font'
+      className: 'vjs-track-settings-font'
     }, undefined, [fontPercent, edgeStyle, fontFamily]);
   }
 
@@ -474,7 +471,7 @@ class TextTrackSettings extends ModalDialog {
     });
 
     return createEl('div', {
-      className: 'vjs-tracksettings-controls'
+      className: 'vjs-track-settings-controls'
     }, undefined, [defaultsButton, doneButton]);
   }
 
@@ -489,15 +486,11 @@ class TextTrackSettings extends ModalDialog {
   }
 
   content() {
-    const settings = createEl('div', {
-      className: 'vjs-tracksettings'
-    }, undefined, [
+    return [
       this.createElColors_(),
       this.createElFont_(),
       this.createElControls_()
-    ]);
-
-    return settings;
+    ];
   }
 
   label() {
