@@ -76,6 +76,26 @@ const markPluginAsActive = (player, name) => {
 };
 
 /**
+ * Triggers a pair of plugin setup events.
+ *
+ * @private
+ * @param  {Player} player
+ *         A Video.js player instance.
+ *
+ * @param  {Plugin~PluginEventHash} hash
+ *         A plugin event hash.
+ *
+ * @param  {Boolean} [before]
+ *         If true, modifies the events to be "before" events.
+ */
+const triggerSetupEvent = (player, hash, before) => {
+  const eventName = (before ? 'before' : '') + 'pluginsetup';
+
+  player.trigger(eventName, hash);
+  player.trigger(eventName + ':' + hash.name, hash);
+};
+
+/**
  * Takes a basic plugin function and returns a wrapper function which marks
  * on the player that the plugin has been activated.
  *
@@ -91,15 +111,20 @@ const markPluginAsActive = (player, name) => {
  */
 const createBasicPlugin = function(name, plugin) {
   const basicPluginWrapper = function() {
+
+    // We trigger the "beforepluginsetup" and "pluginsetup" events on the player
+    // regardless, but we want the hash to be consistent with the hash provided
+    // for advanced plugins.
+    //
+    // The only potentially counter-intuitive thing here is the `instance` in
+    // the "pluginsetup" event is the value returned by the `plugin` function.
+    triggerSetupEvent(this, {name, plugin, instance: null}, true);
+
     const instance = plugin.apply(this, arguments);
 
     markPluginAsActive(this, name);
+    triggerSetupEvent(this, {name, plugin, instance});
 
-    // We trigger the "pluginsetup" event on the player regardless, but we want
-    // the hash to be consistent with the hash provided for advanced plugins.
-    // The only potentially counter-intuitive thing here is the `instance` is the
-    // value returned by the `plugin` function.
-    this.trigger('pluginsetup', {name, plugin, instance});
     return instance;
   };
 
@@ -133,6 +158,8 @@ const createPluginFactory = (name, PluginSubClass) => {
   PluginSubClass.prototype.name = name;
 
   return function(...args) {
+    triggerSetupEvent(this, {name, plugin: PluginSubClass, instance: null}, true);
+
     const instance = new PluginSubClass(...[this, ...args]);
 
     // The plugin is replaced by a function that returns the current instance.
@@ -147,7 +174,10 @@ const createPluginFactory = (name, PluginSubClass) => {
  *
  * @mixes   module:evented~EventedMixin
  * @mixes   module:stateful~StatefulMixin
+ * @fires   Player#beforepluginsetup
+ * @fires   Player#beforepluginsetup:$name
  * @fires   Player#pluginsetup
+ * @fires   Player#pluginsetup:$name
  * @listens Player#dispose
  * @throws  {Error}
  *          If attempting to instantiate the base {@link Plugin} class
@@ -164,11 +194,11 @@ class Plugin {
    *        A Video.js player instance.
    */
   constructor(player) {
-    this.player = player;
-
     if (this.constructor === Plugin) {
       throw new Error('Plugin must be sub-classed; not directly instantiated.');
     }
+
+    this.player = player;
 
     // Make this object evented, but remove the added `trigger` method so we
     // use the prototype version instead.
@@ -184,7 +214,7 @@ class Plugin {
 
     // If the player is disposed, dispose the plugin.
     player.on('dispose', this.dispose);
-    player.trigger('pluginsetup', this.getEventHash());
+    triggerSetupEvent(player, this.getEventHash());
   }
 
   /**
@@ -433,9 +463,32 @@ Player.prototype.hasPlugin = function(name) {
 export default Plugin;
 
 /**
+ * Signals that a plugin is about to be set up on a player.
+ *
+ * @event    Player#beforepluginsetup
+ * @type     {Plugin~PluginEventHash}
+ */
+
+/**
+ * Signals that a plugin is about to be set up on a player - by name. The name
+ * is the name of the plugin.
+ *
+ * @event    Player#beforepluginsetup:$name
+ * @type     {Plugin~PluginEventHash}
+ */
+
+/**
  * Signals that a plugin has just been set up on a player.
  *
  * @event    Player#pluginsetup
+ * @type     {Plugin~PluginEventHash}
+ */
+
+/**
+ * Signals that a plugin has just been set up on a player - by name. The name
+ * is the name of the plugin.
+ *
+ * @event    Player#pluginsetup:$name
  * @type     {Plugin~PluginEventHash}
  */
 
