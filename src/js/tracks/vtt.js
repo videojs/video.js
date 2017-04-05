@@ -8,6 +8,8 @@ import window from 'global/window';
 import document from 'global/document';
 import {isPlainEmpty} from '../utils/obj.js';
 
+export let vttjsLoaded = !isPlainEmpty(vttjs);
+
 /**
  * The `VttLoader` is the `Component` that decides how to load in vttjs
  *
@@ -105,7 +107,6 @@ class VttLoader extends Component {
 }
 
 export const getVttjs = () => VttLoader.vttjs;
-export let vttjsLoaded = !isPlainEmpty(vttjs);
 
 Component.registerComponent('VttLoader', VttLoader);
 export default VttLoader;
