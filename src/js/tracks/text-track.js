@@ -11,6 +11,7 @@ import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 import merge from '../utils/merge-options';
 import * as browser from '../utils/browser.js';
+import {vttjsLoaded, getVttjs} from './vtt.js';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -88,7 +89,9 @@ const loadTrack = function(src, track) {
 
     // Make sure that vttjs has loaded, otherwise, wait till it finished loading
     // NOTE: this is only used for the alt/video.novtt.js build
-    if (typeof window.WebVTT !== 'function') {
+    if (vttjsLoaded) {
+      parseCues(responseBody, track);
+    } else {
       if (track.tech_) {
         const loadHandler = () => parseCues(responseBody, track);
 
@@ -97,10 +100,7 @@ const loadTrack = function(src, track) {
           log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
           track.tech_.off('vttjsloaded', loadHandler);
         });
-
       }
-    } else {
-      parseCues(responseBody, track);
     }
 
   }));
