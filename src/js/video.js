@@ -151,6 +151,7 @@ videojs.hooks = function(type, fn) {
   if (fn && type === 'vttjsloaded') {
     vttjsOnLoad((vttjs) => {
       const vttjsLoadedHooks = videojs.hooks('vttjsloaded');
+
       vttjsLoadedHooks.forEach((hookFn) => hookFn(vttjs));
       // we notified the listeners, now clear them out
       vttjsLoadedHooks.length = 0;
@@ -737,7 +738,9 @@ videojs.url = Url;
  */
 videojs.vttjs = {
   get: getVttjs,
-  loaded() { return vttjsLoaded; }
+  loaded() {
+    return vttjsLoaded;
+  }
 };
 
 // We use Node-style module.exports here instead of ES6 because it is more

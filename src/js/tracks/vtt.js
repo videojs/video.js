@@ -9,6 +9,7 @@ import document from 'global/document';
 import {isPlainEmpty} from '../utils/obj.js';
 
 let loadedCallback;
+
 export let vttjsLoaded = !isPlainEmpty(vttjs) ||
                          typeof window.WebVTT === 'function';
 
@@ -65,6 +66,7 @@ class VttLoader extends Component {
     }, true);
 
     if (loadedCallback) {
+      // eslint-disable-next-line no-use-before-define
       loadedCallback(getVttjs());
     }
   }

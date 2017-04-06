@@ -333,6 +333,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   let parserCreated = false;
 
   const WebVTT = () => {};
+
   WebVTT.StringDecoder = () => {};
   WebVTT.Parser = () => {
     parserCreated = true;
@@ -347,10 +348,10 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
 
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
-  let vttjs = {
+  const vttjs = {
     vttjsLoaded: false,
     getVttjs() {
-      return { WebVTT }
+      return { WebVTT };
     }
   };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
@@ -382,6 +383,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   let parserCreated = false;
 
   const WebVTT = () => {};
+
   WebVTT.StringDecoder = () => {};
   WebVTT.Parser = () => {
     parserCreated = true;
@@ -394,12 +396,13 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
     };
   };
 
-
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
-  let vttjs = {
+  const vttjs = {
     vttjsLoaded: false,
-    getVttjs() { return { WebVTT } }
+    getVttjs() {
+      return { WebVTT };
+    }
   };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
     './vtt.js': vttjs,
@@ -446,9 +449,11 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
-  let vttjs = {
+  const vttjs = {
     vttjsLoaded: false,
-    getVttjs() { return null; }
+    getVttjs() {
+      return null;
+    }
   };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
     './vtt.js': vttjs,
