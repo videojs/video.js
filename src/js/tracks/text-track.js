@@ -11,7 +11,7 @@ import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 import merge from '../utils/merge-options';
 import * as browser from '../utils/browser.js';
-import {vttjsLoaded} from './vtt.js';
+import {vttjsLoaded, getVttjs} from './vtt.js';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -25,9 +25,8 @@ import {vttjsLoaded} from './vtt.js';
  * @private
  */
 const parseCues = function(srcContent, track) {
-  const parser = new window.WebVTT.Parser(window,
-                                          window.vttjs,
-                                          window.WebVTT.StringDecoder());
+  const vttjs = getVttjs();
+  const parser = new vttjs.WebVTT.Parser(window, vttjs, vttjs.WebVTT.StringDecoder());
   const errors = [];
 
   parser.oncue = function(cue) {
@@ -93,7 +92,6 @@ const loadTrack = function(src, track) {
       parseCues(responseBody, track);
       return;
     }
-
     if (track.tech_) {
       const loadHandler = () => parseCues(responseBody, track);
 
