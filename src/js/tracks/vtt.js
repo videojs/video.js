@@ -43,6 +43,8 @@ class VttLoader extends Component {
   }
 
   triggerLoaded() {
+    vttjsLoaded = true;
+
     /**
      * Fired when vtt.js is loaded.
      *
@@ -57,7 +59,6 @@ class VttLoader extends Component {
      * @type {EventTarget~Event}
      */
     this.player_.tech_.trigger('vttjsloaded');
-    vttjsLoaded = true;
   }
 
   triggerError() {
