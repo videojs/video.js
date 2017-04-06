@@ -31,6 +31,7 @@ import xhr from 'xhr';
 // Include the built-in techs
 import Tech from './tech/tech.js';
 import { use as middlewareUse } from './tech/middleware.js';
+import {getVttjs, vttjsLoaded} from './tracks/vtt.js';
 
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
@@ -721,6 +722,15 @@ videojs.dom = Dom;
  * and Tech's
  */
 videojs.url = Url;
+
+/**
+ * Export the ability to get vttjs
+ * as well as a boolean that tells you whether it is loaded
+ */
+videojs.vttjs = {
+  get: getVttjs,
+  loaded() { return vttjsLoaded; }
+};
 
 // We use Node-style module.exports here instead of ES6 because it is more
 // compatible with different module systems.
