@@ -31,7 +31,7 @@ import xhr from 'xhr';
 // Include the built-in techs
 import Tech from './tech/tech.js';
 import { use as middlewareUse } from './tech/middleware.js';
-import {getVttjs, vttjsLoaded} from './tracks/vtt.js';
+import {getVttjs, vttjsLoaded, onLoad as vttjsOnLoad} from './tracks/vtt.js';
 
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
@@ -148,6 +148,14 @@ videojs.hooks_ = {};
  */
 videojs.hooks = function(type, fn) {
   videojs.hooks_[type] = videojs.hooks_[type] || [];
+  if (fn && type === 'vttjsloaded') {
+    vttjsOnLoad((vttjs) => {
+      const vttjsLoadedHooks = videojs.hooks('vttjsloaded');
+      vttjsLoadedHooks.forEach((hookFn) => hookFn(vttjs));
+      // we notified the listeners, now clear them out
+      vttjsLoadedHooks.length = 0;
+    });
+  }
   if (fn) {
     videojs.hooks_[type] = videojs.hooks_[type].concat(fn);
   }

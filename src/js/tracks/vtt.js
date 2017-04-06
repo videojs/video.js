@@ -8,6 +8,7 @@ import window from 'global/window';
 import document from 'global/document';
 import {isPlainEmpty} from '../utils/obj.js';
 
+let loadedCallback;
 export let vttjsLoaded = !isPlainEmpty(vttjs) ||
                          typeof window.WebVTT === 'function';
 
@@ -52,16 +53,25 @@ class VttLoader extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('vttjsloaded');
-    /**
-     * Fired when vtt.js is loaded.
-     *
-     * @event Tech#vttjsloaded
-     * @type {EventTarget~Event}
-     */
-    this.player_.tech_.trigger('vttjsloaded');
+
+    this.player_.ready(() => {
+      /**
+       * Fired when vtt.js is loaded.
+       *
+       * @event Tech#vttjsloaded
+       * @type {EventTarget~Event}
+       */
+      this.player_.tech_.trigger('vttjsloaded');
+    }, true);
+
+    if (loadedCallback) {
+      loadedCallback(getVttjs());
+    }
   }
 
   triggerError() {
+    vttjsLoaded = false;
+
     /**
      * Fired when vtt.js was not loaded due to an error
      *
@@ -69,14 +79,16 @@ class VttLoader extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('vttjserror');
-    /**
-     * Fired when vtt.js was not loaded due to an error
-     *
-     * @event Tech#vttjserror
-     * @type {EventTarget~Event}
-     */
-    this.player_.tech_.trigger('vttjserror');
-    vttjsLoaded = false;
+
+    this.player_.ready(() => {
+      /**
+       * Fired when vtt.js was not loaded due to an error
+       *
+       * @event Tech#vttjserror
+       * @type {EventTarget~Event}
+       */
+      this.player_.tech_.trigger('vttjserror');
+    }, true);
   }
 
   loadRemoteVtt() {
@@ -110,6 +122,13 @@ class VttLoader extends Component {
 VttLoader.vttjs = vttjsLoaded ? window.vttjs : null;
 
 export const getVttjs = () => VttLoader.vttjs;
+export const onLoad = (callback) => {
+  if (vttjsLoaded) {
+    window.setTimeout(() => callback(getVttjs()), 0);
+  } else {
+    loadedCallback = callback;
+  }
+};
 
 Component.registerComponent('VttLoader', VttLoader);
 export default VttLoader;
