@@ -446,7 +446,12 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
+  let vttjs = {
+    vttjsLoaded: false,
+    getVttjs() { return null; }
+  };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
+    './vtt.js': vttjs,
     xhr(options, fn) {
       xhrHandler = fn;
     },
