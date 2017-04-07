@@ -10,7 +10,7 @@ test/*.map
 .s3config.json
 
 node_modules
-npm-debug.log
+npm-debug.log*
 
 sandbox/*
 !sandbox/*.example
