@@ -292,7 +292,7 @@ Player
 ├── BigPlayButton
 ├─┬ ControlBar
 │ ├── PlayToggle
-│ ├── VolumeMenuButton
+│ ├── VolumePanel
 │ ├── CurrentTimeDisplay (hidden by default)
 │ ├── TimeDivider (hidden by default)
 │ ├── DurationDisplay (hidden by default)
