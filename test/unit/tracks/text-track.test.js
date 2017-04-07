@@ -491,7 +491,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   assert.ok(errorSpy.called, 'vttjs failed to load, so log.error was called');
   if (errorSpy.called) {
-    assert.ok(/^vttjs failed to load, stopping trying to process/.test(errorSpy.getCall(0).args[0]),
+    assert.ok(/^vttjs failed to load, unable to process/.test(errorSpy.getCall(0).args[0]),
        'log.error was called with the expected message');
   }
   assert.ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
