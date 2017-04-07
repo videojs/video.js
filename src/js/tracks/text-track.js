@@ -97,7 +97,7 @@ const loadTrack = function(src, track) {
 
       track.tech_.on('vttjsloaded', loadHandler);
       track.tech_.on('vttjserror', () => {
-        log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
+        log.error(`vttjs failed to load, unable to process ${track.src}`);
         track.tech_.off('vttjsloaded', loadHandler);
       });
     }

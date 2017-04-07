@@ -22,9 +22,9 @@ export let vttjsLoaded = !isPlainEmpty(vttjs) ||
  */
 class VttLoader extends Component {
   constructor(player, options, ready) {
-    const options_ = mergeOptions({createEl: false}, options);
+    const settings = mergeOptions({createEl: false}, options);
 
-    super(player, options_, ready);
+    super(player, settings, ready);
 
     if (vttjsLoaded) {
       this.setVttjs(vttjs);
@@ -47,14 +47,6 @@ class VttLoader extends Component {
   triggerLoaded() {
     vttjsLoaded = true;
 
-    /**
-     * Fired when vtt.js is loaded.
-     *
-     * @event VttLoader#vttjsloaded
-     * @type {EventTarget~Event}
-     */
-    this.trigger('vttjsloaded');
-
     this.player_.ready(() => {
       /**
        * Fired when vtt.js is loaded.
@@ -73,14 +65,6 @@ class VttLoader extends Component {
 
   triggerError() {
     vttjsLoaded = false;
-
-    /**
-     * Fired when vtt.js was not loaded due to an error
-     *
-     * @event VttLoader#vttjserror
-     * @type {EventTarget~Event}
-     */
-    this.trigger('vttjserror');
 
     this.player_.ready(() => {
       /**
