@@ -53,19 +53,4 @@ return <VideoPlayer { ...videoJsOptions } />
 
 Dont forget to include the video.js CSS, located at `video.js/dist/video-js.css`.
 
-### Some notes for Webpack Users:
-If you are using Webpack, then this can easily be achieved by adding
-`require('!style-loader!css-loader!video.js/dist/video-js.css')` to the file where you use the VideoPlayer component.
-
-In addition to this, you may run into a problem where Webpack does not know how to load .eot files by default. This can be solved by installing the file-loader and url-loader packages. Install them by running:
-`npm install --save file-loader url-loader`
-
-With both packages installed, simply add the following to you webpack.config file in the 'loaders' section:
-```
-{
-  test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-  loader: 'url-loader?limit=100000'
-}
-```
-
 [options]: /docs/guides/options.md
