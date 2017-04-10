@@ -667,6 +667,32 @@ class Html5 extends Tech {
       }
     }
   }
+
+  /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see https://wicg.github.io/media-playback-quality/
+   *
+   * @return {Object|undefined}
+   *         An object with supported media playback quality metrics
+   */
+  getVideoPlaybackQuality() {
+    if (typeof this.el().getVideoPlaybackQuality === 'function') {
+      return this.el().getVideoPlaybackQuality();
+    }
+
+    if (typeof this.el().webkitDroppedFrameCount !== 'undefined' &&
+        typeof this.el().webkitDecodedFrameCount !== 'undefined') {
+      return {
+        droppedVideoFrames: this.el().webkitDroppedFrameCount,
+        totalVideoFrames: this.el().webkitDecodedFrameCount
+      };
+    }
+
+    // no supported API
+    return {};
+  }
 }
 
 /* HTML5 Support Testing ---------------------------------------------------- */

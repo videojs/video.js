@@ -665,3 +665,42 @@ test('When Android Chrome reports Infinity duration with currentTime 0, return N
   browser.IS_CHROME = oldIsChrome;
   tech.el_ = oldEl;
 });
+
+QUnit.test('supports getting available media playback quality metrics', function(assert) {
+  const oldEl = tech.el_;
+  const videoPlaybackQuality = {
+    creationTime: 1,
+    corruptedVideoFrames: 2,
+    droppedVideoFrames: 3,
+    totalVideoFrames: 5
+  };
+
+  tech.el_ = {
+    getVideoPlaybackQuality: () => videoPlaybackQuality
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   videoPlaybackQuality,
+                   'returns native implementation when supported');
+
+  tech.el_ = {
+    webkitDroppedFrameCount: 1,
+    webkitDecodedFrameCount: 2
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { droppedVideoFrames: 1, totalVideoFrames: 2 },
+                   'returns metrics from webkit prefixed metrics when supported');
+
+  tech.el_ = {};
+  assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'empty object when not supported');
+
+  tech.el_ = {
+    getVideoPlaybackQuality: () => videoPlaybackQuality,
+    webkitDroppedFrameCount: 1,
+    webkitDecodedFrameCount: 2
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   videoPlaybackQuality,
+                   'prefers native implementation when supported');
+
+  tech.el_ = oldEl;
+});
