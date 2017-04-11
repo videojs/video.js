@@ -261,7 +261,8 @@ git reset --hard upstream/master
 
 Releasing video.js is partially automated through [`conrib.json`](/contrib.json) scripts. To do a release, you need a couple of things: npm access, GitHub personal access token.
 
-Releases in video.js are done on npm and bower and GitHub and eventually posted on the CDN. This is the instruction for the npm/bower/GitHub releases.
+Releases in video.js are done on npm and GitHub and eventually posted on the CDN. These
+are the instructions for the npm/GitHub releases.
 
 When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
 
