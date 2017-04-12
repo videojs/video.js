@@ -21,3 +21,19 @@ function toTitleCase(string) {
 }
 
 export default toTitleCase;
+
+/**
+ * Compares the TitleCase versions of the two strings for equality.
+ *
+ * @param {string} str1
+ *        The first string to compare
+ *
+ * @param {string} str2
+ *        The second string to compare
+ *
+ * @return {boolean}
+ *         Whether the TitleCase versions of the strings are equal
+ */
+export function titleCaseEquals(str1, str2) {
+  return toTitleCase(str1) === toTitleCase(str2);
+}

@@ -1564,6 +1564,26 @@ QUnit.test('src selects tech based on middleware', function(assert) {
 
 });
 
+QUnit.test('src_ does not call loadTech is name is titleCaseEquals', function(assert) {
+  let loadTechCalled = 0;
+  const playerProxy = {
+    selectSource() {
+      return {
+        tech: 'html5'
+      };
+    },
+    techName_: 'Html5',
+    ready() {},
+    loadTech_() {
+      loadTechCalled++;
+    }
+  };
+
+  Player.prototype.src_.call(playerProxy);
+
+  assert.equal(loadTechCalled, 0, 'loadTech was not called');
+});
+
 QUnit.test('options: plugins', function(assert) {
   const optionsSpy = sinon.spy();
 

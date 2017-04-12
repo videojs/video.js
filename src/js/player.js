@@ -14,7 +14,7 @@ import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
 import log from './utils/log.js';
-import toTitleCase from './utils/to-title-case.js';
+import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
@@ -2326,7 +2326,7 @@ class Player extends Component {
       return true;
     }
 
-    if (sourceTech.tech !== this.techName_) {
+    if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
       this.changingSrc_ = true;
 
       // load this technology with the chosen source
