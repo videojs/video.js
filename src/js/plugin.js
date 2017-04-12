@@ -86,7 +86,8 @@ const markPluginAsActive = (player, name) => {
  *         A plugin event hash.
  *
  * @param  {Boolean} [before]
- *         If true, modifies the events to be "before" events.
+ *         If true, prefixes the event name with "before". In other words,
+ *         use this to trigger "beforepluginsetup" instead of "pluginsetup".
  */
 const triggerSetupEvent = (player, hash, before) => {
   const eventName = (before ? 'before' : '') + 'pluginsetup';
