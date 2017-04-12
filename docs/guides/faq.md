@@ -59,13 +59,15 @@ video.js is an extendable framework/library around the native video element. It 
 
 ## Q: How do I install video.js?
 
-Currently video.js can be installed using bower, npm, serving a release file from
+Currently video.js can be installed using npm, serving a release file from
 a github tag, or even using a CDN hosted version. For information on doing any of those
 see the [install guide][install-guide].
 
 ## Q: Is video.js on bower?
 
-Yes! See the [install guide][install-guide] for more information.
+Versions prior to video.js 6 do support bower, however, as of video.js 6, bower is no
+longer officially supported. Please see https://github.com/videojs/video.js/issues/4012
+for more information.
 
 ## Q: What do video.js version numbers mean?
 
