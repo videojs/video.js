@@ -682,16 +682,24 @@ class Html5 extends Tech {
       return this.el().getVideoPlaybackQuality();
     }
 
+    const videoPlaybackQuality = {};
+
     if (typeof this.el().webkitDroppedFrameCount !== 'undefined' &&
         typeof this.el().webkitDecodedFrameCount !== 'undefined') {
-      return {
-        droppedVideoFrames: this.el().webkitDroppedFrameCount,
-        totalVideoFrames: this.el().webkitDecodedFrameCount
-      };
+      videoPlaybackQuality.droppedVideoFrames = this.el().webkitDroppedFrameCount;
+      videoPlaybackQuality.totalVideoFrames = this.el().webkitDecodedFrameCount;
     }
 
-    // no supported API
-    return {};
+    if (window.performance && typeof window.performance.now === 'function') {
+      videoPlaybackQuality.creationTime = window.performance.now();
+    } else if (window.performance &&
+               window.performance.timing &&
+               typeof window.performance.timing.navigationStart === 'number') {
+      videoPlaybackQuality.creationTime =
+        window.Date.now() - window.performance.timing.navigationStart;
+    }
+
+    return videoPlaybackQuality;
   }
 }
 

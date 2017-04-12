@@ -667,6 +667,8 @@ test('When Android Chrome reports Infinity duration with currentTime 0, return N
 });
 
 QUnit.test('supports getting available media playback quality metrics', function(assert) {
+  const origPerformance = window.performance;
+  const origDate = window.Date;
   const oldEl = tech.el_;
   const videoPlaybackQuality = {
     creationTime: 1,
@@ -680,18 +682,55 @@ QUnit.test('supports getting available media playback quality metrics', function
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
                    videoPlaybackQuality,
-                   'returns native implementation when supported');
+                   'uses native implementation when supported');
 
   tech.el_ = {
     webkitDroppedFrameCount: 1,
     webkitDecodedFrameCount: 2
   };
+  window.performance = {
+    now: () => 4
+  };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   { droppedVideoFrames: 1, totalVideoFrames: 2 },
-                   'returns metrics from webkit prefixed metrics when supported');
+                   { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 4 },
+                   'uses webkit prefixed metrics and performance.now when supported');
+
+  tech.el_ = {
+    webkitDroppedFrameCount: 1,
+    webkitDecodedFrameCount: 2
+  };
+  window.Date = {
+    now: () => 10
+  };
+  window.performance = {
+    timing: {
+      navigationStart: 3
+    }
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 7 },
+                   'uses webkit prefixed metrics and Date.now() - navigationStart when ' +
+                   'supported');
 
   tech.el_ = {};
+  delete window.performance;
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'empty object when not supported');
+
+  window.performance = {
+    now: () => 5
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { creationTime: 5 },
+                   'only creation time when it\'s the only piece available');
+
+  window.performance = {
+    timing: {
+      navigationStart: 3
+    }
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { creationTime: 7 },
+                   'only creation time when it\'s the only piece available');
 
   tech.el_ = {
     getVideoPlaybackQuality: () => videoPlaybackQuality,
@@ -703,4 +742,6 @@ QUnit.test('supports getting available media playback quality metrics', function
                    'prefers native implementation when supported');
 
   tech.el_ = oldEl;
+  window.performance = origPerformance;
+  window.Date = origDate;
 });
