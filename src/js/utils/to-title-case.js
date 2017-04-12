@@ -27,6 +27,7 @@ export default toTitleCase;
  *
  * @param {string} str1
  *        The first string to compare
+ *
  * @param {string} str2
  *        The second string to compare
  *
