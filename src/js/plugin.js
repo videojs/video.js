@@ -166,6 +166,8 @@ const createPluginFactory = (name, PluginSubClass) => {
     // The plugin is replaced by a function that returns the current instance.
     this[name] = () => instance;
 
+    triggerSetupEvent(this, instance.getEventHash());
+
     return instance;
   };
 };
@@ -215,7 +217,6 @@ class Plugin {
 
     // If the player is disposed, dispose the plugin.
     player.on('dispose', this.dispose);
-    triggerSetupEvent(player, this.getEventHash());
   }
 
   /**
