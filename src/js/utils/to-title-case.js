@@ -21,3 +21,7 @@ function toTitleCase(string) {
 }
 
 export default toTitleCase;
+
+export function titleCaseEquals(str1, str2) {
+  return toTitleCase(str1) === toTitleCase(str2);
+}
