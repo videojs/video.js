@@ -266,67 +266,68 @@ Yes! Please [submit an issue or open a pull request][pr-issue-question] if this 
 
 Yes! Please [submit an issue or open a pull request][pr-issue-question] if this does not work.
 
-Be sure to use `require('!style-loader!css-loader!video.js/dist/video-js.css')` to inject video.js CSS.
+We have a short guide that deals with small configurations that you will need to do. [Webpack and Videojs Configuration][webpack-guide].
 
 ## Q: Does video.js work with react?
 
 Yes! See [ReactJS integration example][react-guide].
 
-[reduced-test-case]: https://css-tricks.com/reduced-test-cases/
-
-[react-guide]: /docs/guides/react.md
-
-[plugin-guide]: /docs/guides/plugins.md
-
-[install-guide]: http://videojs.com/getting-started/
-
-[troubleshooting]: /docs/guides/troubleshooting.md
-
-[video-tracks]: /docs/guides/video-tracks.md
-
-[audio-tracks]: /docs/guides/audio-tracks.md
-
-[text-tracks]: /docs/guides/text-tracks.md
-
-[debug-guide]: /docs/guides/debugging.md
-
-[pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
-
-[hls]: http://github.com/videojs/videojs-contrib-hls
-
-[flash]: https://github.com/videojs/videojs-flash
-
-[dash]: http://github.com/videojs/videojs-contrib-dash
-
-[eme]: https://github.com/videojs/videojs-contrib-eme
-
-[generator]: https://github.com/videojs/generator-videojs-plugin
-
-[youtube]: https://github.com/videojs/videojs-youtube
-
-[vimeo]: https://github.com/videojs/videojs-vimeo
-
 [ads]: https://github.com/videojs/videojs-contrib-ads
 
-[pr-template]: http://github.com/videojs/video.js/blob/master/.github/PULL_REQUEST_TEMPLATE.md
-
-[issue-template]: http://github.com/videojs/video.js/blob/master/.github/ISSUE_TEMPLATE.md
-
-[plugin-list]: http://videojs.com/plugins
-
-[skins-list]: https://github.com/videojs/video.js/wiki/Skins
+[audio-tracks]: /docs/guides/audio-tracks.md
 
 [contributing-issues]: http://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#filing-issues
 
 [contributing-prs]: http://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#contributing-code
 
+[dash]: http://github.com/videojs/videojs-contrib-dash
+
+[debug-guide]: /docs/guides/debugging.md
+
+[eme]: https://github.com/videojs/videojs-contrib-eme
+
+[flash]: https://github.com/videojs/videojs-flash
+
+[generator]: https://github.com/videojs/generator-videojs-plugin
+
+[hls]: http://github.com/videojs/videojs-contrib-hls
+
+[install-guide]: http://videojs.com/getting-started/
+
+[issue-template]: http://github.com/videojs/video.js/blob/master/.github/ISSUE_TEMPLATE.md
+
+[npm-keywords]: https://docs.npmjs.com/files/package.json#keywords
+
+[plugin-guide]: /docs/guides/plugins.md
+
+[plugin-list]: http://videojs.com/plugins
+
+[pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
+
+[pr-template]: http://github.com/videojs/video.js/blob/master/.github/PULL_REQUEST_TEMPLATE.md
+
+[react-guide]: /docs/guides/react.md
+
+[reduced-test-case]: https://css-tricks.com/reduced-test-cases/
+
+[semver]: http://semver.org/
+
+[skins-list]: https://github.com/videojs/video.js/wiki/Skins
+
+[starter-example]: http://jsbin.com/axedog/edit?html,output
+
+[text-tracks]: /docs/guides/text-tracks.md
+
+[troubleshooting]: /docs/guides/troubleshooting.md
+
+[video-tracks]: /docs/guides/video-tracks.md
+
+[vimeo]: https://github.com/videojs/videojs-vimeo
+
 [vjs-issues]: https://github.com/videojs/video.js/issues
 
 [vjs-prs]: https://github.com/videojs/video.js/pulls
 
-[npm-keywords]: https://docs.npmjs.com/files/package.json#keywords
+[webpack-guide]: /docs/guides/webpack.md
 
-[semver]: http://semver.org/
-
-[starter-example]: http://jsbin.com/axedog/edit?html,output
-
+[youtube]: https://github.com/videojs/videojs-youtube
