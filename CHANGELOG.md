@@ -1,3 +1,10 @@
+<a name="5.19.2"></a>
+## [5.19.2](https://github.com/videojs/video.js/compare/v5.19.1...v5.19.2) (2017-04-13)
+
+### Bug Fixes
+
+* set IE_VERSION correctly for IE11 ([#4280](https://github.com/videojs/video.js/issues/4280)) ([207730e](https://github.com/videojs/video.js/commit/207730e)), closes [#4278](https://github.com/videojs/video.js/issues/4278)
+
 <a name="5.19.1"></a>
 ## [5.19.1](https://github.com/videojs/video.js/compare/v5.19.0...v5.19.1) (2017-03-27)
 
