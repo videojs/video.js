@@ -1,3 +1,23 @@
+<a name="6.0.1"></a>
+## [6.0.1](https://github.com/videojs/video.js/compare/v6.0.0...v6.0.1) (2017-04-13)
+
+### Bug Fixes
+
+* set IE_VERSION correctly for IE11 ([#4281](https://github.com/videojs/video.js/issues/4281)) ([1ea0041](https://github.com/videojs/video.js/commit/1ea0041)), closes [#4278](https://github.com/videojs/video.js/issues/4278)
+* techOrder names can be camelCased. ([#4277](https://github.com/videojs/video.js/issues/4277)) ([92e5d9f](https://github.com/videojs/video.js/commit/92e5d9f))
+
+### Chores
+
+* **changelog:** Update CHANGELOG with v5 changes ([#4257](https://github.com/videojs/video.js/issues/4257)) ([c20ca5c](https://github.com/videojs/video.js/commit/c20ca5c))
+* add slack travis notifications ([#4282](https://github.com/videojs/video.js/issues/4282)) ([7490a49](https://github.com/videojs/video.js/commit/7490a49))
+* gitignore all npm-debug.log.* ([#4252](https://github.com/videojs/video.js/issues/4252)) ([083f643](https://github.com/videojs/video.js/commit/083f643))
+
+### Documentation
+
+* **component:** Replace VolumeMenuButton with VolumePanel in component tree ([#4267](https://github.com/videojs/video.js/issues/4267)) ([02721c7](https://github.com/videojs/video.js/commit/02721c7)), closes [#4266](https://github.com/videojs/video.js/issues/4266)
+* add a Webpack usage guide ([#4261](https://github.com/videojs/video.js/issues/4261)) ([230743e](https://github.com/videojs/video.js/commit/230743e))
+* remove mentions of bower support ([#4274](https://github.com/videojs/video.js/issues/4274)) ([39fd73f](https://github.com/videojs/video.js/commit/39fd73f))
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/videojs/video.js/compare/v5.16.0...v6.0.0) (2017-04-03)
 
