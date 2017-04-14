@@ -2989,6 +2989,22 @@ class Player extends Component {
   }
 
   /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see https://wicg.github.io/media-playback-quality/
+   *
+   * @return {Object|undefined}
+   *         An object with supported media playback quality metrics or undefined if there
+   *         is no tech or the tech does not support it.
+   */
+  getVideoPlaybackQuality() {
+    if (this.tech_ && this.tech_.getVideoPlaybackQuality) {
+      return this.tech_.getVideoPlaybackQuality();
+    }
+  }
+
+  /**
    * Get video width
    *
    * @return {number}
