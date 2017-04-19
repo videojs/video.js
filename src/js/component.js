@@ -40,7 +40,7 @@ class Component {
    *
    * @param {Object} [options]
    *        The key/value store of player options.
-   #
+   *
    * @param {Object[]} [options.children]
    *        An array of children objects to intialize this component with. Children objects have
    *        a name property that will be used if more than one component of the same type needs to be
