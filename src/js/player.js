@@ -2999,9 +2999,7 @@ class Player extends Component {
    *         is no tech or the tech does not support it.
    */
   getVideoPlaybackQuality() {
-    if (this.tech_ && this.tech_.getVideoPlaybackQuality) {
-      return this.tech_.getVideoPlaybackQuality();
-    }
+    return this.techGet_('getVideoPlaybackQuality');
   }
 
   /**
