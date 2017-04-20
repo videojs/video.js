@@ -101,9 +101,13 @@ class TextTrackMenuItem extends MenuItem {
       const track = tracks[i];
 
       if (track === this.track && (kinds.indexOf(track.kind) > -1)) {
-        track.mode = 'showing';
+        if (track.mode !== 'showing') {
+          track.mode = 'showing';
+        }
       } else {
-        track.mode = 'disabled';
+        if (track.mode !== 'disabled') {
+          track.mode = 'disabled';
+        }
       }
     }
   }
