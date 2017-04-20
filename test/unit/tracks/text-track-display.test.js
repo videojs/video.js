@@ -16,18 +16,6 @@ QUnit.module('Text Track Display', {
   }
 });
 
-const getTrackByLanguage = function(player, language) {
-  const tracks = player.tech_.remoteTextTracks();
-
-  for (let i = 0; i < tracks.length; i++) {
-    const track = tracks[i];
-
-    if (track.language === language) {
-      return track;
-    }
-  }
-};
-
 const getMenuItemByLanguage = function(items, language) {
   for (let i = items.length - 1; i > 0; i--) {
     const captionMenuItem = items[i];
@@ -87,21 +75,6 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   player.dispose();
 });
 
-QUnit.test('no captions tracks, no captions are displayed', function(assert) {
-  // The video has no captions
-  const player = TestHelpers.makePlayer();
-  const tracks = player.tech_.remoteTextTracks();
-  const captionsButton = player.controlBar.getChild('SubsCapsButton');
-
-  player.src({type: 'video/mp4', src: 'http://google.com'});
-  this.clock.tick(1);
-
-  // the captions track and button are not shown
-  assert.ok(tracks.length === 0, 'No captions tracks');
-  assert.ok(captionsButton.hasClass('vjs-hidden'), 'The captions button should not be shown');
-  player.dispose();
-});
-
 QUnit.test('shows the default caption track first', function(assert) {
   const player = TestHelpers.makePlayer();
   const track1 = {
@@ -119,14 +92,11 @@ QUnit.test('shows the default caption track first', function(assert) {
   };
 
   // Add the text tracks
-  player.addRemoteTextTrack(track1);
-  player.addRemoteTextTrack(track2);
+  const englishTrack = player.addRemoteTextTrack(track1).track;
+  const spanishTrack = player.addRemoteTextTrack(track2).track;
 
   // Make sure the ready handler runs
   this.clock.tick(1);
-
-  const englishTrack = getTrackByLanguage(player, 'en');
-  const spanishTrack = getTrackByLanguage(player, 'es');
 
   assert.ok(englishTrack.mode === 'showing', 'English track should be showing');
   assert.ok(spanishTrack.mode === 'disabled', 'Spanish track should not be showing');
@@ -134,9 +104,8 @@ QUnit.test('shows the default caption track first', function(assert) {
 });
 
 if (!Html5.supportsNativeTextTracks()) {
-  QUnit.test('if user-selected language is unavailable, don\'t pick a track to show', function(assert) {
+  QUnit.test("if user-selected language is unavailable, don't pick a track to show", function(assert) {
     // The video has no default language but has ‘English’ captions only
-    const oldIsFirefox = browser.IS_FIREFOX;
     const player = TestHelpers.makePlayer();
     const track1 = {
       kind: 'captions',
@@ -146,28 +115,23 @@ if (!Html5.supportsNativeTextTracks()) {
     };
     const captionsButton = player.controlBar.getChild('SubsCapsButton');
 
-    browser.IS_FIREFOX = true;
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    player.addRemoteTextTrack(track1);
+    const englishTrack = player.addRemoteTextTrack(track1).track;
+
     // Force 'es' as user-selected track
     player.cache_.selectedLanguage = 'es';
 
     this.clock.tick(1);
     player.play();
 
-    const englishTrack = getTrackByLanguage(player, 'en');
-
     assert.ok(!captionsButton.hasClass('vjs-hidden'), 'The captions button is shown');
     assert.ok(englishTrack.mode === 'disabled', 'English track should be disabled');
-
-    browser.IS_FIREFOX = oldIsFirefox;
     player.dispose();
   });
 
   QUnit.test('the user-selected language takes priority over default language', function(assert) {
     // The video has ‘English’ captions as default, but has ‘Spanish’ captions also
-    const oldIsFirefox = browser.IS_FIREFOX;
     const player = TestHelpers.makePlayer({techOrder: ['html5']});
     const track1 = {
       kind: 'captions',
@@ -183,29 +147,22 @@ if (!Html5.supportsNativeTextTracks()) {
       src: 'es.vtt'
     };
 
-    browser.IS_FIREFOX = true;
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    player.addRemoteTextTrack(track1);
-    player.addRemoteTextTrack(track2);
+    const englishTrack = player.addRemoteTextTrack(track1).track;
+    const spanishTrack = player.addRemoteTextTrack(track2).track;
+
     // Force 'es' as user-selected track
     player.cache_.selectedLanguage = 'es';
     this.clock.tick(1);
 
-    // the spanish captions track should be shown
-    const englishTrack = getTrackByLanguage(player, 'en');
-    const spanishTrack = getTrackByLanguage(player, 'es');
-
     assert.ok(spanishTrack.mode === 'showing', 'Spanish captions should be shown');
     assert.ok(englishTrack.mode === 'disabled', 'English captions should be hidden');
-
-    browser.IS_FIREFOX = oldIsFirefox;
     player.dispose();
   });
 
   QUnit.test('the user-selected language is used for subsequent source changes', function(assert) {
     // Start with two captions tracks: English and Spanish
-    const oldIsFirefox = browser.IS_FIREFOX;
     const player = TestHelpers.makePlayer();
     const track1 = {
       kind: 'captions',
@@ -224,7 +181,6 @@ if (!Html5.supportsNativeTextTracks()) {
     let esCaptionMenuItem;
     let enCaptionMenuItem;
 
-    browser.IS_FIREFOX = true;
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
     player.addRemoteTextTrack(track1);
@@ -236,7 +192,6 @@ if (!Html5.supportsNativeTextTracks()) {
 
     // The user chooses Spanish
     player.play();
-    captionsButton.pressButton();
     esCaptionMenuItem.trigger('click');
 
     // Track mode changes on user-selection
@@ -251,8 +206,8 @@ if (!Html5.supportsNativeTextTracks()) {
       player.removeRemoteTextTrack(tracks[0]);
     }
     // Add tracks for the new source
-    player.addRemoteTextTrack(track1);
-    player.addRemoteTextTrack(track2);
+    const englishTrack = player.addRemoteTextTrack(track1).track;
+    const spanishTrack = player.addRemoteTextTrack(track2).track;
 
     // Make sure player ready handler runs
     this.clock.tick(1);
@@ -267,13 +222,8 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(enCaptionMenuItem.track.mode === 'disabled',
       'English should remain disabled');
 
-    const englishTrack = getTrackByLanguage(player, 'en');
-    const spanishTrack = getTrackByLanguage(player, 'es');
-
     assert.ok(spanishTrack.mode === 'showing', 'Spanish track remains showing');
     assert.ok(englishTrack.mode === 'disabled', 'English track remains disabled');
-
-    browser.IS_FIREFOX = oldIsFirefox;
     player.dispose();
   });
 }

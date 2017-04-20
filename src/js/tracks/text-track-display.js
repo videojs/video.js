@@ -131,9 +131,8 @@ class TextTrackDisplay extends Component {
             preferredCaptions = track;
           }
           break;
-        }
 
-        if (track.default) {
+        } else if (track.default) {
           if (track.kind === 'descriptions' && !firstDesc) {
             firstDesc = track;
           } else if (track.kind in modes && !firstCaptions) {
