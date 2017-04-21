@@ -18,6 +18,7 @@
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
     "build": "grunt dist",
+    "assets": "node build/assets.js",
     "change": "grunt chg-add",
     "clean": "grunt clean",
     "grunt": "grunt",
