@@ -18,8 +18,9 @@
   "author": "Steve Heffernan",
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
-    "build": "rollup -c && rollup -c --environment minify",
-    "rollup": "rollup -c",
+    "build": "npm run rollup && npm run rollup-minify",
+    "rollup": "rollup -c && rollup -c --environment novtt",
+    "rollup-minify": "rollup -c --environment minify && rollup -c --environment minify,novtt",
     "rollup-dev": "rollup -c -w",
     "assets": "node build/assets.js",
     "change": "grunt chg-add",
