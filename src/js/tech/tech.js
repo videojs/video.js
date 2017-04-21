@@ -14,6 +14,7 @@ import document from 'global/document';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
 import toTitleCase from '../utils/to-title-case';
+import vtt from 'videojs-vtt.js/dist/vtt.js';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -516,7 +517,6 @@ class Tech extends Component {
     // signals that the Tech is ready at which point Tech.el_ is part of the DOM
     // before inserting the WebVTT script
     if (document.body.contains(this.el())) {
-      const vtt = require('videojs-vtt.js');
 
       // load via require if available and vtt.js script location was not passed in
       // as an option. novtt builds will turn the above require call into an empty object
