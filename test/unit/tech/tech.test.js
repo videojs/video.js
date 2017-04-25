@@ -631,3 +631,9 @@ QUnit.test('setSource after previous setSource should dispose source handler onc
 
 });
 
+QUnit.test('returns an empty object for getVideoPlaybackQuality', function(assert) {
+  const tech = new Tech();
+
+  assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'returns an empty object');
+});
+
