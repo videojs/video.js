@@ -1,0 +1,91 @@
+@charset "utf-8";
+/*
+Video.js Old IE Stylesheet
+
+Styles to be applied to IE < 8 to make Video.js work on those
+platforms. This is entirely based on the work of: https://github.com/doublex
+*/
+
+/* Poster Styles
+-------------------------------------------------------------------------------- */
+
+/* Prevent poster image from being deformed in IE7. See #272. */
+.vjs-poster,
+.vjs-poster img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 100%;
+	width: 100%;
+}
+
+/* Control Bar
+-------------------------------------------------------------------------------- */
+.vjs-default-skin .vjs-control-bar {
+	background-color: #000;		/* CHANGED FROM rgb(0, 0, 0) */
+}
+.vjs-default-skin .vjs-control {
+	font-family: VideoJS;
+	line-height: 3;      /* "font-size: 1.5em" * "line-height: 2" = 3  */
+}
+
+/* Play/Pause
+-------------------------------------------------------------------------------- */
+.vjs-default-skin .vjs-play-control {
+	zoom: expression(
+		this.innerHTML+=this.innerHTML.search('\e001')==-1?'\e001':'',
+		style.zoom = 1, 0 /* overwriting dummy property, 0 needed to avoid crash */
+	);
+}
+
+/*
+Can't seem to get the play button to change to pause when it's playing.
+This expression should work, but it doesn't.
+*/
+.vjs-default-skin.vjs-playing .vjs-play-control {
+	zoom: expression(
+		this.innerHTML='\e002',
+		style.zoom = 1, 0 /* overwriting dummy property, 0 needed to avoid crash */
+	);
+}
+
+/* Volume/Mute
+-------------------------------------------------------------------------------- */
+.vjs-default-skin .vjs-mute-control,
+.vjs-default-skin .vjs-volume-menu-button {
+	zoom: expression(
+		this.innerHTML+=this.innerHTML.search('\e006')==-1?'\e006':'',
+		style.zoom = 1, 0 /* overwriting dummy property, 0 needed to avoid crash */
+	);
+}
+
+/* Fullscreen
+-------------------------------------------------------------------------------- */
+.vjs-default-skin .vjs-fullscreen-control {
+	zoom: expression(
+		this.innerHTML+=this.innerHTML.search('\e000')==-1?'\e000':'',
+		style.zoom = 1, 0 /* overwriting dummy property, 0 needed to avoid crash */
+	);
+}
+
+/* Big Play Button (at start)
+---------------------------------------------------------*/
+.vjs-default-skin .vjs-big-play-button {
+	width: 4.0em;                 /* CHANGED FROM 12em: 12em/3em = 4em */
+	height: 2.66em;               /* CHANGED FROM 8em: 8em/3em = 2.66em */
+	border: 0.1em solid rgb(50, 50, 50);          /* CHANGED FROM 0.3em */
+	background-color: #282828;		/* CHANGED FROM rgb(40,40,40) */
+	
+	/* COPIED FROM .vjs-default-skin .vjs-big-play-button:before */
+	font-family: VideoJS;
+	font-size: 3em;
+	line-height: 2.66;
+	text-shadow: 0.05em 0.05em 0.1em #000;
+	
+	zoom: expression(
+		this.innerHTML+=this.innerHTML.search('\e001')==-1?'\e001':'',
+		style.zoom = 1, 0 /* overwriting dummy property, 0 needed to avoid crash */
+	);
+}
