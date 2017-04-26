@@ -11,6 +11,8 @@ import ignore from 'rollup-plugin-ignore';
 import uglify from 'rollup-plugin-uglify';
 import minimist from 'minimist';
 import _ from 'lodash';
+import pkg from '../package.json';
+import fs from 'fs';
 
 const args = minimist(process.argv.slice(2), {
   boolean: ['watch', 'minify'],
@@ -19,6 +21,9 @@ const args = minimist(process.argv.slice(2), {
     m: 'minify'
   }
 });
+
+const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
+const bannerData = _.pick(pkg, ['version', 'copyright']);
 
 const primedResolve = resolve({
   jsnext: true,
@@ -63,6 +68,7 @@ const es = {
     },
     legacy: true
   },
+  banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   format: 'es',
   dest: 'dist/video.es.js'
 };
@@ -85,6 +91,7 @@ const umd = {
     ],
     legacy: true
   },
+  banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   format: 'umd',
   dest: 'dist/video.js'
 };
@@ -110,23 +117,26 @@ minifiedUmd.options.plugins.splice(4, 0, uglify({
 }));
 
 const novttUmd = Object.assign({}, _.cloneDeep(umd), {
+  banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
   dest: 'dist/alt/video.novtt.js'
 });
 
 novttUmd.options.plugins.unshift(ignore(['videojs-vtt.js/dist/vtt.js']));
 
 const minifiedNovttUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
+  banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
   dest: 'dist/alt/video.novtt.min.js'
 });
 
 minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js/dist/vtt.js']));
 
-function runRollup({options, format, dest}) {
+function runRollup({options, format, dest, banner}) {
   rollup(options)
   .then(function(bundle) {
     bundle.write({
       format,
       dest,
+      banner,
       moduleName: 'videojs',
       sourceMap: false
     });
@@ -147,23 +157,24 @@ if (!args.watch) {
     runRollup(novttUmd);
   }
 } else {
+  const props = ['format', 'dest', 'banner'];
   const watchers = [
     ['es', watch({rollup},
                  Object.assign({},
                                es.options,
-                               _.pick(es, ['format', 'dest'])))],
+                               _.pick(es, props)))],
     ['cjs', watch({rollup},
                   Object.assign({},
                                 cjs.options,
-                                _.pick(cjs, ['format', 'dest'])))],
+                                _.pick(cjs, props)))],
     ['umd', watch({rollup},
                   Object.assign({moduleName: 'videojs'},
                                 umd.options,
-                                _.pick(umd, ['format', 'dest'])))],
+                                _.pick(umd, props)))],
     ['novtt', watch({rollup},
                     Object.assign({moduleName: 'videojs'},
                                   novttUmd.options,
-                                  _.pick(novttUmd, ['format', 'dest'])))]
+                                  _.pick(novttUmd, props)))]
   ];
 
   watchers.forEach(function([type, watcher]) {
