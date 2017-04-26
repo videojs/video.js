@@ -19,7 +19,8 @@
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
     "build": "npm run rollup",
-    "build-dist": "npm run rollup && npm-run rollup --minify",
+    "prebuild-dist": "npm run clean",
+    "build-dist": "npm run rollup && npm run rollup-minify",
     "rollup": "babel-node build/rollup.js",
     "rollup-minify": "babel-node build/rollup.js --minify",
     "rollup-dev": "babel-node build/rollup.js --watch",
