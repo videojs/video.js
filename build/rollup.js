@@ -64,12 +64,12 @@ const es = {
     legacy: true
   },
   format: 'es',
-  dest: 'dist/videojs.rollup.es.js'
+  dest: 'dist/video.es.js'
 };
 
 const cjs = Object.assign({}, es, {
   format: 'cjs',
-  dest: 'dist/videojs.rollup.cjs.js'
+  dest: 'dist/video.cjs.js'
 });
 
 const umd = {
@@ -86,11 +86,11 @@ const umd = {
     legacy: true
   },
   format: 'umd',
-  dest: 'dist/videojs.rollup.js'
+  dest: 'dist/video.js'
 };
 
 const minifiedUmd = Object.assign({}, _.cloneDeep(umd), {
-  dest: 'dist/videojs.rollup.min.js'
+  dest: 'dist/video.min.js'
 });
 
 minifiedUmd.options.plugins.splice(4, 0, uglify({
@@ -110,13 +110,13 @@ minifiedUmd.options.plugins.splice(4, 0, uglify({
 }));
 
 const novttUmd = Object.assign({}, _.cloneDeep(umd), {
-  dest: 'dist/alt/videojs.novtt.rollup.js'
+  dest: 'dist/alt/video.novtt.js'
 });
 
 novttUmd.options.plugins.unshift(ignore(['videojs-vtt.js/dist/vtt.js']));
 
 const minifiedNovttUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
-  dest: 'dist/alt/videojs.novtt.rollup.min.js'
+  dest: 'dist/alt/video.novtt.min.js'
 });
 
 minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js/dist/vtt.js']));
