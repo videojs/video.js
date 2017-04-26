@@ -60,7 +60,8 @@ const es = {
 
       // eslint-disable-next-line no-console
       console.warn(warning.message);
-    }
+    },
+    legacy: true
   },
   format: 'es',
   dest: 'dist/videojs.rollup.es.js'
@@ -81,7 +82,8 @@ const umd = {
       primedBabel,
       progress(),
       filesize()
-    ]
+    ],
+    legacy: true
   },
   format: 'umd',
   dest: 'dist/videojs.rollup.js'
@@ -91,7 +93,21 @@ const minifiedUmd = Object.assign({}, _.cloneDeep(umd), {
   dest: 'dist/videojs.rollup.min.js'
 });
 
-minifiedUmd.options.plugins.splice(4, 0, uglify());
+minifiedUmd.options.plugins.splice(4, 0, uglify({
+  preserveComments: 'some',
+  srewIE8: false,
+  mangle: true,
+  compress: {
+    sequences: true,
+    dead_code: true,
+    conditionals: true,
+    booleans: true,
+    unused: true,
+    if_return: true,
+    join_vars: true,
+    drop_console: true
+  }
+}));
 
 const novttUmd = Object.assign({}, _.cloneDeep(umd), {
   dest: 'dist/alt/videojs.novtt.rollup.js'
