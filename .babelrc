@@ -2,9 +2,7 @@
   "presets": [
     "es3",
     ["es2015", {
-      "loose": true,
-      "modules": false
+      "loose": true
     }]
-  ],
-  "plugins": ["external-helpers"]
+  ]
 }
