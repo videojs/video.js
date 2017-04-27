@@ -35,7 +35,7 @@ const primedCjs = commonjs({
 });
 const primedBabel = babel({
   babelrc: false,
-  exclude: ['node_modules/**', '/Users/gkatsevman/p/vtt.js/dist/vtt.js'],
+  exclude: 'node_modules/**',
   presets: [
     'es3',
     ['es2015', {
@@ -123,14 +123,14 @@ const novttUmd = Object.assign({}, _.cloneDeep(umd), {
   dest: 'dist/alt/video.novtt.js'
 });
 
-novttUmd.options.plugins.unshift(ignore(['videojs-vtt.js/dist/vtt.js']));
+novttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
 
 const minifiedNovttUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
   banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
   dest: 'dist/alt/video.novtt.min.js'
 });
 
-minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js/dist/vtt.js']));
+minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
 
 function runRollup({options, format, dest, banner}) {
   rollup(options)
