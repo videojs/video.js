@@ -104,6 +104,27 @@ QUnit.test('shows the default caption track first', function(assert) {
 });
 
 if (!Html5.supportsNativeTextTracks()) {
+  QUnit.test('selectedlanguagechange is triggered by a track mode change', function(assert) {
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt'
+    };
+    const spy = sinon.spy();
+    const selectedLanguageHandler = function(event) {
+      spy();
+    }
+    const englishTrack = player.addRemoteTextTrack(track1).track;
+
+    player.tech_.on('selectedlanguagechange', selectedLanguageHandler);
+    englishTrack.mode = 'showing';
+
+    assert.strictEqual(spy.callCount, 1, 'selectedlanguagechange event was fired');
+    player.dispose();
+  });
+
   QUnit.test("if user-selected language is unavailable, don't pick a track to show", function(assert) {
     // The video has no default language but has ‘English’ captions only
     const player = TestHelpers.makePlayer();
@@ -120,7 +141,7 @@ if (!Html5.supportsNativeTextTracks()) {
     const englishTrack = player.addRemoteTextTrack(track1).track;
 
     // Force 'es' as user-selected track
-    player.cache_.selectedLanguage = 'es';
+    player.cache_.selectedLanguage = { language: 'es', kind: 'captions' };
 
     this.clock.tick(1);
     player.play();
@@ -158,6 +179,35 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish captions should be shown');
     assert.ok(englishTrack.mode === 'disabled', 'English captions should be hidden');
+    player.dispose();
+  });
+
+  QUnit.test("matching both the selectedLanguage's language and kind takes priority over just matching the language", function(assert) {
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt'
+    };
+    const track2 = {
+      kind: 'subtitles',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt',
+    };
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    // manualCleanUp = true by default
+    const captionTrack = player.addRemoteTextTrack(track1).track;
+    const subsTrack = player.addRemoteTextTrack(track2).track;
+
+    // Force English captions as user-selected track
+    player.cache_.selectedLanguage = { language: 'en', kind: 'captions' };
+    this.clock.tick(1);
+
+    assert.ok(captionTrack.mode === 'showing', 'Captions track should be preselected');
+    assert.ok(subsTrack.mode === 'disabled', 'Subtitles track should remain disabled');
     player.dispose();
   });
 
@@ -233,4 +283,39 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(englishTrack.mode === 'disabled', 'English track remains disabled');
     player.dispose();
   });
+
+  QUnit.test('the user-selected language is cleared on turning off captions', function(assert) {
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt'
+    };
+    const captionsButton = player.controlBar.getChild('SubsCapsButton');
+    // we know the postition of the OffTextTrackMenuItem
+    const offMenuItem = captionsButton.items[1];
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    // manualCleanUp = true by default
+    const englishTrack = player.addRemoteTextTrack(track1).track;
+    // Keep track of menu items
+    const enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
+
+    // Select English initially
+    player.play();
+    enCaptionMenuItem.trigger('click');
+
+    assert.deepEqual(player.cache_.selectedLanguage,
+      { language: 'en', kind: 'captions' }, 'English track is selected');
+    assert.ok(englishTrack.mode === 'showing', 'English track should be showing');
+
+    // Select the off button
+    offMenuItem.trigger('click');
+
+    assert.ok(!player.cache_.selectedLanguage, 'selectedLanguage is cleared');
+    assert.ok(englishTrack.mode === 'disabled', 'English track is disabled');
+    player.dispose();
+  });
+
 }

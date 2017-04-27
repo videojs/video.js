@@ -124,9 +124,7 @@ class TextTrackDisplay extends Component {
 
         if (this.player_.cache_.selectedLanguage &&
           this.player_.cache_.selectedLanguage.language === track.language) {
-          if (track.kind === this.player_.cache_.selectedLanguage.kind ||
-            (track.kind in modes &&
-            this.player_.cache_.selectedLanguage.kind in modes)) {
+          if (track.kind === this.player_.cache_.selectedLanguage.kind) {
             preferredTrack = track;
           } else if (track.kind === 'descriptions' && !preferredDesc) {
             preferredDesc = track;
