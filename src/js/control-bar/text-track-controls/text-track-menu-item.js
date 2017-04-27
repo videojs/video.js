@@ -38,9 +38,7 @@ class TextTrackMenuItem extends MenuItem {
     const handleSelectedLanguageChange = Fn.bind(this, this.handleSelectedLanguageChange);
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
-    player.ready(function() {
-      player.tech_.on('selectedlanguagechange', handleSelectedLanguageChange);
-    });
+    player.tech_.on('selectedlanguagechange', handleSelectedLanguageChange);
     tracks.addEventListener('change', changeHandler);
     this.on('dispose', function() {
       tracks.removeEventListener('change', changeHandler);
@@ -126,6 +124,15 @@ class TextTrackMenuItem extends MenuItem {
 
   handleSelectedLanguageChange(event) {
     if (this.track.mode === 'showing') {
+      const selectedLanguage = this.player_.cache_.selectedLanguage;
+
+      // Don't replace the kind of track across the same language
+      if (selectedLanguage &&
+        selectedLanguage.language === this.track.language &&
+        selectedLanguage.kind !== this.track.kind) {
+        return;
+      }
+
       this.player_.cache_.selectedLanguage = {
         language: this.track.language,
         kind: this.track.kind
