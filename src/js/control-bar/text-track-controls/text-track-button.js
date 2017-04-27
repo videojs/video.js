@@ -60,21 +60,41 @@ class TextTrackButton extends TrackButton {
     this.hideThreshold_ += 1;
 
     const tracks = this.player_.textTracks();
+    let preferredItem;
 
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
+      const selectedLanguage = this.player_.cache_.selectedLanguage;
 
       // only add tracks that are of an appropriate kind and have a label
       if (this.kinds_.indexOf(track.kind) > -1) {
+
         const item = new TrackMenuItem(this.player_, {
           track,
           // MenuItem is selectable
           selectable: true
         });
 
+        // Find a track that matches at least the selectedLanguage's language
+        if (selectedLanguage) {
+          // Matches both language and kind
+          if (track.language === selectedLanguage.language &&
+            track.kind === selectedLanguage.kind) {
+            preferredItem = item;
+          // Matches just language
+          } else if (!preferredItem &&
+            track.language === selectedLanguage.language) {
+            preferredItem = item;
+          }
+        }
+
         item.addClass(`vjs-${track.kind}-menu-item`);
         items.push(item);
       }
+    }
+
+    if (preferredItem) {
+      preferredItem.track.mode = 'showing';
     }
 
     return items;

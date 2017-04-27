@@ -29,15 +29,18 @@ class TextTrackMenuItem extends MenuItem {
 
     // Modify options for parent MenuItem class's init.
     options.label = track.label || track.language || 'Unknown';
-    options.selected = (track.language === player.cache_.selectedLanguage) ||
-      track.default || track.mode === 'showing';
+    options.selected = track.default || track.mode === 'showing';
 
     super(player, options);
 
     this.track = track;
     const changeHandler = Fn.bind(this, this.handleTracksChange);
+    const handleSelectedLanguageChange = Fn.bind(this, this.handleSelectedLanguageChange);
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
+    player.ready(function() {
+      player.tech_.on('selectedlanguagechange', handleSelectedLanguageChange);
+    });
     tracks.addEventListener('change', changeHandler);
     this.on('dispose', function() {
       tracks.removeEventListener('change', changeHandler);
@@ -103,7 +106,6 @@ class TextTrackMenuItem extends MenuItem {
 
       if (track === this.track && (kinds.indexOf(track.kind) > -1)) {
         track.mode = 'showing';
-        this.player_.cache_.selectedLanguage = track.language;
       } else {
         track.mode = 'disabled';
       }
@@ -120,6 +122,15 @@ class TextTrackMenuItem extends MenuItem {
    */
   handleTracksChange(event) {
     this.selected(this.track.mode === 'showing');
+  }
+
+  handleSelectedLanguageChange(event) {
+    if (this.track.mode === 'showing') {
+      this.player_.cache_.selectedLanguage = {
+        language: this.track.language,
+        kind: this.track.kind
+      };
+    }
   }
 
 }

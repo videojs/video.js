@@ -253,6 +253,15 @@ class TextTrack extends Track {
          * @type {EventTarget~Event}
          */
         this.trigger('modechange');
+
+        /**
+        *
+        */
+        const nonLanguageTextTrackKind = ['metadata', 'chapters'];
+
+        if (nonLanguageTextTrackKind.indexOf(tt.kind) === -1) {
+          this.tech_.trigger('selectedlanguagechange');
+        }
       }
     });
 

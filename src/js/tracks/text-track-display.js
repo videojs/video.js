@@ -115,22 +115,24 @@ class TextTrackDisplay extends Component {
       const trackList = this.player_.textTracks();
       let firstDesc;
       let firstCaptions;
+      let preferredTrack;
       let preferredDesc;
       let preferredCaptions;
 
       for (let i = 0; i < trackList.length; i++) {
         const track = trackList[i];
 
-        // If we find a track matching the preferred language
-        // there is no need to find the first default track
-        if (player.cache_.selectedLanguage &&
-          player.cache_.selectedLanguage === track.language) {
-          if (track.kind === 'descriptions' && !preferredDesc) {
+        if (this.player_.cache_.selectedLanguage &&
+          this.player_.cache_.selectedLanguage.language === track.language) {
+          if (track.kind === this.player_.cache_.selectedLanguage.kind ||
+            (track.kind in modes &&
+            this.player_.cache_.selectedLanguage.kind in modes)) {
+            preferredTrack = track;
+          } else if (track.kind === 'descriptions' && !preferredDesc) {
             preferredDesc = track;
           } else if (track.kind in modes && !preferredCaptions) {
             preferredCaptions = track;
           }
-          break;
 
         } else if (track.default) {
           if (track.kind === 'descriptions' && !firstDesc) {
@@ -141,11 +143,16 @@ class TextTrackDisplay extends Component {
         }
       }
 
+      // The preferredTrack matches the user preference exactly and takes
+      // precendence over all the other tracks.
       // The preferred tracks take precedence over the first default track,
       // captions and subtitles take precedence over descriptions.
-      // So, display the preferred track before the first default track
-      // and the subtitles or captions track before the descriptions track
-      if (preferredCaptions) {
+      // So, display the preferredTrack before the other preferred tracks,
+      // before the first default track and the subtitles or captions track
+      // before the descriptions track
+      if (preferredTrack) {
+        preferredTrack.mode = 'showing';
+      } else if (preferredCaptions) {
         preferredCaptions.mode = 'showing';
       } else if (preferredDesc) {
         preferredDesc.mode = 'showing';
@@ -154,6 +161,7 @@ class TextTrackDisplay extends Component {
       } else if (firstDesc) {
         firstDesc.mode = 'showing';
       }
+
     }));
   }
 
