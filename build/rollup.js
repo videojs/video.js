@@ -105,6 +105,7 @@ minifiedUmd.options.plugins.splice(4, 0, uglify({
   srewIE8: false,
   mangle: true,
   compress: {
+    /* eslint-disable camelcase */
     sequences: true,
     dead_code: true,
     conditionals: true,
@@ -113,6 +114,7 @@ minifiedUmd.options.plugins.splice(4, 0, uglify({
     if_return: true,
     join_vars: true,
     drop_console: true
+    /* eslint-enable camelcase */
   }
 }));
 
