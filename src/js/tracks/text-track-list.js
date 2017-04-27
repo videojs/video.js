@@ -61,6 +61,14 @@ class TextTrackList extends TrackList {
     track.addEventListener('modechange', Fn.bind(this, function() {
       this.trigger('change');
     }));
+
+    const nonLanguageTextTrackKind = ['metadata', 'chapters'];
+
+    if (nonLanguageTextTrackKind.indexOf(track.kind) === -1) {
+      track.addEventListener('modechange', Fn.bind(this, function() {
+        this.trigger('selectedlanguagechange');
+      }));
+    }
   }
 }
 export default TextTrackList;

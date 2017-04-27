@@ -38,10 +38,11 @@ class TextTrackMenuItem extends MenuItem {
     const handleSelectedLanguageChange = Fn.bind(this, this.handleSelectedLanguageChange);
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
-    player.tech_.on('selectedlanguagechange', handleSelectedLanguageChange);
     tracks.addEventListener('change', changeHandler);
+    tracks.addEventListener('selectedlanguagechange', handleSelectedLanguageChange);
     this.on('dispose', function() {
       tracks.removeEventListener('change', changeHandler);
+      tracks.removeEventListener('selectedlanguagechange', handleSelectedLanguageChange);
     });
 
     // iOS7 doesn't dispatch change events to TextTrackLists when an

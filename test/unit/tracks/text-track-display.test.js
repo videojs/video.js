@@ -115,10 +115,10 @@ if (!Html5.supportsNativeTextTracks()) {
     const spy = sinon.spy();
     const selectedLanguageHandler = function(event) {
       spy();
-    }
+    };
     const englishTrack = player.addRemoteTextTrack(track1).track;
 
-    player.tech_.on('selectedlanguagechange', selectedLanguageHandler);
+    player.textTracks().addEventListener('selectedlanguagechange', selectedLanguageHandler);
     englishTrack.mode = 'showing';
 
     assert.strictEqual(spy.callCount, 1, 'selectedlanguagechange event was fired');
@@ -194,7 +194,7 @@ if (!Html5.supportsNativeTextTracks()) {
       kind: 'subtitles',
       label: 'English',
       language: 'en',
-      src: 'en.vtt',
+      src: 'en.vtt'
     };
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
@@ -250,7 +250,7 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(enCaptionMenuItem.track.mode === 'disabled',
       'English should be disabled after selecting Spanish');
     assert.deepEqual(player.cache_.selectedLanguage,
-      { language : 'es', kind : 'captions' });
+      { language: 'es', kind: 'captions' });
 
     // Switch source and remove old tracks
     player.tech_.src({type: 'video/mp4', src: 'http://example.com'});
@@ -277,7 +277,7 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(enCaptionMenuItem.track.mode === 'disabled',
       'English should remain disabled');
     assert.deepEqual(player.cache_.selectedLanguage,
-      { language : 'es', kind : 'captions' });
+      { language: 'es', kind: 'captions' });
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish track remains showing');
     assert.ok(englishTrack.mode === 'disabled', 'English track remains disabled');
