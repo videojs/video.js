@@ -174,7 +174,7 @@ if (!Html5.supportsNativeTextTracks()) {
     const spanishTrack = player.addRemoteTextTrack(track2).track;
 
     // Force 'es' as user-selected track
-    player.cache_.selectedLanguage = { language: 'es', kind: 'captions' };
+    player.cache_.selectedLanguage = { enabled: true, language: 'es', kind: 'captions' };
     this.clock.tick(1);
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish captions should be shown');
@@ -203,7 +203,7 @@ if (!Html5.supportsNativeTextTracks()) {
     const subsTrack = player.addRemoteTextTrack(track2).track;
 
     // Force English captions as user-selected track
-    player.cache_.selectedLanguage = { language: 'en', kind: 'captions' };
+    player.cache_.selectedLanguage = { enabled: true, language: 'en', kind: 'captions' };
     this.clock.tick(1);
 
     assert.ok(captionTrack.mode === 'showing', 'Captions track should be preselected');
@@ -250,7 +250,7 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(enCaptionMenuItem.track.mode === 'disabled',
       'English should be disabled after selecting Spanish');
     assert.deepEqual(player.cache_.selectedLanguage,
-      { language: 'es', kind: 'captions' });
+      { enabled: true, language: 'es', kind: 'captions' });
 
     // Switch source and remove old tracks
     player.tech_.src({type: 'video/mp4', src: 'http://example.com'});
@@ -277,7 +277,7 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(enCaptionMenuItem.track.mode === 'disabled',
       'English should remain disabled');
     assert.deepEqual(player.cache_.selectedLanguage,
-      { language: 'es', kind: 'captions' });
+      { enabled: true, language: 'es', kind: 'captions' });
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish track remains showing');
     assert.ok(englishTrack.mode === 'disabled', 'English track remains disabled');
@@ -307,13 +307,14 @@ if (!Html5.supportsNativeTextTracks()) {
     enCaptionMenuItem.trigger('click');
 
     assert.deepEqual(player.cache_.selectedLanguage,
-      { language: 'en', kind: 'captions' }, 'English track is selected');
+      { enabled: true, language: 'en', kind: 'captions' }, 'English track is selected');
     assert.ok(englishTrack.mode === 'showing', 'English track should be showing');
 
     // Select the off button
     offMenuItem.trigger('click');
 
-    assert.ok(!player.cache_.selectedLanguage, 'selectedLanguage is cleared');
+    assert.deepEqual(player.cache_.selectedLanguage,
+      { enabled: false }, 'selectedLanguage is cleared');
     assert.ok(englishTrack.mode === 'disabled', 'English track is disabled');
     player.dispose();
   });
