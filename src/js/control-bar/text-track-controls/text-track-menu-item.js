@@ -29,20 +29,20 @@ class TextTrackMenuItem extends MenuItem {
 
     // Modify options for parent MenuItem class's init.
     options.label = track.label || track.language || 'Unknown';
-    options.selected = track.default || track.mode === 'showing';
+    options.selected = track.mode === 'showing';
 
     super(player, options);
 
     this.track = track;
     const changeHandler = Fn.bind(this, this.handleTracksChange);
-    const handleSelectedLanguageChange = Fn.bind(this, this.handleSelectedLanguageChange);
+    const selectedLanguageChangeHandler = Fn.bind(this, this.handleSelectedLanguageChange);
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
     tracks.addEventListener('change', changeHandler);
-    tracks.addEventListener('selectedlanguagechange', handleSelectedLanguageChange);
+    tracks.addEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     this.on('dispose', function() {
       tracks.removeEventListener('change', changeHandler);
-      tracks.removeEventListener('selectedlanguagechange', handleSelectedLanguageChange);
+      tracks.removeEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     });
 
     // iOS7 doesn't dispatch change events to TextTrackLists when an
@@ -128,13 +128,14 @@ class TextTrackMenuItem extends MenuItem {
       const selectedLanguage = this.player_.cache_.selectedLanguage;
 
       // Don't replace the kind of track across the same language
-      if (selectedLanguage &&
+      if (selectedLanguage && selectedLanguage.enabled &&
         selectedLanguage.language === this.track.language &&
         selectedLanguage.kind !== this.track.kind) {
         return;
       }
 
       this.player_.cache_.selectedLanguage = {
+        enabled: true,
         language: this.track.language,
         kind: this.track.kind
       };

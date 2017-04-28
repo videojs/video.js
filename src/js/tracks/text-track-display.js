@@ -92,6 +92,7 @@ class TextTrackDisplay extends Component {
 
     player.on('loadstart', Fn.bind(this, this.toggleDisplay));
     player.on('texttrackchange', Fn.bind(this, this.updateDisplay));
+    player.on('loadstart', Fn.bind(this, this.preselectTrack));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
@@ -111,56 +112,66 @@ class TextTrackDisplay extends Component {
         this.player_.addRemoteTextTrack(tracks[i], true);
       }
 
-      const modes = {captions: 1, subtitles: 1};
-      const trackList = this.player_.textTracks();
-      let firstDesc;
-      let firstCaptions;
-      let preferredTrack;
-      let preferredDesc;
-      let preferredCaptions;
+      this.preselectTrack();
+    }));
+  }
 
-      for (let i = 0; i < trackList.length; i++) {
-        const track = trackList[i];
+  /**
+  * Preselect a track following this precedence:
+  * - matches the previously selected {@link TextTrack}'s language and kind
+  * - matches the previously selected {@link TextTrack}'s language only
+  * - is the first default captions track
+  * - is the first default descriptions track
+  *
+  * @listens Player#loadstart
+  */
+  preselectTrack() {
+    const modes = {captions: 1, subtitles: 1};
+    const trackList = this.player_.textTracks();
+    const userPref = this.player_.cache_.selectedLanguage;
+    let firstDesc;
+    let firstCaptions;
+    let preferredTrack;
 
-        if (this.player_.cache_.selectedLanguage &&
-          this.player_.cache_.selectedLanguage.language === track.language) {
-          if (track.kind === this.player_.cache_.selectedLanguage.kind) {
-            preferredTrack = track;
-          } else if (track.kind === 'descriptions' && !preferredDesc) {
-            preferredDesc = track;
-          } else if (track.kind in modes && !preferredCaptions) {
-            preferredCaptions = track;
-          }
+    for (let i = 0; i < trackList.length; i++) {
+      const track = trackList[i];
 
-        } else if (track.default) {
-          if (track.kind === 'descriptions' && !firstDesc) {
-            firstDesc = track;
-          } else if (track.kind in modes && !firstCaptions) {
-            firstCaptions = track;
-          }
+      if (userPref && userPref.enabled &&
+        userPref.language === track.language) {
+        // Always choose the track that matches both language and kind
+        if (track.kind === userPref.kind) {
+          preferredTrack = track;
+        // or choose the first track that matches language
+        } else if (!preferredTrack) {
+          preferredTrack = track;
+        }
+
+      // clear everything if offTextTrackMenuItem was clicked
+      } else if (track.default && userPref && !userPref.enabled) {
+        preferredTrack = null;
+        firstDesc = null;
+        firstCaptions = null;
+
+      } else if (track.default) {
+        if (track.kind === 'descriptions' && !firstDesc) {
+          firstDesc = track;
+        } else if (track.kind in modes && !firstCaptions) {
+          firstCaptions = track;
         }
       }
+    }
 
-      // The preferredTrack matches the user preference exactly and takes
-      // precendence over all the other tracks.
-      // The preferred tracks take precedence over the first default track,
-      // captions and subtitles take precedence over descriptions.
-      // So, display the preferredTrack before the other preferred tracks,
-      // before the first default track and the subtitles or captions track
-      // before the descriptions track
-      if (preferredTrack) {
-        preferredTrack.mode = 'showing';
-      } else if (preferredCaptions) {
-        preferredCaptions.mode = 'showing';
-      } else if (preferredDesc) {
-        preferredDesc.mode = 'showing';
-      } else if (firstCaptions) {
-        firstCaptions.mode = 'showing';
-      } else if (firstDesc) {
-        firstDesc.mode = 'showing';
-      }
-
-    }));
+    // The preferredTrack matches the user preference and takes
+    // precendence over all the other tracks.
+    // So, display the preferredTrack before the first default track
+    // and the subtitles/captions track before the descriptions track
+    if (preferredTrack) {
+      preferredTrack.mode = 'showing';
+    } else if (firstCaptions) {
+      firstCaptions.mode = 'showing';
+    } else if (firstDesc) {
+      firstDesc.mode = 'showing';
+    }
   }
 
   /**

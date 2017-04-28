@@ -84,7 +84,9 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     }
 
     if (allHidden) {
-      this.player_.cache_.selectedLanguage = null;
+      this.player_.cache_.selectedLanguage = {
+        enabled: false
+      };
     }
   }
 
