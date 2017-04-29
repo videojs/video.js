@@ -71,3 +71,25 @@ QUnit.test('handleClick should not be triggered when disabled', function() {
   testClickableComponent.dispose();
   player.dispose();
 });
+
+QUnit.test('handleClick should not be triggered more than once when enabled', function() {
+  let clicks = 0;
+
+  class TestClickableComponent extends ClickableComponent {
+    handleClick() {
+      clicks++;
+    }
+  }
+
+  const player = TestHelpers.makePlayer({});
+  const testClickableComponent = new TestClickableComponent(player);
+  const el = testClickableComponent.el();
+
+  testClickableComponent.enable();
+  // Click should still be handled just once
+  Events.trigger(el, 'click');
+  QUnit.equal(clicks, 1, 'no additional click handler when already enabled ClickableComponent has been enabled again');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});
