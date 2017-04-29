@@ -448,6 +448,18 @@ module.exports = function(grunt) {
       }
     },
     shell: {
+      rollup: {
+        command: 'npm run rollup',
+        options: {
+          preferLocal: true
+        }
+      },
+      rollupall: {
+        command: 'npm run rollup-all',
+        options: {
+          preferLocal: true
+        }
+      },
       babel: {
         command: 'npm run babel -- --watch',
         options: {
@@ -509,12 +521,7 @@ module.exports = function(grunt) {
     'shell:lint',
     'clean:build',
 
-    'babel:es5',
-    'browserify:build',
-    'browserify:buildnovtt',
-    'usebanner:novtt',
-    'usebanner:vtt',
-    'uglify',
+    'shell:rollupall',
 
     'skin',
     'version:css',

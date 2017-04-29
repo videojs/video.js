@@ -18,9 +18,8 @@
   "author": "Steve Heffernan",
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
-    "build": "npm run rollup",
-    "prebuild-dist": "npm run clean",
-    "build-dist": "npm run rollup && npm run rollup-minify",
+    "build": "grunt dist",
+    "rollup-all": "npm run rollup && npm run rollup-minify",
     "rollup": "babel-node build/rollup.js",
     "rollup-minify": "babel-node build/rollup.js --minify",
     "rollup-dev": "babel-node build/rollup.js --watch",
