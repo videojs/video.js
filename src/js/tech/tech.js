@@ -137,7 +137,7 @@ class Tech extends Component {
     }
 
     if (!this.featuresNativeTextTracks) {
-      this.emulateTextTracks();
+      this.on('ready', this.emulateTextTracks);
     }
 
     this.autoRemoteTextTracks_ = new TRACK_TYPES.ALL.text.ListClass();
