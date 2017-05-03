@@ -349,6 +349,13 @@ class Player extends Component {
     // Cache for video property values.
     this.cache_ = {};
 
+    // Load plugins
+    if (options['plugins']) {
+      Lib.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
+    }
+
     // Set poster
     this.poster_ = options.poster || '';
 
