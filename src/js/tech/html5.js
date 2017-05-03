@@ -1518,6 +1518,19 @@ Html5.resetMediaElement = function(el) {
   'autoplay',
 
   /**
+   * Set the value of `playsinline` on the media element. `playsinline` indicates
+   * that the media should play inline in iOS Safari.
+   *
+   * @method Html5#setPlaysinline
+   * @param {boolean} playsinline
+   *         - True indicates that the media should play inline.
+   *         - False indicates that the media should not play inline.
+   *
+   * @see [Spec]{@link https://github.com/whatwg/html/pull/1444}
+   */
+  'playsinline',
+
+  /**
    * Set the value of `loop` on the media element. `loop` indicates
    * that the media should return to the start of the media and continue playing once
    * it reaches the end.

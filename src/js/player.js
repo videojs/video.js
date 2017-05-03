@@ -2381,6 +2381,26 @@ class Player extends Component {
   }
 
   /**
+   * Get or set the playsinline attribute.
+   *
+   * @param {boolean} [value]
+   *        - true means that we should play inline in iOS Safari
+   *        - false means that we should not play inline in iOS Safari
+   *
+   * @return {string|Player}
+   *         - the current value of playsinline
+   *         - the player when setting
+   */
+  playsinline(value) {
+    if (value !== undefined) {
+      this.techCall_('setPlaysinline', value);
+      this.options_.playsinline = value;
+      return this;
+    }
+    return this.techGet_('playsinline', value);
+  }
+
+  /**
    * Get or set the loop attribute on the video element.
    *
    * @param {boolean} [value]
