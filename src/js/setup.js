@@ -70,14 +70,14 @@ const autoSetup = function() {
 
       // If getAttribute isn't defined, we need to wait for the DOM.
       } else {
-        autoSetupTimeout(1);
+        setTimeout(autoSetup, 1);
         break;
       }
     }
 
   // No videos were found, so keep looping unless page is finished loading.
   } else if (!_windowLoaded) {
-    autoSetupTimeout(1);
+    setTimeout(autoSetup, 1);
   }
 };
 
