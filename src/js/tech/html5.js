@@ -223,7 +223,7 @@ class Html5 extends Tech {
     }
 
     // Update specific tag settings, in case they were overridden
-    const settingsAttrs = ['autoplay', 'preload', 'loop', 'muted'];
+    const settingsAttrs = ['autoplay', 'preload', 'loop', 'muted', 'playsinline'];
 
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
       const attr = settingsAttrs[i];
@@ -1233,6 +1233,20 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
    */
   'autoplay',
+
+  /**
+   * Get the value of `playsinline` from the media element. `playsinline` indicates
+   * that the media should play inline in iOS Safari.
+   *
+   * @method Html5#playsinline
+   * @return {boolean}
+   *         - The value of `playsinline` from the media element.
+   *         - True indicates that the media should play inline.
+   *         - False indicates that the media should not play inline.
+   *
+   * @see [Spec]{@link https://github.com/whatwg/html/pull/1444}
+   */
+  'playsinline',
 
   /**
    * Get the value of `controls` from the media element. `controls` indicates

@@ -822,6 +822,7 @@ class Player extends Component {
       'textTracks': this.textTracks_,
       'audioTracks': this.audioTracks_,
       'autoplay': this.options_.autoplay,
+      'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
       'muted': this.options_.muted,
@@ -2397,7 +2398,7 @@ class Player extends Component {
       this.options_.playsinline = value;
       return this;
     }
-    return this.techGet_('playsinline', value);
+    return this.techGet_('playsinline');
   }
 
   /**
