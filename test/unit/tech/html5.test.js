@@ -90,6 +90,9 @@ QUnit.test('blacklist playbackRate support on older verisons of Chrome on Androi
     return;
   }
 
+  // Reset playbackrate - Firefox's rounding of playbackRate causes the rate not to change in canControlPlaybackRate() after a few instances
+  Html5.TEST_VID.playbackRate = 1;
+
   const oldIsAndroid = browser.IS_ANDROID;
   const oldIsChrome = browser.IS_CHROME;
   const oldChromeVersion = browser.CHROME_VERSION;
