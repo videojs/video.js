@@ -1244,7 +1244,7 @@ Html5.resetMediaElement = function(el) {
    *         - True indicates that the media should play inline.
    *         - False indicates that the media should not play inline.
    *
-   * @see [Spec]{@link https://github.com/whatwg/html/pull/1444}
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
    */
   'playsinline',
 
@@ -1540,7 +1540,7 @@ Html5.resetMediaElement = function(el) {
    *         - True indicates that the media should play inline.
    *         - False indicates that the media should not play inline.
    *
-   * @see [Spec]{@link https://github.com/whatwg/html/pull/1444}
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
    */
   'playsinline',
 
