@@ -809,7 +809,7 @@ class Tech extends Component {
    * Gets available media playback quality metrics as specified by the W3C's Media
    * Playback Quality API.
    *
-   * @see https://wicg.github.io/media-playback-quality/
+   * @see [Spec]{@link https://wicg.github.io/media-playback-quality}
    *
    * @return {Object}
    *         An object with supported media playback quality metrics
