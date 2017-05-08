@@ -20,8 +20,8 @@
   "captions off": "Subtítulos con lenda desactivados",
   "Chapters": "Capítulos",
   "You aborted the media playback": "Interrompeches a reprodución do vídeo.",
-  "A network error caused the media download to fail part-way.": "Un error de rede interrompeu a descarga do vídeo.",
+  "A network error caused the media download to fail part-way.": "Un erro de rede interrompeu a descarga do vídeo.",
   "The media could not be loaded, either because the server or network failed or because the format is not supported.": "Non se puido cargar o vídeo debido a un fallo de rede ou do servidor ou porque o formato é incompatible.",
-  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "A reproducción de vídeo interrompeuse por un problema de corrupción de datos ou porque o vídeo precisa funcións que o seu navegador non ofrece.",
+  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "A reproducción de vídeo interrompeuse por un problema de corrupción de datos ou porque o vídeo precisa funcións que o teu navegador non ofrece.",
   "No compatible source was found for this media.": "Non se atopou ningunha fonte compatible con este vídeo."
 }
