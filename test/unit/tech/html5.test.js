@@ -99,10 +99,10 @@ QUnit.test('blacklist playbackRate support on older verisons of Chrome on Androi
 
   browser.IS_ANDROID = true;
   browser.IS_CHROME = true;
-  browser.CHROME_VERSION = '50';
+  browser.CHROME_VERSION = 50;
   assert.strictEqual(Html5.canControlPlaybackRate(), false, 'canControlPlaybackRate should return false on older Chrome');
 
-  browser.CHROME_VERSION = '58';
+  browser.CHROME_VERSION = 58;
   assert.strictEqual(Html5.canControlPlaybackRate(), true, 'canControlPlaybackRate should return true on newer Chrome');
 
   browser.IS_ANDROID = oldIsAndroid;

@@ -66,7 +66,7 @@ export const CHROME_VERSION = (function() {
   const match = USER_AGENT.match(/Chrome\/(\d+)/);
 
   if (match && match[1]) {
-    return match[1];
+    return parseFloat(match[1]);
   }
   return null;
 }());
