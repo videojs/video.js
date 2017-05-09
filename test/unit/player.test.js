@@ -1387,3 +1387,12 @@ QUnit.test('should not allow to register custom player when any player has been 
   // reset the Player to the original value;
   videojs.registerComponent('Player', Player);
 });
+
+QUnit.test('should add a class with major version', function(assert) {
+  const majorVersion = require('../../package.json').version.split('.')[0];
+  const player = TestHelpers.makePlayer();
+
+  assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');
+
+  player.dispose();
+});
