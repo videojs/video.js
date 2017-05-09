@@ -2394,6 +2394,8 @@ class Player extends Component {
    * @return {string|Player}
    *         - the current value of playsinline
    *         - the player when setting
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
    */
   playsinline(value) {
     if (value !== undefined) {

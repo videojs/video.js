@@ -794,6 +794,43 @@ class Html5 extends Tech {
       }
     }
   }
+
+  /**
+   * Get the value of `playsinline` from the media element. `playsinline` indicates
+   * to the browser that non-fullscreen playback is preferred when fullscreen
+   * playback is the native default, such as in iOS Safari.
+   *
+   * @method Html5#playsinline
+   * @return {boolean}
+   *         - The value of `playsinline` from the media element.
+   *         - True indicates that the media should play inline.
+   *         - False indicates that the media should not play inline.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
+   */
+  playsinline() {
+    return this.el_.hasAttribute('playsinline');
+  }
+
+  /**
+   * Set the value of `playsinline` from the media element. `playsinline` indicates
+   * to the browser that non-fullscreen playback is preferred when fullscreen
+   * playback is the native default, such as in iOS Safari.
+   *
+   * @method Html5#setPlaysinline
+   * @param {boolean} playsinline
+   *         - True indicates that the media should play inline.
+   *         - False indicates that the media should not play inline.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
+   */
+  setPlaysinline(value) {
+    if (value) {
+      this.el_.setAttribute('playsinline', 'playsinline');
+    } else {
+      this.el_.removeAttribute('playsinline');
+    }
+  }
 }
 
 /* HTML5 Support Testing ---------------------------------------------------- */
@@ -1431,27 +1468,6 @@ Html5.resetMediaElement = function(el) {
   };
 });
 
-// This getter is declared outside of the loop because there is no 'playsinline'
-// property for the <video> element, but we still want to be able to detect the presence
-// of the 'playsinline' attribute
-
-/**
- * Get the value of `playsinline` from the media element. `playsinline` indicates
- * to the browser that non-fullscreen playback is preferred when fullscreen
- * playback is the native default, such as in iOS Safari.
- *
- * @method Html5#playsinline
- * @return {boolean}
- *         - The value of `playsinline` from the media element.
- *         - True indicates that the media should play inline.
- *         - False indicates that the media should not play inline.
- *
- * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
- */
-Html5.prototype.playsinline = function() {
-  return this.el_.hasAttribute('playsinline');
-};
-
 // Wrap native properties with a setter in this format:
 // set + toTitleCase(name)
 [
@@ -1573,30 +1589,6 @@ Html5.prototype.playsinline = function() {
     this.el_[prop] = v;
   };
 });
-
-// This setter is declared outside of the loop because there is no 'playsinline'
-// property for the <video> element, but we still want to be able to add and remove
-// the 'playsinline' attribute
-
-/**
- * Set the value of `playsinline` from the media element. `playsinline` indicates
- * to the browser that non-fullscreen playback is preferred when fullscreen
- * playback is the native default, such as in iOS Safari.
- *
- * @method Html5#setPlaysinline
- * @param {boolean} playsinline
- *         - True indicates that the media should play inline.
- *         - False indicates that the media should not play inline.
- *
- * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
- */
-Html5.prototype.setPlaysinline = function(value) {
-  if (value) {
-    this.el_.setAttribute('playsinline', 'playsinline');
-  } else {
-    this.el_.removeAttribute('playsinline');
-  }
-};
 
 // wrap native functions with a function
 [
