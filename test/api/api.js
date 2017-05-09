@@ -59,6 +59,7 @@ QUnit.test('should be able to access expected player API methods', function(asse
   assert.ok(player.userActive, 'userActive exists');
   assert.ok(player.usingNativeControls, 'usingNativeControls exists');
   assert.ok(player.isFullscreen, 'isFullscreen exists');
+  assert.ok(player.getVideoPlaybackQuality, 'getVideoPlaybackQuality exists');
 
   // Track methods
   assert.ok(player.audioTracks, 'audioTracks exists');

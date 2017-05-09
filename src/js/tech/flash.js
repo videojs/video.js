@@ -341,6 +341,29 @@ class Flash extends Tech {
     return false;
   }
 
+  /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see [Spec]{@link https://wicg.github.io/media-playback-quality}
+   *
+   * @return {Object}
+   *         An object with supported media playback quality metrics
+   */
+  getVideoPlaybackQuality() {
+    const videoPlaybackQuality = this.el_.vjs_getProperty('getVideoPlaybackQuality');
+
+    if (window.performance && typeof window.performance.now === 'function') {
+      videoPlaybackQuality.creationTime = window.performance.now();
+    } else if (window.performance &&
+               window.performance.timing &&
+               typeof window.performance.timing.navigationStart === 'number') {
+      videoPlaybackQuality.creationTime =
+        window.Date.now() - window.performance.timing.navigationStart;
+    }
+
+    return videoPlaybackQuality;
+  }
 }
 
 // Create setters and getters for attributes
