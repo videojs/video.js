@@ -2382,11 +2382,14 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the playsinline attribute.
+   * Set or unset the playsinline attribute.
+   * Playsinline tells the browser that non-fullscreen playback is preferred.
    *
    * @param {boolean} [value]
-   *        - true means that we should play inline in iOS Safari
-   *        - false means that we should not play inline in iOS Safari
+   *        - true means that we should try to play inline by default
+   *        - false means that we should use the browser's default playback mode,
+   *          which in most cases is inline. iOS Safari is a notable exception
+   *          and plays fullscreen by default.
    *
    * @return {string|Player}
    *         - the current value of playsinline

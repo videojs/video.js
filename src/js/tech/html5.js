@@ -1236,7 +1236,8 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Get the value of `playsinline` from the media element. `playsinline` indicates
-   * that the media should play inline in iOS Safari.
+   * to the browser that non-fullscreen playback is preferred when fullscreen
+   * playback is the native default, such as in iOS Safari.
    *
    * @method Html5#playsinline
    * @return {boolean}
@@ -1532,8 +1533,9 @@ Html5.resetMediaElement = function(el) {
   'autoplay',
 
   /**
-   * Set the value of `playsinline` on the media element. `playsinline` indicates
-   * that the media should play inline in iOS Safari.
+   * Set the value of `playsinline` from the media element. `playsinline` indicates
+   * to the browser that non-fullscreen playback is preferred when fullscreen
+   * playback is the native default, such as in iOS Safari.
    *
    * @method Html5#setPlaysinline
    * @param {boolean} playsinline
