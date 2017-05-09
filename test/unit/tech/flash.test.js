@@ -277,9 +277,6 @@ QUnit.test('getVideoPlaybackQuality API exists', function(assert) {
     }
   };
 
-  assert.equal(typeof Flash.prototype.getVideoPlaybackQuality,
-               'function',
-               'getVideoPlaybackQuality is a function');
   assert.deepEqual(Flash.prototype.getVideoPlaybackQuality.call(mockFlash),
                    videoPlaybackQuality,
                    'called to get property from flash');
