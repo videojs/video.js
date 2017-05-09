@@ -58,6 +58,7 @@ class ErrorDisplay extends ModalDialog {
  * @private
  */
 ErrorDisplay.prototype.options_ = mergeOptions(ModalDialog.prototype.options_, {
+  pauseOnOpen: false,
   fillAlways: true,
   temporary: false,
   uncloseable: true

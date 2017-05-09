@@ -551,7 +551,7 @@ class Tech extends Component {
       // passed in
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js';
+      script.src = this.options_['vtt.js'] || 'https://vjs.zencdn.net/vttjs/0.12.3/vtt.min.js';
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.
@@ -622,11 +622,15 @@ class Tech extends Component {
 
     textTracksChanges();
     tracks.addEventListener('change', textTracksChanges);
+    tracks.addEventListener('addtrack', textTracksChanges);
+    tracks.addEventListener('removetrack', textTracksChanges);
 
     this.on('dispose', function() {
       remoteTracks.off('addtrack', handleAddTrack);
       remoteTracks.off('removetrack', handleRemoveTrack);
       tracks.removeEventListener('change', textTracksChanges);
+      tracks.removeEventListener('addtrack', textTracksChanges);
+      tracks.removeEventListener('removetrack', textTracksChanges);
 
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
@@ -799,6 +803,21 @@ class Tech extends Component {
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
     this.autoRemoteTextTracks_.removeTrack_(track);
+  }
+
+  /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see [Spec]{@link https://wicg.github.io/media-playback-quality}
+   *
+   * @return {Object}
+   *         An object with supported media playback quality metrics
+   *
+   * @abstract
+   */
+  getVideoPlaybackQuality() {
+    return {};
   }
 
   /**

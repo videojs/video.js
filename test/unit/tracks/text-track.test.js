@@ -205,6 +205,46 @@ QUnit.test('cues can be added and removed from a TextTrack', function(assert) {
   assert.equal(cues.length, 3, 'we now have 3 cues');
 });
 
+QUnit.test('original cue can be used to remove cue from cues list', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+  const Cue = window.VTTCue ||
+              window.vttjs && window.vttjs.VTTCue ||
+              window.TextTrackCue;
+
+  const cue1 = new Cue(0, 1, 'some-cue');
+
+  assert.equal(tt.cues.length, 0, 'start with zero cues');
+  tt.addCue(cue1);
+  assert.equal(tt.cues.length, 1, 'we have one cue');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 0, 'we have removed cue1');
+});
+
+QUnit.test('can only remove one cue at a time', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+  const Cue = window.VTTCue ||
+              window.vttjs && window.vttjs.VTTCue ||
+              window.TextTrackCue;
+
+  const cue1 = new Cue(0, 1, 'some-cue');
+
+  assert.equal(tt.cues.length, 0, 'start with zero cues');
+  tt.addCue(cue1);
+  tt.addCue(cue1);
+  assert.equal(tt.cues.length, 2, 'we have two cues');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 1, 'we have removed one instance of cue1');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 0, 'we have removed the other instance of cue1');
+});
+
 QUnit.test('fires cuechange when cues become active and inactive', function(assert) {
   const player = TestHelpers.makePlayer();
   let changes = 0;

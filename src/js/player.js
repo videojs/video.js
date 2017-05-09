@@ -413,6 +413,11 @@ class Player extends Component {
     // Make player easily findable by ID
     Player.players[this.id_] = this;
 
+    // Add a major version class to aid css in plugins
+    const majorVersion = require('../../package.json').version.split('.')[0];
+
+    this.addClass(`vjs-v${majorVersion}`);
+
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
     this.userActive(true);
@@ -3012,6 +3017,20 @@ class Player extends Component {
     if (this.tech_) {
       return this.tech_.removeRemoteTextTrack(track);
     }
+  }
+
+  /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see [Spec]{@link https://wicg.github.io/media-playback-quality}
+   *
+   * @return {Object|undefined}
+   *         An object with supported media playback quality metrics or undefined if there
+   *         is no tech or the tech does not support it.
+   */
+  getVideoPlaybackQuality() {
+    return this.techGet_('getVideoPlaybackQuality');
   }
 
   /**

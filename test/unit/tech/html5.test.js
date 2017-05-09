@@ -84,6 +84,32 @@ QUnit.test('test playbackRate', function(assert) {
   assert.strictEqual(tech.playbackRate(), 0.75);
 });
 
+QUnit.test('blacklist playbackRate support on older verisons of Chrome on Android', function(assert) {
+  if (!Html5.canControlPlaybackRate()) {
+    assert.ok(true, 'playbackRate is not supported');
+    return;
+  }
+
+  // Reset playbackrate - Firefox's rounding of playbackRate causes the rate not to change in canControlPlaybackRate() after a few instances
+  Html5.TEST_VID.playbackRate = 1;
+
+  const oldIsAndroid = browser.IS_ANDROID;
+  const oldIsChrome = browser.IS_CHROME;
+  const oldChromeVersion = browser.CHROME_VERSION;
+
+  browser.IS_ANDROID = true;
+  browser.IS_CHROME = true;
+  browser.CHROME_VERSION = 50;
+  assert.strictEqual(Html5.canControlPlaybackRate(), false, 'canControlPlaybackRate should return false on older Chrome');
+
+  browser.CHROME_VERSION = 58;
+  assert.strictEqual(Html5.canControlPlaybackRate(), true, 'canControlPlaybackRate should return true on newer Chrome');
+
+  browser.IS_ANDROID = oldIsAndroid;
+  browser.IS_CHROME = oldIsChrome;
+  browser.CHROME_VERSION = oldChromeVersion;
+});
+
 QUnit.test('should export played', function(assert) {
   tech.createEl();
   assert.deepEqual(tech.played(), tech.el().played, 'returns the played attribute');
@@ -640,4 +666,84 @@ test('When Android Chrome reports Infinity duration with currentTime 0, return N
   browser.IS_ANDROID = oldIsAndroid;
   browser.IS_CHROME = oldIsChrome;
   tech.el_ = oldEl;
+});
+
+QUnit.test('supports getting available media playback quality metrics', function(assert) {
+  const origPerformance = window.performance;
+  const origDate = window.Date;
+  const oldEl = tech.el_;
+  const videoPlaybackQuality = {
+    creationTime: 1,
+    corruptedVideoFrames: 2,
+    droppedVideoFrames: 3,
+    totalVideoFrames: 5
+  };
+
+  tech.el_ = {
+    getVideoPlaybackQuality: () => videoPlaybackQuality
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   videoPlaybackQuality,
+                   'uses native implementation when supported');
+
+  tech.el_ = {
+    webkitDroppedFrameCount: 1,
+    webkitDecodedFrameCount: 2
+  };
+  window.performance = {
+    now: () => 4
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 4 },
+                   'uses webkit prefixed metrics and performance.now when supported');
+
+  tech.el_ = {
+    webkitDroppedFrameCount: 1,
+    webkitDecodedFrameCount: 2
+  };
+  window.Date = {
+    now: () => 10
+  };
+  window.performance = {
+    timing: {
+      navigationStart: 3
+    }
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 7 },
+                   'uses webkit prefixed metrics and Date.now() - navigationStart when ' +
+                   'supported');
+
+  tech.el_ = {};
+  window.performance = void 0;
+  assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'empty object when not supported');
+
+  window.performance = {
+    now: () => 5
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { creationTime: 5 },
+                   'only creation time when it\'s the only piece available');
+
+  window.performance = {
+    timing: {
+      navigationStart: 3
+    }
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   { creationTime: 7 },
+                   'only creation time when it\'s the only piece available');
+
+  tech.el_ = {
+    getVideoPlaybackQuality: () => videoPlaybackQuality,
+    webkitDroppedFrameCount: 1,
+    webkitDecodedFrameCount: 2
+  };
+  assert.deepEqual(tech.getVideoPlaybackQuality(),
+                   videoPlaybackQuality,
+                   'prefers native implementation when supported');
+
+  tech.el_ = oldEl;
+  window.performance = origPerformance;
+  window.Date = origDate;
 });

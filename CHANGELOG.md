@@ -1,3 +1,34 @@
+<a name="5.19.2"></a>
+## [5.19.2](https://github.com/videojs/video.js/compare/v5.19.1...v5.19.2) (2017-04-13)
+
+### Bug Fixes
+
+* set IE_VERSION correctly for IE11 ([#4280](https://github.com/videojs/video.js/issues/4280)) ([207730e](https://github.com/videojs/video.js/commit/207730e)), closes [#4278](https://github.com/videojs/video.js/issues/4278)
+
+<a name="5.19.1"></a>
+## [5.19.1](https://github.com/videojs/video.js/compare/v5.19.0...v5.19.1) (2017-03-27)
+
+### Bug Fixes
+
+* not showing default text tracks over video ([#4217](https://github.com/videojs/video.js/issues/4217)) ([4653922](https://github.com/videojs/video.js/commit/4653922))
+* removeCue should work with native passed in cue ([#4209](https://github.com/videojs/video.js/issues/4209)) ([3974944](https://github.com/videojs/video.js/commit/3974944))
+
+### Chores
+
+* **package:** update videojs-vtt.js to 0.12.3 ([#4223](https://github.com/videojs/video.js/issues/4223)) ([ad770fb](https://github.com/videojs/video.js/commit/ad770fb))
+
+<a name="5.19.0"></a>
+# [5.19.0](https://github.com/videojs/video.js/compare/v5.18.4...v5.19.0) (2017-03-15)
+
+### Features
+
+* Make pause on open optional for ModalDialog via options ([#4187](https://github.com/videojs/video.js/issues/4187)) ([4ec3b56](https://github.com/videojs/video.js/commit/4ec3b56))
+
+### Bug Fixes
+
+* make load progress buffered regions height 100% ([#4191](https://github.com/videojs/video.js/issues/4191)) ([398c6e9](https://github.com/videojs/video.js/commit/398c6e9))
+* make sure audio track hides with one item ([#4203](https://github.com/videojs/video.js/issues/4203)) ([c069655](https://github.com/videojs/video.js/commit/c069655))
+
 <a name="5.18.4"></a>
 ## [5.18.4](https://github.com/videojs/video.js/compare/v5.18.3...v5.18.4) (2017-03-08)
 

@@ -346,6 +346,7 @@ class TextTrack extends Track {
 
       // make sure that `id` is copied over
       cue.id = originalCue.id;
+      cue.originalCue_ = originalCue;
     }
 
     const tracks = this.tech_.textTracks();
@@ -369,19 +370,16 @@ class TextTrack extends Track {
    *        The cue to remove from our internal list
    */
   removeCue(removeCue) {
-    let removed = false;
+    let i = this.cues_.length;
 
-    for (let i = 0, l = this.cues_.length; i < l; i++) {
+    while (i--) {
       const cue = this.cues_[i];
 
-      if (cue === removeCue) {
+      if (cue === removeCue || (cue.originalCue_ && cue.originalCue_ === removeCue)) {
         this.cues_.splice(i, 1);
-        removed = true;
+        this.cues.setCues_(this.cues_);
+        break;
       }
-    }
-
-    if (removed) {
-      this.cues.setCues_(this.cues_);
     }
   }
 }
