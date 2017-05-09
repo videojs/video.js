@@ -713,7 +713,7 @@ QUnit.test('supports getting available media playback quality metrics', function
                    'supported');
 
   tech.el_ = {};
-  delete window.performance;
+  window.performance = void 0;
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'empty object when not supported');
 
   window.performance = {
