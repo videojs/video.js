@@ -84,6 +84,32 @@ QUnit.test('test playbackRate', function(assert) {
   assert.strictEqual(tech.playbackRate(), 0.75);
 });
 
+QUnit.test('blacklist playbackRate support on older verisons of Chrome on Android', function(assert) {
+  if (!Html5.canControlPlaybackRate()) {
+    assert.ok(true, 'playbackRate is not supported');
+    return;
+  }
+
+  // Reset playbackrate - Firefox's rounding of playbackRate causes the rate not to change in canControlPlaybackRate() after a few instances
+  Html5.TEST_VID.playbackRate = 1;
+
+  const oldIsAndroid = browser.IS_ANDROID;
+  const oldIsChrome = browser.IS_CHROME;
+  const oldChromeVersion = browser.CHROME_VERSION;
+
+  browser.IS_ANDROID = true;
+  browser.IS_CHROME = true;
+  browser.CHROME_VERSION = 50;
+  assert.strictEqual(Html5.canControlPlaybackRate(), false, 'canControlPlaybackRate should return false on older Chrome');
+
+  browser.CHROME_VERSION = 58;
+  assert.strictEqual(Html5.canControlPlaybackRate(), true, 'canControlPlaybackRate should return true on newer Chrome');
+
+  browser.IS_ANDROID = oldIsAndroid;
+  browser.IS_CHROME = oldIsChrome;
+  browser.CHROME_VERSION = oldChromeVersion;
+});
+
 QUnit.test('should export played', function(assert) {
   tech.createEl();
   assert.deepEqual(tech.played(), tech.el().played, 'returns the played attribute');

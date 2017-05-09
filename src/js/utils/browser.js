@@ -62,6 +62,14 @@ export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebki
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
 export const IS_EDGE = (/Edge/i).test(USER_AGENT);
 export const IS_CHROME = !IS_EDGE && (/Chrome/i).test(USER_AGENT);
+export const CHROME_VERSION = (function() {
+  const match = USER_AGENT.match(/Chrome\/(\d+)/);
+
+  if (match && match[1]) {
+    return parseFloat(match[1]);
+  }
+  return null;
+}());
 export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
 export const IE_VERSION = (function() {
   const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT);
