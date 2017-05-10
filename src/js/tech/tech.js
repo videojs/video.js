@@ -827,6 +827,20 @@ class Tech extends Component {
    */
   setPoster() {}
 
+  /**
+   * A method to check for the presence of the 'playsinine' <video> attribute.
+   *
+   * @abstract
+   */
+  playsinline() {}
+
+  /**
+   * A method to set or unset the 'playsinine' <video> attribute.
+   *
+   * @abstract
+   */
+  setPlaysinline() {}
+
   /*
    * Check if the tech can support the given mime-type.
    *
