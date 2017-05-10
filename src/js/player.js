@@ -855,6 +855,7 @@ class Player extends Component {
       'playerId': this.id(),
       'techId': `${this.id()}_${titleTechName}_api`,
       'autoplay': this.options_.autoplay,
+      'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
       'muted': this.options_.muted,
@@ -2464,6 +2465,31 @@ class Player extends Component {
       return;
     }
     return this.techGet_('autoplay', value);
+  }
+
+  /**
+   * Set or unset the playsinline attribute.
+   * Playsinline tells the browser that non-fullscreen playback is preferred.
+   *
+   * @param {boolean} [value]
+   *        - true means that we should try to play inline by default
+   *        - false means that we should use the browser's default playback mode,
+   *          which in most cases is inline. iOS Safari is a notable exception
+   *          and plays fullscreen by default.
+   *
+   * @return {string|Player}
+   *         - the current value of playsinline
+   *         - the player when setting
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
+   */
+  playsinline(value) {
+    if (value !== undefined) {
+      this.techCall_('setPlaysinline', value);
+      this.options_.playsinline = value;
+      return this;
+    }
+    return this.techGet_('playsinline');
   }
 
   /**
