@@ -100,6 +100,32 @@ QUnit.test('test defaultPlaybackRate', function(assert) {
   assert.strictEqual(tech.defaultPlaybackRate(), 0.75, 'can be changed from the API');
 });
 
+QUnit.test('blacklist playbackRate support on older verisons of Chrome on Android', function(assert) {
+  if (!Html5.canControlPlaybackRate()) {
+    assert.ok(true, 'playbackRate is not supported');
+    return;
+  }
+
+  // Reset playbackrate - Firefox's rounding of playbackRate causes the rate not to change in canControlPlaybackRate() after a few instances
+  Html5.TEST_VID.playbackRate = 1;
+
+  const oldIsAndroid = browser.IS_ANDROID;
+  const oldIsChrome = browser.IS_CHROME;
+  const oldChromeVersion = browser.CHROME_VERSION;
+
+  browser.IS_ANDROID = true;
+  browser.IS_CHROME = true;
+  browser.CHROME_VERSION = 50;
+  assert.strictEqual(Html5.canControlPlaybackRate(), false, 'canControlPlaybackRate should return false on older Chrome');
+
+  browser.CHROME_VERSION = 58;
+  assert.strictEqual(Html5.canControlPlaybackRate(), true, 'canControlPlaybackRate should return true on newer Chrome');
+
+  browser.IS_ANDROID = oldIsAndroid;
+  browser.IS_CHROME = oldIsChrome;
+  browser.CHROME_VERSION = oldChromeVersion;
+});
+
 QUnit.test('test volume', function(assert) {
   if (!Html5.canControlVolume()) {
     assert.ok(true, 'Volume is not supported');
