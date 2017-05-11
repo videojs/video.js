@@ -2528,7 +2528,7 @@ class Player extends Component {
    * asynchronous way. We want the poster component to use this
    * poster source so that it covers up the tech's controls.
    * (YouTube's play button). However we only want to use this
-   * soruce if the player user hasn't set a poster through
+   * source if the player user hasn't set a poster through
    * the normal APIs.
    *
    * @fires Player#posterchange
