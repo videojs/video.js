@@ -1617,3 +1617,12 @@ QUnit.test('options: plugins', function(assert) {
   player.dispose();
   Plugin.deregisterPlugin('foo');
 });
+
+QUnit.test('should add a class with major version', function(assert) {
+  const majorVersion = require('../../package.json').version.split('.')[0];
+  const player = TestHelpers.makePlayer();
+
+  assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');
+
+  player.dispose();
+});
