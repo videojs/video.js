@@ -67,24 +67,35 @@ QUnit.test('setup', function(assert) {
   );
 });
 
-QUnit.test('"pluginsetup" event', function(assert) {
+QUnit.test('all "pluginsetup" events', function(assert) {
   const setupSpy = sinon.spy();
+  const events = [
+    'beforepluginsetup',
+    'beforepluginsetup:mock',
+    'pluginsetup',
+    'pluginsetup:mock'
+  ];
 
-  this.player.on('pluginsetup', setupSpy);
+  this.player.on(events, setupSpy);
 
   const instance = this.player.mock();
-  const event = setupSpy.firstCall.args[0];
-  const hash = setupSpy.firstCall.args[1];
 
-  assert.strictEqual(setupSpy.callCount, 1, 'the "pluginsetup" event was triggered');
-  assert.strictEqual(event.type, 'pluginsetup', 'the event has the correct type');
-  assert.strictEqual(event.target, this.player.el_, 'the event has the correct target');
+  events.forEach((type, i) => {
+    const event = setupSpy.getCall(i).args[0];
+    const hash = setupSpy.getCall(i).args[1];
 
-  assert.deepEqual(hash, {
-    name: 'mock',
-    instance,
-    plugin: this.MockPlugin
-  }, 'the event hash object is correct');
+    assert.strictEqual(event.type, type, `the "${type}" event was triggered`);
+    assert.strictEqual(event.target, this.player.el_, 'the event has the correct target');
+
+    assert.deepEqual(hash, {
+      name: 'mock',
+
+      // The "before" events have a `null` instance and the others have the
+      // return value of the plugin factory.
+      instance: i < 2 ? null : instance,
+      plugin: this.MockPlugin
+    }, 'the event hash object is correct');
+  });
 });
 
 QUnit.test('defaultState static property is used to populate state', function(assert) {

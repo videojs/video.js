@@ -176,6 +176,14 @@ Like components, advanced plugins offer an implementation of events. This includ
 
 By offering a built-in events system, advanced plugins offer a wider range of options for code structure with a pattern familiar to most web developers.
 
+##### Extra Event Data
+
+All events triggered by plugins include an additional data object as a second argument. This object has three properties:
+
+- `name`: The name of the plugin (e.g. `"examplePlugin"`) as a string.
+- `plugin`: The plugin constructor (e.g. `ExamplePlugin`).
+- `instance`: The plugin constructor instance.
+
 #### Statefulness
 
 A new concept introduced for advanced plugins is _statefulness_. This is similar to React components' `state` property and `setState` method.
@@ -306,6 +314,19 @@ player.examplePlugin({customClass: 'example-class'});
 ```
 
 These two methods are functionally identical - use whichever you prefer!
+
+### Plugin Setup Events
+
+Occasionally, a use-case arises where some code needs to wait for a plugin to be initialized. As of Video.js 6, this can be achieved by listening for `pluginsetup` events on the player.
+
+For any given plugin initialization, there are four events to be aware of:
+
+- `beforepluginsetup`: Triggered immediately before any plugin is initialized.
+- `beforepluginsetup:examplePlugin` Triggered immediately before the `examplePlugin` is initialized.
+- `pluginsetup`: Triggered after any plugin is initialized.
+- `pluginsetup:examplePlugin`: Triggered after he `examplePlugin` is initialized.
+
+These events work for both basic and advanced plugins. They are triggered on the player and each includes an object of [extra event data](#extra-event-data) as a second argument to its listeners.
 
 ## References
 
