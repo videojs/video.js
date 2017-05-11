@@ -1,3 +1,22 @@
+<a name="5.20.0"></a>
+# [5.20.0](https://github.com/videojs/video.js/compare/v5.19.2...v5.20.0) (2017-05-11)
+
+### Features
+
+* add 'playsinline' player option ([#4325](https://github.com/videojs/video.js/issues/4325)) ([946f84b](https://github.com/videojs/video.js/commit/946f84b))
+* Add a version class to the player ([#4335](https://github.com/videojs/video.js/issues/4335)) ([b855bfb](https://github.com/videojs/video.js/commit/b855bfb))
+* Add getVideoPlaybackQuality API ([#4286](https://github.com/videojs/video.js/issues/4286)) ([c970474](https://github.com/videojs/video.js/commit/c970474))
+* remove playbackRate blacklist for recent Android Chrome ([#4336](https://github.com/videojs/video.js/issues/4336)) ([3fe22e9](https://github.com/videojs/video.js/commit/3fe22e9))
+
+### Chores
+
+* add slack travis notifications ([#4339](https://github.com/videojs/video.js/issues/4339)) ([ab110ff](https://github.com/videojs/video.js/commit/ab110ff))
+* **package:** pin karma to 1.3.0 for IE8 support ([#4340](https://github.com/videojs/video.js/issues/4340)) ([6cf7327](https://github.com/videojs/video.js/commit/6cf7327))
+
+### Tests
+
+* fix playsinline test for IE8 ([#4347](https://github.com/videojs/video.js/issues/4347)) ([823f6c7](https://github.com/videojs/video.js/commit/823f6c7))
+
 <a name="5.19.2"></a>
 ## [5.19.2](https://github.com/videojs/video.js/compare/v5.19.1...v5.19.2) (2017-04-13)
 
