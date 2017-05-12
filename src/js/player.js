@@ -1287,7 +1287,8 @@ class Player extends Component {
    *
    * @fires Player#firstplay
    * @listens Tech#firstplay
-   * @deprecated As of 6.0 passing the `starttime` option to the player will be deprecated
+   * @deprecated As of 6.0 firstplay event is deprecated.
+   * @deprecated As of 6.0 passing the `starttime` option to the player and the firstplay event are deprecated.
    * @private
    */
   handleTechFirstPlay_() {
@@ -1305,6 +1306,7 @@ class Player extends Component {
      * reason to prevent playback, use `myPlayer.one('play');` instead.
      *
      * @event Player#firstplay
+     * @deprecated As of 6.0 firstplay event is deprecated.
      * @type {EventTarget~Event}
      */
     this.trigger('firstplay');
