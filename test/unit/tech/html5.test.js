@@ -50,6 +50,19 @@ QUnit.module('HTML5', {
   }
 });
 
+QUnit.test('should be able to set playsinline attribute', function(assert) {
+  assert.expect(2);
+
+  tech.createEl();
+  tech.setPlaysinline(true);
+
+  assert.ok(tech.el().hasAttribute('playsinline'), 'playsinline attribute was added');
+
+  tech.setPlaysinline(false);
+
+  assert.ok(!tech.el().hasAttribute('playsinline'), 'playsinline attribute was removed');
+});
+
 QUnit.test('should detect whether the volume can be changed', function(assert) {
 
   if (!{}.__defineSetter__) {
