@@ -26,10 +26,6 @@ class TextTrackButton extends TrackButton {
     options.tracks = player.textTracks();
 
     super(player, options);
-
-    if (!Array.isArray(this.kinds_)) {
-      this.kinds_ = [this.kind_];
-    }
   }
 
   /**
@@ -60,6 +56,10 @@ class TextTrackButton extends TrackButton {
     this.hideThreshold_ += 1;
 
     const tracks = this.player_.textTracks();
+
+    if (!Array.isArray(this.kinds_)) {
+      this.kinds_ = [this.kind_];
+    }
 
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
