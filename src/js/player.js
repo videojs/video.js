@@ -442,6 +442,11 @@ class Player extends Component {
     // Make player easily findable by ID
     Player.players[this.id_] = this;
 
+    // Add a major version class to aid css in plugins
+    const majorVersion = require('../../package.json').version.split('.')[0];
+
+    this.addClass(`vjs-v${majorVersion}`);
+
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
     this.userActive(true);
@@ -2554,7 +2559,7 @@ class Player extends Component {
    * asynchronous way. We want the poster component to use this
    * poster source so that it covers up the tech's controls.
    * (YouTube's play button). However we only want to use this
-   * soruce if the player user hasn't set a poster through
+   * source if the player user hasn't set a poster through
    * the normal APIs.
    *
    * @fires Player#posterchange
@@ -3019,6 +3024,20 @@ class Player extends Component {
     if (this.tech_) {
       return this.tech_.removeRemoteTextTrack(track);
     }
+  }
+
+  /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see [Spec]{@link https://wicg.github.io/media-playback-quality}
+   *
+   * @return {Object|undefined}
+   *         An object with supported media playback quality metrics or undefined if there
+   *         is no tech or the tech does not support it.
+   */
+  getVideoPlaybackQuality() {
+    return this.techGet_('getVideoPlaybackQuality');
   }
 
   /**
