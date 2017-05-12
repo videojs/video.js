@@ -6,6 +6,8 @@
 .vjs-modal-dialog .vjs-modal-dialog-content {
   @extend %fill-parent;
 
+  @include user-select(auto);
+
   font-size: 1.2em; // 12px
   line-height: 1.5; // 18px
   padding: 20px 24px;
