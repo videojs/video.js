@@ -704,7 +704,7 @@ class Html5 extends Tech {
       this.el_.removeAttribute('playsinline');
     }
   }
-  
+
   /**
    * Gets available media playback quality metrics as specified by the W3C's Media
    * Playback Quality API.
