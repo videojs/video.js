@@ -147,17 +147,17 @@ class ClickableComponent extends Component {
    *         Returns itself; method can be chained.
    */
   enable() {
-    if (!this.enabled_) {
-      this.enabled_ = true;
-      this.removeClass('vjs-disabled');
-      this.el_.setAttribute('aria-disabled', 'false');
-      if (typeof this.tabIndex_ !== 'undefined') {
-        this.el_.setAttribute('tabIndex', this.tabIndex_);
-      }
-      this.on(['tap', 'click'], this.handleClick);
-      this.on('focus', this.handleFocus);
-      this.on('blur', this.handleBlur);
+    this.removeClass('vjs-disabled');
+    this.el_.setAttribute('aria-disabled', 'false');
+    if (typeof this.tabIndex_ !== 'undefined') {
+      this.el_.setAttribute('tabIndex', this.tabIndex_);
     }
+    this.off(['tap', 'click'], this.handleClick);
+    this.off('focus', this.handleFocus);
+    this.off('blur', this.handleBlur);
+    this.on(['tap', 'click'], this.handleClick);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
     return this;
   }
 
@@ -168,7 +168,6 @@ class ClickableComponent extends Component {
    *         Returns itself; method can be chained.
    */
   disable() {
-    this.enabled_ = false;
     this.addClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'true');
     if (typeof this.tabIndex_ !== 'undefined') {
