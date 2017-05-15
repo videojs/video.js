@@ -152,8 +152,10 @@ class ClickableComponent extends Component {
     if (typeof this.tabIndex_ !== 'undefined') {
       this.el_.setAttribute('tabIndex', this.tabIndex_);
     }
-    this.on('tap', this.handleClick);
-    this.on('click', this.handleClick);
+    this.off(['tap', 'click'], this.handleClick);
+    this.off('focus', this.handleFocus);
+    this.off('blur', this.handleBlur);
+    this.on(['tap', 'click'], this.handleClick);
     this.on('focus', this.handleFocus);
     this.on('blur', this.handleBlur);
     return this;
@@ -171,8 +173,7 @@ class ClickableComponent extends Component {
     if (typeof this.tabIndex_ !== 'undefined') {
       this.el_.removeAttribute('tabIndex');
     }
-    this.off('tap', this.handleClick);
-    this.off('click', this.handleClick);
+    this.off(['tap', 'click'], this.handleClick);
     this.off('focus', this.handleFocus);
     this.off('blur', this.handleBlur);
     return this;
