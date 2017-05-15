@@ -5,6 +5,8 @@
   padding: 0;
   margin: 0 0.45em 0 0.45em;
 
+  @include user-select(none);
+
   @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
 }
 

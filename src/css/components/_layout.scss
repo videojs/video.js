@@ -21,8 +21,6 @@
   // Avoiding helvetica: issue #376
   font-family: $text-font-family;
 
-  @include user-select(none);
-
   // Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when
   // checking fullScreenEnabled.
   &:-moz-full-screen { position: absolute; }
