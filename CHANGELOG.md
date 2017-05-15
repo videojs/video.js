@@ -1,3 +1,11 @@
+<a name="5.20.1"></a>
+## [5.20.1](https://github.com/videojs/video.js/compare/v5.20.0...v5.20.1) (2017-05-15)
+
+### Bug Fixes
+
+* only disable user-selection on sliders ([#4355](https://github.com/videojs/video.js/issues/4355)) ([0d60720](https://github.com/videojs/video.js/commit/0d60720))
+* prevent dupe events on enabled ClickableComponents ([#4357](https://github.com/videojs/video.js/issues/4357)) ([3faea9f](https://github.com/videojs/video.js/commit/3faea9f))
+
 <a name="5.20.0"></a>
 # [5.20.0](https://github.com/videojs/video.js/compare/v5.19.2...v5.20.0) (2017-05-11)
 
