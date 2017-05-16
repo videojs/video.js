@@ -4,6 +4,7 @@
  // Subclasses Component
 import Component from './component.js';
 
+import {version} from '../../package.json';
 import document from 'global/document';
 import window from 'global/window';
 import tsml from 'tsml';
@@ -443,7 +444,7 @@ class Player extends Component {
     Player.players[this.id_] = this;
 
     // Add a major version class to aid css in plugins
-    const majorVersion = require('../../package.json').version.split('.')[0];
+    const majorVersion = version.split('.')[0];
 
     this.addClass(`vjs-v${majorVersion}`);
 
