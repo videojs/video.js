@@ -601,3 +601,9 @@ QUnit.test('setSource after previous setSource should dispose source handler onc
   assert.equal(disposeCount, 2, 'did dispose for third setSource');
 
 });
+
+QUnit.test('returns an empty object for getVideoPlaybackQuality', function(assert) {
+  const tech = new Tech();
+
+  assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'returns an empty object');
+});

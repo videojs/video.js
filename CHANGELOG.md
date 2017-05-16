@@ -1,3 +1,32 @@
+<a name="6.1.0"></a>
+# [6.1.0](https://github.com/videojs/video.js/compare/v6.0.1...v6.1.0) (2017-05-15)
+
+### Features
+
+* Add 'beforepluginsetup' event and named plugin setup events (e.g. 'pluginsetup:foo') ([#4255](https://github.com/videojs/video.js/issues/4255)) ([0a19cf0](https://github.com/videojs/video.js/commit/0a19cf0))
+* add 'playsinline' player option ([#4348](https://github.com/videojs/video.js/issues/4348)) ([8d80a58](https://github.com/videojs/video.js/commit/8d80a58))
+* Add a version class to the player ([#4320](https://github.com/videojs/video.js/issues/4320)) ([ae423df](https://github.com/videojs/video.js/commit/ae423df))
+* Add getVideoPlaybackQuality API ([#4338](https://github.com/videojs/video.js/issues/4338)) ([483e5a2](https://github.com/videojs/video.js/commit/483e5a2))
+* deprecate firstplay event ([#4353](https://github.com/videojs/video.js/issues/4353)) ([35df351](https://github.com/videojs/video.js/commit/35df351))
+* remove playbackRate blacklist for recent Android Chrome ([#4321](https://github.com/videojs/video.js/issues/4321)) ([da0f1ee](https://github.com/videojs/video.js/commit/da0f1ee))
+
+### Bug Fixes
+
+* **package:** update global to version 4.3.2 ([#4291](https://github.com/videojs/video.js/issues/4291)) ([b5c60f3](https://github.com/videojs/video.js/commit/b5c60f3))
+* only disable user-selection on sliders ([#4354](https://github.com/videojs/video.js/issues/4354)) ([cb6005e](https://github.com/videojs/video.js/commit/cb6005e))
+* Only update text track mode if changed ([#4298](https://github.com/videojs/video.js/issues/4298)) ([3087830](https://github.com/videojs/video.js/commit/3087830))
+* prevent dupe events on enabled ClickableComponents ([#4316](https://github.com/videojs/video.js/issues/4316)) ([03bab83](https://github.com/videojs/video.js/commit/03bab83)), closes [#4312](https://github.com/videojs/video.js/issues/4312)
+* TextTrackButton on Safari and iOS ([#4350](https://github.com/videojs/video.js/issues/4350)) ([3dcfa95](https://github.com/videojs/video.js/commit/3dcfa95))
+
+### Chores
+
+* Fix examples and docs and some links ([#4279](https://github.com/videojs/video.js/issues/4279)) ([f773c47](https://github.com/videojs/video.js/commit/f773c47))
+* typo soruce -> source ([#4307](https://github.com/videojs/video.js/issues/4307)) ([da1d861](https://github.com/videojs/video.js/commit/da1d861))
+
+### Documentation
+
+* **react-guide:** Use a React component as a VJS component ([#4287](https://github.com/videojs/video.js/issues/4287)) ([cff2e50](https://github.com/videojs/video.js/commit/cff2e50))
+
 <a name="6.0.1"></a>
 ## [6.0.1](https://github.com/videojs/video.js/compare/v6.0.0...v6.0.1) (2017-04-13)
 

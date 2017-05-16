@@ -791,6 +791,35 @@ QUnit.test('should restore attributes from the original video tag when creating 
   assert.equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
 
+if (Html5.isSupported()) {
+  QUnit.test('player.playsinline() should be able to get/set playsinline attribute', function(assert) {
+    assert.expect(5);
+
+    const video = document.createElement('video');
+    const player = TestHelpers.makePlayer({techOrder: ['html5']}, video);
+
+    // test setter
+    assert.ok(!player.tech_.el().hasAttribute('playsinline'), 'playsinline has not yet been added');
+
+    player.playsinline(true);
+
+    assert.ok(player.tech_.el().hasAttribute('playsinline'), 'playsinline attribute added');
+
+    player.playsinline(false);
+
+    assert.ok(!player.tech_.el().hasAttribute('playsinline'), 'playsinline attribute removed');
+
+    // test getter
+    player.tech_.el().setAttribute('playsinline', 'playsinline');
+
+    assert.ok(player.playsinline(), 'correctly detects playsinline attribute');
+
+    player.tech_.el().removeAttribute('playsinline');
+
+    assert.ok(!player.playsinline(), 'correctly detects absence of playsinline attribute');
+  });
+}
+
 QUnit.test('if tag exists and movingMediaElementInDOM, re-use the tag', function(assert) {
   // simulate attributes stored from the original tag
   const tag = Dom.createEl('video');
@@ -1616,4 +1645,13 @@ QUnit.test('options: plugins', function(assert) {
 
   player.dispose();
   Plugin.deregisterPlugin('foo');
+});
+
+QUnit.test('should add a class with major version', function(assert) {
+  const majorVersion = require('../../package.json').version.split('.')[0];
+  const player = TestHelpers.makePlayer();
+
+  assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');
+
+  player.dispose();
 });

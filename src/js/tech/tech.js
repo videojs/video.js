@@ -722,11 +722,40 @@ class Tech extends Component {
   }
 
   /**
+   * Gets available media playback quality metrics as specified by the W3C's Media
+   * Playback Quality API.
+   *
+   * @see [Spec]{@link https://wicg.github.io/media-playback-quality}
+   *
+   * @return {Object}
+   *         An object with supported media playback quality metrics
+   *
+   * @abstract
+   */
+  getVideoPlaybackQuality() {
+    return {};
+  }
+
+  /**
    * A method to set a poster from a `Tech`.
    *
    * @abstract
    */
   setPoster() {}
+
+  /**
+   * A method to check for the presence of the 'playsinine' <video> attribute.
+   *
+   * @abstract
+   */
+  playsinline() {}
+
+  /**
+   * A method to set or unset the 'playsinine' <video> attribute.
+   *
+   * @abstract
+   */
+  setPlaysinline() {}
 
   /*
    * Check if the tech can support the given mime-type.

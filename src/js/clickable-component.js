@@ -141,28 +141,30 @@ class ClickableComponent extends Component {
    * Enable this `Component`s element.
    */
   enable() {
-    this.removeClass('vjs-disabled');
-    this.el_.setAttribute('aria-disabled', 'false');
-    if (typeof this.tabIndex_ !== 'undefined') {
-      this.el_.setAttribute('tabIndex', this.tabIndex_);
+    if (!this.enabled_) {
+      this.enabled_ = true;
+      this.removeClass('vjs-disabled');
+      this.el_.setAttribute('aria-disabled', 'false');
+      if (typeof this.tabIndex_ !== 'undefined') {
+        this.el_.setAttribute('tabIndex', this.tabIndex_);
+      }
+      this.on(['tap', 'click'], this.handleClick);
+      this.on('focus', this.handleFocus);
+      this.on('blur', this.handleBlur);
     }
-    this.on('tap', this.handleClick);
-    this.on('click', this.handleClick);
-    this.on('focus', this.handleFocus);
-    this.on('blur', this.handleBlur);
   }
 
   /**
    * Disable this `Component`s element.
    */
   disable() {
+    this.enabled_ = false;
     this.addClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'true');
     if (typeof this.tabIndex_ !== 'undefined') {
       this.el_.removeAttribute('tabIndex');
     }
-    this.off('tap', this.handleClick);
-    this.off('click', this.handleClick);
+    this.off(['tap', 'click'], this.handleClick);
     this.off('focus', this.handleFocus);
     this.off('blur', this.handleBlur);
   }
