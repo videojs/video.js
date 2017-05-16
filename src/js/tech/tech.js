@@ -551,7 +551,7 @@ class Tech extends Component {
       // passed in
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || 'https://vjs.zencdn.net/vttjs/0.12.3/vtt.min.js';
+      script.src = this.options_['vtt.js'] || 'https://vjs.zencdn.net/vttjs/0.12.4/vtt.min.js';
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.
