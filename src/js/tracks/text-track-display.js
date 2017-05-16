@@ -147,7 +147,7 @@ class TextTrackDisplay extends Component {
         }
 
       // clear everything if offTextTrackMenuItem was clicked
-      } else if (track.default && userPref && !userPref.enabled) {
+      } else if (userPref && !userPref.enabled) {
         preferredTrack = null;
         firstDesc = null;
         firstCaptions = null;
