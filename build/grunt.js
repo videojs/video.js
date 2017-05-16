@@ -408,8 +408,7 @@ module.exports = function(grunt) {
       ],
       dev: [
         'shell:babel',
-        'browserify:watch',
-        'browserify:watchnovtt',
+        'shell:rollupwatch',
         'browserify:tests',
         'watch:skin',
         'watch:lang',
@@ -457,6 +456,12 @@ module.exports = function(grunt) {
       rollupall: {
         command: 'npm run rollup-all',
         options: {
+          preferLocal: true
+        }
+      },
+      rollupwatch: {
+        command: 'npm run rollup-dev',
+        optoins: {
           preferLocal: true
         }
       },
