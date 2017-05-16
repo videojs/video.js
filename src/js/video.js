@@ -7,6 +7,8 @@
 
 import window from 'global/window';
 import document from 'global/document';
+import * as browser from './utils/browser.js';
+import * as Dom from './utils/dom.js';
 import * as setup from './setup';
 import * as stylesheet from './utils/stylesheet.js';
 import Component from './component';
@@ -23,8 +25,6 @@ import VideoTrack from './tracks/video-track.js';
 import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime from './utils/format-time.js';
 import log from './utils/log.js';
-import * as Dom from './utils/dom.js';
-import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
