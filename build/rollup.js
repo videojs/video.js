@@ -15,10 +15,14 @@ import pkg from '../package.json';
 import fs from 'fs';
 
 const args = minimist(process.argv.slice(2), {
-  boolean: ['watch', 'minify'],
+  boolean: ['watch', 'minify', 'progress'],
+  default: {
+    progress: true
+  },
   alias: {
     w: 'watch',
-    m: 'minify'
+    m: 'minify',
+    p: 'progress'
   }
 });
 
@@ -52,7 +56,7 @@ const es = {
     plugins: [
       json(),
       primedBabel,
-      progress(),
+      args.progress ? progress() : {},
       filesize()
     ],
     onwarn(warning) {
@@ -86,7 +90,7 @@ const umd = {
       json(),
       primedCjs,
       primedBabel,
-      progress(),
+      args.progress ? progress() : {},
       filesize()
     ],
     legacy: true

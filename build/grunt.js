@@ -454,7 +454,7 @@ module.exports = function(grunt) {
         }
       },
       rollupall: {
-        command: 'npm run rollup-all',
+        command: 'npm run rollup -- --no-progress && npm run rollup-minify -- --no-progress',
         options: {
           preferLocal: true
         }
