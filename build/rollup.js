@@ -106,7 +106,7 @@ const minifiedUmd = Object.assign({}, _.cloneDeep(umd), {
 
 minifiedUmd.options.plugins.splice(4, 0, uglify({
   preserveComments: 'some',
-  srewIE8: false,
+  screwIE8: false,
   mangle: true,
   compress: {
     /* eslint-disable camelcase */
