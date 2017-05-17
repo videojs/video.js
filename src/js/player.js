@@ -3426,6 +3426,13 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
 });
 
 /**
+ * Fired when the user agent begins looking for media data
+ *
+ * @event loadstart
+ */
+Player.prototype.handleTechLoadStart_;
+
+/**
  * Fired when the player has initial duration and dimension information
  *
  * @event Player#loadedmetadata
