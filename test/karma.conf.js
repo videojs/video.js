@@ -10,7 +10,7 @@ module.exports = function(config) {
     // Compling tests here
     files: [
       '../build/temp/video-js.css',
-      '../build/temp/ie8/videojs-ie8.js',
+      '../node_modules/videojs-ie8/dist/videojs-ie8.js',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
       '../build/temp/browserify.js',
