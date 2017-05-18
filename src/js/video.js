@@ -163,9 +163,12 @@ videojs.hooks = function(type, fn) {
  *
  * @param {Function|Function[]}
  *        The function or array of functions to attach.
+ *
+ * @return {Array}
+ *         an array of hooks, or an empty array if there are none.
  */
 videojs.hook = function(type, fn) {
-  videojs.hooks(type, fn);
+  return videojs.hooks(type, fn);
 };
 
 /**
