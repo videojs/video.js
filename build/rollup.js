@@ -60,10 +60,8 @@ const es = {
       filesize()
     ],
     onwarn(warning) {
-      if (warning.code === 'UNUSED_EXTERNAL_IMPORT') {
-        return;
-      }
-      if (warning.code === 'UNRESOLVED_IMPORT') {
+      if (warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
+          warning.code === 'UNRESOLVED_IMPORT') {
         return;
       }
 
