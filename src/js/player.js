@@ -1752,7 +1752,7 @@ class Player extends Component {
     seconds = parseFloat(seconds) || 0;
 
     // Standardize on Inifity for signaling video is live
-    if (seconds < 0) {
+    if (seconds < 0 || seconds >= Number.MAX_VALUE) {
       seconds = Infinity;
     }
 
