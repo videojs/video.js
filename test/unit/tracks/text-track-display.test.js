@@ -153,7 +153,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
   QUnit.test('the user-selected language takes priority over default language', function(assert) {
     // The video has ‘English’ captions as default, but has ‘Spanish’ captions also
-    const player = TestHelpers.makePlayer({techOrder: ['html5']});
+    const player = TestHelpers.makePlayer();
     const track1 = {
       kind: 'captions',
       label: 'English',
