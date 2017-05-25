@@ -332,9 +332,10 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   const oldVTT = window.WebVTT;
   let parserCreated = false;
 
-  window.WebVTT = () => {};
-  window.WebVTT.StringDecoder = () => {};
-  window.WebVTT.Parser = () => {
+  const WebVTT = () => {};
+
+  WebVTT.StringDecoder = () => {};
+  WebVTT.Parser = () => {
     parserCreated = true;
     return {
       oncue() {},
@@ -347,7 +348,14 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
 
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
+  const vttjs = {
+    vttjsLoaded: false,
+    getVttjs() {
+      return { WebVTT };
+    }
+  };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
+    './vtt.js': vttjs,
     xhr(options, fn) {
       xhrHandler = fn;
     }
@@ -361,6 +369,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   /* eslint-enable no-unused-vars */
 
   xhrHandler(null, {}, 'WEBVTT\n');
+  this.tech.trigger('vttjsloaded');
 
   assert.ok(parserCreated, 'WebVTT is loaded, so we can just parse');
 
@@ -373,9 +382,30 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   const oldVTT = window.WebVTT;
   let parserCreated = false;
 
+  const WebVTT = () => {};
+
+  WebVTT.StringDecoder = () => {};
+  WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
+  const vttjs = {
+    vttjsLoaded: false,
+    getVttjs() {
+      return { WebVTT };
+    }
+  };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
+    './vtt.js': vttjs,
     xhr(options, fn) {
       xhrHandler = fn;
     }
@@ -402,19 +432,6 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   clock.tick(100);
   assert.ok(!parserCreated, 'WebVTT still not loaded, do not try to parse yet');
 
-  window.WebVTT = () => {};
-  window.WebVTT.StringDecoder = () => {};
-  window.WebVTT.Parser = () => {
-    parserCreated = true;
-    return {
-      oncue() {},
-      onparsingerror() {},
-      onflush() {},
-      parse() {},
-      flush() {}
-    };
-  };
-
   testTech.trigger('vttjsloaded');
   assert.ok(parserCreated, 'WebVTT is loaded, so we can parse now');
 
@@ -432,7 +449,14 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
+  const vttjs = {
+    vttjsLoaded: false,
+    getVttjs() {
+      return null;
+    }
+  };
   const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
+    './vtt.js': vttjs,
     xhr(options, fn) {
       xhrHandler = fn;
     },
@@ -467,7 +491,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   assert.ok(errorSpy.called, 'vttjs failed to load, so log.error was called');
   if (errorSpy.called) {
-    assert.ok(/^vttjs failed to load, stopping trying to process/.test(errorSpy.getCall(0).args[0]),
+    assert.ok(/^vttjs failed to load, unable to process/.test(errorSpy.getCall(0).args[0]),
        'log.error was called with the expected message');
   }
   assert.ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');

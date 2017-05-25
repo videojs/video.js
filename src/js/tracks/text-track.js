@@ -11,6 +11,7 @@ import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 import merge from '../utils/merge-options';
 import * as browser from '../utils/browser.js';
+import {vttjsLoaded, getVttjs} from './vtt.js';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -24,9 +25,8 @@ import * as browser from '../utils/browser.js';
  * @private
  */
 const parseCues = function(srcContent, track) {
-  const parser = new window.WebVTT.Parser(window,
-                                          window.vttjs,
-                                          window.WebVTT.StringDecoder());
+  const vttjs = getVttjs();
+  const parser = new vttjs.WebVTT.Parser(window, vttjs, vttjs.WebVTT.StringDecoder());
   const errors = [];
 
   parser.oncue = function(cue) {
@@ -88,21 +88,19 @@ const loadTrack = function(src, track) {
 
     // Make sure that vttjs has loaded, otherwise, wait till it finished loading
     // NOTE: this is only used for the alt/video.novtt.js build
-    if (typeof window.WebVTT !== 'function') {
-      if (track.tech_) {
-        const loadHandler = () => parseCues(responseBody, track);
-
-        track.tech_.on('vttjsloaded', loadHandler);
-        track.tech_.on('vttjserror', () => {
-          log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
-          track.tech_.off('vttjsloaded', loadHandler);
-        });
-
-      }
-    } else {
+    if (vttjsLoaded) {
       parseCues(responseBody, track);
+      return;
     }
+    if (track.tech_) {
+      const loadHandler = () => parseCues(responseBody, track);
 
+      track.tech_.on('vttjsloaded', loadHandler);
+      track.tech_.on('vttjserror', () => {
+        log.error(`vttjs failed to load, unable to process ${track.src}`);
+        track.tech_.off('vttjsloaded', loadHandler);
+      });
+    }
   }));
 };
 

@@ -132,3 +132,13 @@ export function isPlain(value) {
     toString.call(value) === '[object Object]' &&
     value.constructor === Object;
 }
+
+/**
+ * Returns whether an object appears to be a "plain" object without any keys.
+ *
+ * @param {Object} value
+ * @return {Boolean}
+ */
+export function isPlainEmpty(value) {
+  return isPlain(value) && keys(value).length === 0;
+}

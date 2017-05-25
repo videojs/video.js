@@ -34,6 +34,7 @@ import filterSource from './utils/filter-source';
 // are always included in the video.js package. Importing the modules will
 // execute them and they will register themselves with video.js.
 import './tech/loader.js';
+import './tracks/vtt.js';
 import './poster-image.js';
 import './tracks/text-track-display.js';
 import './loading-spinner.js';
@@ -3327,6 +3328,7 @@ Player.prototype.options_ = {
   // Included control sets
   children: [
     'mediaLoader',
+    'vttLoader',
     'posterImage',
     'textTrackDisplay',
     'loadingSpinner',

@@ -21,6 +21,11 @@ const TestHelpers = {
     playerOptions = playerOptions || {};
     playerOptions.techOrder = playerOptions.techOrder || ['techFaker'];
 
+    // disable the vttjsLoaded if not set explicitly
+    if (!('vttLoader' in playerOptions)) {
+      playerOptions.vttLoader = false;
+    }
+
     const player = new Player(videoTag, playerOptions);
 
     player.middleware_ = [player.tech_];
