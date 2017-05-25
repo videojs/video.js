@@ -1,4 +1,8 @@
 {
-  "presets": [ "es3", ["es2015", {"loose": true}] ],
-  "plugins": ["inline-json"]
+  "presets": [
+    "es3",
+    ["es2015", {
+      "loose": true
+    }]
+  ]
 }

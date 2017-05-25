@@ -9,7 +9,7 @@
 
   <!-- Load the source files -->
   <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
-  <script src="../build/temp/video.js"></script>
+  <script src="../dist/video.js"></script>
   <script src="../node_modules/videojs-flash/dist/videojs-flash.js"></script>
 
   <!-- Set the location of the flash SWF -->

@@ -408,8 +408,7 @@ module.exports = function(grunt) {
       ],
       dev: [
         'shell:babel',
-        'browserify:watch',
-        'browserify:watchnovtt',
+        'shell:rollupwatch',
         'browserify:tests',
         'watch:skin',
         'watch:lang',
@@ -448,6 +447,24 @@ module.exports = function(grunt) {
       }
     },
     shell: {
+      rollup: {
+        command: 'npm run rollup',
+        options: {
+          preferLocal: true
+        }
+      },
+      rollupall: {
+        command: 'npm run rollup -- --no-progress && npm run rollup-minify -- --no-progress',
+        options: {
+          preferLocal: true
+        }
+      },
+      rollupwatch: {
+        command: 'npm run rollup-dev',
+        optoins: {
+          preferLocal: true
+        }
+      },
       babel: {
         command: 'npm run babel -- --watch',
         options: {
@@ -509,12 +526,7 @@ module.exports = function(grunt) {
     'shell:lint',
     'clean:build',
 
-    'babel:es5',
-    'browserify:build',
-    'browserify:buildnovtt',
-    'usebanner:novtt',
-    'usebanner:vtt',
-    'uglify',
+    'shell:rollupall',
 
     'skin',
     'version:css',
