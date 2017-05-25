@@ -253,6 +253,7 @@ class TextTrack extends Track {
          * @type {EventTarget~Event}
          */
         this.trigger('modechange');
+
       }
     });
 

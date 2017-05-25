@@ -66,6 +66,7 @@ class TextTrackButton extends TrackButton {
 
       // only add tracks that are of an appropriate kind and have a label
       if (this.kinds_.indexOf(track.kind) > -1) {
+
         const item = new TrackMenuItem(this.player_, {
           track,
           // MenuItem is selectable
