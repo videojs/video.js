@@ -1,3 +1,24 @@
+<a name="6.2.0"></a>
+# [6.2.0](https://github.com/videojs/video.js/compare/v6.1.0...v6.2.0) (2017-05-30)
+
+### Features
+
+* Persist caption/description choice over source changes in emulated tracks ([#4295](https://github.com/videojs/video.js/issues/4295)) ([188ead1](https://github.com/videojs/video.js/commit/188ead1))
+* **lang:** Adding galician ([#4334](https://github.com/videojs/video.js/issues/4334)) ([2a26c7f](https://github.com/videojs/video.js/commit/2a26c7f))
+* **lang:** Create sk.json ([#4374](https://github.com/videojs/video.js/issues/4374)) ([e5e1c7f](https://github.com/videojs/video.js/commit/e5e1c7f))
+* **lang:** Update zh-CN.json ([#4370](https://github.com/videojs/video.js/issues/4370)) ([0c16c5f](https://github.com/videojs/video.js/commit/0c16c5f))
+* Use Rollup to generate dist files ([#4301](https://github.com/videojs/video.js/issues/4301)) ([c31836c](https://github.com/videojs/video.js/commit/c31836c))
+
+### Chores
+
+* **package:** update grunt-contrib-cssmin to version 2.2.0 ([#4345](https://github.com/videojs/video.js/issues/4345)) ([d57f09f](https://github.com/videojs/video.js/commit/d57f09f))
+* **package:** update videojs-flash to version 2.0.0 ([#4375](https://github.com/videojs/video.js/issues/4375)) ([9816070](https://github.com/videojs/video.js/commit/9816070))
+* update translations needed ([#4380](https://github.com/videojs/video.js/issues/4380)) ([a5a68e8](https://github.com/videojs/video.js/commit/a5a68e8))
+
+### Tests
+
+* **TextTrackDisplay:** Removing incorrect test techOrder ([#4379](https://github.com/videojs/video.js/issues/4379)) ([eade52e](https://github.com/videojs/video.js/commit/eade52e))
+
 <a name="6.1.0"></a>
 # [6.1.0](https://github.com/videojs/video.js/compare/v6.0.1...v6.1.0) (2017-05-15)
 
