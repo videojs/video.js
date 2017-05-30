@@ -60,7 +60,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -118,7 +118,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -176,7 +176,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -234,7 +234,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -292,7 +292,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -350,19 +350,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
-| de.json (missing 8)     | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Volume Level                                                                        |
-|                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
-|                         | End of dialog window.                                                               |
+| de.json (Complete)      |                                                                                     |
 | el.json (missing 44)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -402,7 +395,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -459,7 +452,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -517,7 +510,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -575,7 +568,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -633,7 +626,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -691,7 +684,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -749,7 +742,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -807,7 +800,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -865,7 +858,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -923,7 +916,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -981,7 +974,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1028,7 +1021,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1086,7 +1079,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1137,7 +1130,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1195,7 +1188,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1238,7 +1231,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1282,7 +1275,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1341,7 +1334,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1399,7 +1392,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1410,7 +1403,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Volume Level                                                                        |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | End of dialog window.                                                               |
 | uk.json (missing 44)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -1451,7 +1444,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1494,7 +1487,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1538,7 +1531,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
@@ -1582,7 +1575,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
 |                         | Reset                                                                               |
-|                         | all settings to the default values                                                  |
+|                         | restore all settings to the default values                                          |
 |                         | Done                                                                                |
 |                         | Caption Settings Dialog                                                             |
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
