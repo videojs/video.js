@@ -1204,7 +1204,7 @@ Tech.withSourceHandlers = function(_Tech) {
     // then we are loading something new
     // than clear all of our current tracks
     if (this.currentSource_) {
-      this.clearTracks(['audio', 'video']);
+      this.clearTracks(TRACK_TYPES.NORMAL.names);
       this.currentSource_ = null;
     }
 
