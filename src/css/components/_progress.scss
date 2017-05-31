@@ -5,6 +5,7 @@
   cursor: pointer;
   @include flex(auto);
   @include display-flex(center);
+  margin: 0 0.45em 0 0.45em;
   min-width: 4em;
 }
 
