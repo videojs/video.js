@@ -126,7 +126,7 @@
     "npm-run": "^4.1.0",
     "npm-run-all": "^4.0.2",
     "proxyquireify": "^3.0.0",
-    "qunitjs": "1.23.1",
+    "qunitjs": "2.2.0",
     "remark-cli": "^3.0.0",
     "remark-lint": "^6.0.0",
     "remark-toc": "^4.0.0",
