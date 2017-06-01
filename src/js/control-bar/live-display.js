@@ -3,6 +3,7 @@
  */
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
+import * as browser from '../utils/browser.js';
 
 // TODO - Future make it click to snap to live
 
@@ -62,7 +63,24 @@ class LiveDisplay extends Component {
    */
   updateShowing(event) {
     if (this.player().duration() === Infinity) {
-      this.show();
+      // On Android Chrome, duration of VOD HLS remains Infinity until
+      // after playback has begun (and after hasStarted()).
+      if (browser.IS_ANDROID && browser.IS_CHROME) {
+        let checkDuration = function () {
+          if (this.player().currentTime() > 0) {
+            if (this.player().duration() === Infinity) {
+              this.show();
+            } else {
+              this.hide();
+            }
+            this.off(this.player(), 'timeupdate', checkDuration);
+          }
+        };
+
+        this.on(this.player(), 'timeupdate', checkDuration);
+      } else {
+        this.show();
+      }
     } else {
       this.hide();
     }
