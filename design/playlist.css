@@ -1,0 +1,48 @@
+.vjs-playlist {
+  background-color: black;
+  position: absolute;
+  overflow-y: hidden;
+  overflow-x: auto;
+  display: none;
+}
+
+.vjs-playlist img { 
+  margin: 10px;
+  border: 3px solid #555;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  width: 125px;
+  height: 95px;
+}
+
+.vjs-playlist img:hover {
+  border: 3px solid #777;
+  cursor: pointer;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+}
+
+/* Scrollbar
+---------------------------------------------------------*/
+
+
+.vjs-playlist.webkit-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.vjs-playlist.webkit-scrollbar::-webkit-scrollbar-button:start:decrement,
+.vjs-playlist::-webkit-scrollbar-button:end:increment  {
+  display: none;
+}
+ 
+.vjs-playlist.webkit-scrollbar::-webkit-scrollbar-track-piece  {
+  background-color: #3b3b3b;
+  -webkit-border-radius: 6px;
+}
+ 
+.vjs-playlist.webkit-scrollbar::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 6px;
+  background: #666 no-repeat center; 
+}
+
+
