@@ -60,6 +60,7 @@ class ChaptersButton extends TextTrackButton {
       this.setTrack(this.findChaptersTrack());
     }
     super.update();
+    this.trigger('change');
   }
 
   /**
