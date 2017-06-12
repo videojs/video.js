@@ -5,15 +5,15 @@
   <title>Video.js Plugin Example</title>
 
   <!-- Add ES5 shim and sham for IE8 -->
-  <script src="../build/temp/ie8/videojs-ie8.js"></script>
+  <script src="../dist/ie8/videojs-ie8.js"></script>
 
   <!-- Load the source files -->
   <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
-  <script src="../build/temp/video.js"></script>
+  <script src="../dist/video.js"></script>
 
   <!-- Set the location of the flash SWF -->
   <script>
-    videojs.options.flash.swf = '../build/temp/video-js.swf';
+    videojs.options.flash.swf = '../node_modules/videojs-flash/node_modules/videojs-swf/dist/video-js.swf';
   </script>
 
 </head>
