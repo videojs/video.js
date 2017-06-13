@@ -3265,7 +3265,7 @@ class Player extends Component {
  * @return {TextTrackList}
  *         The current remote text track list
  *
- * @method Player.prototype.textTracks
+ * @method Player.prototype.remoteTextTracks
  */
 
 /**
