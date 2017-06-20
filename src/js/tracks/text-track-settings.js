@@ -299,8 +299,9 @@ class TextTrackSettings extends ModalDialog {
    * @param {string} key
    *        Configuration key to use during creation.
    *
-   * @return {Element}
-   *         The DOM element that gets created.
+   * @return {string}
+   *         An HTML string.
+   *
    * @private
    */
   createElSelect_(key, legendId = '', type = 'label') {
@@ -308,101 +309,94 @@ class TextTrackSettings extends ModalDialog {
     const id = config.id.replace('%s', this.id_);
 
     return [
-      createEl(type, {
-        id,
-        className: type === 'label' ? 'vjs-label' : '',
-        textContent: this.localize(config.label)
-      }, {
-      }),
-      createEl('select', {}, {
-        'aria-labelledby': `${legendId} ${id}`
-      }, config.options.map(o => {
+      `<${type} id="${id}" class="${type === 'label' ? 'vjs-label' : ''}">`,
+      this.localize(config.label),
+      `</${type}>`,
+      `<select aria-labelledby="${legendId} ${id}">`
+    ].
+      concat(config.options.map(o => {
         const optionId = id + '-' + o[1];
 
-        return createEl('option', {
-          id: optionId,
-          textContent: this.localize(o[1]),
-          value: o[0]
-        }, {
-          'aria-labelledby': `${legendId} ${id} ${optionId}`
-        });
-      }))
-    ];
+        return [
+          `<option id="${optionId}" value="${o[0]}" `,
+          `aria-labelledby="${legendId} ${id} ${optionId}">`,
+          this.localize(o[1]),
+          '</option>'
+        ].join('');
+      })).
+      concat('</select>').join('');
   }
 
   /**
    * Create foreground color element for the component
    *
-   * @return {Element}
-   *         The element that was created.
+   * @return {string}
+   *         An HTML string.
    *
    * @private
    */
   createElFgColor_() {
-    const legend = createEl('legend', {
-      id: `captions-text-legend-${this.id_}`,
-      textContent: this.localize('Text')
-    });
+    const legendId = `captions-text-legend-${this.id_}`;
 
-    const select = this.createElSelect_('color', legend.id);
-
-    const opacity = createEl('span', {
-      className: 'vjs-text-opacity vjs-opacity'
-    }, undefined, this.createElSelect_('textOpacity', legend.id));
-
-    return createEl('fieldset', {
-      className: 'vjs-fg-color vjs-track-setting'
-    }, undefined, [legend].concat(select, opacity));
+    return [
+      '<fieldset class="vjs-fg-color vjs-track-setting">',
+      `<legend id="${legendId}">`,
+      this.localize('Text'),
+      '</legend>',
+      this.createElSelect_('color', legendId),
+      '<span class="vjs-text-opacity vjs-opacity">',
+      this.createElSelect_('textOpacity', legendId),
+      '</span>',
+      '</fieldset>'
+    ].join('');
   }
 
   /**
    * Create background color element for the component
    *
-   * @return {Element}
-   *         The element that was created
+   * @return {string}
+   *         An HTML string.
    *
    * @private
    */
   createElBgColor_() {
-    const legend = createEl('legend', {
-      id: `captions-background-${this.id_}`,
-      textContent: this.localize('Background')
-    });
+    const legendId = `captions-background-${this.id_}`;
 
-    const select = this.createElSelect_('backgroundColor', legend.id);
-
-    const opacity = createEl('span', {
-      className: 'vjs-bg-opacity vjs-opacity'
-    }, undefined, this.createElSelect_('backgroundOpacity', legend.id));
-
-    return createEl('fieldset', {
-      className: 'vjs-bg-color vjs-track-setting'
-    }, undefined, [legend].concat(select, opacity));
+    return [
+      '<fieldset class="vjs-bg-color vjs-track-setting">',
+      `<legend id="${legendId}">`,
+      this.localize('Background'),
+      '</legend>',
+      this.createElSelect_('backgroundColor', legendId),
+      '<span class="vjs-bg-opacity vjs-opacity">',
+      this.createElSelect_('backgroundOpacity', legendId),
+      '</span>',
+      '</fieldset>'
+    ].join('');
   }
 
   /**
    * Create window color element for the component
    *
-   * @return {Element}
-   *         The element that was created
+   * @return {string}
+   *         An HTML string.
    *
    * @private
    */
   createElWinColor_() {
-    const legend = createEl('legend', {
-      id: `captions-window-${this.id_}`,
-      textContent: this.localize('Window')
-    });
+    const legendId = `captions-window-${this.id_}`;
 
-    const select = this.createElSelect_('windowColor', legend.id);
-
-    const opacity = createEl('span', {
-      className: 'vjs-window-opacity vjs-opacity'
-    }, undefined, this.createElSelect_('windowOpacity', legend.id));
-
-    return createEl('fieldset', {
-      className: 'vjs-window-color vjs-track-setting'
-    }, undefined, [legend].concat(select, opacity));
+    return [
+      '<fieldset class="vjs-window-color vjs-track-setting">',
+      `<legend id="${legendId}">`,
+      this.localize('Window'),
+      '</legend>',
+      this.createElSelect_('windowColor', legendId),
+      '<span class="vjs-window-opacity vjs-opacity">',
+      this.createElSelect_('windowOpacity', legendId),
+      '</span>',
+      '</fieldset>'
+    ].join('');
   }
 
   /**
@@ -415,12 +409,13 @@ class TextTrackSettings extends ModalDialog {
    */
   createElColors_() {
     return createEl('div', {
-      className: 'vjs-track-settings-colors'
-    }, undefined, [
-      this.createElFgColor_(),
-      this.createElBgColor_(),
-      this.createElWinColor_()
-    ]);
+      className: 'vjs-track-settings-colors',
+      innerHTML: [
+        this.createElFgColor_(),
+        this.createElBgColor_(),
+        this.createElWinColor_()
+      ].join('')
+    });
   }
 
   /**
@@ -432,21 +427,20 @@ class TextTrackSettings extends ModalDialog {
    * @private
    */
   createElFont_() {
-    const fontPercent = createEl('fieldset', {
-      className: 'vjs-font-percent vjs-track-setting'
-    }, undefined, this.createElSelect_('fontPercent', '', 'legend'));
-
-    const edgeStyle = createEl('fieldset', {
-      className: 'vjs-edge-style vjs-track-setting'
-    }, undefined, this.createElSelect_('edgeStyle', '', 'legend'));
-
-    const fontFamily = createEl('fieldset', {
-      className: 'vjs-font-family vjs-track-setting'
-    }, undefined, this.createElSelect_('fontFamily', '', 'legend'));
-
     return createEl('div', {
-      className: 'vjs-track-settings-font'
-    }, undefined, [fontPercent, edgeStyle, fontFamily]);
+      className: 'vjs-track-settings-font">',
+      innerHTML: [
+        '<fieldset class="vjs-font-percent vjs-track-setting">',
+        this.createElSelect_('fontPercent', '', 'legend'),
+        '</fieldset>',
+        '<fieldset class="vjs-edge-style vjs-track-setting">',
+        this.createElSelect_('edgeStyle', '', 'legend'),
+        '</fieldset>',
+        '<fieldset class="vjs-font-family vjs-track-setting">',
+        this.createElSelect_('fontFamily', '', 'legend'),
+        '</fieldset>'
+      ].join('')
+    });
   }
 
   /**
@@ -459,30 +453,17 @@ class TextTrackSettings extends ModalDialog {
    */
   createElControls_() {
     const defaultsDescription = this.localize('restore all settings to the default values');
-    const defaultsButton = createEl('button', {
-      className: 'vjs-default-button',
-      title: defaultsDescription,
-      innerHTML: `${this.localize('Reset')}<span class='vjs-control-text'> ${defaultsDescription}</span>`
-    });
-
-    const doneButton = createEl('button', {
-      className: 'vjs-done-button',
-      textContent: this.localize('Done')
-    });
 
     return createEl('div', {
-      className: 'vjs-track-settings-controls'
-    }, undefined, [defaultsButton, doneButton]);
-  }
-
-  /**
-   * Create the component's DOM element
-   *
-   * @return {Element}
-   *         The element that was created.
-   */
-  createEl() {
-    return super.createEl();
+      className: 'vjs-track-settings-controls',
+      innerHTML: [
+        `<button class="vjs-default-button" title="${defaultsDescription}">`,
+        this.localize('Reset'),
+        `<span class="vjs-control-text"> ${defaultsDescription}</span>`,
+        '</button>',
+        `<button class="vjs-done-button">${this.localize('Done')}</button>`
+      ].join('')
+    });
   }
 
   content() {
