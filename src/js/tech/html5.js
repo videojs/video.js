@@ -368,24 +368,26 @@ class Html5 extends Tech {
     // playback has started, which triggers the live display erroneously.
     // Return NaN if playback has not started and trigger a durationupdate once
     // the duration can be reliably known.
-    if (this.el_.duration === Infinity &&
-      browser.IS_ANDROID && browser.IS_CHROME) {
-      if (this.el_.currentTime === 0) {
-        // Wait for the first `timeupdate` with currentTime > 0 - there may be
-        // several with 0
-        const checkProgress = () => {
-          if (this.el_.currentTime > 0) {
-            // Trigger durationchange for genuinely live video
-            if (this.el_.duration === Infinity) {
-              this.trigger('durationchange');
-            }
-            this.off('timeupdate', checkProgress);
+    if (
+      this.el_.duration === Infinity &&
+      browser.IS_ANDROID &&
+      browser.IS_CHROME &&
+      this.el_.currentTime === 0
+    ) {
+      // Wait for the first `timeupdate` with currentTime > 0 - there may be
+      // several with 0
+      const checkProgress = () => {
+        if (this.el_.currentTime > 0) {
+          // Trigger durationchange for genuinely live video
+          if (this.el_.duration === Infinity) {
+            this.trigger('durationchange');
           }
-        };
+          this.off('timeupdate', checkProgress);
+        }
+      };
 
-        this.on('timeupdate', checkProgress);
-        return NaN;
-      }
+      this.on('timeupdate', checkProgress);
+      return NaN;
     }
     return this.el_.duration || NaN;
   }
