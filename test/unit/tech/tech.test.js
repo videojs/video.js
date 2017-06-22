@@ -221,6 +221,7 @@ QUnit.test('switching sources should clear all remote tracks that are added with
 
   // default value for manualCleanup is true
   tech.addRemoteTextTrack({});
+  this.clock.tick(1);
 
   assert.equal(warning,
                'Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js',
@@ -228,6 +229,7 @@ QUnit.test('switching sources should clear all remote tracks that are added with
 
   // should be automatically cleaned up when source changes
   tech.addRemoteTextTrack({}, false);
+  this.clock.tick(1);
 
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
   assert.equal(tech.remoteTextTrackEls().length,
@@ -240,6 +242,7 @@ QUnit.test('switching sources should clear all remote tracks that are added with
 
   // change source to force cleanup of auto remote text tracks
   tech.setSource({src: 'bar.mp4', type: 'mp4'});
+  this.clock.tick(1);
 
   assert.equal(tech.textTracks().length,
                1,

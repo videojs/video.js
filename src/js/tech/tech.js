@@ -700,7 +700,7 @@ class Tech extends Component {
 
     if (manualCleanup !== true) {
       // create the TextTrackList if it doesn't exist
-      this.ready(() => this.autoRemoteTextTracks_.addTrack(htmlTrackElement.track), true);
+      this.ready(() => this.autoRemoteTextTracks_.addTrack(htmlTrackElement.track));
     }
 
     return htmlTrackElement;

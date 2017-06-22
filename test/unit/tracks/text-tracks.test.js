@@ -551,4 +551,26 @@ if (Html5.isSupported()) {
     this.clock.tick(1);
     assert.equal(player.textTracks().length, 1, 'we have one text track');
   });
+
+  QUnit.test('auto remove tracks added right before a source change will be cleaned up', function(assert) {
+    const player = TestHelpers.makePlayer({
+      techOrder: ['html5']
+    });
+
+    console.log(player.isReady_, player.tech_.isReady_);
+
+    const track = {
+      kind: 'kind',
+      src: 'src',
+      language: 'language',
+      label: 'label',
+      default: 'default'
+    };
+
+    player.addRemoteTextTrack(track, false);
+    player.src({src: 'example.mp4', type: 'video/mp4'});
+
+    this.clock.tick(1);
+    assert.equal(player.textTracks().length, 0, 'we do not have any tracks left');
+  });
 }
