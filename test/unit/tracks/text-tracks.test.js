@@ -528,3 +528,27 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
               'the track element was removed correctly');
   player.dispose();
 });
+
+if (Html5.isSupported()) {
+  QUnit.test('auto remove tracks should not clean up tracks added while source is being added', function(assert) {
+    const player = TestHelpers.makePlayer({
+      techOrder: ['html5']
+    });
+
+    console.log(player.isReady_, player.tech_.isReady_);
+
+    const track = {
+      kind: 'kind',
+      src: 'src',
+      language: 'language',
+      label: 'label',
+      default: 'default'
+    };
+
+    player.src({src: 'example.mp4', type: 'video/mp4'});
+    player.addRemoteTextTrack(track, false);
+
+    this.clock.tick(1);
+    assert.equal(player.textTracks().length, 1, 'we have one text track');
+  });
+}
