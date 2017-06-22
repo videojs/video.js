@@ -557,9 +557,12 @@ class Html5 extends Tech {
     };
 
     const beginFn = function() {
-      this.one('webkitendfullscreen', endFn);
+      if ('webkitPresentationMode' in this.el_ &&
+        this.el_.webkitPresentationMode !== 'picture-in-picture') {
+        this.one('webkitendfullscreen', endFn);
 
-      this.trigger('fullscreenchange', { isFullscreen: true });
+        this.trigger('fullscreenchange', { isFullscreen: true });
+      }
     };
 
     this.on('webkitbeginfullscreen', beginFn);
