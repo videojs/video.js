@@ -102,7 +102,7 @@
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.17.1",
     "humanize-duration": "^3.10.0",
-    "husky": "^0.13.1",
+    "husky": "^0.14.0",
     "in-publish": "^2.0.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.2",
