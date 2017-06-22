@@ -214,6 +214,8 @@ QUnit.test('switching sources should clear all remote tracks that are added with
 
   const tech = new MyTech();
 
+  tech.triggerReady();
+
   // set the initial source
   tech.setSource({src: 'foo.mp4', type: 'mp4'});
 
