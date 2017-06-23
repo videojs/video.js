@@ -535,8 +535,6 @@ if (Html5.isSupported()) {
       techOrder: ['html5']
     });
 
-    console.log(player.isReady_, player.tech_.isReady_);
-
     const track = {
       kind: 'kind',
       src: 'src',
@@ -556,8 +554,6 @@ if (Html5.isSupported()) {
     const player = TestHelpers.makePlayer({
       techOrder: ['html5']
     });
-
-    console.log(player.isReady_, player.tech_.isReady_);
 
     const track = {
       kind: 'kind',
