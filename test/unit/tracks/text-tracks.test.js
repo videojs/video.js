@@ -532,7 +532,10 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
 if (Html5.isSupported()) {
   QUnit.test('auto remove tracks should not clean up tracks added while source is being added', function(assert) {
     const player = TestHelpers.makePlayer({
-      techOrder: ['html5']
+      techOrder: ['html5'],
+      html5: {
+        nativeTextTracks: false
+      }
     });
 
     const track = {
@@ -552,7 +555,10 @@ if (Html5.isSupported()) {
 
   QUnit.test('auto remove tracks added right before a source change will be cleaned up', function(assert) {
     const player = TestHelpers.makePlayer({
-      techOrder: ['html5']
+      techOrder: ['html5'],
+      html5: {
+        nativeTextTracks: false
+      }
     });
 
     const track = {
