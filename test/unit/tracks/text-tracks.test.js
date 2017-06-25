@@ -551,6 +551,8 @@ if (Html5.isSupported()) {
 
     this.clock.tick(1);
     assert.equal(player.textTracks().length, 1, 'we have one text track');
+
+    player.dispose();
   });
 
   QUnit.test('auto remove tracks added right before a source change will be cleaned up', function(assert) {
@@ -574,5 +576,7 @@ if (Html5.isSupported()) {
 
     this.clock.tick(1);
     assert.equal(player.textTracks().length, 0, 'we do not have any tracks left');
+
+    player.dispose();
   });
 }
