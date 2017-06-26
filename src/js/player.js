@@ -148,7 +148,7 @@ const TECH_EVENTS_RETRIGGER = [
   /**
    * Fires when the browser has loaded the current frame of the audio/video.
    *
-   * @event player#loadeddata
+   * @event Player#loadeddata
    * @type {event}
    */
   /**
@@ -164,7 +164,7 @@ const TECH_EVENTS_RETRIGGER = [
   /**
    * Fires when the current playback position has changed.
    *
-   * @event player#timeupdate
+   * @event Player#timeupdate
    * @type {event}
    */
   /**
@@ -180,7 +180,7 @@ const TECH_EVENTS_RETRIGGER = [
   /**
    * Fires when the playing speed of the audio/video is changed
    *
-   * @event player#ratechange
+   * @event Player#ratechange
    * @type {event}
    */
   /**
@@ -212,7 +212,7 @@ const TECH_EVENTS_RETRIGGER = [
   /**
    * Fires when the volume has been changed
    *
-   * @event player#volumechange
+   * @event Player#volumechange
    * @type {event}
    */
   /**
@@ -228,7 +228,7 @@ const TECH_EVENTS_RETRIGGER = [
   /**
    * Fires when the text track has been changed
    *
-   * @event player#texttrackchange
+   * @event Player#texttrackchange
    * @type {event}
    */
   /**
