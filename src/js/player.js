@@ -1747,10 +1747,12 @@ class Player extends Component {
    */
   duration(seconds) {
     if (seconds === undefined) {
-      return this.cache_.duration || 0;
+      
+      // return NaN if the duration is not known
+      return this.cache_.duration !== undefined ? this.cache_.duration : NaN;
     }
 
-    seconds = parseFloat(seconds) || 0;
+    seconds = parseFloat(seconds);
 
     // Standardize on Inifity for signaling video is live
     if (seconds < 0) {
