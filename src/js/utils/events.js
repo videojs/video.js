@@ -207,17 +207,19 @@ export function fixEvent(event) {
  */
 let _supportsPassive = false;
 
-try {
-  const opts = Object.defineProperty({}, 'passive', {
-    get() {
-      _supportsPassive = true;
-    }
-  });
+(function() {
+  try {
+    const opts = Object.defineProperty({}, 'passive', {
+      get() {
+        _supportsPassive = true;
+      }
+    });
 
-  window.addEventListener('test', null, opts);
-} catch (e) {
-  // disregard
-}
+    window.addEventListener('test', null, opts);
+  } catch (e) {
+    // disregard
+  }
+})();
 
 /**
  * Touch events Chrome expects to be passive
