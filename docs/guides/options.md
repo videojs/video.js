@@ -318,7 +318,7 @@ The `children` options can also be passed as an `Object`. In this case, it is us
 videojs('my-player', {
   children: {
     controlBar: {
-      fullscreenControl: false
+      fullscreenToggle: false
     }
   }
 });
@@ -333,7 +333,7 @@ Components can be given custom options via the _lower-camel-case variant of the 
 ```js
 videojs('my-player', {
   controlBar: {
-    fullscreenControl: false
+    fullscreenToggle: false
   }
 });
 ```
