@@ -220,6 +220,14 @@ try {
 }
 
 /**
+ * Touch events Chrome expects to be passive
+ */
+const passiveEvents = [
+  'touchstart',
+  'touchmove'
+];
+
+/**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
@@ -293,7 +301,7 @@ export function on(elem, type, fn) {
       let options = false;
 
       if (_supportsPassive &&
-        ['touchstart', 'touchmove'].indexOf(type) > -1) {
+        passiveEvents.indexOf(type) > -1) {
         options = {passive: true};
       }
       elem.addEventListener(type, data.dispatcher, options);
