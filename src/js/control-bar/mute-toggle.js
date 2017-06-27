@@ -83,9 +83,9 @@ class MuteToggle extends Button {
 
     if (this.player_.muted()) {
       level = 0;
-    } else if (vol === 0) {
+    } else if (vol < 0.33) {
       level = 1;
-    } else if (vol > 0 && vol <= 0.5) {
+    } else if (vol < 0.67) {
       level = 2;
     }
 
