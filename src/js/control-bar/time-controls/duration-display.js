@@ -1,8 +1,10 @@
 /**
  * @file duration-display.js
  */
+import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
+import {bind, throttle} from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -24,13 +26,17 @@ class DurationDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
-    this.on(player, 'durationchange', this.updateContent);
+    this.throttledUpdateContent = throttle(bind(this, this.updateContent), 25);
 
-    // Also listen for timeupdate and loadedmetadata because removing those
-    // listeners could have broken dependent applications/libraries. These
-    // can likely be removed for 6.0.
-    this.on(player, 'timeupdate', this.updateContent);
-    this.on(player, 'loadedmetadata', this.updateContent);
+    this.on(player, [
+      'durationchange',
+
+      // Also listen for timeupdate and loadedmetadata because removing those
+      // listeners could have broken dependent applications/libraries. These
+      // can likely be removed for 7.0.
+      'loadedmetadata',
+      'timeupdate'
+    ], this.throttledUpdateContent);
   }
 
   /**
@@ -45,16 +51,32 @@ class DurationDisplay extends Component {
     });
 
     this.contentEl_ = Dom.createEl('div', {
-      className: 'vjs-duration-display',
-      // label the duration time for screen reader users
-      innerHTML: `<span class="vjs-control-text">${this.localize('Duration Time')}</span> 0:00`
+      className: 'vjs-duration-display'
     }, {
       // tell screen readers not to automatically read the time as it changes
       'aria-live': 'off'
-    });
+    }, Dom.createEl('span', {
+      className: 'vjs-control-text',
+      textContent: this.localize('Duration Time')
+    }));
 
+    this.updateTextNode_();
     el.appendChild(this.contentEl_);
     return el;
+  }
+
+  /**
+   * Updates the "current time" text node with new content using the
+   * contents of the `formattedTime_` property.
+   *
+   * @private
+   */
+  updateTextNode_() {
+    if (this.textNode_) {
+      this.contentEl_.removeChild(this.textNode_);
+    }
+    this.textNode_ = document.createTextNode(` ${this.formattedTime_ || '0:00'}`);
+    this.contentEl_.appendChild(this.textNode_);
   }
 
   /**
@@ -73,14 +95,10 @@ class DurationDisplay extends Component {
 
     if (duration && this.duration_ !== duration) {
       this.duration_ = duration;
-      const localizedText = this.localize('Duration Time');
-      const formattedTime = formatTime(duration);
-
-      // label the duration time for screen reader users
-      this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;
+      this.formattedTime_ = formatTime(duration);
+      this.requestAnimationFrame(this.updateTextNode_);
     }
   }
-
 }
 
 Component.registerComponent('DurationDisplay', DurationDisplay);
