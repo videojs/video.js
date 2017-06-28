@@ -1,3 +1,32 @@
+<a name="6.2.1"></a>
+## [6.2.1](https://github.com/videojs/video.js/compare/v6.2.0...v6.2.1) (2017-06-28)
+
+### Bug Fixes
+
+* auto-removal remote text tracks being removed when not supposed to ([#4450](https://github.com/videojs/video.js/issues/4450)) ([82c8b80](https://github.com/videojs/video.js/commit/82c8b80)), closes [#4403](https://github.com/videojs/video.js/issues/4403) [#4315](https://github.com/videojs/video.js/issues/4315)
+* IE10 issue for disableOthers when property access results in "permission denied" ([#4395](https://github.com/videojs/video.js/issues/4395)) ([7f7ea70](https://github.com/videojs/video.js/commit/7f7ea70)), closes [#4378](https://github.com/videojs/video.js/issues/4378)
+* player.duration() should return NaN if duration is not known ([#4443](https://github.com/videojs/video.js/issues/4443)) ([f5cc165](https://github.com/videojs/video.js/commit/f5cc165))
+* Safari picture-in-picture triggers fullscreenchange ([#4437](https://github.com/videojs/video.js/issues/4437)) ([b636663](https://github.com/videojs/video.js/commit/b636663))
+* Update translations to match correct string ([#4383](https://github.com/videojs/video.js/issues/4383)) ([e0824c8](https://github.com/videojs/video.js/commit/e0824c8))
+* Use passive event listeners for touchstart/touchmove ([#4440](https://github.com/videojs/video.js/issues/4440)) ([b4dc4f8](https://github.com/videojs/video.js/commit/b4dc4f8)), closes [#4432](https://github.com/videojs/video.js/issues/4432)
+
+### Chores
+
+* **package:** update husky to version 0.14.1 ([#4444](https://github.com/videojs/video.js/issues/4444)) ([66a0d23](https://github.com/videojs/video.js/commit/66a0d23)), closes [#4436](https://github.com/videojs/video.js/issues/4436)
+* **package:** update rollup to version 0.42.0 ([#4392](https://github.com/videojs/video.js/issues/4392)) ([f87b12c](https://github.com/videojs/video.js/commit/f87b12c))
+* **package:** update rollup-watch to version 4.0.0 ([#4396](https://github.com/videojs/video.js/issues/4396)) ([4bce4a2](https://github.com/videojs/video.js/commit/4bce4a2))
+* **sandbox:** Fix paths in sandbox files. ([#4416](https://github.com/videojs/video.js/issues/4416)) ([c4bbe5d](https://github.com/videojs/video.js/commit/c4bbe5d))
+
+### Documentation
+
+* Fix links in API docs for several Player events. ([#4427](https://github.com/videojs/video.js/issues/4427)) ([cc6e824](https://github.com/videojs/video.js/commit/cc6e824))
+* Fixing player.remoteTextTracks jsdoc ([#4417](https://github.com/videojs/video.js/issues/4417)) ([9329e3e](https://github.com/videojs/video.js/commit/9329e3e))
+* Update name of FullscreenToggle in documentation ([#4410](https://github.com/videojs/video.js/issues/4410)) ([9702155](https://github.com/videojs/video.js/commit/9702155))
+
+### Performance Improvements
+
+* Various small performance improvements. ([#4426](https://github.com/videojs/video.js/issues/4426)) ([77ba3d1](https://github.com/videojs/video.js/commit/77ba3d1))
+
 <a name="6.2.0"></a>
 # [6.2.0](https://github.com/videojs/video.js/compare/v6.1.0...v6.2.0) (2017-05-30)
 
