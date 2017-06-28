@@ -203,6 +203,33 @@ export function fixEvent(event) {
 }
 
 /**
+ * Whether passive event listeners are supported
+ */
+let _supportsPassive = false;
+
+(function() {
+  try {
+    const opts = Object.defineProperty({}, 'passive', {
+      get() {
+        _supportsPassive = true;
+      }
+    });
+
+    window.addEventListener('test', null, opts);
+  } catch (e) {
+    // disregard
+  }
+})();
+
+/**
+ * Touch events Chrome expects to be passive
+ */
+const passiveEvents = [
+  'touchstart',
+  'touchmove'
+];
+
+/**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
@@ -273,7 +300,13 @@ export function on(elem, type, fn) {
 
   if (data.handlers[type].length === 1) {
     if (elem.addEventListener) {
-      elem.addEventListener(type, data.dispatcher, false);
+      let options = false;
+
+      if (_supportsPassive &&
+        passiveEvents.indexOf(type) > -1) {
+        options = {passive: true};
+      }
+      elem.addEventListener(type, data.dispatcher, options);
     } else if (elem.attachEvent) {
       elem.attachEvent('on' + type, data.dispatcher);
     }
