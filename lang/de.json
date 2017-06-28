@@ -70,7 +70,15 @@
   "Casual": "Zwanglos",
   "Script": "Schreibeschrift",
   "Small Caps": "Small-Caps",
+  "Reset": "Zurücksetzen",
+  "restore all settings to the default values": "Alle Einstellungen auf die Standardwerte zurücksetzen",
   "Done": "Fertig",
   "Caption Settings Dialog": "Einstellungsdialog für Untertitel",
-  "Beginning of dialog window. Escape will cancel and close the window.": "Anfang des Dialogfensters. Esc bricht ab und schließt das Fenster."
+  "Beginning of dialog window. Escape will cancel and close the window.": "Anfang des Dialogfensters. Esc bricht ab und schließt das Fenster.",
+  "End of dialog window.": "Ende des Dialogfensters.",
+  "Audio Player": "Audio-Player",
+  "Video Player": "Video-Player",
+  "Progress Bar": "Forschrittsbalken",
+  "progress bar timing: currentTime={1} duration={2}": "{1} von {2}",
+  "Volume Level": "Lautstärkestufe"
 }
