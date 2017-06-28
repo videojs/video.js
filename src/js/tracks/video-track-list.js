@@ -18,7 +18,7 @@ import document from 'global/document';
  */
 const disableOthers = function(list, track) {
   for (let i = 0; i < list.length; i++) {
-    if (track.id === list[i].id) {
+    if (!Object.keys(list[i]).length || track.id === list[i].id) {
       continue;
     }
     // another video track is enabled, disable it
