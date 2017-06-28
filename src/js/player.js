@@ -2247,17 +2247,16 @@ class Player extends Component {
   }
 
   /**
-   * The source function updates the video source
-   * There are three types of variables you can pass as the argument.
-   * **URL string**: A URL to the the video file. Use this method if you are sure
-   * the current playback technology (HTML5/Flash) can support the source you
-   * provide. Currently only MP4 files can be used in both HTML5 and Flash.
+   * Get or set the video source.
    *
-   * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
-   *        One SourceObject or an array of SourceObjects
+   * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
+   *        A SourceObject, an array of SourceObjects, or a string referencing
+   *        a URL to a media source. If not provided, this method acts as a
+   *        getter.
    *
-   * @return {string}
-   *         The current video source when getting
+   * @return {string|undefined}
+   *         If the `source` argument is missing, returns the current source
+   *         URL. Otherwise, returns nothing/undefined.
    */
   src(source) {
     // getter usage
