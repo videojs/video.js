@@ -25,8 +25,6 @@ class CurrentTimeDisplay extends Component {
    */
   constructor(player, options) {
     super(player, options);
-
-    this.formattedTime_ = '0:00';
     this.throttledUpdateContent = throttle(bind(this, this.updateContent), 25);
     this.on(player, 'timeupdate', this.throttledUpdateContent);
   }
@@ -67,7 +65,7 @@ class CurrentTimeDisplay extends Component {
     if (this.textNode_) {
       this.contentEl_.removeChild(this.textNode_);
     }
-    this.textNode_ = document.createTextNode(` ${this.formattedTime_}`);
+    this.textNode_ = document.createTextNode(` ${this.formattedTime_ || '0:00'}`);
     this.contentEl_.appendChild(this.textNode_);
   }
 
