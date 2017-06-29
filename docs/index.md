@@ -28,11 +28,11 @@ Guides explain general topics and use cases (e.g. setup). API docs are automatic
 
 ### [FAQ](/docs/guides/faq.md)
 
-The frequently asked questions for video.js.
+The frequently asked questions for Video.js.
 
 ### [Troubleshooting](/docs/guides/troubleshooting.md)
 
-Troubleshooting help for video.js.
+Troubleshooting help for Video.js.
 
 ## [Guides](/docs/guides/)
 
@@ -58,7 +58,7 @@ Tracks are used for displaying text information over a video, selecting differen
 
 #### [Skins](/docs/guides/skins.md)
 
-You can change the look of the player across playback technologies just by editing a CSS file. The skins documentation gives you a intro to how the HTML and CSS of the default skin is put together. For a list of skins you can check the [video.js wiki][skins-list].
+You can change the look of the player across playback technologies just by editing a CSS file. The skins documentation gives you a intro to how the HTML and CSS of the default skin is put together. For a list of skins you can check the [Video.js wiki][skins-list].
 
 #### [Plugins](/docs/guides/plugins.md)
 

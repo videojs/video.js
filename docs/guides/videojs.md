@@ -11,7 +11,7 @@
 * [extend()](#extend)
 * [mergeOptions()](#mergeoptions)
 * [bind()](#bind)
-* [plugin()](#plugin)
+* [registerPlugin()](#plugin)
 * [xhr()](#xhr)
 
 ## `videojs()`
@@ -126,13 +126,13 @@ videojs.bind(someObj, function() {
 });
 ```
 
-## `plugin()`
+## `registerPlugin()`
 
 **See the [plugin guide](/docs/guides/plugins.md) in the docs for a more detailed example**
 
 ```js
 // Make a plugin that alerts when the player plays
-videojs.plugin('myPlugin', function(myPluginOptions) {
+videojs.registerPlugin('myPlugin', function(myPluginOptions) {
   myPluginOptions = myPluginOptions || {};
 
   var player = this;

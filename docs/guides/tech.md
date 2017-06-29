@@ -57,7 +57,7 @@ videojs("videoID", {
 
 ## Technology Ordering
 
-By default Video.js performs "Tech-first" ordering when it searches for a source/tech combination to play videos. This means that if you have two sources and two techs, video.js will try to play each video with the first tech in the `techOrder` option property before moving on to try the next playback technology.
+By default Video.js performs "Tech-first" ordering when it searches for a source/tech combination to play videos. This means that if you have two sources and two techs, Video.js will try to play each video with the first tech in the `techOrder` option property before moving on to try the next playback technology.
 
 Tech-first ordering can present a problem if you have a `sourceHandler` that supports both `Html5` and `Flash` techs such as videojs-contrib-hls.
 

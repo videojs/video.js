@@ -99,7 +99,7 @@ Example
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   // get
   var howLoudIsIt = myPlayer.volume();
@@ -113,7 +113,7 @@ Volume can also be muted (without actually changing the volume value) using the 
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   // get, should be false
   console.log(myPlayer.muted());
@@ -131,7 +131,7 @@ To check if the player is currently fullscreen call the `isFullscreen` function 
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   // get, should be false
   console.log(myPlayer.isFullscreen());
@@ -149,7 +149,7 @@ To request that the player enter fullscreen call `requestFullscreen`.
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   myPlayer.requestFullscreen();
 });
@@ -160,7 +160,7 @@ To exit fullscreen call `exitFullscreen`
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   myPlayer.requestFullscreen();
   myPlayer.exitFullscreen();
@@ -174,7 +174,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   myPlayer.play();
 });
@@ -185,7 +185,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   myPlayer.play();
   myPlayer.pause();
@@ -197,7 +197,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 
 myPlayer.ready(function() {
   // true
@@ -224,7 +224,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   // set current time to 2 minutes into the video
   myPlayer.currentTime(120);
@@ -239,7 +239,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   var lengthOfVideo = myPlayer.duration();
 });
@@ -249,7 +249,7 @@ myPlayer.ready(function() {
 
 ```js
 var myPlayer = videojs('some-player-id');
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
    myPlayer.currentTime(10);
 
@@ -263,7 +263,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   var bufferedTimeRange = myPlayer.buffered();
 
@@ -288,7 +288,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
   // example 0.11 aka 11%
   var howMuchIsDownloaded = myPlayer.bufferedPercent();
@@ -302,7 +302,7 @@ Passing a source to the player via the API. (this can also be done using options
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 ```
 
 **Source Object (or element):** A javascript object containing information
@@ -351,10 +351,9 @@ function on the player.
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src("http://www.example.com/path/to/video.mp4");
+myPlayer.src('http://www.example.com/path/to/video.mp4');
 myPlayer.ready(function() {
-   // function call throws an error if we
-    // dont add {IWillNotUseThisInPlugins: true}
+   // tech() will error with no argument
    var tech = myPlayer.tech({IWillNotUseThisInPlugins: true});
 });
 ```
