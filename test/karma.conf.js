@@ -124,7 +124,7 @@ module.exports = function(config) {
         'ie8_bs'
       ];
     } else {
-      settings.browsers = ['Firefox'];
+      settings.browsers = ['Chrome'];
     }
   }
 
