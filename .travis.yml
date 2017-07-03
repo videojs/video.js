@@ -31,4 +31,6 @@ cache:
     - node_modules
 addons:
   firefox: latest
-  chrome: stable
+  apt:
+    packages:
+      - google-chrome-stable
