@@ -7,7 +7,6 @@ if (tuple[0]) {
 }
 
 var sh = require('shelljs');
-var version = process.env.npm_package_version;
 var prereleaseType = npm_config_argv['remain'][0];
 var approvedTypes = {
   'major': 1,
