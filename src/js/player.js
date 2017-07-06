@@ -2251,8 +2251,11 @@ class Player extends Component {
    *
    * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
    *        A SourceObject, an array of SourceObjects, or a string referencing
-   *        a URL to a media source. If not provided, this method acts as a
-   *        getter.
+   *        a URL to a media source. It is _highly recommended_ that an object
+   *        or array of objects is used here, so that source selection
+   *        algorithms can take the `type` into account.
+   *
+   *        If not provided, this method acts as a getter.
    *
    * @return {string|undefined}
    *         If the `source` argument is missing, returns the current source
