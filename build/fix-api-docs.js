@@ -13,6 +13,11 @@ var replacements = [
   {find: /(\<h[1-6] id=")-(.*)("\>)/g, replace: '$1$2$3'},
   {find: /(\<h[1-6] id=")(.*)-("\>)/g, replace: '$1$2$3'},
   {find: /(\<h[1-6] id=".*)-docs-guides-.*-md("\>)/g, replace: '$1$2'},
+  // replace all children with children-1
+  {find: /\<h3 id="children"\>/g, replace: '<h3 id="children-1">'},
+  // remove the -1 from the first item
+  {find: /\<h3 id="children-1"\>/, replace: '<h3 id="children">'},
+  {find: '<h4 id="nativecontrolsfortouch">', replace: '<h4 id="nativecontrolsfortouch-1">'},
   {find: '<h3 id="videojs-(audio|video)track">', replace: '<h3 id="videojs$1track">'},
   {find: '<h3 id="text-tracks">', replace: '<h3 id="text-tracks-1">'},
   {find: '<h2 id="q-how-can-i-hide-the-links-to-my-video-subtitles-audio-tracks">',
