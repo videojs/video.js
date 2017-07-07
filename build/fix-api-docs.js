@@ -12,6 +12,7 @@ var replacements = [
   {find: /(\<h[1-6] id="(?:.*)?)vtt-js(.*)?"\>/g, replace: '$1vttjs$2">'},
   {find: /(\<h[1-6] id=")-(.*)("\>)/g, replace: '$1$2$3'},
   {find: /(\<h[1-6] id=")(.*)-("\>)/g, replace: '$1$2$3'},
+  {find: /(\<h[1-6] id=".*)-docs-guides-.*-md("\>)/g, replace: '$1$2'},
   {find: '<h3 id="videojs-(audio|video)track">', replace: '<h3 id="videojs$1track">'},
   {find: '<h3 id="text-tracks">', replace: '<h3 id="text-tracks-1">'},
   {find: '<h2 id="q-how-can-i-hide-the-links-to-my-video-subtitles-audio-tracks">',
@@ -21,8 +22,9 @@ var replacements = [
   {find: '<h4 id="effect-on-player-width-and-player-height">',
    replace: '<h4 id="effect-on-playerwidth-and-playerheight">'},
   {find: '<h4 id="i-want-to-have-a-single-source-and-dont-care-about-live-adaptive-streaming">',
-   replace: '<h4 id="i-want-to-have-a-single-source-and-dont-care-about-liveadaptive-streaming">'}
-
+   replace: '<h4 id="i-want-to-have-a-single-source-and-dont-care-about-liveadaptive-streaming">'},
+  {find: '<h2 id="api-docs-api">', replace: '<h2 id="api-docs">'},
+  {find: '<h2 id="guides-docs-guides">', replace: '<h2 id="guides">'}
 ];
 
 
