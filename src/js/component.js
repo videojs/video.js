@@ -84,8 +84,8 @@ class Component {
       this.el_ = this.createEl();
     }
 
-    // Make this an evented object and use `el_`, if available, as its event bus
-    evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+    // Make this an evented object and use `el_` as its event bus
+    evented(this, {eventBusKey: options.hasOwnProperty('eventBusKey') ? options.eventBusKey : 'el_'});
     stateful(this, this.constructor.defaultState);
 
     this.children_ = [];
@@ -124,6 +124,7 @@ class Component {
      *           bubble up
      */
     this.trigger({type: 'dispose', bubbles: false});
+    this.off();
 
     // Dispose all children.
     if (this.children_) {

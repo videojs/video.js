@@ -6,7 +6,6 @@ import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
-import EventTarget from '../event-target';
 
 /**
  * Returns whether or not an object has had the evented mixin applied.
@@ -18,8 +17,8 @@ import EventTarget from '../event-target';
  *         Whether or not the object appears to be evented.
  */
 const isEvented = (object) =>
-  object instanceof EventTarget ||
-  !!object.eventBusEl_ &&
+  typeof object.eventBusKey_ === 'string' &&
+  (/\S/).test(object.eventBusKey_) &&
   ['on', 'one', 'off', 'trigger'].every(k => typeof object[k] === 'function');
 
 /**
@@ -39,48 +38,30 @@ const isValidEventType = (type) =>
   (Array.isArray(type) && !!type.length);
 
 /**
- * Validates a value to determine if it is a valid event target. Throws if not.
+ * Validates common on/off arguments.
  *
  * @private
  * @throws {Error}
- *         If the target does not appear to be a valid event target.
+ *         If any argument is not valid.
  *
  * @param  {Object} target
- *         The object to test.
+ *         A value to be tested to determine if it is a valid event target.
+ *
+ * @param  {string|string[]}
+ *         A value to be tested to determine if it is a valid event type.
+ *
+ * @param  {Function} listener
+ *         A value to be tested to determine if it is a valid event listener.
  */
-const validateTarget = (target) => {
-  if (!target.nodeName && !isEvented(target)) {
+const validate = (target, type, listener) => {
+  if (!target || (!Events.canHaveListeners(target) && !isEvented(target))) {
     throw new Error('Invalid target; must be a DOM node or evented object.');
   }
-};
 
-/**
- * Validates a value to determine if it is a valid event target. Throws if not.
- *
- * @private
- * @throws {Error}
- *         If the type does not appear to be a valid event type.
- *
- * @param  {string|Array} type
- *         The type to test.
- */
-const validateEventType = (type) => {
   if (!isValidEventType(type)) {
     throw new Error('Invalid event type; must be a non-empty string or array.');
   }
-};
 
-/**
- * Validates a value to determine if it is a valid listener. Throws if not.
- *
- * @private
- * @throws {Error}
- *         If the listener is not a function.
- *
- * @param  {Function} listener
- *         The listener to test.
- */
-const validateListener = (listener) => {
   if (typeof listener !== 'function') {
     throw new Error('Invalid listener; must be a function.');
   }
@@ -102,16 +83,17 @@ const validateListener = (listener) => {
  *         An object containing useful values for `on()` or `one()` calls.
  */
 const normalizeListenArgs = (self, args) => {
+  const eventBusEl = self.getEventBusEl_();
 
   // If the number of arguments is less than 3, the target is always the
   // evented object itself.
-  const isTargetingSelf = args.length < 3 || args[0] === self || args[0] === self.eventBusEl_;
+  const isTargetingSelf = args.length < 3 || args[0] === self || args[0] === eventBusEl;
   let target;
   let type;
   let listener;
 
   if (isTargetingSelf) {
-    target = self.eventBusEl_;
+    target = eventBusEl;
 
     // Deal with cases where we got 3 arguments, but we are still listening to
     // the evented object itself.
@@ -124,9 +106,7 @@ const normalizeListenArgs = (self, args) => {
     [target, type, listener] = args;
   }
 
-  validateTarget(target);
-  validateEventType(type);
-  validateListener(listener);
+  validate(target, type, listener);
 
   listener = Fn.bind(self, listener);
 
@@ -151,9 +131,7 @@ const normalizeListenArgs = (self, args) => {
  *         A listener function.
  */
 const listen = (target, method, type, listener) => {
-  validateTarget(target);
-
-  if (target.nodeName) {
+  if (Events.canHaveListeners(target)) {
     Events[method](target, type, listener);
   } else {
     target[method](type, listener);
@@ -167,6 +145,21 @@ const listen = (target, method, type, listener) => {
  * @mixin EventedMixin
  */
 const EventedMixin = {
+
+  /**
+   * Returns an evented object's "event bus" element - this element acts as a
+   * conduit for events triggered on the evented object.
+   *
+   * An event bus element is necessary because the underlying events system
+   * relies on a DOM element behind the scenes to function.
+   *
+   * @return {Element}
+   */
+  getEventBusEl_() {
+    if (Events.canHaveListeners(this[this.eventBusKey_])) {
+      return this[this.eventBusKey_];
+    }
+  },
 
   /**
    * Add a listener to an event (or events) on this object or another evented
@@ -287,7 +280,7 @@ const EventedMixin = {
 
     // Targeting this evented object.
     if (!targetOrType || isValidEventType(targetOrType)) {
-      Events.off(this.eventBusEl_, targetOrType, typeOrListener);
+      Events.off(this.getEventBusEl_(), targetOrType, typeOrListener);
 
     // Targeting another evented object.
     } else {
@@ -295,9 +288,7 @@ const EventedMixin = {
       const type = typeOrListener;
 
       // Fail fast and in a meaningful way!
-      validateTarget(target);
-      validateEventType(type);
-      validateListener(listener);
+      validate(target, type, listener);
 
       // Ensure there's at least a guid, even if the function hasn't been used
       listener = Fn.bind(this, listener);
@@ -329,7 +320,7 @@ const EventedMixin = {
    *          Whether or not the default behavior was prevented.
    */
   trigger(event, hash) {
-    return Events.trigger(this.eventBusEl_, event, hash);
+    return Events.trigger(this.getEventBusEl_(), event, hash);
   }
 };
 
@@ -342,31 +333,33 @@ const EventedMixin = {
  * @param  {Object} [options={}]
  *         Options for customizing the mixin behavior.
  *
- * @param  {String} [options.eventBusKey]
- *         By default, adds a `eventBusEl_` DOM element to the target object,
- *         which is used as an event bus. If the target object already has a
- *         DOM element that should be used, pass its key here.
+ * @param  {string} [options.eventBusKey]
+ *         By default, an evented object will have an element created for it
+ *         to act as an "event bus". However, for most use-cases (such as with
+ *         components), we want to use a pre-existing element in the live DOM.
+ *
+ *         For those cases, an optional key can be provided, which represents
+ *         the property on the target object containing an element to use as
+ *         an event bus. We use a string here to support cases where the actual
+ *         DOM element may change.
  *
  * @return {Object}
  *         The target object.
  */
 function evented(target, options = {}) {
-  const {eventBusKey} = options;
 
-  // Set or create the eventBusEl_.
-  if (eventBusKey) {
-    if (!target[eventBusKey].nodeName) {
-      throw new Error(`The eventBusKey "${eventBusKey}" does not refer to an element.`);
-    }
-    target.eventBusEl_ = target[eventBusKey];
+  // If an eventBusKey is provided, use it. We assume then that the element has
+  // either been created or will be created before binding any listeners.
+  if (options.eventBusKey) {
+    target.eventBusKey_ = options.eventBusKey;
+
+  // If no eventBusKey is provided, create an event bus element.
   } else {
-    target.eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
+    target.eventBusKey_ = 'eventBusEl_';
+    target[target.eventBusKey_] = Dom.createEl('span', {className: 'vjs-event-bus'});
   }
 
   Obj.assign(target, EventedMixin);
-
-  // When any evented object is disposed, it removes all its listeners.
-  target.on('dispose', () => target.off());
 
   return target;
 }
