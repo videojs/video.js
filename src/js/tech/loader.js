@@ -28,7 +28,11 @@ class MediaLoader extends Component {
    */
   constructor(player, options, ready) {
     // MediaLoader has no element
-    const options_ = mergeOptions({createEl: false}, options);
+    const options_ = mergeOptions({
+      createEl: false,
+      eventBusKey: null,
+      reportTouchActivity: false
+    }, options);
 
     super(player, options_, ready);
 

@@ -694,10 +694,10 @@ test('When Android Chrome reports Infinity duration with currentTime 0, return N
   browser.IS_ANDROID = true;
   browser.IS_CHROME = true;
 
-  tech.el_ = {
-    duration: Infinity,
-    currentTime: 0
-  };
+  tech.el_ = document.createElement('div');
+  tech.el_.duration = Infinity;
+  tech.el_.currentTime = 0;
+
   ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
 
   browser.IS_ANDROID = oldIsAndroid;
@@ -716,17 +716,17 @@ QUnit.test('supports getting available media playback quality metrics', function
     totalVideoFrames: 5
   };
 
-  tech.el_ = {
-    getVideoPlaybackQuality: () => videoPlaybackQuality
-  };
+  tech.el_ = document.createElement('div');
+  tech.el_.getVideoPlaybackQuality = () => videoPlaybackQuality;
+
   assert.deepEqual(tech.getVideoPlaybackQuality(),
                    videoPlaybackQuality,
                    'uses native implementation when supported');
 
-  tech.el_ = {
-    webkitDroppedFrameCount: 1,
-    webkitDecodedFrameCount: 2
-  };
+  tech.el_ = document.createElement('div');
+  tech.el_.webkitDroppedFrameCount = 1;
+  tech.el_.webkitDecodedFrameCount = 2;
+
   window.performance = {
     now: () => 4
   };
@@ -734,10 +734,10 @@ QUnit.test('supports getting available media playback quality metrics', function
                    { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 4 },
                    'uses webkit prefixed metrics and performance.now when supported');
 
-  tech.el_ = {
-    webkitDroppedFrameCount: 1,
-    webkitDecodedFrameCount: 2
-  };
+  tech.el_ = document.createElement('div');
+  tech.el_.webkitDroppedFrameCount = 1;
+  tech.el_.webkitDecodedFrameCount = 2;
+
   window.Date = {
     now: () => 10
   };
@@ -751,7 +751,7 @@ QUnit.test('supports getting available media playback quality metrics', function
                    'uses webkit prefixed metrics and Date.now() - navigationStart when ' +
                    'supported');
 
-  tech.el_ = {};
+  tech.el_ = document.createElement('div');
   window.performance = void 0;
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'empty object when not supported');
 
@@ -771,11 +771,11 @@ QUnit.test('supports getting available media playback quality metrics', function
                    { creationTime: 7 },
                    'only creation time when it\'s the only piece available');
 
-  tech.el_ = {
-    getVideoPlaybackQuality: () => videoPlaybackQuality,
-    webkitDroppedFrameCount: 1,
-    webkitDecodedFrameCount: 2
-  };
+  tech.el_ = document.createElement('div');
+  tech.el_.getVideoPlaybackQuality = () => videoPlaybackQuality;
+  tech.el_.webkitDroppedFrameCount = 1;
+  tech.el_.webkitDecodedFrameCount = 2;
+
   assert.deepEqual(tech.getVideoPlaybackQuality(),
                    videoPlaybackQuality,
                    'prefers native implementation when supported');

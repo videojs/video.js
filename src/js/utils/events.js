@@ -14,6 +14,18 @@ import window from 'global/window';
 import document from 'global/document';
 
 /**
+ * Determine if an object can have listeners attached.
+ *
+ * @param  {Mixed} obj
+ *         An object to inspect.
+ *
+ * @return {boolean}
+ */
+export function canHaveListeners(obj) {
+  return !!(obj && (obj.addEventListener || obj.attachEvent));
+}
+
+/**
  * Clean up the listener cache and dispatchers
  *
  * @param {Element|Object} elem
