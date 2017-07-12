@@ -25,8 +25,13 @@ Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted
 <link href="//vjs.zencdn.net/5.19/video-js.min.css" rel="stylesheet">
 <script src="//vjs.zencdn.net/5.19/video.min.js"></script>
 ```
-
 > For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
+
+> We include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
+>
+> ```html
+> <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
+> ```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!
 
