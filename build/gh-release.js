@@ -2,6 +2,17 @@ var ghrelease = require('gh-release');
 var currentChangelog = require('./current-changelog.js');
 var safeParse = require('safe-json-parse/tuple');
 var pkg = require('../package.json')
+var minimist = require('minimist');
+
+var args = minimist(process.argv.slice(2), {
+  boolean: ['prelease'],
+  default: {
+    prelease: false
+  },
+  alias: {
+    p: 'prelease'
+  }
+}
 
 var options = {
   owner: 'videojs',
@@ -18,7 +29,7 @@ var options = {
 var tuple = safeParse(process.env.npm_config_argv);
 var npmargs = tuple[0] ? [] : tuple[1].cooked;
 
-if (npmargs.some(function(arg) { return /next/.test(arg); })) {
+if (args.prerelease || npmargs.some(function(arg) { return /next/.test(arg); })) {
   options.prerelease = true;
 }
 
