@@ -18,7 +18,7 @@ var options = {
   owner: 'videojs',
   repo: 'video.js',
   body: currentChangelog(),
-  assets: ['./dist/videojs-'+pkg.version+'.zip'],
+  assets: ['./dist/video-js-'+pkg.version+'.zip'],
   endpoint: 'https://api.github.com',
   auth: {
     username: process.env.VJS_GITHUB_USER,
