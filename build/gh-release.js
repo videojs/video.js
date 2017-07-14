@@ -12,7 +12,7 @@ var args = minimist(process.argv.slice(2), {
   alias: {
     p: 'prerelease'
   }
-}
+});
 
 var options = {
   owner: 'videojs',
