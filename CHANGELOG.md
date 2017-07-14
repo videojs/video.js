@@ -1,3 +1,26 @@
+<a name="6.2.2"></a>
+## [6.2.2](https://github.com/videojs/video.js/compare/v6.2.1...v6.2.2) (2017-07-14)
+
+### Bug Fixes
+
+* **playback rate menu:** cycling rates via click ([#4486](https://github.com/videojs/video.js/issues/4486)) ([4f43616](https://github.com/videojs/video.js/commit/4f43616))
+
+### Chores
+
+* **build:** remove unused var in build/version.js ([#4458](https://github.com/videojs/video.js/issues/4458)) ([6986dbb](https://github.com/videojs/video.js/commit/6986dbb))
+* add automatic github release ([#4466](https://github.com/videojs/video.js/issues/4466)) ([3a600d0](https://github.com/videojs/video.js/commit/3a600d0))
+* switch to using chrome for testing PRs on travis ([#4462](https://github.com/videojs/video.js/issues/4462)) ([687aae5](https://github.com/videojs/video.js/commit/687aae5))
+* **package:** update rollup to version 0.45.2 ([#4487](https://github.com/videojs/video.js/issues/4487)) ([971f633](https://github.com/videojs/video.js/commit/971f633)), closes [#4475](https://github.com/videojs/video.js/issues/4475)
+
+### Documentation
+
+* Fix Player#src API documentation. ([#4454](https://github.com/videojs/video.js/issues/4454)) ([7579fc1](https://github.com/videojs/video.js/commit/7579fc1))
+* make jsdoc generate anchor names so ToC links work ([#4471](https://github.com/videojs/video.js/issues/4471)) ([03fd402](https://github.com/videojs/video.js/commit/03fd402))
+
+### Tests
+
+* add unit tests for player.duration() ([#4459](https://github.com/videojs/video.js/issues/4459)) ([1e80e59](https://github.com/videojs/video.js/commit/1e80e59))
+
 <a name="6.2.1"></a>
 ## [6.2.1](https://github.com/videojs/video.js/compare/v6.2.0...v6.2.1) (2017-06-28)
 
