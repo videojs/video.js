@@ -89,6 +89,9 @@ class Html5 extends Tech {
             This may prevent text tracks from loading.`);
     }
 
+    // prevent iOS Safari from disabling metadata text tracks during native playback
+    this.reEnableMetadataTracksInIOSNativePlayer_();
+
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
@@ -112,6 +115,36 @@ class Html5 extends Tech {
     Html5.disposeMediaElement(this.el_);
     // tech will handle clearing of the emulated track list
     super.dispose();
+  }
+
+  /**
+   * When a captions track is enabled in the iOS Safari native player, all other
+   * tracks are disabled (including metadata tracks), which nulls all of their
+   * associated cue points. This will re-enable metadata tracks in those cases
+   * so that their cue points persist through native playback.
+   *
+   * @private
+   */
+  reEnableMetadataTracksInIOSNativePlayer_() {
+    if (browser.IS_IOS) {
+      this.on('fullscreenchange', (event, data) => {
+
+        // listen for first 'change' event only while in fullscreen
+        if (data.isFullscreen) {
+          const textTracks = myPlayer.textTracks();
+
+          textTracks.one('change', () => {
+            for (let i = 0; i < textTracks.length; i++) {
+              const track = textTracks[i];
+
+              if (track.kind === 'metadata' && track.mode === 'disabled') {
+                track.mode = 'hidden';
+              }
+            }
+          })
+        }
+      })
+    }
   }
 
   /**
