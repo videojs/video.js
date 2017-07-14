@@ -1,3 +1,10 @@
+<a name="6.2.3"></a>
+## [6.2.3](https://github.com/videojs/video.js/compare/v6.2.2...v6.2.3) (2017-07-14)
+
+### Chores
+
+* **gh-release:** add prerelease flag and find right zip  ([#4488](https://github.com/videojs/video.js/issues/4488)) ([b1ac2e0](https://github.com/videojs/video.js/commit/b1ac2e0))
+
 <a name="6.2.2"></a>
 ## [6.2.2](https://github.com/videojs/video.js/compare/v6.2.1...v6.2.2) (2017-07-14)
 
