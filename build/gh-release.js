@@ -5,12 +5,12 @@ var pkg = require('../package.json')
 var minimist = require('minimist');
 
 var args = minimist(process.argv.slice(2), {
-  boolean: ['prelease'],
+  boolean: ['prerelease'],
   default: {
-    prelease: false
+    prerelease: false
   },
   alias: {
-    p: 'prelease'
+    p: 'prerelease'
   }
 }
 
