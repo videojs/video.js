@@ -131,7 +131,7 @@ class Html5 extends Tech {
 
         // listen for first 'change' event only while in fullscreen
         if (data.isFullscreen) {
-          const textTracks = myPlayer.textTracks();
+          const textTracks = this.textTracks();
 
           textTracks.one('change', () => {
             for (let i = 0; i < textTracks.length; i++) {
@@ -141,9 +141,9 @@ class Html5 extends Tech {
                 track.mode = 'hidden';
               }
             }
-          })
+          });
         }
-      })
+      });
     }
   }
 
