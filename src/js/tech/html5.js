@@ -90,7 +90,9 @@ class Html5 extends Tech {
     }
 
     // prevent iOS Safari from disabling metadata text tracks during native playback
-    this.reEnableMetadataTracksInIOSNativePlayer_();
+    if (browser.IS_IOS) {
+      this.saveAndRestoreMetadataTrackModeInIOSNativePlayer_();
+    }
 
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
@@ -120,31 +122,54 @@ class Html5 extends Tech {
   /**
    * When a captions track is enabled in the iOS Safari native player, all other
    * tracks are disabled (including metadata tracks), which nulls all of their
-   * associated cue points. This will re-enable metadata tracks in those cases
-   * so that their cue points persist through native playback.
+   * associated cue points. This will restore metadata tracks to their pre-fullscreen
+   * state in those cases so that cue points are not needlessly lost.
    *
    * @private
    */
-  reEnableMetadataTracksInIOSNativePlayer_() {
-    if (browser.IS_IOS) {
-      this.on('fullscreenchange', (event, data) => {
+  saveAndRestoreMetadataTrackModeInIOSNativePlayer_() {
+    const textTracks = this.textTracks();
+    let metadataTracksPreFullscreenState;
 
-        // listen for first 'change' event only while in fullscreen
-        if (data.isFullscreen) {
-          const textTracks = this.textTracks();
+    // captures a snapshot of every metadata track's current state
+    const takeMetadataTrackSnapshot = () => {
+      metadataTracksPreFullscreenState = [];
 
-          textTracks.one('change', () => {
-            for (let i = 0; i < textTracks.length; i++) {
-              const track = textTracks[i];
+      for (let i = 0; i < textTracks.length; i++) {
+        const track = textTracks[i];
 
-              if (track.kind === 'metadata' && track.mode === 'disabled') {
-                track.mode = 'hidden';
-              }
-            }
+        if (track.kind === 'metadata') {
+          metadataTracksPreFullscreenState.push({
+            track,
+            storedMode: track.mode
           });
         }
-      });
+      }
     }
+
+    // snapshot each metadata track's initial state, and update the snapshot
+    // each time there is a track 'change' event
+    takeMetadataTrackSnapshot();
+    textTracks.on('change', takeMetadataTrackSnapshot);
+
+    // when we enter fullscreen playback, restore all track modes to their initial state
+    this.on('fullscreenchange', (event, data) => {
+      if (data.isFullscreen) {
+        // stop updating the snapshot now that we are in fullscreen
+        textTracks.off('change', takeMetadataTrackSnapshot);
+
+        textTracks.one('change', () => {
+          for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
+            const storedTrack = metadataTracksPreFullscreenState[i];
+
+            storedTrack.track.mode = storedTrack.storedMode;
+          }
+        });
+      } else {
+        // start updating the snapshot again now that we are leaving fullscreen
+        textTracks.on('change', takeMetadataTrackSnapshot);
+      }
+    });
   }
 
   /**
