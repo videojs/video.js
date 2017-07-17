@@ -36,6 +36,11 @@ class BigPlayButton extends Button {
   handleClick(event) {
     const playPromise = this.player_.play();
 
+    // exit early if clicked via the mouse
+    if (!this._keypressed) {
+      return;
+    }
+
     const cb = this.player_.getChild('controlBar');
     const playToggle = cb && cb.getChild('playToggle');
 
