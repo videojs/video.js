@@ -15,7 +15,7 @@ class Button extends ClickableComponent {
   constructor(player, options) {
     super(player, options);
 
-    this._keypressed = false;
+    this._mouseused = false;
 
     this.on('mousedown', this.handleMouseDown);
   }
@@ -114,7 +114,7 @@ class Button extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
-    this._keypressed = true;
+    this._mouseused = false;
 
     // Ignore Space (32) or Enter (13) key operation, which is handled by the browser for a button.
     if (event.which === 32 || event.which === 13) {
@@ -126,7 +126,7 @@ class Button extends ClickableComponent {
   }
 
   handleMouseDown(event) {
-    this._keypressed = false;
+    this._mouseused = true;
   }
 }
 

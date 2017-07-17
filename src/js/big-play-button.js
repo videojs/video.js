@@ -37,7 +37,7 @@ class BigPlayButton extends Button {
     const playPromise = this.player_.play();
 
     // exit early if clicked via the mouse
-    if (!this._keypressed) {
+    if (this._mouseused && event.clientX && event.clientY) {
       return;
     }
 
