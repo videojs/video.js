@@ -145,7 +145,7 @@ class Html5 extends Tech {
           });
         }
       }
-    }
+    };
 
     // snapshot each metadata track's initial state, and update the snapshot
     // each time there is a track 'change' event
