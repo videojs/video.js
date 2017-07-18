@@ -162,7 +162,9 @@ class Html5 extends Tech {
           for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
             const storedTrack = metadataTracksPreFullscreenState[i];
 
-            storedTrack.track.mode = storedTrack.storedMode;
+            if (storedTrack.track.mode === 'disabled' && storedTrack.track.mode !== storedTrack.storedMode) {
+              storedTrack.track.mode = storedTrack.storedMode;
+            }
           }
         });
       } else {
