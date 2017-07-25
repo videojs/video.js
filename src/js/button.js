@@ -12,6 +12,7 @@ import {assign} from './utils/obj';
  * @extends ClickableComponent
  */
 class Button extends ClickableComponent {
+
   /**
    * Create the `Button`s DOM element.
    *
@@ -116,6 +117,7 @@ class Button extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
+
     // Ignore Space (32) or Enter (13) key operation, which is handled by the browser for a button.
     if (event.which === 32 || event.which === 13) {
       return;
