@@ -11,6 +11,14 @@ import Component from './component.js';
  * @extends Button
  */
 class BigPlayButton extends Button {
+  constructor(player, options) {
+    super(player, options);
+
+    this.mouseused_ = false;
+
+    this.on('mousedown', this.handleMouseDown);
+  }
+
 
   /**
    * Builds the default DOM `className`.
@@ -37,7 +45,7 @@ class BigPlayButton extends Button {
     const playPromise = this.player_.play();
 
     // exit early if clicked via the mouse
-    if (this._mouseused && event.clientX && event.clientY) {
+    if (this.mouseused_ && event.clientX && event.clientY) {
       return;
     }
 
@@ -52,6 +60,16 @@ class BigPlayButton extends Button {
     this.setTimeout(function() {
       playToggle.focus();
     }, 1);
+  }
+
+  handleKeyPress(event) {
+    this.mouseused_ = false;
+
+    super.handleKeyPress(event);
+  }
+
+  handleMouseDown(event) {
+    this.mouseused_ = true;
   }
 }
 
