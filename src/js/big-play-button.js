@@ -19,7 +19,6 @@ class BigPlayButton extends Button {
     this.on('mousedown', this.handleMouseDown);
   }
 
-
   /**
    * Builds the default DOM `className`.
    *
