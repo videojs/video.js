@@ -175,7 +175,9 @@
   "greenkeeper": {
     "ignore": [
       "qunitjs",
-      "sinon"
+      "sinon",
+      "webpack",
+      "uglify-js"
     ]
   }
 }
