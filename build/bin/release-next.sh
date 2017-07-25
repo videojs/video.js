@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Release Type?"
-read -p "> " rtype
+read -rp "> " rtype
 
 echo grunt version:${rtype}
 grunt version:${rtype}
