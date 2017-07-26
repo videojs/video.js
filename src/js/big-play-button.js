@@ -60,6 +60,7 @@ class BigPlayButton extends Button {
 
     if (playPromise && playPromise.then) {
       const ignoreRejectedPlayPromise = () => {};
+
       playPromise.then(playFocus, ignoreRejectedPlayPromise);
     } else {
       this.setTimeout(playFocus, 1);
