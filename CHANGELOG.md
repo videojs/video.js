@@ -1,3 +1,17 @@
+<a name="6.2.5"></a>
+## [6.2.5](https://github.com/videojs/video.js/compare/v6.2.4...v6.2.5) (2017-07-26)
+
+### Bug Fixes
+
+* only change focus from BPB if not a mouse click ([#4497](https://github.com/videojs/video.js/issues/4497)) ([ee014e2](https://github.com/videojs/video.js/commit/ee014e2))
+
+### Chores
+
+* **greenkeeper:** ignore webpack and uglify ([#4518](https://github.com/videojs/video.js/issues/4518)) ([fe95a77](https://github.com/videojs/video.js/commit/fe95a77))
+* **package:** update remark-cli to version 4.0.0 ([#4508](https://github.com/videojs/video.js/issues/4508)) ([7c80e13](https://github.com/videojs/video.js/commit/7c80e13))
+* **package:** update remark-parse to version 4.0.0 ([#4507](https://github.com/videojs/video.js/issues/4507)) ([abb5d67](https://github.com/videojs/video.js/commit/abb5d67))
+* **package:** update remark-stringify to version 4.0.0 ([#4506](https://github.com/videojs/video.js/issues/4506)) ([bbd92ab](https://github.com/videojs/video.js/commit/bbd92ab))
+
 <a name="6.2.4"></a>
 ## [6.2.4](https://github.com/videojs/video.js/compare/v6.2.3...v6.2.4) (2017-07-14)
 
