@@ -56,12 +56,13 @@ class BigPlayButton extends Button {
       return;
     }
 
-    if (playPromise) {
-      playPromise.then(() => playToggle.focus());
+    const playFocus = () => playToggle.focus();
+
+    if (playPromise && playPromise.then) {
+      const ignoreRejectedPlayPromise = () => {};
+      playPromise.then(playFocus, ignoreRejectedPlayPromise);
     } else {
-      this.setTimeout(function() {
-        playToggle.focus();
-      }, 1);
+      this.setTimeout(playFocus, 1);
     }
   }
 
