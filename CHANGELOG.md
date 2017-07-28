@@ -1,5 +1,5 @@
 <a name="5.20.2"></a>
-## [5.20.2](https://github.com/videojs/video.js/compare/v5.20.1...v5.20.2) (2017-07-28)
+## [5.20.2](https://github.com/videojs/video.js/compare/v5.20.1...v5.20.2) (2017-07-26)
 
 ### Bug Fixes
 
