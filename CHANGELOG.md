@@ -1,62 +1,21 @@
 <a name="5.20.2"></a>
-## [5.20.2](https://github.com/videojs/video.js/compare/v6.2.5...v5.20.2) (2017-07-26)
-
-### Features
-
-* add 'playsinline' player option ([#4325](https://github.com/videojs/video.js/issues/4325)) ([946f84b](https://github.com/videojs/video.js/commit/946f84b))
-* Add a version class to the player ([#4335](https://github.com/videojs/video.js/issues/4335)) ([b855bfb](https://github.com/videojs/video.js/commit/b855bfb))
-* Add getVideoPlaybackQuality API ([#4286](https://github.com/videojs/video.js/issues/4286)) ([c970474](https://github.com/videojs/video.js/commit/c970474))
-* focus play toggle from Big Play Btn on play ([#4132](https://github.com/videojs/video.js/issues/4132)) ([dcc615a](https://github.com/videojs/video.js/commit/dcc615a)), closes [#2729](https://github.com/videojs/video.js/issues/2729)
-* Make pause on open optional for ModalDialog via options ([#4187](https://github.com/videojs/video.js/issues/4187)) ([4ec3b56](https://github.com/videojs/video.js/commit/4ec3b56))
-* remove playbackRate blacklist for recent Android Chrome ([#4336](https://github.com/videojs/video.js/issues/4336)) ([3fe22e9](https://github.com/videojs/video.js/commit/3fe22e9))
-* update videojs-vtt.js and wrap native cues in TextTrack ([#4131](https://github.com/videojs/video.js/issues/4131)) ([3d4aebc](https://github.com/videojs/video.js/commit/3d4aebc)), closes [#4093](https://github.com/videojs/video.js/issues/4093)
+## [5.20.2](https://github.com/videojs/video.js/compare/v5.20.1...v5.20.2) (2017-07-26)
 
 ### Bug Fixes
 
-* addChild instance names should be toTitleCased ([#4117](https://github.com/videojs/video.js/issues/4117)) ([fa97309](https://github.com/videojs/video.js/commit/fa97309))
 * adjust volume ranges so muted(true) and vol=0 do not use the same icons ([#4425](https://github.com/videojs/video.js/issues/4425)) ([b314268](https://github.com/videojs/video.js/commit/b314268))
-* cue-points with a startTime of 0 ([#4148](https://github.com/videojs/video.js/issues/4148)) ([e7d4b47](https://github.com/videojs/video.js/commit/e7d4b47))
-* make load progress buffered regions height 100% ([#4191](https://github.com/videojs/video.js/issues/4191)) ([398c6e9](https://github.com/videojs/video.js/commit/398c6e9))
-* make mergeOptions behave the same across browsers  ([#4090](https://github.com/videojs/video.js/issues/4090)) ([ce19ed5](https://github.com/videojs/video.js/commit/ce19ed5))
-* make sure audio track hides with one item ([#4203](https://github.com/videojs/video.js/issues/4203)) ([c069655](https://github.com/videojs/video.js/commit/c069655))
-* make sure that cues copy over their id ([#4154](https://github.com/videojs/video.js/issues/4154)) ([072c277](https://github.com/videojs/video.js/commit/072c277))
-* not showing default text tracks over video ([#4217](https://github.com/videojs/video.js/issues/4217)) ([4653922](https://github.com/videojs/video.js/commit/4653922))
-* **vttjs:** wait till tech el in DOM before loading vttjs ([#4176](https://github.com/videojs/video.js/issues/4176)) ([ad86eec](https://github.com/videojs/video.js/commit/ad86eec))
 * only change focus from BPB if not a mouse click ([#4523](https://github.com/videojs/video.js/issues/4523)) ([d90c945](https://github.com/videojs/video.js/commit/d90c945))
-* only disable user-selection on sliders ([#4355](https://github.com/videojs/video.js/issues/4355)) ([0d60720](https://github.com/videojs/video.js/commit/0d60720))
 * Only update text track mode if changed ([#4368](https://github.com/videojs/video.js/issues/4368)) ([a1763dc](https://github.com/videojs/video.js/commit/a1763dc))
-* Patch a memory leak caused by un-removed track listener(s). ([#3975](https://github.com/videojs/video.js/issues/3975)) ([bca44c0](https://github.com/videojs/video.js/commit/bca44c0))
 * player.duration() should return NaN if duration is not known ([#4456](https://github.com/videojs/video.js/issues/4456)) ([2576eda](https://github.com/videojs/video.js/commit/2576eda))
-* prevent dupe events on enabled ClickableComponents ([#4357](https://github.com/videojs/video.js/issues/4357)) ([3faea9f](https://github.com/videojs/video.js/commit/3faea9f))
-* remove title attribute on menu items, fixes [#3699](https://github.com/videojs/video.js/issues/3699) ([#4009](https://github.com/videojs/video.js/issues/4009)) ([91874a3](https://github.com/videojs/video.js/commit/91874a3))
-* removeCue should work with native passed in cue ([#4209](https://github.com/videojs/video.js/issues/4209)) ([3974944](https://github.com/videojs/video.js/commit/3974944))
 * Safari picture-in-picture triggers fullscreenchange ([#4442](https://github.com/videojs/video.js/issues/4442)) ([c17c003](https://github.com/videojs/video.js/commit/c17c003))
-* **cues:** only copy cue props that don't exist ([#4146](https://github.com/videojs/video.js/issues/4146)) ([de08669](https://github.com/videojs/video.js/commit/de08669))
-* **cues:** only copy cue props that don't exist ([#4146](https://github.com/videojs/video.js/issues/4146)) ([841d135](https://github.com/videojs/video.js/commit/841d135))
-* **MenuButton:** Unify behavior of showing/hiding ([#3993](https://github.com/videojs/video.js/issues/3993)) ([4367c69](https://github.com/videojs/video.js/commit/4367c69))
-* set IE_VERSION correctly for IE11 ([#4280](https://github.com/videojs/video.js/issues/4280)) ([207730e](https://github.com/videojs/video.js/commit/207730e)), closes [#4278](https://github.com/videojs/video.js/issues/4278)
-* synchronously shim vtt.js when possible ([#4082](https://github.com/videojs/video.js/issues/4082)) ([b5727a6](https://github.com/videojs/video.js/commit/b5727a6))
 * Use passive event listeners for touchstart/touchmove ([#4445](https://github.com/videojs/video.js/issues/4445)) ([8599c8e](https://github.com/videojs/video.js/commit/8599c8e)), closes [#4432](https://github.com/videojs/video.js/issues/4432)
-* **playback rate menu:** playback rate menu items should be selectable ([#4150](https://github.com/videojs/video.js/issues/4150)) ([288edd1](https://github.com/videojs/video.js/commit/288edd1))
-* **sass:** import path has cwd once again ([#4076](https://github.com/videojs/video.js/issues/4076)) ([c02c6c6](https://github.com/videojs/video.js/commit/c02c6c6))
 
 ### Chores
 
 * add a release script to makes things easier ([#4517](https://github.com/videojs/video.js/issues/4517)) ([9ca9989](https://github.com/videojs/video.js/commit/9ca9989))
-* add slack travis notifications ([#4339](https://github.com/videojs/video.js/issues/4339)) ([ab110ff](https://github.com/videojs/video.js/commit/ab110ff))
-* change accessibility test in grunt.js to remove unnecessary warning message. ([#4008](https://github.com/videojs/video.js/issues/4008)) ([daad492](https://github.com/videojs/video.js/commit/daad492))
-* **build:** lint errors only and silence webpack ([#4153](https://github.com/videojs/video.js/issues/4153)) ([b1ca344](https://github.com/videojs/video.js/commit/b1ca344))
-* **package:** pin karma to 1.3.0 for IE8 support ([#4340](https://github.com/videojs/video.js/issues/4340)) ([6cf7327](https://github.com/videojs/video.js/commit/6cf7327))
-* **package:** update swf to 5.2.0 ([#4040](https://github.com/videojs/video.js/issues/4040)) ([dab893b](https://github.com/videojs/video.js/commit/dab893b))
-* **package:** update to swf 5.4.1 ([#4516](https://github.com/videojs/video.js/issues/4516)) ([a145dd2](https://github.com/videojs/video.js/commit/a145dd2))
-* **package:** update video-js-swf to 5.3.0 ([#4161](https://github.com/videojs/video.js/issues/4161)) ([2bcfe21](https://github.com/videojs/video.js/commit/2bcfe21))
-* **package:** update videojs-vtt.js to 0.12.3 ([#4223](https://github.com/videojs/video.js/issues/4223)) ([ad770fb](https://github.com/videojs/video.js/commit/ad770fb))
-* **package:** update videojs-vtt.js to 0.12.4 ([#4364](https://github.com/videojs/video.js/issues/4364)) ([3f7e215](https://github.com/videojs/video.js/commit/3f7e215))
 * move imports up so bundlers wont trip up ([#4363](https://github.com/videojs/video.js/issues/4363)) ([0d725df](https://github.com/videojs/video.js/commit/0d725df))
-
-### Tests
-
-* fix playsinline test for IE8 ([#4347](https://github.com/videojs/video.js/issues/4347)) ([823f6c7](https://github.com/videojs/video.js/commit/823f6c7))
+* **package:** update to swf 5.4.1 ([#4516](https://github.com/videojs/video.js/issues/4516)) ([a145dd2](https://github.com/videojs/video.js/commit/a145dd2))
+* **package:** update videojs-vtt.js to 0.12.4 ([#4364](https://github.com/videojs/video.js/issues/4364)) ([3f7e215](https://github.com/videojs/video.js/commit/3f7e215))
 
 <a name="5.20.1"></a>
 ## [5.20.1](https://github.com/videojs/video.js/compare/v5.20.0...v5.20.1) (2017-05-15)
