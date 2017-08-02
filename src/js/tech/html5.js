@@ -90,9 +90,7 @@ class Html5 extends Tech {
     }
 
     // prevent iOS Safari from disabling metadata text tracks during native playback
-    if (browser.IS_IOS) {
-      this.saveAndRestoreMetadataTrackModeInIOSNativePlayer_();
-    }
+    this.restoreMetadataTracksInIOSNativePlayer_();
 
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
@@ -127,7 +125,7 @@ class Html5 extends Tech {
    *
    * @private
    */
-  saveAndRestoreMetadataTrackModeInIOSNativePlayer_() {
+  restoreMetadataTracksInIOSNativePlayer_() {
     const textTracks = this.textTracks();
     let metadataTracksPreFullscreenState;
 
@@ -152,25 +150,25 @@ class Html5 extends Tech {
     takeMetadataTrackSnapshot();
     textTracks.on('change', takeMetadataTrackSnapshot);
 
-    // when we enter fullscreen playback, restore all track modes to their initial state
-    this.on('fullscreenchange', (event, data) => {
-      if (data.isFullscreen) {
-        // stop updating the snapshot now that we are in fullscreen
-        textTracks.off('change', takeMetadataTrackSnapshot);
+    // when we enter fullscreen playback, restore all track modes to their pre-fullscreen state
+    this.on('webkitbeginfullscreen', () => {
+      // stop updating the snapshot now that we are in fullscreen
+      textTracks.off('change', takeMetadataTrackSnapshot);
 
-        textTracks.one('change', () => {
-          for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
-            const storedTrack = metadataTracksPreFullscreenState[i];
+      textTracks.one('change', () => {
+        for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
+          const storedTrack = metadataTracksPreFullscreenState[i];
 
-            if (storedTrack.track.mode === 'disabled' && storedTrack.track.mode !== storedTrack.storedMode) {
-              storedTrack.track.mode = storedTrack.storedMode;
-            }
+          if (storedTrack.track.mode === 'disabled' && storedTrack.track.mode !== storedTrack.storedMode) {
+            storedTrack.track.mode = storedTrack.storedMode;
           }
-        });
-      } else {
-        // start updating the snapshot again now that we are leaving fullscreen
-        textTracks.on('change', takeMetadataTrackSnapshot);
-      }
+        }
+      });
+    });
+
+    this.on('webkitendfullscreen', () => {
+      // start updating the snapshot again now that we are leaving fullscreen
+      textTracks.on('change', takeMetadataTrackSnapshot);
     });
   }
 
