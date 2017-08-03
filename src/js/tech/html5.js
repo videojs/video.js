@@ -148,27 +148,30 @@ class Html5 extends Tech {
     // snapshot each metadata track's initial state, and update the snapshot
     // each time there is a track 'change' event
     takeMetadataTrackSnapshot();
-    textTracks.on('change', takeMetadataTrackSnapshot);
+    textTracks.addEventListener('change', takeMetadataTrackSnapshot);
 
-    // when we enter fullscreen playback, restore all track modes to their pre-fullscreen state
-    this.on('webkitbeginfullscreen', () => {
-      // stop updating the snapshot now that we are in fullscreen
-      textTracks.off('change', takeMetadataTrackSnapshot);
+    const restoreTrackMode = () => {
+      for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
+        const storedTrack = metadataTracksPreFullscreenState[i];
 
-      textTracks.one('change', () => {
-        for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
-          const storedTrack = metadataTracksPreFullscreenState[i];
-
-          if (storedTrack.track.mode === 'disabled' && storedTrack.track.mode !== storedTrack.storedMode) {
-            storedTrack.track.mode = storedTrack.storedMode;
-          }
+        if (storedTrack.track.mode === 'disabled' && storedTrack.track.mode !== storedTrack.storedMode) {
+          storedTrack.track.mode = storedTrack.storedMode;
         }
-      });
+      }
+      // we only want this handler to be executed on the first 'change' event
+      textTracks.removeEventListener('change', restoreTrackMode);
+    };
+
+    // when we enter fullscreen playback, stop updating the snapshot and
+    // restore all track modes to their pre-fullscreen state
+    this.on('webkitbeginfullscreen', () => {
+      textTracks.removeEventListener('change', takeMetadataTrackSnapshot);
+      textTracks.addEventListener('change', restoreTrackMode);
     });
 
+    // start updating the snapshot again after leaving fullscreen
     this.on('webkitendfullscreen', () => {
-      // start updating the snapshot again now that we are leaving fullscreen
-      textTracks.on('change', takeMetadataTrackSnapshot);
+      textTracks.addEventListener('change', takeMetadataTrackSnapshot);
     });
   }
 
