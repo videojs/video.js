@@ -166,12 +166,20 @@ class Html5 extends Tech {
     // restore all track modes to their pre-fullscreen state
     this.on('webkitbeginfullscreen', () => {
       textTracks.removeEventListener('change', takeMetadataTrackSnapshot);
+
+      // remove the listener before adding it just in case it wasn't previously removed
+      textTracks.removeEventListener('change', restoreTrackMode);
       textTracks.addEventListener('change', restoreTrackMode);
     });
 
     // start updating the snapshot again after leaving fullscreen
     this.on('webkitendfullscreen', () => {
+      // remove the listener before adding it just in case it wasn't previously removed
+      textTracks.removeEventListener('change', takeMetadataTrackSnapshot);
       textTracks.addEventListener('change', takeMetadataTrackSnapshot);
+
+      // remove the restoreTrackMode handler in case it wasn't triggered during fullscreen playback
+      textTracks.removeEventListener('change', restoreTrackMode);
     });
   }
 
