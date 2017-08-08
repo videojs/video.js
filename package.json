@@ -82,7 +82,7 @@
     "gh-release": "^3.0.0",
     "grunt": "^0.4.5",
     "grunt-accessibility": "^5.0.0",
-    "grunt-babel": "^6.0.0",
+    "grunt-babel": "^7.0.0",
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "5.0.0",
     "grunt-cli": "~1.2.0",
