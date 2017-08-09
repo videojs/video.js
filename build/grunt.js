@@ -466,7 +466,7 @@ module.exports = function(grunt) {
         }
       },
       babel: {
-        command: 'npm run babel -- --watch',
+        command: 'npm run babel -- --watch --quiet',
         options: {
           preferLocal: true
         }

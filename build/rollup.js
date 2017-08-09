@@ -26,6 +26,10 @@ const args = minimist(process.argv.slice(2), {
   }
 });
 
+if (args.watch) {
+  args.progress = false;
+}
+
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
 
