@@ -1,10 +1,12 @@
 .video-js button {
-  background: none;
-  border: none;
-  color: inherit;
   display: inline-block;
-
   overflow: visible; // IE8
+  border: none;
+  width: 100%;
+  height: 100%;
+  background: none;
+  color: inherit;
+
   font-size: inherit; // IE in general. WTF.
   line-height: inherit;
   text-transform: none;
