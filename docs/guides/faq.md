@@ -15,6 +15,7 @@
   * [If you don't think you can fix the issue or add the feature](#if-you-dont-think-you-can-fix-the-issue-or-add-the-feature)
 * [Q: What is a reduced test case?](#q-what-is-a-reduced-test-case)
 * [Q: What media formats does Video.js support?](#q-what-media-formats-does-videojs-support)
+* [Q: How does Video.js choose which source to use?](#q-how-does-videojs-choose-which-source-to-use)
 * [Q: How to I autoplay the video?](#q-how-to-i-autoplay-the-video)
   * [Q: How can I autoplay a video on a mobile device?](#q-how-can-i-autoplay-a-video-on-a-mobile-device)
 * [Q: How can I play RTMP video in Video.js?](#q-how-can-i-play-rtmp-video-in-videojs)
@@ -128,6 +129,10 @@ about reduced test cases visit [css-tricks][reduced-test-case]
 
 This depends on the formats supported by the browser's HTML5 video element, and the playback
 techs/plugins made available to Video.js. For more information on media formats see the [troubleshooting guide][troubleshooting].
+
+## Q: How does Video.js choose which source to use?
+
+When an array of sources is available, Video.js test each source in the order given. For each source, each tech in the [`techOrder`][techorder] will be checked to see if it can play it whether directly or via source handler (such as videojs-contrib-hls). The first match will be chosen.
 
 ## Q: How to I autoplay the video?
 
@@ -296,6 +301,8 @@ Yes! See [ReactJS integration example][react-guide].
 
 [components-guide]: /docs/guides/components.md
 
+[cors]: https://enable-cors.org
+
 [dash]: http://github.com/videojs/videojs-contrib-dash
 
 [debug-guide]: /docs/guides/debugging.md
@@ -338,6 +345,8 @@ Yes! See [ReactJS integration example][react-guide].
 
 [starter-example]: http://jsbin.com/axedog/edit?html,output
 
+[techorder]: [cors]: /docs/guides/options.md#techorder
+
 [text-tracks]: /docs/guides/text-tracks.md
 
 [troubleshooting]: /docs/guides/troubleshooting.md
@@ -353,5 +362,3 @@ Yes! See [ReactJS integration example][react-guide].
 [webpack-guide]: /docs/guides/webpack.md
 
 [youtube]: https://github.com/videojs/videojs-youtube
-
-[cors]: https://enable-cors.org

@@ -208,26 +208,6 @@ Although, since the `plugins` option is an object, the order of initialization i
 
 See [the plugins guide][plugins] for more information on Video.js plugins.
 
-### `sourceOrder`
-
-> Type: `boolean`, Default: `true`
->
-> **Note:** In Video.js 6.0, this option will default to `true`. and that [videojs-flash](https://github.com/videojs/videojs-flash) will be required to use the flash tech.
-
-Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techorder) in selecting a source and playback tech.
-
-The default algorithm is:
-
-* for each source:
-  * for each tech:
-    * if tech can play source, use this tech/source combo
-
-With `sourceOrder: false`, the algorithm becomes:
-
-* for each tech:
-  * for each source:
-    * if tech can play source, use this tech/source combo
-
 ### `sources`
 
 > Type: `Array`
