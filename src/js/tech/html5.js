@@ -239,6 +239,8 @@ class Html5 extends Tech {
     }
 
     // Update specific tag settings, in case they were overridden
+    // `autoplay` has to be *last* so that `muted` and `playsinline` are present
+    // when iOS/Safari or other browsers attempt to autoplay.
     const settingsAttrs = ['loop', 'muted', 'playsinline', 'autoplay'];
 
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
