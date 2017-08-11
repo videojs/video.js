@@ -234,8 +234,8 @@ class Html5 extends Tech {
     }
 
 
-    if (this.options_['preload'] !== 'undefined') {
-      Dom.setAttribute(el, 'preload', this.options_['preload']);
+    if (this.options_.preload !== 'undefined') {
+      Dom.setAttribute(el, 'preload', this.options_.preload);
     }
 
     // Update specific tag settings, in case they were overridden
@@ -1068,7 +1068,6 @@ Html5.resetMediaElement = function(el) {
   }
 };
 
-
 /* Native HTML5 element property wrapping ----------------------------------- */
 // Wrap native boolean attributes with getters that check both property and attribute
 // The list is as followed:
@@ -1244,7 +1243,6 @@ Html5.resetMediaElement = function(el) {
   'playsinline'
 ].forEach(function(prop) {
   Html5.prototype['set' + toTitleCase(prop)] = function(v) {
-    console.log(prop, v);
     this.el_[prop] = v;
 
     if (v) {
