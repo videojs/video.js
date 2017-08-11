@@ -233,17 +233,26 @@ class Html5 extends Tech {
       el.playerId = this.options_.playerId;
     }
 
+
+    if (this.options_['preload'] !== 'undefined') {
+      Dom.setAttribute(el, 'preload', this.options_['preload']);
+    }
+
     // Update specific tag settings, in case they were overridden
-    const settingsAttrs = ['autoplay', 'preload', 'loop', 'muted', 'playsinline'];
+    const settingsAttrs = ['loop', 'muted', 'playsinline', 'autoplay'];
 
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
       const attr = settingsAttrs[i];
-      const overwriteAttrs = {};
+      const value = this.options_[attr];
 
-      if (typeof this.options_[attr] !== 'undefined') {
-        overwriteAttrs[attr] = this.options_[attr];
+      if (typeof value !== 'undefined') {
+        if (value) {
+          Dom.setAttribute(el, attr, attr);
+        } else {
+          Dom.removeAttribute(el, attr);
+        }
+        el[attr] = value;
       }
-      Dom.setAttributes(el, overwriteAttrs);
     }
 
     return el;
