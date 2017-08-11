@@ -95,9 +95,11 @@ In "Source-first" mode, the tests run something like this:
 
 ## Flash Technology
 
-The Flash playback tech is a part of the default `techOrder`. You may notice undesirable playback behavior in browsers that are subject to using this playback tech, in particular when scrubbing and seeking within a video. This behavior is a result of Flash's progressive video playback.
+The Flash playback tech was previously included in Video.js core and was included in the default `techOrder`. As of version 6, the Flash tech was moved to a separate [videojs-flash plugin][flash] which you would need to include if you still need to use Flash.
 
-### Enabling Streaming Playback
+It's increasingly likely that end users don't have Flash or their browser disables it, so it's strongly recommended to find an alternative such as HLS.
+
+### Enabling RTMP Streaming Playback
 
 In order to force the Flash tech to choose streaming playback, you need to provide a valid streaming source **before other valid Flash video sources**. This is necessary because of the source selection algorithm, where playback tech chooses the first possible source object with a valid type. Valid streaming `type` values include `rtmp/mp4` and `rtmp/flv`. The streaming `src` value requires valid connection and stream strings, separated by an `&`. An example of supplying a streaming source through your HTML markup might look like:
 
@@ -118,3 +120,7 @@ All four RTMP protocols are valid in the `src` (RTMP, RTMPT, RTMPE, and RTMPS).
 #### A note on sandboxing and security
 
 In some environments, such as Electron and NW.js apps, stricter policies are enforced, and `.swf` files won’t be able to communicate with the outside world out of the box. To stream media, you have to add them to a special manifest of trusted files. [nw-flash-trust](https://github.com/szwacz/nw-flash-trust) makes this job easy.
+
+Browsers also prevent the Flash tech from working when you load a page from the filesystem (with the `file:` protocol) and also in sandboxed iframes.
+
+[flash]: https://github.com/videojs/videojs-flash
