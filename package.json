@@ -136,7 +136,7 @@
     "remark-toc": "^4.0.0",
     "remark-validate-links": "^6.0.0",
     "replace": "^0.3.0",
-    "rollup": "^0.45.2",
+    "rollup": "^0.47.4",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-filesize": "^1.2.1",
