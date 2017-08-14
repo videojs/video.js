@@ -120,7 +120,7 @@
     "karma-qunit": "^1.2.0",
     "karma-safari-launcher": "^1.0.0",
     "karma-sinon": "^1.0.5",
-    "klaw-sync": "^1.1.2",
+    "klaw-sync": "^3.0.0",
     "load-grunt-tasks": "^3.1.0",
     "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
