@@ -36,8 +36,13 @@
   * [${componentName}](#componentname)
 * [Tech Options](#tech-options)
   * [${techName}](#techname)
+  * [flash](#flash)
+    * [swf](#swf)
+  * [html5](#html5)
     * [nativeControlsForTouch](#nativecontrolsfortouch-1)
+    * [nativeAudioTracks](#nativeaudiotracks)
     * [nativeTextTracks](#nativetexttracks)
+    * [nativeVideoTracks](#nativevideotracks)
 
 ## Standard `<video>` Element Options
 
@@ -203,49 +208,6 @@ Although, since the `plugins` option is an object, the order of initialization i
 
 See [the plugins guide][plugins] for more information on Video.js plugins.
 
-### `sourceOrder`
-
-> Type: `boolean`, Default: `false`
->
-> **Note:** In video.js 6.0, this option will default to `true`. and that [videojs-flash](https://github.com/videojs/videojs-flash) will be required to use the flash tech.
-
-Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techorder) in selecting a source and playback tech.
-
-Given the following example:
-
-```js
-videojs('my-player', {
-  sourceOrder: true,
-  sources: [{
-    src: '//path/to/video.flv',
-    type: 'video/x-flv'
-  }, {
-    src: '//path/to/video.mp4',
-    type: 'video/mp4'
-  }, {
-    src: '//path/to/video.webm',
-    type: 'video/webm'
-  }],
-  techOrder: ['html5', 'flash']
-});
-```
-
-Normally, the fact that HTML5 comes before Flash in the `techOrder` would mean Video.js would look for a compatible _source_ for HTML5 and would pick either the MP4 or WebM video (depending on browser support) only falling back to Flash if no compatible source for HTML5 was found.
-
-However, because the `sourceOrder` is `true`, Video.js flips that process around. It will look for a compatible _tech_ for each source in order. Presumably, it would first find a match between the FLV (since it's first in the source order) and the Flash tech.
-
-In summary, the default algorithm is:
-
-* for each tech:
-  * for each source:
-    * if tech can play source, use this tech/source combo
-
-With `sourceOrder: true`, the algorithm becomes:
-
-* for each source:
-  * for each tech:
-    * if tech can play source, use this tech/source combo
-
 ### `sources`
 
 > Type: `Array`
@@ -285,7 +247,7 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 
 Allows overriding the default URL to vtt.js, which may be loaded asynchronously to polyfill support for `WebVTT`.
 
-This option will be used in the "novtt" build of video.js (i.e. `video.novtt.js`). Otherwise, vtt.js is bundled with video.js.
+This option will be used in the "novtt" build of Video.js (i.e. `video.novtt.js`). Otherwise, vtt.js is bundled with Video.js.
 
 ## Component Options
 
@@ -346,7 +308,11 @@ videojs('my-player', {
 
 Video.js playback technologies (i.e. "techs") can be given custom options as part of the options passed to the `videojs` function. They should be passed under the _lower-case variant of the tech name_ (e.g. `"flash"` or `"html5"`).
 
-This is not used in most implementations, but one case where it may be is dictating where the Video.js SWF file is located for the `Flash` tech:
+### `flash`
+
+#### `swf`
+
+Specifies where the Video.js SWF file is located for the `Flash` tech:
 
 ```js
 videojs('my-player', {
@@ -356,11 +322,13 @@ videojs('my-player', {
 });
 ```
 
-However, this is a case where changing the global defaults is more useful:
+However, changing the global defaults is generally more appropriate:
 
 ```js
 videojs.options.flash.swf = '//path/to/videojs.swf'
 ```
+
+### `html5`
 
 #### `nativeControlsForTouch`
 
@@ -368,11 +336,23 @@ videojs.options.flash.swf = '//path/to/videojs.swf'
 
 Only supported by the `Html5` tech, this option can be set to `true` to force native controls for touch devices.
 
+#### `nativeAudioTracks`
+
+> Type: `boolean`
+
+Can be set to `false` to disable native audio track support. Most commonly used with [videojs-contrib-hls][videojs-contrib-hls].
+
 #### `nativeTextTracks`
 
 > Type: `boolean`
 
 Can be set to `false` to force emulation of text tracks instead of native support. The `nativeCaptions` option also exists, but is simply an alias to `nativeTextTracks`.
+
+#### `nativeVideoTracks`
+
+> Type: `boolean`
+
+Can be set to `false` to disable native video track support. Most commonly used with [videojs-contrib-hls][videojs-contrib-hls].
 
 [plugins]: /docs/guides/plugins.md
 
@@ -383,3 +363,5 @@ Can be set to `false` to force emulation of text tracks instead of native suppor
 [lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
 [video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes
+
+[videojs-contrib-hls]: https://github.com/videojs/videojs-contrib-hls

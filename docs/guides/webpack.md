@@ -1,6 +1,6 @@
 # Using Webpack with Video.js
 
-video.js, and the playback technologies such as videojs-contrib-hls all work in a Webpack based build environment. Here are several configuration changes specific to Webpack that will get you up and running.
+Video.js, and the playback technologies such as videojs-contrib-hls all work in a Webpack based build environment. Here are several configuration changes specific to Webpack that will get you up and running.
 
 ## Video.js CSS:
 To add the CSS that the player requires, simply add

@@ -96,6 +96,8 @@ Alternatively, you can use the `data-setup` attribute to pass options as [JSON][
 <video data-setup='{"controls": true, "autoplay": false, "preload": "auto"}'...>
 ```
 
+> **Note:** You _must_ use single-quotes around the value of `data-setup` as it contains a JSON string which must use double quotes.
+
 Finally, if you're not using the `data-setup` attribute to trigger the player setup, you can pass in an object of player options as the second argument to the `videojs` function:
 
 ```js
@@ -105,6 +107,8 @@ videojs('my-player', {
   preload: 'auto'
 });
 ```
+
+> **Note:** Do not use both `data-setup` and an options object.
 
 ### Global Defaults
 
@@ -171,7 +175,9 @@ player.on('ready', function() {
 });
 ```
 
-In each case, the callback is called asynchronously - _even if the player is already ready!_
+In each case, the callback is called asynchronously.
+
+An important distinction between the above methods is that adding an listener for `ready` with `on()` _must_ be done before the player is ready. With `player.ready()`, the function is called immediately if the player is already ready.
 
 ## Advanced Player Workflows
 

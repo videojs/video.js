@@ -12,7 +12,7 @@
 
 ## Logging
 
-Video.js includes a lightweight wrapper - `videojs.log` - around a subset of [the `console` API][console]. The available methods are `videojs.log`, `videojs.log.warn`, and `videojs.log.error`.
+Video.js includes `videojs.log`, a lightweight wrapper around a subset of [the `console` API][console]. The available methods are `videojs.log`, `videojs.log.warn`, and `videojs.log.error`.
 
 ### API Overview
 

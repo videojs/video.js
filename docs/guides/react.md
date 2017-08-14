@@ -1,8 +1,8 @@
-# video.js and ReactJS integration
+# Video.js and ReactJS integration
 
 Here's a basic ReactJS player implementation.
 
-It just instantiates the video.js player on `componentDidMount` and destroys it on `componentWillUnmount`.
+It just instantiates the Video.js player on `componentDidMount` and destroys it on `componentWillUnmount`.
 
 ```jsx
 import React from 'react';
@@ -10,7 +10,7 @@ import videojs from 'video.js'
 
 export default class VideoPlayer extends React.Component {
   componentDidMount() {
-    // instantiate video.js
+    // instantiate Video.js
     this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
       console.log('onPlayerReady', this)
     });
@@ -51,7 +51,7 @@ const videoJsOptions = {
 return <VideoPlayer { ...videoJsOptions } />
 ```
 
-Dont forget to include the video.js CSS, located at `video.js/dist/video-js.css`.
+Don't forget to include the Video.js CSS, located at `video.js/dist/video-js.css`.
 
 [options]: /docs/guides/options.md
 
@@ -132,7 +132,7 @@ export default vjsEpisodeList;
 
 // ...
   componentDidMount() {
-    // instantiate video.js
+    // instantiate Video.js
     this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
       console.log('onPlayerReady', this)
     });
