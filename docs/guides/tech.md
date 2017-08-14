@@ -1,120 +1,88 @@
 # Playback Technology ("Tech")
 
-Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using Flash, the playback technology is the specific Flash player used, e.g. Flowplayer, YouTube Player, video-js.swf, etc. (not just "Flash"). This could also include Silverlight, Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it.
+Playback Technology refers to the specific browser or plugin technology used to play the video or audio.
+When using HTML5, the playback technology is the video or audio element. When using Flash and the
+[videojs-flash project](http://github.com/videojs/videojs-flash) (which was builtin to Video.js prior to Video.js 6), the playback technology is the specific Flash player used, and in most cases that will be [video-js-swf](https://github.com/videojs/video-js-swf). This could also include Silverlight,
+Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it.
 
-Essentially we're using HTML5 and plugins only as video decoders, and using HTML and JavaScript to create a consistent API and skinning experience across all of them.
+Essentially we're using HTML5 and plugins only as video decoders, and using HTML and JavaScript to create a
+consistent API and skinning experience across all of them.
 
-## Building an API Wrapper
+## Table of Contents
 
-We'll write a more complete guide on writing a wrapper soon, but for now the best resource is the [Video.js](https://github.com/zencoder/video-js/tree/master/src) source where you can see how both the HTML5 and video-js.swf API wrappers were created.
+* [Writing a new Tech](#writing-a-new-tech)
+* [Proritizing Techs using techOrder](#proritizing-techs-using-techorder)
+* [Resources](#resources)
 
-## Required Methods
+## Writing a new Tech
 
-canPlayType
-play
-pause
-currentTime
-volume
-duration
-buffered
-supportsFullScreen
+When writing a Tech you will have to integrate your technology's API with the existing API. In the following examples
+we are going to make a clone of the base `Tech` class which would not actually play back any media.
 
-## Required Events
-
-loadstart
-play
-pause
-playing
-ended
-volumechange
-durationchange
-error
-
-## Optional Events (include if supported)
-
-timeupdate
-progress
-enterFullScreen
-exitFullScreen
-
-## Adding Playback Technology
-
-When adding additional Tech to a video player, make sure to add the supported tech to the video object.
-
-### Tag Method:
-
-```html
-<video data-setup='{"techOrder": ["html5", "flash", "other supported tech"]}'>
-```
-
-### Object Method:
+ES6 Example of a new Tech
 
 ```js
-videojs("videoID", {
-  techOrder: ["html5", "flash", "other supported tech"]
+const Tech = videojs.getTech('Tech');
+class MyTech extnds Tech {
+  constructor(options, ready) {
+    super(options, ready);
+    console.log('My new Tech!');
+  }
+}
+
+// Add our new Tech to the internal Tech list and to the end of the default tech order list
+// the techOrder will now look like this by default: `['html5', 'mytech']`
+videojs.registerTech('MyTech', MyTech);
+```
+
+ES5 Example of a new Tech
+
+```js
+var Tech = videojs.getTech('Tech');
+var MyTech = videojs.extend(Tech, {
+  constructor: function(options, ready) {
+    Tech.call(options, ready);
+    console.log('My new Tech!');
+  }
 });
+
+// Add our new Tech to the internal Tech list and to the end of the default `techOrder` list
+videojs.registerTech('MyTech', MyTech);
 ```
 
-## Technology Ordering
+For more information on what methods and events a `Tech` is required to implement. See the [Html5 tech API](https://github.com/videojs/video.js/blob/master/src/js/tech/html5.js)
 
-By default Video.js performs "Tech-first" ordering when it searches for a source/tech combination to play videos. This means that if you have two sources and two techs, video.js will try to play each video with the first tech in the `techOrder` option property before moving on to try the next playback technology.
+## Proritizing Techs using `techOrder`
 
-Tech-first ordering can present a problem if you have a `sourceHandler` that supports both `Html5` and `Flash` techs such as videojs-contrib-hls.
+By default Video.js performs "Tech-first" ordering when it searches for a source/tech combination to play videos.
+This means that if you have two sources and two techs, video.js will try to play each video with the first tech in
+the `techOrder` option property before moving on to try the next playback technology. By default Techs will be added
+to the `techOrder` in the order in which they were registered to video.js. So in our `MyTech` example above it would
+look something like this:
 
-For example, given the following video element:
+```json
+['Html5', 'MyTech']
+```
+
+Tech-first is only a problem when you want to prioritize techs differently than the order of registration. To demonstrate how you would change that lets give some examples:
+
+Example 1: Only use `MyTech`:
+
+```js
+var player = videojs('some-player-id', {techOrder: ['MyTech']});
+```
+
+Example 2: Use `MyTech` and fallback to `Html5` when `MyTech` cannot playback a video:
 
 ```html
-<video data-setup='{"techOrder": ["html5", "flash"]}'>
-  <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
-  <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
-</video>
+var player = videojs('some-player-id', {techOrder: ['MyTech', 'Html5']});
 ```
 
-There is a good chance that the mp4 source will be selected on platforms that do not have media source extensions. Video.js will try all sources against the first playback technology, in this case `Html5`, and select the first source that can play - in this case MP4.
+> Note: each of these examples use JavaScript only, but it is possible to pass the `techOrder` using HTML by using the [`data-setup` attribute on a video](./setup.md#automatic-setup).
 
-In "Tech-first" mode, the tests run something like this:
-  Can video.m3u8 play with Html5? No...
-  Can video.mp4 play with Html5? Yes! Use the second source.
+## Resources
 
-Video.js now provides another method of selecting the source - "Source-first" ordering. In this mode, Video.js tries the first source against every tech in `techOrder` before moving onto the next source.
+Here are some examples of a `Tech` which you can use as resources when designing a new `Tech`:
 
-With a player setup as follows:
-
-```html
-<video data-setup='{"techOrder": ["html5", "flash"], "sourceOrder": true}'>
-  <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
-  <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
-</video>
-```
-
-The Flash-based HLS support will be tried before falling back to the MP4 source.
-
-In "Source-first" mode, the tests run something like this:
-  Can video.m3u8 play with Html5? No...
-  Can video.m3u8 play with Flash? Yes! Use the first source.
-
-## Flash Technology
-
-The Flash playback tech is a part of the default `techOrder`. You may notice undesirable playback behavior in browsers that are subject to using this playback tech, in particular when scrubbing and seeking within a video. This behavior is a result of Flash's progressive video playback.
-
-### Enabling Streaming Playback
-
-In order to force the Flash tech to choose streaming playback, you need to provide a valid streaming source **before other valid Flash video sources**. This is necessary because of the source selection algorithm, where playback tech chooses the first possible source object with a valid type. Valid streaming `type` values include `rtmp/mp4` and `rtmp/flv`. The streaming `src` value requires valid connection and stream strings, separated by an `&`. An example of supplying a streaming source through your HTML markup might look like:
-
-```html
-<source src="rtmp://your.streaming.provider.net/cfx/st/&mp4:path/to/video.mp4" type="rtmp/mp4">
-<source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
-<source src="http://your.static.provider.net/path/to/video.webm" type="video/webm">
-```
-
-You may optionally use the last `/` as the separator between connection and stream strings, for example:
-
-```html
-<source src="rtmp://your.streaming.provider.net/cfx/st/mp4:video.mp4" type="rtmp/mp4">
-```
-
-All four RTMP protocols are valid in the `src` (RTMP, RTMPT, RTMPE, and RTMPS).
-
-#### A note on sandboxing and security
-
-In some environments, such as Electron and NW.js apps, stricter policies are enforced, and `.swf` files won’t be able to communicate with the outside world out of the box. To stream media, you have to add them to a special manifest of trusted files. [nw-flash-trust](https://github.com/szwacz/nw-flash-trust) makes this job easy.
+* [The Html5 Tech](https://github.com/videojs/video.js/blob/master/src/js/tech/html5.js)
+* [The videojs-flash project](http://github.com/videojs/videojs-flash/blob/master/src/index.js)
