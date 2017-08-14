@@ -89,6 +89,9 @@ class Html5 extends Tech {
             This may prevent text tracks from loading.`);
     }
 
+    // prevent iOS Safari from disabling metadata text tracks during native playback
+    this.restoreMetadataTracksInIOSNativePlayer_();
+
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
@@ -112,6 +115,72 @@ class Html5 extends Tech {
     Html5.disposeMediaElement(this.el_);
     // tech will handle clearing of the emulated track list
     super.dispose();
+  }
+
+  /**
+   * When a captions track is enabled in the iOS Safari native player, all other
+   * tracks are disabled (including metadata tracks), which nulls all of their
+   * associated cue points. This will restore metadata tracks to their pre-fullscreen
+   * state in those cases so that cue points are not needlessly lost.
+   *
+   * @private
+   */
+  restoreMetadataTracksInIOSNativePlayer_() {
+    const textTracks = this.textTracks();
+    let metadataTracksPreFullscreenState;
+
+    // captures a snapshot of every metadata track's current state
+    const takeMetadataTrackSnapshot = () => {
+      metadataTracksPreFullscreenState = [];
+
+      for (let i = 0; i < textTracks.length; i++) {
+        const track = textTracks[i];
+
+        if (track.kind === 'metadata') {
+          metadataTracksPreFullscreenState.push({
+            track,
+            storedMode: track.mode
+          });
+        }
+      }
+    };
+
+    // snapshot each metadata track's initial state, and update the snapshot
+    // each time there is a track 'change' event
+    takeMetadataTrackSnapshot();
+    textTracks.addEventListener('change', takeMetadataTrackSnapshot);
+
+    const restoreTrackMode = () => {
+      for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
+        const storedTrack = metadataTracksPreFullscreenState[i];
+
+        if (storedTrack.track.mode === 'disabled' && storedTrack.track.mode !== storedTrack.storedMode) {
+          storedTrack.track.mode = storedTrack.storedMode;
+        }
+      }
+      // we only want this handler to be executed on the first 'change' event
+      textTracks.removeEventListener('change', restoreTrackMode);
+    };
+
+    // when we enter fullscreen playback, stop updating the snapshot and
+    // restore all track modes to their pre-fullscreen state
+    this.on('webkitbeginfullscreen', () => {
+      textTracks.removeEventListener('change', takeMetadataTrackSnapshot);
+
+      // remove the listener before adding it just in case it wasn't previously removed
+      textTracks.removeEventListener('change', restoreTrackMode);
+      textTracks.addEventListener('change', restoreTrackMode);
+    });
+
+    // start updating the snapshot again after leaving fullscreen
+    this.on('webkitendfullscreen', () => {
+      // remove the listener before adding it just in case it wasn't previously removed
+      textTracks.removeEventListener('change', takeMetadataTrackSnapshot);
+      textTracks.addEventListener('change', takeMetadataTrackSnapshot);
+
+      // remove the restoreTrackMode handler in case it wasn't triggered during fullscreen playback
+      textTracks.removeEventListener('change', restoreTrackMode);
+    });
   }
 
   /**
