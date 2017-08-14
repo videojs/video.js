@@ -466,7 +466,7 @@ module.exports = function(grunt) {
         }
       },
       babel: {
-        command: 'npm run babel -- --watch',
+        command: 'npm run babel -- --watch --quiet',
         options: {
           preferLocal: true
         }
@@ -575,7 +575,7 @@ module.exports = function(grunt) {
   });
 
   // Run while developing
-  grunt.registerTask('dev', ['connect:dev', 'concurrent:dev']);
+  grunt.registerTask('dev', ['sandbox', 'connect:dev', 'concurrent:dev']);
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
   grunt.registerTask('test-a11y', ['copy:a11y', 'accessibility']);
 
