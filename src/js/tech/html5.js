@@ -302,17 +302,27 @@ class Html5 extends Tech {
       el.playerId = this.options_.playerId;
     }
 
+    if (this.options_.preload !== 'undefined') {
+      Dom.setAttribute(el, 'preload', this.options_.preload);
+    }
+
     // Update specific tag settings, in case they were overridden
-    const settingsAttrs = ['autoplay', 'preload', 'loop', 'muted', 'playsinline'];
+    // `autoplay` has to be *last* so that `muted` and `playsinline` are present
+    // when iOS/Safari or other browsers attempt to autoplay.
+    const settingsAttrs = ['loop', 'muted', 'playsinline', 'autoplay'];
 
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
       const attr = settingsAttrs[i];
-      const overwriteAttrs = {};
+      const value = this.options_[attr];
 
-      if (typeof this.options_[attr] !== 'undefined') {
-        overwriteAttrs[attr] = this.options_[attr];
+      if (typeof value !== 'undefined') {
+        if (value) {
+          Dom.setAttribute(el, attr, attr);
+        } else {
+          Dom.removeAttribute(el, attr);
+        }
+        el[attr] = value;
       }
-      Dom.setAttributes(el, overwriteAttrs);
     }
 
     return el;
@@ -743,43 +753,6 @@ class Html5 extends Tech {
   }
 
   /**
-   * Get the value of `playsinline` from the media element. `playsinline` indicates
-   * to the browser that non-fullscreen playback is preferred when fullscreen
-   * playback is the native default, such as in iOS Safari.
-   *
-   * @method Html5#playsinline
-   * @return {boolean}
-   *         - The value of `playsinline` from the media element.
-   *         - True indicates that the media should play inline.
-   *         - False indicates that the media should not play inline.
-   *
-   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
-   */
-  playsinline() {
-    return this.el_.hasAttribute('playsinline');
-  }
-
-  /**
-   * Set the value of `playsinline` from the media element. `playsinline` indicates
-   * to the browser that non-fullscreen playback is preferred when fullscreen
-   * playback is the native default, such as in iOS Safari.
-   *
-   * @method Html5#setPlaysinline
-   * @param {boolean} playsinline
-   *         - True indicates that the media should play inline.
-   *         - False indicates that the media should not play inline.
-   *
-   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
-   */
-  setPlaysinline(value) {
-    if (value) {
-      this.el_.setAttribute('playsinline', 'playsinline');
-    } else {
-      this.el_.removeAttribute('playsinline');
-    }
-  }
-
-  /**
    * Gets available media playback quality metrics as specified by the W3C's Media
    * Playback Quality API.
    *
@@ -1164,7 +1137,195 @@ Html5.resetMediaElement = function(el) {
 };
 
 /* Native HTML5 element property wrapping ----------------------------------- */
+// Wrap native boolean attributes with getters that check both property and attribute
+// The list is as followed:
+// muted, defaultMuted, autoplay, controls, loop, playsinline
+[
+  /**
+   * Get the value of `muted` from the media element. `muted` indicates
+   * that the volume for the media should be set to silent. This does not actually change
+   * the `volume` attribute.
+   *
+   * @method Html5#muted
+   * @return {boolean}
+   *         - True if the value of `volume` should be ignored and the audio set to silent.
+   *         - False if the value of `volume` should be used.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
+   */
+  'muted',
+
+  /**
+   * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
+   * whether the media should start muted or not. Only changes the default state of the
+   * media. `muted` and `defaultMuted` can have different values. {@link Html5#muted} indicates the
+   * current state.
+   *
+   * @method Html5#defaultMuted
+   * @return {boolean}
+   *         - The value of `defaultMuted` from the media element.
+   *         - True indicates that the media should start muted.
+   *         - False indicates that the media should not start muted
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
+   */
+  'defaultMuted',
+
+  /**
+   * Get the value of `autoplay` from the media element. `autoplay` indicates
+   * that the media should start to play as soon as the page is ready.
+   *
+   * @method Html5#autoplay
+   * @return {boolean}
+   *         - The value of `autoplay` from the media element.
+   *         - True indicates that the media should start as soon as the page loads.
+   *         - False indicates that the media should not start as soon as the page loads.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
+   */
+  'autoplay',
+
+  /**
+   * Get the value of `controls` from the media element. `controls` indicates
+   * whether the native media controls should be shown or hidden.
+   *
+   * @method Html5#controls
+   * @return {boolean}
+   *         - The value of `controls` from the media element.
+   *         - True indicates that native controls should be showing.
+   *         - False indicates that native controls should be hidden.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-controls}
+   */
+  'controls',
+
+  /**
+   * Get the value of `loop` from the media element. `loop` indicates
+   * that the media should return to the start of the media and continue playing once
+   * it reaches the end.
+   *
+   * @method Html5#loop
+   * @return {boolean}
+   *         - The value of `loop` from the media element.
+   *         - True indicates that playback should seek back to start once
+   *           the end of a media is reached.
+   *         - False indicates that playback should not loop back to the start when the
+   *           end of the media is reached.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-loop}
+   */
+  'loop',
+
+  /**
+   * Get the value of `playsinline` from the media element. `playsinline` indicates
+   * to the browser that non-fullscreen playback is preferred when fullscreen
+   * playback is the native default, such as in iOS Safari.
+   *
+   * @method Html5#playsinline
+   * @return {boolean}
+   *         - The value of `playsinline` from the media element.
+   *         - True indicates that the media should play inline.
+   *         - False indicates that the media should not play inline.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
+   */
+  'playsinline'
+].forEach(function(prop) {
+  Html5.prototype[prop] = function() {
+    return this.el_[prop] || this.el_.hasAttribute(prop);
+  };
+});
+
+// Wrap native boolean attributes with setters that set both property and attribute
+// The list is as followed:
+// setMuted, setDefaultMuted, setAutoplay, setLoop, setPlaysinline
+// setControls is special-cased above
+[
+  /**
+   * Set the value of `muted` on the media element. `muted` indicates that the current
+   * audio level should be silent.
+   *
+   * @method Html5#setMuted
+   * @param {boolean} muted
+   *        - True if the audio should be set to silent
+   *        - False otherwise
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
+   */
+  'muted',
+
+  /**
+   * Set the value of `defaultMuted` on the media element. `defaultMuted` indicates that the current
+   * audio level should be silent, but will only effect the muted level on intial playback..
+   *
+   * @method Html5.prototype.setDefaultMuted
+   * @param {boolean} defaultMuted
+   *        - True if the audio should be set to silent
+   *        - False otherwise
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
+   */
+  'defaultMuted',
+
+  /**
+   * Set the value of `autoplay` on the media element. `autoplay` indicates
+   * that the media should start to play as soon as the page is ready.
+   *
+   * @method Html5#setAutoplay
+   * @param {boolean} autoplay
+   *         - True indicates that the media should start as soon as the page loads.
+   *         - False indicates that the media should not start as soon as the page loads.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
+   */
+  'autoplay',
+
+  /**
+   * Set the value of `loop` on the media element. `loop` indicates
+   * that the media should return to the start of the media and continue playing once
+   * it reaches the end.
+   *
+   * @method Html5#setLoop
+   * @param {boolean} loop
+   *         - True indicates that playback should seek back to start once
+   *           the end of a media is reached.
+   *         - False indicates that playback should not loop back to the start when the
+   *           end of the media is reached.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-loop}
+   */
+  'loop',
+
+  /**
+   * Set the value of `playsinline` from the media element. `playsinline` indicates
+   * to the browser that non-fullscreen playback is preferred when fullscreen
+   * playback is the native default, such as in iOS Safari.
+   *
+   * @method Html5#setPlaysinline
+   * @param {boolean} playsinline
+   *         - True indicates that the media should play inline.
+   *         - False indicates that the media should not play inline.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
+   */
+  'playsinline'
+].forEach(function(prop) {
+  Html5.prototype['set' + toTitleCase(prop)] = function(v) {
+    this.el_[prop] = v;
+
+    if (v) {
+      this.el_.setAttribute(prop, prop);
+    } else {
+      this.el_.removeAttribute(prop);
+    }
+  };
+});
+
 // Wrap native properties with a getter
+// The list is as followed
+// paused, currentTime, buffered, volume, poster, preload, error, seeking
+// seekable, ended, playbackRate, defaultPlaybackRate, played, networkState
+// readyState, videoWidth, videoHeight
 [
   /**
    * Get the value of `paused` from the media element. `paused` indicates whether the media element
@@ -1217,35 +1378,6 @@ Html5.resetMediaElement = function(el) {
   'volume',
 
   /**
-   * Get the value of `muted` from the media element. `muted` indicates
-   * that the volume for the media should be set to silent. This does not actually change
-   * the `volume` attribute.
-   *
-   * @method Html5#muted
-   * @return {boolean}
-   *         - True if the value of `volume` should be ignored and the audio set to silent.
-   *         - False if the value of `volume` should be used.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
-   */
-  'muted',
-
-  /**
-   * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
-   * that the volume for the media should be set to silent when the video first starts.
-   * This does not actually change the `volume` attribute. After playback has started `muted`
-   * will indicate the current status of the volume and `defaultMuted` will not.
-   *
-   * @method Html5.prototype.defaultMuted
-   * @return {boolean}
-   *         - True if the value of `volume` should be ignored and the audio set to silent.
-   *         - False if the value of `volume` should be used.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
-   */
-  'defaultMuted',
-
-  /**
    * Get the value of `poster` from the media element. `poster` indicates
    * that the url of an image file that can/will be shown when no media data is available.
    *
@@ -1276,51 +1408,6 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-preload}
    */
   'preload',
-
-  /**
-   * Get the value of `autoplay` from the media element. `autoplay` indicates
-   * that the media should start to play as soon as the page is ready.
-   *
-   * @method Html5#autoplay
-   * @return {boolean}
-   *         - The value of `autoplay` from the media element.
-   *         - True indicates that the media should start as soon as the page loads.
-   *         - False indicates that the media should not start as soon as the page loads.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
-   */
-  'autoplay',
-
-  /**
-   * Get the value of `controls` from the media element. `controls` indicates
-   * whether the native media controls should be shown or hidden.
-   *
-   * @method Html5#controls
-   * @return {boolean}
-   *         - The value of `controls` from the media element.
-   *         - True indicates that native controls should be showing.
-   *         - False indicates that native controls should be hidden.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-controls}
-   */
-  'controls',
-
-  /**
-   * Get the value of `loop` from the media element. `loop` indicates
-   * that the media should return to the start of the media and continue playing once
-   * it reaches the end.
-   *
-   * @method Html5#loop
-   * @return {boolean}
-   *         - The value of `loop` from the media element.
-   *         - True indicates that playback should seek back to start once
-   *           the end of a media is reached.
-   *         - False indicates that playback should not loop back to the start when the
-   *           end of the media is reached.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-loop}
-   */
-  'loop',
 
   /**
    * Get the value of the `error` from the media element. `error` indicates any
@@ -1376,22 +1463,6 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-ended}
    */
   'ended',
-
-  /**
-   * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
-   * whether the media should start muted or not. Only changes the default state of the
-   * media. `muted` and `defaultMuted` can have different values. {@link Html5#muted} indicates the
-   * current state.
-   *
-   * @method Html5#defaultMuted
-   * @return {boolean}
-   *         - The value of `defaultMuted` from the media element.
-   *         - True indicates that the media should start muted.
-   *         - False indicates that the media should not start muted
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
-   */
-  'defaultMuted',
 
   /**
    * Get the value of `playbackRate` from the media element. `playbackRate` indicates
@@ -1508,6 +1579,8 @@ Html5.resetMediaElement = function(el) {
 
 // Wrap native properties with a setter in this format:
 // set + toTitleCase(name)
+// The list is as follows:
+// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate
 [
   /**
    * Set the value of `volume` on the media element. `volume` indicates the current
@@ -1521,32 +1594,6 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-a-volume}
    */
   'volume',
-
-  /**
-   * Set the value of `muted` on the media element. `muted` indicates that the current
-   * audio level should be silent.
-   *
-   * @method Html5#setMuted
-   * @param {boolean} muted
-   *        - True if the audio should be set to silent
-   *        - False otherwise
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-muted}
-   */
-  'muted',
-
-  /**
-   * Set the value of `defaultMuted` on the media element. `defaultMuted` indicates that the current
-   * audio level should be silent, but will only effect the muted level on intial playback..
-   *
-   * @method Html5.prototype.setDefaultMuted
-   * @param {boolean} defaultMuted
-   *        - True if the audio should be set to silent
-   *        - False otherwise
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultmuted}
-   */
-  'defaultMuted',
 
   /**
    * Set the value of `src` on the media element. `src` indicates the current
@@ -1593,35 +1640,6 @@ Html5.resetMediaElement = function(el) {
   'preload',
 
   /**
-   * Set the value of `autoplay` on the media element. `autoplay` indicates
-   * that the media should start to play as soon as the page is ready.
-   *
-   * @method Html5#setAutoplay
-   * @param {boolean} autoplay
-   *         - True indicates that the media should start as soon as the page loads.
-   *         - False indicates that the media should not start as soon as the page loads.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-autoplay}
-   */
-  'autoplay',
-
-  /**
-   * Set the value of `loop` on the media element. `loop` indicates
-   * that the media should return to the start of the media and continue playing once
-   * it reaches the end.
-   *
-   * @method Html5#setLoop
-   * @param {boolean} loop
-   *         - True indicates that playback should seek back to start once
-   *           the end of a media is reached.
-   *         - False indicates that playback should not loop back to the start when the
-   *           end of the media is reached.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#attr-media-loop}
-   */
-  'loop',
-
-  /**
    * Set the value of `playbackRate` on the media element. `playbackRate` indicates
    * the rate at which the media should play back. Examples:
    *   - if playbackRate is set to 2, media will play twice as fast.
@@ -1661,6 +1679,8 @@ Html5.resetMediaElement = function(el) {
 });
 
 // wrap native functions with a function
+// The list is as follows:
+// pause, load play
 [
   /**
    * A wrapper around the media elements `pause` function. This will call the `HTML5`
