@@ -84,7 +84,7 @@
     "grunt-accessibility": "^5.0.0",
     "grunt-babel": "^7.0.0",
     "grunt-banner": "^0.6.0",
-    "grunt-browserify": "5.0.0",
+    "grunt-browserify": "5.1.0",
     "grunt-cli": "~1.2.0",
     "grunt-concurrent": "^2.3.1",
     "grunt-contrib-clean": "^1.0.0",
