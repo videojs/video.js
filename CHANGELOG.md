@@ -1,3 +1,14 @@
+<a name="5.20.3"></a>
+## [5.20.3](https://github.com/videojs/video.js/compare/v5.20.2...v5.20.3) (2017-08-16)
+
+### Bug Fixes
+
+* tracks are disabled and cuepoints are cleared in iOS native player ([#4569](https://github.com/videojs/video.js/issues/4569)) ([424d021](https://github.com/videojs/video.js/commit/424d021))
+
+### Chores
+
+* **CHANGELOG:** update CHANGELOG for 5.20.2 ([#4529](https://github.com/videojs/video.js/issues/4529)) ([935ec1e](https://github.com/videojs/video.js/commit/935ec1e))
+
 <a name="5.20.2"></a>
 ## [5.20.2](https://github.com/videojs/video.js/compare/v5.20.1...v5.20.2) (2017-07-26)
 
