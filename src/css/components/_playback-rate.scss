@@ -10,12 +10,14 @@
 
 .vjs-playback-rate .vjs-playback-rate-value {
   pointer-events: none;
-  font-size: 1.5em;
-  line-height: 2;
+  font-size: 1em;
+  line-height: 3em;
   text-align: center;
 }
 
 .vjs-playback-rate .vjs-menu {
   width: 4em;
   left: 0em;
+
+  li { font-size: 1em; }
 }
