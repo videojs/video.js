@@ -1,3 +1,26 @@
+<a name="6.2.6"></a>
+## [6.2.6](https://github.com/videojs/video.js/compare/v6.2.5...v6.2.6) (2017-08-16)
+
+### Bug Fixes
+
+* make boolean attributes set and check both the associated property and the attribute ([#4562](https://github.com/videojs/video.js/issues/4562)) ([d668c49](https://github.com/videojs/video.js/commit/d668c49)), closes [#4351](https://github.com/videojs/video.js/issues/4351)
+* playback rate default text ([#4558](https://github.com/videojs/video.js/issues/4558)) ([a6b8425](https://github.com/videojs/video.js/commit/a6b8425))
+* remove 'use strict' from rollup because vttjs isn't strict ([#4551](https://github.com/videojs/video.js/issues/4551)) ([db55bbd](https://github.com/videojs/video.js/commit/db55bbd))
+* set width and height for vjs-button like the SubsCaps button ([#4548](https://github.com/videojs/video.js/issues/4548)) ([cd2f510](https://github.com/videojs/video.js/commit/cd2f510)), closes [#4547](https://github.com/videojs/video.js/issues/4547)
+* **lang:** typos in ar.json ([#4528](https://github.com/videojs/video.js/issues/4528)) ([3e63bf3](https://github.com/videojs/video.js/commit/3e63bf3))
+
+### Chores
+
+* improve dev and beginner experience ([#4555](https://github.com/videojs/video.js/issues/4555)) ([19ebc0d](https://github.com/videojs/video.js/commit/19ebc0d))
+* **package:** update grunt-babel to version 7.0.0 ([#4553](https://github.com/videojs/video.js/issues/4553)) ([f6f9998](https://github.com/videojs/video.js/commit/f6f9998))
+* **package:** update grunt-browserify to version 5.1.0 ([#4565](https://github.com/videojs/video.js/issues/4565)) ([8c21f0a](https://github.com/videojs/video.js/commit/8c21f0a))
+* **package:** update klaw-sync to version 3.0.0 ([#4544](https://github.com/videojs/video.js/issues/4544)) ([6233d14](https://github.com/videojs/video.js/commit/6233d14))
+* **package:** update rollup to version 0.47.4 ([#4570](https://github.com/videojs/video.js/issues/4570)) ([d7f7e05](https://github.com/videojs/video.js/commit/d7f7e05)), closes [#4561](https://github.com/videojs/video.js/issues/4561)
+
+### Documentation
+
+* updates to faq, language guide, and minor edits ([#4556](https://github.com/videojs/video.js/issues/4556)) ([1f3375e](https://github.com/videojs/video.js/commit/1f3375e))
+
 <a name="6.2.5"></a>
 ## [6.2.5](https://github.com/videojs/video.js/compare/v6.2.4...v6.2.5) (2017-07-26)
 
