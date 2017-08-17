@@ -302,7 +302,7 @@ class Html5 extends Tech {
       el.playerId = this.options_.playerId;
     }
 
-    if (this.options_.preload !== 'undefined') {
+    if (typeof this.options_.preload !== 'undefined') {
       Dom.setAttribute(el, 'preload', this.options_.preload);
     }
 
