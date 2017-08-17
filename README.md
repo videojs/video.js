@@ -27,7 +27,7 @@ Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted
 ```
 > For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
 
-> We include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
+> In the CDN-hosted versions we include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
 >
 > ```html
 > <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
