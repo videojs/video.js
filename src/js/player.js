@@ -2363,10 +2363,6 @@ class Player extends Component {
         this.load();
       }
 
-      if (this.options_.autoplay) {
-        this.play();
-      }
-
     // Set the source synchronously if possible (#2326)
     }, true);
 
