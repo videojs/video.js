@@ -259,22 +259,15 @@ git reset --hard upstream/master
 
 ## video.js releases
 
-Releasing video.js is partially automated through [`conrib.json`](/contrib.json) scripts. To do a release, you need a couple of things: npm access, GitHub personal access token.
+Releasing video.js is partially automated through various scripts.
+To do a release, you need a couple of things: npm access, GitHub personal access token.
 
-Releases in video.js are done on npm and GitHub and eventually posted on the CDN. These
-are the instructions for the npm/GitHub releases.
+Releases in video.js are done on npm and GitHub and eventually posted on the CDN.
+These are the instructions for the npm/GitHub releases.
 
 When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
 
 ### Getting dependencies
-
-#### Install contrib
-
-You can install it globally
-
-```sh
-npm i -g contrib/contrib
-```
 
 #### npm access
 
@@ -285,6 +278,7 @@ npm owner ls video.js
 ```
 
 If you are a core committer, you can request access to npm from one of the current owners.
+Access is managed via an [npm organization][npm org] for [Video.js][vjs npm].
 
 #### GitHub personal access token
 
@@ -294,21 +288,120 @@ After generating one, make sure to keep it safe because GitHub will not show the
 
 ### Doing a release
 
-To do a release, check out the master branch
+It is also recommended you have a clean clone of Video.js for each release line you want to relase.
+That means having a folder for master/v6 and one for 5.x.
+
+```sh
+# for v6
+git clone git@github.com:videojs/video.js.git videojs-6-release
+# for v5
+git clone git@github.com:videojs/video.js.git videojs-5-release
+```
+
+#### Video.js 6
+
+Make sure go to the master branch and grab the latest updates.
 
 ```sh
 git checkout master
+git pull origin master
 ```
 
-Then run the contrib command to do the next release. Don't forget to provide your GitHub token so the GitHub release goes through.
+Then, it's mostly a standard npm package release process with running `npm version`, followed by an `npm publish`.
 
 ```sh
-VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token contrib release next patch
+npm version {major|minor|patch}
 ```
 
-This makes a patch release, you can also do a `minor` and a `major` release.
+Depending on the commits that have been merged, you can choose from `major`, `minor`, or `patch` as the versioning values.
+
+Afterwards, you want to push the commit and the tag to the repo.
+It's necessary to do this before running `npm publish` because our GitHub release automation
+relies on the commit being available on GitHub.
+
+```sh
+git push origin master
+```
+
+Finally, run `npm publish` with an appropriate tag. Don't forget to supply your token.
+
+```sh
+VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token npm publish --tag next
+```
 
 After it's done, verify that the GitHub release has the correct changelog output.
+
+If the GitHub release did not work correctly for whatever reason, you can run it manually:
+
+```sh
+VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 node build/gh-release.js --prelease
+```
+
+#### Video.js 5
+
+Make sure to go to the 5.x branch and grab the latest updates.
+
+```sh
+git checkout 5.x
+git pull origin 5.x
+```
+
+> *Note:* you probably need to delete v6 tags due to the way that the our CHANGELOG lib works.
+>
+> You can run this to delete them:
+> ```sh
+> git tag | grep '^v6' | xargs git tag -d
+> ```
+> This will find all tags that start with `^v6` and delete them.
+
+Then, we have a script that automates most of the steps for publishing. It's a little trickier than publishing v6.
+
+##### Edit git-semver-tags
+
+You'll need to edit `git-semver-tags` to support our usage of tags that are not part of the branch.
+In the file `node_modules/conventional-changelog-cli/node_modules/conventional-changelog/node_modules/conventional-changelog-core/node_modules/git-semver-tags/index.js`, edit the line that says sets the `cmd` to be:
+```js
+var cmd = 'git log --all --date-order --decorate --no-color';
+```
+
+#### And now for the release
+
+After getting rid of the tags and getting the latest updates, you can just run the release script:
+
+```sh
+VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 ./build/bin/release-next.sh
+```
+
+It will prompt you for a version change type, so, input `patch` or `minor` or `major`.
+
+When it's done building everything, it'll show you the commit that's made via the default pager (i.e., less).
+
+After exiting the pager, it'll make sure you want to continue with publishing.
+
+It will automatically release it as a `next-5` tag on npm.
+
+Then push the local changes up:
+
+```sh
+git push origin 5.x
+```
+
+Also, you'll need to copy the CHANGELOG for this version and manually edit the GitHub release to include it.
+
+### Deploy as a patch to the CDN
+
+Follow the steps on the [CDN repo][] for the CDN release process.
+If it's a `next` or `next-5` release, only publish the patch version to the CDN.
+
+When the version gets promoted to `latest` or `latest-5`, the corresponding `minor` or `latest` version should be published to the CDN.
+
+### Annoucement
+
+An announcement should automatically make it's way to #announcements channel on [slack][], it uses IFTTT and might take a while.
+
+You can also post it to twitter or ask someone (like @gkatsev) to post on your behalf.
+
+If it's a large enough release, consider writing a blog post as well.
 
 ## Doc credit
 
@@ -319,3 +412,11 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 [pr template]: /.github/PULL_REQUEST_TEMPLATE.md
 
 [conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md
+
+[vjs npm]: http://npmjs.com/org/videojs
+
+[npm org]: https://docs.npmjs.com/misc/orgs
+
+[slack]: http://slack.videojs.com
+
+[CDN repo]: https://github.com/videojs/cdn
