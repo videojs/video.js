@@ -395,7 +395,7 @@ If it's a `next` or `next-5` release, only publish the patch version to the CDN.
 
 When the version gets promoted to `latest` or `latest-5`, the corresponding `minor` or `latest` version should be published to the CDN.
 
-### Annoucement
+### Announcement
 
 An announcement should automatically make it's way to #announcements channel on [slack][], it uses IFTTT and might take a while.
 
