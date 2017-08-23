@@ -1076,7 +1076,6 @@ class Player extends Component {
       } catch (e) {
         log('deleting tag.poster throws in some browsers', e);
       }
-      this.play();
     }
   }
 
