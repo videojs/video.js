@@ -327,7 +327,7 @@ npm version {major|minor|patch}
 ```
 
 Depending on the commits that have been merged, you can choose from `major`, `minor`, or `patch` as the versioning values.
-See [deciding what type of version release section][#deciding-what-type-of-version-release].
+See [deciding what type of version release section](#deciding-what-type-of-version-release).
 
 
 Afterwards, you want to push the commit and the tag to the repo.
@@ -392,7 +392,7 @@ VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 ./build/bin/release-next.sh
 ```
 
 It will prompt you for a version change type, so, input `patch` or `minor` or `major`.
-See [deciding what type of version release section][#deciding-what-type-of-version-release].
+See [deciding what type of version release section](#deciding-what-type-of-version-release).
 
 When it's done building everything, it'll show you the commit that's made via the default pager (i.e., less).
 At this point you can verify that things look normal rather than, for example, missing all the CSS.
