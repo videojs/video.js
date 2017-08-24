@@ -286,10 +286,21 @@ This is used to make a GitHub release on videojs. You can get a token from the [
 
 After generating one, make sure to keep it safe because GitHub will not show the token for you again. A good place to save it is Lastpass Secure Notes.
 
+### Deciding what type of version release
+
+Since we follow the [conventional changelog conventions][conventions],
+all commits are prepended with a type, most commonly `feat` and `fix`.
+If all the commits are fix or other types such as `test` or `chore`, then the release will be a `patch` release.
+If there's even one `feat`, the release will be a `minor` release.
+If any commit has a `BREAKING CHANGE` footer, then the release will be a `major` release.
+Most common releases will be either `patch` or `minor`.
+
 ### Doing a release
 
-It is also recommended you have a clean clone of Video.js for each release line you want to relase.
+It is also recommended you have a clean clone of Video.js for each release line you want to release.
 That means having a folder for master/v6 and one for 5.x.
+This is because 5.x and 6.x have different versions expecations for release process and have different dependencies.
+Plus, during development you could end up with a dirty repo, so, it just usually easier if you have a clean release repo.
 
 ```sh
 # for v6
@@ -307,6 +318,8 @@ git checkout master
 git pull origin master
 ```
 
+At this point, you should run `npm install` because dependencies may have changed.
+
 Then, it's mostly a standard npm package release process with running `npm version`, followed by an `npm publish`.
 
 ```sh
@@ -314,6 +327,8 @@ npm version {major|minor|patch}
 ```
 
 Depending on the commits that have been merged, you can choose from `major`, `minor`, or `patch` as the versioning values.
+See [deciding what type of version release section][#deciding-what-type-of-version-release].
+
 
 Afterwards, you want to push the commit and the tag to the repo.
 It's necessary to do this before running `npm publish` because our GitHub release automation
@@ -330,6 +345,7 @@ VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token npm publish --
 ```
 
 After it's done, verify that the GitHub release has the correct changelog output.
+This is to make sure that the CHANGELOG didn't get garbled and isn't missing pieces.
 
 If the GitHub release did not work correctly, such as if the GitHub token was not provided,
 you can run it manually:
@@ -355,6 +371,8 @@ git pull origin 5.x
 > ```
 > This will find all tags that start with `^v6` and delete them.
 
+At this point, you should run `npm install` because dependencies may have changed.
+
 Then, we have a script that automates most of the steps for publishing. It's a little trickier than publishing v6.
 
 ##### Edit git-semver-tags
@@ -374,8 +392,10 @@ VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 ./build/bin/release-next.sh
 ```
 
 It will prompt you for a version change type, so, input `patch` or `minor` or `major`.
+See [deciding what type of version release section][#deciding-what-type-of-version-release].
 
 When it's done building everything, it'll show you the commit that's made via the default pager (i.e., less).
+At this point you can verify that things look normal rather than, for example, missing all the CSS.
 
 After exiting the pager, it'll make sure you want to continue with publishing.
 
@@ -388,6 +408,8 @@ git push origin 5.x
 ```
 
 Also, you'll need to copy the CHANGELOG for this version and manually edit the GitHub release to include it.
+The current release's CHANGELOG could be copied from the [raw CHANGELOG.md file][raw chg] (or locally from the markdown file)
+and then pasted into the correct [GitHub release](https://github.com/videojs/video.js/releases).
 
 ### Deploy as a patch to the CDN
 
@@ -421,3 +443,5 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 [slack]: http://slack.videojs.com
 
 [CDN repo]: https://github.com/videojs/cdn
+
+[raw chg]: https://raw.githubusercontent.com/videojs/video.js/5.x/CHANGELOG.md
