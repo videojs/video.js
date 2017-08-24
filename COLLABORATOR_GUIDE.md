@@ -331,7 +331,8 @@ VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token npm publish --
 
 After it's done, verify that the GitHub release has the correct changelog output.
 
-If the GitHub release did not work correctly for whatever reason, you can run it manually:
+If the GitHub release did not work correctly, such as if the GitHub token was not provided,
+you can run it manually:
 
 ```sh
 VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 node build/gh-release.js --prelease
