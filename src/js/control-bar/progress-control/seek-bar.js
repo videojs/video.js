@@ -15,6 +15,9 @@ import './mouse-time-display.js';
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
+// The interval at which the bar should update as it progresses.
+const UPDATE_REFRESH_INTERVAL = 30;
+
 /**
  * Seek bar and container for the progress bars. Uses {@link PlayProgressBar}
  * as its `bar`.
@@ -35,10 +38,30 @@ class SeekBar extends Slider {
   constructor(player, options) {
     super(player, options);
 
-    this.update = Fn.throttle(Fn.bind(this, this.update), 50);
+    this.update = Fn.throttle(Fn.bind(this, this.update), UPDATE_REFRESH_INTERVAL);
+
     this.on(player, 'timeupdate', this.update);
     this.on(player, 'ended', this.handleEnded);
 
+    // when playing, let's ensure we smoothly update the play progress bar
+    // via an interval
+    this.updateInterval = null;
+
+    this.on(player, ['playing'], () => {
+      this.clearInterval(this.updateInterval);
+
+      this.updateInterval = this.setInterval(() =>{
+        this.requestAnimationFrame(() => {
+          this.update();
+        });
+      }, UPDATE_REFRESH_INTERVAL);
+    });
+
+    this.on(player, ['ended', 'pause', 'waiting', 'stalled'], () => {
+      this.clearInterval(this.updateInterval);
+    });
+
+    this.on(player, ['timeupdate', 'ended'], this.update);
   }
 
   /**
