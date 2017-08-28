@@ -329,13 +329,14 @@ npm version {major|minor|patch}
 Depending on the commits that have been merged, you can choose from `major`, `minor`, or `patch` as the versioning values.
 See [deciding what type of version release section](#deciding-what-type-of-version-release).
 
+Optionally, you can run `git show` now to verify that the version update and CHANGELOG automation worked as expected.
 
 Afterwards, you want to push the commit and the tag to the repo.
 It's necessary to do this before running `npm publish` because our GitHub release automation
 relies on the commit being available on GitHub.
 
 ```sh
-git push origin master
+git push --tags origin master
 ```
 
 Finally, run `npm publish` with an appropriate tag. Don't forget to supply your token.
@@ -404,7 +405,7 @@ It will automatically release it as a `next-5` tag on npm.
 Then push the local changes up:
 
 ```sh
-git push origin 5.x
+git push --tags origin 5.x
 ```
 
 Also, you'll need to copy the CHANGELOG for this version and manually edit the GitHub release to include it.
