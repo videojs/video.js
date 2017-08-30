@@ -1076,7 +1076,6 @@ class Player extends Component {
       } catch (e) {
         log('deleting tag.poster throws in some browsers', e);
       }
-      this.play();
     }
   }
 
@@ -2361,10 +2360,6 @@ class Player extends Component {
 
       if (this.options_.preload === 'auto') {
         this.load();
-      }
-
-      if (this.options_.autoplay) {
-        this.play();
       }
 
     // Set the source synchronously if possible (#2326)
