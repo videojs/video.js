@@ -55,7 +55,7 @@ class VolumeBar extends Slider {
    */
   handleMouseMove(event) {
     // only allow left-click volume change
-    if (event.buttons != 1) {
+    if (event.buttons !== 1) {
       return;
     }
 
