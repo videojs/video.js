@@ -114,7 +114,7 @@ class SeekBar extends Slider {
    */
   handleMouseDown(event) {
     // only allow left-click seeking
-    if (event.buttons != 1) {
+    if (event.buttons !== 1) {
       return;
     }
 
