@@ -113,6 +113,11 @@ class SeekBar extends Slider {
    * @listens mousedown
    */
   handleMouseDown(event) {
+    // only allow left-click seeking
+    if (event.buttons != 1) {
+      return;
+    }
+
     this.player_.scrubbing(true);
 
     this.videoWasPlaying = !this.player_.paused();
