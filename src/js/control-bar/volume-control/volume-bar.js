@@ -54,6 +54,11 @@ class VolumeBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
+    // only allow left-click volume change
+    if (event.buttons != 1) {
+      return;
+    }
+
     this.checkMuted();
     this.player_.volume(this.calculateDistance(event));
   }
