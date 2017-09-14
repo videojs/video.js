@@ -23,6 +23,7 @@
     "rollup": "babel-node build/rollup.js",
     "rollup-minify": "babel-node build/rollup.js --minify",
     "rollup-dev": "babel-node build/rollup.js --watch",
+    "watch": "npm run rollup-dev",
     "assets": "node build/assets.js",
     "change": "grunt chg-add",
     "clean": "grunt clean",
