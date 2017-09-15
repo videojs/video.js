@@ -57,6 +57,8 @@ class VolumeBar extends Slider {
     // only allow left-click volume change
     if (typeof event.button === 'undefined' && typeof event.buttons === 'undefined') {
       // touch screen, not apply, do nothing
+    } else if (event.button === 0 && typeof event.buttons === 'undefined') {
+      // touch screen, safari on ios
     } else if (event.button !== 0 || event.buttons !== 1) {
       return;
     }
