@@ -100,7 +100,7 @@
     "grunt-karma": "^2.0.0",
     "grunt-sass": "^2.0.0",
     "grunt-shell": "^2.0.0",
-    "grunt-version": "~1.1.1",
+    "grunt-version": "~1.2.0",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.17.1",
     "humanize-duration": "^3.10.0",
