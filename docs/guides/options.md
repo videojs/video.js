@@ -26,6 +26,7 @@
   * [languages](#languages)
   * [nativeControlsForTouch](#nativecontrolsfortouch)
   * [notSupportedMessage](#notsupportedmessage)
+  * [playbackRates](#playbackrates)
   * [plugins](#plugins)
   * [sourceOrder](#sourceorder)
   * [sources](#sources)
@@ -179,6 +180,24 @@ Explicitly set a default value for [the associated tech option](#nativecontrolsf
 > Type: `string`
 
 Allows overriding the default message that is displayed when Video.js cannot play back a media source.
+
+### `playbackRates`
+
+> Type: `Array`
+
+An array of numbers strictly greater than 0, where 1 means regular speed
+(100%), 0.5 means half-speed (50%), 2 means double-speed (200%), etc.
+If specified, Video.js displays a control (of class `vjs-playback-rate`)
+allowing the user to choose playback speed from among the array of choices.
+The choices are presented in the specified order from bottom to top.
+
+For example:
+
+```js
+videojs('my-player', {
+  playbackRates: [0.5, 1, 1.5, 2]
+});
+```
 
 ### `plugins`
 
