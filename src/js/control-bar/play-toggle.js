@@ -70,8 +70,11 @@ class PlayToggle extends Button {
     // remove the ended class
     this.removeClass('vjs-ended');
 
-    // and set us back to showing the play button
-    this.handlePause(event);
+    if (this.player_.paused()) {
+      this.handlePause(event);
+    } else {
+      this.handlePlay(event);
+    }
   }
 
   /**
@@ -83,12 +86,8 @@ class PlayToggle extends Button {
    * @listens Player#play
    */
   handlePlay(event) {
-    this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
-
-    if (!this.hasClass('vjs-playing')) {
-      this.addClass('vjs-playing');
-    }
+    this.addClass('vjs-playing');
     // change the button text to "Pause"
     this.controlText('Pause');
   }
@@ -103,10 +102,7 @@ class PlayToggle extends Button {
    */
   handlePause(event) {
     this.removeClass('vjs-playing');
-
-    if (!this.hasClass('vjs-paused')) {
-      this.addClass('vjs-paused');
-    }
+    this.addClass('vjs-paused');
     // change the button text to "Play"
     this.controlText('Play');
   }
@@ -121,13 +117,11 @@ class PlayToggle extends Button {
    */
   handleEnded(event) {
     this.removeClass('vjs-playing');
-
-    if (!this.hasClass('vjs-ended')) {
-      this.addClass('vjs-ended');
-    }
+    this.addClass('vjs-ended');
     // change the button text to "Replay"
     this.controlText('Replay');
 
+    // on the next seek remove the replay button
     this.one(this.player_, 'seeked', this.handleSeeked);
   }
 }
