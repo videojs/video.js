@@ -251,7 +251,7 @@ class Advanced extends Plugin {
   }
 
   updateState() {
-    this.setState({playing: !this.paused()});
+    this.setState({playing: !this.player.paused()});
   }
 
   logState(changed) {
