@@ -26,7 +26,6 @@ class PlayToggle extends Button {
     this.on(player, 'play', this.handlePlay);
     this.on(player, 'pause', this.handlePause);
     this.on(player, 'ended', this.handleEnded);
-    this.on(player, 'seeked', this.handleSeeked);
   }
 
   /**
@@ -59,9 +58,8 @@ class PlayToggle extends Button {
   }
 
   /**
-   * This gets called whenever the player seeks. We want to change the replay button
-   * back to a play/pause button on any seek because you cannot seek to the very end
-   * of a video
+   * This gets called once after the video has ended and the user seeks so that
+   * we can change the replay button back to a play button.
    *
    * @param {EventTarget~Event} [event]
    *        The event that caused this function to run.
@@ -69,11 +67,6 @@ class PlayToggle extends Button {
    * @listens Player#seeked
    */
   handleSeeked(event) {
-    // check to see if the video has ended yet
-    if (!this.hasClass('vjs-ended')) {
-      return;
-    }
-
     // remove the ended class
     this.removeClass('vjs-ended');
 
@@ -121,6 +114,10 @@ class PlayToggle extends Button {
   /**
    * Add the vjs-ended class to the element so it can change appearance
    *
+   * @param {EventTarget~Event} [event]
+   *        The event that caused this function to run.
+   *
+   * @listens Player#ended
    */
   handleEnded(event) {
     this.removeClass('vjs-playing');
@@ -130,6 +127,8 @@ class PlayToggle extends Button {
     }
     // change the button text to "Replay"
     this.controlText('Replay');
+
+    this.one(this.player_, 'seeked', this.handleSeeked);
   }
 }
 
