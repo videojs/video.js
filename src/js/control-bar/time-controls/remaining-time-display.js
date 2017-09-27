@@ -22,6 +22,7 @@ class RemainingTimeDisplay extends TimeDisplay {
   constructor(player, options) {
     super(player, options);
     this.on(player, 'durationchange', this.throttledUpdateContent);
+    this.on(player, 'ended', this.handleEnded);
   }
 
   /**
@@ -49,6 +50,23 @@ class RemainingTimeDisplay extends TimeDisplay {
     }
 
     this.updateFormattedTime_(this.player_.remainingTime());
+  }
+
+  /**
+   * When the player fires ended there should be no time left. Sadly
+   * this is not always the case, lets make it seem like that is the case
+   * for users.
+   *
+   * @param {EventTarget~Event} [event]
+   *        The `ended` event that caused this to run.
+   *
+   * @listens Player#ended
+   */
+  handleEnded(event) {
+    if (!this.player_.duration()) {
+      return;
+    }
+    this.updateFormattedTime_(0);
   }
 }
 
