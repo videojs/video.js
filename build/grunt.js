@@ -175,7 +175,8 @@ module.exports = function(grunt) {
       ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
-      examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
+      examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' },
+      NGStore: { cwd: 'dist/', src: ['**/**'], dest: '../js/', expand: true },
     },
     cssmin: {
       minify: {
@@ -535,13 +536,15 @@ module.exports = function(grunt) {
     'copy:fonts',
     'copy:swf',
     'copy:ie8',
-    'vjslanguages'
+    'vjslanguages',
+    
   ]);
 
   grunt.registerTask('dist', [
     'clean:dist',
     'build',
     'copy:dist',
+    'copy:NGStore',
     'copy:examples',
     'zip:dist'
   ]);

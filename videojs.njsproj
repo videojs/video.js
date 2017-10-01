@@ -1,0 +1,357 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{d9adda0e-e7ea-46c5-bd44-6ce4a59eb50b}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>Gruntfile.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include=".jsdoc.json" />
+    <Content Include="composer.json" />
+    <Content Include="package.json" />
+    <Content Include="CHANGELOG.md" />
+    <Content Include="CODE_OF_CONDUCT.md" />
+    <Content Include="COLLABORATOR_GUIDE.md" />
+    <Content Include="CONTRIBUTING.md" />
+    <None Include="packages.config" />
+    <Content Include="README.md" />
+    <Compile Include=".remarkrc.js" />
+    <Compile Include="Gruntfile.js" />
+    <Content Include="build\license-header.txt" />
+    <Compile Include="build\assets.js" />
+    <Compile Include="build\current-changelog.js" />
+    <Compile Include="build\docs-only.js" />
+    <Compile Include="build\fix-api-docs.js" />
+    <Compile Include="build\gh-release.js" />
+    <Compile Include="build\grunt.js" />
+    <Compile Include="build\options-customizer.js" />
+    <Compile Include="build\rollup.js" />
+    <Compile Include="build\version.js" />
+    <Content Include="docs\index.md" />
+    <Content Include="docs\translations-needed.md" />
+    <Content Include="lang\ar.json" />
+    <Content Include="lang\ba.json" />
+    <Content Include="lang\bg.json" />
+    <Content Include="lang\ca.json" />
+    <Content Include="lang\cs.json" />
+    <Content Include="lang\da.json" />
+    <Content Include="lang\de.json" />
+    <Content Include="lang\el.json" />
+    <Content Include="lang\en.json" />
+    <Content Include="lang\es.json" />
+    <Content Include="lang\fa.json" />
+    <Content Include="lang\fi.json" />
+    <Content Include="lang\fr.json" />
+    <Content Include="lang\gl.json" />
+    <Content Include="lang\hr.json" />
+    <Content Include="lang\hu.json" />
+    <Content Include="lang\it.json" />
+    <Content Include="lang\ja.json" />
+    <Content Include="lang\ko.json" />
+    <Content Include="lang\nb.json" />
+    <Content Include="lang\nl.json" />
+    <Content Include="lang\nn.json" />
+    <Content Include="lang\pl.json" />
+    <Content Include="lang\pt-BR.json" />
+    <Content Include="lang\pt-PT.json" />
+    <Content Include="lang\ru.json" />
+    <Content Include="lang\sk.json" />
+    <Content Include="lang\sr.json" />
+    <Content Include="lang\sv.json" />
+    <Content Include="lang\tr.json" />
+    <Content Include="lang\uk.json" />
+    <Content Include="lang\vi.json" />
+    <Content Include="lang\zh-CN.json" />
+    <Content Include="lang\zh-TW.json" />
+    <Content Include="test\index.html" />
+    <Compile Include="test\globals-shim.js" />
+    <Compile Include="test\karma.conf.js" />
+    <Compile Include="build\tasks\cdn-links.js" />
+    <Compile Include="build\tasks\languages.js" />
+    <Compile Include="build\tasks\sandbox.js" />
+    <Compile Include="build\tasks\style-injection.js" />
+    <Compile Include="build\tasks\test-local.js" />
+    <Compile Include="build\tasks\vjs-version.js" />
+    <Content Include="build\docs\styles\videojs.css" />
+    <Content Include="docs\examples\index.html" />
+    <Content Include="docs\guides\audio-tracks.md" />
+    <Content Include="docs\guides\components.md" />
+    <Content Include="docs\guides\debugging.md" />
+    <Content Include="docs\guides\event-target.md" />
+    <Content Include="docs\guides\faq.md" />
+    <Content Include="docs\guides\hooks.md" />
+    <Content Include="docs\guides\languages.md" />
+    <Content Include="docs\guides\modal-dialog.md" />
+    <Content Include="docs\guides\options.md" />
+    <Content Include="docs\guides\player-workflows.md" />
+    <Content Include="docs\guides\plugins.md" />
+    <Content Include="docs\guides\react.md" />
+    <Content Include="docs\guides\setup.md" />
+    <Content Include="docs\guides\skins.md" />
+    <Content Include="docs\guides\tech.md" />
+    <Content Include="docs\guides\text-tracks.md" />
+    <Content Include="docs\guides\tracks.md" />
+    <Content Include="docs\guides\troubleshooting.md" />
+    <Content Include="docs\guides\video-tracks.md" />
+    <Content Include="docs\guides\videojs.md" />
+    <Content Include="docs\guides\webpack.md" />
+    <Content Include="docs\examples\elephantsdream\index.html" />
+    <Content Include="docs\examples\simple-embed\index.html" />
+    <Content Include="src\css\ie8.css" />
+    <Compile Include="src\js\big-play-button.js" />
+    <Compile Include="src\js\button.js" />
+    <Compile Include="src\js\clickable-component.js" />
+    <Compile Include="src\js\close-button.js" />
+    <Compile Include="src\js\component.js" />
+    <Compile Include="src\js\error-display.js" />
+    <Compile Include="src\js\event-target.js" />
+    <Compile Include="src\js\extend.js" />
+    <Compile Include="src\js\fullscreen-api.js" />
+    <Compile Include="src\js\loading-spinner.js" />
+    <Compile Include="src\js\media-error.js" />
+    <Compile Include="src\js\modal-dialog.js" />
+    <Compile Include="src\js\player.js" />
+    <Compile Include="src\js\plugin.js" />
+    <Compile Include="src\js\poster-image.js" />
+    <Compile Include="src\js\setup.js" />
+    <Compile Include="src\js\video.js" />
+    <Compile Include="src\js\control-bar\control-bar.js" />
+    <Compile Include="src\js\control-bar\fullscreen-toggle.js" />
+    <Compile Include="src\js\control-bar\live-display.js" />
+    <Compile Include="src\js\control-bar\mute-toggle.js" />
+    <Compile Include="src\js\control-bar\play-toggle.js" />
+    <Compile Include="src\js\control-bar\track-button.js" />
+    <Compile Include="src\js\control-bar\volume-panel.js" />
+    <Compile Include="src\js\menu\menu-button.js" />
+    <Compile Include="src\js\menu\menu-item.js" />
+    <Compile Include="src\js\menu\menu.js" />
+    <Compile Include="src\js\mixins\evented.js" />
+    <Compile Include="src\js\mixins\stateful.js" />
+    <Compile Include="src\js\popup\popup-button.js" />
+    <Compile Include="src\js\popup\popup.js" />
+    <Compile Include="src\js\slider\slider.js" />
+    <Compile Include="src\js\tech\html5.js" />
+    <Compile Include="src\js\tech\loader.js" />
+    <Compile Include="src\js\tech\middleware.js" />
+    <Compile Include="src\js\tech\tech.js" />
+    <Compile Include="src\js\tracks\audio-track-list.js" />
+    <Compile Include="src\js\tracks\audio-track.js" />
+    <Compile Include="src\js\tracks\html-track-element-list.js" />
+    <Compile Include="src\js\tracks\html-track-element.js" />
+    <Compile Include="src\js\tracks\text-track-cue-list.js" />
+    <Compile Include="src\js\tracks\text-track-display.js" />
+    <Compile Include="src\js\tracks\text-track-list-converter.js" />
+    <Compile Include="src\js\tracks\text-track-list.js" />
+    <Compile Include="src\js\tracks\text-track-settings.js" />
+    <Compile Include="src\js\tracks\text-track.js" />
+    <Compile Include="src\js\tracks\track-enums.js" />
+    <Compile Include="src\js\tracks\track-list.js" />
+    <Compile Include="src\js\tracks\track-types.js" />
+    <Compile Include="src\js\tracks\track.js" />
+    <Compile Include="src\js\tracks\video-track-list.js" />
+    <Compile Include="src\js\tracks\video-track.js" />
+    <Compile Include="src\js\utils\browser.js" />
+    <Compile Include="src\js\utils\buffer.js" />
+    <Compile Include="src\js\utils\computed-style.js" />
+    <Compile Include="src\js\utils\dom-data.js" />
+    <Compile Include="src\js\utils\dom.js" />
+    <Compile Include="src\js\utils\events.js" />
+    <Compile Include="src\js\utils\filter-source.js" />
+    <Compile Include="src\js\utils\fn.js" />
+    <Compile Include="src\js\utils\format-time.js" />
+    <Compile Include="src\js\utils\guid.js" />
+    <Compile Include="src\js\utils\log.js" />
+    <Compile Include="src\js\utils\merge-options.js" />
+    <Compile Include="src\js\utils\obj.js" />
+    <Compile Include="src\js\utils\stylesheet.js" />
+    <Compile Include="src\js\utils\time-ranges.js" />
+    <Compile Include="src\js\utils\to-title-case.js" />
+    <Compile Include="src\js\utils\url.js" />
+    <Compile Include="src\js\control-bar\audio-track-controls\audio-track-button.js" />
+    <Compile Include="src\js\control-bar\audio-track-controls\audio-track-menu-item.js" />
+    <Compile Include="src\js\control-bar\playback-rate-menu\playback-rate-menu-button.js" />
+    <Compile Include="src\js\control-bar\playback-rate-menu\playback-rate-menu-item.js" />
+    <Compile Include="src\js\control-bar\progress-control\load-progress-bar.js" />
+    <Compile Include="src\js\control-bar\progress-control\mouse-time-display.js" />
+    <Compile Include="src\js\control-bar\progress-control\play-progress-bar.js" />
+    <Compile Include="src\js\control-bar\progress-control\progress-control.js" />
+    <Compile Include="src\js\control-bar\progress-control\seek-bar.js" />
+    <Compile Include="src\js\control-bar\progress-control\time-tooltip.js" />
+    <Compile Include="src\js\control-bar\spacer-controls\custom-control-spacer.js" />
+    <Compile Include="src\js\control-bar\spacer-controls\spacer.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\caption-settings-menu-item.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\captions-button.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\chapters-button.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\chapters-track-menu-item.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\descriptions-button.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\off-text-track-menu-item.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\subs-caps-button.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\subs-caps-menu-item.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\subtitles-button.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\text-track-button.js" />
+    <Compile Include="src\js\control-bar\text-track-controls\text-track-menu-item.js" />
+    <Compile Include="src\js\control-bar\time-controls\current-time-display.js" />
+    <Compile Include="src\js\control-bar\time-controls\duration-display.js" />
+    <Compile Include="src\js\control-bar\time-controls\remaining-time-display.js" />
+    <Compile Include="src\js\control-bar\time-controls\time-divider.js" />
+    <Compile Include="src\js\control-bar\volume-control\check-volume-support.js" />
+    <Compile Include="src\js\control-bar\volume-control\volume-bar.js" />
+    <Compile Include="src\js\control-bar\volume-control\volume-control.js" />
+    <Compile Include="src\js\control-bar\volume-control\volume-level.js" />
+    <Compile Include="test\api\api.js" />
+    <Compile Include="test\require\browserify.js" />
+    <Compile Include="test\require\node.js" />
+    <Compile Include="test\require\webpack.js" />
+    <Compile Include="test\unit\button.test.js" />
+    <Compile Include="test\unit\clickable-component.test.js" />
+    <Compile Include="test\unit\close-button.test.js" />
+    <Compile Include="test\unit\component.test.js" />
+    <Compile Include="test\unit\controls.test.js" />
+    <Compile Include="test\unit\events.test.js" />
+    <Compile Include="test\unit\extend.test.js" />
+    <Compile Include="test\unit\media-error.test.js" />
+    <Compile Include="test\unit\menu.test.js" />
+    <Compile Include="test\unit\modal-dialog.test.js" />
+    <Compile Include="test\unit\player.test.js" />
+    <Compile Include="test\unit\plugin-advanced.test.js" />
+    <Compile Include="test\unit\plugin-basic.test.js" />
+    <Compile Include="test\unit\plugin-static.test.js" />
+    <Compile Include="test\unit\poster.test.js" />
+    <Compile Include="test\unit\setup.test.js" />
+    <Compile Include="test\unit\test-helpers.js" />
+    <Compile Include="test\unit\video.test.js" />
+    <Compile Include="test\unit\videojs-hooks.test.js" />
+    <Compile Include="test\unit\mixins\evented.test.js" />
+    <Compile Include="test\unit\mixins\stateful.test.js" />
+    <Compile Include="test\unit\tech\html5.test.js" />
+    <Compile Include="test\unit\tech\middleware.test.js" />
+    <Compile Include="test\unit\tech\tech-faker.js" />
+    <Compile Include="test\unit\tech\tech.test.js" />
+    <Compile Include="test\unit\tracks\audio-track-list.test.js" />
+    <Compile Include="test\unit\tracks\audio-track.test.js" />
+    <Compile Include="test\unit\tracks\audio-tracks.test.js" />
+    <Compile Include="test\unit\tracks\html-track-element-list.test.js" />
+    <Compile Include="test\unit\tracks\html-track-element.test.js" />
+    <Compile Include="test\unit\tracks\text-track-controls.test.js" />
+    <Compile Include="test\unit\tracks\text-track-cue-list.test.js" />
+    <Compile Include="test\unit\tracks\text-track-display.test.js" />
+    <Compile Include="test\unit\tracks\text-track-list-converter.test.js" />
+    <Compile Include="test\unit\tracks\text-track-list.test.js" />
+    <Compile Include="test\unit\tracks\text-track-settings.test.js" />
+    <Compile Include="test\unit\tracks\text-track.test.js" />
+    <Compile Include="test\unit\tracks\text-tracks.test.js" />
+    <Compile Include="test\unit\tracks\track-baseline.js" />
+    <Compile Include="test\unit\tracks\track-list.test.js" />
+    <Compile Include="test\unit\tracks\track.test.js" />
+    <Compile Include="test\unit\tracks\video-track-list.test.js" />
+    <Compile Include="test\unit\tracks\video-track.test.js" />
+    <Compile Include="test\unit\tracks\video-tracks.test.js" />
+    <Compile Include="test\unit\utils\dom-data.test.js" />
+    <Compile Include="test\unit\utils\dom.test.js" />
+    <Compile Include="test\unit\utils\filter-source.test.js" />
+    <Compile Include="test\unit\utils\fn.test.js" />
+    <Compile Include="test\unit\utils\format-time.test.js" />
+    <Compile Include="test\unit\utils\log.test.js" />
+    <Compile Include="test\unit\utils\merge-options.test.js" />
+    <Compile Include="test\unit\utils\obj.test.js" />
+    <Compile Include="test\unit\utils\time-ranges.test.js" />
+    <Compile Include="test\unit\utils\to-title-case.test.js" />
+    <Compile Include="test\unit\utils\url.test.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="build" />
+    <Folder Include="build\bin" />
+    <Folder Include="build\docs" />
+    <Folder Include="build\docs\styles" />
+    <Folder Include="build\tasks" />
+    <Folder Include="docs" />
+    <Folder Include="docs\examples" />
+    <Folder Include="docs\examples\elephantsdream" />
+    <Folder Include="docs\examples\shared" />
+    <Folder Include="docs\examples\simple-embed" />
+    <Folder Include="docs\guides" />
+    <Folder Include="lang" />
+    <Folder Include="sandbox" />
+    <Folder Include="src" />
+    <Folder Include="src\css" />
+    <Folder Include="src\css\components" />
+    <Folder Include="src\css\components\menu" />
+    <Folder Include="src\css\utilities" />
+    <Folder Include="src\js" />
+    <Folder Include="src\js\control-bar" />
+    <Folder Include="src\js\control-bar\audio-track-controls" />
+    <Folder Include="src\js\control-bar\playback-rate-menu" />
+    <Folder Include="src\js\control-bar\progress-control" />
+    <Folder Include="src\js\control-bar\spacer-controls" />
+    <Folder Include="src\js\control-bar\text-track-controls" />
+    <Folder Include="src\js\control-bar\time-controls" />
+    <Folder Include="src\js\control-bar\volume-control" />
+    <Folder Include="src\js\menu" />
+    <Folder Include="src\js\mixins" />
+    <Folder Include="src\js\popup" />
+    <Folder Include="src\js\slider" />
+    <Folder Include="src\js\tech" />
+    <Folder Include="src\js\tracks" />
+    <Folder Include="src\js\utils" />
+    <Folder Include="test" />
+    <Folder Include="test\api" />
+    <Folder Include="test\require" />
+    <Folder Include="test\unit" />
+    <Folder Include="test\unit\mixins" />
+    <Folder Include="test\unit\tech" />
+    <Folder Include="test\unit\tracks" />
+    <Folder Include="test\unit\utils" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
