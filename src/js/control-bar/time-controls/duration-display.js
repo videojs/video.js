@@ -1,18 +1,15 @@
 /**
  * @file duration-display.js
  */
-import document from 'global/document';
+import TimeDisplay from './time-display';
 import Component from '../../component.js';
-import * as Dom from '../../utils/dom.js';
-import {bind, throttle} from '../../utils/fn.js';
-import formatTime from '../../utils/format-time.js';
 
 /**
  * Displays the duration
  *
  * @extends Component
  */
-class DurationDisplay extends Component {
+class DurationDisplay extends TimeDisplay {
 
   /**
    * Creates an instance of this class.
@@ -26,57 +23,24 @@ class DurationDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
-    this.throttledUpdateContent = throttle(bind(this, this.updateContent), 25);
-
     this.on(player, [
       'durationchange',
 
-      // Also listen for timeupdate and loadedmetadata because removing those
+      // Also listen for timeupdate (in the parent) and loadedmetadata because removing those
       // listeners could have broken dependent applications/libraries. These
       // can likely be removed for 7.0.
-      'loadedmetadata',
-      'timeupdate'
+      'loadedmetadata'
     ], this.throttledUpdateContent);
   }
 
   /**
-   * Create the `Component`'s DOM element
+   * Builds the default DOM `className`.
    *
-   * @return {Element}
-   *         The element that was created.
+   * @return {string}
+   *         The DOM `className` for this object.
    */
-  createEl() {
-    const el = super.createEl('div', {
-      className: 'vjs-duration vjs-time-control vjs-control'
-    });
-
-    this.contentEl_ = Dom.createEl('div', {
-      className: 'vjs-duration-display'
-    }, {
-      // tell screen readers not to automatically read the time as it changes
-      'aria-live': 'off'
-    }, Dom.createEl('span', {
-      className: 'vjs-control-text',
-      textContent: this.localize('Duration Time')
-    }));
-
-    this.updateTextNode_();
-    el.appendChild(this.contentEl_);
-    return el;
-  }
-
-  /**
-   * Updates the "current time" text node with new content using the
-   * contents of the `formattedTime_` property.
-   *
-   * @private
-   */
-  updateTextNode_() {
-    if (this.textNode_) {
-      this.contentEl_.removeChild(this.textNode_);
-    }
-    this.textNode_ = document.createTextNode(` ${this.formattedTime_ || '0:00'}`);
-    this.contentEl_.appendChild(this.textNode_);
+  buildCSSClass() {
+    return 'vjs-duration';
   }
 
   /**
@@ -95,11 +59,18 @@ class DurationDisplay extends Component {
 
     if (duration && this.duration_ !== duration) {
       this.duration_ = duration;
-      this.formattedTime_ = formatTime(duration);
-      this.requestAnimationFrame(this.updateTextNode_);
+      this.updateFormattedTime_(duration);
     }
   }
 }
+
+/**
+ * The text that should display over the `DurationDisplay`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ */
+DurationDisplay.prototype.controlText_ = 'Duration Time';
 
 Component.registerComponent('DurationDisplay', DurationDisplay);
 export default DurationDisplay;
