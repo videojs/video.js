@@ -8,6 +8,7 @@ import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
 import toTitleCase from '../utils/to-title-case.js';
+import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
 
 /**
@@ -339,8 +340,12 @@ class MenuButton extends Component {
       this.buttonPressed_ = true;
       this.menu.lockShowing();
       this.menuButton_.el_.setAttribute('aria-expanded', 'true');
-      // set the focus into the submenu
-      this.menu.focus();
+
+      // set the focus into the submenu, except on iOS where it is resulting in
+      // undesired scrolling behavior when the player is in an iframe
+      if (!IS_IOS && !Dom.isInFrame()) {
+        this.menu.focus();
+      }
     }
   }
 
