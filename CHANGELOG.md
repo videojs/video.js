@@ -1,3 +1,10 @@
+<a name="5.20.4"></a>
+## [5.20.4](https://github.com/videojs/video.js/compare/v5.20.3...v5.20.4) (2017-10-02)
+
+### Bug Fixes
+
+* Make boolean attributes set and check both the associated property and the attribute ([#4631](https://github.com/videojs/video.js/issues/4631)) ([0f8de52](https://github.com/videojs/video.js/commit/0f8de52)), closes [#4351](https://github.com/videojs/video.js/issues/4351)
+
 <a name="5.20.3"></a>
 ## [5.20.3](https://github.com/videojs/video.js/compare/v5.20.2...v5.20.3) (2017-08-16)
 
