@@ -485,7 +485,7 @@ export function getElAttributes(tag) {
   // known boolean attributes
   // we can check for matching boolean properties, but older browsers
   // won't know about HTML5 boolean attributes that we still read from
-  const knownBooleans = ',' + 'autoplay,controls,loop,muted,default' + ',';
+  const knownBooleans = ',' + 'autoplay,controls,playsinline,loop,muted,default,defaultMuted' + ',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     const attrs = tag.attributes;
