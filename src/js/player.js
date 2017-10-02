@@ -1787,6 +1787,17 @@ class Player extends Component {
     return this.duration() - this.currentTime();
   }
 
+  /**
+   * A remaining time function that is intented to be used when
+   * the time is to be displayed directly to the user.
+   *
+   * @return {number}
+   *         The rounded time remaining in seconds
+   */
+  remainingTimeDisplay() {
+    return Math.floor(this.duration()) - Math.floor(this.currentTime());
+  }
+
   //
   // Kind of like an array of portions of the video that have been downloaded.
 

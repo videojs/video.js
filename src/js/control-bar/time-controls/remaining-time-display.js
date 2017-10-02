@@ -49,7 +49,7 @@ class RemainingTimeDisplay extends TimeDisplay {
       return;
     }
 
-    this.updateFormattedTime_(this.player_.remainingTime());
+    this.updateFormattedTime_(this.player_.remainingTimeDisplay());
   }
 
   /**
