@@ -86,12 +86,12 @@ export function isEl(value) {
 }
 
 /**
- * Determines if the player is embedded in an iframe.
+ * Determines if the current DOM is embedded in an iframe.
  *
  * @return {boolean}
  *
  */
-export function isPlayerInFrame() {
+export function isInFrame() {
 
   // We need a try/catch here because Safari will throw errors when attempting
   // to get either `parent` or `self`
