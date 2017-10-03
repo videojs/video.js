@@ -517,8 +517,6 @@ class Player extends Component {
     let playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
     const divEmbed = this.tag.tagName.toLowerCase() === 'div';
 
-    debugger;
-
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
     } else if (!divEmbed) {
