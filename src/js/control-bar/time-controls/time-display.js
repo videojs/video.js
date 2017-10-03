@@ -66,8 +66,23 @@ class TimeDisplay extends Component {
     if (this.textNode_) {
       this.contentEl_.removeChild(this.textNode_);
     }
-    this.textNode_ = document.createTextNode(` -${this.formattedTime_ || '0:00'}`);
+    this.textNode_ = document.createTextNode(this.formattedTime_ || '0:00');
     this.contentEl_.appendChild(this.textNode_);
+  }
+
+  /**
+   * Generates a formatted time for this component to use in display.
+   *
+   * @param  {number} time
+   *         A numeric time, in seconds.
+   *
+   * @return {string}
+   *         A formatted time
+   *
+   * @private
+   */
+  formatTime_(time) {
+    return formatTime(time);
   }
 
   /**
@@ -80,7 +95,7 @@ class TimeDisplay extends Component {
    * @private
    */
   updateFormattedTime_(time) {
-    const formattedTime = formatTime(time);
+    const formattedTime = this.formatTime_(time);
 
     if (formattedTime === this.formattedTime_) {
       return;
