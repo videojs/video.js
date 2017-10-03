@@ -242,7 +242,7 @@ var version = videojs.getPluginVersion('examplePlugin');
 console.log(version);  // 1.0.1
 ```
 
-Note that the plugin generator already takes care of adding a version number for you.
+Note that the [plugin generator](https://github.com/videojs/generator-videojs-plugin) already takes care of adding a version number for you.
 
 ### Advanced Example Advanced Plugin
 
