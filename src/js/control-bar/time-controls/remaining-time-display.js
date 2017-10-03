@@ -36,6 +36,21 @@ class RemainingTimeDisplay extends TimeDisplay {
   }
 
   /**
+   * The remaining time display prefixes numbers with a "minus" character.
+   *
+   * @param  {number} time
+   *         A numeric time, in seconds.
+   *
+   * @return {string}
+   *         A formatted time
+   *
+   * @private
+   */
+  formatTime_(time) {
+    return '-' + super.formatTime_(time);
+  }
+
+  /**
    * Update remaining time display.
    *
    * @param {EventTarget~Event} [event]
