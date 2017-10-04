@@ -64,7 +64,7 @@ class CurrentTimeDisplay extends TimeDisplay {
     if (!this.player_.duration()) {
       return;
     }
-    this.updateFormattedTime_(this.player.duration());
+    this.updateFormattedTime_(this.player_.duration());
   }
 
 }
