@@ -14,7 +14,7 @@ Hooks exist so that users can "hook" on to certain Video.js player lifecycle
 
 ## Current Hooks
 
-Currently, the following hooks are avialable:
+Currently, the following hooks are available:
 
 ### beforesetup
 
