@@ -37,7 +37,7 @@ ghrelease(options, function(err, result) {
   if (err) {
     console.error('Unable to publish release to github');
     console.error('err:', err);
-    console.error('\nresult:', result);
+    console.error('result:', result);
   } else {
     console.log('Publish release to github!');
   }
