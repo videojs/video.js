@@ -64,7 +64,13 @@ class RemainingTimeDisplay extends TimeDisplay {
       return;
     }
 
-    this.updateFormattedTime_(this.player_.remainingTimeDisplay());
+    // @deprecated We should only use remainingTimeDisplay
+    // as of video.js 7
+    if (this.player_.remainingTimeDisplay) {
+      this.updateFormattedTime_(this.player_.remainingTimeDisplay());
+    } else {
+      this.updateFormattedTime_(this.player_.remainingTime());
+    }
   }
 
   /**
