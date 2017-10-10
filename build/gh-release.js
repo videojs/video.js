@@ -35,10 +35,10 @@ if (args.prerelease || npmargs.some(function(arg) { return /next/.test(arg); }))
 
 ghrelease(options, function(err, result) {
   if (err) {
-    console.log('Unable to publish release to github');
-    console.log(err);
+    console.error('Unable to publish release to github');
+    console.error('err:', err);
+    console.error('result:', result);
   } else {
     console.log('Publish release to github!');
-    console.log(result);
   }
 });
