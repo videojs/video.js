@@ -316,6 +316,32 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+    // we don't want a source change for the first source set
+    let sourceSet = false;
+
+    if (tag.src) {
+      sourceSet = true;
+    }
+    const triggerSourceChange = () => {
+      if (!sourceSet) {
+        sourceSet = true;
+        return;
+      }
+      this.trigger('sourcechange');
+    };
+
+    this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
+    this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
+
+    tag.load_ = tag.load;
+    tag.load = () => {
+      const retval = tag.load_();
+
+      triggerSourceChange();
+
+      return retval;
+    };
+
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
