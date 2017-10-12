@@ -67,7 +67,6 @@ class PlayToggle extends Button {
    * @listens Player#seeked
    */
   handleSeeked(event) {
-    // remove the ended class
     this.removeClass('vjs-ended');
 
     if (this.player_.paused()) {
@@ -86,6 +85,7 @@ class PlayToggle extends Button {
    * @listens Player#play
    */
   handlePlay(event) {
+    this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
     // change the button text to "Pause"
