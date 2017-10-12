@@ -330,17 +330,19 @@ class Player extends Component {
       this.trigger('sourcechange');
     };
 
-    this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
-    this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
+    if (window.MutationObserver) {
+      this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
+      this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
 
-    tag.load_ = tag.load;
-    tag.load = () => {
-      const retval = tag.load_();
+      tag.load_ = tag.load;
+      tag.load = () => {
+        const retval = tag.load_();
 
-      triggerSourceChange();
+        triggerSourceChange();
 
-      return retval;
-    };
+        return retval;
+      };
+    }
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
