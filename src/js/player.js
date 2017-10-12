@@ -334,15 +334,24 @@ class Player extends Component {
       this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
       this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
 
-      tag.load_ = tag.load;
-      tag.load = () => {
-        const retval = tag.load_();
-
-        triggerSourceChange();
-
-        return retval;
-      };
+    } else {
+      // IE 9/10 do not support MutationObservers
+      // use the old Mutation events
+      tag.addEventListener('DOMAttrModified', (event) => {
+        if ((/src/i).test(event.attrName)) {
+          triggerSourceChange();
+        }
+      });
     }
+
+    tag.load_ = tag.load;
+    tag.load = () => {
+      const retval = tag.load_();
+
+      triggerSourceChange();
+
+      return retval;
+    };
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
