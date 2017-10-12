@@ -251,8 +251,8 @@ class Html5 extends Tech {
       });
 
       // Remove (native) tracks that are not used anymore
-      this.on('loadstart', removeOldTracks);
-      this.on('dispose', (e) => this.off('loadstart', removeOldTracks));
+      this.on('sourcechange', removeOldTracks);
+      this.on('dispose', (e) => this.off('sourcechange', removeOldTracks));
     });
 
   }
