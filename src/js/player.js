@@ -316,43 +316,61 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
-    // we don't want a source change for the first source set
-    let initialSourceSet = false;
+    if (!browser.IS_IE8) {
+      // we don't want a source change for the first source set
+      let initialSourceSet = tag.src ? true : false;
+      const triggerSourceChange = () => {
+        if (!initialSourceSet) {
+          initialSourceSet = true;
+          return;
+        }
+        this.trigger('sourcechange');
+      };
+      const MediaElementPrototype = window.HTMLMediaElement.prototype;
 
-    if (tag.src) {
-      initialSourceSet = true;
-    }
-    const triggerSourceChange = () => {
-      if (!initialSourceSet) {
-        initialSourceSet = true;
-        return;
+      if (window.MutationObserver) {
+        this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
+        this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
+      } else {
+        // get the internal getter/setter functions for src
+        // aka {get: () => [native fn], set (s) => [native fn]};
+        const srcDescriptor = Object.getOwnPropertyDescriptor(MediaElementPrototype, 'src');
+
+        // older version of safari did not support this...
+        if (!srcDescriptor.set) {
+          srcDescriptor.set = (s) => MediaElementPrototype.setAttribute.call(tag, 'src', s);
+        }
+        if (!srcDescriptor.get) {
+          srcDescriptor.get = () => MediaElementPrototype.getAttribute.call(tag, 'src');
+        }
+
+        tag.setAttribute = (name, val) => {
+          MediaElementPrototype.setAttribute.call(tag, name, val);
+
+          if (name === 'src') {
+            triggerSourceChange();
+          }
+        };
+
+        Object.defineProperty(tag, 'src', {
+          get: () => srcDescriptor.get.call(tag),
+          set: (s) => {
+            srcDescriptor.set.call(tag, s);
+            triggerSourceChange();
+          }
+        });
       }
-      this.trigger('sourcechange');
-    };
 
-    if (window.MutationObserver) {
-      this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
-      this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
-    } else {
-      Object.defineProperty(tag, 'src', {
-        get: () => tag.getAttribute('src'),
-        set: (s) => {
-          tag.setAttribute('src', s);
+      tag.load = () => {
+        const retval = MediaElementPrototype.load.call(tag);
+
+        if (!this.loading_) {
           triggerSourceChange();
         }
-      });
+
+        return retval;
+      };
     }
-
-    tag.load_ = tag.load;
-    tag.load = () => {
-      const retval = tag.load_();
-
-      if (!this.loading_) {
-        triggerSourceChange();
-      }
-
-      return retval;
-    };
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;

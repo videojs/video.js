@@ -26,8 +26,8 @@ class AudioTrackMenuItem extends MenuItem {
     const tracks = player.audioTracks();
 
     // Modify options for parent MenuItem class's init.
-    // options.label = track.label || track.language || 'Unknown';
-    // options.selected = track.enabled;
+    options.label = track.label || track.language || 'Unknown';
+    options.selected = track.enabled;
 
     super(player, options);
 
