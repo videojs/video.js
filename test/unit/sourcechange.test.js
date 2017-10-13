@@ -27,6 +27,14 @@ if (videojs.browser.IE_VERSION !== 8) {
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
 
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
+
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 0, 'no initial sourcechange');
           done();
@@ -105,6 +113,14 @@ if (videojs.browser.IE_VERSION !== 8) {
         this.player = videojs(this.video);
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
 
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 0, 'no initial sourcechange');
@@ -202,6 +218,20 @@ if (videojs.browser.IE_VERSION !== 8) {
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
 
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+
+            // the sources also change
+            const sources = this.video.getElementsByTagName('source');
+
+            this.source = sources[0];
+            this.source2 = sources[1];
+          });
+        }
+
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 0, 'no initial sourcechange');
           done();
@@ -239,6 +269,14 @@ if (videojs.browser.IE_VERSION !== 8) {
         this.player = videojs(this.video);
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
 
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 0, 'no initial sourcechange');
@@ -311,6 +349,13 @@ if (videojs.browser.IE_VERSION !== 8) {
         this.player = videojs(this.video);
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.video = this.player.tech(true).el();
+        }
+
       },
       afterEach() {
         this.player.dispose();
@@ -325,7 +370,16 @@ if (videojs.browser.IE_VERSION !== 8) {
       window.setTimeout(() => {
         assert.equal(this.sourcechanges, 0, 'does not trigger sourcechange');
 
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
+
         this.player.src(testSrc);
+
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 1, 'triggers sourcechange');
           done();
@@ -340,6 +394,14 @@ if (videojs.browser.IE_VERSION !== 8) {
 
       window.setTimeout(() => {
         assert.equal(this.sourcechanges, 0, 'does not trigger sourcechange');
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
 
         this.video.src = testSrc.src;
         window.setTimeout(() => {
@@ -356,6 +418,14 @@ if (videojs.browser.IE_VERSION !== 8) {
 
       window.setTimeout(() => {
         assert.equal(this.sourcechanges, 0, 'does not trigger sourcechange');
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
 
         this.video.setAttribute('src', testSrc.src);
         window.setTimeout(() => {
@@ -382,6 +452,14 @@ if (videojs.browser.IE_VERSION !== 8) {
         source2.src = testSrc.src;
         source2.type = testSrc.type;
 
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
+
         this.video.appendChild(source2);
         this.video.load();
 
@@ -407,6 +485,14 @@ if (videojs.browser.IE_VERSION !== 8) {
         this.player = videojs(this.video);
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
 
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 0, 'no initial sourcechange');
@@ -483,6 +569,14 @@ if (videojs.browser.IE_VERSION !== 8) {
 
         this.sourcechanges = 0;
         this.player.on('sourcechange', () => this.sourcechanges++);
+
+        // IOS changes the underlying video element
+        // when the tech is ready
+        if (videojs.browser.IS_IOS) {
+          this.player.ready(() => {
+            this.video = this.player.tech(true).el();
+          });
+        }
 
         window.setTimeout(() => {
           assert.equal(this.sourcechanges, 0, 'no initial sourcechange');

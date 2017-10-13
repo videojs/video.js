@@ -316,61 +316,8 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
-    if (!browser.IS_IE8) {
-      // we don't want a source change for the first source set
-      let initialSourceSet = tag.src ? true : false;
-      const triggerSourceChange = () => {
-        if (!initialSourceSet) {
-          initialSourceSet = true;
-          return;
-        }
-        this.trigger('sourcechange');
-      };
-      const MediaElementPrototype = window.HTMLMediaElement.prototype;
-
-      if (window.MutationObserver) {
-        this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
-        this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
-      } else {
-        // get the internal getter/setter functions for src
-        // aka {get: () => [native fn], set (s) => [native fn]};
-        const srcDescriptor = Object.getOwnPropertyDescriptor(MediaElementPrototype, 'src');
-
-        // older version of safari did not support this...
-        if (!srcDescriptor.set) {
-          srcDescriptor.set = (s) => MediaElementPrototype.setAttribute.call(tag, 'src', s);
-        }
-        if (!srcDescriptor.get) {
-          srcDescriptor.get = () => MediaElementPrototype.getAttribute.call(tag, 'src');
-        }
-
-        tag.setAttribute = (name, val) => {
-          MediaElementPrototype.setAttribute.call(tag, name, val);
-
-          if (name === 'src') {
-            triggerSourceChange();
-          }
-        };
-
-        Object.defineProperty(tag, 'src', {
-          get: () => srcDescriptor.get.call(tag),
-          set: (s) => {
-            srcDescriptor.set.call(tag, s);
-            triggerSourceChange();
-          }
-        });
-      }
-
-      tag.load = () => {
-        const retval = MediaElementPrototype.load.call(tag);
-
-        if (!this.loading_) {
-          triggerSourceChange();
-        }
-
-        return retval;
-      };
-    }
+    // was a source set intially? used to determine if we should fire a sourcechange
+    this.initialSourceSet_ = tag.src ? true : false;
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
@@ -529,6 +476,7 @@ class Player extends Component {
     this.playOnLoadstart_ = null;
 
     this.forceAutoplayInChrome_();
+    this.watchForSourceChange_();
   }
 
   /**
@@ -566,6 +514,9 @@ class Player extends Component {
       this.el_.player = null;
     }
 
+    if (this.videoSrcObserver_ && this.videoSrcObserver_.disconnect) {
+      this.videoSrcObserver_.disconnect();
+    }
     if (this.tech_) {
       this.tech_.dispose();
     }
@@ -951,6 +902,74 @@ class Player extends Component {
     `);
   }
 
+  watchForSourceChange_() {
+    if (browser.IS_IE8) {
+      return;
+    }
+    const tag = this.el().getElementsByTagName('video')[0];
+
+    if (!tag) {
+      return;
+    }
+
+    // we don't want a source change for the first source set
+    const triggerSourceChange = () => {
+      if (!this.initialSourceSet_) {
+        this.initialSourceSet_ = true;
+        return;
+      }
+      this.trigger('sourcechange');
+    };
+    const MediaElementPrototype = window.HTMLMediaElement.prototype;
+
+    if (window.MutationObserver) {
+      if (this.videoSrcObserver_ && this.videoSrcObserver_.disconnect) {
+        this.videoSrcObserver_.disconnect();
+        this.videoSrcObserver_ = null;
+      }
+      this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
+      this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
+    } else {
+      // get the internal getter/setter functions for src
+      // aka {get: () => [native fn], set (s) => [native fn]};
+      const srcDescriptor = Object.getOwnPropertyDescriptor(MediaElementPrototype, 'src');
+
+      // older version of safari did not support this...
+      if (!srcDescriptor.set) {
+        srcDescriptor.set = (s) => MediaElementPrototype.setAttribute.call(tag, 'src', s);
+      }
+      if (!srcDescriptor.get) {
+        srcDescriptor.get = () => MediaElementPrototype.getAttribute.call(tag, 'src');
+      }
+
+      tag.setAttribute = (name, val) => {
+        MediaElementPrototype.setAttribute.call(tag, name, val);
+
+        if (name === 'src') {
+          triggerSourceChange();
+        }
+      };
+
+      Object.defineProperty(tag, 'src', {
+        get: () => srcDescriptor.get.call(tag),
+        set: (s) => {
+          srcDescriptor.set.call(tag, s);
+          triggerSourceChange();
+        }
+      });
+    }
+
+    tag.load = () => {
+      const retval = MediaElementPrototype.load.call(tag);
+
+      if (!this.loading_) {
+        triggerSourceChange();
+      }
+
+      return retval;
+    };
+  }
+
   /**
    * Load/Create an instance of playback {@link Tech} including element
    * and API methods. Then append the `Tech` element in `Player` as a child.
@@ -1029,6 +1048,12 @@ class Player extends Component {
 
     this.tech_ = new TechClass(techOptions);
 
+    // if the tag was changed by a tech load
+    // start the source change watcher again
+    if (this.tag !== this.tech_.el()) {
+      this.watchForSourceChange_();
+    }
+
     // player.triggerReady is always async, so don't need this to be async
     this.tech_.ready(Fn.bind(this, this.handleTechReady_), true);
 
@@ -1073,6 +1098,7 @@ class Player extends Component {
       this.tag.player = null;
       this.tag = null;
     }
+
   }
 
   /**
