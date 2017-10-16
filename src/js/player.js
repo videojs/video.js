@@ -24,6 +24,7 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
+import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
@@ -459,8 +460,6 @@ class Player extends Component {
 
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
-
-    this.changingSrc_ = false;
   }
 
   /**
@@ -1623,35 +1622,33 @@ class Player extends Component {
   }
 
   /**
-   * start media playback
+   * Begin playback.
    *
    * @return {Promise|undefined}
-   *         Returns a `Promise` if the browser returns one, for most browsers this will
-   *         return undefined.
+   *         Returns a `Promise` only if the browser returns one and the player
+   *         is ready to begin playback. For most browsers and non-ready
+   *         situations, this will return undefined.
    */
   play() {
-    if (this.changingSrc_) {
-      this.ready(function() {
-        const retval = this.techGet_('play');
 
-        // silence errors (unhandled promise from play)
-        if (retval !== undefined && typeof retval.then === 'function') {
-          retval.then(null, (e) => {});
-        }
+    // If the player is not ready, queue up a call to the tech's `play()`
+    // method for when it _is_ ready.
+    if (!this.isReady_) {
+      this.ready(() => {
+        silencePromise(this.techGet_('play'));
       });
 
-    // Only calls the tech's play if we already have a src loaded
-    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
+    // If the player is ready and there is a source, call the tech's `play()`
+    // method.
+    } else if (this.src() || this.currentSrc()) {
       return this.techGet_('play');
-    } else {
-      this.ready(function() {
-        this.tech_.one('loadstart', function() {
-          const retval = this.play();
 
-          // silence errors (unhandled promise from play)
-          if (retval !== undefined && typeof retval.then === 'function') {
-            retval.then(null, (e) => {});
-          }
+    // Finally, if the player is ready, but we don't have a source, wait for
+    // one to be set.
+    } else {
+      this.ready(() => {
+        this.tech_.one('loadstart', () => {
+          silencePromise(this.techGet_('play'));
         });
       });
     }
@@ -2304,7 +2301,7 @@ class Player extends Component {
 
     // intial sources
     this.cache_.sources = sources;
-    this.changingSrc_ = true;
+    this.isReady_ = false;
 
     // intial source
     this.cache_.source = sources[0];
@@ -2325,17 +2322,22 @@ class Player extends Component {
           this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
         }, 0);
 
-        // we could not find an appropriate tech, but let's still notify the delegate that this is it
-        // this needs a better comment about why this is needed
+        // We could not find an appropriate tech, but let's still notify the
+        // delegate that this is it. This needs a better comment about why this
+        // is needed.
         this.triggerReady();
 
         return;
       }
 
-      this.changingSrc_ = false;
+      // Now that we have a source (and a tech, thanks to `src_`) we can
+      // tell any subscribers that the player is ready again.
+      this.triggerReady();
+
       // video element listed source
       this.cache_.src = middlewareSource.src;
 
+      // Notify middlewares of a new tech.
       middleware.setTech(mws, this.tech_);
     });
   }
@@ -2361,7 +2363,6 @@ class Player extends Component {
     }
 
     if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
-      this.changingSrc_ = true;
 
       // load this technology with the chosen source
       this.loadTech_(sourceTech.tech, sourceTech.source);
