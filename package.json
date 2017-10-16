@@ -69,7 +69,7 @@
     "blanket": "^1.1.6",
     "bluebird": "^3.5.0",
     "browserify-derequire": "^0.9.4",
-    "browserify-istanbul": "^2.0.0",
+    "browserify-istanbul": "^3.0.0",
     "browserify-versionify": "^1.0.4",
     "bundle-collapser": "^1.2.1",
     "chg": "^0.3.2",
