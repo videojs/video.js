@@ -2281,60 +2281,74 @@ class Player extends Component {
    *         URL. Otherwise, returns nothing/undefined.
    */
   src(source) {
-    // getter usage
-    if (typeof source === 'undefined') {
+
+    // Getter usage.
+    if (source === undefined) {
       return this.cache_.src || '';
     }
-    // filter out invalid sources and turn our source into
-    // an array of source objects
+
+    // Queues "error 4" to be triggered on the player on the next tick. This
+    // is done on a delay to give users a chance to listen for "error" events.
+    const queueError = () => {
+      this.setTimeout(() => {
+        this.error({
+          code: 4,
+          message: this.localize(this.options_.notSupportedMessage)
+        });
+      }, 1);
+    };
+
+    // Filter out invalid sources and normalize the passed source into an array
+    // of source objects.
     const sources = filterSource(source);
 
-    // if a source was passed in then it is invalid because
-    // it was filtered to a zero length Array. So we have to
-    // show an error
+    // Show an error if there are no sources after filtering.
     if (!sources.length) {
-      this.setTimeout(function() {
-        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-      }, 0);
-      return;
+      return queueError();
     }
 
-    // intial sources
+    // Cache initial sources.
     this.cache_.sources = sources;
-    this.isReady_ = false;
-
-    // intial source
     this.cache_.source = sources[0];
 
-    // middlewareSource is the source after it has been changed by middleware
+    // Set the player to a non-ready state while middleware asynchronously
+    // determines the final source.
+    this.isReady_ = false;
+
+    // This asynchronously resolves any configured middleware. The callback is
+    // called when the process completes and given the `middlewareSource`,
+    // which is the final source we'll use to find a compatible tech.
     middleware.setSource(this, sources[0], (middlewareSource, mws) => {
+
+      // Cache middleware.
       this.middleware_ = mws;
 
-      const err = this.src_(middlewareSource);
+      // Attempt to set the source on a tech.
+      const foundTech = this.src_(middlewareSource);
 
-      if (err) {
+      // We could not find a compatible tech.
+      if (foundTech) {
+
+        // If no compatible tech was found and there are still sources we have
+        // not tried, start the process over (including middleware) with the
+        // next source in the sources array.
         if (sources.length > 1) {
           return this.src(sources.slice(1));
         }
 
-        // We need to wrap this in a timeout to give folks a chance to add error event handlers
-        this.setTimeout(function() {
-          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-        }, 0);
-
-        // We could not find an appropriate tech, but let's still notify the
-        // delegate that this is it. This needs a better comment about why this
-        // is needed.
+        // If there is no compatible tech, but there are no sources left to
+        // try, we queue up an error state on the player and trigger "ready"
+        // to inform any subscribers that the player is ready.
+        queueError();
         this.triggerReady();
-
         return;
       }
 
-      // Now that we have a source (and a tech, thanks to `src_`) we can
-      // tell any subscribers that the player is ready again.
+      // At this point, we've found a compatible tech for the middleware source,
+      // so we can tell any subscribers that the player is ready again.
       this.triggerReady();
 
-      // video element listed source
+      // Cache the source URL.
       this.cache_.src = middlewareSource.src;
 
       // Notify middlewares of a new tech.
