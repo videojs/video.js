@@ -364,9 +364,9 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   Html5.nativeSourceHandler.canPlayType = oldCPT;
 });
 
-/********************************************************
+/* **************************************************** *
  * div embed tests copied from video emebed tests above *
- ********************************************************/
+ * **************************************************** */
 
 QUnit.module('video.js div embed', {
   beforeEach() {
