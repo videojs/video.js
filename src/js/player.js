@@ -2358,36 +2358,34 @@ class Player extends Component {
   src_(source) {
     const sourceTech = this.selectSource([source]);
 
+    // There is no tech available that can play the chosen source.
     if (!sourceTech) {
       return true;
     }
 
+    // The tech that was found is not the tech that is currently loaded into
+    // the player; so, we need to unload the old tech, load a new one, and
+    // set the source on it.
     if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
-
-      // load this technology with the chosen source
       this.loadTech_(sourceTech.tech, sourceTech.source);
       return false;
     }
 
-    // wait until the tech is ready to set the source
-    this.ready(function() {
+    // The existing tech will work with this source; so, we can set the
+    // source on the existing tech.
+    //
+    // The `setSource` method was added with source handlers; so, older techs
+    // won't support it. Also, we need to check the direct prototype for
+    // the case where subclasses of `Tech` do not support source handlers.
+    if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
+      this.techCall_('setSource', source);
+    } else {
+      this.techCall_('src', source.src);
+    }
 
-      // The setSource tech method was added with source handlers
-      // so older techs won't support it
-      // We need to check the direct prototype for the case where subclasses
-      // of the tech do not support source handlers
-      if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
-        this.techCall_('setSource', source);
-      } else {
-        this.techCall_('src', source.src);
-      }
-
-      if (this.options_.preload === 'auto') {
-        this.load();
-      }
-
-    // Set the source synchronously if possible (#2326)
-    }, true);
+    if (this.options_.preload === 'auto') {
+      this.load();
+    }
 
     return false;
   }

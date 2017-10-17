@@ -574,7 +574,7 @@ if (Html5.isSupported()) {
     player.addRemoteTextTrack(track, false);
     player.src({src: 'example.mp4', type: 'video/mp4'});
 
-    this.clock.tick(1);
+    this.clock.tick(2);
     assert.equal(player.textTracks().length, 0, 'we do not have any tracks left');
 
     player.dispose();

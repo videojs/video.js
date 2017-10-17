@@ -1602,14 +1602,22 @@ QUnit.test('src_ does not call loadTech is name is titleCaseEquals', function(as
         tech: 'html5'
       };
     },
+    options_: {},
+    tech_: {
+      constructor: {
+        prototype: {}
+      }
+    },
+    techCall_() {},
     techName_: 'Html5',
-    ready() {},
+    // ready() {},
+    load() {},
     loadTech_() {
       loadTechCalled++;
     }
   };
 
-  Player.prototype.src_.call(playerProxy);
+  Player.prototype.src_.call(playerProxy, {});
 
   assert.equal(loadTechCalled, 0, 'loadTech was not called');
 });
