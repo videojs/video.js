@@ -1622,6 +1622,64 @@ QUnit.test('src_ does not call loadTech is name is titleCaseEquals', function(as
   assert.equal(loadTechCalled, 0, 'loadTech was not called');
 });
 
+QUnit.test('subsequent calls to src() will put the player in a non-ready state, so calling ready() immediately after will correctly wait until the new source is set', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+  const onReadySpy = sinon.spy();
+  const readySpy = sinon.spy();
+
+  player.on('ready', onReadySpy);
+  player.ready(readySpy);
+
+  assert.equal(onReadySpy.callCount, 0, 'no readiness yet...');
+  assert.equal(readySpy.callCount, 0, 'no readiness yet...');
+
+  this.clock.tick(1);
+
+  assert.equal(onReadySpy.callCount, 1, 'saw an initial "ready"');
+  assert.equal(readySpy.callCount, 1, 'saw an initial ready() callback');
+
+  player.src({
+    src: 'http://example.com/video.mp4',
+    type: 'video/mp4'
+  });
+
+  player.ready(readySpy);
+
+  assert.equal(onReadySpy.callCount, 1, 'did not see a "ready" because source setting is async');
+  assert.equal(readySpy.callCount, 1, 'did not see a ready() callback because source setting is async');
+
+  this.clock.tick(1);
+
+  assert.equal(onReadySpy.callCount, 1, 'did not see a "ready" because middleware queues up another async operation');
+  assert.equal(readySpy.callCount, 1, 'did not see a ready() callback because middleware queues up another async operation');
+
+  this.clock.tick(1);
+
+  assert.equal(onReadySpy.callCount, 2, 'saw second "ready" because source setting and tech selection are complete');
+  assert.equal(readySpy.callCount, 2, 'saw second ready() callback because source setting and tech selection are complete');
+
+  player.src({
+    src: 'http://example.com/video2.mp4',
+    type: 'video/mp4'
+  });
+
+  player.ready(readySpy);
+
+  assert.equal(onReadySpy.callCount, 2, 'did not see a "ready" because source setting is async');
+  assert.equal(readySpy.callCount, 2, 'did not see a ready() callback because source setting is async');
+
+  this.clock.tick(1);
+
+  assert.equal(onReadySpy.callCount, 2, 'did not see a "ready" because middleware queues up another async operation');
+  assert.equal(readySpy.callCount, 2, 'did not see a ready() callback because middleware queues up another async operation');
+
+  this.clock.tick(1);
+
+  assert.equal(onReadySpy.callCount, 3, 'saw third "ready" because source setting and tech selection are complete');
+  assert.equal(readySpy.callCount, 3, 'saw third ready() callback because source setting and tech selection are complete');
+});
+
 QUnit.test('options: plugins', function(assert) {
   const optionsSpy = sinon.spy();
 
