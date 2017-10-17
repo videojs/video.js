@@ -8,7 +8,7 @@ const testSrc = {
   type: 'video/mp4'
 };
 
-const wait = 100;
+const wait = 200;
 
 if (videojs.browser.IE_VERSION !== 8) {
   QUnit.module('sourcechange', function() {
