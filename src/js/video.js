@@ -132,6 +132,23 @@ function videojs(id, options, ready) {
   return player;
 }
 
+// Cache the previous videojs global in case it's overwritten.
+const previousVideojs = window.videojs;
+
+/**
+ * Removes this `videojs` global from the global namespace and returns it, so
+ * it can be re-used under a different name.
+ *
+ * @return {Function}
+ *         Returns `videojs`.
+ */
+videojs.noConflict = function() {
+  if (window.videojs === videojs) {
+    window.videojs = previousVideojs;
+  }
+  return videojs;
+};
+
 /**
  * An Object that contains lifecycle hooks as keys which point to an array
  * of functions that are run when a lifecycle is triggered

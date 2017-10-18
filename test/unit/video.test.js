@@ -3,6 +3,7 @@ import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
+import window from 'global/window';
 import sinon from 'sinon';
 
 QUnit.module('video.js', {
@@ -330,4 +331,15 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   Html5.prototype.movingMediaElementInDOM = oldMoving;
   Html5.isSupported = oldIS;
   Html5.nativeSourceHandler.canPlayType = oldCPT;
+});
+
+QUnit.test('noConflict', function(assert) {
+
+  // The test build does not expose a global videojs, so we need to fake it.
+  window.videojs = videojs;
+
+  const vjs = videojs.noConflict();
+
+  assert.strictEqual(window.videojs, undefined);
+  assert.strictEqual(vjs, videojs);
 });
