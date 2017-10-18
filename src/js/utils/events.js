@@ -351,11 +351,9 @@ export function off(elem, type, fn) {
 
   // Are we removing all bound events?
   if (!type) {
-    if (!!data && !!data.handlers) {
-      for (const t in data.handlers) {
-        if (!!data.handlers && !!data.handlers.hasOwnProperty && data.handlers.hasOwnProperty(t)) {
-          removeType(t);
-        }
+    for (const t in data.handlers) {
+      if (data.handlers) {
+        removeType(t);
       }
     }
     return;
