@@ -350,9 +350,9 @@ export function off(elem, type, fn) {
   };
 
   // Are we removing all bound events?
-  if (!type) {
+  if (type === undefined) {
     for (const t in data.handlers) {
-      if (data.handlers) {
+      if (Object.prototype.hasOwnProperty.call(data.handlers || {}, t)) {
         removeType(t);
       }
     }
