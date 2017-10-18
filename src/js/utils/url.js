@@ -85,10 +85,6 @@ export const parseUrl = function(url) {
     document.body.removeChild(div);
   }
 
-  if (details.protocol === '') {
-    details.protocol = window.location.protocol;
-  }
-
   return details;
 };
 
