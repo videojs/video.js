@@ -316,9 +316,6 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
-    // was a source set intially? used to determine if we should fire a sourcechange
-    this.initialSourceSet_ = tag.src ? true : false;
-
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
@@ -476,7 +473,7 @@ class Player extends Component {
     this.playOnLoadstart_ = null;
 
     this.forceAutoplayInChrome_();
-    this.watchForSourceChange_();
+    this.watchForSourceSet_();
   }
 
   /**
@@ -514,9 +511,14 @@ class Player extends Component {
       this.el_.player = null;
     }
 
-    if (this.videoSrcObserver_ && this.videoSrcObserver_.disconnect) {
+    if (this.videoSrcObserver_) {
       this.videoSrcObserver_.disconnect();
     }
+
+    if (this.videoTagObserver_) {
+      this.videoTagObserver_.disconnect();
+    }
+
     if (this.tech_) {
       this.tech_.dispose();
     }
@@ -902,72 +904,149 @@ class Player extends Component {
     `);
   }
 
-  watchForSourceChange_() {
+  /**
+   * watch for source setting and fire sourceset when it happens
+   */
+  watchForSourceSet_() {
     if (browser.IS_IE8) {
       return;
     }
-    const tag = this.el().getElementsByTagName('video')[0];
+    const base = window.HTMLMediaElement.prototype;
+    const srcDescriptor = Object.getOwnPropertyDescriptor(base, 'src') || {};
 
-    if (!tag) {
-      return;
+    if (!srcDescriptor.get) {
+      srcDescriptor.get = function() {
+        return base.getAttribute.call(this, 'src');
+      };
     }
 
-    // we don't want a source change for the first source set
-    const triggerSourceChange = () => {
-      if (!this.initialSourceSet_) {
-        this.initialSourceSet_ = true;
-        return;
-      }
-      this.trigger('sourcechange');
-    };
-    const MediaElementPrototype = window.HTMLMediaElement.prototype;
-
-    if (window.MutationObserver) {
-      if (this.videoSrcObserver_ && this.videoSrcObserver_.disconnect) {
-        this.videoSrcObserver_.disconnect();
-        this.videoSrcObserver_ = null;
-      }
-      this.videoSrcObserver_ = new window.MutationObserver(triggerSourceChange);
-      this.videoSrcObserver_.observe(tag, {attributes: true, attributeFilter: ['src']});
-    } else {
-      // get the internal getter/setter functions for src
-      // aka {get: () => [native fn], set (s) => [native fn]};
-      const srcDescriptor = Object.getOwnPropertyDescriptor(MediaElementPrototype, 'src');
-
-      // older version of safari did not support this...
-      if (!srcDescriptor.set) {
-        srcDescriptor.set = (s) => MediaElementPrototype.setAttribute.call(tag, 'src', s);
-      }
-      if (!srcDescriptor.get) {
-        srcDescriptor.get = () => MediaElementPrototype.getAttribute.call(tag, 'src');
-      }
-
-      tag.setAttribute = (name, val) => {
-        MediaElementPrototype.setAttribute.call(tag, name, val);
-
-        if (name === 'src') {
-          triggerSourceChange();
-        }
+    if (!srcDescriptor.set) {
+      srcDescriptor.set = function(v) {
+        return base.setAttribute.call(this, 'src', v);
       };
+    }
 
-      Object.defineProperty(tag, 'src', {
-        get: () => srcDescriptor.get.call(tag),
-        set: (s) => {
-          srcDescriptor.set.call(tag, s);
-          triggerSourceChange();
-        }
+    // if the tag initially had a source before we started watching
+    // we need to fire sourceset when the player is ready
+    if (this.tagAttributes && this.tagAttributes.src) {
+      this.ready(() => {
+        this.trigger('sourceset');
       });
     }
 
-    tag.load = () => {
-      const retval = MediaElementPrototype.load.call(tag);
+    const setupSrcObserver = () => {
+      const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
 
-      if (!this.loading_) {
-        triggerSourceChange();
+      if (!el) {
+        return;
       }
 
-      return retval;
+      Object.defineProperty(el, 'src', {
+        get: srcDescriptor.get.bind(el),
+        set: (v) => {
+          const retval = srcDescriptor.set.call(el, v);
+
+          this.ready(() => this.trigger('sourceset'), true);
+
+          return retval;
+        },
+        configurable: true,
+        enumerable: true
+      });
+
+      el.setAttribute = (n, v) => {
+        const retval = base.setAttribute.call(el, n, v);
+
+        if (n === 'src') {
+          this.ready(() => this.trigger('sourceset'), true);
+        }
+
+        return retval;
+      };
+
+      el.load = () => {
+        const retval = base.load.call(el);
+
+        this.ready(() => this.trigger('sourceset'), true);
+
+        return retval;
+      };
+
+      this.on('dispose', () => {
+        if (el) {
+          el.load = window.HTMLMediaElement.prototype.load.bind(el);
+          el.setAttribute = window.HTMLMediaElement.prototype.setAttribute.bind(el);
+          Object.defineProperty(el, 'src', {
+            get: srcDescriptor.get.bind(el),
+            set: srcDescriptor.set.bind(el),
+            configurable: true,
+            enumerable: true
+          });
+        }
+      });
     };
+
+    // observer video tag changes, we do this when tech loads on iOS
+    if (window.MutationObserver) {
+      this.videoTagObserver_ = new window.MutationObserver((muts) => {
+        muts.forEach((mut) => {
+          const addedNodes = Array.prototype.filter.call(mut.addedNodes, (node) => (/video|audio/i).test(node.tagName));
+
+          if (!addedNodes.length) {
+            return;
+          }
+          setupSrcObserver();
+        });
+      });
+
+      this.videoTagObserver_.observe(this.el(), {childList: true});
+    }
+    setupSrcObserver();
+    this.on('sourceset', this.handleSourceSet_);
+  }
+
+  /**
+   * update the internal source caches based on the current source that was set
+   */
+  handleSourceSet_(e) {
+    const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
+
+    if (!el) {
+      return;
+    }
+
+    // get what the video element thinks the source is
+    let src = el.src;
+    let sources = Array.prototype.map.call(el.getElementsByTagName('source'), (sourceEl) => {
+      return {src: sourceEl.src, type: sourceEl.type};
+    });
+
+    if (!sources.length && !src) {
+      return;
+    }
+
+    if (el.getAttribute('src') === null) {
+      src = null;
+    }
+
+    if (src) {
+      src = {src, type: 'video/mp4'};
+    }
+
+    if (!src && sources.length) {
+      src = sources[0];
+    } else if (src && !sources.length) {
+      sources = [src];
+    }
+
+    if (!this.cache_.src || this.cache_.src !== src.src) {
+      this.cache_.src = src.src;
+    }
+
+    if (!this.cache_.source || this.cache_.source.src !== src.src) {
+      this.cache_.source = src;
+      this.cache_.sources = sources;
+    }
   }
 
   /**
@@ -1047,12 +1126,6 @@ class Player extends Component {
     }
 
     this.tech_ = new TechClass(techOptions);
-
-    // if the tag was changed by a tech load
-    // start the source change watcher again
-    if (this.tag !== this.tech_.el()) {
-      this.watchForSourceChange_();
-    }
 
     // player.triggerReady is always async, so don't need this to be async
     this.tech_.ready(Fn.bind(this, this.handleTechReady_), true);
@@ -2566,9 +2639,7 @@ class Player extends Component {
    * Begin loading the src data.
    */
   load() {
-    this.loading_ = true;
     this.techCall_('load');
-    this.loading_ = false;
   }
 
   /**
