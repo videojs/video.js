@@ -35,8 +35,6 @@ class SeekBar extends Slider {
   constructor(player, options) {
     super(player, options);
 
-    // @deprecated, we should change this to throttleUpdate in v7
-    // as modifying functions so that they always throttle is a bit weird
     this.update = Fn.throttle(Fn.bind(this, this.update), 50);
     this.on(player, 'timeupdate', this.update);
     this.on(player, 'ended', this.handleEnded);
