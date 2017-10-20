@@ -48,7 +48,7 @@ class TimeDisplay extends Component {
       'aria-live': 'off'
     }, Dom.createEl('span', {
       className: 'vjs-control-text',
-      textContent: this.localize(this.contentText_)
+      textContent: this.localize(this.controlText_)
     }));
 
     this.updateTextNode_();
@@ -63,7 +63,7 @@ class TimeDisplay extends Component {
    * @private
    */
   updateTextNode_() {
-    if (this.textNode_) {
+    if (this.textNode_ && this.contentEl_ && this.contentEl_.contains(this.textNode_)) {
       this.contentEl_.removeChild(this.textNode_);
     }
     this.textNode_ = document.createTextNode(this.formattedTime_ || '0:00');
