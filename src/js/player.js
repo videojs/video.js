@@ -1622,6 +1622,13 @@ class Player extends Component {
   play() {
     if (this.changingSrc_) {
       this.ready(function() {
+
+        // Safari struggles to play immediately following a source change
+        // without first calling load()
+        if (browser.IS_ANY_SAFARI) {
+          this.techCall_('load');
+        }
+
         const retval = this.techGet_('play');
 
         // silence errors (unhandled promise from play)
