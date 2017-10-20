@@ -511,14 +511,6 @@ class Player extends Component {
       this.el_.player = null;
     }
 
-    if (this.videoSrcObserver_) {
-      this.videoSrcObserver_.disconnect();
-    }
-
-    if (this.videoTagObserver_) {
-      this.videoTagObserver_.disconnect();
-    }
-
     if (this.tech_) {
       this.tech_.dispose();
     }
@@ -911,6 +903,19 @@ class Player extends Component {
     if (browser.IS_IE8) {
       return;
     }
+    // if we cannot overwrite the src property, there is no support
+    // iOS 7 safari for instance cannot do this.
+    try {
+      const el = document.createElement('video');
+
+      Object.defineProperty(el, 'src', {
+        get() {},
+        set() {}
+      });
+    } catch (e) {
+      return;
+    }
+
     const base = window.HTMLMediaElement.prototype;
     const srcDescriptor = Object.getOwnPropertyDescriptor(base, 'src') || {};
 
@@ -934,74 +939,57 @@ class Player extends Component {
       });
     }
 
-    const setupSrcObserver = () => {
-      const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
+    const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
 
-      if (!el) {
-        return;
-      }
+    if (!el) {
+      return;
+    }
 
-      Object.defineProperty(el, 'src', {
-        get: srcDescriptor.get.bind(el),
-        set: (v) => {
-          const retval = srcDescriptor.set.call(el, v);
-
-          this.ready(() => this.trigger('sourceset'), true);
-
-          return retval;
-        },
-        configurable: true,
-        enumerable: true
-      });
-
-      el.setAttribute = (n, v) => {
-        const retval = base.setAttribute.call(el, n, v);
-
-        if (n === 'src') {
-          this.ready(() => this.trigger('sourceset'), true);
-        }
-
-        return retval;
-      };
-
-      el.load = () => {
-        const retval = base.load.call(el);
+    Object.defineProperty(el, 'src', {
+      get: srcDescriptor.get.bind(el),
+      set: (v) => {
+        const retval = srcDescriptor.set.call(el, v);
 
         this.ready(() => this.trigger('sourceset'), true);
 
         return retval;
-      };
+      },
+      configurable: true,
+      enumerable: true
+    });
 
-      this.on('dispose', () => {
-        if (el) {
-          el.load = window.HTMLMediaElement.prototype.load.bind(el);
-          el.setAttribute = window.HTMLMediaElement.prototype.setAttribute.bind(el);
-          Object.defineProperty(el, 'src', {
-            get: srcDescriptor.get.bind(el),
-            set: srcDescriptor.set.bind(el),
-            configurable: true,
-            enumerable: true
-          });
-        }
-      });
+    el.setAttribute = (n, v) => {
+      const retval = base.setAttribute.call(el, n, v);
+
+      if (n === 'src') {
+        this.ready(() => this.trigger('sourceset'), true);
+      }
+
+      return retval;
     };
 
-    // observer video tag changes, we do this when tech loads on iOS
-    if (window.MutationObserver) {
-      this.videoTagObserver_ = new window.MutationObserver((muts) => {
-        muts.forEach((mut) => {
-          const addedNodes = Array.prototype.filter.call(mut.addedNodes, (node) => (/video|audio/i).test(node.tagName));
+    el.load = () => {
+      const retval = base.load.call(el);
 
-          if (!addedNodes.length) {
-            return;
-          }
-          setupSrcObserver();
+      this.ready(() => this.trigger('sourceset'), true);
+
+      return retval;
+    };
+
+    this.on('dispose', () => {
+      if (el) {
+        el.load = window.HTMLMediaElement.prototype.load.bind(el);
+        el.setAttribute = window.HTMLMediaElement.prototype.setAttribute.bind(el);
+        Object.defineProperty(el, 'src', {
+          get: srcDescriptor.get.bind(el),
+          set: srcDescriptor.set.bind(el),
+          configurable: true,
+          enumerable: true
         });
-      });
+      }
+    });
 
-      this.videoTagObserver_.observe(this.el(), {childList: true});
-    }
-    setupSrcObserver();
+    // observer video tag changes, we do this when tech loads on iOS
     this.on('sourceset', this.handleSourceSet_);
   }
 
@@ -1030,7 +1018,28 @@ class Player extends Component {
     }
 
     if (src) {
-      src = {src, type: 'video/mp4'};
+      let type;
+
+      if (sources && !type) {
+        // get the source type from our sources list
+        for (let i = 0; i < sources.length; i++) {
+          if (sources[i].src === src) {
+            type = sources[i].type;
+            break;
+          }
+        }
+      }
+
+      if (!type) {
+        type = 'video/mp4';
+
+        if ((/\.mp3$/).test(src)) {
+          type = 'audio/mpeg';
+        }
+
+      }
+
+      src = {src, type};
     }
 
     if (!src && sources.length) {
