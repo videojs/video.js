@@ -314,6 +314,9 @@ class Player extends Component {
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
+    
+    // Init state hasStarted_ 
+    this.hasStarted_ = false;
 
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
@@ -1124,29 +1127,28 @@ class Player extends Component {
    *
    * @fires Player#firstplay
    *
-   * @param {boolean} hasStarted
+   * @param {boolean} request
    *        - true: adds the class
    *        - false: remove the class
    *
    * @return {boolean}
-   *         the boolean value of hasStarted
+   *         the boolean value of hasStarted_
    */
-  hasStarted(hasStarted) {
-    if (hasStarted !== undefined) {
-      // only update if this is a new value
-      if (this.hasStarted_ !== hasStarted) {
-        this.hasStarted_ = hasStarted;
-        if (hasStarted) {
-          this.addClass('vjs-has-started');
-          // trigger the firstplay event if this newly has played
-          this.trigger('firstplay');
-        } else {
-          this.removeClass('vjs-has-started');
-        }
-      }
-      return;
+  hasStarted(request) {
+    if (request === undefined || request === this.hasStarted_) {
+      return this.hasStarted_;
     }
-    return !!this.hasStarted_;
+    
+    this.hasStarted_ = request;
+  
+    if (this.hasStarted_) {
+      this.addClass('vjs-has-started');
+      this.trigger('firstplay');
+    } else {
+      this.removeClass('vjs-has-started');
+    }
+  
+    return this.hasStarted_;
   }
 
   /**
