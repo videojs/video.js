@@ -314,8 +314,8 @@ class Player extends Component {
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
-    
-    // Init state hasStarted_ 
+
+    // Init state hasStarted_
     this.hasStarted_ = false;
 
     // if the global option object was accidentally blown away by
@@ -1138,16 +1138,16 @@ class Player extends Component {
     if (request === undefined || request === this.hasStarted_) {
       return this.hasStarted_;
     }
-    
+
     this.hasStarted_ = request;
-  
+
     if (this.hasStarted_) {
       this.addClass('vjs-has-started');
       this.trigger('firstplay');
     } else {
       this.removeClass('vjs-has-started');
     }
-  
+
     return this.hasStarted_;
   }
 
