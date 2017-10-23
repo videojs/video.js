@@ -63,7 +63,11 @@ class TimeDisplay extends Component {
    * @private
    */
   updateTextNode_() {
-    if (this.textNode_ && this.contentEl_ && this.contentEl_.contains(this.textNode_)) {
+    if (!this.contentEl_) {
+      return;
+    }
+
+    if (this.textNode_ && this.contentEl_.contains(this.textNode_)) {
       this.contentEl_.removeChild(this.textNode_);
     }
     this.textNode_ = document.createTextNode(this.formattedTime_ || '0:00');
@@ -102,7 +106,7 @@ class TimeDisplay extends Component {
     }
 
     this.formattedTime_ = formattedTime;
-    this.requestAnimationFrame(this.updateTextNode_);
+    this.requestAnimationFrame(() => this.updateTextNode_());
   }
 
   /**
