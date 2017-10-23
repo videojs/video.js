@@ -2,9 +2,15 @@
 import videojs from '../../src/js/video.js';
 import document from 'global/document';
 import window from 'global/window';
+import log from '../../src/js/utils/log.js';
+import sinon from 'sinon';
 
 const wait = 100;
 let qunitFn = 'module';
+
+if (videojs.browser.IS_IE8) {
+  qunitFn = 'skip';
+}
 
 // if we cannot overwrite the src property, there is no support
 try {
@@ -38,9 +44,9 @@ const validateSource = function(assert, player, sources, checkMediaElSource = tr
 
 QUnit[qunitFn]('sourceset', function(hooks) {
   ['video el', 'change video el', 'audio el', 'change audio el'].forEach((testName) => {
-
     QUnit.module(`source before player - ${testName}`, {
       beforeEach() {
+        sinon.stub(log, 'error');
         if (testName === 'change video el' || testName === 'change audio el') {
           Html5.prototype.movingMediaElementInDOM = false;
         }
@@ -88,6 +94,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
           videojs.removeHook('setup', this.hook);
           Html5.prototype.movingMediaElementInDOM = oldMovingMedia;
+          log.error.restore();
           done();
         }, wait);
       }
@@ -238,6 +245,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
     QUnit.module(`source change - ${testName}`, {
       beforeEach(assert) {
+        sinon.stub(log, 'error');
         const done = assert.async();
 
         if (testName === 'change video el' || testName === 'change audio el') {
@@ -302,6 +310,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
           videojs.removeHook('setup', this.hook);
           Html5.prototype.movingMediaElementInDOM = oldMovingMedia;
+          log.error.restore();
           done();
         }, wait);
       }

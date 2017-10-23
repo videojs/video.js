@@ -903,20 +903,18 @@ class Player extends Component {
    * @fires Player#sourceset
    */
   watchForSourceSet_() {
+    if (browser.IS_IE8) {
+      return;
+    }
     // if we cannot overwrite the src property, there is no support
     // iOS 7 safari for instance cannot do this.
     try {
-      const el = document.createElement('video');
-
-      Object.defineProperty(el, 'src', {
-        get() {},
-        set() {}
-      });
+      Object.defineProperty(document.createElement('video'), 'src', {get: () => {}, set: () =>{}});
     } catch (e) {
       return;
     }
 
-    const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
+    const el = this.$('video') || this.$('audio');
 
     if (!el) {
       if (!this.isReady_) {
@@ -929,27 +927,33 @@ class Player extends Component {
     // if we find that the media element had a src when it was
     // given to us
     if (this.tagAttributes && this.tagAttributes.src) {
-      this.ready(() => {
-        this.trigger('sourceset');
-      });
+      this.ready(() => this.trigger('sourceset'));
     }
 
     const proto = window.HTMLMediaElement.prototype;
-    const srcDescriptor = {
-      get() {
-        return proto.getAttribute.call(this, 'src');
-      },
-      set(v) {
-        return proto.setAttribute.call(this, 'src', v);
-      },
-      enumerable: true
-    };
+    let srcDescriptor = {};
 
     // preserve getters/setters already on `el.src` if they exist
     if (Object.getOwnPropertyDescriptor(el, 'src')) {
-      Object.assign(srcDescriptor, Object.getOwnPropertyDescriptor(el, 'src'));
+      srcDescriptor = Object.getOwnPropertyDescriptor(el, 'src');
     } else if (Object.getOwnPropertyDescriptor(proto, 'src')) {
-      Object.assign(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
+      srcDescriptor = mergeOptions(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
+    }
+
+    if (!srcDescriptor.get) {
+      srcDescriptor.get = function() {
+        return proto.getAttribute.call(this, 'src');
+      };
+    }
+
+    if (!srcDescriptor.set) {
+      srcDescriptor.set = function(v) {
+        return proto.setAttribute.call(this, 'src', v);
+      };
+    }
+
+    if (typeof srcDescriptor.enumerable === 'undefined') {
+      srcDescriptor.enumerable = true;
     }
 
     Object.defineProperty(el, 'src', {
@@ -1002,67 +1006,97 @@ class Player extends Component {
   }
 
   /**
-   * Update the internal source cache based on the `sourceset` event.
+   * Update the internal source cache based on the `sourceset` event, and the resource selection
+   * algorithm.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/multipage/media.html#concept-media-load-algorithm}
    *
    * @param {EventTarget~Event} e
    *        The sourceset event that triggered this function to run.
    */
   handleSourceSet_(e) {
-    const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
+    const el = this.$('video') || this.$('audio');
 
     if (!el) {
       return;
     }
 
     // get what the video element thinks the source is
+    // and remove any querystring/hash from it
     let src = el.src;
     let sources = Array.prototype.map.call(el.getElementsByTagName('source'), (sourceEl) => {
       return {src: sourceEl.src, type: sourceEl.type};
     });
 
-    if (!sources.length && !src) {
+    // if no source was set
+    if (!sources.length && typeof src === 'undefined') {
       return;
     }
 
+    // if we have el.src but there is no src attribute,
+    // el.src will be ignored, we should treat it like
+    // there is no el.src
     if (el.getAttribute('src') === null) {
       src = null;
     }
 
+    // if we have a src we need to find out what the
+    // type for that source is
     if (src) {
+      // get the source without any query string
+      const baseSrc = src.split(/[?#]/)[0];
       let type;
 
-      if (sources && !type) {
+      // if we have sources see if we can
+      // find the type in those
+      if (sources) {
         // get the source type from our sources list
         for (let i = 0; i < sources.length; i++) {
-          if (sources[i].src === src) {
-            type = sources[i].type;
+          const source = sources[i];
+          const baseSource = source.src.split(/[?#]/)[0];
+
+          if (source.src === src || baseSource === baseSrc) {
+            type = source.type;
             break;
           }
         }
       }
 
+      // otherwise we set the type to unknown,
+      // or in the case where we know the type based on the file extension
+      // we use that
       if (!type) {
-        type = 'video/mp4';
+        type = 'unknown';
 
-        if ((/\.mp3$/).test(src)) {
+        if ((/\.mp3$/).test(baseSrc)) {
           type = 'audio/mpeg';
+        } else if ((/\.mp4$/).test(baseSrc)) {
+          type = 'video/mp4';
         }
-
       }
 
+      // set source to an object now that we have a type
       src = {src, type};
     }
 
+    // if we have no `src` but we have <source> els
+    // set `src` to the first <source> el
     if (!src && sources.length) {
       src = sources[0];
+    // if we have no <source> els but
+    // we have a `src` use that for our sources list
     } else if (src && !sources.length) {
       sources = [src];
     }
 
+    // if we have a cached src property and it is not
+    // the current src, update it.
     if (!this.cache_.src || this.cache_.src !== src.src) {
       this.cache_.src = src.src;
     }
 
+    // if we have a source property and it is not the current
+    // src, update it.
     if (!this.cache_.source || this.cache_.source.src !== src.src) {
       this.cache_.source = src;
       this.cache_.sources = sources;
