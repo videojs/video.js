@@ -897,12 +897,12 @@ class Player extends Component {
   }
 
   /**
-   * watch for source setting and fire sourceset when it happens
+   * Modify the video/audio element so that we can detect when
+   * the source is changed. Fires `sourceset` just after the source has changed
+   *
+   * @fires Player#sourceset
    */
   watchForSourceSet_() {
-    if (browser.IS_IE8) {
-      return;
-    }
     // if we cannot overwrite the src property, there is no support
     // iOS 7 safari for instance cannot do this.
     try {
@@ -916,33 +916,40 @@ class Player extends Component {
       return;
     }
 
-    const base = window.HTMLMediaElement.prototype;
-    const srcDescriptor = Object.getOwnPropertyDescriptor(base, 'src') || {};
+    const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
 
-    if (!srcDescriptor.get) {
-      srcDescriptor.get = function() {
-        return base.getAttribute.call(this, 'src');
-      };
+    if (!el) {
+      if (!this.isReady_) {
+        this.ready(() => this.watchForSourceSet_());
+      }
+      return;
     }
 
-    if (!srcDescriptor.set) {
-      srcDescriptor.set = function(v) {
-        return base.setAttribute.call(this, 'src', v);
-      };
-    }
-
-    // if the tag initially had a source before we started watching
     // we need to fire sourceset when the player is ready
+    // if we find that the media element had a src when it was
+    // given to us
     if (this.tagAttributes && this.tagAttributes.src) {
       this.ready(() => {
         this.trigger('sourceset');
       });
     }
 
-    const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];
+    const proto = window.HTMLMediaElement.prototype;
+    const srcDescriptor = {
+      get() {
+        return proto.getAttribute.call(this, 'src');
+      },
+      set(v) {
+        return proto.setAttribute.call(this, 'src', v);
+      },
+      enumerable: true
+    };
 
-    if (!el) {
-      return;
+    // preserve getters/setters already on `el.src` if they exist
+    if (Object.getOwnPropertyDescriptor(el, 'src')) {
+      Object.assign(srcDescriptor, Object.getOwnPropertyDescriptor(el, 'src'));
+    } else if (Object.getOwnPropertyDescriptor(proto, 'src')) {
+      Object.assign(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
     }
 
     Object.defineProperty(el, 'src', {
@@ -955,11 +962,13 @@ class Player extends Component {
         return retval;
       },
       configurable: true,
-      enumerable: true
+      enumerable: srcDescriptor.enumerable
     });
 
+    const oldSetAttribute = el.setAttribute;
+
     el.setAttribute = (n, v) => {
-      const retval = base.setAttribute.call(el, n, v);
+      const retval = oldSetAttribute.call(el, n, v);
 
       if (n === 'src') {
         this.ready(() => this.trigger('sourceset'), true);
@@ -968,8 +977,10 @@ class Player extends Component {
       return retval;
     };
 
+    const oldLoad = el.load;
+
     el.load = () => {
-      const retval = base.load.call(el);
+      const retval = oldLoad.call(el);
 
       this.ready(() => this.trigger('sourceset'), true);
 
@@ -977,16 +988,13 @@ class Player extends Component {
     };
 
     this.on('dispose', () => {
-      if (el) {
-        el.load = window.HTMLMediaElement.prototype.load.bind(el);
-        el.setAttribute = window.HTMLMediaElement.prototype.setAttribute.bind(el);
-        Object.defineProperty(el, 'src', {
-          get: srcDescriptor.get.bind(el),
-          set: srcDescriptor.set.bind(el),
-          configurable: true,
-          enumerable: true
-        });
+      if (!el) {
+        return;
       }
+
+      el.load = oldLoad.bind(el);
+      el.setAttribute = oldSetAttribute.bind(el);
+      Object.defineProperty(el, 'src', srcDescriptor);
     });
 
     // observer video tag changes, we do this when tech loads on iOS
@@ -994,7 +1002,10 @@ class Player extends Component {
   }
 
   /**
-   * update the internal source caches based on the current source that was set
+   * Update the internal source cache based on the `sourceset` event.
+   *
+   * @param {EventTarget~Event} e
+   *        The sourceset event that triggered this function to run.
    */
   handleSourceSet_(e) {
     const el = this.el().getElementsByTagName('video')[0] || this.el().getElementsByTagName('audio')[0];

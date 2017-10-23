@@ -6,10 +6,6 @@ import window from 'global/window';
 const wait = 100;
 let qunitFn = 'module';
 
-if (videojs.browser.IS_IE8) {
-  qunitFn = 'skip';
-}
-
 // if we cannot overwrite the src property, there is no support
 try {
   const el = document.createElement('video');
