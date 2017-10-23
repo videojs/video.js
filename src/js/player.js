@@ -515,7 +515,7 @@ class Player extends Component {
     let tag = this.tag;
     let el;
     let playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
-    const divEmbed = this.tag.tagName.toLowerCase() === 'div';
+    const divEmbed = this.tag.tagName.toLowerCase() === 'video-js';
 
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
@@ -531,8 +531,7 @@ class Player extends Component {
       el = this.el_ = tag;
       tag = this.tag = document.createElement('video');
       while (el.children.length) {
-        tag.appendChild(el.firstChild);
-        el.removeChild(el.firstChild);
+        tag.appendChild(child);
       }
 
       el.appendChild(tag);

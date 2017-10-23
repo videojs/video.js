@@ -31,7 +31,7 @@ const autoSetup = function() {
   // through each list of elements to build up a new, combined list of elements.
   const vids = document.getElementsByTagName('video');
   const audios = document.getElementsByTagName('audio');
-  const divs = document.getElementsByTagName('div');
+  const divs = document.getElementsByTagName('video-js');
   const mediaEls = [];
 
   if (vids && vids.length > 0) {
