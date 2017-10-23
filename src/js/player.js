@@ -378,6 +378,8 @@ class Player extends Component {
 
     this.el_ = this.createEl();
 
+    this.options_.sources = Player.getTagSettings(this.tag).sources || this.options_.sources;
+
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
