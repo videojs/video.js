@@ -1625,7 +1625,7 @@ class Player extends Component {
 
         // Safari struggles to play immediately following a source change
         // without first calling load() if preload="none", except in desktop Safari 11
-        if (this.preload() === 'none' && (browser.IS_IOS || browser.DESKTOP_SAFARI_VERSION < 11)) {
+        if (this.techGet_('preload') === 'none' && (browser.IS_IOS || browser.DESKTOP_SAFARI_VERSION < 11)) {
           this.techCall_('load');
         }
 
