@@ -51,9 +51,9 @@
     <div class="panel source-el">
       <p>js setup with source element</p>
       <p>Div embed, source element</p>
-      <div id="vid01" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+      <video-js id="vid01" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
         <source src="./oceans.mp4" type='video/mp4'>
-      </div>
+      </video-js>
       <p>Video embed, source element</p>
       <video id="vid11" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
         <source src="./oceans.mp4" type='video/mp4'>
@@ -68,8 +68,8 @@
     <div class="panel options-src">
       <p>js setup with sources options</p>
       <p>Div embed, js source</p>
-      <div id="vid05" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
-      </div>
+      <video-js id="vid05" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+      </video-js>
       <p>Video embed, js source</p>
       <video id="vid15" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
       </video>
@@ -82,8 +82,8 @@
     <div class="panel source-js">
       <p>js setup with js method sources</p>
       <p>Div embed, js source</p>
-      <div id="vid02" class="video-js" controls>
-      </div>
+      <video-js id="vid02" class="video-js" controls>
+      </video-js>
       <p>Video embed, js source</p>
       <video id="vid12" class="video-js" controls>
       </video>
@@ -96,9 +96,9 @@
     <div class="panel source-el data-setup">
       <p>data-setup with sourrce elements</p>
       <p>Div embed, source element</p>
-      <div id="vid03" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+      <video-js id="vid03" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
         <source src="./oceans.mp4" type='video/mp4'>
-      </div>
+      </video-js>
       <p>Video embed, source element</p>
       <video id="vid13" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
         <source src="./oceans.mp4" type='video/mp4'>
@@ -113,8 +113,8 @@
     <div class="panel options-src data-setup">
       <p>data-setup embeds with sources options</p>
       <p>Div embed, source element</p>
-      <div id="vid04" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup='{"sources": [{"src":"./oceans.mp4", "type":"video/mp4"}]}'>
-      </div>
+      <video-js id="vid04" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup='{"sources": [{"src":"./oceans.mp4", "type":"video/mp4"}]}'>
+      </video-js>
       <p>Video embed, source element</p>
       <video id="vid14" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup='{"sources": [{"src":"./oceans.mp4", "type":"video/mp4"}]}'>
       </video>
@@ -127,8 +127,8 @@
     <div class="panel source-js data-setup">
       <p>js setup with js method sources</p>
       <p>Div embed, js source</p>
-      <div id="vid06" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
-      </div>
+      <video-js id="vid06" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+      </video-js>
       <p>Video embed, js source</p>
       <video id="vid16" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
       </video>
