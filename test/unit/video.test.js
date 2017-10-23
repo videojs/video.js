@@ -368,7 +368,7 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
  * div embed tests copied from video emebed tests above *
  * **************************************************** */
 
-QUnit.module('video.js div embed', {
+QUnit.module('video.js video-js embed', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
   },
@@ -379,8 +379,8 @@ QUnit.module('video.js div embed', {
 QUnit.test('should return a video player instance', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += '<div id="test_vid_id"></div>' +
-                       '<div id="test_vid_id2"></div>';
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>' +
+                       '<video-js id="test_vid_id2"></video-js>';
 
   const player = videojs('test_vid_id', { techOrder: ['techFaker'] });
 
@@ -414,7 +414,7 @@ function(assert) {
     warnLogs.push(args);
   };
 
-  fixture.innerHTML += '<div id="test_vid_id"></div>';
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>';
 
   const player = videojs('test_vid_id', { techOrder: ['techFaker'] });
 
@@ -445,8 +445,8 @@ function(assert) {
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += '<div id="test_vid_id"></div>' +
-                       '<div id="test_vid_id2"></div>';
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>' +
+                       '<video-js id="test_vid_id2"></video-js>';
 
   const vid = document.querySelector('#test_vid_id');
 
@@ -474,8 +474,8 @@ QUnit.test('should return a video player instance from el html5 tech', function(
 QUnit.test('should return a video player instance from el techfaker', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += '<div id="test_vid_id"></div>' +
-                       '<div id="test_vid_id2"></div>';
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>' +
+                       '<video-js id="test_vid_id2"></video-js>';
 
   const vid = document.querySelector('#test_vid_id');
   const player = videojs(vid, {techOrder: ['techFaker']});
