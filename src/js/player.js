@@ -538,11 +538,10 @@ class Player extends Component {
         // use nodeName because it might not all be tags
         if (child.nodeName.toLowerCase() === 'vjs-source') {
           const srcEl = document.createElement('source');
-          const attrs = child.attributes;
+          const childAttrs = child.attributes;
 
-
-          for (let i = 0; i < attrs.length; i++) {
-            srcEl.setAttribute(attrs[i].name, attrs[i].value);
+          for (let i = 0; i < childAttrs.length; i++) {
+            srcEl.setAttribute(childAttrs[i].name, childAttrs[i].value);
             tag.appendChild(srcEl);
           }
 
