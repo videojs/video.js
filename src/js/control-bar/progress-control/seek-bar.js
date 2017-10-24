@@ -114,9 +114,9 @@ class SeekBar extends Slider {
    */
   handleMouseDown(event) {
     // only allow left-click seeking
-    if (typeof event.button === 'undefined' && typeof event.buttons === 'undefined') {
+    if (event.button === undefined && event.buttons === undefined) {
       // touch screen, not apply, do nothing
-    } else if (event.button === 0 && typeof event.buttons === 'undefined') {
+    } else if (event.button === 0 && event.buttons === undefined) {
       // touch screen, safari on ios
     } else if (event.button !== 0 || event.buttons !== 1) {
       return;
@@ -139,6 +139,15 @@ class SeekBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
+    // only allow left-click seeking
+    if (event.button === undefined && event.buttons === undefined) {
+      // touch screen, not apply, do nothing
+    } else if (event.button === 0 && event.buttons === undefined) {
+      // touch screen, safari on ios
+    } else if (event.button !== 0 || event.buttons !== 1) {
+      return;
+    }
+    
     let newTime = this.calculateDistance(event) * this.player_.duration();
 
     // Don't let video end while scrubbing.
