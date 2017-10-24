@@ -46,6 +46,27 @@ class VolumeBar extends Slider {
   }
 
   /**
+   * Handle mouse down on volume bar
+   *
+   * @param {EventTarget~Event} event
+   *        The `mousedown` event that caused this to run.
+   *
+   * @listens mousedown
+   */
+  handleMouseDown(event) {
+    // only allow left-click volume change
+    if (event.button === undefined && event.buttons === undefined) {
+      // touch screen, not apply, do nothing
+    } else if (event.button === 0 && event.buttons === undefined) {
+      // touch screen, safari on ios
+    } else if (event.button !== 0 || event.buttons !== 1) {
+      return;
+    }
+
+    super.handleMouseDown(event);
+  }
+
+  /**
    * Handle movement events on the {@link VolumeMenuButton}.
    *
    * @param {EventTarget~Event} event
@@ -55,9 +76,9 @@ class VolumeBar extends Slider {
    */
   handleMouseMove(event) {
     // only allow left-click volume change
-    if (typeof event.button === 'undefined' && typeof event.buttons === 'undefined') {
+    if (event.button === undefined && event.buttons === undefined) {
       // touch screen, not apply, do nothing
-    } else if (event.button === 0 && typeof event.buttons === 'undefined') {
+    } else if (event.button === 0 && event.buttons === undefined) {
       // touch screen, safari on ios
     } else if (event.button !== 0 || event.buttons !== 1) {
       return;
