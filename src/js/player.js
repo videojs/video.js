@@ -1139,7 +1139,7 @@ class Player extends Component {
       // act as getter, if we have no request to change
       return this.hasStarted_;
     }
-    
+
     if (request === this.hasStarted_) {
       return;
     }
