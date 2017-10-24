@@ -1135,8 +1135,13 @@ class Player extends Component {
    *         the boolean value of hasStarted_
    */
   hasStarted(request) {
-    if (request === undefined || request === this.hasStarted_) {
+    if (request === undefined) {
+      // act as getter, if we have no request to change
       return this.hasStarted_;
+    }
+    
+    if (request === this.hasStarted_) {
+      return;
     }
 
     this.hasStarted_ = request;
@@ -1147,8 +1152,6 @@ class Player extends Component {
     } else {
       this.removeClass('vjs-has-started');
     }
-
-    return this.hasStarted_;
   }
 
   /**
