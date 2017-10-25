@@ -81,12 +81,12 @@ export const parseUrl = function(url) {
     details.host = details.host.replace(/:443$/, '');
   }
 
-  if (addToBody) {
-    document.body.removeChild(div);
+  if (!details.protocol) {
+    details.protocol = window.location.protocol;
   }
 
-  if (details.protocol === '') {
-    details.protocol = window.location.protocol;
+  if (addToBody) {
+    document.body.removeChild(div);
   }
 
   return details;
