@@ -8,6 +8,10 @@
   min-width: 4em;
 }
 
+.video-js .vjs-progress-control.disabled {
+  cursor: default;
+}
+
 .vjs-live .vjs-progress-control {
   display: none;
 }
@@ -36,7 +40,7 @@
 
 // This increases the size of the progress holder so there is an increased
 // hit area for clicks/touches.
-.video-js .vjs-progress-control:hover .vjs-progress-holder {
+.video-js .vjs-progress-control:hover .vjs-progress-holder.enabled {
   font-size: 1.666666666666666666em;
 }
 

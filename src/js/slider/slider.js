@@ -31,7 +31,7 @@ class Slider extends Component {
     // Set a horizontal or vertical class on the slider depending on the slider type
     this.vertical(!!this.options_.vertical);
 
-    this.enableControls();
+    this.enable();
   }
 
   /**
@@ -40,15 +40,15 @@ class Slider extends Component {
    * @return {boolean}
    *         true if controls are enabled, false otherwise
    */
-  controlsEnabled() {
-    return this.controlsEnabled_;
+  enabled() {
+    return this.enabled_;
   }
 
   /**
    * Enable controls for this slider if they are disabled
    */
-  enableControls() {
-    if (this.controlsEnabled()) {
+  enable() {
+    if (this.enabled()) {
       return;
     }
 
@@ -63,14 +63,19 @@ class Slider extends Component {
     if (this.playerEvent) {
       this.on(this.player_, this.playerEvent, this.update);
     }
-    this.controlsEnabled_ = true;
+
+    this.removeClass('disabled');
+    this.addClass('enabled');
+    this.setAttribute('tabindex', 0);
+
+    this.enabled_ = true;
   }
 
   /**
    * Disable controls for this slider if they are enabled
    */
-  disableControls() {
-    if (!this.controlsEnabled()) {
+  disable() {
+    if (!this.enabled()) {
       return;
     }
     const doc = this.bar.el_.ownerDocument;
@@ -85,11 +90,15 @@ class Slider extends Component {
     this.off(doc, 'mouseup', this.handleMouseUp);
     this.off(doc, 'touchmove', this.handleMouseMove);
     this.off(doc, 'touchend', this.handleMouseUp);
+    this.removeAttribute('tabindex');
+
+    this.removeClass('enabled');
+    this.addClass('disabled');
 
     if (this.playerEvent) {
       this.off(this.player_, this.playerEvent, this.update);
     }
-    this.controlsEnabled_ = false;
+    this.enabled_ = false;
   }
 
   /**
