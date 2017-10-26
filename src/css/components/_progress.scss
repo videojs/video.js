@@ -45,7 +45,7 @@
 }
 
 .video-js .vjs-progress-control:hover .vjs-progress-holder.disabled {
-  font-size: inherit;
+  font-size: 1em;
 }
 
 // .vjs-play-progress / PlayProgressBar and .vjs-load-progress / LoadProgressBar
@@ -139,6 +139,10 @@
   // Ensure that we maintain a font-size of ~10px.
   font-size: 0.6em;
   visibility: visible;
+}
+
+.video-js .vjs-progress-control.disabled:hover .vjs-time-tooltip {
+  font-size: 1em;
 }
 
 // .vjs-mouse-display / MouseTimeDisplay
