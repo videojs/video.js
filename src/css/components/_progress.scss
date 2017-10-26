@@ -40,9 +40,14 @@
 
 // This increases the size of the progress holder so there is an increased
 // hit area for clicks/touches.
-.video-js .vjs-progress-control:hover .vjs-progress-holder.enabled {
+.video-js .vjs-progress-control:hover .vjs-progress-holder {
   font-size: 1.666666666666666666em;
 }
+
+.video-js .vjs-progress-control:hover .vjs-progress-holder.disabled {
+  font-size: inherit;
+}
+
 
 // .vjs-play-progress / PlayProgressBar and .vjs-load-progress / LoadProgressBar
 //

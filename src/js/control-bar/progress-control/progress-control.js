@@ -124,7 +124,6 @@ class ProgressControl extends Component {
     this.off(this.el_, 'mousemove', this.handleMouseMove);
     this.handleMouseUp();
 
-    this.removeClass('enabled');
     this.addClass('disabled');
 
     this.enabled_ = false;
@@ -143,7 +142,6 @@ class ProgressControl extends Component {
     this.on(['mousedown', 'touchstart'], this.handleMouseDown);
     this.on(this.el_, 'mousemove', this.handleMouseMove);
     this.removeClass('disabled');
-    this.addClass('enabled');
 
     this.enabled_ = true;
   }

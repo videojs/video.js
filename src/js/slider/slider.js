@@ -65,7 +65,6 @@ class Slider extends Component {
     }
 
     this.removeClass('disabled');
-    this.addClass('enabled');
     this.setAttribute('tabindex', 0);
 
     this.enabled_ = true;
@@ -92,7 +91,6 @@ class Slider extends Component {
     this.off(doc, 'touchend', this.handleMouseUp);
     this.removeAttribute('tabindex');
 
-    this.removeClass('enabled');
     this.addClass('disabled');
 
     if (this.playerEvent) {
