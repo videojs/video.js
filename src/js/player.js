@@ -289,24 +289,21 @@ class Player extends Component {
     options.reportTouchActivity = false;
 
     // If language is not set, get the closest lang attribute
-    if (!options.language) {
-      if (typeof tag.closest === 'function') {
-        const closest = tag.closest('[lang]');
+    if (options.language) {
+      let element = tag;
 
-        if (closest) {
-          options.language = closest.getAttribute('lang');
+      while (element && element.nodeType === 1) {
+        if (Dom.getAttributes(element).hasOwnProperty('lang')) {
+          break; // current element have 'lang' property
         }
-      } else {
-        let element = tag;
-
-        while (element && element.nodeType === 1) {
-          if (Dom.getAttributes(element).hasOwnProperty('lang')) {
-            options.language = element.getAttribute('lang');
-            break;
-          }
-          element = element.parentNode;
-        }
+        element = element.parentNode;
       }
+
+      options.language = element.getAttribute('lang');
+    }
+
+    if (!options.language && tag.closest instanceof Function && tag.closest('[lang]')) {
+      options.language = tag.closest('[lang]').getAttribute('lang');
     }
 
     // Run base component initializing with new options
