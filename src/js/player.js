@@ -290,22 +290,23 @@ class Player extends Component {
 
     // If language is not set, get the closest lang attribute
     if (!options.language) {
-      if (typeof tag.closest === 'function') {
-        const closest = tag.closest('[lang]');
 
-        if (closest) {
-          options.language = closest.getAttribute('lang');
-        }
-      } else {
+      if (typeof tag.closest === 'function' && tag.closest('[lang]')) {
+        options.language = tag.closest('[lang]').getAttribute('lang');
+      }
+
+      if (typeof tag.closest !== 'function') {
         let element = tag;
 
+        // find element have 'lang' property
         while (element && element.nodeType === 1) {
           if (Dom.getAttributes(element).hasOwnProperty('lang')) {
-            options.language = element.getAttribute('lang');
             break;
           }
           element = element.parentNode;
         }
+
+        options.language = element.getAttribute('lang');
       }
     }
 
