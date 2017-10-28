@@ -99,6 +99,11 @@ function videojs(id, options, ready) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
+  // Check if element is included in the DOM
+  if (Dom.isEl(tag) && !document.body.contains(tag)) {
+    log.warn('The element supplied is\'t included in the DOM');
+  }
+
   // Element may have a player attr referring to an already created player instance.
   // If so return that otherwise set up a new player below
   if (tag.player || Player.players[tag.playerId]) {
