@@ -292,9 +292,10 @@ class Player extends Component {
     if (options.language) {
       let element = tag;
 
+      // find element have 'lang' property
       while (element && element.nodeType === 1) {
         if (Dom.getAttributes(element).hasOwnProperty('lang')) {
-          break; // current element have 'lang' property
+          break;
         }
         element = element.parentNode;
       }
