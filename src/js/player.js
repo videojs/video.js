@@ -531,7 +531,7 @@ class Player extends Component {
       el = this.el_ = tag;
       tag = this.tag = document.createElement('video');
       while (el.children.length) {
-        tag.appendChild(child);
+        tag.appendChild(el.firstChild);
       }
 
       el.appendChild(tag);
