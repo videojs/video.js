@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import videojs from '../../src/js/video.js';
 import document from 'global/document';
+import sinon from 'sinon';
 import log from '../../src/js/utils/log.js';
 
 QUnit.module('video.js:hooks ', {
@@ -23,9 +24,7 @@ QUnit.test('should be able to add a hook', function(assert) {
   assert.equal(videojs.hooks_.bar.length, 2, 'should have 2 bar hooks');
   assert.equal(videojs.hooks_.foo.length, 1, 'should have 1 foo hook');
 
-  videojs.hook('foo', function() {});
-  videojs.hook('foo', function() {});
-  videojs.hook('foo', function() {});
+  videojs.hook('foo', [function() {}, function() {}, function() {}]);
   assert.equal(videojs.hooks_.foo.length, 4, 'should have 4 foo hooks');
   assert.equal(videojs.hooks_.bar.length, 2, 'should have 2 bar hooks');
 });
@@ -102,6 +101,26 @@ QUnit.test('should be get all hooks for a type and add at the same time', functi
   assert.deepEqual(videojs.hooks_.bar.length, 2, 'bar should have two noop hooks');
   assert.deepEqual(videojs.hooks_.foo, fooHooks, 'should return the exact foo list from videojs.hooks_');
   assert.deepEqual(videojs.hooks_.bar, barHooks, 'should return the exact bar list from videojs.hooks_');
+});
+
+QUnit.test('should be able to add a hook that runs once', function(assert) {
+  const spies = [
+    sinon.spy(),
+    sinon.spy(),
+    sinon.spy()
+  ];
+
+  videojs.hookOnce('foo', spies);
+
+  assert.equal(videojs.hooks_.foo.length, 3, 'should have 3 foo hooks');
+
+  videojs.hooks('foo').forEach(fn => fn());
+
+  spies.forEach((spy, i) => {
+    assert.ok(spy.calledOnce, `spy #${i + 1} was called`);
+  });
+
+  assert.equal(videojs.hooks_.foo.length, 0, 'should have 0 foo hooks');
 });
 
 QUnit.test('should trigger beforesetup and setup during videojs setup', function(assert) {

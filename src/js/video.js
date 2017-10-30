@@ -140,8 +140,8 @@ videojs.hooks_ = {};
  * @param {string} type
  *        the lifecyle to get hooks from
  *
- * @param {Function} [fn]
- *        Optionally add a hook to the lifecycle that your are getting.
+ * @param {Function|Function[]} [fn]
+ *        Optionally add a hook (or hooks) to the lifecycle that your are getting.
  *
  * @return {Array}
  *         an array of hooks, or an empty array if there are none.
@@ -165,6 +165,26 @@ videojs.hooks = function(type, fn) {
  */
 videojs.hook = function(type, fn) {
   videojs.hooks(type, fn);
+};
+
+/**
+ * Add a function hook that will only run once to a specific videojs lifecycle.
+ *
+ * @param {string} type
+ *        the lifecycle to hook the function to.
+ *
+ * @param {Function|Function[]}
+ *        The function or array of functions to attach.
+ */
+videojs.hookOnce = function(type, fn) {
+  videojs.hooks(type, [].concat(fn).map(original => {
+    const wrapper = (...args) => {
+      videojs.removeHook(type, wrapper);
+      original(...args);
+    };
+
+    return wrapper;
+  }));
 };
 
 /**
