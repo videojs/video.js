@@ -1239,9 +1239,7 @@ class Component {
     fn = Fn.bind(this, fn);
 
     const timeoutId = window.setTimeout(fn, timeout);
-    const disposeFn = function() {
-      this.clearTimeout(timeoutId);
-    };
+    const disposeFn = () => this.clearTimeout(timeoutId);
 
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
@@ -1302,9 +1300,7 @@ class Component {
 
     const intervalId = window.setInterval(fn, interval);
 
-    const disposeFn = function() {
-      this.clearInterval(intervalId);
-    };
+    const disposeFn = () => this.clearInterval(intervalId);
 
     disposeFn.guid = `vjs-interval-${intervalId}`;
 
