@@ -531,22 +531,7 @@ class Player extends Component {
       el = this.el_ = tag;
       tag = this.tag = document.createElement('video');
       while (el.children.length) {
-        const child = el.firstChild;
-
-        // use nodeName because it might not all be tags
-        if (child.nodeName.toLowerCase() === 'vjs-source') {
-          const srcEl = document.createElement('source');
-          const childAttrs = child.attributes;
-
-          for (let i = 0; i < childAttrs.length; i++) {
-            srcEl.setAttribute(childAttrs[i].name, childAttrs[i].value);
-            tag.appendChild(srcEl);
-          }
-
-          el.removeChild(child);
-        } else {
-          tag.appendChild(child);
-        }
+        tag.appendChild(child);
       }
 
       el.appendChild(tag);
