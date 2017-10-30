@@ -67,7 +67,7 @@ class TimeDisplay extends Component {
       return;
     }
 
-    if (this.textNode_ && this.contentEl_.contains(this.textNode_)) {
+    if (this.textNode_ && this.textNode_.parentNode === this.contentEl_) {
       this.contentEl_.removeChild(this.textNode_);
     }
     this.textNode_ = document.createTextNode(this.formattedTime_ || '0:00');
