@@ -37,6 +37,8 @@ Video.js supports all attributes of the `<video>` element (such as `controls`, `
 </video>
 ```
 
+For a high-level overview of all the various embed options, check out the [embeds page](/docs/guides/embeds.md), then follow the rest of this page.
+
 ### Automatic Setup
 
 By default, when your web page finishes loading, Video.js will scan for media elements that have the `data-setup` attribute. The `data-setup` attribute is used to pass options to Video.js. A minimal example looks like this:
