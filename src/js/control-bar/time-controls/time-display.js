@@ -106,7 +106,7 @@ class TimeDisplay extends Component {
     }
 
     this.formattedTime_ = formattedTime;
-    this.requestAnimationFrame(() => this.updateTextNode_());
+    this.requestAnimationFrame(this.updateTextNode_);
   }
 
   /**
