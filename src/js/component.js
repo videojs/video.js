@@ -1239,7 +1239,9 @@ class Component {
     fn = Fn.bind(this, fn);
 
     const timeoutId = window.setTimeout(fn, timeout);
-    const disposeFn = () => this.clearTimeout(timeoutId);
+    const disposeFn = function() {
+      this.clearTimeout(timeoutId);
+    };
 
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
