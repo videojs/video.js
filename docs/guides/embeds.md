@@ -76,7 +76,9 @@ const player = videojs('vid1', {});
 Native Custom Elements support is relativly small according to [Can I Use](http://caniuse.com/#feat=custom-elementsv1) and because we didn't want to include a polyfill we're going with just an element called `video-js` rather than a full blown custom element.
 
 #### Browser support
-This embed does not currently support older browsers like IE8 and IE9 due to intricascies with those browsers.
+These all work in all browsers that Video.js supports, though, there are some caveats for some older browsers.
+- IE8 requires running `document.createElement('video-js')` before using the `video-js` embed code.
+- IE9 doesn't support having `source` elements outside of the `video` element, thus, the `video-js` embed will not work there. Though, if the source is set later, it should still work.
 
 ## data-setup
 This is an ease-of-use method for having Video.js set up the player automatically. It is an html attribute and it takes a JSON string representation of the [player options](/docs/guides/options.md) as the value.
