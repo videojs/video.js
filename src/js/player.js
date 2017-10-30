@@ -3240,7 +3240,7 @@ class Player extends Component {
         // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
         const childName = child.nodeName.toLowerCase();
 
-        if (childName === 'source' || childName === 'vjs-source') {
+        if (childName === 'source') {
           baseOptions.sources.push(Dom.getAttributes(child));
         } else if (childName === 'track') {
           baseOptions.tracks.push(Dom.getAttributes(child));
