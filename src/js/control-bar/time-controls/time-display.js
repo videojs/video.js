@@ -67,6 +67,7 @@ class TimeDisplay extends Component {
       return;
     }
 
+    // ie8/9 don't support `el.contains` inside of setTimeout call.
     if (this.textNode_ && this.textNode_.parentNode === this.contentEl_) {
       this.contentEl_.removeChild(this.textNode_);
     }
