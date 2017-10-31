@@ -179,6 +179,28 @@ class SeekBar extends Slider {
     this.player_.currentTime(newTime);
   }
 
+  enable() {
+    super.enable();
+    const mouseTimeDisplay = this.getChild('mouseTimeDisplay');
+
+    if (!mouseTimeDisplay) {
+      return;
+    }
+
+    mouseTimeDisplay.show();
+  }
+
+  disable() {
+    super.disable();
+    const mouseTimeDisplay = this.getChild('mouseTimeDisplay');
+
+    if (!mouseTimeDisplay) {
+      return;
+    }
+
+    mouseTimeDisplay.hide();
+  }
+
   /**
    * Handle mouse up on seek bar
    *

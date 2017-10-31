@@ -31,17 +31,72 @@ class Slider extends Component {
     // Set a horizontal or vertical class on the slider depending on the slider type
     this.vertical(!!this.options_.vertical);
 
+    this.enable();
+  }
+
+  /**
+   * Are controls are currently enabled for this slider or not.
+   *
+   * @return {boolean}
+   *         true if controls are enabled, false otherwise
+   */
+  enabled() {
+    return this.enabled_;
+  }
+
+  /**
+   * Enable controls for this slider if they are disabled
+   */
+  enable() {
+    if (this.enabled()) {
+      return;
+    }
+
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
     this.on('focus', this.handleFocus);
     this.on('blur', this.handleBlur);
     this.on('click', this.handleClick);
 
-    this.on(player, 'controlsvisible', this.update);
+    this.on(this.player_, 'controlsvisible', this.update);
 
     if (this.playerEvent) {
-      this.on(player, this.playerEvent, this.update);
+      this.on(this.player_, this.playerEvent, this.update);
     }
+
+    this.removeClass('disabled');
+    this.setAttribute('tabindex', 0);
+
+    this.enabled_ = true;
+  }
+
+  /**
+   * Disable controls for this slider if they are enabled
+   */
+  disable() {
+    if (!this.enabled()) {
+      return;
+    }
+    const doc = this.bar.el_.ownerDocument;
+
+    this.off('mousedown', this.handleMouseDown);
+    this.off('touchstart', this.handleMouseDown);
+    this.off('focus', this.handleFocus);
+    this.off('blur', this.handleBlur);
+    this.off('click', this.handleClick);
+    this.off(this.player_, 'controlsvisible', this.update);
+    this.off(doc, 'mousemove', this.handleMouseMove);
+    this.off(doc, 'mouseup', this.handleMouseUp);
+    this.off(doc, 'touchmove', this.handleMouseMove);
+    this.off(doc, 'touchend', this.handleMouseUp);
+    this.removeAttribute('tabindex');
+
+    this.addClass('disabled');
+
+    if (this.playerEvent) {
+      this.off(this.player_, this.playerEvent, this.update);
+    }
+    this.enabled_ = false;
   }
 
   /**
