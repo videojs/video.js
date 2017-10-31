@@ -67,10 +67,10 @@ class TimeDisplay extends Component {
       return;
     }
 
-    // ie8/9 don't support `el.contains` inside of setTimeout call.
-    if (this.textNode_ && this.textNode_.parentNode === this.contentEl_) {
-      this.contentEl_.removeChild(this.textNode_);
+    while (this.contentEl_.firstChild) {
+      this.contentEl_.removeChild(this.contentEl_.firstChild);
     }
+
     this.textNode_ = document.createTextNode(this.formattedTime_ || '0:00');
     this.contentEl_.appendChild(this.textNode_);
   }
