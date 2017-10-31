@@ -328,7 +328,7 @@ QUnit.test('open() hides controls, close() does not show controls if previously 
   assert.notOk(this.player.controls_, 'controls are hidden');
 
   this.modal.close();
-  assert.ok(this.player.controls_, 'controls are no longer hidden');
+  assert.notOk(this.player.controls_, 'controls are still hidden');
 });
 
 QUnit.test('opened()', function(assert) {
