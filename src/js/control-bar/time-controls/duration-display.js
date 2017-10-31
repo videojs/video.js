@@ -23,14 +23,15 @@ class DurationDisplay extends TimeDisplay {
   constructor(player, options) {
     super(player, options);
 
-    this.on(player, [
-      'durationchange',
+    // we do not want to/need to throttle duration changes,
+    // as they should always display the changed duration as
+    // it has changed
+    this.on(player, 'durationchange', this.updateContent);
 
-      // Also listen for timeupdate (in the parent) and loadedmetadata because removing those
-      // listeners could have broken dependent applications/libraries. These
-      // can likely be removed for 7.0.
-      'loadedmetadata'
-    ], this.throttledUpdateContent);
+    // Also listen for timeupdate (in the parent) and loadedmetadata because removing those
+    // listeners could have broken dependent applications/libraries. These
+    // can likely be removed for 7.0.
+    this.on(player, 'loadedmetadata', this.throttledUpdateContent);
   }
 
   /**
