@@ -660,12 +660,14 @@ class Player extends Component {
       return;
     }
 
-    if (isNaN(parseFloat(value))) {
+    const parsedVal = parseFloat(value);
+
+    if (isNaN(parsedVal)) {
       log.error(`Improper value "${value}" supplied for for ${dimension}`);
       return;
     }
 
-    this[privDimension] = parseFloat(value);
+    this[privDimension] = parsedVal;
     this.updateStyleEl_();
   }
 
