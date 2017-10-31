@@ -1587,34 +1587,38 @@ class Player extends Component {
    * @private
    */
   techGet_(method) {
-    if (this.tech_ && this.tech_.isReady_) {
-
-      if (method in middleware.allowedGetters) {
-        return middleware.get(this.middleware_, this.tech_, method);
-      }
-
-      // Flash likes to die and reload when you hide or reposition it.
-      // In these cases the object methods go away and we get errors.
-      // When that happens we'll catch the errors and inform tech that it's not ready any more.
-      try {
-        return this.tech_[method]();
-      } catch (e) {
-        // When building additional tech libs, an expected method may not be defined yet
-        if (this.tech_[method] === undefined) {
-          log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
-
-        // When a method isn't available on the object it throws a TypeError
-        } else if (e.name === 'TypeError') {
-          log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
-          this.tech_.isReady_ = false;
-        } else {
-          log(e);
-        }
-        throw e;
-      }
+    if (!this.tech_ || !this.tech_.isReady_) {
+      return;
     }
 
-    return;
+    if (method in middleware.allowedGetters) {
+      return middleware.get(this.middleware_, this.tech_, method);
+    }
+
+    // Flash likes to die and reload when you hide or reposition it.
+    // In these cases the object methods go away and we get errors.
+    // When that happens we'll catch the errors and inform tech that it's not ready any more.
+    try {
+      return this.tech_[method]();
+    } catch (e) {
+
+      // When building additional tech libs, an expected method may not be defined yet
+      if (this.tech_[method] === undefined) {
+        log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
+        throw e;
+      }
+
+      // When a method isn't available on the object it throws a TypeError
+      if (e.name === 'TypeError') {
+        log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
+        this.tech_.isReady_ = false;
+        throw e;
+      }
+
+      // If error unknown, just log and throw
+      log(e);
+      throw e;
+    }
   }
 
   /**
