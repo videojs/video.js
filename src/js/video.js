@@ -101,7 +101,7 @@ function videojs(id, options, ready) {
 
   // Check if element is included in the DOM
   if (Dom.isEl(tag) && !document.body.contains(tag)) {
-    log.warn('The element supplied is\'t included in the DOM');
+    log.warn('The element supplied is not included in the DOM');
   }
 
   // Element may have a player attr referring to an already created player instance.
