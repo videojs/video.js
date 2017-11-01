@@ -659,17 +659,18 @@ class Player extends Component {
     if (value === '') {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
-    } else {
-      const parsedVal = parseFloat(value);
-
-      if (isNaN(parsedVal)) {
-        log.error(`Improper value "${value}" supplied for for ${dimension}`);
-        return;
-      }
-
-      this[privDimension] = parsedVal;
+      this.updateStyleEl_();
+      return;
     }
 
+    const parsedVal = parseFloat(value);
+
+    if (isNaN(parsedVal)) {
+      log.error(`Improper value "${value}" supplied for for ${dimension}`);
+      return;
+    }
+
+    this[privDimension] = parsedVal;
     this.updateStyleEl_();
   }
 
