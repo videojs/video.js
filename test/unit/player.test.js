@@ -193,6 +193,7 @@ QUnit.test('should get current source from src set', function(assert) {
 
   // check for matching undefined src
   assert.deepEqual(player.currentSource(), {});
+  assert.equal(player.src(), '');
 
   player.src('http://google.com');
 
