@@ -1,3 +1,51 @@
+<a name="6.4.0"></a>
+# [6.4.0](https://github.com/videojs/video.js/compare/v6.3.3...v6.4.0) (2017-11-01)
+
+### Features
+
+* **lang:** add Hebrew translation ([#4675](https://github.com/videojs/video.js/issues/4675)) ([32caf35](https://github.com/videojs/video.js/commit/32caf35))
+* **lang:** Update for Russian translation ([#4663](https://github.com/videojs/video.js/issues/4663)) ([45e21fd](https://github.com/videojs/video.js/commit/45e21fd))
+* Add videojs.hookOnce method to allow single-run hooks. ([#4672](https://github.com/videojs/video.js/issues/4672)) ([85fe685](https://github.com/videojs/video.js/commit/85fe685))
+* add warning if the element given to Video.js is not in the DOM ([#4698](https://github.com/videojs/video.js/issues/4698)) ([6f713ca](https://github.com/videojs/video.js/commit/6f713ca))
+* allow progress controls to be disabled ([#4649](https://github.com/videojs/video.js/issues/4649)) ([a3c254e](https://github.com/videojs/video.js/commit/a3c254e))
+* set the play progress seek bar to 100% on ended ([#4648](https://github.com/videojs/video.js/issues/4648)) ([5e9655f](https://github.com/videojs/video.js/commit/5e9655f))
+
+### Bug Fixes
+
+* **css:** update user-select none ([#4678](https://github.com/videojs/video.js/issues/4678)) ([43ddc72](https://github.com/videojs/video.js/commit/43ddc72))
+* aria-labelledby attribute has an extra space ([#4708](https://github.com/videojs/video.js/issues/4708)) ([855adf3](https://github.com/videojs/video.js/commit/855adf3)), closes [#4688](https://github.com/videojs/video.js/issues/4688)
+* Don't enable player controls if they where disabled when ModalDialog closes. ([#4690](https://github.com/videojs/video.js/issues/4690)) ([afea980](https://github.com/videojs/video.js/commit/afea980))
+* don't throttle duration change updates ([#4635](https://github.com/videojs/video.js/issues/4635)) ([9cf9800](https://github.com/videojs/video.js/commit/9cf9800))
+* Events#off threw if Object.prototype had extra enumerable properties, don't remove all events if off receives a falsey value ([#4669](https://github.com/videojs/video.js/issues/4669)) ([7963913](https://github.com/videojs/video.js/commit/7963913))
+* make parseUrl helper always have a protocl ([#4673](https://github.com/videojs/video.js/issues/4673)) ([bebca9c](https://github.com/videojs/video.js/commit/bebca9c)), closes [#3100](https://github.com/videojs/video.js/issues/3100)
+* Make sure we remove vjs-ended from the play toggle in all appropriate cases. ([#4661](https://github.com/videojs/video.js/issues/4661)) ([0287f6e](https://github.com/videojs/video.js/commit/0287f6e))
+* player.src() should return empty string if no source is set ([#4711](https://github.com/videojs/video.js/issues/4711)) ([9acbcd8](https://github.com/videojs/video.js/commit/9acbcd8))
+
+### Chores
+
+* **gh-release:** no console log on success ([#4657](https://github.com/videojs/video.js/issues/4657)) ([e8511a5](https://github.com/videojs/video.js/commit/e8511a5))
+* **lang:** Update Polish ([#4686](https://github.com/videojs/video.js/issues/4686)) ([ee2a49c](https://github.com/videojs/video.js/commit/ee2a49c))
+* **package:** update babelify to version 8.0.0 ([#4684](https://github.com/videojs/video.js/issues/4684)) ([db2f14c](https://github.com/videojs/video.js/commit/db2f14c))
+* add comment about avoiding helvetica font ([#4679](https://github.com/videojs/video.js/issues/4679)) ([cb638d0](https://github.com/videojs/video.js/commit/cb638d0))
+* add GA note to primary readme ([#4481](https://github.com/videojs/video.js/issues/4481)) ([e2af322](https://github.com/videojs/video.js/commit/e2af322))
+* Add package-lock.json file. ([#4641](https://github.com/videojs/video.js/issues/4641)) ([ec5b603](https://github.com/videojs/video.js/commit/ec5b603))
+
+### Code Refactoring
+
+* component.ready() ([#4693](https://github.com/videojs/video.js/issues/4693)) ([b40858b](https://github.com/videojs/video.js/commit/b40858b))
+* player.dimension() ([#4704](https://github.com/videojs/video.js/issues/4704)) ([ad1b47b](https://github.com/videojs/video.js/commit/ad1b47b))
+* player.hasStarted() ([#4680](https://github.com/videojs/video.js/issues/4680)) ([cde8335](https://github.com/videojs/video.js/commit/cde8335))
+* player.techGet_() ([#4687](https://github.com/videojs/video.js/issues/4687)) ([a1748aa](https://github.com/videojs/video.js/commit/a1748aa))
+
+### Documentation
+
+* **lang:** update translations needed doc ([#4702](https://github.com/videojs/video.js/issues/4702)) ([93e7670](https://github.com/videojs/video.js/commit/93e7670))
+
+### Tests
+
+* fix modal dialog test for showing controls ([#4707](https://github.com/videojs/video.js/issues/4707)) ([45a6b30](https://github.com/videojs/video.js/commit/45a6b30)), closes [#4706](https://github.com/videojs/video.js/issues/4706)
+* get rid of redundant test logging ([#4682](https://github.com/videojs/video.js/issues/4682)) ([983a573](https://github.com/videojs/video.js/commit/983a573))
+
 <a name="6.3.3"></a>
 ## [6.3.3](https://github.com/videojs/video.js/compare/v6.3.2...v6.3.3) (2017-10-10)
 
