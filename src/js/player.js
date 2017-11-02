@@ -1639,22 +1639,24 @@ class Player extends Component {
           retval.then(null, (e) => {});
         }
       });
+      return;
+    }
 
     // Only calls the tech's play if we already have a src loaded
-    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
+    if (this.isReady_ && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
-    } else {
-      this.ready(function() {
-        this.tech_.one('loadstart', function() {
-          const retval = this.play();
-
-          // silence errors (unhandled promise from play)
-          if (retval !== undefined && typeof retval.then === 'function') {
-            retval.then(null, (e) => {});
-          }
-        });
-      });
     }
+
+    this.ready(function() {
+      this.tech_.one('loadstart', function() {
+        const retval = this.play();
+
+        // silence errors (unhandled promise from play)
+        if (retval !== undefined && typeof retval.then === 'function') {
+          retval.then(null, (e) => {});
+        }
+      });
+    });
   }
 
   /**
