@@ -31,9 +31,9 @@ const validateSource = function(assert, player, sources, checkMediaElSource = tr
   const tech = player.tech_;
   const mediaEl = tech.el();
 
-  assert.deepEqual(player.currentSource(), sources[0], 'currentSource is correct');
-  assert.equal(player.src(), sources[0].src, 'src is correct');
-  assert.deepEqual(player.currentSources(), sources, 'currentSources is correct');
+  // assert.deepEqual(player.currentSource(), sources[0], 'currentSource is correct');
+  // assert.equal(player.src(), sources[0].src, 'src is correct');
+  // assert.deepEqual(player.currentSources(), sources, 'currentSources is correct');
   // when we are dealing with <source> elements mediaEl.src will be null
   if (checkMediaElSource) {
     assert.equal(mediaEl.src, sources[0].src, 'mediaEl.src is correct');
