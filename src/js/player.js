@@ -1546,27 +1546,27 @@ class Player extends Component {
   }
 
   /**
-   * Pass values to the playback tech
+   * Call a method on the playback tech with an optional argument.
    *
-   * @param {string} [method]
-   *        the method to call
+   * Waits for the tech to be ready before executing the call.
    *
-   * @param {Object} arg
-   *        the argument to pass
+   * @param  {string} method
+   *         The name of the method to call on the tech.
+   *
+   * @param  {Object} [arg]
+   *         An argument to pass to the tech.
    *
    * @private
    */
   techCall_(method, arg) {
-    // If it's not ready yet, call method when it is
-
-    this.ready(function() {
+    this.tech_.ready(() => {
       if (method in middleware.allowedSetters) {
         return middleware.set(this.middleware_, this.tech_, method, arg);
       }
 
       try {
         if (this.tech_) {
-          this.tech_[method](arg);
+          return this.tech_[method](arg);
         }
       } catch (e) {
         log(e);
@@ -1576,13 +1576,14 @@ class Player extends Component {
   }
 
   /**
-   * Get calls can't wait for the tech, and sometimes don't need to.
+   * Get the return value for a method call on the playback tech.
    *
-   * @param {string} method
-   *        Tech method
+   * @param  {string} method
+   *         The name of the method to call on the tech.
    *
-   * @return {Function|undefined}
-   *         the method or undefined
+   * @return {Mixed|undefined}
+   *         The return value of the method that was called or undefined if
+   *         there is no tech or the tech is not ready.
    *
    * @private
    */
@@ -1631,20 +1632,25 @@ class Player extends Component {
    */
   play() {
 
-    // If the player is not ready, queue up a call to the tech's `play()`
-    // method for when it _is_ ready.
+    // If either the player or tech are not ready, queue up a call to the
+    // tech's `play()` method for when it _is_ ready.
     if (!this.isReady_) {
       this.ready(() => {
         silencePromise(this.techGet_('play'));
       });
 
-    // If the player is ready and there is a source, call the tech's `play()`
-    // method.
+    } else if (!this.tech_.isReady_) {
+      this.tech_.ready(() => {
+        silencePromise(this.techGet_('play'));
+      });
+
+    // If the player/tech are ready and there is a source, call the tech's
+    // `play()` method.
     } else if (this.src() || this.currentSrc()) {
       return this.techGet_('play');
 
-    // Finally, if the player is ready, but we don't have a source, wait for
-    // one to be set.
+    // Finally, if the player/tech are ready, but we don't have a source, wait
+    // for one to be set.
     } else {
       this.ready(() => {
         this.tech_.one('loadstart', () => {
@@ -2324,10 +2330,10 @@ class Player extends Component {
       this.middleware_ = mws;
 
       // Attempt to set the source on a tech.
-      const foundTech = this.src_(middlewareSource);
+      const didNotFindTech = this.src_(middlewareSource);
 
       // We could not find a compatible tech.
-      if (foundTech) {
+      if (didNotFindTech) {
 
         // If no compatible tech was found and there are still sources we have
         // not tried, start the process over (including middleware) with the
@@ -2344,15 +2350,19 @@ class Player extends Component {
         return;
       }
 
-      // At this point, we've found a compatible tech for the middleware source,
-      // so we can tell any subscribers that the player is ready again.
-      this.triggerReady();
-
-      // Cache the source URL.
-      this.cache_.src = middlewareSource.src;
-
-      // Notify middlewares of a new tech.
+      // Notify middlewares of a potentially new tech.
       middleware.setTech(mws, this.tech_);
+
+      this.tech_.ready(() => {
+
+        // Cache the source URL.
+        this.cache_.src = middlewareSource.src;
+
+        // At this point, we've found a compatible tech and source and set the
+        // source both on the tech and in the internal cache. It's safe to tell
+        // any subscribers that the player is ready again.
+        this.triggerReady();
+      });
     });
   }
 

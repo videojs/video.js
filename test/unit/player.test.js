@@ -1073,7 +1073,7 @@ if (window.Promise) {
       type: 'video/mp4'
     });
 
-    this.clock.tick(1);
+    this.clock.tick(2);
 
     player.tech_.play = () => window.Promise.resolve('foo');
     const p = player.play();
@@ -1097,7 +1097,7 @@ QUnit.test('play promise should resolve to native value if returned', function(a
     type: 'video/mp4'
   });
 
-  this.clock.tick(1);
+  this.clock.tick(2);
 
   player.tech_.play = () => 'foo';
   const p = player.play();
@@ -1654,7 +1654,7 @@ QUnit.test('subsequent calls to src() will put the player in a non-ready state, 
   assert.equal(onReadySpy.callCount, 1, 'did not see a "ready" because middleware queues up another async operation');
   assert.equal(readySpy.callCount, 1, 'did not see a ready() callback because middleware queues up another async operation');
 
-  this.clock.tick(1);
+  this.clock.tick(2);
 
   assert.equal(onReadySpy.callCount, 2, 'saw second "ready" because source setting and tech selection are complete');
   assert.equal(readySpy.callCount, 2, 'saw second ready() callback because source setting and tech selection are complete');
@@ -1674,7 +1674,7 @@ QUnit.test('subsequent calls to src() will put the player in a non-ready state, 
   assert.equal(onReadySpy.callCount, 2, 'did not see a "ready" because middleware queues up another async operation');
   assert.equal(readySpy.callCount, 2, 'did not see a ready() callback because middleware queues up another async operation');
 
-  this.clock.tick(1);
+  this.clock.tick(2);
 
   assert.equal(onReadySpy.callCount, 3, 'saw third "ready" because source setting and tech selection are complete');
   assert.equal(readySpy.callCount, 3, 'saw third ready() callback because source setting and tech selection are complete');
