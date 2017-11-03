@@ -318,6 +318,9 @@ class Player extends Component {
     // Init state hasStarted_
     this.hasStarted_ = false;
 
+    // Init state userActive_
+    this.userActive_ = false;
+
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -2774,53 +2777,41 @@ class Player extends Component {
    *         The current value of userActive when getting
    */
   userActive(bool) {
-    if (bool !== undefined) {
-      bool = !!bool;
-      if (bool !== this.userActive_) {
-        this.userActive_ = bool;
-        if (bool) {
-          // If the user was inactive and is now active we want to reset the
-          // inactivity timer
-          this.userActivity_ = true;
-          this.removeClass('vjs-user-inactive');
-          this.addClass('vjs-user-active');
-          /**
-           * @event Player#useractive
-           * @type {EventTarget~Event}
-           */
-          this.trigger('useractive');
-        } else {
-          // We're switching the state to inactive manually, so erase any other
-          // activity
-          this.userActivity_ = false;
+    if (bool === undefined) {
+      return this.userActive_;
+    }
 
-          // Chrome/Safari/IE have bugs where when you change the cursor it can
-          // trigger a mousemove event. This causes an issue when you're hiding
-          // the cursor when the user is inactive, and a mousemove signals user
-          // activity. Making it impossible to go into inactive mode. Specifically
-          // this happens in fullscreen when we really need to hide the cursor.
-          //
-          // When this gets resolved in ALL browsers it can be removed
-          // https://code.google.com/p/chromium/issues/detail?id=103041
-          if (this.tech_) {
-            this.tech_.one('mousemove', function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-            });
-          }
-
-          this.removeClass('vjs-user-active');
-          this.addClass('vjs-user-inactive');
-          /**
-           * @event Player#userinactive
-           * @type {EventTarget~Event}
-           */
-          this.trigger('userinactive');
-        }
-      }
+    if (bool === this.userActive_) {
       return;
     }
-    return this.userActive_;
+
+    this.userActive_ = bool;
+    
+    if (this.userActive_) {
+      this.removeClass('vjs-user-inactive');
+      this.addClass('vjs-user-active');
+      this.trigger('useractive');
+      return;
+    }
+
+    // Chrome/Safari/IE have bugs where when you change the cursor it can
+    // trigger a mousemove event. This causes an issue when you're hiding
+    // the cursor when the user is inactive, and a mousemove signals user
+    // activity. Making it impossible to go into inactive mode. Specifically
+    // this happens in fullscreen when we really need to hide the cursor.
+    //
+    // When this gets resolved in ALL browsers it can be removed
+    // https://code.google.com/p/chromium/issues/detail?id=103041
+    if (this.tech_) {
+      this.tech_.one('mousemove', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    }
+
+    this.removeClass('vjs-user-active');
+    this.addClass('vjs-user-inactive');
+    this.trigger('userinactive');
   }
 
   /**
