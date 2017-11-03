@@ -2786,8 +2786,9 @@ class Player extends Component {
     }
 
     this.userActive_ = bool;
-    
+
     if (this.userActive_) {
+      this.userActivity_ = true;
       this.removeClass('vjs-user-inactive');
       this.addClass('vjs-user-active');
       this.trigger('useractive');
@@ -2809,6 +2810,7 @@ class Player extends Component {
       });
     }
 
+    this.userActivity_ = false;
     this.removeClass('vjs-user-active');
     this.addClass('vjs-user-inactive');
     this.trigger('userinactive');
