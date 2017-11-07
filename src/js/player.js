@@ -2896,9 +2896,7 @@ class Player extends Component {
 
       const timeout = this.options_.inactivityTimeout;
 
-      // Min time for setTimeout is 4ms regardless any less number
-      // https://www.w3.org/TR/2011/WD-html5-20110525/timers.html#timers
-      if (timeout <= 4) {
+      if (timeout <= 0) {
         return;
       }
 
