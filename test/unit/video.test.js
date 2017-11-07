@@ -53,6 +53,38 @@ QUnit.test('should return a video player instance', function(assert) {
   player2.dispose();
 });
 
+QUnit.test('should log if the supplied element is not included in the DOM',
+function(assert) {
+  const origWarnLog = log.warn;
+  const fixture = document.getElementById('qunit-fixture');
+  const warnLogs = [];
+
+  log.warn = (args) => {
+    warnLogs.push(args);
+  };
+
+  const vid = document.createElement('video');
+
+  fixture.appendChild(vid);
+  const player = videojs(vid);
+
+  assert.ok(player, 'created player from tag');
+  assert.equal(warnLogs.length, 0, 'no warn logs');
+
+  const vid2 = document.createElement('video');
+  const player2 = videojs(vid2);
+
+  assert.ok(player2, 'created player from tag');
+  assert.equal(warnLogs.length, 1, 'logged a warning');
+  assert.equal(warnLogs[0],
+               'The element supplied is not included in the DOM',
+               'logged the right message');
+
+  log.warn = origWarnLog;
+  player.dispose();
+  player2.dispose();
+});
+
 QUnit.test('should log about already initalized players if options already passed',
 function(assert) {
   const origWarnLog = log.warn;
