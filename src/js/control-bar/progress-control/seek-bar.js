@@ -57,7 +57,7 @@ class SeekBar extends Slider {
       }, UPDATE_REFRESH_INTERVAL);
     });
 
-    this.on(player, ['ended', 'pause', 'waiting', 'stalled'], () => {
+    this.on(player, ['ended', 'pause', 'waiting'], () => {
       this.clearInterval(this.updateInterval);
     });
 
