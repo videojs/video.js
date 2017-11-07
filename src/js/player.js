@@ -2781,6 +2781,8 @@ class Player extends Component {
       return this.userActive_;
     }
 
+    bool = !!bool;
+
     if (bool === this.userActive_) {
       return;
     }
