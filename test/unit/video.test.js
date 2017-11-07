@@ -72,7 +72,6 @@ function(assert) {
   assert.equal(warnLogs.length, 0, 'no warn logs');
 
   const vid2 = document.createElement('video');
-
   const player2 = videojs(vid2);
 
   assert.ok(player2, 'created player from tag');
@@ -82,7 +81,6 @@ function(assert) {
                'logged the right message');
 
   log.warn = origWarnLog;
-
   player.dispose();
   player2.dispose();
 });
