@@ -534,8 +534,8 @@ class Player extends Component {
         tag.appendChild(el.firstChild);
       }
 
-      if (el.className.indexOf('video-js') === -1) {
-        el.className += ' video-js';
+      if (!Dom.hasClass(el, 'video-js')) {
+        Dom.addClass(el, 'video-js');
       }
 
       el.appendChild(tag);
