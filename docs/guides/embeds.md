@@ -59,18 +59,20 @@ This is useful for all the things that the player div ingest is useful for and i
 
 ```html
 <!-- via data-setup -->
-<video-js id="vid1" class="video-js" data-setup='{}'>
+<video-js id="vid1" data-setup='{}'>
   <source src="//vjs.zencdn.net/v/oceans.mp4">
 </video-js>
 
 <!-- via code -->
-<video-js id="vid1" class="video-js">
+<video-js id="vid1">
   <source src="//vjs.zencdn.net/v/oceans.mp4">
 </video-js>
 ```
 ```js
 const player = videojs('vid1', {});
 ```
+
+Adding `class="video-js"` with this embed is no longer necessary as it will automatically add the class `video-js` if missing.
 
 #### Custom Elements
 Native Custom Elements support is relativly small according to [Can I Use](http://caniuse.com/#feat=custom-elementsv1) and because we didn't want to include a polyfill we're going with just an element called `video-js` rather than a full blown custom element.

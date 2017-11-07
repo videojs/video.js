@@ -498,3 +498,21 @@ QUnit.test('should return a video player instance from el techfaker', function(a
   player.dispose();
   player2.dispose();
 });
+
+QUnit.test('adds video-js class name with the video-js embed', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>' +
+                       '<video-js class="video-js" id="test_vid_id2"></video-js>';
+
+  const vid = document.querySelector('#test_vid_id');
+  const player = videojs(vid, {techOrder: ['techFaker']});
+  const tag2 = document.getElementById('test_vid_id2');
+  const player2 = videojs(tag2, { techOrder: ['techFaker'] });
+
+  assert.ok(player.hasClass('video-js'), 'video-js class was added to the first embed');
+  assert.ok(player2.hasClass('video-js'), 'video-js class was preserved to the second embed');
+
+  player.dispose();
+  player2.dispose();
+});
