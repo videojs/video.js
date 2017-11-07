@@ -1,9 +1,9 @@
 # How to Embed the Video.js player
 
-Video.js is meant to be an ehnacement to the video element in HTML5 so for years, it's embed code has been just a `<video>` element.
+Video.js is meant to be an enhacement to the video element in HTML5 so for years, its embed code has been just a `<video>` element.
 Video.js then wraps the video element in a div that is used for us to place controls and anything else that's required for the player.
 
-For a long time this was enough. In 2016, a "div ingest" which allows the developer to give Video.js a player div to use instead of making it's own.
+For a long time this was enough. In 2016, "div ingest" was added, it allows the developer to give Video.js a player div to use instead of making it's own.
 This is partly to help with content reflow but also to help with iOS where you sometimes need to prime the video element and we re-create the video element when we create the player div.
 However, this is kind of weird to have a `<video>` element embed with a `<div>` wrapped around it. So, we built out a new embed, a `<video-js>` embed.
 
@@ -81,5 +81,5 @@ These all work in all browsers that Video.js supports, though, there are some ca
 - IE9 doesn't support having `source` elements outside of the `video` element, thus, the `video-js` embed will not work there. Though, if the source is set later, it should still work.
 
 ## data-setup
-This is an ease-of-use method for having Video.js set up the player automatically. It is an html attribute and it takes a JSON string representation of the [player options](/docs/guides/options.md) as the value.
+This is an ease-of-use method for having Video.js set up the player automatically. It is an HTML attribute and it takes a JSON string representation of the [player options](/docs/guides/options.md) as the value.
 Using the programmatic approach is probably preferable.
