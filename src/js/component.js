@@ -590,12 +590,20 @@ class Component {
   }
 
   /**
-   * Bind a listener to the component's ready state.
-   * Different from event listeners in that if the ready event has already happened
-   * it will trigger the function immediately.
+   * Queue a callback to the component's next ready state update.
    *
-   * @return {Component}
-   *         Returns itself; method can be chained.
+   * This is different from an event listener in two ways. First, if the
+   * component is already ready, it will call the callback asynchronously (or
+   * synchronously if the second argument is `true`). Second, it will only
+   * call the callback once; so, it's similar to binding an event listener via
+   * the `one` method.
+   *
+   * @param  {Function} fn
+   *         A callback to call.
+   *
+   * @param  {boolean} [sync=false]
+   *         Pass `true` to execute the callback synchronously if the component
+   *         is ready. Otherwise, calls it asynchronously.
    */
   ready(fn, sync = false) {
     if (!fn) {

@@ -24,6 +24,7 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
+import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
@@ -459,8 +460,6 @@ class Player extends Component {
 
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
-
-    this.changingSrc_ = false;
   }
 
   /**
@@ -1547,27 +1546,27 @@ class Player extends Component {
   }
 
   /**
-   * Pass values to the playback tech
+   * Call a method on the playback tech with an optional argument.
    *
-   * @param {string} [method]
-   *        the method to call
+   * Waits for the tech to be ready before executing the call.
    *
-   * @param {Object} arg
-   *        the argument to pass
+   * @param  {string} method
+   *         The name of the method to call on the tech.
+   *
+   * @param  {Object} [arg]
+   *         An argument to pass to the tech.
    *
    * @private
    */
   techCall_(method, arg) {
-    // If it's not ready yet, call method when it is
-
-    this.ready(function() {
+    this.tech_.ready(() => {
       if (method in middleware.allowedSetters) {
         return middleware.set(this.middleware_, this.tech_, method, arg);
       }
 
       try {
         if (this.tech_) {
-          this.tech_[method](arg);
+          return this.tech_[method](arg);
         }
       } catch (e) {
         log(e);
@@ -1577,13 +1576,14 @@ class Player extends Component {
   }
 
   /**
-   * Get calls can't wait for the tech, and sometimes don't need to.
+   * Get the return value for a method call on the playback tech.
    *
-   * @param {string} method
-   *        Tech method
+   * @param  {string} method
+   *         The name of the method to call on the tech.
    *
-   * @return {Function|undefined}
-   *         the method or undefined
+   * @return {Mixed|undefined}
+   *         The return value of the method that was called or undefined if
+   *         there is no tech or the tech is not ready.
    *
    * @private
    */
@@ -1623,35 +1623,38 @@ class Player extends Component {
   }
 
   /**
-   * start media playback
+   * Begin playback.
    *
    * @return {Promise|undefined}
-   *         Returns a `Promise` if the browser returns one, for most browsers this will
-   *         return undefined.
+   *         Returns a `Promise` only if the browser returns one and the player
+   *         is ready to begin playback. For most browsers and non-ready
+   *         situations, this will return undefined.
    */
   play() {
-    if (this.changingSrc_) {
-      this.ready(function() {
-        const retval = this.techGet_('play');
 
-        // silence errors (unhandled promise from play)
-        if (retval !== undefined && typeof retval.then === 'function') {
-          retval.then(null, (e) => {});
-        }
+    // If either the player or tech are not ready, queue up a call to the
+    // tech's `play()` method for when it _is_ ready.
+    if (!this.isReady_) {
+      this.ready(() => {
+        silencePromise(this.techGet_('play'));
       });
 
-    // Only calls the tech's play if we already have a src loaded
-    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
-      return this.techGet_('play');
-    } else {
-      this.ready(function() {
-        this.tech_.one('loadstart', function() {
-          const retval = this.play();
+    } else if (!this.tech_.isReady_) {
+      this.tech_.ready(() => {
+        silencePromise(this.techGet_('play'));
+      });
 
-          // silence errors (unhandled promise from play)
-          if (retval !== undefined && typeof retval.then === 'function') {
-            retval.then(null, (e) => {});
-          }
+    // If the player/tech are ready and there is a source, call the tech's
+    // `play()` method.
+    } else if (this.src() || this.currentSrc()) {
+      return this.techGet_('play');
+
+    // Finally, if the player/tech are ready, but we don't have a source, wait
+    // for one to be set.
+    } else {
+      this.ready(() => {
+        this.tech_.one('loadstart', () => {
+          silencePromise(this.techGet_('play'));
         });
       });
     }
@@ -2284,59 +2287,82 @@ class Player extends Component {
    *         URL. Otherwise, returns nothing/undefined.
    */
   src(source) {
-    // getter usage
-    if (typeof source === 'undefined') {
+
+    // Getter usage.
+    if (source === undefined) {
       return this.cache_.src || '';
     }
-    // filter out invalid sources and turn our source into
-    // an array of source objects
+
+    // Queues "error 4" to be triggered on the player on the next tick. This
+    // is done on a delay to give users a chance to listen for "error" events.
+    const queueError = () => {
+      this.setTimeout(() => {
+        this.error({
+          code: 4,
+          message: this.localize(this.options_.notSupportedMessage)
+        });
+      }, 1);
+    };
+
+    // Filter out invalid sources and normalize the passed source into an array
+    // of source objects.
     const sources = filterSource(source);
 
-    // if a source was passed in then it is invalid because
-    // it was filtered to a zero length Array. So we have to
-    // show an error
+    // Show an error if there are no sources after filtering.
     if (!sources.length) {
-      this.setTimeout(function() {
-        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-      }, 0);
-      return;
+      return queueError();
     }
 
-    // intial sources
+    // Cache initial sources.
     this.cache_.sources = sources;
-    this.changingSrc_ = true;
-
-    // intial source
     this.cache_.source = sources[0];
 
-    // middlewareSource is the source after it has been changed by middleware
+    // Set the player to a non-ready state while middleware asynchronously
+    // determines the final source.
+    this.isReady_ = false;
+
+    // This asynchronously resolves any configured middleware. The callback is
+    // called when the process completes and given the `middlewareSource`,
+    // which is the final source we'll use to find a compatible tech.
     middleware.setSource(this, sources[0], (middlewareSource, mws) => {
+
+      // Cache middleware.
       this.middleware_ = mws;
 
-      const err = this.src_(middlewareSource);
+      // Attempt to set the source on a tech.
+      const didNotFindTech = this.src_(middlewareSource);
 
-      if (err) {
+      // We could not find a compatible tech.
+      if (didNotFindTech) {
+
+        // If no compatible tech was found and there are still sources we have
+        // not tried, start the process over (including middleware) with the
+        // next source in the sources array.
         if (sources.length > 1) {
           return this.src(sources.slice(1));
         }
 
-        // We need to wrap this in a timeout to give folks a chance to add error event handlers
-        this.setTimeout(function() {
-          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-        }, 0);
-
-        // we could not find an appropriate tech, but let's still notify the delegate that this is it
-        // this needs a better comment about why this is needed
+        // If there is no compatible tech, but there are no sources left to
+        // try, we queue up an error state on the player and trigger "ready"
+        // to inform any subscribers that the player is ready.
+        queueError();
         this.triggerReady();
-
         return;
       }
 
-      this.changingSrc_ = false;
-      // video element listed source
-      this.cache_.src = middlewareSource.src;
-
+      // Notify middlewares of a potentially new tech.
       middleware.setTech(mws, this.tech_);
+
+      this.tech_.ready(() => {
+
+        // Cache the source URL.
+        this.cache_.src = middlewareSource.src;
+
+        // At this point, we've found a compatible tech and source and set the
+        // source both on the tech and in the internal cache. It's safe to tell
+        // any subscribers that the player is ready again.
+        this.triggerReady();
+      });
     });
   }
 
@@ -2356,37 +2382,34 @@ class Player extends Component {
   src_(source) {
     const sourceTech = this.selectSource([source]);
 
+    // There is no tech available that can play the chosen source.
     if (!sourceTech) {
       return true;
     }
 
+    // The tech that was found is not the tech that is currently loaded into
+    // the player; so, we need to unload the old tech, load a new one, and
+    // set the source on it.
     if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
-      this.changingSrc_ = true;
-
-      // load this technology with the chosen source
       this.loadTech_(sourceTech.tech, sourceTech.source);
       return false;
     }
 
-    // wait until the tech is ready to set the source
-    this.ready(function() {
+    // The existing tech will work with this source; so, we can set the
+    // source on the existing tech.
+    //
+    // The `setSource` method was added with source handlers; so, older techs
+    // won't support it. Also, we need to check the direct prototype for
+    // the case where subclasses of `Tech` do not support source handlers.
+    if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
+      this.techCall_('setSource', source);
+    } else {
+      this.techCall_('src', source.src);
+    }
 
-      // The setSource tech method was added with source handlers
-      // so older techs won't support it
-      // We need to check the direct prototype for the case where subclasses
-      // of the tech do not support source handlers
-      if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
-        this.techCall_('setSource', source);
-      } else {
-        this.techCall_('src', source.src);
-      }
-
-      if (this.options_.preload === 'auto') {
-        this.load();
-      }
-
-    // Set the source synchronously if possible (#2326)
-    }, true);
+    if (this.options_.preload === 'auto') {
+      this.load();
+    }
 
     return false;
   }
