@@ -2612,46 +2612,38 @@ class Player extends Component {
    *         The current value of controls when getting
    */
   controls(bool) {
-    if (bool !== undefined) {
-      bool = !!bool;
+    if (bool === undefined) {
+      return !!this.controls_;
+    }
 
-      // Don't trigger a change event unless it actually changed
-      if (this.controls_ !== bool) {
-        this.controls_ = bool;
+    bool = !!bool;
 
-        if (this.usingNativeControls()) {
-          this.techCall_('setControls', bool);
-        }
-
-        if (bool) {
-          this.removeClass('vjs-controls-disabled');
-          this.addClass('vjs-controls-enabled');
-          /**
-           * @event Player#controlsenabled
-           * @type {EventTarget~Event}
-           */
-          this.trigger('controlsenabled');
-
-          if (!this.usingNativeControls()) {
-            this.addTechControlsListeners_();
-          }
-        } else {
-          this.removeClass('vjs-controls-enabled');
-          this.addClass('vjs-controls-disabled');
-          /**
-           * @event Player#controlsdisabled
-           * @type {EventTarget~Event}
-           */
-          this.trigger('controlsdisabled');
-
-          if (!this.usingNativeControls()) {
-            this.removeTechControlsListeners_();
-          }
-        }
-      }
+    // Don't trigger a change event unless it actually changed
+    if (this.controls_ === bool) {
       return;
     }
-    return !!this.controls_;
+
+    this.controls_ = bool;
+
+    if (this.usingNativeControls()) {
+      this.techCall_('setControls', bool);
+    }
+
+    if (this.controls_) {
+      this.removeClass('vjs-controls-disabled');
+      this.addClass('vjs-controls-enabled');
+      this.trigger('controlsenabled');
+      if (!this.usingNativeControls()) {
+        this.addTechControlsListeners_();
+      }
+    } else {
+      this.removeClass('vjs-controls-enabled');
+      this.addClass('vjs-controls-disabled');
+      this.trigger('controlsdisabled');
+      if (!this.usingNativeControls()) {
+        this.removeTechControlsListeners_();
+      }
+    }
   }
 
   /**
