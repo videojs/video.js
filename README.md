@@ -36,11 +36,11 @@ Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted
 > ```html
 > <!-- unpkg -->
 > <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
-> <script src="https://unpkg.com/video.js/dist/video.js"><script>
+> <script src="https://unpkg.com/video.js/dist/video.js"></script>
 >
 > <!-- cdnjs -->
 > <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video-js.css" rel="stylesheet">
-> <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video.js"><script>
+> <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video.js"></script>
 > ```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!
