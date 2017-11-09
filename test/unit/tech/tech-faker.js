@@ -81,6 +81,10 @@ class TechFaker extends Tech {
   controls() {
     return false;
   }
+  preload() {
+    return 'auto';
+  }
+  load() {}
 
   // Support everything except for "video/unsupported-format"
   static isSupported() {
