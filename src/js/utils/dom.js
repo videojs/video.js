@@ -86,6 +86,23 @@ export function isEl(value) {
 }
 
 /**
+ * Determines if the current DOM is embedded in an iframe.
+ *
+ * @return {boolean}
+ *
+ */
+export function isInFrame() {
+
+  // We need a try/catch here because Safari will throw errors when attempting
+  // to get either `parent` or `self`
+  try {
+    return window.parent !== window.self;
+  } catch (x) {
+    return true;
+  }
+}
+
+/**
  * Creates functions to query the DOM using a given method.
  *
  * @param {string} method
@@ -375,7 +392,7 @@ export function getAttributes(tag) {
   // known boolean attributes
   // we can check for matching boolean properties, but older browsers
   // won't know about HTML5 boolean attributes that we still read from
-  const knownBooleans = ',' + 'autoplay,controls,loop,muted,default' + ',';
+  const knownBooleans = ',' + 'autoplay,controls,playsinline,loop,muted,default,defaultMuted' + ',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     const attrs = tag.attributes;

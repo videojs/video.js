@@ -598,18 +598,21 @@ class Component {
    *         Returns itself; method can be chained.
    */
   ready(fn, sync = false) {
-    if (fn) {
-      if (this.isReady_) {
-        if (sync) {
-          fn.call(this);
-        } else {
-          // Call the function asynchronously by default for consistency
-          this.setTimeout(fn, 1);
-        }
-      } else {
-        this.readyQueue_ = this.readyQueue_ || [];
-        this.readyQueue_.push(fn);
-      }
+    if (!fn) {
+      return;
+    }
+
+    if (!this.isReady_) {
+      this.readyQueue_ = this.readyQueue_ || [];
+      this.readyQueue_.push(fn);
+      return;
+    }
+
+    if (sync) {
+      fn.call(this);
+    } else {
+      // Call the function asynchronously by default for consistency
+      this.setTimeout(fn, 1);
     }
   }
 
@@ -1239,9 +1242,7 @@ class Component {
     fn = Fn.bind(this, fn);
 
     const timeoutId = window.setTimeout(fn, timeout);
-    const disposeFn = function() {
-      this.clearTimeout(timeoutId);
-    };
+    const disposeFn = () => this.clearTimeout(timeoutId);
 
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
@@ -1302,9 +1303,7 @@ class Component {
 
     const intervalId = window.setInterval(fn, interval);
 
-    const disposeFn = function() {
-      this.clearInterval(intervalId);
-    };
+    const disposeFn = () => this.clearInterval(intervalId);
 
     disposeFn.guid = `vjs-interval-${intervalId}`;
 

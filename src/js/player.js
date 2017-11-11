@@ -315,6 +315,9 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
+    // Init state hasStarted_
+    this.hasStarted_ = false;
+
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -605,10 +608,11 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`'s width.
+   * A getter/setter for the `Player`'s width. Returns the player's configured value.
+   * To get the current width use `currentWidth()`.
    *
    * @param {number} [value]
-   *        The value to set the `Player's width to.
+   *        The value to set the `Player`'s width to.
    *
    * @return {number}
    *         The current width of the `Player` when getting.
@@ -618,10 +622,11 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`'s height.
+   * A getter/setter for the `Player`'s height. Returns the player's configured value.
+   * To get the current height use `currentheight()`.
    *
    * @param {number} [value]
-   *        The value to set the `Player's heigth to.
+   *        The value to set the `Player`'s heigth to.
    *
    * @return {number}
    *         The current height of the `Player` when getting.
@@ -654,17 +659,18 @@ class Player extends Component {
     if (value === '') {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
-    } else {
-      const parsedVal = parseFloat(value);
-
-      if (isNaN(parsedVal)) {
-        log.error(`Improper value "${value}" supplied for for ${dimension}`);
-        return;
-      }
-
-      this[privDimension] = parsedVal;
+      this.updateStyleEl_();
+      return;
     }
 
+    const parsedVal = parseFloat(value);
+
+    if (isNaN(parsedVal)) {
+      log.error(`Improper value "${value}" supplied for for ${dimension}`);
+      return;
+    }
+
+    this[privDimension] = parsedVal;
     this.updateStyleEl_();
   }
 
@@ -1076,7 +1082,6 @@ class Player extends Component {
       } catch (e) {
         log('deleting tag.poster throws in some browsers', e);
       }
-      this.play();
     }
   }
 
@@ -1123,29 +1128,31 @@ class Player extends Component {
    *
    * @fires Player#firstplay
    *
-   * @param {boolean} hasStarted
+   * @param {boolean} request
    *        - true: adds the class
    *        - false: remove the class
    *
    * @return {boolean}
-   *         the boolean value of hasStarted
+   *         the boolean value of hasStarted_
    */
-  hasStarted(hasStarted) {
-    if (hasStarted !== undefined) {
-      // only update if this is a new value
-      if (this.hasStarted_ !== hasStarted) {
-        this.hasStarted_ = hasStarted;
-        if (hasStarted) {
-          this.addClass('vjs-has-started');
-          // trigger the firstplay event if this newly has played
-          this.trigger('firstplay');
-        } else {
-          this.removeClass('vjs-has-started');
-        }
-      }
+  hasStarted(request) {
+    if (request === undefined) {
+      // act as getter, if we have no request to change
+      return this.hasStarted_;
+    }
+
+    if (request === this.hasStarted_) {
       return;
     }
-    return !!this.hasStarted_;
+
+    this.hasStarted_ = request;
+
+    if (this.hasStarted_) {
+      this.addClass('vjs-has-started');
+      this.trigger('firstplay');
+    } else {
+      this.removeClass('vjs-has-started');
+    }
   }
 
   /**
@@ -1581,34 +1588,38 @@ class Player extends Component {
    * @private
    */
   techGet_(method) {
-    if (this.tech_ && this.tech_.isReady_) {
-
-      if (method in middleware.allowedGetters) {
-        return middleware.get(this.middleware_, this.tech_, method);
-      }
-
-      // Flash likes to die and reload when you hide or reposition it.
-      // In these cases the object methods go away and we get errors.
-      // When that happens we'll catch the errors and inform tech that it's not ready any more.
-      try {
-        return this.tech_[method]();
-      } catch (e) {
-        // When building additional tech libs, an expected method may not be defined yet
-        if (this.tech_[method] === undefined) {
-          log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
-
-        // When a method isn't available on the object it throws a TypeError
-        } else if (e.name === 'TypeError') {
-          log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
-          this.tech_.isReady_ = false;
-        } else {
-          log(e);
-        }
-        throw e;
-      }
+    if (!this.tech_ || !this.tech_.isReady_) {
+      return;
     }
 
-    return;
+    if (method in middleware.allowedGetters) {
+      return middleware.get(this.middleware_, this.tech_, method);
+    }
+
+    // Flash likes to die and reload when you hide or reposition it.
+    // In these cases the object methods go away and we get errors.
+    // When that happens we'll catch the errors and inform tech that it's not ready any more.
+    try {
+      return this.tech_[method]();
+    } catch (e) {
+
+      // When building additional tech libs, an expected method may not be defined yet
+      if (this.tech_[method] === undefined) {
+        log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
+        throw e;
+      }
+
+      // When a method isn't available on the object it throws a TypeError
+      if (e.name === 'TypeError') {
+        log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
+        this.tech_.isReady_ = false;
+        throw e;
+      }
+
+      // If error unknown, just log and throw
+      log(e);
+      throw e;
+    }
   }
 
   /**
@@ -1784,6 +1795,17 @@ class Player extends Component {
    */
   remainingTime() {
     return this.duration() - this.currentTime();
+  }
+
+  /**
+   * A remaining time function that is intented to be used when
+   * the time is to be displayed directly to the user.
+   *
+   * @return {number}
+   *         The rounded time remaining in seconds
+   */
+  remainingTimeDisplay() {
+    return Math.floor(this.duration()) - Math.floor(this.currentTime());
   }
 
   //
@@ -2247,22 +2269,24 @@ class Player extends Component {
   }
 
   /**
-   * The source function updates the video source
-   * There are three types of variables you can pass as the argument.
-   * **URL string**: A URL to the the video file. Use this method if you are sure
-   * the current playback technology (HTML5/Flash) can support the source you
-   * provide. Currently only MP4 files can be used in both HTML5 and Flash.
+   * Get or set the video source.
    *
-   * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
-   *        One SourceObject or an array of SourceObjects
+   * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
+   *        A SourceObject, an array of SourceObjects, or a string referencing
+   *        a URL to a media source. It is _highly recommended_ that an object
+   *        or array of objects is used here, so that source selection
+   *        algorithms can take the `type` into account.
    *
-   * @return {string}
-   *         The current video source when getting
+   *        If not provided, this method acts as a getter.
+   *
+   * @return {string|undefined}
+   *         If the `source` argument is missing, returns the current source
+   *         URL. Otherwise, returns nothing/undefined.
    */
   src(source) {
     // getter usage
     if (typeof source === 'undefined') {
-      return this.cache_.src;
+      return this.cache_.src || '';
     }
     // filter out invalid sources and turn our source into
     // an array of source objects
@@ -2359,10 +2383,6 @@ class Player extends Component {
 
       if (this.options_.preload === 'auto') {
         this.load();
-      }
-
-      if (this.options_.autoplay) {
-        this.play();
       }
 
     // Set the source synchronously if possible (#2326)

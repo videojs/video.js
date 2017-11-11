@@ -312,14 +312,14 @@ class TextTrackSettings extends ModalDialog {
       `<${type} id="${id}" class="${type === 'label' ? 'vjs-label' : ''}">`,
       this.localize(config.label),
       `</${type}>`,
-      `<select aria-labelledby="${legendId} ${id}">`
+      `<select aria-labelledby="${legendId !== '' ? legendId + ' ' : ''}${id}">`
     ].
       concat(config.options.map(o => {
         const optionId = id + '-' + o[1];
 
         return [
           `<option id="${optionId}" value="${o[0]}" `,
-          `aria-labelledby="${legendId} ${id} ${optionId}">`,
+          `aria-labelledby="${legendId !== '' ? legendId + ' ' : ''}${id} ${optionId}">`,
           this.localize(o[1]),
           '</option>'
         ].join('');

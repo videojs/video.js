@@ -1,18 +1,14 @@
 /**
  * @file remaining-time-display.js
  */
-import document from 'global/document';
+import TimeDisplay from './time-display';
 import Component from '../../component.js';
-import * as Dom from '../../utils/dom.js';
-import {bind, throttle} from '../../utils/fn.js';
-import formatTime from '../../utils/format-time.js';
-
 /**
  * Displays the time left in the video
  *
  * @extends Component
  */
-class RemainingTimeDisplay extends Component {
+class RemainingTimeDisplay extends TimeDisplay {
 
   /**
    * Creates an instance of this class.
@@ -25,48 +21,33 @@ class RemainingTimeDisplay extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.throttledUpdateContent = throttle(bind(this, this.updateContent), 25);
-    this.on(player, ['timeupdate', 'durationchange'], this.throttledUpdateContent);
+    this.on(player, 'durationchange', this.throttledUpdateContent);
+    this.on(player, 'ended', this.handleEnded);
   }
 
   /**
-   * Create the `Component`'s DOM element
+   * Builds the default DOM `className`.
    *
-   * @return {Element}
-   *         The element that was created.
+   * @return {string}
+   *         The DOM `className` for this object.
    */
-  createEl() {
-    const el = super.createEl('div', {
-      className: 'vjs-remaining-time vjs-time-control vjs-control'
-    });
-
-    this.contentEl_ = Dom.createEl('div', {
-      className: 'vjs-remaining-time-display'
-    }, {
-      // tell screen readers not to automatically read the time as it changes
-      'aria-live': 'off'
-    }, Dom.createEl('span', {
-      className: 'vjs-control-text',
-      textContent: this.localize('Remaining Time')
-    }));
-
-    this.updateTextNode_();
-    el.appendChild(this.contentEl_);
-    return el;
+  buildCSSClass() {
+    return 'vjs-remaining-time';
   }
 
   /**
-   * Updates the "remaining time" text node with new content using the
-   * contents of the `formattedTime_` property.
+   * The remaining time display prefixes numbers with a "minus" character.
+   *
+   * @param  {number} time
+   *         A numeric time, in seconds.
+   *
+   * @return {string}
+   *         A formatted time
    *
    * @private
    */
-  updateTextNode_() {
-    if (this.textNode_) {
-      this.contentEl_.removeChild(this.textNode_);
-    }
-    this.textNode_ = document.createTextNode(` -${this.formattedTime_ || '0:00'}`);
-    this.contentEl_.appendChild(this.textNode_);
+  formatTime_(time) {
+    return '-' + super.formatTime_(time);
   }
 
   /**
@@ -79,16 +60,44 @@ class RemainingTimeDisplay extends Component {
    * @listens Player#durationchange
    */
   updateContent(event) {
-    if (this.player_.duration()) {
-      const formattedTime = formatTime(this.player_.remainingTime());
+    if (!this.player_.duration()) {
+      return;
+    }
 
-      if (formattedTime !== this.formattedTime_) {
-        this.formattedTime_ = formattedTime;
-        this.requestAnimationFrame(this.updateTextNode_);
-      }
+    // @deprecated We should only use remainingTimeDisplay
+    // as of video.js 7
+    if (this.player_.remainingTimeDisplay) {
+      this.updateFormattedTime_(this.player_.remainingTimeDisplay());
+    } else {
+      this.updateFormattedTime_(this.player_.remainingTime());
     }
   }
+
+  /**
+   * When the player fires ended there should be no time left. Sadly
+   * this is not always the case, lets make it seem like that is the case
+   * for users.
+   *
+   * @param {EventTarget~Event} [event]
+   *        The `ended` event that caused this to run.
+   *
+   * @listens Player#ended
+   */
+  handleEnded(event) {
+    if (!this.player_.duration()) {
+      return;
+    }
+    this.updateFormattedTime_(0);
+  }
 }
+
+/**
+ * The text that should display over the `RemainingTimeDisplay`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ */
+RemainingTimeDisplay.prototype.controlText_ = 'Remaining Time';
 
 Component.registerComponent('RemainingTimeDisplay', RemainingTimeDisplay);
 export default RemainingTimeDisplay;

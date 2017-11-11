@@ -26,6 +26,10 @@ const args = minimist(process.argv.slice(2), {
   }
 });
 
+if (args.watch) {
+  args.progress = false;
+}
+
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
 
@@ -71,6 +75,7 @@ const es = {
     legacy: true
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
+  useStrict: false,
   format: 'es',
   dest: 'dist/video.es.js'
 };
@@ -94,6 +99,7 @@ const umd = {
     legacy: true
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
+  useStrict: false,
   format: 'umd',
   dest: 'dist/video.js'
 };
@@ -134,10 +140,11 @@ const minifiedNovttUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
 
 minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
 
-function runRollup({options, format, dest, banner}) {
+function runRollup({options, useStrict, format, dest, banner}) {
   rollup(options)
   .then(function(bundle) {
     bundle.write({
+      useStrict,
       format,
       dest,
       banner,
@@ -161,7 +168,7 @@ if (!args.watch) {
     runRollup(novttUmd);
   }
 } else {
-  const props = ['format', 'dest', 'banner'];
+  const props = ['format', 'dest', 'banner', 'useStrict'];
   const watchers = [
     ['es', watch({rollup},
                  Object.assign({},

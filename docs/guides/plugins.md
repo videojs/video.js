@@ -10,14 +10,6 @@ Because we view plugins as such an important part of Video.js, the organization 
 
   In short, the generator sets up plugin authors to focus on writing their plugin - not messing with tools.
 
-* [videojs-spellbook][spellbook]
-
-  As of version 3, the plugin generator includes a new dependency: [videojs-spellbook][spellbook]. Spellbook is a kitchen sink plugin development tool: it builds plugins, creates tags, runs a development server, and more.
-
-  The benefit of Spellbook is that you can run the generator _once_ and receive updates and bugfixes in Spellbook without having to run the generator again and deal with Yeoman conflicts and other headaches.
-
-  As long as your plugin project follows the [conventions][standards], Spellbook should work on it!
-
 ## Writing a Basic Plugin
 
 If you've written a Video.js plugin before, the basic plugin concept should be familiar. It's similar to a jQuery plugin in that the core idea is that you're adding a method to the player.
@@ -57,7 +49,7 @@ After that, any player will automatically have an `examplePlugin` method on its 
 
 ## Writing an Advanced Plugin
 
-Video.js 6 introduces advanced plugins: these are plugins that share a similar API with basic plugins, but are class-based and offer a range of extra features out of the box.
+Video.js 6 introduced advanced plugins: these are plugins that share a similar API with basic plugins, but are class-based and offer a range of extra features out of the box.
 
 While reading the following sections, you may want to refer to the [Plugin API docs][api-plugin] for more detail.
 
@@ -109,7 +101,7 @@ var ExamplePlugin = videojs.extend(Plugin, {
 
 For now, this example advanced plugin does the exact same thing as the basic plugin described above - not to worry, we will make it more interesting as we continue!
 
-### Register a Advanced Plugin
+### Register an Advanced Plugin
 
 The registration process for advanced plugins is identical to [the process for basic plugins](#register-a-basic-plugin).
 
@@ -233,6 +225,25 @@ The `dispose` method has several effects:
 
 In addition, if the player is disposed, the disposal of all its advanced plugin instances will be triggered as well.
 
+#### Version
+
+Adding a version number to a plugin is done by defining a `VERSION` property on the plugin before registering it:
+
+```js
+ExamplePlugin.VERSION = '1.0.1';
+
+videojs.registerPlugin('examplePlugin', ExamplePlugin);
+```
+
+Retrieve it using `videojs.getPluginVersion`:
+
+```js
+var version = videojs.getPluginVersion('examplePlugin');
+console.log(version);  // 1.0.1
+```
+
+Note that the [plugin generator](https://github.com/videojs/generator-videojs-plugin) already takes care of adding a version number for you.
+
 ### Advanced Example Advanced Plugin
 
 What follows is a complete ES6 advanced plugin that logs a custom message when the player's state changes between playing and paused. It uses all the described advanced features:
@@ -259,7 +270,7 @@ class Advanced extends Plugin {
   }
 
   updateState() {
-    this.setState({playing: !player.paused()});
+    this.setState({playing: !this.player.paused()});
   }
 
   logState(changed) {

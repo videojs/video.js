@@ -193,6 +193,7 @@ QUnit.test('should get current source from src set', function(assert) {
 
   // check for matching undefined src
   assert.deepEqual(player.currentSource(), {});
+  assert.equal(player.src(), '');
 
   player.src('http://google.com');
 
@@ -1654,4 +1655,32 @@ QUnit.test('should add a class with major version', function(assert) {
   assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');
 
   player.dispose();
+});
+
+QUnit.test('player.duration() returns NaN if player.cache_.duration is undefined', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.cache_.duration = undefined;
+  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unkown duration');
+});
+
+QUnit.test('player.duration() returns player.cache_.duration if it is defined', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.cache_.duration = 200;
+  assert.equal(player.duration(), 200, 'returned correct integer duration');
+  player.cache_.duration = 942;
+  assert.equal(player.duration(), 942, 'returned correct integer duration');
+});
+
+QUnit.test('player.duration() sets the value of player.cache_.duration', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  // set an arbitrary initial cached duration value for testing the setter functionality
+  player.cache_.duration = 1;
+
+  player.duration(NaN);
+  assert.ok(Number.isNaN(player.duration()), 'duration() set and get NaN duration value');
+  player.duration(200);
+  assert.equal(player.duration(), 200, 'duration() set and get integer duration value');
 });

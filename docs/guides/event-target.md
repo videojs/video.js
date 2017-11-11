@@ -10,7 +10,7 @@
 
 ## Overview
 
-Events in video.js are setup so that they mimic the DOM API that is used on object, but also have helpful shorthand functions with the same functionality.
+Events in Video.js are setup so that they mimic the DOM API that is used on object, but also have helpful shorthand functions with the same functionality.
 
 ## `on()` and `addEventListener()`
 

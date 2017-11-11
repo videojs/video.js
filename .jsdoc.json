@@ -35,6 +35,7 @@
   },
   "plugins": ["plugins/markdown"],
   "markdown": {
-    "tags": ["example"]
+    "tags": ["example"],
+    "idInHeadings": true
   }
 }

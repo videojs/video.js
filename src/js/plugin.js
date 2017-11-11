@@ -220,6 +220,13 @@ class Plugin {
   }
 
   /**
+   * Get the version of the plugin that was set on <pluginName>.VERSION
+   */
+  version() {
+    return this.constructor.VERSION;
+  }
+
+  /**
    * Each event triggered by plugins includes a hash of additional data with
    * conventional properties.
    *

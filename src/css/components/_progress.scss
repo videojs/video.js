@@ -8,6 +8,10 @@
   min-width: 4em;
 }
 
+.video-js .vjs-progress-control.disabled {
+  cursor: default;
+}
+
 .vjs-live .vjs-progress-control {
   display: none;
 }
@@ -38,6 +42,10 @@
 // hit area for clicks/touches.
 .video-js .vjs-progress-control:hover .vjs-progress-holder {
   font-size: 1.666666666666666666em;
+}
+
+.video-js .vjs-progress-control:hover .vjs-progress-holder.disabled {
+  font-size: 1em;
 }
 
 // .vjs-play-progress / PlayProgressBar and .vjs-load-progress / LoadProgressBar
@@ -131,6 +139,10 @@
   // Ensure that we maintain a font-size of ~10px.
   font-size: 0.6em;
   visibility: visible;
+}
+
+.video-js .vjs-progress-control.disabled:hover .vjs-time-tooltip {
+  font-size: 1em;
 }
 
 // .vjs-mouse-display / MouseTimeDisplay

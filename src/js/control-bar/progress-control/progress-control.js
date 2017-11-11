@@ -27,10 +27,9 @@ class ProgressControl extends Component {
   constructor(player, options) {
     super(player, options);
     this.handleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
-    this.on(this.el_, 'mousemove', this.handleMouseMove);
-
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
-    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
+
+    this.enable();
   }
 
   /**
@@ -99,6 +98,52 @@ class ProgressControl extends Component {
     const seekBar = this.getChild('seekBar');
 
     seekBar.handleMouseMove(event);
+  }
+
+  /**
+   * Are controls are currently enabled for this progress control.
+   *
+   * @return {boolean}
+   *         true if controls are enabled, false otherwise
+   */
+  enabled() {
+    return this.enabled_;
+  }
+
+  /**
+   * Disable all controls on the progress control and its children
+   */
+  disable() {
+    this.children().forEach((child) => child.disable && child.disable());
+
+    if (!this.enabled()) {
+      return;
+    }
+
+    this.off(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.off(this.el_, 'mousemove', this.handleMouseMove);
+    this.handleMouseUp();
+
+    this.addClass('disabled');
+
+    this.enabled_ = false;
+  }
+
+  /**
+   * Enable all controls on the progress control and its children
+   */
+  enable() {
+    this.children().forEach((child) => child.enable && child.enable());
+
+    if (this.enabled()) {
+      return;
+    }
+
+    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.on(this.el_, 'mousemove', this.handleMouseMove);
+    this.removeClass('disabled');
+
+    this.enabled_ = true;
   }
 
   /**
