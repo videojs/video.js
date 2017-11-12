@@ -31,7 +31,7 @@
   "A network error caused the media download to fail part-way.": "خطای شبکه باعث عدم بارگیری بخشی از رسانه شد.",
   "The media could not be loaded, either because the server or network failed or because the format is not supported.": ".رسانه قابل بارگیری نیست.   علت آن ممکن است خطا در اتصال یا عدم پشتیبانی از فرمت باشد",
   "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "پخش  رسانه به علت اشکال در آن یا عدم پشتیبانی مرورگر شما قطع شد.",
-  "No compatible source was found for this media.": "هیچ منبع سازگار برای این رسانه پیدا نشد.",
+  "No compatible source was found for this media.": "هیچ منبع سازگاری، برای این رسانه پیدا نشد.",
   "The media is encrypted and we do not have the keys to decrypt it.": "این رسانه رمزنگاری شده است و ما کلید رمزگشایی آن را نداریم.",
   "Play Video": "پخش ویدیو",
   "Close": "بستن",
