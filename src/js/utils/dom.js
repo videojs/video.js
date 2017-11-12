@@ -734,8 +734,8 @@ export function insertContent(el, content) {
  *        Event object
  *
  * @return {boolean}
- *         - True if not a left click
- *         - False if a left click
+ *         - True if a left click
+ *         - False if not a left click
  */
 export function isSingleLeftClick(event) {
   /* Note: if you create something draggable, be sure to
