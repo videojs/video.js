@@ -148,6 +148,9 @@ class Component {
       DomData.removeData(this.el_);
       this.el_ = null;
     }
+
+    // remove reference to the player after disposing of the element
+    this.player_ = null;
   }
 
   /**

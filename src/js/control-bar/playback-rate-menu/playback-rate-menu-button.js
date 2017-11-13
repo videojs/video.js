@@ -52,6 +52,12 @@ class PlaybackRateMenuButton extends MenuButton {
     return el;
   }
 
+  dispose() {
+    this.labelEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Builds the default DOM `className`.
    *

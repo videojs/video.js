@@ -147,6 +147,8 @@ class TextTrackMenuItem extends MenuItem {
   dispose() {
     // remove reference to track object on dispose
     this.track = null;
+
+    super.dispose();
   }
 
 }

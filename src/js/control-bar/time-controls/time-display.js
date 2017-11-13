@@ -56,6 +56,12 @@ class TimeDisplay extends Component {
     return el;
   }
 
+  dispose() {
+    this.contentEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Updates the "remaining time" text node with new content using the
    * contents of the `formattedTime_` property.
