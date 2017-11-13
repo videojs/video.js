@@ -366,6 +366,7 @@ class Player extends Component {
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
+    tag.removeAttribute('controls');
 
     /*
      * Store the internal state of scrubbing
@@ -511,14 +512,35 @@ class Player extends Component {
    *         The DOM element that gets created.
    */
   createEl() {
-    const tag = this.tag;
+    let tag = this.tag;
     let el;
-    const playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
+    let playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
+    const divEmbed = this.tag.tagName.toLowerCase() === 'video-js';
 
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
-    } else {
+    } else if (!divEmbed) {
       el = this.el_ = super.createEl('div');
+    }
+
+    // Copy over all the attributes from the tag, including ID and class
+    // ID will now reference player box, not the video tag
+    const attrs = Dom.getAttributes(tag);
+
+    if (divEmbed) {
+      el = this.el_ = tag;
+      tag = this.tag = document.createElement('video');
+      while (el.children.length) {
+        tag.appendChild(el.firstChild);
+      }
+
+      if (!Dom.hasClass(el, 'video-js')) {
+        Dom.addClass(el, 'video-js');
+      }
+
+      el.appendChild(tag);
+
+      playerElIngest = this.playerElIngest_ = el;
     }
 
     // set tabindex to -1 so we could focus on the player element
@@ -528,17 +550,21 @@ class Player extends Component {
     tag.removeAttribute('width');
     tag.removeAttribute('height');
 
-    // Copy over all the attributes from the tag, including ID and class
-    // ID will now reference player box, not the video tag
-    const attrs = Dom.getAttributes(tag);
-
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
       // workaround so we don't totally break IE7
       // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
       if (attr === 'class') {
         el.className += ' ' + attrs[attr];
+
+        if (divEmbed) {
+          tag.className += ' ' + attrs[attr];
+        }
       } else {
         el.setAttribute(attr, attrs[attr]);
+
+        if (divEmbed) {
+          tag.setAttribute(attr, attrs[attr]);
+        }
       }
     });
 

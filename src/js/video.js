@@ -38,6 +38,7 @@ if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
   document.createElement('video');
   document.createElement('audio');
   document.createElement('track');
+  document.createElement('video-js');
 }
 
 /**
