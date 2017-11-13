@@ -144,6 +144,11 @@ class TextTrackMenuItem extends MenuItem {
     }
   }
 
+  dispose() {
+    // remove reference to track object on dispose
+    this.track = null;
+  }
+
 }
 
 Component.registerComponent('TextTrackMenuItem', TextTrackMenuItem);
