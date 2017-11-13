@@ -58,6 +58,7 @@ class TimeDisplay extends Component {
 
   dispose() {
     this.contentEl_ = null;
+    this.textNode_ = null;
 
     super.dispose();
   }
