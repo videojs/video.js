@@ -1638,7 +1638,7 @@ class Player extends Component {
     // If this is called while we have a play queued up on a loadstart, remove
     // that listener to avoid getting in a potentially bad state.
     if (this.playOnLoadstart_) {
-      this.tech_.off('loadstart', this.playOnLoadstart_);
+      this.off('loadstart', this.playOnLoadstart_);
     }
 
     // If the player/tech is not ready, queue up another call to `play()` for
@@ -1658,7 +1658,7 @@ class Player extends Component {
       });
 
     // If the player/tech is ready and we have a source, we can attempt playback.
-    } else if (!this.changingSrc && (this.src() || this.currentSrc())) {
+    } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
 
     // If the tech is ready, but we do not have a source, we'll need to wait
@@ -1674,7 +1674,7 @@ class Player extends Component {
         silencePromise(this.play());
       };
 
-      this.tech_.one('loadstart', this.playOnLoadstart_);
+      this.one('loadstart', this.playOnLoadstart_);
     }
   }
 
