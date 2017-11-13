@@ -368,7 +368,7 @@ function evented(target, options = {}) {
   // When any evented object is disposed, it removes all its listeners.
   target.on('dispose', () => {
     target.off();
-    target.eventBusEl_ = null;
+    window.setTimeout(() => target.eventBusEl_ = null, 0);
   });
 
   return target;
