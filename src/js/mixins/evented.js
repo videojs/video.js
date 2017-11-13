@@ -366,7 +366,10 @@ function evented(target, options = {}) {
   Obj.assign(target, EventedMixin);
 
   // When any evented object is disposed, it removes all its listeners.
-  target.on('dispose', () => target.off());
+  target.on('dispose', () => {
+    target.off();
+    target.eventBusEl_ = null;
+  });
 
   return target;
 }
