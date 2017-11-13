@@ -113,6 +113,8 @@ class Html5 extends Tech {
    */
   dispose() {
     Html5.disposeMediaElement(this.el_);
+    this.options_ = null;
+
     // tech will handle clearing of the emulated track list
     super.dispose();
   }
