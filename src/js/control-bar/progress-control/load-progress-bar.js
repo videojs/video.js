@@ -40,7 +40,7 @@ class LoadProgressBar extends Component {
   }
 
   dispose() {
-    this.partsEls_ = null;
+    this.partEls_ = null;
 
     super.dispose();
   }
