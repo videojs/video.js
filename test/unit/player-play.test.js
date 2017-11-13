@@ -7,7 +7,7 @@ QUnit.module('Player#play', {
 
   beforeEach() {
     this.clock = sinon.useFakeTimers();
-    this.player = TestHelpers.makePlayer({techOrder: ['html5']});
+    this.player = TestHelpers.makePlayer({});
     this.techPlaySpy = sinon.spy(this.player.tech_, 'play');
   },
 
