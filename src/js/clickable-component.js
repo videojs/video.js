@@ -113,7 +113,7 @@ class ClickableComponent extends Component {
    *         - The control text when getting
    */
   controlText(text, el = this.el()) {
-    if (!text) {
+    if (text === undefined) {
       return this.controlText_ || 'Need Text';
     }
 
