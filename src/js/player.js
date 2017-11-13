@@ -502,6 +502,15 @@ class Player extends Component {
       this.tech_.dispose();
     }
 
+    if (this.playerElIngest_) {
+      this.playerElIngest_ = null;
+    }
+
+    if (this.tag) {
+      this.tag = null;
+    }
+
+    // the actual .el_ is removed here
     super.dispose();
   }
 
