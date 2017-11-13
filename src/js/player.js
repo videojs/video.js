@@ -462,6 +462,8 @@ class Player extends Component {
     this.on('stageclick', this.handleStageClick_);
 
     this.changingSrc_ = false;
+    this.playWaitingForReady_ = false;
+    this.playOnLoadstart_ = null;
   }
 
   /**
@@ -1633,9 +1635,15 @@ class Player extends Component {
    */
   play() {
 
-    // If the tech is not ready, queue up another call to `play()` for when it
-    // is. This will loop back into this method for another attempt at playback
-    // when the tech is ready.
+    // If this is called while we have a play queued up on a loadstart, remove
+    // that listener to avoid getting in a potentially bad state.
+    if (this.playOnLoadstart_) {
+      this.tech_.off('loadstart', this.playOnLoadstart_);
+    }
+
+    // If the player/tech is not ready, queue up another call to `play()` for
+    // when it is. This will loop back into this method for another attempt at
+    // playback when the tech is ready.
     if (!this.isReady_) {
 
       // Bail out if we're already waiting for `ready`!
@@ -1649,26 +1657,24 @@ class Player extends Component {
         silencePromise(this.play());
       });
 
-    // If the tech is ready, but we are currently changing sources, wait for
-    // the next "loadstart" on the tech. Again, this will loop back into this
-    // method for another attempt at playback when we are no longer changing
-    // sources.
-    } else if (this.changingSrc_) {
-
-      // Bail out if we're already waiting for `loadstart`!
-      if (this.playWaitingForLoadstart_) {
-        return;
-      }
-
-      this.playWaitingForLoadstart_ = true;
-      this.tech_.one('loadstart', () => {
-        this.playWaitingForLoadstart_ = false;
-        silencePromise(this.play());
-      });
-
-    // Finally, if we have a source, we can attempt playback for real.
-    } else if (this.src() || this.currentSrc()) {
+    // If the player/tech is ready and we have a source, we can attempt playback.
+    } else if (!this.changingSrc && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
+
+    // If the tech is ready, but we do not have a source, we'll need to wait
+    // for both the `ready` and a `loadstart` when the source is finally
+    // resolved by middleware and set on the player.
+    //
+    // This can happen if `play()` is called while changing sources or before
+    // one has been set on the player.
+    } else {
+
+      this.playOnLoadstart_ = () => {
+        this.playOnLoadstart_ = null;
+        silencePromise(this.play());
+      };
+
+      this.tech_.one('loadstart', this.playOnLoadstart_);
     }
   }
 
