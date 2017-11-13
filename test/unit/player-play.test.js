@@ -33,7 +33,8 @@ QUnit.test('tech not ready + no source = wait for ready, then loadstart', functi
   assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because there was no source');
 
   // Add a source and trigger loadstart.
-  this.player.src = () => 'xyz.mp4';
+  this.player.src('xyz.mp4');
+  this.clock.tick(100);
   this.player.trigger('loadstart');
   assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
 });
@@ -42,7 +43,8 @@ QUnit.test('tech not ready + has source = wait for ready', function(assert) {
 
   // Mock the player/tech not being ready, but having a source.
   this.player.isReady_ = false;
-  this.player.src = () => 'xyz.mp4';
+  this.player.src('xyz.mp4');
+  this.clock.tick(100);
 
   // Attempt to play.
   this.player.play();
@@ -63,7 +65,8 @@ QUnit.test('tech ready + no source = wait for loadstart', function(assert) {
   assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because the tech was not ready');
 
   // Add a source and trigger loadstart.
-  this.player.src = () => 'xyz.mp4';
+  this.player.src('xyz.mp4');
+  this.clock.tick(100);
   this.player.trigger('loadstart');
   assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
 });
@@ -71,9 +74,24 @@ QUnit.test('tech ready + no source = wait for loadstart', function(assert) {
 QUnit.test('tech ready + has source = play immediately!', function(assert) {
 
   // Mock the player having a source.
-  this.player.src = () => 'xyz.mp4';
+  this.player.src('xyz.mp4');
+  this.clock.tick(100);
 
   // Attempt to play, but silence the promise that might be returned.
   silencePromise(this.player.play());
+  assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
+});
+
+QUnit.test('tech ready + has source + changing source = wait for loadstart', function(assert) {
+
+  // Mock the player having a source and in the process of changing its source.
+  this.player.src('xyz.mp4');
+  this.clock.tick(100);
+  this.player.src('abc.mp4');
+  this.player.play();
+  this.clock.tick(100);
+  assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because the source was changing');
+
+  this.player.trigger('loadstart');
   assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
 });
