@@ -84,8 +84,11 @@ class Component {
       this.el_ = this.createEl();
     }
 
-    // Make this an evented object and use `el_`, if available, as its event bus
-    evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+    // if evented is anything except false, we want to mixin in evented
+    if (options.evented !== false) {
+      // Make this an evented object and use `el_`, if available, as its event bus
+      evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+    }
     stateful(this, this.constructor.defaultState);
 
     this.children_ = [];
