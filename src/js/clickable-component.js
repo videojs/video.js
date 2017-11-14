@@ -113,7 +113,7 @@ class ClickableComponent extends Component {
    *         - Returns itself when setting; method can be chained.
    */
   controlText(text, el = this.el()) {
-    if (!text) {
+    if (text === undefined) {
       return this.controlText_ || 'Need Text';
     }
 
