@@ -152,6 +152,8 @@ class Html5 extends Tech {
     takeMetadataTrackSnapshot();
     textTracks.addEventListener('change', takeMetadataTrackSnapshot);
 
+    this.on('dispose', () => textTracks.removeEventListener('change', takeMetadataTrackSnapshot));
+
     const restoreTrackMode = () => {
       for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {
         const storedTrack = metadataTracksPreFullscreenState[i];
