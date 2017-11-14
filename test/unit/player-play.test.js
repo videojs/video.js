@@ -8,7 +8,10 @@ QUnit.module('Player#play', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
     this.player = TestHelpers.makePlayer({});
-    this.techPlaySpy = sinon.spy(this.player.tech_, 'play');
+    this.techPlayCallCount = 0;
+    this.player.tech_.play = () => {
+      this.techPlayCallCount++;
+    };
   },
 
   afterEach() {
@@ -25,18 +28,18 @@ QUnit.test('tech not ready + no source = wait for ready, then loadstart', functi
   // Attempt to play.
   this.player.play();
   this.clock.tick(100);
-  assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because the tech was not ready');
+  assert.strictEqual(this.techPlayCallCount, 0, 'tech_.play was not called because the tech was not ready');
 
   // Ready the player.
   this.player.triggerReady();
   this.clock.tick(100);
-  assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because there was no source');
+  assert.strictEqual(this.techPlayCallCount, 0, 'tech_.play was not called because there was no source');
 
   // Add a source and trigger loadstart.
   this.player.src('xyz.mp4');
   this.clock.tick(100);
   this.player.trigger('loadstart');
-  assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
+  assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
 
 QUnit.test('tech not ready + has source = wait for ready', function(assert) {
@@ -49,12 +52,12 @@ QUnit.test('tech not ready + has source = wait for ready', function(assert) {
   // Attempt to play.
   this.player.play();
   this.clock.tick(100);
-  assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because the tech was not ready');
+  assert.strictEqual(this.techPlayCallCount, 0, 'tech_.play was not called because the tech was not ready');
 
   // Ready the player.
   this.player.triggerReady();
   this.clock.tick(100);
-  assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
+  assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
 
 QUnit.test('tech ready + no source = wait for loadstart', function(assert) {
@@ -62,13 +65,13 @@ QUnit.test('tech ready + no source = wait for loadstart', function(assert) {
   // Attempt to play.
   this.player.play();
   this.clock.tick(100);
-  assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because the tech was not ready');
+  assert.strictEqual(this.techPlayCallCount, 0, 'tech_.play was not called because the tech was not ready');
 
   // Add a source and trigger loadstart.
   this.player.src('xyz.mp4');
   this.clock.tick(100);
   this.player.trigger('loadstart');
-  assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
+  assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
 
 QUnit.test('tech ready + has source = play immediately!', function(assert) {
@@ -79,7 +82,7 @@ QUnit.test('tech ready + has source = play immediately!', function(assert) {
 
   // Attempt to play, but silence the promise that might be returned.
   silencePromise(this.player.play());
-  assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
+  assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
 
 QUnit.test('tech ready + has source + changing source = wait for loadstart', function(assert) {
@@ -90,8 +93,8 @@ QUnit.test('tech ready + has source + changing source = wait for loadstart', fun
   this.player.src('abc.mp4');
   this.player.play();
   this.clock.tick(100);
-  assert.notOk(this.techPlaySpy.called, 'tech_.play was not called because the source was changing');
+  assert.strictEqual(this.techPlayCallCount, 0, 'tech_.play was not called because the source was changing');
 
   this.player.trigger('loadstart');
-  assert.ok(this.techPlaySpy.calledOnce, 'tech_.play was called');
+  assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
