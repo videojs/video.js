@@ -2632,6 +2632,10 @@ class Player extends Component {
     if (this.controls_) {
       this.removeClass('vjs-controls-disabled');
       this.addClass('vjs-controls-enabled');
+      /**
+       * @event Player#controlsenabled
+       * @type {EventTarget~Event}
+       */
       this.trigger('controlsenabled');
       if (!this.usingNativeControls()) {
         this.addTechControlsListeners_();
@@ -2639,6 +2643,10 @@ class Player extends Component {
     } else {
       this.removeClass('vjs-controls-enabled');
       this.addClass('vjs-controls-disabled');
+      /**
+       * @event Player#controlsdisabled
+       * @type {EventTarget~Event}
+       */
       this.trigger('controlsdisabled');
       if (!this.usingNativeControls()) {
         this.removeTechControlsListeners_();
