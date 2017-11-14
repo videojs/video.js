@@ -41,6 +41,7 @@ class TextTrackMenuItem extends MenuItem {
     tracks.addEventListener('change', changeHandler);
     tracks.addEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     this.on('dispose', function() {
+      player.off(['loadstart', 'texttrackchange'], changeHandler);
       tracks.removeEventListener('change', changeHandler);
       tracks.removeEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     });

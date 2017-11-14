@@ -62,6 +62,7 @@ class MenuButton extends Component {
     const menu = this.createMenu();
 
     if (this.menu) {
+      this.menu.dispose();
       this.removeChild(this.menu);
     }
 
