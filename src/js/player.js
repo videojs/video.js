@@ -2793,6 +2793,10 @@ class Player extends Component {
       this.userActivity_ = true;
       this.removeClass('vjs-user-inactive');
       this.addClass('vjs-user-active');
+      /**
+       * @event Player#useractive
+       * @type {EventTarget~Event}
+       */
       this.trigger('useractive');
       return;
     }
@@ -2815,6 +2819,10 @@ class Player extends Component {
     this.userActivity_ = false;
     this.removeClass('vjs-user-active');
     this.addClass('vjs-user-inactive');
+    /**
+     * @event Player#userinactive
+     * @type {EventTarget~Event}
+     */
     this.trigger('userinactive');
   }
 
