@@ -34,8 +34,8 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
-    const selectedLanguageChangeHandler = Fn.bind(this, this.handleSelectedLanguageChange);
+    const changeHandler = (...args) => this.handleTracksChange.apply(this, args);
+    const selectedLanguageChangeHandler = (...args) => this.handleSelectedLanguageChange.apply(this, args);
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
     tracks.addEventListener('change', changeHandler);
