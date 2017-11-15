@@ -2698,37 +2698,40 @@ class Player extends Component {
    *         The current value of native controls when getting
    */
   usingNativeControls(bool) {
-    if (bool !== undefined) {
-      bool = !!bool;
+    if (bool === undefined) {
+      return !!this.usingNativeControls_;
+    }
 
-      // Don't trigger a change event unless it actually changed
-      if (this.usingNativeControls_ !== bool) {
-        this.usingNativeControls_ = bool;
-        if (bool) {
-          this.addClass('vjs-using-native-controls');
+    bool = !!bool;
 
-          /**
-           * player is using the native device controls
-           *
-           * @event Player#usingnativecontrols
-           * @type {EventTarget~Event}
-           */
-          this.trigger('usingnativecontrols');
-        } else {
-          this.removeClass('vjs-using-native-controls');
-
-          /**
-           * player is using the custom HTML controls
-           *
-           * @event Player#usingcustomcontrols
-           * @type {EventTarget~Event}
-           */
-          this.trigger('usingcustomcontrols');
-        }
-      }
+    // Don't trigger a change event unless it actually changed
+    if (this.usingNativeControls_ === bool) {
       return;
     }
-    return !!this.usingNativeControls_;
+
+    this.usingNativeControls_ = bool;
+
+    if (this.usingNativeControls_) {
+      this.addClass('vjs-using-native-controls');
+
+      /**
+       * player is using the native device controls
+       *
+       * @event Player#usingnativecontrols
+       * @type {EventTarget~Event}
+       */
+      this.trigger('usingnativecontrols');
+    } else {
+      this.removeClass('vjs-using-native-controls');
+
+      /**
+       * player is using the custom HTML controls
+       *
+       * @event Player#usingcustomcontrols
+       * @type {EventTarget~Event}
+       */
+      this.trigger('usingcustomcontrols');
+    }
   }
 
   /**
