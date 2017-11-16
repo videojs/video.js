@@ -174,6 +174,10 @@ class SeekBar extends Slider {
    * @listens mousedown
    */
   handleMouseDown(event) {
+    if (!Dom.isSingleLeftClick(event)) {
+      return;
+    }
+
     this.player_.scrubbing(true);
 
     this.videoWasPlaying = !this.player_.paused();
@@ -191,6 +195,10 @@ class SeekBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
+    if (!Dom.isSingleLeftClick(event)) {
+      return;
+    }
+
     let newTime = this.calculateDistance(event) * this.player_.duration();
 
     // Don't let video end while scrubbing.
