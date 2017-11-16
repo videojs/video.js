@@ -246,7 +246,8 @@ class SeekBar extends Slider {
     this.player_.scrubbing(false);
 
     /**
-     * Triggered to force timeui to not use cache time.
+     * Trigger timeupdate because we're done seeking and the time has changed.
+     * This is particularly useful for if the player is paused to time the time displays.
      *
      * @event Tech#timeupdate
      * @type {EventTarget~Event}
