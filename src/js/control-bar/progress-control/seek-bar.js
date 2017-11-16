@@ -244,6 +244,8 @@ class SeekBar extends Slider {
     super.handleMouseUp(event);
 
     this.player_.scrubbing(false);
+    // forces timeui to not use cache
+    this.player_.tech_.trigger('timeupdate');
     if (this.videoWasPlaying) {
       this.player_.play();
     }
