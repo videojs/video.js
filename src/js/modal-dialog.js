@@ -97,6 +97,14 @@ class ModalDialog extends Component {
     });
   }
 
+  dispose() {
+    this.contentEl_ = null;
+    this.descEl_ = null;
+    this.previouslyActiveEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Builds the default DOM `className`.
    *

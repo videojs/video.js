@@ -77,6 +77,13 @@ class ClickableComponent extends Component {
     return el;
   }
 
+  dispose() {
+    // remove controlTextEl_ on dipose
+    this.controlTextEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Create a control text element on this `Component`
    *

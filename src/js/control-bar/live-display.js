@@ -51,6 +51,12 @@ class LiveDisplay extends Component {
     return el;
   }
 
+  dispose() {
+    this.contentEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Check the duration to see if the LiveDisplay should be showing or not. Then show/hide
    * it accordingly

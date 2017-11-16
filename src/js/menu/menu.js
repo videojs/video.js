@@ -91,6 +91,12 @@ class Menu extends Component {
     return el;
   }
 
+  dispose() {
+    this.contentEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Handle a `keydown` event on this menu. This listener is added in the constructor.
    *

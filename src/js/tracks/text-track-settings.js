@@ -293,6 +293,12 @@ class TextTrackSettings extends ModalDialog {
     }
   }
 
+  dispose() {
+    this.endDialog = null;
+
+    super.dispose();
+  }
+
   /**
    * Create a <select> element with configured options.
    *

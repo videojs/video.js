@@ -113,6 +113,8 @@ class Html5 extends Tech {
    */
   dispose() {
     Html5.disposeMediaElement(this.el_);
+    this.options_ = null;
+
     // tech will handle clearing of the emulated track list
     super.dispose();
   }
@@ -149,6 +151,8 @@ class Html5 extends Tech {
     // each time there is a track 'change' event
     takeMetadataTrackSnapshot();
     textTracks.addEventListener('change', takeMetadataTrackSnapshot);
+
+    this.on('dispose', () => textTracks.removeEventListener('change', takeMetadataTrackSnapshot));
 
     const restoreTrackMode = () => {
       for (let i = 0; i < metadataTracksPreFullscreenState.length; i++) {

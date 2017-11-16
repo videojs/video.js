@@ -293,14 +293,14 @@ if (!Html5.supportsNativeTextTracks()) {
       src: 'en.vtt'
     };
     const captionsButton = player.controlBar.getChild('SubsCapsButton');
-    // we know the postition of the OffTextTrackMenuItem
-    const offMenuItem = captionsButton.items[1];
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
     const englishTrack = player.addRemoteTextTrack(track1, true).track;
     // Keep track of menu items
     const enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
+    // we know the postition of the OffTextTrackMenuItem
+    const offMenuItem = captionsButton.items[1];
 
     // Select English initially
     player.play();

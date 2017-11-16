@@ -56,6 +56,12 @@ class Popup extends Component {
 
     return el;
   }
+
+  dispose() {
+    this.contentEl_ = null;
+
+    super.dispose();
+  }
 }
 
 Component.registerComponent('Popup', Popup);
