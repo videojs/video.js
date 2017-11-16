@@ -65,6 +65,7 @@ function(assert) {
 
   const vid = document.createElement('video');
 
+  vid.id = 'test_vid_id';
   fixture.appendChild(vid);
   const player = videojs(vid);
 
@@ -72,6 +73,8 @@ function(assert) {
   assert.equal(warnLogs.length, 0, 'no warn logs');
 
   const vid2 = document.createElement('video');
+
+  vid2.id = 'test_vid_id2';
   const player2 = videojs(vid2);
 
   assert.ok(player2, 'created player from tag');
@@ -79,6 +82,11 @@ function(assert) {
   assert.equal(warnLogs[0],
                'The element supplied is not included in the DOM',
                'logged the right message');
+
+  // should only log warnings on the first creation
+  videojs(vid2);
+  videojs('test_vid_id2');
+  assert.equal(warnLogs.length, 1, 'did not log another warning');
 
   log.warn = origWarnLog;
   player.dispose();
