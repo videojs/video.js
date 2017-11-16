@@ -1119,10 +1119,6 @@ QUnit.test('should throw on startup no techs are specified', function(assert) {
   }, 'a falsey techOrder should throw');
 
   videojs.options.techOrder = techOrder;
-
-  while (fixture.firstChild) {
-    fixture.removeChild(fixture.firstChild);
-  }
 });
 
 QUnit.test('should have a sensible toJSON that is equivalent to player.options', function(assert) {
