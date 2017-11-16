@@ -90,16 +90,16 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   player.dispose();
 });
 
-QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function() {
+QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
   const player = TestHelpers.makePlayer();
   const fullscreentoggle = new FullscreenToggle(player);
 
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
-  QUnit.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
+  assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
   player.isFullscreen(false);
   player.trigger('fullscreenchange');
-  QUnit.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
+  assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
   player.dispose();
 });
 
