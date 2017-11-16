@@ -1107,10 +1107,15 @@ QUnit.test('play promise should resolve to native value if returned', function(a
 
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
+  const fixture = document.getElementById('qunit-fixture');
 
   videojs.options.techOrder = null;
   assert.throws(function() {
-    videojs(TestHelpers.makeTag());
+    const tag = TestHelpers.makeTag();
+
+    fixture.appendChild(tag);
+
+    videojs(tag);
   }, 'a falsey techOrder should throw');
 
   videojs.options.techOrder = techOrder;
@@ -1428,6 +1433,10 @@ QUnit.test('should allow to register custom player when any player has not been 
   videojs.registerComponent('Player', CustomPlayer);
 
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag);
 
   assert.equal(player instanceof CustomPlayer, true, 'player is custom');
@@ -1439,6 +1448,10 @@ QUnit.test('should allow to register custom player when any player has not been 
 
 QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag);
 
   class CustomPlayer extends Player {}
@@ -1471,6 +1484,10 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
   }));
 
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag, {
     techOrder: ['techFaker']
   });
@@ -1504,6 +1521,10 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
   }));
 
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag, {
     techOrder: ['techFaker']
   });
@@ -1560,7 +1581,11 @@ QUnit.test('src selects tech based on middleware', function(assert) {
     }
   }));
 
+  const fixture = document.getElementById('qunit-fixture');
   const tag = TestHelpers.makeTag();
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag, {
     techOrder: ['fooTech', 'barTech']
   });
