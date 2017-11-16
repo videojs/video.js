@@ -24,6 +24,7 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
+import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
@@ -468,6 +469,8 @@ class Player extends Component {
     this.on('stageclick', this.handleStageClick_);
 
     this.changingSrc_ = false;
+    this.playWaitingForReady_ = false;
+    this.playOnLoadstart_ = null;
   }
 
   /**
@@ -1665,37 +1668,55 @@ class Player extends Component {
   }
 
   /**
-   * start media playback
+   * Attempt to begin playback at the first opportunity.
    *
    * @return {Promise|undefined}
-   *         Returns a `Promise` if the browser returns one, for most browsers this will
-   *         return undefined.
+   *         Returns a `Promise` only if the browser returns one and the player
+   *         is ready to begin playback. For some browsers and all non-ready
+   *         situations, this will return `undefined`.
    */
   play() {
-    if (this.changingSrc_) {
-      this.ready(function() {
-        const retval = this.techGet_('play');
 
-        // silence errors (unhandled promise from play)
-        if (retval !== undefined && typeof retval.then === 'function') {
-          retval.then(null, (e) => {});
-        }
+    // If this is called while we have a play queued up on a loadstart, remove
+    // that listener to avoid getting in a potentially bad state.
+    if (this.playOnLoadstart_) {
+      this.off('loadstart', this.playOnLoadstart_);
+    }
+
+    // If the player/tech is not ready, queue up another call to `play()` for
+    // when it is. This will loop back into this method for another attempt at
+    // playback when the tech is ready.
+    if (!this.isReady_) {
+
+      // Bail out if we're already waiting for `ready`!
+      if (this.playWaitingForReady_) {
+        return;
+      }
+
+      this.playWaitingForReady_ = true;
+      this.ready(() => {
+        this.playWaitingForReady_ = false;
+        silencePromise(this.play());
       });
 
-    // Only calls the tech's play if we already have a src loaded
-    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
+    // If the player/tech is ready and we have a source, we can attempt playback.
+    } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
-    } else {
-      this.ready(function() {
-        this.tech_.one('loadstart', function() {
-          const retval = this.play();
 
-          // silence errors (unhandled promise from play)
-          if (retval !== undefined && typeof retval.then === 'function') {
-            retval.then(null, (e) => {});
-          }
-        });
-      });
+    // If the tech is ready, but we do not have a source, we'll need to wait
+    // for both the `ready` and a `loadstart` when the source is finally
+    // resolved by middleware and set on the player.
+    //
+    // This can happen if `play()` is called while changing sources or before
+    // one has been set on the player.
+    } else {
+
+      this.playOnLoadstart_ = () => {
+        this.playOnLoadstart_ = null;
+        silencePromise(this.play());
+      };
+
+      this.one('loadstart', this.playOnLoadstart_);
     }
   }
 
