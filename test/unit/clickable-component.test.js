@@ -41,7 +41,7 @@ QUnit.test('should be enabled/disabled', function(assert) {
   player.dispose();
 });
 
-QUnit.test('handleClick should not be triggered when disabled', function() {
+QUnit.test('handleClick should not be triggered when disabled', function(assert) {
   let clicks = 0;
 
   class TestClickableComponent extends ClickableComponent {
@@ -56,23 +56,23 @@ QUnit.test('handleClick should not be triggered when disabled', function() {
 
   // 1st click
   Events.trigger(el, 'click');
-  QUnit.equal(clicks, 1, 'click on enabled ClickableComponent is handled');
+  assert.equal(clicks, 1, 'click on enabled ClickableComponent is handled');
 
   testClickableComponent.disable();
   // No click should happen.
   Events.trigger(el, 'click');
-  QUnit.equal(clicks, 1, 'click on disabled ClickableComponent is not handled');
+  assert.equal(clicks, 1, 'click on disabled ClickableComponent is not handled');
 
   testClickableComponent.enable();
   // 2nd Click
   Events.trigger(el, 'click');
-  QUnit.equal(clicks, 2, 'click on re-enabled ClickableComponent is handled');
+  assert.equal(clicks, 2, 'click on re-enabled ClickableComponent is handled');
 
   testClickableComponent.dispose();
   player.dispose();
 });
 
-QUnit.test('handleClick should not be triggered more than once when enabled', function() {
+QUnit.test('handleClick should not be triggered more than once when enabled', function(assert) {
   let clicks = 0;
 
   class TestClickableComponent extends ClickableComponent {
@@ -88,7 +88,7 @@ QUnit.test('handleClick should not be triggered more than once when enabled', fu
   testClickableComponent.enable();
   // Click should still be handled just once
   Events.trigger(el, 'click');
-  QUnit.equal(clicks, 1, 'no additional click handler when already enabled ClickableComponent has been enabled again');
+  assert.equal(clicks, 1, 'no additional click handler when already enabled ClickableComponent has been enabled again');
 
   testClickableComponent.dispose();
   player.dispose();
