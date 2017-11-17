@@ -1430,20 +1430,20 @@ class Player extends Component {
    * @private
    */
   handleTechClick_(event) {
-    // We're using mousedown to detect clicks thanks to Flash, but mousedown
-    // will also be triggered with right-clicks, so we need to prevent that
-    if (event.button !== 0) {
+    if (!Dom.isSingleLeftClick(event)) {
       return;
     }
 
     // When controls are disabled a click should not toggle playback because
     // the click is considered a control
-    if (this.controls()) {
-      if (this.paused()) {
-        this.play();
-      } else {
-        this.pause();
-      }
+    if (!this.controls_) {
+      return;
+    }
+
+    if (this.paused()) {
+      this.play();
+    } else {
+      this.pause();
     }
   }
 
