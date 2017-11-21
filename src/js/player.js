@@ -87,6 +87,8 @@ const TECH_EVENTS_RETRIGGER = [
    * Fired when the source is set on the tech causing the media element
    * to reload.
    *
+   * @private
+   * @method Player#handleTechSourceset_
    * @event Player#sourceset
    * @type {EventTarget~Event}
    */
@@ -998,7 +1000,6 @@ class Player extends Component {
     TECH_EVENTS_RETRIGGER.forEach((event) => {
       this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
     });
-
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
     this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
@@ -1169,24 +1170,6 @@ class Player extends Component {
         log('deleting tag.poster throws in some browsers', e);
       }
     }
-  }
-
-  /**
-   * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
-   *
-   * @fires Player#sourceset
-   * @listens Tech#sourceset
-   * @private
-   */
-  handleTechSourceset_() {
-    /**
-     * Fired when the source is set on the tech causing the media element
-     * to reload.
-     *
-     * @event Player#sourceset
-     * @type {EventTarget~Event}
-     */
-    this.trigger('sourceset');
   }
 
   /**

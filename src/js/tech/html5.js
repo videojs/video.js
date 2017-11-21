@@ -123,7 +123,7 @@ class Html5 extends Tech {
 
   /**
    * A special function to trigger source set in a way that
-   * will allow player to re-trigger it if everyone is not ready
+   * will allow player to re-trigger if player/html5 are not ready
    * yet.
    *
    * @fires Tech#sourceset
@@ -131,7 +131,7 @@ class Html5 extends Tech {
   triggerSourceSet_() {
     if (!this.isReady_) {
       // on initial ready we have to trigger source set
-      // after 1ms after so player can watch for it.
+      // 1ms after ready so that player can watch for it.
       this.one('ready', () => this.setTimeout(this.triggerSourceSet_, 1));
     }
 

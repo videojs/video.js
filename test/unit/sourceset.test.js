@@ -5,28 +5,15 @@ import window from 'global/window';
 import log from '../../src/js/utils/log.js';
 import sinon from 'sinon';
 
+const Html5 = videojs.getTech('Html5');
 const wait = 100;
 let qunitFn = 'module';
 
-if (videojs.browser.IS_IE8) {
+if (!Html5.canOverrideAttributes()) {
   qunitFn = 'skip';
 }
 
-// if we cannot overwrite the src property, there is no support
-try {
-  const el = document.createElement('video');
-
-  Object.defineProperty(el, 'src', {
-    get() {},
-    set() {}
-  });
-} catch (e) {
-  qunitFn = 'skip';
-}
-
-const Html5 = videojs.getTech('Html5');
 const oldMovingMedia = Html5.prototype.movingMediaElementInDOM;
-
 const validateSource = function(assert, player, sources, checkMediaElSource = true) {
   const tech = player.tech_;
   const mediaEl = tech.el();
