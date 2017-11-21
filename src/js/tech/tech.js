@@ -990,6 +990,14 @@ Tech.prototype.featuresPlaybackRate = false;
 Tech.prototype.featuresProgressEvents = false;
 
 /**
+ * Boolean indicating wether the `Tech` supports the `sourceset` event.
+ *
+ * @type {boolean}
+ * @default
+ */
+Tech.prototype.featuresSourceset = false;
+
+/**
  * Boolean indicating wether the `Tech` supports the `timeupdate` event. This is currently
  * not triggered by video-js-swf. This will be used to determine if
  * {@link Tech#manualTimeUpdates} should be called.

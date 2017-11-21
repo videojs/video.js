@@ -84,6 +84,22 @@ const TECH_EVENTS_RETRIGGER = [
   'abort',
 
   /**
+   * Fired when the source is set on the tech causing the media element
+   * to reload.
+   *
+   * @event Player#sourceset
+   * @type {EventTarget~Event}
+   */
+  /**
+   * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
+   *
+   * @fires Player#sourceset
+   * @listens Tech#sourceset
+   * @private
+   */
+  'sourceset',
+
+  /**
    * Fires when the browser is intentionally not getting media data.
    *
    * @event Player#suspend
@@ -473,7 +489,6 @@ class Player extends Component {
     this.playOnLoadstart_ = null;
 
     this.forceAutoplayInChrome_();
-    this.watchForSourceSet_();
   }
 
   /**
@@ -897,112 +912,6 @@ class Player extends Component {
   }
 
   /**
-   * Modify the video/audio element so that we can detect when
-   * the source is changed. Fires `sourceset` just after the source has changed
-   *
-   * @fires Player#sourceset
-   */
-  watchForSourceSet_() {
-    if (browser.IS_IE8) {
-      return;
-    }
-    // if we cannot overwrite the src property, there is no support
-    // iOS 7 safari for instance cannot do this.
-    try {
-      Object.defineProperty(document.createElement('video'), 'src', {get: () => {}, set: () =>{}});
-    } catch (e) {
-      return;
-    }
-
-    const el = this.$('video') || this.$('audio');
-
-    if (!el) {
-      if (!this.isReady_) {
-        this.ready(() => this.watchForSourceSet_());
-      }
-      return;
-    }
-
-    // we need to fire sourceset when the player is ready
-    // if we find that the media element had a src when it was
-    // given to us
-    if (this.tagAttributes && this.tagAttributes.src) {
-      this.ready(() => this.trigger('sourceset'));
-    }
-
-    const proto = window.HTMLMediaElement.prototype;
-    let srcDescriptor = {};
-
-    // preserve getters/setters already on `el.src` if they exist
-    if (Object.getOwnPropertyDescriptor(el, 'src')) {
-      srcDescriptor = Object.getOwnPropertyDescriptor(el, 'src');
-    } else if (Object.getOwnPropertyDescriptor(proto, 'src')) {
-      srcDescriptor = mergeOptions(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
-    }
-
-    if (!srcDescriptor.get) {
-      srcDescriptor.get = function() {
-        return proto.getAttribute.call(this, 'src');
-      };
-    }
-
-    if (!srcDescriptor.set) {
-      srcDescriptor.set = function(v) {
-        return proto.setAttribute.call(this, 'src', v);
-      };
-    }
-
-    if (typeof srcDescriptor.enumerable === 'undefined') {
-      srcDescriptor.enumerable = true;
-    }
-
-    Object.defineProperty(el, 'src', {
-      get: srcDescriptor.get.bind(el),
-      set: (v) => {
-        const retval = srcDescriptor.set.call(el, v);
-
-        this.ready(() => this.trigger('sourceset'), true);
-
-        return retval;
-      },
-      configurable: true,
-      enumerable: srcDescriptor.enumerable
-    });
-
-    const oldSetAttribute = el.setAttribute;
-
-    el.setAttribute = (n, v) => {
-      const retval = oldSetAttribute.call(el, n, v);
-
-      if (n === 'src') {
-        this.ready(() => this.trigger('sourceset'), true);
-      }
-
-      return retval;
-    };
-
-    const oldLoad = el.load;
-
-    el.load = () => {
-      const retval = oldLoad.call(el);
-
-      this.ready(() => this.trigger('sourceset'), true);
-
-      return retval;
-    };
-
-    this.on('dispose', () => {
-      if (!el) {
-        return;
-      }
-
-      el.load = oldLoad.bind(el);
-      el.setAttribute = oldSetAttribute.bind(el);
-      Object.defineProperty(el, 'src', srcDescriptor);
-    });
-  }
-
-  /**
    * Load/Create an instance of playback {@link Tech} including element
    * and API methods. Then append the `Tech` element in `Player` as a child.
    *
@@ -1089,6 +998,7 @@ class Player extends Component {
     TECH_EVENTS_RETRIGGER.forEach((event) => {
       this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
     });
+
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
     this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
@@ -1259,6 +1169,24 @@ class Player extends Component {
         log('deleting tag.poster throws in some browsers', e);
       }
     }
+  }
+
+  /**
+   * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
+   *
+   * @fires Player#sourceset
+   * @listens Tech#sourceset
+   * @private
+   */
+  handleTechSourceset_() {
+    /**
+     * Fired when the source is set on the tech causing the media element
+     * to reload.
+     *
+     * @event Player#sourceset
+     * @type {EventTarget~Event}
+     */
+    this.trigger('sourceset');
   }
 
   /**
