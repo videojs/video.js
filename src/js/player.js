@@ -44,6 +44,8 @@ import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
+import './popup/popup.js';
+import './popup/popup-button.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
