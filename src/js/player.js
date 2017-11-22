@@ -297,7 +297,7 @@ class Player extends Component {
       if (typeof tag.closest === 'function') {
         const closest = tag.closest('[lang]');
 
-        if (closest) {
+        if (closest && closest.getAttribute) {
           options.language = closest.getAttribute('lang');
         }
       } else {
