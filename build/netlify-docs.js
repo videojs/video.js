@@ -9,5 +9,7 @@ const output = sh.exec(GIT_CONTAINS, {async: false, silent:true}).stdout;
 // if we're on any other branch, we can regenerate docs
 if (process.env.BRANCH === 'master' && output !== '' ||
     process.env.BRANCH !== 'master') {
-  sh.exec(DOCS);
+  // sh.exec(DOCS);
 }
+
+sh.rm('-rf', ['docs/api']);
