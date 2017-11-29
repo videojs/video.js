@@ -13,3 +13,4 @@ if (process.env.BRANCH === 'master' && output !== '' ||
 }
 
 sh.rm('-rf', ['docs/api']);
+sh.mkdir('-p', 'docs/api');
