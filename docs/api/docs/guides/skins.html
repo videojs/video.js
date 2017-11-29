@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="skins">Skins</h1>
+<h2 id="base-skin">Base Skin</h2>
+<p>The base Video.js skin is made using HTML and CSS (although we use the <a href="http://sass-lang.com">Sass preprocessor</a>),
+and by default these styles are added to the DOM for you!
+That means you can build a custom skin by simply taking advantage of the cascading aspect of CSS and overriding
+the styles you&#39;d like to change.</p>
+<p>If you don&#39;t want Video.js to inject the base styles for you, you can disable it by setting <code>window.VIDEOJS_NO_BASE_THEME = true</code> before Video.js is loaded.
+Keep in mind that without these base styles enabled, you&#39;ll need to manually include them.</p>
+<p>Video.js does not currently include the base skin automatically yet, so, this option isn&#39;t necessary.</p>
+<h2 id="default-style-elements">Default style elements</h2>
+<p>Video.js uses a couple of style elements dynamically, specifically, there&#39;s a default styles element as well as a player dimensions style element.
+They are used to provide extra default flexiblity with styling the player. However, in some cases, like if a user has the HEAD tag managed by React, users do not want this.
+When <code>window.VIDEOJS_NO_DYNAMIC_STYLE</code> is set to <code>true</code>, video.js will <em>not</em> include these element in the page.
+This means that default dimensions and configured player dimensions will <em>not</em> be applied.
+For example, the following player will end up having a width and height of 0 when initialized if <code>window.VIDEOJS_NO_DYNAMIC_STYLE === true</code>:</p>
+<pre><code class="lang-html">&lt;video width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/video&gt;
+</code></pre>
+<h3 id="-player-width-and-player-height-"><code>Player#width</code> and <code>Player#height</code></h3>
+<p>When <code>VIDEOJS_NO_DYNAMIC_STYLE</code> is set, <code>Player#width</code> and <code>Player#height</code> will apply any width and height
+that is set directly to the video element (or whatever element the current tech uses).</p>
+<h2 id="icons">Icons</h2>
+<p>You can view all of the icons available in the base theme by renaming and viewing
+<a href="https://github.com/videojs/video.js/blob/master/sandbox/icons.html.example"><code>icons.html.example</code></a> in the sandbox directory.</p>
+<h2 id="customization">Customization</h2>
+<p>When you create a new skin, the easiest way to get started is to simply override the base Video.js theme.
+You should include a new class matching the name of your theme, then just start overriding!</p>
+<pre><code class="lang-css">.vjs-skin-hotdog-stand { color: #FF0000; }
+.vjs-skin-hotdog-stand .vjs-control-bar { background: #FFFF00; }
+.vjs-skin-hotdog-stand .vjs-play-progress { background: #FF0000; }
+</code></pre>
+<p>This would take care of the major areas of the skin (play progress, the control bar background, and icon colors),
+but you can skin any other aspect.
+Our suggestion is to use a browser such as Firefox and Chrome,
+and use the developer tools to inspect the different elements and see what you&#39;d like to change and what classes
+to target when you do so.</p>
+<p>More custom skins will be available for download soon.
+If you have one you like you can share it by forking <a href="http://codepen.io/heff/pen/EarCt">this example on CodePen.io</a>,
+and adding a link on the <a href="https://github.com/videojs/video.js/wiki/Skins">Skins wiki page</a>.</p>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

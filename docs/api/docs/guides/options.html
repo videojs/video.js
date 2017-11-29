@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="options">Options</h1>
+<h2 id="setting-options">Setting Options</h2>
+<p>The Video.js embed code is simply an HTML5 video tag, so for many of the options you can use the standard tag attributes to set the options.</p>
+<pre><code class="lang-html">&lt;video controls autoplay preload=&quot;auto&quot; ...&gt;
+</code></pre>
+<p>Alternatively, you can use the data-setup attribute to provide options in the <a href="http://json.org/example.html">JSON</a> format. This is also how you would set options that aren&#39;t standard to the video tag.</p>
+<pre><code class="lang-html">&lt;video data-setup=&#39;{ &quot;controls&quot;: true, &quot;autoplay&quot;: false, &quot;preload&quot;: &quot;auto&quot; }&#39;...&gt;
+</code></pre>
+<p>Finally, if you&#39;re not using the data-setup attribute to trigger the player setup, you can pass in an object with the player options as the second argument in the javascript setup function.</p>
+<pre><code class="lang-js">videojs(&quot;example_video_1&quot;, { &quot;controls&quot;: true, &quot;autoplay&quot;: false, &quot;preload&quot;: &quot;auto&quot; });
+</code></pre>
+<h2 id="individual-options">Individual Options</h2>
+<blockquote>
+<h3 id="note-on-video-tag-attributes">Note on Video Tag Attributes</h3>
+<p>With HTML5 video tag attributes that can only be true or false (boolean), you simply include the attribute (no equals sign) to turn it on, or exclude it to turn it off. For example, to turn controls on:</p>
+</blockquote>
+<p>WRONG</p>
+<pre><code class="lang-html">&lt;video controls=&quot;true&quot; ...&gt;
+</code></pre>
+<p>RIGHT</p>
+<pre><code class="lang-html">&lt;video controls ...&gt;
+</code></pre>
+<blockquote>
+<p>The biggest issue people run into is trying to set these values to false using false as the value (e.g. controls=&quot;false&quot;) which actually does the opposite and sets the value to true because the attribute is still included. If you need the attribute to include an equals sign for XHTML validation, you can set the attribute&#39;s value to the same as its name (e.g. controls=&quot;controls&quot;).</p>
+</blockquote>
+<h3 id="controls">controls</h3>
+<p>The controls option sets whether or not the player has controls that the user can interact with. Without controls the only way to start the video playing is with the autoplay attribute or through the API.</p>
+<pre><code class="lang-html">&lt;video controls ...&gt;
+or
+{ &quot;controls&quot;: true }
+</code></pre>
+<h3 id="autoplay">autoplay</h3>
+<p>If autoplay is true, the video will start playing as soon as page is loaded (without any interaction from the user).
+NOT SUPPORTED BY APPLE iOS DEVICES. Apple blocks the autoplay functionality in an effort to protect it&#39;s customers from unwillingly using a lot of their (often expensive) monthly data plans. A user touch/click is required to start the video in this case.</p>
+<pre><code class="lang-html">&lt;video autoplay ...&gt;
+or
+{ &quot;autoplay&quot;: true }
+</code></pre>
+<h3 id="preload">preload</h3>
+<p>The preload attribute informs the browser whether or not the video data should begin downloading as soon as the video tag is loaded. The options are auto, metadata, and none.</p>
+<p>&#39;auto&#39;: Start loading the video immediately (if the browser agrees). Some mobile devices like iPhones and iPads will not preload the video in order to protect their users&#39; bandwidth. This is why the value is called &#39;auto&#39; and not something more final like &#39;true&#39;.</p>
+<p>&#39;metadata&#39;: Load only the meta data of the video, which includes information like the duration and dimensions of the video.</p>
+<p>&#39;none&#39;: Don&#39;t preload any of the video data. This will wait until the user clicks play to begin downloading.</p>
+<pre><code class="lang-html">&lt;video preload ...&gt;
+or
+{ &quot;preload&quot;: &quot;auto&quot; }
+</code></pre>
+<h3 id="poster">poster</h3>
+<p>The poster attribute sets the image that displays before the video begins playing. This is often a frame of the video or a custom title screen. As soon as the user clicks play the image will go away.</p>
+<pre><code class="lang-html">&lt;video poster=&quot;myPoster.jpg&quot; ...&gt;
+or
+{ &quot;poster&quot;: &quot;myPoster.jpg&quot; }
+</code></pre>
+<h3 id="loop">loop</h3>
+<p>The loop attribute causes the video to start over as soon as it ends. This could be used for a visual effect like clouds in the background.</p>
+<pre><code class="lang-html">&lt;video loop ...&gt;
+or
+{ &quot;loop&quot;: true }
+</code></pre>
+<h3 id="width">width</h3>
+<p>The width attribute sets the display width of the video.</p>
+<pre><code class="lang-html">&lt;video width=&quot;640&quot; ...&gt;
+or
+{ &quot;width&quot;: 640 }
+</code></pre>
+<h3 id="height">height</h3>
+<p>The height attribute sets the display height of the video.</p>
+<pre><code class="lang-html">&lt;video height=&quot;480&quot; ...&gt;
+or
+{ &quot;height&quot;: 480 }
+</code></pre>
+<h2 id="component-options">Component Options</h2>
+<p>You can set the options for any single player component. For instance, if you wanted to remove the <code>muteToggle</code> button, which
+is a child of <code>controlBar</code>, you can just set that component to false:</p>
+<pre><code class="lang-js">var player = videojs(&#39;video-id&#39;, {
+  controlBar: {
+    muteToggle: false
+  }
+});
+</code></pre>
+<p>This also works using the <code>data-setup</code> attribute on the video element, just remember the options need to use proper JSON
+notation.</p>
+<pre><code class="lang-html">&lt;video ... data-setup=&#39;{ &quot;controlBar&quot;: { &quot;muteToggle&quot;: false } }&#39;&gt;&lt;/video&gt;
+</code></pre>
+<p>The <a href="./components.html">components guide</a> has an excellent breakdown of the structure of a player, you
+just need to remember to nest child components in a <code>children</code> array for each level.</p>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

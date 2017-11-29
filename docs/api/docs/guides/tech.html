@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="playback-technology-tech-">Playback Technology (&quot;Tech&quot;)</h1>
+<p>Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using Flash, the playback technology is the specific Flash player used, e.g. Flowplayer, YouTube Player, video-js.swf, etc. (not just &quot;Flash&quot;). This could also include Silverlight, Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it.</p>
+<p>Essentially we&#39;re using HTML5 and plugins only as video decoders, and using HTML and JavaScript to create a consistent API and skinning experience across all of them.</p>
+<h2 id="building-an-api-wrapper">Building an API Wrapper</h2>
+<p>We&#39;ll write a more complete guide on writing a wrapper soon, but for now the best resource is the <a href="https://github.com/zencoder/video-js/tree/master/src">Video.js</a> source where you can see how both the HTML5 and video-js.swf API wrappers were created.</p>
+<h2 id="required-methods">Required Methods</h2>
+<p>canPlayType
+play
+pause
+currentTime
+volume
+duration
+buffered
+supportsFullScreen</p>
+<h2 id="required-events">Required Events</h2>
+<p>loadstart
+play
+pause
+playing
+ended
+volumechange
+durationchange
+error</p>
+<h2 id="optional-events-include-if-supported-">Optional Events (include if supported)</h2>
+<p>timeupdate
+progress
+enterFullScreen
+exitFullScreen</p>
+<h1 id="adding-playback-technology">Adding Playback Technology</h1>
+<p>When adding additional Tech to a video player, make sure to add the supported tech to the video object.</p>
+<h3 id="tag-method-">Tag Method:</h3>
+<pre><code>&lt;video data-setup=&#39;{&quot;techOrder&quot;: [&quot;html5&quot;, &quot;flash&quot;, &quot;other supported tech&quot;]}&#39;
+</code></pre><h3 id="object-method-">Object Method:</h3>
+<pre><code>videojs(&quot;videoID&quot;, {
+  techOrder: [&quot;html5&quot;, &quot;flash&quot;, &quot;other supported tech&quot;]
+});
+</code></pre><h1 id="technology-ordering">Technology Ordering</h1>
+<p>By default Video.js performs &quot;Tech-first&quot; ordering when it searches for a source/tech combination to play videos. This means that if you have two sources and two techs, video.js will try to play each video with the first tech in the <code>techOrder</code> option property before moving on to try the next playback technology.</p>
+<p>Tech-first ordering can present a problem if you have a <code>sourceHandler</code> that supports both <code>Html5</code> and <code>Flash</code> techs such as videojs-contrib-hls.</p>
+<p>For example, given the following video element:</p>
+  <video data-setup='{"techOrder": ["html5", "flash"]}'>
+    <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
+    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+  </video>
+
+<p>There is a good chance that the mp4 source will be selected on platforms that do not have media source extensions. Video.js will try all sources against the first playback technology, in this case <code>Html5</code>, and select the first source that can play - in this case MP4.</p>
+<p>In &quot;Tech-first&quot; mode, the tests run something like this:
+  Can video.m3u8 play with Html5? No...
+  Can video.mp4 play with Html5? Yes! Use the second source.</p>
+<p>Video.js now provides another method of selecting the source - &quot;Source-first&quot; ordering. In this mode, Video.js tries the first source against every tech in <code>techOrder</code> before moving onto the next source.</p>
+<p>With a player setup as follows:</p>
+  <video data-setup='{"techOrder": ["html5", "flash"], "sourceOrder": true}'>
+    <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
+    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+  </video>
+
+<p>The Flash-based HLS support will be tried before falling back to the MP4 source.</p>
+<p>In &quot;Source-first&quot; mode, the tests run something like this:
+  Can video.m3u8 play with Html5? No...
+  Can video.m3u8 play with Flash? Yes! Use the first source.</p>
+<h1 id="flash-technology">Flash Technology</h1>
+<p>The Flash playback tech is a part of the default <code>techOrder</code>. You may notice undesirable playback behavior in browsers that are subject to using this playback tech, in particular when scrubbing and seeking within a video. This behavior is a result of Flash&#39;s progressive video playback.</p>
+<h2 id="enabling-streaming-playback">Enabling Streaming Playback</h2>
+<p>In order to force the Flash tech to choose streaming playback, you need to provide a valid streaming source <strong>before other valid Flash video sources</strong>. This is necessary because of the source selection algorithm, where playback tech chooses the first possible source object with a valid type. Valid streaming <code>type</code> values include <code>rtmp/mp4</code> and <code>rtmp/flv</code>. The streaming <code>src</code> value requires valid connection and stream strings, separated by an <code>&amp;</code>. An example of supplying a streaming source through your HTML markup might look like:</p>
+<pre><code>&lt;source src=&quot;rtmp://your.streaming.provider.net/cfx/st/&amp;mp4:path/to/video.mp4&quot; type=&quot;rtmp/mp4&quot;&gt;
+&lt;source src=&quot;http://your.static.provider.net/path/to/video.mp4&quot; type=&quot;video/mp4&quot;&gt;
+&lt;source src=&quot;http://your.static.provider.net/path/to/video.webm&quot; type=&quot;video/webm&quot;&gt;
+</code></pre><p>You may optionally use the last <code>/</code> as the separator between connection and stream strings, for example:</p>
+<pre><code>&lt;source src=&quot;rtmp://your.streaming.provider.net/cfx/st/mp4:video.mp4&quot; type=&quot;rtmp/mp4&quot;&gt;
+</code></pre><p>All four RTMP protocols are valid in the <code>src</code> (RTMP, RTMPT, RTMPE, and RTMPS).</p>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>
