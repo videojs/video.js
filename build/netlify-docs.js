@@ -11,5 +11,9 @@ if (process.env.BRANCH === 'master' && output === '')
 
 // if we're on any other branch, we can regenerate docs
 else {
+  // generate the docs
   sh.exec('npm run docs:api');
+
+  // copy the legacy docs over
+  sh.cp('-R', 'docs/legacy-docs', 'docs/api/docs');
 }
