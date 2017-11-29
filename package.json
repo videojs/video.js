@@ -35,6 +35,7 @@
     "predocs:api": "node ./build/prepare-docs.js",
     "docs:api": "jsdoc -c .jsdoc.json",
     "postdocs:api": "node ./build/fix-api-docs.js",
+    "netlify": "babel-node ./build/netlify-docs.js",
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
     "babel": "babel src/js -d es5",
