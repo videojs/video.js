@@ -7,7 +7,7 @@ var hasOwnProp = Object.prototype.hasOwnProperty;
  * @return {Element}
  * @private
  */
-vjs.createEl = function(tagName, properties){
+vjs.createEl = function (tagName, properties) {
   var el;
 
   tagName = tagName || 'div';
@@ -15,7 +15,7 @@ vjs.createEl = function(tagName, properties){
 
   el = document.createElement(tagName);
 
-  vjs.obj.each(properties, function(propName, val){
+  vjs.obj.each(properties, function (propName, val) {
     // Not remembering why we were checking for dash
     // but using setAttribute means you have to use getAttribute
 
@@ -25,9 +25,9 @@ vjs.createEl = function(tagName, properties){
     // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
     // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
     if (propName.indexOf('aria-') !== -1 || propName == 'role') {
-     el.setAttribute(propName, val);
+      el.setAttribute(propName, val);
     } else {
-     el[propName] = val;
+      el[propName] = val;
     }
   });
 
@@ -40,7 +40,7 @@ vjs.createEl = function(tagName, properties){
  * @return {String}
  * @private
  */
-vjs.capitalize = function(string){
+vjs.capitalize = function (string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -60,9 +60,9 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
-vjs.obj.create = Object.create || function(obj){
+vjs.obj.create = Object.create || function (obj) {
   //Create a new function called 'F' which is just an empty object.
-  function F() {}
+  function F() { }
 
   //the prototype of the 'F' function should point to the
   //parameter of the anonymous function.
@@ -80,7 +80,7 @@ vjs.obj.create = Object.create || function(obj){
  * @this {*}
  * @private
  */
-vjs.obj.each = function(obj, fn, context){
+vjs.obj.each = function (obj, fn, context) {
   for (var key in obj) {
     if (hasOwnProp.call(obj, key)) {
       fn.call(context || this, key, obj[key]);
@@ -95,9 +95,9 @@ vjs.obj.each = function(obj, fn, context){
  * @return {Object}
  * @private
  */
-vjs.obj.merge = function(obj1, obj2){
+vjs.obj.merge = function (obj1, obj2) {
   if (!obj2) { return obj1; }
-  for (var key in obj2){
+  for (var key in obj2) {
     if (hasOwnProp.call(obj2, key)) {
       obj1[key] = obj2[key];
     }
@@ -114,14 +114,14 @@ vjs.obj.merge = function(obj1, obj2){
  * @return {Object}      New object. Obj1 and Obj2 will be untouched.
  * @private
  */
-vjs.obj.deepMerge = function(obj1, obj2){
+vjs.obj.deepMerge = function (obj1, obj2) {
   var key, val1, val2;
 
   // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
-  for (key in obj2){
+  for (key in obj2) {
     if (hasOwnProp.call(obj2, key)) {
       val1 = obj1[key];
       val2 = obj2[key];
@@ -143,7 +143,7 @@ vjs.obj.deepMerge = function(obj1, obj2){
  * @return {Object}     Copy of object
  * @private
  */
-vjs.obj.copy = function(obj){
+vjs.obj.copy = function (obj) {
   return vjs.obj.merge({}, obj);
 };
 
@@ -153,7 +153,7 @@ vjs.obj.copy = function(obj){
  * @return {Boolean}     True if plain, false otherwise
  * @private
  */
-vjs.obj.isPlain = function(obj){
+vjs.obj.isPlain = function (obj) {
   return !!obj
     && typeof obj === 'object'
     && obj.toString() === '[object Object]'
@@ -167,7 +167,7 @@ vjs.obj.isPlain = function(obj){
  * @return {Boolean}     True if plain, false otherwise
  * @private
  */
-vjs.obj.isArray = Array.isArray || function(arr) {
+vjs.obj.isArray = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) === '[object Array]';
 };
 
@@ -178,7 +178,7 @@ vjs.obj.isArray = Array.isArray || function(arr) {
  * @return {Boolean} True if NaN, false otherwise
  * @private
  */
-vjs.isNaN = function(num) {
+vjs.isNaN = function (num) {
   return num !== num;
 };
 
@@ -191,12 +191,12 @@ vjs.isNaN = function(num) {
  * @return {Function}
  * @private
  */
-vjs.bind = function(context, fn, uid) {
+vjs.bind = function (context, fn, uid) {
   // Make sure the function has a unique ID
   if (!fn.guid) { fn.guid = vjs.guid++; }
 
   // Create the new function that changes the context
-  var ret = function() {
+  var ret = function () {
     return fn.apply(context, arguments);
   };
 
@@ -241,7 +241,7 @@ vjs.expando = 'vdata' + (new Date()).getTime();
  * @return {Object}
  * @private
  */
-vjs.getData = function(el){
+vjs.getData = function (el) {
   var id = el[vjs.expando];
   if (!id) {
     id = el[vjs.expando] = vjs.guid++;
@@ -258,7 +258,7 @@ vjs.getData = function(el){
  * @return {Object}
  * @private
  */
-vjs.hasData = function(el){
+vjs.hasData = function (el) {
   var id = el[vjs.expando];
   return !(!id || vjs.isEmpty(vjs.cache[id]));
 };
@@ -268,7 +268,7 @@ vjs.hasData = function(el){
  * @param  {Element} el Remove data for an element
  * @private
  */
-vjs.removeData = function(el){
+vjs.removeData = function (el) {
   var id = el[vjs.expando];
   if (!id) { return; }
   // Remove all stored data
@@ -280,7 +280,7 @@ vjs.removeData = function(el){
   // Remove the expando property from the DOM node
   try {
     delete el[vjs.expando];
-  } catch(e) {
+  } catch (e) {
     if (el.removeAttribute) {
       el.removeAttribute(vjs.expando);
     } else {
@@ -296,7 +296,7 @@ vjs.removeData = function(el){
  * @return {Boolean}
  * @private
  */
-vjs.isEmpty = function(obj) {
+vjs.isEmpty = function (obj) {
   for (var prop in obj) {
     // Inlude null properties as empty.
     if (obj[prop] !== null) {
@@ -312,7 +312,7 @@ vjs.isEmpty = function(obj) {
  * @param {String} classToCheck Classname to check
  * @private
  */
-vjs.hasClass = function(element, classToCheck){
+vjs.hasClass = function (element, classToCheck) {
   return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
 };
 
@@ -323,7 +323,7 @@ vjs.hasClass = function(element, classToCheck){
  * @param {String} classToAdd Classname to add
  * @private
  */
-vjs.addClass = function(element, classToAdd){
+vjs.addClass = function (element, classToAdd) {
   if (!vjs.hasClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
@@ -335,17 +335,17 @@ vjs.addClass = function(element, classToAdd){
  * @param {String} classToAdd Classname to remove
  * @private
  */
-vjs.removeClass = function(element, classToRemove){
+vjs.removeClass = function (element, classToRemove) {
   var classNames, i;
 
-  if (!vjs.hasClass(element, classToRemove)) {return;}
+  if (!vjs.hasClass(element, classToRemove)) { return; }
 
   classNames = element.className.split(' ');
 
   // no arr.indexOf in ie8, and we don't want to add a big shim
   for (i = classNames.length - 1; i >= 0; i--) {
     if (classNames[i] === classToRemove) {
-      classNames.splice(i,1);
+      classNames.splice(i, 1);
     }
   }
 
@@ -359,7 +359,7 @@ vjs.removeClass = function(element, classToRemove){
  * @private
  */
 vjs.TEST_VID = vjs.createEl('video');
-(function() {
+(function () {
   var track = document.createElement('track');
   track.kind = 'captions';
   track.srclang = 'en';
@@ -386,13 +386,13 @@ vjs.IS_IPAD = (/iPad/i).test(vjs.USER_AGENT);
 vjs.IS_IPOD = (/iPod/i).test(vjs.USER_AGENT);
 vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
 
-vjs.IOS_VERSION = (function(){
+vjs.IOS_VERSION = (function () {
   var match = vjs.USER_AGENT.match(/OS (\d+)_/i);
   if (match && match[1]) { return match[1]; }
 })();
 
 vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
-vjs.ANDROID_VERSION = (function() {
+vjs.ANDROID_VERSION = (function () {
   // This matches Android Major.Minor.Patch versions
   // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
   var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
@@ -424,14 +424,31 @@ vjs.IS_IE8 = (/MSIE\s8\.0/).test(vjs.USER_AGENT);
 vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 vjs.BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in vjs.TEST_VID.style;
 
+vjs.PASSIVE_LISTNERS_SUPPORTED = (function () {
+  var isPassiveSupported = false;
+  var opts;
+  try {
+    opts = Object.defineProperty({}, 'passive', {
+      get: function () {
+        isPassiveSupported = true;
+      }
+    });
+    window.addEventListener('testPassive', null, opts);
+    window.removeEventListener('testPassive', null, opts);
+  } catch (e) { }
+
+  return isPassiveSupported;
+})();
+vjs.PASSIVE_EVENTS = ['touchstart', 'touchmove'];
+
 /**
  * Apply attributes to an HTML element.
  * @param  {Element} el         Target element.
  * @param  {Object=} attributes Element attributes to be applied.
  * @private
  */
-vjs.setElementAttributes = function(el, attributes){
-  vjs.obj.each(attributes, function(attrName, attrValue) {
+vjs.setElementAttributes = function (el, attributes) {
+  vjs.obj.each(attributes, function (attrName, attrValue) {
     if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
       el.removeAttribute(attrName);
     } else {
@@ -449,7 +466,7 @@ vjs.setElementAttributes = function(el, attributes){
  * @return {Object}
  * @private
  */
-vjs.getElementAttributes = function(tag){
+vjs.getElementAttributes = function (tag) {
   var obj, knownBooleans, attrs, attrName, attrVal;
 
   obj = {};
@@ -457,7 +474,7 @@ vjs.getElementAttributes = function(tag){
   // known boolean attributes
   // we can check for matching boolean properties, but older browsers
   // won't know about HTML5 boolean attributes that we still read from
-  knownBooleans = ','+'autoplay,controls,loop,muted,default'+',';
+  knownBooleans = ',' + 'autoplay,controls,loop,muted,default' + ',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     attrs = tag.attributes;
@@ -468,7 +485,7 @@ vjs.getElementAttributes = function(tag){
 
       // check for known booleans
       // the matching element property will return a value for typeof
-      if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(','+attrName+',') !== -1) {
+      if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(',' + attrName + ',') !== -1) {
         // the value of an included boolean attribute is typically an empty
         // string ('') which would equal false if we just check for a false value.
         // we also don't want support bad code like autoplay='false'
@@ -490,14 +507,14 @@ vjs.getElementAttributes = function(tag){
  * @return {String}            Style value
  * @private
  */
-vjs.getComputedDimension = function(el, strCssRule){
+vjs.getComputedDimension = function (el, strCssRule) {
   var strValue = '';
-  if(document.defaultView && document.defaultView.getComputedStyle){
+  if (document.defaultView && document.defaultView.getComputedStyle) {
     strValue = document.defaultView.getComputedStyle(el, '').getPropertyValue(strCssRule);
 
-  } else if(el.currentStyle){
+  } else if (el.currentStyle) {
     // IE8 Width/Height support
-    strValue = el['client'+strCssRule.substr(0,1).toUpperCase() + strCssRule.substr(1)] + 'px';
+    strValue = el['client' + strCssRule.substr(0, 1).toUpperCase() + strCssRule.substr(1)] + 'px';
   }
   return strValue;
 };
@@ -508,7 +525,7 @@ vjs.getComputedDimension = function(el, strCssRule){
  * @param  {[type]} parent Element to insert child into
  * @private
  */
-vjs.insertFirst = function(child, parent){
+vjs.insertFirst = function (child, parent) {
   if (parent.firstChild) {
     parent.insertBefore(child, parent.firstChild);
   } else {
@@ -530,7 +547,7 @@ vjs.browser = {};
  * @return {Element}    Element with supplied ID
  * @private
  */
-vjs.el = function(id){
+vjs.el = function (id) {
   if (id.indexOf('#') === 0) {
     id = id.slice(1);
   }
@@ -547,14 +564,14 @@ vjs.el = function(id){
  * @return {String}         Time formatted as H:MM:SS or M:SS
  * @private
  */
-vjs.formatTime = function(seconds, guide) {
+vjs.formatTime = function (seconds, guide) {
   // Default to using seconds as guide
   guide = guide || seconds;
   var s = Math.floor(seconds % 60),
-      m = Math.floor(seconds / 60 % 60),
-      h = Math.floor(seconds / 3600),
-      gm = Math.floor(guide / 60 % 60),
-      gh = Math.floor(guide / 3600);
+    m = Math.floor(seconds / 60 % 60),
+    h = Math.floor(seconds / 3600),
+    gm = Math.floor(guide / 60 % 60),
+    gh = Math.floor(guide / 3600);
 
   // handle invalid times
   if (isNaN(seconds) || seconds === Infinity) {
@@ -577,12 +594,12 @@ vjs.formatTime = function(seconds, guide) {
 };
 
 // Attempt to block the ability to select text while dragging controls
-vjs.blockTextSelection = function(){
+vjs.blockTextSelection = function () {
   document.body.focus();
   document.onselectstart = function () { return false; };
 };
 // Turn off text selection blocking
-vjs.unblockTextSelection = function(){ document.onselectstart = function () { return true; }; };
+vjs.unblockTextSelection = function () { document.onselectstart = function () { return true; }; };
 
 /**
  * Trim whitespace from the ends of a string.
@@ -590,8 +607,8 @@ vjs.unblockTextSelection = function(){ document.onselectstart = function () { re
  * @return {String}        Trimmed string
  * @private
  */
-vjs.trim = function(str){
-  return (str+'').replace(/^\s+|\s+$/g, '');
+vjs.trim = function (str) {
+  return (str + '').replace(/^\s+|\s+$/g, '');
 };
 
 /**
@@ -601,9 +618,9 @@ vjs.trim = function(str){
  * @return {Number}     Rounded number
  * @private
  */
-vjs.round = function(num, dec) {
+vjs.round = function (num, dec) {
   if (!dec) { dec = 0; }
-  return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
+  return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
 };
 
 /**
@@ -616,14 +633,14 @@ vjs.round = function(num, dec) {
  * @return {Object}       Fake TimeRange object
  * @private
  */
-vjs.createTimeRange = function(start, end){
+vjs.createTimeRange = function (start, end) {
   if (start === undefined && end === undefined) {
     return {
       length: 0,
-      start: function() {
+      start: function () {
         throw new Error('This TimeRanges object is empty');
       },
-      end: function() {
+      end: function () {
         throw new Error('This TimeRanges object is empty');
       }
     };
@@ -631,8 +648,8 @@ vjs.createTimeRange = function(start, end){
 
   return {
     length: 1,
-    start: function() { return start; },
-    end: function() { return end; }
+    start: function () { return start; },
+    end: function () { return end; }
   };
 };
 
@@ -640,13 +657,13 @@ vjs.createTimeRange = function(start, end){
  * Add to local storage (may removable)
  * @private
  */
-vjs.setLocalStorage = function(key, value){
+vjs.setLocalStorage = function (key, value) {
   try {
     // IE was throwing errors referencing the var anywhere without this
     var localStorage = window.localStorage || false;
     if (!localStorage) { return; }
     localStorage[key] = value;
-  } catch(e) {
+  } catch (e) {
     if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
       vjs.log('LocalStorage Full (VideoJS)', e);
     } else {
@@ -666,13 +683,13 @@ vjs.setLocalStorage = function(key, value){
  * @return {String}     Absolute URL
  * @private
  */
-vjs.getAbsoluteURL = function(url){
+vjs.getAbsoluteURL = function (url) {
 
   // Check if absolute URL
   if (!url.match(/^https?:\/\//)) {
     // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
     url = vjs.createEl('div', {
-      innerHTML: '<a href="'+url+'">x</a>'
+      innerHTML: '<a href="' + url + '">x</a>'
     }).firstChild.href;
   }
 
@@ -685,7 +702,7 @@ vjs.getAbsoluteURL = function(url){
  * @param  {String} url The url to parse
  * @return {Object}     An object of url details
  */
-vjs.parseUrl = function(url) {
+vjs.parseUrl = function (url) {
   var div, a, addToBody, props, details;
 
   props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
@@ -699,7 +716,7 @@ vjs.parseUrl = function(url) {
   addToBody = (a.host === '' && a.protocol !== 'file:');
   if (addToBody) {
     div = vjs.createEl('div');
-    div.innerHTML = '<a href="'+url+'"></a>';
+    div.innerHTML = '<a href="' + url + '"></a>';
     a = div.firstChild;
     // prevent the div from affecting layout
     div.setAttribute('style', 'display:none; position:absolute;');
@@ -737,7 +754,7 @@ vjs.parseUrl = function(url) {
  * @param  {[type]} args The args to be passed to the log
  * @private
  */
-function _logType(type, args){
+function _logType(type, args) {
   var argsArray, noop, console;
 
   // convert args to an array to get array functions
@@ -746,7 +763,7 @@ function _logType(type, args){
   // they will still be stored in vjs.log.history
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
-  noop = function(){};
+  noop = function () { };
   console = window['console'] || {
     'log': noop,
     'warn': noop,
@@ -755,7 +772,7 @@ function _logType(type, args){
 
   if (type) {
     // add the type to the front of the message
-    argsArray.unshift(type.toUpperCase()+':');
+    argsArray.unshift(type.toUpperCase() + ':');
   } else {
     // default to log with no prefix
     type = 'log';
@@ -779,7 +796,7 @@ function _logType(type, args){
 /**
  * Log plain debug messages
  */
-vjs.log = function(){
+vjs.log = function () {
   _logType(null, arguments);
 };
 
@@ -792,20 +809,20 @@ vjs.log.history = [];
 /**
  * Log error messages
  */
-vjs.log.error = function(){
+vjs.log.error = function () {
   _logType('error', arguments);
 };
 
 /**
  * Log warning messages
  */
-vjs.log.warn = function(){
+vjs.log.warn = function () {
   _logType('warn', arguments);
 };
 
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-vjs.findPosition = function(el) {
+vjs.findPosition = function (el) {
   var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
   if (el.getBoundingClientRect && el.parentNode) {
@@ -852,7 +869,7 @@ vjs.arr = {};
  * @returns {Array}               The array
  * @private
  */
-vjs.arr.forEach = function(array, callback, thisArg) {
+vjs.arr.forEach = function (array, callback, thisArg) {
   if (vjs.obj.isArray(array) && callback instanceof Function) {
     for (var i = 0, len = array.length; i < len; ++i) {
       callback.call(thisArg || vjs, array[i], i, array);

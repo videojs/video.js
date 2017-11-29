@@ -15,7 +15,7 @@
  * @param  {Function} fn   Event listener.
  * @private
  */
-vjs.on = function(elem, type, fn){
+vjs.on = function (elem, type, fn) {
   if (vjs.obj.isArray(type)) {
     return _handleMultipleEvents(vjs.on, elem, type, fn);
   }
@@ -34,7 +34,7 @@ vjs.on = function(elem, type, fn){
   if (!data.dispatcher) {
     data.disabled = false;
 
-    data.dispatcher = function (event){
+    data.dispatcher = function (event) {
 
       if (data.disabled) return;
       event = vjs.fixEvent(event);
@@ -58,7 +58,13 @@ vjs.on = function(elem, type, fn){
 
   if (data.handlers[type].length == 1) {
     if (elem.addEventListener) {
-      elem.addEventListener(type, data.dispatcher, false);
+      if (vjs.PASSIVE_LISTNERS_SUPPORTED && vjs.PASSIVE_EVENTS.indexOf(type) > -1) {
+        elem.addEventListener(type, data.dispatcher, {
+          'passive': true
+        });
+      } else {
+        elem.addEventListener(type, data.dispatcher, false);
+      }
     } else if (elem.attachEvent) {
       elem.attachEvent('on' + type, data.dispatcher);
     }
@@ -72,7 +78,7 @@ vjs.on = function(elem, type, fn){
  * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
  * @private
  */
-vjs.off = function(elem, type, fn) {
+vjs.off = function (elem, type, fn) {
   // Don't want to add a cache object through getData if not needed
   if (!vjs.hasData(elem)) return;
 
@@ -86,9 +92,9 @@ vjs.off = function(elem, type, fn) {
   }
 
   // Utility function
-  var removeType = function(t){
-     data.handlers[t] = [];
-     vjs.cleanUpEvents(elem,t);
+  var removeType = function (t) {
+    data.handlers[t] = [];
+    vjs.cleanUpEvents(elem, t);
   };
 
   // Are we removing all bound events?
@@ -126,7 +132,7 @@ vjs.off = function(elem, type, fn) {
  * @param  {String} type Type of event to clean up
  * @private
  */
-vjs.cleanUpEvents = function(elem, type) {
+vjs.cleanUpEvents = function (elem, type) {
   var data = vjs.getData(elem);
 
   // Remove the events of a particular type if there are none left
@@ -137,7 +143,13 @@ vjs.cleanUpEvents = function(elem, type) {
 
     // Remove the meta-handler from the element
     if (elem.removeEventListener) {
-      elem.removeEventListener(type, data.dispatcher, false);
+      if (vjs.PASSIVE_LISTNERS_SUPPORTED && vjs.PASSIVE_EVENTS.indexOf(type) > -1) {
+        elem.removeEventListener(type, data.dispatcher, {
+          'passive': true
+        });
+      } else {
+        elem.removeEventListener(type, data.dispatcher, false);
+      }
     } else if (elem.detachEvent) {
       elem.detachEvent('on' + type, data.dispatcher);
     }
@@ -166,7 +178,7 @@ vjs.cleanUpEvents = function(elem, type) {
  * @return {Object}
  * @private
  */
-vjs.fixEvent = function(event) {
+vjs.fixEvent = function (event) {
 
   function returnTrue() { return true; }
   function returnFalse() { return false; }
@@ -276,18 +288,18 @@ vjs.fixEvent = function(event) {
  * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
  * @private
  */
-vjs.trigger = function(elem, event) {
+vjs.trigger = function (elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasData first.
   var elemData = (vjs.hasData(elem)) ? vjs.getData(elem) : {};
   var parent = elem.parentNode || elem.ownerDocument;
-      // type = event.type || event,
-      // handler;
+  // type = event.type || event,
+  // handler;
 
   // If an event name was passed as a string, creates an event out of it
   if (typeof event === 'string') {
-    event = { type:event, target:elem };
+    event = { type: event, target: elem };
   }
   // Normalizes the event properties.
   event = vjs.fixEvent(event);
@@ -298,11 +310,11 @@ vjs.trigger = function(elem, event) {
   }
 
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
-    // recursively calls this function to bubble the event up the DOM.
-    if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
+  // recursively calls this function to bubble the event up the DOM.
+  if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
     vjs.trigger(parent, event);
 
-  // If at the top of the DOM, triggers the default action unless disabled.
+    // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
     var targetData = vjs.getData(event.target);
 
@@ -349,11 +361,11 @@ vjs.trigger = function(elem, event) {
  * @param  {Function} fn
  * @private
  */
-vjs.one = function(elem, type, fn) {
+vjs.one = function (elem, type, fn) {
   if (vjs.obj.isArray(type)) {
     return _handleMultipleEvents(vjs.one, elem, type, fn);
   }
-  var func = function(){
+  var func = function () {
     vjs.off(elem, type, func);
     fn.apply(this, arguments);
   };
@@ -371,7 +383,7 @@ vjs.one = function(elem, type, fn) {
  * @private
  */
 function _handleMultipleEvents(fn, elem, type, callback) {
-  vjs.arr.forEach(type, function(type) {
+  vjs.arr.forEach(type, function (type) {
     fn(elem, type, callback); //Call the event method for each one of the types
   });
 }
