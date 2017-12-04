@@ -5,6 +5,9 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 4.12.11-notrack (2017-12-04)
+* @Mulder90 Add passive event listeners support
+
 ## 4.12.10-notrack (2016-10-21)
 * @Mulder90 Remove track supports
 
