@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="languages">Languages</h1>
+<p>Multiple language support allows for users of non-English locales to natively interact with the displayed player. Video.js will compile multiple language files (see below) and instantiate with a global dictionary of language key/value support. Video.js player instances can be created with per-player language support that amends/overrides these default values. Player instances can also hard-set default languages to values other than English as of version 4.7.</p>
+<h2 id="creating-the-language-file">Creating the Language File</h2>
+<p>Video.js uses key/value object dictionaries in JSON form.</p>
+<p>An English lang file is at <a href="https://github.com/videojs/video.js/tree/master/lang/en.json">/lang/en.json</a> which should be used as a template for new files. This will be kept up to date with strings in the core player that need localizations.</p>
+<p>A sample dictionary for Spanish <code>[&#39;es&#39;]</code> would look as follows:</p>
+<pre><code class="lang-JSON">{
+  &quot;Play&quot;: &quot;Reproducción&quot;,
+  &quot;Pause&quot;: &quot;Pausa&quot;,
+  &quot;Current Time&quot;: &quot;Tiempo reproducido&quot;,
+  &quot;Duration Time&quot;: &quot;Duración total&quot;,
+  &quot;Remaining Time&quot;: &quot;Tiempo restante&quot;,
+  &quot;Stream Type&quot;: &quot;Tipo de secuencia&quot;,
+  &quot;LIVE&quot;: &quot;DIRECTO&quot;,
+  &quot;Loaded&quot;: &quot;Cargado&quot;,
+  &quot;Progress&quot;: &quot;Progreso&quot;,
+  &quot;Fullscreen&quot;: &quot;Pantalla completa&quot;,
+  &quot;Non-Fullscreen&quot;: &quot;Pantalla no completa&quot;,
+  &quot;Mute&quot;: &quot;Silenciar&quot;,
+  &quot;Unmute&quot;: &quot;No silenciado&quot;,
+  &quot;Playback Rate&quot;: &quot;Velocidad de reproducción&quot;,
+  &quot;Subtitles&quot;: &quot;Subtítulos&quot;,
+  &quot;subtitles off&quot;: &quot;Subtítulos desactivados&quot;,
+  &quot;Captions&quot;: &quot;Subtítulos especiales&quot;,
+  &quot;captions off&quot;: &quot;Subtítulos especiales desactivados&quot;,
+  &quot;Chapters&quot;: &quot;Capítulos&quot;,
+  &quot;Close Modal Dialog&quot;: &quot;Cerca de diálogo modal&quot;,
+  &quot;You aborted the video playback&quot;: &quot;Ha interrumpido la reproducción del vídeo.&quot;,
+  &quot;A network error caused the video download to fail part-way.&quot;: &quot;Un error de red ha interrumpido la descarga del vídeo.&quot;,
+  &quot;The video could not be loaded, either because the server or network failed or because the format is not supported.&quot;: &quot;No se ha podido cargar el vídeo debido a un fallo de red o del servidor o porque el formato es incompatible.&quot;,
+  &quot;The video playback was aborted due to a corruption problem or because the video used features your browser did not support.&quot;: &quot;La reproducción de vídeo se ha interrumpido por un problema de corrupción de datos o porque el vídeo precisa funciones que su navegador no ofrece.&quot;,
+  &quot;No compatible source was found for this video.&quot;: &quot;No se ha encontrado ninguna fuente compatible con este vídeo.&quot;
+}
+</code></pre>
+<p>Notes:</p>
+<ul>
+<li>The file name should always be in the format <code>XX.json</code>, where <code>XX</code> is the language code. This should be a two letter code (for options see the bottom of this document) except for cases where a more specific code with sub-code is appropriate, e.g. <code>zh-CN.lang</code>.</li>
+<li>For automatic inclusion at build time, add your language file to the <code>/lang</code> directory (see &#39;Adding Languages to Video.js below&#39;).</li>
+</ul>
+<h2 id="adding-languages-to-video-js">Adding Languages to Video.js</h2>
+<p>Additional language support can be added to Video.js in multiple ways.</p>
+<ol>
+<li>Create language scripts out of your JSON objects by using our custom grunt task <code>vjslanguages</code>. This task is automatically run as part of the default grunt task in Video.JS, but can be configured to match your <code>src</code>/<code>dist</code> directories if different. Once these scripts are created, just add them to your DOM like any other script.</li>
+</ol>
+<p>NOTE: These need to be added after the core Video.js script.</p>
+<ol>
+<li>Add your JSON objects via the videojs.addLanguage API. Preferably in the HEAD element of your DOM or otherwise prior to player instantiation.</li>
+</ol>
+<pre><code class="lang-html">&lt;head&gt;
+&lt;script&gt;
+  videojs.options.flash.swf = &#39;../node_modules/videojs-swf/dist/video-js.swf&#39;;
+  videojs.addLanguage(&#39;es&#39;, {
+    &quot;Play&quot;: &quot;Reproducción&quot;,
+    &quot;Pause&quot;: &quot;Pausa&quot;,
+    &quot;Current Time&quot;: &quot;Tiempo reproducido&quot;,
+    &quot;Duration Time&quot;: &quot;Duración total&quot;,
+    &quot;Remaining Time&quot;: &quot;Tiempo restante&quot;,
+    &quot;Stream Type&quot;: &quot;Tipo de secuencia&quot;,
+    &quot;LIVE&quot;: &quot;DIRECTO&quot;,
+    &quot;Loaded&quot;: &quot;Cargado&quot;,
+    &quot;Progress&quot;: &quot;Progreso&quot;,
+    &quot;Fullscreen&quot;: &quot;Pantalla completa&quot;,
+    &quot;Non-Fullscreen&quot;: &quot;Pantalla no completa&quot;,
+    &quot;Mute&quot;: &quot;Silenciar&quot;,
+    &quot;Unmute&quot;: &quot;No silenciado&quot;,
+    &quot;Playback Rate&quot;: &quot;Velocidad de reproducción&quot;,
+    &quot;Subtitles&quot;: &quot;Subtítulos&quot;,
+    &quot;subtitles off&quot;: &quot;Subtítulos desactivados&quot;,
+    &quot;Captions&quot;: &quot;Subtítulos especiales&quot;,
+    &quot;captions off&quot;: &quot;Subtítulos especiales desactivados&quot;,
+    &quot;Chapters&quot;: &quot;Capítulos&quot;,
+    &quot;Close Modal Dialog&quot;: &quot;Cerca de diálogo modal&quot;,
+    &quot;You aborted the video playback&quot;: &quot;Ha interrumpido la reproducción del vídeo.&quot;,
+    &quot;A network error caused the video download to fail part-way.&quot;: &quot;Un error de red ha interrumpido la descarga del vídeo.&quot;,
+    &quot;The video could not be loaded, either because the server or network failed or because the format is not supported.&quot;: &quot;No se ha podido cargar el vídeo debido a un fallo de red o del servidor o porque el formato es incompatible.&quot;,
+    &quot;The video playback was aborted due to a corruption problem or because the video used features your browser did not support.&quot;: &quot;La reproducción de vídeo se ha interrumpido por un problema de corrupción de datos o porque el vídeo precisa funciones que su navegador no ofrece.&quot;,
+    &quot;No compatible source was found for this video.&quot;: &quot;No se ha encontrado ninguna fuente compatible con este vídeo.&quot;
+});
+&lt;/script&gt;
+&lt;/head&gt;
+</code></pre>
+<ol>
+<li>During a Video.js player instantiation. Adding the languages to the configuration object provided in the <code>data-setup</code> attribute.</li>
+</ol>
+<pre><code class="lang-html">&lt;video id=&quot;example_video_1&quot; class=&quot;video-js vjs-default-skin&quot;
+  controls preload=&quot;auto&quot; width=&quot;640&quot; height=&quot;264&quot;
+  data-setup=&#39;{&quot;languages&quot;:{&quot;es&quot;:{&quot;Play&quot;:&quot;Juego&quot;}}}&#39;&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.mp4&quot; type=&#39;video/mp4&#39; /&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.webm&quot; type=&#39;video/webm&#39; /&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.ogv&quot; type=&#39;video/ogg&#39; /&gt;
+
+ &lt;track kind=&quot;captions&quot; src=&quot;http://example.com/path/to/captions.vtt&quot; srclang=&quot;en&quot; label=&quot;English&quot; default&gt;
+
+&lt;/video&gt;
+</code></pre>
+<p>Notes:</p>
+<ul>
+<li>This will add your language key/values to the Video.js player instances individually. If these values already exist in the global dictionary via the process above, those will be overridden for the player instance in question.</li>
+</ul>
+<h2 id="setting-default-language-in-a-video-js-player">Setting Default Language in a Video.js Player</h2>
+<p>During a Video.js player instantiation you can force it to localize to a specific language by including the locale value into the configuration object via the <code>data-setup</code> attribute. Valid options listed at the bottom of the page for reference.</p>
+<pre><code class="lang-html">&lt;video id=&quot;example_video_1&quot; class=&quot;video-js vjs-default-skin&quot;
+  controls preload=&quot;auto&quot; width=&quot;640&quot; height=&quot;264&quot;
+  data-setup=&#39;{&quot;language&quot;:&quot;es&quot;}&#39;&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.mp4&quot; type=&#39;video/mp4&#39; /&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.webm&quot; type=&#39;video/webm&#39; /&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.ogv&quot; type=&#39;video/ogg&#39; /&gt;
+
+ &lt;track kind=&quot;captions&quot; src=&quot;http://example.com/path/to/captions.vtt&quot; srclang=&quot;en&quot; label=&quot;English&quot; default&gt;
+
+&lt;/video&gt;
+</code></pre>
+<h2 id="determining-player-language">Determining Player Language</h2>
+<p>The player language is set to one of the following in descending priority:</p>
+<ul>
+<li>The language specified in setup options as above</li>
+<li>The language specified by the closet element with a <code>lang</code> attribute. This could be the player itself or a parent element. Usually the document language is specified on the <code>html</code> tag.</li>
+<li>Browser language preference (the first language if more than one is configured)</li>
+<li>&#39;en&#39;</li>
+</ul>
+<p>The player language can be change after instantiation with <code>language(&#39;fr&#39;)</code>. However localizable text will not be modified by doing this, for best results set the language beforehand.</p>
+<h2 id="language-selection">Language selection</h2>
+<ul>
+<li>Language codes are considered case-insensitively (<code>en-US</code> == <code>en-us</code>).</li>
+<li>If there is no match for a language code with a subcode (<code>en-us</code>), a match for the primary code (<code>en</code>) is used if available.</li>
+</ul>
+<h2 id="localization-in-plugins">Localization in Plugins</h2>
+<p>When you&#39;re developing a plugin, you can also introduce new localized strings. Simply wrap the string with the player&#39;s <code>localize</code> function:</p>
+<pre><code class="lang-js">var details = &#39;&lt;div class=&quot;vjs-errors-details&quot;&gt;&#39; + player.localize(&#39;Technical details&#39;) + &#39;&lt;/div&gt;&#39;;
+</code></pre>
+<h2 id="language-codes">Language Codes</h2>
+<p>The following is a list of official language codes.</p>
+<p><strong>NOTE:</strong> For supported language translations, please see the <a href="https://github.com/videojs/video.js/tree/master/lang">Languages Folder (/lang)</a> folder located in the project root.</p>
+<table border="0" cellspacing="5" cellpadding="5">
+  <tr>
+    <table>
+      <tr><th>ab<th><td>Abkhazian</td></tr>
+      <tr><th>aa<th><td>Afar</td></tr>
+      <tr><th>af<th><td>Afrikaans</td></tr>
+      <tr><th>sq<th><td>Albanian</td></tr>
+      <tr><th>am<th><td>Amharic</td></tr>
+      <tr><th>ar<th><td>Arabic</td></tr>
+      <tr><th>an<th><td>Aragonese</td></tr>
+      <tr><th>hy<th><td>Armenian</td></tr>
+      <tr><th>as<th><td>Assamese</td></tr>
+      <tr><th>ay<th><td>Aymara</td></tr>
+      <tr><th>az<th><td>Azerbaijani</td></tr>
+      <tr><th>ba<th><td>Bashkir</td></tr>
+      <tr><th>eu<th><td>Basque</td></tr>
+      <tr><th>bn<th><td>Bengali (Bangla)</td></tr>
+      <tr><th>dz<th><td>Bhutani</td></tr>
+      <tr><th>bh<th><td>Bihari</td></tr>
+      <tr><th>bi<th><td>Bislama</td></tr>
+      <tr><th>br<th><td>Breton</td></tr>
+      <tr><th>bg<th><td>Bulgarian</td></tr>
+      <tr><th>my<th><td>Burmese</td></tr>
+      <tr><th>be<th><td>Byelorussian (Belarusian)</td></tr>
+      <tr><th>km<th><td>Cambodian</td></tr>
+      <tr><th>ca<th><td>Catalan</td></tr>
+      <tr><th>zh<th><td>Chinese (Simplified)</td></tr>
+      <tr><th>zh<th><td>Chinese (Traditional)</td></tr>
+      <tr><th>co<th><td>Corsican</td></tr>
+      <tr><th>hr<th><td>Croatian</td></tr>
+      <tr><th>cs<th><td>Czech</td></tr>
+      <tr><th>da<th><td>Danish</td></tr>
+      <tr><th>nl<th><td>Dutch</td></tr>
+      <tr><th>en<th><td>English</td></tr>
+      <tr><th>eo<th><td>Esperanto</td></tr>
+      <tr><th>et<th><td>Estonian</td></tr>
+      <tr><th>fo<th><td>Faeroese</td></tr>
+      <tr><th>fa<th><td>Farsi</td></tr>
+      <tr><th>fj<th><td>Fiji</td></tr>
+      <tr><th>fi<th><td>Finnish</td></tr>
+      <tr><th>fr<th><td>French</td></tr>
+      <tr><th>fy<th><td>Frisian</td></tr>
+      <tr><th>gl<th><td>Galician</td></tr>
+      <tr><th>gd<th><td>Gaelic (Scottish)</td></tr>
+      <tr><th>gv<th><td>Gaelic (Manx)</td></tr>
+      <tr><th>ka<th><td>Georgian</td></tr>
+      <tr><th>de<th><td>German</td></tr>
+      <tr><th>el<th><td>Greek</td></tr>
+      <tr><th>kl<th><td>Greenlandic</td></tr>
+      <tr><th>gn<th><td>Guarani</td></tr>
+      <tr><th>gu<th><td>Gujarati</td></tr>
+      <tr><th>ht<th><td>Haitian Creole</td></tr>
+      <tr><th>ha<th><td>Hausa</td></tr>
+      <tr><th>he<th><td>Hebrew</td></tr>
+      <tr><th>hi<th><td>Hindi</td></tr>
+      <tr><th>hu<th><td>Hungarian</td></tr>
+      <tr><th>is<th><td>Icelandic</td></tr>
+      <tr><th>io<th><td>Ido</td></tr>
+      <tr><th>id<th><td>Indonesian</td></tr>
+      <tr><th>ia<th><td>Interlingua</td></tr>
+      <tr><th>ie<th><td>Interlingue</td></tr>
+      <tr><th>iu<th><td>Inuktitut</td></tr>
+      <tr><th>ik<th><td>Inupiak</td></tr>
+      <tr><th>ga<th><td>Irish</td></tr>
+      <tr><th>it<th><td>Italian</td></tr>
+      <tr><th>ja<th><td>Japanese</td></tr>
+      <tr><th>jv<th><td>Javanese</td></tr>
+      <tr><th>kn<th><td>Kannada</td></tr>
+      <tr><th>ks<th><td>Kashmiri</td></tr>
+      <tr><th>kk<th><td>Kazakh</td></tr>
+      <tr><th>rw<th><td>Kinyarwanda (Ruanda)</td></tr>
+      <tr><th>ky<th><td>Kirghiz</td></tr>
+      <tr><th>rn<th><td>Kirundi (Rundi)</td></tr>
+      <tr><th>ko<th><td>Korean</td></tr>
+      <tr><th>ku<th><td>Kurdish</td></tr>
+      <tr><th>lo<th><td>Laothian</td></tr>
+      <tr><th>la<th><td>Latin</td></tr>
+      <tr><th>lv<th><td>Latvian (Lettish)</td></tr>
+      <tr><th>li<th><td>Limburgish ( Limburger)</td></tr>
+      <tr><th>ln<th><td>Lingala</td></tr>
+      <tr><th>lt<th><td>Lithuanian</td></tr>
+      <tr><th>mk<th><td>Macedonian</td></tr>
+      <tr><th>mg<th><td>Malagasy</td></tr>
+      <tr><th>ms<th><td>Malay</td></tr>
+      <tr><th>ml<th><td>Malayalam</td></tr>
+      <tr><th>mt<th><td>Maltese</td></tr>
+      <tr><th>mi<th><td>Maori</td></tr>
+      <tr><th>mr<th><td>Marathi</td></tr>
+      <tr><th>mo<th><td>Moldavian</td></tr>
+      <tr><th>mn<th><td>Mongolian</td></tr>
+      <tr><th>na<th><td>Nauru</td></tr>
+      <tr><th>ne<th><td>Nepali</td></tr>
+      <tr><th>no<th><td>Norwegian</td></tr>
+      <tr><th>oc<th><td>Occitan</td></tr>
+      <tr><th>or<th><td>Oriya</td></tr>
+      <tr><th>om<th><td>Oromo (Afan, Galla)</td></tr>
+      <tr><th>ps<th><td>Pashto (Pushto)</td></tr>
+      <tr><th>pl<th><td>Polish</td></tr>
+      <tr><th>pt<th><td>Portuguese</td></tr>
+      <tr><th>pa<th><td>Punjabi</td></tr>
+      <tr><th>qu<th><td>Quechua</td></tr>
+      <tr><th>rm<th><td>Rhaeto-Romance</td></tr>
+      <tr><th>ro<th><td>Romanian</td></tr>
+      <tr><th>ru<th><td>Russian</td></tr>
+      <tr><th>sm<th><td>Samoan</td></tr>
+      <tr><th>sg<th><td>Sangro</td></tr>
+      <tr><th>sa<th><td>Sanskrit</td></tr>
+      <tr><th>sr<th><td>Serbian</td></tr>
+      <tr><th>sh<th><td>Serbo-Croatian</td></tr>
+      <tr><th>st<th><td>Sesotho</td></tr>
+      <tr><th>tn<th><td>Setswana</td></tr>
+      <tr><th>sn<th><td>Shona</td></tr>
+      <tr><th>ii<th><td>Sichuan Yi</td></tr>
+      <tr><th>sd<th><td>Sindhi</td></tr>
+      <tr><th>si<th><td>Sinhalese</td></tr>
+      <tr><th>ss<th><td>Siswati</td></tr>
+      <tr><th>sk<th><td>Slovak</td></tr>
+      <tr><th>sl<th><td>Slovenian</td></tr>
+      <tr><th>so<th><td>Somali</td></tr>
+      <tr><th>es<th><td>Spanish</td></tr>
+      <tr><th>su<th><td>Sundanese</td></tr>
+      <tr><th>sw<th><td>Swahili (Kiswahili)</td></tr>
+      <tr><th>sv<th><td>Swedish</td></tr>
+      <tr><th>tl<th><td>Tagalog</td></tr>
+      <tr><th>tg<th><td>Tajik</td></tr>
+      <tr><th>ta<th><td>Tamil</td></tr>
+      <tr><th>tt<th><td>Tatar</td></tr>
+      <tr><th>te<th><td>Telugu</td></tr>
+      <tr><th>th<th><td>Thai</td></tr>
+      <tr><th>bo<th><td>Tibetan</td></tr>
+      <tr><th>ti<th><td>Tigrinya</td></tr>
+      <tr><th>to<th><td>Tonga</td></tr>
+      <tr><th>ts<th><td>Tsonga</td></tr>
+      <tr><th>tr<th><td>Turkish</td></tr>
+      <tr><th>tk<th><td>Turkmen</td></tr>
+      <tr><th>tw<th><td>Twi</td></tr>
+      <tr><th>ug<th><td>Uighur</td></tr>
+      <tr><th>uk<th><td>Ukrainian</td></tr>
+      <tr><th>ur<th><td>Urdu</td></tr>
+      <tr><th>uz<th><td>Uzbek</td></tr>
+      <tr><th>vi<th><td>Vietnamese</td></tr>
+      <tr><th>vo<th><td>Volapük</td></tr>
+      <tr><th>wa<th><td>Wallon</td></tr>
+      <tr><th>cy<th><td>Welsh</td></tr>
+      <tr><th>wo<th><td>Wolof</td></tr>
+      <tr><th>xh<th><td>Xhosa</td></tr>
+      <tr><th>yi<th><td>Yiddish</td></tr>
+      <tr><th>yo<th><td>Yoruba</td></tr>
+      <tr><th>zu<th><td>Zulu</td></tr>
+    </table>
+  </tr>
+</table>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

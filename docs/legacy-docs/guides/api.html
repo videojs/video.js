@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="api">API</h1>
+<p>The Video.js API allows you to interact with the video through JavaScript, whether the browser is playing the video through HTML5 video, Flash, or any other supported playback technologies.</p>
+<h2 id="referencing-the-player">Referencing the Player</h2>
+<p>To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of &quot;example_video_1&quot;. If you have multiple videos on one page, make sure every video tag has a unique ID.</p>
+<pre><code class="lang-js">var myPlayer = videojs(&#39;example_video_1&#39;);
+</code></pre>
+<p>(If the player hasn&#39;t been initialized yet via the data-setup attribute or another method, this will also initialize the player.)</p>
+<h2 id="wait-until-the-player-is-ready">Wait Until the Player is Ready</h2>
+<p>The time it takes Video.js to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player&#39;s &#39;ready&#39; function to trigger any code that requires the player&#39;s API.</p>
+<pre><code class="lang-js">videojs(&quot;example_video_1&quot;).ready(function(){
+  var myPlayer = this;
+
+  // EXAMPLE: Start playing the video.
+  myPlayer.play();
+
+});
+</code></pre>
+<h2 id="api-methods">API Methods</h2>
+<p>Now that you have access to a ready player, you can control the video, get values, or respond to video events. The Video.js API function names follow the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html">HTML5 media API</a>. The main difference is that getter/setter functions are used for video properties.</p>
+<pre><code class="lang-js">
+// setting a property on a bare HTML5 video element
+myVideoElement.currentTime = &quot;120&quot;;
+
+// setting a property on a Video.js player
+myPlayer.currentTime(120);
+</code></pre>
+<p>The full list of player API methods and events can be found in the <a href="http://docs.videojs.com/docs/api/index.html">player API docs</a>.</p>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

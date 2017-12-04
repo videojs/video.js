@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="setup">Setup</h1>
+<p>Video.js is pretty easy to set up. It can take a matter of seconds to get the player up and working on your web page.</p>
+<h2 id="step-1-include-the-video-js-javascript-and-css-files-in-the-head-of-your-page-">Step 1: Include the Video.js Javascript and CSS files in the head of your page.</h2>
+<p>You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. As of Video.js 5.0, the source is <a href="http://babeljs.io/">transpiled from ES2015</a> (formerly known as ES6) to <a href="https://es5.github.io/">ES5</a>, but IE8 only supports ES3. In order to continue to support IE8, we&#39;ve bundled an <a href="https://github.com/es-shims/es5-shim">ES5 shim and sham</a> together and hosted it on the CDN.</p>
+<pre><code class="lang-html">&lt;script src=&quot;//vjs.zencdn.net/ie8/1.1.1/videojs-ie8.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<h3 id="cdn-version">CDN Version</h3>
+<pre><code class="lang-html">&lt;link href=&quot;//vjs.zencdn.net/5.4.6/video-js.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;script src=&quot;//vjs.zencdn.net/5.4.6/video.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>Alternatively you can always <a href="http://videojs.com/getting-started/">go here</a> to get the latest URL for videojs CDN.</p>
+<p>We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you&#39;d like to disable analytics, you can simply include the following global <strong>before</strong> including Video.js:</p>
+<pre><code class="lang-js">window.HELP_IMPROVE_VIDEOJS = false;
+</code></pre>
+<h2 id="install-via-package-manager">Install via package manager</h2>
+<h3 id="npm">NPM</h3>
+<pre><code>$ npm install --save video.js
+</code></pre><h3 id="bower">Bower</h3>
+<pre><code>$ bower install --save video.js
+</code></pre><h3 id="self-hosted-">Self Hosted.</h3>
+<p>To entirely self-host, you&#39;ll need to pull in the font files and let Video.js know where the swf is located. If you simply copy the dist folder or zip file contents into your project everything
+should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file. Additionally include the <a href="https://www.npmjs.com/package/videojs-vtt.js">videojs-vtt.js</a> source, which adds the <code>WebVTT</code> object to the global scope.</p>
+<pre><code class="lang-html">&lt;link href=&quot;//example.com/path/to/video-js.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;script src=&quot;//example.com/path/to/videojs-vtt.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;//example.com/path/to/video.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+  videojs.options.flash.swf = &quot;http://example.com/path/to/video-js.swf&quot;
+&lt;/script&gt;
+</code></pre>
+<h2 id="step-2-add-an-html5-video-tag-to-your-page-">Step 2: Add an HTML5 video tag to your page.</h2>
+<p>With Video.js you just use an HTML5 video tag to embed a video. Video.js will then read the tag and make it work in all browsers, not just ones that support HTML5 video. Beyond the basic markup, Video.js needs a few extra pieces.</p>
+<blockquote>
+<p>Note: The <code>data-setup</code> attribute described here should not be used if you use the alternative setup described in the next section.</p>
+</blockquote>
+<ol>
+<li><p>The &#39;data-setup&#39; Attribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see <a href="./options.html">options</a>). There are other methods for initializing the player, but this is the easiest.</p>
+</li>
+<li><p>The &#39;id&#39; Attribute: Should be used and unique for every video on the same page.</p>
+</li>
+<li><p>The &#39;class&#39; attribute contains two classes:</p>
+<ul>
+<li><code>video-js</code> applies styles that are required for Video.js functionality, like fullscreen and subtitles.</li>
+<li><code>vjs-default-skin</code> applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.</li>
+</ul>
+</li>
+</ol>
+<p>Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.*</p>
+<pre><code class="lang-html">&lt;video id=&quot;example_video_1&quot; class=&quot;video-js vjs-default-skin&quot;
+  controls preload=&quot;auto&quot; width=&quot;640&quot; height=&quot;264&quot;
+  poster=&quot;http://video-js.zencoder.com/oceans-clip.png&quot;
+  data-setup=&#39;{&quot;example_option&quot;:true}&#39;&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.mp4&quot; type=&quot;video/mp4&quot; /&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.webm&quot; type=&quot;video/webm&quot; /&gt;
+ &lt;source src=&quot;http://video-js.zencoder.com/oceans-clip.ogv&quot; type=&quot;video/ogg&quot; /&gt;
+ &lt;p class=&quot;vjs-no-js&quot;&gt;To view this video please enable JavaScript, and consider upgrading to a web browser that &lt;a href=&quot;http://videojs.com/html5-video-support/&quot; target=&quot;_blank&quot;&gt;supports HTML5 video&lt;/a&gt;&lt;/p&gt;
+&lt;/video&gt;
+</code></pre>
+<p>By default, the big play button is located in the upper left hand corner so it doesn&#39;t cover up the interesting parts of the poster. If you&#39;d prefer to center the big play button, you can add an additional <code>vjs-big-play-centered</code> class to your video element. For example:</p>
+<pre><code class="lang-html">&lt;video id=&quot;example_video_1&quot; class=&quot;video-js vjs-default-skin vjs-big-play-centered&quot;
+  controls preload=&quot;auto&quot; width=&quot;640&quot; height=&quot;264&quot;
+  poster=&quot;http://video-js.zencoder.com/oceans-clip.png&quot;
+  data-setup=&#39;{&quot;example_option&quot;:true}&#39;&gt;
+  ...
+&lt;/video&gt;
+</code></pre>
+<h2 id="alternative-setup-for-dynamically-loaded-html">Alternative Setup for Dynamically Loaded HTML</h2>
+<p>If your web page or application loads the video tag dynamically (ajax, appendChild, etc.), so that it may not exist when the page loads, you&#39;ll want to manually set up the player instead of relying on the data-setup attribute. To do this, first remove the data-setup attribute from the tag so there&#39;s no confusion around when the player is initialized. Next, run the following javascript some time after the Video.js javascript library has loaded, and after the video tag has been loaded into the DOM.</p>
+<pre><code class="lang-js">videojs(&quot;example_video_1&quot;, {}, function(){
+  // Player (this) is initialized and ready.
+});
+</code></pre>
+<p>The first argument in the <code>videojs</code> function is the ID of your video tag. Replace it with your own.</p>
+<p>The second argument is an options object. It allows you to set additional options like you can with the data-setup attribute.</p>
+<p>The third argument is a &#39;ready&#39; callback. Once Video.js has initialized it will call this function.</p>
+<p>Instead of using an element ID, you can also pass a reference to the element itself.</p>
+<pre><code class="lang-js">videojs(document.getElementById(&#39;example_video_1&#39;), {}, function() {
+  // This is functionally the same as the previous example.
+});
+</code></pre>
+<pre><code class="lang-js">videojs(document.getElementsByClassName(&#39;awesome_video_class&#39;)[0], {}, function() {
+  // You can grab an element by class if you&#39;d like, just make sure
+  // if it&#39;s an array that you pick one (here we chose the first).
+});
+</code></pre>
+<p>* If you have trouble playing back content you know is in the <a href="http://blog.zencoder.com/2013/09/13/what-formats-do-i-need-for-html5-video/">correct format</a>, your HTTP server might not be delivering the content with the correct <a href="http://en.wikipedia.org/wiki/Internet_media_type#Type_video">MIME type</a>. Please double check your content&#39;s headers before opening an <a href="https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md">issue</a>.</p>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>
