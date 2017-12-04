@@ -216,6 +216,7 @@ let _supportsPassive = false;
     });
 
     window.addEventListener('test', null, opts);
+    window.removeEventListener('test', null, opts);
   } catch (e) {
     // disregard
   }
