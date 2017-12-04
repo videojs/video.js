@@ -1,6 +1,6 @@
 # Text Tracks
 
-Text tracks are a feature of HTML5 video for displaying time-triggered text to the viewer. Video.js offers a cross-browser implementation of text tracks.
+Text tracks are a feature of HTML5 for displaying time-triggered text to the end-user. Video.js offers a cross-browser implementation of text tracks.
 
 ## Table of Contents
 
