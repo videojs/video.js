@@ -407,12 +407,14 @@ module.exports = function(grunt) {
         'browserify:tests'
       ],
       dev: [
+        'skin',
         'shell:babel',
         'shell:rollupwatch',
         'browserify:tests',
         'watch:skin',
         'watch:lang',
-        'watch:dist'
+        'watch:dist',
+        'copy:dist'
       ],
       // Run multiple watch tasks in parallel
       // Needed so watchify can cache intelligently
