@@ -45,7 +45,6 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     options.selectable = true;
 
     super(player, options);
-    this.selected(true);
   }
 
   /**

@@ -76,6 +76,9 @@ class TextTrackMenuItem extends MenuItem {
         tracks.dispatchEvent(event);
       });
     }
+
+    // set the default state based on current tracks
+    this.handleTracksChange();
   }
 
   /**
