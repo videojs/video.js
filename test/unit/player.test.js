@@ -1724,3 +1724,17 @@ QUnit.test('should fire playerresize when player is resized', function(assert) {
 
   player.dispose();
 });
+
+QUnit.test('should fire playerresize exactly once for a two-dimensional resize', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  player.on('playerresize', function() {
+    assert.ok(true, 'playerresize fired once');
+  });
+
+  player.dimensions(400, 300);
+
+  player.dispose();
+});
