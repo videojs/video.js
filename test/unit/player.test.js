@@ -1709,3 +1709,18 @@ QUnit.test('player.duration() sets the value of player.cache_.duration', functio
   player.duration(200);
   assert.equal(player.duration(), 200, 'duration() set and get integer duration value');
 });
+
+QUnit.test('should fire playerresize when player is resized', function(assert) {
+  assert.expect(2);
+
+  const player = TestHelpers.makePlayer();
+
+  player.on('playerresize', function() {
+    assert.ok(true, 'playerresize fired');
+  });
+
+  player.width(400);
+  player.height(300);
+
+  player.dispose();
+});
