@@ -683,6 +683,8 @@ class Player extends Component {
   /**
    * A getter/setter for the `Player`'s width & height.
    *
+   * @fires Player#playerresize
+   *
    * @param {string} dimension
    *        This string can be:
    *        - 'width'
@@ -717,6 +719,16 @@ class Player extends Component {
 
     this[privDimension] = parsedVal;
     this.updateStyleEl_();
+
+    if (this.isReady_) {
+      /**
+       * Triggered when the player is resized.
+       *
+       * @event Player#playerresize
+       * @type {EventTarget~Event}
+       */
+      this.trigger('playerresize');
+    }
   }
 
   /**
