@@ -315,7 +315,7 @@ class Html5 extends Tech {
     // when iOS/Safari or other browsers attempt to autoplay.
     const settingsAttrs = ['loop', 'muted', 'playsinline', 'autoplay'];
 
-    for (let i = settingsAttrs.length - 1; i >= 0; i--) {
+    for (let i = 0; i < settingsAttrs.length; i++) {
       const attr = settingsAttrs[i];
       const value = this.options_[attr];
 
