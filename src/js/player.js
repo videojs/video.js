@@ -1233,7 +1233,7 @@ class Player extends Component {
    * @private
    */
   handleTechWaiting_() {
-    this.throttle(() => this.addClass('vjs-waiting'), 500);
+    this.addClass('vjs-waiting');
     /**
      * A readyState change on the DOM element has caused playback to stop.
      *
