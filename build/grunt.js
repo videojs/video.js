@@ -293,23 +293,6 @@ module.exports = function(grunt) {
         src: 'build/temp/video-js.css'
       }
     },
-    'github-release': {
-      options: {
-        repository: 'videojs/video.js',
-        auth: {
-          user: process.env.VJS_GITHUB_USER,
-          password: process.env.VJS_GITHUB_TOKEN
-        }
-      },
-      release: githubReleaseOptions(),
-      prerelease: githubReleaseOptions({
-        options: {
-          release: {
-            prerelease: true
-          }
-        }
-      })
-    },
     browserify: {
       build: {
         options: browserifyGruntOptions(),
