@@ -2574,9 +2574,10 @@ class Player extends Component {
    */
   forceAutoplayInChrome_() {
     if (this.paused() &&
-        this.autoplay() &&
-        browser.IS_CHROME &&
-        !browser.IS_ANDROID) {
+        // read from the video element or options
+        (this.autoplay() || this.options_.autoplay) &&
+        // only target desktop chrome
+        (browser.IS_CHROME && !browser.IS_ANDROID)) {
       this.play();
     }
   }
