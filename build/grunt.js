@@ -27,22 +27,6 @@ module.exports = function(grunt) {
     ]
   };
 
-  const githubReleaseDefaults = {
-    options: {
-      release: {
-        tag_name: 'v'+ version.full,
-        name: version.full,
-        body: npmRun.execSync('conventional-changelog -p videojs', {
-          silent: true,
-          encoding: 'utf8'
-        })
-      },
-    },
-    files: {
-      src: [`dist/video-js-${version.full}.zip`] // Files that you want to attach to Release
-    }
-  };
-
   /**
    * Customizes _.merge behavior in `browserifyGruntOptions` to concatenate
    * arrays. This can be overridden on a per-call basis to
@@ -69,9 +53,6 @@ module.exports = function(grunt) {
    * @return {Object}
    */
   const browserifyGruntOptions = gruntOptionsMaker(browserifyGruntDefaults, browserifyGruntCustomizer);
-
-  const githubReleaseCustomizer = gruntCustomizer;
-  const githubReleaseOptions = gruntOptionsMaker(githubReleaseDefaults, githubReleaseCustomizer);
 
   /**
    * Creates processor functions for license banners.
