@@ -259,33 +259,6 @@ module.exports = function(grunt) {
       }
     },
     version: {
-      options: {
-        pkg: 'package.json'
-      },
-      major: {
-        options: {
-          release: 'major'
-        },
-        src: ['package.json']
-      },
-      minor: {
-        options: {
-          release: 'minor'
-        },
-        src: ['package.json']
-      },
-      patch: {
-        options: {
-          release: 'patch'
-        },
-        src: ['package.json']
-      },
-      prerelease: {
-        options: {
-          release: 'prerelease'
-        },
-        src: ['package.json']
-      },
       css: {
         options: {
           prefix: '@version\\s*'
