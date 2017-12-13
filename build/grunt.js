@@ -211,16 +211,6 @@ module.exports = function(grunt) {
       ie9_bs:       { browsers: ['ie9_bs'] },
       ie8_bs:       { browsers: ['ie8_bs'] }
     },
-    vjsdocs: {
-      all: {
-        // TODO: Update vjsdocs to support new build, or switch to jsdoc
-        src: '',
-        dest: 'docs/api',
-        options: {
-          baseURL: 'https://github.com/videojs/video.js/blob/master/'
-        }
-      }
-    },
     vjslanguages: {
       defaults: {
         files: {
@@ -446,7 +436,6 @@ module.exports = function(grunt) {
 
   // load all the npm grunt tasks
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-accessibility');
 
   grunt.registerTask('build', [
