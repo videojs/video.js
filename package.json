@@ -24,7 +24,6 @@
     "rollup-dev": "babel-node build/rollup.js --watch",
     "watch": "npm run rollup-dev",
     "assets": "node build/assets.js",
-    "change": "grunt chg-add",
     "clean": "grunt clean",
     "grunt": "grunt",
     "lint": "vjsstandard",
