@@ -471,6 +471,13 @@ class Player extends Component {
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
     this.playOnLoadstart_ = null;
+
+    // chrome started pausing the video when moving in the DOM
+    // causing autoplay to not continue due to how Video.js functions.
+    // See #4720 for more info.
+    if (this.paused() && this.options().autoplay && browser.IS_CHROME) {
+      this.play();
+    }
   }
 
   /**
