@@ -1,5 +1,4 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
-import chg from 'chg';
 import npmRun from 'npm-run';
 import isDocsOnly from './docs-only.js';
 
@@ -521,7 +520,6 @@ module.exports = function(grunt) {
   // load all the npm grunt tasks
   require('load-grunt-tasks')(grunt);
   grunt.loadNpmTasks('videojs-doc-generator');
-  grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('grunt-accessibility');
 
   grunt.registerTask('build', [
