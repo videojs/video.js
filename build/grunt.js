@@ -310,16 +310,6 @@ module.exports = function(grunt) {
         }
       })
     },
-    babel: {
-      es5: {
-        files: [{
-          expand: true,
-          cwd: 'src/js/',
-          src: ['**/*.js', '!base-styles.js'],
-          dest: 'es5/'
-        }]
-      }
-    },
     browserify: {
       build: {
         options: browserifyGruntOptions(),
