@@ -1,3 +1,19 @@
+<a name="6.5.2"></a>
+## [6.5.2](https://github.com/videojs/video.js/compare/v6.5.1...v6.5.2) (2017-12-14)
+
+### Bug Fixes
+
+* **html5:** loop video el attributes in order ([#4805](https://github.com/videojs/video.js/issues/4805)) ([409a13e](https://github.com/videojs/video.js/commit/409a13e))
+* force autoplay in Chrome ([#4804](https://github.com/videojs/video.js/issues/4804)) ([6fe7a9a](https://github.com/videojs/video.js/commit/6fe7a9a)), closes [#4720](https://github.com/videojs/video.js/issues/4720)
+* Seek to 0 if attempt is made to seek to negative value ([#4799](https://github.com/videojs/video.js/issues/4799)) ([1a588f7](https://github.com/videojs/video.js/commit/1a588f7)), closes [#4501](https://github.com/videojs/video.js/issues/4501)
+* use correct logic for menu focus ([#4823](https://github.com/videojs/video.js/issues/4823)) ([51ed400](https://github.com/videojs/video.js/commit/51ed400)), closes [#4821](https://github.com/videojs/video.js/issues/4821)
+
+### Chores
+
+* remove unused popup classes ([#4792](https://github.com/videojs/video.js/issues/4792)) ([295889b](https://github.com/videojs/video.js/commit/295889b)), closes [#4725](https://github.com/videojs/video.js/issues/4725)
+* **lang:** Add translation for "caption settings" in zh-CN.json ([#4815](https://github.com/videojs/video.js/issues/4815)) ([15cd32e](https://github.com/videojs/video.js/commit/15cd32e))
+* **lang:** Add translation for "caption settings" in zh-TW.json ([#4816](https://github.com/videojs/video.js/issues/4816)) ([029955a](https://github.com/videojs/video.js/commit/029955a))
+
 <a name="6.5.1"></a>
 ## [6.5.1](https://github.com/videojs/video.js/compare/v6.5.0...v6.5.1) (2017-12-04)
 
