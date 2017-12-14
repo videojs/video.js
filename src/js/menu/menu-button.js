@@ -344,9 +344,12 @@ class MenuButton extends Component {
 
       // set the focus into the submenu, except on iOS where it is resulting in
       // undesired scrolling behavior when the player is in an iframe
-      if (!IS_IOS && !Dom.isInFrame()) {
-        this.menu.focus();
+      if (IS_IOS && Dom.isInFrame()) {
+        // Return early so that the menu isn't focused
+        return;
       }
+
+      this.menu.focus();
     }
   }
 
