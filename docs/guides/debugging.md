@@ -12,22 +12,23 @@
 
 ## Logging
 
-Video.js includes `videojs.log`, a lightweight wrapper around a subset of [the `console` API][console]. The available methods are `videojs.log`, `videojs.log.warn`, and `videojs.log.error`.
+Video.js includes `videojs.log`, a lightweight wrapper around a subset of [the `console` API][console]. The available methods are `videojs.log`, `videojs.log.debug`, `videojs.log.warn`, and `videojs.log.error`.
 
 ### API Overview
 
 Most of these methods should be fairly self-explanatory, but for complete details, see [the API docs][api].
 
-| Method                          | Alias Of        | Matching Level(s) |
-| ------------------------------- | --------------- | ----------------- |
-| `videojs.log()`                 | `console.log`   | all               |
-| `videojs.log.warn()`            | `console.warn`  | all, warn         |
-| `videojs.log.error()`           | `console.error` | all, warn, error  |
-| `videojs.log.level()`           | n/a             | n/a               |
-| `videojs.log.history()`         | n/a             | n/a               |
-| `videojs.log.history.clear()`   | n/a             | n/a               |
-| `videojs.log.history.disable()` | n/a             | n/a               |
-| `videojs.log.history.enable()`  | n/a             | n/a               |
+| Method                          | Alias Of         | Matching Level(s)              |
+| ------------------------------- | ---------------- | ------------------------------ |
+| `videojs.log()`                 | `console.log`    | all, debug, info               |
+| `videojs.log.debug()            | `console.debug`  | all, debug                     |
+| `videojs.log.warn()`            | `console.warn`   | all, debug, info, warn         |
+| `videojs.log.error()`           | `console.error`  | all, debug, info, warn, error  |
+| `videojs.log.level()`           | n/a              | n/a                            |
+| `videojs.log.history()`         | n/a              | n/a                            |
+| `videojs.log.history.clear()`   | n/a              | n/a                            |
+| `videojs.log.history.disable()` | n/a              | n/a                            |
+| `videojs.log.history.enable()`  | n/a              | n/a                            |
 
 For descriptions of these features, please refer to the sections below.
 
@@ -62,7 +63,7 @@ Unlike the `console`, `videojs.log` includes the concept of logging levels. Thes
 Levels are exposed through the `videojs.log.level` method. This method acts as both a getter and setter for the current logging level. With no arguments, it returns the current logging level:
 
 ```js
-videojs.log.level(); // "all"
+videojs.log.level(); // "info"
 ```
 
 By passing a string, the logging level can be changed to one of the available logging levels:
@@ -76,10 +77,16 @@ videojs.log.error('foo'); // logs "foo" as an error
 
 ### Available Log Levels
 
-* **all** (default): enables all logging methods
+* **info** (default): only show `log`, `log.warn`, and `log.error` messages
+* **all**: enables all logging methods
 * **error**: only show `log.error` messages
 * **off**: disable all logging methods
 * **warn**: only show `log.warn` _and_ `log.error` messages
+* **debug**: show `log`, `log.debug`, `log.warn`, and `log.error` messages
+
+### Debug Logging
+
+Although the log levels attempt to match their `window.console` counterparts, `window.console.debug` is not available on all platforms. As such, it will use the closest comparable method, falling back from `window.console.debug` to `window.console.info` to `window.console.log`, and ultimately to nothing if none of those methods are available.
 
 ### History
 
