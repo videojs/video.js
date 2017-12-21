@@ -4,33 +4,52 @@
   color: $primary-foreground-color;
   height: 100%;
 }
-
 // Layout divs
 .vjs-text-track-settings .vjs-modal-dialog-content {
-  display: grid;
-  grid-template-columns: minmax(230px, 400px) 230px 400px;
-  grid-template-rows: minmax(180px, 330px) 180px 330px;
-
+  display: table;
 }
 
-.vjs-text-track-settings .vjs-track-settings-colors
- {
-  display: block;
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.vjs-text-track-settings .vjs-track-settings-font
-{
-  grid-column: 2;
-  grid-row: 1;
-}
+.vjs-text-track-settings .vjs-track-settings-colors,
+.vjs-text-track-settings .vjs-track-settings-font,
 .vjs-text-track-settings .vjs-track-settings-controls {
-  grid-column: 2;
-  grid-row: 2;
+  display: table-cell;
+}
+
+.vjs-text-track-settings .vjs-track-settings-controls {
+  text-align: right;
+  vertical-align: bottom;
+}
+
+@supports (display: grid) {
+  // code that will only run if CSS Grid is supported by the browser
+  .vjs-text-track-settings .vjs-modal-dialog-content {
+    display: grid;
+    grid-template-columns: minmax(230px, 400px) 230px 400px;
+    grid-template-rows: minmax(180px, 330px) 180px 330px;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-colors {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-font {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-controls {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: unset;
+    vertical-align: unset;
+
+  }
 }
 
 // Form elements
+
 .vjs-text-track-settings fieldset {
   margin: 5px;
   padding: 3px;
@@ -44,16 +63,15 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
 }
-
 // Hide labels, so they are only for screen reader users
 .vjs-text-track-settings .vjs-label {
   position: absolute;
   clip: rect(1px 1px 1px 1px); // for Internet Explorer
   clip: rect(1px, 1px, 1px, 1px);
   display: block;
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   padding: 0;
   border: 0;
   height: 1px;
@@ -61,8 +79,8 @@
   overflow: hidden;
 }
 
-.vjs-track-settings-controls button:focus,
-.vjs-track-settings-controls button:active {
+.vjs-track-settings-controls button:active,
+.vjs-track-settings-controls button:focus {
   outline-style: solid;
   outline-width: medium;
   background-image: linear-gradient(0deg, $primary-foreground-color 88%, $secondary-background-color 100%);
