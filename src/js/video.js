@@ -186,7 +186,7 @@ videojs.hookOnce = function(type, fn) {
   videojs.hooks(type, [].concat(fn).map(original => {
     const wrapper = (...args) => {
       videojs.removeHook(type, wrapper);
-      original(...args);
+      return original(...args);
     };
 
     return wrapper;

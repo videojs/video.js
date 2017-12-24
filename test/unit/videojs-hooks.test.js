@@ -123,6 +123,17 @@ QUnit.test('should be able to add a hook that runs once', function(assert) {
   assert.equal(videojs.hooks_.foo.length, 0, 'should have 0 foo hooks');
 });
 
+QUnit.test('hooks registered using hookOnce should return the original callback return value', function(assert) {
+  let result;
+
+  videojs.hookOnce('foo', () => 'ok');
+  videojs.hooks('foo').forEach(fn => {
+    result = fn();
+  });
+
+  assert.equal(result, 'ok', 'the hookOnce callback returned "ok"');
+});
+
 QUnit.test('should trigger beforesetup and setup during videojs setup', function(assert) {
   const vjsOptions = {techOrder: ['techFaker']};
   let setupCalled = false;
