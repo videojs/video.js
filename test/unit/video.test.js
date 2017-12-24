@@ -11,6 +11,7 @@ QUnit.module('video.js', {
   },
   afterEach() {
     this.clock.restore();
+    videojs.all('dispose');
   }
 });
 
@@ -48,9 +49,6 @@ QUnit.test('should return a video player instance', function(assert) {
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
-
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('should log if the supplied element is not included in the DOM',
@@ -89,8 +87,6 @@ function(assert) {
   assert.equal(warnLogs.length, 1, 'did not log another warning');
 
   log.warn = origWarnLog;
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('should log about already initalized players if options already passed',
@@ -127,8 +123,6 @@ function(assert) {
                'logged the right message');
 
   log.warn = origWarnLog;
-
-  player.dispose();
 });
 
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {
@@ -155,9 +149,6 @@ QUnit.test('should return a video player instance from el html5 tech', function(
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
-
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('should return a video player instance from el techfaker', function(assert) {
@@ -183,9 +174,6 @@ QUnit.test('should return a video player instance from el techfaker', function(a
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
-
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('should add the value to the languages object', function(assert) {
@@ -295,8 +283,6 @@ QUnit.test('ingest player div if data-vjs-player attribute is present on video p
 
   assert.equal(player.el(), playerDiv, 'we re-used the given div');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
-
-  player.dispose();
 });
 
 QUnit.test('ingested player div should not create a new tag for movingMediaElementInDOM', function(assert) {
@@ -330,7 +316,6 @@ QUnit.test('ingested player div should not create a new tag for movingMediaEleme
   assert.equal(player.tech_.el(), vid, 'we re-used the video element');
   assert.ok(player.hasClass('foo'), 'keeps any classes that were around previously');
 
-  player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
   Html5.isSupported = oldIS;
   Html5.nativeSourceHandler.canPlayType = oldCPT;
@@ -366,7 +351,6 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   assert.notEqual(player.el(), playerDiv, 'we used a new div');
   assert.notEqual(player.tech_.el(), vid, 'we a new video element');
 
-  player.dispose();
   Html5.prototype.movingMediaElementInDOM = oldMoving;
   Html5.isSupported = oldIS;
   Html5.nativeSourceHandler.canPlayType = oldCPT;
@@ -389,6 +373,37 @@ QUnit.test('getPlayer', function(assert) {
   player.dispose();
 });
 
+QUnit.test('all', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.innerHTML += '<video id="test_vid_id"></video>' +
+                       '<video id="test_vid_id2"></video>';
+
+  let arr = videojs.all();
+
+  assert.ok(Array.isArray(arr), 'an array was returned');
+  assert.strictEqual(arr.length, 0, 'the array was empty because no players have been created yet');
+
+  const player = videojs('test_vid_id');
+  const player2 = videojs('test_vid_id2');
+
+  arr = videojs.all();
+
+  assert.ok(Array.isArray(arr), 'an array was returned');
+  assert.strictEqual(arr.length, 2, 'the array had two items');
+  assert.notStrictEqual(arr.indexOf(player), -1, 'the first player was in the array');
+  assert.notStrictEqual(arr.indexOf(player2), -1, 'the second player was in the array');
+
+  let ct = videojs.all('currentTime');
+
+  assert.deepEqual(ct, [0, 0], 'when a method is given, the array contains return values');
+
+  videojs.all('currentTime', 1);
+  ct = videojs.all('currentTime');
+
+  assert.deepEqual(ct, [1, 1], 'arguments are passed through to player methods');
+});
+
 /* **************************************************** *
  * div embed tests copied from video emebed tests above *
  * **************************************************** */
@@ -398,8 +413,10 @@ QUnit.module('video.js video-js embed', {
   },
   afterEach() {
     this.clock.restore();
+    videojs.all('dispose');
   }
 });
+
 QUnit.test('should return a video player instance', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
@@ -423,9 +440,6 @@ QUnit.test('should return a video player instance', function(assert) {
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
-
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('should log about already initalized players if options already passed',
@@ -462,8 +476,6 @@ function(assert) {
                'logged the right message');
 
   log.warn = origWarnLog;
-
-  player.dispose();
 });
 
 QUnit.test('should return a video player instance from el html5 tech', function(assert) {
@@ -490,9 +502,6 @@ QUnit.test('should return a video player instance from el html5 tech', function(
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
-
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('should return a video player instance from el techfaker', function(assert) {
@@ -518,9 +527,6 @@ QUnit.test('should return a video player instance from el techfaker', function(a
   const player2 = videojs(tag2, { techOrder: ['techFaker'] });
 
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
-
-  player.dispose();
-  player2.dispose();
 });
 
 QUnit.test('adds video-js class name with the video-js embed', function(assert) {
@@ -536,7 +542,4 @@ QUnit.test('adds video-js class name with the video-js embed', function(assert) 
 
   assert.ok(player.hasClass('video-js'), 'video-js class was added to the first embed');
   assert.ok(player2.hasClass('video-js'), 'video-js class was preserved to the second embed');
-
-  player.dispose();
-  player2.dispose();
 });

@@ -286,6 +286,38 @@ videojs.getPlayer = (id) => {
 };
 
 /**
+ * Either return an array of all players or call a function on all players.
+ *
+ * @param  {string} [method]
+ *         If given, calls a method on all players.
+ *
+ * @param  {...Mixed} [args]
+ *         Subsequent arguments will be passed through to the method being
+ *         called.
+ *
+ * @return {Array}
+ *         If a `method` argument was passed, returns an array of the return
+ *         values for all players. Otherwise, if no `method` argument was
+ *         passed, returns an array of all players.
+ *
+ *         Either way, the array will be in the order that `Object.keys`
+ *         provides, which could potentially vary between JavaScript engines.
+ *
+ */
+videojs.all = (method, ...args) => {
+
+  // Disposed players leave a key with a `null` value, so we need to make sure
+  // we filter those out.
+  const players = Object.keys(Player.players).map(k => Player.players[k]).filter(Boolean);
+
+  if (typeof method === 'string') {
+    return players.map(p => p[method](...args));
+  }
+
+  return players;
+};
+
+/**
  * Expose players object.
  *
  * @memberOf videojs
