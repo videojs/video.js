@@ -36,11 +36,13 @@ export const allowedGetters = {
   currentTime: 1,
   duration: 1,
   seekable: 1,
-  played: 1
+  played: 1,
+  play: 1
 };
 
 export const allowedSetters = {
-  setCurrentTime: 1
+  setCurrentTime: 1,
+  play: 1
 };
 
 function middlewareIterator(method) {
