@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 
 /**
  * An {@link AudioTrack} {@link MenuItem}
@@ -33,7 +32,9 @@ class AudioTrackMenuItem extends MenuItem {
 
     this.track = track;
 
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
+    const changeHandler = (...args) => {
+      this.handleTracksChange.apply(this, args);
+    };
 
     tracks.addEventListener('change', changeHandler);
     this.on('dispose', () => {
