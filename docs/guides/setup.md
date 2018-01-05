@@ -92,6 +92,10 @@ Calling `videojs()` with the ID of element of an already-existing player will re
 
 If there is no player matching the argument, it will attempt to create one.
 
+#### Using `videojs.getPlayer()`
+
+Sometimes, you want to get a reference to a player without the potential side effects of calling `videojs()`. This can be acheived by calling `videojs.getPlayer()` with either a string matching the element's ID or the element itself.
+
 #### Using `videojs.getPlayers()` or `videojs.players`
 
 The `videojs.players` property exposes all known players. The method, `videojs.getPlayers()` simply returns the same object.
@@ -99,10 +103,6 @@ The `videojs.players` property exposes all known players. The method, `videojs.g
 Players are stored on this object with keys matching their IDs.
 
 > **Note:** A player created from an element without an ID will be assigned an automatically-generated ID.
-
-#### Using `videojs.getPlayer()`
-
-Sometimes, you want to get a reference to a player without the potential side effects of calling `videojs()`. This can be acheived by calling `videojs.getPlayer()` with either a string matching the element's ID or the element itself.
 
 ## Options
 
