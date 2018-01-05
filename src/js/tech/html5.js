@@ -229,8 +229,13 @@ class Html5 extends Tech {
         return;
       }
 
-      el.load = oldLoad.bind(el);
-      el.setAttribute = oldSetAttribute.bind(el);
+      if (oldLoad) {
+        el.load = oldLoad.bind(el);
+      }
+
+      if (oldSetAttribute) {
+        el.setAttribute = oldSetAttribute.bind(el);
+      }
       Object.defineProperty(el, 'src', srcDescriptor);
     });
   }
