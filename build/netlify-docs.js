@@ -1,8 +1,12 @@
 const sh = require('shelljs');
 
 const GIT_CONTAINS = `git tag --contains ${process.env.COMMIT_REF}`;
-
 const output = sh.exec(GIT_CONTAINS, {async: false, silent:true}).stdout;
+
+console.log('CONTAINS command:', GIT_CONTAINS);
+console.log('BRANCH:', process.env.BRANCH);
+console.log('OUTPUT', output);
+
 
 // if we're on master branch and not on a tagged commit,
 // error the build so it doesn't redeploy the docs
