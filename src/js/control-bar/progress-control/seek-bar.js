@@ -7,6 +7,7 @@ import {IE_VERSION, IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
+import {silencePromise} from '../../utils/promise';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -254,7 +255,7 @@ class SeekBar extends Slider {
      */
     this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     if (this.videoWasPlaying) {
-      this.player_.play();
+      silencePromise(this.player_.play());
     }
   }
 
