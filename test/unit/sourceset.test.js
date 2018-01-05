@@ -102,7 +102,8 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       });
     });
 
-    QUnit.test('data-setup preload auto', function(assert) {
+    // TODO: unskip when https://github.com/videojs/video.js/pull/4861 is merged
+    QUnit.skip('data-setup preload auto', function(assert) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [this.testSrc]}));
@@ -161,7 +162,8 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       });
     });
 
-    QUnit.test('player.src({...}) preload auto', function(assert) {
+    // TODO: unskip when https://github.com/videojs/video.js/pull/4861 is merged
+    QUnit.skip('player.src({...}) preload auto', function(assert) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('preload', 'auto');
