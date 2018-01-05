@@ -158,8 +158,8 @@ class Html5 extends Tech {
 
     // we need to fire sourceset when the player is ready
     // if we find that the media element had a src when it was
-    // given to us
-    if (el.src || el.currentSrc) {
+    // given to us and that source is not in a stalled state
+    if (el.src || el.currentSrc && this.el().initNetworkState_ !== 3) {
       this.triggerSourceSet_();
     }
 
