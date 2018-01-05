@@ -2489,10 +2489,6 @@ class Player extends Component {
         this.techCall_('src', source.src);
       }
 
-      if (this.options_.preload === 'auto') {
-        this.load();
-      }
-
     // Set the source synchronously if possible (#2326)
     }, true);
 
