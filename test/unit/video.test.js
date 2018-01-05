@@ -11,7 +11,7 @@ QUnit.module('video.js', {
   },
   afterEach() {
     this.clock.restore();
-    videojs.all('dispose');
+    videojs.getAllPlayers().forEach(p => p.dispose());
   }
 });
 
@@ -373,35 +373,26 @@ QUnit.test('getPlayer', function(assert) {
   player.dispose();
 });
 
-QUnit.test('all', function(assert) {
+QUnit.test('getAllPlayers', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
   fixture.innerHTML += '<video id="test_vid_id"></video>' +
                        '<video id="test_vid_id2"></video>';
 
-  let arr = videojs.all();
+  let all = videojs.getAllPlayers();
 
-  assert.ok(Array.isArray(arr), 'an array was returned');
-  assert.strictEqual(arr.length, 0, 'the array was empty because no players have been created yet');
+  assert.ok(Array.isArray(all), 'an array was returned');
+  assert.strictEqual(all.length, 0, 'the array was empty because no players have been created yet');
 
   const player = videojs('test_vid_id');
   const player2 = videojs('test_vid_id2');
 
-  arr = videojs.all();
+  all = videojs.getAllPlayers();
 
-  assert.ok(Array.isArray(arr), 'an array was returned');
-  assert.strictEqual(arr.length, 2, 'the array had two items');
-  assert.notStrictEqual(arr.indexOf(player), -1, 'the first player was in the array');
-  assert.notStrictEqual(arr.indexOf(player2), -1, 'the second player was in the array');
-
-  let ct = videojs.all('currentTime');
-
-  assert.deepEqual(ct, [0, 0], 'when a method is given, the array contains return values');
-
-  videojs.all('currentTime', 1);
-  ct = videojs.all('currentTime');
-
-  assert.deepEqual(ct, [1, 1], 'arguments are passed through to player methods');
+  assert.ok(Array.isArray(all), 'an array was returned');
+  assert.strictEqual(all.length, 2, 'the array had two items');
+  assert.notStrictEqual(all.indexOf(player), -1, 'the first player was in the array');
+  assert.notStrictEqual(all.indexOf(player2), -1, 'the second player was in the array');
 });
 
 /* **************************************************** *
@@ -413,7 +404,7 @@ QUnit.module('video.js video-js embed', {
   },
   afterEach() {
     this.clock.restore();
-    videojs.all('dispose');
+    videojs.getAllPlayers().forEach(p => p.dispose());
   }
 });
 
