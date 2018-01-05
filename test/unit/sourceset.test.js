@@ -323,7 +323,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
           this.totalSourcesets = 3;
         }
         window.setTimeout(() => {
-          console.log(this.sourcesets);
           assert.equal(this.sourcesets, this.totalSourcesets, 'no additional sourcesets');
 
           this.player.dispose();
