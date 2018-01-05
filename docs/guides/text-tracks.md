@@ -229,7 +229,7 @@ As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represen
   **Note**: If you need a callback, instead of a callback you could use the technique below:
   ```js
   const trackEl = player.addRemoteTextTrack({src: 'en.vtt'}, false);
-  trackEl.on('load', function() {
+  trackEl.addEventListener('load', function() {
     // your callback go here
   });
   ```
