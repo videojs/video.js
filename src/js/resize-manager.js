@@ -25,7 +25,7 @@ class ResizeManager extends Component {
 
     console.log(width, width/10, width/50, width/100);
 
-    // this.player_.el_.style.fontSize = width/50 + 'px';
+    this.player_.el_.style.fontSize = width/50 + 'px';
   }
 }
 
