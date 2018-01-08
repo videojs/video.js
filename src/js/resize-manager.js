@@ -1,32 +1,60 @@
 /**
  * @file resize-manager.js
  */
+import window from 'global/window';
+import * as Fn from './utils/fn.js';
 import Component from './component.js';
+
+const RESIZE_OBSERVER_AVAILABLE = window.ResizeObserver;
 
 class ResizeManager extends Component {
   constructor(player, options) {
     super(player, options);
 
-    this.el_.addEventListener('load', () => {
-      this.el_.contentWindow.addEventListener('resize', (event) => this.resizeHandler(event));
-    });
+    if (RESIZE_OBSERVER_AVAILABLE) {
+      this.resizeObserver = new window.ResizeObserver(() => this.resizeHandler());
+      this.resizeObserver.observe(player.el());
+
+    } else {
+      this.iframeResizeHandler_ = Fn.throttle(() => this.resizeHandler(), 50);
+
+      const loadListener = () => {
+        this.el_.contentWindow.addEventListener('resize', this.iframeResizeHandler_);
+        this.el_.removeEventListener('load', loadListener);
+      };
+
+      this.el_.addEventListener('load', loadListener);
+    }
   }
 
   createEl() {
+    if (RESIZE_OBSERVER_AVAILABLE) {
+      return;
+    }
+
     return super.createEl('iframe', {
       className: 'vjs-resize-manager'
     });
   }
 
-  resizeHandler(event) {
-    // this.player_.trigger('playerresize');
-
-    const width = this.player_.currentWidth();
-
-    console.log(width, width/10, width/50, width/100);
-
-    this.player_.el_.style.fontSize = width/50 + 'px';
+  resizeHandler() {
+    this.player_.trigger('playerresize');
   }
+
+  dispose() {
+    if (this.resizeObserver) {
+      this.resizeObserver.unobserve(this.player.el());
+      this.resizeObserver.disconnect();
+    }
+
+    if (this.iframeResizeHandler_) {
+      this.el_.contentWindow.removeEventListener('resize', this.iframeResizeHandler_);
+    }
+
+    this.resizeObserver = null;
+    this.iframeResizeHandler_ = null;
+  }
+
 }
 
 Component.registerComponent('ResizeManager', ResizeManager);
