@@ -30,12 +30,7 @@
         play: function(promise) {
           console.log('in the middleware. Promise:', promise);
 
-          promise.then((resolve) => {
-            console.log('we are playing');
-          });
-          promise.catch((err) => {
-            console.log('we failed to play');
-          });
+          return promise;
         },
         setSource: function(srcObj, next) {
           next(null, srcObj);
@@ -72,7 +67,15 @@
     });
 
     console.log('Calling play...');
-    player.setTimeout(player.play, 500);
+    player.setTimeout(() => {
+      player.play()
+        .then(() => {
+          console.log('we are playing, the promise resolved');
+        },
+        (err) => {
+          console.log('we failed to play, the promise was rejected');
+        });
+    }, 500);
   </script>
 
 </body>
