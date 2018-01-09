@@ -18,6 +18,7 @@ QUnit.module('PosterImage', {
         return this.poster_;
       },
       handler_: null,
+      off() {},
       on(type, handler) {
         this.handler_ = handler;
       },
