@@ -82,6 +82,7 @@ QUnit.test('listen to remove and add track events in native text tracks', functi
 
   Html5.prototype.textTracks = function() {
     return {
+      removeEventListener() {},
       addEventListener(type, handler) {
         events[type] = true;
       }
@@ -323,6 +324,8 @@ QUnit.test('should check for text track changes when emulating text tracks', fun
   });
   tech.emulateTextTracks();
   assert.equal(numTextTrackChanges, 1, 'we got a texttrackchange event');
+
+  tech.dispose();
 });
 
 QUnit.test('removes cuechange event when text track is hidden for emulated tracks', function(assert) {

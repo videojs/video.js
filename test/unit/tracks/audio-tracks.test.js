@@ -33,6 +33,7 @@ QUnit.test('listen to remove and add track events in native audio tracks', funct
 
   Html5.prototype.audioTracks = function() {
     return {
+      removeEventListener() {},
       addEventListener(type, handler) {
         events[type] = true;
       }
