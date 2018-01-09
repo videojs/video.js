@@ -3,6 +3,7 @@
  */
 import window from 'global/window';
 import * as Fn from './utils/fn.js';
+import * as Events from './utils/events.js';
 import Component from './component.js';
 
 const RESIZE_OBSERVER_AVAILABLE = window.ResizeObserver;
@@ -23,7 +24,7 @@ class ResizeManager extends Component {
       this.iframeResizeHandler_ = Fn.throttle(() => this.resizeHandler(), 50);
       this.loadListener_ = () => {
         if (this.el_.contentWindow) {
-          this.on(this.el_.contentWindow, 'resize', this.iframeResizeHandler_);
+          Events.on(this.el_.contentWindow, 'resize', this.iframeResizeHandler_);
         }
         this.off('load', this.loadListener_);
       };
@@ -53,7 +54,7 @@ class ResizeManager extends Component {
     }
 
     if (this.iframeResizeHandler_ && this.el_.contentWindow) {
-      this.off(this.el_.contentWindow, 'resize', this.iframeResizeHandler_);
+      Events.off(this.el_.contentWindow, 'resize', this.iframeResizeHandler_);
     }
 
     if (this.loadListener_) {
