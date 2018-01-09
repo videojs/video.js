@@ -31,17 +31,29 @@ export function set(middleware, tech, method, arg) {
   return tech[method](middleware.reduce(middlewareIterator(method), arg));
 }
 
+// Runs the middleware from the player to the tech, and a 2nd time back up to the player
+export function mediate(middleware, tech, method, arg = null) {
+  const mediateToTech = tech[method](middleware.reduce(middlewareIterator(method), arg));
+  const mediateToPlayer = middleware.reduceRight(middlewareIterator(method), mediateToTech);
+
+  return mediateToPlayer;
+}
+
 export const allowedGetters = {
   buffered: 1,
   currentTime: 1,
   duration: 1,
   seekable: 1,
   played: 1,
-  play: 1
+  paused: 1
 };
 
 export const allowedSetters = {
   setCurrentTime: 1
+};
+
+export const allowedMediators = {
+  play: 1
 };
 
 function middlewareIterator(method) {

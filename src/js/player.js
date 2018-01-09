@@ -1632,6 +1632,9 @@ class Player extends Component {
     this.ready(function() {
       if (method in middleware.allowedSetters) {
         return middleware.set(this.middleware_, this.tech_, method, arg);
+
+      } else if (method in middleware.allowedMediators) {
+        return middleware.mediate(this.middleware_, this.tech_, method, arg);
       }
 
       try {
@@ -1663,6 +1666,9 @@ class Player extends Component {
 
     if (method in middleware.allowedGetters) {
       return middleware.get(this.middleware_, this.tech_, method);
+
+    } else if (method in middleware.allowedMediators) {
+      return middleware.mediate(this.middleware_, this.tech_, method);
     }
 
     // Flash likes to die and reload when you hide or reposition it.
