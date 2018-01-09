@@ -11,19 +11,22 @@ class ResizeManager extends Component {
   constructor(player, options) {
     super(player, options);
 
+    this.iframeResizeHandler_ = null;
+    this.loadListener_ = null;
+    this.resizeObserver = null;
+
     if (RESIZE_OBSERVER_AVAILABLE) {
       this.resizeObserver = new window.ResizeObserver(() => this.resizeHandler());
       this.resizeObserver.observe(player.el());
 
     } else {
       this.iframeResizeHandler_ = Fn.throttle(() => this.resizeHandler(), 50);
-
-      const loadListener = () => {
+      this.loadListener_ = () => {
         this.el_.contentWindow.addEventListener('resize', this.iframeResizeHandler_);
-        this.el_.removeEventListener('load', loadListener);
+        this.el_.removeEventListener('load', this.loadListener_);
       };
 
-      this.el_.addEventListener('load', loadListener);
+      this.el_.addEventListener('load', this.loadListener_);
     }
   }
 
@@ -51,8 +54,13 @@ class ResizeManager extends Component {
       this.el_.contentWindow.removeEventListener('resize', this.iframeResizeHandler_);
     }
 
+    if (this.loadListener_) {
+      this.el_.removeEventListener('load', this.loadListener_);
+    }
+
     this.resizeObserver = null;
     this.iframeResizeHandler_ = null;
+    this.loadListener_ = null;
   }
 
 }
