@@ -46,12 +46,10 @@ class VolumePanel extends Component {
     checkVolumeSupport(this, player);
 
     // while the slider is active (the mouse has been pressed down and
-    // is dragging) or in focus we do not want to hide the VolumeBar
+    // is dragging) we do not want to hide the VolumeBar
     this.on(this.volumeControl, ['slideractive'], this.sliderActive_);
-    this.on(this.muteToggle, 'focus', this.sliderActive_);
 
     this.on(this.volumeControl, ['sliderinactive'], this.sliderInactive_);
-    this.on(this.muteToggle, 'blur', this.sliderInactive_);
   }
 
   /**
