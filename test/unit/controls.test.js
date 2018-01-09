@@ -31,6 +31,7 @@ QUnit.test('should hide volume control if it\'s not supported', function(assert)
 
   assert.ok(volumeControl.hasClass('vjs-hidden'), 'volumeControl is not hidden');
   assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
+
   player.dispose();
 });
 
@@ -56,6 +57,8 @@ QUnit.test('should test and toggle volume control on `loadstart`', function(asse
 
   assert.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl does not show itself');
   assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
+
+  player.dispose();
 });
 
 QUnit.test('calculateDistance should use changedTouches, if available', function(assert) {
@@ -78,6 +81,8 @@ QUnit.test('calculateDistance should use changedTouches, if available', function
   };
 
   assert.equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
+
+  player.dispose();
 });
 
 QUnit.test('should hide playback rate control if it\'s not supported', function(assert) {
@@ -87,6 +92,7 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   const playbackRate = new PlaybackRateMenuButton(player);
 
   assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
+
   player.dispose();
 });
 
@@ -97,9 +103,11 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
+
   player.isFullscreen(false);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
+
   player.dispose();
 });
 
@@ -118,6 +126,8 @@ if (Html5.isSupported()) {
 
     assert.equal(player.volume(), 1, 'volume is same');
     assert.equal(player.muted(), true, 'player is muted');
+
+    player.dispose();
   });
 
   QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
@@ -132,6 +142,8 @@ if (Html5.isSupported()) {
 
     assert.equal(player.volume(), 1, 'volume is set to lastVolume');
     assert.equal(player.muted(), false, 'muted remains false');
+
+    player.dispose();
   });
 
   QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
@@ -146,6 +158,8 @@ if (Html5.isSupported()) {
 
     assert.equal(player.volume(), 0.5, 'volume is set to lastVolume');
     assert.equal(player.muted(), false, 'muted is set to false');
+
+    player.dispose();
   });
 
   QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, and muted is true sets volume to 0.1 and muted to false', function(assert) {
@@ -161,6 +175,8 @@ if (Html5.isSupported()) {
     // `Number.prototype.toFixed()` is used here to circumvent IE9 rounding issues
     assert.equal(player.volume().toFixed(1), (0.1).toFixed(1), 'since lastVolume is less than 0.1, volume is set to 0.1');
     assert.equal(player.muted(), false, 'muted is set to false');
+
+    player.dispose();
   });
 
   QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
@@ -170,6 +186,8 @@ if (Html5.isSupported()) {
     this.clock.tick(1);
 
     assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
+
+    player.dispose();
   });
 
   QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', function(assert) {
@@ -193,5 +211,7 @@ if (Html5.isSupported()) {
     assert.equal(player.volume(), 1, 'Volume remains 1');
     assert.equal(player.muted(), true, 'Muted is true');
     assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
+
+    player.dispose();
   });
 }
