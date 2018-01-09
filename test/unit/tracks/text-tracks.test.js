@@ -121,6 +121,8 @@ QUnit.test('listen to remove and add track events in native text tracks', functi
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.textTracks = oldTextTracks;
+
+  html.dispose();
 });
 
 QUnit.test('update texttrack buttons on removetrack or addtrack', function(assert) {
@@ -278,6 +280,8 @@ if (Html5.supportsNativeTextTracks()) {
     emulatedTt.on('removetrack', function() {
       assert.equal(emulatedTt.length, tt.length, 'we have matching tracks length');
       assert.equal(emulatedTt.length, 0, 'we have no more text tracks');
+
+      html.dispose();
       done();
     });
   });
