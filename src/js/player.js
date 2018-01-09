@@ -3463,7 +3463,7 @@ Player.prototype.options_ = {
 };
 
 if (!browser.IS_IE8) {
-  Player.prototype.options_.push('resizeManager');
+  Player.prototype.options_.children.push('resizeManager');
 }
 
 [
