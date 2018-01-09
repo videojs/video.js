@@ -3450,8 +3450,7 @@ Player.prototype.options_ = {
     'bigPlayButton',
     'controlBar',
     'errorDisplay',
-    'textTrackSettings',
-    'resizeManager'
+    'textTrackSettings'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
@@ -3462,6 +3461,10 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.'
 };
+
+if (!browser.IS_IE8) {
+  Player.prototype.options_.push('resizeManager');
+}
 
 [
   /**
