@@ -47,7 +47,7 @@ class ResizeManager extends Component {
       this.resizeObserver.disconnect();
     }
 
-    if (this.iframeResizeHandler_) {
+    if (this.iframeResizeHandler_ && this.el_.contentWindow) {
       this.el_.contentWindow.removeEventListener('resize', this.iframeResizeHandler_);
     }
 
