@@ -22,7 +22,9 @@ class ResizeManager extends Component {
     } else {
       this.iframeResizeHandler_ = Fn.throttle(() => this.resizeHandler(), 50);
       this.loadListener_ = () => {
-        this.el_.contentWindow.addEventListener('resize', this.iframeResizeHandler_);
+        if (this.el_.contentWindow) {
+          this.el_.contentWindow.addEventListener('resize', this.iframeResizeHandler_);
+        }
         this.el_.removeEventListener('load', this.loadListener_);
       };
 
