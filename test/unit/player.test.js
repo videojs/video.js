@@ -1469,7 +1469,7 @@ QUnit.test('should not allow to register custom player when any player has been 
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
   let durs = 0;
-  let ps = 0;
+  let lps = 0;
 
   videojs.use('video/foo', () => ({
     currentTime() {
@@ -1478,8 +1478,8 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
     duration() {
       durs++;
     },
-    paused() {
-      ps++;
+    loop() {
+      lps++;
     }
   }));
 
@@ -1496,11 +1496,11 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
 
   player.techGet_('currentTime');
   player.techGet_('duration');
-  player.techGet_('paused');
+  player.techGet_('loop');
 
   assert.equal(cts, 1, 'currentTime is allowed');
   assert.equal(durs, 1, 'duration is allowed');
-  assert.equal(ps, 0, 'paused is not allowed');
+  assert.equal(lps, 0, 'loop is not allowed');
 
   middleware.getMiddleware('video/foo').pop();
   player.dispose();
