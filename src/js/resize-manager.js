@@ -57,7 +57,7 @@ class ResizeManager extends Component {
       this.resizeObserver_.disconnect();
     }
 
-    if (this.debouncedHandler_ && this.el_.contentWindow) {
+    if (this.el_ && this.el_.contentWindow) {
       Events.off(this.el_.contentWindow, 'resize', this.debouncedHandler_);
     }
 
