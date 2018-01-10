@@ -25,6 +25,9 @@ if (!browser.IS_IE8) {
   QUnit.test('ResizeManager uses the ResizeObserver, if given', function(assert) {
     let roCreated = false;
     let observeCalled = false;
+    let unobserveCalled = false;
+    let disconnectCalled = false;
+    let sameEl = false;
 
     class MyResizeObserver {
       constructor(fn) {
@@ -36,6 +39,15 @@ if (!browser.IS_IE8) {
         observeCalled = true;
         this.el = el;
       }
+
+      unobserve(el) {
+        unobserveCalled = true;
+        sameEl = this.el === el;
+      }
+
+      disconnect() {
+        disconnectCalled = true;
+      }
     }
 
     const rm = new ResizeManager(this.player, {ResizeObserver: MyResizeObserver});
@@ -45,6 +57,10 @@ if (!browser.IS_IE8) {
     assert.equal(rm.resizeObserver.el, this.player.el(), 'we observed the player el');
 
     rm.dispose();
+
+    assert.ok(unobserveCalled, 'we unobserve when disposed');
+    assert.ok(sameEl, 'we unobserve the same el as we observed');
+    assert.ok(disconnectCalled, 'we disconnected when disposed');
   });
 
   QUnit.test('ResizeManager triggers `playerresize` when the observer method is called', function(assert) {
@@ -55,6 +71,12 @@ if (!browser.IS_IE8) {
 
       observe(el) {
         this.el = el;
+      }
+
+      unobserve(el) {
+      }
+
+      disconnect() {
       }
     }
 
