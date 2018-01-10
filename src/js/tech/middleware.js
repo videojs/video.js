@@ -27,15 +27,14 @@ export function setTech(middleware, tech) {
 
 // returns value from tech or TERMINATOR
 export function get(middleware, tech, method) {
-  const reversedMiddleware = middleware.reverse();
-  const getFromTech = exitableReducer(reversedMiddleware, middlewareIterator(method), tech[method]());
+  const getFromTech = exitableReduceRight(middleware, middlewareIterator(method), tech[method]());
 
   return getFromTech;
 }
 
 // returns results if any of calling the method on the tech or TERMINATOR
 export function set(middleware, tech, method, arg) {
-  const middlewareValue = exitableReducer(middleware, middlewareIterator(method), arg);
+  const middlewareValue = exitableReduce(middleware, middlewareIterator(method), arg);
 
   if (middlewareValue === TERMINATOR) {
     return TERMINATOR;
@@ -48,16 +47,15 @@ export function set(middleware, tech, method, arg) {
 
 // Runs the middleware from the player to the tech, and a 2nd time back up to the player
 export function mediate(middleware, tech, method, arg = null) {
-  const reversedMiddleware = middleware.reverse();
   const iterator = middlewareIterator(method);
-  const middlewareValue = exitableReducer(middleware, iterator, arg);
+  const middlewareValue = exitableReduce(middleware, iterator, arg);
 
   if (middlewareValue === TERMINATOR) {
     return TERMINATOR;
   }
 
   const mediateToTech = tech[method](middlewareValue);
-  const mediateToPlayer = exitableReducer(reversedMiddleware, iterator, mediateToTech);
+  const mediateToPlayer = exitableReduceRight(middleware, iterator, mediateToTech);
 
   return mediateToPlayer;
 }
@@ -89,8 +87,22 @@ function middlewareIterator(method) {
   };
 }
 
-function exitableReducer(mws, iterator, acc) {
+function exitableReduce(mws, iterator, acc) {
   for (let i = 0; i < mws.length; i++) {
+    const mw = mws[i];
+
+    if (acc === TERMINATOR) {
+      return TERMINATOR;
+    }
+
+    acc = iterator(acc, mw);
+  }
+
+  return acc;
+}
+
+function exitableReduceRight(mws, iterator, acc) {
+  for (let i = mws.length - 1; i >= 0; i--) {
     const mw = mws[i];
 
     if (acc === TERMINATOR) {
