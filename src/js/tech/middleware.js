@@ -25,18 +25,42 @@ export function setTech(middleware, tech) {
   middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
 }
 
+// returns value from tech or TERMINATOR
 export function get(middleware, tech, method) {
-  return middleware.reduceRight(middlewareIterator(method), tech[method]());
+  const reversedMiddleware = middleware.reverse();
+  const getFromTech = exitableReducer(reversedMiddleware, middlewareIterator(method), tech[method]());
+
+  return getFromTech;
 }
 
+// returns results if any of calling the method on the tech or TERMINATOR
 export function set(middleware, tech, method, arg) {
-  return tech[method](middleware.reduce(middlewareIterator(method), arg));
+  const middlewareValue = exitableReducer(middleware, middlewareIterator(method), arg);
+  let setFromPlayer;
+
+  if (middlewareValue === TERMINATOR) {
+    return TERMINATOR;
+  }
+
+  setFromPlayer = tech[method](middlewareValue);
+
+  return setFromPlayer;
 }
 
 // Runs the middleware from the player to the tech, and a 2nd time back up to the player
 export function mediate(middleware, tech, method, arg = null) {
-  const mediateToTech = tech[method](middleware.reduce(middlewareIterator(method), arg));
-  const mediateToPlayer = middleware.reduceRight(middlewareIterator(method), mediateToTech);
+  const reversedMiddleware = middleware.reverse();
+  const iterator = middlewareIterator(method);
+  let middlewareValue = exitableReducer(middleware, iterator, arg);
+  let mediateToTech;
+  let mediateToPlayer;
+
+  if (middlewareValue === TERMINATOR) {
+    return TERMINATOR;
+  }
+
+  mediateToTech = tech[method](middlewareValue);
+  mediateToPlayer = exitableReducer(reversedMiddleware, iterator, mediateToTech);
 
   return mediateToPlayer;
 }
@@ -66,6 +90,20 @@ function middlewareIterator(method) {
 
     return value;
   };
+}
+
+function exitableReducer(mws, iterator, acc) {
+  for (let i = 0; i < mws.length; i++) {
+    const mw = mws[i];
+
+    if (acc === TERMINATOR) {
+      return TERMINATOR;
+    }
+
+    acc = iterator(acc, mw);
+  }
+
+  return acc;
 }
 
 function setSourceHelper(src = {}, middleware = [], next, player, acc = [], lastRun = false) {
