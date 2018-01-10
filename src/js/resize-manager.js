@@ -6,18 +6,17 @@ import * as Fn from './utils/fn.js';
 import * as Events from './utils/events.js';
 import Component from './component.js';
 
-const RESIZE_OBSERVER_AVAILABLE = window.ResizeObserver;
-
 class ResizeManager extends Component {
   constructor(player, options) {
     super(player, options);
 
+    this.ResizeObserver = options.ResizeObserver || window.ResizeObserver;
     this.iframeResizeHandler_ = null;
     this.loadListener_ = null;
     this.resizeObserver = null;
 
-    if (RESIZE_OBSERVER_AVAILABLE) {
-      this.resizeObserver = new window.ResizeObserver(() => this.resizeHandler());
+    if (this.ResizeObserver) {
+      this.resizeObserver = new this.ResizeObserver(() => this.resizeHandler());
       this.resizeObserver.observe(player.el());
 
     } else {
@@ -34,7 +33,7 @@ class ResizeManager extends Component {
   }
 
   createEl() {
-    if (RESIZE_OBSERVER_AVAILABLE) {
+    if (this.ResizeObserver) {
       return;
     }
 
