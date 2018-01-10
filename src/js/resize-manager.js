@@ -21,9 +21,11 @@ class ResizeManager extends Component {
     super(player, options_);
 
     this.ResizeObserver = options.ResizeObserver || window.ResizeObserver;
-    this.debouncedHandler_ = debounce(() => { this.resizeHandler() }, 100, false, player);
     this.loadListener_ = null;
     this.resizeObserver_ = null;
+    this.debouncedHandler_ = debounce(() => {
+      this.resizeHandler();
+    }, 100, false, player);
 
     if (RESIZE_OBSERVER_AVAILABLE) {
       this.resizeObserver_ = new this.ResizeObserver(this.debouncedHandler_);

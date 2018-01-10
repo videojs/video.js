@@ -2,6 +2,7 @@
 import ResizeManager from '../../src/js/resize-manager.js';
 import TestHelpers from './test-helpers.js';
 import * as browser from '../../src/js/utils/browser.js';
+import sinon from 'sinon';
 
 if (!browser.IS_IE8) {
 

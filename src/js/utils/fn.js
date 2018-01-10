@@ -3,6 +3,7 @@
  * @module fn
  */
 import { newGUID } from './guid.js';
+import window from 'global/window';
 
 /**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
@@ -97,12 +98,10 @@ export const throttle = function(fn, wait) {
 export const debounce = function(func, wait, immediate, context = window) {
   let timeout;
 
-
   /* eslint-disable consistent-this */
   return function() {
     const self = this;
     const args = arguments;
-
 
     let later = function() {
       timeout = null;
@@ -112,14 +111,12 @@ export const debounce = function(func, wait, immediate, context = window) {
       }
     };
 
-
     if (!timeout && immediate) {
       func.apply(self, args);
     }
-
 
     context.clearTimeout(timeout);
     timeout = context.setTimeout(later, wait);
   };
   /* eslint-enable consistent-this */
-}
+};
