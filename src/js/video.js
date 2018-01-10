@@ -31,7 +31,7 @@ import xhr from 'xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
-import { use as middlewareUse } from './tech/middleware.js';
+import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
 
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
@@ -748,6 +748,8 @@ videojs.dom = Dom;
  * and Tech's
  */
 videojs.url = Url;
+
+videojs.TERMINATOR = TERMINATOR;
 
 export default videojs;
 
