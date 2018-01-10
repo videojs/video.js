@@ -23,14 +23,24 @@
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
   </video>
+
+  <input id="stateToggle" type="checkbox">Terminate</input>
+
   <script>
+    var stateToggle = document.getElementById('stateToggle');
+
     // Play Middleware
     var playIntercept = function(player) {
       return {
         play: function(promise) {
           console.log('in the middleware. Promise:', promise);
 
-          return promise;
+          if (stateToggle.checked) {
+            console.log('Play is terminated');
+            return videojs.TERMINATOR;
+          } else {
+            return promise;
+          }
         },
         setSource: function(srcObj, next) {
           next(null, srcObj);
