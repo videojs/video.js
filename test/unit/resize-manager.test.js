@@ -7,10 +7,12 @@ if (!browser.IS_IE8) {
 
   QUnit.module('ResizeManager', {
     beforeEach() {
+      this.clock = sinon.useFakeTimers();
       this.player = TestHelpers.makePlayer();
     },
     afterEach() {
       this.player.dispose();
+      this.clock.restore();
     }
   });
 
@@ -54,7 +56,7 @@ if (!browser.IS_IE8) {
 
     assert.ok(roCreated, 'we intantiated the RO that was passed');
     assert.ok(observeCalled, 'we observed the RO');
-    assert.equal(rm.resizeObserver.el, this.player.el(), 'we observed the player el');
+    assert.equal(rm.resizeObserver_.el, this.player.el(), 'we observed the player el');
 
     rm.dispose();
 
@@ -86,7 +88,9 @@ if (!browser.IS_IE8) {
     this.player.on('playerresize', function() {
       playerresizeCalled++;
     });
-    rm.resizeObserver.observer();
+    rm.resizeObserver_.observer();
+
+    this.clock.tick(100);
 
     assert.equal(playerresizeCalled, 1, 'playerresize was triggered');
 
