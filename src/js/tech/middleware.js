@@ -36,13 +36,12 @@ export function get(middleware, tech, method) {
 // returns results if any of calling the method on the tech or TERMINATOR
 export function set(middleware, tech, method, arg) {
   const middlewareValue = exitableReducer(middleware, middlewareIterator(method), arg);
-  let setFromPlayer;
 
   if (middlewareValue === TERMINATOR) {
     return TERMINATOR;
   }
 
-  setFromPlayer = tech[method](middlewareValue);
+  const setFromPlayer = tech[method](middlewareValue);
 
   return setFromPlayer;
 }
@@ -51,16 +50,14 @@ export function set(middleware, tech, method, arg) {
 export function mediate(middleware, tech, method, arg = null) {
   const reversedMiddleware = middleware.reverse();
   const iterator = middlewareIterator(method);
-  let middlewareValue = exitableReducer(middleware, iterator, arg);
-  let mediateToTech;
-  let mediateToPlayer;
+  const middlewareValue = exitableReducer(middleware, iterator, arg);
 
   if (middlewareValue === TERMINATOR) {
     return TERMINATOR;
   }
 
-  mediateToTech = tech[method](middlewareValue);
-  mediateToPlayer = exitableReducer(reversedMiddleware, iterator, mediateToTech);
+  const mediateToTech = tech[method](middlewareValue);
+  const mediateToPlayer = exitableReducer(reversedMiddleware, iterator, mediateToTech);
 
   return mediateToPlayer;
 }
