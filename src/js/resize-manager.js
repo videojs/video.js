@@ -2,28 +2,37 @@
  * @file resize-manager.js
  */
 import window from 'global/window';
-import * as Fn from './utils/fn.js';
+import { debounce } from './utils/fn.js';
 import * as Events from './utils/events.js';
+import mergeOptions from './utils/merge-options.js';
 import Component from './component.js';
 
 class ResizeManager extends Component {
   constructor(player, options) {
-    super(player, options);
+    let RESIZE_OBSERVER_AVAILABLE = options.ResizeObserver || window.ResizeObserver;
+
+    if (options.ResizeObserver === null) {
+      RESIZE_OBSERVER_AVAILABLE = false;
+    }
+
+    // Only create an element when ResizeObserver isn't available
+    const options_ = mergeOptions({createEl: !RESIZE_OBSERVER_AVAILABLE}, options);
+
+    super(player, options_);
 
     this.ResizeObserver = options.ResizeObserver || window.ResizeObserver;
-    this.iframeResizeHandler_ = null;
+    this.debouncedHandler_ = debounce(() => { this.resizeHandler() }, 100);
     this.loadListener_ = null;
-    this.resizeObserver = null;
+    this.resizeObserver_ = null;
 
-    if (this.ResizeObserver) {
-      this.resizeObserver = new this.ResizeObserver(() => this.resizeHandler());
-      this.resizeObserver.observe(player.el());
+    if (RESIZE_OBSERVER_AVAILABLE) {
+      this.resizeObserver_ = new this.ResizeObserver(this.debouncedHandler_);
+      this.resizeObserver_.observe(player.el());
 
     } else {
-      this.iframeResizeHandler_ = Fn.throttle(() => this.resizeHandler(), 50);
       this.loadListener_ = () => {
         if (this.el_.contentWindow) {
-          Events.on(this.el_.contentWindow, 'resize', this.iframeResizeHandler_);
+          Events.on(this.el_.contentWindow, 'resize', this.debouncedHandler_);
         }
         this.off('load', this.loadListener_);
       };
@@ -33,10 +42,6 @@ class ResizeManager extends Component {
   }
 
   createEl() {
-    if (this.ResizeObserver) {
-      return;
-    }
-
     return super.createEl('iframe', {
       className: 'vjs-resize-manager'
     });
@@ -47,21 +52,22 @@ class ResizeManager extends Component {
   }
 
   dispose() {
-    if (this.resizeObserver) {
-      this.resizeObserver.unobserve(this.player_.el());
-      this.resizeObserver.disconnect();
+    if (this.resizeObserver_) {
+      this.resizeObserver_.unobserve(this.player_.el());
+      this.resizeObserver_.disconnect();
     }
 
-    if (this.iframeResizeHandler_ && this.el_.contentWindow) {
-      Events.off(this.el_.contentWindow, 'resize', this.iframeResizeHandler_);
+    if (this.debouncedHandler_ && this.el_.contentWindow) {
+      Events.off(this.el_.contentWindow, 'resize', this.debouncedHandler_);
     }
 
     if (this.loadListener_) {
       this.off('load', this.loadListener_);
     }
 
+    this.ResizeObserver = null;
     this.resizeObserver = null;
-    this.iframeResizeHandler_ = null;
+    this.debouncedHandler_ = null;
     this.loadListener_ = null;
   }
 
