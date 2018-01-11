@@ -30,6 +30,20 @@ Any issue and PR can be closed if they are not relevant, when in doubt leave it 
 
 If issues or PRs are very short and don't contain much information, ask for more by linking to the [issue][issue template] or [PR][pr template] template. There is also a [response guide](https://github.com/videojs/video.js/wiki/New-Issue-Response-Guide) if you're unsure.
 
+### Labels
+
+There are labels that are useful to include on issues and PRs. A few of them are defined below:
+
+| Label | Issue or PR | Description |
+|-------|-------------|-------------|
+| confirmed | Issue and PR | Issue: marks as reproducible. PR: marks as ready to be merged|
+| 5.x | PR | Marks as a change to the 5.x branch only |
+| bug | Issue | Marks as a confirmed bug |
+| first-timers-only | Issue | Marks as a good bug or enhancement for first time contributors only |
+| minor, patch, major | PR | Marks PR with the expected semver classification of the change |
+| needs: LGTM | PR | Marks PR to be reviewed by a collaborator |
+
+
 ## Accepting changes
 
 Any code change in video.js should be happening through Pull Requests on GitHub. This includes core committers.
