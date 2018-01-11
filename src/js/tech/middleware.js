@@ -2,7 +2,7 @@ import { assign } from '../utils/obj.js';
 
 const middlewares = {};
 
-export const TERMINATOR = 'TERMINATOR';
+export const TERMINATOR = {};
 
 export function use(type, middleware) {
   middlewares[type] = middlewares[type] || [];
