@@ -32,15 +32,37 @@
     // Play Middleware
     var playIntercept = function(player) {
       return {
-        play: function(promise) {
-          console.log('in the middleware. Promise:', promise);
-
+        // Mediating play to the tech
+        callPlay: function() {
           if (stateToggle.checked) {
-            console.log('Play is terminated');
+            console.log('Play is set to terminate');
             return videojs.TERMINATOR;
-          } else {
-            return promise;
           }
+        },
+        // Mediating the results back to the player
+        play: function(value, cancelled) {
+          console.log('in the middleware. Did it succeed:', !cancelled);
+
+          return value;
+        },
+        callPause: function() {
+          if (stateToggle.checked) {
+            return videojs.TERMINATOR;
+          }
+        },
+        pause: function(value, cancelled) {
+          console.log('Did pause succeed:', !cancelled);
+
+          return value;
+        },
+        paused: function(paused) {
+          console.log('got paused', paused);
+
+          return paused;
+        },
+        setCurrentTime: function(time) {
+          console.log('was going to set time to', time);
+          return time * 2;
         },
         setSource: function(srcObj, next) {
           next(null, srcObj);
