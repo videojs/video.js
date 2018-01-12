@@ -41,7 +41,7 @@
         },
         // Mediating the results back to the player
         play: function(value, cancelled) {
-          console.log('in the middleware. Did it succeed:', !cancelled);
+          console.log('Play. Did it succeed:', !cancelled, 'value', value);
 
           return value;
         },
@@ -51,7 +51,7 @@
           }
         },
         pause: function(value, cancelled) {
-          console.log('Did pause succeed:', !cancelled);
+          console.log('Pause succeed:', !cancelled);
 
           return value;
         },
