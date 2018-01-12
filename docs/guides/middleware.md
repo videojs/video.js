@@ -6,7 +6,7 @@ Middleware is a Video.js feature that allows interaction with and modification o
 
 * [Understanding Middleware](#understanding-middleware)
 * [Using Middleware](#using-middleware)
-* [setSource](#set-source)
+* [setSource](#setsource)
 
 ## Understanding Middleware
 
