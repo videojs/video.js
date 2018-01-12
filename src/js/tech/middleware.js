@@ -26,30 +26,18 @@ export function setTech(middleware, tech) {
   middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
 }
 
-// returns value from tech or TERMINATOR
 export function get(middleware, tech, method) {
-  const getFromTech = exitableReduceRight(middleware, middlewareIterator(method), tech[method]());
-
-  return getFromTech;
+  return middleware.reduceRight(middlewareIterator(method), tech[method]());
 }
 
-// returns results if any of calling the method on the tech or TERMINATOR
 export function set(middleware, tech, method, arg) {
-  const middlewareValue = exitableReduce(middleware, middlewareIterator(method), arg);
-
-  if (middlewareValue === TERMINATOR) {
-    return TERMINATOR;
-  }
-
-  const setFromPlayer = tech[method](middlewareValue);
-
-  return setFromPlayer;
+  return tech[method](middleware.reduce(middlewareIterator(method), arg));
 }
 
 // Runs the middleware from the player to the tech, and a 2nd time back up to the player
 export function mediate(middleware, tech, method, arg = null) {
   const callMethod = 'call' + toTitleCase(method);
-  const middlewareValue = exitableReduce(middleware, middlewareIterator(callMethod), arg);
+  const middlewareValue = middleware.reduce(middlewareIterator(callMethod), arg);
   const terminated = middlewareValue === TERMINATOR;
   const returnValue = terminated ? null : tech[method](middlewareValue);
 
@@ -83,34 +71,6 @@ function middlewareIterator(method) {
 
     return value;
   };
-}
-
-function exitableReduce(mws, iterator, acc) {
-  for (let i = 0; i < mws.length; i++) {
-    const mw = mws[i];
-
-    if (acc === TERMINATOR) {
-      return TERMINATOR;
-    }
-
-    acc = iterator(acc, mw);
-  }
-
-  return acc;
-}
-
-function exitableReduceRight(mws, iterator, acc) {
-  for (let i = mws.length - 1; i >= 0; i--) {
-    const mw = mws[i];
-
-    if (acc === TERMINATOR) {
-      return TERMINATOR;
-    }
-
-    acc = iterator(acc, mw);
-  }
-
-  return acc;
 }
 
 function executeRight(mws, method, value, terminated) {
