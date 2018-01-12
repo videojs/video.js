@@ -1,4 +1,5 @@
 import { assign } from '../utils/obj.js';
+import toTitleCase from '../utils/to-title-case.js';
 
 const middlewares = {};
 
@@ -47,17 +48,14 @@ export function set(middleware, tech, method, arg) {
 
 // Runs the middleware from the player to the tech, and a 2nd time back up to the player
 export function mediate(middleware, tech, method, arg = null) {
-  const iterator = middlewareIterator(method);
-  const middlewareValue = exitableReduce(middleware, iterator, arg);
+  const callMethod = 'call' + toTitleCase(method);
+  const middlewareValue = exitableReduce(middleware, middlewareIterator(callMethod), arg);
+  const terminated = middlewareValue === TERMINATOR;
+  const returnValue = terminated ? null : tech[method](middlewareValue);
 
-  if (middlewareValue === TERMINATOR) {
-    return TERMINATOR;
-  }
+  executeRight(middleware, method, returnValue, terminated);
 
-  const mediateToTech = tech[method](middlewareValue);
-  const mediateToPlayer = exitableReduceRight(middleware, iterator, mediateToTech);
-
-  return mediateToPlayer;
+  return returnValue;
 }
 
 export const allowedGetters = {
@@ -113,6 +111,14 @@ function exitableReduceRight(mws, iterator, acc) {
   }
 
   return acc;
+}
+
+function executeRight(mws, method, value, terminated) {
+  for (let i = mws.length - 1; i >= 0; i--) {
+    const mw = mws[i];
+
+    mw[method](value, terminated);
+  }
 }
 
 function setSourceHelper(src = {}, middleware = [], next, player, acc = [], lastRun = false) {
