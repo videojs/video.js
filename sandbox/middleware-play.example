@@ -30,18 +30,18 @@
     var stateToggle = document.getElementById('stateToggle');
 
     // Play Middleware
-    var playIntercept = function(player) {
+    var m1 = function(player) {
       return {
         // Mediating play to the tech
         callPlay: function() {
           if (stateToggle.checked) {
-            console.log('Play is set to terminate');
+            console.log('1 Play is set to terminate');
             return videojs.TERMINATOR;
           }
         },
         // Mediating the results back to the player
         play: function(value, cancelled) {
-          console.log('Play. Did it succeed:', !cancelled, 'value', value);
+          console.log('1 got Play. Did it succeed:', !cancelled, 'value', value);
 
           return value;
         },
@@ -51,17 +51,17 @@
           }
         },
         pause: function(value, cancelled) {
-          console.log('Pause succeed:', !cancelled);
+          console.log('1 Pause succeed:', !cancelled);
 
           return value;
         },
         paused: function(paused) {
-          console.log('got paused', paused);
+          console.log('1 got paused', paused);
 
           return paused;
         },
         setCurrentTime: function(time) {
-          console.log('was going to set time to', time);
+          console.log('1 was going to set time to', time);
           return time * 2;
         },
         setSource: function(srcObj, next) {
@@ -70,7 +70,28 @@
       };
     };
 
-    videojs.use('*', playIntercept);
+    var m2 = function(player) {
+      return {
+        callPlay: function() {
+          console.log('2 called play');
+        },
+        play: function(value, cancelled) {
+          console.log('2 got play');
+        },
+        callPause: function() {
+          console.log('2 called pause');
+        },
+        pause: function(value, cancelled) {
+          console.log('2 got pause');
+        },
+        setSource: function(srcObj, next) {
+          next(null, srcObj);
+        }
+      };
+    }
+
+    videojs.use('*', m1);
+    videojs.use('*', m2);
 
     // Initial set-up
     var vid = document.getElementById("vid1");
