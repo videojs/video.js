@@ -65,6 +65,10 @@ export const allowedMediators = {
 
 function middlewareIterator(method) {
   return (value, mw) => {
+    if (value === TERMINATOR) {
+      return TERMINATOR;
+    }
+
     if (mw[method]) {
       return mw[method](value);
     }
