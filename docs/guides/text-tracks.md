@@ -230,7 +230,7 @@ As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represen
   ```js
   const trackEl = player.addRemoteTextTrack({src: 'en.vtt'}, false);
   trackEl.addEventListener('load', function() {
-    // your callback go here
+    // your callback goes here
   });
   ```
 
