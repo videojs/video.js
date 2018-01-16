@@ -749,7 +749,9 @@ videojs.dom = Dom;
  */
 videojs.url = Url;
 
-videojs.TERMINATOR = TERMINATOR;
+Object.defineProperty(videojs, 'TERMINATOR', {
+  value: TERMINATOR
+});
 
 export default videojs;
 
