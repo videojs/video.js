@@ -751,8 +751,8 @@ videojs.url = Url;
 
 // Object.defineProperty is not available in IE8
 if (!browser.IS_IE8 && Object.defineProperty) {
-  Object.defineProperty(videojs, 'middleware.TERMINATOR', {
-    value: TERMINATOR,
+  Object.defineProperty(videojs, 'middleware', {
+    value: { TERMINATOR },
     writeable: false,
     enumerable: true
   });

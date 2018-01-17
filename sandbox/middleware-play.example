@@ -36,7 +36,7 @@
         callPlay: function() {
           if (stateToggle.checked) {
             console.log('1 Play is set to terminate');
-            return videojs.TERMINATOR;
+            return videojs.middleware.TERMINATOR;
           }
         },
         // Mediating the results back to the player
@@ -47,7 +47,7 @@
         },
         callPause: function() {
           if (stateToggle.checked) {
-            return videojs.TERMINATOR;
+            return videojs.middleware.TERMINATOR;
           }
         },
         pause: function(cancelled, value) {
