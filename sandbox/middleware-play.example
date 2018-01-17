@@ -19,7 +19,7 @@
 </head>
 <body>
 
-  <video id="vid1" class="video-js vjs-default-skin" lang="en" controls preload="auto" width="640" height="360" poster="//d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
+  <video id="vid1" class="video-js" lang="en" controls poster="//d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
   </video>
@@ -40,7 +40,7 @@
           }
         },
         // Mediating the results back to the player
-        play: function(value, cancelled) {
+        play: function(cancelled, value) {
           console.log('1 got Play. Did it succeed:', !cancelled, 'value', value);
 
           return value;
@@ -50,7 +50,7 @@
             return videojs.TERMINATOR;
           }
         },
-        pause: function(value, cancelled) {
+        pause: function(cancelled, value) {
           console.log('1 Pause succeed:', !cancelled);
 
           return value;
@@ -75,13 +75,13 @@
         callPlay: function() {
           console.log('2 called play');
         },
-        play: function(value, cancelled) {
+        play: function(cancelled, value) {
           console.log('2 got play');
         },
         callPause: function() {
           console.log('2 called pause');
         },
-        pause: function(value, cancelled) {
+        pause: function(cancelled, value) {
           console.log('2 got pause');
         },
         setSource: function(srcObj, next) {
