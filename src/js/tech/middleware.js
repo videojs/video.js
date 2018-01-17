@@ -60,7 +60,8 @@ export const allowedSetters = {
 };
 
 export const allowedMediators = {
-  play: 1
+  play: 1,
+  pause: 1
 };
 
 function middlewareIterator(method) {
@@ -81,7 +82,7 @@ function executeRight(mws, method, value, terminated) {
   for (let i = mws.length - 1; i >= 0; i--) {
     const mw = mws[i];
 
-    mw[method](value, terminated);
+    mw[method](terminated, value);
   }
 }
 
