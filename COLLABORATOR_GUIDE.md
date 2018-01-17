@@ -3,6 +3,7 @@
 ## Table of Contents
 
 * [Issues and Pull Requests](#issues-and-pull-requests)
+  * [Labels](#labels)
 * [Accepting changes](#accepting-changes)
   * [Involving the TSC](#involving-the-tsc)
 * [Landing a PR](#landing-a-pr)
@@ -42,6 +43,8 @@ There are labels that are useful to include on issues and PRs. A few of them are
 | first-timers-only | Issue | Marks as a good bug or enhancement for first time contributors only |
 | minor, patch, major | PR | Marks PR with the expected semver classification of the change |
 | needs: LGTM | PR | Marks PR to be reviewed by a collaborator |
+| needs: more info | Issue | Marks as needing more information from the issue reporter |
+| needs: reduced test case | Issue | Marks as needing a reduced test case from the issue reporter |
 
 
 ## Accepting changes
