@@ -35,7 +35,6 @@ if (!browser.IS_IE8) {
     class MyResizeObserver {
       constructor(fn) {
         roCreated = true;
-        this.observer = fn;
       }
 
       observe(el) {
@@ -67,9 +66,11 @@ if (!browser.IS_IE8) {
   });
 
   QUnit.test('ResizeManager triggers `playerresize` when the observer method is called', function(assert) {
+    let observer;
+
     class MyResizeObserver {
       constructor(fn) {
-        this.observer = fn;
+        observer = fn;
       }
 
       observe(el) {
@@ -89,7 +90,7 @@ if (!browser.IS_IE8) {
     this.player.on('playerresize', function() {
       playerresizeCalled++;
     });
-    rm.resizeObserver_.observer();
+    observer();
 
     this.clock.tick(100);
 

@@ -41,6 +41,7 @@ class ResizeManager extends Component {
   constructor(player, options) {
     let RESIZE_OBSERVER_AVAILABLE = options.ResizeObserver || window.ResizeObserver;
 
+    // if `null` was passed, we want to disable the ResizeObserver
     if (options.ResizeObserver === null) {
       RESIZE_OBSERVER_AVAILABLE = false;
     }
