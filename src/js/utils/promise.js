@@ -9,7 +9,7 @@
  *         Whether or not the object is `Promise`-like.
  */
 export function isPromise(value) {
-  return value !== undefined && typeof value.then === 'function';
+  return value !== undefined && value !== null && typeof value.then === 'function';
 }
 
 /**

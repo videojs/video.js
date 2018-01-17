@@ -59,7 +59,7 @@ class BigPlayButton extends Button {
 
     const playFocus = () => playToggle.focus();
 
-    if (playPromise && isPromise(playPromise)) {
+    if (isPromise(playPromise)) {
       playPromise.then(playFocus, () => {});
     } else {
       this.setTimeout(playFocus, 1);
