@@ -158,7 +158,7 @@ QUnit.test('middleware mediate iterates through the middleware array twice', fun
     callPlay() {
       playsToTech++;
     },
-    play(value, cancelled) {
+    play(cancelled, value) {
       playsToPlayer++;
       pv1 = value;
       pc1 = cancelled;
@@ -167,7 +167,7 @@ QUnit.test('middleware mediate iterates through the middleware array twice', fun
     callPlay() {
       playsToTech++;
     },
-    play(value, cancelled) {
+    play(cancelled, value) {
       playsToPlayer++;
       pv2 = value;
       pc2 = cancelled;
@@ -209,7 +209,7 @@ QUnit.test('middleware mediate allows and can detect cancellation', function(ass
     callPlay() {
       playsToTech++;
     },
-    play(value, cancelled) {
+    play(cancelled, value) {
       playsToPlayer++;
       pv1 = value;
       pc1 = cancelled;
@@ -219,7 +219,7 @@ QUnit.test('middleware mediate allows and can detect cancellation', function(ass
       playsToTech++;
       return middleware.TERMINATOR;
     },
-    play(value, cancelled) {
+    play(cancelled, value) {
       playsToPlayer++;
       pv2 = value;
       pc2 = cancelled;
