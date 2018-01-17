@@ -18,6 +18,7 @@ The architecture of the Video.js player is centered around components. The `Play
 * [Specific Component Details](#specific-component-details)
   * [Volume Panel](#volume-panel)
   * [Text Track Settings](#text-track-settings)
+  * [Resize Manager](#resize-manager)
 
 ## What is a Component?
 
@@ -347,6 +348,7 @@ It uses the ResizeObserver if available or a polyfill was provided. It has no el
 If a ResizeObserver is not available, it will fallback to an iframe element and listen to its resize event via a debounced handler.
 
 A ResizeObserver polyfill can be passed in like so:
+
 ```js
 var player = videojs('myplayer', {
   resizeManager: {
@@ -356,6 +358,7 @@ var player = videojs('myplayer', {
 ```
 
 To force using the iframe fallback, pass in `null` as the `ResizeObserver`:
+
 ```js
 var player = videojs('myplayer', {
   resizeManager: {
@@ -365,6 +368,7 @@ var player = videojs('myplayer', {
 ```
 
 The ResizeManager can also just be disabled like so:
+
 ```js
 var player = videojs('myplayer', {
   resizeManager: false
