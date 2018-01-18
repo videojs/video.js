@@ -8,7 +8,7 @@ import mergeOptions from './utils/merge-options.js';
 import Component from './component.js';
 
 /**
- * A Resize Manager. It is in charge of trigger `playerresize` on the player on the right conditions.
+ * A Resize Manager. It is in charge of triggering `playerresize` on the player in the right conditions.
  *
  * It'll either create an iframe and use a debounced resize handler on it or use the new {@link https://wicg.github.io/ResizeObserver/|ResizeObserver}.
  *
@@ -26,7 +26,7 @@ import Component from './component.js';
 class ResizeManager extends Component {
 
   /**
-   * Create the ResizeMAnager.
+   * Create the ResizeManager.
    *
    * @param {Object} player
    *        The `Player` that this class should be attached to.
