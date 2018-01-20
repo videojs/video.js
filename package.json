@@ -126,7 +126,7 @@
     "remark-cli": "^4.0.0",
     "remark-lint": "^6.0.0",
     "remark-parse": "^4.0.0",
-    "remark-stringify": "^4.0.0",
+    "remark-stringify": "^5.0.0",
     "remark-toc": "^5.0.0",
     "remark-validate-links": "^7.0.0",
     "replace": "^0.3.0",
