@@ -93,7 +93,8 @@ var myMiddleware = function(player) {
     },
     play: function(terminated, value) {
       // the terminated argument should be true here.
-    }
+    },
+    ...
   };
 };
 
