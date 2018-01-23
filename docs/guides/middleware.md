@@ -27,7 +27,7 @@ These allowed methods are split into three categories: `getters`, `setters` and 
 
 ### Termination and Mediators
 
-Mediators are the thrid category of allowed methods. These are methods that not only change the state of the Tech, but also return some value back to the Player. Currently, these are `play` and `pause`.
+Mediators are the third category of allowed methods. These are methods that not only change the state of the Tech, but also return some value back to the Player. Currently, these are `play` and `pause`.
 
 Mediators make a round trip: starting at the `Player`, mediating to the `Tech` and returning the result to the `Player` again. A `call{method}` method must be supplied by the middleware which is used when mediating to the `Tech`. For example: `callPlay`. On the way back to the `Player`, the `{method}` will be called instead, with 2 arguments: `terminated`, a Boolean indicating whether a middleware terminated during the mediation to the tech portion, and `value`, which is the value returned from the `Tech`.
 
@@ -37,7 +37,7 @@ Mediators make a round trip: starting at the `Player`, mediating to the `Tech` a
 
 +----------+                      +----------+
 |          |                      |          |
-|          +-----call{method}+---->          |
+|          +-----call{method}----->          |
 |  Player  |                      |   Tech   |
 |          <-------{method}-------+          |
 |          |                      |          |
