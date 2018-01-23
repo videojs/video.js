@@ -12,7 +12,7 @@ Middleware is a Video.js feature that allows interaction with and modification o
 
 Middleware are functions that return an object with methods matching those on the `Tech`. There are currently a limited set of allowed methods that will be understood by middleware. These are: `buffered`, `currentTime`, `setCurrentTime`, `duration`, `seekable` and `played`.
 
-These allowed methods are split into two categories: `getters` and `setters`. Setters will be called on the `Player` first and run through middleware(from left to right) before calling the method, with its arguments, on the `Tech`. Setters are called on the `Tech` first and are run though middleware(from right to left) before returning the result to the `Player`.
+These allowed methods are split into two categories: `getters` and `setters`. Setters will be called on the `Player` first and run through middleware(from left to right) before calling the method, with its arguments, on the `Tech`. Getters are called on the `Tech` first and are run though middleware(from right to left) before returning the result to the `Player`.
 
 ```
 +----------+                      +----------+
