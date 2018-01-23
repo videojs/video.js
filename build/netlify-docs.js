@@ -1,6 +1,6 @@
 const sh = require('shelljs');
 
-const GIT_CONTAINS = `git tag --contains ${process.env.COMMIT_REF}`;
+const GIT_CONTAINS = `git log --format=%B -n 1 ${process.env.COMMIT_REF}`;
 const output = sh.exec(GIT_CONTAINS, {async: false, silent:true}).stdout;
 
 console.log('CONTAINS command:', GIT_CONTAINS);
