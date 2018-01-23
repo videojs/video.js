@@ -76,7 +76,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
       // we've succeeded, now we need to go deeper
       acc.push(mw);
 
-      // if it's the same time, continue does the current chain
+      // if it's the same type, continue down the current chain
       // otherwise, we want to go down the new chain
       setSourceHelper(_src,
           src.type === _src.type ? mwrest : middlewares[_src.type],
