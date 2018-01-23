@@ -5,14 +5,15 @@ Middleware is a Video.js feature that allows interaction with and modification o
 ## Table of Contents
 
 * [Understanding Middleware](#understanding-middleware)
+  * [Termination and Mediators](#termination-and-mediators)
 * [Using Middleware](#using-middleware)
 * [setSource](#setsource)
 
 ## Understanding Middleware
 
-Middleware are functions that return an object with methods matching those on the `Tech`. There are currently a limited set of allowed methods that will be understood by middleware. These are: `buffered`, `currentTime`, `setCurrentTime`, `duration`, `seekable` and `played`.
+Middleware are functions that return an object with methods matching those on the `Tech`. There are currently a limited set of allowed methods that will be understood by middleware. These are: `buffered`, `currentTime`, `setCurrentTime`, `duration`, `seekable`, `played`, `play` and `pause`.
 
-These allowed methods are split into two categories: `getters` and `setters`. Setters will be called on the `Player` first and run through middleware(from left to right) before calling the method, with its arguments, on the `Tech`. Getters are called on the `Tech` first and are run though middleware(from right to left) before returning the result to the `Player`.
+These allowed methods are split into three categories: `getters`, `setters` and `mediators`. Setters will be called on the `Player` first and run through middleware(from left to right) before calling the method, with its arguments, on the `Tech`. Getters are called on the `Tech` first and are run though middleware(from right to left) before returning the result to the `Player`.
 
 ```
 +----------+                      +----------+
@@ -23,6 +24,31 @@ These allowed methods are split into two categories: `getters` and `setters`. Se
 |          |  getter middleware   |          |
 +----------+                      +----------+
 ```
+
+### Termination and Mediators
+
+Mediators are the thrid category of allowed methods. These are methods that not only change the state of the Tech, but also return some value back to the Player. Currently, these are `play` and `pause`.
+
+Mediators make a round trip: starting at the `Player`, mediating to the `Tech` and returning the result to the `Player` again. A `call{method}` method must be supplied by the middleware which is used when mediating to the `Tech`. For example: `callPlay`. On the way back to the `Player`, the `{method}` will be called instead, with 2 arguments: `terminated`, a Boolean indicating whether a middleware terminated during the mediation to the tech portion, and `value`, which is the value returned from the `Tech`.
+
+```
+               mediate to tech
+               +------------->
+
++----------+                      +----------+
+|          |                      |          |
+|          +-----call{method}+---->          |
+|  Player  |                      |   Tech   |
+|          <-------{method}-------+          |
+|          |                      |          |
++----------+                      +----------+
+
+              <---------------+
+              mediate to player
+
+```
+
+Middleware termination occurs when a middleware method decides to stop mediating to the Tech. We'll see more examples of this in the next section.
 
 ## Using Middleware
 
@@ -56,6 +82,23 @@ var myMiddleware = function(player) {
 videojs.use('*', myMiddleware);
 ```
 
+Mediator methods can terminate, by doing the following:
+
+```javascript
+var myMiddleware = function(player) {
+  return {
+    callPlay: function() {
+      // Terminate by returning the middleware terminator
+      return videojs.middleware.TERMINATOR;
+    },
+    play: function(terminated, value) {
+      // the terminated argument should be true here.
+    }
+  };
+};
+
+videojs.use('*', myMiddleware);
+```
 
 ## setSource
 
@@ -71,4 +114,3 @@ videojs.use('*', function(player) {
   };
 });
 ```
-
