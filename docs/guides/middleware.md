@@ -42,13 +42,15 @@ Your middleware should be a function that takes a player as an argument and retu
 
 ```javascript
 var myMiddleware = function(player) {
-  currentTime: function(ct) {
-    return ct / 2;
-  },
-  setCurrentTime: function(time) {
-    return time * 2;
-  },
-  ...
+  return {
+    currentTime: function(ct) {
+      return ct / 2;
+    },
+    setCurrentTime: function(time) {
+      return time * 2;
+    },
+    ...
+  };
 };
 
 videojs.use('*', myMiddleware);
