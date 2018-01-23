@@ -325,6 +325,12 @@ videojs.getTech = Tech.getTech;
  */
 videojs.registerTech = Tech.registerTech;
 
+/**
+ * Register a middleware to a source type.
+ *
+ * @param {String} type A string representing a MIME type.
+ * @param {function(player):object} middleware A middleware factory that takes a player.
+ **/
 videojs.use = middlewareUse;
 
 /**
@@ -749,6 +755,14 @@ videojs.dom = Dom;
  */
 videojs.url = Url;
 
+/**
+ * An object that can be returned by a middleware to signify
+ * that the middleware is being terminated.
+ *
+ * @type {object}
+ * @memberOf {videojs}
+ * @property {object} middleware.TERMINATOR
+ **/
 // Object.defineProperty is not available in IE8
 if (!browser.IS_IE8 && Object.defineProperty) {
   Object.defineProperty(videojs, 'middleware', {
