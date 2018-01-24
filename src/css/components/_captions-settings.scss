@@ -24,8 +24,8 @@
   // code that will only run if CSS Grid is supported by the browser
   .vjs-text-track-settings .vjs-modal-dialog-content {
     display: grid;
-    grid-template-columns: minmax(230px, 400px) 230px 400px;
-    grid-template-rows: minmax(180px, 330px) 180px 330px;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr auto;
   }
 
   .vjs-text-track-settings .vjs-track-settings-colors {
@@ -44,7 +44,21 @@
     grid-row: 2;
     text-align: unset;
     vertical-align: unset;
-
+  }
+  .vjs-text-track-settings fieldset span.vjs-opacity{
+    margin-left: unset;
+  }
+  .video-js{
+    @media (max-width: 365px) {
+      .vjs-modal-dialog .vjs-modal-dialog-content{
+      font-size: 1em;
+      line-height: 1em;
+      padding: 5px 5px;
+    }
+    .vjs-text-track-settings legend{
+      margin: unset;
+    }
+    }
   }
 }
 
