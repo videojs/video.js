@@ -54,7 +54,6 @@
   & .vjs-volume-control:hover  ,
   & .vjs-volume-control:active ,
   & .vjs-mute-control:hover  ~ .vjs-volume-control,
-  & .vjs-mute-control:active ~ .vjs-volume-control,
   & .vjs-volume-control.vjs-slider-active {
     &.vjs-volume-horizontal {
       width: 5em;
