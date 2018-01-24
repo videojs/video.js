@@ -40,7 +40,8 @@ There are labels that are useful to include on issues and PRs. A few of them are
 | confirmed | Issue and PR | Issue: marks as reproducible. PR: marks as ready to be merged|
 | 5.x | PR | Marks as a change to the 5.x branch only |
 | bug | Issue | Marks as a confirmed bug |
-| first-timers-only | Issue | Marks as a good bug or enhancement for first time contributors only |
+| good first issue | Issue | Marks as a good bug or enhancement for first time contributors to Video.js |
+| first-timers-only | Issue | Marks as a good bug or enhancement to be done by a newcomer to open source |
 | minor, patch, major | PR | Marks PR with the expected semver classification of the change |
 | needs: LGTM | PR | Marks PR to be reviewed by a collaborator |
 | needs: more info | Issue | Marks as needing more information from the issue reporter |
