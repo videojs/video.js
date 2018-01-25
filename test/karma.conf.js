@@ -1,5 +1,5 @@
 module.exports = function(config) {
-  var browserstackName = process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH,
+  var browserstackName = process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH;
 
   if (process.env.TRAVIS_PULL_REQUEST) {
     browserstackName = process.env.TRAVIS_PULL_REQUEST + ' ' + browserstackName;
