@@ -1,10 +1,13 @@
 module.exports = function(config) {
-  var browserstackName = process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH;
-  console.log(process.env);
+  // build out a name for browserstack
+  // {TRAVIS_BUILD_NUMBER} [{TRAVIS_PULL_REQUEST} {PR_BRANCH}] {TRAVIS_BRANCH}
+  var browserstackName = process.env.TRAVIS_BUILD_NUMBER;
 
-  if (!Boolean(process.env.TRAVIS_PULL_REQUEST)) {
-    browserstackName = process.env.TRAVIS_PULL_REQUEST + ' ' + browserstackName;
+  if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+    browserstackName += ' ' + process.env.TRAVIS_PULL_REQUEST + ' ' + process.env.TRAVIS_PULL_REQUEST_BRANCH;
   }
+
+  browserstackName +=  ' ' + process.env.TRAVIS_BRANCH;
 
   // Creating settings object first so we can modify based on travis
   var settings = {
