@@ -70,11 +70,19 @@
         play: function(cancelled, value) {
           console.log('Middleware 1: play got from tech. What is the value passed?', value);
 
+          // Handle the promise if it is returned
+          if(value && value.then) {
+            value.then(() => {
+              console.log('Middleware 1: Promise resolved.')
+            })
+            .catch((err) => {
+              console.log('Middleware 1: Promise rejected.');
+            });
+          }
+
           if (cancelled) {
             console.log('Middleware 1: play has been cancelled prior to this middleware');
           }
-
-          return value;
         },
         // Mediating to tech
         callPause: function() {
@@ -144,29 +152,7 @@
 
     // Initial set-up
     var vid = document.getElementById("vid1");
-    var player = videojs(vid, {
-      controlBar: {
-        children: [
-          'playToggle',
-          'volumePanel',
-          'currentTimeDisplay',
-          'timeDivider',
-          'durationDisplay',
-          'progressControl',
-          'liveDisplay',
-          'remainingTimeDisplay',
-          'customControlSpacer',
-          'playbackRateMenuButton',
-          'chaptersButton',
-          'descriptionsButton',
-          'subtitlesButton',
-          'captionsButton',
-          'subsCapsButton',
-          'audioTrackButton',
-          'fullscreenToggle'
-        ]
-      }
-    });
+    var player = videojs(vid);
 
     console.log('Calling play...');
     player.setTimeout(() => {
