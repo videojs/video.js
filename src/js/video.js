@@ -334,6 +334,31 @@ videojs.registerTech = Tech.registerTech;
 videojs.use = middlewareUse;
 
 /**
+ * An object that can be returned by a middleware to signify
+ * that the middleware is being terminated.
+ *
+ * @type {object}
+ * @memberOf {videojs}
+ * @property {object} middleware.TERMINATOR
+ **/
+// Object.defineProperty is not available in IE8
+if (!browser.IS_IE8 && Object.defineProperty) {
+  Object.defineProperty(videojs, 'middleware', {
+    value: {},
+    writeable: false,
+    enumerable: true
+  });
+
+  Object.defineProperty(videojs.middleware, 'TERMINATOR', {
+    value: TERMINATOR,
+    writeable: false,
+    enumerable: true
+  });
+} else {
+  videojs.middleware.TERMINATOR = TERMINATOR;
+}
+
+/**
  * A suite of browser and device tests from {@link browser}.
  *
  * @type {Object}
@@ -754,31 +779,6 @@ videojs.dom = Dom;
  * and Tech's
  */
 videojs.url = Url;
-
-/**
- * An object that can be returned by a middleware to signify
- * that the middleware is being terminated.
- *
- * @type {object}
- * @memberOf {videojs}
- * @property {object} middleware.TERMINATOR
- **/
-// Object.defineProperty is not available in IE8
-if (!browser.IS_IE8 && Object.defineProperty) {
-  Object.defineProperty(videojs, 'middleware', {
-    value: {},
-    writeable: false,
-    enumerable: true
-  });
-
-  Object.defineProperty(videojs.middleware, 'TERMINATOR', {
-    value: TERMINATOR,
-    writeable: false,
-    enumerable: true
-  });
-} else {
-  videojs.middleware.TERMINATOR = TERMINATOR;
-}
 
 export default videojs;
 
