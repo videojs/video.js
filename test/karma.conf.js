@@ -67,7 +67,9 @@ module.exports = function(config) {
     browserDisconnectTolerance: 3,
 
     browserStack: {
-      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+      project: 'Video.js',
+      name: process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH,
+      build: process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH,
       pollingTimeout: 30000,
       captureTimeout: 600,
       timeout: 600
