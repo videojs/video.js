@@ -1,4 +1,10 @@
 module.exports = function(config) {
+  var browserstackName = process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH,
+
+  if (process.env.TRAVIS_PULL_REQUEST) {
+    browserstackName = process.env.TRAVIS_PULL_REQUEST + ' ' + browserstackName;
+  }
+
   // Creating settings object first so we can modify based on travis
   var settings = {
     basePath: '',
@@ -68,8 +74,8 @@ module.exports = function(config) {
 
     browserStack: {
       project: 'Video.js',
-      name: process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH,
-      build: process.env.TRAVIS_BUILD_NUMBER + ' ' + process.env.TRAVIS_BRANCH,
+      name: browserstackName,
+      build: browserstackName,
       pollingTimeout: 30000,
       captureTimeout: 600,
       timeout: 600
