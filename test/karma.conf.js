@@ -106,9 +106,9 @@ module.exports = function(config) {
 
     // make QUnit show the UI in karma runs
     client: {
-      // clearContext: false,
+      clearContext: false,
       qunit: {
-        // showUI: true,
+        showUI: true,
         testTimeout: 5000
       }
     }
