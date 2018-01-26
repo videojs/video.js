@@ -82,7 +82,8 @@ module.exports = function(config) {
       build: browserstackName,
       pollingTimeout: 30000,
       captureTimeout: 600,
-      timeout: 600
+      timeout: 600,
+      video: false
     },
     customLaunchers: getCustomLaunchers(),
 
