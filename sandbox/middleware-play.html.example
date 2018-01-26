@@ -22,7 +22,7 @@
       margin: 2em 1em;
     }
 
-    .vjs-progress-control.vjs-control .vjs-play-progress.vjs-slider-bar.terminated {
+    .terminated .vjs-progress-control .vjs-play-progress {
       background: red;
     }
   </style>
@@ -40,15 +40,6 @@
 
   <script>
     var stateToggle = document.getElementById('stateToggle');
-    var toggleClassToPlayProgress = function(player, className, shouldAdd) {
-      var playProgressBar = player.getChild('controlBar').getChild('progressControl').getChild('seekBar').getChild('playProgressBar');
-
-      if (shouldAdd) {
-        playProgressBar.addClass(className);
-      } else {
-        playProgressBar.removeClass(className);
-      }
-    };
 
     // Middleware 1
     var m1 = function(player) {
@@ -58,12 +49,12 @@
           if (stateToggle.checked) {
             console.log('Middleware 1: Play is set to terminate');
 
-            toggleClassToPlayProgress(player, 'terminated', true);
+            player.addClass('terminated');
             return videojs.middleware.TERMINATOR;
 
           } else {
             console.log('Middleware 1: Play has been called');
-            toggleClassToPlayProgress(player, 'terminated', false);
+            player.removeClass('terminated');
           }
         },
         // Mediating the results back to the player
@@ -89,12 +80,12 @@
           if (stateToggle.checked) {
             console.log('Middleware 1: Pause is set to terminate');
 
-            toggleClassToPlayProgress(player, 'terminated', true);
+            player.addClass('terminated');
             return videojs.middleware.TERMINATOR;
 
           } else {
             console.log('Middleware 1: Pause has been called');
-            toggleClassToPlayProgress(player, 'terminated', false);
+            player.removeClass('terminated');
           }
         },
         // Mediating the results back to the player
