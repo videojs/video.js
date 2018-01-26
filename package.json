@@ -113,6 +113,7 @@
     "karma-opera-launcher": "^1.0.0",
     "karma-qunit": "^1.2.0",
     "karma-safari-launcher": "^1.0.0",
+    "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
     "klaw-sync": "^3.0.2",
     "load-grunt-tasks": "^3.1.0",
