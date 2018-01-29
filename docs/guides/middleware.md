@@ -5,6 +5,9 @@ Middleware is a Video.js feature that allows interaction with and modification o
 ## Table of Contents
 
 * [Understanding Middleware](#understanding-middleware)
+  * [Middleware Setters](#middleware-setters)
+  * [Middleware Getters](#middleware-getters)
+  * [Middleware Mediators](#middleware-mediators)
   * [Termination and Mediators](#termination-and-mediators)
 * [Using Middleware](#using-middleware)
   * [Terminating Mediator Methods](#terminating-mediator-methods)
@@ -14,7 +17,16 @@ Middleware is a Video.js feature that allows interaction with and modification o
 
 Middleware are functions that return an object with methods matching those on the `Tech`. There are currently a limited set of allowed methods that will be understood by middleware. These are: `buffered`, `currentTime`, `setCurrentTime`, `duration`, `seekable`, `played`, `play`, `pause` and `paused`.
 
-These allowed methods are split into three categories: `getters`, `setters` and `mediators`. Setters will be called on the `Player` first and run through middleware(from left to right) before calling the method, with its arguments, on the `Tech`. Getters are called on the `Tech` first and are run though middleware(from right to left) before returning the result to the `Player`. Mediators are called on the `Player` first, run through middleware from left to right, then called on the `Tech` and the result is returned to the `Player` unchanged, while calling the middleware from right to left. For more information, check out the [mediator section](#termination-and-mediators).
+These allowed methods are split into three categories: `getters`, `setters`, and `mediators`.
+
+### Middleware Setters
+Setters will be called on the `Player` first and run through middleware (from left to right) before calling the method, with its arguments, on the `Tech`.
+
+### Middleware Getters
+Getters are called on the `Tech` first and are run though middleware (from right to left) before returning the result to the `Player`.
+
+### Middleware Mediators
+Mediators are called on the `Player` first, run through middleware (from left to right), then called on the `Tech`. The result is returned to the `Player` unchanged, while calling the middleware from right to left. For more information on mediators, check out the [mediator section](#termination-and-mediators).
 
 ```
 +----------+                      +----------+
