@@ -1,5 +1,6 @@
 const sh = require('shelljs');
 const semver = require('semver');
+const generateExample = require('./generate-example.js').default;
 
 const GIT_LOG = `git log --format=%B -n 1 ${process.env.COMMIT_REF}`;
 const output = sh.exec(GIT_LOG, {async: false, silent:true}).stdout;
@@ -16,4 +17,9 @@ if (process.env.BRANCH === 'master' && semver.valid(output.trim()) === null) {
 
   // copy the legacy docs over
   sh.cp('-R', 'docs/legacy-docs', 'docs/api/docs');
+
+  if (process.env.BRANCH !== 'master') {
+    // generate the example
+    generateExample();
+  }
 }
