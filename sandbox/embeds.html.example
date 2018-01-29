@@ -6,13 +6,13 @@
   <script src='../node_modules/es5-shim/es5-shim.js'></script>
   <script src='../node_modules/es6-shim/es6-shim.js'></script>
 
-  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
 
   <script src='../node_modules/videojs-flash/dist/videojs-flash.js'></script>
   <script src="https://unpkg.com/videojs-contrib-hls@latest/dist/videojs-contrib-hls.js"></script>
 
-  <script src="../build/temp/lang/es.js"></script>
+  <script src="../dist/lang/es.js"></script>
 
   <!-- Set the location of the flash SWF -->
   <script>
