@@ -17,7 +17,7 @@ export function cleanupExample() {
   sh.rm('-rf', path.join(dest, 'node_modules'));
 }
 
-export default function generateExample({skipBuild}) {
+export default function generateExample({skipBuild} = {}) {
   // run the build
   if (!skipBuild) {
     sh.exec('npm run build');
