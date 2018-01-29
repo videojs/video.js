@@ -330,7 +330,7 @@ videojs.registerTech = Tech.registerTech;
  *
  * @param {String} type A string representing a MIME type.
  * @param {function(player):object} middleware A middleware factory that takes a player.
- **/
+ */
 videojs.use = middlewareUse;
 
 /**
@@ -340,7 +340,7 @@ videojs.use = middlewareUse;
  * @type {object}
  * @memberOf {videojs}
  * @property {object} middleware.TERMINATOR
- **/
+ */
 // Object.defineProperty is not available in IE8
 if (!browser.IS_IE8 && Object.defineProperty) {
   Object.defineProperty(videojs, 'middleware', {
@@ -355,7 +355,7 @@ if (!browser.IS_IE8 && Object.defineProperty) {
     enumerable: true
   });
 } else {
-  videojs.middleware.TERMINATOR = TERMINATOR;
+  videojs.middleware = { TERMINATOR };
 }
 
 /**

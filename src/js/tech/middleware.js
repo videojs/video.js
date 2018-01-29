@@ -29,7 +29,7 @@ export function setTech(middleware, tech) {
 /**
  * Calls a getter on the tech first, through each middleware
  * from right to left to the player.
- **/
+ */
 export function get(middleware, tech, method) {
   return middleware.reduceRight(middlewareIterator(method), tech[method]());
 }
@@ -37,7 +37,7 @@ export function get(middleware, tech, method) {
 /**
  * Takes the argument given to the player and calls the setter method on each
  * middlware from left to right to the tech.
- **/
+ */
 export function set(middleware, tech, method, arg) {
   return tech[method](middleware.reduce(middlewareIterator(method), arg));
 }
@@ -47,7 +47,7 @@ export function set(middleware, tech, method, arg) {
  * on each middleware from left to right.
  * Then, call the passed in method on the tech and return the result unchanged
  * back to the player, through middleware, this time from right to left.
- **/
+ */
 export function mediate(middleware, tech, method, arg = null) {
   const callMethod = 'call' + toTitleCase(method);
   const middlewareValue = middleware.reduce(middlewareIterator(callMethod), arg);
