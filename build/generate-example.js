@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import sh from 'shelljs';
 import klawSync from 'klaw-sync';
+import pkg from '../package.json';
 
 const dest = 'docs/api/';
 const vjsFlash = 'node_modules/videojs-flash';
@@ -30,6 +31,7 @@ export default function generateExample({skipBuild} = {}) {
 
   // copy the `dist` dir
   sh.cp('-R', 'dist', path.join(dest, 'dist'));
+  sh.rm(path.join(dest, 'dist', `video-js-${pkg.version}.zip`));
 
   // copy videojs-flash
   sh.cp(path.join(vjsFlash, 'dist', 'videojs-flash.js'), vjsFlashDest);
