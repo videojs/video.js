@@ -51,6 +51,7 @@ module.exports = function(config) {
       'karma-ie-launcher',
       'karma-opera-launcher',
       'karma-safari-launcher',
+      'karma-safaritechpreview-launcher',
       'karma-browserstack-launcher',
       'karma-browserify',
       'karma-coverage',
