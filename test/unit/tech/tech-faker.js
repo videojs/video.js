@@ -65,6 +65,9 @@ class TechFaker extends Tech {
   paused() {
     return true;
   }
+  loop() {
+    return false;
+  }
   play() {
     this.trigger('play');
   }
