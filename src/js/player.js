@@ -44,6 +44,7 @@ import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
+import './resize-manager.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -661,14 +662,11 @@ class Player extends Component {
    * @param {number} [value]
    *        The value to set the `Player`'s width to.
    *
-   * @param {boolean} [skipListeners]
-   *        Skip the playerresize event trigger
-   *
    * @return {number}
    *         The current width of the `Player` when getting.
    */
-  width(value, skipListeners) {
-    return this.dimension('width', value, skipListeners);
+  width(value) {
+    return this.dimension('width', value);
   }
 
   /**
@@ -678,20 +676,15 @@ class Player extends Component {
    * @param {number} [value]
    *        The value to set the `Player`'s heigth to.
    *
-   * @param {boolean} [skipListeners]
-   *        Skip the playerresize event trigger
-   *
    * @return {number}
    *         The current height of the `Player` when getting.
    */
-  height(value, skipListeners) {
-    return this.dimension('height', value, skipListeners);
+  height(value) {
+    return this.dimension('height', value);
   }
 
   /**
    * A getter/setter for the `Player`'s width & height.
-   *
-   * @fires Player#playerresize
    *
    * @param {string} dimension
    *        This string can be:
@@ -701,13 +694,10 @@ class Player extends Component {
    * @param {number} [value]
    *        Value for dimension specified in the first argument.
    *
-   * @param {boolean} [skipListeners]
-   *        Skip the playerresize event trigger
-   *
    * @return {number}
    *         The dimension arguments value when getting (width/height).
    */
-  dimension(dimension, value, skipListeners) {
+  dimension(dimension, value) {
     const privDimension = dimension + '_';
 
     if (value === undefined) {
@@ -730,17 +720,6 @@ class Player extends Component {
 
     this[privDimension] = parsedVal;
     this.updateStyleEl_();
-
-    // skipListeners allows us to avoid triggering the resize event when setting both width and height
-    if (this.isReady_ && !skipListeners) {
-      /**
-       * Triggered when the player is resized.
-       *
-       * @event Player#playerresize
-       * @type {EventTarget~Event}
-       */
-      this.trigger('playerresize');
-    }
   }
 
   /**
@@ -3488,6 +3467,10 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.'
 };
+
+if (!browser.IS_IE8) {
+  Player.prototype.options_.children.push('resizeManager');
+}
 
 [
   /**
