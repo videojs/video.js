@@ -286,6 +286,21 @@ videojs.getPlayer = (id) => {
 };
 
 /**
+ * Returns an array of all current players.
+ *
+ * @return {Array}
+ *         An array of all players. The array will be in the order that
+ *         `Object.keys` provides, which could potentially vary between
+ *         JavaScript engines.
+ *
+ */
+videojs.getAllPlayers = () =>
+
+  // Disposed players leave a key with a `null` value, so we need to make sure
+  // we filter those out.
+  Object.keys(Player.players).map(k => Player.players[k]).filter(Boolean);
+
+/**
  * Expose players object.
  *
  * @memberOf videojs
