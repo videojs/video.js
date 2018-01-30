@@ -372,6 +372,23 @@ QUnit.test('should create a new tag for movingMediaElementInDOM', function(asser
   Html5.nativeSourceHandler.canPlayType = oldCPT;
 });
 
+QUnit.test('getPlayer', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>';
+
+  assert.notOk(videojs.getPlayer('test_vid_id'), 'no player was created yet');
+
+  const tag = document.querySelector('#test_vid_id');
+  const player = videojs(tag);
+
+  assert.strictEqual(videojs.getPlayer('#test_vid_id'), player, 'the player was returned when using a jQuery-style ID selector');
+  assert.strictEqual(videojs.getPlayer('test_vid_id'), player, 'the player was returned when using a raw ID value');
+  assert.strictEqual(videojs.getPlayer(tag), player, 'the player was returned when using the original tag/element');
+
+  player.dispose();
+});
+
 /* **************************************************** *
  * div embed tests copied from video emebed tests above *
  * **************************************************** */

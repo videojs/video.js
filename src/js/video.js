@@ -42,6 +42,17 @@ if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
 }
 
 /**
+ * Normalize an `id` value by trimming off a leading `#`
+ *
+ * @param   {string} id
+ *          A string, maybe with a leading `#`.
+ *
+ * @returns {string}
+ *          The string, without any leading `#`.
+ */
+const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
+
+/**
  * Doubles as the main function for users to create a player instance and also
  * the main library object.
  * The `videojs` function can be used to initialize or retrieve a player.
@@ -59,62 +70,32 @@ if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
  *         A player instance
  */
 function videojs(id, options, ready) {
-  let tag;
+  let player = videojs.getPlayer(id);
 
-  // Allow for element or ID to be passed in
-  // String ID
-  if (typeof id === 'string') {
-    const players = videojs.getPlayers();
-
-    // Adjust for jQuery ID syntax
-    if (id.indexOf('#') === 0) {
-      id = id.slice(1);
+  if (player) {
+    if (options) {
+      log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
     }
-
-    // If a player instance has already been created for this ID return it.
-    if (players[id]) {
-
-      // If options or ready function are passed, warn
-      if (options) {
-        log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
-      }
-
-      if (ready) {
-        players[id].ready(ready);
-      }
-
-      return players[id];
+    if (ready) {
+      player.ready(ready);
     }
-
-    // Otherwise get element for ID
-    tag = Dom.$('#' + id);
-
-  // ID is a media element
-  } else {
-    tag = id;
+    return player;
   }
 
-  // Check for a useable element
-  // re: nodeName, could be a box div also
-  if (!tag || !tag.nodeName) {
+  const el = (typeof id === 'string') ? Dom.$('#' + normalizeId(id)) : id;
+
+  if (!Dom.isEl(el)) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
-  // Element may have a player attr referring to an already created player instance.
-  // If so return that otherwise set up a new player below
-  if (tag.player || Player.players[tag.playerId]) {
-    return tag.player || Player.players[tag.playerId];
-  }
-
-  // Check if element is included in the DOM
-  if (Dom.isEl(tag) && !document.body.contains(tag)) {
+  if (!document.body.contains(el)) {
     log.warn('The element supplied is not included in the DOM');
   }
 
   options = options || {};
 
-  videojs.hooks('beforesetup').forEach(function(hookFunction) {
-    const opts = hookFunction(tag, mergeOptions(options));
+  videojs.hooks('beforesetup').forEach((hookFunction) => {
+    const opts = hookFunction(el, mergeOptions(options));
 
     if (!isObject(opts) || Array.isArray(opts)) {
       log.error('please return an object in beforesetup hooks');
@@ -124,9 +105,11 @@ function videojs(id, options, ready) {
     options = mergeOptions(options, opts);
   });
 
+  // We get the current "Player" component here in case an integration has
+  // replaced it with a custom player.
   const PlayerComponent = Component.getComponent('Player');
-  // If not, set up a new player
-  const player = new PlayerComponent(tag, options, ready);
+
+  player = new PlayerComponent(el, options, ready);
 
   videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
 
@@ -269,6 +252,38 @@ videojs.options = Player.prototype.options_;
  *         The created players
  */
 videojs.getPlayers = () => Player.players;
+
+/**
+ * Get a single player based on an ID or DOM element.
+ *
+ * This is useful if you want to check if an element or ID has an associated
+ * Video.js player, but not create one if it doesn't.
+ *
+ * @param   {string|Element} id
+ *          An HTML element - `<video>`, `<audio>`, or `<video-js>` -
+ *          or a string matching the `id` of such an element.
+ *
+ * @returns {Player|undefined}
+ *          A player instance or `undefined` if there is no player instance
+ *          matching the argument.
+ */
+videojs.getPlayer = (id) => {
+  const players = Player.players;
+
+  if (typeof id === 'string') {
+    return players[normalizeId(id)];
+  }
+
+  if (Dom.isEl(id)) {
+    const {player, playerId} = id;
+
+    // Element may have a `player` property referring to an already created
+    // player instance. If so, return that.
+    if (player || players[playerId]) {
+      return player || players[playerId];
+    }
+  }
+};
 
 /**
  * Expose players object.
