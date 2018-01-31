@@ -28,6 +28,7 @@ class TechFaker extends Tech {
   }
   setPoster(val) {
     this.el().poster = val;
+    this.trigger('posterchange');
   }
 
   setControls(val) {}

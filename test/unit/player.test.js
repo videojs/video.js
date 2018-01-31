@@ -1709,3 +1709,31 @@ QUnit.test('player.duration() sets the value of player.cache_.duration', functio
   player.duration(200);
   assert.equal(player.duration(), 200, 'duration() set and get integer duration value');
 });
+
+QUnit.test('setPoster in tech with `techCanOverridePoster` in player should override poster', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techCanOverridePoster: true
+  });
+  const posterchangeSpy = sinon.spy();
+  const firstPosterUrl = 'https://wherever.test/test.jpg';
+  const techPosterUrl = 'https://somewhere.text/my/image.png';
+
+  assert.equal(player.options_.techCanOverridePoster, true);
+
+  player.on('posterchange', posterchangeSpy);
+
+  player.poster('');
+  assert.ok(posterchangeSpy.notCalled, 'posterchangeSpy not called when no change of poster');
+  assert.equal(player.isPosterFromTech_, false);
+
+  player.poster(firstPosterUrl);
+  assert.ok(posterchangeSpy.calledOnce, 'posterchangeSpy only called once on update');
+  assert.equal(player.poster(), firstPosterUrl);
+  assert.equal(player.isPosterFromTech_, false);
+
+  posterchangeSpy.reset();
+
+  player.tech_.setPoster(techPosterUrl);
+  assert.ok(posterchangeSpy.calledOnce, "posterchangeSpy should've been called");
+});
+
