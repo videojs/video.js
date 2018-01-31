@@ -96,7 +96,9 @@ function executeRight(mws, method, value, terminated) {
   for (let i = mws.length - 1; i >= 0; i--) {
     const mw = mws[i];
 
-    mw[method](terminated, value);
+    if (mw[method]) {
+      mw[method](terminated, value);
+    }
   }
 }
 

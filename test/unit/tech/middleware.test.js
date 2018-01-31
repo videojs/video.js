@@ -394,3 +394,18 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   middleware.getMiddleware('video/foo').pop();
   middleware.getMiddleware('video/foo').pop();
 });
+
+QUnit.test('a middleware without a mediator method will not throw an error', function(assert) {
+  let pauseCalled = 0;
+  const myMw = {};
+  const mwFactory = () => myMw;
+  const mwFactory2 = () => ({
+    pause() {
+      pauseCalled++;
+    }
+  });
+
+  middleware.mediate([mwFactory(), mwFactory2()], {pause: () => {}}, 'pause');
+
+  assert.equal(pauseCalled, 1, 'pauseCalled was called once and no error was thrown');
+});
