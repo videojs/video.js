@@ -34,7 +34,6 @@ class TextTrackMenuItem extends MenuItem {
 
     this.track = track;
     const changeHandler = (event, ...args) => {
-      // console.log('changeHandler called on:', event) // eslint-disable-line
       this.handleTracksChange.apply(this, args);
     };
     const selectedLanguageChangeHandler = (...args) => {
@@ -130,17 +129,15 @@ class TextTrackMenuItem extends MenuItem {
    * @listens TextTrackList#change
    */
   handleTracksChange(event) {
-    console.log('handleTracksChange() called with track:', this.track); // eslint-disable-line
-    // determine if the menu item *should* be selected at this time
     const trackModeIsShowing = this.track.mode === 'showing';
 
-    // menu item should either be selected, or remain selected if it already was
     if (trackModeIsShowing) {
+      // Prevent redundant selected(true) calls because they may cause
+      // screen readers to read the appended control text unnecessarily
       if (!this.isSelected_) {
         this.selected(true);
         this.isSelected_ = true;
       }
-    // menu item should not be selected
     } else {
       this.selected(false);
       this.isSelected_ = false;

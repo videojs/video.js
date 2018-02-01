@@ -26,11 +26,9 @@ class MenuItem extends ClickableComponent {
     super(player, options);
 
     this.selectable = options.selectable;
-
-    this.selected(options.selected);
-
-    // I ADDED THIS
     this.isSelected_ = options.selected;
+
+    this.selected(this.isSelected_);
 
     if (this.selectable) {
       // TODO: May need to be either menuitemcheckbox or menuitemradio,
@@ -90,14 +88,13 @@ class MenuItem extends ClickableComponent {
    *        if the menu item is selected or not
    */
   selected(selected) {
-    console.log(`selected(${selected}) called on`, this); // eslint-disable-line
     if (this.selectable) {
       if (selected) {
         this.addClass('vjs-selected');
         this.el_.setAttribute('aria-checked', 'true');
         // aria-checked isn't fully supported by browsers/screen readers,
         // so indicate selected state to screen reader in the control text.
-        this.controlText('alex');
+        this.controlText(', selected');
       } else {
         this.removeClass('vjs-selected');
         this.el_.setAttribute('aria-checked', 'false');

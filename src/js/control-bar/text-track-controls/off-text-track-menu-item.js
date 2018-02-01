@@ -54,7 +54,6 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
    *        The event that caused this function to run
    */
   handleTracksChange(event) {
-    // console.log('handleTracksChange() called', event); // eslint-disable-line
     const tracks = this.player().textTracks();
     let shouldBeSelected = true;
 
@@ -68,6 +67,8 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     }
 
     if (shouldBeSelected) {
+      // Prevent redundant selected(true) calls because they may cause
+      // screen readers to read the appended control text unnecessarily
       if (!this.isSelected_) {
         this.selected(true);
         this.isSelected_ = true;
