@@ -55,6 +55,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
     this.player().getChild('textTrackSettings').open();
   }
 
+  // No operation is needed following text track list changes
   handleTracksChange(event) {
 
   }
