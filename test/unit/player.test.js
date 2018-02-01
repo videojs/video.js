@@ -1737,6 +1737,29 @@ QUnit.test('setPoster in tech with `techCanOverridePoster` in player should over
   assert.ok(posterchangeSpy.calledOnce, "posterchangeSpy should've been called");
 });
 
+QUnit.test('setPoster in tech WITHOUT `techCanOverridePoster` in player should NOT override poster', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const posterchangeSpy = sinon.spy();
+  const firstPosterUrl = 'https://wherever.test/test.jpg';
+  const techPosterUrl = 'https://somewhere.test/my/image.png';
+
+  assert.equal(player.options_.techCanOverridePoster, undefined);
+
+  player.on('posterchange', posterchangeSpy);
+
+  player.poster(firstPosterUrl);
+  assert.ok(posterchangeSpy.calledOnce, 'posterchangeSpy only called once on update');
+  assert.equal(player.poster(), firstPosterUrl);
+  assert.equal(player.isPosterFromTech_, false);
+
+  posterchangeSpy.reset();
+
+  player.tech_.setPoster(techPosterUrl);
+  assert.ok(posterchangeSpy.notCalled, "posterchangeSpy shouldn't have been called");
+
+  player.dispose();
+});
+
 QUnit.test('disposing a tech that set a poster, should unset the poster', function(assert) {
   const player = TestHelpers.makePlayer({
     techCanOverridePoster: true
