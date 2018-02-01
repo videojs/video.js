@@ -33,7 +33,7 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
-    const changeHandler = (event, ...args) => {
+    const changeHandler = (...args) => {
       this.handleTracksChange.apply(this, args);
     };
     const selectedLanguageChangeHandler = (...args) => {
