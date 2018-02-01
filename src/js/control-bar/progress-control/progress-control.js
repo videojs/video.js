@@ -157,6 +157,9 @@ class ProgressControl extends Component {
    */
   handleMouseDown(event) {
     const doc = this.el_.ownerDocument;
+    const seekBar = this.getChild('seekBar');
+
+    seekBar.handleMouseDown(event);
 
     this.on(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.on(doc, 'touchmove', this.throttledHandleMouseSeek);
@@ -175,6 +178,9 @@ class ProgressControl extends Component {
    */
   handleMouseUp(event) {
     const doc = this.el_.ownerDocument;
+    const seekBar = this.getChild('seekBar');
+
+    seekBar.handleMouseUp(event);
 
     this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
