@@ -71,11 +71,9 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
       // screen readers to read the appended control text unnecessarily
       if (!this.isSelected_) {
         this.selected(true);
-        this.isSelected_ = true;
       }
     } else {
       this.selected(false);
-      this.isSelected_ = false;
     }
   }
 
