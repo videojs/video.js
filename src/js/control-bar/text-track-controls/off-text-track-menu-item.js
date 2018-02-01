@@ -54,19 +54,28 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
    *        The event that caused this function to run
    */
   handleTracksChange(event) {
+    // console.log('handleTracksChange() called', event); // eslint-disable-line
     const tracks = this.player().textTracks();
-    let selected = true;
+    let shouldBeSelected = true;
 
     for (let i = 0, l = tracks.length; i < l; i++) {
       const track = tracks[i];
 
       if ((this.options_.kinds.indexOf(track.kind) > -1) && track.mode === 'showing') {
-        selected = false;
+        shouldBeSelected = false;
         break;
       }
     }
 
-    this.selected(selected);
+    if (shouldBeSelected) {
+      if (!this.isSelected_) {
+        this.selected(true);
+        this.isSelected_ = true;
+      }
+    } else {
+      this.selected(false);
+      this.isSelected_ = false;
+    }
   }
 
   handleSelectedLanguageChange(event) {

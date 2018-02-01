@@ -33,7 +33,8 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
-    const changeHandler = (...args) => {
+    const changeHandler = (event, ...args) => {
+      // console.log('changeHandler called on:', event) // eslint-disable-line
       this.handleTracksChange.apply(this, args);
     };
     const selectedLanguageChangeHandler = (...args) => {
@@ -129,6 +130,7 @@ class TextTrackMenuItem extends MenuItem {
    * @listens TextTrackList#change
    */
   handleTracksChange(event) {
+    console.log('handleTracksChange() called with track:', this.track); // eslint-disable-line
     // determine if the menu item *should* be selected at this time
     const trackModeIsShowing = this.track.mode === 'showing';
 

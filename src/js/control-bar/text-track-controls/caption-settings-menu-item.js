@@ -54,6 +54,10 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
   }
+
+  handleTracksChange(event) {
+
+  }
 }
 
 Component.registerComponent('CaptionSettingsMenuItem', CaptionSettingsMenuItem);
