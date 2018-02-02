@@ -54,12 +54,6 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
   }
-
-  // CaptionSettingsMenuItem does not need to handle track list change events because
-  // it has no concept of 'selected'
-  handleTracksChange(event) {
-
-  }
 }
 
 Component.registerComponent('CaptionSettingsMenuItem', CaptionSettingsMenuItem);
