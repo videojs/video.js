@@ -16,7 +16,7 @@ Middleware is a Video.js feature that allows interaction with and modification o
 
 ## Understanding Middleware
 
-Middleware are functions that return an object, a class instance, a prototype, e.c.t, scoped to the Player with methods matching those on the `Tech`. There are currently a limited set of allowed methods that will be understood by middleware. These are: `buffered`, `currentTime`, `setCurrentTime`, `duration`, `seekable`, `played`, `play`, `pause` and `paused`. These allowed methods are split into three categories: [getters](#middleware-getters), [setters](#middleware-setters), and [mediators](#middleware-mediators).
+Middleware are functions that return an object, a class instance, a prototype, etc, scoped to the Player with methods matching those on the `Tech`. There are currently a limited set of allowed methods that will be understood by middleware. These are: `buffered`, `currentTime`, `setCurrentTime`, `duration`, `seekable`, `played`, `play`, `pause` and `paused`. These allowed methods are split into three categories: [getters](#middleware-getters), [setters](#middleware-setters), and [mediators](#middleware-mediators).
 
 There are a few special methods that affect middleware: `setSource` and `setTech`. These are called internally by Video.js when you call `player.src()`.
 
@@ -124,7 +124,7 @@ You can also register a middleware on all sources by registering it on `*`.
 videojs.use('*', myMiddleware);
 ```
 
-Your middleware should be a function that is scoped to a player and returns an object, class instance, e.c.t, with methods on it that match those on the `Tech`. An example of a middleware that returns an object is below:
+Your middleware should be a function that is scoped to a player and returns an object, class instance, etc, with methods on it that match those on the `Tech`. An example of a middleware that returns an object is below:
 
 ```javascript
 var myMiddleware = function(player) {
