@@ -1718,24 +1718,25 @@ QUnit.test('setPoster in tech with `techCanOverridePoster` in player should over
   const firstPosterUrl = 'https://wherever.test/test.jpg';
   const techPosterUrl = 'https://somewhere.text/my/image.png';
 
-  assert.equal(player.options_.techCanOverridePoster, true);
-  assert.equal(player.tech_.options_.canOverridePoster, true);
+  assert.equal(player.options_.techCanOverridePoster, true, 'make sure player option was passed correctly');
+  assert.equal(player.tech_.options_.canOverridePoster, true, 'make sure tech option was passed correctly');
 
   player.on('posterchange', posterchangeSpy);
 
   player.poster('');
   assert.ok(posterchangeSpy.notCalled, 'posterchangeSpy not called when no change of poster');
-  assert.equal(player.isPosterFromTech_, false);
+  assert.equal(player.isPosterFromTech_, false, "ensure tech didn't change poster after empty call from player");
 
   player.poster(firstPosterUrl);
   assert.ok(posterchangeSpy.calledOnce, 'posterchangeSpy only called once on update');
-  assert.equal(player.poster(), firstPosterUrl);
-  assert.equal(player.isPosterFromTech_, false);
+  assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
+  assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
 
   posterchangeSpy.reset();
 
   player.tech_.setPoster(techPosterUrl);
   assert.ok(posterchangeSpy.calledOnce, "posterchangeSpy should've been called");
+  assert.equal(player.isPosterFromTech_, true, 'ensure player marked poster as set by tech after the fact');
 
   player.dispose();
 });
@@ -1746,20 +1747,21 @@ QUnit.test('setPoster in tech WITHOUT `techCanOverridePoster` in player should N
   const firstPosterUrl = 'https://wherever.test/test.jpg';
   const techPosterUrl = 'https://somewhere.test/my/image.png';
 
-  assert.equal(player.options_.techCanOverridePoster, undefined);
-  assert.equal(player.tech_.options_.canOverridePoster, false);
+  assert.equal(player.options_.techCanOverridePoster, undefined, "ensure player option wasn't unwittingly set");
+  assert.equal(player.tech_.options_.canOverridePoster, false, "ensure tech option wasn't unwittinyly set");
 
   player.on('posterchange', posterchangeSpy);
 
   player.poster(firstPosterUrl);
   assert.ok(posterchangeSpy.calledOnce, 'posterchangeSpy only called once on update');
-  assert.equal(player.poster(), firstPosterUrl);
-  assert.equal(player.isPosterFromTech_, false);
+  assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
+  assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
 
   posterchangeSpy.reset();
 
   player.tech_.setPoster(techPosterUrl);
   assert.ok(posterchangeSpy.notCalled, "posterchangeSpy shouldn't have been called");
+  assert.equal(player.isPosterFromTech_, false, "ensure tech didn't change poster because player option was false");
 
   player.dispose();
 });
@@ -1770,16 +1772,16 @@ QUnit.test('disposing a tech that set a poster, should unset the poster', functi
   });
   const techPosterUrl = 'https://somewhere.test/my/image.png';
 
-  assert.equal(player.options_.techCanOverridePoster, true);
-  assert.equal(player.tech_.options_.canOverridePoster, true);
+  assert.equal(player.options_.techCanOverridePoster, true, 'make sure player option was passed correctly');
+  assert.equal(player.tech_.options_.canOverridePoster, true, 'make sure tech option was passed correctly');
 
   player.tech_.setPoster(techPosterUrl);
-  assert.equal(player.poster(), techPosterUrl);
-  assert.equal(player.isPosterFromTech_, true);
+  assert.equal(player.poster(), techPosterUrl, 'player poster should equal tech poster');
+  assert.equal(player.isPosterFromTech_, true, 'setting the poster with the tech should be remembered in the player');
 
   player.unloadTech_();
 
-  assert.equal(player.poster(), '');
+  assert.equal(player.poster(), '', 'ensure poster set by poster is unset after tech disposal');
 
   player.dispose();
 });
@@ -1790,16 +1792,16 @@ QUnit.test('disposing a tech that dit NOT set a poster, should keep the poster',
   });
   const posterUrl = 'https://myposter.test/lol.jpg';
 
-  assert.equal(player.options_.techCanOverridePoster, true);
-  assert.equal(player.tech_.options_.canOverridePoster, true);
+  assert.equal(player.options_.techCanOverridePoster, true, 'make sure player option was passed correctly');
+  assert.equal(player.tech_.options_.canOverridePoster, true, 'make sure tech option was passed correctly');
 
   player.poster(posterUrl);
-  assert.equal(player.poster(), posterUrl);
-  assert.equal(player.isPosterFromTech_, false);
+  assert.equal(player.poster(), posterUrl, 'player poster should NOT have changed');
+  assert.equal(player.isPosterFromTech_, false, 'player should mark poster as set by itself');
 
   player.unloadTech_();
 
-  assert.equal(player.poster(), posterUrl);
+  assert.equal(player.poster(), posterUrl, 'player poster should stay the same after unloading / dispoing tech');
 
   player.dispose();
 });
