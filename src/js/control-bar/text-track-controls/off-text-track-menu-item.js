@@ -66,14 +66,10 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
       }
     }
 
-    if (shouldBeSelected) {
-      // Prevent redundant selected(true) calls because they may cause
-      // screen readers to read the appended control text unnecessarily
-      if (!this.isSelected_) {
-        this.selected(true);
-      }
-    } else {
-      this.selected(false);
+    // Prevent redundant selected() calls because they may cause
+    // screen readers to read the appended control text unnecessarily
+    if (shouldBeSelected !== this.isSelected_) {
+      this.selected(shouldBeSelected);
     }
   }
 

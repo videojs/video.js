@@ -129,16 +129,12 @@ class TextTrackMenuItem extends MenuItem {
    * @listens TextTrackList#change
    */
   handleTracksChange(event) {
-    const trackModeIsShowing = this.track.mode === 'showing';
+    const shouldBeSelected = this.track.mode === 'showing';
 
-    if (trackModeIsShowing) {
-      // Prevent redundant selected(true) calls because they may cause
-      // screen readers to read the appended control text unnecessarily
-      if (!this.isSelected_) {
-        this.selected(true);
-      }
-    } else {
-      this.selected(false);
+    // Prevent redundant selected() calls because they may cause
+    // screen readers to read the appended control text unnecessarily
+    if (shouldBeSelected !== this.isSelected_) {
+      this.selected(shouldBeSelected);
     }
   }
 
