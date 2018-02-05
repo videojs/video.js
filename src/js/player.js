@@ -927,7 +927,8 @@ class Player extends Component {
       'poster': this.poster(),
       'language': this.language(),
       'playerElIngest': this.playerElIngest_ || false,
-      'vtt.js': this.options_['vtt.js']
+      'vtt.js': this.options_['vtt.js'],
+      'canOverridePoster': !!this.options_.techCanOverridePoster
     };
 
     TRACK_TYPES.names.forEach((name) => {
