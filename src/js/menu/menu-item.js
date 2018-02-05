@@ -26,7 +26,7 @@ class MenuItem extends ClickableComponent {
     super(player, options);
 
     this.selectable = options.selectable;
-    this.isSelected_ = options.selected;
+    this.isSelected_ = options.selected || false;
 
     this.selected(this.isSelected_);
 
