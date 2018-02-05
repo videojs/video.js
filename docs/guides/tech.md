@@ -57,6 +57,21 @@ videojs("videoID", {
 });
 ```
 
+### Posters
+
+By default, techs will have to handle their own posters and are somewhat locked out of the player's poster lifecycle. 
+However, when the player is initialized with the `techCanOverridePoster` option 
+it will be possible for techs to integrate into that lifecycle  and the player's `PosterImage` component to be used.
+ 
+Techs can check if they have this capability by checking the `canOverridePoster` boolean in their options. 
+
+**`techCanOverridePoster` requirements**
+
+ - `poster()` which returns the tech's current poster url
+ - `setPoster()` which updates the tech's poster url and triggers a `posterchange` event
+   which the player will handle
+
+
 ## Technology Ordering
 
 When Video.js is given an array of sources, which to use is determined by finding the first supported source / tech combination. Each tech will be queried in the order specified in `techOrder` whether it can play the first source. The first match wins. If no tech can play the first source, then the next will be tested. It's important to set the `type` of each source correctly for this test to be accurate.

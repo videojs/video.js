@@ -30,6 +30,7 @@
   * [plugins](#plugins)
   * [sourceOrder](#sourceorder)
   * [sources](#sources)
+  * [techCanOverridePoster](#techCanOverridePoster)
   * [techOrder](#techorder)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
@@ -253,6 +254,15 @@ Using `<source>` elements will have the same effect:
   <source src="//path/to/video.webm" type="video/webm">
 </video>
 ```
+
+### `techCanOverridePoster`
+
+> Type: `boolean`
+
+Gives the possibility to techs to override the player's poster 
+and integrate into the player's poster life-cycle.
+This can be useful when multiple techs are used and each has to set their own poster
+ any time a new source is played.
 
 ### `techOrder`
 
