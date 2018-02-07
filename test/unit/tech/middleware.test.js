@@ -423,8 +423,6 @@ QUnit.test('a middleware without a mediator method will not throw an error', fun
 });
 
 QUnit.test('a middleware factory is not called on source change', function(assert) {
-  let src;
-  let acc;
   let mwfactoryCalled = 0;
   const mw = {
     setSource(_src, next) {
@@ -447,10 +445,7 @@ QUnit.test('a middleware factory is not called on source change', function(asser
       return 'vid1';
     },
     setTimeout: window.setTimeout
-  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
-    src = _src;
-    acc = _acc;
-  });
+  }, {src: 'foo', type: 'video/foo'}, function() {});
 
   this.clock.tick(1);
 
@@ -462,10 +457,7 @@ QUnit.test('a middleware factory is not called on source change', function(asser
       return 'vid1';
     },
     setTimeout: window.setTimeout
-  }, {src: 'bar', type: 'video/foo'}, function(_src, _acc) {
-    src = _src;
-    acc = _acc;
-  });
+  }, {src: 'bar', type: 'video/foo'}, function() {});
 
   this.clock.tick(1);
 
@@ -475,8 +467,6 @@ QUnit.test('a middleware factory is not called on source change', function(asser
 });
 
 QUnit.test('a middleware factory is called on a new source with a new player', function(assert) {
-  let src;
-  let acc;
   let mwfactoryCalled = 0;
   const mw = {
     setSource(_src, next) {
@@ -499,10 +489,7 @@ QUnit.test('a middleware factory is called on a new source with a new player', f
       return 'vid1';
     },
     setTimeout: window.setTimeout
-  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
-    src = _src;
-    acc = _acc;
-  });
+  }, {src: 'foo', type: 'video/foo'}, function() {});
 
   this.clock.tick(1);
 
@@ -514,10 +501,7 @@ QUnit.test('a middleware factory is called on a new source with a new player', f
       return 'vid2';
     },
     setTimeout: window.setTimeout
-  }, {src: 'bar', type: 'video/foo'}, function(_src, _acc) {
-    src = _src;
-    acc = _acc;
-  });
+  }, {src: 'bar', type: 'video/foo'}, function() {});
 
   this.clock.tick(1);
 
