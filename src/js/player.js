@@ -523,6 +523,8 @@ class Player extends Component {
       this.tag = null;
     }
 
+    middleware.clearCacheForPlayer(this);
+
     // the actual .el_ is removed here
     super.dispose();
   }

@@ -103,6 +103,10 @@ function executeRight(mws, method, value, terminated) {
   }
 }
 
+export function clearCacheForPlayer(player) {
+  middlewareInstances[player.id()] = null;
+}
+
 /**
  * {
  *  [playerId]: [[mwFactory, mwInstance], ...]
