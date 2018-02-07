@@ -105,40 +105,32 @@ function executeRight(mws, method, value, terminated) {
 
 /**
  * {
- *  [type]: [[player, [[mwFactory, mwInstance], ...]], ...]
+ *  [playerId]: [[mwFactory, mwInstance], ...]
  * }
  */
-function getOrCreateFactory(type, player, mwFactory) {
-  const mws = middlewareInstances[type];
+function getOrCreateFactory(player, mwFactory) {
+  const mws = middlewareInstances[player.id()];
   let mw = null;
 
   if (mws === undefined) {
     mw = mwFactory(player);
-    middlewareInstances[type] = [[player, [[mwFactory, mw]]]];
+    middlewareInstances[player.id()] = [[mwFactory, mw]];
     return mw;
   }
 
   for (let i = 0; i < mws.length; i++) {
-    const [mwplayer, mwpp] = mws[i];
+    const [mwf, mwi] = mws[i];
 
-    if (mwplayer !== player) {
+    if (mwf !== mwFactory) {
       continue;
     }
 
-    for (let j = 0; j < mwpp.length; j++) {
-      const [mwf, mwi] = mwpp[j];
+    mw = mwi;
+  }
 
-      if (mwf !== mwFactory) {
-        continue;
-      }
-
-      mw = mwi;
-    }
-
-    if (mw === null) {
-      mw = mwFactory(player);
-      mwpp.push([mwFactory, mw]);
-    }
+  if (mw === null) {
+    mw = mwFactory(player);
+    mws.push([mwFactory, mw]);
   }
 
   return mw;
@@ -154,7 +146,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
   // if we have an mwFactory, call it with the player to get the mw,
   // then call the mw's setSource method
   } else if (mwFactory) {
-    const mw = getOrCreateFactory(src.type, player, mwFactory);
+    const mw = getOrCreateFactory(player, mwFactory);
 
     mw.setSource(assign({}, src), function(err, _src) {
 
