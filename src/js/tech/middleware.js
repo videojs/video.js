@@ -116,7 +116,7 @@ function getOrCreateFactory(player, mwFactory) {
   const mws = middlewareInstances[player.id()];
   let mw = null;
 
-  if (mws === undefined) {
+  if (mws === undefined || mws === null) {
     mw = mwFactory(player);
     middlewareInstances[player.id()] = [[mwFactory, mw]];
     return mw;
