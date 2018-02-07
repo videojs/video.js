@@ -435,7 +435,7 @@ QUnit.test('a middleware factory is not called on source change', function(asser
   const fooFactory = () => {
     mwfactoryCalled++;
     return mw;
-  }
+  };
 
   middleware.use('video/foo', fooFactory);
 
@@ -479,7 +479,7 @@ QUnit.test('a middleware factory is called on a new source with a new player', f
   const fooFactory = () => {
     mwfactoryCalled++;
     return mw;
-  }
+  };
 
   middleware.use('video/foo', fooFactory);
 
