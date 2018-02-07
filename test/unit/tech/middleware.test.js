@@ -421,3 +421,53 @@ QUnit.test('a middleware without a mediator method will not throw an error', fun
 
   assert.equal(pauseCalled, 1, 'pauseCalled was called once and no error was thrown');
 });
+
+QUnit.test('a middleware factory is not called on source change', function(assert) {
+  let src;
+  let acc;
+  let mwfactoryCalled = 0;
+  const mw = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  };
+  const fooFactory = () => {
+    mwfactoryCalled++;
+    return mw;
+  }
+
+  middleware.use('video/foo', fooFactory);
+
+  // set "initial" source"
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
+    src = _src;
+    acc = _acc;
+  });
+
+  this.clock.tick(1);
+
+  // "change" source
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/foo'}, function(_src, _acc) {
+    src = _src;
+    acc = _acc;
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was called once');
+
+  middleware.getMiddleware('video/foo').pop();
+});
