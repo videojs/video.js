@@ -260,7 +260,7 @@ class Advanced extends Plugin {
 
     // Whenever the player emits a playing or paused event, we update the
     // state if necessary.
-    this.on(player, ['playing', 'paused'], this.updateState);
+    this.on(player, ['playing', 'pause'], this.updateState);
     this.on('statechanged', this.logState);
   }
 
