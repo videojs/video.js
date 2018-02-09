@@ -129,7 +129,13 @@ class TextTrackMenuItem extends MenuItem {
    * @listens TextTrackList#change
    */
   handleTracksChange(event) {
-    this.selected(this.track.mode === 'showing');
+    const shouldBeSelected = this.track.mode === 'showing';
+
+    // Prevent redundant selected() calls because they may cause
+    // screen readers to read the appended control text unnecessarily
+    if (shouldBeSelected !== this.isSelected_) {
+      this.selected(shouldBeSelected);
+    }
   }
 
   handleSelectedLanguageChange(event) {
