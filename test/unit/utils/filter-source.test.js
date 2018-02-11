@@ -122,3 +122,69 @@ QUnit.test('Dont filter extra object properties', function(assert) {
   );
 
 });
+
+QUnit.test('SourceObject type is filled with default values when extension is known', function(assert) {
+  assert.deepEqual(
+    filterSource('some-url.mp4'),
+    [{src: 'some-url.mp4', type: 'video/mp4'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource('some-url.ogv'),
+    [{src: 'some-url.ogv', type: 'video/ogg'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource('some-url.aac'),
+    [{src: 'some-url.aac', type: 'audio/aac'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource({src: 'some-url.mp4'}),
+    [{src: 'some-url.mp4', type: 'video/mp4'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource({src: 'some-url.ogv'}),
+    [{src: 'some-url.ogv', type: 'video/ogg'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource([{src: 'some-url.MP4'}, {src: 'some-url.OgV'}, {src: 'some-url.AaC'}]),
+    [{src: 'some-url.MP4', type: 'video/mp4'}, {src: 'some-url.OgV', type: 'video/ogg'}, {src: 'some-url.AaC', type: 'audio/aac'}],
+    'string source filters to object'
+  );
+});
+
+QUnit.test('SourceObject type is not filled when extension is unknown', function(assert) {
+  assert.deepEqual(
+    filterSource('some-url.ppp'),
+    [{src: 'some-url.ppp'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource('some-url.a'),
+    [{src: 'some-url.a'}],
+    'string source filters to object'
+  );
+
+  assert.deepEqual(
+    filterSource('some-url.mp8'),
+    [{src: 'some-url.mp8'}],
+    'string source filters to object'
+  );
+});
+
+QUnit.test('SourceObject type is not changed when type exists', function(assert) {
+  assert.deepEqual(
+    filterSource({src: 'some-url.aac', type: 'video/zzz'}),
+    [{src: 'some-url.aac', type: 'video/zzz'}],
+    'string source filters to object'
+  );
+});
