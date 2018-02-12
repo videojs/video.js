@@ -2,6 +2,7 @@ import { assign } from '../utils/obj.js';
 import toTitleCase from '../utils/to-title-case.js';
 
 const middlewares = {};
+const middlewareInstances = {};
 
 export const TERMINATOR = {};
 
@@ -102,6 +103,43 @@ function executeRight(mws, method, value, terminated) {
   }
 }
 
+export function clearCacheForPlayer(player) {
+  middlewareInstances[player.id()] = null;
+}
+
+/**
+ * {
+ *  [playerId]: [[mwFactory, mwInstance], ...]
+ * }
+ */
+function getOrCreateFactory(player, mwFactory) {
+  const mws = middlewareInstances[player.id()];
+  let mw = null;
+
+  if (mws === undefined || mws === null) {
+    mw = mwFactory(player);
+    middlewareInstances[player.id()] = [[mwFactory, mw]];
+    return mw;
+  }
+
+  for (let i = 0; i < mws.length; i++) {
+    const [mwf, mwi] = mws[i];
+
+    if (mwf !== mwFactory) {
+      continue;
+    }
+
+    mw = mwi;
+  }
+
+  if (mw === null) {
+    mw = mwFactory(player);
+    mws.push([mwFactory, mw]);
+  }
+
+  return mw;
+}
+
 function setSourceHelper(src = {}, middleware = [], next, player, acc = [], lastRun = false) {
   const [mwFactory, ...mwrest] = middleware;
 
@@ -112,7 +150,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
   // if we have an mwFactory, call it with the player to get the mw,
   // then call the mw's setSource method
   } else if (mwFactory) {
-    const mw = mwFactory(player);
+    const mw = getOrCreateFactory(player, mwFactory);
 
     mw.setSource(assign({}, src), function(err, _src) {
 
