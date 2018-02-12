@@ -99,7 +99,7 @@ var myMiddleware = function(player) {
       // mediating to the Tech
       ...
     },
-    pause: function(terminated, value) {
+    play: function(terminated, value) {
       // mediating back to the Player
       ...
     },
@@ -129,15 +129,15 @@ Your middleware should be a function that is scoped to a player and returns an o
 ```javascript
 var myMiddleware = function(player) {
   return {
+    setSource: function(srcObj, next) {
+      // pass null as the first argument to indicate that the source is not rejected
+      next(null, srcObj);
+    },
     currentTime: function(ct) {
       return ct / 2;
     },
     setCurrentTime: function(time) {
       return time * 2;
-    },
-    setSource: function(srcObj, next) {
-      // pass null as the first argument to indicate that the source is not rejected
-      next(null, srcObj);
     }
   };
 };
@@ -152,6 +152,10 @@ An example of a middleware that uses Mediator methods is below:
 ```javascript
 var myMiddleware = function(player) {
   return {
+    setSource: function(srcObj, next) {
+      // pass null as the first argument to indicate that the source is not rejected
+      next(null, srcObj);
+    },
     callPlay: function() {
       // Do nothing, thereby allowing play() to be called on the Tech
     },
@@ -169,10 +173,6 @@ var myMiddleware = function(player) {
             console.log('The play was rejected', err);
           });
       }
-    },
-    setSource: function(srcObj, next) {
-      // pass null as the first argument to indicate that the source is not rejected
-      next(null, srcObj);
     }
   };
 };
@@ -189,6 +189,10 @@ Mediator methods can terminate, by doing the following:
 ```javascript
 var myMiddleware = function(player) {
   return {
+    setSource: function(srcObj, next) {
+      // pass null as the first argument to indicate that the source is not rejected
+      next(null, srcObj);
+    },
     callPlay: function() {
       // Terminate by returning the middleware terminator
       return videojs.middleware.TERMINATOR;
@@ -198,10 +202,6 @@ var myMiddleware = function(player) {
       if (terminated) {
         console.log('The play was middleware terminated.');
       }
-    },
-    setSource: function(srcObj, next) {
-      // pass null as the first argument to indicate that the source is not rejected
-      next(null, srcObj);
     }
   };
 };
