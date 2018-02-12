@@ -179,6 +179,8 @@ class SeekBar extends Slider {
       return;
     }
 
+    // Stop event propagation to prevent double fire in progress-control.js
+    event.stopPropagation();
     this.player_.scrubbing(true);
 
     this.videoWasPlaying = !this.player_.paused();
@@ -244,6 +246,8 @@ class SeekBar extends Slider {
   handleMouseUp(event) {
     super.handleMouseUp(event);
 
+    // Stop event propagation to prevent double fire in progress-control.js
+    event.stopPropagation();
     this.player_.scrubbing(false);
 
     /**
