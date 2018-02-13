@@ -19,7 +19,7 @@ import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
 
 import { createTimeRanges } from './utils/time-ranges.js';
-import formatTime from './utils/format-time.js';
+import formatTime, { setFormatTime } from './utils/format-time.js';
 import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
@@ -809,6 +809,11 @@ videojs.dom = Dom;
  * and Tech's
  */
 videojs.url = Url;
+
+/**
+ * Replaces format-time with a custom implementation
+ */
+videojs.setFormatTime = setFormatTime;
 
 export default videojs;
 

@@ -16,7 +16,7 @@
  * @return {string}
  *         Time formatted as H:MM:SS or M:SS
  */
-function formatTime(seconds, guide = seconds) {
+function implementation(seconds, guide) {
   seconds = seconds < 0 ? 0 : seconds;
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);
@@ -44,4 +44,11 @@ function formatTime(seconds, guide = seconds) {
   return h + m + s;
 }
 
-export default formatTime;
+// override format-time with a custom implementation
+export function setFormatTime (customImplementation) {
+  implementation = customImplementation;
+}
+
+export default function (seconds, guide = seconds) {
+  return implementation(seconds, duration)
+};
