@@ -3,20 +3,7 @@
  * @module Format-time
  */
 
-/**
- * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in seconds)
- * will force a number of leading zeros to cover the length of the guide.
- *
- * @param {number} seconds
- *        Number of seconds to be turned into a string
- *
- * @param {number} guide
- *        Number (in seconds) to model the string after
- *
- * @return {string}
- *         Time formatted as H:MM:SS or M:SS
- */
-function implementation(seconds, guide) {
+let implementation = function(seconds, guide) {
   seconds = seconds < 0 ? 0 : seconds;
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);
@@ -42,13 +29,32 @@ function implementation(seconds, guide) {
   s = (s < 10) ? '0' + s : s;
 
   return h + m + s;
-}
+};
 
-// override format-time with a custom implementation
-export function setFormatTime (customImplementation) {
+/**
+ * Replaces the default formatTime implementation with a custom implementation.
+ *
+ * @param {Function} customImplementation
+ *        A function which will be used in place of the default formatTime implementation.
+ *        Will receive the current time in seconds and the guide (in seconds) as arguments.
+ */
+export function setFormatTime(customImplementation) {
   implementation = customImplementation;
 }
 
-export default function (seconds, guide = seconds) {
-  return implementation(seconds, duration)
-};
+/**
+ * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in seconds)
+ * will force a number of leading zeros to cover the length of the guide.
+ *
+ * @param {number} seconds
+ *        Number of seconds to be turned into a string
+ *
+ * @param {number} guide
+ *        Number (in seconds) to model the string after
+ *
+ * @return {string}
+ *         Time formatted as H:MM:SS or M:SS
+ */
+export default function(seconds, guide = seconds) {
+  return implementation(seconds, guide);
+}
