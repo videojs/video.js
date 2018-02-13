@@ -57,27 +57,14 @@ const filterSource = function(src) {
  *        src Object with known type
  */
 function checkMimetype(src) {
-  const type = extractType(src.src);
+  const ext = Url.getFileExtension(src.src);
+  const mimetype = MimetypesKind[ext.toLowerCase()];
 
-  if (!src.type && type) {
-    src.type = type;
+  if (!src.type && mimetype) {
+    src.type = mimetype;
   }
 
   return src;
-}
-
-/**
- * Extracts video mimetype
- *
- * @param {string} src
- *        The src whose type will be extracted
- * @return {string}
- *        Extracted Mimetype for src
- */
-function extractType(src) {
-  const ext = Url.getFileExtension(src);
-
-  return MimetypesKind[ext.toLowerCase()];
 }
 
 export default filterSource;

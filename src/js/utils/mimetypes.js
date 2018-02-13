@@ -12,11 +12,7 @@ export const MimetypesKind = {
   mov: 'video/mp4',
   m4v: 'video/mp4',
   mkv: 'video/x-matroska',
-  mp1: 'audio/mpeg',
-  mp2: 'audio/mpeg',
   mp3: 'audio/mpeg',
-  mpg: 'audio/mpeg',
-  mpeg: 'audio/mpeg',
   aac: 'audio/aac',
   oga: 'audio/ogg',
   m3u8: 'application/x-mpegURL'
