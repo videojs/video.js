@@ -1,3 +1,6 @@
+<a name="5.20.5"></a>
+## [5.20.5](https://github.com/videojs/video.js/compare/v5.20.4...v5.20.5) (2018-02-13)
+
 <a name="5.20.4"></a>
 ## [5.20.4](https://github.com/videojs/video.js/compare/v5.20.3...v5.20.4) (2017-10-02)
 
