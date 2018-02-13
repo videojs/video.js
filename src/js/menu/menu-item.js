@@ -97,8 +97,7 @@ class MenuItem extends ClickableComponent {
         this.removeClass('vjs-selected');
         this.el_.setAttribute('aria-checked', 'false');
         // Indicate un-selected state to screen reader
-        // Note that a space clears out the selected state text
-        this.controlText(' ');
+        this.controlText('');
       }
     }
   }
