@@ -4,6 +4,7 @@
   color: $primary-foreground-color;
   height: 100%;
 }
+
 // Layout divs
 .vjs-text-track-settings .vjs-modal-dialog-content {
   display: table;
@@ -20,8 +21,8 @@
   vertical-align: bottom;
 }
 
+// code that will only run if CSS Grid is supported by the browser
 @supports (display: grid) {
-  // code that will only run if CSS Grid is supported by the browser
   .vjs-text-track-settings .vjs-modal-dialog-content {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -45,25 +46,24 @@
     text-align: unset;
     vertical-align: unset;
   }
-  .vjs-text-track-settings fieldset span.vjs-opacity{
+  .vjs-text-track-settings fieldset span.vjs-opacity {
     margin-left: unset;
   }
-  .video-js{
+  .video-js {
     @media (max-width: 365px) {
-      .vjs-modal-dialog .vjs-modal-dialog-content{
-      font-size: 1em;
-      line-height: 1em;
-      padding: 5px 5px;
-    }
-    .vjs-text-track-settings legend{
-      margin: unset;
-    }
+      .vjs-modal-dialog .vjs-modal-dialog-content {
+        font-size: 1em;
+        line-height: 1em;
+        padding: 5px 5px;
+      }
+      .vjs-text-track-settings legend {
+        margin: unset;
+      }
     }
   }
 }
 
 // Form elements
-
 .vjs-text-track-settings fieldset {
   margin: 5px;
   padding: 3px;
@@ -79,6 +79,7 @@
   color: $primary-foreground-color;
   margin: 0 0 5px;
 }
+
 // Hide labels, so they are only for screen reader users
 .vjs-text-track-settings .vjs-label {
   position: absolute;
@@ -101,13 +102,13 @@
 }
 
 .vjs-track-settings-controls button:hover {
-  color: rgba(#2B333F, 0.75);
+  color: rgba(#2b333f, 0.75);
 }
 
 .vjs-track-settings-controls button {
   background-color: $primary-foreground-color;
   background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
-  color: #2B333F;
+  color: #2b333f;
   cursor: pointer;
   border-radius: 2px;
 }
