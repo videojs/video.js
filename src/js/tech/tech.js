@@ -155,6 +155,30 @@ class Tech extends Component {
     }
   }
 
+  /**
+   * A special function to trigger source set in a way that
+   * will allow player to re-trigger if player/html5 are not ready
+   * yet.
+   *
+   * @fires Tech#sourceset
+   */
+  triggerSourceset() {
+    if (!this.isReady_) {
+      // on initial ready we have to trigger source set
+      // 1ms after ready so that player can watch for it.
+      this.one('ready', () => this.setTimeout(this.triggerSourceset, 1));
+    }
+
+    /**
+     * Fired when the source is set on the tech causing the media element
+     * to reload.
+     *
+     * @event Tech#sourceset
+     * @type {EventTarget~Event}
+     */
+    this.trigger('sourceset');
+  }
+
   /* Fallbacks for unsupported event types
   ================================================================================ */
 

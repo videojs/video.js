@@ -122,30 +122,6 @@ class Html5 extends Tech {
   }
 
   /**
-   * A special function to trigger source set in a way that
-   * will allow player to re-trigger if player/html5 are not ready
-   * yet.
-   *
-   * @fires Tech#sourceset
-   */
-  triggerSourceSet_() {
-    if (!this.isReady_) {
-      // on initial ready we have to trigger source set
-      // 1ms after ready so that player can watch for it.
-      this.one('ready', () => this.setTimeout(this.triggerSourceSet_, 1));
-    }
-
-    /**
-     * Fired when the source is set on the tech causing the media element
-     * to reload.
-     *
-     * @event Tech#sourceset
-     * @type {EventTarget~Event}
-     */
-    this.trigger('sourceset');
-  }
-
-  /**
    * Modify the media element so that we can detect when
    * the source is changed. Fires `sourceset` just after the source has changed
    */
@@ -160,7 +136,7 @@ class Html5 extends Tech {
     // if we find that the media element had a src when it was
     // given to us and that tech element is not in a stalled state
     if (el.src || el.currentSrc && this.el().initNetworkState_ !== 3) {
-      this.triggerSourceSet_();
+      this.triggerSourceset();
     }
 
     const proto = window.HTMLMediaElement.prototype;
@@ -194,7 +170,7 @@ class Html5 extends Tech {
       set: (v) => {
         const retval = srcDescriptor.set.call(el, v);
 
-        this.triggerSourceSet_();
+        this.triggerSourceset();
 
         return retval;
       },
@@ -208,7 +184,7 @@ class Html5 extends Tech {
       const retval = oldSetAttribute.call(el, n, v);
 
       if (n === 'src') {
-        this.triggerSourceSet_();
+        this.triggerSourceset();
       }
 
       return retval;
@@ -219,7 +195,7 @@ class Html5 extends Tech {
     el.load = () => {
       const retval = oldLoad.call(el);
 
-      this.triggerSourceSet_();
+      this.triggerSourceset();
 
       return retval;
     };
