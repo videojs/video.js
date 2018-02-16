@@ -688,7 +688,7 @@ QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function(ass
   Html5.resetMediaElement = oldResetMedia;
 });
 
-test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function() {
+QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function(assert) {
   const oldIsAndroid = browser.IS_ANDROID;
   const oldIsChrome = browser.IS_CHROME;
   const oldEl = tech.el_;
@@ -700,7 +700,7 @@ test('When Android Chrome reports Infinity duration with currentTime 0, return N
     duration: Infinity,
     currentTime: 0
   };
-  ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
+  assert.ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
 
   browser.IS_ANDROID = oldIsAndroid;
   browser.IS_CHROME = oldIsChrome;
