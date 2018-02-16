@@ -84,15 +84,6 @@ const TECH_EVENTS_RETRIGGER = [
   'abort',
 
   /**
-   * Fired when the source is set on the tech causing the media element
-   * to reload.
-   *
-   * @private
-   * @method Player#handleTechSourceset_
-   * @event Player#sourceset
-   * @type {EventTarget~Event}
-   */
-  /**
    * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
    *
    * @fires Player#sourceset
