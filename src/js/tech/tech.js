@@ -173,6 +173,7 @@ class Tech extends Component {
      * Fired when the source is set on the tech causing the media element
      * to reload.
      *
+     * @see {@link Player#event:sourceset}
      * @event Tech#sourceset
      * @type {EventTarget~Event}
      */

@@ -44,7 +44,6 @@ import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
-import './resize-manager.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -84,6 +83,21 @@ const TECH_EVENTS_RETRIGGER = [
    */
   'abort',
 
+  /**
+   * Fired when the source is set or changed on the {@link Tech}
+   * causing the media element to reload.
+   *
+   * It will fire for the initial source and each subsequent source.
+   * This event is a custom event from Video.js and is triggered by the {@link Tech}.
+   *
+   * It is also fired when `load` is called on the player (or media element)
+   * because the {@link https://html.spec.whatwg.org/multipage/media.html#dom-media-load|specification for `load`}
+   * says that the resource selection algorithm
+   * needs to be aborted and restarted.
+   *
+   * @event Player#sourceset
+   * @type {EventTarget~Event}
+   */
   /**
    * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
    *
@@ -671,11 +685,14 @@ class Player extends Component {
    * @param {number} [value]
    *        The value to set the `Player`'s width to.
    *
+   * @param {boolean} [skipListeners]
+   *        Skip the playerresize event trigger
+   *
    * @return {number}
    *         The current width of the `Player` when getting.
    */
-  width(value) {
-    return this.dimension('width', value);
+  width(value, skipListeners) {
+    return this.dimension('width', value, skipListeners);
   }
 
   /**
@@ -685,15 +702,20 @@ class Player extends Component {
    * @param {number} [value]
    *        The value to set the `Player`'s heigth to.
    *
+   * @param {boolean} [skipListeners]
+   *        Skip the playerresize event trigger
+   *
    * @return {number}
    *         The current height of the `Player` when getting.
    */
-  height(value) {
-    return this.dimension('height', value);
+  height(value, skipListeners) {
+    return this.dimension('height', value, skipListeners);
   }
 
   /**
    * A getter/setter for the `Player`'s width & height.
+   *
+   * @fires Player#playerresize
    *
    * @param {string} dimension
    *        This string can be:
@@ -703,10 +725,13 @@ class Player extends Component {
    * @param {number} [value]
    *        Value for dimension specified in the first argument.
    *
+   * @param {boolean} [skipListeners]
+   *        Skip the playerresize event trigger
+   *
    * @return {number}
    *         The dimension arguments value when getting (width/height).
    */
-  dimension(dimension, value) {
+  dimension(dimension, value, skipListeners) {
     const privDimension = dimension + '_';
 
     if (value === undefined) {
@@ -729,6 +754,17 @@ class Player extends Component {
 
     this[privDimension] = parsedVal;
     this.updateStyleEl_();
+
+    // skipListeners allows us to avoid triggering the resize event when setting both width and height
+    if (this.isReady_ && !skipListeners) {
+      /**
+       * Triggered when the player is resized.
+       *
+       * @event Player#playerresize
+       * @type {EventTarget~Event}
+       */
+      this.trigger('playerresize');
+    }
   }
 
   /**
@@ -1620,9 +1656,6 @@ class Player extends Component {
     this.ready(function() {
       if (method in middleware.allowedSetters) {
         return middleware.set(this.middleware_, this.tech_, method, arg);
-
-      } else if (method in middleware.allowedMediators) {
-        return middleware.mediate(this.middleware_, this.tech_, method, arg);
       }
 
       try {
@@ -1654,9 +1687,6 @@ class Player extends Component {
 
     if (method in middleware.allowedGetters) {
       return middleware.get(this.middleware_, this.tech_, method);
-
-    } else if (method in middleware.allowedMediators) {
-      return middleware.mediate(this.middleware_, this.tech_, method);
     }
 
     // Flash likes to die and reload when you hide or reposition it.
@@ -3476,10 +3506,6 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.'
 };
-
-if (!browser.IS_IE8) {
-  Player.prototype.options_.children.push('resizeManager');
-}
 
 [
   /**
