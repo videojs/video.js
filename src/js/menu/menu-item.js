@@ -26,8 +26,9 @@ class MenuItem extends ClickableComponent {
     super(player, options);
 
     this.selectable = options.selectable;
+    this.isSelected_ = options.selected || false;
 
-    this.selected(options.selected);
+    this.selected(this.isSelected_);
 
     if (this.selectable) {
       // TODO: May need to be either menuitemcheckbox or menuitemradio,
@@ -93,11 +94,13 @@ class MenuItem extends ClickableComponent {
         // aria-checked isn't fully supported by browsers/screen readers,
         // so indicate selected state to screen reader in the control text.
         this.controlText(', selected');
+        this.isSelected_ = true;
       } else {
         this.removeClass('vjs-selected');
         this.el_.setAttribute('aria-checked', 'false');
         // Indicate un-selected state to screen reader
         this.controlText('');
+        this.isSelected_ = false;
       }
     }
   }

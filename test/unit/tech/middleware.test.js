@@ -250,6 +250,9 @@ QUnit.test('setSource is run asynchronously', function(assert) {
   let acc;
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, { src: 'foo', type: 'video/foo' }, function(_src, _acc) {
     src = _src;
@@ -281,6 +284,9 @@ QUnit.test('setSource selects a source based on the middleware given', function(
   middleware.use('video/foo', fooFactory);
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
@@ -323,6 +329,9 @@ QUnit.test('setSource can select multiple middleware from multiple types', funct
   middleware.use('video/bar', barFactory);
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
@@ -377,6 +386,9 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   middleware.use('video/foo', fooFactory3);
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
@@ -408,4 +420,92 @@ QUnit.test('a middleware without a mediator method will not throw an error', fun
   middleware.mediate([mwFactory(), mwFactory2()], {pause: () => {}}, 'pause');
 
   assert.equal(pauseCalled, 1, 'pauseCalled was called once and no error was thrown');
+});
+
+QUnit.test('a middleware factory is not called on source change', function(assert) {
+  let mwfactoryCalled = 0;
+  const mw = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  };
+  const fooFactory = () => {
+    mwfactoryCalled++;
+    return mw;
+  };
+
+  middleware.use('video/foo', fooFactory);
+
+  // set "initial" source"
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was called once');
+
+  // "change" source
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was not called again');
+
+  middleware.getMiddleware('video/foo').pop();
+});
+
+QUnit.test('a middleware factory is called on a new source with a new player', function(assert) {
+  let mwfactoryCalled = 0;
+  const mw = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  };
+  const fooFactory = () => {
+    mwfactoryCalled++;
+    return mw;
+  };
+
+  middleware.use('video/foo', fooFactory);
+
+  // set "initial" source with player vid1
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was called once');
+
+  // set "initial" source with player vid2
+  middleware.setSource({
+    id() {
+      return 'vid2';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 2, 'the factory was called again');
+
+  middleware.getMiddleware('video/foo').pop();
 });
