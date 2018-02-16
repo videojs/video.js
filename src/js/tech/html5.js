@@ -199,21 +199,6 @@ class Html5 extends Tech {
 
       return retval;
     };
-
-    this.on('dispose', () => {
-      if (!el) {
-        return;
-      }
-
-      if (oldLoad) {
-        el.load = oldLoad.bind(el);
-      }
-
-      if (oldSetAttribute) {
-        el.setAttribute = oldSetAttribute.bind(el);
-      }
-      Object.defineProperty(el, 'src', srcDescriptor);
-    });
   }
 
   /**
