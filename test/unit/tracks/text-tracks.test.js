@@ -82,6 +82,7 @@ QUnit.test('listen to remove and add track events in native text tracks', functi
 
   Html5.prototype.textTracks = function() {
     return {
+      removeEventListener() {},
       addEventListener(type, handler) {
         events[type] = true;
       }
@@ -121,6 +122,8 @@ QUnit.test('listen to remove and add track events in native text tracks', functi
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.textTracks = oldTextTracks;
+
+  html.dispose();
 });
 
 QUnit.test('update texttrack buttons on removetrack or addtrack', function(assert) {
@@ -278,6 +281,8 @@ if (Html5.supportsNativeTextTracks()) {
     emulatedTt.on('removetrack', function() {
       assert.equal(emulatedTt.length, tt.length, 'we have matching tracks length');
       assert.equal(emulatedTt.length, 0, 'we have no more text tracks');
+
+      html.dispose();
       done();
     });
   });
@@ -319,6 +324,8 @@ QUnit.test('should check for text track changes when emulating text tracks', fun
   });
   tech.emulateTextTracks();
   assert.equal(numTextTrackChanges, 1, 'we got a texttrackchange event');
+
+  tech.dispose();
 });
 
 QUnit.test('removes cuechange event when text track is hidden for emulated tracks', function(assert) {

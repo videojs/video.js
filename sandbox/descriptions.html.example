@@ -8,7 +8,7 @@
   <script src="../dist/ie8/videojs-ie8.js"></script>
 
   <!-- Load the source files -->
-  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
 
   <!-- Set the location of the flash SWF -->

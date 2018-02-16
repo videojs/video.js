@@ -33,6 +33,7 @@ QUnit.test('listen to remove and add track events in native video tracks', funct
 
   Html5.prototype.videoTracks = function() {
     return {
+      removeEventListener() {},
       addEventListener(type, handler) {
         events[type] = true;
       }

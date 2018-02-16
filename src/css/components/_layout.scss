@@ -29,6 +29,9 @@
     width: 100% !important;
     height: 100% !important;
   }
+  
+  // reset word-break inside the player div
+  word-break: initial;
 }
 
 .video-js[tabindex="-1"] {

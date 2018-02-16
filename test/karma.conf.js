@@ -1,4 +1,14 @@
 module.exports = function(config) {
+  // build out a name for browserstack
+  // {TRAVIS_BUILD_NUMBER} [{TRAVIS_PULL_REQUEST} {PR_BRANCH}] {TRAVIS_BRANCH}
+  var browserstackName = process.env.TRAVIS_BUILD_NUMBER;
+
+  if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+    browserstackName += ' ' + process.env.TRAVIS_PULL_REQUEST + ' ' + process.env.TRAVIS_PULL_REQUEST_BRANCH;
+  }
+
+  browserstackName +=  ' ' + process.env.TRAVIS_BRANCH;
+
   // Creating settings object first so we can modify based on travis
   var settings = {
     basePath: '',
@@ -41,6 +51,7 @@ module.exports = function(config) {
       'karma-ie-launcher',
       'karma-opera-launcher',
       'karma-safari-launcher',
+      'karma-safaritechpreview-launcher',
       'karma-browserstack-launcher',
       'karma-browserify',
       'karma-coverage',
@@ -67,7 +78,9 @@ module.exports = function(config) {
     browserDisconnectTolerance: 3,
 
     browserStack: {
-      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+      project: 'Video.js',
+      name: browserstackName,
+      build: browserstackName,
       pollingTimeout: 30000,
       captureTimeout: 600,
       timeout: 600

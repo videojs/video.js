@@ -89,7 +89,7 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Enable the `Button` element so that it cannot be activated or clicked. Use this with
+   * Disable the `Button` element so that it cannot be activated or clicked. Use this with
    * {@link Button#enable}.
    */
   disable() {
