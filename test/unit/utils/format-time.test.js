@@ -1,7 +1,7 @@
 /* eslint-env qunit */
-import formatTime from '../../../src/js/utils/format-time.js';
+import formatTime, { setFormatTime } from '../../../src/js/utils/format-time.js';
 
-QUnit.module('format-time');
+QUnit.module('format-time standard implementation');
 
 QUnit.test('should format time as a string', function(assert) {
   assert.ok(formatTime(1) === '0:01');
@@ -32,4 +32,12 @@ QUnit.test('should format invalid times as dashes', function(assert) {
   assert.equal(formatTime(NaN), '-:-');
   assert.equal(formatTime(10, Infinity), '0:00:10');
   assert.equal(formatTime(90, NaN), '1:30');
+});
+
+QUnit.module('setFormatTime', {
+  before: setFormatTime((seconds, guide) => `custom:${seconds}:${guide}`)
+});
+
+QUnit.only('should replace the standard implementation of formatTime with the custom function', function(assert) {
+  assert.equal(formatTime(1, 2), 'custom:1:2');
 });
