@@ -4,6 +4,7 @@
 
 [![Build Status][travis-icon]][travis-link]
 [![Coverage Status][coveralls-icon]][coveralls-link]
+[![Greenkeeper badge](https://badges.greenkeeper.io/videojs/video.js.svg)](https://greenkeeper.io/)
 [![Slack Status][slack-icon]][slack-link]
 
 [![NPM][npm-icon]][npm-link]
