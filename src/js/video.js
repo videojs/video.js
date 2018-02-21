@@ -269,13 +269,23 @@ videojs.getPlayers = () => Player.players;
  */
 videojs.getPlayer = (id) => {
   const players = Player.players;
+  let tag;
 
   if (typeof id === 'string') {
-    return players[normalizeId(id)];
+    const nId = normalizeId(id);
+    const player = players[nId];
+
+    if (player) {
+      return player;
+    }
+
+    tag = Dom.$('#' + nId);
+  } else {
+    tag = id;
   }
 
-  if (Dom.isEl(id)) {
-    const {player, playerId} = id;
+  if (Dom.isEl(tag)) {
+    const {player, playerId} = tag;
 
     // Element may have a `player` property referring to an already created
     // player instance. If so, return that.
