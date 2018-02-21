@@ -78,7 +78,7 @@
     "filesize": "^3.5.11",
     "gh-release": "^3.2.0",
     "grunt": "^1.0.1",
-    "grunt-accessibility": "^5.0.0",
+    "grunt-accessibility": "^6.0.0",
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "5.2.0",
     "grunt-cli": "~1.2.0",
