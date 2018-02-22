@@ -379,7 +379,7 @@ QUnit.test('videojs() works with the tech id', function(assert) {
   fixture.innerHTML += '<video-js id="player"></video-js>';
 
   const tag = document.querySelector('#player');
-  const player = videojs('#player');
+  const player = videojs('#player', {techOrder: ['html5']});
 
   assert.strictEqual(videojs('player_html5_api'), player, 'the player was returned for the tech id');
   assert.strictEqual(videojs(tag), player, 'the player was returned when using the original tag/element');
@@ -393,7 +393,7 @@ QUnit.test('getPlayer works with the tech id', function(assert) {
   fixture.innerHTML += '<video-js id="player"></video-js>';
 
   const tag = document.querySelector('#player');
-  const player = videojs('#player');
+  const player = videojs('#player', {techOrder: ['html5']});
 
   assert.strictEqual(videojs.getPlayer('player_html5_api'), player, 'the player was returned for the tech id');
   assert.strictEqual(videojs.getPlayer(tag), player, 'the player was returned when using the original tag/element');
