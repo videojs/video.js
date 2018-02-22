@@ -28,8 +28,6 @@ class LoadingSpinner extends Component {
     const el = super.createEl('div', {
       className: 'vjs-loading-spinner',
       dir: 'ltr'
-    }, {
-      role: 'alert'
     });
 
     el.appendChild(controlText);
