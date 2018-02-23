@@ -6,7 +6,7 @@ import log from '../../src/js/utils/log.js';
 import sinon from 'sinon';
 
 const Html5 = videojs.getTech('Html5');
-const wait = 100;
+const wait = 1;
 let qunitFn = 'module';
 
 if (!Html5.canOverrideAttributes()) {
