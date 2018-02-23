@@ -38,24 +38,15 @@ const setupEnv = function(env, testName) {
 
   if ((/audio/i).test(testName)) {
     env.mediaEl = document.createElement('audio');
-    env.testSrc = {
-      src: 'http://vjs.zencdn.net/v/oceans.mp3',
-      type: 'audio/mpeg'
-    };
   } else {
     env.mediaEl = document.createElement('video');
-    env.testSrc = {
-      src: 'http://vjs.zencdn.net/v/oceans.mp4',
-      type: 'video/mp4'
-    };
   }
+  env.testSrc = {
+    src: 'http://vjs.zencdn.net/v/oceans.mp4',
+    type: 'video/mp4'
+  };
   env.sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
   env.sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
-
-  if ((/audio/).test(testName)) {
-    env.sourceOne = {src: 'http://example.com/one.mp3', type: 'audio/mpeg'};
-    env.sourceTwo = {src: 'http://example.com/two.mp3', type: 'audio/mpeg'};
-  }
 
   env.mediaEl.className = 'video-js';
   env.fixture.appendChild(env.mediaEl);
