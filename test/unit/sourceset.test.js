@@ -50,7 +50,7 @@ const setupEnv = function(env, testName) {
 
   env.mediaEl.className = 'video-js';
   env.fixture.appendChild(env.mediaEl);
-}
+};
 
 const setupAfterEach = function(totalSourcesets) {
   return function(assert) {
@@ -72,7 +72,7 @@ const setupAfterEach = function(totalSourcesets) {
       done();
     }, wait);
   };
-}
+};
 
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el'];
 
