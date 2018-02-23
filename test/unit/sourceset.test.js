@@ -35,6 +35,27 @@ const setupEnv = function(env, testName) {
   env.sourcesets = 0;
   env.hook = (player) => player.on('sourceset', () => env.sourcesets++);
   videojs.hook('setup', env.hook);
+
+  if ((/audio/i).test(testName)) {
+    env.mediaEl = document.createElement('audio');
+    env.testSrc = {
+      src: 'http://vjs.zencdn.net/v/oceans.mp3',
+      type: 'audio/mpeg'
+    };
+  } else {
+    env.mediaEl = document.createElement('video');
+    env.testSrc = {
+      src: 'http://vjs.zencdn.net/v/oceans.mp4',
+      type: 'video/mp4'
+    };
+  }
+  env.sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
+  env.sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
+
+  if ((/audio/).test(testName)) {
+    env.sourceOne = {src: 'http://example.com/one.mp3', type: 'audio/mpeg'};
+    env.sourceTwo = {src: 'http://example.com/two.mp3', type: 'audio/mpeg'};
+  }
 }
 
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el'];
@@ -47,26 +68,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
         setupEnv(this, testName);
 
-        if ((/audio/i).test(testName)) {
-          this.mediaEl = document.createElement('audio');
-          this.testSrc = {
-            src: 'http://vjs.zencdn.net/v/oceans.mp3',
-            type: 'audio/mpeg'
-          };
-        } else {
-          this.mediaEl = document.createElement('video');
-          this.testSrc = {
-            src: 'http://vjs.zencdn.net/v/oceans.mp4',
-            type: 'video/mp4'
-          };
-        }
-        this.sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
-        this.sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
-
-        if ((/audio/).test(testName)) {
-          this.sourceOne = {src: 'http://example.com/one.mp3', type: 'audio/mpeg'};
-          this.sourceTwo = {src: 'http://example.com/two.mp3', type: 'audio/mpeg'};
-        }
 
         this.mediaEl.className = 'video-js';
         this.fixture.appendChild(this.mediaEl);
@@ -273,28 +274,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         const done = assert.async();
 
         setupEnv(this, testName);
-
-        if ((/audio/i).test(testName)) {
-          this.mediaEl = document.createElement('audio');
-          this.testSrc = {
-            src: 'http://vjs.zencdn.net/v/oceans.mp3',
-            type: 'audio/mpeg'
-          };
-        } else {
-          this.mediaEl = document.createElement('video');
-          this.testSrc = {
-            src: 'http://vjs.zencdn.net/v/oceans.mp4',
-            type: 'video/mp4'
-          };
-        }
-
-        this.sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
-        this.sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
-
-        if ((/audio/).test(testName)) {
-          this.sourceOne = {src: 'http://example.com/one.mp3', type: 'audio/mpeg'};
-          this.sourceTwo = {src: 'http://example.com/two.mp3', type: 'audio/mpeg'};
-        }
 
         this.mediaEl.className = 'video-js';
         this.mediaEl.src = this.testSrc.src;
