@@ -26,13 +26,15 @@ const validateSource = function(assert, player, sources, checkMediaElSource = tr
 };
 
 const setupEnv = function(env, testName) {
+  env.fixture = document.getElementById('qunit-fixture');
+
   if (testName === 'change video el' || testName === 'change audio el') {
     Html5.prototype.movingMediaElementInDOM = false;
   }
 
+  env.sourcesets = 0;
   env.hook = (player) => player.on('sourceset', () => env.sourcesets++);
   videojs.hook('setup', env.hook);
-
 }
 
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el'];
@@ -44,9 +46,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         sinon.stub(log, 'error');
 
         setupEnv(this, testName);
-
-        this.sourcesets = 0;
-        this.fixture = document.getElementById('qunit-fixture');
 
         if ((/audio/i).test(testName)) {
           this.mediaEl = document.createElement('audio');
@@ -274,9 +273,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         const done = assert.async();
 
         setupEnv(this, testName);
-
-        this.sourcesets = 0;
-        this.fixture = document.getElementById('qunit-fixture');
 
         if ((/audio/i).test(testName)) {
           this.mediaEl = document.createElement('audio');
