@@ -56,6 +56,9 @@ const setupEnv = function(env, testName) {
     env.sourceOne = {src: 'http://example.com/one.mp3', type: 'audio/mpeg'};
     env.sourceTwo = {src: 'http://example.com/two.mp3', type: 'audio/mpeg'};
   }
+
+  env.mediaEl.className = 'video-js';
+  env.fixture.appendChild(env.mediaEl);
 }
 
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el'];
@@ -67,10 +70,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         sinon.stub(log, 'error');
 
         setupEnv(this, testName);
-
-
-        this.mediaEl.className = 'video-js';
-        this.fixture.appendChild(this.mediaEl);
       },
       afterEach(assert) {
         const done = assert.async();
@@ -275,10 +274,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
         setupEnv(this, testName);
 
-        this.mediaEl.className = 'video-js';
         this.mediaEl.src = this.testSrc.src;
-        this.fixture.appendChild(this.mediaEl);
-
         this.player = videojs(this.mediaEl);
 
         this.player.ready(() => {
