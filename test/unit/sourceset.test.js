@@ -52,6 +52,28 @@ const setupEnv = function(env, testName) {
   env.fixture.appendChild(env.mediaEl);
 }
 
+const setupAfterEach = function(totalSourcesets) {
+  return function(assert) {
+    const done = assert.async();
+
+    if (typeof this.totalSourcesets === 'undefined') {
+      this.totalSourcesets = totalSourcesets;
+    }
+
+    window.setTimeout(() => {
+      assert.equal(this.sourcesets, this.totalSourcesets, 'no additional sourcesets');
+
+      this.player.dispose();
+      assert.equal(this.sourcesets, this.totalSourcesets, 'no source set on dispose');
+
+      videojs.removeHook('setup', this.hook);
+      Html5.prototype.movingMediaElementInDOM = oldMovingMedia;
+      log.error.restore();
+      done();
+    }, wait);
+  };
+}
+
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el'];
 
 QUnit[qunitFn]('sourceset', function(hooks) {
@@ -62,25 +84,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
         setupEnv(this, testName);
       },
-      afterEach(assert) {
-        const done = assert.async();
-
-        if (typeof this.totalSourcesets === 'undefined') {
-          this.totalSourcesets = 1;
-        }
-
-        window.setTimeout(() => {
-          assert.equal(this.sourcesets, this.totalSourcesets, 'no additional sourcesets');
-
-          this.player.dispose();
-          assert.equal(this.sourcesets, this.totalSourcesets, 'no source set on dispose');
-
-          videojs.removeHook('setup', this.hook);
-          Html5.prototype.movingMediaElementInDOM = oldMovingMedia;
-          log.error.restore();
-          done();
-        }, wait);
-      }
+      afterEach: setupAfterEach(1)
     });
 
     QUnit.test('data-setup one source', function(assert) {
@@ -278,24 +282,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
           done();
         });
       },
-      afterEach(assert) {
-        const done = assert.async();
-
-        if (typeof this.totalSourcesets === 'undefined') {
-          this.totalSourcesets = 3;
-        }
-        window.setTimeout(() => {
-          assert.equal(this.sourcesets, this.totalSourcesets, 'no additional sourcesets');
-
-          this.player.dispose();
-          assert.equal(this.sourcesets, this.totalSourcesets, 'no source set on dispose');
-
-          videojs.removeHook('setup', this.hook);
-          Html5.prototype.movingMediaElementInDOM = oldMovingMedia;
-          log.error.restore();
-          done();
-        }, wait);
-      }
+      afterEach: setupAfterEach(3)
     });
 
     QUnit.test('player.src({...})', function(assert) {
