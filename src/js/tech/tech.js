@@ -156,9 +156,8 @@ class Tech extends Component {
   }
 
   /**
-   * A special function to trigger source set in a way that
-   * will allow player to re-trigger if player/html5 are not ready
-   * yet.
+   * A special function to trigger source set in a way that will allow player
+   * to re-trigger if the player or tech are not ready yet.
    *
    * @fires Tech#sourceset
    */
@@ -1016,6 +1015,10 @@ Tech.prototype.featuresProgressEvents = false;
 
 /**
  * Boolean indicating wether the `Tech` supports the `sourceset` event.
+ *
+ * A tech should set this to `true` and then use {@link Tech#triggerSourceset}
+ * to trigger a {@link Tech#event:sourceset} at the earliest time after getting
+ * a new source.
  *
  * @type {boolean}
  * @default
