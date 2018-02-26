@@ -266,7 +266,7 @@ class TextTrackDisplay extends Component {
    *        Text track object to be added to the list.
    */
   updateForTrack(track) {
-    if (typeof window.WebVTT !== 'function' || !track.activeCues) {
+    if (typeof window.WebVTT !== 'function' || !track.activeCues || this.player_.textTrackSettings === false) {
       return;
     }
 
