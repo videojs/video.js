@@ -266,11 +266,10 @@ class TextTrackDisplay extends Component {
    *        Text track object to be added to the list.
    */
   updateForTrack(track) {
-    if (typeof window.WebVTT !== 'function' || !track.activeCues || this.player_.textTrackSettings === false) {
+    if (typeof window.WebVTT !== 'function' || !track.activeCues) {
       return;
     }
 
-    const overrides = this.player_.textTrackSettings.getValues();
     const cues = [];
 
     for (let i = 0; i < track.activeCues.length; i++) {
@@ -278,7 +277,12 @@ class TextTrackDisplay extends Component {
     }
 
     window.WebVTT.processCues(window, cues, this.el_);
-
+	
+	if(this.player_.textTrackSettings === false)
+		return;
+	
+    const overrides = this.player_.textTrackSettings.getValues();
+	
     let i = cues.length;
 
     while (i--) {
