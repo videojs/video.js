@@ -278,9 +278,8 @@ class TextTrackDisplay extends Component {
 
     window.WebVTT.processCues(window, cues, this.el_);
 
-    if (this.player_.textTrackSettings === false)
-    {
-        return;
+    if (this.player_.textTrackSettings === false) {
+      return;
     }
 
     const overrides = this.player_.textTrackSettings.getValues();
