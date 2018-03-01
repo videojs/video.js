@@ -1,9 +1,22 @@
 /**
  * @file format-time.js
- * @module Format-time
+ * @module format-time
  */
 
-let implementation = function(seconds, guide) {
+ /**
+ * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in seconds)
+ * will force a number of leading zeros to cover the length of the guide.
+ *
+ * @param {number} seconds
+ *        Number of seconds to be turned into a string
+ *
+ * @param {number} guide
+ *        Number (in seconds) to model the string after
+ *
+ * @return {string}
+ *         Time formatted as H:MM:SS or M:SS
+ */
+const defaultImplementation = function(seconds, guide) {
   seconds = seconds < 0 ? 0 : seconds;
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);
@@ -31,6 +44,8 @@ let implementation = function(seconds, guide) {
   return h + m + s;
 };
 
+let implementation = defaultImplementation;
+
 /**
  * Replaces the default formatTime implementation with a custom implementation.
  *
@@ -43,18 +58,12 @@ export function setFormatTime(customImplementation) {
 }
 
 /**
- * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in seconds)
- * will force a number of leading zeros to cover the length of the guide.
- *
- * @param {number} seconds
- *        Number of seconds to be turned into a string
- *
- * @param {number} guide
- *        Number (in seconds) to model the string after
- *
- * @return {string}
- *         Time formatted as H:MM:SS or M:SS
+ * Resets formatTime to the default implementation.
  */
+export function resetFormatTime() {
+  implementation = defaultImplementation;
+}
+
 export default function(seconds, guide = seconds) {
   return implementation(seconds, guide);
 }
