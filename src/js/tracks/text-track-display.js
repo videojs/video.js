@@ -278,7 +278,7 @@ class TextTrackDisplay extends Component {
 
     window.WebVTT.processCues(window, cues, this.el_);
 
-    if (this.player_.textTrackSettings === false) {
+    if (!this.player_.textTrackSettings) {
       return;
     }
 
