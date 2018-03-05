@@ -136,7 +136,7 @@ class Html5 extends Tech {
     // if we find that the media element had a src when it was
     // given to us and that tech element is not in a stalled state
     if (el.src || el.currentSrc && this.el().initNetworkState_ !== 3) {
-      this.triggerSourceset(e.src || el.currentSrc);
+      this.triggerSourceset(el.src || el.currentSrc);
     }
 
     const proto = window.HTMLMediaElement.prototype;
