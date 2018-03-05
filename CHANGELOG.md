@@ -1,3 +1,17 @@
+<a name="6.7.4"></a>
+## [6.7.4](https://github.com/videojs/video.js/compare/v6.7.3...v6.7.4) (2018-03-05)
+
+### Bug Fixes
+
+* Fix an issue where disabling the progress control would throw an error. ([#4986](https://github.com/videojs/video.js/issues/4986)) ([5b5cc50](https://github.com/videojs/video.js/commit/5b5cc50))
+* **events:** triggering with an object had incorrect target property on event object ([#4993](https://github.com/videojs/video.js/issues/4993)) ([9c4ded8](https://github.com/videojs/video.js/commit/9c4ded8))
+* **package:** update videojs-vtt.js to version 0.12.6 ([#4954](https://github.com/videojs/video.js/issues/4954)) ([2d64977](https://github.com/videojs/video.js/commit/2d64977))
+* **text-tracks:** keep showing captions even if the text track settings were disabled ([#4974](https://github.com/videojs/video.js/issues/4974)) ([7facc44](https://github.com/videojs/video.js/commit/7facc44)), closes [#4964](https://github.com/videojs/video.js/issues/4964)
+
+### Chores
+
+* **package:** update grunt-accessibility to version 6.0.0 🚀 ([#4968](https://github.com/videojs/video.js/issues/4968)) ([270a231](https://github.com/videojs/video.js/commit/270a231))
+
 <a name="6.7.3"></a>
 ## [6.7.3](https://github.com/videojs/video.js/compare/v6.7.2...v6.7.3) (2018-02-22)
 
