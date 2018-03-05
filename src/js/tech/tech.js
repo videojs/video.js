@@ -161,11 +161,11 @@ class Tech extends Component {
    *
    * @fires Tech#sourceset
    */
-  triggerSourceset() {
+  triggerSourceset(src) {
     if (!this.isReady_) {
       // on initial ready we have to trigger source set
       // 1ms after ready so that player can watch for it.
-      this.one('ready', () => this.setTimeout(this.triggerSourceset, 1));
+      this.one('ready', () => this.setTimeout(() => this.triggerSourceset(src), 1));
     }
 
     /**
@@ -176,7 +176,10 @@ class Tech extends Component {
      * @event Tech#sourceset
      * @type {EventTarget~Event}
      */
-    this.trigger('sourceset');
+    this.trigger({
+      src,
+      type: 'sourceset',
+    });
   }
 
   /* Fallbacks for unsupported event types

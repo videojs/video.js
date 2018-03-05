@@ -136,7 +136,7 @@ class Html5 extends Tech {
     // if we find that the media element had a src when it was
     // given to us and that tech element is not in a stalled state
     if (el.src || el.currentSrc && this.el().initNetworkState_ !== 3) {
-      this.triggerSourceset();
+      this.triggerSourceset(e.src || el.currentSrc);
     }
 
     const proto = window.HTMLMediaElement.prototype;
@@ -170,7 +170,7 @@ class Html5 extends Tech {
       set: (v) => {
         const retval = srcDescriptor.set.call(el, v);
 
-        this.triggerSourceset();
+        this.triggerSourceset(v);
 
         return retval;
       },
@@ -184,7 +184,7 @@ class Html5 extends Tech {
       const retval = oldSetAttribute.call(el, n, v);
 
       if (n === 'src') {
-        this.triggerSourceset();
+        this.triggerSourceset(v);
       }
 
       return retval;
@@ -195,7 +195,7 @@ class Html5 extends Tech {
     el.load = () => {
       const retval = oldLoad.call(el);
 
-      this.triggerSourceset();
+      this.triggerSourceset(el.src || el.currentSrc);
 
       return retval;
     };

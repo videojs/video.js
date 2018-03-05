@@ -91,6 +91,10 @@ const TECH_EVENTS_RETRIGGER = [
    * It will fire for the initial source and each subsequent source.
    * This event is a custom event from Video.js and is triggered by the {@link Tech}.
    *
+   * The event object for this event contains a `src` property that will contain the source
+   * that was available when the event was triggered. This is generally only necessary if Video.js
+   * is switching techs while the source was being changed.
+   *
    * It is also fired when `load` is called on the player (or media element)
    * because the {@link https://html.spec.whatwg.org/multipage/media.html#dom-media-load|specification for `load`}
    * says that the resource selection algorithm
@@ -3573,8 +3577,8 @@ if (!browser.IS_IE8) {
 });
 
 TECH_EVENTS_RETRIGGER.forEach(function(event) {
-  Player.prototype[`handleTech${toTitleCase(event)}_`] = function() {
-    return this.trigger(event);
+  Player.prototype[`handleTech${toTitleCase(event)}_`] = function(evt) {
+    return this.trigger(evt);
   };
 });
 
