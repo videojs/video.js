@@ -23,6 +23,7 @@
 * [Q: Can I turn off Video.js logging?](#q-can-i-turn-off-videojs-logging)
 * [Q: What is a plugin?](#q-what-is-a-plugin)
 * [Q: How do I make a plugin for Video.js?](#q-how-do-i-make-a-plugin-for-videojs)
+* [Q: How do I add a button to Video.js?](#q-how-do-i-add-a-button-to-videojs)
 * [Q: Where can I find a list of Video.js plugins?](#q-where-can-i-find-a-list-of-videojs-plugins)
 * [Q: How can I get my plugin listed on the website?](#q-how-can-i-get-my-plugin-listed-on-the-website)
 * [Q: Where can I find a list of Video.js skins?](#q-where-can-i-find-a-list-of-videojs-skins)
@@ -263,11 +264,11 @@ Like HLS, DASH streams require [CORS headers][cors].
 Yes! Common formats for live are HLS or historically RTMP.
 HLS is supported via [videojs-contrib-hls][hls]. and RTMP via [videojs-flash][flash].
 
-## Q: Can Video.js play YouTube videos?
+## Q: Can Video.js wrap around YouTube videos?
 
 There is an official plugin that adds support, [videojs-youtube][youtube].
 
-## Q: Can Video.js play Vimeo videos?
+## Q: Can Video.js wrap around Vimeo videos?
 
 There is an official plugin that adds support, [videojs-vimeo][vimeo].
 
