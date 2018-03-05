@@ -270,7 +270,6 @@ class TextTrackDisplay extends Component {
       return;
     }
 
-    const overrides = this.player_.textTrackSettings.getValues();
     const cues = [];
 
     for (let i = 0; i < track.activeCues.length; i++) {
@@ -278,6 +277,12 @@ class TextTrackDisplay extends Component {
     }
 
     window.WebVTT.processCues(window, cues, this.el_);
+
+    if (!this.player_.textTrackSettings) {
+      return;
+    }
+
+    const overrides = this.player_.textTrackSettings.getValues();
 
     let i = cues.length;
 
