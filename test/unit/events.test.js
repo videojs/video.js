@@ -284,3 +284,12 @@ QUnit.test('should execute remaining handlers after an exception in an event han
 
   log.error = oldLogError;
 });
+
+QUnit.test('trigger with an object should set the correct target property', function(assert) {
+  const el = document.createElement('div');
+
+  Events.on(el, 'click', function(e) {
+    assert.equal(e.target, el, 'the event object target should be our element');
+  });
+  Events.trigger(el, { type: 'click'});
+});
