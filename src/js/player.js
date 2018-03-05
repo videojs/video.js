@@ -1202,7 +1202,11 @@ class Player extends Component {
    * @listens Tech#sourceset
    * @private
    */
-  handleTechSourceset_() {
+  handleTechSourceset_(event) {
+    this.trigger({
+      src: event.src,
+      type: 'sourceset'
+    });
   }
 
   /**
