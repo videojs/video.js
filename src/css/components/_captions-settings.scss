@@ -49,18 +49,6 @@
   .vjs-text-track-settings fieldset span.vjs-opacity {
     margin-left: unset;
   }
-  .video-js {
-    @media (max-width: 365px) {
-      .vjs-modal-dialog .vjs-modal-dialog-content {
-        font-size: 1em;
-        line-height: 1em;
-        padding: 5px 5px;
-      }
-      .vjs-text-track-settings legend {
-        margin: unset;
-      }
-    }
-  }
 }
 
 // Form elements
@@ -77,7 +65,7 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
-  margin: 0 0 5px;
+  margin: 0 0 5px 0;
 }
 
 // Hide labels, so they are only for screen reader users
@@ -86,7 +74,7 @@
   clip: rect(1px 1px 1px 1px); // for Internet Explorer
   clip: rect(1px, 1px, 1px, 1px);
   display: block;
-  margin: 0 0 5px;
+  margin: 0 0 5px 0;
   padding: 0;
   border: 0;
   height: 1px;
@@ -94,21 +82,21 @@
   overflow: hidden;
 }
 
-.vjs-track-settings-controls button:active,
-.vjs-track-settings-controls button:focus {
+.vjs-track-settings-controls button:focus,
+.vjs-track-settings-controls button:active {
   outline-style: solid;
   outline-width: medium;
   background-image: linear-gradient(0deg, $primary-foreground-color 88%, $secondary-background-color 100%);
 }
 
 .vjs-track-settings-controls button:hover {
-  color: rgba(#2b333f, 0.75);
+  color: rgba(#2B333f, 0.75);
 }
 
 .vjs-track-settings-controls button {
   background-color: $primary-foreground-color;
   background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
-  color: #2b333f;
+  color: #2B333f;
   cursor: pointer;
   border-radius: 2px;
 }
