@@ -3584,8 +3584,8 @@ if (!browser.IS_IE8) {
 });
 
 TECH_EVENTS_RETRIGGER.forEach(function(event) {
-  Player.prototype[`handleTech${toTitleCase(event)}_`] = function(evt) {
-    return this.trigger(evt);
+  Player.prototype[`handleTech${toTitleCase(event)}_`] = function() {
+    return this.trigger(event);
   };
 });
 
