@@ -34,7 +34,7 @@ class Html5 extends Tech {
   constructor(options, ready) {
     super(options, ready);
 
-    this.watchForSourceSet_();
+    this.setupSourcesetHandling_();
 
     const source = options.source;
     let crossoriginTracks = false;
@@ -125,7 +125,7 @@ class Html5 extends Tech {
    * Modify the media element so that we can detect when
    * the source is changed. Fires `sourceset` just after the source has changed
    */
-  watchForSourceSet_() {
+  setupSourcesetHandling_() {
     if (!this.featuresSourceset) {
       return;
     }
