@@ -515,8 +515,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       // the first sourceset comes from our FakeFlash because it extends Html5 tech
       // which calls load() on dispose for various reasons
       player.one('sourceset', function(e1) {
-        assert.equal(e1.src, flashSrc.src, 'the first sourceset is for disposing the original tech');
-        sourcesets++;
+        // ignore the first sourceset that gets called when disposing the original tech
 
         // the second sourceset ends up being the second source because when the first source is set
         // the tech isn't ready so we delay it, then the second source comes and the tech is ready
@@ -531,7 +530,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
             assert.equal(e3.src, sourceOne.src, 'the third sourceset is the first source');
             sourcesets++;
 
-            assert.equal(sourcesets, 3, 'two sourcesets');
+            assert.equal(sourcesets, 2, 'two sourcesets');
             player.dispose();
             delete Tech.techs_.FakeFlash;
             done();
