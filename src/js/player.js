@@ -1174,7 +1174,6 @@ class Player extends Component {
     }
   }
 
-
   /**
    * Fired when the source is set or changed on the {@link Tech}
    * causing the media element to reload.

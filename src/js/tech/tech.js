@@ -178,7 +178,7 @@ class Tech extends Component {
      */
     this.trigger({
       src,
-      type: 'sourceset',
+      type: 'sourceset'
     });
   }
 

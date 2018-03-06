@@ -490,6 +490,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       type: 'video/flv'
     };
     let sourcesets = 0;
+
     class FakeFlash extends Html5 {
       static canPlayType(type) {
         return type === 'video/flv' ? 'maybe' : '';
@@ -513,21 +514,21 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     player.ready(function() {
       // the first sourceset comes from our FakeFlash because it extends Html5 tech
       // which calls load() on dispose for various reasons
-      player.one('sourceset', function(e) {
-        assert.equal(e.src, flashSrc.src, 'the first sourceset is for disposing the original tech');
+      player.one('sourceset', function(e1) {
+        assert.equal(e1.src, flashSrc.src, 'the first sourceset is for disposing the original tech');
         sourcesets++;
 
         // the second sourceset ends up being the second source because when the first source is set
         // the tech isn't ready so we delay it, then the second source comes and the tech is ready
         // so it ends up being triggered immediately.
-        player.one('sourceset', function(e) {
-          assert.equal(e.src, sourceTwo.src, 'the second sourceset ends up being the second source');
+        player.one('sourceset', function(e2) {
+          assert.equal(e2.src, sourceTwo.src, 'the second sourceset ends up being the second source');
           sourcesets++;
 
           // now that the tech is ready, we will re-trigger the original sourceset event
           // and get the first source
-          player.one('sourceset', function(e) {
-            assert.equal(e.src, sourceOne.src, 'the third sourceset is the first source');
+          player.one('sourceset', function(e3) {
+            assert.equal(e3.src, sourceOne.src, 'the third sourceset is the first source');
             sourcesets++;
 
             assert.equal(sourcesets, 3, 'two sourcesets');
