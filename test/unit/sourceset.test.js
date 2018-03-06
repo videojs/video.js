@@ -492,6 +492,10 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     let sourcesets = 0;
 
     class FakeFlash extends Html5 {
+      static isSupported() {
+        return true;
+      }
+
       static canPlayType(type) {
         return type === 'video/flv' ? 'maybe' : '';
       }
