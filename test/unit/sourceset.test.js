@@ -8,6 +8,12 @@ import sinon from 'sinon';
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
 let qunitFn = 'module';
+const testSrc = {
+  src: 'http://vjs.zencdn.net/v/oceans.mp4',
+  type: 'video/mp4'
+};
+const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
+const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
 
 if (!Html5.canOverrideAttributes()) {
   qunitFn = 'skip';
@@ -41,12 +47,9 @@ const setupEnv = function(env, testName) {
   } else {
     env.mediaEl = document.createElement('video');
   }
-  env.testSrc = {
-    src: 'http://vjs.zencdn.net/v/oceans.mp4',
-    type: 'video/mp4'
-  };
-  env.sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
-  env.sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
+  env.testSrc = testSrc;
+  env.sourceOne = sourceOne;
+  env.sourceTwo = sourceTwo;
 
   env.mediaEl.className = 'video-js';
   env.fixture.appendChild(env.mediaEl);
@@ -476,4 +479,57 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       }, wait);
     });
   }));
+
+  QUnit.test('sourceset event object has a src property', function(assert) {
+    const done = assert.async();
+    const fixture = document.querySelector('#qunit-fixture');
+    const vid = document.createElement('video');
+    const Tech = videojs.getTech('Tech');
+    let sourcesets = 0;
+    class FakeFlash extends Html5 {
+      static canPlayType(type) {
+        return type === 'video/flv' ? 'maybe' : '';
+      }
+
+      static canPlaySource(srcObj) {
+        return srcObj.type === 'video/flv';
+      }
+    }
+
+    videojs.registerTech('FakeFlash', FakeFlash);
+
+    fixture.appendChild(vid);
+
+    const player = videojs(vid, {
+      techOrder: ['fakeFlash', 'html5']
+    });
+
+    player.src({
+      src: 'http://example.com/oceans.flv',
+      type: 'video/flv'
+    });
+
+    player.ready(function() {
+      player.one('sourceset', function(e) {
+        assert.equal(e.src, sourceOne.src, 'the first source matches');
+        sourcesets++;
+
+        player.one('sourceset', function(e) {
+          assert.equal(e.src, sourceTwo.src, 'the second source matches');
+          sourcesets++;
+        });
+      });
+
+      player.src(sourceOne);
+      player.src(sourceTwo);
+
+      player.setTimeout(() => {
+        assert.equal(sourcesets, 2, 'two sourcesets');
+        player.dispose();
+        delete Tech.techs_.FakeFlash;
+        done();
+      }, wait);
+    });
+
+  });
 });
