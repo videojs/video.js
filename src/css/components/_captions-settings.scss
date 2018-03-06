@@ -2,7 +2,7 @@
   background-color: $primary-background-color;
   background-color: rgba($primary-background-color, 0.75);
   color: $primary-foreground-color;
-  height: 70%;
+  height: 100%;
 }
 
 // Layout divs
@@ -21,6 +21,48 @@
   vertical-align: bottom;
 }
 
+// code that will only run if CSS Grid is supported by the browser
+@supports (display: grid) {
+  .vjs-text-track-settings .vjs-modal-dialog-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr auto;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-colors {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-font {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-controls {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: unset;
+    vertical-align: unset;
+  }
+  .vjs-text-track-settings fieldset span.vjs-opacity {
+    margin-left: unset;
+  }
+  .video-js {
+    @media (max-width: 365px) {
+      .vjs-modal-dialog .vjs-modal-dialog-content {
+        font-size: 1em;
+        line-height: 1em;
+        padding: 5px 5px;
+      }
+      .vjs-text-track-settings legend {
+        margin: unset;
+      }
+    }
+  }
+}
+
 // Form elements
 .vjs-text-track-settings fieldset {
   margin: 5px;
@@ -35,7 +77,7 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
 }
 
 // Hide labels, so they are only for screen reader users
@@ -44,7 +86,7 @@
   clip: rect(1px 1px 1px 1px); // for Internet Explorer
   clip: rect(1px, 1px, 1px, 1px);
   display: block;
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   padding: 0;
   border: 0;
   height: 1px;
@@ -52,21 +94,21 @@
   overflow: hidden;
 }
 
-.vjs-track-settings-controls button:focus,
-.vjs-track-settings-controls button:active {
+.vjs-track-settings-controls button:active,
+.vjs-track-settings-controls button:focus {
   outline-style: solid;
   outline-width: medium;
   background-image: linear-gradient(0deg, $primary-foreground-color 88%, $secondary-background-color 100%);
 }
 
 .vjs-track-settings-controls button:hover {
-  color: rgba(#2B333F, 0.75);
+  color: rgba(#2b333f, 0.75);
 }
 
 .vjs-track-settings-controls button {
   background-color: $primary-foreground-color;
   background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
-  color: #2B333F;
+  color: #2b333f;
   cursor: pointer;
   border-radius: 2px;
 }
