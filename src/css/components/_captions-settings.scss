@@ -90,13 +90,13 @@
 }
 
 .vjs-track-settings-controls button:hover {
-  color: rgba(#2B333f, 0.75);
+  color: rgba(#2B333F, 0.75);
 }
 
 .vjs-track-settings-controls button {
   background-color: $primary-foreground-color;
   background-image: linear-gradient(-180deg, $primary-foreground-color 88%, $secondary-background-color 100%);
-  color: #2B333f;
+  color: #2B333F;
   cursor: pointer;
   border-radius: 2px;
 }
