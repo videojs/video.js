@@ -160,6 +160,7 @@ class Tech extends Component {
    * to re-trigger if the player or tech are not ready yet.
    *
    * @fires Tech#sourceset
+   * @param {string} src The source string at the time of the source changing.
    */
   triggerSourceset(src) {
     if (!this.isReady_) {
