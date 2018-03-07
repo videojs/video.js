@@ -2,6 +2,8 @@
  * @module filter-source
  */
 import {isObject} from './obj';
+import {MimetypesKind} from './mimetypes';
+import * as Url from '../utils/url.js';
 
 /**
  * Filter out single bad source objects or multiple source objects in an
@@ -34,10 +36,10 @@ const filterSource = function(src) {
     src = newsrc;
   } else if (typeof src === 'string' && src.trim()) {
     // convert string into object
-    src = [{src}];
+    src = [checkMimetype({src})];
   } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
     // src is already valid
-    src = [src];
+    src = [checkMimetype(src)];
   } else {
     // invalid source, turn it into an empty array
     src = [];
@@ -45,5 +47,24 @@ const filterSource = function(src) {
 
   return src;
 };
+
+/**
+ * Checks src mimetype, adding it when possible
+ *
+ * @param {Tech~SourceObject} src
+ *        The src object to check
+ * @return {Tech~SourceObject}
+ *        src Object with known type
+ */
+function checkMimetype(src) {
+  const ext = Url.getFileExtension(src.src);
+  const mimetype = MimetypesKind[ext.toLowerCase()];
+
+  if (!src.type && mimetype) {
+    src.type = mimetype;
+  }
+
+  return src;
+}
 
 export default filterSource;
