@@ -45,17 +45,13 @@
     grid-row: 2;
 
   }
-
-  .vjs-text-track-settings fieldset span.vjs-opacity {
-    margin-left: unset;
-  }
-
-  .vjs-track-setting > select {
-    margin-right: 5px;
-  }
 }
 
 // Form elements
+.vjs-track-setting > select {
+  margin-right: 5px;
+}
+
 .vjs-text-track-settings fieldset {
   margin: 5px;
   padding: 3px;
@@ -64,7 +60,7 @@
 
 .vjs-text-track-settings fieldset span {
   display: inline-block;
-  margin-left: 5px;
+  margin-left: 0px;
 }
 
 .vjs-text-track-settings legend {
