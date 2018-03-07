@@ -13,7 +13,7 @@ Nothing. This issue is meant to welcome you to Open Source :) We are happy to wa
 
 - [ ] 🙋 **Claim this issue**: Comment below.
 
- Once claimed, we'll add a 'claimed' label to the issue so others will know not to work on it.
+ Once claimed, we'll remove the 'unclaimed' label from the issue so others will know not to work on it.
 
 - [ ] 📝 **Update** the file [$FILENAME]($BRANCH_URL) in the `$REPO` repository (press the little pen Icon) and edit the line as shown below.
 
