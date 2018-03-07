@@ -105,6 +105,11 @@ class vjsEpisodeList extends vjsComponent {
     player.ready(() => {
       this.mount();
     });
+    
+    /* Remove React root when component is destroyed */
+    this.on("dispose", () => {
+      ReactDOM.unmountComponentAtNode(this.el())
+    });
   }
 
   /**
