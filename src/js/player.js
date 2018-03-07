@@ -317,6 +317,9 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+    // Tracks when a tech changes the poster
+    this.isPosterFromTech_ = false;
+
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
@@ -513,6 +516,8 @@ class Player extends Component {
 
     if (this.tech_) {
       this.tech_.dispose();
+      this.isPosterFromTech_ = false;
+      this.poster_ = '';
     }
 
     if (this.playerElIngest_) {
@@ -924,7 +929,8 @@ class Player extends Component {
       'poster': this.poster(),
       'language': this.language(),
       'playerElIngest': this.playerElIngest_ || false,
-      'vtt.js': this.options_['vtt.js']
+      'vtt.js': this.options_['vtt.js'],
+      'canOverridePoster': !!this.options_.techCanOverridePoster
     };
 
     TRACK_TYPES.names.forEach((name) => {
@@ -1020,6 +1026,13 @@ class Player extends Component {
     this.tech_.dispose();
 
     this.tech_ = false;
+
+    if (this.isPosterFromTech_) {
+      this.poster_ = '';
+      this.trigger('posterchange');
+    }
+
+    this.isPosterFromTech_ = false;
   }
 
   /**
@@ -2692,11 +2705,17 @@ class Player extends Component {
       src = '';
     }
 
+    if (src === this.poster_) {
+      return;
+    }
+
     // update the internal poster variable
     this.poster_ = src;
 
     // update the tech's poster
     this.techCall_('setPoster', src);
+
+    this.isPosterFromTech_ = false;
 
     // alert components that the poster has been set
     /**
@@ -2721,11 +2740,16 @@ class Player extends Component {
    * @private
    */
   handleTechPosterChange_() {
-    if (!this.poster_ && this.tech_ && this.tech_.poster) {
-      this.poster_ = this.tech_.poster() || '';
+    if ((!this.poster_ || this.options_.techCanOverridePoster) && this.tech_ && this.tech_.poster) {
+      const newPoster = this.tech_.poster() || '';
 
-      // Let components know the poster has changed
-      this.trigger('posterchange');
+      if (newPoster !== this.poster_) {
+        this.poster_ = newPoster;
+        this.isPosterFromTech_ = true;
+
+        // Let components know the poster has changed
+        this.trigger('posterchange');
+      }
     }
   }
 
