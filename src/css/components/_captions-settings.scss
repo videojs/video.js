@@ -43,11 +43,15 @@
   .vjs-text-track-settings .vjs-track-settings-controls {
     grid-column: 2;
     grid-row: 2;
-    text-align: unset;
-    vertical-align: unset;
+
   }
+
   .vjs-text-track-settings fieldset span.vjs-opacity {
     margin-left: unset;
+  }
+
+  .vjs-track-setting > select {
+    margin-right: 5px;
   }
 }
 
