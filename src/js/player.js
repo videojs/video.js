@@ -964,6 +964,7 @@ class Player extends Component {
       this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
     });
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
+    this.on(this.tech_, 'sourceset', this.handleTechSourceset_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
     this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
     this.on(this.tech_, 'canplaythrough', this.handleTechCanPlayThrough_);
@@ -1171,6 +1172,40 @@ class Player extends Component {
       this.hasStarted(false);
       this.trigger('loadstart');
     }
+  }
+
+  /**
+   * Fired when the source is set or changed on the {@link Tech}
+   * causing the media element to reload.
+   *
+   * It will fire for the initial source and each subsequent source.
+   * This event is a custom event from Video.js and is triggered by the {@link Tech}.
+   *
+   * The event object for this event contains a `src` property that will contain the source
+   * that was available when the event was triggered. This is generally only necessary if Video.js
+   * is switching techs while the source was being changed.
+   *
+   * It is also fired when `load` is called on the player (or media element)
+   * because the {@link https://html.spec.whatwg.org/multipage/media.html#dom-media-load|specification for `load`}
+   * says that the resource selection algorithm
+   * needs to be aborted and restarted.
+   *
+   * @event Player#sourceset
+   * @type {EventTarget~Event}
+   * @prop {string} src The source url available when the `sourceset` was triggered
+   */
+  /**
+   * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
+   *
+   * @fires Player#sourceset
+   * @listens Tech#sourceset
+   * @private
+   */
+  handleTechSourceset_(event) {
+    this.trigger({
+      src: event.src,
+      type: 'sourceset'
+    });
   }
 
   /**

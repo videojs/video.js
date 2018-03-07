@@ -34,6 +34,8 @@ class Html5 extends Tech {
   constructor(options, ready) {
     super(options, ready);
 
+    this.setupSourcesetHandling_();
+
     const source = options.source;
     let crossoriginTracks = false;
 
@@ -117,6 +119,86 @@ class Html5 extends Tech {
 
     // tech will handle clearing of the emulated track list
     super.dispose();
+  }
+
+  /**
+   * Modify the media element so that we can detect when
+   * the source is changed. Fires `sourceset` just after the source has changed
+   */
+  setupSourcesetHandling_() {
+    if (!this.featuresSourceset) {
+      return;
+    }
+
+    const el = this.el();
+
+    // we need to fire sourceset when the player is ready
+    // if we find that the media element had a src when it was
+    // given to us and that tech element is not in a stalled state
+    if (el.src || el.currentSrc && this.el().initNetworkState_ !== 3) {
+      this.triggerSourceset(el.src || el.currentSrc);
+    }
+
+    const proto = window.HTMLMediaElement.prototype;
+    let srcDescriptor = {};
+
+    // preserve getters/setters already on `el.src` if they exist
+    if (Object.getOwnPropertyDescriptor(el, 'src')) {
+      srcDescriptor = Object.getOwnPropertyDescriptor(el, 'src');
+    } else if (Object.getOwnPropertyDescriptor(proto, 'src')) {
+      srcDescriptor = mergeOptions(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
+    }
+
+    if (!srcDescriptor.get) {
+      srcDescriptor.get = function() {
+        return proto.getAttribute.call(this, 'src');
+      };
+    }
+
+    if (!srcDescriptor.set) {
+      srcDescriptor.set = function(v) {
+        return proto.setAttribute.call(this, 'src', v);
+      };
+    }
+
+    if (typeof srcDescriptor.enumerable === 'undefined') {
+      srcDescriptor.enumerable = true;
+    }
+
+    Object.defineProperty(el, 'src', {
+      get: srcDescriptor.get.bind(el),
+      set: (v) => {
+        const retval = srcDescriptor.set.call(el, v);
+
+        this.triggerSourceset(v);
+
+        return retval;
+      },
+      configurable: true,
+      enumerable: srcDescriptor.enumerable
+    });
+
+    const oldSetAttribute = el.setAttribute;
+
+    el.setAttribute = (n, v) => {
+      const retval = oldSetAttribute.call(el, n, v);
+
+      if (n === 'src') {
+        this.triggerSourceset(v);
+      }
+
+      return retval;
+    };
+
+    const oldLoad = el.load;
+
+    el.load = () => {
+      const retval = oldLoad.call(el);
+
+      this.triggerSourceset(el.src || el.currentSrc);
+
+      return retval;
+    };
   }
 
   /**
@@ -898,6 +980,32 @@ Html5.canControlPlaybackRate = function() {
 };
 
 /**
+ * Check if we can override a video/audio elements attributes, with
+ * Object.defineProperty.
+ *
+ * @return {boolean}
+ *         - True if builtin attributes can be overriden
+ *         - False otherwise
+ */
+Html5.canOverrideAttributes = function() {
+  if (browser.IS_IE8) {
+    return false;
+  }
+  // if we cannot overwrite the src property, there is no support
+  // iOS 7 safari for instance cannot do this.
+  try {
+    const noop = () => {};
+
+    Object.defineProperty(document.createElement('video'), 'src', {get: noop, set: noop});
+    Object.defineProperty(document.createElement('audio'), 'src', {get: noop, set: noop});
+  } catch (e) {
+    return false;
+  }
+
+  return true;
+};
+
+/**
  * Check to see if native `TextTrack`s are supported by this browser/device.
  *
  * @return {boolean}
@@ -980,6 +1088,14 @@ Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
  * @default {@link Html5.canControlPlaybackRate}
  */
 Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
+
+/**
+ * Boolean indicating wether the `Tech` supports the `sourceset` event.
+ *
+ * @type {boolean}
+ * @default
+ */
+Html5.prototype.featuresSourceset = Html5.canOverrideAttributes();
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the media element

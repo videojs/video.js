@@ -155,6 +155,34 @@ class Tech extends Component {
     }
   }
 
+  /**
+   * A special function to trigger source set in a way that will allow player
+   * to re-trigger if the player or tech are not ready yet.
+   *
+   * @fires Tech#sourceset
+   * @param {string} src The source string at the time of the source changing.
+   */
+  triggerSourceset(src) {
+    if (!this.isReady_) {
+      // on initial ready we have to trigger source set
+      // 1ms after ready so that player can watch for it.
+      this.one('ready', () => this.setTimeout(() => this.triggerSourceset(src), 1));
+    }
+
+    /**
+     * Fired when the source is set on the tech causing the media element
+     * to reload.
+     *
+     * @see {@link Player#event:sourceset}
+     * @event Tech#sourceset
+     * @type {EventTarget~Event}
+     */
+    this.trigger({
+      src,
+      type: 'sourceset'
+    });
+  }
+
   /* Fallbacks for unsupported event types
   ================================================================================ */
 
@@ -988,6 +1016,18 @@ Tech.prototype.featuresPlaybackRate = false;
  * @default
  */
 Tech.prototype.featuresProgressEvents = false;
+
+/**
+ * Boolean indicating wether the `Tech` supports the `sourceset` event.
+ *
+ * A tech should set this to `true` and then use {@link Tech#triggerSourceset}
+ * to trigger a {@link Tech#event:sourceset} at the earliest time after getting
+ * a new source.
+ *
+ * @type {boolean}
+ * @default
+ */
+Tech.prototype.featuresSourceset = false;
 
 /**
  * Boolean indicating wether the `Tech` supports the `timeupdate` event. This is currently

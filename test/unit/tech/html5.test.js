@@ -422,9 +422,11 @@ if (Html5.supportsNativeTextTracks()) {
       addEventListener: (type, fn) => events.push([type, fn]),
       removeEventListener: (type, fn) => events.push([type, fn])
     };
-    const el = document.createElement('div');
+    const el = document.createElement('video');
 
-    el.textTracks = tt;
+    Object.defineProperty(el, 'textTracks', {
+      get: () => tt
+    });
 
     /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeTextTracks: false});
