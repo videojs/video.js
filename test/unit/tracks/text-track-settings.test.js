@@ -178,7 +178,7 @@ QUnit.test('should close on done click', function(assert) {
     tracks
   });
 
-  Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
+  Events.trigger(player.$('.vjs-text-track-settings'), 'click');
   Events.trigger(player.$('.vjs-done-button'), 'click');
   assert.ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
 
