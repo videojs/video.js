@@ -173,17 +173,6 @@ QUnit.test('should restore default settings', function(assert) {
   player.dispose();
 });
 
-QUnit.test('should open on click', function(assert) {
-  const player = TestHelpers.makePlayer({
-    tracks
-  });
-
-  Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
-  assert.ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
-
-  player.dispose();
-});
-
 QUnit.test('should close on done click', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks
