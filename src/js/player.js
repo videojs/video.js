@@ -2636,6 +2636,11 @@ class Player extends Component {
         // only target desktop chrome
         (browser.IS_CHROME && !browser.IS_ANDROID)) {
       this.play();
+    } else if ((!this.autoplay() || !this.options_.autoplay) &&
+              // only target desktop chrome
+              (browser.IS_CHROME && !browser.IS_ANDROID)) {
+      // reload to initial state if autoplay is disabled
+      this.load();
     }
   }
 
