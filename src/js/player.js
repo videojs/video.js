@@ -2637,8 +2637,10 @@ class Player extends Component {
         (browser.IS_CHROME && !browser.IS_ANDROID)) {
       this.play();
     } else {
-      // reload to initial state if autoplay is disabled
-      this.load();
+      // reload to initial state if autoplay is disabled in desktop chrome
+      if(browser.IS_CHROME && !browser.IS_ANDROID) {
+        this.load();
+      }      
     }
   }
 
