@@ -1,0 +1,5 @@
+labels:
+  - first-timers-only
+  - unclaimed
+template: .github/first_timers_issue_template.md
+
