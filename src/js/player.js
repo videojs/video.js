@@ -475,8 +475,6 @@ class Player extends Component {
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
     this.playOnLoadstart_ = null;
-
-    this.forceAutoplayInChrome_();
   }
 
   /**
@@ -2616,27 +2614,9 @@ class Player extends Component {
     if (value !== undefined) {
       this.techCall_('setAutoplay', value);
       this.options_.autoplay = value;
-      this.ready(this.forceAutoplayInChrome_);
       return;
     }
     return this.techGet_('autoplay', value);
-  }
-
-  /**
-   * chrome started pausing the video when moving in the DOM
-   * causing autoplay to not continue due to how Video.js functions.
-   * See #4720 for more info.
-   *
-   * @private
-   */
-  forceAutoplayInChrome_() {
-    if (this.paused() &&
-        // read from the video element or options
-        (this.autoplay() || this.options_.autoplay) &&
-        // only target desktop chrome
-        (browser.IS_CHROME && !browser.IS_ANDROID)) {
-      this.play();
-    }
   }
 
   /**
