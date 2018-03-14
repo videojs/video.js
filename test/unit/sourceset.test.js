@@ -423,12 +423,11 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       source.src = this.sourceOne.src;
       source.type = this.sourceOne.type;
 
-      this.player.one('sourceset', () => {
-        validateSource(assert, this.player, [this.sourceOne], false);
+      this.player.one('sourceset', (e1) => {
+        assert.equal(e1.src, '', 'we got a sourceset with an empty src');
 
-        this.player.one('sourceset', () => {
-          validateSource(assert, this.player, [this.sourceTwo], false);
-          done();
+        this.player.one('sourceset', (e2) => {
+          assert.equal(e2.src, '', 'we got a sourceset with an empty src');
         });
       });
 
@@ -441,6 +440,8 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       source.src = this.sourceTwo.src;
       source.type = this.sourceTwo.type;
       this.mediaEl.load();
+
+      done();
     });
 
     QUnit.test('adding a <source> without load()', function(assert) {
