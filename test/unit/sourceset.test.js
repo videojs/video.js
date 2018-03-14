@@ -387,6 +387,27 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       this.mediaEl.setAttribute('src', this.sourceTwo.src);
     });
 
+    QUnit.test('load() with a src attribute', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl);
+
+      this.totalSourcesets = 1;
+
+      window.setTimeout(() => {
+        this.sourcesets = 0;
+        this.totalSourcesets = 1;
+
+        this.player.one('sourceset', (e) => {
+          assert.equal(e.src, this.mediaEl.src, "the sourceset event's src matches the src attribute");
+
+          done();
+        });
+
+        this.player.load();
+      }, wait);
+    });
+
     QUnit.test('mediaEl.load()', function(assert) {
       const source = document.createElement('source');
 
