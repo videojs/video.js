@@ -192,10 +192,39 @@ class Html5 extends Tech {
 
     const oldLoad = el.load;
 
+    const chooseSourceEl = (sources) => {
+      for (let i = 0; i < sources.length; i++) {
+        if (!sources[i].src) {
+          continue;
+        }
+
+        if (sources[i].type && !Html5.canPlayType(sources[i].type)) {
+          continue;
+        }
+
+        if (sources[i].media) {
+          // ignored, as it isn't used for videos
+        }
+
+        return sources[i].src;
+      }
+
+      return '';
+    };
+
     el.load = () => {
+      const sources = document.querySelectorAll('source');
       const retval = oldLoad.call(el);
 
-      this.triggerSourceset(el.src || el.currentSrc);
+      let src = '';
+
+      if (el.src) {
+        src = el.src;
+      } else if (sources.length) {
+        src = chooseSourceEl(sources);
+      }
+
+      this.triggerSourceset(src);
 
       return retval;
     };

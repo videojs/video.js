@@ -423,10 +423,12 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       source.src = this.sourceOne.src;
       source.type = this.sourceOne.type;
 
-      this.player.one('sourceset', () => {
+      this.player.one('sourceset', (e) => {
+        assert.equal(e.src, this.sourceOne.src, 'first sourceset is for sourceOne');
         validateSource(assert, this.player, [this.sourceOne], false);
 
-        this.player.one('sourceset', () => {
+        this.player.one('sourceset', (e2) => {
+          assert.equal(e2.src, this.sourceTwo.src, 'first sourceset is for sourceOne');
           validateSource(assert, this.player, [this.sourceTwo], false);
           done();
         });
