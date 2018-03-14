@@ -194,19 +194,19 @@ class Html5 extends Tech {
 
     const chooseSourceEl = (sources) => {
       for (let i = 0; i < sources.length; i++) {
-        if (!sources[0].src) {
+        if (!sources[i].src) {
           continue;
         }
 
-        if (sources[0].type && !Html5.canPlayType(sources[0].type)) {
+        if (sources[i].type && !Html5.canPlayType(sources[i].type)) {
           continue;
         }
 
-        if (sources[0].media) {
+        if (sources[i].media) {
           // ignored, as it isn't used for videos
         }
 
-        return sources[0].src;
+        return sources[i].src;
       }
 
       return '';
