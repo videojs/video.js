@@ -169,7 +169,7 @@ function getCustomLaunchers(){
       base: 'BrowserStack',
       browser: 'safari',
       os: 'OS X',
-      os_version: 'Yosemite'
+      os_version: 'El Capitan'
     },
 
     edge_bs: {
