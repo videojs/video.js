@@ -154,12 +154,12 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       const done = assert.async();
 
       this.player = videojs(this.mediaEl);
-      this.player.src(this.testSrc);
-
       this.player.one('sourceset', () => {
         validateSource(assert, this.player, [this.testSrc]);
         done();
       });
+
+      this.player.src(this.testSrc);
     });
 
     // TODO: unskip when https://github.com/videojs/video.js/pull/4861 is merged
@@ -168,24 +168,26 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
       this.mediaEl.setAttribute('preload', 'auto');
       this.player = videojs(this.mediaEl);
-      this.player.src(this.testSrc);
 
       this.player.one('sourceset', () => {
         validateSource(assert, this.player, [this.testSrc]);
         done();
       });
+
+      this.player.src(this.testSrc);
     });
 
     QUnit.test('player.src({...}) two sources', function(assert) {
       const done = assert.async();
 
       this.player = videojs(this.mediaEl);
-      this.player.src([this.sourceOne, this.sourceTwo]);
 
       this.player.one('sourceset', () => {
         validateSource(assert, this.player, [this.sourceOne, this.sourceTwo]);
         done();
       });
+
+      this.player.src([this.sourceOne, this.sourceTwo]);
     });
 
     QUnit.test('mediaEl.src = ...;', function(assert) {
