@@ -111,7 +111,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-opera-launcher": "^1.0.0",
-    "karma-qunit": "^1.2.0",
+    "karma-qunit": "^2.0.1",
     "karma-safari-launcher": "^1.0.0",
     "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
