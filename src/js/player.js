@@ -244,6 +244,13 @@ const TECH_EVENTS_RETRIGGER = [
   'texttrackchange'
 ];
 
+const TECH_EVENTS_QUEUE = {
+  canplay: 'CanPlay',
+  canplaythrough: 'CanPlayThrough',
+  playing: 'Playing',
+  seeked: 'Seeked'
+};
+
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
  * are used to initialize a video.
@@ -319,6 +326,9 @@ class Player extends Component {
 
     // Tracks when a tech changes the poster
     this.isPosterFromTech_ = false;
+
+    // TODO: Docs
+    this.queuedCallbacks_ = [];
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
@@ -967,15 +977,22 @@ class Player extends Component {
     TECH_EVENTS_RETRIGGER.forEach((event) => {
       this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
     });
+
+    Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
+      this.on(this.tech_, event, () => {
+        if (this.tech_.playbackRate() === 0) {
+          this.queuedCallbacks_.push(this[`handleTech${TECH_EVENTS_QUEUE[event]}_`].bind(this));
+          return;
+        }
+        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`]();
+      });
+    });
+
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
     this.on(this.tech_, 'sourceset', this.handleTechSourceset_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
-    this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
-    this.on(this.tech_, 'canplaythrough', this.handleTechCanPlayThrough_);
-    this.on(this.tech_, 'playing', this.handleTechPlaying_);
     this.on(this.tech_, 'ended', this.handleTechEnded_);
     this.on(this.tech_, 'seeking', this.handleTechSeeking_);
-    this.on(this.tech_, 'seeked', this.handleTechSeeked_);
     this.on(this.tech_, 'play', this.handleTechPlay_);
     this.on(this.tech_, 'firstplay', this.handleTechFirstPlay_);
     this.on(this.tech_, 'pause', this.handleTechPause_);
@@ -985,6 +1002,7 @@ class Player extends Component {
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
     this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
     this.on(this.tech_, 'textdata', this.handleTechTextData_);
+    this.on(this.tech_, 'ratechange', this.handleTechRateChange_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -1274,6 +1292,17 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('play');
+  }
+
+  /**
+   * TODO: docs
+   */
+  handleTechRateChange_() {
+    if (this.tech_.playbackRate() > 0 && this.previousPlaybackRate === 0) {
+      this.queuedCallbacks_.forEach((callback) => callback());
+      this.queuedCallbacks_ = [];
+    }
+    this.previousPlaybackRate = this.tech_.playbackRate();
   }
 
   /**
