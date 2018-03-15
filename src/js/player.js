@@ -1186,7 +1186,7 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the source is set or changed on the {@link Tech}
+   * *EXPERIMENTAL* Fired when the source is set or changed on the {@link Tech}
    * causing the media element to reload.
    *
    * It will fire for the initial source and each subsequent source.
@@ -1202,6 +1202,8 @@ class Player extends Component {
    * In this case, it is very likely that the `src` property will be set to the
    * empty string `""` to indicate we do not know what the source will be but
    * that it is changing.
+   *
+   * *This event is currently still experimental and may change in minor releases.*
    *
    * @event Player#sourceset
    * @type {EventTarget~Event}
