@@ -87,7 +87,7 @@ if (!browser.IS_IE8) {
     let playerresizeCalled = 0;
     const rm = new ResizeManager(this.player, {ResizeObserver: MyResizeObserver});
 
-    this.player.on('playerresize', function() {
+    this.player.one('playerresize', function() {
       playerresizeCalled++;
     });
     observer();
