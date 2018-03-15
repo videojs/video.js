@@ -223,7 +223,7 @@ class Component {
    * Localize a string given the string in english.
    *
    * If tokens are provided, it'll try and run a simple token replacement on the provided string.
-   * The tokens it loooks for look like `{1}` with the index being 1-indexed into the tokens array.
+   * The tokens it looks for look like `{1}` with the index being 1-indexed into the tokens array.
    *
    * If a `defaultValue` is provided, it'll use that over `string`,
    * if a value isn't found in provided language files.
