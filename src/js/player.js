@@ -1186,7 +1186,7 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the source is set or changed on the {@link Tech}
+   * *EXPERIMENTAL* Fired when the source is set or changed on the {@link Tech}
    * causing the media element to reload.
    *
    * It will fire for the initial source and each subsequent source.
@@ -1198,12 +1198,19 @@ class Player extends Component {
    *
    * It is also fired when `load` is called on the player (or media element)
    * because the {@link https://html.spec.whatwg.org/multipage/media.html#dom-media-load|specification for `load`}
-   * says that the resource selection algorithm
-   * needs to be aborted and restarted.
+   * says that the resource selection algorithm needs to be aborted and restarted.
+   * In this case, it is very likely that the `src` property will be set to the
+   * empty string `""` to indicate we do not know what the source will be but
+   * that it is changing.
+   *
+   * *This event is currently still experimental and may change in minor releases.*
    *
    * @event Player#sourceset
    * @type {EventTarget~Event}
-   * @prop {string} src The source url available when the `sourceset` was triggered
+   * @prop {string} src
+   *                The source url available when the `sourceset` was triggered.
+   *                It will be an empty string if we cannot know what the source is
+   *                but know that the source will change.
    */
   /**
    * Retrigger the `sourceset` event that was triggered by the {@link Tech}.

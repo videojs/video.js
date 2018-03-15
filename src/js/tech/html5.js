@@ -195,7 +195,12 @@ class Html5 extends Tech {
     el.load = () => {
       const retval = oldLoad.call(el);
 
-      this.triggerSourceset(el.src || el.currentSrc);
+      // if `el.src` is set, that source will be loaded
+      // otherwise, we can't know for sure what source will be set because
+      // source elements will be used but implementing the source selection algorithm
+      // is laborious and asynchronous, so,
+      // instead return an empty string to basically indicate source may change
+      this.triggerSourceset(el.src || '');
 
       return retval;
     };
