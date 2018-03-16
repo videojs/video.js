@@ -56,7 +56,8 @@ function rangeCheck(fnName, index, maxIndex) {
 }
 
 /**
- * Check if any of the time ranges are over the maximum index.
+ * Get the time for the specified index at the start or end
+ * of a TimeRange object.
  *
  * @param {string} fnName
  *        The function name to use for logging
