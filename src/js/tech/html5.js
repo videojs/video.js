@@ -172,7 +172,9 @@ class Html5 extends Tech {
       set: (v) => {
         const retval = srcDescriptor.set.call(el, v);
 
-        this.triggerSourceset(v);
+        // we use the getter here so we get the
+        // absolute url rather than the relative
+        this.triggerSourceset(srcDescriptor.get.call(el));
 
         return retval;
       },
