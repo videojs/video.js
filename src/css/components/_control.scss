@@ -8,8 +8,8 @@
   padding: 0;
   height: 100%;
   width: 4em;
+  outline: 0;
   @include flex(none);
-
 }
 .vjs-button > .vjs-icon-placeholder:before {
   font-size: 1.8em;
