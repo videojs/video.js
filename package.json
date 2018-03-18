@@ -90,7 +90,7 @@
     "grunt-contrib-cssmin": "~2.2.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "~1.0.0",
-    "grunt-coveralls": "^1.0.0",
+    "grunt-coveralls": "^2.0.0",
     "grunt-karma": "^2.0.0",
     "grunt-sass": "^2.0.0",
     "grunt-shell": "^2.0.0",
