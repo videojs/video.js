@@ -2,7 +2,7 @@
  * @module filter-source
  */
 import {isObject} from './obj';
-import getMimetype from './get-mime-type';
+import getMimeType from './get-mime-type';
 
 /**
  * Filter out single bad source objects or multiple source objects in an
@@ -17,7 +17,7 @@ import getMimetype from './get-mime-type';
  *
  * @private
  */
-export const filterSource = function(src) {
+const filterSource = function(src) {
   // traverse array
   if (Array.isArray(src)) {
     let newsrc = [];
@@ -35,10 +35,10 @@ export const filterSource = function(src) {
     src = newsrc;
   } else if (typeof src === 'string' && src.trim()) {
     // convert string into object
-    src = [{src: src.src, type: getMimetype(src.src)}];
+    src = [checkMimetype({src})];
   } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
     // src is already valid
-    src = [{src: src.src, type: getMimetype(src.src)}];
+    src = [checkMimetype(src)];
   } else {
     // invalid source, turn it into an empty array
     src = [];
@@ -46,5 +46,23 @@ export const filterSource = function(src) {
 
   return src;
 };
+
+/**
+ * Checks src mimetype, adding it when possible
+ *
+ * @param {Tech~SourceObject} src
+ *        The src object to check
+ * @return {Tech~SourceObject}
+ *        src Object with known type
+ */
+function checkMimetype(src) {
+  const mimetype = getMimeType(src.src);
+
+  if (!src.type && mimetype) {
+    src.type = mimetype;
+  }
+
+  return src;
+}
 
 export default filterSource;

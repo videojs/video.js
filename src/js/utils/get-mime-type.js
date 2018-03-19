@@ -2,13 +2,13 @@ import {MimetypesKind} from './mimetypes';
 import * as Url from '../utils/url.js';
 
 /**
- * Checks src mimetype, adding it when possible
+ * Get the mimetype of a given src url if possible
  *
- * @param {Tech~SourceObject} src
- *        The src object to check
+ * @param {string} src
+ *        The url to the src
  *
- * @return {Tech~SourceObject}
- *        src Object with known type
+ * @return {string}
+ *         return the mimetype if it was known or empty string otherwise
  */
 const getMimetype = function(src = '') {
   const ext = Url.getFileExtension(src);

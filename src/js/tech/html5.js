@@ -172,9 +172,9 @@ class Html5 extends Tech {
       set: (v) => {
         const retval = srcDescriptor.set.call(el, v);
 
-        // we use the getter here so we get the
-        // absolute url rather than the relative
-        this.triggerSourceset(srcDescriptor.get.call(el));
+        // we use the getter here to get the actual value set on
+        // src
+        this.triggerSourceset(el.src);
 
         return retval;
       },
@@ -188,7 +188,7 @@ class Html5 extends Tech {
       const retval = oldSetAttribute.call(el, n, v);
 
       if (n === 'src') {
-        this.triggerSourceset(v);
+        this.triggerSourceset(el.getAttribute('src'));
       }
 
       return retval;
@@ -204,7 +204,18 @@ class Html5 extends Tech {
       // source elements will be used but implementing the source selection algorithm
       // is laborious and asynchronous, so,
       // instead return an empty string to basically indicate source may change
-      this.triggerSourceset(el.src || '');
+      let src = el.src || '';
+
+      // if their is only one source
+      // we can know that it is that source
+      if (!src) {
+        const sources = this.$$('source');
+
+        if (sources.length === 1) {
+          src = sources[0].src;
+        }
+      }
+      this.triggerSourceset(src);
 
       return retval;
     };
