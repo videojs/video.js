@@ -928,7 +928,8 @@ class Player extends Component {
       'language': this.language(),
       'playerElIngest': this.playerElIngest_ || false,
       'vtt.js': this.options_['vtt.js'],
-      'canOverridePoster': !!this.options_.techCanOverridePoster
+      'canOverridePoster': !!this.options_.techCanOverridePoster,
+      'enableSourceset': this.options_.enableSourceset
     };
 
     TRACK_TYPES.names.forEach((name) => {
@@ -1204,6 +1205,7 @@ class Player extends Component {
    * that it is changing.
    *
    * *This event is currently still experimental and may change in minor releases.*
+   * __To use this, pass `enableSourceset` option to the player.__
    *
    * @event Player#sourceset
    * @type {EventTarget~Event}

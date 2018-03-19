@@ -34,7 +34,9 @@ class Html5 extends Tech {
   constructor(options, ready) {
     super(options, ready);
 
-    this.setupSourcesetHandling_();
+    if (options.enableSourceset) {
+      this.setupSourcesetHandling_();
+    }
 
     const source = options.source;
     let crossoriginTracks = false;

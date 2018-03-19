@@ -163,6 +163,10 @@ class Tech extends Component {
    * @param {string} src The source string at the time of the source changing.
    */
   triggerSourceset(src) {
+    if (!this.options_.enableSourceset) {
+      return;
+    }
+
     if (!this.isReady_) {
       // on initial ready we have to trigger source set
       // 1ms after ready so that player can watch for it.
