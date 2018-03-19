@@ -205,10 +205,7 @@ module.exports = function(grunt) {
       firefox_bs:   { browsers: ['firefox_bs'] },
       safari_bs:    { browsers: ['safari_bs'] },
       edge_bs:      { browsers: ['edge_bs'] },
-      ie11_bs:      { browsers: ['ie11_bs'] },
-      ie10_bs:      { browsers: ['ie10_bs'] },
-      ie9_bs:       { browsers: ['ie9_bs'] },
-      ie8_bs:       { browsers: ['ie8_bs'] }
+      ie11_bs:      { browsers: ['ie11_bs'] }
     },
     vjslanguages: {
       defaults: {
