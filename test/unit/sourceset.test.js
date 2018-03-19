@@ -304,8 +304,8 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
         this.mediaEl.src = this.testSrc.src;
         this.player = videojs(this.mediaEl, {
-        enableSourceset: true
-      });
+          enableSourceset: true
+        });
 
         this.player.ready(() => {
           this.mediaEl = this.player.tech_.el();
