@@ -210,9 +210,21 @@ class Html5 extends Tech {
       // we can know that it is that source
       if (!src) {
         const sources = this.$$('source');
+        const srcUrls = [];
 
-        if (sources.length === 1) {
-          src = sources[0].src;
+        // only count valid/non-duplicate source elements
+        for (let i = 0; i < sources.length; i++) {
+          const url = sources[i].src;
+
+          if (srcUrls.indexOf(url) === -1) {
+            srcUrls.push(url);
+          }
+        }
+
+        // there is only one valid source element url
+        // use that
+        if (srcUrls.length === 1) {
+          src = srcUrls[0];
         }
       }
       this.triggerSourceset(src);
