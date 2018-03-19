@@ -569,6 +569,9 @@ class Player extends Component {
       el.appendChild(tag);
 
       playerElIngest = this.playerElIngest_ = el;
+      Object.keys(el).forEach((k) => {
+        tag[k] = el[k];
+      });
     }
 
     // set tabindex to -1 so we could focus on the player element
