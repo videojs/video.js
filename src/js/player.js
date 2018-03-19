@@ -1188,6 +1188,115 @@ class Player extends Component {
   }
 
   /**
+   * find the mime type of a given source string url if possible
+   *
+   * @param {string} src
+   *        The source string
+   *
+   * @return {string}
+   *         The type that was found
+   *
+   */
+  findMimeType_(src) {
+
+    if (!src) {
+      return '';
+    }
+
+    // 1. check for the type in the `source` cache
+    if (this.cache_.source.src === src && this.cache_.source.type) {
+      return this.cache_.source.type;
+    }
+
+    // 2. if we do not have a type yet check in the `previousSource` cache
+    if (this.cache_.previousSource.src === src && this.cache_.previousSource.type) {
+      return this.cache_.previousSource.type;
+    }
+
+    // see if we have this source in our `currentSources` cache
+    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+
+    if (matchingSources.length) {
+      return matchingSources[0].type;
+    }
+
+    // 4. if we do not have a type yet check in the `previousSources` cache
+    const previousMatchingSources = this.cache_.previousSources.filter((s) => s.src && s.src === src);
+
+    if (previousMatchingSources.length) {
+      return previousMatchingSources[0].type;
+    }
+
+    // 5. look for the src url in source elements
+    const sources = this.$$('source');
+
+    for (let i = 0; i < sources.length; i++) {
+      const s = sources[i];
+
+      if (s.type && s.src && s.src === src) {
+        return s.type;
+      }
+    }
+
+    // 6. finally fallback to our list of mime types based on src url extension
+    return getMimeType(src);
+  }
+
+  updateSourceCaches_(src) {
+    // make sure all the caches are set to default values
+    // to prevent null checking
+    this.cache_.source = this.cache_.source || {};
+    this.cache_.previousSource = this.cache_.previousSource || {};
+    this.cache_.sources = this.cache_.sources || [];
+    this.cache_.previousSources = this.cache_.previousSources || [];
+
+    // try to get the type of the src that was passed in
+    const type = this.findMimeType_(src);
+
+    // update `previousSource` cache if the current one is a valid source
+    if (this.cache_.source && this.cache_.sources.src) {
+      this.cache_.previousSource = this.cache_.source;
+    }
+    // update `currentSource` cache always
+    this.cache_.source = {src, type};
+
+    const validSources = this.cache_.sources.filter((s) => !!s.src);
+
+    // update `previousSources` cache if the current cache has valid sources
+    if (validSources.length) {
+      this.cache_.previousSources = this.cache_.sources;
+    }
+
+    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+    const sourceElSources = [];
+    const sourceEls = this.$$('source');
+    const matchingSourceEls = [];
+
+    for (let i = 0; i < sourceEls.length; i++) {
+      const srcObj = {src: sourceEls[i].src, type: sourceEls[i].type};
+
+      sourceElSources.push(srcObj);
+
+      if (srcObj.src && srcObj.src === src) {
+        matchingSourceEls.push(srcObj);
+      }
+    }
+
+    // if we have mathcing source els but not matching sources
+    // the current source cache is not up to date
+    if (matchingSourceEls.length && !matchingSources.length) {
+      this.cache_.sources = sourceElSources;
+    // if we don't have matching source or source els set the
+    // sources cache to the `currentSource` cache
+    } else if (!matchingSources.length) {
+      this.cache_.sources = [this.cache_.source];
+    }
+
+    // update the tech `src` cache
+    this.cache_.src = src;
+  }
+
+  /**
    * *EXPERIMENTAL* Fired when the source is set or changed on the {@link Tech}
    * causing the media element to reload.
    *
@@ -1223,76 +1332,15 @@ class Player extends Component {
    * @private
    */
   handleTechSourceset_(event) {
-    // to prevent null checks
-    this.cache_.source = this.cache_.source || {};
-    this.cache_.previousSource = this.cache_.previousSource || {};
-    this.cache_.sources = this.cache_.sources || [];
-    this.cache_.previousSources = this.cache_.previousSources || [];
+    this.updateSourceCaches_(event.src);
 
-    // see if we have this new source in any of our `currentSources` cache
-    const matchingSources = this.cache_.sources
-      .filter((s) => s.src && s.src === event.src);
-
-    let type = '';
-
-    // 1. check for the type in the `source` cache
-    if (this.cache_.source.src === event.src && this.cache_.source.type) {
-      type = this.cache_.source.type;
+    // this was a load sourceset, update the source cache later
+    // when we know what the source is
+    if (!event.src) {
+      this.one('loadstart', () => {
+        this.updateSourceCaches_(this.techGet_('src'));
+      });
     }
-
-    // 2. if we do not have a type yet check in the `previousSource` cache
-    if (!type && this.cache_.previousSource.src === event.src && this.cache_.previousSource.type) {
-      type = this.cache_.source.type;
-    }
-
-    // 3. if we do not have a type yet check in the `sources` cache
-    if (!type && matchingSources.length) {
-      type = matchingSources[0].type;
-    }
-
-    // 4. if we do not have a type yet check in the `previousSources` cache
-    if (!type) {
-      const previousMatchingSources = this.cache_.previousSources
-        .filter((s) => s.src && s.src === event.src);
-
-      if (previousMatchingSources.length) {
-        type = previousMatchingSources[0].type;
-      }
-
-    }
-
-    // 5. if we still do not have a type, then it is not in the cache, check in <source> elements
-    if (!type) {
-      const sources = this.$$('source');
-
-      for (let i = 0; i < sources.length; i++) {
-        const s = sources[i];
-
-        if (s.type && s.src && s.src === event.src) {
-          type = s.type;
-          break;
-        }
-      }
-    }
-
-    // 6. finally fallback to our list of mime types based on src extension
-    if (!type) {
-      type = getMimeType(event.src);
-    }
-
-    // update `currentSource`  and `previousSource` caches
-    this.cache_.previousSource = this.cache_.source;
-    this.cache_.source = {src: event.src, type};
-
-    // if we did not find the new source in the `currentSources` cache
-    // update the `currentSources` cache
-    if (!matchingSources.length) {
-      this.cache_.previousSources = this.cache_.sources;
-      this.cache_.sources = [this.cache_.source];
-    }
-
-    // update the tech `src` cache
-    this.cache_.src = event.src;
 
     this.trigger({
       src: event.src,
