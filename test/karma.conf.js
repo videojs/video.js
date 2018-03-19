@@ -131,10 +131,7 @@ module.exports = function(config) {
         'firefox_bs',
         'safari_bs',
         'edge_bs',
-        'ie11_bs',
-        'ie10_bs',
-        'ie9_bs',
-        'ie8_bs'
+        'ie11_bs'
       ];
     } else {
       settings.browsers = ['chrome_travis'];
@@ -185,30 +182,6 @@ function getCustomLaunchers(){
       browser_version: '11',
       os: 'Windows',
       os_version: '8.1'
-    },
-
-    ie10_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '10',
-      os: 'Windows',
-      os_version: '7'
-    },
-
-    ie9_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '9',
-      os: 'Windows',
-      os_version: '7'
-    },
-
-    ie8_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '8',
-      os: 'Windows',
-      os_version: '7'
     }
   };
 }
