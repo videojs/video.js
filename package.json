@@ -17,7 +17,7 @@
   "author": "Steve Heffernan",
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
-    "build": "grunt dist",
+    "build": "webpack --config build/webpack.config.babel.js --mode production",
     "watch": "npm run rollup-dev",
     "assets": "node build/assets.js",
     "clean": "grunt clean",
