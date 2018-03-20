@@ -31,6 +31,7 @@ import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
+import getMimeType from './utils/get-mime-type';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -568,6 +569,9 @@ class Player extends Component {
       el.appendChild(tag);
 
       playerElIngest = this.playerElIngest_ = el;
+      Object.keys(el).forEach((k) => {
+        tag[k] = el[k];
+      });
     }
 
     // set tabindex to -1 so we could focus on the player element
@@ -1187,6 +1191,134 @@ class Player extends Component {
   }
 
   /**
+   * find the mime type of a given source string url if possible
+   *
+   * @param {string} src
+   *        The source string
+   *
+   * @return {string}
+   *         The type that was found
+   *
+   */
+  findMimeType_(src) {
+    if (!src) {
+      return '';
+    }
+
+    // 1. check for the type in the `source` cache
+    if (this.cache_.source.src === src && this.cache_.source.type) {
+      return this.cache_.source.type;
+    }
+
+    // 2. if we do not have a type yet check in the `previousSource` cache
+    if (this.cache_.previousSource.src === src && this.cache_.previousSource.type) {
+      return this.cache_.previousSource.type;
+    }
+
+    // see if we have this source in our `currentSources` cache
+    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+
+    if (matchingSources.length) {
+      return matchingSources[0].type;
+    }
+
+    // 4. if we do not have a type yet check in the `previousSources` cache
+    const previousMatchingSources = this.cache_.previousSources.filter((s) => s.src && s.src === src);
+
+    if (previousMatchingSources.length) {
+      return previousMatchingSources[0].type;
+    }
+
+    // 5. look for the src url in source elements
+    const sources = this.$$('source');
+
+    for (let i = 0; i < sources.length; i++) {
+      const s = sources[i];
+
+      if (s.type && s.src && s.src === src) {
+        return s.type;
+      }
+    }
+
+    // 6. finally fallback to our list of mime types based on src url extension
+    return getMimeType(src);
+  }
+
+  /**
+   * Update the internal source caches so that we return the correct source from
+   * `src()`, `currentSource()`, and `currentSources()`.
+   *
+   * > Note: `currentSources` will not be updated if the source that is passed in exists
+   *         in the current `currentSources` cache.
+   *
+   *
+   * @param {Tech~SourceObject} srcObj
+   *        A string or object source to update our caches to.
+   */
+  updateSourceCaches_(srcObj) {
+    let src = srcObj;
+    let type = '';
+
+    if (typeof src !== 'string') {
+      src = srcObj.src;
+      type = srcObj.type;
+    }
+    // make sure all the caches are set to default values
+    // to prevent null checking
+    this.cache_.source = this.cache_.source || {};
+    this.cache_.previousSource = this.cache_.previousSource || {};
+    this.cache_.sources = this.cache_.sources || [];
+    this.cache_.previousSources = this.cache_.previousSources || [];
+
+    // try to get the type of the src that was passed in
+    if (!type) {
+      type = this.findMimeType_(src);
+    }
+
+    // update `previousSource` cache if the current one is a valid source
+    if (this.cache_.source && this.cache_.sources.src) {
+      this.cache_.previousSource = this.cache_.source;
+    }
+    // update `currentSource` cache always
+    this.cache_.source = {src, type};
+
+    const validSources = this.cache_.sources.filter((s) => !!s.src);
+
+    // update `previousSources` cache if the current cache has valid sources
+    if (validSources.length) {
+      this.cache_.previousSources = this.cache_.sources;
+    }
+
+    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+    const sourceElSources = [];
+    const sourceEls = this.$$('source');
+    const matchingSourceEls = [];
+
+    for (let i = 0; i < sourceEls.length; i++) {
+      const sourceObj = {src: sourceEls[i].src, type: sourceEls[i].type};
+
+      sourceElSources.push(sourceObj);
+
+      if (sourceObj.src && sourceObj.src === src) {
+        matchingSourceEls.push(sourceObj.src);
+      }
+    }
+
+    // if we have mathcing source els but not matching sources
+    // the current source cache is not up to date
+    if (matchingSourceEls.length && !matchingSources.length) {
+      this.cache_.sources = sourceElSources;
+    // if we don't have matching source or source els set the
+    // sources cache to the `currentSource` cache
+    } else if (!matchingSources.length) {
+      this.cache_.sources = [this.cache_.source];
+    }
+
+    // update the tech `src` cache
+    this.cache_.src = src;
+  }
+
+  /**
    * *EXPERIMENTAL* Fired when the source is set or changed on the {@link Tech}
    * causing the media element to reload.
    *
@@ -1222,6 +1354,16 @@ class Player extends Component {
    * @private
    */
   handleTechSourceset_(event) {
+    this.updateSourceCaches_(event.src);
+
+    // this was a load sourceset, update the source cache later
+    // when we know what the source is
+    if (!event.src && !this.tech_.src() && this.$$('source').length) {
+      this.one('loadstart', () => {
+        this.updateSourceCaches_(this.techGet_('currentSrc'));
+      });
+    }
+
     this.trigger({
       src: event.src,
       type: 'sourceset'
@@ -2435,10 +2577,12 @@ class Player extends Component {
     }
 
     // intial sources
+    this.cache_.previousSources = this.cache_.sources;
     this.cache_.sources = sources;
     this.changingSrc_ = true;
 
     // intial source
+    this.cache_.previousSource = this.cache_.source;
     this.cache_.source = sources[0];
 
     // middlewareSource is the source after it has been changed by middleware
