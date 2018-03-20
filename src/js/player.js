@@ -1244,7 +1244,25 @@ class Player extends Component {
     return getMimeType(src);
   }
 
-  updateSourceCaches_(src) {
+  /**
+   * Update the internal source caches so that we return the correct source from
+   * `src()`, `currentSource()`, and `currentSources()`.
+   *
+   * > Note: `currentSources` will not be updated if the source that is passed in exists
+   *         in the current `currentSources` cache.
+   *
+   *
+   * @param {Tech~SourceObject} srcObj
+   *        A string or object source to update our caches to.
+   */
+  updateSourceCaches_(srcObj) {
+    let src = srcObj;
+    let type = '';
+
+    if (typeof src !== 'string') {
+      src = srcObj.src;
+      type = srcObj.type;
+    }
     // make sure all the caches are set to default values
     // to prevent null checking
     this.cache_.source = this.cache_.source || {};
@@ -1253,7 +1271,9 @@ class Player extends Component {
     this.cache_.previousSources = this.cache_.previousSources || [];
 
     // try to get the type of the src that was passed in
-    const type = this.findMimeType_(src);
+    if (!type) {
+      type = this.findMimeType_(src);
+    }
 
     // update `previousSource` cache if the current one is a valid source
     if (this.cache_.source && this.cache_.sources.src) {
@@ -1275,12 +1295,12 @@ class Player extends Component {
     const matchingSourceEls = [];
 
     for (let i = 0; i < sourceEls.length; i++) {
-      const srcObj = {src: sourceEls[i].src, type: sourceEls[i].type};
+      const sourceObj = {src: sourceEls[i].src, type: sourceEls[i].type};
 
-      sourceElSources.push(srcObj);
+      sourceElSources.push(sourceObj);
 
-      if (srcObj.src && srcObj.src === src) {
-        matchingSourceEls.push(srcObj.src);
+      if (sourceObj.src && sourceObj.src === src) {
+        matchingSourceEls.push(sourceObj.src);
       }
     }
 
@@ -1338,9 +1358,9 @@ class Player extends Component {
 
     // this was a load sourceset, update the source cache later
     // when we know what the source is
-    if (!event.src) {
+    if (!event.src && !this.tech_.src() && this.$$('source').length) {
       this.one('loadstart', () => {
-        this.updateSourceCaches_(this.techGet_('src'));
+        this.updateSourceCaches_(this.techGet_('currentSrc'));
       });
     }
 

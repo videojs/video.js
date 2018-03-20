@@ -82,9 +82,9 @@ const validateSource = function(player, expectedSources, event, srcOverrides = {
   // getAbsoluteURL would return the current url of the page for empty string
   // so we have to check
   if (!techSrc) {
-    assert.equal(mediaEl.src, techSrc, 'mediaEl.src is correct');
+    assert.equal(tech.src(), techSrc, 'tech.src() is correct');
   } else {
-    assert.equal(tech.src(), getAbsoluteURL(techSrc), 'tech is correct');
+    assert.equal(tech.src(), getAbsoluteURL(techSrc), 'tech.src() is correct');
   }
 
   // mediaEl.src source is always absolute, but can be empty string
@@ -102,7 +102,7 @@ const setupEnv = function(env, testName) {
   videojs.players = {};
   env.fixture = document.getElementById('qunit-fixture');
 
-  if (testName === 'change video el' || testName === 'change audio el') {
+  if ((/^change/i).test(testName)) {
     Html5.prototype.movingMediaElementInDOM = false;
   }
 
@@ -157,7 +157,7 @@ const setupAfterEach = function(totalSourcesets) {
   };
 };
 
-const testTypes = ['video el', 'change video el', 'audio el', 'change audio el', 'video-js', 'change video el'];
+const testTypes = ['video el', 'change video el', 'audio el', 'change audio el', 'video-js', 'change video-js el'];
 
 QUnit[qunitFn]('sourceset', function(hooks) {
   QUnit.module('source before player', (subhooks) => testTypes.forEach((testName) => {
@@ -174,7 +174,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [this.testSrc]}));
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, this.testSrc, e);
@@ -188,7 +188,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [this.testSrc]}));
       this.mediaEl.setAttribute('preload', 'auto');
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, this.testSrc, e);
@@ -200,7 +200,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [this.sourceOne, this.sourceTwo]}));
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, [this.sourceOne, this.sourceTwo], e);
@@ -211,7 +211,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('videojs({sources: [...]}) one source', function(assert) {
       const done = assert.async();
 
-      this.player = videojs(this.mediaEl, {sources: [this.testSrc]});
+      this.player = videojs(this.mediaEl, {sources: [this.testSrc], enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, this.testSrc, e);
@@ -222,59 +222,19 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('videojs({sources: [...]}) two sources', function(assert) {
       const done = assert.async();
 
-      this.player = videojs(this.mediaEl, {sources: [this.sourceOne, this.sourceTwo]});
+      this.player = videojs(this.mediaEl, {sources: [this.sourceOne, this.sourceTwo], enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, [this.sourceOne, this.sourceTwo], e);
         done();
       });
-    });
-
-    QUnit.test('player.src({...}) one source', function(assert) {
-      const done = assert.async();
-
-      this.player = videojs(this.mediaEl);
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, this.testSrc, e);
-        done();
-      });
-
-      this.player.src(this.testSrc);
-    });
-
-    // TODO: unskip when https://github.com/videojs/video.js/pull/4861 is merged
-    QUnit.skip('player.src({...}) preload auto', function(assert) {
-      const done = assert.async();
-
-      this.mediaEl.setAttribute('preload', 'auto');
-      this.player = videojs(this.mediaEl);
-
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, this.testSrc, e);
-        done();
-      });
-
-      this.player.src(this.testSrc);
-    });
-
-    QUnit.test('player.src({...}) two sources', function(assert) {
-      const done = assert.async();
-
-      this.player = videojs(this.mediaEl);
-
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [this.sourceOne, this.sourceTwo], e);
-        done();
-      });
-
-      this.player.src([this.sourceOne, this.sourceTwo]);
     });
 
     QUnit.test('mediaEl.src = ...;', function(assert) {
       const done = assert.async();
 
       this.mediaEl.src = this.testSrc.src;
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, this.testSrc, e);
@@ -286,7 +246,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('src', this.testSrc.src);
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, this.testSrc, e);
@@ -303,7 +263,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
       this.mediaEl.appendChild(this.source);
 
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
       this.player.one('sourceset', (e) => {
         validateSource(this.player, this.testSrc, e);
         done();
@@ -324,7 +284,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       this.mediaEl.appendChild(this.source);
       this.mediaEl.appendChild(this.source2);
 
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.player.one('sourceset', (e) => {
         validateSource(this.player, [this.sourceOne, this.sourceTwo], e);
@@ -335,7 +295,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('no source', function(assert) {
       const done = assert.async();
 
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       this.totalSourcesets = 0;
 
@@ -357,7 +317,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       source.type = one.type;
 
       this.mediaEl.appendChild(source);
-      this.player = videojs(this.mediaEl);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
 
       // mediaEl changes on ready
       this.player.ready(() => {
@@ -391,6 +351,285 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     });
   }));
 
+  QUnit.module('source after player', (subhooks) => testTypes.forEach((testName) => {
+    QUnit.module(testName, {
+      beforeEach() {
+        sinon.stub(log, 'error');
+
+        setupEnv(this, testName);
+      },
+      afterEach: setupAfterEach(1)
+    });
+
+    QUnit.test('player.src({...}) one source', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, this.testSrc, e);
+        done();
+      });
+
+      this.player.src(this.testSrc);
+    });
+
+    // TODO: unskip when https://github.com/videojs/video.js/pull/4861 is merged
+    QUnit.skip('player.src({...}) preload auto', function(assert) {
+      const done = assert.async();
+
+      this.mediaEl.setAttribute('preload', 'auto');
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, this.testSrc, e);
+        done();
+      });
+
+      this.player.src(this.testSrc);
+    });
+
+    QUnit.test('player.src({...}) two sources', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, [this.sourceOne, this.sourceTwo], e);
+        done();
+      });
+
+      this.player.src([this.sourceOne, this.sourceTwo]);
+    });
+
+    QUnit.test('mediaEl.src = ...;', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, this.testSrc, e);
+        done();
+      });
+
+      this.player.tech_.el_.src = this.testSrc.src;
+    });
+
+    QUnit.test('mediaEl.setAttribute("src", ...)"', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, this.testSrc, e);
+        done();
+      });
+
+      this.player.tech_.el_.setAttribute('src', this.testSrc.src);
+    });
+
+    const appendTypes = [
+      {name: 'appendChild', fn: (el, obj) => el.appendChild(obj)},
+      {name: 'innerHTML', fn: (el, obj) => {el.innerHTML = obj.outerHTML;}}, // eslint-disable-line
+      {name: 'insertAdjacentHTML', fn: (el, obj) => el.insertAdjacentHTML('afterbegin', obj.outerHTML)}
+    ];
+
+    // ie does not support this and safari < 10 does not either
+    if (window.Element.prototype.append) {
+      appendTypes.push({name: 'append', fn: (el, obj) => el.append(obj)});
+    }
+
+    appendTypes.forEach((appendObj) => {
+
+      QUnit.test(`<source> one source through ${appendObj.name}`, function(assert) {
+        const done = assert.async();
+
+        this.source = document.createElement('source');
+        this.source.src = this.testSrc.src;
+        this.source.type = this.testSrc.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, this.testSrc, e, {el: '', tech: '', attr: ''});
+          done();
+        });
+
+        // since the media el has no source, just appending will
+        // change the source without calling load
+        appendObj.fn(this.player.tech_.el_, this.source);
+      });
+
+      QUnit.test(`<source> one source through ${appendObj.name} and load`, function(assert) {
+        const done = assert.async();
+
+        this.totalSourcesets = 2;
+        this.source = document.createElement('source');
+        this.source.src = this.testSrc.src;
+        this.source.type = this.testSrc.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, this.testSrc, e, {el: '', tech: '', attr: ''});
+
+          this.player.one('sourceset', (e2) => {
+            // should be the same event
+            validateSource(this.player, this.testSrc, e2, {el: '', tech: '', attr: ''});
+
+            done();
+          });
+        });
+
+        // since the media el has no source, just appending will
+        // change the source without calling load
+        appendObj.fn(this.player.tech_.el_, this.source);
+
+        // should fire an additional sourceset
+        this.player.tech_.el_.load();
+      });
+
+      QUnit.test(`one <source> through ${appendObj.name} and then mediaEl.src`, function(assert) {
+        const done = assert.async();
+
+        this.totalSourcesets = 2;
+        this.source = document.createElement('source');
+        this.source.src = this.testSrc.src;
+        this.source.type = this.testSrc.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, this.testSrc, e, {el: '', tech: '', attr: ''});
+
+          this.player.one('sourceset', (e2) => {
+            validateSource(this.player, this.sourceOne, e2);
+
+            done();
+          });
+        });
+
+        // since the media el has no source, just appending will
+        // change the source without calling load
+        appendObj.fn(this.player.tech_.el_, this.source);
+
+        // should fire an additional sourceset
+        this.player.tech_.el_.src = this.sourceOne.src;
+      });
+
+      QUnit.test(`one <source> through ${appendObj.name} and then mediaEl.setAttribute`, function(assert) {
+        const done = assert.async();
+
+        this.totalSourcesets = 2;
+        this.source = document.createElement('source');
+        this.source.src = this.testSrc.src;
+        this.source.type = this.testSrc.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, this.testSrc, e, {el: '', tech: '', attr: ''});
+
+          this.player.one('sourceset', (e2) => {
+            validateSource(this.player, this.sourceOne, e2);
+
+            done();
+          });
+        });
+
+        // since the media el has no source, just appending will
+        // change the source without calling load
+        appendObj.fn(this.player.tech_.el_, this.source);
+
+        // should fire an additional sourceset
+        this.player.tech_.el_.setAttribute('src', this.sourceOne.src);
+      });
+
+      QUnit.test(`mediaEl.src and then <source> through ${appendObj.name}`, function(assert) {
+        const done = assert.async();
+
+        this.source = document.createElement('source');
+        this.source.src = this.testSrc.src;
+        this.source.type = this.testSrc.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, this.sourceOne, e);
+
+          done();
+        });
+
+        this.player.tech_.el_.src = this.sourceOne.src;
+
+        // should not fire sourceset
+        appendObj.fn(this.player.tech_.el_, this.source);
+      });
+
+      QUnit.test(`mediaEl.setAttribute and then <source> through ${appendObj.name}`, function(assert) {
+        const done = assert.async();
+
+        this.source = document.createElement('source');
+        this.source.src = this.testSrc.src;
+        this.source.type = this.testSrc.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, this.sourceOne, e);
+
+          done();
+        });
+
+        this.player.tech_.el_.setAttribute('src', this.sourceOne.src);
+
+        // should not fire sourceset
+        appendObj.fn(this.player.tech_.el_, this.source);
+      });
+
+      QUnit.test(`<source> two sources through ${appendObj.name}`, function(assert) {
+        const done = assert.async();
+
+        this.source = document.createElement('source');
+        this.source.src = this.sourceOne.src;
+        this.source.type = this.sourceOne.type;
+
+        this.source2 = document.createElement('source');
+        this.source2.src = this.sourceTwo.src;
+        this.source2.type = this.sourceTwo.type;
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, [this.sourceOne], e, {el: '', attr: '', tech: ''});
+
+          done();
+        });
+
+        // since the media el has no source, just appending will
+        // change the source without calling load
+        appendObj.fn(this.player.tech_.el_, this.source);
+
+        // this should not be in the source list or fire a sourceset
+        appendObj.fn(this.player.tech_.el_, this.source);
+      });
+
+      QUnit.test('no source and load', function(assert) {
+        const done = assert.async();
+
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
+        this.player.tech_.el_.load();
+
+        this.totalSourcesets = 0;
+
+        window.setTimeout(() => {
+          assert.equal(this.sourcesets.length, 0, 'no sourceset');
+          done();
+        }, wait);
+      });
+
+    });
+  }));
+
   QUnit.module('source change', (subhooks) => testTypes.forEach((testName) => {
     QUnit.module(testName, {
       beforeEach(assert) {
@@ -400,7 +639,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         setupEnv(this, testName);
 
         this.mediaEl.src = this.testSrc.src;
-        this.player = videojs(this.mediaEl);
+        this.player = videojs(this.mediaEl, {enableSourceset: true});
 
         this.player.ready(() => {
           this.mediaEl = this.player.tech_.el();
@@ -544,8 +783,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('mediaEl.load() with a src attribute', function(assert) {
       const done = assert.async();
 
-      this.player = videojs(this.mediaEl);
-
       this.totalSourcesets = 2;
 
       this.player.one('sourceset', (e) => {
@@ -614,12 +851,12 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         validateSource(this.player, {src: '', type: ''}, e1);
 
         // after loadstart we will have source set correctly
-        this.player.tech_.src = () => this.sourceOne.src;
+        this.player.tech_.currentSrc = () => this.sourceOne.src;
         this.player.trigger('loadstart');
 
         // validate that the caches have updated
         // el, and attr will not be up to date as this wasn't a real loadstart
-        validateSource(this.player, [this.sourceOne, this.sourceTwo], e1, {event: '', el: '', attr: ''});
+        validateSource(this.player, [this.sourceOne, this.sourceTwo], e1, {event: '', el: '', attr: '', tech: ''});
         done();
       });
 
@@ -749,7 +986,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     const fixture = document.querySelector('#qunit-fixture');
     const vid = document.createElement('video');
     const Tech = videojs.getTech('Tech');
-    let sourcesets = 0;
+    const sourcesets = [];
 
     class FakeFlash extends Html5 {
       static isSupported() {
@@ -770,38 +1007,31 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     fixture.appendChild(vid);
 
     const player = videojs(vid, {
+      enableSourceset: true,
       techOrder: ['fakeFlash', 'html5']
+    });
+
+    player.on('sourceset', (e) => {
+      sourcesets.push(e.src);
+
+      if (sourcesets.length === 3) {
+        // the second sourceset ends up being the second source because when the first source is set
+        // the tech isn't ready so we delay it, then the second source comes and the tech is ready
+        // so it ends up being triggered immediately.
+        assert.deepEqual([flashSrc.src, sourceTwo.src, sourceOne.src], sourcesets, 'sourcesets happen in order');
+
+        player.dispose();
+        delete Tech.techs_.FakeFlash;
+        window.setTimeout(() => {
+          assert.equal(sourcesets.length, 3, 'only 3 sourcesets');
+          done();
+        }, wait);
+      }
     });
 
     player.src(flashSrc);
 
     player.ready(function() {
-      // the first sourceset comes from our FakeFlash because it extends Html5 tech
-      // which calls load() on dispose for various reasons
-      player.one('sourceset', function(e1) {
-        // ignore the first sourceset that gets called when disposing the original tech
-
-        // the second sourceset ends up being the second source because when the first source is set
-        // the tech isn't ready so we delay it, then the second source comes and the tech is ready
-        // so it ends up being triggered immediately.
-        player.one('sourceset', function(e2) {
-          assert.equal(e2.src, sourceTwo.src, 'the second sourceset ends up being the second source');
-          sourcesets++;
-
-          // now that the tech is ready, we will re-trigger the original sourceset event
-          // and get the first source
-          player.one('sourceset', function(e3) {
-            assert.equal(e3.src, sourceOne.src, 'the third sourceset is the first source');
-            sourcesets++;
-
-            assert.equal(sourcesets, 2, 'two sourcesets');
-            player.dispose();
-            delete Tech.techs_.FakeFlash;
-            done();
-          });
-        });
-      });
-
       player.src(sourceOne);
       player.src(sourceTwo);
     });
