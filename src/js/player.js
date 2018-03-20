@@ -180,22 +180,6 @@ const TECH_EVENTS_RETRIGGER = [
   'timeupdate',
 
   /**
-   * Fires when the playing speed of the audio/video is changed
-   *
-   * @event Player#ratechange
-   * @type {event}
-   */
-  /**
-   * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
-   *
-   * @private
-   * @method Player#handleTechRatechange_
-   * @fires Player#ratechange
-   * @listens Tech#ratechange
-   */
-  'ratechange',
-
-  /**
    * Fires when the video's intrinsic dimensions change
    *
    * @event Player#resize
@@ -244,6 +228,7 @@ const TECH_EVENTS_RETRIGGER = [
   'texttrackchange'
 ];
 
+// events to queue when playback rate is zero
 const TECH_EVENTS_QUEUE = {
   canplay: 'CanPlay',
   canplaythrough: 'CanPlayThrough',
@@ -980,11 +965,14 @@ class Player extends Component {
 
     Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
       this.on(this.tech_, event, () => {
-        if (this.tech_.playbackRate() === 0) {
-          this.queuedCallbacks_.push(this[`handleTech${TECH_EVENTS_QUEUE[event]}_`].bind(this));
+        if (this.tech_.playbackRate() === 0 && this.tech_.seeking()) {
+          this.queuedCallbacks_.push({
+            callback: this[`handleTech${TECH_EVENTS_QUEUE[event]}_`].bind(this),
+            event
+          });
           return;
         }
-        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`]();
+        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`](event);
       });
     });
 
@@ -1295,14 +1283,29 @@ class Player extends Component {
   }
 
   /**
-   * TODO: docs
+   * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
+   *
+   * If there were any events queued while the playback rate was zero, fire
+   * those events now.
+   *
+   * @private
+   * @method Player#handleTechRateChange_
+   * @fires Player#ratechange
+   * @listens Tech#ratechange
    */
   handleTechRateChange_() {
     if (this.tech_.playbackRate() > 0 && this.previousPlaybackRate === 0) {
-      this.queuedCallbacks_.forEach((callback) => callback());
+      this.queuedCallbacks_.forEach((queued) => queued.callback(queued.event));
       this.queuedCallbacks_ = [];
     }
     this.previousPlaybackRate = this.tech_.playbackRate();
+    /**
+     * Fires when the playing speed of the audio/video is changed
+     *
+     * @event Player#ratechange
+     * @type {event}
+     */
+    this.trigger('ratechange');
   }
 
   /**
