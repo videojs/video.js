@@ -441,6 +441,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     });
 
     QUnit.test('mediaEl.load()', function(assert) {
+      const done = assert.async();
       const source = document.createElement('source');
 
       source.src = this.testSrc.src;
@@ -451,10 +452,11 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       this.mediaEl.removeAttribute('src');
 
       this.player.one('sourceset', (e1) => {
-        assert.equal(e1.src, '', 'we got a sourceset with an empty src');
+        assert.equal(e1.src, this.testSrc.src, 'we got a sourceset with an empty src');
 
         this.player.one('sourceset', (e2) => {
-          assert.equal(e2.src, '', 'we got a sourceset with an empty src');
+          assert.equal(e2.src, this.sourceOne.src, 'we got a sourceset with an empty src');
+          done();
         });
 
         source.src = this.sourceOne.src;
@@ -469,15 +471,17 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
     QUnit.test('mediaEl.load() x2 at the same time', function(assert) {
       const source = document.createElement('source');
+      const done = assert.async();
 
       source.src = this.sourceOne.src;
       source.type = this.sourceOne.type;
 
       this.player.one('sourceset', (e1) => {
-        assert.equal(e1.src, '', 'we got a sourceset with an empty src');
+        assert.equal(e1.src, this.sourceOne.src, 'we got a sourceset with an empty src');
 
         this.player.one('sourceset', (e2) => {
-          assert.equal(e2.src, '', 'we got a sourceset with an empty src');
+          assert.equal(e2.src, this.sourceTwo.src, 'we got a sourceset with an empty src');
+          done();
         });
       });
 
@@ -538,7 +542,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       src: 'http://example.com/oceans.flv',
       type: 'video/flv'
     };
-    let sourcesets = 0;
+    const sourcesets = [];
 
     class FakeFlash extends Html5 {
       static isSupported() {
@@ -563,38 +567,27 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       techOrder: ['fakeFlash', 'html5']
     });
 
-    player.src(flashSrc);
-
     player.ready(function() {
-      // the first sourceset comes from our FakeFlash because it extends Html5 tech
-      // which calls load() on dispose for various reasons
-      player.one('sourceset', function(e1) {
-        // ignore the first sourceset that gets called when disposing the original tech
+      // the second sourceset ends up being the second source because when the first source is set
+      // the tech isn't ready so we delay it, then the second source comes and the tech is ready
+      // so it ends up being triggered immediately.
+      player.on('sourceset', (e) => {
+        sourcesets.push(e.src);
 
-        // the second sourceset ends up being the second source because when the first source is set
-        // the tech isn't ready so we delay it, then the second source comes and the tech is ready
-        // so it ends up being triggered immediately.
-        player.one('sourceset', function(e2) {
-          assert.equal(e2.src, sourceTwo.src, 'the second sourceset ends up being the second source');
-          sourcesets++;
+        if (sourcesets.length === 3) {
+          assert.deepEqual([flashSrc.src, sourceTwo.src, sourceOne.src], sourcesets, 'sourceset as expected');
 
-          // now that the tech is ready, we will re-trigger the original sourceset event
-          // and get the first source
-          player.one('sourceset', function(e3) {
-            assert.equal(e3.src, sourceOne.src, 'the third sourceset is the first source');
-            sourcesets++;
-
-            assert.equal(sourcesets, 2, 'two sourcesets');
-            player.dispose();
-            delete Tech.techs_.FakeFlash;
-            done();
-          });
-        });
+          player.dispose();
+          delete Tech.techs_.FakeFlash;
+          done();
+        }
       });
 
       player.src(sourceOne);
       player.src(sourceTwo);
     });
+
+    player.src(flashSrc);
 
   });
 });

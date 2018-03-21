@@ -1,4 +1,5 @@
 import window from 'global/window';
+import mergeOptions from '../utils/merge-options';
 
 /**
  * This function is used to fire a sourceset when there is something
@@ -7,6 +8,9 @@ import window from 'global/window';
  *
  * @param {Html5} tech
  *        The tech object that sourceset was setup on
+ *
+ * @return {boolean}
+ *         returns false if the sourceset was not fired and true otherwise.
  */
 const sourcesetLoad = (tech) => {
   const el = tech.el();
@@ -14,7 +18,7 @@ const sourcesetLoad = (tech) => {
   // if `el.src` is set, that source will be loaded.
   if (el.src) {
     tech.triggerSourceset(el.src);
-    return;
+    return true;
   }
 
   /**
@@ -35,7 +39,7 @@ const sourcesetLoad = (tech) => {
 
   // if there are no sources, do not fire sourceset
   if (!sources.length) {
-    return;
+    return false;
   }
 
   // only count valid/non-duplicate source elements
@@ -54,6 +58,7 @@ const sourcesetLoad = (tech) => {
   }
 
   tech.triggerSourceset(src);
+  return true;
 };
 
 /**
@@ -118,7 +123,7 @@ const getSrcDescriptor = (el) => {
   if (Object.getOwnPropertyDescriptor(el, 'src')) {
     srcDescriptor = Object.getOwnPropertyDescriptor(el, 'src');
   } else if (Object.getOwnPropertyDescriptor(proto, 'src')) {
-    srcDescriptor = Object.getOwnPropertyDescriptor(proto, 'src');
+    srcDescriptor = mergeOptions(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
   }
 
   if (!srcDescriptor.get) {
@@ -143,8 +148,12 @@ const getSrcDescriptor = (el) => {
 /**
  * Patches browser internal functions so that we can tell syncronously
  * if a `<source>` was appended to the media element. For some reason this
- * will cause a `sourceset` if the the media element is ready and has yet to
- * be given a source. It does this by patching the following functions/properties:
+ * will cause a `sourceset` if the the media element is ready and has no source. This
+ * happens when:
+ * - The page has just loaded and the media element does not have a source.
+ * - The media element was emptied of all sources, then `load()` was called.
+ *
+ * It does this by patching the following functions/properties:
  *
  * - `append()` - can be used to add a `<source>` element to the media element
  * - `appendChild()` - can be used to add a `<source>` element to the media element
@@ -154,8 +163,14 @@ const getSrcDescriptor = (el) => {
  * @param {Html5} tech
  *        The tech object that sourceset is being setup on.
  */
-const firstSourceAppend = function(tech) {
+const firstSourceWatch = function(tech) {
   const el = tech.el();
+
+  if (el.firstSourceWatch_) {
+    return;
+  }
+
+  el.firstSourceWatch_ = true;
   const oldAppend = el.append;
   const oldAppendChild = el.appendChild;
   const oldInsertAdjacentHTML = el.insertAdjacentHTML;
@@ -228,7 +243,7 @@ const firstSourceAppend = function(tech) {
  *              cause a sourceset.
  *
  * If there is no source when we are adding `sourceset` support we also
- * patch the functions listed in `firstSourceAppend`.
+ * patch the functions listed in `firstSourceWatch`.
  *
  * @param {Html5} tech
  *        The tech to patch
@@ -239,7 +254,7 @@ const setupSourceset = function(tech) {
   }
 
   const el = tech.el();
-  const srcDescriptor = getSrcDescriptor(tech);
+  const srcDescriptor = getSrcDescriptor(el);
   const oldSetAttribute = el.setAttribute;
   const oldLoad = el.load;
 
@@ -253,13 +268,13 @@ const setupSourceset = function(tech) {
   // for some reason adding a source element when a mediaElement has no source
   // calls `load` internally right away. We need to handle that.
   if (!el.src && !el.currentSrc && !tech.$$('source').length) {
-    firstSourceAppend(tech);
+    firstSourceWatch(tech);
   }
 
   Object.defineProperty(el, 'src', {
     get: srcDescriptor.get.bind(el),
     set: (v) => {
-      const retval = srcDescriptor.set.call(el, v);
+      const retval = srcDescriptor.set.call(tech.el(), v);
 
       // we use the getter here to get the actual value set on
       // src
@@ -284,7 +299,13 @@ const setupSourceset = function(tech) {
   el.load = () => {
     const retval = oldLoad.call(el);
 
-    sourcesetLoad(tech);
+    // if load was called, but there was no source to fire
+    // sourceset on. We have to watch for a source append
+    // as that can trigger a `sourceset` when the media element
+    // has no source
+    if (!sourcesetLoad(tech)) {
+      firstSourceWatch(tech);
+    }
 
     return retval;
   };
