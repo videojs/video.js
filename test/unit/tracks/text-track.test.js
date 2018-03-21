@@ -7,6 +7,7 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import proxyquireify from 'proxyquireify';
 import sinon from 'sinon';
+import log from '../../../src/js/utils/log.js';
 
 const proxyquire = proxyquireify(require);
 
@@ -416,6 +417,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   const clock = sinon.useFakeTimers();
   const errorSpy = sinon.spy();
   const oldVTT = window.WebVTT;
+  const oldLogError = log.error;
   const parserCreated = false;
   const reqs = [];
 
@@ -423,16 +425,9 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
     reqs.push(req);
   };
 
-  window.WebVTT = true;
+  log.error = errorSpy;
 
-  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
-  const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
-    '../utils/log.js': {
-      default: {
-        error: errorSpy
-      }
-    }
-  }).default;
+  window.WebVTT = true;
 
   const testTech = new EventTarget();
 
@@ -464,4 +459,5 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   clock.restore();
   window.WebVTT = oldVTT;
+  log.error = oldLogError;
 });
