@@ -995,9 +995,6 @@ Html5.canControlPlaybackRate = function() {
  *         - False otherwise
  */
 Html5.canOverrideAttributes = function() {
-  if (browser.IS_IE8) {
-    return false;
-  }
   // if we cannot overwrite the src property, there is no support
   // iOS 7 safari for instance cannot do this.
   try {

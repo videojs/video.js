@@ -70,7 +70,6 @@ export const CHROME_VERSION = (function() {
   }
   return null;
 }());
-export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
 export const IE_VERSION = (function() {
   const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT);
   let version = result && parseFloat(result[1]);

@@ -10,7 +10,6 @@ import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 import merge from '../utils/merge-options';
-import * as browser from '../utils/browser.js';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -163,27 +162,17 @@ class TextTrack extends Track {
     if (settings.kind === 'metadata' || settings.kind === 'chapters') {
       mode = 'hidden';
     }
-    // on IE8 this will be a document element
-    // for every other browser this will be a normal object
-    const tt = super(settings);
+    super(settings);
 
-    tt.tech_ = settings.tech;
+    this.tech_ = settings.tech;
 
-    if (browser.IS_IE8) {
-      for (const prop in TextTrack.prototype) {
-        if (prop !== 'constructor') {
-          tt[prop] = TextTrack.prototype[prop];
-        }
-      }
-    }
+    this.cues_ = [];
+    this.activeCues_ = [];
 
-    tt.cues_ = [];
-    tt.activeCues_ = [];
-
-    const cues = new TextTrackCueList(tt.cues_);
-    const activeCues = new TextTrackCueList(tt.activeCues_);
+    const cues = new TextTrackCueList(this.cues_);
+    const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
-    const timeupdateHandler = Fn.bind(tt, function() {
+    const timeupdateHandler = Fn.bind(this, function() {
 
       // Accessing this.activeCues for the side-effects of updating itself
       // due to it's nature as a getter function. Do not remove or cues will
@@ -198,8 +187,8 @@ class TextTrack extends Track {
     });
 
     if (mode !== 'disabled') {
-      tt.tech_.ready(() => {
-        tt.tech_.on('timeupdate', timeupdateHandler);
+      this.tech_.ready(() => {
+        this.tech_.on('timeupdate', timeupdateHandler);
       }, true);
     }
 
@@ -212,7 +201,7 @@ class TextTrack extends Track {
      *
      * @readonly
      */
-    Object.defineProperty(tt, 'default', {
+    Object.defineProperty(this, 'default', {
       get() {
         return default_;
       },
@@ -228,7 +217,7 @@ class TextTrack extends Track {
      *
      * @fires TextTrack#modechange
      */
-    Object.defineProperty(tt, 'mode', {
+    Object.defineProperty(this, 'mode', {
       get() {
         return mode;
       },
@@ -263,7 +252,7 @@ class TextTrack extends Track {
      *         The text track cue list for this TextTrack.
      * @instance
      */
-    Object.defineProperty(tt, 'cues', {
+    Object.defineProperty(this, 'cues', {
       get() {
         if (!this.loaded_) {
           return null;
@@ -280,7 +269,7 @@ class TextTrack extends Track {
      *         The list text track cues that are currently active for this TextTrack.
      * @instance
      */
-    Object.defineProperty(tt, 'activeCues', {
+    Object.defineProperty(this, 'activeCues', {
       get() {
         if (!this.loaded_) {
           return null;
@@ -327,13 +316,11 @@ class TextTrack extends Track {
     });
 
     if (settings.src) {
-      tt.src = settings.src;
-      loadTrack(settings.src, tt);
+      this.src = settings.src;
+      loadTrack(settings.src, this);
     } else {
-      tt.loaded_ = true;
+      this.loaded_ = true;
     }
-
-    return tt;
   }
 
   /**

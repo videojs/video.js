@@ -1,8 +1,6 @@
 /**
  * @file text-track-cue-list.js
  */
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
 
 /**
  * @typedef {Object} TextTrackCueList~TextTrackCue
@@ -36,19 +34,7 @@ class TextTrackCueList {
    *        A list of cues to be initialized with
    */
   constructor(cues) {
-    let list = this; // eslint-disable-line
-
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-
-      for (const prop in TextTrackCueList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TextTrackCueList.prototype[prop];
-        }
-      }
-    }
-
-    TextTrackCueList.prototype.setCues_.call(list, cues);
+    TextTrackCueList.prototype.setCues_.call(this, cues);
 
     /**
      * @memberof TextTrackCueList
@@ -56,15 +42,11 @@ class TextTrackCueList {
      *         The current number of `TextTrackCue`s in the TextTrackCueList.
      * @instance
      */
-    Object.defineProperty(list, 'length', {
+    Object.defineProperty(this, 'length', {
       get() {
         return this.length_;
       }
     });
-
-    if (browser.IS_IE8) {
-      return list;
-    }
   }
 
   /**
