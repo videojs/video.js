@@ -55,8 +55,6 @@ export const ANDROID_VERSION = (function() {
   return null;
 }());
 
-// Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
-export const IS_OLD_ANDROID = IS_ANDROID && (/webkit/i).test(USER_AGENT) && ANDROID_VERSION < 2.3;
 export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebkitVersion < 537;
 
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
