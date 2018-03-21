@@ -2,7 +2,7 @@
  * @file play-progress-bar.js
  */
 import Component from '../../component.js';
-import {IE_VERSION, IS_IOS, IS_ANDROID} from '../../utils/browser.js';
+import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import formatTime from '../../utils/format-time.js';
 
 import './time-tooltip';
