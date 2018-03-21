@@ -70,28 +70,31 @@ class HTMLTrackElement extends EventTarget {
     this.label = track.label;
     this.default = track.default;
 
-    /**
-     * @memberof HTMLTrackElement
-     * @member {HTMLTrackElement~ReadyState} readyState
-     *         The current ready state of the track element.
-     * @instance
-     */
-    Object.defineProperty(this, 'readyState', {
-      get() {
-        return readyState;
-      }
-    });
+    Object.defineProperties(this, {
 
-    /**
-     * @memberof HTMLTrackElement
-     * @member {TextTrack} track
-     *         The underlying TextTrack object.
-     * @instance
-     *
-     */
-    Object.defineProperty(this, 'track', {
-      get() {
-        return track;
+      /**
+       * @memberof HTMLTrackElement
+       * @member {HTMLTrackElement~ReadyState} readyState
+       *         The current ready state of the track element.
+       * @instance
+       */
+      readyState: {
+        get() {
+          return readyState;
+        }
+      },
+
+      /**
+       * @memberof HTMLTrackElement
+       * @member {TextTrack} track
+       *         The underlying TextTrack object.
+       * @instance
+       *
+       */
+      track: {
+        get() {
+          return track;
+        }
       }
     });
 
