@@ -1,5 +1,4 @@
 /* eslint-env qunit */
-import window from 'global/window';
 import document from 'global/document';
 import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
