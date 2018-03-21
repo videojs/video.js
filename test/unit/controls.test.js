@@ -7,7 +7,6 @@ import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
-import Html5 from '../../src/js/tech/html5.js';
 import sinon from 'sinon';
 
 QUnit.module('Controls', {

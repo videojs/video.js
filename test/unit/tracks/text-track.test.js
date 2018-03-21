@@ -5,11 +5,8 @@ import TrackBaseline from './track-baseline';
 import TechFaker from '../tech/tech-faker';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
-import proxyquireify from 'proxyquireify';
 import sinon from 'sinon';
 import log from '../../../src/js/utils/log.js';
-
-const proxyquire = proxyquireify(require);
 
 QUnit.module('Text Track', {
   beforeEach() {
@@ -334,7 +331,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   let parserCreated = false;
   const reqs = [];
 
-  xhr.onCreate = function(req) {
+  window.xhr.onCreate = function(req) {
     reqs.push(req);
   };
 
@@ -351,10 +348,12 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
     };
   };
 
+  /* eslint-disable no-unused-vars */
   const tt = new TextTrack({
     tech: this.tech,
     src: 'http://example.com'
   });
+  /* eslint-enable no-unused-vars */
 
   reqs.pop().respond(200, null, 'WEBVTT\n');
 
@@ -370,7 +369,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   let parserCreated = false;
   const reqs = [];
 
-  xhr.onCreate = function(req) {
+  window.xhr.onCreate = function(req) {
     reqs.push(req);
   };
 
@@ -381,10 +380,12 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
 
+  /* eslint-disable no-unused-vars */
   const tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
   });
+  /* eslint-enable no-unused-vars */
 
   reqs.pop().respond(200, null, 'WEBVTT\n');
 
@@ -421,7 +422,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   const parserCreated = false;
   const reqs = [];
 
-  xhr.onCreate = function(req) {
+  window.xhr.onCreate = function(req) {
     reqs.push(req);
   };
 
@@ -437,10 +438,12 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   sinon.stub(testTech, 'off');
   testTech.off.withArgs('vttjsloaded');
 
+  /* eslint-disable no-unused-vars */
   const tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
   });
+  /* eslint-enable no-unused-vars */
 
   reqs.pop().respond(200, null, 'WEBVTT\n');
 

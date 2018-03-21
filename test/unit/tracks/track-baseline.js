@@ -1,5 +1,4 @@
 /* eslint-env qunit */
-import * as browser from '../../../src/js/utils/browser.js';
 
 /**
  * Tests baseline functionality for all tracks
