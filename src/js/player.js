@@ -568,6 +568,13 @@ class Player extends Component {
       el.appendChild(tag);
 
       playerElIngest = this.playerElIngest_ = el;
+      // move properties over from our custom `video-js` element
+      // to our new `video` element. This will move things like
+      // `src` or `controls` that were set via js before the player
+      // was initialized.
+      Object.keys(el).forEach((k) => {
+        tag[k] = el[k];
+      });
     }
 
     // set tabindex to -1 so we could focus on the player element
