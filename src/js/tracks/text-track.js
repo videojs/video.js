@@ -192,127 +192,129 @@ class TextTrack extends Track {
       }, true);
     }
 
-    /**
-     * @memberof TextTrack
-     * @member {boolean} default
-     *         If this track was set to be on or off by default. Cannot be changed after
-     *         creation.
-     * @instance
-     *
-     * @readonly
-     */
-    Object.defineProperty(this, 'default', {
-      get() {
-        return default_;
+    Object.defineProperties(this, {
+      /**
+       * @memberof TextTrack
+       * @member {boolean} default
+       *         If this track was set to be on or off by default. Cannot be changed after
+       *         creation.
+       * @instance
+       *
+       * @readonly
+       */
+      default: {
+        get() {
+          return default_;
+        },
+        set() {}
       },
-      set() {}
-    });
 
-    /**
-     * @memberof TextTrack
-     * @member {string} mode
-     *         Set the mode of this TextTrack to a valid {@link TextTrack~Mode}. Will
-     *         not be set if setting to an invalid mode.
-     * @instance
-     *
-     * @fires TextTrack#modechange
-     */
-    Object.defineProperty(this, 'mode', {
-      get() {
-        return mode;
-      },
-      set(newMode) {
-        if (!TextTrackMode[newMode]) {
-          return;
-        }
-        mode = newMode;
-        if (mode === 'showing') {
-
-          this.tech_.ready(() => {
-            this.tech_.on('timeupdate', timeupdateHandler);
-          }, true);
-        }
-        /**
-         * An event that fires when mode changes on this track. This allows
-         * the TextTrackList that holds this track to act accordingly.
-         *
-         * > Note: This is not part of the spec!
-         *
-         * @event TextTrack#modechange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('modechange');
-
-      }
-    });
-
-    /**
-     * @memberof TextTrack
-     * @member {TextTrackCueList} cues
-     *         The text track cue list for this TextTrack.
-     * @instance
-     */
-    Object.defineProperty(this, 'cues', {
-      get() {
-        if (!this.loaded_) {
-          return null;
-        }
-
-        return cues;
-      },
-      set() {}
-    });
-
-    /**
-     * @memberof TextTrack
-     * @member {TextTrackCueList} activeCues
-     *         The list text track cues that are currently active for this TextTrack.
-     * @instance
-     */
-    Object.defineProperty(this, 'activeCues', {
-      get() {
-        if (!this.loaded_) {
-          return null;
-        }
-
-        // nothing to do
-        if (this.cues.length === 0) {
-          return activeCues;
-        }
-
-        const ct = this.tech_.currentTime();
-        const active = [];
-
-        for (let i = 0, l = this.cues.length; i < l; i++) {
-          const cue = this.cues[i];
-
-          if (cue.startTime <= ct && cue.endTime >= ct) {
-            active.push(cue);
-          } else if (cue.startTime === cue.endTime &&
-                     cue.startTime <= ct &&
-                     cue.startTime + 0.5 >= ct) {
-            active.push(cue);
+      /**
+       * @memberof TextTrack
+       * @member {string} mode
+       *         Set the mode of this TextTrack to a valid {@link TextTrack~Mode}. Will
+       *         not be set if setting to an invalid mode.
+       * @instance
+       *
+       * @fires TextTrack#modechange
+       */
+      mode: {
+        get() {
+          return mode;
+        },
+        set(newMode) {
+          if (!TextTrackMode[newMode]) {
+            return;
           }
+          mode = newMode;
+          if (mode === 'showing') {
+
+            this.tech_.ready(() => {
+              this.tech_.on('timeupdate', timeupdateHandler);
+            }, true);
+          }
+          /**
+           * An event that fires when mode changes on this track. This allows
+           * the TextTrackList that holds this track to act accordingly.
+           *
+           * > Note: This is not part of the spec!
+           *
+           * @event TextTrack#modechange
+           * @type {EventTarget~Event}
+           */
+          this.trigger('modechange');
+
         }
+      },
 
-        changed = false;
+      /**
+       * @memberof TextTrack
+       * @member {TextTrackCueList} cues
+       *         The text track cue list for this TextTrack.
+       * @instance
+       */
+      cues: {
+        get() {
+          if (!this.loaded_) {
+            return null;
+          }
 
-        if (active.length !== this.activeCues_.length) {
-          changed = true;
-        } else {
-          for (let i = 0; i < active.length; i++) {
-            if (this.activeCues_.indexOf(active[i]) === -1) {
-              changed = true;
+          return cues;
+        },
+        set() {}
+      },
+
+      /**
+       * @memberof TextTrack
+       * @member {TextTrackCueList} activeCues
+       *         The list text track cues that are currently active for this TextTrack.
+       * @instance
+       */
+      activeCues: {
+        get() {
+          if (!this.loaded_) {
+            return null;
+          }
+
+          // nothing to do
+          if (this.cues.length === 0) {
+            return activeCues;
+          }
+
+          const ct = this.tech_.currentTime();
+          const active = [];
+
+          for (let i = 0, l = this.cues.length; i < l; i++) {
+            const cue = this.cues[i];
+
+            if (cue.startTime <= ct && cue.endTime >= ct) {
+              active.push(cue);
+            } else if (cue.startTime === cue.endTime &&
+                       cue.startTime <= ct &&
+                       cue.startTime + 0.5 >= ct) {
+              active.push(cue);
             }
           }
-        }
 
-        this.activeCues_ = active;
-        activeCues.setCues_(this.activeCues_);
+          changed = false;
 
-        return activeCues;
-      },
-      set() {}
+          if (active.length !== this.activeCues_.length) {
+            changed = true;
+          } else {
+            for (let i = 0; i < active.length; i++) {
+              if (this.activeCues_.indexOf(active[i]) === -1) {
+                changed = true;
+              }
+            }
+          }
+
+          this.activeCues_ = active;
+          activeCues.setCues_(this.activeCues_);
+
+          return activeCues;
+        },
+        set() {}
+      }
     });
 
     if (settings.src) {
