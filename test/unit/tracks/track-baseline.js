@@ -35,10 +35,6 @@ const TrackBaseline = function(TrackClass, options) {
   QUnit.test('returns an instance of itself on non ie8 browsers', function(assert) {
     const track = new TrackClass(options);
 
-    if (browser.IS_IE8) {
-      assert.ok(track, 'returns an object on ie8');
-      return;
-    }
     assert.ok(track instanceof TrackClass, 'returns an instance');
   });
 };
