@@ -1179,15 +1179,6 @@ Html5.patchCanPlayType = function() {
       }
       return canPlayType.call(this, type);
     };
-
-  // Override Android 2.2 and less canPlayType method which is broken
-  } else if (browser.IS_OLD_ANDROID) {
-    Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
-      if (type && mp4RE.test(type)) {
-        return 'maybe';
-      }
-      return canPlayType.call(this, type);
-    };
   }
 };
 
