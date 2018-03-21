@@ -101,7 +101,7 @@ class HTMLTrackElement extends EventTarget {
      * @listens TextTrack#loadeddata
      * @fires HTMLTrackElement#load
      */
-    track.addEventListener('loadeddata', function() {
+    track.addEventListener('loadeddata', () => {
       readyState = LOADED;
 
       this.trigger({
