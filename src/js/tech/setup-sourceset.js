@@ -1,4 +1,5 @@
 import window from 'global/window';
+import document from 'global/document';
 import mergeOptions from '../utils/merge-options';
 
 /**
@@ -76,7 +77,7 @@ const getInnerHTMLDescriptor = (el) => {
   const proto = window.Element.prototype;
   let innerDescriptor = {};
 
-  // preserve getters/setters already on `el.src` if they exist
+  // preserve getters/setters already on `el.innerHTML` if they exist
   if (Object.getOwnPropertyDescriptor(el, 'innerHTML')) {
     innerDescriptor = Object.getOwnPropertyDescriptor(el, 'innerHTML');
   } else if (Object.getOwnPropertyDescriptor(proto, 'innerHTML')) {
@@ -85,13 +86,29 @@ const getInnerHTMLDescriptor = (el) => {
 
   if (!innerDescriptor.get) {
     innerDescriptor.get = function() {
-      return el.cloneNode.innerHTML;
+      return el.cloneNode().innerHTML;
     };
   }
 
   if (!innerDescriptor.set) {
     innerDescriptor.set = function(v) {
-      window.Element.prototype.insertAdjacentHTML.call(el, 'afterbegin', v);
+      const dummy = document.createElement('div');
+
+      dummy.innerHTML = v;
+
+      // remove all elements from dummy and add
+      // to our el
+      while (dummy.children.length) {
+        const child = dummy.removeChild(dummy.children[0]);
+
+        window.Element.prototype.appendChild.call(el, child);
+      }
+
+      // if any text is left it is not an element and
+      // we must add that as innerText
+      if (dummy.innerText) {
+        el.innerText = dummy.innerText;
+      }
 
       return v;
     };
@@ -194,13 +211,15 @@ const firstSourceWatch = function(tech) {
     };
   }
 
-  el.insertAdjacentHTML = function() {
-    const retval = oldInsertAdjacentHTML.apply(el, arguments);
+  if (oldInsertAdjacentHTML) {
+    el.insertAdjacentHTML = function() {
+      const retval = oldInsertAdjacentHTML.apply(el, arguments);
 
-    sourcesetLoad(tech);
+      sourcesetLoad(tech);
 
-    return retval;
-  };
+      return retval;
+    };
+  }
 
   Object.defineProperty(el, 'innerHTML', {
     get: innerDescriptor.get.bind(el),
@@ -223,7 +242,9 @@ const firstSourceWatch = function(tech) {
     if (oldAppend) {
       el.append = oldAppend;
     }
-    el.insertAdjacentHTML = oldInsertAdjacentHTML;
+    if (oldInsertAdjacentHTML) {
+      el.insertAdjacentHTML = oldInsertAdjacentHTML;
+    }
 
     Object.defineProperty(el, 'innerHTML', {
       get: innerDescriptor.get.bind(el),
