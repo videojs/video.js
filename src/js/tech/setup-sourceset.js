@@ -204,8 +204,8 @@ const firstSourceWatch = function(tech) {
 
   Object.defineProperty(el, 'innerHTML', {
     get: innerDescriptor.get.bind(el),
-    set() {
-      const retval = innerDescriptor.set.call(el, arguments);
+    set(v) {
+      const retval = innerDescriptor.set.call(el, v);
 
       sourcesetLoad(tech);
 
@@ -217,7 +217,8 @@ const firstSourceWatch = function(tech) {
 
   // on the first sourceset, we need to revert
   // our changes
-  tech.one('sourceset', () => {
+  tech.one('sourceset', (e) => {
+    el.firstSourceWatch_ = false;
     el.appendChild = oldAppendChild;
     if (oldAppend) {
       el.append = oldAppend;
