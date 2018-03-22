@@ -31,8 +31,8 @@
   box-sizing: border-box;
 }
 
-// prevent menus from opening while scrubbing (FF, IE)
-.vjs-scrubbing .vjs-menu-button:hover .vjs-menu {
+// prevent menus from opening while scrubbing
+.vjs-scrubbing .vjs-control.vjs-menu-button:hover .vjs-menu {
   display: none;
 }
 
