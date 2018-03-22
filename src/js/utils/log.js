@@ -3,8 +3,6 @@
  * @module log
  */
 import window from 'global/window';
-import {IE_VERSION} from './browser';
-import {isObject} from './obj';
 
 let log;
 
@@ -65,7 +63,7 @@ export const logByType = (type, args) => {
     return;
   }
 
-    fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
+  fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
 };
 
 /**
