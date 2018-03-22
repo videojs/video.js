@@ -87,7 +87,3 @@ export const TOUCH_ENABLED = Dom.isReal() && (
   'ontouchstart' in window ||
   window.DocumentTouch &&
   window.document instanceof window.DocumentTouch);
-
-export const BACKGROUND_SIZE_SUPPORTED = (
-  Dom.isReal() &&
-  'backgroundSize' in window.document.createElement('video').style);
