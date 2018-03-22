@@ -2884,7 +2884,7 @@ class Player extends Component {
     this.addClass('vjs-error');
 
     // log the name of the error type and any message
-    // ie8 just logs "[object object]" if you just log the error object
+    // IE11 logs "[object object]" and required you to expand message to see error object
     log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     /**
