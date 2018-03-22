@@ -34,8 +34,6 @@ const autoSetup = function() {
       const mediaEl = mediaEls[i];
 
       // Check if element exists, has getAttribute func.
-      // IE seems to consider typeof el.getAttribute == 'object' instead of
-      // 'function' like expected, at least when loading the player immediately.
       if (mediaEl && mediaEl.getAttribute) {
 
         // Make sure this player hasn't already been set up.
