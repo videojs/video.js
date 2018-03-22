@@ -65,7 +65,7 @@ export const logByType = (type, args) => {
     return;
   }
 
-  fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
+    fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
 };
 
 /**
