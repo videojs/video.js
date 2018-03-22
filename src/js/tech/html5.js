@@ -908,7 +908,7 @@ if (Dom.isReal()) {
  *         - False if HTML5 media is not supported.
  */
 Html5.isSupported = function() {
-  // IE9 with no Media Player is a LIAR! (#984)
+  // IE with no Media Player is a LIAR! (#984)
   try {
     Html5.TEST_VID.volume = 0.5;
   } catch (e) {
@@ -1852,8 +1852,7 @@ Html5.nativeSourceHandler = {};
  *         'probably', 'maybe', or '' (empty string)
  */
 Html5.nativeSourceHandler.canPlayType = function(type) {
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
+  // IE without MediaPlayer throws an error (#519)
   try {
     return Html5.TEST_VID.canPlayType(type);
   } catch (e) {
