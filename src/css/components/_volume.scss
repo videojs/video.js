@@ -34,13 +34,6 @@
   margin-left: -1px;
 
 }
-.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  & .vjs-volume-bar,
-  & .vjs-volume-level {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  }
-}
 
 .video-js .vjs-volume-panel {
   &:hover  .vjs-volume-control,
@@ -58,14 +51,6 @@
     visibility: visible;
     opacity: 1;
     position: relative;
-
-    &.vjs-volume-vertical {
-      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-      & .vjs-volume-bar,
-      & .vjs-volume-level {
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-      }
-    }
 
     $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
     @include transition($transition-property);
