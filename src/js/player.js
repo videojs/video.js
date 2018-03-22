@@ -578,20 +578,10 @@ class Player extends Component {
     tag.removeAttribute('height');
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
-      // workaround so we don't totally break IE7
-      // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
-      if (attr === 'class') {
-        el.className += ' ' + attrs[attr];
+      el.setAttribute(attr, attrs[attr]);
 
-        if (divEmbed) {
-          tag.className += ' ' + attrs[attr];
-        }
-      } else {
-        el.setAttribute(attr, attrs[attr]);
-
-        if (divEmbed) {
-          tag.setAttribute(attr, attrs[attr]);
-        }
+      if (divEmbed) {
+        tag.setAttribute(attr, attrs[attr]);
       }
     });
 
