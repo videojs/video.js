@@ -92,27 +92,6 @@ QUnit.test('logging functions should work', function(assert) {
                    'history recorded the correct arguments');
 });
 
-QUnit.test('in IE pre-11 (or when requested) objects and arrays are stringified', function(assert) {
-
-  // Need to reset history here because there are extra messages logged
-  // when running via Karma.
-  log.history.clear();
-
-  // Run a custom log call, explicitly requesting object/array stringification.
-  logByType('log', [
-    'test',
-    {foo: 'bar'},
-    [1, 2, 3],
-    0,
-    false,
-    null
-  ], true);
-
-  assert.ok(window.console.log.called, 'log was called');
-  assert.deepEqual(window.console.log.firstCall.args,
-            ['VIDEOJS: test {"foo":"bar"} [1,2,3] 0 false null']);
-});
-
 QUnit.test('setting the log level changes what is actually logged', function(assert) {
 
   // Need to reset history here because there are extra messages logged
