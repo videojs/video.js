@@ -1,11 +1,6 @@
 .video-js .vjs-mute-control {
   cursor: pointer;
   @include flex(none);
-  // padding here is for IE < 9, it doesn't do width: auto from
-  // another style correctly
-  padding-left: 2em;
-  padding-right: 2em;
-  padding-bottom: 3em;
 
   & .vjs-icon-placeholder {
     @extend .vjs-icon-volume-high;
