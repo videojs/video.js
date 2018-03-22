@@ -56,7 +56,7 @@ const primedBabel = babel({
 
 const es = {
   options: {
-    entry: 'src/js/video.js',
+    entry: 'src/js/index.js',
     plugins: [
       json(),
       primedBabel,
@@ -87,7 +87,7 @@ const cjs = Object.assign({}, es, {
 
 const umd = {
   options: {
-    entry: 'src/js/video.js',
+    entry: 'src/js/index.js',
     plugins: [
       primedResolve,
       json(),
