@@ -320,7 +320,7 @@ export function removeClass(element, classToRemove) {
  */
 export function toggleClass(element, classToToggle, predicate) {
 
-  // This CANNOT use `classList` internally because IE does not support the
+  // This CANNOT use `classList` internally because IE11 does not support the
   // second parameter to the `classList.toggle()` method! Which is fine because
   // `classList` will be used by the add/remove functions.
   const has = hasClass(element, classToToggle);
