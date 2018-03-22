@@ -8,7 +8,6 @@ import log from './log.js';
 import tsml from 'tsml';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
-import * as browser from './browser';
 
 /**
  * Detect if a value is a string with any non-whitespace characters.
@@ -774,12 +773,6 @@ export function isSingleLeftClick(event) {
   if (event.button === 0 && event.buttons === undefined) {
     // Touch screen, sometimes on some specific device, `buttons`
     // doesn't have anything (safari on ios, blackberry...)
-
-    return true;
-  }
-
-  if (browser.IE_VERSION === 9) {
-    // Ignore IE9
 
     return true;
   }
