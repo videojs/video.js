@@ -167,7 +167,7 @@ QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, a
 
   muteToggle.handleClick();
 
-  // `Number.prototype.toFixed()` is used here to circumvent IE9 rounding issues
+  // `Number.prototype.toFixed()` is used here to circumvent rounding issues
   assert.equal(player.volume().toFixed(1), (0.1).toFixed(1), 'since lastVolume is less than 0.1, volume is set to 0.1');
   assert.equal(player.muted(), false, 'muted is set to false');
 
