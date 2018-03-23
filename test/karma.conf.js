@@ -151,21 +151,21 @@ function getCustomLaunchers(){
       base: 'BrowserStack',
       browser: 'chrome',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     },
 
     firefox_bs: {
       base: 'BrowserStack',
       browser: 'firefox',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     },
 
     safari_bs: {
       base: 'BrowserStack',
       browser: 'safari',
       os: 'OS X',
-      os_version: 'El Capitan'
+      os_version: 'High Sierra'
     },
 
     edge_bs: {
@@ -180,7 +180,7 @@ function getCustomLaunchers(){
       browser: 'ie',
       browser_version: '11',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     }
   };
 }
