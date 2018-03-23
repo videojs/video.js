@@ -908,7 +908,7 @@ if (Dom.isReal()) {
  *         - False if HTML5 media is not supported.
  */
 Html5.isSupported = function() {
-  // IE9 with no Media Player is a LIAR! (#984)
+  // IE with no Media Player is a LIAR! (#984)
   try {
     Html5.TEST_VID.volume = 0.5;
   } catch (e) {
@@ -995,9 +995,6 @@ Html5.canControlPlaybackRate = function() {
  *         - False otherwise
  */
 Html5.canOverrideAttributes = function() {
-  if (browser.IS_IE8) {
-    return false;
-  }
   // if we cannot overwrite the src property, there is no support
   // iOS 7 safari for instance cannot do this.
   try {
@@ -1169,7 +1166,6 @@ Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 const canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
-const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
 
@@ -1178,15 +1174,6 @@ Html5.patchCanPlayType = function() {
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX && !browser.IS_CHROME) {
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mpegurlRE.test(type)) {
-        return 'maybe';
-      }
-      return canPlayType.call(this, type);
-    };
-
-  // Override Android 2.2 and less canPlayType method which is broken
-  } else if (browser.IS_OLD_ANDROID) {
-    Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
-      if (type && mp4RE.test(type)) {
         return 'maybe';
       }
       return canPlayType.call(this, type);
@@ -1865,8 +1852,7 @@ Html5.nativeSourceHandler = {};
  *         'probably', 'maybe', or '' (empty string)
  */
 Html5.nativeSourceHandler.canPlayType = function(type) {
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
+  // IE without MediaPlayer throws an error (#519)
   try {
     return Html5.TEST_VID.canPlayType(type);
   } catch (e) {

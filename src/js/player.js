@@ -578,20 +578,10 @@ class Player extends Component {
     tag.removeAttribute('height');
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
-      // workaround so we don't totally break IE7
-      // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
-      if (attr === 'class') {
-        el.className += ' ' + attrs[attr];
+      el.setAttribute(attr, attrs[attr]);
 
-        if (divEmbed) {
-          tag.className += ' ' + attrs[attr];
-        }
-      } else {
-        el.setAttribute(attr, attrs[attr]);
-
-        if (divEmbed) {
-          tag.setAttribute(attr, attrs[attr]);
-        }
+      if (divEmbed) {
+        tag.setAttribute(attr, attrs[attr]);
       }
     });
 
@@ -624,7 +614,8 @@ class Player extends Component {
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
 
-    // Hide any links within the video/audio tag, because IE doesn't hide them completely.
+    // Hide any links within the video/audio tag,
+    // because IE doesn't hide them completely from screen readers.
     const links = tag.getElementsByTagName('a');
 
     for (let i = 0; i < links.length; i++) {
@@ -2884,7 +2875,7 @@ class Player extends Component {
     this.addClass('vjs-error');
 
     // log the name of the error type and any message
-    // ie8 just logs "[object object]" if you just log the error object
+    // IE11 logs "[object object]" and required you to expand message to see error object
     log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     /**
@@ -3396,7 +3387,7 @@ class Player extends Component {
             'webkitFlexBasis' in elem.style ||
             'mozFlexBasis' in elem.style ||
             'msFlexBasis' in elem.style ||
-            // IE10-specific (2012 flex spec)
+            // IE10-specific (2012 flex spec), available for completeness
             'msFlexOrder' in elem.style);
   }
 }
@@ -3506,7 +3497,8 @@ Player.prototype.options_ = {
     'bigPlayButton',
     'controlBar',
     'errorDisplay',
-    'textTrackSettings'
+    'textTrackSettings',
+    'resizeManager'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
@@ -3517,10 +3509,6 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.'
 };
-
-if (!browser.IS_IE8) {
-  Player.prototype.options_.children.push('resizeManager');
-}
 
 [
   /**

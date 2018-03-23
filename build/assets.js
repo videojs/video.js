@@ -6,7 +6,7 @@ const filesize = require('filesize');
 const Table = require('cli-table');
 
 const files = klawSync('dist/', {
-  ignore: ['examples', 'lang', 'font', 'ie8', '*.zip', '*.gz'],
+  ignore: ['examples', 'lang', 'font', '*.zip', '*.gz'],
   nodir: true
 });
 

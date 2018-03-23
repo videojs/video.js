@@ -3,8 +3,6 @@
  */
 import TrackList from './track-list';
 import * as Fn from '../utils/fn.js';
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
 
 /**
  * The current list of {@link TextTrack} for a media file.
@@ -13,35 +11,6 @@ import document from 'global/document';
  * @extends TrackList
  */
 class TextTrackList extends TrackList {
-
-  /**
-   * Create an instance of this class.
-   *
-   * @param {TextTrack[]} [tracks=[]]
-   *        A list of `TextTrack` to instantiate the list with.
-   */
-  constructor(tracks = []) {
-    let list;
-
-    // IE8 forces us to implement inheritance ourselves
-    // as it does not support Object.defineProperty properly
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-      for (const prop in TrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TrackList.prototype[prop];
-        }
-      }
-      for (const prop in TextTrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TextTrackList.prototype[prop];
-        }
-      }
-    }
-
-    list = super(tracks, list);
-    return list;
-  }
 
   /**
    * Add a {@link TextTrack} to the `TextTrackList`

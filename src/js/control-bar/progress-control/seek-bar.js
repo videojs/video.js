@@ -3,7 +3,7 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
-import {IE_VERSION, IS_IOS, IS_ANDROID} from '../../utils/browser.js';
+import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
@@ -332,8 +332,8 @@ SeekBar.prototype.options_ = {
   barName: 'playProgressBar'
 };
 
-// MouseTimeDisplay tooltips should not be added to a player on mobile devices or IE8
-if ((!IE_VERSION || IE_VERSION > 8) && !IS_IOS && !IS_ANDROID) {
+// MouseTimeDisplay tooltips should not be added to a player on mobile devices
+if (!IS_IOS && !IS_ANDROID) {
   SeekBar.prototype.options_.children.splice(1, 0, 'mouseTimeDisplay');
 }
 

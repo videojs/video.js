@@ -49,25 +49,6 @@ QUnit.test('should create and update a poster image', function(assert) {
   posterImage.dispose();
 });
 
-QUnit.test('should create and update a fallback image in older browsers', function(assert) {
-  browser.BACKGROUND_SIZE_SUPPORTED = false;
-
-  const posterImage = new PosterImage(this.mockPlayer);
-
-  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster1),
-                 -1,
-                 'Fallback image created');
-
-  // Update with a new poster source and check the new value
-  this.mockPlayer.poster_ = this.poster2;
-  this.mockPlayer.trigger('posterchange');
-  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster2),
-                 -1,
-                 'Fallback image updated');
-
-  posterImage.dispose();
-});
-
 QUnit.test('should remove itself from the document flow when there is no poster', function(assert) {
   const posterImage = new PosterImage(this.mockPlayer);
 

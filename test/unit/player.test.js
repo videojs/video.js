@@ -344,7 +344,7 @@ QUnit.test('should default to 16:9 when fluid', function(assert) {
   const player = TestHelpers.makePlayer({fluid: true});
   const ratio = player.currentHeight() / player.currentWidth();
 
-  // IE8 rounds 0.5625 up to 0.563
+  // account for some rounding of 0.5625 up to 0.563
   assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
 
   player.dispose();

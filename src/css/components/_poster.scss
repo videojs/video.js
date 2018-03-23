@@ -16,16 +16,6 @@
   height: 100%;
 }
 
-// Used for IE8 fallback
-.vjs-poster img {
-  display: block;
-  vertical-align: middle;
-  margin: 0 auto;
-  max-height: 100%;
-  padding: 0;
-  width: 100%;
-}
-
 // Hide the poster after the video has started playing
 .vjs-has-started .vjs-poster {
   display: none;
