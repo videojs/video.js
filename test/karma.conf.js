@@ -168,6 +168,13 @@ function getCustomLaunchers(){
       os_version: 'High Sierra'
     },
 
+    safari9_bs: {
+      base: 'BrowserStack',
+      browser: 'safari',
+      os: 'OS X',
+      os_version: 'El Capitan'
+    },
+
     edge_bs: {
       base: 'BrowserStack',
       browser: 'edge',
