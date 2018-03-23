@@ -49,9 +49,14 @@ const sourcesetLoad = (tech) => {
   for (let i = 0; i < sources.length; i++) {
     const url = sources[i].src;
 
-    if (srcUrls.indexOf(url) === -1) {
+    if (url && srcUrls.indexOf(url) === -1) {
       srcUrls.push(url);
     }
+  }
+
+  // there were no valid sources
+  if (!srcUrls.length) {
+    return;
   }
 
   // there is only one valid source element url
@@ -94,25 +99,30 @@ const getInnerHTMLDescriptor = (el) => {
 
   if (!innerDescriptor.set) {
     innerDescriptor.set = function(v) {
-      const dummy = document.createElement('div');
+      // remove all current content from inside
+      el.innerText = '';
 
+      // make a dummy node to use innerHTML on
+      const dummy = document.createElement(el.nodeName.toLowerCase());
+
+      // set innerHTML to the value provided
       dummy.innerHTML = v;
 
-      // remove all elements from dummy and add
-      // to our el
-      while (dummy.children.length) {
-        const child = dummy.removeChild(dummy.children[0]);
+      // make a document fragment to hold the nodes from dummy
+      const docFrag = document.createDocumentFragment();
 
-        window.Element.prototype.appendChild.call(el, child);
+      // copy all of the nodes created by the innerHTML on dummy
+      // to the document fragment
+      while (dummy.childNodes.length) {
+        docFrag.appendChild(dummy.childNodes[0]);
       }
 
-      // if any text is left it is not an element and
-      // we must add that as innerText
-      if (dummy.innerText) {
-        el.innerText = dummy.innerText;
-      }
+      // now we add all of that html in one by appending the
+      // document fragment. This is how innerHTML does it.
+      window.Element.prototype.appendChild.call(el, docFrag);
 
-      return v;
+      // then return the result that innerHTML's setter would
+      return el.innerHTML;
     };
   }
 
@@ -185,6 +195,7 @@ const getSrcDescriptor = (el) => {
 const firstSourceWatch = function(tech) {
   const el = tech.el();
 
+  // make sure firstSourceWatch isn't setup twice.
   if (el.firstSourceWatch_) {
     return;
   }
@@ -241,6 +252,7 @@ const firstSourceWatch = function(tech) {
   tech.one('sourceset', (e) => {
     el.firstSourceWatch_ = false;
     el.appendChild = oldAppendChild;
+
     if (oldAppend) {
       el.append = oldAppend;
     }
@@ -248,12 +260,7 @@ const firstSourceWatch = function(tech) {
       el.insertAdjacentHTML = oldInsertAdjacentHTML;
     }
 
-    Object.defineProperty(el, 'innerHTML', {
-      get: innerDescriptor.get.bind(el),
-      set: innerDescriptor.set.bind(el),
-      configurable: true,
-      enumerable: innerDescriptor.enumerable
-    });
+    Object.defineProperty(el, 'innerHTML', innerDescriptor);
   });
 };
 
@@ -278,6 +285,14 @@ const setupSourceset = function(tech) {
   }
 
   const el = tech.el();
+
+  // make sure sourceset isn't setup twice.
+  if (el.setupSourceset_) {
+    return;
+  }
+
+  el.setupSourceset_ = true;
+
   const srcDescriptor = getSrcDescriptor(el);
   const oldSetAttribute = el.setAttribute;
   const oldLoad = el.load;
@@ -286,7 +301,11 @@ const setupSourceset = function(tech) {
   // if we find that the media element had a src when it was
   // given to us and that tech element is not in a stalled state
   if (el.src || el.currentSrc && el.initNetworkState_ !== 3) {
-    tech.triggerSourceset(el.src || el.currentSrc);
+    if (el.currentSrc) {
+      tech.triggerSourceset(el.currentSrc);
+    } else {
+      sourcesetLoad(tech);
+    }
   }
 
   // for some reason adding a source element when a mediaElement has no source
@@ -298,10 +317,9 @@ const setupSourceset = function(tech) {
   Object.defineProperty(el, 'src', {
     get: srcDescriptor.get.bind(el),
     set: (v) => {
-      const retval = srcDescriptor.set.call(tech.el(), v);
+      const retval = srcDescriptor.set.call(el, v);
 
-      // we use the getter here to get the actual value set on
-      // src
+      // we use the getter here to get the actual value set on src
       tech.triggerSourceset(el.src);
 
       return retval;
