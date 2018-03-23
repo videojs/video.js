@@ -4,8 +4,10 @@ import mergeOptions from '../utils/merge-options';
 
 /**
  * This function is used to fire a sourceset when there is something
- * similar to `mediaEl.load()` being called. It will try to find the `src`
- * and if there it cannot there was no `sourceset` and it will not fire one.
+ * similar to `mediaEl.load()` being called. It will try to find the source via
+ * the `src` attribute and then the `<source>` elements. It will then fire `sourceset`
+ * with the source that was found or empty string if we cannot know. If it cannot
+ * find a source then `sourceset` will not be fired.
  *
  * @param {Html5} tech
  *        The tech object that sourceset was setup on
@@ -63,7 +65,7 @@ const sourcesetLoad = (tech) => {
 };
 
 /**
- * Get the browsers property descriptor for the innerHTML
+ * Get the browsers property descriptor for the `innerHTML`
  * property. This will allow us to overwrite it without
  * destroying native functionality.
  *
@@ -122,7 +124,7 @@ const getInnerHTMLDescriptor = (el) => {
 };
 
 /**
- * Get the browsers property descriptor for the src
+ * Get the browsers property descriptor for the `src`
  * property. This will allow us to overwrite it without
  * destroying native functionality.
  *
@@ -165,12 +167,12 @@ const getSrcDescriptor = (el) => {
 /**
  * Patches browser internal functions so that we can tell syncronously
  * if a `<source>` was appended to the media element. For some reason this
- * will cause a `sourceset` if the the media element is ready and has no source. This
- * happens when:
+ * causes a `sourceset` if the the media element is ready and has no source.
+ * This happens when:
  * - The page has just loaded and the media element does not have a source.
  * - The media element was emptied of all sources, then `load()` was called.
  *
- * It does this by patching the following functions/properties:
+ * It does this by patching the following functions/properties when they are supported:
  *
  * - `append()` - can be used to add a `<source>` element to the media element
  * - `appendChild()` - can be used to add a `<source>` element to the media element
@@ -264,8 +266,8 @@ const firstSourceWatch = function(tech) {
  * - `load()` - this re-triggers the source selection algorithm, and can
  *              cause a sourceset.
  *
- * If there is no source when we are adding `sourceset` support we also
- * patch the functions listed in `firstSourceWatch`.
+ * If there is no source when we are adding `sourceset` support or during a `load()`
+ * we also patch the functions listed in `firstSourceWatch`.
  *
  * @param {Html5} tech
  *        The tech to patch
@@ -331,7 +333,6 @@ const setupSourceset = function(tech) {
 
     return retval;
   };
-
 };
 
 export default setupSourceset;
