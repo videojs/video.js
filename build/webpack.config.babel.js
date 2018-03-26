@@ -1,7 +1,7 @@
 import path from 'path';
 
 export default [{
-  entry: './src/js/video.js',
+  entry: './src/js/index.js',
   output: {
     path: path.resolve(__dirname, '..', 'dist'),
     filename: './video.js',
@@ -9,28 +9,19 @@ export default [{
     libraryTarget: 'umd',
     libraryExport: 'default'
   },
+  resolve: {
+    alias: {
+      'video.js': path.resolve(__dirname, '..', 'src', 'js', 'bundle.js')
+    }
+  },
   performance: {
     hints: false
   },
   optimization: {
     minimize: false
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [['es2015', {modules: false, loose: true}]]
-          }
-        }
-      }
-    ]
   }
 }, {
-  entry: './src/js/video.js',
+  entry: './src/js/index.js',
   output: {
     path: path.resolve(__dirname, '..', 'dist'),
     filename: './video.min.js',
@@ -38,22 +29,13 @@ export default [{
     libraryTarget: 'umd',
     libraryExport: 'default'
   },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [['es2015', {modules: false, loose: true}]]
-          }
-        }
-      }
-    ]
-  }
+  resolve: {
+    alias: {
+      'video.js': path.resolve(__dirname, '..', 'src', 'js', 'bundle.js')
+    }
+  },
 }, {
-  entry: './src/js/video.js',
+  entry: './src/js/index.js',
   output: {
     path: path.resolve(__dirname, '..', 'dist'),
     filename: './video.cjs.js',
@@ -67,18 +49,9 @@ export default [{
     'xhr',
     'safe-json-parse'
   ],
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [['es2015', {modules: false, loose: true}]]
-          }
-        }
-      }
-    ]
-  }
+  resolve: {
+    alias: {
+      'video.js': path.resolve(__dirname, '..', 'src', 'js', 'bundle.js')
+    }
+  },
 }];
