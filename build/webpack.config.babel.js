@@ -33,7 +33,7 @@ export default [{
     alias: {
       'video.js': path.resolve(__dirname, '..', 'src', 'js', 'bundle.js')
     }
-  },
+  }
 }, {
   entry: './src/js/index.js',
   output: {
@@ -53,5 +53,5 @@ export default [{
     alias: {
       'video.js': path.resolve(__dirname, '..', 'src', 'js', 'bundle.js')
     }
-  },
+  }
 }];
