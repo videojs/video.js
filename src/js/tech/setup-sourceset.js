@@ -130,6 +130,8 @@ const getInnerHTMLDescriptor = (el) => {
     innerDescriptor.enumerable = true;
   }
 
+  innerDescriptor.configurable = true;
+
   return innerDescriptor;
 };
 
@@ -170,6 +172,8 @@ const getSrcDescriptor = (el) => {
   if (typeof srcDescriptor.enumerable === 'undefined') {
     srcDescriptor.enumerable = true;
   }
+
+  srcDescriptor.configurable = true;
 
   return srcDescriptor;
 };
