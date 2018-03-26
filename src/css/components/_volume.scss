@@ -84,6 +84,9 @@
 
       @include transition(width 0.1s);
     }
+    &.vjs-mute-supported {
+      width: 4em;
+    }
   }
 
   @include transition(width 1s);

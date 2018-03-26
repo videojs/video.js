@@ -2,7 +2,6 @@
  * @file volume-control.js
  */
 import Component from '../component.js';
-import checkVolumeSupport from './volume-control/check-volume-support';
 import {isPlain} from '../utils/obj';
 
 // Required children
@@ -41,9 +40,6 @@ class VolumePanel extends Component {
     }
 
     super(player, options);
-
-    // hide this control if volume support is missing
-    checkVolumeSupport(this, player);
 
     // while the slider is active (the mouse has been pressed down and
     // is dragging) we do not want to hide the VolumeBar
