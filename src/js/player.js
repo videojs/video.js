@@ -229,6 +229,8 @@ const TECH_EVENTS_RETRIGGER = [
 ];
 
 // events to queue when playback rate is zero
+// this is a hash for the sole purpose of mapping non-camel-cased event names
+// to camel-cased function names
 const TECH_EVENTS_QUEUE = {
   canplay: 'CanPlay',
   canplaythrough: 'CanPlayThrough',
