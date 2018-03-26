@@ -56,10 +56,11 @@
   "devDependencies": {
     "aliasify": "^2.1.0",
     "babel-cli": "^6.11.4",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-es2015": "^6.14.0",
-    "babel-preset-es3": "^1.0.1",
     "babel-register": "^6.9.0",
     "babelify": "^8.0.0",
     "bluebird": "^3.5.1",
@@ -127,6 +128,7 @@
     "remark-toc": "^5.0.0",
     "remark-validate-links": "^7.0.0",
     "replace": "^0.3.0",
+    "rollup": "^0.57.1",
     "semver": "^5.5.0",
     "shelljs": "^0.8.1",
     "sinon": "^1.16.1",
@@ -137,7 +139,9 @@
     "videojs-flash": "^2.1.0",
     "videojs-standard": "^6.0.1",
     "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.12"
+    "webpack-bundle-analyzer": "^2.11.1",
+    "webpack-cli": "^2.0.12",
+    "webpack-rollup-loader": "^0.7.1"
   },
   "vjsstandard": {
     "ignore": [

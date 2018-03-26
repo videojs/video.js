@@ -14,6 +14,20 @@ export default [{
   },
   optimization: {
     minimize: false
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [['es2015', {modules: false, loose: true}]]
+          }
+        }
+      }
+    ]
   }
 }, {
   entry: './src/js/video.js',
@@ -23,6 +37,20 @@ export default [{
     library: 'videojs',
     libraryTarget: 'umd',
     libraryExport: 'default'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [['es2015', {modules: false, loose: true}]]
+          }
+        }
+      }
+    ]
   }
 }, {
   entry: './src/js/video.js',
@@ -38,5 +66,19 @@ export default [{
     'videojs-vtt.js',
     'xhr',
     'safe-json-parse'
-  ]
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [['es2015', {modules: false, loose: true}]]
+          }
+        }
+      }
+    ]
+  }
 }];
