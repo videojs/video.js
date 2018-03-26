@@ -149,6 +149,7 @@
   "vjsstandard": {
     "ignore": [
       "**/Gruntfile.js",
+      "**/bundle.js",
       "**/es5/**",
       "**/build/**",
       "!build/webpack*.js",
