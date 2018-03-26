@@ -109,7 +109,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-opera-launcher": "^1.0.0",
-    "karma-qunit": "^1.2.0",
+    "karma-qunit": "^2.0.1",
     "karma-safari-launcher": "^1.0.0",
     "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
@@ -121,7 +121,7 @@
     "npm-run": "^4.1.0",
     "npm-run-all": "^4.1.2",
     "proxyquireify": "^3.0.0",
-    "qunitjs": "1.23.1",
+    "qunit": "^2.5.1",
     "remark-cli": "^5.0.0",
     "remark-lint": "^6.0.0",
     "remark-parse": "^5.0.0",
@@ -167,7 +167,6 @@
   },
   "greenkeeper": {
     "ignore": [
-      "qunitjs",
       "sinon",
       "webpack",
       "uglify-js"
