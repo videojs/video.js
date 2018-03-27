@@ -17,7 +17,11 @@
   "author": "Steve Heffernan",
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
+    "rollup": "rollup -c build/rollup.config.js",
+    "prebuild": "npm run rollup",
     "build": "webpack --config build/webpack.config.babel.js --mode production",
+    "predev": "npm run rollup",
+    "dev": "webpack --config build/webpack.config.babel.js --mode development",
     "watch": "npm run rollup-dev",
     "assets": "node build/assets.js",
     "clean": "grunt clean",
