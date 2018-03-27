@@ -3,7 +3,7 @@ import babel from 'rollup-plugin-babel';
 
 export default [
   {
-    entry: 'src/js/video.js',
+    input: 'src/js/video.js',
     output: {
       file: 'src/js/bundle.js',
       format: 'es'
