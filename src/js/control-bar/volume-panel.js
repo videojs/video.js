@@ -77,19 +77,19 @@ class VolumePanel extends Component {
    * @listens Player#loadstart
    * @private
    */
-   volumePanelState_() {
-    // hide volume panel if neither volume controle or mute toggle 
+  volumePanelState_() {
+    // hide volume panel if neither volume controle or mute toggle
     // are displayed
-    if(this.volumeControl.hasClass('vjs-hidden') && this.muteToggle.hasClass('vjs-hidden')) {
+    if (this.volumeControl.hasClass('vjs-hidden') && this.muteToggle.hasClass('vjs-hidden')) {
       this.addClass('vjs-hidden');
     }
 
-    // if only mute toggle is visible we don't want 
+    // if only mute toggle is visible we don't want
     // volume panel expanding when hovered or active
-    if(this.volumeControl.hasClass('vjs-hidden') && !this.muteToggle.hasClass('vjs-hidden')) {
+    if (this.volumeControl.hasClass('vjs-hidden') && !this.muteToggle.hasClass('vjs-hidden')) {
       this.addClass('vjs-mute-toggle-only');
     }
-   }  
+  }
 
   /**
    * Create the `Component`'s DOM element

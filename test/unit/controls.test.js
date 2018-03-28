@@ -19,12 +19,13 @@ QUnit.module('Controls', {
   }
 });
 
-QUnit.test('should hide volume control if it\'s not supported', function(assert) {
+QUnit.test('should hide volume and mute toggle control if it\'s not supported', function(assert) {
   assert.expect(2);
 
   const player = TestHelpers.makePlayer();
 
   player.tech_.featuresVolumeControl = false;
+  player.tech_.featuresMuteControl = false;
 
   const volumeControl = new VolumeControl(player);
   const muteToggle = new MuteToggle(player);
@@ -39,6 +40,7 @@ QUnit.test('should test and toggle volume control on `loadstart`', function(asse
   const player = TestHelpers.makePlayer();
 
   player.tech_.featuresVolumeControl = true;
+  player.tech_.featuresMuteControl = true;
 
   const volumeControl = new VolumeControl(player);
   const muteToggle = new MuteToggle(player);
@@ -47,12 +49,14 @@ QUnit.test('should test and toggle volume control on `loadstart`', function(asse
   assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle is hidden initially');
 
   player.tech_.featuresVolumeControl = false;
+  player.tech_.featuresMuteControl = false;
   player.trigger('loadstart');
 
   assert.equal(volumeControl.hasClass('vjs-hidden'), true, 'volumeControl does not hide itself');
   assert.equal(muteToggle.hasClass('vjs-hidden'), true, 'muteToggle does not hide itself');
 
   player.tech_.featuresVolumeControl = true;
+  player.tech_.featuresMuteControl = true;
   player.trigger('loadstart');
 
   assert.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl does not show itself');

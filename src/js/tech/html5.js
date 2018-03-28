@@ -964,7 +964,7 @@ Html5.canControlVolume = function() {
 
 /**
  * Check if the volume can be muted in this browser/device.
- * Some devices, e.g. iOS, don't allow chaning volume
+ * Some devices, e.g. iOS, don't allow changing volume
  * but permits muting/unmuting.
  *
  * @return {bolean}

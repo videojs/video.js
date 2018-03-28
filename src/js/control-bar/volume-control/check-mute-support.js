@@ -2,15 +2,15 @@
  * Check if muting volume is supported and if it isn't hide the mute toggle
  * button.
  *
- * @param {MuteToggle} muteToggle
- *        A reference to the mute toggle button 
+ * @param {Component} self
+ *        A reference to the mute toggle button
  *
  * @param {Player} player
  *        A reference to the player
  *
  * @private
  */
-const checkMuteSupport  = function(self, player) {
+const checkMuteSupport = function(self, player) {
   // hide mute toggle button if it's not supported by the current tech
   if (player.tech_ && !player.tech_.featuresMuteControl) {
     self.addClass('vjs-hidden');
