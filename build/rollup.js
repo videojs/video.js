@@ -55,7 +55,7 @@ const primedBabel = babel({
   plugins: ['external-helpers']
 });
 
-const noVhsEs = {
+const coreEs = {
   options: {
     entry: 'src/js/video.js',
     plugins: [
@@ -200,7 +200,7 @@ if (!args.watch) {
     runRollup(cjs);
     runRollup(umd);
     runRollup(novttUmd);
-    runRollup(noVhsEs);
+    runRollup(coreEs);
   }
 } else {
   const props = ['format', 'dest', 'banner', 'useStrict'];
