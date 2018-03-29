@@ -975,7 +975,10 @@ Html5.canMuteVolume = function() {
   try {
     const muted = Html5.TEST_VID.muted;
 
+    // in some versions of iOS muted property doesn't always
+    // work, so we want to set both property and attribute
     Html5.TEST_VID.muted = !muted;
+    Html5.TEST_VID.setAttribute('muted', 'muted');
     return muted !== Html5.TEST_VID.muted;
   } catch (e) {
     return false;
