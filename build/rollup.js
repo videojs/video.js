@@ -45,7 +45,7 @@ const primedCjs = commonjs({
 });
 const primedBabel = babel({
   babelrc: false,
-  exclude: 'node_modules/**',
+  exclude: 'node_modules/**(!http-streaming)',
   presets: [
     ['es2015', {
       loose: true,
