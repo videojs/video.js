@@ -966,15 +966,15 @@ class Player extends Component {
     });
 
     Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
-      this.on(this.tech_, event, () => {
+      this.on(this.tech_, event, (eventObj) => {
         if (this.tech_.playbackRate() === 0 && this.tech_.seeking()) {
           this.queuedCallbacks_.push({
             callback: this[`handleTech${TECH_EVENTS_QUEUE[event]}_`].bind(this),
-            event
+            event: eventObj
           });
           return;
         }
-        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`](event);
+        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`](eventObj);
       });
     });
 
