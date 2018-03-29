@@ -988,7 +988,7 @@ TRACK_TYPES.ALL.names.forEach(function(name) {
 Tech.prototype.featuresVolumeControl = true;
 
 /**
- * Boolean indicating whether the `Tech` support fullscreen resize control.
+ * Boolean indicating whether the `Tech` supports fullscreen resize control.
  * Resizing plugins using request fullscreen reloads the plugin
  *
  * @type {boolean}
