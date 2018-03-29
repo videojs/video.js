@@ -772,14 +772,14 @@ class Tech extends Component {
   setPoster() {}
 
   /**
-   * A method to check for the presence of the 'playsinine' <video> attribute.
+   * A method to check for the presence of the 'playsinline' <video> attribute.
    *
    * @abstract
    */
   playsinline() {}
 
   /**
-   * A method to set or unset the 'playsinine' <video> attribute.
+   * A method to set or unset the 'playsinline' <video> attribute.
    *
    * @abstract
    */
