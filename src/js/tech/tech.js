@@ -891,7 +891,7 @@ class Tech extends Component {
    *        `camelCase` or `TitleCase` name of the Tech to get
    *
    * @return {Tech|undefined}
-   *         The `Tech` or undefined if there was no tech with the name requsted.
+   *         The `Tech` or undefined if there was no tech with the name requested.
    */
   static getTech(name) {
     if (!name) {
