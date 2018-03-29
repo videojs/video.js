@@ -58,7 +58,7 @@ const parseCues = function(srcContent, track) {
 };
 
 /**
- * Load a `TextTrack` from a specifed url.
+ * Load a `TextTrack` from a specified url.
  *
  * @param {string} src
  *        Url to load track from.
@@ -139,7 +139,7 @@ class TextTrack extends Track {
    *
    * @param {string} [options.srclang='']
    *        A valid two character language code. An alternative, but deprioritized
-   *        vesion of `options.language`
+   *        version of `options.language`
    *
    * @param {string} [options.src]
    *        A url to TextTrack cues.
