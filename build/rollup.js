@@ -55,12 +55,39 @@ const primedBabel = babel({
   plugins: ['external-helpers']
 });
 
+const noVhsEs = {
+  options: {
+    entry: 'src/js/video.js',
+    plugins: [
+      json(),
+      primedBabel,
+      args.progress ? progress() : {},
+      filesize()
+    ],
+    onwarn(warning) {
+      if (warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
+          warning.code === 'UNRESOLVED_IMPORT') {
+        return;
+      }
+
+      // eslint-disable-next-line no-console
+      console.warn(warning.message);
+    },
+    legacy: true
+  },
+  banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
+  useStrict: false,
+  format: 'es',
+  dest: 'core.js'
+};
+
 const es = {
   options: {
     entry: 'src/js/index.js',
     plugins: [
       alias({
-        'video.js': path.resolve(__dirname, '../src/js/video.js')
+        'video.js': path.resolve(__dirname, '../src/js/video.js'),
+        '@videojs/http-streaming': path.resolve(__dirname, '../node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
       json(),
       primedBabel,
@@ -147,22 +174,6 @@ const minifiedNovttUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
 
 minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
 
-const noVhsUmd = Object.assign({}, _.cloneDeep(umd), {
-  banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
-  dest: 'dist/alt/video.core.js'
-});
-
-noVhsUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
-noVhsUmd.options.plugins.unshift(ignore(['@videojs/http-streaming']));
-
-const minifiedNoVhsUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
-  banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
-  dest: 'dist/alt/video.core.min.js'
-});
-
-minifiedNoVhsUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
-minifiedNoVhsUmd.options.plugins.unshift(ignore(['@videojs/http-streaming']));
-
 function runRollup({options, useStrict, format, dest, banner}) {
   rollup(options)
   .then(function(bundle) {
@@ -184,13 +195,12 @@ if (!args.watch) {
   if (args.minify) {
     runRollup(minifiedUmd);
     runRollup(minifiedNovttUmd);
-    runRollup(minifiedNoVhsUmd);
   } else {
     runRollup(es);
     runRollup(cjs);
     runRollup(umd);
     runRollup(novttUmd);
-    runRollup(noVhsUmd);
+    runRollup(noVhsEs);
   }
 } else {
   const props = ['format', 'dest', 'banner', 'useStrict'];
