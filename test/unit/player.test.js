@@ -1364,14 +1364,14 @@ QUnit.test('Remove waiting class on timeupdate after tech waiting', function(ass
   player.dispose();
 });
 
-QUnit.test('Queues playing events when playback rate is zero', function(assert) {
+QUnit.test('Queues playing events when playback rate is zero while seeking', function(assert) {
   const player = TestHelpers.makePlayer({techOrder: ['html5']});
 
   let canPlayCount = 0;
   let canPlayThroughCount = 0;
   let playingCount = 0;
   let seekedCount = 0;
-  let seeking = true;
+  let seeking = false;
 
   player.on('canplay', () => canPlayCount++);
   player.on('canplaythrough', () => canPlayThroughCount++);
@@ -1390,20 +1390,30 @@ QUnit.test('Queues playing events when playback rate is zero', function(assert) 
   player.tech_.trigger('playing');
   player.tech_.trigger('seeked');
 
-  assert.equal(canPlayCount, 0, 'canplay event not dispatched');
-  assert.equal(canPlayThroughCount, 0, 'canplaythrough event not dispatched');
-  assert.equal(playingCount, 0, 'playing event not dispatched');
-  assert.equal(seekedCount, 0, 'seeked event not dispatched');
+  assert.equal(canPlayCount, 1, 'canplay event dispatched when not seeking');
+  assert.equal(canPlayThroughCount, 1, 'canplaythrough event dispatched when not seeking');
+  assert.equal(playingCount, 1, 'playing event dispatched when not seeking');
+  assert.equal(seekedCount, 1, 'seeked event dispatched when not seeking');
+
+  seeking = true;
+  player.tech_.trigger('canplay');
+  player.tech_.trigger('canplaythrough');
+  player.tech_.trigger('playing');
+  player.tech_.trigger('seeked');
+
+  assert.equal(canPlayCount, 1, 'canplay event not dispatched');
+  assert.equal(canPlayThroughCount, 1, 'canplaythrough event not dispatched');
+  assert.equal(playingCount, 1, 'playing event not dispatched');
+  assert.equal(seekedCount, 1, 'seeked event not dispatched');
 
   seeking = false;
-
   player.tech_.setPlaybackRate(1);
   player.tech_.trigger('ratechange');
 
-  assert.equal(canPlayCount, 1, 'canplay event dispatched');
-  assert.equal(canPlayThroughCount, 1, 'canplaythrough event dispatched');
-  assert.equal(playingCount, 1, 'playing event dispatched');
-  assert.equal(seekedCount, 1, 'seeked event dispatched');
+  assert.equal(canPlayCount, 2, 'canplay event dispatched after playback rate restore');
+  assert.equal(canPlayThroughCount, 2, 'canplaythrough event dispatched after playback rate restore');
+  assert.equal(playingCount, 2, 'playing event dispatched after playback rate restore');
+  assert.equal(seekedCount, 2, 'seeked event dispatched after playback rate restore');
 
 });
 
