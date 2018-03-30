@@ -1,5 +1,5 @@
 /**
- * @file button.js
+ * @file clickable-component.js
  */
 import Component from './component';
 import * as Dom from './utils/dom.js';
