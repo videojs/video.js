@@ -314,7 +314,8 @@ class Player extends Component {
     // Tracks when a tech changes the poster
     this.isPosterFromTech_ = false;
 
-    // TODO: Docs
+    // Holds callback info that gets queued when playback rate is zero
+    // and a seek is happening
     this.queuedCallbacks_ = [];
 
     // Turn off API access because we're loading a new tech that might load asynchronously
