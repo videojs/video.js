@@ -77,7 +77,7 @@ const coreEs = {
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   useStrict: false,
-  format: 'es',
+  format: 'cjs',
   dest: 'core.js'
 };
 
