@@ -78,7 +78,7 @@ class ClickableComponent extends Component {
   }
 
   dispose() {
-    // remove controlTextEl_ on dipose
+    // remove controlTextEl_ on dispose
     this.controlTextEl_ = null;
 
     super.dispose();
