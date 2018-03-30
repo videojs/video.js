@@ -9,10 +9,12 @@ import filesize from 'rollup-plugin-filesize';
 import progress from 'rollup-plugin-progress';
 import ignore from 'rollup-plugin-ignore';
 import uglify from 'rollup-plugin-uglify';
+import alias from 'rollup-plugin-alias';
 import minimist from 'minimist';
 import _ from 'lodash';
 import pkg from '../package.json';
 import fs from 'fs';
+import path from 'path';
 
 const args = minimist(process.argv.slice(2), {
   boolean: ['watch', 'minify', 'progress'],
@@ -43,7 +45,7 @@ const primedCjs = commonjs({
 });
 const primedBabel = babel({
   babelrc: false,
-  exclude: 'node_modules/**',
+  exclude: 'node_modules/**(!http-streaming)',
   presets: [
     ['es2015', {
       loose: true,
@@ -53,10 +55,40 @@ const primedBabel = babel({
   plugins: ['external-helpers']
 });
 
-const es = {
+const coreEs = {
   options: {
     entry: 'src/js/video.js',
     plugins: [
+      json(),
+      primedBabel,
+      args.progress ? progress() : {},
+      filesize()
+    ],
+    onwarn(warning) {
+      if (warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
+          warning.code === 'UNRESOLVED_IMPORT') {
+        return;
+      }
+
+      // eslint-disable-next-line no-console
+      console.warn(warning.message);
+    },
+    legacy: true
+  },
+  banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
+  useStrict: false,
+  format: 'cjs',
+  dest: 'core.js'
+};
+
+const es = {
+  options: {
+    entry: 'src/js/index.js',
+    plugins: [
+      alias({
+        'video.js': path.resolve(__dirname, '../src/js/video.js'),
+        '@videojs/http-streaming': path.resolve(__dirname, '../node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
+      }),
       json(),
       primedBabel,
       args.progress ? progress() : {},
@@ -86,8 +118,11 @@ const cjs = Object.assign({}, es, {
 
 const umd = {
   options: {
-    entry: 'src/js/video.js',
+    entry: 'src/js/index.js',
     plugins: [
+      alias({
+        'video.js': path.resolve(__dirname, '../src/js/video.js')
+      }),
       primedResolve,
       json(),
       primedCjs,
@@ -165,6 +200,7 @@ if (!args.watch) {
     runRollup(cjs);
     runRollup(umd);
     runRollup(novttUmd);
+    runRollup(coreEs);
   }
 } else {
   const props = ['format', 'dest', 'banner', 'useStrict'];

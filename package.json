@@ -48,6 +48,7 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "dependencies": {
+    "@videojs/http-streaming": "^0.8.0",
     "babel-runtime": "^6.9.2",
     "global": "4.3.2",
     "safe-json-parse": "4.0.0",
@@ -130,6 +131,7 @@
     "remark-validate-links": "^7.0.0",
     "replace": "^0.3.0",
     "rollup": "^0.47.5",
+    "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-filesize": "^1.2.1",
@@ -156,6 +158,7 @@
       "**/es5/**",
       "**/build/**",
       "!build/rollup.js",
+      "core.js",
       "**/dist/**",
       "**/docs/**",
       "**/lang/**",
