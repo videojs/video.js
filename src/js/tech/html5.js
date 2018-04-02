@@ -919,13 +919,15 @@ Html5.canControlPlaybackRate = function() {
  *         - False otherwise
  */
 Html5.canOverrideAttributes = function() {
-  // if we cannot overwrite the src property, there is no support
+  // if we cannot overwrite the src/innerHTML property, there is no support
   // iOS 7 safari for instance cannot do this.
   try {
     const noop = () => {};
 
     Object.defineProperty(document.createElement('video'), 'src', {get: noop, set: noop});
     Object.defineProperty(document.createElement('audio'), 'src', {get: noop, set: noop});
+    Object.defineProperty(document.createElement('video'), 'innerHTML', {get: noop, set: noop});
+    Object.defineProperty(document.createElement('audio'), 'innerHTML', {get: noop, set: noop});
   } catch (e) {
     return false;
   }
