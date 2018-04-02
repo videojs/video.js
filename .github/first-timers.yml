@@ -2,4 +2,4 @@ repository: 'video.js'
 labels:
   - first-timers-only
   - unclaimed
-template: .github/first_timers_issue_template.md
+template: .github/first-timers-issue-template.md
