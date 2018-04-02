@@ -100,7 +100,7 @@ class Slider extends Component {
   }
 
   /**
-   * Create the `Button`s DOM element.
+   * Create the `Slider`s DOM element.
    *
    * @param {string} type
    *        Type of element to create.
