@@ -260,7 +260,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add an {@link Texttrack} to to the {@link Tech}s {@link TextTrackList}.
+   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
    *
    * @param {TextTrack} track
    *        Text track object to be added to the list.
