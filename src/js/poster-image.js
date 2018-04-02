@@ -85,7 +85,7 @@ class PosterImage extends ClickableComponent {
   setSrc(url) {
     let backgroundImage = '';
 
-    // Any falsey values should stay as an empty string, otherwise
+    // Any false values should stay as an empty string, otherwise
     // this will throw an extra error
     if (url) {
       backgroundImage = `url("${url}")`;
