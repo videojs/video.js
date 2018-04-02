@@ -2492,6 +2492,7 @@ class Player extends Component {
     }
 
     // wait until the tech is ready to set the source
+    // and set it synchronously if possible (#2326)
     this.ready(function() {
 
       // The setSource tech method was added with source handlers
@@ -2504,7 +2505,6 @@ class Player extends Component {
         this.techCall_('src', source.src);
       }
 
-      // Set the source synchronously if possible (#2326)
     }, true);
 
     return false;
