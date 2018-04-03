@@ -387,6 +387,9 @@ class Player extends Component {
 
     this.el_ = this.createEl();
 
+    // Set default value for lastPlaybackRate
+    this.cache_.lastPlaybackRate = this.defaultPlaybackRate();
+
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
@@ -1297,11 +1300,11 @@ class Player extends Component {
    * @listens Tech#ratechange
    */
   handleTechRateChange_() {
-    if (this.tech_.playbackRate() > 0 && this.previousPlaybackRate === 0) {
+    if (this.tech_.playbackRate() > 0 && this.cache_.lastPlaybackRate === 0) {
       this.queuedCallbacks_.forEach((queued) => queued.callback(queued.event));
       this.queuedCallbacks_ = [];
     }
-    this.previousPlaybackRate = this.tech_.playbackRate();
+    this.cache_.lastPlaybackRate = this.tech_.playbackRate();
     /**
      * Fires when the playing speed of the audio/video is changed
      *
@@ -3101,12 +3104,14 @@ class Player extends Component {
    */
   playbackRate(rate) {
     if (rate !== undefined) {
+      // NOTE: this.cache_.lastPlaybackRate is set from the tech handler
+      // that is registered above
       this.techCall_('setPlaybackRate', rate);
       return;
     }
 
     if (this.tech_ && this.tech_.featuresPlaybackRate) {
-      return this.techGet_('playbackRate');
+      return this.cache_.lastPlaybackRate || this.techGet_('playbackRate');
     }
     return 1.0;
   }
