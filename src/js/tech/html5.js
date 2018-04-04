@@ -200,6 +200,14 @@ class Html5 extends Tech {
     });
   }
 
+  overrideNativeAudioTracks(override) {
+    this.forceNativeAudioOverride = override;
+  }
+
+  overrideNativeVideoTracks(override) {
+    this.forceNativeVideoOverride = override;
+  }
+
   /**
    * Proxy all native track list events to our track lists if the browser we are playing
    * in supports that type of track list.
@@ -217,22 +225,36 @@ class Html5 extends Tech {
           !elTracks.addEventListener) {
         return;
       }
-      const listeners = {
-        change(e) {
+
+      const listeners = {};
+
+      listeners.change = (e) => {
+        if (!this[`forceNative${props.capitalName}Override_`]) {
           techTracks.trigger({
             type: 'change',
             target: techTracks,
             currentTarget: techTracks,
             srcElement: techTracks
           });
-        },
-        addtrack(e) {
+        }
+      };
+
+      listeners.addtrack = (e) => {
+        if (this[`forceNative${props.capitalName}Override_`] && elTracks.addTrack) {
+          elTracks.addTrack(e.track);
+        } else if (!this[`forceNative${props.capitalName}Override_`]) {
           techTracks.addTrack(e.track);
-        },
-        removetrack(e) {
+        }
+      };
+
+      listeners.removetrack = (e) => {
+        if (this[`forceNative${props.capitalName}Override_`] && elTracks.addTrack) {
+          elTracks.removeTrack(e.track);
+        } else if (!this[`forceNative${props.capitalName}Override_`]) {
           techTracks.removeTrack(e.track);
         }
       };
+
       const removeOldTracks = function() {
         const removeTracks = [];
 
@@ -605,12 +627,22 @@ class Html5 extends Tech {
    * @deprecated Since version 5.
    */
   src(src) {
+    this.forceNativeAudioOverride_ = this.forceNativeAudioOverride;
+    this.forceNativeVideoOverride_ = this.forceNativeVideoOverride;
+
     if (src === undefined) {
       return this.el_.src;
     }
 
     // Setting src through `src` instead of `setSrc` will be deprecated
     this.setSrc(src);
+  }
+
+  setSrc(src) {
+    this.forceNativeAudioOverride_ = this.forceNativeAudioOverride;
+    this.forceNativeVideoOverride_ = this.forceNativeVideoOverride;
+
+    super.setSrc(src);
   }
 
   /**

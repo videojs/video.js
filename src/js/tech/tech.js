@@ -1218,7 +1218,7 @@ Tech.withSourceHandlers = function(_Tech) {
       if (_Tech.nativeSourceHandler) {
         sh = _Tech.nativeSourceHandler;
       } else {
-        log.error('No source hander found for the current source.');
+        log.error('No source handler found for the current source.');
       }
     }
 
