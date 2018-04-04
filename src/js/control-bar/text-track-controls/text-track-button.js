@@ -39,7 +39,7 @@ class TextTrackButton extends TrackButton {
    */
   createItems(items = [], TrackMenuItem = TextTrackMenuItem) {
 
-    // Label is an overide for the [track] off label
+    // Label is an override for the [track] off label
     // USed to localise captions/subtitles
     let label;
 
