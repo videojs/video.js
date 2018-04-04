@@ -143,6 +143,8 @@ QUnit.test('should get current source from source tag', function(assert) {
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
 
@@ -164,6 +166,8 @@ QUnit.test('should get current sources from source tag', function(assert) {
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
 
+  this.clock.tick(1);
+
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === 'video/mp4');
   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
@@ -171,6 +175,7 @@ QUnit.test('should get current sources from source tag', function(assert) {
 
   // when redefining src expect sources to update accordingly
   player.src('http://google.com');
+  this.clock.tick(1);
 
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === undefined);
@@ -197,20 +202,19 @@ QUnit.test('should get current source from src set', function(assert) {
 
   player.src('http://google.com');
 
-  assert.ok(player.currentSource().src === 'http://google.com');
-  assert.ok(player.currentSource().type === undefined);
-
-  player.src({
-    src: 'http://google.com'
-  });
+  this.clock.tick(1);
 
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === undefined);
 
-  player.src({
-    src: 'http://google.com',
-    type: 'video/mp4'
-  });
+  player.src({src: 'http://google.com'});
+  this.clock.tick(1);
+
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === undefined);
+
+  player.src({src: 'http://google.com', type: 'video/mp4'});
+  this.clock.tick(1);
 
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
@@ -237,6 +241,7 @@ QUnit.test('should get current sources from src set', function(assert) {
   }, {
     src: 'http://hugo.com'
   }]);
+  this.clock.tick(1);
 
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === undefined);
@@ -250,6 +255,7 @@ QUnit.test('should get current sources from src set', function(assert) {
     src: 'http://hugo.com',
     type: 'video/webm'
   }]);
+  this.clock.tick(1);
 
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === 'video/mp4');
@@ -258,6 +264,7 @@ QUnit.test('should get current sources from src set', function(assert) {
 
   // when redefining src expect sources to update accordingly
   player.src('http://hugo.com');
+  this.clock.tick(1);
 
   assert.ok(player.currentSources()[0].src === 'http://hugo.com');
   assert.ok(player.currentSources()[0].type === undefined);
