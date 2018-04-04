@@ -223,6 +223,16 @@ const TECH_EVENTS_RETRIGGER = [
   'texttrackchange'
 ];
 
+// events to queue when playback rate is zero
+// this is a hash for the sole purpose of mapping non-camel-cased event names
+// to camel-cased function names
+const TECH_EVENTS_QUEUE = {
+  canplay: 'CanPlay',
+  canplaythrough: 'CanPlayThrough',
+  playing: 'Playing',
+  seeked: 'Seeked'
+};
+
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
  * are used to initialize a video.
@@ -306,6 +316,10 @@ class Player extends Component {
     // Store the original tag used to set options
     this.tag = tag;
 
+    // Holds callback info that gets queued when playback rate is zero
+    // and a seek is happening
+    this.queuedCallbacks_ = [];
+
     // Store the tag attributes used to restore html5 element
     this.tagAttributes = tag && Dom.getElAttributes(tag);
 
@@ -348,6 +362,9 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
+
+    // Set default value for lastPlaybackRate
+    this.cache_.lastPlaybackRate = 1.0;
 
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
@@ -872,14 +889,24 @@ class Player extends Component {
     TECH_EVENTS_RETRIGGER.forEach((event) => {
       this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
     });
+
+    Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
+      this.on(this.tech_, event, (eventObj) => {
+        if (this.tech_.playbackRate() === 0 && this.tech_.seeking()) {
+          this.queuedCallbacks_.push({
+            callback: this[`handleTech${TECH_EVENTS_QUEUE[event]}_`].bind(this),
+            event: eventObj
+          });
+          return;
+        }
+        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`](eventObj);
+      });
+    });
+
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
-    this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
-    this.on(this.tech_, 'canplaythrough', this.handleTechCanPlayThrough_);
-    this.on(this.tech_, 'playing', this.handleTechPlaying_);
     this.on(this.tech_, 'ended', this.handleTechEnded_);
     this.on(this.tech_, 'seeking', this.handleTechSeeking_);
-    this.on(this.tech_, 'seeked', this.handleTechSeeked_);
     this.on(this.tech_, 'play', this.handleTechPlay_);
     this.on(this.tech_, 'firstplay', this.handleTechFirstPlay_);
     this.on(this.tech_, 'pause', this.handleTechPause_);
@@ -889,6 +916,7 @@ class Player extends Component {
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
     this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
     this.on(this.tech_, 'textdata', this.handleTechTextData_);
+    this.on(this.tech_, 'ratechange', this.handleTechRateChange_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -1141,6 +1169,32 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('play');
+  }
+
+  /**
+   * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
+   *
+   * If there were any events queued while the playback rate was zero, fire
+   * those events now.
+   *
+   * @private
+   * @method Player#handleTechRateChange_
+   * @fires Player#ratechange
+   * @listens Tech#ratechange
+   */
+  handleTechRateChange_() {
+    if (this.tech_.playbackRate() > 0 && this.cache_.lastPlaybackRate === 0) {
+      this.queuedCallbacks_.forEach((queued) => queued.callback(queued.event));
+      this.queuedCallbacks_ = [];
+    }
+    this.cache_.lastPlaybackRate = this.tech_.playbackRate();
+    /**
+     * Fires when the playing speed of the audio/video is changed
+     *
+     * @event Player#ratechange
+     * @type {event}
+     */
+    this.trigger('ratechange');
   }
 
   /**
@@ -2823,12 +2877,14 @@ class Player extends Component {
    */
   playbackRate(rate) {
     if (rate !== undefined) {
+      // NOTE: this.cache_.lastPlaybackRate is set from the tech handler
+      // that is registered above
       this.techCall_('setPlaybackRate', rate);
       return this;
     }
 
     if (this.tech_ && this.tech_.featuresPlaybackRate) {
-      return this.techGet_('playbackRate');
+      return this.cache_.lastPlaybackRate || this.techGet_('playbackRate');
     }
     return 1.0;
   }
