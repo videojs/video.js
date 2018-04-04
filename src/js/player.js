@@ -1210,26 +1210,14 @@ class Player extends Component {
       return this.cache_.source.type;
     }
 
-    // 2. if we do not have a type yet check in the `previousSource` cache
-    if (this.cache_.previousSource.src === src && this.cache_.previousSource.type) {
-      return this.cache_.previousSource.type;
-    }
-
-    // see if we have this source in our `currentSources` cache
+    // 2. see if we have this source in our `currentSources` cache
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
 
     if (matchingSources.length) {
       return matchingSources[0].type;
     }
 
-    // 4. if we do not have a type yet check in the `previousSources` cache
-    const previousMatchingSources = this.cache_.previousSources.filter((s) => s.src && s.src === src);
-
-    if (previousMatchingSources.length) {
-      return previousMatchingSources[0].type;
-    }
-
-    // 5. look for the src url in source elements
+    // 3. look for the src url in source elements and use the type there
     const sources = this.$$('source');
 
     for (let i = 0; i < sources.length; i++) {
@@ -1240,7 +1228,7 @@ class Player extends Component {
       }
     }
 
-    // 6. finally fallback to our list of mime types based on src url extension
+    // 4. finally fallback to our list of mime types based on src url extension
     return getMimeType(src);
   }
 
@@ -1266,28 +1254,15 @@ class Player extends Component {
     // make sure all the caches are set to default values
     // to prevent null checking
     this.cache_.source = this.cache_.source || {};
-    this.cache_.previousSource = this.cache_.previousSource || {};
     this.cache_.sources = this.cache_.sources || [];
-    this.cache_.previousSources = this.cache_.previousSources || [];
 
     // try to get the type of the src that was passed in
     if (!type) {
       type = this.findMimeType_(src);
     }
 
-    // update `previousSource` cache if the current one is a valid source
-    if (this.cache_.source && this.cache_.sources.src) {
-      this.cache_.previousSource = this.cache_.source;
-    }
     // update `currentSource` cache always
     this.cache_.source = {src, type};
-
-    const validSources = this.cache_.sources.filter((s) => !!s.src);
-
-    // update `previousSources` cache if the current cache has valid sources
-    if (validSources.length) {
-      this.cache_.previousSources = this.cache_.sources;
-    }
 
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
     const sourceElSources = [];
@@ -1304,7 +1279,7 @@ class Player extends Component {
       }
     }
 
-    // if we have mathcing source els but not matching sources
+    // if we have matching source els but not matching sources
     // the current source cache is not up to date
     if (matchingSourceEls.length && !matchingSources.length) {
       this.cache_.sources = sourceElSources;
@@ -1354,14 +1329,28 @@ class Player extends Component {
    * @private
    */
   handleTechSourceset_(event) {
-    this.updateSourceCaches_(event.src);
+    // only update the source cache when the source
+    // was not updated using the player api
+    if (!this.changingSrc_) {
+      // update the source to the intial source right away
+      // in some cases this will be empty string
+      this.updateSourceCaches_(event.src);
 
-    // this was a load sourceset, update the source cache later
-    // when we know what the source is
-    if (!event.src && !this.tech_.src() && this.$$('source').length) {
-      this.one('loadstart', () => {
-        this.updateSourceCaches_(this.techGet_('currentSrc'));
-      });
+      // if the `sourceset` `src` was an empty string
+      // wait for a `loadstart` to update the cache to `currentSrc`.
+      // If a sourceset happens before a `loadstart`, we reset the state
+      // as this function will be called again.
+      if (!event.src) {
+        const updateCache = (e) => {
+          if (e.type !== 'sourceset') {
+            this.updateSourceCaches_(this.techGet_('currentSrc'));
+          }
+
+          this.tech_.off(['sourceset', 'loadstart'], updateCache);
+        };
+
+        this.tech_.one(['sourceset', 'loadstart'], updateCache);
+      }
     }
 
     this.trigger({
@@ -2603,12 +2592,10 @@ class Player extends Component {
     }
 
     // intial sources
-    this.cache_.previousSources = this.cache_.sources;
     this.cache_.sources = sources;
     this.changingSrc_ = true;
 
     // intial source
-    this.cache_.previousSource = this.cache_.source;
     this.cache_.source = sources[0];
 
     // middlewareSource is the source after it has been changed by middleware
@@ -2630,11 +2617,11 @@ class Player extends Component {
         // we could not find an appropriate tech, but let's still notify the delegate that this is it
         // this needs a better comment about why this is needed
         this.triggerReady();
+        this.changingSrc_ = false;
 
         return;
       }
 
-      this.changingSrc_ = false;
       // video element listed source
       this.cache_.src = middlewareSource.src;
 
@@ -2684,6 +2671,7 @@ class Player extends Component {
         this.techCall_('src', source.src);
       }
 
+      this.changingSrc_ = false;
     }, true);
 
     return false;
