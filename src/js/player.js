@@ -363,6 +363,9 @@ class Player extends Component {
 
     this.el_ = this.createEl();
 
+    // Set default value for lastPlaybackRate
+    this.cache_.lastPlaybackRate = 1.0;
+
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
@@ -1180,11 +1183,11 @@ class Player extends Component {
    * @listens Tech#ratechange
    */
   handleTechRateChange_() {
-    if (this.tech_.playbackRate() > 0 && this.previousPlaybackRate === 0) {
+    if (this.tech_.playbackRate() > 0 && this.cache_.lastPlaybackRate === 0) {
       this.queuedCallbacks_.forEach((queued) => queued.callback(queued.event));
       this.queuedCallbacks_ = [];
     }
-    this.previousPlaybackRate = this.tech_.playbackRate();
+    this.cache_.lastPlaybackRate = this.tech_.playbackRate();
     /**
      * Fires when the playing speed of the audio/video is changed
      *
@@ -2874,12 +2877,14 @@ class Player extends Component {
    */
   playbackRate(rate) {
     if (rate !== undefined) {
+      // NOTE: this.cache_.lastPlaybackRate is set from the tech handler
+      // that is registered above
       this.techCall_('setPlaybackRate', rate);
       return this;
     }
 
     if (this.tech_ && this.tech_.featuresPlaybackRate) {
-      return this.techGet_('playbackRate');
+      return this.cache_.lastPlaybackRate || this.techGet_('playbackRate');
     }
     return 1.0;
   }
