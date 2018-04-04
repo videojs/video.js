@@ -4,6 +4,7 @@ import document from 'global/document';
 import window from 'global/window';
 import log from '../../src/js/utils/log.js';
 import sinon from 'sinon';
+import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
@@ -20,15 +21,40 @@ if (!Html5.canOverrideAttributes()) {
 }
 
 const oldMovingMedia = Html5.prototype.movingMediaElementInDOM;
-const validateSource = function(assert, player, sources, checkMediaElSource = true) {
-  const tech = player.tech_;
-  const mediaEl = tech.el();
+const validateSource = function(assert, player, event, expectedSources, srcOverrides = {}) {
+  expectedSources = Array.isArray(expectedSources) ? expectedSources : [expectedSources];
+  const mediaEl = player.tech_.el();
+  const expected = {
+    // player cache checks
+    currentSources: expectedSources, currentSource: expectedSources[0], src: expectedSources[0].src,
+    // tech checks
+    event: expectedSources[0].src, attr: expectedSources[0].src, prop: expectedSources[0].src
+  };
 
-  if (checkMediaElSource) {
-    assert.equal(mediaEl.src, sources[0].src, 'mediaEl.src is correct');
-    assert.equal(mediaEl.getAttribute('src'), sources[0].src, 'mediaEl attribute is correct');
-    assert.equal(tech.src(), sources[0].src, 'tech is correct');
-  }
+  Object.keys(srcOverrides).forEach((k) => {
+    // only override known properties
+    if (!expected.hasOwnProperty(k)) {
+      return;
+    }
+
+    expected[k] = srcOverrides[k];
+  });
+
+  assert.deepEqual(player.currentSource(), expected.currentSource, 'player.currentSource() is correct');
+  assert.deepEqual(player.currentSources(), expected.currentSources, 'player.currentSources() is correct');
+  assert.equal(player.src(), expected.src, 'player.src() is correct');
+
+  assert.equal(event.src, expected.event, 'event src is correct');
+
+  // if we expect a blank attr it will be null instead
+  assert.equal(mediaEl.getAttribute('src'), expected.attrSrc || null, 'mediaEl attribute is correct');
+
+  // mediaEl.src source is always absolute, but can be empty string
+  // getAbsoluteURL would return the current url of the page for empty string
+  // so we have to check
+  expected.prop = expected.prop ? getAbsoluteURL(expected.prop) : expected.prop;
+  assert.equal(mediaEl.src, expected.prop, 'mediaEl src property is correct');
+
 };
 
 const setupEnv = function(env, testName) {
