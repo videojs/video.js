@@ -4,6 +4,7 @@ import document from 'global/document';
 import window from 'global/window';
 import log from '../../src/js/utils/log.js';
 import sinon from 'sinon';
+import * as browser from '../../src/js/utils/browser.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
@@ -329,9 +330,13 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     });
 
     const appendTypes = [
-      {name: 'appendChild', fn: (el, obj) => el.appendChild(obj)},
-      {name: 'innerHTML', fn: (el, obj) => {el.innerHTML = obj.outerHTML;}}, // eslint-disable-line
+      {name: 'appendChild', fn: (el, obj) => el.appendChild(obj)}
     ];
+
+    // ie 9 won't append a <source> element in innerHTML... interesting
+    if (!browser.IE_VERSION || browser.IE_VERSION > 9) {
+      appendTypes.push({name: 'innerHTML', fn: (el, obj) => {el.innerHTML = obj.outerHTML;}}); // eslint-disable-line
+    }
 
     // ie does not support this and safari < 10 does not either
     if (window.Element.prototype.append) {
