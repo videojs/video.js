@@ -1,6 +1,7 @@
 import window from 'global/window';
 import document from 'global/document';
 import mergeOptions from '../utils/merge-options';
+import {getAbsoluteURL} from '../utils/url';
 
 /**
  * This function is used to fire a sourceset when there is something
@@ -19,7 +20,7 @@ const sourcesetLoad = (tech) => {
   const el = tech.el();
 
   // if `el.src` is set, that source will be loaded.
-  if (el.src) {
+  if (el.hasAttribute('src')) {
     tech.triggerSourceset(el.src);
     return true;
   }
@@ -56,7 +57,7 @@ const sourcesetLoad = (tech) => {
 
   // there were no valid sources
   if (!srcUrls.length) {
-    return;
+    return false;
   }
 
   // there is only one valid source element url
@@ -70,113 +71,68 @@ const sourcesetLoad = (tech) => {
 };
 
 /**
- * Get the browsers property descriptor for the `innerHTML`
- * property. This will allow us to overwrite it without
- * destroying native functionality.
- *
- * @param {HTMLMediaElement} el
- *        The tech element that should be used to get the descriptor
- *
- * @return {Object}
- *          The property descriptor for innerHTML.
+ * our implementation of an `innerHTML` descriptor for browsers
+ * that do not have one.
  */
-const getInnerHTMLDescriptor = (el) => {
-  const proto = window.Element.prototype;
-  let innerDescriptor = {};
+const innerHTMLDescriptorPolyfill = Object.defineProperty({}, 'innerHTML', {
+  get() {
+    return this.cloneNode(true).innerHTML;
+  },
+  set(v) {
+    // make a dummy node to use innerHTML on
+    const dummy = document.createElement(this.nodeName.toLowerCase());
 
-  // preserve getters/setters already on `el.innerHTML` if they exist
-  if (Object.getOwnPropertyDescriptor(el, 'innerHTML')) {
-    innerDescriptor = Object.getOwnPropertyDescriptor(el, 'innerHTML');
-  } else if (Object.getOwnPropertyDescriptor(proto, 'innerHTML')) {
-    innerDescriptor = Object.getOwnPropertyDescriptor(proto, 'innerHTML');
+    // set innerHTML to the value provided
+    dummy.innerHTML = v;
+
+    // make a document fragment to hold the nodes from dummy
+    const docFrag = document.createDocumentFragment();
+
+    // copy all of the nodes created by the innerHTML on dummy
+    // to the document fragment
+    while (dummy.childNodes.length) {
+      docFrag.appendChild(dummy.childNodes[0]);
+    }
+
+    // remove content
+    this.innerText = '';
+
+    // now we add all of that html in one by appending the
+    // document fragment. This is how innerHTML does it.
+    window.Element.prototype.appendChild.call(this, docFrag);
+
+    // then return the result that innerHTML's setter would
+    return this.innerHTML;
   }
-
-  if (!innerDescriptor.get) {
-    innerDescriptor.get = function() {
-      return el.cloneNode().innerHTML;
-    };
-  }
-
-  if (!innerDescriptor.set) {
-    innerDescriptor.set = function(v) {
-      // remove all current content from inside
-      el.innerText = '';
-
-      // make a dummy node to use innerHTML on
-      const dummy = document.createElement(el.nodeName.toLowerCase());
-
-      // set innerHTML to the value provided
-      dummy.innerHTML = v;
-
-      // make a document fragment to hold the nodes from dummy
-      const docFrag = document.createDocumentFragment();
-
-      // copy all of the nodes created by the innerHTML on dummy
-      // to the document fragment
-      while (dummy.childNodes.length) {
-        docFrag.appendChild(dummy.childNodes[0]);
-      }
-
-      // now we add all of that html in one by appending the
-      // document fragment. This is how innerHTML does it.
-      window.Element.prototype.appendChild.call(el, docFrag);
-
-      // then return the result that innerHTML's setter would
-      return el.innerHTML;
-    };
-  }
-
-  if (typeof innerDescriptor.enumerable === 'undefined') {
-    innerDescriptor.enumerable = true;
-  }
-
-  innerDescriptor.configurable = true;
-
-  return innerDescriptor;
-};
+});
 
 /**
- * Get the browsers property descriptor for the `src`
- * property. This will allow us to overwrite it without
- * destroying native functionality.
- *
- * @param {HTMLMediaElement} el
- *        The tech element that should be used to get the descriptor
- *
- * @return {Object}
- *          The property descriptor for `src`.
+ * Get a property descriptor given a list of priorities and the
+ * property to get.
  */
-const getSrcDescriptor = (el) => {
-  const proto = window.HTMLMediaElement.prototype;
-  let srcDescriptor = {};
+const getDescriptor = (priority, prop) => {
+  let descriptor = {};
 
-  // preserve getters/setters already on `el.src` if they exist
-  if (Object.getOwnPropertyDescriptor(el, 'src')) {
-    srcDescriptor = Object.getOwnPropertyDescriptor(el, 'src');
-  } else if (Object.getOwnPropertyDescriptor(proto, 'src')) {
-    srcDescriptor = mergeOptions(srcDescriptor, Object.getOwnPropertyDescriptor(proto, 'src'));
+  for (let i = 0; i < priority.length; i++) {
+    descriptor = Object.getOwnPropertyDescriptor(priority[i], prop);
+
+    if (descriptor && descriptor.set && descriptor.get) {
+      break;
+    }
   }
 
-  if (!srcDescriptor.get) {
-    srcDescriptor.get = function() {
-      return proto.getAttribute.call(el, 'src');
-    };
-  }
+  descriptor.enumerable = true;
+  descriptor.configurable = true;
 
-  if (!srcDescriptor.set) {
-    srcDescriptor.set = function(v) {
-      return proto.setAttribute.call(el, 'src', v);
-    };
-  }
-
-  if (typeof srcDescriptor.enumerable === 'undefined') {
-    srcDescriptor.enumerable = true;
-  }
-
-  srcDescriptor.configurable = true;
-
-  return srcDescriptor;
+  return descriptor;
 };
+
+const getInnerHTMLDescriptor = (tech) => getDescriptor([
+  tech.el(),
+  window.HTMLMediaElement.prototype,
+  window.Element.prototype,
+  innerHTMLDescriptorPolyfill
+], 'innerHTML');
 
 /**
  * Patches browser internal functions so that we can tell synchronously
@@ -200,73 +156,70 @@ const firstSourceWatch = function(tech) {
   const el = tech.el();
 
   // make sure firstSourceWatch isn't setup twice.
-  if (el.firstSourceWatch_) {
+  if (el.resetSourceWatch_) {
     return;
   }
 
-  el.firstSourceWatch_ = true;
-  const oldAppend = el.append;
-  const oldAppendChild = el.appendChild;
-  const oldInsertAdjacentHTML = el.insertAdjacentHTML;
-  const innerDescriptor = getInnerHTMLDescriptor(el);
-
-  el.appendChild = function() {
-    const retval = oldAppendChild.apply(el, arguments);
+  const old = {};
+  const innerDescriptor = getInnerHTMLDescriptor(tech);
+  const appendWrapper = (appendFn) => (...args) => {
+    const retval = appendFn.apply(el, args);
 
     sourcesetLoad(tech);
 
     return retval;
   };
 
-  if (oldAppend) {
-    el.append = function() {
-      const retval = oldAppend.apply(el, arguments);
+  ['append', 'appendChild', 'insertAdjacentHTML'].forEach((k) => {
+    if (!el[k]) {
+      return;
+    }
 
-      sourcesetLoad(tech);
+    // store the old function
+    old[k] = el[k];
 
-      return retval;
-    };
-  }
-
-  if (oldInsertAdjacentHTML) {
-    el.insertAdjacentHTML = function() {
-      const retval = oldInsertAdjacentHTML.apply(el, arguments);
-
-      sourcesetLoad(tech);
-
-      return retval;
-    };
-  }
-
-  Object.defineProperty(el, 'innerHTML', {
-    get: innerDescriptor.get.bind(el),
-    set(v) {
-      const retval = innerDescriptor.set.call(el, v);
-
-      sourcesetLoad(tech);
-
-      return retval;
-    },
-    configurable: true,
-    enumerable: innerDescriptor.enumerable
+    // call the old function with a sourceset if a source
+    // was loaded
+    el[k] = appendWrapper(old[k]);
   });
 
-  // on the first sourceset, we need to revert
-  // our changes
-  tech.one('sourceset', (e) => {
-    el.firstSourceWatch_ = false;
-    el.appendChild = oldAppendChild;
+  Object.defineProperty(el, 'innerHTML', mergeOptions(innerDescriptor, {
+    set: appendWrapper(innerDescriptor.set)
+  }));
 
-    if (oldAppend) {
-      el.append = oldAppend;
-    }
-    if (oldInsertAdjacentHTML) {
-      el.insertAdjacentHTML = oldInsertAdjacentHTML;
-    }
+  el.resetSourceWatch_ = () => {
+    el.resetSourceWatch_ = null;
+    Object.keys(old).forEach((k) => {
+      el[k] = old[k];
+    });
 
     Object.defineProperty(el, 'innerHTML', innerDescriptor);
-  });
+  };
+
+  // on the first sourceset, we need to revert our changes
+  tech.one('sourceset', el.resetSourceWatch_);
 };
+
+/**
+ * our implementation of a `src` descriptor for browsers
+ * that do not have one.
+ */
+const srcDescriptorPolyfill = Object.defineProperty({}, 'src', {
+  get() {
+    if (this.hasAttribute('src')) {
+      return getAbsoluteURL(window.Element.prototype.getAttribute.call(this, 'src'));
+    }
+
+    return '';
+  },
+  set(v) {
+    window.Element.prototype.setAttribute.call(this, 'src', v);
+
+    return v;
+  }
+});
+
+const getSrcDescriptor = (tech) => getDescriptor([tech.el(), window.HTMLMediaElement.prototype, srcDescriptorPolyfill], 'src');
 
 /**
  * setup `sourceset` handling on the `Html5` tech. This function
@@ -291,35 +244,15 @@ const setupSourceset = function(tech) {
   const el = tech.el();
 
   // make sure sourceset isn't setup twice.
-  if (el.setupSourceset_) {
+  if (el.resetSourceset_) {
     return;
   }
 
-  el.setupSourceset_ = true;
-
-  const srcDescriptor = getSrcDescriptor(el);
+  const srcDescriptor = getSrcDescriptor(tech);
   const oldSetAttribute = el.setAttribute;
   const oldLoad = el.load;
 
-  // we need to fire sourceset when the player is ready
-  // if we find that the media element had a src when it was
-  // given to us and that tech element is not in a stalled state
-  if (el.src || el.currentSrc && el.initNetworkState_ !== 3) {
-    if (el.currentSrc) {
-      tech.triggerSourceset(el.currentSrc);
-    } else {
-      sourcesetLoad(tech);
-    }
-  }
-
-  // for some reason adding a source element when a mediaElement has no source
-  // calls `load` internally right away. We need to handle that.
-  if (!el.src && !el.currentSrc && !tech.$$('source').length) {
-    firstSourceWatch(tech);
-  }
-
-  Object.defineProperty(el, 'src', {
-    get: srcDescriptor.get.bind(el),
+  Object.defineProperty(el, 'src', mergeOptions(srcDescriptor, {
     set: (v) => {
       const retval = srcDescriptor.set.call(el, v);
 
@@ -327,16 +260,14 @@ const setupSourceset = function(tech) {
       tech.triggerSourceset(el.src);
 
       return retval;
-    },
-    configurable: true,
-    enumerable: srcDescriptor.enumerable
-  });
+    }
+  }));
 
   el.setAttribute = (n, v) => {
     const retval = oldSetAttribute.call(el, n, v);
 
-    if (n === 'src') {
-      tech.triggerSourceset(el.getAttribute('src'));
+    if ((/src/i).test(n)) {
+      tech.triggerSourceset(el.src);
     }
 
     return retval;
@@ -350,10 +281,27 @@ const setupSourceset = function(tech) {
     // as that can trigger a `sourceset` when the media element
     // has no source
     if (!sourcesetLoad(tech)) {
+      tech.triggerSourceset('');
       firstSourceWatch(tech);
     }
 
     return retval;
+  };
+
+  if (el.currentSrc) {
+    tech.triggerSourceset(el.currentSrc);
+  } else if (!sourcesetLoad(tech)) {
+    firstSourceWatch(tech);
+  }
+
+  el.resetSourceset_ = () => {
+    el.resetSourceset_ = null;
+    el.load = oldLoad;
+    el.setAttribute = oldSetAttribute;
+    Object.defineProperty(el, 'src', srcDescriptor);
+    if (el.resetSourceWatch_) {
+      el.resetSourceWatch_();
+    }
   };
 };
 

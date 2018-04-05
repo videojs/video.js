@@ -35,10 +35,10 @@ const filterSource = function(src) {
     src = newsrc;
   } else if (typeof src === 'string' && src.trim()) {
     // convert string into object
-    src = [checkMimetype({src})];
+    src = [fixSource({src})];
   } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
     // src is already valid
-    src = [checkMimetype(src)];
+    src = [fixSource(src)];
   } else {
     // invalid source, turn it into an empty array
     src = [];
@@ -55,7 +55,7 @@ const filterSource = function(src) {
  * @return {Tech~SourceObject}
  *        src Object with known type
  */
-function checkMimetype(src) {
+function fixSource(src) {
   const mimetype = getMimetype(src.src);
 
   if (!src.type && mimetype) {
