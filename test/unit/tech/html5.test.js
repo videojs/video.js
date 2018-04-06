@@ -677,7 +677,7 @@ if (Html5.supportsNativeVideoTracks()) {
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
 
-  QUnit.only('should use overrideNativeVideo correctly', function(assert) {
+  QUnit.test('should use overrideNativeVideo correctly', function(assert) {
     assert.expect(6);
     let elAddTrackCount = 0;
     let elRemoveTrackCount = 0;
