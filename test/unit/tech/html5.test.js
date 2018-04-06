@@ -535,6 +535,79 @@ if (Html5.supportsNativeAudioTracks()) {
     assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
+
+  QUnit.test('should use overrideNativeAudio correctly', function(assert) {
+    assert.expect(6);
+
+    let elAddTrackCount = 0;
+    let elRemoveTrackCount = 0;
+
+    const adds = [];
+    const rems = [];
+    const vt = {
+      length: 0,
+      addEventListener: (type, fn) => {
+        adds.push({ type, fn });
+      },
+      removeEventListener: (type, fn) => {
+        rems.push({ type, fn });
+      },
+      addTrack: (track) => elAddTrackCount++,
+      removeTrack: (track) => elRemoveTrackCount++
+    };
+
+    const getTrackFn = function(array, type) {
+      const arrayObj = array.filter(item => item.type === type);
+
+      if (arrayObj.length > 0) {
+        return arrayObj[0].fn;
+      }
+
+      return function() {};
+    };
+
+    const el = document.createElement('div');
+
+    el.audioTracks = vt;
+
+    const htmlTech = new Html5({el});
+
+    htmlTech.overrideNativeAudioTracks(true);
+
+    // overrideNative only takes effect after the source is set,
+    // by default this should proxy the tracks
+    getTrackFn(adds, 'addtrack')({ track: '' });
+    getTrackFn(adds, 'removetrack')({ track: '' });
+
+    assert.equal(elAddTrackCount, 0,
+      'override hasnt taken effect, shouldnt increment');
+    assert.equal(elRemoveTrackCount, 0,
+      'override hasnt taken effect, shouldnt increment');
+
+    htmlTech.src('im a source');
+
+    getTrackFn(adds, 'addtrack')({ track: '' });
+    getTrackFn(adds, 'removetrack')({ track: '' });
+
+    assert.equal(elAddTrackCount, 1,
+      'override has taken effect, shouldnt increment once');
+    assert.equal(elRemoveTrackCount, 1,
+      'override has taken effect, shouldnt increment once');
+
+    htmlTech.overrideNativeVideoTracks(false);
+
+    htmlTech.src('im another source');
+
+    getTrackFn(adds, 'addtrack')({ track: '' });
+    getTrackFn(adds, 'removetrack')({ track: '' });
+
+    assert.equal(elAddTrackCount, 1,
+      'override disabled effect, shouldnt increment');
+    assert.equal(elRemoveTrackCount, 1,
+      'override disabled effect, shouldnt increment');
+
+    htmlTech.dispose();
+  });
 }
 
 if (Html5.supportsNativeVideoTracks()) {
@@ -602,6 +675,78 @@ if (Html5.supportsNativeVideoTracks()) {
     assert.equal(adds[0][0], rems[0][0], 'change event handler removed');
     assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+  });
+
+  QUnit.only('should use overrideNativeVideo correctly', function(assert) {
+    assert.expect(6);
+    let elAddTrackCount = 0;
+    let elRemoveTrackCount = 0;
+
+    const adds = [];
+    const rems = [];
+    const vt = {
+      length: 0,
+      addEventListener: (type, fn) => {
+        adds.push({ type, fn });
+      },
+      removeEventListener: (type, fn) => {
+        rems.push({ type, fn });
+      },
+      addTrack: (track) => elAddTrackCount++,
+      removeTrack: (track) => elRemoveTrackCount++
+    };
+
+    const getTrackFn = function(array, type) {
+      const arrayObj = array.filter(item => item.type === type);
+
+      if (arrayObj.length > 0) {
+        return arrayObj[0].fn;
+      }
+
+      return function() {};
+    };
+
+    const el = document.createElement('div');
+
+    el.videoTracks = vt;
+
+    const htmlTech = new Html5({el});
+
+    htmlTech.overrideNativeVideoTracks(true);
+
+    // overrideNative only takes effect after the source is set,
+    // by default this should proxy the tracks
+    getTrackFn(adds, 'addtrack')({ track: '' });
+    getTrackFn(adds, 'removetrack')({ track: '' });
+
+    assert.equal(elAddTrackCount, 0,
+      'override hasnt taken effect, shouldnt increment');
+    assert.equal(elRemoveTrackCount, 0,
+      'override hasnt taken effect, shouldnt increment');
+
+    htmlTech.src('im a source');
+
+    getTrackFn(adds, 'addtrack')({ track: '' });
+    getTrackFn(adds, 'removetrack')({ track: '' });
+
+    assert.equal(elAddTrackCount, 1,
+      'override has taken effect, shouldnt increment once');
+    assert.equal(elRemoveTrackCount, 1,
+      'override has taken effect, shouldnt increment once');
+
+    htmlTech.overrideNativeVideoTracks(false);
+
+    htmlTech.src('im another source');
+
+    getTrackFn(adds, 'addtrack')({ track: '' });
+    getTrackFn(adds, 'removetrack')({ track: '' });
+
+    assert.equal(elAddTrackCount, 1,
+      'override disabled effect, shouldnt increment');
+    assert.equal(elRemoveTrackCount, 1,
+      'override disabled effect, shouldnt increment');
+
+    htmlTech.dispose();
   });
 }
 
