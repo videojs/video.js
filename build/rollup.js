@@ -55,7 +55,7 @@ const primedBabel = babel({
   plugins: ['external-helpers']
 });
 
-const coreEs = {
+const core = {
   options: {
     entry: 'src/js/video.js',
     plugins: [
@@ -160,6 +160,47 @@ minifiedUmd.options.plugins.splice(4, 0, uglify({
   }
 }));
 
+const coreUmd = {
+  options: {
+    entry: 'src/js/video.js',
+    plugins: [
+      primedResolve,
+      json(),
+      primedCjs,
+      primedBabel,
+      args.progress ? progress() : {},
+      filesize()
+    ],
+    legacy: true
+  },
+  banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
+  useStrict: false,
+  format: 'umd',
+  dest: 'dist/alt/video.core.js'
+};
+
+const minifiedCoreUmd = Object.assign({}, _.cloneDeep(coreUmd), {
+  dest: 'dist/alt/video.core.min.js'
+});
+
+minifiedCoreUmd.options.plugins.splice(4, 0, uglify({
+  preserveComments: 'some',
+  screwIE8: false,
+  mangle: true,
+  compress: {
+    /* eslint-disable camelcase */
+    sequences: true,
+    dead_code: true,
+    conditionals: true,
+    booleans: true,
+    unused: true,
+    if_return: true,
+    join_vars: true,
+    drop_console: true
+    /* eslint-enable camelcase */
+  }
+}));
+
 const novttUmd = Object.assign({}, _.cloneDeep(umd), {
   banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
   dest: 'dist/alt/video.novtt.js'
@@ -194,13 +235,15 @@ function runRollup({options, useStrict, format, dest, banner}) {
 if (!args.watch) {
   if (args.minify) {
     runRollup(minifiedUmd);
+    runRollup(minifiedCoreUmd);
     runRollup(minifiedNovttUmd);
   } else {
     runRollup(es);
     runRollup(cjs);
     runRollup(umd);
+    runRollup(core);
+    runRollup(coreUmd);
     runRollup(novttUmd);
-    runRollup(coreEs);
   }
 } else {
   const props = ['format', 'dest', 'banner', 'useStrict'];
