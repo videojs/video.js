@@ -18,7 +18,7 @@ import setupSourceset from './setup-sourceset';
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  *
- * @mixes Tech~SouceHandlerAdditions
+ * @mixes Tech~SourceHandlerAdditions
  * @extends Tech
  */
 class Html5 extends Tech {
@@ -502,7 +502,7 @@ class Html5 extends Tech {
    * Get the current height of the HTML5 media element.
    *
    * @return {number}
-   *         The heigth of the HTML5 media element.
+   *         The height of the HTML5 media element.
    */
   height() {
     return this.el_.offsetHeight;
@@ -674,12 +674,12 @@ class Html5 extends Tech {
    * on the value of `featuresNativeTextTracks`
    *
    * @param {Object} options
-   *        The object should contain the options to intialize the TextTrack with.
+   *        The object should contain the options to initialize the TextTrack with.
    *
    * @param {string} [options.kind]
    *        `TextTrack` kind (subtitles, captions, descriptions, chapters, or metadata).
    *
-   * @param {string} [options.label].
+   * @param {string} [options.label]
    *        Label to identify the text track
    *
    * @param {string} [options.language]
@@ -915,7 +915,7 @@ Html5.canControlPlaybackRate = function() {
  * Object.defineProperty.
  *
  * @return {boolean}
- *         - True if builtin attributes can be overriden
+ *         - True if builtin attributes can be overridden
  *         - False otherwise
  */
 Html5.canOverrideAttributes = function() {
@@ -1020,7 +1020,7 @@ Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
 /**
- * Boolean indicating wether the `Tech` supports the `sourceset` event.
+ * Boolean indicating whether the `Tech` supports the `sourceset` event.
  *
  * @type {boolean}
  * @default
@@ -1050,7 +1050,7 @@ Html5.prototype.featuresFullscreenResize = true;
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the progress event.
- * If this is false, manual `progress` events will be triggred instead.
+ * If this is false, manual `progress` events will be triggered instead.
  *
  * @type {boolean}
  * @default
@@ -1059,7 +1059,7 @@ Html5.prototype.featuresProgressEvents = true;
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the timeupdate event.
- * If this is false, manual `timeupdate` events will be triggred instead.
+ * If this is false, manual `timeupdate` events will be triggered instead.
  *
  * @default
  */
@@ -1452,7 +1452,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Get the value of the `error` from the media element. `error` indicates any
-   * MediaError that may have occured during playback. If error returns null there is no
+   * MediaError that may have occurred during playback. If error returns null there is no
    * current error.
    *
    * @method Html5#error
@@ -1472,7 +1472,7 @@ Html5.resetMediaElement = function(el) {
    * @return {boolean}
    *         - The value of `seeking` from the media element.
    *         - True indicates that the media is currently seeking to a new position.
-   *         - Flase indicates that the media is not seeking to a new position at this time.
+   *         - False indicates that the media is not seeking to a new position at this time.
    *
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-seeking}
    */
@@ -1555,7 +1555,7 @@ Html5.resetMediaElement = function(el) {
    * Get the value of `networkState` from the media element. `networkState` indicates
    * the current network state. It returns an enumeration from the following list:
    * - 0: NETWORK_EMPTY
-   * - 1: NEWORK_IDLE
+   * - 1: NETWORK_IDLE
    * - 2: NETWORK_LOADING
    * - 3: NETWORK_NO_SOURCE
    *
@@ -1601,7 +1601,7 @@ Html5.resetMediaElement = function(el) {
   'videoWidth',
 
   /**
-   * Get the value of `videoHeight` from the video element. `videoHeigth` indicates
+   * Get the value of `videoHeight` from the video element. `videoHeight` indicates
    * the current height of the video in css pixels.
    *
    * @method Html5#videoHeight
@@ -1721,7 +1721,7 @@ Html5.resetMediaElement = function(el) {
 
 // wrap native functions with a function
 // The list is as follows:
-// pause, load play
+// pause, load, play
 [
   /**
    * A wrapper around the media elements `pause` function. This will call the `HTML5`
@@ -1760,10 +1760,10 @@ Tech.withSourceHandlers(Html5);
 /**
  * Native source handler for Html5, simply passes the source to the media element.
  *
- * @proprety {Tech~SourceObject} source
+ * @property {Tech~SourceObject} source
  *        The source object
  *
- * @proprety {Html5} tech
+ * @property {Html5} tech
  *        The instance of the HTML5 tech.
  */
 Html5.nativeSourceHandler = {};

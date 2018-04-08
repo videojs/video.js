@@ -118,7 +118,7 @@ The source URL to a video source to embed.
 
 > Type: `string|number`
 
-Sets the display height of the video player in pixels.
+Sets the display width of the video player in pixels.
 
 ## Video.js-specific Options
 
@@ -259,7 +259,7 @@ Using `<source>` elements will have the same effect:
 
 > Type: `boolean`
 
-Gives the possibility to techs to override the player's poster 
+Gives the possibility to techs to override the player's poster
 and integrate into the player's poster life-cycle.
 This can be useful when multiple techs are used and each has to set their own poster
  any time a new source is played.
