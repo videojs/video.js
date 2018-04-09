@@ -201,6 +201,9 @@ minifiedCoreUmd.options.plugins.splice(4, 0, uglify({
   }
 }));
 
+/**
+ * video.js without vtt.js
+ */
 const novttUmd = Object.assign({}, _.cloneDeep(umd), {
   banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
   dest: 'dist/alt/video.novtt.js'
@@ -211,6 +214,23 @@ novttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
 const minifiedNovttUmd = Object.assign({}, _.cloneDeep(minifiedUmd), {
   banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
   dest: 'dist/alt/video.novtt.min.js'
+});
+
+minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
+
+/**
+ * Core video.js without vtt.js
+ */
+const novttCoreUmd = Object.assign({}, _.cloneDeep(coreUmd), {
+  banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
+  dest: 'dist/alt/video.core.novtt.js'
+});
+
+novttCoreUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
+
+const minifiedNovttCoreUmd = Object.assign({}, _.cloneDeep(minifiedCoreUmd), {
+  banner: compiledLicense(Object.assign({includesVtt: false}, bannerData)),
+  dest: 'dist/alt/video.core.novtt.min.js'
 });
 
 minifiedNovttUmd.options.plugins.unshift(ignore(['videojs-vtt.js']));
@@ -237,6 +257,7 @@ if (!args.watch) {
     runRollup(minifiedUmd);
     runRollup(minifiedCoreUmd);
     runRollup(minifiedNovttUmd);
+    runRollup(minifiedNovttCoreUmd);
   } else {
     runRollup(es);
     runRollup(cjs);
@@ -244,6 +265,7 @@ if (!args.watch) {
     runRollup(core);
     runRollup(coreUmd);
     runRollup(novttUmd);
+    runRollup(novttCoreUmd);
   }
 } else {
   const props = ['format', 'dest', 'banner', 'useStrict'];
