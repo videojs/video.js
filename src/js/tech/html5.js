@@ -200,10 +200,22 @@ class Html5 extends Tech {
     });
   }
 
+  /**
+   * Attempt to force override of native audio tracks.
+   *
+   * @param {Boolean} override - If set to true native audio will be overridden,
+   * otherwise native video will potentially be used.
+   */
   overrideNativeAudioTracks(override) {
     this.forceNativeAudioOverride = override;
   }
 
+  /**
+   * Attempt to force override of native video tracks.
+   *
+   * @param {Boolean} override - If set to true native video will be overridden,
+   * otherwise native video will potentially be used.
+   */
   overrideNativeVideoTracks(override) {
     this.forceNativeVideoOverride = override;
   }
