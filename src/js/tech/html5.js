@@ -208,12 +208,9 @@ class Html5 extends Tech {
    */
   overrideNativeTracks(override) {
     // If there is no behavioral change don't add/remove listeners
-    if (override === this.override_) {
+    if (override === !(this.featuresNativeAudioTracks && this.featuresNativeAudioTracks)) {
       return;
     }
-
-    // Store this so that we don't re-run everything here if there is no change in state
-    this.override_ = override;
 
     if (this.audioTracksListeners_) {
       Object.keys(this.audioTracksListeners_).forEach((eventName) => {
@@ -297,13 +294,12 @@ class Html5 extends Tech {
         }
       };
 
+      this[props.getterName + 'Listeners_'] = listeners;
+
       Object.keys(listeners).forEach((eventName) => {
         const listener = listeners[eventName];
 
         elTracks.addEventListener(eventName, listener);
-
-        this[props.getterName + 'Listeners_'] = listeners;
-
         this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
       });
 
