@@ -254,7 +254,6 @@ class Html5 extends Tech {
           !elTracks.addEventListener) {
         return;
       }
-
       const listeners = {
         change(e) {
           techTracks.trigger({
