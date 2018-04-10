@@ -119,7 +119,6 @@
     "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "minimist": "^1.2.0",
-    "npm-run": "^4.1.0",
     "npm-run-all": "^4.1.2",
     "proxyquireify": "^3.0.0",
     "qunit": "^2.5.1",
