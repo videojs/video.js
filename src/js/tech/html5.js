@@ -208,7 +208,7 @@ class Html5 extends Tech {
    */
   overrideNativeTracks(override) {
     // If there is no behavioral change don't add/remove listeners
-    if (override !== (this.featuresNativeAudioTracks && this.featuresNativeAudioTracks)) {
+    if (override !== (this.featuresNativeAudioTracks && this.featuresNativeVideoTracks)) {
       return;
     }
 
