@@ -179,7 +179,7 @@ const getSrcDescriptor = (el) => {
 };
 
 /**
- * Patches browser internal functions so that we can tell syncronously
+ * Patches browser internal functions so that we can tell synchronously
  * if a `<source>` was appended to the media element. For some reason this
  * causes a `sourceset` if the the media element is ready and has no source.
  * This happens when:
