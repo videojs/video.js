@@ -1,5 +1,4 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
-import npmRun from 'npm-run';
 import isDocsOnly from './docs-only.js';
 
 module.exports = function(grunt) {
