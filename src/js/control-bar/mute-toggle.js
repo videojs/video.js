@@ -5,6 +5,7 @@ import Button from '../button';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 import checkMuteSupport from './volume-control/check-mute-support';
+import * as browser from '../utils/browser.js';
 
 /**
  * A button component for muting the audio.
@@ -96,6 +97,13 @@ class MuteToggle extends Button {
   updateIcon_() {
     const vol = this.player_.volume();
     let level = 3;
+
+    // in iOS when a player is loaded with muted attribute
+    // and volume is changed with a native mute button
+    // we want to make sure muted state is updated
+    if (browser.IS_IOS) {
+      this.player_.muted(this.player_.tech_.el_.muted);
+    }
 
     if (vol === 0 || this.player_.muted()) {
       level = 0;
