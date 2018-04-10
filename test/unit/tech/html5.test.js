@@ -555,7 +555,6 @@ if (Html5.supportsNativeAudioTracks()) {
       addEventListener: (type, fn) => null,
       removeEventListener: (type, fn) => null
     };
-
     const el = document.createElement('div');
 
     el.audioTracks = at;
@@ -674,13 +673,11 @@ if (Html5.supportsNativeVideoTracks()) {
         rems.push({ type, fn });
       }
     };
-
     const at = {
       length: 0,
       addEventListener: (type, fn) => null,
       removeEventListener: (type, fn) => null
     };
-
     const el = document.createElement('div');
 
     el.audioTracks = at;
