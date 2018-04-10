@@ -789,7 +789,7 @@ class Tech extends Component {
    * Attempt to force override of native audio.video tracks.
    *
    * @param {Boolean} override - If set to true native audio/video will be overridden,
-   * otherwise native video will potentially be used.
+   * otherwise native audio/video will potentially be used.
    *
    * @abstract
    */

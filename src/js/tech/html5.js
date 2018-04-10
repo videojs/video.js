@@ -204,7 +204,7 @@ class Html5 extends Tech {
    * Attempt to force override of native audiio/video tracks.
    *
    * @param {Boolean} override - If set to true native audio/video will be overridden,
-   * otherwise native video will potentially be used.
+   * otherwise native audio/video will potentially be used.
    */
   overrideNativeTracks(override) {
     // If there is no behavioral change don't add/remove listeners
@@ -257,6 +257,7 @@ class Html5 extends Tech {
           !elTracks.addEventListener) {
         return;
       }
+
       const listeners = {
         change(e) {
           techTracks.trigger({
