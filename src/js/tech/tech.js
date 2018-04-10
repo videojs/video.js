@@ -786,9 +786,9 @@ class Tech extends Component {
   setPlaysinline() {}
 
   /**
-   * Attempt to force override of native video tracks.
+   * Attempt to force override of native audio.video tracks.
    *
-   * @param {Boolean} override - If set to true native video will be overridden,
+   * @param {Boolean} override - If set to true native audio/video will be overridden,
    * otherwise native video will potentially be used.
    *
    * @abstract
