@@ -201,35 +201,41 @@ class Html5 extends Tech {
   }
 
   /**
-   * Attempt to force override of native video tracks.
+   * Attempt to force override of native audiio/video tracks.
    *
-   * @param {Boolean} override - If set to true native video will be overridden,
+   * @param {Boolean} override - If set to true native audio/video will be overridden,
    * otherwise native video will potentially be used.
    */
   overrideNativeTracks(override) {
-    const removeTracks = (trackType) => {
-      const props = TRACK_TYPES[trackType];
-      const elTracks = this.el()[props.getterName];
+    // If there is no behavioral change don't add/remove listeners
+    if (override === this.override_) {
+      return;
+    }
 
-      if (this.trackListeners[props.capitalName]) {
-        this.trackListeners[props.capitalName].forEach(trackListener => {
-          elTracks.removeEventListener(trackListener.eventName, trackListener.listener);
-        });
-      }
-    };
+    // Store this so that we don't re-run everything here if there is no change in state
+    this.override_ = override;
+
+    if (this.audioTracksListeners_) {
+      Object.keys(this.audioTracksListeners_).forEach((eventName) => {
+        const elTracks = this.el().audioTracks;
+
+        elTracks.removeEventListener(eventName, this.audioTracksListeners_[eventName]);
+      });
+    }
+
+    if (this.videoTracksListeners_) {
+      Object.keys(this.videoTracksListeners_).forEach((eventName) => {
+        const elTracks = this.el().videoTracks;
+
+        elTracks.removeEventListener(eventName, this.videoTracksListeners_[eventName]);
+      });
+    }
 
     this.featuresNativeVideoTracks = !override;
     this.featuresNativeAudioTracks = !override;
 
-    if (!this.trackListeners) {
-      this.trackListeners = [];
-    }
-
-    removeTracks('video');
-    removeTracks('audio');
-
-    this.trackListeners.Video = [];
-    this.trackListeners.Audio = [];
+    this.audioTracksListeners_ = [];
+    this.videoTracksListeners_ = [];
 
     this.proxyNativeTracks_();
   }
@@ -252,23 +258,23 @@ class Html5 extends Tech {
         return;
       }
 
-      const listeners = {};
+      const listeners = {
+        change(e) {
+          techTracks.trigger({
+            type: 'change',
+            target: techTracks,
+            currentTarget: techTracks,
+            srcElement: techTracks
+          });
+        },
 
-      listeners.change = (e) => {
-        techTracks.trigger({
-          type: 'change',
-          target: techTracks,
-          currentTarget: techTracks,
-          srcElement: techTracks
-        });
-      };
+        addtrack(e) {
+          techTracks.addTrack(e.track);
+        },
 
-      listeners.addtrack = (e) => {
-        techTracks.addTrack(e.track);
-      };
-
-      listeners.removetrack = (e) => {
-        techTracks.removeTrack(e.track);
+        removetrack(e) {
+          techTracks.removeTrack(e.track);
+        }
       };
 
       const removeOldTracks = function() {
@@ -299,15 +305,8 @@ class Html5 extends Tech {
 
         elTracks.addEventListener(eventName, listener);
 
-        if (!this.trackListeners) {
-          this.trackListeners = [];
-        }
+        this[props.getterName + 'Listeners_'] = listeners;
 
-        if (!this.trackListeners[props.capitalName]) {
-          this.trackListeners[props.capitalName] = [];
-        }
-
-        this.trackListeners[props.capitalName].push({ eventName, listener });
         this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
       });
 
@@ -659,10 +658,6 @@ class Html5 extends Tech {
 
     // Setting src through `src` instead of `setSrc` will be deprecated
     this.setSrc(src);
-  }
-
-  setSrc(src) {
-    super.setSrc(src);
   }
 
   /**

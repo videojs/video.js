@@ -537,7 +537,7 @@ if (Html5.supportsNativeAudioTracks()) {
   });
 
   QUnit.test('should use overrideNativeTracks on audio correctly', function(assert) {
-    assert.expect(6);
+    assert.expect(8);
 
     const adds = [];
     const rems = [];
@@ -550,10 +550,16 @@ if (Html5.supportsNativeAudioTracks()) {
         rems.push({ type, fn });
       }
     };
+    const vt = {
+      length: 0,
+      addEventListener: (type, fn) => null,
+      removeEventListener: (type, fn) => null
+    };
 
     const el = document.createElement('div');
 
     el.audioTracks = at;
+    el.videoTracks = vt;
 
     const htmlTech = new Html5({el});
 
@@ -569,12 +575,19 @@ if (Html5.supportsNativeAudioTracks()) {
     assert.equal(rems.length, 3,
       'should have removed previous three listeners');
 
+    htmlTech.overrideNativeTracks(true);
+
+    assert.equal(adds.length, 3,
+      'no state change so do not add listeners');
+    assert.equal(rems.length, 3,
+      'no state change so do not remove listeners');
+
     htmlTech.overrideNativeTracks(false);
 
     assert.equal(adds.length, 6,
-      'should have added 3 listeners back');
+      'should add listeners because native tracks should be proxied');
     assert.equal(rems.length, 3,
-      'no listeners should be removed');
+      'should not remove listeners because there where none added on previous state');
 
     htmlTech.dispose();
   });
@@ -648,7 +661,7 @@ if (Html5.supportsNativeVideoTracks()) {
   });
 
   QUnit.test('should use overrideNativeTracks on video correctly', function(assert) {
-    assert.expect(6);
+    assert.expect(8);
 
     const adds = [];
     const rems = [];
@@ -662,8 +675,15 @@ if (Html5.supportsNativeVideoTracks()) {
       }
     };
 
+    const at = {
+      length: 0,
+      addEventListener: (type, fn) => null,
+      removeEventListener: (type, fn) => null
+    };
+
     const el = document.createElement('div');
 
+    el.audioTracks = at;
     el.videoTracks = vt;
 
     const htmlTech = new Html5({el});
@@ -680,12 +700,19 @@ if (Html5.supportsNativeVideoTracks()) {
     assert.equal(rems.length, 3,
       'should have removed previous three listeners');
 
+    htmlTech.overrideNativeTracks(true);
+
+    assert.equal(adds.length, 3,
+      'no state change so do not add listeners');
+    assert.equal(rems.length, 3,
+      'no state change so do not remove listeners');
+
     htmlTech.overrideNativeTracks(false);
 
     assert.equal(adds.length, 6,
-      'should have added 3 listeners back');
+      'should add listeners because native tracks should be proxied');
     assert.equal(rems.length, 3,
-      'no listeners should be removed');
+      'should not remove listeners because there where none added on previous state');
 
     htmlTech.dispose();
   });
