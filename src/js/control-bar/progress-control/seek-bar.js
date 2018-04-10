@@ -80,11 +80,11 @@ class SeekBar extends Slider {
   }
 
   /**
-   * This function updates the play progress bar and accessiblity
+   * This function updates the play progress bar and accessibility
    * attributes to whatever is passed in.
    *
    * @param {number} currentTime
-   *        The currentTime value that should be used for accessiblity
+   *        The currentTime value that should be used for accessibility
    *
    * @param {number} percent
    *        The percentage as a decimal that the bar should be filled from 0-1.
