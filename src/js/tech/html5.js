@@ -267,16 +267,13 @@ class Html5 extends Tech {
             srcElement: techTracks
           });
         },
-
         addtrack(e) {
           techTracks.addTrack(e.track);
         },
-
         removetrack(e) {
           techTracks.removeTrack(e.track);
         }
       };
-
       const removeOldTracks = function() {
         const removeTracks = [];
 
