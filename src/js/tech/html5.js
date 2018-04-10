@@ -201,23 +201,37 @@ class Html5 extends Tech {
   }
 
   /**
-   * Attempt to force override of native audio tracks.
-   *
-   * @param {Boolean} override - If set to true native audio will be overridden,
-   * otherwise native video will potentially be used.
-   */
-  overrideNativeAudioTracks(override) {
-    this.forceNativeAudioOverride = override;
-  }
-
-  /**
    * Attempt to force override of native video tracks.
    *
    * @param {Boolean} override - If set to true native video will be overridden,
    * otherwise native video will potentially be used.
    */
-  overrideNativeVideoTracks(override) {
-    this.forceNativeVideoOverride = override;
+  overrideNativeTracks(override) {
+    const removeTracks = (trackType) => {
+      const props = TRACK_TYPES[trackType];
+      const elTracks = this.el()[props.getterName];
+
+      if (this.trackListeners[props.capitalName]) {
+        this.trackListeners[props.capitalName].forEach(trackListener => {
+          elTracks.removeEventListener(trackListener.eventName, trackListener.listener);
+        });
+      }
+    };
+
+    this.featuresNativeVideoTracks = !override;
+    this.featuresNativeAudioTracks = !override;
+
+    if (!this.trackListeners) {
+      this.trackListeners = [];
+    }
+
+    removeTracks('video');
+    removeTracks('audio');
+
+    this.trackListeners.Video = [];
+    this.trackListeners.Audio = [];
+
+    this.proxyNativeTracks_();
   }
 
   /**
@@ -241,30 +255,20 @@ class Html5 extends Tech {
       const listeners = {};
 
       listeners.change = (e) => {
-        if (!this[`forceNative${props.capitalName}Override_`]) {
-          techTracks.trigger({
-            type: 'change',
-            target: techTracks,
-            currentTarget: techTracks,
-            srcElement: techTracks
-          });
-        }
+        techTracks.trigger({
+          type: 'change',
+          target: techTracks,
+          currentTarget: techTracks,
+          srcElement: techTracks
+        });
       };
 
       listeners.addtrack = (e) => {
-        if (this[`forceNative${props.capitalName}Override_`] && elTracks.addTrack) {
-          elTracks.addTrack(e.track);
-        } else if (!this[`forceNative${props.capitalName}Override_`]) {
-          techTracks.addTrack(e.track);
-        }
+        techTracks.addTrack(e.track);
       };
 
       listeners.removetrack = (e) => {
-        if (this[`forceNative${props.capitalName}Override_`] && elTracks.addTrack) {
-          elTracks.removeTrack(e.track);
-        } else if (!this[`forceNative${props.capitalName}Override_`]) {
-          techTracks.removeTrack(e.track);
-        }
+        techTracks.removeTrack(e.track);
       };
 
       const removeOldTracks = function() {
@@ -294,6 +298,16 @@ class Html5 extends Tech {
         const listener = listeners[eventName];
 
         elTracks.addEventListener(eventName, listener);
+
+        if (!this.trackListeners) {
+          this.trackListeners = [];
+        }
+
+        if (!this.trackListeners[props.capitalName]) {
+          this.trackListeners[props.capitalName] = [];
+        }
+
+        this.trackListeners[props.capitalName].push({ eventName, listener });
         this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
       });
 
