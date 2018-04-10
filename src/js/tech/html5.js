@@ -653,9 +653,6 @@ class Html5 extends Tech {
    * @deprecated Since version 5.
    */
   src(src) {
-    this.forceNativeAudioOverride_ = this.forceNativeAudioOverride;
-    this.forceNativeVideoOverride_ = this.forceNativeVideoOverride;
-
     if (src === undefined) {
       return this.el_.src;
     }
@@ -665,9 +662,6 @@ class Html5 extends Tech {
   }
 
   setSrc(src) {
-    this.forceNativeAudioOverride_ = this.forceNativeAudioOverride;
-    this.forceNativeVideoOverride_ = this.forceNativeVideoOverride;
-
     super.setSrc(src);
   }
 
