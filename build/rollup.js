@@ -57,7 +57,7 @@ const primedBabel = babel({
 
 const core = {
   options: {
-    entry: 'src/js/video.js',
+    input: 'src/js/video.js',
     plugins: [
       json(),
       primedBabel,
@@ -82,7 +82,7 @@ const core = {
 
 const es = {
   options: {
-    entry: 'src/js/index.js',
+    input: 'src/js/index.js',
     plugins: [
       alias({
         'video.js': path.resolve(__dirname, '../src/js/video.js'),
@@ -116,7 +116,7 @@ const cjs = Object.assign({}, es, {
 
 const umd = {
   options: {
-    entry: 'src/js/index.js',
+    input: 'src/js/index.js',
     plugins: [
       alias({
         'video.js': path.resolve(__dirname, '../src/js/video.js')
@@ -158,7 +158,7 @@ minifiedUmd.options.plugins.splice(4, 0, uglify({
 
 const coreUmd = {
   options: {
-    entry: 'src/js/video.js',
+    input: 'src/js/video.js',
     plugins: [
       primedResolve,
       json(),
