@@ -54,7 +54,7 @@
     "safe-json-parse": "4.0.0",
     "tsml": "1.0.1",
     "videojs-font": "2.1.0",
-    "videojs-vtt.js": "0.12.6",
+    "videojs-vtt.js": "0.14.1",
     "xhr": "2.4.0"
   },
   "devDependencies": {
