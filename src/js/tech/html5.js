@@ -201,7 +201,7 @@ class Html5 extends Tech {
   }
 
   /**
-   * Attempt to force override of native audiio/video tracks.
+   * Attempt to force override of native audio/video tracks.
    *
    * @param {Boolean} override - If set to true native audio/video will be overridden,
    * otherwise native audio/video will potentially be used.
@@ -231,8 +231,8 @@ class Html5 extends Tech {
     this.featuresNativeVideoTracks = !override;
     this.featuresNativeAudioTracks = !override;
 
-    this.audioTracksListeners_ = [];
-    this.videoTracksListeners_ = [];
+    this.audioTracksListeners_ = null;
+    this.videoTracksListeners_ = null;
 
     this.proxyNativeTracks_();
   }
