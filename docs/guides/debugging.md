@@ -21,7 +21,7 @@ Most of these methods should be fairly self-explanatory, but for complete detail
 | Method                          | Alias Of         | Matching Level(s)              |
 | ------------------------------- | ---------------- | ------------------------------ |
 | `videojs.log()`                 | `console.log`    | all, debug, info               |
-| `videojs.log.debug()            | `console.debug`  | all, debug                     |
+| `videojs.log.debug()`           | `console.debug`  | all, debug                     |
 | `videojs.log.warn()`            | `console.warn`   | all, debug, info, warn         |
 | `videojs.log.error()`           | `console.error`  | all, debug, info, warn, error  |
 | `videojs.log.level()`           | n/a              | n/a                            |
