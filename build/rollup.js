@@ -72,8 +72,7 @@ const core = {
 
       // eslint-disable-next-line no-console
       console.warn(warning.message);
-    },
-    legacy: true
+    }
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   useStrict: false,
@@ -102,8 +101,7 @@ const es = {
 
       // eslint-disable-next-line no-console
       console.warn(warning.message);
-    },
-    legacy: true
+    }
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   useStrict: false,
@@ -129,8 +127,7 @@ const umd = {
       primedBabel,
       args.progress ? progress() : {},
       filesize()
-    ],
-    legacy: true
+    ]
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   useStrict: false,
@@ -170,8 +167,7 @@ const coreUmd = {
       primedBabel,
       args.progress ? progress() : {},
       filesize()
-    ],
-    legacy: true
+    ]
   },
   banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
   useStrict: false,
