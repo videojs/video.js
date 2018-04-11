@@ -1270,8 +1270,11 @@ class Player extends Component {
     const matchingSourceEls = [];
 
     for (let i = 0; i < sourceEls.length; i++) {
-      const sourceObj = {src: sourceEls[i].src, type: sourceEls[i].type};
+      const sourceObj = {src: sourceEls[i].src};
 
+      if (sourceEls[i].type) {
+        sourceObj.type = sourceEls[i].type;
+      }
       sourceElSources.push(sourceObj);
 
       if (sourceObj.src && sourceObj.src === src) {
