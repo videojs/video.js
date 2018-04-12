@@ -913,6 +913,7 @@ QUnit.test('should honor default inactivity timeout', function(assert) {
 
   // default timeout is 2000ms
   const player = TestHelpers.makePlayer({});
+  
   player.trigger('play');
 
   assert.equal(player.userActive(), true, 'User is active on creation');
@@ -932,6 +933,7 @@ QUnit.test('should honor configured inactivity timeout', function(assert) {
   const player = TestHelpers.makePlayer({
     inactivityTimeout: 200
   });
+  
   player.trigger('play');
 
   assert.equal(player.userActive(), true, 'User is active on creation');
