@@ -25,12 +25,7 @@ const onwarn = (warning) => {
   }
 
   // eslint-disable-next-line no-console
-  console.warn(warning.message);
-}
-
-const globals = {
-  'global/document': 'document',
-  'global/window': 'window'
+  console.warn('\n??\n',warning.message,'\n??\n');
 }
 
 const primedIgnore = ignore(['videojs-vtt.js']);
@@ -45,6 +40,7 @@ const primedCjs = commonjs({
 const primedBabel = babel({
   babelrc: false,
   exclude: 'node_modules/**(!http-streaming)',
+  compact: false,
   presets: [
     ['es2015', {
       loose: true,
@@ -63,14 +59,12 @@ export default [
         format: 'es',
         file: 'dist/video.es.js',
         strict: false,
-        banner,
-        globals
+        banner
       }, {
         format: 'cjs',
         file: 'dist/video.cjs.js',
         strict: false,
-        banner,
-        globals
+        banner
       }
     ],
     plugins: [
@@ -93,8 +87,7 @@ export default [
       file: 'dist/video.js',
       name: 'videojs',
       strict: false,
-      banner,
-      globals
+      banner
     },
     plugins: [
       alias({
@@ -116,8 +109,7 @@ export default [
       file: 'dist/alt/video.novtt.js',
       name: 'videojs',
       strict: false,
-      banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
-      globals
+      banner: compiledLicense(Object.assign({includesVtt: true}, bannerData))
     },
     plugins: [
       primedIgnore,
@@ -139,8 +131,7 @@ export default [
       format: 'cjs',
       file: 'core.js',
       strict: false,
-      banner,
-      globals
+      banner
     },
     plugins: [
       json(),
@@ -157,8 +148,7 @@ export default [
       format: 'cjs',
       file: 'dist/alt/video.core.js',
       strict: false,
-      banner,
-      globals
+      banner
     },
     plugins: [
       primedResolve,
@@ -177,8 +167,7 @@ export default [
       format: 'cjs',
       file: 'dist/alt/video.core.novtt.js',
       strict: false,
-      banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
-      globals
+      banner: compiledLicense(Object.assign({includesVtt: true}, bannerData))
     },
     plugins: [
       primedIgnore,
