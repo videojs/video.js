@@ -30,3 +30,8 @@
 .vjs-using-native-controls .vjs-poster {
   display: none;
 }
+
+// avoid black borders if poster doesn't fit 100% to ratio
+.vjs-fluid .vjs-poster {
+  background-size: cover;
+}
