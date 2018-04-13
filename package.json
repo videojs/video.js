@@ -87,7 +87,6 @@
     "grunt-contrib-connect": "~1.0.2",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "~2.2.0",
-    "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "~1.0.0",
     "grunt-coveralls": "^1.0.0",
     "grunt-karma": "^2.0.0",
@@ -138,14 +137,13 @@
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-progress": "^0.4.0",
-    "rollup-plugin-uglify": "^3.0.0",
     "rollup-watch": "^4.3.1",
     "semver": "^5.5.0",
     "shelljs": "^0.8.1",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "tui-jsdoc-template": "^1.1.0",
-    "uglify-js": "~2.8.8",
+    "uglify-js": "^3.3.21",
     "unified": "^6.1.6",
     "videojs-flash": "^2.1.0",
     "videojs-standard": "^6.0.1",
@@ -170,8 +168,7 @@
   "greenkeeper": {
     "ignore": [
       "sinon",
-      "webpack",
-      "uglify-js"
+      "webpack"
     ]
   }
 }
