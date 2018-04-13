@@ -458,6 +458,7 @@ module.exports = function(grunt) {
   // The test script includes coveralls only when the TRAVIS env var is set.
   grunt.registerTask('test', function() {
     const tasks = [
+      'build',
       'shell:noderequire',
       'shell:browserify',
       'shell:webpack',
