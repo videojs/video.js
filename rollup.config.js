@@ -1,7 +1,5 @@
 import path from 'path';
 import fs from 'fs';
-import duration from 'humanize-duration';
-import watch from 'rollup-watch';
 import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
@@ -24,8 +22,8 @@ const onwarn = (warning) => {
   }
 
   // eslint-disable-next-line no-console
-  console.warn('\n??\n',warning.message,'\n??\n');
-}
+  console.warn(warning.message);
+};
 
 const primedIgnore = ignore(['videojs-vtt.js']);
 const primedResolve = resolve({
