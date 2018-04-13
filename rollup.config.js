@@ -9,7 +9,6 @@ import json from 'rollup-plugin-json';
 import filesize from 'rollup-plugin-filesize';
 import progress from 'rollup-plugin-progress';
 import ignore from 'rollup-plugin-ignore';
-import uglify from 'rollup-plugin-uglify';
 import alias from 'rollup-plugin-alias';
 import _ from 'lodash';
 import pkg from './package.json';
