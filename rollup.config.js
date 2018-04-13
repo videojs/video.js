@@ -15,6 +15,10 @@ const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt',
 const bannerData = _.pick(pkg, ['version', 'copyright']);
 const banner = compiledLicense(Object.assign({includesVtt: true}, bannerData));
 
+const watch = {
+  clearScreen: false
+};
+
 const onwarn = (warning) => {
   if (warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
       warning.code === 'UNRESOLVED_IMPORT') {
@@ -74,7 +78,8 @@ export default [
       progress(),
       filesize()
     ],
-    onwarn
+    onwarn,
+    watch
   },
   // standard umd file
   {
@@ -96,7 +101,8 @@ export default [
       primedBabel,
       progress(),
       filesize()
-    ]
+    ],
+    watch
   },
   // novtt umd
   {
@@ -119,7 +125,8 @@ export default [
       primedBabel,
       progress(),
       filesize()
-    ]
+    ],
+    watch
   },
   // core
   {
@@ -136,7 +143,8 @@ export default [
       progress(),
       filesize()
     ],
-    onwarn
+    onwarn,
+    watch
   },
   // core umd
   {
@@ -155,7 +163,8 @@ export default [
       progress(),
       filesize()
     ],
-    onwarn
+    onwarn,
+    watch
   },
   // core novtt umd
   {
@@ -175,6 +184,7 @@ export default [
       progress(),
       filesize()
     ],
-    onwarn
+    onwarn,
+    watch
   }
 ];
