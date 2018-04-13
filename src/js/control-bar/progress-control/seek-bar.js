@@ -38,7 +38,21 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
+    this.setEventHandlers_(player, options);
+  }
 
+  /**
+   * Sets the event handlers
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @private
+   */
+  setEventHandlers_(player, options) {
     this.update = Fn.throttle(Fn.bind(this, this.update), UPDATE_REFRESH_INTERVAL);
 
     this.on(player, 'timeupdate', this.update);
