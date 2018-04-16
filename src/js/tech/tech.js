@@ -993,7 +993,7 @@ Tech.prototype.featuresVolumeControl = true;
  * @type {bolean}
  * @default
  */
- Tech.prototype.featuresMuteControl = true;
+Tech.prototype.featuresMuteControl = true;
 
 /**
  * Boolean indicating whether the `Tech` supports fullscreen resize control.
