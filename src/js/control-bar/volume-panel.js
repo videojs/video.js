@@ -78,7 +78,7 @@ class VolumePanel extends Component {
    * @private
    */
   volumePanelState_() {
-    // hide volume panel if neither volume controle or mute toggle
+    // hide volume panel if neither volume control or mute toggle
     // are displayed
     if (this.volumeControl.hasClass('vjs-hidden') && this.muteToggle.hasClass('vjs-hidden')) {
       this.addClass('vjs-hidden');
