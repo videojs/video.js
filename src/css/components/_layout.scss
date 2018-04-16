@@ -103,8 +103,6 @@ body.vjs-full-window {
   padding: 0;
   margin: 0;
   height: 100%;
-  // Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html
-  overflow-y: auto;
 }
 .vjs-full-window .video-js.vjs-fullscreen {
   position: fixed;
@@ -149,10 +147,8 @@ body.vjs-full-window {
   visibility: visible;
 }
 
-//  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
-// The .video-js classname on the video tag also isn't considered.
 // This optional paragraph inside the video tag can provide a message to users
-// about what's required to play video.
+// about what's required to play video when JavaScript is disabled
 .vjs-no-js {
   padding: 20px;
   color: #fff;

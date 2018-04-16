@@ -35,7 +35,7 @@ $DIFF
 
 ### 🤔❓ Questions
 
-Leave a comment below! Alternatively, drop by our [slack's #discussion channel](http://slack.videojs.com].
+Leave a comment below! Alternatively, drop by our [slack's #discussion channel](http://slack.videojs.com).
 
 
 This issue was created by [First-Timers-Bot](https://github.com/hoodiehq/first-timers-bot).

@@ -1,5 +1,4 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
-import npmRun from 'npm-run';
 import isDocsOnly from './docs-only.js';
 
 module.exports = function(grunt) {
@@ -151,7 +150,6 @@ module.exports = function(grunt) {
         ]
       },
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
-      ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
@@ -304,10 +302,6 @@ module.exports = function(grunt) {
     concat: {
       options: {
         separator: '\n'
-      },
-      ie8_addition: {
-        src: ['build/temp/video-js.css', 'src/css/ie8.css'],
-        dest: 'build/temp/video-js.css'
       }
     },
     concurrent: {
@@ -445,7 +439,6 @@ module.exports = function(grunt) {
     'cssmin',
 
     'copy:fonts',
-    'copy:ie8',
     'vjslanguages'
   ]);
 
@@ -457,7 +450,7 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass', 'concat:ie8_addition']);
+  grunt.registerTask('skin', ['sass']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);

@@ -20,7 +20,6 @@ module.exports = function(config) {
     // Compling tests here
     files: [
       '../build/temp/video-js.css',
-      '../build/temp/ie8/videojs-ie8.js',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
       '../build/temp/browserify.js',
@@ -152,17 +151,24 @@ function getCustomLaunchers(){
       base: 'BrowserStack',
       browser: 'chrome',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     },
 
     firefox_bs: {
       base: 'BrowserStack',
       browser: 'firefox',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     },
 
     safari_bs: {
+      base: 'BrowserStack',
+      browser: 'safari',
+      os: 'OS X',
+      os_version: 'High Sierra'
+    },
+
+    safari9_bs: {
       base: 'BrowserStack',
       browser: 'safari',
       os: 'OS X',
@@ -181,7 +187,7 @@ function getCustomLaunchers(){
       browser: 'ie',
       browser_version: '11',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     }
   };
 }

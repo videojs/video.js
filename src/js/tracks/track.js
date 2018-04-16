@@ -1,8 +1,6 @@
 /**
  * @file track.js
  */
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
 import * as Guid from '../utils/guid.js';
 import EventTarget from '../event-target';
 
@@ -40,17 +38,6 @@ class Track extends EventTarget {
    */
   constructor(options = {}) {
     super();
-
-    let track = this; // eslint-disable-line
-
-    if (browser.IS_IE8) {
-      track = document.createElement('custom');
-      for (const prop in Track.prototype) {
-        if (prop !== 'constructor') {
-          track[prop] = Track.prototype[prop];
-        }
-      }
-    }
 
     const trackProps = {
       id: options.id || 'vjs_track_' + Guid.newGUID(),
@@ -97,15 +84,13 @@ class Track extends EventTarget {
      */
 
     for (const key in trackProps) {
-      Object.defineProperty(track, key, {
+      Object.defineProperty(this, key, {
         get() {
           return trackProps[key];
         },
         set() {}
       });
     }
-
-    return track;
   }
 }
 

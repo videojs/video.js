@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "6.8.0",
+  "version": "7.0.0-alpha.1",
   "main": "./dist/video.cjs.js",
   "style": "./dist/video-js.css",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
@@ -48,13 +48,13 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "dependencies": {
+    "@videojs/http-streaming": "^1.0.0",
     "babel-runtime": "^6.9.2",
     "global": "4.3.2",
     "safe-json-parse": "4.0.0",
     "tsml": "1.0.1",
     "videojs-font": "2.1.0",
-    "videojs-ie8": "1.1.2",
-    "videojs-vtt.js": "0.12.6",
+    "videojs-vtt.js": "0.14.1",
     "xhr": "2.4.0"
   },
   "devDependencies": {
@@ -63,7 +63,6 @@
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-es2015": "^6.14.0",
-    "babel-preset-es3": "^1.0.1",
     "babel-register": "^6.9.0",
     "babelify": "^8.0.0",
     "bluebird": "^3.5.1",
@@ -111,7 +110,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-opera-launcher": "^1.0.0",
-    "karma-qunit": "^1.2.0",
+    "karma-qunit": "^2.0.1",
     "karma-safari-launcher": "^1.0.0",
     "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
@@ -120,10 +119,9 @@
     "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "minimist": "^1.2.0",
-    "npm-run": "^4.1.0",
     "npm-run-all": "^4.1.2",
     "proxyquireify": "^3.0.0",
-    "qunitjs": "1.23.1",
+    "qunit": "^2.5.1",
     "remark-cli": "^5.0.0",
     "remark-lint": "^6.0.0",
     "remark-parse": "^5.0.0",
@@ -132,6 +130,7 @@
     "remark-validate-links": "^7.0.0",
     "replace": "^0.3.0",
     "rollup": "^0.47.5",
+    "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-filesize": "^1.2.1",
@@ -158,6 +157,7 @@
       "**/es5/**",
       "**/build/**",
       "!build/rollup.js",
+      "core.js",
       "**/dist/**",
       "**/docs/**",
       "**/lang/**",
@@ -169,7 +169,6 @@
   },
   "greenkeeper": {
     "ignore": [
-      "qunitjs",
       "sinon",
       "webpack",
       "uglify-js"

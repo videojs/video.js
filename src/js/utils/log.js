@@ -3,8 +3,6 @@
  * @module log
  */
 import window from 'global/window';
-import {IE_VERSION} from './browser';
-import {isObject} from './obj';
 
 let log;
 
@@ -23,12 +21,8 @@ let history = [];
  *
  * @param  {Array} args
  *         The arguments to be passed to the matching console method.
- *
- * @param  {boolean} [stringify]
- *         By default, only old IEs should get console argument stringification,
- *         but this is exposed as a parameter to facilitate testing.
  */
-export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
+export const logByType = (type, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
 
@@ -69,31 +63,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
     return;
   }
 
-  // IEs previous to 11 log objects uselessly as "[object Object]"; so, JSONify
-  // objects and arrays for those less-capable browsers.
-  if (stringify) {
-    args = args.map(a => {
-      if (isObject(a) || Array.isArray(a)) {
-        try {
-          return JSON.stringify(a);
-        } catch (x) {
-          return String(a);
-        }
-      }
-
-      // Cast to string before joining, so we get null and undefined explicitly
-      // included in output (as we would in a modern console).
-      return String(a);
-    }).join(' ');
-  }
-
-  // Old IE versions do not allow .apply() for console methods (they are
-  // reported as objects rather than functions).
-  if (!fn.apply) {
-    fn(args);
-  } else {
-    fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
-  }
+  fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
 };
 
 /**

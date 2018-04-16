@@ -15,17 +15,6 @@ QUnit.module('video.js', {
   }
 });
 
-QUnit.test('should create a video tag and have access children in old IE', function(assert) {
-  const fixture = document.getElementById('qunit-fixture');
-
-  fixture.innerHTML += '<video id="test_vid_id"><source type="video/mp4"></video>';
-
-  const vid = document.getElementById('test_vid_id');
-
-  assert.ok(vid.childNodes.length === 1);
-  assert.ok(vid.childNodes[0].getAttribute('type') === 'video/mp4');
-});
-
 QUnit.test('should return a video player instance', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 

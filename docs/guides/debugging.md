@@ -21,7 +21,7 @@ Most of these methods should be fairly self-explanatory, but for complete detail
 | Method                          | Alias Of         | Matching Level(s)              |
 | ------------------------------- | ---------------- | ------------------------------ |
 | `videojs.log()`                 | `console.log`    | all, debug, info               |
-| `videojs.log.debug()            | `console.debug`  | all, debug                     |
+| `videojs.log.debug()`           | `console.debug`  | all, debug                     |
 | `videojs.log.warn()`            | `console.warn`   | all, debug, info, warn         |
 | `videojs.log.error()`           | `console.error`  | all, debug, info, warn, error  |
 | `videojs.log.level()`           | n/a              | n/a                            |
@@ -42,18 +42,6 @@ Similar to the `console`, any number of mixed-type values can be passed to `vide
 
 ```js
 videojs.log('this is a string', {butThis: 'is an object'});
-```
-
-However, certain browser consoles (namely, IE10 and lower) do not support non-string values. Video.js improves on this situation by passing objects through `JSON.stringify` before logging them in IE10 and below. In other words, instead of the above producing this:
-
-```txt
-VIDEOJS: this is a string [object Object]
-```
-
-it will produce this:
-
-```txt
-VIDEOJS: this is a string {"butThis": "is an object"}
 ```
 
 ### Log Levels
