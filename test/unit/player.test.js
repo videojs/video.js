@@ -1365,6 +1365,11 @@ QUnit.test('Remove waiting class on timeupdate after tech waiting', function(ass
 });
 
 QUnit.test('Queues playing events when playback rate is zero while seeking', function(assert) {
+  if (!Html5.canControlPlaybackRate()) {
+    assert.ok(true, 'Playback rate is not supported');
+    return;
+  }
+
   const player = TestHelpers.makePlayer({techOrder: ['html5']});
 
   let canPlayCount = 0;
