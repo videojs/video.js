@@ -14,6 +14,20 @@ import TextTrackList from '../../../src/js/tracks/text-track-list';
 import sinon from 'sinon';
 import log from '../../../src/js/utils/log.js';
 
+function stubbedSourceHandler(handler) {
+  return {
+    canPlayType() {
+      return true;
+    },
+    canHandleSource() {
+      return true;
+    },
+    handleSource(source, tech, options) {
+      return handler;
+    }
+  };
+}
+
 QUnit.module('Media Tech', {
   beforeEach(assert) {
     this.noop = function() {};
@@ -474,9 +488,15 @@ QUnit.test('should track whether a video has played', function(assert) {
   assert.equal(tech.played().length, 1, 'has length after playing');
 });
 
-QUnit.test('delegates seekable to the source handler', function(assert) {
+QUnit.test('delegates deferrables to the source handler', function(assert) {
   const MyTech = extendFn(Tech, {
     seekable() {
+      throw new Error('You should not be calling me!');
+    },
+    seeking() {
+      throw new Error('You should not be calling me!');
+    },
+    duration() {
       throw new Error('You should not be calling me!');
     }
   });
@@ -484,24 +504,24 @@ QUnit.test('delegates seekable to the source handler', function(assert) {
   Tech.withSourceHandlers(MyTech);
 
   let seekableCount = 0;
+  let seekingCount = 0;
+  let durationCount = 0;
   const handler = {
     seekable() {
       seekableCount++;
       return createTimeRange(0, 0);
+    },
+    seeking() {
+      seekingCount++;
+      return false;
+    },
+    duration() {
+      durationCount++;
+      return 0;
     }
   };
 
-  MyTech.registerSourceHandler({
-    canPlayType() {
-      return true;
-    },
-    canHandleSource() {
-      return true;
-    },
-    handleSource(source, tech, options) {
-      return handler;
-    }
-  });
+  MyTech.registerSourceHandler(stubbedSourceHandler(handler));
 
   const tech = new MyTech();
 
@@ -510,7 +530,57 @@ QUnit.test('delegates seekable to the source handler', function(assert) {
     type: 'video/mp4'
   });
   tech.seekable();
+  tech.seeking();
+  tech.duration();
   assert.equal(seekableCount, 1, 'called the source handler');
+  assert.equal(seekingCount, 1, 'called the source handler');
+  assert.equal(durationCount, 1, 'called the source handler');
+});
+
+QUnit.test('delegates only deferred deferrables to the source handler', function(assert) {
+  let seekingCount = 0;
+  const MyTech = extendFn(Tech, {
+    seekable() {
+      throw new Error('You should not be calling me!');
+    },
+    seeking() {
+      seekingCount++;
+      return false;
+    },
+    duration() {
+      throw new Error('You should not be calling me!');
+    }
+  });
+
+  Tech.withSourceHandlers(MyTech);
+
+  let seekableCount = 0;
+  let durationCount = 0;
+  const handler = {
+    seekable() {
+      seekableCount++;
+      return createTimeRange(0, 0);
+    },
+    duration() {
+      durationCount++;
+      return 0;
+    }
+  };
+
+  MyTech.registerSourceHandler(stubbedSourceHandler(handler));
+
+  const tech = new MyTech();
+
+  tech.setSource({
+    src: 'example.mp4',
+    type: 'video/mp4'
+  });
+  tech.seekable();
+  tech.seeking();
+  tech.duration();
+  assert.equal(seekableCount, 1, 'called the source handler');
+  assert.equal(seekingCount, 1, 'called the tech itself');
+  assert.equal(durationCount, 1, 'called the source handler');
 });
 
 QUnit.test('Tech.isTech returns correct answers for techs and components', function(assert) {
