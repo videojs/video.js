@@ -21,7 +21,9 @@ const watch = {
 
 const onwarn = (warning) => {
   if (warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
-      warning.code === 'UNRESOLVED_IMPORT') {
+      warning.code === 'UNRESOLVED_IMPORT' ||
+      (warning.code === 'UNKNOWN_OPTION' &&
+       warning.message.indexOf('progress') !== -1)) {
     return;
   }
 
@@ -51,7 +53,7 @@ const primedBabel = babel({
   plugins: ['external-helpers']
 });
 
-export default [
+export default cliargs => [
   // es, cjs
   {
     input: 'src/js/index.js',
@@ -75,7 +77,7 @@ export default [
       }),
       json(),
       primedBabel,
-      progress(),
+      cliargs.progress ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -99,9 +101,10 @@ export default [
       json(),
       primedCjs,
       primedBabel,
-      progress(),
+      cliargs.progress ? progress() : {},
       filesize()
     ],
+    onwarn,
     watch
   },
   // novtt umd
@@ -123,9 +126,10 @@ export default [
       json(),
       primedCjs,
       primedBabel,
-      progress(),
+      cliargs.progress ? progress() : {},
       filesize()
     ],
+    onwarn,
     watch
   },
   // core
@@ -140,7 +144,7 @@ export default [
     plugins: [
       json(),
       primedBabel,
-      progress(),
+      cliargs.progress ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -160,7 +164,7 @@ export default [
       json(),
       primedCjs,
       primedBabel,
-      progress(),
+      cliargs.progress ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -181,7 +185,7 @@ export default [
       json(),
       primedCjs,
       primedBabel,
-      progress(),
+      cliargs.progress ? progress() : {},
       filesize()
     ],
     onwarn,
