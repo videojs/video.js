@@ -77,7 +77,7 @@ export default cliargs => [
       }),
       json(),
       primedBabel,
-      cliargs.progress ? progress() : {},
+      cliargs.progress !== false ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -101,7 +101,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress ? progress() : {},
+      cliargs.progress !== false ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -126,7 +126,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress ? progress() : {},
+      cliargs.progress !== false ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -144,7 +144,7 @@ export default cliargs => [
     plugins: [
       json(),
       primedBabel,
-      cliargs.progress ? progress() : {},
+      cliargs.progress !== false ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -164,7 +164,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress ? progress() : {},
+      cliargs.progress !== false ? progress() : {},
       filesize()
     ],
     onwarn,
@@ -185,7 +185,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress ? progress() : {},
+      cliargs.progress !== false ? progress() : {},
       filesize()
     ],
     onwarn,
