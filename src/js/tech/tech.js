@@ -785,6 +785,16 @@ class Tech extends Component {
    */
   setPlaysinline() {}
 
+  /**
+   * Attempt to force override of native audio.video tracks.
+   *
+   * @param {Boolean} override - If set to true native audio/video will be overridden,
+   * otherwise native audio/video will potentially be used.
+   *
+   * @abstract
+   */
+  overrideNativeTracks() {}
+
   /*
    * Check if the tech can support the given mime-type.
    *
@@ -1219,7 +1229,7 @@ Tech.withSourceHandlers = function(_Tech) {
       if (_Tech.nativeSourceHandler) {
         sh = _Tech.nativeSourceHandler;
       } else {
-        log.error('No source hander found for the current source.');
+        log.error('No source handler found for the current source.');
       }
     }
 

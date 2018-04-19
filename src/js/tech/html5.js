@@ -201,6 +201,43 @@ class Html5 extends Tech {
   }
 
   /**
+   * Attempt to force override of native audio/video tracks.
+   *
+   * @param {Boolean} override - If set to true native audio/video will be overridden,
+   * otherwise native audio/video will potentially be used.
+   */
+  overrideNativeTracks(override) {
+    // If there is no behavioral change don't add/remove listeners
+    if (override !== (this.featuresNativeAudioTracks && this.featuresNativeVideoTracks)) {
+      return;
+    }
+
+    if (this.audioTracksListeners_) {
+      Object.keys(this.audioTracksListeners_).forEach((eventName) => {
+        const elTracks = this.el().audioTracks;
+
+        elTracks.removeEventListener(eventName, this.audioTracksListeners_[eventName]);
+      });
+    }
+
+    if (this.videoTracksListeners_) {
+      Object.keys(this.videoTracksListeners_).forEach((eventName) => {
+        const elTracks = this.el().videoTracks;
+
+        elTracks.removeEventListener(eventName, this.videoTracksListeners_[eventName]);
+      });
+    }
+
+    this.featuresNativeVideoTracks = !override;
+    this.featuresNativeAudioTracks = !override;
+
+    this.audioTracksListeners_ = null;
+    this.videoTracksListeners_ = null;
+
+    this.proxyNativeTracks_();
+  }
+
+  /**
    * Proxy all native track list events to our track lists if the browser we are playing
    * in supports that type of track list.
    *
@@ -255,6 +292,8 @@ class Html5 extends Tech {
           techTracks.removeTrack(removeTracks.shift());
         }
       };
+
+      this[props.getterName + 'Listeners_'] = listeners;
 
       Object.keys(listeners).forEach((eventName) => {
         const listener = listeners[eventName];
