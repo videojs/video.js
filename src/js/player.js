@@ -264,7 +264,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready) {
     // Make sure tag ID exists
-    tag.id = tag.id || `vjs_video_${Guid.newGUID()}`;
+    tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
 
     // Set Options
     // The options argument overrides options set in the video tag
