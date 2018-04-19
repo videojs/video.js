@@ -207,6 +207,7 @@ class Html5 extends Tech {
    * 'Video', and 'Text'.
    * @param {Boolean} override - If set to true native audio/video will be overridden,
    * otherwise native audio/video will potentially be used.
+   * @private
    */
   overrideNative_(type, override) {
     // If there is no behavioral change don't add/remove listeners
