@@ -82,29 +82,6 @@ module.exports = function(grunt) {
       build: ['build/temp/*', 'es5'],
       dist: ['dist/*']
     },
-    uglify: {
-      options: {
-        preserveComments: 'some',
-        screwIE8: false,
-        mangle: true,
-        compress: {
-          sequences: true,
-          dead_code: true,
-          conditionals: true,
-          booleans: true,
-          unused: true,
-          if_return: true,
-          join_vars: true,
-          drop_console: true
-        }
-      },
-      build: {
-        files: {
-          'build/temp/alt/video.novtt.min.js': 'build/temp/alt/video.novtt.js',
-          'build/temp/video.min.js': 'build/temp/video.js'
-        }
-      }
-    },
     dist: {},
     watch: {
       dist: {
@@ -115,10 +92,6 @@ module.exports = function(grunt) {
           'build/temp/alt/video-js-cdn.css'
         ],
         tasks: ['copy:dist']
-      },
-      minify: {
-        files: ['build/temp/video.js'],
-        tasks: ['uglify']
       },
       skin: {
         files: ['src/css/**/*'],
@@ -362,7 +335,7 @@ module.exports = function(grunt) {
         }
       },
       rollupall: {
-        command: 'npm run rollup -- --no-progress && npm run rollup-minify -- --no-progress',
+        command: 'npm run rollup -- --no-progress && npm run minify',
         options: {
           preferLocal: true
         }
