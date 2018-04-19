@@ -23,8 +23,8 @@
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
 
 ```html
-<link href="//vjs.zencdn.net/5.19/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/5.19/video.min.js"></script>
+<link href="//vjs.zencdn.net/6.7/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/6.7/video.min.js"></script>
 ```
 > For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
 
@@ -40,8 +40,8 @@ Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted
 > <script src="https://unpkg.com/video.js/dist/video.js"></script>
 >
 > <!-- cdnjs -->
-> <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video-js.css" rel="stylesheet">
-> <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video.js"></script>
+> <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video-js.css" rel="stylesheet">
+> <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video.js"></script>
 > ```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!

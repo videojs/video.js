@@ -1,3 +1,42 @@
+<a name="6.8.0"></a>
+# [6.8.0](https://github.com/videojs/video.js/compare/v6.7.4...v6.8.0) (2018-03-19)
+
+### Features
+
+* add mimetype type to source object when possible ([#4469](https://github.com/videojs/video.js/issues/4469)) ([#4947](https://github.com/videojs/video.js/issues/4947)) ([62ff3f6](https://github.com/videojs/video.js/commit/62ff3f6)), closes [#4851](https://github.com/videojs/video.js/issues/4851)
+* Allow techs to change poster if player option `techCanOverridePoster` is set ([#4921](https://github.com/videojs/video.js/issues/4921)) ([8706941](https://github.com/videojs/video.js/commit/8706941)), closes [#4910](https://github.com/videojs/video.js/issues/4910)
+* **format time:** add setFormatTime for overriding the time format  ([#4962](https://github.com/videojs/video.js/issues/4962)) ([2f96914](https://github.com/videojs/video.js/commit/2f96914)), closes [#2931](https://github.com/videojs/video.js/issues/2931)
+* require enableSourceset option for event ([#5031](https://github.com/videojs/video.js/issues/5031)) ([1b3c827](https://github.com/videojs/video.js/commit/1b3c827))
+* sourceset event ([#4660](https://github.com/videojs/video.js/issues/4660)) ([df96a74](https://github.com/videojs/video.js/commit/df96a74))
+* Use CSS grid for Caption Settings dialog to begin making it more responsive ([#4997](https://github.com/videojs/video.js/issues/4997)) ([d2f63ad](https://github.com/videojs/video.js/commit/d2f63ad))
+
+### Bug Fixes
+
+* don't add captions settings menu item when TextTrackSettings is disabled ([#5002](https://github.com/videojs/video.js/issues/5002)) ([ba6a71e](https://github.com/videojs/video.js/commit/ba6a71e)), closes [#4996](https://github.com/videojs/video.js/issues/4996)
+* **sourceset:** set evt.src to empty string or src attr from load ([#5016](https://github.com/videojs/video.js/issues/5016)) ([46d8b37](https://github.com/videojs/video.js/commit/46d8b37))
+
+### Chores
+
+* make sure first-timers bot uses our template ([#5001](https://github.com/videojs/video.js/issues/5001)) ([43b5a6d](https://github.com/videojs/video.js/commit/43b5a6d))
+* **dom.js:** Fix misspellings ([#5008](https://github.com/videojs/video.js/issues/5008)) ([e833d3e](https://github.com/videojs/video.js/commit/e833d3e))
+* update package-lock.json ([9519740](https://github.com/videojs/video.js/commit/9519740))
+
+### Documentation
+
+* **component:** fix misspellings ([#5017](https://github.com/videojs/video.js/issues/5017)) ([1532df3](https://github.com/videojs/video.js/commit/1532df3))
+* **component:** fix misspelllings ([#5019](https://github.com/videojs/video.js/issues/5019)) ([ebbe868](https://github.com/videojs/video.js/commit/ebbe868))
+* **react guide:** update guide to prevent memory leaks when components are disposed of ([#4998](https://github.com/videojs/video.js/issues/4998)) ([1fa9dfb](https://github.com/videojs/video.js/commit/1fa9dfb))
+* **time-ranges:** fix misspellings ([#5025](https://github.com/videojs/video.js/issues/5025)) ([bd6b31c](https://github.com/videojs/video.js/commit/bd6b31c))
+* **time-ranges:** fix wrong comment for getRange function ([#5026](https://github.com/videojs/video.js/issues/5026)) ([d7f45ba](https://github.com/videojs/video.js/commit/d7f45ba))
+
+### Reverts
+
+* Revert "fix: force autoplay in Chrome ([#4804](https://github.com/videojs/video.js/issues/4804))" ([#5009](https://github.com/videojs/video.js/issues/5009)) ([8d86afd](https://github.com/videojs/video.js/commit/8d86afd)), closes [#4720](https://github.com/videojs/video.js/issues/4720) [#5005](https://github.com/videojs/video.js/issues/5005) [#4720](https://github.com/videojs/video.js/issues/4720) [#5005](https://github.com/videojs/video.js/issues/5005)
+
+### Tests
+
+* **ResizeManager:** only listen for one playerresize to make test not flaky ([#5022](https://github.com/videojs/video.js/issues/5022)) ([4e83cd3](https://github.com/videojs/video.js/commit/4e83cd3))
+
 <a name="6.7.4"></a>
 ## [6.7.4](https://github.com/videojs/video.js/compare/v6.7.3...v6.7.4) (2018-03-05)
 

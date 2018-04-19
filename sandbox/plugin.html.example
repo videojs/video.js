@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <title>Video.js Plugin Example</title>
 
-  <!-- Add ES5 shim and sham for IE8 -->
-  <script src="../dist/ie8/videojs-ie8.js"></script>
-
   <!-- Load the source files -->
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>

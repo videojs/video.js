@@ -21,7 +21,37 @@
   vertical-align: bottom;
 }
 
+// code that will only run if CSS Grid is supported by the browser
+@supports (display: grid) {
+  .vjs-text-track-settings .vjs-modal-dialog-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-colors {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-font {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-controls {
+    grid-column: 2;
+    grid-row: 2;
+
+  }
+}
+
 // Form elements
+.vjs-track-setting > select {
+  margin-right: 5px;
+}
+
 .vjs-text-track-settings fieldset {
   margin: 5px;
   padding: 3px;
@@ -30,7 +60,6 @@
 
 .vjs-text-track-settings fieldset span {
   display: inline-block;
-  margin-left: 5px;
 }
 
 .vjs-text-track-settings legend {

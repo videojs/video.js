@@ -162,7 +162,7 @@ class TextTrackDisplay extends Component {
     }
 
     // The preferredTrack matches the user preference and takes
-    // precendence over all the other tracks.
+    // precedence over all the other tracks.
     // So, display the preferredTrack before the first default track
     // and the subtitles/captions track before the descriptions track
     if (preferredTrack) {
@@ -260,7 +260,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add an {@link Texttrack} to to the {@link Tech}s {@link TextTrackList}.
+   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
    *
    * @param {TextTrack} track
    *        Text track object to be added to the list.

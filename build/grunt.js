@@ -1,5 +1,4 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
-import npmRun from 'npm-run';
 import isDocsOnly from './docs-only.js';
 
 module.exports = function(grunt) {
@@ -83,29 +82,6 @@ module.exports = function(grunt) {
       build: ['build/temp/*', 'es5'],
       dist: ['dist/*']
     },
-    uglify: {
-      options: {
-        preserveComments: 'some',
-        screwIE8: false,
-        mangle: true,
-        compress: {
-          sequences: true,
-          dead_code: true,
-          conditionals: true,
-          booleans: true,
-          unused: true,
-          if_return: true,
-          join_vars: true,
-          drop_console: true
-        }
-      },
-      build: {
-        files: {
-          'build/temp/alt/video.novtt.min.js': 'build/temp/alt/video.novtt.js',
-          'build/temp/video.min.js': 'build/temp/video.js'
-        }
-      }
-    },
     dist: {},
     watch: {
       dist: {
@@ -116,10 +92,6 @@ module.exports = function(grunt) {
           'build/temp/alt/video-js-cdn.css'
         ],
         tasks: ['copy:dist']
-      },
-      minify: {
-        files: ['build/temp/video.js'],
-        tasks: ['uglify']
       },
       skin: {
         files: ['src/css/**/*'],
@@ -151,7 +123,6 @@ module.exports = function(grunt) {
         ]
       },
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
-      ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
@@ -205,10 +176,7 @@ module.exports = function(grunt) {
       firefox_bs:   { browsers: ['firefox_bs'] },
       safari_bs:    { browsers: ['safari_bs'] },
       edge_bs:      { browsers: ['edge_bs'] },
-      ie11_bs:      { browsers: ['ie11_bs'] },
-      ie10_bs:      { browsers: ['ie10_bs'] },
-      ie9_bs:       { browsers: ['ie9_bs'] },
-      ie8_bs:       { browsers: ['ie8_bs'] }
+      ie11_bs:      { browsers: ['ie11_bs'] }
     },
     vjslanguages: {
       defaults: {
@@ -307,10 +275,6 @@ module.exports = function(grunt) {
     concat: {
       options: {
         separator: '\n'
-      },
-      ie8_addition: {
-        src: ['build/temp/video-js.css', 'src/css/ie8.css'],
-        dest: 'build/temp/video-js.css'
       }
     },
     concurrent: {
@@ -371,7 +335,7 @@ module.exports = function(grunt) {
         }
       },
       rollupall: {
-        command: 'npm run rollup -- --no-progress && npm run rollup-minify -- --no-progress',
+        command: 'npm run rollup -- --no-progress && npm run minify',
         options: {
           preferLocal: true
         }
@@ -448,7 +412,6 @@ module.exports = function(grunt) {
     'cssmin',
 
     'copy:fonts',
-    'copy:ie8',
     'vjslanguages'
   ]);
 
@@ -460,7 +423,7 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass', 'concat:ie8_addition']);
+  grunt.registerTask('skin', ['sass']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);

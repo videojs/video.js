@@ -63,9 +63,6 @@
   padding: 0;
   // updated by javascript during playback
   width: 0;
-  // Needed for IE6
-  left: 0;
-  top: 0;
 }
 
 .video-js .vjs-play-progress {
@@ -83,18 +80,12 @@
 }
 
 .video-js .vjs-load-progress {
-  // For IE8, we'll lighten the color
-  background: lighten($secondary-background-color, 25%);
-  // Otherwise, we'll rely on stacked opacities
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
 
 // There are child elements of the load progress bar that represent the
 // specific time ranges that have been buffered.
 .video-js .vjs-load-progress div {
-  // For IE8, we'll lighten the color
-  background: lighten($secondary-background-color, 50%);
-  // Otherwise, we'll rely on stacked opacities
   background: rgba($secondary-background-color, 0.75);
 }
 

@@ -21,7 +21,7 @@ class MediaLoader extends Component {
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]
-   *        The key/value stroe of player options.
+   *        The key/value store of player options.
    *
    * @param {Component~ReadyCallback} [ready]
    *        The function that is run when this component is ready.

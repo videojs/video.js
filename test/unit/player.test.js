@@ -108,7 +108,7 @@ QUnit.test('should get tag, source, and track settings', function(assert) {
   assert.equal(player.options_.id, 'example_1', 'id is set to example_1');
   assert.equal(player.options_.sources.length, 2, 'we have two sources');
   assert.equal(player.options_.sources[0].src, 'http://google.com', 'first source is google.com');
-  assert.equal(player.options_.sources[0].type, 'video/mp4', 'first time is video/mp4');
+  assert.equal(player.options_.sources[0].type, 'video/mp4', 'first type is video/mp4');
   assert.equal(player.options_.sources[1].type, 'video/webm', 'second type is video/webm');
   assert.equal(player.options_.tracks.length, 1, 'we have one text track');
   assert.equal(player.options_.tracks[0].kind, 'captions', 'the text track is a captions file');
@@ -344,7 +344,7 @@ QUnit.test('should default to 16:9 when fluid', function(assert) {
   const player = TestHelpers.makePlayer({fluid: true});
   const ratio = player.currentHeight() / player.currentWidth();
 
-  // IE8 rounds 0.5625 up to 0.563
+  // account for some rounding of 0.5625 up to 0.563
   assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
 
   player.dispose();
@@ -914,6 +914,8 @@ QUnit.test('should honor default inactivity timeout', function(assert) {
   // default timeout is 2000ms
   const player = TestHelpers.makePlayer({});
 
+  player.trigger('play');
+
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(1800);
   assert.equal(player.userActive(), true, 'User is still active');
@@ -931,6 +933,8 @@ QUnit.test('should honor configured inactivity timeout', function(assert) {
   const player = TestHelpers.makePlayer({
     inactivityTimeout: 200
   });
+
+  player.trigger('play');
 
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(150);
@@ -1362,6 +1366,59 @@ QUnit.test('Remove waiting class on timeupdate after tech waiting', function(ass
   player.trigger('timeupdate');
   assert.ok(!(/vjs-waiting/).test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
   player.dispose();
+});
+
+QUnit.test('Queues playing events when playback rate is zero while seeking', function(assert) {
+  const player = TestHelpers.makePlayer({techOrder: ['html5']});
+
+  let canPlayCount = 0;
+  let canPlayThroughCount = 0;
+  let playingCount = 0;
+  let seekedCount = 0;
+  let seeking = false;
+
+  player.on('canplay', () => canPlayCount++);
+  player.on('canplaythrough', () => canPlayThroughCount++);
+  player.on('playing', () => playingCount++);
+  player.on('seeked', () => seekedCount++);
+
+  player.tech_.seeking = () => {
+    return seeking;
+  };
+
+  player.tech_.setPlaybackRate(0);
+  player.tech_.trigger('ratechange');
+
+  player.tech_.trigger('canplay');
+  player.tech_.trigger('canplaythrough');
+  player.tech_.trigger('playing');
+  player.tech_.trigger('seeked');
+
+  assert.equal(canPlayCount, 1, 'canplay event dispatched when not seeking');
+  assert.equal(canPlayThroughCount, 1, 'canplaythrough event dispatched when not seeking');
+  assert.equal(playingCount, 1, 'playing event dispatched when not seeking');
+  assert.equal(seekedCount, 1, 'seeked event dispatched when not seeking');
+
+  seeking = true;
+  player.tech_.trigger('canplay');
+  player.tech_.trigger('canplaythrough');
+  player.tech_.trigger('playing');
+  player.tech_.trigger('seeked');
+
+  assert.equal(canPlayCount, 1, 'canplay event not dispatched');
+  assert.equal(canPlayThroughCount, 1, 'canplaythrough event not dispatched');
+  assert.equal(playingCount, 1, 'playing event not dispatched');
+  assert.equal(seekedCount, 1, 'seeked event not dispatched');
+
+  seeking = false;
+  player.tech_.setPlaybackRate(1);
+  player.tech_.trigger('ratechange');
+
+  assert.equal(canPlayCount, 2, 'canplay event dispatched after playback rate restore');
+  assert.equal(canPlayThroughCount, 2, 'canplaythrough event dispatched after playback rate restore');
+  assert.equal(playingCount, 2, 'playing event dispatched after playback rate restore');
+  assert.equal(seekedCount, 2, 'seeked event dispatched after playback rate restore');
+
 });
 
 QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option', function(assert) {
