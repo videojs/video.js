@@ -38,17 +38,25 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
+    this.setEventHandlers_();
+  }
 
+  /**
+   * Sets the event handlers
+   *
+   * @private
+   */
+  setEventHandlers_() {
     this.update = Fn.throttle(Fn.bind(this, this.update), UPDATE_REFRESH_INTERVAL);
 
-    this.on(player, 'timeupdate', this.update);
-    this.on(player, 'ended', this.handleEnded);
+    this.on(this.player_, 'timeupdate', this.update);
+    this.on(this.player_, 'ended', this.handleEnded);
 
     // when playing, let's ensure we smoothly update the play progress bar
     // via an interval
     this.updateInterval = null;
 
-    this.on(player, ['playing'], () => {
+    this.on(this.player_, ['playing'], () => {
       this.clearInterval(this.updateInterval);
 
       this.updateInterval = this.setInterval(() =>{
@@ -58,11 +66,11 @@ class SeekBar extends Slider {
       }, UPDATE_REFRESH_INTERVAL);
     });
 
-    this.on(player, ['ended', 'pause', 'waiting'], () => {
+    this.on(this.player_, ['ended', 'pause', 'waiting'], () => {
       this.clearInterval(this.updateInterval);
     });
 
-    this.on(player, ['timeupdate', 'ended'], this.update);
+    this.on(this.player_, ['timeupdate', 'ended'], this.update);
   }
 
   /**
