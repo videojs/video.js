@@ -1364,58 +1364,61 @@ QUnit.test('Remove waiting class on timeupdate after tech waiting', function(ass
   player.dispose();
 });
 
-QUnit.test('Queues playing events when playback rate is zero while seeking', function(assert) {
-  const player = TestHelpers.makePlayer({techOrder: ['html5']});
+if (Html5.canControlPlaybackRate()) {
+  QUnit.test('Queues playing events when playback rate is zero while seeking', function(assert) {
 
-  let canPlayCount = 0;
-  let canPlayThroughCount = 0;
-  let playingCount = 0;
-  let seekedCount = 0;
-  let seeking = false;
+    const player = TestHelpers.makePlayer({techOrder: ['html5']});
 
-  player.on('canplay', () => canPlayCount++);
-  player.on('canplaythrough', () => canPlayThroughCount++);
-  player.on('playing', () => playingCount++);
-  player.on('seeked', () => seekedCount++);
+    let canPlayCount = 0;
+    let canPlayThroughCount = 0;
+    let playingCount = 0;
+    let seekedCount = 0;
+    let seeking = false;
 
-  player.tech_.seeking = () => {
-    return seeking;
-  };
+    player.on('canplay', () => canPlayCount++);
+    player.on('canplaythrough', () => canPlayThroughCount++);
+    player.on('playing', () => playingCount++);
+    player.on('seeked', () => seekedCount++);
 
-  player.tech_.setPlaybackRate(0);
-  player.tech_.trigger('ratechange');
+    player.tech_.seeking = () => {
+      return seeking;
+    };
 
-  player.tech_.trigger('canplay');
-  player.tech_.trigger('canplaythrough');
-  player.tech_.trigger('playing');
-  player.tech_.trigger('seeked');
+    player.tech_.setPlaybackRate(0);
+    player.tech_.trigger('ratechange');
 
-  assert.equal(canPlayCount, 1, 'canplay event dispatched when not seeking');
-  assert.equal(canPlayThroughCount, 1, 'canplaythrough event dispatched when not seeking');
-  assert.equal(playingCount, 1, 'playing event dispatched when not seeking');
-  assert.equal(seekedCount, 1, 'seeked event dispatched when not seeking');
+    player.tech_.trigger('canplay');
+    player.tech_.trigger('canplaythrough');
+    player.tech_.trigger('playing');
+    player.tech_.trigger('seeked');
 
-  seeking = true;
-  player.tech_.trigger('canplay');
-  player.tech_.trigger('canplaythrough');
-  player.tech_.trigger('playing');
-  player.tech_.trigger('seeked');
+    assert.equal(canPlayCount, 1, 'canplay event dispatched when not seeking');
+    assert.equal(canPlayThroughCount, 1, 'canplaythrough event dispatched when not seeking');
+    assert.equal(playingCount, 1, 'playing event dispatched when not seeking');
+    assert.equal(seekedCount, 1, 'seeked event dispatched when not seeking');
 
-  assert.equal(canPlayCount, 1, 'canplay event not dispatched');
-  assert.equal(canPlayThroughCount, 1, 'canplaythrough event not dispatched');
-  assert.equal(playingCount, 1, 'playing event not dispatched');
-  assert.equal(seekedCount, 1, 'seeked event not dispatched');
+    seeking = true;
+    player.tech_.trigger('canplay');
+    player.tech_.trigger('canplaythrough');
+    player.tech_.trigger('playing');
+    player.tech_.trigger('seeked');
 
-  seeking = false;
-  player.tech_.setPlaybackRate(1);
-  player.tech_.trigger('ratechange');
+    assert.equal(canPlayCount, 1, 'canplay event not dispatched');
+    assert.equal(canPlayThroughCount, 1, 'canplaythrough event not dispatched');
+    assert.equal(playingCount, 1, 'playing event not dispatched');
+    assert.equal(seekedCount, 1, 'seeked event not dispatched');
 
-  assert.equal(canPlayCount, 2, 'canplay event dispatched after playback rate restore');
-  assert.equal(canPlayThroughCount, 2, 'canplaythrough event dispatched after playback rate restore');
-  assert.equal(playingCount, 2, 'playing event dispatched after playback rate restore');
-  assert.equal(seekedCount, 2, 'seeked event dispatched after playback rate restore');
+    seeking = false;
+    player.tech_.setPlaybackRate(1);
+    player.tech_.trigger('ratechange');
 
-});
+    assert.equal(canPlayCount, 2, 'canplay event dispatched after playback rate restore');
+    assert.equal(canPlayThroughCount, 2, 'canplaythrough event dispatched after playback rate restore');
+    assert.equal(playingCount, 2, 'playing event dispatched after playback rate restore');
+    assert.equal(seekedCount, 2, 'seeked event dispatched after playback rate restore');
+
+  });
+}
 
 QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option', function(assert) {
   // clear the HEAD before running this test
