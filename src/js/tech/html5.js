@@ -201,40 +201,123 @@ class Html5 extends Tech {
   }
 
   /**
-   * Attempt to force override of native audio/video tracks.
+   * Attempt to force override of tracks for the given type
    *
+   * @param {String} type - Track type to override, possible values include 'Audio',
+   * 'Video', and 'Text'.
    * @param {Boolean} override - If set to true native audio/video will be overridden,
    * otherwise native audio/video will potentially be used.
    */
-  overrideNativeTracks(override) {
+  overrideNative_(type, override) {
     // If there is no behavioral change don't add/remove listeners
-    if (override !== (this.featuresNativeAudioTracks && this.featuresNativeVideoTracks)) {
+    if (override !== this[`featuresNative${type}Tracks`]) {
       return;
     }
 
-    if (this.audioTracksListeners_) {
-      Object.keys(this.audioTracksListeners_).forEach((eventName) => {
-        const elTracks = this.el().audioTracks;
+    const lowerCaseType = type.toLowerCase();
 
-        elTracks.removeEventListener(eventName, this.audioTracksListeners_[eventName]);
+    if (this[`${lowerCaseType}TracksListeners_`]) {
+      Object.keys(this[`${lowerCaseType}TracksListeners_`]).forEach((eventName) => {
+        const elTracks = this.el()[`${lowerCaseType}Tracks`];
+
+        elTracks.removeEventListener(eventName, this[`${lowerCaseType}TracksListeners_`][eventName]);
       });
     }
 
-    if (this.videoTracksListeners_) {
-      Object.keys(this.videoTracksListeners_).forEach((eventName) => {
-        const elTracks = this.el().videoTracks;
+    this[`featuresNative${type}Tracks`] = !override;
+    this[`${lowerCaseType}TracksListeners_`] = null;
 
-        elTracks.removeEventListener(eventName, this.videoTracksListeners_[eventName]);
-      });
+    this.proxyNativeTracksForType_(lowerCaseType);
+  }
+
+  /**
+   * Attempt to force override of native audio tracks.
+   *
+   * @param {Boolean} override - If set to true native audio will be overridden,
+   * otherwise native audio will potentially be used.
+   */
+  overrideNativeAudioTracks(override) {
+    this.overrideNative_('Audio', override);
+  }
+
+  /**
+   * Attempt to force override of native video tracks.
+   *
+   * @param {Boolean} override - If set to true native video will be overridden,
+   * otherwise native video will potentially be used.
+   */
+  overrideNativeVideoTracks(override) {
+    this.overrideNative_('Video', override);
+  }
+
+ /**
+   * Proxy native track list events for the given type to our track
+   * lists if the browser we are playing in supports that type of track list.
+   *
+   * @param {string} name - Track type; values include 'audio', 'video', and 'text'
+   * @private
+   */
+  proxyNativeTracksForType_(name) {
+    const props = TRACK_TYPES[name];
+    const elTracks = this.el()[props.getterName];
+    const techTracks = this[props.getterName]();
+
+    if (!this[`featuresNative${props.capitalName}Tracks`] ||
+        !elTracks ||
+        !elTracks.addEventListener) {
+      return;
     }
+    const listeners = {
+      change(e) {
+        techTracks.trigger({
+          type: 'change',
+          target: techTracks,
+          currentTarget: techTracks,
+          srcElement: techTracks
+        });
+      },
+      addtrack(e) {
+        techTracks.addTrack(e.track);
+      },
+      removetrack(e) {
+        techTracks.removeTrack(e.track);
+      }
+    };
+    const removeOldTracks = function() {
+      const removeTracks = [];
 
-    this.featuresNativeVideoTracks = !override;
-    this.featuresNativeAudioTracks = !override;
+      for (let i = 0; i < techTracks.length; i++) {
+        let found = false;
 
-    this.audioTracksListeners_ = null;
-    this.videoTracksListeners_ = null;
+        for (let j = 0; j < elTracks.length; j++) {
+          if (elTracks[j] === techTracks[i]) {
+            found = true;
+            break;
+          }
+        }
 
-    this.proxyNativeTracks_();
+        if (!found) {
+          removeTracks.push(techTracks[i]);
+        }
+      }
+
+      while (removeTracks.length) {
+        techTracks.removeTrack(removeTracks.shift());
+      }
+    };
+
+    this[props.getterName + 'Listeners_'] = listeners;
+
+    Object.keys(listeners).forEach((eventName) => {
+      const listener = listeners[eventName];
+
+      elTracks.addEventListener(eventName, listener);
+      this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
+    });
+
+    // Remove (native) tracks that are not used anymore
+    this.on('loadstart', removeOldTracks);
+    this.on('dispose', (e) => this.off('loadstart', removeOldTracks));
   }
 
   /**
@@ -245,68 +328,8 @@ class Html5 extends Tech {
    */
   proxyNativeTracks_() {
     TRACK_TYPES.names.forEach((name) => {
-      const props = TRACK_TYPES[name];
-      const elTracks = this.el()[props.getterName];
-      const techTracks = this[props.getterName]();
-
-      if (!this[`featuresNative${props.capitalName}Tracks`] ||
-          !elTracks ||
-          !elTracks.addEventListener) {
-        return;
-      }
-      const listeners = {
-        change(e) {
-          techTracks.trigger({
-            type: 'change',
-            target: techTracks,
-            currentTarget: techTracks,
-            srcElement: techTracks
-          });
-        },
-        addtrack(e) {
-          techTracks.addTrack(e.track);
-        },
-        removetrack(e) {
-          techTracks.removeTrack(e.track);
-        }
-      };
-      const removeOldTracks = function() {
-        const removeTracks = [];
-
-        for (let i = 0; i < techTracks.length; i++) {
-          let found = false;
-
-          for (let j = 0; j < elTracks.length; j++) {
-            if (elTracks[j] === techTracks[i]) {
-              found = true;
-              break;
-            }
-          }
-
-          if (!found) {
-            removeTracks.push(techTracks[i]);
-          }
-        }
-
-        while (removeTracks.length) {
-          techTracks.removeTrack(removeTracks.shift());
-        }
-      };
-
-      this[props.getterName + 'Listeners_'] = listeners;
-
-      Object.keys(listeners).forEach((eventName) => {
-        const listener = listeners[eventName];
-
-        elTracks.addEventListener(eventName, listener);
-        this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
-      });
-
-      // Remove (native) tracks that are not used anymore
-      this.on('loadstart', removeOldTracks);
-      this.on('dispose', (e) => this.off('loadstart', removeOldTracks));
+      this.proxyNativeTracksForType_(name);
     });
-
   }
 
   /**
