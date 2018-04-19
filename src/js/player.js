@@ -468,8 +468,8 @@ class Player extends Component {
     // like the control bar show themselves if needed
     this.userActive(true);
     this.reportUserActivity();
-    this.listenForUserActivity_();
 
+    this.one('play', this.listenForUserActivity_);
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
 
