@@ -786,14 +786,24 @@ class Tech extends Component {
   setPlaysinline() {}
 
   /**
-   * Attempt to force override of native audio.video tracks.
+   * Attempt to force override of native audio tracks.
    *
-   * @param {Boolean} override - If set to true native audio/video will be overridden,
-   * otherwise native audio/video will potentially be used.
+   * @param {Boolean} override - If set to true native audio will be overridden,
+   * otherwise native audio will potentially be used.
    *
    * @abstract
    */
-  overrideNativeTracks() {}
+  overrideNativeAudioTracks() {}
+
+  /**
+   * Attempt to force override of native video tracks.
+   *
+   * @param {Boolean} override - If set to true native video will be overridden,
+   * otherwise native video will potentially be used.
+   *
+   * @abstract
+   */
+  overrideNativeVideoTracks() {}
 
   /*
    * Check if the tech can support the given mime-type.
