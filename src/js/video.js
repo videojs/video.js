@@ -193,14 +193,6 @@ videojs.removeHook = function(type, fn) {
   return true;
 };
 
-/**
- * The global options object. These are the settings that take effect
- * if no overrides are specified when the player is created.
- *
- * @type {Object}
- */
-videojs.options = Player.prototype.options_;
-
 // Add default styles
 if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
   let style = Dom.$('.vjs-styles-defaults');
@@ -225,12 +217,10 @@ if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
   }
 }
 
-// Run Auto-load players if not deactivated by option
+// Run Auto-load players
 // You have to wait at least once in case this script is loaded after your
 // video in the DOM (weird behavior only with minified version)
-if (videojs.options.autoSetup !== false) {
-  setup.autoSetupTimeout(1, videojs);
-}
+setup.autoSetupTimeout(1, videojs);
 
 /**
  * Current software version. Follows semver.
@@ -238,6 +228,14 @@ if (videojs.options.autoSetup !== false) {
  * @type {string}
  */
 videojs.VERSION = version;
+
+/**
+ * The global options object. These are the settings that take effect
+ * if no overrides are specified when the player is created.
+ *
+ * @type {Object}
+ */
+videojs.options = Player.prototype.options_;
 
 /**
  * Get an object with the currently created players, keyed by player ID
