@@ -4,6 +4,7 @@ import document from 'global/document';
 import window from 'global/window';
 import log from '../../src/js/utils/log.js';
 import sinon from 'sinon';
+import * as browser from '../../src/js/utils/browser.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
