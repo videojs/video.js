@@ -31,7 +31,7 @@ import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
-import {getMimetype} from './utils/mimetypes';
+import {findMimetype} from './utils/mimetypes';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -1191,48 +1191,6 @@ class Player extends Component {
   }
 
   /**
-   * find the mime type of a given source string url if possible
-   *
-   * @param {string} src
-   *        The source string
-   *
-   * @return {string}
-   *         The type that was found
-   *
-   */
-  findMimeType_(src) {
-    if (!src) {
-      return '';
-    }
-
-    // 1. check for the type in the `source` cache
-    if (this.cache_.source.src === src && this.cache_.source.type) {
-      return this.cache_.source.type;
-    }
-
-    // 2. see if we have this source in our `currentSources` cache
-    const matchingSources = this.cache_.sources.filter((s) => s.src === src);
-
-    if (matchingSources.length) {
-      return matchingSources[0].type;
-    }
-
-    // 3. look for the src url in source elements and use the type there
-    const sources = this.$$('source');
-
-    for (let i = 0; i < sources.length; i++) {
-      const s = sources[i];
-
-      if (s.type && s.src && s.src === src) {
-        return s.type;
-      }
-    }
-
-    // 4. finally fallback to our list of mime types based on src url extension
-    return getMimetype(src);
-  }
-
-  /**
    * Update the internal source caches so that we return the correct source from
    * `src()`, `currentSource()`, and `currentSources()`.
    *
@@ -1244,6 +1202,7 @@ class Player extends Component {
    *        A string or object source to update our caches to.
    */
   updateSourceCaches_(srcObj = '') {
+
     let src = srcObj;
     let type = '';
 
@@ -1258,7 +1217,7 @@ class Player extends Component {
 
     // try to get the type of the src that was passed in
     if (src && !type) {
-      type = this.findMimeType_(src);
+      type = findMimetype(this, src);
     }
 
     // update `currentSource` cache always
