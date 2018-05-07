@@ -1519,7 +1519,7 @@ class Player extends Component {
   }
 
   /**
-   * Handle a click on the media element to play/pause
+   * Handle a click on the media element
    *
    * @param {EventTarget~Event} event
    *        the event that caused this function to trigger
@@ -1528,6 +1528,42 @@ class Player extends Component {
    * @private
    */
   handleTechClick_(event) {
+    const self = this;
+
+    // We want to handle single and double click events separately
+    // because they perform different actions.
+    // A single-click will puse/resume playback.
+    // A double-click will enter/exit fullscreen.
+
+    // If a subsequent click doesn't occur after a single click,
+    // within a short amount of time, trigger a single-click handler.
+    if (event.detail === 1) {
+      this.singleClickTimer_ = setTimeout(function() {
+        self.handleTechSingleClick_(event);
+      }, 200);
+    }
+
+    // If a second click occurs, shortly after a single-click,
+    // Remove the timer that invokes the single-click handler
+    // and handle the double-click instead.
+    if (event.detail === 2) {
+      // In IE you can request fullscreen only on click
+      // (or dblclick) events. Therefore if a second click occurs,
+      // we want to listen for a click event.
+      clearTimeout(this.singleClickTimer_);
+      self.one('click', this.handleTechDoubleClick_);
+    }
+  }
+
+  /**
+   * Handle a single click on the media element to play/pause
+   *
+   * @param {EventTarget~Event} event
+   *        the event that caused this function to trigger
+   *
+   * @private
+   */
+  handleTechSingleClick_(event) {
     if (!Dom.isSingleLeftClick(event)) {
       return;
     }
@@ -1542,6 +1578,35 @@ class Player extends Component {
       this.play();
     } else {
       this.pause();
+    }
+  }
+
+  /**
+   * Handle a double-click on the media element to enter/exit fullscreen
+   *
+   * @param {EventTarget~Event} event
+   *        the event that caused this function to trigger
+   *
+   * @listens Tech#click
+   * @private
+   */
+  handleTechDoubleClick_(event) {
+    if (!this.controls_) {
+      return;
+    }
+
+    const inAllowedEls = Array.prototype.some.call(
+        this.$$('.vjs-control-bar, .vjs-modal-dialog'),
+        function(el) {
+          el.contains(event.target);
+        });
+
+    if (!inAllowedEls) {
+      if (this.isFullscreen()) {
+        this.exitFullscreen();
+      } else {
+        this.requestFullscreen();
+      }
     }
   }
 
