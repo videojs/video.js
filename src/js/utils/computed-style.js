@@ -5,7 +5,7 @@
 import window from 'global/window';
 
 /**
- * A safe getComputedStyle with an IE8 fallback.
+ * A safe getComputedStyle.
  *
  * This is needed because in Firefox, if the player is loaded in an iframe with
  * `display:none`, then `getComputedStyle` returns `null`, so, we do a null-check to
@@ -33,5 +33,5 @@ export default function computedStyle(el, prop) {
     return cs ? cs[prop] : '';
   }
 
-  return el.currentStyle[prop] || '';
+  return '';
 }

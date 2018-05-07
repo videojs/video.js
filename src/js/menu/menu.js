@@ -51,7 +51,7 @@ class Menu extends Component {
         this.menuButton_.unpressButton();
 
         // don't focus menu button if item is a caption settings item
-        // because focus will move elsewhere and it logs an error on IE8
+        // because focus will move elsewhere
         if (component.name() !== 'CaptionSettingsMenuItem') {
           this.menuButton_.focus();
         }

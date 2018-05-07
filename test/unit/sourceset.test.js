@@ -330,13 +330,9 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     });
 
     const appendTypes = [
-      {name: 'appendChild', fn: (el, obj) => el.appendChild(obj)}
+      {name: 'appendChild', fn: (el, obj) => el.appendChild(obj)},
+      {name: 'innerHTML', fn: (el, obj) => {el.innerHTML = obj.outerHTML;}}, // eslint-disable-line
     ];
-
-    // ie 9 won't append a <source> element in innerHTML... interesting
-    if (!browser.IE_VERSION || browser.IE_VERSION > 9) {
-      appendTypes.push({name: 'innerHTML', fn: (el, obj) => {el.innerHTML = obj.outerHTML;}}); // eslint-disable-line
-    }
 
     // ie does not support this and safari < 10 does not either
     if (window.Element.prototype.append) {

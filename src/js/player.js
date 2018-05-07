@@ -579,20 +579,10 @@ class Player extends Component {
     tag.removeAttribute('height');
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
-      // workaround so we don't totally break IE7
-      // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
-      if (attr === 'class') {
-        el.className += ' ' + attrs[attr];
+      el.setAttribute(attr, attrs[attr]);
 
-        if (divEmbed) {
-          tag.className += ' ' + attrs[attr];
-        }
-      } else {
-        el.setAttribute(attr, attrs[attr]);
-
-        if (divEmbed) {
-          tag.setAttribute(attr, attrs[attr]);
-        }
+      if (divEmbed) {
+        tag.setAttribute(attr, attrs[attr]);
       }
     });
 
@@ -625,7 +615,8 @@ class Player extends Component {
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
 
-    // Hide any links within the video/audio tag, because IE doesn't hide them completely.
+    // Hide any links within the video/audio tag,
+    // because IE doesn't hide them completely from screen readers.
     const links = tag.getElementsByTagName('a');
 
     for (let i = 0; i < links.length; i++) {
@@ -1929,7 +1920,7 @@ class Player extends Component {
    * dragging it along the progress bar.
    *
    * @param {boolean} [isScrubbing]
-   *        wether the user is or is not scrubbing
+   *        whether the user is or is not scrubbing
    *
    * @return {boolean}
    *         The value of scrubbing when getting
@@ -1999,7 +1990,7 @@ class Player extends Component {
 
     seconds = parseFloat(seconds);
 
-    // Standardize on Inifity for signaling video is live
+    // Standardize on Infinity for signaling video is live
     if (seconds < 0) {
       seconds = Infinity;
     }
@@ -2072,7 +2063,7 @@ class Player extends Component {
    *
    * @return {number}
    *         A decimal between 0 and 1 representing the percent
-   *         that is bufferred 0 being 0% and 1 being 100%
+   *         that is buffered 0 being 0% and 1 being 100%
    */
   bufferedPercent() {
     return bufferedPercent(this.buffered(), this.duration());
@@ -2151,7 +2142,7 @@ class Player extends Component {
 
   /**
    * Get the current defaultMuted state, or turn defaultMuted on or off. defaultMuted
-   * indicates the state of muted on intial playback.
+   * indicates the state of muted on initial playback.
    *
    * ```js
    *   var myPlayer = videojs('some-player-id');
@@ -2576,7 +2567,7 @@ class Player extends Component {
   }
 
   /**
-   * Set the source object on the tech, returns a boolean that indicates wether
+   * Set the source object on the tech, returns a boolean that indicates whether
    * there is a tech that can play the source or not
    *
    * @param {Tech~SourceObject} source
@@ -2668,7 +2659,7 @@ class Player extends Component {
 
   /**
    * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
-   * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
+   * Can be used in conjunction with `currentType` to assist in rebuilding the current source object.
    *
    * @return {string}
    *         The current source
@@ -2694,7 +2685,7 @@ class Player extends Component {
    *
    * @param {boolean} [value]
    *        - true means that we should preload
-   *        - false maens that we should not preload
+   *        - false means that we should not preload
    *
    * @return {string}
    *         The preload attribute value when getting
@@ -2983,7 +2974,7 @@ class Player extends Component {
     this.addClass('vjs-error');
 
     // log the name of the error type and any message
-    // ie8 just logs "[object object]" if you just log the error object
+    // IE11 logs "[object object]" and required you to expand message to see error object
     log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     /**
@@ -3189,7 +3180,7 @@ class Player extends Component {
   /**
    * Gets or sets the current default playback rate. A default playback rate of
    * 1.0 represents normal speed and 0.5 would indicate half-speed playback, for instance.
-   * defaultPlaybackRate will only represent what the intial playbackRate of a video was, not
+   * defaultPlaybackRate will only represent what the initial playbackRate of a video was, not
    * not the current playbackRate.
    *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-defaultplaybackrate
@@ -3339,7 +3330,7 @@ class Player extends Component {
   /**
    * The player's language code
    * NOTE: The language should be set in the player options if you want the
-   * the controls to be built with a specific language. Changing the lanugage
+   * the controls to be built with a specific language. Changing the language
    * later will not update controls text.
    *
    * @param {string} [code]
@@ -3482,7 +3473,7 @@ class Player extends Component {
   }
 
   /**
-   * Determine wether or not flexbox is supported
+   * Determine whether or not flexbox is supported
    *
    * @return {boolean}
    *         - true if flexbox is supported
@@ -3497,7 +3488,7 @@ class Player extends Component {
             'webkitFlexBasis' in elem.style ||
             'mozFlexBasis' in elem.style ||
             'msFlexBasis' in elem.style ||
-            // IE10-specific (2012 flex spec)
+            // IE10-specific (2012 flex spec), available for completeness
             'msFlexOrder' in elem.style);
   }
 }
@@ -3607,7 +3598,8 @@ Player.prototype.options_ = {
     'bigPlayButton',
     'controlBar',
     'errorDisplay',
-    'textTrackSettings'
+    'textTrackSettings',
+    'resizeManager'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
@@ -3618,10 +3610,6 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.'
 };
-
-if (!browser.IS_IE8) {
-  Player.prototype.options_.children.push('resizeManager');
-}
 
 [
   /**

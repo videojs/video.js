@@ -33,14 +33,6 @@ import xhr from 'xhr';
 import Tech from './tech/tech.js';
 import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
 
-// HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
-  document.createElement('video');
-  document.createElement('audio');
-  document.createElement('track');
-  document.createElement('video-js');
-}
-
 /**
  * Normalize an `id` value by trimming off a leading `#`
  *
@@ -381,22 +373,17 @@ videojs.use = middlewareUse;
  * @memberOf {videojs}
  * @property {object} middleware.TERMINATOR
  */
-// Object.defineProperty is not available in IE8
-if (!browser.IS_IE8 && Object.defineProperty) {
-  Object.defineProperty(videojs, 'middleware', {
-    value: {},
-    writeable: false,
-    enumerable: true
-  });
+Object.defineProperty(videojs, 'middleware', {
+  value: {},
+  writeable: false,
+  enumerable: true
+});
 
-  Object.defineProperty(videojs.middleware, 'TERMINATOR', {
-    value: TERMINATOR,
-    writeable: false,
-    enumerable: true
-  });
-} else {
-  videojs.middleware = { TERMINATOR };
-}
+Object.defineProperty(videojs.middleware, 'TERMINATOR', {
+  value: TERMINATOR,
+  writeable: false,
+  enumerable: true
+});
 
 /**
  * A suite of browser and device tests from {@link browser}.
@@ -820,7 +807,7 @@ videojs.VideoTrack = VideoTrack;
 });
 
 /**
- * A safe getComputedStyle with an IE8 fallback.
+ * A safe getComputedStyle.
  *
  * This is because in Firefox, if the player is loaded in an iframe with `display:none`,
  * then `getComputedStyle` returns `null`, so, we do a null-check to make sure

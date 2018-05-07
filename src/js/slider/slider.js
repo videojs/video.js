@@ -100,7 +100,7 @@ class Slider extends Component {
   }
 
   /**
-   * Create the `Button`s DOM element.
+   * Create the `Slider`s DOM element.
    *
    * @param {string} type
    *        Type of element to create.
@@ -270,8 +270,8 @@ class Slider extends Component {
    *
    * @return {number}
    *         The current position of the Slider.
-   *         - postition.x for vertical `Slider`s
-   *         - postition.y for horizontal `Slider`s
+   *         - position.x for vertical `Slider`s
+   *         - position.y for horizontal `Slider`s
    */
   calculateDistance(event) {
     const position = Dom.getPointerPosition(this.el_, event);

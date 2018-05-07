@@ -31,3 +31,5 @@ dist/*
 es5/*
 
 .idea/
+
+core.js

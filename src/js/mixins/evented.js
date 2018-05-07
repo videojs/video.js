@@ -162,7 +162,7 @@ const listen = (target, method, type, listener) => {
 };
 
 /**
- * Contains methods that provide event capabilites to an object which is passed
+ * Contains methods that provide event capabilities to an object which is passed
  * to {@link module:evented|evented}.
  *
  * @mixin EventedMixin

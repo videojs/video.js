@@ -2,9 +2,6 @@
  * @file html-track-element-list.js
  */
 
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
-
 /**
  * The current list of {@link HtmlTrackElement}s.
  */
@@ -17,19 +14,7 @@ class HtmlTrackElementList {
    *        A list of `HtmlTrackElement` to instantiate the list with.
    */
   constructor(trackElements = []) {
-    let list = this; // eslint-disable-line
-
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-
-      for (const prop in HtmlTrackElementList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = HtmlTrackElementList.prototype[prop];
-        }
-      }
-    }
-
-    list.trackElements_ = [];
+    this.trackElements_ = [];
 
     /**
      * @memberof HtmlTrackElementList
@@ -37,18 +22,14 @@ class HtmlTrackElementList {
      *         The current number of `Track`s in the this Trackist.
      * @instance
      */
-    Object.defineProperty(list, 'length', {
+    Object.defineProperty(this, 'length', {
       get() {
         return this.trackElements_.length;
       }
     });
 
     for (let i = 0, length = trackElements.length; i < length; i++) {
-      list.addTrackElement_(trackElements[i]);
-    }
-
-    if (browser.IS_IE8) {
-      return list;
+      this.addTrackElement_(trackElements[i]);
     }
   }
 

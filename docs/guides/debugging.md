@@ -44,18 +44,6 @@ Similar to the `console`, any number of mixed-type values can be passed to `vide
 videojs.log('this is a string', {butThis: 'is an object'});
 ```
 
-However, certain browser consoles (namely, IE10 and lower) do not support non-string values. Video.js improves on this situation by passing objects through `JSON.stringify` before logging them in IE10 and below. In other words, instead of the above producing this:
-
-```txt
-VIDEOJS: this is a string [object Object]
-```
-
-it will produce this:
-
-```txt
-VIDEOJS: this is a string {"butThis": "is an object"}
-```
-
 ### Log Levels
 
 Unlike the `console`, `videojs.log` includes the concept of logging levels. These levels toggle logging methods on or off.

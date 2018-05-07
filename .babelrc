@@ -1,6 +1,5 @@
 {
   "presets": [
-    "es3",
     ["es2015", {
       "loose": true
     }]

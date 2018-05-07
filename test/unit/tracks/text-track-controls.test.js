@@ -1,7 +1,6 @@
 /* eslint-env qunit */
 import TextTrackMenuItem from '../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
 import TestHelpers from '../test-helpers.js';
-import * as browser from '../../../src/js/utils/browser.js';
 import sinon from 'sinon';
 
 QUnit.module('Text Track Controls', {
@@ -289,35 +288,31 @@ QUnit.test('enabling a captions track should disable the descriptions menu butto
   player.dispose();
 });
 
-if (!browser.IS_IE8) {
-  // This test doesn't work on IE8.
-  // However, this test tests a specific with iOS7 where
-  // the TextTrackList doesn't report track mode changes.
-  // TODO: figure out why this test doens't work on IE8. https://github.com/videojs/video.js/issues/1861
-  QUnit.test('menu items should polyfill mode change events', function(assert) {
-    const player = TestHelpers.makePlayer({});
-    let changes;
+// This test tests a specific with iOS7 where
+// the TextTrackList doesn't report track mode changes.
+QUnit.test('menu items should polyfill mode change events', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  let changes;
 
-    // emulate a TextTrackList that doesn't report track mode changes,
-    // like iOS7
-    player.textTracks().onchange = undefined;
-    const trackMenuItem = new TextTrackMenuItem(player, {
-      track
-    });
-
-    player.textTracks().on('change', function() {
-      changes++;
-    });
-    changes = 0;
-    trackMenuItem.trigger('tap');
-    assert.equal(changes, 1, 'taps trigger change events');
-
-    trackMenuItem.trigger('click');
-    assert.equal(changes, 2, 'clicks trigger change events');
-
-    player.dispose();
+  // emulate a TextTrackList that doesn't report track mode changes,
+  // like iOS7
+  player.textTracks().onchange = undefined;
+  const trackMenuItem = new TextTrackMenuItem(player, {
+    track
   });
-}
+
+  player.textTracks().on('change', function() {
+    changes++;
+  });
+  changes = 0;
+  trackMenuItem.trigger('tap');
+  assert.equal(changes, 1, 'taps trigger change events');
+
+  trackMenuItem.trigger('click');
+  assert.equal(changes, 2, 'clicks trigger change events');
+
+  player.dispose();
+});
 
 const chaptersTrack = {
   kind: 'chapters',

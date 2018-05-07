@@ -37,7 +37,7 @@ export function get(middleware, tech, method) {
 
 /**
  * Takes the argument given to the player and calls the setter method on each
- * middlware from left to right to the tech.
+ * middleware from left to right to the tech.
  */
 export function set(middleware, tech, method, arg) {
   return tech[method](middleware.reduce(middlewareIterator(method), arg));

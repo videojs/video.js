@@ -63,7 +63,7 @@ function rangeCheck(fnName, index, maxIndex) {
  *        The function name to use for logging
  *
  * @param {string} valueIndex
- *        The proprety that should be used to get the time. should be 'start' or 'end'
+ *        The property that should be used to get the time. should be 'start' or 'end'
  *
  * @param {Array} ranges
  *        An array of time ranges

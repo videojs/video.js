@@ -18,7 +18,7 @@ import setupSourceset from './setup-sourceset';
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  *
- * @mixes Tech~SouceHandlerAdditions
+ * @mixes Tech~SourceHandlerAdditions
  * @extends Tech
  */
 class Html5 extends Tech {
@@ -201,6 +201,127 @@ class Html5 extends Tech {
   }
 
   /**
+   * Attempt to force override of tracks for the given type
+   *
+   * @param {String} type - Track type to override, possible values include 'Audio',
+   * 'Video', and 'Text'.
+   * @param {Boolean} override - If set to true native audio/video will be overridden,
+   * otherwise native audio/video will potentially be used.
+   * @private
+   */
+  overrideNative_(type, override) {
+    // If there is no behavioral change don't add/remove listeners
+    if (override !== this[`featuresNative${type}Tracks`]) {
+      return;
+    }
+
+    const lowerCaseType = type.toLowerCase();
+
+    if (this[`${lowerCaseType}TracksListeners_`]) {
+      Object.keys(this[`${lowerCaseType}TracksListeners_`]).forEach((eventName) => {
+        const elTracks = this.el()[`${lowerCaseType}Tracks`];
+
+        elTracks.removeEventListener(eventName, this[`${lowerCaseType}TracksListeners_`][eventName]);
+      });
+    }
+
+    this[`featuresNative${type}Tracks`] = !override;
+    this[`${lowerCaseType}TracksListeners_`] = null;
+
+    this.proxyNativeTracksForType_(lowerCaseType);
+  }
+
+  /**
+   * Attempt to force override of native audio tracks.
+   *
+   * @param {Boolean} override - If set to true native audio will be overridden,
+   * otherwise native audio will potentially be used.
+   */
+  overrideNativeAudioTracks(override) {
+    this.overrideNative_('Audio', override);
+  }
+
+  /**
+   * Attempt to force override of native video tracks.
+   *
+   * @param {Boolean} override - If set to true native video will be overridden,
+   * otherwise native video will potentially be used.
+   */
+  overrideNativeVideoTracks(override) {
+    this.overrideNative_('Video', override);
+  }
+
+ /**
+   * Proxy native track list events for the given type to our track
+   * lists if the browser we are playing in supports that type of track list.
+   *
+   * @param {string} name - Track type; values include 'audio', 'video', and 'text'
+   * @private
+   */
+  proxyNativeTracksForType_(name) {
+    const props = TRACK_TYPES[name];
+    const elTracks = this.el()[props.getterName];
+    const techTracks = this[props.getterName]();
+
+    if (!this[`featuresNative${props.capitalName}Tracks`] ||
+        !elTracks ||
+        !elTracks.addEventListener) {
+      return;
+    }
+    const listeners = {
+      change(e) {
+        techTracks.trigger({
+          type: 'change',
+          target: techTracks,
+          currentTarget: techTracks,
+          srcElement: techTracks
+        });
+      },
+      addtrack(e) {
+        techTracks.addTrack(e.track);
+      },
+      removetrack(e) {
+        techTracks.removeTrack(e.track);
+      }
+    };
+    const removeOldTracks = function() {
+      const removeTracks = [];
+
+      for (let i = 0; i < techTracks.length; i++) {
+        let found = false;
+
+        for (let j = 0; j < elTracks.length; j++) {
+          if (elTracks[j] === techTracks[i]) {
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          removeTracks.push(techTracks[i]);
+        }
+      }
+
+      while (removeTracks.length) {
+        techTracks.removeTrack(removeTracks.shift());
+      }
+    };
+
+    this[props.getterName + 'Listeners_'] = listeners;
+
+    Object.keys(listeners).forEach((eventName) => {
+      const listener = listeners[eventName];
+
+      elTracks.addEventListener(eventName, listener);
+      this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
+    });
+
+    // Remove (native) tracks that are not used anymore
+    this.on('loadstart', removeOldTracks);
+    this.on('dispose', (e) => this.off('loadstart', removeOldTracks));
+  }
+
+  /**
    * Proxy all native track list events to our track lists if the browser we are playing
    * in supports that type of track list.
    *
@@ -208,66 +329,8 @@ class Html5 extends Tech {
    */
   proxyNativeTracks_() {
     TRACK_TYPES.names.forEach((name) => {
-      const props = TRACK_TYPES[name];
-      const elTracks = this.el()[props.getterName];
-      const techTracks = this[props.getterName]();
-
-      if (!this[`featuresNative${props.capitalName}Tracks`] ||
-          !elTracks ||
-          !elTracks.addEventListener) {
-        return;
-      }
-      const listeners = {
-        change(e) {
-          techTracks.trigger({
-            type: 'change',
-            target: techTracks,
-            currentTarget: techTracks,
-            srcElement: techTracks
-          });
-        },
-        addtrack(e) {
-          techTracks.addTrack(e.track);
-        },
-        removetrack(e) {
-          techTracks.removeTrack(e.track);
-        }
-      };
-      const removeOldTracks = function() {
-        const removeTracks = [];
-
-        for (let i = 0; i < techTracks.length; i++) {
-          let found = false;
-
-          for (let j = 0; j < elTracks.length; j++) {
-            if (elTracks[j] === techTracks[i]) {
-              found = true;
-              break;
-            }
-          }
-
-          if (!found) {
-            removeTracks.push(techTracks[i]);
-          }
-        }
-
-        while (removeTracks.length) {
-          techTracks.removeTrack(removeTracks.shift());
-        }
-      };
-
-      Object.keys(listeners).forEach((eventName) => {
-        const listener = listeners[eventName];
-
-        elTracks.addEventListener(eventName, listener);
-        this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
-      });
-
-      // Remove (native) tracks that are not used anymore
-      this.on('loadstart', removeOldTracks);
-      this.on('dispose', (e) => this.off('loadstart', removeOldTracks));
+      this.proxyNativeTracksForType_(name);
     });
-
   }
 
   /**
@@ -502,7 +565,7 @@ class Html5 extends Tech {
    * Get the current height of the HTML5 media element.
    *
    * @return {number}
-   *         The heigth of the HTML5 media element.
+   *         The height of the HTML5 media element.
    */
   height() {
     return this.el_.offsetHeight;
@@ -674,12 +737,12 @@ class Html5 extends Tech {
    * on the value of `featuresNativeTextTracks`
    *
    * @param {Object} options
-   *        The object should contain the options to intialize the TextTrack with.
+   *        The object should contain the options to initialize the TextTrack with.
    *
    * @param {string} [options.kind]
    *        `TextTrack` kind (subtitles, captions, descriptions, chapters, or metadata).
    *
-   * @param {string} [options.label].
+   * @param {string} [options.label]
    *        Label to identify the text track
    *
    * @param {string} [options.language]
@@ -832,7 +895,7 @@ if (Dom.isReal()) {
  *         - False if HTML5 media is not supported.
  */
 Html5.isSupported = function() {
-  // IE9 with no Media Player is a LIAR! (#984)
+  // IE with no Media Player is a LIAR! (#984)
   try {
     Html5.TEST_VID.volume = 0.5;
   } catch (e) {
@@ -915,13 +978,10 @@ Html5.canControlPlaybackRate = function() {
  * Object.defineProperty.
  *
  * @return {boolean}
- *         - True if builtin attributes can be overriden
+ *         - True if builtin attributes can be overridden
  *         - False otherwise
  */
 Html5.canOverrideAttributes = function() {
-  if (browser.IS_IE8) {
-    return false;
-  }
   // if we cannot overwrite the src/innerHTML property, there is no support
   // iOS 7 safari for instance cannot do this.
   try {
@@ -1023,7 +1083,7 @@ Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
 /**
- * Boolean indicating wether the `Tech` supports the `sourceset` event.
+ * Boolean indicating whether the `Tech` supports the `sourceset` event.
  *
  * @type {boolean}
  * @default
@@ -1053,7 +1113,7 @@ Html5.prototype.featuresFullscreenResize = true;
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the progress event.
- * If this is false, manual `progress` events will be triggred instead.
+ * If this is false, manual `progress` events will be triggered instead.
  *
  * @type {boolean}
  * @default
@@ -1062,7 +1122,7 @@ Html5.prototype.featuresProgressEvents = true;
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the timeupdate event.
- * If this is false, manual `timeupdate` events will be triggred instead.
+ * If this is false, manual `timeupdate` events will be triggered instead.
  *
  * @default
  */
@@ -1095,7 +1155,6 @@ Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 const canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
-const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
 
@@ -1104,15 +1163,6 @@ Html5.patchCanPlayType = function() {
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX && !browser.IS_CHROME) {
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mpegurlRE.test(type)) {
-        return 'maybe';
-      }
-      return canPlayType.call(this, type);
-    };
-
-  // Override Android 2.2 and less canPlayType method which is broken
-  } else if (browser.IS_OLD_ANDROID) {
-    Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
-      if (type && mp4RE.test(type)) {
         return 'maybe';
       }
       return canPlayType.call(this, type);
@@ -1465,7 +1515,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Get the value of the `error` from the media element. `error` indicates any
-   * MediaError that may have occured during playback. If error returns null there is no
+   * MediaError that may have occurred during playback. If error returns null there is no
    * current error.
    *
    * @method Html5#error
@@ -1485,7 +1535,7 @@ Html5.resetMediaElement = function(el) {
    * @return {boolean}
    *         - The value of `seeking` from the media element.
    *         - True indicates that the media is currently seeking to a new position.
-   *         - Flase indicates that the media is not seeking to a new position at this time.
+   *         - False indicates that the media is not seeking to a new position at this time.
    *
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-seeking}
    */
@@ -1568,7 +1618,7 @@ Html5.resetMediaElement = function(el) {
    * Get the value of `networkState` from the media element. `networkState` indicates
    * the current network state. It returns an enumeration from the following list:
    * - 0: NETWORK_EMPTY
-   * - 1: NEWORK_IDLE
+   * - 1: NETWORK_IDLE
    * - 2: NETWORK_LOADING
    * - 3: NETWORK_NO_SOURCE
    *
@@ -1614,7 +1664,7 @@ Html5.resetMediaElement = function(el) {
   'videoWidth',
 
   /**
-   * Get the value of `videoHeight` from the video element. `videoHeigth` indicates
+   * Get the value of `videoHeight` from the video element. `videoHeight` indicates
    * the current height of the video in css pixels.
    *
    * @method Html5#videoHeight
@@ -1734,7 +1784,7 @@ Html5.resetMediaElement = function(el) {
 
 // wrap native functions with a function
 // The list is as follows:
-// pause, load play
+// pause, load, play
 [
   /**
    * A wrapper around the media elements `pause` function. This will call the `HTML5`
@@ -1773,10 +1823,10 @@ Tech.withSourceHandlers(Html5);
 /**
  * Native source handler for Html5, simply passes the source to the media element.
  *
- * @proprety {Tech~SourceObject} source
+ * @property {Tech~SourceObject} source
  *        The source object
  *
- * @proprety {Html5} tech
+ * @property {Html5} tech
  *        The instance of the HTML5 tech.
  */
 Html5.nativeSourceHandler = {};
@@ -1791,8 +1841,7 @@ Html5.nativeSourceHandler = {};
  *         'probably', 'maybe', or '' (empty string)
  */
 Html5.nativeSourceHandler.canPlayType = function(type) {
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
+  // IE without MediaPlayer throws an error (#519)
   try {
     return Html5.TEST_VID.canPlayType(type);
   } catch (e) {

@@ -535,6 +535,56 @@ if (Html5.supportsNativeAudioTracks()) {
     assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
+
+  QUnit.test('should use overrideNativeTracks on audio correctly', function(assert) {
+    assert.expect(8);
+
+    const adds = [];
+    const rems = [];
+    const at = {
+      length: 0,
+      addEventListener: (type, fn) => {
+        adds.push({ type, fn });
+      },
+      removeEventListener: (type, fn) => {
+        rems.push({ type, fn });
+      }
+    };
+
+    const el = document.createElement('div');
+
+    el.audioTracks = at;
+
+    const htmlTech = new Html5({el});
+
+    assert.equal(adds.length, 3,
+      'should have added change, remove, add listeners');
+    assert.equal(rems.length, 0,
+      'no listeners should be removed');
+
+    htmlTech.overrideNativeAudioTracks(true);
+
+    assert.equal(adds.length, 3,
+      'should not have added additional listeners');
+    assert.equal(rems.length, 3,
+      'should have removed previous three listeners');
+
+    htmlTech.overrideNativeAudioTracks(true);
+
+    assert.equal(adds.length, 3,
+      'no state change so do not add listeners');
+    assert.equal(rems.length, 3,
+      'no state change so do not remove listeners');
+
+    htmlTech.overrideNativeAudioTracks(false);
+
+    assert.equal(adds.length, 6,
+      'should add listeners because native tracks should be proxied');
+    assert.equal(rems.length, 3,
+      'should not remove listeners because there where none added on previous state');
+
+    htmlTech.dispose();
+  });
 }
 
 if (Html5.supportsNativeVideoTracks()) {
@@ -602,6 +652,55 @@ if (Html5.supportsNativeVideoTracks()) {
     assert.equal(adds[0][0], rems[0][0], 'change event handler removed');
     assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+  });
+
+  QUnit.test('should use overrideNativeTracks on video correctly', function(assert) {
+    assert.expect(8);
+
+    const adds = [];
+    const rems = [];
+    const vt = {
+      length: 0,
+      addEventListener: (type, fn) => {
+        adds.push({ type, fn });
+      },
+      removeEventListener: (type, fn) => {
+        rems.push({ type, fn });
+      }
+    };
+    const el = document.createElement('div');
+
+    el.videoTracks = vt;
+
+    const htmlTech = new Html5({el});
+
+    assert.equal(adds.length, 3,
+      'should have added change, remove, add listeners');
+    assert.equal(rems.length, 0,
+      'no listeners should be removed');
+
+    htmlTech.overrideNativeVideoTracks(true);
+
+    assert.equal(adds.length, 3,
+      'should not have added additional listeners');
+    assert.equal(rems.length, 3,
+      'should have removed previous three listeners');
+
+    htmlTech.overrideNativeVideoTracks(true);
+
+    assert.equal(adds.length, 3,
+      'no state change so do not add listeners');
+    assert.equal(rems.length, 3,
+      'no state change so do not remove listeners');
+
+    htmlTech.overrideNativeVideoTracks(false);
+
+    assert.equal(adds.length, 6,
+      'should add listeners because native tracks should be proxied');
+    assert.equal(rems.length, 3,
+      'should not remove listeners because there where none added on previous state');
+
+    htmlTech.dispose();
   });
 }
 
