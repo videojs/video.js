@@ -2,7 +2,7 @@
  * @module filter-source
  */
 import {isObject} from './obj';
-import getMimeType from './get-mime-type';
+import {getMimetype} from './mimetypes';
 
 /**
  * Filter out single bad source objects or multiple source objects in an
@@ -56,7 +56,7 @@ const filterSource = function(src) {
  *        src Object with known type
  */
 function checkMimetype(src) {
-  const mimetype = getMimeType(src.src);
+  const mimetype = getMimetype(src.src);
 
   if (!src.type && mimetype) {
     src.type = mimetype;

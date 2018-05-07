@@ -31,7 +31,7 @@ import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
-import getMimeType from './utils/get-mime-type';
+import {getMimetype} from './utils/mimetypes';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -1211,7 +1211,7 @@ class Player extends Component {
     }
 
     // 2. see if we have this source in our `currentSources` cache
-    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+    const matchingSources = this.cache_.sources.filter((s) => s.src === src);
 
     if (matchingSources.length) {
       return matchingSources[0].type;
@@ -1229,7 +1229,7 @@ class Player extends Component {
     }
 
     // 4. finally fallback to our list of mime types based on src url extension
-    return getMimeType(src);
+    return getMimetype(src);
   }
 
   /**
@@ -1270,11 +1270,8 @@ class Player extends Component {
     const matchingSourceEls = [];
 
     for (let i = 0; i < sourceEls.length; i++) {
-      const sourceObj = {src: sourceEls[i].src};
+      const sourceObj = Dom.getAttributes(sourceEls[i]);
 
-      if (sourceEls[i].type) {
-        sourceObj.type = sourceEls[i].type;
-      }
       sourceElSources.push(sourceObj);
 
       if (sourceObj.src && sourceObj.src === src) {
@@ -2597,12 +2594,18 @@ class Player extends Component {
     // intial sources
     this.changingSrc_ = true;
 
+    this.cache_.sources = sources;
+    this.updateSourceCaches_(sources[0]);
+
     // middlewareSource is the source after it has been changed by middleware
     middleware.setSource(this, sources[0], (middlewareSource, mws) => {
       this.middleware_ = mws;
 
+      // since sourceSet is async we have to update the cache again after we select a source since
+      // the source that is selected could be out of order from the cache update above this callback.
       this.cache_.sources = sources;
       this.updateSourceCaches_(middlewareSource);
+
       const err = this.src_(middlewareSource);
 
       if (err) {
@@ -2610,7 +2613,6 @@ class Player extends Component {
           return this.src(sources.slice(1));
         }
 
-        this.updateSourceCaches_();
         this.changingSrc_ = false;
 
         // We need to wrap this in a timeout to give folks a chance to add error event handlers
@@ -2624,9 +2626,6 @@ class Player extends Component {
 
         return;
       }
-
-      // video element listed source
-      this.cache_.src = middlewareSource.src;
 
       middleware.setTech(mws, this.tech_);
     });

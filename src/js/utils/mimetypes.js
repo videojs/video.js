@@ -1,3 +1,5 @@
+import * as Url from '../utils/url.js';
+
 /**
  * Mimetypes
  *
@@ -16,4 +18,20 @@ export const MimetypesKind = {
   aac: 'audio/aac',
   oga: 'audio/ogg',
   m3u8: 'application/x-mpegURL'
+};
+
+/**
+ * Get the mimetype of a given src url if possible
+ *
+ * @param {string} src
+ *        The url to the src
+ *
+ * @return {string}
+ *         return the mimetype if it was known or empty string otherwise
+ */
+export const getMimetype = function(src = '') {
+  const ext = Url.getFileExtension(src);
+  const mimetype = MimetypesKind[ext.toLowerCase()];
+
+  return mimetype || '';
 };
