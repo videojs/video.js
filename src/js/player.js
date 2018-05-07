@@ -1523,7 +1523,7 @@ class Player extends Component {
 
     // We want to handle single and double click events separately
     // because they perform different actions.
-    // A single-click will puse/resume playback.
+    // A single-click will pause/resume playback.
     // A double-click will enter/exit fullscreen.
 
     // If a subsequent click doesn't occur after a single click,
