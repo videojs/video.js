@@ -31,6 +31,7 @@ import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
+import {findMimetype} from './utils/mimetypes';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -1190,6 +1191,68 @@ class Player extends Component {
   }
 
   /**
+   * Update the internal source caches so that we return the correct source from
+   * `src()`, `currentSource()`, and `currentSources()`.
+   *
+   * > Note: `currentSources` will not be updated if the source that is passed in exists
+   *         in the current `currentSources` cache.
+   *
+   *
+   * @param {Tech~SourceObject} srcObj
+   *        A string or object source to update our caches to.
+   */
+  updateSourceCaches_(srcObj = '') {
+
+    let src = srcObj;
+    let type = '';
+
+    if (typeof src !== 'string') {
+      src = srcObj.src;
+      type = srcObj.type;
+    }
+    // make sure all the caches are set to default values
+    // to prevent null checking
+    this.cache_.source = this.cache_.source || {};
+    this.cache_.sources = this.cache_.sources || [];
+
+    // try to get the type of the src that was passed in
+    if (src && !type) {
+      type = findMimetype(this, src);
+    }
+
+    // update `currentSource` cache always
+    this.cache_.source = {src, type};
+
+    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+    const sourceElSources = [];
+    const sourceEls = this.$$('source');
+    const matchingSourceEls = [];
+
+    for (let i = 0; i < sourceEls.length; i++) {
+      const sourceObj = Dom.getAttributes(sourceEls[i]);
+
+      sourceElSources.push(sourceObj);
+
+      if (sourceObj.src && sourceObj.src === src) {
+        matchingSourceEls.push(sourceObj.src);
+      }
+    }
+
+    // if we have matching source els but not matching sources
+    // the current source cache is not up to date
+    if (matchingSourceEls.length && !matchingSources.length) {
+      this.cache_.sources = sourceElSources;
+    // if we don't have matching source or source els set the
+    // sources cache to the `currentSource` cache
+    } else if (!matchingSources.length) {
+      this.cache_.sources = [this.cache_.source];
+    }
+
+    // update the tech `src` cache
+    this.cache_.src = src;
+  }
+
+  /**
    * *EXPERIMENTAL* Fired when the source is set or changed on the {@link Tech}
    * causing the media element to reload.
    *
@@ -1225,6 +1288,30 @@ class Player extends Component {
    * @private
    */
   handleTechSourceset_(event) {
+    // only update the source cache when the source
+    // was not updated using the player api
+    if (!this.changingSrc_) {
+      // update the source to the intial source right away
+      // in some cases this will be empty string
+      this.updateSourceCaches_(event.src);
+
+      // if the `sourceset` `src` was an empty string
+      // wait for a `loadstart` to update the cache to `currentSrc`.
+      // If a sourceset happens before a `loadstart`, we reset the state
+      // as this function will be called again.
+      if (!event.src) {
+        const updateCache = (e) => {
+          if (e.type !== 'sourceset') {
+            this.updateSourceCaches_(this.techGet_('currentSrc'));
+          }
+
+          this.tech_.off(['sourceset', 'loadstart'], updateCache);
+        };
+
+        this.tech_.one(['sourceset', 'loadstart'], updateCache);
+      }
+    }
+
     this.trigger({
       src: event.src,
       type: 'sourceset'
@@ -2464,15 +2551,19 @@ class Player extends Component {
     }
 
     // intial sources
-    this.cache_.sources = sources;
     this.changingSrc_ = true;
 
-    // intial source
-    this.cache_.source = sources[0];
+    this.cache_.sources = sources;
+    this.updateSourceCaches_(sources[0]);
 
     // middlewareSource is the source after it has been changed by middleware
     middleware.setSource(this, sources[0], (middlewareSource, mws) => {
       this.middleware_ = mws;
+
+      // since sourceSet is async we have to update the cache again after we select a source since
+      // the source that is selected could be out of order from the cache update above this callback.
+      this.cache_.sources = sources;
+      this.updateSourceCaches_(middlewareSource);
 
       const err = this.src_(middlewareSource);
 
@@ -2480,6 +2571,8 @@ class Player extends Component {
         if (sources.length > 1) {
           return this.src(sources.slice(1));
         }
+
+        this.changingSrc_ = false;
 
         // We need to wrap this in a timeout to give folks a chance to add error event handlers
         this.setTimeout(function() {
@@ -2492,10 +2585,6 @@ class Player extends Component {
 
         return;
       }
-
-      this.changingSrc_ = false;
-      // video element listed source
-      this.cache_.src = middlewareSource.src;
 
       middleware.setTech(mws, this.tech_);
     });
@@ -2543,6 +2632,7 @@ class Player extends Component {
         this.techCall_('src', source.src);
       }
 
+      this.changingSrc_ = false;
     }, true);
 
     return false;
