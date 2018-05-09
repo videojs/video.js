@@ -39,7 +39,6 @@ class ControlBar extends Component {
     return super.createEl('div', {
       className: 'vjs-control-bar',
       dir: 'ltr'
-    }, {
     });
   }
 }
