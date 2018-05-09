@@ -6,7 +6,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 
 ## Progress Bar Translations
 
-The progress bar as a translation with a few token replacements.
+The progress bar has a translation with a few token replacements.
 They key is `progress bar timing: currentTime={1} duration={2}` and the default English value is `{1} of {2}`.
 This default value is hardcoded as a default to the localize method in the SeekBar component.
 
@@ -15,9 +15,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 <!-- START langtable -->
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 51)    | Audio Player                                                                        |
+| ar.json (missing 52)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -66,68 +67,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ba.json (missing 59)    | Audio Player                                                                        |
+| ba.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-| bg.json (missing 59)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -184,9 +127,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ca.json (missing 59)    | Audio Player                                                                        |
+| bg.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -243,9 +187,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| cs.json (missing 59)    | Audio Player                                                                        |
+| ca.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -302,9 +247,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| da.json (missing 59)    | Audio Player                                                                        |
+| cs.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -361,114 +307,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| de.json (missing 1)     | {1} is loading.                                                                     |
-| el.json (missing 45)    | Audio Player                                                                        |
+| da.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Volume Level                                                                        |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-| es.json (missing 58)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-| fa.json (missing 1)     | {1} is loading.                                                                     |
-| fi.json (missing 59)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -525,10 +367,58 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| fr.json (missing 1)     | {1} is loading.                                                                     |
-| gl.json (missing 58)    | Audio Player                                                                        |
+| de.json (missing 2)     | Duration                                                                            |
+|                         | {1} is loading.                                                                     |
+| el.json (missing 46)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
+|                         | Progress Bar                                                                        |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Volume Level                                                                        |
+|                         | captions settings                                                                   |
+|                         | subtitles settings                                                                  |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Reset                                                                               |
+|                         | restore all settings to the default values                                          |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+|                         | End of dialog window.                                                               |
+|                         | {1} is loading.                                                                     |
+| es.json (missing 59)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -584,10 +474,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| he.json (missing 1)     | {1} is loading.                                                                     |
-| hr.json (missing 59)    | Audio Player                                                                        |
+| fa.json (missing 2)     | Duration                                                                            |
+|                         | {1} is loading.                                                                     |
+| fi.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -644,9 +536,73 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| hu.json (missing 59)    | Audio Player                                                                        |
+| fr.json (missing 2)     | Duration                                                                            |
+|                         | {1} is loading.                                                                     |
+| gl.json (missing 59)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
+|                         | Progress Bar                                                                        |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subtitles settings                                                                  |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Reset                                                                               |
+|                         | restore all settings to the default values                                          |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+|                         | End of dialog window.                                                               |
+|                         | {1} is loading.                                                                     |
+| he.json (missing 2)     | Duration                                                                            |
+|                         | {1} is loading.                                                                     |
+| hr.json (missing 60)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -703,9 +659,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| it.json (missing 59)    | Audio Player                                                                        |
+| hu.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -762,9 +719,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ja.json (missing 59)    | Audio Player                                                                        |
+| it.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -821,9 +779,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ko.json (missing 59)    | Audio Player                                                                        |
+| ja.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -880,9 +839,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| nb.json (missing 59)    | Audio Player                                                                        |
+| ko.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -939,10 +899,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| nl.json (missing 1)     | {1} is loading.                                                                     |
-| nn.json (missing 59)    | Audio Player                                                                        |
+| nb.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -999,60 +959,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| pl.json (missing 51)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Close Modal Dialog                                                                  |
-|                         | , opens descriptions settings dialog                                                |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
+| nl.json (missing 2)     | Duration                                                                            |
 |                         | {1} is loading.                                                                     |
-| pt-BR.json (missing 59) | Audio Player                                                                        |
+| nn.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -1109,11 +1021,19 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| pt-PT.json (missing 44) | Audio Player                                                                        |
+| pl.json (missing 52)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
 |                         | Volume Level                                                                        |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Close Modal Dialog                                                                  |
+|                         | , opens descriptions settings dialog                                                |
 |                         | captions settings                                                                   |
 |                         | subtitles settings                                                                  |
 |                         | descriptions settings                                                               |
@@ -1153,11 +1073,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ru.json (missing 1)     | {1} is loading.                                                                     |
-| sk.json (missing 1)     | {1} is loading.                                                                     |
-| sr.json (missing 59)    | Audio Player                                                                        |
+| pt-BR.json (missing 60) | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -1214,9 +1133,59 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| sv.json (missing 59)    | Audio Player                                                                        |
+| pt-PT.json (missing 45) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Duration                                                                            |
+|                         | Progress Bar                                                                        |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Volume Level                                                                        |
+|                         | captions settings                                                                   |
+|                         | subtitles settings                                                                  |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Reset                                                                               |
+|                         | restore all settings to the default values                                          |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+|                         | End of dialog window.                                                               |
+|                         | {1} is loading.                                                                     |
+| ru.json (missing 2)     | Duration                                                                            |
+|                         | {1} is loading.                                                                     |
+| sk.json (missing 2)     | Duration                                                                            |
+|                         | {1} is loading.                                                                     |
+| sr.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Descriptions                                                                        |
@@ -1273,8 +1242,69 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| tr.json (missing 9)     | Audio Player                                                                        |
+| sv.json (missing 60)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Duration                                                                            |
+|                         | Progress Bar                                                                        |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subtitles settings                                                                  |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Reset                                                                               |
+|                         | restore all settings to the default values                                          |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+|                         | End of dialog window.                                                               |
+|                         | {1} is loading.                                                                     |
+| tr.json (missing 10)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Volume Level                                                                        |
@@ -1282,9 +1312,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | restore all settings to the default values                                          |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| uk.json (missing 45)    | Audio Player                                                                        |
+| uk.json (missing 46)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
+|                         | Duration                                                                            |
 |                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Volume Level                                                                        |
@@ -1327,9 +1358,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| vi.json (missing 1)     | {1} is loading.                                                                     |
-| zh-CN.json (missing 2)  | progress bar timing: currentTime={1} duration={2}                                   |
+| vi.json (missing 2)     | Duration                                                                            |
 |                         | {1} is loading.                                                                     |
-| zh-TW.json (missing 2)  | progress bar timing: currentTime={1} duration={2}                                   |
+| zh-CN.json (missing 3)  | Duration                                                                            |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | {1} is loading.                                                                     |
+| zh-TW.json (missing 3)  | Duration                                                                            |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | {1} is loading.                                                                     |
 <!-- END langtable -->
