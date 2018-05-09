@@ -574,9 +574,11 @@ class Player extends Component {
       // to our new `video` element. This will move things like
       // `src` or `controls` that were set via js before the player
       // was initialized.
-      Object.keys(el).forEach((k) => {
-        tag[k] = el[k];
-      });
+      for (const i in el) {
+        if (el.hasOwnProperty(i)) {
+          tag[i] = el[i];
+        }
+      }
     }
 
     // set tabindex to -1 so we could focus on the player element

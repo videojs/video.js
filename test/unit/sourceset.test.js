@@ -18,7 +18,7 @@ const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
 const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
 const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
 
-if (!Html5.canOverrideAttributes()) {
+if (!Html5.canOverrideAttributes() || browser.IE_VERSION < 9) {
   qunitFn = 'skip';
 }
 
