@@ -1586,9 +1586,8 @@ class Player extends Component {
 
     const inAllowedEls = Array.prototype.some.call(
         this.$$('.vjs-control-bar, .vjs-modal-dialog'),
-        function(el) {
-          el.contains(event.target);
-        });
+        el => el.contains(event.target)
+      );
 
     if (!inAllowedEls) {
       if (this.isFullscreen()) {
