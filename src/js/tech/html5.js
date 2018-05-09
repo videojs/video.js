@@ -35,10 +35,6 @@ class Html5 extends Tech {
   constructor(options, ready) {
     super(options, ready);
 
-    if (options.enableSourceset) {
-      this.setupSourcesetHandling_();
-    }
-
     const source = options.source;
     let crossoriginTracks = false;
 
@@ -50,6 +46,11 @@ class Html5 extends Tech {
       this.setSource(source);
     } else {
       this.handleLateInit_(this.el_);
+    }
+
+    // setup sourceset after late sourceset/init
+    if (options.enableSourceset) {
+      this.setupSourcesetHandling_();
     }
 
     if (this.el_.hasChildNodes()) {
@@ -117,6 +118,9 @@ class Html5 extends Tech {
    * Dispose of `HTML5` media element and remove all tracks.
    */
   dispose() {
+    if (this.el_.resetSourceset_) {
+      this.el_.resetSourceset_();
+    }
     Html5.disposeMediaElement(this.el_);
     this.options_ = null;
 
