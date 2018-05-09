@@ -171,7 +171,7 @@ class SeekBar extends Slider {
   getPercent() {
     const percent = this.getCurrentTime_() / this.player_.duration();
 
-    return percent >= 1 ? 1 : percent;
+    return percent >= 1 ? 1 : (percent || 0);
   }
 
   /**
