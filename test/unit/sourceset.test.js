@@ -56,6 +56,14 @@ const validateSource = function(player, expectedSources, event, srcOverrides = {
   // getAbsoluteURL would return the current url of the page for empty string
   // so we have to check
   expected.prop = expected.prop ? getAbsoluteURL(expected.prop) : expected.prop;
+
+  // on older browsers mediaEl.src will be null instead of empty string
+  // so if they are both falsey just set them to the same value so the
+  // check below passes
+  if (!mediaEl.src && !expected.prop) {
+    expected.prop = mediaEl.src;
+  }
+
   assert.equal(mediaEl.src, expected.prop, 'mediaEl src property is correct');
 
 };
