@@ -2,6 +2,7 @@ import window from 'global/window';
 import document from 'global/document';
 import mergeOptions from '../utils/merge-options';
 import {getAbsoluteURL} from '../utils/url';
+import * as browser from '../utils/browser';
 
 /**
  * This function is used to fire a sourceset when there is something
@@ -74,38 +75,42 @@ const sourcesetLoad = (tech) => {
  * our implementation of an `innerHTML` descriptor for browsers
  * that do not have one.
  */
-const innerHTMLDescriptorPolyfill = Object.defineProperty({}, 'innerHTML', {
-  get() {
-    return this.cloneNode(true).innerHTML;
-  },
-  set(v) {
-    // make a dummy node to use innerHTML on
-    const dummy = document.createElement(this.nodeName.toLowerCase());
+let innerHTMLDescriptorPolyfill = {};
 
-    // set innerHTML to the value provided
-    dummy.innerHTML = v;
+if (!browser.IS_IE8) {
+  innerHTMLDescriptorPolyfill = Object.defineProperty({}, 'innerHTML', {
+    get() {
+      return this.cloneNode(true).innerHTML;
+    },
+    set(v) {
+      // make a dummy node to use innerHTML on
+      const dummy = document.createElement(this.nodeName.toLowerCase());
 
-    // make a document fragment to hold the nodes from dummy
-    const docFrag = document.createDocumentFragment();
+      // set innerHTML to the value provided
+      dummy.innerHTML = v;
 
-    // copy all of the nodes created by the innerHTML on dummy
-    // to the document fragment
-    while (dummy.childNodes.length) {
-      docFrag.appendChild(dummy.childNodes[0]);
+      // make a document fragment to hold the nodes from dummy
+      const docFrag = document.createDocumentFragment();
+
+      // copy all of the nodes created by the innerHTML on dummy
+      // to the document fragment
+      while (dummy.childNodes.length) {
+        docFrag.appendChild(dummy.childNodes[0]);
+      }
+
+      // remove content
+      this.innerText = '';
+
+      // now we add all of that html in one by appending the
+      // document fragment. This is how innerHTML does it.
+      window.Element.prototype.appendChild.call(this, docFrag);
+
+      // then return the result that innerHTML's setter would
+      return this.innerHTML;
     }
+  });
 
-    // remove content
-    this.innerText = '';
-
-    // now we add all of that html in one by appending the
-    // document fragment. This is how innerHTML does it.
-    window.Element.prototype.appendChild.call(this, docFrag);
-
-    // then return the result that innerHTML's setter would
-    return this.innerHTML;
-  }
-});
-
+}
 /**
  * Get a property descriptor given a list of priorities and the
  * property to get.
@@ -204,20 +209,25 @@ const firstSourceWatch = function(tech) {
  * our implementation of a `src` descriptor for browsers
  * that do not have one.
  */
-const srcDescriptorPolyfill = Object.defineProperty({}, 'src', {
-  get() {
-    if (this.hasAttribute('src')) {
-      return getAbsoluteURL(window.Element.prototype.getAttribute.call(this, 'src'));
+
+let srcDescriptorPolyfill = {};
+
+if (!browser.IS_IE8) {
+  srcDescriptorPolyfill = Object.defineProperty({}, 'src', {
+    get() {
+      if (this.hasAttribute('src')) {
+        return getAbsoluteURL(window.Element.prototype.getAttribute.call(this, 'src'));
+      }
+
+      return '';
+    },
+    set(v) {
+      window.Element.prototype.setAttribute.call(this, 'src', v);
+
+      return v;
     }
-
-    return '';
-  },
-  set(v) {
-    window.Element.prototype.setAttribute.call(this, 'src', v);
-
-    return v;
-  }
-});
+  });
+}
 
 const getSrcDescriptor = (tech) => getDescriptor([tech.el(), window.HTMLMediaElement.prototype, srcDescriptorPolyfill], 'src');
 
