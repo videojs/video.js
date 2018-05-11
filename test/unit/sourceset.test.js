@@ -18,7 +18,7 @@ const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
 const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
 const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
 
-if (!Html5.canOverrideAttributes()) {
+if (!Html5.canOverrideAttributes() || browser.IE_VERSION < 9) {
   qunitFn = 'skip';
 }
 
@@ -72,7 +72,7 @@ const setupEnv = function(env, testName) {
   sinon.stub(log, 'error');
   env.fixture = document.getElementById('qunit-fixture');
 
-  if (testName === 'change video el' || testName === 'change audio el') {
+  if ((/^change/i).test(testName)) {
     Html5.prototype.movingMediaElementInDOM = false;
   }
 
@@ -80,7 +80,9 @@ const setupEnv = function(env, testName) {
   env.hook = (player) => player.on('sourceset', () => env.sourcesets++);
   videojs.hook('setup', env.hook);
 
-  if ((/audio/i).test(testName)) {
+  if ((/video-js/i).test(testName)) {
+    env.mediaEl = document.createElement('video-js');
+  } else if ((/audio/i).test(testName)) {
     env.mediaEl = document.createElement('audio');
   } else {
     env.mediaEl = document.createElement('video');
@@ -111,7 +113,7 @@ const setupAfterEach = function(totalSourcesets) {
   };
 };
 
-const testTypes = ['video el', 'change video el', 'audio el', 'change audio el'];
+const testTypes = ['video el', 'change video el', 'audio el', 'change audio el', 'video-js', 'change video-js el'];
 
 QUnit[qunitFn]('sourceset', function(hooks) {
   QUnit.module('source before player', (subhooks) => testTypes.forEach((testName) => {

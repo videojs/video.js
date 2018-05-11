@@ -570,6 +570,26 @@ class Player extends Component {
       el.appendChild(tag);
 
       playerElIngest = this.playerElIngest_ = el;
+
+      // copy over properties from the video-js element
+      // ie8 doesn't support Object.keys nor hasOwnProperty
+      // on dom elements so we have to specify properties individually
+      [
+        'autoplay',
+        'controls',
+        'crossOrigin',
+        'defaultMuted',
+        'defaultPlaybackRate',
+        'loop',
+        'muted',
+        'playbackRate',
+        'src',
+        'volume'
+      ].forEach((prop) => {
+        if (typeof el[prop] !== 'undefined') {
+          tag[prop] = el[prop];
+        }
+      });
     }
 
     // set tabindex to -1 so we could focus on the player element
