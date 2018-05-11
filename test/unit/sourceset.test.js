@@ -77,7 +77,9 @@ const setupEnv = function(env, testName) {
   }
 
   env.sourcesets = 0;
-  env.hook = (player) => player.on('sourceset', () => env.sourcesets++);
+  env.hook = (player) => player.on('sourceset', (e) => {
+    env.sourcesets++;
+  });
   videojs.hook('setup', env.hook);
 
   if ((/video-js/i).test(testName)) {
@@ -279,6 +281,51 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         assert.equal(this.sourcesets, 0, 'no sourceset');
         done();
       }, wait);
+    });
+
+    QUnit.test('relative sources are handled correctly', function(assert) {
+      const done = assert.async();
+      const one = {src: 'relative-one.mp4', type: 'video/mp4'};
+      const two = {src: '../relative-two.mp4', type: 'video/mp4'};
+      const three = {src: './relative-three.mp4?test=test', type: 'video/mp4'};
+
+      const source = document.createElement('source');
+
+      source.src = one.src;
+      source.type = one.type;
+
+      this.mediaEl.appendChild(source);
+      this.player = videojs(this.mediaEl, {enableSourceset: true});
+
+      // mediaEl changes on ready
+      this.player.ready(() => {
+        this.mediaEl = this.player.tech_.el();
+      });
+
+      this.totalSourcesets = 3;
+      this.player.one('sourceset', (e) => {
+        assert.ok(true, '** sourceset with relative source and <source> el');
+        // mediaEl attr is relative
+        validateSource(this.player, {src: getAbsoluteURL(one.src), type: one.type}, e, {attr: one.src});
+
+        this.player.one('sourceset', (e2) => {
+          assert.ok(true, '** sourceset with relative source and mediaEl.src');
+          // mediaEl attr is relative
+          validateSource(this.player, {src: getAbsoluteURL(two.src), type: two.type}, e2, {attr: two.src});
+
+          // setAttribute makes the source absolute
+          this.player.one('sourceset', (e3) => {
+            assert.ok(true, '** sourceset with relative source and mediaEl.setAttribute');
+            validateSource(this.player, {src: getAbsoluteURL(three.src), type: three.type}, e3, {attr: three.src});
+            done();
+          });
+
+          this.mediaEl.setAttribute('src', three.src);
+        });
+
+        this.mediaEl.src = two.src;
+      });
+
     });
   }));
 
@@ -555,7 +602,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       QUnit.test(`set, remove, load, and set again through ${appendObj.name}`, function(assert) {
         const done = assert.async();
 
-        this.totalSourcesets = 2;
+        this.totalSourcesets = 3;
         this.source = document.createElement('source');
         this.source.src = sourceTwo.src;
         this.source.type = sourceTwo.type;
@@ -566,8 +613,12 @@ QUnit[qunitFn]('sourceset', function(hooks) {
           validateSource(this.player, [sourceOne], e1);
 
           this.player.one('sourceset', (e2) => {
-            validateSource(this.player, sourceTwo, e2, {prop: '', attr: ''});
-            done();
+            validateSource(this.player, [{src: '', type: ''}], e2);
+
+            this.player.one('sourceset', (e3) => {
+              validateSource(this.player, sourceTwo, e3, {prop: '', attr: ''});
+              done();
+            });
           });
 
           // reset to no source
@@ -585,17 +636,10 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     });
 
     QUnit.test('no source and load', function(assert) {
-      const done = assert.async();
-
       this.player = videojs(this.mediaEl, {enableSourceset: true});
       this.player.tech_.el_.load();
 
-      this.totalSourcesets = 0;
-
-      window.setTimeout(() => {
-        assert.equal(this.sourcesets, 0, 'no sourceset');
-        done();
-      }, wait);
+      this.totalSourcesets = 1;
     });
   }));
 
