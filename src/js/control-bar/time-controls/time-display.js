@@ -38,18 +38,16 @@ class TimeDisplay extends Component {
   createEl(plainName) {
     const className = this.buildCSSClass();
     const el = super.createEl('div', {
-      className: `${className} vjs-time-control vjs-control`
+      className: `${className} vjs-time-control vjs-control`,
+      innerHTML: `<span class="vjs-control-text">${this.localize(this.labelText_)}\u00a0</span>`
     });
 
-    this.contentEl_ = Dom.createEl('div', {
+    this.contentEl_ = Dom.createEl('span', {
       className: `${className}-display`
     }, {
       // tell screen readers not to automatically read the time as it changes
       'aria-live': 'off'
-    }, Dom.createEl('span', {
-      className: 'vjs-control-text',
-      textContent: this.localize(this.controlText_)
-    }));
+    });
 
     this.updateTextNode_();
     el.appendChild(this.contentEl_);
@@ -130,10 +128,20 @@ class TimeDisplay extends Component {
 }
 
 /**
+ * The text that is added to the `TimeDisplay` for screen reader users.
+ *
+ * @type {string}
+ * @private
+ */
+TimeDisplay.prototype.labelText_ = 'Time';
+
+/**
  * The text that should display over the `TimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
  * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
  */
 TimeDisplay.prototype.controlText_ = 'Time';
 
