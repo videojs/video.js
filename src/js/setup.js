@@ -17,8 +17,8 @@ let videojs;
  */
 const autoSetup = function() {
 
-  // Protect against breakage in non-browser environments.
-  if (!Dom.isReal()) {
+  // Protect against breakage in non-browser environments and check global autoSetup option.
+  if (!Dom.isReal() || videojs.options.autoSetup === false) {
     return;
   }
 

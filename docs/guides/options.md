@@ -19,6 +19,7 @@
   * [width](#width)
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
+  * [autoSetup](#autosetup)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -129,6 +130,15 @@ Each option is `undefined` by default unless otherwise specified.
 > Type: `string`
 
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
+
+### `autoSetup`
+
+> Type: `boolean`
+
+Prevents the player from running the autoSetup for media elements with `data-setup` attribute.
+
+> **Note**: this must be set globally with `videojs.options.autoSetup = false` in the same tick as videojs source is loaded to take effect.
+
 
 ### `children`
 
