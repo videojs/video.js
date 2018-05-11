@@ -143,7 +143,7 @@
     "time-grunt": "^1.1.1",
     "tui-jsdoc-template": "^1.1.0",
     "uglify-js": "^3.3.21",
-    "unified": "^6.1.6",
+    "unified": "^7.0.0",
     "videojs-flash": "^2.1.0",
     "videojs-standard": "^6.0.1",
     "webpack": "^1.15.0"
