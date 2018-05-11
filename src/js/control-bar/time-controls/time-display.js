@@ -135,5 +135,15 @@ class TimeDisplay extends Component {
  */
 TimeDisplay.prototype.labelText_ = 'Time';
 
+/**
+ * The text that should display over the `TimeDisplay`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
+ */
+TimeDisplay.prototype.controlText_ = 'Time';
+
 Component.registerComponent('TimeDisplay', TimeDisplay);
 export default TimeDisplay;

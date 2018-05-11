@@ -77,5 +77,15 @@ class CurrentTimeDisplay extends TimeDisplay {
  */
 CurrentTimeDisplay.prototype.labelText_ = 'Current Time';
 
+/**
+ * The text that should display over the `CurrentTimeDisplay`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
+ */
+CurrentTimeDisplay.prototype.controlText_ = 'Current Time';
+
 Component.registerComponent('CurrentTimeDisplay', CurrentTimeDisplay);
 export default CurrentTimeDisplay;

@@ -100,5 +100,15 @@ class RemainingTimeDisplay extends TimeDisplay {
  */
 RemainingTimeDisplay.prototype.labelText_ = 'Remaining Time';
 
+/**
+ * The text that should display over the `RemainingTimeDisplay`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
+ */
+RemainingTimeDisplay.prototype.controlText_ = 'Remaining Time';
+
 Component.registerComponent('RemainingTimeDisplay', RemainingTimeDisplay);
 export default RemainingTimeDisplay;
