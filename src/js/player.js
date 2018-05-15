@@ -32,6 +32,7 @@ import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
 import {findMimetype} from './utils/mimetypes';
+import {IE_VERSION} from './utils/browser';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -592,8 +593,15 @@ class Player extends Component {
       });
     }
 
-    // set tabindex to -1 so we could focus on the player element
+    // set tabindex to -1 to remove the video element from the focus order
     tag.setAttribute('tabindex', '-1');
+    // Workaround for #4583 (JAWS+IE doesn't announce BPB or play button)
+    // See https://github.com/FreedomScientific/VFO-standards-support/issues/78
+    // Note that we can't detect if JAWS is being used, but this ARIA attribute
+    //  doesn't change behavior of IE11 if JAWS is not being used
+    if (IE_VERSION) {
+      tag.setAttribute('role', 'application');
+    }
 
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
