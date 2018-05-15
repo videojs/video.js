@@ -118,7 +118,7 @@ class Html5 extends Tech {
    * Dispose of `HTML5` media element and remove all tracks.
    */
   dispose() {
-    if (this.el_.resetSourceset_) {
+    if (this.el_ && this.el_.resetSourceset_) {
       this.el_.resetSourceset_();
     }
     Html5.disposeMediaElement(this.el_);
