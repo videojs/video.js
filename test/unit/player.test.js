@@ -49,6 +49,48 @@ QUnit.test('dispose should not throw if styleEl is missing', function(assert) {
   assert.ok(player.el() === null, 'element disposed');
 });
 
+QUnit.test('dispose should not throw if techEl is missing', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag);
+
+  player.tech_.el_.parentNode.removeChild(player.tech_.el_);
+  player.tech_.el_ = null;
+  let error;
+
+  try {
+    player.dispose();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on dispose');
+});
+
+QUnit.test('dispose should not throw if playerEl is missing', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag);
+
+  player.el_.parentNode.removeChild(player.el_);
+  player.el_ = null;
+  let error;
+
+  try {
+    player.dispose();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on dispose');
+});
+
 // technically, all uses of videojs.options should be replaced with
 // Player.prototype.options_ in this file and a equivalent test using
 // videojs.options should be made in video.test.js. Keeping this here

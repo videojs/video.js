@@ -97,7 +97,9 @@ class ResizeManager extends Component {
 
   dispose() {
     if (this.resizeObserver_) {
-      this.resizeObserver_.unobserve(this.player_.el());
+      if (this.player_.el()) {
+        this.resizeObserver_.unobserve(this.player_.el());
+      }
       this.resizeObserver_.disconnect();
     }
 
