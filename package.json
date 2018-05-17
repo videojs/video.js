@@ -54,7 +54,7 @@
     "tsml": "1.0.1",
     "videojs-font": "3.0.0",
     "videojs-vtt.js": "0.14.1",
-    "xhr": "2.4.0"
+    "xhr": "2.5.0"
   },
   "devDependencies": {
     "aliasify": "^2.1.0",
