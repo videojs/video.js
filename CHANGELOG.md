@@ -1,3 +1,10 @@
+<a name="6.10.1"></a>
+## [6.10.1](https://github.com/videojs/video.js/compare/v6.10.0...v6.10.1) (2018-05-17)
+
+### Bug Fixes
+
+* check for el before resetSourceSet ([#5177](https://github.com/videojs/video.js/issues/5177)) ([7746bae](https://github.com/videojs/video.js/commit/7746bae))
+
 <a name="6.10.0"></a>
 # [6.10.0](https://github.com/videojs/video.js/compare/v6.9.0...v6.10.0) (2018-05-11)
 
