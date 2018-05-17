@@ -907,7 +907,6 @@ Html5.canMuteVolume = function() {
     } else {
       Dom.removeAttribute(Html5.TEST_VID, 'muted', 'muted');
     }
-    Html5.TEST_VID.setAttribute('muted', 'muted');
     return muted !== Html5.TEST_VID.muted;
   } catch (e) {
     return false;
