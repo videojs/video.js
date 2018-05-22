@@ -590,9 +590,9 @@ class Player extends Component {
       // don't copy over the class attribute to the player element when we're in a div embed
       // the class is already set up properly in the divEmbed case
       // and we want to make sure that `video-js` class doesn't get lost
-      if (!(divEmbed && attr === 'class')) {
-        el.setAttribute(attr, attrs[attr]);
-      }
+      // if (!(divEmbed && attr === 'class')) {
+      el.setAttribute(attr, attrs[attr]);
+      // }
 
       if (divEmbed) {
         tag.setAttribute(attr, attrs[attr]);
