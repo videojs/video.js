@@ -587,7 +587,10 @@ class Player extends Component {
     tag.removeAttribute('height');
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
-      el.setAttribute(attr, attrs[attr]);
+      // don't copy over the class attribute to the player element when we're in a div embed
+      if (!(divEmbed && attr === 'class')) {
+        el.setAttribute(attr, attrs[attr]);
+      }
 
       if (divEmbed) {
         tag.setAttribute(attr, attrs[attr]);
