@@ -1158,6 +1158,49 @@ class Player extends Component {
     // Update the duration if available
     this.handleTechDurationChange_();
 
+    // if manual auto play is set to muted, any, or any truthy value
+    // we will try to auto play manually, rather than using the attribute
+    //
+    // - muted: mutes the media element and then calls play
+    // - truthy value: will just call play
+    // - any: Will call play and if the promise fails, it will try to mute
+    //        and then play
+    if (this.options_.manualAutoplay) {
+      // we have to run on every loadstart since autoplay will always try to play
+      // even on source changes. We also need the play promise and we won't get
+      // it until `loadstart`.
+      this.on('loadstart', () => {
+        if (this.options_.manualAutoplay === 'muted') {
+          this.muted(true);
+        }
+
+        // default to an object so that we can check
+        // if "then" is a property on it more easily
+        const playPromise = this.play() || {};
+
+        // if we don't have a play promise there is nothing else we can do
+        if (!playPromise.then) {
+          return;
+        }
+
+        // if the playPromise fails and the mode is set to
+        // any then we can possibly still try to autoplay by muting and
+        // then playing, otherwise just silence the promise
+        if (this.options_.manualAutoplay !== 'any' || this.muted()) {
+          silencePromise(playPromise);
+          return;
+        }
+
+        // failed to autoplay without muted, fallback to muted autoplay
+        // and silece any promise errors from that
+        playPromise.catch((e) => {
+          this.muted(true);
+          silencePromise(this.play());
+        });
+      });
+
+    }
+
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
