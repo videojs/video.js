@@ -1162,15 +1162,15 @@ class Player extends Component {
     // we will try to auto play manually, rather than using the attribute
     //
     // - muted: mutes the media element and then calls play
-    // - truthy value: will just call play
-    // - any: Will call play and if the promise fails, it will try to mute
+    // - manual: will just call play
+    // - auto: Will call play and if the promise fails, it will try to mute
     //        and then play
-    if (this.options_.manualAutoplay) {
+    if (typeof this.options_.autoplay === 'string' && (/(auto|muted|manual)/).test(this.options_.autoplay)) {
       // we have to run on every loadstart since autoplay will always try to play
       // even on source changes. We also need the play promise and we won't get
       // it until `loadstart`.
       this.on('loadstart', () => {
-        if (this.options_.manualAutoplay === 'muted') {
+        if (this.options_.autoplay === 'muted') {
           this.muted(true);
         }
 
@@ -1186,7 +1186,7 @@ class Player extends Component {
         // if the playPromise fails and the mode is set to
         // any then we can possibly still try to autoplay by muting and
         // then playing, otherwise just silence the promise
-        if (this.options_.manualAutoplay !== 'any' || this.muted()) {
+        if (this.options_.autoplay !== 'auto' || this.muted()) {
           silencePromise(playPromise);
           return;
         }
