@@ -43,6 +43,8 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
 
     // MenuItem is selectable
     options.selectable = true;
+    // MenuItem is NOT multiSelectable (i.e. only one can be marked "selected" at a time)
+    options.multiSelectable = false;
 
     super(player, options);
   }
