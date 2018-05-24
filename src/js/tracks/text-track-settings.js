@@ -313,19 +313,20 @@ class TextTrackSettings extends ModalDialog {
   createElSelect_(key, legendId = '', type = 'label') {
     const config = selectConfigs[key];
     const id = config.id.replace('%s', this.id_);
+    const selectLabelledbyIds = [legendId, id].join(' ').trim();
 
     return [
       `<${type} id="${id}" class="${type === 'label' ? 'vjs-label' : ''}">`,
       this.localize(config.label),
       `</${type}>`,
-      `<select aria-labelledby="${legendId !== '' ? legendId + ' ' : ''}${id}">`
+      `<select aria-labelledby="${selectLabelledbyIds}">`
     ].
       concat(config.options.map(o => {
-        const optionId = id + '-' + o[1];
+        const optionId = id + '-' + o[1].replace(/\W+/g, '');
 
         return [
           `<option id="${optionId}" value="${o[0]}" `,
-          `aria-labelledby="${legendId !== '' ? legendId + ' ' : ''}${id} ${optionId}">`,
+          `aria-labelledby="${selectLabelledbyIds} ${optionId}">`,
           this.localize(o[1]),
           '</option>'
         ].join('');

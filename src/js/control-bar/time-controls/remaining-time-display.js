@@ -47,6 +47,7 @@ class RemainingTimeDisplay extends TimeDisplay {
    * @private
    */
   formatTime_(time) {
+    // TODO: The "-" should be decorative, and not announced by a screen reader
     return '-' + super.formatTime_(time);
   }
 
@@ -92,10 +93,20 @@ class RemainingTimeDisplay extends TimeDisplay {
 }
 
 /**
+ * The text that is added to the `RemainingTimeDisplay` for screen reader users.
+ *
+ * @type {string}
+ * @private
+ */
+RemainingTimeDisplay.prototype.labelText_ = 'Remaining Time';
+
+/**
  * The text that should display over the `RemainingTimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
  * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
  */
 RemainingTimeDisplay.prototype.controlText_ = 'Remaining Time';
 

@@ -27,13 +27,16 @@ class MenuItem extends ClickableComponent {
 
     this.selectable = options.selectable;
     this.isSelected_ = options.selected || false;
+    this.multiSelectable = options.multiSelectable;
 
     this.selected(this.isSelected_);
 
     if (this.selectable) {
-      // TODO: May need to be either menuitemcheckbox or menuitemradio,
-      //       and may need logical grouping of menu items.
-      this.el_.setAttribute('role', 'menuitemcheckbox');
+      if (this.multiSelectable) {
+        this.el_.setAttribute('role', 'menuitemcheckbox');
+      } else {
+        this.el_.setAttribute('role', 'menuitemradio');
+      }
     } else {
       this.el_.setAttribute('role', 'menuitem');
     }
@@ -66,7 +69,7 @@ class MenuItem extends ClickableComponent {
   }
 
   /**
-   * Any click on a `MenuItem` puts int into the selected state.
+   * Any click on a `MenuItem` puts it into the selected state.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
    * @param {EventTarget~Event} event

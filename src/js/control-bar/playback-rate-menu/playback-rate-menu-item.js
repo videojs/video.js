@@ -28,6 +28,7 @@ class PlaybackRateMenuItem extends MenuItem {
     options.label = label;
     options.selected = rate === 1;
     options.selectable = true;
+    options.multiSelectable = false;
 
     super(player, options);
 

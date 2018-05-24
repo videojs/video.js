@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "7.0.0-rc.1",
+  "version": "7.0.3",
   "main": "./dist/video.cjs.js",
   "style": "./dist/video-js.css",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
@@ -47,7 +47,7 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "dependencies": {
-    "@videojs/http-streaming": "^1.0.0",
+    "@videojs/http-streaming": "^1.0.2",
     "babel-runtime": "^6.9.2",
     "global": "4.3.2",
     "safe-json-parse": "4.0.0",
@@ -113,7 +113,7 @@
     "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
     "klaw-sync": "^4.0.0",
-    "load-grunt-tasks": "^3.1.0",
+    "load-grunt-tasks": "^4.0.0",
     "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "maxmin": "^2.1.0",
@@ -134,7 +134,7 @@
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-filesize": "^1.5.0",
     "rollup-plugin-ignore": "^1.0.3",
-    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-progress": "^0.4.0",
     "semver": "^5.5.0",
@@ -143,7 +143,7 @@
     "time-grunt": "^1.1.1",
     "tui-jsdoc-template": "^1.1.0",
     "uglify-js": "^3.3.21",
-    "unified": "^6.1.6",
+    "unified": "^7.0.0",
     "videojs-flash": "^2.1.0",
     "videojs-standard": "^6.0.1",
     "webpack": "^1.15.0"

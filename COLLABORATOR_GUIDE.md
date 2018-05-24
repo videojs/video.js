@@ -82,7 +82,7 @@ When using the big green button on GitHub, make sure the "squash and merge" is s
 
 The commit message should follow our [conventional changelog conventions][conventions]. They are based on the angularjs changelog conventions. The changelog is then generated from these commit messages on release.
 
-The first line of the commit message -- the header and first text box on GitHub -- should be prefixed with a type and optional scope followed by a short description of the commit.
+The first line of the commit message -- the header, which is the first text box on GitHub -- should be prefixed with a type and optional scope followed by a short description of the commit.
 The type is required. Two common ones are `fix` and `feat` for bug fixes and new features. Scope is optional and can be anything.
 
 The body should contain extra information, potentially copied from the original comment of the PR.

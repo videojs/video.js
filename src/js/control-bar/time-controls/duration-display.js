@@ -66,12 +66,22 @@ class DurationDisplay extends TimeDisplay {
 }
 
 /**
- * The text that should display over the `DurationDisplay`s controls. Added to for localization.
+ * The text that is added to the `DurationDisplay` for screen reader users.
  *
  * @type {string}
  * @private
  */
-DurationDisplay.prototype.controlText_ = 'Duration Time';
+DurationDisplay.prototype.labelText_ = 'Duration';
+
+/**
+ * The text that should display over the `DurationDisplay`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
+ */
+DurationDisplay.prototype.controlText_ = 'Duration';
 
 Component.registerComponent('DurationDisplay', DurationDisplay);
 export default DurationDisplay;

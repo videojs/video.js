@@ -450,6 +450,26 @@ QUnit.test('should return a video player instance', function(assert) {
   assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
 });
 
+QUnit.test('should add video-js class to video-js embed if missing', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.innerHTML += '<video-js id="test_vid_id"></video-js>' +
+                       '<video-js id="test_vid_id2" class="foo"></video-js>';
+
+  const player = videojs('test_vid_id', { techOrder: ['techFaker'] });
+
+  assert.ok(player, 'created player from tag');
+  assert.ok(player.id() === 'test_vid_id');
+  assert.ok(player.hasClass('video-js'), 'we have the video-js class');
+
+  const tag2 = document.getElementById('test_vid_id2');
+  const player2 = videojs(tag2, { techOrder: ['techFaker'] });
+
+  assert.ok(player2.id() === 'test_vid_id2', 'created player from element');
+  assert.ok(player2.hasClass('video-js'), 'we have the video-js class');
+  assert.ok(player2.hasClass('foo'), 'we have the foo class');
+});
+
 QUnit.test('should log about already initalized players if options already passed',
 function(assert) {
   const origWarnLog = log.warn;
