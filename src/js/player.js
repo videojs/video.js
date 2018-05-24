@@ -367,6 +367,9 @@ class Player extends Component {
     // Set poster
     this.poster_ = options.poster || '';
 
+    // Tech click counter to track clicks
+    this.clickCounter_ = [];
+
     // Set controls
     this.controls_ = !!options.controls;
 
@@ -1110,6 +1113,7 @@ class Player extends Component {
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
     this.on(this.tech_, 'mousedown', this.handleTechClick_);
+    this.on(this.tech_, 'dblclick', this.handleTechDoubleClick_);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
@@ -1137,6 +1141,7 @@ class Player extends Component {
     this.off(this.tech_, 'touchmove', this.handleTechTouchMove_);
     this.off(this.tech_, 'touchend', this.handleTechTouchEnd_);
     this.off(this.tech_, 'mousedown', this.handleTechClick_);
+    this.off(this.tech_, 'dblclick', this.handleTechDoubleClick_);
   }
 
   /**
@@ -1617,7 +1622,7 @@ class Player extends Component {
   }
 
   /**
-   * Handle a click on the media element
+   * Handle a click on the media element to play/pause
    *
    * @param {EventTarget~Event} event
    *        the event that caused this function to trigger
@@ -1626,42 +1631,6 @@ class Player extends Component {
    * @private
    */
   handleTechClick_(event) {
-    const self = this;
-
-    // We want to handle single and double click events separately
-    // because they perform different actions.
-    // A single-click will pause/resume playback.
-    // A double-click will enter/exit fullscreen.
-
-    // If a subsequent click doesn't occur after a single click,
-    // within a short amount of time, trigger a single-click handler.
-    if (event.detail === 1) {
-      this.singleClickTimer_ = setTimeout(function() {
-        self.handleTechSingleClick_(event);
-      }, 200);
-    }
-
-    // If a second click occurs, shortly after a single-click,
-    // Remove the timer that invokes the single-click handler
-    // and handle the double-click instead.
-    if (event.detail === 2) {
-      // In IE you can request fullscreen only on click
-      // (or dblclick) events. Therefore if a second click occurs,
-      // we want to listen for a click event.
-      clearTimeout(this.singleClickTimer_);
-      self.one('click', this.handleTechDoubleClick_);
-    }
-  }
-
-  /**
-   * Handle a single click on the media element to play/pause
-   *
-   * @param {EventTarget~Event} event
-   *        the event that caused this function to trigger
-   *
-   * @private
-   */
-  handleTechSingleClick_(event) {
     if (!Dom.isSingleLeftClick(event)) {
       return;
     }
@@ -1672,18 +1641,26 @@ class Player extends Component {
       return;
     }
 
-    if (this.paused()) {
-      this.play();
-    } else {
-      this.pause();
-    }
+    const self = this;
+
+    // wait for a bit before handling a single click
+    // in case a second click occurs
+    this.clickCounter_.push(setTimeout(function() {
+      if (self.paused()) {
+        self.play();
+      } else {
+        self.pause();
+      }
+    }, 500));
   }
 
   /**
    * Handle a double-click on the media element to enter/exit fullscreen
    *
-   * @param
+   * @param {EventTarget~Event} event
+   *        the event that caused this function to trigger
    *
+   * @listens Tech#dblclick
    * @private
    */
   handleTechDoubleClick_(event) {
@@ -1703,6 +1680,12 @@ class Player extends Component {
         this.requestFullscreen();
       }
     }
+
+    this.clickCounter_.forEach(function(clickHandler) {
+      clearTimeout(clickHandler);
+    });
+
+    this.clickCounter_ = [];
   }
 
   /**
