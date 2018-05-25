@@ -53,11 +53,35 @@ Each of these options is also available as a [standard `<video>` element attribu
 
 ### `autoplay`
 
-> Type: `boolean`
+> Type: `boolean|string`
+> NOTE: At this point the autoplay attribute and option are NOT a guarantee that your video will autoplay.
+> NOTE2: If there is an attribute on the media element the option will be ignored.
+> NOTE3: You cannot pass a string value in the attribute, you must pass it in the videojs options
 
-If `true`/present as an attribute, begins playback when the player is ready.
+Instead of using the `autoplay` attribute you should pass an `autoplay` option to videojs. The following values
+are valid:
 
-> **Note:** As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
+* a boolean value of `false`: the same as having no attribute on the video element, won't `autoplay`
+* a boolean value of `true`: the same as having attribute on the video element, will use browsers `autoplay`
+* a string value of `'muted'`: will mute the video element and then manually call `play()` on `loadstart`. This is likely to work.
+* a string value of `'play'`: will call `play()` on `loadstart`, similar to browsers `autoplay`
+* a string value of `'any'`: will call `play()` on `loadstart` and if the promise is rejected it will mute the video element then call `play()`.
+
+To pass the option
+
+```js
+var player = videojs('my-video', {
+  autoplay: 'muted'
+});
+
+// or
+
+player.autoplay('muted');
+```
+
+#### More info on autoplay support and changes:
+* As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
+* The autoplay policy in Chrome is changing: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
 
 ### `controls`
 

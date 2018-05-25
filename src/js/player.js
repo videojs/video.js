@@ -379,6 +379,13 @@ class Player extends Component {
     tag.controls = false;
     tag.removeAttribute('controls');
 
+    // the attribute overrides the option
+    if (tag.hasAttribute('autoplay')) {
+      this.options_.autoplay = true;
+    } else {
+      this.autoplay(this.options_.autoplay);
+    }
+
     /*
      * Store the internal state of scrubbing
      *
@@ -926,13 +933,17 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
+    // if autoplay is a string we pass false to the tech
+    // because the player is going to handle autoplay on `loadstart`
+    const autoplay = typeof this.autoplay() === 'string' ? false : this.autoplay();
+
     // Grab tech-specific options from player options and add source and parent element to use.
     const techOptions = {
       source,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
       'techId': `${this.id()}_${titleTechName}_api`,
-      'autoplay': this.options_.autoplay,
+      autoplay,
       'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
@@ -1158,49 +1169,6 @@ class Player extends Component {
     // Update the duration if available
     this.handleTechDurationChange_();
 
-    // if manual auto play is set to muted, any, or any truthy value
-    // we will try to auto play manually, rather than using the attribute
-    //
-    // - muted: mutes the media element and then calls play
-    // - manual: will just call play
-    // - auto: Will call play and if the promise fails, it will try to mute
-    //        and then play
-    if (typeof this.options_.autoplay === 'string' && (/(auto|muted|manual)/).test(this.options_.autoplay)) {
-      // we have to run on every loadstart since autoplay will always try to play
-      // even on source changes. We also need the play promise and we won't get
-      // it until `loadstart`.
-      this.on('loadstart', () => {
-        if (this.options_.autoplay === 'muted') {
-          this.muted(true);
-        }
-
-        // default to an object so that we can check
-        // if "then" is a property on it more easily
-        const playPromise = this.play() || {};
-
-        // if we don't have a play promise there is nothing else we can do
-        if (!playPromise.then) {
-          return;
-        }
-
-        // if the playPromise fails and the mode is set to
-        // any then we can possibly still try to autoplay by muting and
-        // then playing, otherwise just silence the promise
-        if (this.options_.autoplay !== 'auto' || this.muted()) {
-          silencePromise(playPromise);
-          return;
-        }
-
-        // failed to autoplay without muted, fallback to muted autoplay
-        // and silece any promise errors from that
-        playPromise.catch((e) => {
-          this.muted(true);
-          silencePromise(this.play());
-        });
-      });
-
-    }
-
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
@@ -1251,6 +1219,51 @@ class Player extends Component {
       this.hasStarted(false);
       this.trigger('loadstart');
     }
+
+    // autoplay happens after loadstart for the browser,
+    // so we mimic that behavior
+    this.manualAutoplay_();
+  }
+
+  /**
+   * Handle autoplay string values, rather than the typical boolean
+   * values that should be handled by the tech. Note that this is not
+   * part of any specification. Valid values and what they do follow:
+   *
+   * - 'play': call play() on every loadstart
+   * - 'muted': call muted() then play() on every loadstart
+   * - 'any': call play() on every loadstart. if that fails call muted() then play().
+   */
+  manualAutoplay_() {
+    if (typeof this.autoplay() !== 'string') {
+      return;
+    }
+
+    if (this.autoplay() === 'muted') {
+      this.muted(true);
+    }
+
+    // default to an object so that we can check
+    // if "then" is a property on it more easily
+    const playPromise = this.play() || {};
+
+    // if we don't have a play promise there is nothing else we can do
+    if (!playPromise.then) {
+      return;
+    }
+
+    // if we are muted or not set to any here there is nothing we can do
+    if (this.autoplay() !== 'any' || this.muted()) {
+      silencePromise(playPromise);
+      return;
+    }
+
+    // Catch the play failure and attempt to mute and call play
+    // which should work.
+    playPromise.catch((e) => {
+      this.muted(true);
+      silencePromise(this.play());
+    });
   }
 
   /**
@@ -2790,22 +2803,48 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the autoplay attribute.
+   * Get or set the autoplay option. When this is a boolean it will
+   * modify the attribute on the tech. When this is a string the attribute on
+   * the tech will be removed and `Player` will handle autoplay on loadstarts.
    *
-   * @param {boolean} [value]
-   *        - true means that we should autoplay
-   *        - false means that we should not autoplay
+   * @param {boolean|string} [value]
+   *        - true: autoplay using the browser behavior
+   *        - false: do not autoplay
+   *        - See `manualAutoplay_` for valid string values
+   *        - *: values other than those listed here or in `manualAutoplay_`
+   *             will be set `autoplay` to true
    *
-   * @return {string}
+   * @return {boolean|string}
    *         The current value of autoplay when getting
    */
   autoplay(value) {
-    if (value !== undefined) {
-      this.techCall_('setAutoplay', value);
-      this.options_.autoplay = value;
-      return;
+    // getter usage
+    if (value === undefined) {
+      return this.options_.autoplay;
     }
-    return this.techGet_('autoplay', value);
+
+    let techAutoplay;
+
+    // if the value is a valid string set it to that
+    if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
+      this.options_.autoplay = value;
+      techAutoplay = false;
+      // if the value is a boolean set it to that
+    } else if (typeof value === 'boolean') {
+      this.options_.autoplay = value;
+      // any other value sets autoplay to true
+    } else {
+      this.options_.autoplay = true;
+    }
+
+    techAutoplay = techAutoplay || value;
+
+    // if we don't have a tech do not queue up
+    // a setAutoplay call. This option will be passed
+    // in the constructor for the tech
+    if (this.tech_) {
+      this.techCall_('setAutoplay', techAutoplay);
+    }
   }
 
   /**

@@ -1905,7 +1905,7 @@ QUnit.test('disposing a tech that dit NOT set a poster, should keep the poster',
   player.dispose();
 });
 
-QUnit.module('Player: autoplay loadstart', {
+QUnit.module('Player autoplay', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
     // reset players storage
@@ -1938,7 +1938,11 @@ QUnit.module('Player: autoplay loadstart', {
       }
     };
 
-    this.createPlayer = (options, playRetval) => {
+    this.createPlayer = (options = {}, attributes = {}, playRetval = null) => {
+      Object.keys(attributes).forEach((a) => {
+        videoTag.setAttribute(a, attributes[a]);
+      });
+
       this.player = videojs(videoTag.id, videojs.mergeOptions({techOrder: ['techFaker']}, options));
       const oldMuted = this.player.muted;
 
@@ -1971,110 +1975,182 @@ QUnit.module('Player: autoplay loadstart', {
   }
 });
 
-QUnit.test('false no play/muted', function(assert) {
+QUnit.test('option = false no play/muted', function(assert) {
   this.createPlayer({autoplay: false});
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), false, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 0, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 0, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
-QUnit.test('true no play/muted', function(assert) {
+QUnit.test('option = true no play/muted', function(assert) {
   this.createPlayer({autoplay: true});
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), true, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), true, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 0, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 0, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
-QUnit.test('"random" no play/muted', function(assert) {
+QUnit.test('option = "random" no play/muted', function(assert) {
   this.createPlayer({autoplay: 'random'});
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), true, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), true, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 0, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 0, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
-QUnit.test('"manual" play, no muted', function(assert) {
-  this.createPlayer({autoplay: 'manual'});
+QUnit.test('options = "play" play, no muted', function(assert) {
+  this.createPlayer({autoplay: 'play'});
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), 'play', 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 1, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
-QUnit.test('"auto" play, no muted', function(assert) {
-  this.createPlayer({autoplay: 'auto'});
+QUnit.test('option = "any" play, no muted', function(assert) {
+  this.createPlayer({autoplay: 'any'});
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), 'any', 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 1, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
-QUnit.test('"muted" play and muted', function(assert) {
+QUnit.test('option = "muted" play and muted', function(assert) {
   this.createPlayer({autoplay: 'muted'});
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), 'muted', 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 1, 'play count');
   assert.equal(this.counts.muted, 1, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
 });
 
-QUnit.test('"manual" play, no muted, rejection ignored', function(assert) {
-  this.createPlayer({autoplay: 'manual'}, this.rejectPromise);
+QUnit.test('option = "play" play, no muted, rejection ignored', function(assert) {
+  this.createPlayer({autoplay: 'play'}, {}, this.rejectPromise);
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), 'play', 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 1, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
-QUnit.test('"auto" play, no muted, rejection leads to muted then play', function(assert) {
-  this.createPlayer({autoplay: 'auto'}, this.rejectPromise);
+QUnit.test('option = "any" play, no muted, rejection leads to muted then play', function(assert) {
+  this.createPlayer({autoplay: 'any'}, {}, this.rejectPromise);
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), 'any', 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 1, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 4, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
 });
 
-QUnit.test('"muted" play and muted, rejection ignored', function(assert) {
-  this.createPlayer({autoplay: 'muted'}, this.rejectPromise);
+QUnit.test('option = "muted" play and muted, rejection ignored', function(assert) {
+  this.createPlayer({autoplay: 'muted'}, {}, this.rejectPromise);
 
-  this.player.trigger('loadstart');
+  assert.equal(this.player.autoplay(), 'muted', 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 1, 'play count');
   assert.equal(this.counts.muted, 1, 'muted count');
 
-  this.player.trigger('loadstart');
+  this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
+});
+
+QUnit.test('option = "muted", attr = true, play and muted', function(assert) {
+  this.createPlayer({autoplay: 'muted'}, {autoplay: true});
+
+  assert.equal(this.player.autoplay(), true, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), true, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+});
+
+QUnit.test('option = "play", attr = true, play only', function(assert) {
+  this.createPlayer({autoplay: 'play'}, {autoplay: true});
+
+  assert.equal(this.player.autoplay(), true, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), true, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+});
+
+QUnit.test('option = "any", attr = true, play only', function(assert) {
+  this.createPlayer({autoplay: 'any'}, {autoplay: true});
+
+  assert.equal(this.player.autoplay(), true, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), true, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
 });
