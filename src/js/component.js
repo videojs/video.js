@@ -1222,13 +1222,11 @@ class Component {
    * Creates a function that runs after an `x` millisecond timeout. This function is a
    * wrapper around `window.setTimeout`. There are a few reasons to use this one
    * instead though:
-   * 1. It gets cleared via  {@link Component#clearTimeout} when
-   *    {@link Component#dispose} gets called.
+   * 1. It checks the player and element are still valid when it's run
+   *
    * 2. The function callback will gets turned into a {@link Component~GenericCallback}
    *
-   * > Note: You can use `window.clearTimeout` on the id returned by this function. This
-   *         will cause its dispose listener not to get cleaned up! Please use
-   *         {@link Component#clearTimeout} or {@link Component#dispose}.
+   * > Note: You can use `window.clearTimeout` on the id returned by this function.
    *
    * @param {Component~GenericCallback} fn
    *        The function that will be run after `timeout`.
@@ -1247,21 +1245,18 @@ class Component {
   setTimeout(fn, timeout) {
     fn = Fn.bind(this, fn);
 
-    const timeoutId = window.setTimeout(fn, timeout);
-    const disposeFn = () => this.clearTimeout(timeoutId);
-
-    disposeFn.guid = `vjs-timeout-${timeoutId}`;
-
-    this.on('dispose', disposeFn);
+    const timeoutId = window.setTimeout(() => {
+      if (this.player_ && this.el_) {
+        fn();
+      }
+    }, timeout);
 
     return timeoutId;
   }
 
   /**
    * Clears a timeout that gets created via `window.setTimeout` or
-   * {@link Component#setTimeout}. If you set a timeout via {@link Component#setTimeout}
-   * use this function instead of `window.clearTimout`. If you don't your dispose
-   * listener will not get cleaned up until {@link Component#dispose}!
+   * {@link Component#setTimeout}.
    *
    * @param {number} timeoutId
    *        The id of the timeout to clear. The return value of
@@ -1274,13 +1269,6 @@ class Component {
    */
   clearTimeout(timeoutId) {
     window.clearTimeout(timeoutId);
-
-    const disposeFn = function() {};
-
-    disposeFn.guid = `vjs-timeout-${timeoutId}`;
-
-    this.off('dispose', disposeFn);
-
     return timeoutId;
   }
 
@@ -1355,8 +1343,7 @@ class Component {
    * - The callback is turned into a {@link Component~GenericCallback} (i.e.
    *   bound to the component).
    *
-   * - Automatic cancellation of the rAF callback is handled if the component
-   *   is disposed before it is called.
+   * - Checks if the player and element are still alive when run.
    *
    * @param  {Component~GenericCallback} fn
    *         A function that will be bound to this component and executed just
@@ -1374,11 +1361,11 @@ class Component {
     if (this.supportsRaf_) {
       fn = Fn.bind(this, fn);
 
-      const id = window.requestAnimationFrame(fn);
-      const disposeFn = () => this.cancelAnimationFrame(id);
-
-      disposeFn.guid = `vjs-raf-${id}`;
-      this.on('dispose', disposeFn);
+      const id = window.requestAnimationFrame((ts) => {
+        if (this.player_ && this.el_) {
+          fn(ts);
+        }
+      });
 
       return id;
     }
@@ -1406,13 +1393,6 @@ class Component {
   cancelAnimationFrame(id) {
     if (this.supportsRaf_) {
       window.cancelAnimationFrame(id);
-
-      const disposeFn = function() {};
-
-      disposeFn.guid = `vjs-raf-${id}`;
-
-      this.off('dispose', disposeFn);
-
       return id;
     }
 
