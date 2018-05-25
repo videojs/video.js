@@ -54,6 +54,30 @@ const primedBabel = babel({
 });
 
 export default cliargs => [
+  // standard umd file
+  {
+    input: 'src/js/index.js',
+    output: {
+      format: 'umd',
+      file: 'dist/video.js',
+      name: 'videojs',
+      strict: false,
+      banner
+    },
+    plugins: [
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {},
+      filesize()
+    ],
+    onwarn,
+    watch
+  },
   // es, cjs
   {
     input: 'src/js/index.js',
@@ -76,30 +100,6 @@ export default cliargs => [
         '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
       json(),
-      primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
-    ],
-    onwarn,
-    watch
-  },
-  // standard umd file
-  {
-    input: 'src/js/index.js',
-    output: {
-      format: 'umd',
-      file: 'dist/video.js',
-      name: 'videojs',
-      strict: false,
-      banner
-    },
-    plugins: [
-      alias({
-        'video.js': path.resolve(__dirname, './src/js/video.js')
-      }),
-      primedResolve,
-      json(),
-      primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {},
       filesize()
