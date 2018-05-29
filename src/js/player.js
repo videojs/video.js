@@ -1228,11 +1228,9 @@ class Player extends Component {
   /**
    * Handle autoplay string values, rather than the typical boolean
    * values that should be handled by the tech. Note that this is not
-   * part of any specification. Valid values and what they do follow:
+   * part of any specification. Valid values and what they do can be
+   * found on the autoplay getter at Player#autoplay()
    *
-   * - 'play': call play() on every loadstart
-   * - 'muted': call muted() then play() on every loadstart
-   * - 'any': call play() on every loadstart. if that fails call muted() then play().
    */
   manualAutoplay_() {
     if (typeof this.autoplay() !== 'string') {
@@ -2810,9 +2808,10 @@ class Player extends Component {
    * @param {boolean|string} [value]
    *        - true: autoplay using the browser behavior
    *        - false: do not autoplay
-   *        - See `manualAutoplay_` for valid string values
-   *        - *: values other than those listed here or in `manualAutoplay_`
-   *             will be set `autoplay` to true
+   *        - 'play': call play() on every loadstart
+   *        - 'muted': call muted() then play() on every loadstart
+   *        - 'any': call play() on every loadstart. if that fails call muted() then play().
+   *        - *: values other than those listed here will be set `autoplay` to true
    *
    * @return {boolean|string}
    *         The current value of autoplay when getting
@@ -2837,7 +2836,7 @@ class Player extends Component {
       this.options_.autoplay = true;
     }
 
-    techAutoplay = techAutoplay || value;
+    techAutoplay = techAutoplay || this.options_.autoplay;
 
     // if we don't have a tech do not queue up
     // a setAutoplay call. This option will be passed
