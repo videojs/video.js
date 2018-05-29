@@ -80,8 +80,7 @@ player.autoplay('muted');
 ```
 
 #### More info on autoplay support and changes:
-* As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
-* The autoplay policy in Chrome is changing: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+* See our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
 
 ### `controls`
 

@@ -140,7 +140,8 @@ When an array of sources is available, Video.js test each source in the order gi
 Do to recent changes in `autoplay` behavior we no longer recommend using the `autoplay` attribute
 on the video element. It's still supported by video.js but many browsers, including Chrome, are changing their
 `autoplay` attribute behavior.
-For more info on that see: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+
+For more information on the autoplay changes see our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
 
 Instead we recommend using the `autoplay` option rather than the `autoplay` attribute. For more information on using that.
 See the [autoplay option][autoplay-option] in the videojs options guide.
