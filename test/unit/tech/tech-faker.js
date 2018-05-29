@@ -9,7 +9,6 @@ class TechFaker extends Tech {
 
   constructor(options, handleReady) {
     super(options, handleReady);
-
     if (!options || options.autoReady !== false) {
       this.triggerReady();
     }
@@ -39,7 +38,7 @@ class TechFaker extends Tech {
   setMuted() {}
 
   setAutoplay(v) {
-    if (v === false) {
+    if (!v) {
       this.options_.autoplay = false;
     }
 

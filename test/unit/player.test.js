@@ -1904,4 +1904,3 @@ QUnit.test('disposing a tech that dit NOT set a poster, should keep the poster',
 
   player.dispose();
 });
-

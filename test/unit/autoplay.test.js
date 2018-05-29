@@ -120,6 +120,21 @@ QUnit.test('option = "random" no play/muted', function(assert) {
   assert.equal(this.counts.muted, 0, 'muted count');
 });
 
+QUnit.test('option = null, should be set to false no play/muted', function(assert) {
+  this.createPlayer({autoplay: null});
+
+  assert.equal(this.player.autoplay(), false, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 0, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+});
+
 QUnit.test('options = "play" play, no muted', function(assert) {
   this.createPlayer({autoplay: 'play'});
 
