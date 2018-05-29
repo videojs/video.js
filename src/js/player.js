@@ -383,6 +383,8 @@ class Player extends Component {
     if (tag.hasAttribute('autoplay')) {
       this.options_.autoplay = true;
     } else {
+      // otherwise use the setter to validate and
+      // set the correct value.
       this.autoplay(this.options_.autoplay);
     }
 
@@ -2828,19 +2830,23 @@ class Player extends Component {
     if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
       this.options_.autoplay = value;
       techAutoplay = false;
-      // if the value is a boolean set it to that
-    } else if (typeof value === 'boolean') {
-      this.options_.autoplay = value;
-      // any other value sets autoplay to true
+
+    // any falsy value sets autoplay to false in the browser,
+    // lets do the same
+    } else if (!value) {
+      this.options_.autoplay = false;
+
+    // any other value (ie truthy) sets autoplay to true
     } else {
       this.options_.autoplay = true;
     }
 
     techAutoplay = techAutoplay || this.options_.autoplay;
 
-    // if we don't have a tech do not queue up
-    // a setAutoplay call. This option will be passed
-    // in the constructor for the tech
+    // if we don't have a tech then we do not queue up
+    // a setAutoplay call on tech ready. We do this because the
+    // autoplay option will be passed in the constructor and we
+    // do not need to set it twice
     if (this.tech_) {
       this.techCall_('setAutoplay', techAutoplay);
     }
