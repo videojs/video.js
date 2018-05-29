@@ -940,10 +940,10 @@ class Player extends Component {
     // Grab tech-specific options from player options and add source and parent element to use.
     const techOptions = {
       source,
+      autoplay,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
       'techId': `${this.id()}_${titleTechName}_api`,
-      autoplay,
       'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
