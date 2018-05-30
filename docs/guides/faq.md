@@ -137,14 +137,14 @@ When an array of sources is available, Video.js test each source in the order gi
 ## Q: How do I autoplay a video?
 
 
-Do to recent changes in `autoplay` behavior we no longer recommend using the `autoplay` attribute
-on the video element. It's still supported by video.js but many browsers, including Chrome, are changing their
+Due to recent changes in autoplay behavior we no longer recommend using the `autoplay` attribute
+on the `video` element. It's still supported by Video.js but, many browsers, including Chrome, are changing their
 `autoplay` attribute behavior.
 
 For more information on the autoplay changes see our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
 
-Instead we recommend using the `autoplay` option rather than the `autoplay` attribute. For more information on using that.
-See the [autoplay option][autoplay-option] in the videojs options guide.
+Instead we recommend using the `autoplay` option rather than the `autoplay` attribute, for more information on using that.
+see the [autoplay option][autoplay-option] in the Video.js options guide.
 
 ### Q: How can I autoplay a video on a mobile device?
 
@@ -153,11 +153,11 @@ For mobile devices that don't support autoplaying, autoplay isn't supported by V
 For those devices that support autoplaying, like iOS10 and Chrome for Android 53+,
 you must mute the video or have a video without audio tracks to be able to play it.
 
-We do not recommend doing this manually using attributes on the video element. Instead you should pass the
+We do not recommend doing this manually using attributes on the `video` element. Instead, you should pass the
 [autoplay option][autoplay-option] with a value of `'any'` or `'muted'`. See the previous link for more information
 on using that option.
 
-> NOTE: At this point the autoplay attribute and option are NOT a guarantee that your video will autoplay.
+> NOTE: At this point, the autoplay attribute and option are NOT a guarantee that your video will autoplay.
 
 ## Q: How can I play RTMP video in Video.js?
 

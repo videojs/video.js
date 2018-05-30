@@ -54,11 +54,11 @@ Each of these options is also available as a [standard `<video>` element attribu
 ### `autoplay`
 
 > Type: `boolean|string`
-> NOTE: At this point the autoplay attribute and option are NOT a guarantee that your video will autoplay.
+> NOTE: At this point, the autoplay attribute and option are NOT a guarantee that your video will autoplay.
 > NOTE2: If there is an attribute on the media element the option will be ignored.
 > NOTE3: You cannot pass a string value in the attribute, you must pass it in the videojs options
 
-Instead of using the `autoplay` attribute you should pass an `autoplay` option to videojs. The following values
+Instead of using the `autoplay` attribute you should pass an `autoplay` option to the `videojs` function. The following values
 are valid:
 
 * a boolean value of `false`: the same as having no attribute on the video element, won't `autoplay`
