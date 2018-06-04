@@ -1654,7 +1654,7 @@ class Player extends Component {
     }
 
     if (this.paused()) {
-      this.play();
+      silencePromise(this.play());
     } else {
       this.pause();
     }
