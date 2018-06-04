@@ -154,7 +154,8 @@ export default cliargs => [
   {
     input: 'src/js/video.js',
     output: {
-      format: 'cjs',
+      format: 'umd',
+      name: 'videojs',
       file: 'dist/alt/video.core.js',
       strict: false,
       banner
@@ -174,7 +175,8 @@ export default cliargs => [
   {
     input: 'src/js/video.js',
     output: {
-      format: 'cjs',
+      format: 'umd',
+      name: 'videojs',
       file: 'dist/alt/video.core.novtt.js',
       strict: false,
       banner: compiledLicense(Object.assign({includesVtt: true}, bannerData))
