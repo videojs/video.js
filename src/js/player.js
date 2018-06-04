@@ -2821,7 +2821,7 @@ class Player extends Component {
   autoplay(value) {
     // getter usage
     if (value === undefined) {
-      return this.options_.autoplay;
+      return this.options_.autoplay || false;
     }
 
     let techAutoplay;

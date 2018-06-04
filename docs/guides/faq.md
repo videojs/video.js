@@ -141,10 +141,10 @@ Due to recent changes in autoplay behavior we no longer recommend using the `aut
 on the `video` element. It's still supported by Video.js but, many browsers, including Chrome, are changing their
 `autoplay` attribute behavior.
 
-For more information on the autoplay changes see our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
-
 Instead we recommend using the `autoplay` option rather than the `autoplay` attribute, for more information on using that.
 see the [autoplay option][autoplay-option] in the Video.js options guide.
+
+For more information on the autoplay changes see our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
 
 ### Q: How can I autoplay a video on a mobile device?
 
