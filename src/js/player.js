@@ -1246,7 +1246,7 @@ class Player extends Component {
     // if "then" is a property on it more easily
     const playPromise = this.play();
 
-    if (!playPromise || !playPromise.then) {
+    if (!playPromise || !playPromise.then || !playPromise.catch) {
       return;
     }
 

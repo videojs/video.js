@@ -29,10 +29,10 @@ QUnit.module('autoplay', {
     // this promise fake will act right away
     // it will also only act on catch calls
     this.rejectPromise = {
-      then: (fn) => {
+      then(fn) {
         return this;
       },
-      catch: (fn) => {
+      catch(fn) {
         fn();
         return this;
       }
