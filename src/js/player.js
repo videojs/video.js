@@ -1224,7 +1224,7 @@ class Player extends Component {
 
     // autoplay happens after loadstart for the browser,
     // so we mimic that behavior
-    this.manualAutoplay_();
+    this.manualAutoplay_(this.autoplay());
   }
 
   /**
@@ -1232,37 +1232,34 @@ class Player extends Component {
    * values that should be handled by the tech. Note that this is not
    * part of any specification. Valid values and what they do can be
    * found on the autoplay getter at Player#autoplay()
-   *
    */
-  manualAutoplay_() {
-    if (!this.tech_ || typeof this.autoplay() !== 'string') {
+  manualAutoplay_(type) {
+    if (!this.tech_ || typeof type !== 'string') {
       return;
     }
 
-    if (this.autoplay() === 'muted') {
+    if (type === 'muted') {
       this.muted(true);
     }
 
     // default to an object so that we can check
     // if "then" is a property on it more easily
-    const playPromise = this.play() || {};
+    const playPromise = this.play();
 
-    // if we don't have a play promise there is nothing else we can do
-    if (!playPromise.then) {
+    if (!playPromise || !playPromise.then) {
       return;
     }
 
-    // if we are muted or not set to any here there is nothing we can do
-    if (this.autoplay() !== 'any' || this.muted()) {
-      silencePromise(playPromise);
-      return;
-    }
+    playPromise.then(() => {
+      this.trigger('autoplay-success');
+    }).catch((e) => {
+      // if we are muted or not set to any here there is nothing we can do
+      if (type !== 'any' || this.muted()) {
+        this.trigger('autoplay-failure');
+        return;
+      }
 
-    // Catch the play failure and attempt to mute and call play
-    // which should work.
-    playPromise.catch((e) => {
-      this.muted(true);
-      silencePromise(this.play());
+      this.manualAutoplay_('muted');
     });
   }
 
@@ -2829,7 +2826,7 @@ class Player extends Component {
     // if the value is a valid string set it to that
     if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
       this.options_.autoplay = value;
-      this.manualAutoplay_();
+      this.manualAutoplay_(value);
       techAutoplay = false;
 
     // any falsy value sets autoplay to false in the browser,
