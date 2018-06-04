@@ -1235,7 +1235,7 @@ class Player extends Component {
    *
    */
   manualAutoplay_() {
-    if (typeof this.autoplay() !== 'string') {
+    if (!this.tech_ || typeof this.autoplay() !== 'string') {
       return;
     }
 
@@ -2829,6 +2829,7 @@ class Player extends Component {
     // if the value is a valid string set it to that
     if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
       this.options_.autoplay = value;
+      this.manualAutoplay_();
       techAutoplay = false;
 
     // any falsy value sets autoplay to false in the browser,
