@@ -5,6 +5,7 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
 import * as Fn from './utils/fn.js';
 import * as Dom from './utils/dom.js';
+import {silencePromise} from './utils/promise';
 
 /**
  * A `ClickableComponent` that handles showing the poster image for the player.
@@ -112,7 +113,7 @@ class PosterImage extends ClickableComponent {
     }
 
     if (this.player_.paused()) {
-      this.player_.play();
+      silencePromise(this.player_.play());
     } else {
       this.player_.pause();
     }
