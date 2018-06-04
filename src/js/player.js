@@ -1900,10 +1900,7 @@ class Player extends Component {
    * @param {Function} [callback]
    *        The callback that should be called when the techs play is actually called
    */
-  play_(callback) {
-    if (!callback) {
-      callback = () => {};
-    }
+  play_(callback = silencePromise) {
     // If this is called while we have a play queued up on a loadstart, remove
     // that listener to avoid getting in a potentially bad state.
     if (this.playOnLoadstart_) {
