@@ -4,6 +4,7 @@
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {assign} from '../utils/obj';
+import {IS_CHROME} from '../utils/browser.js';
 
 /**
  * The base functionality for a slider. Can be vertical or horizontal.
@@ -145,7 +146,16 @@ class Slider extends Component {
   handleMouseDown(event) {
     const doc = this.bar.el_.ownerDocument;
 
-    event.preventDefault();
+    if (event.type === 'mousedown') {
+      event.preventDefault();
+    }
+    // Do not call preventDefault() on touchstart in Chrome
+    // to avoid console warnings. Use a 'touch-action: none' style
+    // instead to prevent unintented scrolling.
+    // https://developers.google.com/web/updates/2017/01/scrolling-intervention
+    if (event.type === 'touchstart' && !IS_CHROME) {
+      event.preventDefault();
+    }
     Dom.blockTextSelection();
 
     this.addClass('vjs-sliding');

@@ -6,6 +6,7 @@
   @include flex(auto);
   @include display-flex(center);
   min-width: 4em;
+  touch-action: none;
 }
 
 .video-js .vjs-progress-control.disabled {
