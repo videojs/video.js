@@ -1,3 +1,18 @@
+<a name="6.10.2"></a>
+## [6.10.2](https://github.com/videojs/video.js/compare/v6.10.1...v6.10.2) (2018-06-05)
+
+### Bug Fixes
+
+* **menus:** change ARIA role of menu items for better screen reader support ([2e790af](https://github.com/videojs/video.js/commit/2e790af)), closes [#5171](https://github.com/videojs/video.js/issues/5171) [#5136](https://github.com/videojs/video.js/issues/5136)
+* **player:** ensure that JAWS+IE announces the BPB and play button ([#5206](https://github.com/videojs/video.js/issues/5206)) ([49056e1](https://github.com/videojs/video.js/commit/49056e1)), closes [FreedomScientific/VFO-standards-support#78](https://github.com/FreedomScientific/VFO-standards-support/issues/78) [#5173](https://github.com/videojs/video.js/issues/5173) [#4583](https://github.com/videojs/video.js/issues/4583)
+* **slider:** suppress console warnings in Chrome for Android when scrubbing ([#5219](https://github.com/videojs/video.js/issues/5219)) ([4d9a6ae](https://github.com/videojs/video.js/commit/4d9a6ae)), closes [#4650](https://github.com/videojs/video.js/issues/4650)
+* silence play promise in a few more places ([#5213](https://github.com/videojs/video.js/issues/5213)) ([7efefff](https://github.com/videojs/video.js/commit/7efefff))
+
+### Documentation
+
+* **component:** fix typo ([#5226](https://github.com/videojs/video.js/issues/5226)) ([c25c15d](https://github.com/videojs/video.js/commit/c25c15d))
+* **examples:** update doc examples and README to use video.js v6.10 ([#5207](https://github.com/videojs/video.js/issues/5207)) ([af6d3bf](https://github.com/videojs/video.js/commit/af6d3bf))
+
 <a name="6.10.1"></a>
 ## [6.10.1](https://github.com/videojs/video.js/compare/v6.10.0...v6.10.1) (2018-05-17)
 
