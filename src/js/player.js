@@ -1647,7 +1647,7 @@ class Player extends Component {
     // in case a second click occurs
     this.clickCounter_.push(setTimeout(function() {
       if (self.paused()) {
-        self.play();
+        silencePromise(self.play());
       } else {
         self.pause();
       }
