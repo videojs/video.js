@@ -1238,28 +1238,43 @@ class Player extends Component {
       return;
     }
 
-    if (type === 'muted') {
+    const muted = () => {
+      const previouslyMuted = this.muted();
+
       this.muted(true);
-    }
 
-    // default to an object so that we can check
-    // if "then" is a property on it more easily
-    const playPromise = this.play();
+      const playPromise = this.play();
 
-    if (!playPromise || !playPromise.then || !playPromise.catch) {
-      return;
-    }
-
-    playPromise.then(() => {
-      this.trigger('autoplay-success');
-    }).catch((e) => {
-      // if we are muted or not set to any here there is nothing we can do
-      if (type !== 'any' || this.muted()) {
-        this.trigger('autoplay-failure');
+      if (!playPromise || !playPromise.then || !playPromise.catch) {
         return;
       }
 
-      this.manualAutoplay_('muted');
+      return playPromise.catch((e) => {
+        // restore old value of muted on failure
+        this.muted(previouslyMuted);
+      });
+    };
+
+    let promise;
+
+    if (type === 'any') {
+      promise = this.play();
+
+      if (promise && promise.then && promise.catch) {
+        promise.catch(() => {
+          return muted();
+        });
+      }
+    } else if (type === 'muted') {
+      promise = muted();
+    } else {
+      promise = this.play();
+    }
+
+    return promise.then(() => {
+      this.trigger({type: 'autoplay-success', autoplay: type});
+    }).catch((e) => {
+      this.trigger({type: 'autoplay-failure', autoplay: type});
     });
   }
 

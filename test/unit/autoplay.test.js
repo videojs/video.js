@@ -201,13 +201,14 @@ QUnit.test('option = "any" play, no muted, rejection leads to muted then play', 
   assert.equal(this.player.autoplay(), 'any', 'player.autoplay getter');
   assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
 
+  // muted called twice here, as muted is value is restored on failure.
   this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
-  assert.equal(this.counts.muted, 1, 'muted count');
+  assert.equal(this.counts.muted, 2, 'muted count');
 
   this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 4, 'play count');
-  assert.equal(this.counts.muted, 2, 'muted count');
+  assert.equal(this.counts.muted, 4, 'muted count');
 });
 
 QUnit.test('option = "muted" play and muted, rejection ignored', function(assert) {
@@ -216,13 +217,14 @@ QUnit.test('option = "muted" play and muted, rejection ignored', function(assert
   assert.equal(this.player.autoplay(), 'muted', 'player.autoplay getter');
   assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
 
+  // muted called twice here, as muted is value is restored on failure.
   this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 1, 'play count');
-  assert.equal(this.counts.muted, 1, 'muted count');
+  assert.equal(this.counts.muted, 2, 'muted count');
 
   this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
-  assert.equal(this.counts.muted, 2, 'muted count');
+  assert.equal(this.counts.muted, 4, 'muted count');
 });
 
 QUnit.test('option = "muted", attr = true, play and muted', function(assert) {
