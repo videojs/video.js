@@ -6,6 +6,11 @@
   @include flex(auto);
   @include display-flex(center);
   min-width: 4em;
+  touch-action: none;
+}
+
+.video-js .vjs-progress-control.disabled {
+  cursor: default;
 }
 
 .vjs-live .vjs-progress-control {
@@ -40,6 +45,10 @@
   font-size: 1.666666666666666666em;
 }
 
+.video-js .vjs-progress-control:hover .vjs-progress-holder.disabled {
+  font-size: 1em;
+}
+
 // .vjs-play-progress / PlayProgressBar and .vjs-load-progress / LoadProgressBar
 //
 // These are bars that appear within the progress control to communicate the
@@ -55,9 +64,6 @@
   padding: 0;
   // updated by javascript during playback
   width: 0;
-  // Needed for IE6
-  left: 0;
-  top: 0;
 }
 
 .video-js .vjs-play-progress {
@@ -75,18 +81,12 @@
 }
 
 .video-js .vjs-load-progress {
-  // For IE8, we'll lighten the color
-  background: lighten($secondary-background-color, 25%);
-  // Otherwise, we'll rely on stacked opacities
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
 
 // There are child elements of the load progress bar that represent the
 // specific time ranges that have been buffered.
 .video-js .vjs-load-progress div {
-  // For IE8, we'll lighten the color
-  background: lighten($secondary-background-color, 50%);
-  // Otherwise, we'll rely on stacked opacities
   background: rgba($secondary-background-color, 0.75);
 }
 
@@ -131,6 +131,10 @@
   // Ensure that we maintain a font-size of ~10px.
   font-size: 0.6em;
   visibility: visible;
+}
+
+.video-js .vjs-progress-control.disabled:hover .vjs-time-tooltip {
+  font-size: 1em;
 }
 
 // .vjs-mouse-display / MouseTimeDisplay

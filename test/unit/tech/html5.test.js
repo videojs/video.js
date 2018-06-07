@@ -191,11 +191,13 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
 
   const oldAV = browser.ANDROID_VERSION;
   const oldIsFirefox = browser.IS_FIREFOX;
+  const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   browser.ANDROID_VERSION = 4.0;
   browser.IS_FIREFOX = false;
+  browser.IS_CHROME = false;
   Html5.patchCanPlayType();
 
   assert.notStrictEqual(video.canPlayType,
@@ -214,6 +216,32 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_FIREFOX = oldIsFirefox;
+  browser.IS_CHROME = oldIsChrome;
+  Html5.unpatchCanPlayType();
+});
+
+QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chrome for Android', function(assert) {
+  // the patch runs automatically so we need to first unpatch
+  Html5.unpatchCanPlayType();
+
+  const oldAV = browser.ANDROID_VERSION;
+  const oldIsChrome = browser.IS_CHROME;
+  const oldIsFirefox = browser.IS_FIREFOX;
+  const video = document.createElement('video');
+  const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
+
+  browser.ANDROID_VERSION = 4.0;
+  browser.IS_CHROME = true;
+  browser.IS_FIREFOX = false;
+  Html5.patchCanPlayType();
+
+  assert.strictEqual(video.canPlayType,
+                 canPlayType,
+                 'original canPlayType and patched canPlayType should be equal');
+
+  browser.ANDROID_VERSION = oldAV;
+  browser.IS_CHROME = oldIsChrome;
+  browser.IS_FIREFOX = oldIsFirefox;
   Html5.unpatchCanPlayType();
 });
 
@@ -223,11 +251,13 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
 
   const oldAV = browser.ANDROID_VERSION;
   const oldIsFirefox = browser.IS_FIREFOX;
+  const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   browser.ANDROID_VERSION = 4.0;
   browser.IS_FIREFOX = true;
+  browser.IS_CHROME = false;
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType,
@@ -236,16 +266,19 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_FIREFOX = oldIsFirefox;
+  browser.IS_CHROME = oldIsChrome;
   Html5.unpatchCanPlayType();
 });
 
-QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(assert) {
+QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Chrome or Firefox', function(assert) {
   const oldAV = browser.ANDROID_VERSION;
   const oldIsFirefox = browser.IS_FIREFOX;
+  const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
 
   browser.ANDROID_VERSION = 4.0;
   browser.IS_FIREFOX = false;
+  browser.IS_CHROME = false;
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType('application/x-mpegurl'),
@@ -265,6 +298,7 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_FIREFOX = oldIsFirefox;
+  browser.IS_CHROME = oldIsChrome;
   Html5.unpatchCanPlayType();
 });
 
@@ -388,9 +422,11 @@ if (Html5.supportsNativeTextTracks()) {
       addEventListener: (type, fn) => events.push([type, fn]),
       removeEventListener: (type, fn) => events.push([type, fn])
     };
-    const el = document.createElement('div');
+    const el = document.createElement('video');
 
-    el.textTracks = tt;
+    Object.defineProperty(el, 'textTracks', {
+      get: () => tt
+    });
 
     /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeTextTracks: false});
@@ -499,6 +535,56 @@ if (Html5.supportsNativeAudioTracks()) {
     assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
+
+  QUnit.test('should use overrideNativeTracks on audio correctly', function(assert) {
+    assert.expect(8);
+
+    const adds = [];
+    const rems = [];
+    const at = {
+      length: 0,
+      addEventListener: (type, fn) => {
+        adds.push({ type, fn });
+      },
+      removeEventListener: (type, fn) => {
+        rems.push({ type, fn });
+      }
+    };
+
+    const el = document.createElement('div');
+
+    el.audioTracks = at;
+
+    const htmlTech = new Html5({el});
+
+    assert.equal(adds.length, 3,
+      'should have added change, remove, add listeners');
+    assert.equal(rems.length, 0,
+      'no listeners should be removed');
+
+    htmlTech.overrideNativeAudioTracks(true);
+
+    assert.equal(adds.length, 3,
+      'should not have added additional listeners');
+    assert.equal(rems.length, 3,
+      'should have removed previous three listeners');
+
+    htmlTech.overrideNativeAudioTracks(true);
+
+    assert.equal(adds.length, 3,
+      'no state change so do not add listeners');
+    assert.equal(rems.length, 3,
+      'no state change so do not remove listeners');
+
+    htmlTech.overrideNativeAudioTracks(false);
+
+    assert.equal(adds.length, 6,
+      'should add listeners because native tracks should be proxied');
+    assert.equal(rems.length, 3,
+      'should not remove listeners because there where none added on previous state');
+
+    htmlTech.dispose();
+  });
 }
 
 if (Html5.supportsNativeVideoTracks()) {
@@ -566,6 +652,55 @@ if (Html5.supportsNativeVideoTracks()) {
     assert.equal(adds[0][0], rems[0][0], 'change event handler removed');
     assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
     assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+  });
+
+  QUnit.test('should use overrideNativeTracks on video correctly', function(assert) {
+    assert.expect(8);
+
+    const adds = [];
+    const rems = [];
+    const vt = {
+      length: 0,
+      addEventListener: (type, fn) => {
+        adds.push({ type, fn });
+      },
+      removeEventListener: (type, fn) => {
+        rems.push({ type, fn });
+      }
+    };
+    const el = document.createElement('div');
+
+    el.videoTracks = vt;
+
+    const htmlTech = new Html5({el});
+
+    assert.equal(adds.length, 3,
+      'should have added change, remove, add listeners');
+    assert.equal(rems.length, 0,
+      'no listeners should be removed');
+
+    htmlTech.overrideNativeVideoTracks(true);
+
+    assert.equal(adds.length, 3,
+      'should not have added additional listeners');
+    assert.equal(rems.length, 3,
+      'should have removed previous three listeners');
+
+    htmlTech.overrideNativeVideoTracks(true);
+
+    assert.equal(adds.length, 3,
+      'no state change so do not add listeners');
+    assert.equal(rems.length, 3,
+      'no state change so do not remove listeners');
+
+    htmlTech.overrideNativeVideoTracks(false);
+
+    assert.equal(adds.length, 6,
+      'should add listeners because native tracks should be proxied');
+    assert.equal(rems.length, 3,
+      'should not remove listeners because there where none added on previous state');
+
+    htmlTech.dispose();
   });
 }
 
@@ -686,7 +821,7 @@ QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function(ass
   Html5.resetMediaElement = oldResetMedia;
 });
 
-test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function() {
+QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function(assert) {
   const oldIsAndroid = browser.IS_ANDROID;
   const oldIsChrome = browser.IS_CHROME;
   const oldEl = tech.el_;
@@ -698,7 +833,7 @@ test('When Android Chrome reports Infinity duration with currentTime 0, return N
     duration: Infinity,
     currentTime: 0
   };
-  ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
+  assert.ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
 
   browser.IS_ANDROID = oldIsAndroid;
   browser.IS_CHROME = oldIsChrome;

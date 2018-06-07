@@ -310,6 +310,7 @@ QUnit.test('open() does not pause, close() does not play() with pauseOnOpen set 
 });
 
 QUnit.test('open() hides controls, close() shows controls', function(assert) {
+  this.player.controls(true);
   this.modal.open();
 
   assert.expect(2);
@@ -317,6 +318,17 @@ QUnit.test('open() hides controls, close() shows controls', function(assert) {
 
   this.modal.close();
   assert.ok(this.player.controls_, 'controls are no longer hidden');
+});
+
+QUnit.test('open() hides controls, close() does not show controls if previously hidden', function(assert) {
+  this.player.controls(false);
+  this.modal.open();
+
+  assert.expect(2);
+  assert.notOk(this.player.controls_, 'controls are hidden');
+
+  this.modal.close();
+  assert.notOk(this.player.controls_, 'controls are still hidden');
 });
 
 QUnit.test('opened()', function(assert) {

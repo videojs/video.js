@@ -19,7 +19,7 @@ import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
 
 import { createTimeRanges } from './utils/time-ranges.js';
-import formatTime from './utils/format-time.js';
+import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
 import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
@@ -31,14 +31,18 @@ import xhr from 'xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
-import { use as middlewareUse } from './tech/middleware.js';
+import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
 
-// HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
-  document.createElement('video');
-  document.createElement('audio');
-  document.createElement('track');
-}
+/**
+ * Normalize an `id` value by trimming off a leading `#`
+ *
+ * @param   {string} id
+ *          A string, maybe with a leading `#`.
+ *
+ * @returns {string}
+ *          The string, without any leading `#`.
+ */
+const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
 
 /**
  * Doubles as the main function for users to create a player instance and also
@@ -58,57 +62,32 @@ if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
  *         A player instance
  */
 function videojs(id, options, ready) {
-  let tag;
+  let player = videojs.getPlayer(id);
 
-  // Allow for element or ID to be passed in
-  // String ID
-  if (typeof id === 'string') {
-    const players = videojs.getPlayers();
-
-    // Adjust for jQuery ID syntax
-    if (id.indexOf('#') === 0) {
-      id = id.slice(1);
+  if (player) {
+    if (options) {
+      log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
     }
-
-    // If a player instance has already been created for this ID return it.
-    if (players[id]) {
-
-      // If options or ready function are passed, warn
-      if (options) {
-        log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
-      }
-
-      if (ready) {
-        players[id].ready(ready);
-      }
-
-      return players[id];
+    if (ready) {
+      player.ready(ready);
     }
-
-    // Otherwise get element for ID
-    tag = Dom.$('#' + id);
-
-  // ID is a media element
-  } else {
-    tag = id;
+    return player;
   }
 
-  // Check for a useable element
-  // re: nodeName, could be a box div also
-  if (!tag || !tag.nodeName) {
+  const el = (typeof id === 'string') ? Dom.$('#' + normalizeId(id)) : id;
+
+  if (!Dom.isEl(el)) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
-  // Element may have a player attr referring to an already created player instance.
-  // If so return that otherwise set up a new player below
-  if (tag.player || Player.players[tag.playerId]) {
-    return tag.player || Player.players[tag.playerId];
+  if (!document.body.contains(el)) {
+    log.warn('The element supplied is not included in the DOM');
   }
 
   options = options || {};
 
-  videojs.hooks('beforesetup').forEach(function(hookFunction) {
-    const opts = hookFunction(tag, mergeOptions(options));
+  videojs.hooks('beforesetup').forEach((hookFunction) => {
+    const opts = hookFunction(el, mergeOptions(options));
 
     if (!isObject(opts) || Array.isArray(opts)) {
       log.error('please return an object in beforesetup hooks');
@@ -118,9 +97,11 @@ function videojs(id, options, ready) {
     options = mergeOptions(options, opts);
   });
 
+  // We get the current "Player" component here in case an integration has
+  // replaced it with a custom player.
   const PlayerComponent = Component.getComponent('Player');
-  // If not, set up a new player
-  const player = new PlayerComponent(tag, options, ready);
+
+  player = new PlayerComponent(el, options, ready);
 
   videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
 
@@ -140,8 +121,8 @@ videojs.hooks_ = {};
  * @param {string} type
  *        the lifecyle to get hooks from
  *
- * @param {Function} [fn]
- *        Optionally add a hook to the lifecycle that your are getting.
+ * @param {Function|Function[]} [fn]
+ *        Optionally add a hook (or hooks) to the lifecycle that your are getting.
  *
  * @return {Array}
  *         an array of hooks, or an empty array if there are none.
@@ -165,6 +146,26 @@ videojs.hooks = function(type, fn) {
  */
 videojs.hook = function(type, fn) {
   videojs.hooks(type, fn);
+};
+
+/**
+ * Add a function hook that will only run once to a specific videojs lifecycle.
+ *
+ * @param {string} type
+ *        the lifecycle to hook the function to.
+ *
+ * @param {Function|Function[]}
+ *        The function or array of functions to attach.
+ */
+videojs.hookOnce = function(type, fn) {
+  videojs.hooks(type, [].concat(fn).map(original => {
+    const wrapper = (...args) => {
+      videojs.removeHook(type, wrapper);
+      return original(...args);
+    };
+
+    return wrapper;
+  }));
 };
 
 /**
@@ -245,6 +246,63 @@ videojs.options = Player.prototype.options_;
 videojs.getPlayers = () => Player.players;
 
 /**
+ * Get a single player based on an ID or DOM element.
+ *
+ * This is useful if you want to check if an element or ID has an associated
+ * Video.js player, but not create one if it doesn't.
+ *
+ * @param   {string|Element} id
+ *          An HTML element - `<video>`, `<audio>`, or `<video-js>` -
+ *          or a string matching the `id` of such an element.
+ *
+ * @returns {Player|undefined}
+ *          A player instance or `undefined` if there is no player instance
+ *          matching the argument.
+ */
+videojs.getPlayer = (id) => {
+  const players = Player.players;
+  let tag;
+
+  if (typeof id === 'string') {
+    const nId = normalizeId(id);
+    const player = players[nId];
+
+    if (player) {
+      return player;
+    }
+
+    tag = Dom.$('#' + nId);
+  } else {
+    tag = id;
+  }
+
+  if (Dom.isEl(tag)) {
+    const {player, playerId} = tag;
+
+    // Element may have a `player` property referring to an already created
+    // player instance. If so, return that.
+    if (player || players[playerId]) {
+      return player || players[playerId];
+    }
+  }
+};
+
+/**
+ * Returns an array of all current players.
+ *
+ * @return {Array}
+ *         An array of all players. The array will be in the order that
+ *         `Object.keys` provides, which could potentially vary between
+ *         JavaScript engines.
+ *
+ */
+videojs.getAllPlayers = () =>
+
+  // Disposed players leave a key with a `null` value, so we need to make sure
+  // we filter those out.
+  Object.keys(Player.players).map(k => Player.players[k]).filter(Boolean);
+
+/**
  * Expose players object.
  *
  * @memberOf videojs
@@ -299,7 +357,33 @@ videojs.getTech = Tech.getTech;
  */
 videojs.registerTech = Tech.registerTech;
 
+/**
+ * Register a middleware to a source type.
+ *
+ * @param {String} type A string representing a MIME type.
+ * @param {function(player):object} middleware A middleware factory that takes a player.
+ */
 videojs.use = middlewareUse;
+
+/**
+ * An object that can be returned by a middleware to signify
+ * that the middleware is being terminated.
+ *
+ * @type {object}
+ * @memberOf {videojs}
+ * @property {object} middleware.TERMINATOR
+ */
+Object.defineProperty(videojs, 'middleware', {
+  value: {},
+  writeable: false,
+  enumerable: true
+});
+
+Object.defineProperty(videojs.middleware, 'TERMINATOR', {
+  value: TERMINATOR,
+  writeable: false,
+  enumerable: true
+});
 
 /**
  * A suite of browser and device tests from {@link browser}.
@@ -470,9 +554,32 @@ videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
 videojs.formatTime = formatTime;
 
 /**
+ * Replaces format-time with a custom implementation, to be used in place of the default.
+ *
+ * @borrows format-time:setFormatTime as videojs.setFormatTime
+ *
+ * @method setFormatTime
+ *
+ * @param {Function} customFn
+ *        A custom format-time function which will be called with the current time and guide (in seconds) as arguments.
+ *        Passed fn should return a string.
+ */
+videojs.setFormatTime = setFormatTime;
+
+/**
+ * Resets format-time to the default implementation.
+ *
+ * @borrows format-time:resetFormatTime as videojs.resetFormatTime
+ *
+ * @method resetFormatTime
+ */
+videojs.resetFormatTime = resetFormatTime;
+
+/**
  * Resolve and parse the elements of a URL
  *
  * @borrows url:parseUrl as videojs.parseUrl
+ *
  */
 videojs.parseUrl = Url.parseUrl;
 
@@ -700,7 +807,7 @@ videojs.VideoTrack = VideoTrack;
 });
 
 /**
- * A safe getComputedStyle with an IE8 fallback.
+ * A safe getComputedStyle.
  *
  * This is because in Firefox, if the player is loaded in an iframe with `display:none`,
  * then `getComputedStyle` returns `null`, so, we do a null-check to make sure

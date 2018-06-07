@@ -1,6 +1,6 @@
 # Text Tracks
 
-Text tracks are a feature of HTML5 video for displaying time-triggered text to the viewer. Video.js offers a cross-browser implementation of text tracks.
+Text tracks are a feature of HTML5 for displaying time-triggered text to the end-user. Video.js offers a cross-browser implementation of text tracks.
 
 ## Table of Contents
 
@@ -225,6 +225,14 @@ As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represen
 * `Player#addRemoteTextTrack(Object options)`
 
   Available options are the same as the [available `track` attributes](#track-attributes). And `language` is a supported option as an alias for the `srclang` attribute - either works here.
+  
+  **Note**: If you need a callback, instead of a callback you could use the technique below:
+  ```js
+  const trackEl = player.addRemoteTextTrack({src: 'en.vtt'}, false);
+  trackEl.addEventListener('load', function() {
+    // your callback goes here
+  });
+  ```
 
 * `Player#removeRemoteTextTrack(HTMLTrackElement|TextTrack)`
 

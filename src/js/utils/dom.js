@@ -61,14 +61,8 @@ function classRegExp(className) {
  * @return {Boolean}
  */
 export function isReal() {
-  return (
-
     // Both document and window will never be undefined thanks to `global`.
-    document === window.document &&
-
-    // In IE < 9, DOM methods return "object" as their type, so all we can
-    // confidently check is that it exists.
-    typeof document.createElement !== 'undefined');
+  return document === window.document;
 }
 
 /**
@@ -83,6 +77,23 @@ export function isReal() {
  */
 export function isEl(value) {
   return isObject(value) && value.nodeType === 1;
+}
+
+/**
+ * Determines if the current DOM is embedded in an iframe.
+ *
+ * @return {boolean}
+ *
+ */
+export function isInFrame() {
+
+  // We need a try/catch here because Safari will throw errors when attempting
+  // to get either `parent` or `self`
+  try {
+    return window.parent !== window.self;
+  } catch (x) {
+    return true;
+  }
 }
 
 /**
@@ -308,7 +319,7 @@ export function removeClass(element, classToRemove) {
  */
 export function toggleClass(element, classToToggle, predicate) {
 
-  // This CANNOT use `classList` internally because IE does not support the
+  // This CANNOT use `classList` internally because IE11 does not support the
   // second parameter to the `classList.toggle()` method! Which is fine because
   // `classList` will be used by the add/remove functions.
   const has = hasClass(element, classToToggle);
@@ -373,8 +384,8 @@ export function getAttributes(tag) {
   const obj = {};
 
   // known boolean attributes
-  // we can check for matching boolean properties, but older browsers
-  // won't know about HTML5 boolean attributes that we still read from
+  // we can check for matching boolean properties, but not all browsers
+  // and not all tags know about these attributes, so, we still want to check them manually
   const knownBooleans = ',' + 'autoplay,controls,playsinline,loop,muted,default,defaultMuted' + ',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
@@ -725,6 +736,56 @@ export function appendContent(el, content) {
  */
 export function insertContent(el, content) {
   return appendContent(emptyEl(el), content);
+}
+
+/**
+ * Check if event was a single left click
+ *
+ * @param {EventTarget~Event} event
+ *        Event object
+ *
+ * @return {boolean}
+ *         - True if a left click
+ *         - False if not a left click
+ */
+export function isSingleLeftClick(event) {
+  // Note: if you create something draggable, be sure to
+  // call it on both `mousedown` and `mousemove` event,
+  // otherwise `mousedown` should be enough for a button
+
+  if (event.button === undefined && event.buttons === undefined) {
+    // Why do we need `buttons` ?
+    // Because, middle mouse sometimes have this:
+    // e.button === 0 and e.buttons === 4
+    // Furthermore, we want to prevent combination click, something like
+    // HOLD middlemouse then left click, that would be
+    // e.button === 0, e.buttons === 5
+    // just `button` is not gonna work
+
+    // Alright, then what this block does ?
+    // this is for chrome `simulate mobile devices`
+    // I want to support this as well
+
+    return true;
+  }
+
+  if (event.button === 0 && event.buttons === undefined) {
+    // Touch screen, sometimes on some specific device, `buttons`
+    // doesn't have anything (safari on ios, blackberry...)
+
+    return true;
+  }
+
+  if (event.button !== 0 || event.buttons !== 1) {
+    // This is the reason we have those if else block above
+    // if any special case we can catch and let it slide
+    // we do it above, when get to here, this definitely
+    // is-not-left-click
+
+    return false;
+  }
+
+  return true;
 }
 
 /**

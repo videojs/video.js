@@ -33,6 +33,7 @@ QUnit.test('should place title list item into ul', function(assert) {
 
   assert.ok(titleElement.innerHTML === 'TestTitle', 'title element placed in ul');
 
+  menuButton.dispose();
   player.dispose();
 });
 
@@ -71,5 +72,6 @@ QUnit.test('clicking should display the menu', function(assert) {
 
   assert.equal(menuButton.menu.hasClass('vjs-lock-showing'), true, 'enable() allows clicking to show the menu');
 
+  menuButton.dispose();
   player.dispose();
 });

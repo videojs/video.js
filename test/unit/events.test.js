@@ -284,3 +284,40 @@ QUnit.test('should execute remaining handlers after an exception in an event han
 
   log.error = oldLogError;
 });
+
+QUnit.test('trigger with an object should set the correct target property', function(assert) {
+  const el = document.createElement('div');
+
+  Events.on(el, 'click', function(e) {
+    assert.equal(e.target, el, 'the event object target should be our element');
+  });
+  Events.trigger(el, { type: 'click'});
+});
+
+QUnit.test('retrigger with a string should use the new element as target', function(assert) {
+  const el1 = document.createElement('div');
+  const el2 = document.createElement('div');
+
+  Events.on(el2, 'click', function(e) {
+    assert.equal(e.target, el2, 'the event object target should be the new element');
+  });
+  Events.on(el1, 'click', function(e) {
+    Events.trigger(el2, 'click');
+  });
+  Events.trigger(el1, 'click');
+  Events.trigger(el1, {type: 'click'});
+});
+
+QUnit.test('retrigger with an object should use the old element as target', function(assert) {
+  const el1 = document.createElement('div');
+  const el2 = document.createElement('div');
+
+  Events.on(el2, 'click', function(e) {
+    assert.equal(e.target, el1, 'the event object target should be the old element');
+  });
+  Events.on(el1, 'click', function(e) {
+    Events.trigger(el2, e);
+  });
+  Events.trigger(el1, 'click');
+  Events.trigger(el1, {type: 'click'});
+});

@@ -17,6 +17,8 @@ QUnit.module('Plugin: advanced', {
       }
     }
 
+    MockPlugin.VERSION = '1.0.0';
+
     this.MockPlugin = MockPlugin;
     Plugin.registerPlugin('mock', MockPlugin);
   },
@@ -59,6 +61,8 @@ QUnit.test('setup', function(assert) {
   assert.strictEqual(typeof instance.one, 'function', 'instance is evented');
   assert.strictEqual(typeof instance.trigger, 'function', 'instance is evented');
   assert.strictEqual(typeof instance.dispose, 'function', 'instance has dispose method');
+  assert.strictEqual(typeof instance.version, 'function', 'instance has version method');
+  assert.strictEqual(instance.version(), '1.0.0', 'version function returns VERSION value');
 
   assert.throws(
     () => new Plugin(this.player),

@@ -1,4 +1,14 @@
 module.exports = function(config) {
+  // build out a name for browserstack
+  // {TRAVIS_BUILD_NUMBER} [{TRAVIS_PULL_REQUEST} {PR_BRANCH}] {TRAVIS_BRANCH}
+  var browserstackName = process.env.TRAVIS_BUILD_NUMBER;
+
+  if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+    browserstackName += ' ' + process.env.TRAVIS_PULL_REQUEST + ' ' + process.env.TRAVIS_PULL_REQUEST_BRANCH;
+  }
+
+  browserstackName +=  ' ' + process.env.TRAVIS_BRANCH;
+
   // Creating settings object first so we can modify based on travis
   var settings = {
     basePath: '',
@@ -10,7 +20,6 @@ module.exports = function(config) {
     // Compling tests here
     files: [
       '../build/temp/video-js.css',
-      '../build/temp/ie8/videojs-ie8.js',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
       '../build/temp/browserify.js',
@@ -41,6 +50,7 @@ module.exports = function(config) {
       'karma-ie-launcher',
       'karma-opera-launcher',
       'karma-safari-launcher',
+      'karma-safaritechpreview-launcher',
       'karma-browserstack-launcher',
       'karma-browserify',
       'karma-coverage',
@@ -67,7 +77,9 @@ module.exports = function(config) {
     browserDisconnectTolerance: 3,
 
     browserStack: {
-      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+      project: 'Video.js',
+      name: browserstackName,
+      build: browserstackName,
       pollingTimeout: 30000,
       captureTimeout: 600,
       timeout: 600
@@ -118,10 +130,7 @@ module.exports = function(config) {
         'firefox_bs',
         'safari_bs',
         'edge_bs',
-        'ie11_bs',
-        'ie10_bs',
-        'ie9_bs',
-        'ie8_bs'
+        'ie11_bs'
       ];
     } else {
       settings.browsers = ['chrome_travis'];
@@ -142,21 +151,28 @@ function getCustomLaunchers(){
       base: 'BrowserStack',
       browser: 'chrome',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     },
 
     firefox_bs: {
       base: 'BrowserStack',
       browser: 'firefox',
       os: 'Windows',
-      os_version: '8.1'
+      os_version: '10'
     },
 
     safari_bs: {
       base: 'BrowserStack',
       browser: 'safari',
       os: 'OS X',
-      os_version: 'Yosemite'
+      os_version: 'High Sierra'
+    },
+
+    safari9_bs: {
+      base: 'BrowserStack',
+      browser: 'safari',
+      os: 'OS X',
+      os_version: 'El Capitan'
     },
 
     edge_bs: {
@@ -171,31 +187,7 @@ function getCustomLaunchers(){
       browser: 'ie',
       browser_version: '11',
       os: 'Windows',
-      os_version: '8.1'
-    },
-
-    ie10_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '10',
-      os: 'Windows',
-      os_version: '7'
-    },
-
-    ie9_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '9',
-      os: 'Windows',
-      os_version: '7'
-    },
-
-    ie8_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '8',
-      os: 'Windows',
-      os_version: '7'
+      os_version: '10'
     }
   };
 }

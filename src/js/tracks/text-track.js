@@ -10,7 +10,6 @@ import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 import merge from '../utils/merge-options';
-import * as browser from '../utils/browser.js';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -59,7 +58,7 @@ const parseCues = function(srcContent, track) {
 };
 
 /**
- * Load a `TextTrack` from a specifed url.
+ * Load a `TextTrack` from a specified url.
  *
  * @param {string} src
  *        Url to load track from.
@@ -140,7 +139,7 @@ class TextTrack extends Track {
    *
    * @param {string} [options.srclang='']
    *        A valid two character language code. An alternative, but deprioritized
-   *        vesion of `options.language`
+   *        version of `options.language`
    *
    * @param {string} [options.src]
    *        A url to TextTrack cues.
@@ -163,27 +162,17 @@ class TextTrack extends Track {
     if (settings.kind === 'metadata' || settings.kind === 'chapters') {
       mode = 'hidden';
     }
-    // on IE8 this will be a document element
-    // for every other browser this will be a normal object
-    const tt = super(settings);
+    super(settings);
 
-    tt.tech_ = settings.tech;
+    this.tech_ = settings.tech;
 
-    if (browser.IS_IE8) {
-      for (const prop in TextTrack.prototype) {
-        if (prop !== 'constructor') {
-          tt[prop] = TextTrack.prototype[prop];
-        }
-      }
-    }
+    this.cues_ = [];
+    this.activeCues_ = [];
 
-    tt.cues_ = [];
-    tt.activeCues_ = [];
-
-    const cues = new TextTrackCueList(tt.cues_);
-    const activeCues = new TextTrackCueList(tt.activeCues_);
+    const cues = new TextTrackCueList(this.cues_);
+    const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
-    const timeupdateHandler = Fn.bind(tt, function() {
+    const timeupdateHandler = Fn.bind(this, function() {
 
       // Accessing this.activeCues for the side-effects of updating itself
       // due to it's nature as a getter function. Do not remove or cues will
@@ -198,142 +187,142 @@ class TextTrack extends Track {
     });
 
     if (mode !== 'disabled') {
-      tt.tech_.ready(() => {
-        tt.tech_.on('timeupdate', timeupdateHandler);
+      this.tech_.ready(() => {
+        this.tech_.on('timeupdate', timeupdateHandler);
       }, true);
     }
 
-    /**
-     * @memberof TextTrack
-     * @member {boolean} default
-     *         If this track was set to be on or off by default. Cannot be changed after
-     *         creation.
-     * @instance
-     *
-     * @readonly
-     */
-    Object.defineProperty(tt, 'default', {
-      get() {
-        return default_;
+    Object.defineProperties(this, {
+      /**
+       * @memberof TextTrack
+       * @member {boolean} default
+       *         If this track was set to be on or off by default. Cannot be changed after
+       *         creation.
+       * @instance
+       *
+       * @readonly
+       */
+      default: {
+        get() {
+          return default_;
+        },
+        set() {}
       },
-      set() {}
-    });
 
-    /**
-     * @memberof TextTrack
-     * @member {string} mode
-     *         Set the mode of this TextTrack to a valid {@link TextTrack~Mode}. Will
-     *         not be set if setting to an invalid mode.
-     * @instance
-     *
-     * @fires TextTrack#modechange
-     */
-    Object.defineProperty(tt, 'mode', {
-      get() {
-        return mode;
+      /**
+       * @memberof TextTrack
+       * @member {string} mode
+       *         Set the mode of this TextTrack to a valid {@link TextTrack~Mode}. Will
+       *         not be set if setting to an invalid mode.
+       * @instance
+       *
+       * @fires TextTrack#modechange
+       */
+      mode: {
+        get() {
+          return mode;
+        },
+        set(newMode) {
+          if (!TextTrackMode[newMode]) {
+            return;
+          }
+          mode = newMode;
+          if (mode === 'showing') {
+
+            this.tech_.ready(() => {
+              this.tech_.on('timeupdate', timeupdateHandler);
+            }, true);
+          }
+          /**
+           * An event that fires when mode changes on this track. This allows
+           * the TextTrackList that holds this track to act accordingly.
+           *
+           * > Note: This is not part of the spec!
+           *
+           * @event TextTrack#modechange
+           * @type {EventTarget~Event}
+           */
+          this.trigger('modechange');
+
+        }
       },
-      set(newMode) {
-        if (!TextTrackMode[newMode]) {
-          return;
-        }
-        mode = newMode;
-        if (mode === 'showing') {
 
-          this.tech_.ready(() => {
-            this.tech_.on('timeupdate', timeupdateHandler);
-          }, true);
-        }
-        /**
-         * An event that fires when mode changes on this track. This allows
-         * the TextTrackList that holds this track to act accordingly.
-         *
-         * > Note: This is not part of the spec!
-         *
-         * @event TextTrack#modechange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('modechange');
+      /**
+       * @memberof TextTrack
+       * @member {TextTrackCueList} cues
+       *         The text track cue list for this TextTrack.
+       * @instance
+       */
+      cues: {
+        get() {
+          if (!this.loaded_) {
+            return null;
+          }
 
+          return cues;
+        },
+        set() {}
+      },
+
+      /**
+       * @memberof TextTrack
+       * @member {TextTrackCueList} activeCues
+       *         The list text track cues that are currently active for this TextTrack.
+       * @instance
+       */
+      activeCues: {
+        get() {
+          if (!this.loaded_) {
+            return null;
+          }
+
+          // nothing to do
+          if (this.cues.length === 0) {
+            return activeCues;
+          }
+
+          const ct = this.tech_.currentTime();
+          const active = [];
+
+          for (let i = 0, l = this.cues.length; i < l; i++) {
+            const cue = this.cues[i];
+
+            if (cue.startTime <= ct && cue.endTime >= ct) {
+              active.push(cue);
+            } else if (cue.startTime === cue.endTime &&
+                       cue.startTime <= ct &&
+                       cue.startTime + 0.5 >= ct) {
+              active.push(cue);
+            }
+          }
+
+          changed = false;
+
+          if (active.length !== this.activeCues_.length) {
+            changed = true;
+          } else {
+            for (let i = 0; i < active.length; i++) {
+              if (this.activeCues_.indexOf(active[i]) === -1) {
+                changed = true;
+              }
+            }
+          }
+
+          this.activeCues_ = active;
+          activeCues.setCues_(this.activeCues_);
+
+          return activeCues;
+        },
+        set() {}
       }
     });
 
-    /**
-     * @memberof TextTrack
-     * @member {TextTrackCueList} cues
-     *         The text track cue list for this TextTrack.
-     * @instance
-     */
-    Object.defineProperty(tt, 'cues', {
-      get() {
-        if (!this.loaded_) {
-          return null;
-        }
-
-        return cues;
-      },
-      set() {}
-    });
-
-    /**
-     * @memberof TextTrack
-     * @member {TextTrackCueList} activeCues
-     *         The list text track cues that are currently active for this TextTrack.
-     * @instance
-     */
-    Object.defineProperty(tt, 'activeCues', {
-      get() {
-        if (!this.loaded_) {
-          return null;
-        }
-
-        // nothing to do
-        if (this.cues.length === 0) {
-          return activeCues;
-        }
-
-        const ct = this.tech_.currentTime();
-        const active = [];
-
-        for (let i = 0, l = this.cues.length; i < l; i++) {
-          const cue = this.cues[i];
-
-          if (cue.startTime <= ct && cue.endTime >= ct) {
-            active.push(cue);
-          } else if (cue.startTime === cue.endTime &&
-                     cue.startTime <= ct &&
-                     cue.startTime + 0.5 >= ct) {
-            active.push(cue);
-          }
-        }
-
-        changed = false;
-
-        if (active.length !== this.activeCues_.length) {
-          changed = true;
-        } else {
-          for (let i = 0; i < active.length; i++) {
-            if (this.activeCues_.indexOf(active[i]) === -1) {
-              changed = true;
-            }
-          }
-        }
-
-        this.activeCues_ = active;
-        activeCues.setCues_(this.activeCues_);
-
-        return activeCues;
-      },
-      set() {}
-    });
-
     if (settings.src) {
-      tt.src = settings.src;
-      loadTrack(settings.src, tt);
+      this.src = settings.src;
+      loadTrack(settings.src, this);
     } else {
-      tt.loaded_ = true;
+      this.loaded_ = true;
     }
-
-    return tt;
   }
 
   /**

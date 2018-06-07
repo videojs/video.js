@@ -1,10 +1,14 @@
 language: node_js
 node_js:
-  - 4.4
+  - lts/*
 before_install:
+  - npm install -g greenkeeper-lockfile@1
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+before_script: greenkeeper-lockfile-update
+after_script: greenkeeper-lockfile-upload
+
 after_failure:
   - npm ls --depth=1
 after_success:

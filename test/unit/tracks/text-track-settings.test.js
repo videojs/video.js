@@ -3,6 +3,7 @@ import TextTrackSettings from '../../../src/js/tracks/text-track-settings.js';
 import TestHelpers from '../test-helpers.js';
 import * as Events from '../../../src/js/utils/events.js';
 import safeParseTuple from 'safe-json-parse/tuple';
+import sinon from 'sinon';
 import window from 'global/window';
 import Component from '../../../src/js/component.js';
 
@@ -174,26 +175,34 @@ QUnit.test('should restore default settings', function(assert) {
 });
 
 QUnit.test('should open on click', function(assert) {
+  const clock = sinon.useFakeTimers();
   const player = TestHelpers.makePlayer({
     tracks
   });
+
+  clock.tick(1);
 
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
   assert.ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
 
   player.dispose();
+  clock.restore();
 });
 
 QUnit.test('should close on done click', function(assert) {
+  const clock = sinon.useFakeTimers();
   const player = TestHelpers.makePlayer({
     tracks
   });
+
+  clock.tick(1);
 
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
   Events.trigger(player.$('.vjs-done-button'), 'click');
   assert.ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
 
   player.dispose();
+  clock.restore();
 });
 
 QUnit.test('if persist option is set, restore settings on init', function(assert) {

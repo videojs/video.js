@@ -7,6 +7,10 @@
   @include user-select(none);
 
   @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
+ }
+
+.video-js .vjs-slider.disabled {
+  cursor: default;
 }
 
 .video-js .vjs-slider:focus {

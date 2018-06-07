@@ -24,12 +24,15 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
+import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
+import {findMimetype} from './utils/mimetypes';
+import {IE_VERSION} from './utils/browser';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -43,6 +46,7 @@ import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
+import './resize-manager.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -178,22 +182,6 @@ const TECH_EVENTS_RETRIGGER = [
   'timeupdate',
 
   /**
-   * Fires when the playing speed of the audio/video is changed
-   *
-   * @event Player#ratechange
-   * @type {event}
-   */
-  /**
-   * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
-   *
-   * @private
-   * @method Player#handleTechRatechange_
-   * @fires Player#ratechange
-   * @listens Tech#ratechange
-   */
-  'ratechange',
-
-  /**
    * Fires when the video's intrinsic dimensions change
    *
    * @event Player#resize
@@ -242,6 +230,16 @@ const TECH_EVENTS_RETRIGGER = [
   'texttrackchange'
 ];
 
+// events to queue when playback rate is zero
+// this is a hash for the sole purpose of mapping non-camel-cased event names
+// to camel-cased function names
+const TECH_EVENTS_QUEUE = {
+  canplay: 'CanPlay',
+  canplaythrough: 'CanPlayThrough',
+  playing: 'Playing',
+  seeked: 'Seeked'
+};
+
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
  * are used to initialize a video.
@@ -268,7 +266,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready) {
     // Make sure tag ID exists
-    tag.id = tag.id || `vjs_video_${Guid.newGUID()}`;
+    tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
 
     // Set Options
     // The options argument overrides options set in the video tag
@@ -284,6 +282,9 @@ class Player extends Component {
     // Same with creating the element
     options.createEl = false;
 
+    // don't auto mixin the evented mixin
+    options.evented = false;
+
     // we don't want the player to report touch activity on itself
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
@@ -293,7 +294,7 @@ class Player extends Component {
       if (typeof tag.closest === 'function') {
         const closest = tag.closest('[lang]');
 
-        if (closest) {
+        if (closest && closest.getAttribute) {
           options.language = closest.getAttribute('lang');
         }
       } else {
@@ -312,8 +313,21 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+    // Tracks when a tech changes the poster
+    this.isPosterFromTech_ = false;
+
+    // Holds callback info that gets queued when playback rate is zero
+    // and a seek is happening
+    this.queuedCallbacks_ = [];
+
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
+
+    // Init state hasStarted_
+    this.hasStarted_ = false;
+
+    // Init state userActive_
+    this.userActive_ = false;
 
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
@@ -363,6 +377,7 @@ class Player extends Component {
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
+    tag.removeAttribute('controls');
 
     /*
      * Store the internal state of scrubbing
@@ -373,6 +388,9 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
+
+    // Set default value for lastPlaybackRate
+    this.cache_.lastPlaybackRate = this.defaultPlaybackRate();
 
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
@@ -452,12 +470,14 @@ class Player extends Component {
     // like the control bar show themselves if needed
     this.userActive(true);
     this.reportUserActivity();
-    this.listenForUserActivity_();
 
+    this.one('play', this.listenForUserActivity_);
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
 
     this.changingSrc_ = false;
+    this.playWaitingForReady_ = false;
+    this.playOnLoadstart_ = null;
   }
 
   /**
@@ -481,6 +501,7 @@ class Player extends Component {
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
+      this.styleEl_ = null;
     }
 
     // Kill reference to this player
@@ -496,8 +517,21 @@ class Player extends Component {
 
     if (this.tech_) {
       this.tech_.dispose();
+      this.isPosterFromTech_ = false;
+      this.poster_ = '';
     }
 
+    if (this.playerElIngest_) {
+      this.playerElIngest_ = null;
+    }
+
+    if (this.tag) {
+      this.tag = null;
+    }
+
+    middleware.clearCacheForPlayer(this);
+
+    // the actual .el_ is removed here
     super.dispose();
   }
 
@@ -508,34 +542,68 @@ class Player extends Component {
    *         The DOM element that gets created.
    */
   createEl() {
-    const tag = this.tag;
+    let tag = this.tag;
     let el;
-    const playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
+    let playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
+    const divEmbed = this.tag.tagName.toLowerCase() === 'video-js';
 
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
-    } else {
+    } else if (!divEmbed) {
       el = this.el_ = super.createEl('div');
     }
-
-    // set tabindex to -1 so we could focus on the player element
-    tag.setAttribute('tabindex', '-1');
-
-    // Remove width/height attrs from tag so CSS can make it 100% width/height
-    tag.removeAttribute('width');
-    tag.removeAttribute('height');
 
     // Copy over all the attributes from the tag, including ID and class
     // ID will now reference player box, not the video tag
     const attrs = Dom.getAttributes(tag);
 
+    if (divEmbed) {
+      el = this.el_ = tag;
+      tag = this.tag = document.createElement('video');
+      while (el.children.length) {
+        tag.appendChild(el.firstChild);
+      }
+
+      if (!Dom.hasClass(el, 'video-js')) {
+        Dom.addClass(el, 'video-js');
+      }
+
+      el.appendChild(tag);
+
+      playerElIngest = this.playerElIngest_ = el;
+      // move properties over from our custom `video-js` element
+      // to our new `video` element. This will move things like
+      // `src` or `controls` that were set via js before the player
+      // was initialized.
+      Object.keys(el).forEach((k) => {
+        tag[k] = el[k];
+      });
+    }
+
+    // set tabindex to -1 to remove the video element from the focus order
+    tag.setAttribute('tabindex', '-1');
+    // Workaround for #4583 (JAWS+IE doesn't announce BPB or play button)
+    // See https://github.com/FreedomScientific/VFO-standards-support/issues/78
+    // Note that we can't detect if JAWS is being used, but this ARIA attribute
+    //  doesn't change behavior of IE11 if JAWS is not being used
+    if (IE_VERSION) {
+      tag.setAttribute('role', 'application');
+    }
+
+    // Remove width/height attrs from tag so CSS can make it 100% width/height
+    tag.removeAttribute('width');
+    tag.removeAttribute('height');
+
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
-      // workaround so we don't totally break IE7
-      // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
-      if (attr === 'class') {
-        el.className += ' ' + attrs[attr];
-      } else {
+      // don't copy over the class attribute to the player element when we're in a div embed
+      // the class is already set up properly in the divEmbed case
+      // and we want to make sure that the `video-js` class doesn't get lost
+      if (!(divEmbed && attr === 'class')) {
         el.setAttribute(attr, attrs[attr]);
+      }
+
+      if (divEmbed) {
+        tag.setAttribute(attr, attrs[attr]);
       }
     });
 
@@ -568,7 +636,8 @@ class Player extends Component {
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
 
-    // Hide any links within the video/audio tag, because IE doesn't hide them completely.
+    // Hide any links within the video/audio tag,
+    // because IE doesn't hide them completely from screen readers.
     const links = tag.getElementsByTagName('a');
 
     for (let i = 0; i < links.length; i++) {
@@ -605,10 +674,11 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`'s width.
+   * A getter/setter for the `Player`'s width. Returns the player's configured value.
+   * To get the current width use `currentWidth()`.
    *
    * @param {number} [value]
-   *        The value to set the `Player's width to.
+   *        The value to set the `Player`'s width to.
    *
    * @return {number}
    *         The current width of the `Player` when getting.
@@ -618,10 +688,11 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`'s height.
+   * A getter/setter for the `Player`'s height. Returns the player's configured value.
+   * To get the current height use `currentheight()`.
    *
    * @param {number} [value]
-   *        The value to set the `Player's heigth to.
+   *        The value to set the `Player`'s heigth to.
    *
    * @return {number}
    *         The current height of the `Player` when getting.
@@ -654,17 +725,18 @@ class Player extends Component {
     if (value === '') {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
-    } else {
-      const parsedVal = parseFloat(value);
-
-      if (isNaN(parsedVal)) {
-        log.error(`Improper value "${value}" supplied for for ${dimension}`);
-        return;
-      }
-
-      this[privDimension] = parsedVal;
+      this.updateStyleEl_();
+      return;
     }
 
+    const parsedVal = parseFloat(value);
+
+    if (isNaN(parsedVal)) {
+      log.error(`Improper value "${value}" supplied for for ${dimension}`);
+      return;
+    }
+
+    this[privDimension] = parsedVal;
     this.updateStyleEl_();
   }
 
@@ -868,7 +940,9 @@ class Player extends Component {
       'poster': this.poster(),
       'language': this.language(),
       'playerElIngest': this.playerElIngest_ || false,
-      'vtt.js': this.options_['vtt.js']
+      'vtt.js': this.options_['vtt.js'],
+      'canOverridePoster': !!this.options_.techCanOverridePoster,
+      'enableSourceset': this.options_.enableSourceset
     };
 
     TRACK_TYPES.names.forEach((name) => {
@@ -907,14 +981,25 @@ class Player extends Component {
     TECH_EVENTS_RETRIGGER.forEach((event) => {
       this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
     });
+
+    Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
+      this.on(this.tech_, event, (eventObj) => {
+        if (this.tech_.playbackRate() === 0 && this.tech_.seeking()) {
+          this.queuedCallbacks_.push({
+            callback: this[`handleTech${TECH_EVENTS_QUEUE[event]}_`].bind(this),
+            event: eventObj
+          });
+          return;
+        }
+        this[`handleTech${TECH_EVENTS_QUEUE[event]}_`](eventObj);
+      });
+    });
+
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
+    this.on(this.tech_, 'sourceset', this.handleTechSourceset_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
-    this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
-    this.on(this.tech_, 'canplaythrough', this.handleTechCanPlayThrough_);
-    this.on(this.tech_, 'playing', this.handleTechPlaying_);
     this.on(this.tech_, 'ended', this.handleTechEnded_);
     this.on(this.tech_, 'seeking', this.handleTechSeeking_);
-    this.on(this.tech_, 'seeked', this.handleTechSeeked_);
     this.on(this.tech_, 'play', this.handleTechPlay_);
     this.on(this.tech_, 'firstplay', this.handleTechFirstPlay_);
     this.on(this.tech_, 'pause', this.handleTechPause_);
@@ -924,6 +1009,7 @@ class Player extends Component {
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
     this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
     this.on(this.tech_, 'textdata', this.handleTechTextData_);
+    this.on(this.tech_, 'ratechange', this.handleTechRateChange_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -963,6 +1049,13 @@ class Player extends Component {
     this.tech_.dispose();
 
     this.tech_ = false;
+
+    if (this.isPosterFromTech_) {
+      this.poster_ = '';
+      this.trigger('posterchange');
+    }
+
+    this.isPosterFromTech_ = false;
   }
 
   /**
@@ -1076,7 +1169,6 @@ class Player extends Component {
       } catch (e) {
         log('deleting tag.poster throws in some browsers', e);
       }
-      this.play();
     }
   }
 
@@ -1119,33 +1211,163 @@ class Player extends Component {
   }
 
   /**
+   * Update the internal source caches so that we return the correct source from
+   * `src()`, `currentSource()`, and `currentSources()`.
+   *
+   * > Note: `currentSources` will not be updated if the source that is passed in exists
+   *         in the current `currentSources` cache.
+   *
+   *
+   * @param {Tech~SourceObject} srcObj
+   *        A string or object source to update our caches to.
+   */
+  updateSourceCaches_(srcObj = '') {
+
+    let src = srcObj;
+    let type = '';
+
+    if (typeof src !== 'string') {
+      src = srcObj.src;
+      type = srcObj.type;
+    }
+    // make sure all the caches are set to default values
+    // to prevent null checking
+    this.cache_.source = this.cache_.source || {};
+    this.cache_.sources = this.cache_.sources || [];
+
+    // try to get the type of the src that was passed in
+    if (src && !type) {
+      type = findMimetype(this, src);
+    }
+
+    // update `currentSource` cache always
+    this.cache_.source = {src, type};
+
+    const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
+    const sourceElSources = [];
+    const sourceEls = this.$$('source');
+    const matchingSourceEls = [];
+
+    for (let i = 0; i < sourceEls.length; i++) {
+      const sourceObj = Dom.getAttributes(sourceEls[i]);
+
+      sourceElSources.push(sourceObj);
+
+      if (sourceObj.src && sourceObj.src === src) {
+        matchingSourceEls.push(sourceObj.src);
+      }
+    }
+
+    // if we have matching source els but not matching sources
+    // the current source cache is not up to date
+    if (matchingSourceEls.length && !matchingSources.length) {
+      this.cache_.sources = sourceElSources;
+    // if we don't have matching source or source els set the
+    // sources cache to the `currentSource` cache
+    } else if (!matchingSources.length) {
+      this.cache_.sources = [this.cache_.source];
+    }
+
+    // update the tech `src` cache
+    this.cache_.src = src;
+  }
+
+  /**
+   * *EXPERIMENTAL* Fired when the source is set or changed on the {@link Tech}
+   * causing the media element to reload.
+   *
+   * It will fire for the initial source and each subsequent source.
+   * This event is a custom event from Video.js and is triggered by the {@link Tech}.
+   *
+   * The event object for this event contains a `src` property that will contain the source
+   * that was available when the event was triggered. This is generally only necessary if Video.js
+   * is switching techs while the source was being changed.
+   *
+   * It is also fired when `load` is called on the player (or media element)
+   * because the {@link https://html.spec.whatwg.org/multipage/media.html#dom-media-load|specification for `load`}
+   * says that the resource selection algorithm needs to be aborted and restarted.
+   * In this case, it is very likely that the `src` property will be set to the
+   * empty string `""` to indicate we do not know what the source will be but
+   * that it is changing.
+   *
+   * *This event is currently still experimental and may change in minor releases.*
+   * __To use this, pass `enableSourceset` option to the player.__
+   *
+   * @event Player#sourceset
+   * @type {EventTarget~Event}
+   * @prop {string} src
+   *                The source url available when the `sourceset` was triggered.
+   *                It will be an empty string if we cannot know what the source is
+   *                but know that the source will change.
+   */
+  /**
+   * Retrigger the `sourceset` event that was triggered by the {@link Tech}.
+   *
+   * @fires Player#sourceset
+   * @listens Tech#sourceset
+   * @private
+   */
+  handleTechSourceset_(event) {
+    // only update the source cache when the source
+    // was not updated using the player api
+    if (!this.changingSrc_) {
+      // update the source to the intial source right away
+      // in some cases this will be empty string
+      this.updateSourceCaches_(event.src);
+
+      // if the `sourceset` `src` was an empty string
+      // wait for a `loadstart` to update the cache to `currentSrc`.
+      // If a sourceset happens before a `loadstart`, we reset the state
+      // as this function will be called again.
+      if (!event.src) {
+        const updateCache = (e) => {
+          if (e.type !== 'sourceset') {
+            this.updateSourceCaches_(this.techGet_('currentSrc'));
+          }
+
+          this.tech_.off(['sourceset', 'loadstart'], updateCache);
+        };
+
+        this.tech_.one(['sourceset', 'loadstart'], updateCache);
+      }
+    }
+
+    this.trigger({
+      src: event.src,
+      type: 'sourceset'
+    });
+  }
+
+  /**
    * Add/remove the vjs-has-started class
    *
    * @fires Player#firstplay
    *
-   * @param {boolean} hasStarted
+   * @param {boolean} request
    *        - true: adds the class
    *        - false: remove the class
    *
    * @return {boolean}
-   *         the boolean value of hasStarted
+   *         the boolean value of hasStarted_
    */
-  hasStarted(hasStarted) {
-    if (hasStarted !== undefined) {
-      // only update if this is a new value
-      if (this.hasStarted_ !== hasStarted) {
-        this.hasStarted_ = hasStarted;
-        if (hasStarted) {
-          this.addClass('vjs-has-started');
-          // trigger the firstplay event if this newly has played
-          this.trigger('firstplay');
-        } else {
-          this.removeClass('vjs-has-started');
-        }
-      }
+  hasStarted(request) {
+    if (request === undefined) {
+      // act as getter, if we have no request to change
+      return this.hasStarted_;
+    }
+
+    if (request === this.hasStarted_) {
       return;
     }
-    return !!this.hasStarted_;
+
+    this.hasStarted_ = request;
+
+    if (this.hasStarted_) {
+      this.addClass('vjs-has-started');
+      this.trigger('firstplay');
+    } else {
+      this.removeClass('vjs-has-started');
+    }
   }
 
   /**
@@ -1171,6 +1393,32 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('play');
+  }
+
+  /**
+   * Retrigger the `ratechange` event that was triggered by the {@link Tech}.
+   *
+   * If there were any events queued while the playback rate was zero, fire
+   * those events now.
+   *
+   * @private
+   * @method Player#handleTechRateChange_
+   * @fires Player#ratechange
+   * @listens Tech#ratechange
+   */
+  handleTechRateChange_() {
+    if (this.tech_.playbackRate() > 0 && this.cache_.lastPlaybackRate === 0) {
+      this.queuedCallbacks_.forEach((queued) => queued.callback(queued.event));
+      this.queuedCallbacks_ = [];
+    }
+    this.cache_.lastPlaybackRate = this.tech_.playbackRate();
+    /**
+     * Fires when the playing speed of the audio/video is changed
+     *
+     * @event Player#ratechange
+     * @type {event}
+     */
+    this.trigger('ratechange');
   }
 
   /**
@@ -1378,20 +1626,20 @@ class Player extends Component {
    * @private
    */
   handleTechClick_(event) {
-    // We're using mousedown to detect clicks thanks to Flash, but mousedown
-    // will also be triggered with right-clicks, so we need to prevent that
-    if (event.button !== 0) {
+    if (!Dom.isSingleLeftClick(event)) {
       return;
     }
 
     // When controls are disabled a click should not toggle playback because
     // the click is considered a control
-    if (this.controls()) {
-      if (this.paused()) {
-        this.play();
-      } else {
-        this.pause();
-      }
+    if (!this.controls_) {
+      return;
+    }
+
+    if (this.paused()) {
+      silencePromise(this.play());
+    } else {
+      this.pause();
     }
   }
 
@@ -1556,6 +1804,9 @@ class Player extends Component {
     this.ready(function() {
       if (method in middleware.allowedSetters) {
         return middleware.set(this.middleware_, this.tech_, method, arg);
+
+      } else if (method in middleware.allowedMediators) {
+        return middleware.mediate(this.middleware_, this.tech_, method, arg);
       }
 
       try {
@@ -1581,68 +1832,93 @@ class Player extends Component {
    * @private
    */
   techGet_(method) {
-    if (this.tech_ && this.tech_.isReady_) {
-
-      if (method in middleware.allowedGetters) {
-        return middleware.get(this.middleware_, this.tech_, method);
-      }
-
-      // Flash likes to die and reload when you hide or reposition it.
-      // In these cases the object methods go away and we get errors.
-      // When that happens we'll catch the errors and inform tech that it's not ready any more.
-      try {
-        return this.tech_[method]();
-      } catch (e) {
-        // When building additional tech libs, an expected method may not be defined yet
-        if (this.tech_[method] === undefined) {
-          log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
-
-        // When a method isn't available on the object it throws a TypeError
-        } else if (e.name === 'TypeError') {
-          log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
-          this.tech_.isReady_ = false;
-        } else {
-          log(e);
-        }
-        throw e;
-      }
+    if (!this.tech_ || !this.tech_.isReady_) {
+      return;
     }
 
-    return;
+    if (method in middleware.allowedGetters) {
+      return middleware.get(this.middleware_, this.tech_, method);
+
+    } else if (method in middleware.allowedMediators) {
+      return middleware.mediate(this.middleware_, this.tech_, method);
+    }
+
+    // Flash likes to die and reload when you hide or reposition it.
+    // In these cases the object methods go away and we get errors.
+    // When that happens we'll catch the errors and inform tech that it's not ready any more.
+    try {
+      return this.tech_[method]();
+    } catch (e) {
+
+      // When building additional tech libs, an expected method may not be defined yet
+      if (this.tech_[method] === undefined) {
+        log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
+        throw e;
+      }
+
+      // When a method isn't available on the object it throws a TypeError
+      if (e.name === 'TypeError') {
+        log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
+        this.tech_.isReady_ = false;
+        throw e;
+      }
+
+      // If error unknown, just log and throw
+      log(e);
+      throw e;
+    }
   }
 
   /**
-   * start media playback
+   * Attempt to begin playback at the first opportunity.
    *
    * @return {Promise|undefined}
-   *         Returns a `Promise` if the browser returns one, for most browsers this will
-   *         return undefined.
+   *         Returns a `Promise` only if the browser returns one and the player
+   *         is ready to begin playback. For some browsers and all non-ready
+   *         situations, this will return `undefined`.
    */
   play() {
-    if (this.changingSrc_) {
-      this.ready(function() {
-        const retval = this.techGet_('play');
 
-        // silence errors (unhandled promise from play)
-        if (retval !== undefined && typeof retval.then === 'function') {
-          retval.then(null, (e) => {});
-        }
+    // If this is called while we have a play queued up on a loadstart, remove
+    // that listener to avoid getting in a potentially bad state.
+    if (this.playOnLoadstart_) {
+      this.off('loadstart', this.playOnLoadstart_);
+    }
+
+    // If the player/tech is not ready, queue up another call to `play()` for
+    // when it is. This will loop back into this method for another attempt at
+    // playback when the tech is ready.
+    if (!this.isReady_) {
+
+      // Bail out if we're already waiting for `ready`!
+      if (this.playWaitingForReady_) {
+        return;
+      }
+
+      this.playWaitingForReady_ = true;
+      this.ready(() => {
+        this.playWaitingForReady_ = false;
+        silencePromise(this.play());
       });
 
-    // Only calls the tech's play if we already have a src loaded
-    } else if (this.isReady_ && (this.src() || this.currentSrc())) {
+    // If the player/tech is ready and we have a source, we can attempt playback.
+    } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
       return this.techGet_('play');
-    } else {
-      this.ready(function() {
-        this.tech_.one('loadstart', function() {
-          const retval = this.play();
 
-          // silence errors (unhandled promise from play)
-          if (retval !== undefined && typeof retval.then === 'function') {
-            retval.then(null, (e) => {});
-          }
-        });
-      });
+    // If the tech is ready, but we do not have a source, we'll need to wait
+    // for both the `ready` and a `loadstart` when the source is finally
+    // resolved by middleware and set on the player.
+    //
+    // This can happen if `play()` is called while changing sources or before
+    // one has been set on the player.
+    } else {
+
+      this.playOnLoadstart_ = () => {
+        this.playOnLoadstart_ = null;
+        silencePromise(this.play());
+      };
+
+      this.one('loadstart', this.playOnLoadstart_);
     }
   }
 
@@ -1686,7 +1962,7 @@ class Player extends Component {
    * dragging it along the progress bar.
    *
    * @param {boolean} [isScrubbing]
-   *        wether the user is or is not scrubbing
+   *        whether the user is or is not scrubbing
    *
    * @return {boolean}
    *         The value of scrubbing when getting
@@ -1715,6 +1991,9 @@ class Player extends Component {
    */
   currentTime(seconds) {
     if (typeof seconds !== 'undefined') {
+      if (seconds < 0) {
+        seconds = 0;
+      }
       this.techCall_('setCurrentTime', seconds);
       return;
     }
@@ -1753,7 +2032,7 @@ class Player extends Component {
 
     seconds = parseFloat(seconds);
 
-    // Standardize on Inifity for signaling video is live
+    // Standardize on Infinity for signaling video is live
     if (seconds < 0) {
       seconds = Infinity;
     }
@@ -1786,6 +2065,17 @@ class Player extends Component {
     return this.duration() - this.currentTime();
   }
 
+  /**
+   * A remaining time function that is intented to be used when
+   * the time is to be displayed directly to the user.
+   *
+   * @return {number}
+   *         The rounded time remaining in seconds
+   */
+  remainingTimeDisplay() {
+    return Math.floor(this.duration()) - Math.floor(this.currentTime());
+  }
+
   //
   // Kind of like an array of portions of the video that have been downloaded.
 
@@ -1815,7 +2105,7 @@ class Player extends Component {
    *
    * @return {number}
    *         A decimal between 0 and 1 representing the percent
-   *         that is bufferred 0 being 0% and 1 being 100%
+   *         that is buffered 0 being 0% and 1 being 100%
    */
   bufferedPercent() {
     return bufferedPercent(this.buffered(), this.duration());
@@ -1894,7 +2184,7 @@ class Player extends Component {
 
   /**
    * Get the current defaultMuted state, or turn defaultMuted on or off. defaultMuted
-   * indicates the state of muted on intial playback.
+   * indicates the state of muted on initial playback.
    *
    * ```js
    *   var myPlayer = videojs('some-player-id');
@@ -2264,7 +2554,7 @@ class Player extends Component {
   src(source) {
     // getter usage
     if (typeof source === 'undefined') {
-      return this.cache_.src;
+      return this.cache_.src || '';
     }
     // filter out invalid sources and turn our source into
     // an array of source objects
@@ -2281,15 +2571,19 @@ class Player extends Component {
     }
 
     // intial sources
-    this.cache_.sources = sources;
     this.changingSrc_ = true;
 
-    // intial source
-    this.cache_.source = sources[0];
+    this.cache_.sources = sources;
+    this.updateSourceCaches_(sources[0]);
 
     // middlewareSource is the source after it has been changed by middleware
     middleware.setSource(this, sources[0], (middlewareSource, mws) => {
       this.middleware_ = mws;
+
+      // since sourceSet is async we have to update the cache again after we select a source since
+      // the source that is selected could be out of order from the cache update above this callback.
+      this.cache_.sources = sources;
+      this.updateSourceCaches_(middlewareSource);
 
       const err = this.src_(middlewareSource);
 
@@ -2297,6 +2591,8 @@ class Player extends Component {
         if (sources.length > 1) {
           return this.src(sources.slice(1));
         }
+
+        this.changingSrc_ = false;
 
         // We need to wrap this in a timeout to give folks a chance to add error event handlers
         this.setTimeout(function() {
@@ -2310,16 +2606,12 @@ class Player extends Component {
         return;
       }
 
-      this.changingSrc_ = false;
-      // video element listed source
-      this.cache_.src = middlewareSource.src;
-
       middleware.setTech(mws, this.tech_);
     });
   }
 
   /**
-   * Set the source object on the tech, returns a boolean that indicates wether
+   * Set the source object on the tech, returns a boolean that indicates whether
    * there is a tech that can play the source or not
    *
    * @param {Tech~SourceObject} source
@@ -2340,13 +2632,16 @@ class Player extends Component {
 
     if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
       this.changingSrc_ = true;
-
       // load this technology with the chosen source
       this.loadTech_(sourceTech.tech, sourceTech.source);
+      this.tech_.ready(() => {
+        this.changingSrc_ = false;
+      });
       return false;
     }
 
     // wait until the tech is ready to set the source
+    // and set it synchronously if possible (#2326)
     this.ready(function() {
 
       // The setSource tech method was added with source handlers
@@ -2359,15 +2654,7 @@ class Player extends Component {
         this.techCall_('src', source.src);
       }
 
-      if (this.options_.preload === 'auto') {
-        this.load();
-      }
-
-      if (this.options_.autoplay) {
-        this.play();
-      }
-
-    // Set the source synchronously if possible (#2326)
+      this.changingSrc_ = false;
     }, true);
 
     return false;
@@ -2419,7 +2706,7 @@ class Player extends Component {
 
   /**
    * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
-   * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
+   * Can be used in conjunction with `currentType` to assist in rebuilding the current source object.
    *
    * @return {string}
    *         The current source
@@ -2445,7 +2732,7 @@ class Player extends Component {
    *
    * @param {boolean} [value]
    *        - true means that we should preload
-   *        - false maens that we should not preload
+   *        - false means that we should not preload
    *
    * @return {string}
    *         The preload attribute value when getting
@@ -2544,11 +2831,17 @@ class Player extends Component {
       src = '';
     }
 
+    if (src === this.poster_) {
+      return;
+    }
+
     // update the internal poster variable
     this.poster_ = src;
 
     // update the tech's poster
     this.techCall_('setPoster', src);
+
+    this.isPosterFromTech_ = false;
 
     // alert components that the poster has been set
     /**
@@ -2573,11 +2866,16 @@ class Player extends Component {
    * @private
    */
   handleTechPosterChange_() {
-    if (!this.poster_ && this.tech_ && this.tech_.poster) {
-      this.poster_ = this.tech_.poster() || '';
+    if ((!this.poster_ || this.options_.techCanOverridePoster) && this.tech_ && this.tech_.poster) {
+      const newPoster = this.tech_.poster() || '';
 
-      // Let components know the poster has changed
-      this.trigger('posterchange');
+      if (newPoster !== this.poster_) {
+        this.poster_ = newPoster;
+        this.isPosterFromTech_ = true;
+
+        // Let components know the poster has changed
+        this.trigger('posterchange');
+      }
     }
   }
 
@@ -2594,46 +2892,46 @@ class Player extends Component {
    *         The current value of controls when getting
    */
   controls(bool) {
-    if (bool !== undefined) {
-      bool = !!bool;
+    if (bool === undefined) {
+      return !!this.controls_;
+    }
 
-      // Don't trigger a change event unless it actually changed
-      if (this.controls_ !== bool) {
-        this.controls_ = bool;
+    bool = !!bool;
 
-        if (this.usingNativeControls()) {
-          this.techCall_('setControls', bool);
-        }
-
-        if (bool) {
-          this.removeClass('vjs-controls-disabled');
-          this.addClass('vjs-controls-enabled');
-          /**
-           * @event Player#controlsenabled
-           * @type {EventTarget~Event}
-           */
-          this.trigger('controlsenabled');
-
-          if (!this.usingNativeControls()) {
-            this.addTechControlsListeners_();
-          }
-        } else {
-          this.removeClass('vjs-controls-enabled');
-          this.addClass('vjs-controls-disabled');
-          /**
-           * @event Player#controlsdisabled
-           * @type {EventTarget~Event}
-           */
-          this.trigger('controlsdisabled');
-
-          if (!this.usingNativeControls()) {
-            this.removeTechControlsListeners_();
-          }
-        }
-      }
+    // Don't trigger a change event unless it actually changed
+    if (this.controls_ === bool) {
       return;
     }
-    return !!this.controls_;
+
+    this.controls_ = bool;
+
+    if (this.usingNativeControls()) {
+      this.techCall_('setControls', bool);
+    }
+
+    if (this.controls_) {
+      this.removeClass('vjs-controls-disabled');
+      this.addClass('vjs-controls-enabled');
+      /**
+       * @event Player#controlsenabled
+       * @type {EventTarget~Event}
+       */
+      this.trigger('controlsenabled');
+      if (!this.usingNativeControls()) {
+        this.addTechControlsListeners_();
+      }
+    } else {
+      this.removeClass('vjs-controls-enabled');
+      this.addClass('vjs-controls-disabled');
+      /**
+       * @event Player#controlsdisabled
+       * @type {EventTarget~Event}
+       */
+      this.trigger('controlsdisabled');
+      if (!this.usingNativeControls()) {
+        this.removeTechControlsListeners_();
+      }
+    }
   }
 
   /**
@@ -2654,37 +2952,40 @@ class Player extends Component {
    *         The current value of native controls when getting
    */
   usingNativeControls(bool) {
-    if (bool !== undefined) {
-      bool = !!bool;
+    if (bool === undefined) {
+      return !!this.usingNativeControls_;
+    }
 
-      // Don't trigger a change event unless it actually changed
-      if (this.usingNativeControls_ !== bool) {
-        this.usingNativeControls_ = bool;
-        if (bool) {
-          this.addClass('vjs-using-native-controls');
+    bool = !!bool;
 
-          /**
-           * player is using the native device controls
-           *
-           * @event Player#usingnativecontrols
-           * @type {EventTarget~Event}
-           */
-          this.trigger('usingnativecontrols');
-        } else {
-          this.removeClass('vjs-using-native-controls');
-
-          /**
-           * player is using the custom HTML controls
-           *
-           * @event Player#usingcustomcontrols
-           * @type {EventTarget~Event}
-           */
-          this.trigger('usingcustomcontrols');
-        }
-      }
+    // Don't trigger a change event unless it actually changed
+    if (this.usingNativeControls_ === bool) {
       return;
     }
-    return !!this.usingNativeControls_;
+
+    this.usingNativeControls_ = bool;
+
+    if (this.usingNativeControls_) {
+      this.addClass('vjs-using-native-controls');
+
+      /**
+       * player is using the native device controls
+       *
+       * @event Player#usingnativecontrols
+       * @type {EventTarget~Event}
+       */
+      this.trigger('usingnativecontrols');
+    } else {
+      this.removeClass('vjs-using-native-controls');
+
+      /**
+       * player is using the custom HTML controls
+       *
+       * @event Player#usingcustomcontrols
+       * @type {EventTarget~Event}
+       */
+      this.trigger('usingcustomcontrols');
+    }
   }
 
   /**
@@ -2720,7 +3021,7 @@ class Player extends Component {
     this.addClass('vjs-error');
 
     // log the name of the error type and any message
-    // ie8 just logs "[object object]" if you just log the error object
+    // IE11 logs "[object object]" and required you to expand message to see error object
     log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     /**
@@ -2756,53 +3057,53 @@ class Player extends Component {
    *         The current value of userActive when getting
    */
   userActive(bool) {
-    if (bool !== undefined) {
-      bool = !!bool;
-      if (bool !== this.userActive_) {
-        this.userActive_ = bool;
-        if (bool) {
-          // If the user was inactive and is now active we want to reset the
-          // inactivity timer
-          this.userActivity_ = true;
-          this.removeClass('vjs-user-inactive');
-          this.addClass('vjs-user-active');
-          /**
-           * @event Player#useractive
-           * @type {EventTarget~Event}
-           */
-          this.trigger('useractive');
-        } else {
-          // We're switching the state to inactive manually, so erase any other
-          // activity
-          this.userActivity_ = false;
+    if (bool === undefined) {
+      return this.userActive_;
+    }
 
-          // Chrome/Safari/IE have bugs where when you change the cursor it can
-          // trigger a mousemove event. This causes an issue when you're hiding
-          // the cursor when the user is inactive, and a mousemove signals user
-          // activity. Making it impossible to go into inactive mode. Specifically
-          // this happens in fullscreen when we really need to hide the cursor.
-          //
-          // When this gets resolved in ALL browsers it can be removed
-          // https://code.google.com/p/chromium/issues/detail?id=103041
-          if (this.tech_) {
-            this.tech_.one('mousemove', function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-            });
-          }
+    bool = !!bool;
 
-          this.removeClass('vjs-user-active');
-          this.addClass('vjs-user-inactive');
-          /**
-           * @event Player#userinactive
-           * @type {EventTarget~Event}
-           */
-          this.trigger('userinactive');
-        }
-      }
+    if (bool === this.userActive_) {
       return;
     }
-    return this.userActive_;
+
+    this.userActive_ = bool;
+
+    if (this.userActive_) {
+      this.userActivity_ = true;
+      this.removeClass('vjs-user-inactive');
+      this.addClass('vjs-user-active');
+      /**
+       * @event Player#useractive
+       * @type {EventTarget~Event}
+       */
+      this.trigger('useractive');
+      return;
+    }
+
+    // Chrome/Safari/IE have bugs where when you change the cursor it can
+    // trigger a mousemove event. This causes an issue when you're hiding
+    // the cursor when the user is inactive, and a mousemove signals user
+    // activity. Making it impossible to go into inactive mode. Specifically
+    // this happens in fullscreen when we really need to hide the cursor.
+    //
+    // When this gets resolved in ALL browsers it can be removed
+    // https://code.google.com/p/chromium/issues/detail?id=103041
+    if (this.tech_) {
+      this.tech_.one('mousemove', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    }
+
+    this.userActivity_ = false;
+    this.removeClass('vjs-user-active');
+    this.addClass('vjs-user-inactive');
+    /**
+     * @event Player#userinactive
+     * @type {EventTarget~Event}
+     */
+    this.trigger('userinactive');
   }
 
   /**
@@ -2863,31 +3164,36 @@ class Player extends Component {
 
     this.setInterval(function() {
       // Check to see if mouse/touch activity has happened
-      if (this.userActivity_) {
-        // Reset the activity tracker
-        this.userActivity_ = false;
-
-        // If the user state was inactive, set the state to active
-        this.userActive(true);
-
-        // Clear any existing inactivity timeout to start the timer over
-        this.clearTimeout(inactivityTimeout);
-
-        const timeout = this.options_.inactivityTimeout;
-
-        if (timeout > 0) {
-          // In <timeout> milliseconds, if no more activity has occurred the
-          // user will be considered inactive
-          inactivityTimeout = this.setTimeout(function() {
-            // Protect against the case where the inactivityTimeout can trigger just
-            // before the next user activity is picked up by the activity check loop
-            // causing a flicker
-            if (!this.userActivity_) {
-              this.userActive(false);
-            }
-          }, timeout);
-        }
+      if (!this.userActivity_) {
+        return;
       }
+
+      // Reset the activity tracker
+      this.userActivity_ = false;
+
+      // If the user state was inactive, set the state to active
+      this.userActive(true);
+
+      // Clear any existing inactivity timeout to start the timer over
+      this.clearTimeout(inactivityTimeout);
+
+      const timeout = this.options_.inactivityTimeout;
+
+      if (timeout <= 0) {
+        return;
+      }
+
+      // In <timeout> milliseconds, if no more activity has occurred the
+      // user will be considered inactive
+      inactivityTimeout = this.setTimeout(function() {
+        // Protect against the case where the inactivityTimeout can trigger just
+        // before the next user activity is picked up by the activity check loop
+        // causing a flicker
+        if (!this.userActivity_) {
+          this.userActive(false);
+        }
+      }, timeout);
+
     }, 250);
   }
 
@@ -2906,12 +3212,14 @@ class Player extends Component {
    */
   playbackRate(rate) {
     if (rate !== undefined) {
+      // NOTE: this.cache_.lastPlaybackRate is set from the tech handler
+      // that is registered above
       this.techCall_('setPlaybackRate', rate);
       return;
     }
 
     if (this.tech_ && this.tech_.featuresPlaybackRate) {
-      return this.techGet_('playbackRate');
+      return this.cache_.lastPlaybackRate || this.techGet_('playbackRate');
     }
     return 1.0;
   }
@@ -2919,7 +3227,7 @@ class Player extends Component {
   /**
    * Gets or sets the current default playback rate. A default playback rate of
    * 1.0 represents normal speed and 0.5 would indicate half-speed playback, for instance.
-   * defaultPlaybackRate will only represent what the intial playbackRate of a video was, not
+   * defaultPlaybackRate will only represent what the initial playbackRate of a video was, not
    * not the current playbackRate.
    *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-defaultplaybackrate
@@ -3069,7 +3377,7 @@ class Player extends Component {
   /**
    * The player's language code
    * NOTE: The language should be set in the player options if you want the
-   * the controls to be built with a specific language. Changing the lanugage
+   * the controls to be built with a specific language. Changing the language
    * later will not update controls text.
    *
    * @param {string} [code]
@@ -3212,7 +3520,7 @@ class Player extends Component {
   }
 
   /**
-   * Determine wether or not flexbox is supported
+   * Determine whether or not flexbox is supported
    *
    * @return {boolean}
    *         - true if flexbox is supported
@@ -3227,7 +3535,7 @@ class Player extends Component {
             'webkitFlexBasis' in elem.style ||
             'mozFlexBasis' in elem.style ||
             'msFlexBasis' in elem.style ||
-            // IE10-specific (2012 flex spec)
+            // IE10-specific (2012 flex spec), available for completeness
             'msFlexOrder' in elem.style);
   }
 }
@@ -3337,7 +3645,8 @@ Player.prototype.options_ = {
     'bigPlayButton',
     'controlBar',
     'errorDisplay',
-    'textTrackSettings'
+    'textTrackSettings',
+    'resizeManager'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',

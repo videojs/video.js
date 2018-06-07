@@ -2,6 +2,7 @@
  * @file mixins/evented.js
  * @module evented
  */
+import window from 'global/window';
 import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
@@ -161,7 +162,7 @@ const listen = (target, method, type, listener) => {
 };
 
 /**
- * Contains methods that provide event capabilites to an object which is passed
+ * Contains methods that provide event capabilities to an object which is passed
  * to {@link module:evented|evented}.
  *
  * @mixin EventedMixin
@@ -366,7 +367,12 @@ function evented(target, options = {}) {
   Obj.assign(target, EventedMixin);
 
   // When any evented object is disposed, it removes all its listeners.
-  target.on('dispose', () => target.off());
+  target.on('dispose', () => {
+    target.off();
+    window.setTimeout(() => {
+      target.eventBusEl_ = null;
+    }, 0);
+  });
 
   return target;
 }

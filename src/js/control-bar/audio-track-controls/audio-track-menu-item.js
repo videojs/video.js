@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import {assign} from '../../utils/obj';
 
 /**
@@ -36,7 +35,9 @@ class AudioTrackMenuItem extends MenuItem {
 
     this.addClass(`vjs-${track.kind}-menu-item`);
 
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
+    const changeHandler = (...args) => {
+      this.handleTracksChange.apply(this, args);
+    };
 
     tracks.addEventListener('change', changeHandler);
     this.on('dispose', () => {

@@ -118,6 +118,8 @@ QUnit.test('should be able to access expected component API methods', function(a
   assert.ok(comp.clearInterval, 'clearInterval exists');
   assert.ok(comp.setTimeout, 'setTimeout exists');
   assert.ok(comp.clearTimeout, 'clearTimeout exists');
+
+  comp.dispose();
 });
 
 QUnit.test('should be able to access expected MediaTech API methods', function(assert) {
@@ -289,4 +291,6 @@ QUnit.test('should extend Component', function(assert) {
   const noMethods = new NoMethods({});
 
   assert.ok(noMethods.on, 'should extend component with no methods or constructor');
+
+  myComponent.dispose();
 });

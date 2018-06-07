@@ -1,0 +1,5 @@
+repository: 'video.js'
+labels:
+  - first-timers-only
+  - unclaimed
+template: .github/first-timers-issue-template.md

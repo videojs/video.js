@@ -49,6 +49,48 @@ QUnit.test('dispose should not throw if styleEl is missing', function(assert) {
   assert.ok(player.el() === null, 'element disposed');
 });
 
+QUnit.test('dispose should not throw if techEl is missing', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag);
+
+  player.tech_.el_.parentNode.removeChild(player.tech_.el_);
+  player.tech_.el_ = null;
+  let error;
+
+  try {
+    player.dispose();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on dispose');
+});
+
+QUnit.test('dispose should not throw if playerEl is missing', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag);
+
+  player.el_.parentNode.removeChild(player.el_);
+  player.el_ = null;
+  let error;
+
+  try {
+    player.dispose();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on dispose');
+});
+
 // technically, all uses of videojs.options should be replaced with
 // Player.prototype.options_ in this file and a equivalent test using
 // videojs.options should be made in video.test.js. Keeping this here
@@ -108,7 +150,7 @@ QUnit.test('should get tag, source, and track settings', function(assert) {
   assert.equal(player.options_.id, 'example_1', 'id is set to example_1');
   assert.equal(player.options_.sources.length, 2, 'we have two sources');
   assert.equal(player.options_.sources[0].src, 'http://google.com', 'first source is google.com');
-  assert.equal(player.options_.sources[0].type, 'video/mp4', 'first time is video/mp4');
+  assert.equal(player.options_.sources[0].type, 'video/mp4', 'first type is video/mp4');
   assert.equal(player.options_.sources[1].type, 'video/webm', 'second type is video/webm');
   assert.equal(player.options_.tracks.length, 1, 'we have one text track');
   assert.equal(player.options_.tracks[0].kind, 'captions', 'the text track is a captions file');
@@ -193,6 +235,7 @@ QUnit.test('should get current source from src set', function(assert) {
 
   // check for matching undefined src
   assert.deepEqual(player.currentSource(), {});
+  assert.equal(player.src(), '');
 
   player.src('http://google.com');
 
@@ -343,7 +386,7 @@ QUnit.test('should default to 16:9 when fluid', function(assert) {
   const player = TestHelpers.makePlayer({fluid: true});
   const ratio = player.currentHeight() / player.currentWidth();
 
-  // IE8 rounds 0.5625 up to 0.563
+  // account for some rounding of 0.5625 up to 0.563
   assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
 
   player.dispose();
@@ -913,6 +956,8 @@ QUnit.test('should honor default inactivity timeout', function(assert) {
   // default timeout is 2000ms
   const player = TestHelpers.makePlayer({});
 
+  player.trigger('play');
+
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(1800);
   assert.equal(player.userActive(), true, 'User is still active');
@@ -930,6 +975,8 @@ QUnit.test('should honor configured inactivity timeout', function(assert) {
   const player = TestHelpers.makePlayer({
     inactivityTimeout: 200
   });
+
+  player.trigger('play');
 
   assert.equal(player.userActive(), true, 'User is active on creation');
   clock.tick(150);
@@ -1106,10 +1153,15 @@ QUnit.test('play promise should resolve to native value if returned', function(a
 
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
+  const fixture = document.getElementById('qunit-fixture');
 
   videojs.options.techOrder = null;
   assert.throws(function() {
-    videojs(TestHelpers.makeTag());
+    const tag = TestHelpers.makeTag();
+
+    fixture.appendChild(tag);
+
+    videojs(tag);
   }, 'a falsey techOrder should throw');
 
   videojs.options.techOrder = techOrder;
@@ -1358,6 +1410,59 @@ QUnit.test('Remove waiting class on timeupdate after tech waiting', function(ass
   player.dispose();
 });
 
+QUnit.test('Queues playing events when playback rate is zero while seeking', function(assert) {
+  const player = TestHelpers.makePlayer({techOrder: ['html5']});
+
+  let canPlayCount = 0;
+  let canPlayThroughCount = 0;
+  let playingCount = 0;
+  let seekedCount = 0;
+  let seeking = false;
+
+  player.on('canplay', () => canPlayCount++);
+  player.on('canplaythrough', () => canPlayThroughCount++);
+  player.on('playing', () => playingCount++);
+  player.on('seeked', () => seekedCount++);
+
+  player.tech_.seeking = () => {
+    return seeking;
+  };
+
+  player.tech_.setPlaybackRate(0);
+  player.tech_.trigger('ratechange');
+
+  player.tech_.trigger('canplay');
+  player.tech_.trigger('canplaythrough');
+  player.tech_.trigger('playing');
+  player.tech_.trigger('seeked');
+
+  assert.equal(canPlayCount, 1, 'canplay event dispatched when not seeking');
+  assert.equal(canPlayThroughCount, 1, 'canplaythrough event dispatched when not seeking');
+  assert.equal(playingCount, 1, 'playing event dispatched when not seeking');
+  assert.equal(seekedCount, 1, 'seeked event dispatched when not seeking');
+
+  seeking = true;
+  player.tech_.trigger('canplay');
+  player.tech_.trigger('canplaythrough');
+  player.tech_.trigger('playing');
+  player.tech_.trigger('seeked');
+
+  assert.equal(canPlayCount, 1, 'canplay event not dispatched');
+  assert.equal(canPlayThroughCount, 1, 'canplaythrough event not dispatched');
+  assert.equal(playingCount, 1, 'playing event not dispatched');
+  assert.equal(seekedCount, 1, 'seeked event not dispatched');
+
+  seeking = false;
+  player.tech_.setPlaybackRate(1);
+  player.tech_.trigger('ratechange');
+
+  assert.equal(canPlayCount, 2, 'canplay event dispatched after playback rate restore');
+  assert.equal(canPlayThroughCount, 2, 'canplaythrough event dispatched after playback rate restore');
+  assert.equal(playingCount, 2, 'playing event dispatched after playback rate restore');
+  assert.equal(seekedCount, 2, 'seeked event dispatched after playback rate restore');
+
+});
+
 QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option', function(assert) {
   // clear the HEAD before running this test
   let styles = document.querySelectorAll('style');
@@ -1427,6 +1532,10 @@ QUnit.test('should allow to register custom player when any player has not been 
   videojs.registerComponent('Player', CustomPlayer);
 
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag);
 
   assert.equal(player instanceof CustomPlayer, true, 'player is custom');
@@ -1438,6 +1547,10 @@ QUnit.test('should allow to register custom player when any player has not been 
 
 QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag);
 
   class CustomPlayer extends Player {}
@@ -1455,7 +1568,7 @@ QUnit.test('should not allow to register custom player when any player has been 
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
   let durs = 0;
-  let ps = 0;
+  let lps = 0;
 
   videojs.use('video/foo', () => ({
     currentTime() {
@@ -1464,12 +1577,16 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
     duration() {
       durs++;
     },
-    paused() {
-      ps++;
+    loop() {
+      lps++;
     }
   }));
 
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag, {
     techOrder: ['techFaker']
   });
@@ -1478,11 +1595,11 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
 
   player.techGet_('currentTime');
   player.techGet_('duration');
-  player.techGet_('paused');
+  player.techGet_('loop');
 
   assert.equal(cts, 1, 'currentTime is allowed');
   assert.equal(durs, 1, 'duration is allowed');
-  assert.equal(ps, 0, 'paused is not allowed');
+  assert.equal(lps, 0, 'loop is not allowed');
 
   middleware.getMiddleware('video/foo').pop();
   player.dispose();
@@ -1503,6 +1620,10 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
   }));
 
   const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag, {
     techOrder: ['techFaker']
   });
@@ -1559,7 +1680,11 @@ QUnit.test('src selects tech based on middleware', function(assert) {
     }
   }));
 
+  const fixture = document.getElementById('qunit-fixture');
   const tag = TestHelpers.makeTag();
+
+  fixture.appendChild(tag);
+
   const player = videojs(tag, {
     techOrder: ['fooTech', 'barTech']
   });
@@ -1682,4 +1807,100 @@ QUnit.test('player.duration() sets the value of player.cache_.duration', functio
   assert.ok(Number.isNaN(player.duration()), 'duration() set and get NaN duration value');
   player.duration(200);
   assert.equal(player.duration(), 200, 'duration() set and get integer duration value');
+});
+
+QUnit.test('setPoster in tech with `techCanOverridePoster` in player should override poster', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techCanOverridePoster: true
+  });
+  const posterchangeSpy = sinon.spy();
+  const firstPosterUrl = 'https://wherever.test/test.jpg';
+  const techPosterUrl = 'https://somewhere.text/my/image.png';
+
+  assert.equal(player.options_.techCanOverridePoster, true, 'make sure player option was passed correctly');
+  assert.equal(player.tech_.options_.canOverridePoster, true, 'make sure tech option was passed correctly');
+
+  player.on('posterchange', posterchangeSpy);
+
+  player.poster('');
+  assert.ok(posterchangeSpy.notCalled, 'posterchangeSpy not called when no change of poster');
+  assert.equal(player.isPosterFromTech_, false, "ensure tech didn't change poster after empty call from player");
+
+  player.poster(firstPosterUrl);
+  assert.ok(posterchangeSpy.calledOnce, 'posterchangeSpy only called once on update');
+  assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
+  assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
+
+  posterchangeSpy.reset();
+
+  player.tech_.setPoster(techPosterUrl);
+  assert.ok(posterchangeSpy.calledOnce, "posterchangeSpy should've been called");
+  assert.equal(player.isPosterFromTech_, true, 'ensure player marked poster as set by tech after the fact');
+
+  player.dispose();
+});
+
+QUnit.test('setPoster in tech WITHOUT `techCanOverridePoster` in player should NOT override poster', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const posterchangeSpy = sinon.spy();
+  const firstPosterUrl = 'https://wherever.test/test.jpg';
+  const techPosterUrl = 'https://somewhere.test/my/image.png';
+
+  assert.equal(player.options_.techCanOverridePoster, undefined, "ensure player option wasn't unwittingly set");
+  assert.equal(player.tech_.options_.canOverridePoster, false, "ensure tech option wasn't unwittinyly set");
+
+  player.on('posterchange', posterchangeSpy);
+
+  player.poster(firstPosterUrl);
+  assert.ok(posterchangeSpy.calledOnce, 'posterchangeSpy only called once on update');
+  assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
+  assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
+
+  posterchangeSpy.reset();
+
+  player.tech_.setPoster(techPosterUrl);
+  assert.ok(posterchangeSpy.notCalled, "posterchangeSpy shouldn't have been called");
+  assert.equal(player.isPosterFromTech_, false, "ensure tech didn't change poster because player option was false");
+
+  player.dispose();
+});
+
+QUnit.test('disposing a tech that set a poster, should unset the poster', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techCanOverridePoster: true
+  });
+  const techPosterUrl = 'https://somewhere.test/my/image.png';
+
+  assert.equal(player.options_.techCanOverridePoster, true, 'make sure player option was passed correctly');
+  assert.equal(player.tech_.options_.canOverridePoster, true, 'make sure tech option was passed correctly');
+
+  player.tech_.setPoster(techPosterUrl);
+  assert.equal(player.poster(), techPosterUrl, 'player poster should equal tech poster');
+  assert.equal(player.isPosterFromTech_, true, 'setting the poster with the tech should be remembered in the player');
+
+  player.unloadTech_();
+
+  assert.equal(player.poster(), '', 'ensure poster set by poster is unset after tech disposal');
+
+  player.dispose();
+});
+
+QUnit.test('disposing a tech that dit NOT set a poster, should keep the poster', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techCanOverridePoster: true
+  });
+  const posterUrl = 'https://myposter.test/lol.jpg';
+
+  assert.equal(player.options_.techCanOverridePoster, true, 'make sure player option was passed correctly');
+  assert.equal(player.tech_.options_.canOverridePoster, true, 'make sure tech option was passed correctly');
+
+  player.poster(posterUrl);
+  assert.equal(player.poster(), posterUrl, 'player poster should NOT have changed');
+  assert.equal(player.isPosterFromTech_, false, 'player should mark poster as set by itself');
+
+  player.unloadTech_();
+
+  assert.equal(player.poster(), posterUrl, 'player poster should stay the same after unloading / dispoing tech');
+
+  player.dispose();
 });

@@ -19,6 +19,7 @@
   * [width](#width)
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
+  * [autoSetup](#autosetup)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -26,9 +27,11 @@
   * [languages](#languages)
   * [nativeControlsForTouch](#nativecontrolsfortouch)
   * [notSupportedMessage](#notsupportedmessage)
+  * [playbackRates](#playbackrates)
   * [plugins](#plugins)
   * [sourceOrder](#sourceorder)
   * [sources](#sources)
+  * [techCanOverridePoster](#techCanOverridePoster)
   * [techOrder](#techorder)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
@@ -116,7 +119,7 @@ The source URL to a video source to embed.
 
 > Type: `string|number`
 
-Sets the display height of the video player in pixels.
+Sets the display width of the video player in pixels.
 
 ## Video.js-specific Options
 
@@ -127,6 +130,15 @@ Each option is `undefined` by default unless otherwise specified.
 > Type: `string`
 
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
+
+### `autoSetup`
+
+> Type: `boolean`
+
+Prevents the player from running the autoSetup for media elements with `data-setup` attribute.
+
+> **Note**: this must be set globally with `videojs.options.autoSetup = false` in the same tick as videojs source is loaded to take effect.
+
 
 ### `children`
 
@@ -179,6 +191,24 @@ Explicitly set a default value for [the associated tech option](#nativecontrolsf
 > Type: `string`
 
 Allows overriding the default message that is displayed when Video.js cannot play back a media source.
+
+### `playbackRates`
+
+> Type: `Array`
+
+An array of numbers strictly greater than 0, where 1 means regular speed
+(100%), 0.5 means half-speed (50%), 2 means double-speed (200%), etc.
+If specified, Video.js displays a control (of class `vjs-playback-rate`)
+allowing the user to choose playback speed from among the array of choices.
+The choices are presented in the specified order from bottom to top.
+
+For example:
+
+```js
+videojs('my-player', {
+  playbackRates: [0.5, 1, 1.5, 2]
+});
+```
 
 ### `plugins`
 
@@ -234,6 +264,15 @@ Using `<source>` elements will have the same effect:
   <source src="//path/to/video.webm" type="video/webm">
 </video>
 ```
+
+### `techCanOverridePoster`
+
+> Type: `boolean`
+
+Gives the possibility to techs to override the player's poster
+and integrate into the player's poster life-cycle.
+This can be useful when multiple techs are used and each has to set their own poster
+ any time a new source is played.
 
 ### `techOrder`
 

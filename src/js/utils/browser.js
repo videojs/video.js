@@ -55,8 +55,6 @@ export const ANDROID_VERSION = (function() {
   return null;
 }());
 
-// Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
-export const IS_OLD_ANDROID = IS_ANDROID && (/webkit/i).test(USER_AGENT) && ANDROID_VERSION < 2.3;
 export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebkitVersion < 537;
 
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
@@ -70,7 +68,6 @@ export const CHROME_VERSION = (function() {
   }
   return null;
 }());
-export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
 export const IE_VERSION = (function() {
   const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT);
   let version = result && parseFloat(result[1]);
@@ -90,7 +87,3 @@ export const TOUCH_ENABLED = Dom.isReal() && (
   'ontouchstart' in window ||
   window.DocumentTouch &&
   window.document instanceof window.DocumentTouch);
-
-export const BACKGROUND_SIZE_SUPPORTED = (
-  Dom.isReal() &&
-  'backgroundSize' in window.document.createElement('video').style);

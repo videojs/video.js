@@ -5,7 +5,7 @@
   "Pause": "Pause",
   "Replay": "Replay",
   "Current Time": "Current Time",
-  "Duration Time": "Duration Time",
+  "Duration": "Duration",
   "Remaining Time": "Remaining Time",
   "Stream Type": "Stream Type",
   "LIVE": "LIVE",
@@ -80,5 +80,6 @@
   "Done": "Done",
   "Caption Settings Dialog": "Caption Settings Dialog",
   "Beginning of dialog window. Escape will cancel and close the window.": "Beginning of dialog window. Escape will cancel and close the window.",
-  "End of dialog window.": "End of dialog window."
+  "End of dialog window.": "End of dialog window.",
+  "{1} is loading.": "{1} is loading."
 }

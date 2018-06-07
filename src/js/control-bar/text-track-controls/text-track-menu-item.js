@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -34,13 +33,18 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
-    const selectedLanguageChangeHandler = Fn.bind(this, this.handleSelectedLanguageChange);
+    const changeHandler = (...args) => {
+      this.handleTracksChange.apply(this, args);
+    };
+    const selectedLanguageChangeHandler = (...args) => {
+      this.handleSelectedLanguageChange.apply(this, args);
+    };
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
     tracks.addEventListener('change', changeHandler);
     tracks.addEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     this.on('dispose', function() {
+      player.off(['loadstart', 'texttrackchange'], changeHandler);
       tracks.removeEventListener('change', changeHandler);
       tracks.removeEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     });
@@ -72,6 +76,9 @@ class TextTrackMenuItem extends MenuItem {
         tracks.dispatchEvent(event);
       });
     }
+
+    // set the default state based on current tracks
+    this.handleTracksChange();
   }
 
   /**
@@ -122,7 +129,13 @@ class TextTrackMenuItem extends MenuItem {
    * @listens TextTrackList#change
    */
   handleTracksChange(event) {
-    this.selected(this.track.mode === 'showing');
+    const shouldBeSelected = this.track.mode === 'showing';
+
+    // Prevent redundant selected() calls because they may cause
+    // screen readers to read the appended control text unnecessarily
+    if (shouldBeSelected !== this.isSelected_) {
+      this.selected(shouldBeSelected);
+    }
   }
 
   handleSelectedLanguageChange(event) {
@@ -142,6 +155,13 @@ class TextTrackMenuItem extends MenuItem {
         kind: this.track.kind
       };
     }
+  }
+
+  dispose() {
+    // remove reference to track object on dispose
+    this.track = null;
+
+    super.dispose();
   }
 
 }

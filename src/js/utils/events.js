@@ -216,6 +216,7 @@ let _supportsPassive = false;
     });
 
     window.addEventListener('test', null, opts);
+    window.removeEventListener('test', null, opts);
   } catch (e) {
     // disregard
   }
@@ -344,15 +345,17 @@ export function off(elem, type, fn) {
   }
 
   // Utility function
-  const removeType = function(t) {
+  const removeType = function(el, t) {
     data.handlers[t] = [];
-    _cleanUpEvents(elem, t);
+    _cleanUpEvents(el, t);
   };
 
   // Are we removing all bound events?
-  if (!type) {
+  if (type === undefined) {
     for (const t in data.handlers) {
-      removeType(t);
+      if (Object.prototype.hasOwnProperty.call(data.handlers || {}, t)) {
+        removeType(elem, t);
+      }
     }
     return;
   }
@@ -366,7 +369,7 @@ export function off(elem, type, fn) {
 
   // If no listener was provided, remove all listeners for type
   if (!fn) {
-    removeType(type);
+    removeType(elem, type);
     return;
   }
 
@@ -410,7 +413,10 @@ export function trigger(elem, event, hash) {
   // If an event name was passed as a string, creates an event out of it
   if (typeof event === 'string') {
     event = {type: event, target: elem};
+  } else if (!event.target) {
+    event.target = elem;
   }
+
   // Normalizes the event properties.
   event = fixEvent(event);
 

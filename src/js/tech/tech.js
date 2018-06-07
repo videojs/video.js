@@ -155,6 +155,34 @@ class Tech extends Component {
     }
   }
 
+  /**
+   * A special function to trigger source set in a way that will allow player
+   * to re-trigger if the player or tech are not ready yet.
+   *
+   * @fires Tech#sourceset
+   * @param {string} src The source string at the time of the source changing.
+   */
+  triggerSourceset(src) {
+    if (!this.isReady_) {
+      // on initial ready we have to trigger source set
+      // 1ms after ready so that player can watch for it.
+      this.one('ready', () => this.setTimeout(() => this.triggerSourceset(src), 1));
+    }
+
+    /**
+     * Fired when the source is set on the tech causing the media element
+     * to reload.
+     *
+     * @see {@link Player#event:sourceset}
+     * @event Tech#sourceset
+     * @type {EventTarget~Event}
+     */
+    this.trigger({
+      src,
+      type: 'sourceset'
+    });
+  }
+
   /* Fallbacks for unsupported event types
   ================================================================================ */
 
@@ -421,7 +449,7 @@ class Tech extends Component {
    * Returns the `TimeRange`s that have been played through for the current source.
    *
    * > NOTE: This implementation is incomplete. It does not track the played `TimeRange`.
-   *         It only checks wether the source has played at all or not.
+   *         It only checks whether the source has played at all or not.
    *
    * @return {TimeRange}
    *         - A single time range if this video has played
@@ -530,7 +558,7 @@ class Tech extends Component {
       // passed in
       const script = document.createElement('script');
 
-      script.src = this.options_['vtt.js'] || 'https://vjs.zencdn.net/vttjs/0.12.4/vtt.min.js';
+      script.src = this.options_['vtt.js'] || 'https://vjs.zencdn.net/vttjs/0.14.1/vtt.min.js';
       script.onload = () => {
         /**
          * Fired when vtt.js is loaded.
@@ -744,18 +772,38 @@ class Tech extends Component {
   setPoster() {}
 
   /**
-   * A method to check for the presence of the 'playsinine' <video> attribute.
+   * A method to check for the presence of the 'playsinline' <video> attribute.
    *
    * @abstract
    */
   playsinline() {}
 
   /**
-   * A method to set or unset the 'playsinine' <video> attribute.
+   * A method to set or unset the 'playsinline' <video> attribute.
    *
    * @abstract
    */
   setPlaysinline() {}
+
+  /**
+   * Attempt to force override of native audio tracks.
+   *
+   * @param {Boolean} override - If set to true native audio will be overridden,
+   * otherwise native audio will potentially be used.
+   *
+   * @abstract
+   */
+  overrideNativeAudioTracks() {}
+
+  /**
+   * Attempt to force override of native video tracks.
+   *
+   * @param {Boolean} override - If set to true native video will be overridden,
+   * otherwise native video will potentially be used.
+   *
+   * @abstract
+   */
+  overrideNativeVideoTracks() {}
 
   /*
    * Check if the tech can support the given mime-type.
@@ -863,7 +911,7 @@ class Tech extends Component {
    *        `camelCase` or `TitleCase` name of the Tech to get
    *
    * @return {Tech|undefined}
-   *         The `Tech` or undefined if there was no tech with the name requsted.
+   *         The `Tech` or undefined if there was no tech with the name requested.
    */
   static getTech(name) {
     if (!name) {
@@ -952,7 +1000,7 @@ TRACK_TYPES.ALL.names.forEach(function(name) {
  */
 
 /**
- * Boolean indicating wether the `Tech` supports volume control.
+ * Boolean indicating whether the `Tech` supports volume control.
  *
  * @type {boolean}
  * @default
@@ -960,7 +1008,7 @@ TRACK_TYPES.ALL.names.forEach(function(name) {
 Tech.prototype.featuresVolumeControl = true;
 
 /**
- * Boolean indicating wether the `Tech` support fullscreen resize control.
+ * Boolean indicating whether the `Tech` supports fullscreen resize control.
  * Resizing plugins using request fullscreen reloads the plugin
  *
  * @type {boolean}
@@ -969,7 +1017,7 @@ Tech.prototype.featuresVolumeControl = true;
 Tech.prototype.featuresFullscreenResize = false;
 
 /**
- * Boolean indicating wether the `Tech` supports changing the speed at which the video
+ * Boolean indicating whether the `Tech` supports changing the speed at which the video
  * plays. Examples:
  *   - Set player to play 2x (twice) as fast
  *   - Set player to play 0.5x (half) as fast
@@ -980,7 +1028,7 @@ Tech.prototype.featuresFullscreenResize = false;
 Tech.prototype.featuresPlaybackRate = false;
 
 /**
- * Boolean indicating wether the `Tech` supports the `progress` event. This is currently
+ * Boolean indicating whether the `Tech` supports the `progress` event. This is currently
  * not triggered by video-js-swf. This will be used to determine if
  * {@link Tech#manualProgressOn} should be called.
  *
@@ -990,7 +1038,19 @@ Tech.prototype.featuresPlaybackRate = false;
 Tech.prototype.featuresProgressEvents = false;
 
 /**
- * Boolean indicating wether the `Tech` supports the `timeupdate` event. This is currently
+ * Boolean indicating whether the `Tech` supports the `sourceset` event.
+ *
+ * A tech should set this to `true` and then use {@link Tech#triggerSourceset}
+ * to trigger a {@link Tech#event:sourceset} at the earliest time after getting
+ * a new source.
+ *
+ * @type {boolean}
+ * @default
+ */
+Tech.prototype.featuresSourceset = false;
+
+/**
+ * Boolean indicating whether the `Tech` supports the `timeupdate` event. This is currently
  * not triggered by video-js-swf. This will be used to determine if
  * {@link Tech#manualTimeUpdates} should be called.
  *
@@ -1000,7 +1060,7 @@ Tech.prototype.featuresProgressEvents = false;
 Tech.prototype.featuresTimeupdateEvents = false;
 
 /**
- * Boolean indicating wether the `Tech` supports the native `TextTrack`s.
+ * Boolean indicating whether the `Tech` supports the native `TextTrack`s.
  * This will help us integrate with native `TextTrack`s if the browser supports them.
  *
  * @type {boolean}
@@ -1129,6 +1189,7 @@ Tech.withSourceHandlers = function(_Tech) {
    */
   const deferrable = [
     'seekable',
+    'seeking',
     'duration'
   ];
 
@@ -1178,7 +1239,7 @@ Tech.withSourceHandlers = function(_Tech) {
       if (_Tech.nativeSourceHandler) {
         sh = _Tech.nativeSourceHandler;
       } else {
-        log.error('No source hander found for the current source.');
+        log.error('No source handler found for the current source.');
       }
     }
 

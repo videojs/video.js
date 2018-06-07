@@ -18,6 +18,7 @@ The architecture of the Video.js player is centered around components. The `Play
 * [Specific Component Details](#specific-component-details)
   * [Volume Panel](#volume-panel)
   * [Text Track Settings](#text-track-settings)
+  * [Resize Manager](#resize-manager)
 
 ## What is a Component?
 
@@ -312,7 +313,8 @@ Player
 │ ├── AudioTrackButton (hidden, unless there are relevant tracks)
 │ └── FullscreenToggle
 ├── ErrorDisplay (hidden, until there is an error)
-└── TextTrackSettings
+├── TextTrackSettings
+└── ResizeManager (hidden)
 ```
 
 ## Specific Component Details
@@ -338,3 +340,37 @@ let player = videojs('myplayer', {
 The text track settings component is only available when using emulated text tracks.
 
 [api]: http://docs.videojs.com/Component.html
+
+### Resize Manager
+
+This new component is in charge of triggering a `playerresize` event when the player size changed.
+It uses the ResizeObserver if available or a polyfill was provided. It has no element when using the ResizeObserver.
+If a ResizeObserver is not available, it will fallback to an iframe element and listen to its resize event via a debounced handler.
+
+A ResizeObserver polyfill can be passed in like so:
+
+```js
+var player = videojs('myplayer', {
+  resizeManager: {
+    ResizeObserver: ResizeObserverPoylfill
+  }
+});
+```
+
+To force using the iframe fallback, pass in `null` as the `ResizeObserver`:
+
+```js
+var player = videojs('myplayer', {
+  resizeManager: {
+    ResizeObserver: null
+  }
+});
+```
+
+The ResizeManager can also just be disabled like so:
+
+```js
+var player = videojs('myplayer', {
+  resizeManager: false
+});
+```

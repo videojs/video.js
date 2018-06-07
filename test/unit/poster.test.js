@@ -18,6 +18,7 @@ QUnit.module('PosterImage', {
         return this.poster_;
       },
       handler_: null,
+      off() {},
       on(type, handler) {
         this.handler_ = handler;
       },
@@ -44,23 +45,8 @@ QUnit.test('should create and update a poster image', function(assert) {
   this.mockPlayer.trigger('posterchange');
   backgroundImage = posterImage.el().style.backgroundImage;
   assert.notEqual(backgroundImage.indexOf(this.poster2), -1, 'Background image updated');
-});
 
-QUnit.test('should create and update a fallback image in older browsers', function(assert) {
-  browser.BACKGROUND_SIZE_SUPPORTED = false;
-
-  const posterImage = new PosterImage(this.mockPlayer);
-
-  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster1),
-                 -1,
-                 'Fallback image created');
-
-  // Update with a new poster source and check the new value
-  this.mockPlayer.poster_ = this.poster2;
-  this.mockPlayer.trigger('posterchange');
-  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster2),
-                 -1,
-                 'Fallback image updated');
+  posterImage.dispose();
 });
 
 QUnit.test('should remove itself from the document flow when there is no poster', function(assert) {
@@ -81,6 +67,8 @@ QUnit.test('should remove itself from the document flow when there is no poster'
   assert.equal(posterImage.hasClass('vjs-hidden'),
               false,
               'Poster image shows again when there is a source');
+
+  posterImage.dispose();
 });
 
 QUnit.test('should hide the poster in the appropriate player states', function(assert) {
@@ -106,4 +94,6 @@ QUnit.test('should hide the poster in the appropriate player states', function(a
   assert.equal(TestHelpers.getComputedStyle(el, 'display'),
               'block',
               'The poster continues to show when playing audio');
+
+  posterImage.dispose();
 });

@@ -4,10 +4,6 @@
 
   // This allows scrolling of content if need be.
   overflow: auto;
-
-  // When combined with `overflow: auto;`, this fixes gaps left by
-  // scrollbars in older IE versions.
-  box-sizing: content-box;
 }
 
 // Reset box-sizing inside the modal dialog.

@@ -45,9 +45,8 @@ Video.js uses a JSON object to describe a language, where the keys are English a
   "Play": "Reproducción",
   "Pause": "Pausa",
   "Current Time": "Tiempo reproducido",
-  "Duration Time": "Duración total",
+  "Duration": "Duración total",
   "Remaining Time": "Tiempo restante",
-  ...
 }
 ```
 
@@ -90,7 +89,7 @@ videojs.addLanguage('es', {
   Play: 'Reproducción',
   Pause: 'Pausa',
   'Current Time': 'Tiempo reproducido',
-  'Duration Time': 'Duración total',
+  'Duration': 'Duración total',
   'Remaining Time': 'Tiempo restante',
   ...
 });

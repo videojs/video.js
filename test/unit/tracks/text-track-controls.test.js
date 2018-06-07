@@ -1,7 +1,6 @@
 /* eslint-env qunit */
 import TextTrackMenuItem from '../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
 import TestHelpers from '../test-helpers.js';
-import * as browser from '../../../src/js/utils/browser.js';
 import sinon from 'sinon';
 
 QUnit.module('Text Track Controls', {
@@ -289,64 +288,60 @@ QUnit.test('enabling a captions track should disable the descriptions menu butto
   player.dispose();
 });
 
-if (!browser.IS_IE8) {
-  // This test doesn't work on IE8.
-  // However, this test tests a specific with iOS7 where
-  // the TextTrackList doesn't report track mode changes.
-  // TODO: figure out why this test doens't work on IE8. https://github.com/videojs/video.js/issues/1861
-  QUnit.test('menu items should polyfill mode change events', function(assert) {
-    const player = TestHelpers.makePlayer({});
-    let changes;
+// This test tests a specific with iOS7 where
+// the TextTrackList doesn't report track mode changes.
+QUnit.test('menu items should polyfill mode change events', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  let changes;
 
-    // emulate a TextTrackList that doesn't report track mode changes,
-    // like iOS7
-    player.textTracks().onchange = undefined;
-    const trackMenuItem = new TextTrackMenuItem(player, {
-      track
-    });
-
-    player.textTracks().on('change', function() {
-      changes++;
-    });
-    changes = 0;
-    trackMenuItem.trigger('tap');
-    assert.equal(changes, 1, 'taps trigger change events');
-
-    trackMenuItem.trigger('click');
-    assert.equal(changes, 2, 'clicks trigger change events');
-
-    player.dispose();
+  // emulate a TextTrackList that doesn't report track mode changes,
+  // like iOS7
+  player.textTracks().onchange = undefined;
+  const trackMenuItem = new TextTrackMenuItem(player, {
+    track
   });
-}
+
+  player.textTracks().on('change', function() {
+    changes++;
+  });
+  changes = 0;
+  trackMenuItem.trigger('tap');
+  assert.equal(changes, 1, 'taps trigger change events');
+
+  trackMenuItem.trigger('click');
+  assert.equal(changes, 2, 'clicks trigger change events');
+
+  player.dispose();
+});
 
 const chaptersTrack = {
   kind: 'chapters',
   label: 'Test Chapters'
 };
 
-test('chapters should not be displayed when text tracks list is empty', function() {
+QUnit.test('chapters should not be displayed when text tracks list is empty', function(assert) {
   const player = TestHelpers.makePlayer();
 
-  ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'control is not displayed');
-  equal(player.textTracks().length, 0, 'textTracks is empty');
+  assert.ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'control is not displayed');
+  assert.equal(player.textTracks().length, 0, 'textTracks is empty');
 
   player.dispose();
 });
 
-test('chapters should not be displayed when there is chapters track but no cues', function() {
+QUnit.test('chapters should not be displayed when there is chapters track but no cues', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks: [chaptersTrack]
   });
 
   this.clock.tick(1000);
 
-  ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is not displayed');
-  equal(player.textTracks().length, 1, 'textTracks contains one item');
+  assert.ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is not displayed');
+  assert.equal(player.textTracks().length, 1, 'textTracks contains one item');
 
   player.dispose();
 });
 
-test('chapters should be displayed when cues added to initial track and button updated', function() {
+QUnit.test('chapters should be displayed when cues added to initial track and button updated', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks: [chaptersTrack]
   });
@@ -365,20 +360,20 @@ test('chapters should be displayed when cues added to initial track and button u
     endTime: 4,
     text: 'Chapter 2'
   });
-  equal(chapters.cues.length, 2);
+  assert.equal(chapters.cues.length, 2);
 
   player.controlBar.chaptersButton.update();
 
-  ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
+  assert.ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
 
   const menuItems = player.controlBar.chaptersButton.items;
 
-  equal(menuItems.length, 2, 'menu contains two item');
+  assert.equal(menuItems.length, 2, 'menu contains two item');
 
   player.dispose();
 });
 
-test('chapters should be displayed when a track and its cures added and button updated', function() {
+QUnit.test('chapters should be displayed when a track and its cures added and button updated', function(assert) {
   const player = TestHelpers.makePlayer();
 
   this.clock.tick(1000);
@@ -395,20 +390,20 @@ test('chapters should be displayed when a track and its cures added and button u
     endTime: 4,
     text: 'Chapter 2'
   });
-  equal(chapters.cues.length, 2);
+  assert.equal(chapters.cues.length, 2);
 
   player.controlBar.chaptersButton.update();
 
-  ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
+  assert.ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
 
   const menuItems = player.controlBar.chaptersButton.items;
 
-  equal(menuItems.length, 2, 'menu contains two item');
+  assert.equal(menuItems.length, 2, 'menu contains two item');
 
   player.dispose();
 });
 
-test('chapters menu should use track label as menu title', function() {
+QUnit.test('chapters menu should use track label as menu title', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks: [chaptersTrack]
   });
@@ -427,7 +422,7 @@ test('chapters menu should use track label as menu title', function() {
     endTime: 4,
     text: 'Chapter 2'
   });
-  equal(chapters.cues.length, 2);
+  assert.equal(chapters.cues.length, 2);
 
   player.controlBar.chaptersButton.update();
 
@@ -435,12 +430,12 @@ test('chapters menu should use track label as menu title', function() {
   const titleEl = menu.contentEl().firstChild;
   const menuTitle = titleEl.textContent || titleEl.innerText;
 
-  equal(menuTitle, 'Test Chapters', 'menu gets track label as title');
+  assert.equal(menuTitle, 'Test Chapters', 'menu gets track label as title');
 
   player.dispose();
 });
 
-test('chapters should be displayed when remote track added and load event fired', function() {
+QUnit.test('chapters should be displayed when remote track added and load event fired', function(assert) {
   const player = TestHelpers.makePlayer();
 
   this.clock.tick(1000);
@@ -458,7 +453,7 @@ test('chapters should be displayed when remote track added and load event fired'
     text: 'Chapter 2'
   });
 
-  equal(chaptersEl.track.cues.length, 2);
+  assert.equal(chaptersEl.track.cues.length, 2);
 
   // Anywhere where we support using native text tracks, we can trigger a custom DOM event.
   // On IE8 and other places where we have emulated tracks, either we cannot trigger custom
@@ -470,11 +465,11 @@ test('chapters should be displayed when remote track added and load event fired'
     chaptersEl.trigger('load');
   }
 
-  ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
+  assert.ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
 
   const menuItems = player.controlBar.chaptersButton.items;
 
-  equal(menuItems.length, 2, 'menu contains two item');
+  assert.equal(menuItems.length, 2, 'menu contains two item');
 
   player.dispose();
 });

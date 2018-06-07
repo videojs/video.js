@@ -1,7 +1,6 @@
 import {AudioTrackKind} from './track-enums';
 import Track from './track';
 import merge from '../utils/merge-options';
-import * as browser from '../utils/browser.js';
 
 /**
  * A representation of a single `AudioTrack`. If it is part of an {@link AudioTrackList}
@@ -38,18 +37,11 @@ class AudioTrack extends Track {
     const settings = merge(options, {
       kind: AudioTrackKind[options.kind] || ''
     });
-    // on IE8 this will be a document element
-    // for every other browser this will be a normal object
-    const track = super(settings);
+
+    super(settings);
+
     let enabled = false;
 
-    if (browser.IS_IE8) {
-      for (const prop in AudioTrack.prototype) {
-        if (prop !== 'constructor') {
-          track[prop] = AudioTrack.prototype[prop];
-        }
-      }
-    }
     /**
      * @memberof AudioTrack
      * @member {boolean} enabled
@@ -59,7 +51,7 @@ class AudioTrack extends Track {
      *
      * @fires VideoTrack#selectedchange
      */
-    Object.defineProperty(track, 'enabled', {
+    Object.defineProperty(this, 'enabled', {
       get() {
         return enabled;
       },
@@ -88,11 +80,9 @@ class AudioTrack extends Track {
     // set selected to that true value otherwise
     // we keep it false
     if (settings.enabled) {
-      track.enabled = settings.enabled;
+      this.enabled = settings.enabled;
     }
-    track.loaded_ = true;
-
-    return track;
+    this.loaded_ = true;
   }
 }
 

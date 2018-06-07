@@ -225,9 +225,28 @@ The `dispose` method has several effects:
 
 In addition, if the player is disposed, the disposal of all its advanced plugin instances will be triggered as well.
 
+#### Version
+
+Adding a version number to a plugin is done by defining a `VERSION` property on the plugin before registering it:
+
+```js
+ExamplePlugin.VERSION = '1.0.1';
+
+videojs.registerPlugin('examplePlugin', ExamplePlugin);
+```
+
+Retrieve it using `videojs.getPluginVersion`:
+
+```js
+var version = videojs.getPluginVersion('examplePlugin');
+console.log(version);  // 1.0.1
+```
+
+Note that the [plugin generator](https://github.com/videojs/generator-videojs-plugin) already takes care of adding a version number for you.
+
 ### Advanced Example Advanced Plugin
 
-What follows is a complete ES6 advanced plugin that logs a custom message when the player's state changes between playing and paused. It uses all the described advanced features:
+What follows is a complete ES6 advanced plugin that logs a custom message when the player's state changes between playing and pause. It uses all the described advanced features:
 
 ```js
 import videojs from 'video.js';
@@ -239,9 +258,9 @@ class Advanced extends Plugin {
   constructor(player, options) {
     super(player, options);
 
-    // Whenever the player emits a playing or paused event, we update the
+    // Whenever the player emits a playing or pause event, we update the
     // state if necessary.
-    this.on(player, ['playing', 'paused'], this.updateState);
+    this.on(player, ['playing', 'pause'], this.updateState);
     this.on('statechanged', this.logState);
   }
 
@@ -251,7 +270,7 @@ class Advanced extends Plugin {
   }
 
   updateState() {
-    this.setState({playing: !player.paused()});
+    this.setState({playing: !this.player.paused()});
   }
 
   logState(changed) {

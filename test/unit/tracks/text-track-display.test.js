@@ -92,8 +92,8 @@ QUnit.test('shows the default caption track first', function(assert) {
   };
 
   // Add the text tracks
-  const englishTrack = player.addRemoteTextTrack(track1).track;
-  const spanishTrack = player.addRemoteTextTrack(track2).track;
+  const englishTrack = player.addRemoteTextTrack(track1, true).track;
+  const spanishTrack = player.addRemoteTextTrack(track2, true).track;
 
   // Make sure the ready handler runs
   this.clock.tick(1);
@@ -116,7 +116,7 @@ if (!Html5.supportsNativeTextTracks()) {
     const selectedLanguageHandler = function(event) {
       spy();
     };
-    const englishTrack = player.addRemoteTextTrack(track1).track;
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
 
     player.textTracks().addEventListener('selectedlanguagechange', selectedLanguageHandler);
     englishTrack.mode = 'showing';
@@ -138,7 +138,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    const englishTrack = player.addRemoteTextTrack(track1).track;
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
 
     // Force 'es' as user-selected track
     player.cache_.selectedLanguage = { language: 'es', kind: 'captions' };
@@ -170,8 +170,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    const englishTrack = player.addRemoteTextTrack(track1).track;
-    const spanishTrack = player.addRemoteTextTrack(track2).track;
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
+    const spanishTrack = player.addRemoteTextTrack(track2, true).track;
 
     // Force 'es' as user-selected track
     player.cache_.selectedLanguage = { enabled: true, language: 'es', kind: 'captions' };
@@ -199,8 +199,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    const captionTrack = player.addRemoteTextTrack(track1).track;
-    const subsTrack = player.addRemoteTextTrack(track2).track;
+    const captionTrack = player.addRemoteTextTrack(track1, true).track;
+    const subsTrack = player.addRemoteTextTrack(track2, true).track;
 
     // Force English captions as user-selected track
     player.cache_.selectedLanguage = { enabled: true, language: 'en', kind: 'captions' };
@@ -233,8 +233,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    player.addRemoteTextTrack(track1);
-    player.addRemoteTextTrack(track2);
+    player.addRemoteTextTrack(track1, true);
+    player.addRemoteTextTrack(track2, true);
 
     // Keep track of menu items
     esCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'es');
@@ -261,8 +261,8 @@ if (!Html5.supportsNativeTextTracks()) {
     // change the kind of track to subtitles
     track1.kind = 'subtitles';
     track2.kind = 'subtitles';
-    const englishTrack = player.addRemoteTextTrack(track1).track;
-    const spanishTrack = player.addRemoteTextTrack(track2).track;
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
+    const spanishTrack = player.addRemoteTextTrack(track2, true).track;
 
     // Make sure player ready handler runs
     this.clock.tick(1);
@@ -293,14 +293,14 @@ if (!Html5.supportsNativeTextTracks()) {
       src: 'en.vtt'
     };
     const captionsButton = player.controlBar.getChild('SubsCapsButton');
-    // we know the postition of the OffTextTrackMenuItem
-    const offMenuItem = captionsButton.items[1];
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
-    const englishTrack = player.addRemoteTextTrack(track1).track;
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
     // Keep track of menu items
     const enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
+    // we know the postition of the OffTextTrackMenuItem
+    const offMenuItem = captionsButton.items[1];
 
     // Select English initially
     player.play();

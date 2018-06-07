@@ -84,8 +84,11 @@ class Component {
       this.el_ = this.createEl();
     }
 
-    // Make this an evented object and use `el_`, if available, as its event bus
-    evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+    // if evented is anything except false, we want to mixin in evented
+    if (options.evented !== false) {
+      // Make this an evented object and use `el_`, if available, as its event bus
+      evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+    }
     stateful(this, this.constructor.defaultState);
 
     this.children_ = [];
@@ -148,6 +151,9 @@ class Component {
       DomData.removeData(this.el_);
       this.el_ = null;
     }
+
+    // remove reference to the player after disposing of the element
+    this.player_ = null;
   }
 
   /**
@@ -217,7 +223,7 @@ class Component {
    * Localize a string given the string in english.
    *
    * If tokens are provided, it'll try and run a simple token replacement on the provided string.
-   * The tokens it loooks for look like `{1}` with the index being 1-indexed into the tokens array.
+   * The tokens it looks for look like `{1}` with the index being 1-indexed into the tokens array.
    *
    * If a `defaultValue` is provided, it'll use that over `string`,
    * if a value isn't found in provided language files.
@@ -598,18 +604,21 @@ class Component {
    *         Returns itself; method can be chained.
    */
   ready(fn, sync = false) {
-    if (fn) {
-      if (this.isReady_) {
-        if (sync) {
-          fn.call(this);
-        } else {
-          // Call the function asynchronously by default for consistency
-          this.setTimeout(fn, 1);
-        }
-      } else {
-        this.readyQueue_ = this.readyQueue_ || [];
-        this.readyQueue_.push(fn);
-      }
+    if (!fn) {
+      return;
+    }
+
+    if (!this.isReady_) {
+      this.readyQueue_ = this.readyQueue_ || [];
+      this.readyQueue_.push(fn);
+      return;
+    }
+
+    if (sync) {
+      fn.call(this);
+    } else {
+      // Call the function asynchronously by default for consistency
+      this.setTimeout(fn, 1);
     }
   }
 
@@ -621,7 +630,7 @@ class Component {
   triggerReady() {
     this.isReady_ = true;
 
-    // Ensure ready is triggerd asynchronously
+    // Ensure ready is triggered asynchronously
     this.setTimeout(function() {
       const readyQueue = this.readyQueue_;
 
@@ -979,7 +988,7 @@ class Component {
 
     // if the computed value is still 0, it's possible that the browser is lying
     // and we want to check the offset values.
-    // This code also runs on IE8 and wherever getComputedStyle doesn't exist.
+    // This code also runs wherever getComputedStyle doesn't exist.
     if (computedWidthOrHeight === 0) {
       const rule = `offset${toTitleCase(widthOrHeight)}`;
 
@@ -1217,9 +1226,9 @@ class Component {
    *    {@link Component#dispose} gets called.
    * 2. The function callback will gets turned into a {@link Component~GenericCallback}
    *
-   * > Note: You can use `window.clearTimeout` on the id returned by this function. This
+   * > Note: You can't use `window.clearTimeout` on the id returned by this function. This
    *         will cause its dispose listener not to get cleaned up! Please use
-   *         {@link Component#clearTimeout} or {@link Component#dispose}.
+   *         {@link Component#clearTimeout} or {@link Component#dispose} instead.
    *
    * @param {Component~GenericCallback} fn
    *        The function that will be run after `timeout`.
@@ -1239,9 +1248,7 @@ class Component {
     fn = Fn.bind(this, fn);
 
     const timeoutId = window.setTimeout(fn, timeout);
-    const disposeFn = function() {
-      this.clearTimeout(timeoutId);
-    };
+    const disposeFn = () => this.clearTimeout(timeoutId);
 
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
@@ -1302,9 +1309,7 @@ class Component {
 
     const intervalId = window.setInterval(fn, interval);
 
-    const disposeFn = function() {
-      this.clearInterval(intervalId);
-    };
+    const disposeFn = () => this.clearInterval(intervalId);
 
     disposeFn.guid = `vjs-interval-${intervalId}`;
 

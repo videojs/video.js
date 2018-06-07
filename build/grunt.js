@@ -1,6 +1,4 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
-import chg from 'chg';
-import npmRun from 'npm-run';
 import isDocsOnly from './docs-only.js';
 
 module.exports = function(grunt) {
@@ -26,22 +24,6 @@ module.exports = function(grunt) {
       ['bundle-collapser/plugin'],
       ['browserify-derequire']
     ]
-  };
-
-  const githubReleaseDefaults = {
-    options: {
-      release: {
-        tag_name: 'v'+ version.full,
-        name: version.full,
-        body: npmRun.execSync('conventional-changelog -p videojs', {
-          silent: true,
-          encoding: 'utf8'
-        })
-      },
-    },
-    files: {
-      src: [`dist/video-js-${version.full}.zip`] // Files that you want to attach to Release
-    }
   };
 
   /**
@@ -70,9 +52,6 @@ module.exports = function(grunt) {
    * @return {Object}
    */
   const browserifyGruntOptions = gruntOptionsMaker(browserifyGruntDefaults, browserifyGruntCustomizer);
-
-  const githubReleaseCustomizer = gruntCustomizer;
-  const githubReleaseOptions = gruntOptionsMaker(githubReleaseDefaults, githubReleaseCustomizer);
 
   /**
    * Creates processor functions for license banners.
@@ -103,29 +82,6 @@ module.exports = function(grunt) {
       build: ['build/temp/*', 'es5'],
       dist: ['dist/*']
     },
-    uglify: {
-      options: {
-        preserveComments: 'some',
-        screwIE8: false,
-        mangle: true,
-        compress: {
-          sequences: true,
-          dead_code: true,
-          conditionals: true,
-          booleans: true,
-          unused: true,
-          if_return: true,
-          join_vars: true,
-          drop_console: true
-        }
-      },
-      build: {
-        files: {
-          'build/temp/alt/video.novtt.min.js': 'build/temp/alt/video.novtt.js',
-          'build/temp/video.min.js': 'build/temp/video.js'
-        }
-      }
-    },
     dist: {},
     watch: {
       dist: {
@@ -136,10 +92,6 @@ module.exports = function(grunt) {
           'build/temp/alt/video-js-cdn.css'
         ],
         tasks: ['copy:dist']
-      },
-      minify: {
-        files: ['build/temp/video.js'],
-        tasks: ['uglify']
       },
       skin: {
         files: ['src/css/**/*'],
@@ -171,8 +123,6 @@ module.exports = function(grunt) {
         ]
       },
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
-      swf:   { cwd: 'node_modules/videojs-swf/dist/', src: 'video-js.swf', dest: 'build/temp/', expand: true, filter: 'isFile' },
-      ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
@@ -226,20 +176,7 @@ module.exports = function(grunt) {
       firefox_bs:   { browsers: ['firefox_bs'] },
       safari_bs:    { browsers: ['safari_bs'] },
       edge_bs:      { browsers: ['edge_bs'] },
-      ie11_bs:      { browsers: ['ie11_bs'] },
-      ie10_bs:      { browsers: ['ie10_bs'] },
-      ie9_bs:       { browsers: ['ie9_bs'] },
-      ie8_bs:       { browsers: ['ie8_bs'] }
-    },
-    vjsdocs: {
-      all: {
-        // TODO: Update vjsdocs to support new build, or switch to jsdoc
-        src: '',
-        dest: 'docs/api',
-        options: {
-          baseURL: 'https://github.com/videojs/video.js/blob/master/'
-        }
-      }
+      ie11_bs:      { browsers: ['ie11_bs'] }
     },
     vjslanguages: {
       defaults: {
@@ -260,65 +197,11 @@ module.exports = function(grunt) {
       }
     },
     version: {
-      options: {
-        pkg: 'package.json'
-      },
-      major: {
-        options: {
-          release: 'major'
-        },
-        src: ['package.json']
-      },
-      minor: {
-        options: {
-          release: 'minor'
-        },
-        src: ['package.json']
-      },
-      patch: {
-        options: {
-          release: 'patch'
-        },
-        src: ['package.json']
-      },
-      prerelease: {
-        options: {
-          release: 'prerelease'
-        },
-        src: ['package.json']
-      },
       css: {
         options: {
           prefix: '@version\\s*'
         },
         src: 'build/temp/video-js.css'
-      }
-    },
-    'github-release': {
-      options: {
-        repository: 'videojs/video.js',
-        auth: {
-          user: process.env.VJS_GITHUB_USER,
-          password: process.env.VJS_GITHUB_TOKEN
-        }
-      },
-      release: githubReleaseOptions(),
-      prerelease: githubReleaseOptions({
-        options: {
-          release: {
-            prerelease: true
-          }
-        }
-      })
-    },
-    babel: {
-      es5: {
-        files: [{
-          expand: true,
-          cwd: 'src/js/',
-          src: ['**/*.js', '!base-styles.js'],
-          dest: 'es5/'
-        }]
       }
     },
     browserify: {
@@ -392,10 +275,6 @@ module.exports = function(grunt) {
     concat: {
       options: {
         separator: '\n'
-      },
-      ie8_addition: {
-        src: ['build/temp/video-js.css', 'src/css/ie8.css'],
-        dest: 'build/temp/video-js.css'
       }
     },
     concurrent: {
@@ -407,12 +286,13 @@ module.exports = function(grunt) {
         'browserify:tests'
       ],
       dev: [
+        'skin',
         'shell:babel',
-        'shell:rollupwatch',
         'browserify:tests',
         'watch:skin',
         'watch:lang',
-        'watch:dist'
+        'watch:dist',
+        'copy:dist'
       ],
       // Run multiple watch tasks in parallel
       // Needed so watchify can cache intelligently
@@ -454,14 +334,8 @@ module.exports = function(grunt) {
         }
       },
       rollupall: {
-        command: 'npm run rollup -- --no-progress && npm run rollup-minify -- --no-progress',
+        command: 'npm run rollup -- --no-progress && npm run minify',
         options: {
-          preferLocal: true
-        }
-      },
-      rollupwatch: {
-        command: 'npm run rollup-dev',
-        optoins: {
           preferLocal: true
         }
       },
@@ -518,8 +392,6 @@ module.exports = function(grunt) {
 
   // load all the npm grunt tasks
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('videojs-doc-generator');
-  grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('grunt-accessibility');
 
   grunt.registerTask('build', [
@@ -533,8 +405,6 @@ module.exports = function(grunt) {
     'cssmin',
 
     'copy:fonts',
-    'copy:swf',
-    'copy:ie8',
     'vjslanguages'
   ]);
 
@@ -546,7 +416,7 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass', 'concat:ie8_addition']);
+  grunt.registerTask('skin', ['sass']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);

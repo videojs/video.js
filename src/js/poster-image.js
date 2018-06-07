@@ -5,7 +5,7 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
 import * as Fn from './utils/fn.js';
 import * as Dom from './utils/dom.js';
-import * as browser from './utils/browser.js';
+import {silencePromise} from './utils/promise';
 
 /**
  * A `ClickableComponent` that handles showing the poster image for the player.
@@ -52,15 +52,6 @@ class PosterImage extends ClickableComponent {
       tabIndex: -1
     });
 
-    // To ensure the poster image resizes while maintaining its original aspect
-    // ratio, use a div with `background-size` when available. For browsers that
-    // do not support `background-size` (e.g. IE8), fall back on using a regular
-    // img element.
-    if (!browser.BACKGROUND_SIZE_SUPPORTED) {
-      this.fallbackImg_ = Dom.createEl('img');
-      el.appendChild(this.fallbackImg_);
-    }
-
     return el;
   }
 
@@ -93,19 +84,15 @@ class PosterImage extends ClickableComponent {
    *        The URL to the source for the `PosterImage`.
    */
   setSrc(url) {
-    if (this.fallbackImg_) {
-      this.fallbackImg_.src = url;
-    } else {
-      let backgroundImage = '';
+    let backgroundImage = '';
 
-      // Any falsey values should stay as an empty string, otherwise
-      // this will throw an extra error
-      if (url) {
-        backgroundImage = `url("${url}")`;
-      }
-
-      this.el_.style.backgroundImage = backgroundImage;
+    // Any falsy value should stay as an empty string, otherwise
+    // this will throw an extra error
+    if (url) {
+      backgroundImage = `url("${url}")`;
     }
+
+    this.el_.style.backgroundImage = backgroundImage;
   }
 
   /**
@@ -126,7 +113,7 @@ class PosterImage extends ClickableComponent {
     }
 
     if (this.player_.paused()) {
-      this.player_.play();
+      silencePromise(this.player_.play());
     } else {
       this.player_.pause();
     }

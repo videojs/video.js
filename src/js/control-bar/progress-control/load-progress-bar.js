@@ -39,6 +39,12 @@ class LoadProgressBar extends Component {
     });
   }
 
+  dispose() {
+    this.partEls_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Update progress bar
    *

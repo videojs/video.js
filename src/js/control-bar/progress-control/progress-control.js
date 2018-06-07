@@ -27,10 +27,9 @@ class ProgressControl extends Component {
   constructor(player, options) {
     super(player, options);
     this.handleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
-    this.on(this.el_, 'mousemove', this.handleMouseMove);
-
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
-    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
+
+    this.enable();
   }
 
   /**
@@ -56,22 +55,25 @@ class ProgressControl extends Component {
    */
   handleMouseMove(event) {
     const seekBar = this.getChild('seekBar');
-    const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
-    const seekBarEl = seekBar.el();
-    const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
-    let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
 
-    // The default skin has a gap on either side of the `SeekBar`. This means
-    // that it's possible to trigger this behavior outside the boundaries of
-    // the `SeekBar`. This ensures we stay within it at all times.
-    if (seekBarPoint > 1) {
-      seekBarPoint = 1;
-    } else if (seekBarPoint < 0) {
-      seekBarPoint = 0;
-    }
+    if (seekBar) {
+      const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
+      const seekBarEl = seekBar.el();
+      const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
+      let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
 
-    if (mouseTimeDisplay) {
-      mouseTimeDisplay.update(seekBarRect, seekBarPoint);
+      // The default skin has a gap on either side of the `SeekBar`. This means
+      // that it's possible to trigger this behavior outside the boundaries of
+      // the `SeekBar`. This ensures we stay within it at all times.
+      if (seekBarPoint > 1) {
+        seekBarPoint = 1;
+      } else if (seekBarPoint < 0) {
+        seekBarPoint = 0;
+      }
+
+      if (mouseTimeDisplay) {
+        mouseTimeDisplay.update(seekBarRect, seekBarPoint);
+      }
     }
   }
 
@@ -98,7 +100,55 @@ class ProgressControl extends Component {
   handleMouseSeek(event) {
     const seekBar = this.getChild('seekBar');
 
-    seekBar.handleMouseMove(event);
+    if (seekBar) {
+      seekBar.handleMouseMove(event);
+    }
+  }
+
+  /**
+   * Are controls are currently enabled for this progress control.
+   *
+   * @return {boolean}
+   *         true if controls are enabled, false otherwise
+   */
+  enabled() {
+    return this.enabled_;
+  }
+
+  /**
+   * Disable all controls on the progress control and its children
+   */
+  disable() {
+    this.children().forEach((child) => child.disable && child.disable());
+
+    if (!this.enabled()) {
+      return;
+    }
+
+    this.off(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.off(this.el_, 'mousemove', this.handleMouseMove);
+    this.handleMouseUp();
+
+    this.addClass('disabled');
+
+    this.enabled_ = false;
+  }
+
+  /**
+   * Enable all controls on the progress control and its children
+   */
+  enable() {
+    this.children().forEach((child) => child.enable && child.enable());
+
+    if (this.enabled()) {
+      return;
+    }
+
+    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.on(this.el_, 'mousemove', this.handleMouseMove);
+    this.removeClass('disabled');
+
+    this.enabled_ = true;
   }
 
   /**
@@ -112,6 +162,11 @@ class ProgressControl extends Component {
    */
   handleMouseDown(event) {
     const doc = this.el_.ownerDocument;
+    const seekBar = this.getChild('seekBar');
+
+    if (seekBar) {
+      seekBar.handleMouseDown(event);
+    }
 
     this.on(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.on(doc, 'touchmove', this.throttledHandleMouseSeek);
@@ -130,6 +185,11 @@ class ProgressControl extends Component {
    */
   handleMouseUp(event) {
     const doc = this.el_.ownerDocument;
+    const seekBar = this.getChild('seekBar');
+
+    if (seekBar) {
+      seekBar.handleMouseUp(event);
+    }
 
     this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.off(doc, 'touchmove', this.throttledHandleMouseSeek);

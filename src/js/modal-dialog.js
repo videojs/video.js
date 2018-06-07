@@ -97,6 +97,14 @@ class ModalDialog extends Component {
     });
   }
 
+  dispose() {
+    this.contentEl_ = null;
+    this.descEl_ = null;
+    this.previouslyActiveEl_ = null;
+
+    super.dispose();
+  }
+
   /**
    * Builds the default DOM `className`.
    *
@@ -187,7 +195,10 @@ class ModalDialog extends Component {
         this.on(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
       }
 
+      // Hide controls and note if they were enabled.
+      this.hadControls_ = player.controls();
       player.controls(false);
+
       this.show();
       this.conditionalFocus_();
       this.el().setAttribute('aria-hidden', 'false');
@@ -249,7 +260,10 @@ class ModalDialog extends Component {
       this.off(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
     }
 
-    player.controls(true);
+    if (this.hadControls_) {
+      player.controls(true);
+    }
+
     this.hide();
     this.el().setAttribute('aria-hidden', 'true');
 

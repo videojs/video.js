@@ -3,6 +3,7 @@
  * @module fn
  */
 import { newGUID } from './guid.js';
+import window from 'global/window';
 
 /**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
@@ -67,4 +68,55 @@ export const throttle = function(fn, wait) {
   };
 
   return throttled;
+};
+
+/**
+ * Creates a debounced function that delays invoking `func` until after `wait`
+ * milliseconds have elapsed since the last time the debounced function was
+ * invoked.
+ *
+ * Inspired by lodash and underscore implementations.
+ *
+ * @param  {Function} func
+ *         The function to wrap with debounce behavior.
+ *
+ * @param  {number} wait
+ *         The number of milliseconds to wait after the last invocation.
+ *
+ * @param  {boolean} [immediate]
+ *         Whether or not to invoke the function immediately upon creation.
+ *
+ * @param  {Object} [context=window]
+ *         The "context" in which the debounced function should debounce. For
+ *         example, if this function should be tied to a Video.js player,
+ *         the player can be passed here. Alternatively, defaults to the
+ *         global `window` object.
+ *
+ * @return {Function}
+ *         A debounced function.
+ */
+export const debounce = function(func, wait, immediate, context = window) {
+  let timeout;
+
+  /* eslint-disable consistent-this */
+  return function() {
+    const self = this;
+    const args = arguments;
+
+    let later = function() {
+      timeout = null;
+      later = null;
+      if (!immediate) {
+        func.apply(self, args);
+      }
+    };
+
+    if (!timeout && immediate) {
+      func.apply(self, args);
+    }
+
+    context.clearTimeout(timeout);
+    timeout = context.setTimeout(later, wait);
+  };
+  /* eslint-enable consistent-this */
 };

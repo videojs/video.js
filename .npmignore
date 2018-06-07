@@ -3,4 +3,4 @@
 !dist/**
 !es5/**
 !src/css/**
-!docs/api/**
+!core.js

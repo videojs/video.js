@@ -3,13 +3,11 @@
  * @module log
  */
 import window from 'global/window';
-import {IE_VERSION} from './browser';
-import {isObject} from './obj';
 
 let log;
 
 // This is the private tracking variable for logging level.
-let level = 'all';
+let level = 'info';
 
 // This is the private tracking variable for the logging history.
 let history = [];
@@ -23,12 +21,8 @@ let history = [];
  *
  * @param  {Array} args
  *         The arguments to be passed to the matching console method.
- *
- * @param  {boolean} [stringify]
- *         By default, only old IEs should get console argument stringification,
- *         but this is exposed as a parameter to facilitate testing.
  */
-export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
+export const logByType = (type, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
 
@@ -48,11 +42,20 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
 
   // If there's no console then don't try to output messages, but they will
   // still be stored in history.
-  //
+  if (!window.console) {
+    return;
+  }
+
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
   // when the module is executed.
-  const fn = window.console && window.console[type];
+  let fn = window.console[type];
+
+  if (!fn && type === 'debug') {
+    // Certain browsers don't have support for console.debug. For those, we
+    // should default to the closest comparable log.
+    fn = window.console.info || window.console.log;
+  }
 
   // Bail out if there's no console or if this type is not allowed by the
   // current logging level.
@@ -60,31 +63,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
     return;
   }
 
-  // IEs previous to 11 log objects uselessly as "[object Object]"; so, JSONify
-  // objects and arrays for those less-capable browsers.
-  if (stringify) {
-    args = args.map(a => {
-      if (isObject(a) || Array.isArray(a)) {
-        try {
-          return JSON.stringify(a);
-        } catch (x) {
-          return String(a);
-        }
-      }
-
-      // Cast to string before joining, so we get null and undefined explicitly
-      // included in output (as we would in a modern console).
-      return String(a);
-    }).join(' ');
-  }
-
-  // Old IE versions do not allow .apply() for console methods (they are
-  // reported as objects rather than functions).
-  if (!fn.apply) {
-    fn(args);
-  } else {
-    fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
-  }
+  fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
 };
 
 /**
@@ -108,18 +87,22 @@ log = function(...args) {
  *
  * - `off`: Matches no calls. Any value that can be cast to `false` will have
  *   this effect. The most restrictive.
- * - `all` (default): Matches only Video.js-provided functions (`log`,
+ * - `all`: Matches only Video.js-provided functions (`debug`, `log`,
  *   `log.warn`, and `log.error`).
+ * - `debug`: Matches `log.debug`, `log`, `log.warn`, and `log.error` calls.
+ * - `info` (default): Matches `log`, `log.warn`, and `log.error` calls.
  * - `warn`: Matches `log.warn` and `log.error` calls.
  * - `error`: Matches only `log.error` calls.
  *
  * @type {Object}
  */
 log.levels = {
-  all: 'log|warn|error',
-  error: 'error',
+  all: 'debug|log|warn|error',
   off: '',
+  debug: 'debug|log|warn|error',
+  info: 'log|warn|error',
   warn: 'warn|error',
+  error: 'error',
   DEFAULT: level
 };
 
@@ -199,5 +182,14 @@ log.error = (...args) => logByType('error', args);
  *        One or more messages or objects that should be logged as a warning.
  */
 log.warn = (...args) => logByType('warn', args);
+
+/**
+ * Logs debug messages. Similar to `console.debug`, but may also act as a comparable
+ * log if `console.debug` is not available
+ *
+ * @param {Mixed[]} args
+ *        One or more messages or objects that should be logged as debug.
+ */
+log.debug = (...args) => logByType('debug', args);
 
 export default log;

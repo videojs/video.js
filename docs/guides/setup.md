@@ -37,6 +37,8 @@ Video.js supports all attributes of the `<video>` element (such as `controls`, `
 </video>
 ```
 
+For a high-level overview of all the various embed options, check out the [embeds page](/docs/guides/embeds.md), then follow the rest of this page.
+
 ### Automatic Setup
 
 By default, when your web page finishes loading, Video.js will scan for media elements that have the `data-setup` attribute. The `data-setup` attribute is used to pass options to Video.js. A minimal example looks like this:
@@ -79,6 +81,28 @@ However, using an `id` attribute isn't always practical; so, the `videojs` funct
 ```js
 videojs(document.querySelector('.video-js'));
 ```
+
+### Getting References to Players
+
+Once players are created, Video.js keeps track of them internally. There are a few ways to get references to pre-existing players.
+
+#### Using `videojs`
+
+Calling `videojs()` with the ID of element of an already-existing player will return that player and will not create another one.
+
+If there is no player matching the argument, it will attempt to create one.
+
+#### Using `videojs.getPlayer()`
+
+Sometimes, you want to get a reference to a player without the potential side effects of calling `videojs()`. This can be acheived by calling `videojs.getPlayer()` with either a string matching the element's ID or the element itself.
+
+#### Using `videojs.getPlayers()` or `videojs.players`
+
+The `videojs.players` property exposes all known players. The method, `videojs.getPlayers()` simply returns the same object.
+
+Players are stored on this object with keys matching their IDs.
+
+> **Note:** A player created from an element without an ID will be assigned an automatically-generated ID.
 
 ## Options
 

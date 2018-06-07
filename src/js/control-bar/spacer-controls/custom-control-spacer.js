@@ -34,7 +34,7 @@ class CustomControlSpacer extends Spacer {
 
     // No-flex/table-cell mode requires there be some content
     // in the cell to fill the remaining space of the table.
-    el.innerHTML = '&nbsp;';
+    el.innerHTML = '\u00a0';
     return el;
   }
 }

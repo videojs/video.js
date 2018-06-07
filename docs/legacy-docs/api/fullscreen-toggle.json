@@ -1,0 +1,95 @@
+[
+    {
+        "comment": "/**\n * Toggle fullscreen video\n * @param {Player|Object} player\n * @param {Object=} options\n * @extends Button\n * @class FullScreenToggle\n */",
+        "meta": {
+            "range": [
+                0,
+                141
+            ],
+            "filename": "fullscreen-toggle.js",
+            "lineno": 1,
+            "path": "/Users/mboles/git/BCL-LearningSamples/jsdoc-tests2",
+            "code": {}
+        },
+        "description": "<p>Toggle fullscreen video</p>",
+        "params": [
+            {
+                "type": {
+                    "names": [
+                        "Player",
+                        "Object"
+                    ]
+                },
+                "name": "player"
+            },
+            {
+                "type": {
+                    "names": [
+                        "Object"
+                    ]
+                },
+                "optional": true,
+                "name": "options"
+            }
+        ],
+        "augments": [
+            "Button"
+        ],
+        "kind": "class",
+        "name": "FullScreenToggle",
+        "longname": "FullScreenToggle",
+        "scope": "global"
+    },
+    {
+        "comment": "/**\n  * Allows sub components to stack CSS class names\n  * @return {String}\n  * @method buildCSSClass\n  */",
+        "meta": {
+            "range": [
+                143,
+                249
+            ],
+            "filename": "fullscreen-toggle.js",
+            "lineno": 9,
+            "path": "/Users/mboles/git/BCL-LearningSamples/jsdoc-tests2",
+            "code": {}
+        },
+        "description": "<p>Allows sub components to stack CSS class names</p>",
+        "returns": [
+            {
+                "type": {
+                    "names": [
+                        "String"
+                    ]
+                }
+            }
+        ],
+        "kind": "function",
+        "name": "buildCSSClass",
+        "longname": "buildCSSClass",
+        "scope": "global"
+    },
+    {
+        "comment": "/**\n  * Handles the click\n  * @method handleClick\n  */",
+        "meta": {
+            "range": [
+                251,
+                305
+            ],
+            "filename": "fullscreen-toggle.js",
+            "lineno": 15,
+            "path": "/Users/mboles/git/BCL-LearningSamples/jsdoc-tests2",
+            "code": {}
+        },
+        "description": "<p>Handles the click</p>",
+        "kind": "function",
+        "name": "handleClick",
+        "longname": "handleClick",
+        "scope": "global"
+    },
+    {
+        "kind": "package",
+        "longname": "package:undefined",
+        "files": [
+            "/Users/mboles/git/BCL-LearningSamples/jsdoc-tests2/fullscreen-toggle.js"
+        ]
+    }
+]
