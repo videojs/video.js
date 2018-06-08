@@ -196,6 +196,14 @@ module.exports = function(grunt) {
         dest: 'dist/video-js-' + version.full + '.zip'
       }
     },
+    postcss: {
+      options: {
+        processors: [require('autoprefixer')({browsers: ['defaults', 'ie 11']})]
+      },
+      dist: {
+        src: ['build/temp/video-js.css', 'build/temp/alt/video-js-cdn.css']
+      }
+    },
     version: {
       css: {
         options: {
@@ -398,9 +406,10 @@ module.exports = function(grunt) {
     'shell:lint',
     'clean:build',
 
-    'shell:rollupall',
+    // 'shell:rollupall',
 
     'skin',
+    'postcss',
     'version:css',
     'cssmin',
 
