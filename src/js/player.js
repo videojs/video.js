@@ -1258,7 +1258,7 @@ class Player extends Component {
     }
 
     // update `currentSource` cache always
-    this.cache_.source = {src, type};
+    this.cache_.source = mergeOptions({}, srcObj, {src, type});
 
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
     const sourceElSources = [];
