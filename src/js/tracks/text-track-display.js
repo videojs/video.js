@@ -36,22 +36,23 @@ const fontMap = {
  */
 function constructColor(color, opacity) {
   let hex;
+
   switch (color.length) {
-    case 4:
-      // color looks like "#f0e"
-      hex = color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
-      break;
-    case 7:
-      // color looks like "#f604e2"
-      hex = color.slice(1);
-      break;
-    default:
-      throw new Error('Invalid color code provided (' + color + '). Expecting code formatted as e.g. #f0e or #f604e2.');
+  case 4:
+    // color looks like "#f0e"
+    hex = color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+    break;
+  case 7:
+    // color looks like "#f604e2"
+    hex = color.slice(1);
+    break;
+  default:
+    throw new Error('Invalid color code provided (' + color + '). Expecting code formatted as e.g. #f0e or #f604e2.');
   }
   return 'rgba(' +
-    parseInt(hex.slice(0,2), 16) + ',' +
-    parseInt(hex.slice(2,4), 16) + ',' +
-    parseInt(hex.slice(4,6), 16) + ',' +
+    parseInt(hex.slice(0, 2), 16) + ',' +
+    parseInt(hex.slice(2, 4), 16) + ',' +
+    parseInt(hex.slice(4, 6), 16) + ',' +
     opacity + ')';
 }
 
