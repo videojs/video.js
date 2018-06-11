@@ -1,3 +1,11 @@
+<a name="6.10.3"></a>
+## [6.10.3](https://github.com/videojs/video.js/compare/v6.10.2...v6.10.3) (2018-06-11)
+
+### Bug Fixes
+
+* make sure source options are passed through ([#5240](https://github.com/videojs/video.js/issues/5240)) ([246f0d4](https://github.com/videojs/video.js/commit/246f0d4)), closes [#5156](https://github.com/videojs/video.js/issues/5156) [#5241](https://github.com/videojs/video.js/issues/5241)
+* menu sizing when using longer caption labels ([#5228](https://github.com/videojs/video.js/issues/5228)) ([a51b918](https://github.com/videojs/video.js/commit/a51b918)), closes [#4758](https://github.com/videojs/video.js/issues/4758)
+
 <a name="6.10.2"></a>
 ## [6.10.2](https://github.com/videojs/video.js/compare/v6.10.1...v6.10.2) (2018-06-05)
 
