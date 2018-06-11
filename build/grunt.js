@@ -196,14 +196,6 @@ module.exports = function(grunt) {
         dest: 'dist/video-js-' + version.full + '.zip'
       }
     },
-    postcss: {
-      options: {
-        processors: [require('autoprefixer')({browsers: ['defaults', 'ie 11']})]
-      },
-      dist: {
-        src: ['build/temp/video-js.css', 'build/temp/alt/video-js-cdn.css']
-      }
-    },
     version: {
       css: {
         options: {
@@ -347,6 +339,9 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
+      autoprefixer: {
+        command: 'npm run autoprefixer'
+      },
       babel: {
         command: 'npm run babel -- --watch --quiet',
         options: {
@@ -409,7 +404,7 @@ module.exports = function(grunt) {
     'shell:rollupall',
 
     'skin',
-    'postcss',
+    'shell:autoprefixer',
     'version:css',
     'cssmin',
 
