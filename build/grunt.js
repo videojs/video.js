@@ -406,7 +406,7 @@ module.exports = function(grunt) {
     'shell:lint',
     'clean:build',
 
-    // 'shell:rollupall',
+    'shell:rollupall',
 
     'skin',
     'postcss',
