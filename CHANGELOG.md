@@ -1,3 +1,18 @@
+<a name="7.0.5"></a>
+## [7.0.5](https://github.com/videojs/video.js/compare/v7.0.4...v7.0.5) (2018-06-11)
+
+### Bug Fixes
+
+* make sure source options are passed through ([#5241](https://github.com/videojs/video.js/issues/5241)) ([9504a93](https://github.com/videojs/video.js/commit/9504a93)), closes [#5156](https://github.com/videojs/video.js/issues/5156)
+* menu sizing when using longer caption labels ([#5228](https://github.com/videojs/video.js/issues/5228)) ([002d701](https://github.com/videojs/video.js/commit/002d701)), closes [#4758](https://github.com/videojs/video.js/issues/4758)
+
+### Chores
+
+* **package:** update conventional-changelog-cli to version 2.0.1 🚀 ([#5236](https://github.com/videojs/video.js/issues/5236)) ([59ab323](https://github.com/videojs/video.js/commit/59ab323)), closes [#5225](https://github.com/videojs/video.js/issues/5225)
+* **package:** update grunt-contrib-watch to version 1.1.0 🚀 ([#5170](https://github.com/videojs/video.js/issues/5170)) ([e8d00e2](https://github.com/videojs/video.js/commit/e8d00e2))
+* **package:** update rollup to version 0.60.1 🚀 ([#5235](https://github.com/videojs/video.js/issues/5235)) ([1b0ff8a](https://github.com/videojs/video.js/commit/1b0ff8a)), closes [#5232](https://github.com/videojs/video.js/issues/5232)
+* **package:** update rollup-plugin-filesize to version 2.0.0 🚀 ([#5234](https://github.com/videojs/video.js/issues/5234)) ([781d9ae](https://github.com/videojs/video.js/commit/781d9ae))
+
 <a name="7.0.4"></a>
 ## [7.0.4](https://github.com/videojs/video.js/compare/v7.0.3...v7.0.4) (2018-06-05)
 
