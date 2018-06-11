@@ -1904,3 +1904,17 @@ QUnit.test('disposing a tech that dit NOT set a poster, should keep the poster',
 
   player.dispose();
 });
+
+QUnit.test('source options are retained', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const source = {
+    src: 'https://some.url',
+    type: 'someType',
+    sourceOption: 'someOption'
+  };
+
+  player.src(source);
+
+  assert.equal(player.currentSource().sourceOption, 'someOption', 'source option retained');
+});
