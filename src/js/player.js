@@ -367,9 +367,6 @@ class Player extends Component {
     // Set poster
     this.poster_ = options.poster || '';
 
-    // Tech click counter to track clicks
-    this.clickCounter_ = [];
-
     // Set controls
     this.controls_ = !!options.controls;
 
@@ -1641,17 +1638,11 @@ class Player extends Component {
       return;
     }
 
-    const self = this;
-
-    // wait for a bit before handling a single click
-    // in case a second click occurs
-    this.clickCounter_.push(setTimeout(function() {
-      if (self.paused()) {
-        silencePromise(self.play());
-      } else {
-        self.pause();
-      }
-    }, 500));
+    if (this.paused()) {
+      silencePromise(this.play());
+    } else {
+      this.pause();
+    }
   }
 
   /**
@@ -1680,12 +1671,6 @@ class Player extends Component {
         this.requestFullscreen();
       }
     }
-
-    this.clickCounter_.forEach(function(clickHandler) {
-      clearTimeout(clickHandler);
-    });
-
-    this.clickCounter_ = [];
   }
 
   /**
