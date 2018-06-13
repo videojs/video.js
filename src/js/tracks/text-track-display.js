@@ -31,10 +31,8 @@ const fontMap = {
  *
  * @return {string}
  *         The rgba color that was created, like 'rgba(255, 0, 0, 0.3)'.
- *
- * @private
  */
-function constructColor(color, opacity) {
+export function constructColor(color, opacity) {
   let hex;
 
   switch (color.length) {
@@ -47,7 +45,7 @@ function constructColor(color, opacity) {
     hex = color.slice(1);
     break;
   default:
-    throw new Error('Invalid color code provided (' + color + '). Expecting code formatted as e.g. #f0e or #f604e2.');
+    throw new Error('Invalid color code provided, ' + color + '; must be formatted as e.g. #f0e or #f604e2.');
   }
   return 'rgba(' +
     parseInt(hex.slice(0, 2), 16) + ',' +
