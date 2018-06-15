@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import document from 'global/document';
 import window from 'global/window';
 import sinon from 'sinon';
 import evented from '../../../src/js/mixins/evented';
@@ -10,6 +11,20 @@ const errors = {
   type: new Error('Invalid event type; must be a non-empty string or array.'),
   listener: new Error('Invalid listener; must be a function.'),
   target: new Error('Invalid target; must be a DOM node or evented object.')
+};
+
+// Cross-browser event creation.
+const createEvent = (type) => {
+  let event;
+
+  try {
+    event = new window.Event(type);
+  } catch (x) {
+    event = document.createEvent('Event');
+    event.initEvent(type, true, true);
+  }
+
+  return event;
 };
 
 const validateListenerCall = (call, thisValue, eventExpectation) => {
@@ -191,7 +206,7 @@ QUnit.test('on() can add a listener to one event type on a node object', functio
   const a = this.targets.a = evented({});
   const b = this.targets.b = Dom.createEl('div');
   const spy = sinon.spy();
-  const event = new window.Event('x');
+  const event = createEvent('x');
 
   a.on(b, 'x', spy);
   b.dispatchEvent(event);
@@ -211,7 +226,7 @@ QUnit.test('on() can add a listener to one event type on the window object', fun
   const a = this.targets.a = evented({});
   const b = this.targets.b = window;
   const spy = sinon.spy();
-  const event = new window.Event('x');
+  const event = createEvent('x');
 
   a.on(b, 'x', spy);
   b.dispatchEvent(event);
@@ -257,8 +272,8 @@ QUnit.test('on() can add a listener to an array of event types on a node object'
   const a = this.targets.a = evented({});
   const b = this.targets.b = Dom.createEl('div');
   const spy = sinon.spy();
-  const x = new window.Event('x');
-  const y = new window.Event('y');
+  const x = createEvent('x');
+  const y = createEvent('y');
 
   a.on(b, ['x', 'y'], spy);
   b.dispatchEvent(x);
@@ -285,8 +300,8 @@ QUnit.test('on() can add a listener to an array of event types on the window obj
   const a = this.targets.a = evented({});
   const b = this.targets.b = window;
   const spy = sinon.spy();
-  const x = new window.Event('x');
-  const y = new window.Event('y');
+  const x = createEvent('x');
+  const y = createEvent('y');
 
   a.on(b, ['x', 'y'], spy);
   b.dispatchEvent(x);
@@ -333,7 +348,7 @@ QUnit.test('one() can add a listener to one event type on a node object', functi
   const a = this.targets.a = evented({});
   const b = this.targets.b = Dom.createEl('div');
   const spy = sinon.spy();
-  const event = new window.Event('x');
+  const event = createEvent('x');
 
   a.one(b, 'x', spy);
   b.dispatchEvent(event);
@@ -354,7 +369,7 @@ QUnit.test('one() can add a listener to one event type on the window object', fu
   const a = this.targets.a = evented({});
   const b = this.targets.b = window;
   const spy = sinon.spy();
-  const event = new window.Event('x');
+  const event = createEvent('x');
 
   a.one(b, 'x', spy);
   b.dispatchEvent(event);
@@ -398,8 +413,8 @@ QUnit.test('one() can add a listener to an array of event types on a node object
   const a = this.targets.a = evented({});
   const b = this.targets.b = Dom.createEl('div');
   const spy = sinon.spy();
-  const x = new window.Event('x');
-  const y = new window.Event('y');
+  const x = createEvent('x');
+  const y = createEvent('y');
 
   a.one(b, ['x', 'y'], spy);
   b.dispatchEvent(x);
@@ -423,8 +438,8 @@ QUnit.test('one() can add a listener to an array of event types on the window ob
   const a = this.targets.a = evented({});
   const b = this.targets.b = window;
   const spy = sinon.spy();
-  const x = new window.Event('x');
-  const y = new window.Event('y');
+  const x = createEvent('x');
+  const y = createEvent('y');
 
   a.one(b, ['x', 'y'], spy);
   b.dispatchEvent(x);
