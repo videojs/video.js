@@ -18,7 +18,9 @@ import EventTarget from '../event-target';
  * @return {boolean}
  *         Whether or not an object supports native events.
  */
-const supportsNativeEvents = (object) => object instanceof window.EventTarget;
+const supportsNativeEvents = (object) =>
+  (typeof window.EventTarget === 'function' && object instanceof window.EventTarget) ||
+  typeof object.addEventListener === 'function';
 
 /**
  * Returns whether or not an object has had the evented mixin applied.

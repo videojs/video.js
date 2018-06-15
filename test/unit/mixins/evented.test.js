@@ -33,10 +33,10 @@ QUnit.module('mixins: evented', {
 
   afterEach() {
     Object.keys(this.targets).forEach(k => {
-      if (this.targets[k] instanceof window.EventTarget) {
-        this.targets[k] = null;
-      } else {
+      if (typeof this.targets[k].trigger === 'function') {
         this.targets[k].trigger('dispose');
+      } else {
+        this.targets[k] = null;
       }
     });
   }
