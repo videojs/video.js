@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import window from 'global/window';
 import sinon from 'sinon';
 import evented from '../../../src/js/mixins/evented';
 import * as Dom from '../../../src/js/utils/dom';
@@ -31,7 +32,13 @@ QUnit.module('mixins: evented', {
   },
 
   afterEach() {
-    Object.keys(this.targets).forEach(k => this.targets[k].trigger('dispose'));
+    Object.keys(this.targets).forEach(k => {
+      if (this.targets[k] instanceof window.EventTarget) {
+        this.targets[k] = null;
+      } else {
+        this.targets[k].trigger('dispose');
+      }
+    });
   }
 });
 
@@ -61,7 +68,7 @@ QUnit.test('evented() with custom element', function(assert) {
   );
 });
 
-QUnit.test('on() and one() errors', function(assert) {
+QUnit.test('on() and one() error states', function(assert) {
   const target = this.targets.a = evented({});
 
   ['on', 'one'].forEach(method => {
@@ -74,7 +81,7 @@ QUnit.test('on() and one() errors', function(assert) {
   });
 });
 
-QUnit.test('off() errors', function(assert) {
+QUnit.test('off() error states', function(assert) {
   const target = this.targets.a = evented({});
 
   // An invalid event actually causes an invalid target error because it
@@ -86,7 +93,7 @@ QUnit.test('off() errors', function(assert) {
   assert.throws(() => target.off(evented({}), 'x', null), errors.listener, 'the expected error is thrown');
 });
 
-QUnit.test('on() can add a listener to one event type on this object', function(assert) {
+QUnit.test('on() can add a listener to one event type on itself', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -101,7 +108,7 @@ QUnit.test('on() can add a listener to one event type on this object', function(
   });
 });
 
-QUnit.test('on() can add a listener to an array of event types on this object', function(assert) {
+QUnit.test('on() can add a listener to an array of event types on itself', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -122,7 +129,7 @@ QUnit.test('on() can add a listener to an array of event types on this object', 
   });
 });
 
-QUnit.test('one() can add a listener to one event type on this object', function(assert) {
+QUnit.test('one() can add a listener to one event type on itself', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -138,7 +145,7 @@ QUnit.test('one() can add a listener to one event type on this object', function
   });
 });
 
-QUnit.test('one() can add a listener to an array of event types on this object', function(assert) {
+QUnit.test('one() can add a listener to an array of event types on itself', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -161,7 +168,7 @@ QUnit.test('one() can add a listener to an array of event types on this object',
   });
 });
 
-QUnit.test('on() can add a listener to one event type on a different target object', function(assert) {
+QUnit.test('on() can add a listener to one event type on a different evented object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -180,7 +187,47 @@ QUnit.test('on() can add a listener to one event type on a different target obje
   });
 });
 
-QUnit.test('on() can add a listener to an array of event types on a different target object', function(assert) {
+QUnit.test('on() can add a listener to one event type on a node object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = Dom.createEl('div');
+  const spy = sinon.spy();
+  const event = new window.Event('x');
+
+  a.on(b, 'x', spy);
+  b.dispatchEvent(event);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+});
+
+QUnit.test('on() can add a listener to one event type on the window object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = window;
+  const spy = sinon.spy();
+  const event = new window.Event('x');
+
+  a.on(b, 'x', spy);
+  b.dispatchEvent(event);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+});
+
+QUnit.test('on() can add a listener to an array of event types on a different evented object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -206,12 +253,69 @@ QUnit.test('on() can add a listener to an array of event types on a different ta
   });
 });
 
-QUnit.test('one() can add a listener to one event type on a different target object', function(assert) {
+QUnit.test('on() can add a listener to an array of event types on a node object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = Dom.createEl('div');
+  const spy = sinon.spy();
+  const x = new window.Event('x');
+  const y = new window.Event('y');
+
+  a.on(b, ['x', 'y'], spy);
+  b.dispatchEvent(x);
+  b.dispatchEvent(y);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: b
+  });
+});
+
+QUnit.test('on() can add a listener to an array of event types on the window object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = window;
+  const spy = sinon.spy();
+  const x = new window.Event('x');
+  const y = new window.Event('y');
+
+  a.on(b, ['x', 'y'], spy);
+  b.dispatchEvent(x);
+  b.dispatchEvent(y);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: b
+  });
+});
+
+QUnit.test('one() can add a listener to one event type on a different evented object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
 
   a.one(b, 'x', spy);
+  b.trigger('x');
   b.trigger('x');
 
   // Make sure we aren't magically binding a listener to "a".
@@ -225,9 +329,49 @@ QUnit.test('one() can add a listener to one event type on a different target obj
   });
 });
 
-// The behavior here unfortunately differs from the identical case where "a"
-// listens to itself. This is something that should be resolved...
-QUnit.test('one() can add a listener to an array of event types on a different target object', function(assert) {
+QUnit.test('one() can add a listener to one event type on a node object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = Dom.createEl('div');
+  const spy = sinon.spy();
+  const event = new window.Event('x');
+
+  a.one(b, 'x', spy);
+  b.dispatchEvent(event);
+  b.dispatchEvent(event);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+});
+
+QUnit.test('one() can add a listener to one event type on the window object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = window;
+  const spy = sinon.spy();
+  const event = new window.Event('x');
+
+  a.one(b, 'x', spy);
+  b.dispatchEvent(event);
+  b.dispatchEvent(event);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+});
+
+QUnit.test('one() can add a listener to an array of event types on a different evented object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -247,6 +391,56 @@ QUnit.test('one() can add a listener to an array of event types on a different t
   validateListenerCall(spy.getCall(0), a, {
     type: 'x',
     target: b.eventBusEl_
+  });
+});
+
+QUnit.test('one() can add a listener to an array of event types on a node object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = Dom.createEl('div');
+  const spy = sinon.spy();
+  const x = new window.Event('x');
+  const y = new window.Event('y');
+
+  a.one(b, ['x', 'y'], spy);
+  b.dispatchEvent(x);
+  b.dispatchEvent(y);
+  b.dispatchEvent(x);
+  b.dispatchEvent(y);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
+  });
+});
+
+QUnit.test('one() can add a listener to an array of event types on the window object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = window;
+  const spy = sinon.spy();
+  const x = new window.Event('x');
+  const y = new window.Event('y');
+
+  a.one(b, ['x', 'y'], spy);
+  b.dispatchEvent(x);
+  b.dispatchEvent(y);
+  b.dispatchEvent(x);
+  b.dispatchEvent(y);
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b
   });
 });
 
