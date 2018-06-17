@@ -1659,6 +1659,8 @@ class Player extends Component {
       return;
     }
 
+    // we do not want to toggle fullscreen state
+    // when double-clicking inside a control bar or a modal
     const inAllowedEls = Array.prototype.some.call(
         this.$$('.vjs-control-bar, .vjs-modal-dialog'),
         el => el.contains(event.target)
