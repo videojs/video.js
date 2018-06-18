@@ -1880,10 +1880,10 @@ class Player extends Component {
    *         the promise from play is fulfilled.
    */
   play() {
-    const promise = this.options_.Promise || window.Promise;
+    const PromiseClass = this.options_.Promise || window.Promise;
 
-    if (promise) {
-      return new Promise((resolve) => {
+    if (PromiseClass) {
+      return new PromiseClass((resolve) => {
         this.play_(resolve);
       });
     }
