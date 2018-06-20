@@ -59,7 +59,7 @@ export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebki
 
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
 export const IS_EDGE = (/Edge/i).test(USER_AGENT);
-export const IS_CHROME = !IS_EDGE && (/Chrome/i).test(USER_AGENT);
+export const IS_CHROME = !IS_EDGE && ((/Chrome/i).test(USER_AGENT) || (/CriOS/i).test(USER_AGENT));
 export const CHROME_VERSION = (function() {
   const match = USER_AGENT.match(/Chrome\/(\d+)/);
 
