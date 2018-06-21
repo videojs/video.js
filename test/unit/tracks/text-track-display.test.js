@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import Html5 from '../../../src/js/tech/html5.js';
+import { constructColor } from '../../../src/js/tracks/text-track-display.js';
 import Component from '../../../src/js/component.js';
 
 import * as browser from '../../../src/js/utils/browser.js';
@@ -319,4 +320,33 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 
+  QUnit.test('a color can be constructed from a three digit hex code', function(assert) {
+    const hex = '#f0e';
+
+    // f gets mapped to ff -> 255 in decimal,
+    // 0 gets mapped to 00 -> 0 in decimal,
+    // e gets mapped to ee -> 238 in decimal.
+    assert.equal(constructColor(hex, 1), 'rgba(255,0,238,1)');
+  });
+
+  QUnit.test('a color can be constructed from a six digit hex code', function(assert) {
+    const hex = '#f604e2';
+
+    // f6 -> 246 in decimal,
+    // 04 -> 4 in decimal,
+    // e2 -> 226 in decimal.
+    assert.equal(constructColor(hex, 1), 'rgba(246,4,226,1)');
+  });
+
+  QUnit.test('an invalid hex code will throw an error', function(assert) {
+    const hex = '#f';
+
+    assert.throws(
+      function() {
+        constructColor(hex, 1);
+      },
+      new Error('Invalid color code provided, #f; must be formatted as e.g. #f0e or #f604e2.'),
+      'colors must be valid hex codes.'
+    );
+  });
 }
