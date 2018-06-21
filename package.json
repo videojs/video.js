@@ -41,7 +41,10 @@
     "prepublish": "not-in-install && run-p build || in-install",
     "publish": "node build/gh-release.js",
     "prepush": "npm run lint -- --errors",
-    "version": "node build/version.js && git add CHANGELOG.md"
+    "version": "node build/version.js && git add CHANGELOG.md",
+    "autoprefixer": "npm-run-all -p autoprefixer:*",
+    "autoprefixer:main": "postcss --verbose --config postcss.config.js -d build/temp build/temp/video-js.css",
+    "autoprefixer:cdn": "postcss --verbose --config postcss.config.js -d build/temp/alt build/temp/alt/video-js-cdn.css"
   },
   "repository": {
     "type": "git",
@@ -59,6 +62,7 @@
   },
   "devDependencies": {
     "aliasify": "^2.1.0",
+    "autoprefixer": "^8.6.1",
     "babel-cli": "^6.11.4",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.9.0",
@@ -120,6 +124,7 @@
     "maxmin": "^2.1.0",
     "minimist": "^1.2.0",
     "npm-run-all": "^4.1.2",
+    "postcss-cli": "^5.0.0",
     "proxyquireify": "^3.0.0",
     "qunit": "^2.5.1",
     "remark-cli": "^5.0.0",
