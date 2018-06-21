@@ -1,3 +1,17 @@
 .video-js .vjs-audio-button .vjs-icon-placeholder {
   @extend .vjs-icon-audio;
 }
+
+.video-js .vjs-audio-button + .vjs-menu .vjs-main-desc-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
+  vertical-align: middle;
+  display: inline-block;
+  margin-bottom: -0.1em;
+}
+
+// Mark a main-desc-menu-item (main + description) item with a trailing Audio Description icon
+.video-js .vjs-audio-button + .vjs-menu .vjs-main-desc-menu-item .vjs-menu-item-text .vjs-icon-placeholder:before {
+  font-family: VideoJS;
+  content: " \f11d";
+  font-size: 1.5em;
+  line-height: inherit;
+}
