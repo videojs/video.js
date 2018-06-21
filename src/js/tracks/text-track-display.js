@@ -35,16 +35,13 @@ const fontMap = {
 export function constructColor(color, opacity) {
   let hex;
 
-  switch (color.length) {
-  case 4:
+  if (color.length === 4) {
     // color looks like "#f0e"
     hex = color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
-    break;
-  case 7:
+  } else if (color.length === 7) {
     // color looks like "#f604e2"
     hex = color.slice(1);
-    break;
-  default:
+  } else {
     throw new Error('Invalid color code provided, ' + color + '; must be formatted as e.g. #f0e or #f604e2.');
   }
   return 'rgba(' +
