@@ -954,6 +954,33 @@ Html5.canControlVolume = function() {
 };
 
 /**
+ * Check if the volume can be muted in this browser/device.
+ * Some devices, e.g. iOS, don't allow changing volume
+ * but permits muting/unmuting.
+ *
+ * @return {bolean}
+ *      - True if volume can be muted
+ *      - False otherwise
+ */
+Html5.canMuteVolume = function() {
+  try {
+    const muted = Html5.TEST_VID.muted;
+
+    // in some versions of iOS muted property doesn't always
+    // work, so we want to set both property and attribute
+    Html5.TEST_VID.muted = !muted;
+    if (Html5.TEST_VID.muted) {
+      Dom.setAttribute(Html5.TEST_VID, 'muted', 'muted');
+    } else {
+      Dom.removeAttribute(Html5.TEST_VID, 'muted', 'muted');
+    }
+    return muted !== Html5.TEST_VID.muted;
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
  * Check if the playback rate can be changed in this browser/device.
  *
  * @return {boolean}
@@ -1074,6 +1101,14 @@ Html5.Events = [
  * @default {@link Html5.canControlVolume}
  */
 Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
+
+/**
+ * Boolean indicating whether the `Tech` supports muting volume.
+ *
+ * @type {bolean}
+ * @default {@link Html5.canMuteVolume}
+ */
+Html5.prototype.featuresMuteControl = Html5.canMuteVolume();
 
 /**
  * Boolean indicating whether the `Tech` supports changing the speed at which the media
