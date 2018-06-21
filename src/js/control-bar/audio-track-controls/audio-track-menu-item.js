@@ -3,6 +3,7 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
+import {assign} from '../../utils/obj';
 
 /**
  * An {@link AudioTrack} {@link MenuItem}
@@ -32,6 +33,8 @@ class AudioTrackMenuItem extends MenuItem {
 
     this.track = track;
 
+    this.addClass(`vjs-${track.kind}-menu-item`);
+
     const changeHandler = (...args) => {
       this.handleTracksChange.apply(this, args);
     };
@@ -40,6 +43,25 @@ class AudioTrackMenuItem extends MenuItem {
     this.on('dispose', () => {
       tracks.removeEventListener('change', changeHandler);
     });
+  }
+
+  createEl(type, props, attrs) {
+    let innerHTML = `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}`;
+
+    if (this.options_.track.kind === 'main-desc') {
+      innerHTML += `
+        <span aria-hidden="true" class="vjs-icon-placeholder"></span>
+        <span class="vjs-control-text"> ${this.localize('Descriptions')}</span>
+      `;
+    }
+
+    innerHTML += '</span>';
+
+    const el = super.createEl(type, assign({
+      innerHTML
+    }, props), attrs);
+
+    return el;
   }
 
   /**
