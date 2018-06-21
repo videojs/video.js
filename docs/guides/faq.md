@@ -134,24 +134,17 @@ techs/plugins made available to Video.js. For more information on media formats 
 
 When an array of sources is available, Video.js test each source in the order given. For each source, each tech in the [`techOrder`][techorder] will be checked to see if it can play it whether directly or via source handler (such as videojs-contrib-hls). The first match will be chosen.
 
-## Q: How to I autoplay the video?
+## Q: How do I autoplay a video?
 
-Video.js supports the standard html5 `autoplay` attribute on the video element.
-It also supports it as an option to Video.js or as a method invocation on the player.
 
-```html
-<video autoplay controls class="video-js">
-```
+Due to recent changes in autoplay behavior we no longer recommend using the `autoplay` attribute
+on the `video` element. It's still supported by Video.js but, many browsers, including Chrome, are changing their
+`autoplay` attribute behavior.
 
-```js
-var player = videojs('my-video', {
-  autoplay: true
-});
+Instead we recommend using the `autoplay` option rather than the `autoplay` attribute, for more information on using that.
+see the [autoplay option][autoplay-option] in the Video.js options guide.
 
-// or
-
-player.autoplay(true);
-```
+For more information on the autoplay changes see our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
 
 ### Q: How can I autoplay a video on a mobile device?
 
@@ -159,13 +152,12 @@ Most mobile devices have blocked autoplaying videos until recently.
 For mobile devices that don't support autoplaying, autoplay isn't supported by Video.js.
 For those devices that support autoplaying, like iOS10 and Chrome for Android 53+,
 you must mute the video or have a video without audio tracks to be able to play it.
-For example:
 
-```html
-<video muted autoplay playsinline>
-```
+We do not recommend doing this manually using attributes on the `video` element. Instead, you should pass the
+[autoplay option][autoplay-option] with a value of `'any'` or `'muted'`. See the previous link for more information
+on using that option.
 
-Will make an inline, muted, autoplaying video on an iPhone with iOS10.
+> NOTE: At this point, the autoplay attribute and option are NOT a guarantee that your video will autoplay.
 
 ## Q: How can I play RTMP video in Video.js?
 
