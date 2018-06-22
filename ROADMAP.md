@@ -1,5 +1,7 @@
 - Promise Play
   In addition to making sure that a Promise is always returned from play(), if Promises are supported or polyfilled, we should be able to shim a play() promise if a promise isn't provided to us natively.
+  https://github.com/videojs/video.js/pull/5227
+  https://github.com/videojs/video.js/issues/3927
 - vjs-fill being first class
   vjs-fluid is a first-class option now but vjs-fill is just as useful. We should have a fill() method and option just like fluid
 - loadMedia: https://github.com/videojs/video.js/issues/4342
@@ -42,3 +44,4 @@
   It's possible there are still cases where the native control bar shows up under ours in iOS, we should investigate and fix it
 - Make our language files work with bundlers
 - Investigate `type=module` script support for Video.js
+- Fix the rest of the Video.js issues
