@@ -452,6 +452,20 @@ videojs.bind = Fn.bind;
 videojs.registerPlugin = Plugin.registerPlugin;
 
 /**
+ * Deregister a Video.js plugin.
+ *
+ * @borrows plugin:deregisterPlugin as videojs.deregisterPlugin
+ * @method deregisterPlugin
+ *
+ * @param  {string} name
+ *         The name of the plugin to be deregistered. Must be a string and
+ *         must match an existing plugin or a method on the `Player`
+ *         prototype.
+ *
+ */
+videojs.deregisterPlugin = Plugin.deregisterPlugin;
+
+/**
  * Deprecated method to register a plugin with Video.js
  *
  * @deprecated
