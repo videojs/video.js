@@ -42,3 +42,21 @@ QUnit.test('trigger "change" event when mode changes on a TextTrack', function(a
 
   assert.equal(changes, 3, 'three change events should have fired');
 });
+
+QUnit.test('trigger "change" event when "textTrackChange" is fired on a track', function(assert) {
+  const tt = new EventTarget();
+  const ttl = new TextTrackList([tt]);
+  let changes = 0;
+  const changeHandler = function() {
+    changes++;
+  };
+
+  ttl.on('ttChange', changeHandler);
+  tt.trigger('textTrackChange');
+
+  ttl.off('ttChange', changeHandler);
+  ttl.onchange = changeHandler;
+
+  tt.trigger('textTrackChange');
+  assert.equal(changes, 1, 'one ttChange events should have fired');
+});
