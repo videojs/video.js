@@ -31,6 +31,14 @@ class TextTrackList extends TrackList {
       this.trigger('change');
     }));
 
+    /**
+     * @listens TextTrack#textTrackChange
+     * @fires TrackList#ttChange
+     */
+    track.addEventListener('textTrackChange', Fn.bind(this, function() {
+      this.trigger('ttChange');
+    }));
+
     const nonLanguageTextTrackKind = ['metadata', 'chapters'];
 
     if (nonLanguageTextTrackKind.indexOf(track.kind) === -1) {

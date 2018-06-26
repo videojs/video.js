@@ -217,6 +217,7 @@ class TextTrack extends Track {
        * @instance
        *
        * @fires TextTrack#modechange
+       * @fires TextTrack#textTrackChange
        */
       mode: {
         get() {
@@ -228,6 +229,16 @@ class TextTrack extends Track {
           }
           mode = newMode;
           if (mode === 'showing') {
+          /**
+           * An event that fires when the mode change to showing. This allows
+           * listening for a singular text track event.
+           *
+           * > Note: This is not part of the spec!
+           *
+           * @event TextTrack#modechange
+           * @type {EventTarget~Event}
+           */
+            this.trigger('textTrackChange');
 
             this.tech_.ready(() => {
               this.tech_.on('timeupdate', timeupdateHandler);
