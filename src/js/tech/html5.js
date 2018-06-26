@@ -1037,7 +1037,7 @@ Html5.canOverrideAttributes = function() {
  *         - False otherwise
  */
 Html5.supportsNativeTextTracks = function() {
-  return browser.IS_ANY_SAFARI;
+  return browser.IS_ANY_SAFARI || (browser.IS_IOS && browser.IS_CHROME);
 };
 
 /**
