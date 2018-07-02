@@ -84,6 +84,6 @@ export const IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDRO
 export const IS_ANY_SAFARI = (IS_SAFARI || IS_IOS) && !IS_CHROME;
 
 export const TOUCH_ENABLED = Dom.isReal() && (
-  'ontouchstart' in window || 
-  window.navigator.maxTouchPoints || 
-  window.DocumentTouch && document instanceof window.DocumentTouch);
+  'ontouchstart' in window ||
+  window.navigator.maxTouchPoints ||
+  window.DocumentTouch && window.document instanceof window.DocumentTouch);
