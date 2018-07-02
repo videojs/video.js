@@ -1313,18 +1313,11 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval}
    */
   setInterval(fn, interval) {
-    // declare as variables so they are properly available in interval function
-    // eslint-disable-next-line
-    var intervalId, disposeFn;
-
     fn = Fn.bind(this, fn);
 
-    intervalId = window.setInterval(() => {
-      this.off('dispose', disposeFn);
-      fn();
-    }, interval);
+    const intervalId = window.setInterval(fn, interval);
 
-    disposeFn = () => this.clearInterval(intervalId);
+    const disposeFn = () => this.clearInterval(intervalId);
 
     disposeFn.guid = `vjs-interval-${intervalId}`;
 
