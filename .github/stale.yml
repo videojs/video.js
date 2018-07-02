@@ -11,6 +11,7 @@ daysUntilClose: 7
 exemptLabels:
   - pinned
   - a11y
+  - confirmed
   - security
   - "[Status] Maybe Later"
 
