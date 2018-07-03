@@ -1259,7 +1259,6 @@ class Player extends Component {
     }
 
     if (!promise || !promise.then || !promise.catch) {
-      this.trigger({type: 'autoplay-failure', autoplay: type});
       return;
     }
 
