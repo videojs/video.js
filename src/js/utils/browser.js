@@ -88,8 +88,8 @@ export const IS_ANY_SAFARI = (IS_SAFARI || IS_IOS) && !IS_CHROME;
 
 export const TOUCH_ENABLED = Dom.isReal() && (
   'ontouchstart' in window ||
-  window.DocumentTouch &&
-  window.document instanceof window.DocumentTouch);
+  window.navigator.maxTouchPoints ||
+  window.DocumentTouch && window.document instanceof window.DocumentTouch);
 
 export const BACKGROUND_SIZE_SUPPORTED = (
   Dom.isReal() &&
