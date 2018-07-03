@@ -510,3 +510,29 @@ QUnit.test('a middleware factory is called on a new source with a new player', f
 
   middleware.getMiddleware('video/foo').pop();
 });
+
+QUnit.test('a middleware without a setSource gets chosen implicitly', function(assert) {
+  let mws = [];
+  const mw = {
+    currentTime(ct) {
+    }
+  };
+  const mwFactory = () => mw;
+
+  middleware.use('video/foo', mwFactory);
+
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(src, _mws) {
+    mws = _mws;
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(mws.length, 1, 'we have 1 middleware set');
+
+  middleware.getMiddleware('video/foo').pop();
+});
