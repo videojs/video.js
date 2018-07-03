@@ -1123,6 +1123,7 @@ class Player extends Component {
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
     this.on(this.tech_, 'mousedown', this.handleTechClick_);
+    this.on(this.tech_, 'dblclick', this.handleTechDoubleClick_);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
@@ -1150,6 +1151,7 @@ class Player extends Component {
     this.off(this.tech_, 'touchmove', this.handleTechTouchMove_);
     this.off(this.tech_, 'touchend', this.handleTechTouchEnd_);
     this.off(this.tech_, 'mousedown', this.handleTechClick_);
+    this.off(this.tech_, 'dblclick', this.handleTechDoubleClick_);
   }
 
   /**
@@ -1695,6 +1697,36 @@ class Player extends Component {
       silencePromise(this.play());
     } else {
       this.pause();
+    }
+  }
+
+  /**
+   * Handle a double-click on the media element to enter/exit fullscreen
+   *
+   * @param {EventTarget~Event} event
+   *        the event that caused this function to trigger
+   *
+   * @listens Tech#dblclick
+   * @private
+   */
+  handleTechDoubleClick_(event) {
+    if (!this.controls_) {
+      return;
+    }
+
+    // we do not want to toggle fullscreen state
+    // when double-clicking inside a control bar or a modal
+    const inAllowedEls = Array.prototype.some.call(
+        this.$$('.vjs-control-bar, .vjs-modal-dialog'),
+        el => el.contains(event.target)
+      );
+
+    if (!inAllowedEls) {
+      if (this.isFullscreen()) {
+        this.exitFullscreen();
+      } else {
+        this.requestFullscreen();
+      }
     }
   }
 
