@@ -1288,6 +1288,10 @@ class Player extends Component {
       promise = this.play();
     }
 
+    if (!promise || !promise.then || !promise.catch) {
+      return;
+    }
+
     return promise.then(() => {
       this.trigger({type: 'autoplay-success', autoplay: type});
     }).catch((e) => {
