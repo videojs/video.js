@@ -96,7 +96,7 @@
     "grunt-shell": "^2.0.0",
     "grunt-version": "^1.2.1",
     "grunt-videojs-languages": "0.0.4",
-    "grunt-zip": "0.17.1",
+    "grunt-zip": "0.18.1",
     "humanize-duration": "^3.12.1",
     "husky": "^0.14.1",
     "in-publish": "^2.0.0",
