@@ -3,6 +3,8 @@
  */
 import Button from '../button.js';
 import Component from '../component.js';
+import FullscreenApi from '../fullscreen-api.js';
+import document from 'global/document';
 
 /**
  * Toggle fullscreen video
@@ -23,6 +25,10 @@ class FullscreenToggle extends Button {
   constructor(player, options) {
     super(player, options);
     this.on(player, 'fullscreenchange', this.handleFullscreenChange);
+
+    if (document[FullscreenApi.fullscreenEnabled] === false) {
+      this.disable();
+    }
   }
 
   /**
