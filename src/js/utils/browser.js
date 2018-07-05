@@ -26,12 +26,24 @@ export const IS_IPOD = (/iPod/i).test(USER_AGENT);
 export const IS_IOS = IS_IPHONE || IS_IPAD || IS_IPOD;
 
 export const IOS_VERSION = (function() {
-  const match = USER_AGENT.match(/OS (\d+)_/i);
+  // This matches iOS Major.Minor versions
+  const match = USER_AGENT.match(/OS (\d+)_(\d)/i);
 
-  if (match && match[1]) {
-    return match[1];
+  if (!match) {
+    return undefined;
   }
-  return null;
+
+  const major = match[1] && parseFloat(match[1]);
+  const minor = match[2] && parseFloat(match[2]);
+
+  // IOS_VERSION is Major.Minor as a Number.
+  // if Minor isn't available, then return only Major version.
+  if (major && minor) {
+    return parseFloat(match[1] + '.' + match[2]);
+  } else if (major) {
+    return major;
+  }
+  return undefined;
 }());
 
 export const IS_ANDROID = (/Android/i).test(USER_AGENT);
@@ -41,7 +53,7 @@ export const ANDROID_VERSION = (function() {
   const match = USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i);
 
   if (!match) {
-    return null;
+    return undefined;
   }
 
   const major = match[1] && parseFloat(match[1]);
@@ -52,7 +64,7 @@ export const ANDROID_VERSION = (function() {
   } else if (major) {
     return major;
   }
-  return null;
+  return undefined;
 }());
 
 export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebkitVersion < 537;
@@ -66,10 +78,10 @@ export const CHROME_VERSION = (function() {
   if (match && match[2]) {
     return parseFloat(match[2]);
   }
-  return null;
+  return undefined;
 }());
 export const IE_VERSION = (function() {
-  const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT);
+  const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT) || undefined;
   let version = result && parseFloat(result[1]);
 
   if (!version && (/Trident\/7.0/i).test(USER_AGENT) && (/rv:11.0/).test(USER_AGENT)) {
