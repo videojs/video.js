@@ -957,6 +957,55 @@ QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', f
   window.cancelAnimationFrame = oldCAF;
 });
 
+QUnit.test('setTimeout should remove dispose handler on trigger', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const el = comp.el();
+  const data = DomData.getData(el);
+
+  comp.setTimeout(() => {}, 1);
+
+  assert.equal(data.handlers.dispose.length, 2, 'we got a new dispose handler');
+  assert.ok(/vjs-timeout-\d/.test(data.handlers.dispose[1].guid), 'we got a new dispose handler');
+
+  this.clock.tick(1);
+
+  assert.equal(data.handlers.dispose.length, 1, 'we removed our dispose handle');
+
+  comp.dispose();
+});
+
+QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const el = comp.el();
+  const data = DomData.getData(el);
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  const spyRAF = sinon.spy();
+
+  comp.requestAnimationFrame(spyRAF);
+
+  assert.equal(data.handlers.dispose.length, 2, 'we got a new dispose handler');
+  assert.ok(/vjs-raf-\d/.test(data.handlers.dispose[1].guid), 'we got a new dispose handler');
+
+  this.clock.tick(1);
+
+  assert.equal(data.handlers.dispose.length, 1, 'we removed our dispose handle');
+
+  comp.dispose();
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
 QUnit.test('$ and $$ functions', function(assert) {
   const comp = new Component(getFakePlayer());
   const contentEl = document.createElement('div');
