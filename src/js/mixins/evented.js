@@ -10,17 +10,6 @@ import * as Obj from '../utils/obj';
 import EventTarget from '../event-target';
 
 /**
- * Returns whether or not an object supports native events.
- *
- * @param  {Object} object
- *         An object to test.
- *
- * @return {boolean}
- *         Whether or not an object supports native events.
- */
-const supportsNativeEvents = (object) => typeof object.addEventListener === 'function';
-
-/**
  * Returns whether or not an object has had the evented mixin applied.
  *
  * @param  {Object} object
@@ -61,7 +50,7 @@ const isValidEventType = (type) =>
  *         The object to test.
  */
 const validateTarget = (target) => {
-  if (!supportsNativeEvents(target) && !isEvented(target)) {
+  if (!target.nodeName && !isEvented(target)) {
     throw new Error('Invalid target; must be a DOM node or evented object.');
   }
 };
@@ -165,7 +154,7 @@ const normalizeListenArgs = (self, args) => {
 const listen = (target, method, type, listener) => {
   validateTarget(target);
 
-  if (supportsNativeEvents(target)) {
+  if (target.nodeName) {
     Events[method](target, type, listener);
   } else {
     target[method](type, listener);
@@ -318,7 +307,7 @@ const EventedMixin = {
       // the same guid as the event listener in on().
       this.off('dispose', listener);
 
-      if (supportsNativeEvents(target)) {
+      if (target.nodeName) {
         Events.off(target, type, listener);
         Events.off(target, 'dispose', listener);
       } else if (isEvented(target)) {
@@ -357,7 +346,7 @@ const EventedMixin = {
  * @param  {String} [options.eventBusKey]
  *         By default, adds a `eventBusEl_` DOM element to the target object,
  *         which is used as an event bus. If the target object already has a
- *         DOM element which should be used, pass its key here.
+ *         DOM element that should be used, pass its key here.
  *
  * @return {Object}
  *         The target object.
