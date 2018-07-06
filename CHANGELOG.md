@@ -1,3 +1,45 @@
+<a name="7.1.0"></a>
+# [7.1.0](https://github.com/videojs/video.js/compare/v7.0.5...v7.1.0) (2018-07-06)
+
+### Features
+
+* **autoplay:** extend autoplay option for greater good ([#5209](https://github.com/videojs/video.js/issues/5209)) ([e8e4fe2](https://github.com/videojs/video.js/commit/e8e4fe2))
+* Add an Audio Description icon to an audio track name in the track menu if it is "main-desc" kind. ([#4599](https://github.com/videojs/video.js/issues/4599)) ([53c62ac](https://github.com/videojs/video.js/commit/53c62ac))
+* **browser:** include iOS Chrome UA pattern when detecting Google Chrome ([#5262](https://github.com/videojs/video.js/issues/5262)) ([b430461](https://github.com/videojs/video.js/commit/b430461))
+* **css:** run autoprefixer on css ([#5239](https://github.com/videojs/video.js/issues/5239)) ([edce736](https://github.com/videojs/video.js/commit/edce736))
+* add double-click handler to toggle fullscreen ([#5148](https://github.com/videojs/video.js/issues/5148)) ([1b9bd42](https://github.com/videojs/video.js/commit/1b9bd42)), closes [#4948](https://github.com/videojs/video.js/issues/4948)
+* show mute toggle button if the tech supports muting volume ([#5052](https://github.com/videojs/video.js/issues/5052)) ([2370416](https://github.com/videojs/video.js/commit/2370416)), closes [#4478](https://github.com/videojs/video.js/issues/4478)
+* **fullscreen-toggle:** disable fs button if fullcreen is unavailable ([#5296](https://github.com/videojs/video.js/issues/5296)) ([444b271](https://github.com/videojs/video.js/commit/444b271)), closes [#5290](https://github.com/videojs/video.js/issues/5290)
+* **middleware:** make setSource be optional ([#5295](https://github.com/videojs/video.js/issues/5295)) ([781a6d8](https://github.com/videojs/video.js/commit/781a6d8))
+* **text-track-display:** Extend the constructColor function to handle 6 digit hex codes ([#5238](https://github.com/videojs/video.js/issues/5238)) ([e92f177](https://github.com/videojs/video.js/commit/e92f177))
+
+### Bug Fixes
+
+* Allow evented objects, such as components and plugins, to listen to the window object in addition to DOM objects. ([#5255](https://github.com/videojs/video.js/issues/5255)) ([7fd29b4](https://github.com/videojs/video.js/commit/7fd29b4))
+* **browser:** TOUCH_ENABLED detection with Win10  ([#5286](https://github.com/videojs/video.js/issues/5286)) ([e683891](https://github.com/videojs/video.js/commit/e683891)), closes [#3306](https://github.com/videojs/video.js/issues/3306)
+* autoplay throws 'undefined promise' error on some browsers. ([#5283](https://github.com/videojs/video.js/issues/5283)) ([c9d1e8a](https://github.com/videojs/video.js/commit/c9d1e8a))
+
+### Chores
+
+* **npmignore:** don't publish zip file to npm ([#5249](https://github.com/videojs/video.js/issues/5249)) ([5b8d373](https://github.com/videojs/video.js/commit/5b8d373)), closes [#5248](https://github.com/videojs/video.js/issues/5248)
+* enable move and stale probots ([#5292](https://github.com/videojs/video.js/issues/5292)) ([00bb788](https://github.com/videojs/video.js/commit/00bb788))
+* **package:** add module field to package.json ([#5293](https://github.com/videojs/video.js/issues/5293)) ([5d75bb6](https://github.com/videojs/video.js/commit/5d75bb6)), closes [#5288](https://github.com/videojs/video.js/issues/5288)
+* **package:** update rollup to version 0.61.1 ([#5268](https://github.com/videojs/video.js/issues/5268)) ([5c15d48](https://github.com/videojs/video.js/commit/5c15d48))
+* **package:** update rollup to version 0.62.0 🚀 ([#5279](https://github.com/videojs/video.js/issues/5279)) ([2d7a4d7](https://github.com/videojs/video.js/commit/2d7a4d7))
+* **package:** upgrade to VHS 1.1.0 ([#5305](https://github.com/videojs/video.js/issues/5305)) ([da5a590](https://github.com/videojs/video.js/commit/da5a590))
+
+### Code Refactoring
+
+* removed old bug work-around code ([#5200](https://github.com/videojs/video.js/issues/5200)) ([ceed382](https://github.com/videojs/video.js/commit/ceed382))
+
+### Performance Improvements
+
+* setTimeout and requestAnimationFrame memory leak ([#5294](https://github.com/videojs/video.js/issues/5294)) ([d7f27b7](https://github.com/videojs/video.js/commit/d7f27b7)), closes [#5199](https://github.com/videojs/video.js/issues/5199)
+
+### Reverts
+
+* "fix: Allow evented objects, such as components and plugins, to listen to the window object in addition to DOM objects. ([#5255](https://github.com/videojs/video.js/issues/5255))" ([#5301](https://github.com/videojs/video.js/issues/5301)) ([361dc76](https://github.com/videojs/video.js/commit/361dc76)), closes [#5281](https://github.com/videojs/video.js/issues/5281)
+
 <a name="7.0.5"></a>
 ## [7.0.5](https://github.com/videojs/video.js/compare/v7.0.4...v7.0.5) (2018-06-11)
 
