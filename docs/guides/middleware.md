@@ -25,7 +25,9 @@ There are a few special methods that affect middleware: `setSource` and `setTech
 
 This method will setup the routing between a specific source and middleware and eventually sets the source on the `Tech`.
 
-If your middleware is not manipulating, redirecting or rejecting the source, you can pass along the source by doing the following:
+If your middleware is not manipulating, redirecting or rejecting the source, you may leave this method out on newer versions of Video.js. Doing so will make the middleware be selected implicitly.
+
+In versions 7.0.5 and older, to get your middleware selected, you can pass along the source by doing the following:
 
 ```javascript
 videojs.use('*', function(player) {
@@ -37,8 +39,6 @@ videojs.use('*', function(player) {
   };
 });
 ```
-
-Alternative, in versions greater than 7.0.5, you may omit `setSource` entirely and the middleware will get selected implicitly.
 
 ### setTech
 
