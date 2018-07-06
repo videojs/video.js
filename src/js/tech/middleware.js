@@ -152,6 +152,12 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
   } else if (mwFactory) {
     const mw = getOrCreateFactory(player, mwFactory);
 
+    // if setSource isn't present, implicitly select this middleware
+    if (!mw.setSource) {
+      acc.push(mw);
+      return setSourceHelper(src, mwrest, next, player, acc, lastRun);
+    }
+
     mw.setSource(assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
@@ -172,6 +178,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
           acc,
           lastRun);
     });
+
   } else if (mwrest.length) {
     setSourceHelper(src, mwrest, next, player, acc, lastRun);
   } else if (lastRun) {
