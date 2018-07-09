@@ -1,3 +1,30 @@
+<a name="6.11.0"></a>
+# [6.11.0](https://github.com/videojs/video.js/compare/v6.10.3...v6.11.0) (2018-07-09)
+
+### Features
+
+* **autoplay:** extend autoplay option for greater good ([#5209](https://github.com/videojs/video.js/issues/5209)) ([e630e26](https://github.com/videojs/video.js/commit/e630e26))
+* Add an Audio Description icon to an audio track name in the track menu if it is "main-desc" kind. ([#4599](https://github.com/videojs/video.js/issues/4599)) ([efcfc84](https://github.com/videojs/video.js/commit/efcfc84))
+* show mute toggle button if the tech supports muting volume ([#5052](https://github.com/videojs/video.js/issues/5052)) ([89f6397](https://github.com/videojs/video.js/commit/89f6397)), closes [#4478](https://github.com/videojs/video.js/issues/4478)
+* **browser:** include iOS Chrome UA pattern when detecting Google Chrome ([#5262](https://github.com/videojs/video.js/issues/5262)) ([4754c4d](https://github.com/videojs/video.js/commit/4754c4d))
+* **fullscreen-toggle:** disable fs button if fullcreen is unavailable ([#5296](https://github.com/videojs/video.js/issues/5296)) ([c0f0350](https://github.com/videojs/video.js/commit/c0f0350)), closes [#5290](https://github.com/videojs/video.js/issues/5290)
+* **middleware:** make setSource be optional ([#5295](https://github.com/videojs/video.js/issues/5295)) ([aab48c8](https://github.com/videojs/video.js/commit/aab48c8))
+* **text-track-display:** Extend the constructColor function to handle 6 digit hex codes ([#5238](https://github.com/videojs/video.js/issues/5238)) ([f8e8633](https://github.com/videojs/video.js/commit/f8e8633))
+
+### Bug Fixes
+
+* **browser:** TOUCH_ENABLED detection with Win10  ([#5286](https://github.com/videojs/video.js/issues/5286)) ([4b15d02](https://github.com/videojs/video.js/commit/4b15d02)), closes [#3306](https://github.com/videojs/video.js/issues/3306)
+* autoplay throws 'undefined promise' error on some browsers. ([#5283](https://github.com/videojs/video.js/issues/5283)) ([ab3a9b9](https://github.com/videojs/video.js/commit/ab3a9b9))
+
+### Chores
+
+* **npmignore:** don't publish zip file to npm ([#5249](https://github.com/videojs/video.js/issues/5249)) ([2027762](https://github.com/videojs/video.js/commit/2027762)), closes [#5248](https://github.com/videojs/video.js/issues/5248)
+* **README:** use travis 6.x branch badge ([ce31e3a](https://github.com/videojs/video.js/commit/ce31e3a))
+
+### Performance Improvements
+
+* setTimeout and requestAnimationFrame memory leak ([#5294](https://github.com/videojs/video.js/issues/5294)) ([52a08fb](https://github.com/videojs/video.js/commit/52a08fb)), closes [#5199](https://github.com/videojs/video.js/issues/5199)
+
 <a name="6.10.3"></a>
 ## [6.10.3](https://github.com/videojs/video.js/compare/v6.10.2...v6.10.3) (2018-06-11)
 
