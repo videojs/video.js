@@ -1058,8 +1058,7 @@ class Player extends Component {
         this[props.privateName] = this[props.getterName]();
       });
       this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
-    } 
-    
+    }
     this.isReady_ = false;
 
     this.tech_.dispose();
