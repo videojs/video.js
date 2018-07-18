@@ -125,7 +125,7 @@
     "maxmin": "^2.1.0",
     "minimist": "^1.2.0",
     "npm-run-all": "^4.1.2",
-    "postcss-cli": "^5.0.0",
+    "postcss-cli": "^6.0.0",
     "proxyquireify": "^3.0.0",
     "qunit": "^2.5.1",
     "remark-cli": "^5.0.0",
