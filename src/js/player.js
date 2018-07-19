@@ -913,11 +913,11 @@ class Player extends Component {
    *
    * @private
    */
-  loadTech_(techName, source, isResetting) {
+  loadTech_(techName, source) {
 
     // Pause and remove current playback technology
     if (this.tech_) {
-      this.unloadTech_(isResetting);
+      this.unloadTech_();
     }
 
     const titleTechName = toTitleCase(techName);
@@ -1048,17 +1048,15 @@ class Player extends Component {
    *
    * @private
    */
-  unloadTech_(isResetting) {
-    this.textTracksJson_ = [];
+  unloadTech_() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
-    if (!isResetting) {
-      TRACK_TYPES.names.forEach((name) => {
-        const props = TRACK_TYPES[name];
+    TRACK_TYPES.names.forEach((name) => {
+      const props = TRACK_TYPES[name];
 
-        this[props.privateName] = this[props.getterName]();
-      });
-      this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
-    }
+      this[props.privateName] = this[props.getterName]();
+    });
+    this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
+    
     this.isReady_ = false;
 
     this.tech_.dispose();
@@ -2765,6 +2763,7 @@ class Player extends Component {
    * and calls `reset` on the tech`.
    */
   reset() {
+    this.tech_.clearTracks(["text"]);
     this.loadTech_(this.options_.techOrder[0], null, true);
     this.techCall_('reset');
   }
