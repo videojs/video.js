@@ -2,6 +2,7 @@
  * @file src/js/event-target.js
  */
 import * as Events from './utils/events.js';
+import window from 'global/window';
 
 /**
  * `EventTarget` is a class that can have the same API as the DOM `EventTarget`. It
@@ -174,6 +175,7 @@ EventTarget.prototype.queueTrigger = function(event) {
   window.clearTimeout(oldTimeout);
 
   const timeout = window.setTimeout(() => this.trigger(event), 0);
+
   map.set(type, timeout);
 };
 
