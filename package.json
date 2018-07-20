@@ -139,7 +139,7 @@
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-filesize": "^2.0.0",
+    "rollup-plugin-filesize": "^4.0.1",
     "rollup-plugin-ignore": "^1.0.3",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
