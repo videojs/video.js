@@ -158,4 +158,23 @@ EventTarget.prototype.trigger = function(event) {
  */
 EventTarget.prototype.dispatchEvent = EventTarget.prototype.trigger;
 
+const EVENT_MAP = new Map();
+
+EventTarget.prototype.queueTrigger = function(event) {
+  const type = event.type || event;
+  let map = EVENT_MAP.get(this);
+
+  if (!map) {
+    map = new Map();
+    EVENT_MAP.set(this, map);
+  }
+
+  const oldTimeout = map.get(type);
+
+  window.clearTimeout(oldTimeout);
+
+  const timeout = window.setTimeout(() => this.trigger(event), 0);
+  map.set(type, timeout);
+};
+
 export default EventTarget;
