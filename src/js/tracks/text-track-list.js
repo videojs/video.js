@@ -28,7 +28,7 @@ class TextTrackList extends TrackList {
      * @fires TrackList#change
      */
     track.addEventListener('modechange', Fn.bind(this, function() {
-      this.trigger('change');
+      this.queueTrigger('change');
     }));
 
     const nonLanguageTextTrackKind = ['metadata', 'chapters'];
