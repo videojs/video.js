@@ -2778,7 +2778,9 @@ class Player extends Component {
     }
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
-    this.trigger('vjs_reset');
+    if (isEvented(this)) {
+        this.trigger('vjs_reset');
+    }
   }
 
   /**
