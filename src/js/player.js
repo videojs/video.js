@@ -2774,7 +2774,7 @@ class Player extends Component {
    */
   reset() {
     if (this.tech_) {
-      this.tech_.clearTracks(["text"]);
+      this.tech_.clearTracks(['text']);
     }
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
