@@ -405,7 +405,9 @@ class Player extends Component {
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
-    this.fluid_ && this.on("vjs_reset", this.updateStyleEl_);
+    if (this.fluid_) {
+      this.on('vjs_reset', this.updateStyleEl_);
+    }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
@@ -770,10 +772,14 @@ class Player extends Component {
 
     this.fluid_ = !!bool;
 
-    isEvented(this) && this.off('vjs_reset', this.updateStyleEl_);
+    if (isEvented(this)) {
+      this.off('vjs_reset', this.updateStyleEl_);
+    }
     if (bool) {
-       this.addClass('vjs-fluid');
-       isEvented(this) && this.on('vjs_reset', this.updateStyleEl_);
+      this.addClass('vjs-fluid');
+      if (isEvented(this)) {
+        this.on('vjs_reset', this.updateStyleEl_);
+      }
     } else {
       this.removeClass('vjs-fluid');
     }
