@@ -24,6 +24,25 @@ const isEvented = (object) =>
   ['on', 'one', 'off', 'trigger'].every(k => typeof object[k] === 'function');
 
 /**
+ * Adds a callback to run after the evented mixin applied.
+ *
+ * @param  {Object} object
+ *         An object to Add
+ * @param  {Function} callback
+ *         The callback to run.
+ */
+const addEventedCallback = (target, callback) => {
+  if (isEvented(target)) {
+    callback();
+  } else {
+    if (!target.eventedCallbacks) {
+      target.eventedCallbacks = [];
+    }
+    target.eventedCallbacks.push(callback);
+  }
+};
+
+/**
  * Whether a value is a valid event type - non-empty string or array.
  *
  * @private
@@ -366,6 +385,12 @@ function evented(target, options = {}) {
 
   Obj.assign(target, EventedMixin);
 
+  if (target.eventedCallbacks) {
+    target.eventedCallbacks.forEach((callback) => {
+      callback();
+    });
+  }
+
   // When any evented object is disposed, it removes all its listeners.
   target.on('dispose', () => {
     target.off();
@@ -379,3 +404,4 @@ function evented(target, options = {}) {
 
 export default evented;
 export {isEvented};
+export {addEventedCallback};

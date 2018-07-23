@@ -10,6 +10,7 @@ import window from 'global/window';
 import tsml from 'tsml';
 import evented from './mixins/evented';
 import {isEvented} from './mixins/evented';
+import {addEventedCallback} from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -406,7 +407,7 @@ class Player extends Component {
     evented(this, {eventBusKey: 'el_'});
 
     if (this.fluid_) {
-      this.on('vjs_reset', this.updateStyleEl_);
+      this.on('playerreset', this.updateStyleEl_);
     }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
@@ -773,13 +774,13 @@ class Player extends Component {
     this.fluid_ = !!bool;
 
     if (isEvented(this)) {
-      this.off('vjs_reset', this.updateStyleEl_);
+      this.off('playerreset', this.updateStyleEl_);
     }
     if (bool) {
       this.addClass('vjs-fluid');
-      if (isEvented(this)) {
-        this.on('vjs_reset', this.updateStyleEl_);
-      }
+      addEventedCallback(function() {
+        this.on('playerreset', this.updateStyleEl_);
+      });
     } else {
       this.removeClass('vjs-fluid');
     }
@@ -2779,7 +2780,7 @@ class Player extends Component {
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     if (isEvented(this)) {
-      this.trigger('vjs_reset');
+      this.trigger('playerreset');
     }
   }
 
