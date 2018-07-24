@@ -1627,7 +1627,7 @@ class Player extends Component {
    * @fires Player#firstplay
    * @listens Tech#firstplay
    * @deprecated As of 6.0 firstplay event is deprecated.
-   * @deprecated As of 6.0 passing the `starttime` option to the player and the firstplay event are deprecated.
+   *             As of 6.0 passing the `starttime` option to the player and the firstplay event are deprecated.
    * @private
    */
   handleTechFirstPlay_() {
