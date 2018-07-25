@@ -187,7 +187,7 @@ EventTarget.prototype.queueTrigger = function(event) {
       EVENT_MAP.delete(this);
     }
 
-    this.trigger(event)
+    this.trigger(event);
   }, 0);
 
   map.set(type, timeout);
