@@ -44,12 +44,14 @@ QUnit.test('trigger "change" event when mode changes on a TextTrack', function(a
 
   ttl.on('change', changeHandler);
   tt.mode = 'showing';
+  this.clock.tick(1);
 
   ttl.off('change', changeHandler);
   ttl.onchange = changeHandler;
 
   tt.mode = 'hidden';
   tt.mode = 'disabled';
+  this.clock.tick(1);
 
-  assert.equal(changes, 3, 'three change events should have fired');
+  assert.equal(changes, 2, 'two change events should have fired');
 });
