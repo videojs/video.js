@@ -3,8 +3,17 @@ import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 import TechFaker from '../tech/tech-faker';
+import sinon from 'sinon';
 
-QUnit.module('Text Track List');
+QUnit.module('Text Track List', {
+  beforeEach() {
+    this.clock = sinon.useFakeTimers();
+  },
+  afterEach() {
+    this.clock.restore();
+  }
+});
+
 QUnit.test('trigger "change" event when "modechange" is fired on a track', function(assert) {
   const tt = new EventTarget();
   const ttl = new TextTrackList([tt]);
@@ -15,11 +24,13 @@ QUnit.test('trigger "change" event when "modechange" is fired on a track', funct
 
   ttl.on('change', changeHandler);
   tt.trigger('modechange');
+  this.clock.tick(1);
 
   ttl.off('change', changeHandler);
   ttl.onchange = changeHandler;
 
   tt.trigger('modechange');
+  this.clock.tick(1);
   assert.equal(changes, 2, 'two change events should have fired');
 });
 
