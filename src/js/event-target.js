@@ -2,6 +2,7 @@
  * @file src/js/event-target.js
  */
 import * as Events from './utils/events.js';
+import window from 'global/window';
 
 /**
  * `EventTarget` is a class that can have the same API as the DOM `EventTarget`. It
@@ -157,5 +158,39 @@ EventTarget.prototype.trigger = function(event) {
  * @see {@link EventTarget#trigger}
  */
 EventTarget.prototype.dispatchEvent = EventTarget.prototype.trigger;
+
+let EVENT_MAP;
+
+EventTarget.prototype.queueTrigger = function(event) {
+  // only set up EVENT_MAP if it'll be used
+  if (!EVENT_MAP) {
+    EVENT_MAP = new Map();
+  }
+
+  const type = event.type || event;
+  let map = EVENT_MAP.get(this);
+
+  if (!map) {
+    map = new Map();
+    EVENT_MAP.set(this, map);
+  }
+
+  const oldTimeout = map.get(type);
+
+  map.delete(type);
+  window.clearTimeout(oldTimeout);
+
+  const timeout = window.setTimeout(() => {
+    // if we cleared out all timeouts for the current target, delete its map
+    if (map.size === 0) {
+      map = null;
+      EVENT_MAP.delete(this);
+    }
+
+    this.trigger(event);
+  }, 0);
+
+  map.set(type, timeout);
+};
 
 export default EventTarget;

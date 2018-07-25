@@ -349,9 +349,11 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
   });
 
   tt.mode = 'showing';
+  this.clock.tick(1);
   assert.equal(numTextTrackChanges, 1,
     'texttrackchange should be called once for mode change');
   tt.mode = 'showing';
+  this.clock.tick(1);
   assert.equal(numTextTrackChanges, 2,
     'texttrackchange should be called once for mode change');
 
@@ -363,6 +365,7 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
     'texttrackchange should be triggered once for the cuechange');
 
   tt.mode = 'hidden';
+  this.clock.tick(1);
   assert.equal(numTextTrackChanges, 4,
     'texttrackchange should be called once for the mode change');
 
