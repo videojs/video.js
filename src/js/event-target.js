@@ -172,9 +172,18 @@ EventTarget.prototype.queueTrigger = function(event) {
 
   const oldTimeout = map.get(type);
 
+  map.delete(type);
   window.clearTimeout(oldTimeout);
 
-  const timeout = window.setTimeout(() => this.trigger(event), 0);
+  const timeout = window.setTimeout(() => {
+    // if we cleared out all timeouts for the current target, delete its map
+    if (map.size === 0) {
+      map = null;
+      EVENT_MAP.delete(this);
+    }
+
+    this.trigger(event)
+  }, 0);
 
   map.set(type, timeout);
 };
