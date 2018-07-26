@@ -1,3 +1,21 @@
+<a name="6.12.0"></a>
+# [6.12.0](https://github.com/videojs/video.js/compare/v6.11.0...v6.12.0) (2018-07-26)
+
+### Features
+
+* **player:** remove text tracks on Player#reset ([#5327](https://github.com/videojs/video.js/issues/5327)) ([7ba7ae3](https://github.com/videojs/video.js/commit/7ba7ae3)), closes [#5140](https://github.com/videojs/video.js/issues/5140)
+* **plugins:** allow plugin deregistration from videojs ([#5273](https://github.com/videojs/video.js/issues/5273)) ([98e3c81](https://github.com/videojs/video.js/commit/98e3c81))
+
+### Bug Fixes
+
+* **lang:** add a missing translation in sk.json ([#5324](https://github.com/videojs/video.js/issues/5324)) ([76375ee](https://github.com/videojs/video.js/commit/76375ee))
+* **lang:** Added all missing translation for CZ_cs ([#5311](https://github.com/videojs/video.js/issues/5311)) ([378c9c9](https://github.com/videojs/video.js/commit/378c9c9))
+* subtitles/captions freeze when using uglify ([#5346](https://github.com/videojs/video.js/issues/5346)) ([226188d](https://github.com/videojs/video.js/commit/226188d)), closes [#5131](https://github.com/videojs/video.js/issues/5131)
+
+### Documentation
+
+* remove duplicate `[@deprecated](https://github.com/deprecated)` which throws error when minifying via google closure compiler ([#5342](https://github.com/videojs/video.js/issues/5342)) ([041d28c](https://github.com/videojs/video.js/commit/041d28c))
+
 <a name="6.11.0"></a>
 # [6.11.0](https://github.com/videojs/video.js/compare/v6.10.3...v6.11.0) (2018-07-09)
 
