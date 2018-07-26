@@ -188,9 +188,8 @@ class TextTrack extends Track {
       // Accessing this.activeCues for the side-effects of updating itself
       // due to it's nature as a getter function. Do not remove or cues will
       // stop updating!
-      /* eslint-disable no-unused-expressions */
-      this.activeCues;
-      /* eslint-enable no-unused-expressions */
+      // Use the setter to prevent deletion from uglify (pure_getters rule)
+      this.activeCues = this.activeCues;
       if (changed) {
         this.trigger('cuechange');
         changed = false;
@@ -323,6 +322,8 @@ class TextTrack extends Track {
 
         return activeCues;
       },
+
+      // /!\ Keep this setter empty (see the timeupdate handler above)
       set() {}
     });
 
