@@ -241,6 +241,13 @@ git checkout master
 git rebase upstream/master
 ```
 
+Alternative way of git rebase is using GitKraken via drag and drop to avoid conflict during pull request
+```sh
+1. pull origin master to your local master
+2. rebase your new branch onto latest head of your local master
+3. push it to your own fork
+```
+
 #### Step 3: Branch
 
 You want to do your work in a separate branch.
