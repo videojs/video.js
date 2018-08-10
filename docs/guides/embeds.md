@@ -75,7 +75,7 @@ const player = videojs('vid1', {});
 Adding `class="video-js"` with this embed is no longer necessary as it will automatically add the class `video-js` if missing.
 
 #### Custom Elements
-Native Custom Elements support is relatively small according to [Can I Use](http://caniuse.com/#feat=custom-elementsv1) and because we didn't want to include a polyfill we're going with just an element called `video-js` rather than a full blown custom element.
+Native Custom Elements support is relatively small according to [Can I Use](https://caniuse.com/#feat=custom-elementsv1) and because we didn't want to include a polyfill we're going with just an element called `video-js` rather than a full blown custom element.
 
 #### Browser support
 These all work in all browsers that Video.js supports, though, there are some caveats for some older browsers.

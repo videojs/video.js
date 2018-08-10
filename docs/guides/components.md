@@ -36,7 +36,7 @@ For more specifics on the programmatic interface of a component, see [the compon
 
 Video.js components can be inherited and registered with Video.js to add new features and UI to the player.
 
-For a working example, [we have a JSBin](http://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
+For a working example, [we have a JSBin](https://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
 
 In addition, there are a couple methods worth recognizing:
 
@@ -339,7 +339,7 @@ let player = videojs('myplayer', {
 
 The text track settings component is only available when using emulated text tracks.
 
-[api]: http://docs.videojs.com/Component.html
+[api]: https://docs.videojs.com/Component.html
 
 ### Resize Manager
 
