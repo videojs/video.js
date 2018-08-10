@@ -1291,6 +1291,12 @@ class Player extends Component {
       src = srcObj.src;
       type = srcObj.type;
     }
+
+    // if we are a blob url, don't update the source cache
+    if (/^blob:/.test(src)) {
+      return;
+    }
+
     // make sure all the caches are set to default values
     // to prevent null checking
     this.cache_.source = this.cache_.source || {};
