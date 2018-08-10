@@ -14,7 +14,7 @@
     "video",
     "videojs"
   ],
-  "homepage": "http://videojs.com",
+  "homepage": "https://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
