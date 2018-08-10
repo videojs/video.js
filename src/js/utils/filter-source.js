@@ -1,9 +1,8 @@
 /**
  * @module filter-source
  */
-import {isPlain} from './obj';
+import {isObject} from './obj';
 import {getMimetype} from './mimetypes';
-import window from 'global/window';
 
 /**
  * Filter out single bad source objects or multiple source objects in an
@@ -18,36 +17,34 @@ import window from 'global/window';
  *
  * @private
  */
-const filterSource = window.filterSource = function(src) {
-  // convert string src into object src
-  if (src && typeof src === 'string' && src.trim()) {
-    return [fixSource({src})];
-  }
-
-  // if src is a valid object, use it
-  if (src && isPlain(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
-    return [fixSource(src)];
-  }
-
-  // traverse array and filter each entry
-  if (src && Array.isArray(src)) {
+const filterSource = function(src) {
+  // traverse array
+  if (Array.isArray(src)) {
     let newsrc = [];
 
-    src.forEach((srcobj) => {
-      srcobj = window.filterSource(srcobj);
+    src.forEach(function(srcobj) {
+      srcobj = filterSource(srcobj);
 
-      if (!srcobj.length) {
-        return;
+      if (Array.isArray(srcobj)) {
+        newsrc = newsrc.concat(srcobj);
+      } else if (isObject(srcobj)) {
+        newsrc.push(srcobj);
       }
-
-      newsrc = newsrc.concat(srcobj);
     });
 
-    return newsrc;
+    src = newsrc;
+  } else if (typeof src === 'string' && src.trim()) {
+    // convert string into object
+    src = [fixSource({src})];
+  } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
+    // src is already valid
+    src = [fixSource(src)];
+  } else {
+    // invalid source, turn it into an empty array
+    src = [];
   }
 
-  // source is invalid return empty array
-  return [];
+  return src;
 };
 
 /**
