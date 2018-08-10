@@ -47,7 +47,10 @@ class ResizeManager extends Component {
     }
 
     // Only create an element when ResizeObserver isn't available
-    const options_ = mergeOptions({createEl: !RESIZE_OBSERVER_AVAILABLE}, options);
+    const options_ = mergeOptions({
+      createEl: !RESIZE_OBSERVER_AVAILABLE,
+      reportTouchActivity: false
+    }, options);
 
     super(player, options_);
 
