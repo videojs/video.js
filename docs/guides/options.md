@@ -422,7 +422,7 @@ Can be set to `false` to disable native video track support. Most commonly used 
 
 [ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
 
-[lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+[lang-codes]: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
 [video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes
 
