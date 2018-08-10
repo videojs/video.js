@@ -1293,6 +1293,8 @@ class Player extends Component {
     }
 
     // if we are a blob url, don't update the source cache
+    // blob urls can arise when playback is done via Media Source Extension (MSE)
+    // such as m3u8 sources with @videojs/http-streaming (VHS)
     if (/^blob:/.test(src)) {
       return;
     }
