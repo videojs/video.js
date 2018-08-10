@@ -1970,12 +1970,34 @@ class Player extends Component {
    * Attempt to begin playback at the first opportunity.
    *
    * @return {Promise|undefined}
-   *         Returns a `Promise` only if the browser returns one and the player
-   *         is ready to begin playback. For some browsers and all non-ready
-   *         situations, this will return `undefined`.
+   *         Returns a promise if the browser supports Promises (or one
+   *         was passed in as an option). This promise will be resolved on
+   *         the return value of play. If this is undefined it will fulfill the
+   *         promise chain otherwise the promise chain will be fulfilled when
+   *         the promise from play is fulfilled.
    */
   play() {
+    const PromiseClass = this.options_.Promise || window.Promise;
 
+    if (PromiseClass) {
+      return new PromiseClass((resolve) => {
+        this.play_(resolve);
+      });
+    }
+
+    return this.play_();
+  }
+
+  /**
+   * The actual logic for play, takes a callback that will be resolved on the
+   * return value of play. This allows us to resolve to the play promise if there
+   * is one on modern browsers.
+   *
+   * @private
+   * @param {Function} [callback]
+   *        The callback that should be called when the techs play is actually called
+   */
+  play_(callback = silencePromise) {
     // If this is called while we have a play queued up on a loadstart, remove
     // that listener to avoid getting in a potentially bad state.
     if (this.playOnLoadstart_) {
@@ -1995,12 +2017,13 @@ class Player extends Component {
       this.playWaitingForReady_ = true;
       this.ready(() => {
         this.playWaitingForReady_ = false;
-        silencePromise(this.play());
+        callback(this.play());
       });
 
     // If the player/tech is ready and we have a source, we can attempt playback.
     } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
-      return this.techGet_('play');
+      callback(this.techGet_('play'));
+      return;
 
     // If the tech is ready, but we do not have a source, we'll need to wait
     // for both the `ready` and a `loadstart` when the source is finally
@@ -2012,11 +2035,12 @@ class Player extends Component {
 
       this.playOnLoadstart_ = () => {
         this.playOnLoadstart_ = null;
-        silencePromise(this.play());
+        callback(this.play());
       };
 
       this.one('loadstart', this.playOnLoadstart_);
     }
+
   }
 
   /**

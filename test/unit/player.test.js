@@ -1136,6 +1136,7 @@ if (window.Promise) {
 }
 
 QUnit.test('play promise should resolve to native value if returned', function(assert) {
+  const done = assert.async();
   const player = TestHelpers.makePlayer({});
 
   player.src({
@@ -1148,7 +1149,18 @@ QUnit.test('play promise should resolve to native value if returned', function(a
   player.tech_.play = () => 'foo';
   const p = player.play();
 
-  assert.equal(p, 'foo', 'play returns foo');
+  const finish = (v) => {
+    assert.equal(v, 'foo', 'play returns foo');
+    done();
+  };
+
+  if (typeof p === 'string') {
+    finish(p);
+  } else {
+    p.then((v) => {
+      finish(v);
+    });
+  }
 });
 
 QUnit.test('should throw on startup no techs are specified', function(assert) {
