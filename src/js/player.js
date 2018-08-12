@@ -2709,6 +2709,16 @@ class Player extends Component {
   }
 
   /**
+   * Handle keydown events from any Component of this player which is not
+   *  andled by that Component; allows for player-wide keyboard shortcuts
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   */
+  handleKeyPress(event) {
+  }
+
+  /**
    * Check whether the player can play a given mimetype
    *
    * @see https://www.w3.org/TR/2011/WD-html5-20110113/video.html#dom-navigator-canplaytype

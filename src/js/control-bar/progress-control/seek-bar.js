@@ -16,6 +16,9 @@ import './mouse-time-display.js';
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
+// The multiplier of STEP_SECONDS that PgUp/PgDown move the timeline.
+const PAGE_KEY_MULTIPLIER = 12;
+
 // The interval at which the bar should update as it progresses.
 const UPDATE_REFRESH_INTERVAL = 30;
 
@@ -363,7 +366,8 @@ class SeekBar extends Slider {
 
   /**
    * Called when this SeekBar has focus and a key gets pressed down. By
-   * default it will call `this.handleAction` when the key is space or enter.
+   * default it will call `this.handleAction` when the key is space or enter,
+   * and support other common keyboard shortcuts (Home, End, PgUp, PgDown, 0..9)
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
@@ -376,8 +380,30 @@ class SeekBar extends Slider {
     if (event.which === 32 || event.which === 13) {
       event.preventDefault();
       this.handleAction(event);
-    } else if (super.handleKeyPress) {
+    } else if (event.which === 36) {
+      // Home (36) key moves to start of the timeline
+      event.preventDefault();
+      this.player_.currentTime(0);
+    } else if (event.which === 35) {
+      // End (35) key moves to end of the timeline
+      event.preventDefault();
+      this.player_.currentTime(this.player_.duration());
+    } else if (event.which >= 48 && event.which <= 57) {
+      // Number "0" (48) through "9" (57) keys move
+      //  to 0%, 10% ... 80%, 90% of the timeline
+      event.preventDefault();
+      const gotoFraction = (event.which - 48) * 10.0 / 100.0;
 
+      this.player_.currentTime(this.player_.duration() * gotoFraction);
+    } else if (event.which === 34) {
+      // PageDown (34) key moves back a larger step
+      event.preventDefault();
+      this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+    } else if (event.which === 33) {
+      // PageUp (33) key moves forward a large step
+      event.preventDefault();
+      this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+    } else {
       // Pass keypress handling up for unsupported keys
       super.handleKeyPress(event);
     }

@@ -324,6 +324,10 @@ class Slider extends Component {
     } else if (event.which === 38 || event.which === 39) {
       event.preventDefault();
       this.stepForward();
+    } else {
+
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(event);
     }
   }
 

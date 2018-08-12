@@ -297,9 +297,15 @@ class MenuButton extends Component {
     // Enter (13) or Up (38) key or Down (40) key press the 'button'
     } else if (event.which === 13 || event.which === 38 || event.which === 40) {
       if (!this.buttonPressed_) {
-        this.pressButton();
         event.preventDefault();
+        this.pressButton();
       }
+    } else {
+      // NOTE: This is a special case where we don't pass unhandled
+      //  keypress events up to the Component handler, because this
+      //  is just adding a keypress handler on top of the menuButton_'s
+      //  existing keypress handler, which handles that passing keypress
+      //  events up.
     }
   }
 
@@ -325,6 +331,9 @@ class MenuButton extends Component {
         // Set focus back to the menu button's button
         this.menuButton_.el_.focus();
       }
+    } else {
+      // NOTE: This is a special case where we don't pass unhandled
+      //  keypress events up to the Component handler
     }
   }
 

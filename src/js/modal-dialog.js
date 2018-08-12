@@ -127,6 +127,10 @@ class ModalDialog extends Component {
   handleKeyPress(e) {
     if (e.which === ESC && this.closeable()) {
       this.close();
+    } else {
+
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(e);
     }
   }
 
