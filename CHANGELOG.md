@@ -1,3 +1,20 @@
+<a name="7.2.1"></a>
+## [7.2.1](https://github.com/videojs/video.js/compare/v7.2.0...v7.2.1) (2018-08-13)
+
+### Bug Fixes
+
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.2.3 ([#5368](https://github.com/videojs/video.js/issues/5368)) ([db4b894](https://github.com/videojs/video.js/commit/db4b894)), closes [#5365](https://github.com/videojs/video.js/issues/5365)
+* **sourceset:** ignore blob urls when updating source cache ([#5371](https://github.com/videojs/video.js/issues/5371)) ([9cb1ba5](https://github.com/videojs/video.js/commit/9cb1ba5))
+* always return a promise from play, if supported ([#5227](https://github.com/videojs/video.js/issues/5227)) ([58405fd](https://github.com/videojs/video.js/commit/58405fd))
+* call component dispose in resize manager to fix leak ([#5369](https://github.com/videojs/video.js/issues/5369)) ([6f072d8](https://github.com/videojs/video.js/commit/6f072d8)), closes [#5339](https://github.com/videojs/video.js/issues/5339)
+* change time tooltips to be absolutely positioned ([#5355](https://github.com/videojs/video.js/issues/5355)) ([4b666f9](https://github.com/videojs/video.js/commit/4b666f9)), closes [#5351](https://github.com/videojs/video.js/issues/5351)
+
+### Chores
+
+* **https:** update a lot of links to be https ([#5372](https://github.com/videojs/video.js/issues/5372)) ([9c00267](https://github.com/videojs/video.js/commit/9c00267))
+* **package:** update karma to version 3.0.0 🚀 ([#5370](https://github.com/videojs/video.js/issues/5370)) ([6893091](https://github.com/videojs/video.js/commit/6893091))
+* **package:** update rollup to version 0.64.1 ([#5367](https://github.com/videojs/video.js/issues/5367)) ([16f4e92](https://github.com/videojs/video.js/commit/16f4e92)), closes [#5363](https://github.com/videojs/video.js/issues/5363)
+
 <a name="7.2.0"></a>
 # [7.2.0](https://github.com/videojs/video.js/compare/v7.1.0...v7.2.0) (2018-07-26)
 
