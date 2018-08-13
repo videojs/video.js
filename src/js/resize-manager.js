@@ -114,6 +114,10 @@ class ResizeManager extends Component {
       this.off('load', this.loadListener_);
     }
 
+    if (this.debouncedHandler_) {
+      this.debouncedHandler_.cancel();
+    }
+
     this.ResizeObserver = null;
     this.resizeObserver = null;
     this.debouncedHandler_ = null;
