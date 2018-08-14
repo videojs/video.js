@@ -83,7 +83,7 @@ player.videoTracks().removeTrack(track);
 
 ## API
 
-For more complete information, refer to the [Video.js API docs](http://docs.videojs.com/), specifically:
+For more complete information, refer to the [Video.js API docs](https://docs.videojs.com/), specifically:
 
 * `Player#videoTracks`
 * `VideoTrackList`

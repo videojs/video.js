@@ -287,15 +287,15 @@ Yes! See [ReactJS integration example][react-guide].
 
 [audio-tracks]: /docs/guides/audio-tracks.md
 
-[contributing-issues]: http://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#filing-issues
+[contributing-issues]: https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#filing-issues
 
-[contributing-prs]: http://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#contributing-code
+[contributing-prs]: https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#contributing-code
 
 [components-guide]: /docs/guides/components.md
 
 [cors]: https://enable-cors.org
 
-[dash]: http://github.com/videojs/videojs-contrib-dash
+[dash]: https://github.com/videojs/videojs-contrib-dash
 
 [debug-guide]: /docs/guides/debugging.md
 
@@ -307,11 +307,11 @@ Yes! See [ReactJS integration example][react-guide].
 
 [google-ima]: https://github.com/googleads/videojs-ima
 
-[hls]: http://github.com/videojs/videojs-contrib-hls
+[hls]: https://github.com/videojs/videojs-contrib-hls
 
-[install-guide]: http://videojs.com/getting-started/
+[install-guide]: https://videojs.com/getting-started/
 
-[issue-template]: http://github.com/videojs/video.js/blob/master/.github/ISSUE_TEMPLATE.md
+[issue-template]: https://github.com/videojs/video.js/blob/master/.github/ISSUE_TEMPLATE.md
 
 [node]: https://www.npmjs.com/package/video.js
 
@@ -319,23 +319,23 @@ Yes! See [ReactJS integration example][react-guide].
 
 [plugin-guide]: /docs/guides/plugins.md
 
-[plugin-list]: http://videojs.com/plugins
+[plugin-list]: https://videojs.com/plugins
 
 [pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
 
-[pr-template]: http://github.com/videojs/video.js/blob/master/.github/PULL_REQUEST_TEMPLATE.md
+[pr-template]: https://github.com/videojs/video.js/blob/master/.github/PULL_REQUEST_TEMPLATE.md
 
 [react-guide]: /docs/guides/react.md
 
 [reduced-test-case]: https://css-tricks.com/reduced-test-cases/
 
-[semver]: http://semver.org/
+[semver]: https://semver.org/
 
 [skins-list]: https://github.com/videojs/video.js/wiki/Skins
 
 [slack]: https://videojs.slack.com
 
-[starter-example]: http://jsbin.com/axedog/edit?html,output
+[starter-example]: https://jsbin.com/axedog/edit?html,output
 
 [techorder]: [cors]: /docs/guides/options.md#techorder
 

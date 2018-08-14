@@ -91,7 +91,7 @@ player.audioTracks().removeTrack(track);
 ## API
 
 For more complete information, refer to the
-[Video.js API docs](http://docs.videojs.com/), specifically:
+[Video.js API docs](https://docs.videojs.com/), specifically:
 
 * `Player#audioTracks`
 * `AudioTrackList`
@@ -158,4 +158,4 @@ one audio track to be enabled at a time.
 
 [spec-audiotrack]: https://html.spec.whatwg.org/multipage/embedded-content.html#audiotrack
 
-[hls]: http://github.com/videojs/videojs-contrib-hls
+[hls]: https://github.com/videojs/videojs-contrib-hls

@@ -115,6 +115,8 @@ class ResizeManager extends Component {
     this.resizeObserver = null;
     this.debouncedHandler_ = null;
     this.loadListener_ = null;
+
+    super.dispose();
   }
 
 }
