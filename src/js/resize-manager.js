@@ -92,6 +92,14 @@ class ResizeManager extends Component {
      * @event Player#playerresize
      * @type {EventTarget~Event}
      */
+    if (!this.player_) {
+      const e = new Error('no player');
+
+      // eslint-disable-next-line
+      console.error(e.stack);
+      throw e;
+    }
+
     this.player_.trigger('playerresize');
   }
 
