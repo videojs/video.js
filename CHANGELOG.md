@@ -1,3 +1,16 @@
+<a name="6.12.1"></a>
+## [6.12.1](https://github.com/videojs/video.js/compare/v6.12.0...v6.12.1) (2018-08-14)
+
+### Bug Fixes
+
+* **sourceset:** ignore blob urls when updating source cache ([#5371](https://github.com/videojs/video.js/issues/5371)) ([f02b825](https://github.com/videojs/video.js/commit/f02b825))
+* always return a promise from play, if supported ([#5227](https://github.com/videojs/video.js/issues/5227)) ([63e234f](https://github.com/videojs/video.js/commit/63e234f))
+* change time tooltips to be absolutely positioned ([#5355](https://github.com/videojs/video.js/issues/5355)) ([91839d8](https://github.com/videojs/video.js/commit/91839d8)), closes [#5351](https://github.com/videojs/video.js/issues/5351)
+
+### Chores
+
+* **https:** update a lot of links to be https ([#5372](https://github.com/videojs/video.js/issues/5372)) ([513d317](https://github.com/videojs/video.js/commit/513d317))
+
 <a name="6.12.0"></a>
 # [6.12.0](https://github.com/videojs/video.js/compare/v6.11.0...v6.12.0) (2018-07-26)
 
