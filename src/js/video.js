@@ -26,7 +26,7 @@ import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
-import extendFn from './extend.js';
+import extend from './extend.js';
 import xhr from 'xhr';
 
 // Include the built-in techs
@@ -434,7 +434,7 @@ videojs.browser = browser;
  */
 videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
-videojs.extend = extendFn;
+videojs.extend = extend;
 videojs.mergeOptions = mergeOptions;
 videojs.bind = Fn.bind;
 videojs.registerPlugin = Plugin.registerPlugin;
