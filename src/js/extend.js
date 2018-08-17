@@ -40,19 +40,17 @@ const _inherits = function(subClass, superClass) {
  * Function for subclassing using the same inheritance that
  * videojs uses internally
  *
- * @static
- * @const
+ * @function
+ * @param    {Object} superClass
+ *           The class to inherit from
  *
- * @param {Object} superClass
- *        The class to inherit from
+ * @param    {Object} [subClassMethods={}]
+ *           The class to inherit to
  *
- * @param {Object} [subClassMethods={}]
- *        The class to inherit to
- *
- * @return {Object}
- *         The new object with subClassMethods that inherited superClass.
+ * @return   {Object}
+ *           The new object with subClassMethods that inherited superClass.
  */
-const extendFn = function(superClass, subClassMethods = {}) {
+const extend = function(superClass, subClassMethods = {}) {
   let subClass = function() {
     superClass.apply(this, arguments);
   };
@@ -80,4 +78,4 @@ const extendFn = function(superClass, subClassMethods = {}) {
   return subClass;
 };
 
-export default extendFn;
+export default extend;

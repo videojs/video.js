@@ -8,13 +8,14 @@ import {each, isPlain} from './obj';
  * Deep-merge one or more options objects, recursively merging **only** plain
  * object properties.
  *
+ * @static
  * @param   {Object[]} sources
  *          One or more objects to merge into a new object.
  *
  * @return {Object}
  *          A new object that is the merged result of all sources.
  */
-export default function mergeOptions(...sources) {
+function mergeOptions(...sources) {
   const result = {};
 
   sources.forEach(source => {
@@ -38,3 +39,5 @@ export default function mergeOptions(...sources) {
 
   return result;
 }
+
+export default mergeOptions;

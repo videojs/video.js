@@ -1,3 +1,7 @@
+/**
+ * @file middleware.js
+ * @module middleware
+ */
 import { assign } from '../utils/obj.js';
 import toTitleCase from '../utils/to-title-case.js';
 
@@ -6,11 +10,30 @@ const middlewareInstances = {};
 
 export const TERMINATOR = {};
 
+/**
+ * Define a middleware.
+ *
+ * @param  {string} type
+ *         The mime type to match or `"*"` for all mime types.
+ *
+ * @param  {Function} middleware
+ *         A middleware factory function that will be executed for
+ *         matching types.
+ */
 export function use(type, middleware) {
   middlewares[type] = middlewares[type] || [];
   middlewares[type].push(middleware);
 }
 
+/**
+ * Gets middlewares by type (or all middlewares).
+ *
+ * @param  {string} type
+ *         The mime type to match or `"*"` for all mime types.
+ *
+ * @return {Function[]|undefined}
+ *         An array of middlewares or `undefined` if none exist.
+ */
 export function getMiddleware(type) {
   if (type) {
     return middlewares[type];
@@ -19,10 +42,31 @@ export function getMiddleware(type) {
   return middlewares;
 }
 
+/**
+ * Asynchronously sets a source using middleware.
+ *
+ * @param  {Player} player
+ *         A {@link Player} instance.
+ *
+ * @param  {Tech~SourceObject} src
+ *         A source object.
+ *
+ * @param  {Function}
+ *         The next middleware to run.
+ */
 export function setSource(player, src, next) {
   player.setTimeout(() => setSourceHelper(src, middlewares[src.type], next, player), 1);
 }
 
+/**
+ * Sets the tech using middeware.
+ *
+ * @param {Object[]} middleware
+ *        An array of middleware instances.
+ *
+ * @param {Tech} tech
+ *        A Video.js tech.
+ */
 export function setTech(middleware, tech) {
   middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
 }
@@ -30,6 +74,18 @@ export function setTech(middleware, tech) {
 /**
  * Calls a getter on the tech first, through each middleware
  * from right to left to the player.
+ *
+ * @param  {Object[]} middleware
+ *         An array of middleware instances.
+ *
+ * @param  {Tech} tech
+ *         The current tech.
+ *
+ * @param  {string} method
+ *         A method name.
+ *
+ * @return {Mixed}
+ *         The final value from the tech after middleware has intercepted it.
  */
 export function get(middleware, tech, method) {
   return middleware.reduceRight(middlewareIterator(method), tech[method]());
@@ -38,16 +94,48 @@ export function get(middleware, tech, method) {
 /**
  * Takes the argument given to the player and calls the setter method on each
  * middleware from left to right to the tech.
+ *
+ * @param  {Object[]} middleware
+ *         An array of middleware instances.
+ *
+ * @param  {Tech} tech
+ *         The current tech.
+ *
+ * @param  {string} method
+ *         A method name.
+ *
+ * @param  {Mixed} arg
+ *         The value to set on the tech.
+ *
+ * @return {Mixed}
+ *         The return value of the `method` of the `tech`.
  */
 export function set(middleware, tech, method, arg) {
   return tech[method](middleware.reduce(middlewareIterator(method), arg));
 }
 
 /**
- * Takes the argument given to the player and calls the `call` version of the method
- * on each middleware from left to right.
+ * Takes the argument given to the player and calls the `call` version of the
+ * method on each middleware from left to right.
+ *
  * Then, call the passed in method on the tech and return the result unchanged
  * back to the player, through middleware, this time from right to left.
+ *
+ * @param  {Object[]} middleware
+ *         An array of middleware instances.
+ *
+ * @param  {Tech} tech
+ *         The current tech.
+ *
+ * @param  {string} method
+ *         A method name.
+ *
+ * @param  {Mixed} arg
+ *         The value to set on the tech.
+ *
+ * @return {Mixed}
+ *         The return value of the `method` of the `tech`, regardless of the
+ *         return values of middlewares.
  */
 export function mediate(middleware, tech, method, arg = null) {
   const callMethod = 'call' + toTitleCase(method);
@@ -60,6 +148,11 @@ export function mediate(middleware, tech, method, arg = null) {
   return returnValue;
 }
 
+/**
+ * Enumeration of allowed getters where the keys are method names.
+ *
+ * @type {Object}
+ */
 export const allowedGetters = {
   buffered: 1,
   currentTime: 1,
@@ -69,10 +162,20 @@ export const allowedGetters = {
   paused: 1
 };
 
+/**
+ * Enumeration of allowed setters where the keys are method names.
+ *
+ * @type {Object}
+ */
 export const allowedSetters = {
   setCurrentTime: 1
 };
 
+/**
+ * Enumeration of allowed mediators where the keys are method names.
+ *
+ * @type {Object}
+ */
 export const allowedMediators = {
   play: 1,
   pause: 1
@@ -103,6 +206,12 @@ function executeRight(mws, method, value, terminated) {
   }
 }
 
+/**
+ * Clear the middleware cache for a player.
+ *
+ * @param  {Player} player
+ *         A {@link Player} instance.
+ */
 export function clearCacheForPlayer(player) {
   middlewareInstances[player.id()] = null;
 }
@@ -111,6 +220,8 @@ export function clearCacheForPlayer(player) {
  * {
  *  [playerId]: [[mwFactory, mwInstance], ...]
  * }
+ *
+ * @private
  */
 function getOrCreateFactory(player, mwFactory) {
   const mws = middlewareInstances[player.id()];
