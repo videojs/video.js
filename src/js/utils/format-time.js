@@ -77,6 +77,7 @@ export function resetFormatTime() {
  * length of the guide.
  *
  * @static
+ * @example  formatTime(125, 600) === "02:05"
  * @param    {number} seconds
  *           Number of seconds to be turned into a string
  *

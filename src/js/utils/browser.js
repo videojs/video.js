@@ -130,6 +130,9 @@ export const IS_EDGE = (/Edge/i).test(USER_AGENT);
 /**
  * Whether or not this is Google Chrome.
  *
+ * This will also be `true` for Chrome on iOS, which will have different support
+ * as it is actually Safari under the hood.
+ *
  * @static
  * @const
  * @type {Boolean}

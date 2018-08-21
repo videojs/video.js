@@ -37,18 +37,25 @@ const _inherits = function(subClass, superClass) {
 };
 
 /**
- * Function for subclassing using the same inheritance that
- * videojs uses internally
+ * Used to subclass an existing class by emulating ES subclassing using the
+ * `extends` keyword.
  *
  * @function
- * @param    {Object} superClass
+ * @example
+ * var MyComponent = videojs.extend(videojs.getComponent('Component'), {
+ *   myCustomMethod: function() {
+ *     // Do things in my method.
+ *   }
+ * });
+ *
+ * @param    {Function} superClass
  *           The class to inherit from
  *
- * @param    {Object} [subClassMethods={}]
- *           The class to inherit to
+ * @param    {Object}   [subClassMethods={}]
+ *           Methods of the new class
  *
- * @return   {Object}
- *           The new object with subClassMethods that inherited superClass.
+ * @return   {Function}
+ *           The new class with subClassMethods that inherited superClass.
  */
 const extend = function(superClass, subClassMethods = {}) {
   let subClass = function() {

@@ -11,12 +11,35 @@ const middlewareInstances = {};
 export const TERMINATOR = {};
 
 /**
- * Define a middleware.
+ * A middleware object is a plain JavaScript object that has methods that
+ * match the {@link Tech} methods found in the lists of allowed
+ * {@link module:middleware.allowedGetters|getters},
+ * {@link module:middleware.allowedSetters|setters}, and
+ * {@link module:middleware.allowedMediators|mediators}.
+ *
+ * @typedef {Object} MiddlewareObject
+ */
+
+/**
+ * A middleware factory function that should return a
+ * {@link module:middleware~MiddlewareObject|MiddlewareObject}.
+ *
+ * This factory will be called for each player when needed, with the player
+ * passed in as an argument.
+ *
+ * @callback MiddlewareFactory
+ * @param {Player} player
+ *        A Video.js player.
+ */
+
+/**
+ * Define a middleware that the player should use by way of a factory function
+ * that returns a middleware object.
  *
  * @param  {string} type
- *         The mime type to match or `"*"` for all mime types.
+ *         The MIME type to match or `"*"` for all MIME types.
  *
- * @param  {Function} middleware
+ * @param  {MiddlewareFactory} middleware
  *         A middleware factory function that will be executed for
  *         matching types.
  */
@@ -29,7 +52,7 @@ export function use(type, middleware) {
  * Gets middlewares by type (or all middlewares).
  *
  * @param  {string} type
- *         The mime type to match or `"*"` for all mime types.
+ *         The MIME type to match or `"*"` for all MIME types.
  *
  * @return {Function[]|undefined}
  *         An array of middlewares or `undefined` if none exist.
@@ -43,7 +66,9 @@ export function getMiddleware(type) {
 }
 
 /**
- * Asynchronously sets a source using middleware.
+ * Asynchronously sets a source using middleware by recursing through any
+ * matching middlewares and calling `setSource` on each, passing along the
+ * previous returned value each time.
  *
  * @param  {Player} player
  *         A {@link Player} instance.
@@ -59,7 +84,7 @@ export function setSource(player, src, next) {
 }
 
 /**
- * Sets the tech using middeware.
+ * When the tech is set, passes the tech to each middleware's `setTech` method.
  *
  * @param {Object[]} middleware
  *        An array of middleware instances.
