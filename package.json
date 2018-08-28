@@ -137,7 +137,7 @@
     "replace": "^0.3.0",
     "rollup": "^0.64.1",
     "rollup-plugin-alias": "^1.4.0",
-    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-babel": "^4.0.1",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-filesize": "^4.0.1",
     "rollup-plugin-ignore": "^1.0.3",
