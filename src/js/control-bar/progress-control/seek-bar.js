@@ -1,4 +1,4 @@
-/**
+*/**
  * @file seek-bar.js
  */
 import Slider from '../../slider/slider.js';
@@ -8,6 +8,7 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
+import keyboardKey from 'keyboard-key';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -365,9 +366,15 @@ class SeekBar extends Slider {
   }
 
   /**
-   * Called when this SeekBar has focus and a key gets pressed down. By
-   * default it will call `this.handleAction` when the key is space or enter,
-   * and support other common keyboard shortcuts (Home, End, PgUp, PgDown, 0..9)
+   * Called when this SeekBar has focus and a key gets pressed down.
+   * Supports the following keys:
+   *
+   *   Space or Enter key fire a click event
+   *   Home key moves to start of the timeline
+   *   End key moves to end of the timeline
+   *   Digit "0" through "9" keys move to 0%, 10% ... 80%, 90% of the timeline
+   *   PageDown key moves back a larger step than ArrowDown
+   *   PageUp key moves forward a large step
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
@@ -375,32 +382,26 @@ class SeekBar extends Slider {
    * @listens keydown
    */
   handleKeyPress(event) {
+    const keyCode = keyboardKey.getCode(event);
 
-    // Support Space (32) or Enter (13) key operation to fire a click event
-    if (event.which === 32 || event.which === 13) {
+    if (keyCode === keyboardKey.Spacebar || keyCode === keyboardKey.Enter) {
       event.preventDefault();
       this.handleAction(event);
-    } else if (event.which === 36) {
-      // Home (36) key moves to start of the timeline
+    } else if (keyCode === keyboardKey.Home) {
       event.preventDefault();
       this.player_.currentTime(0);
-    } else if (event.which === 35) {
-      // End (35) key moves to end of the timeline
+    } else if (keyCode === keyboardKey.End) {
       event.preventDefault();
       this.player_.currentTime(this.player_.duration());
-    } else if (event.which >= 48 && event.which <= 57) {
-      // Number "0" (48) through "9" (57) keys move
-      //  to 0%, 10% ... 80%, 90% of the timeline
+    } else if (keyCode >= keyboardKey.Digit0 && keyCode <= keyboardKey.Digit9) {
       event.preventDefault();
-      const gotoFraction = (event.which - 48) * 10.0 / 100.0;
+      const gotoFraction = (keyCode - keyboardKey.Digit0) * 10.0 / 100.0;
 
       this.player_.currentTime(this.player_.duration() * gotoFraction);
-    } else if (event.which === 34) {
-      // PageDown (34) key moves back a larger step
+    } else if (keyCode === keyboardKey.PageDown) {
       event.preventDefault();
       this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
-    } else if (event.which === 33) {
-      // PageUp (33) key moves forward a large step
+    } else if (keyCode ===keyboardKey.PageUp) {
       event.preventDefault();
       this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else {

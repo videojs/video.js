@@ -4,6 +4,7 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {assign} from '../utils/obj';
+import keyboardKey from 'keyboard-key';
 
 /**
  * The component for a menu item. `<li>`
@@ -66,6 +67,26 @@ class MenuItem extends ClickableComponent {
       innerHTML: `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}</span>`,
       tabIndex: -1
     }, props), attrs);
+  }
+
+  /**
+   * Ignore keys which are used by the menu, but pass any other ones up. See
+   * {@link ClickableComponent#handleKeyPress} for instances where this is called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+    const keyCode = keyboardKey.getCode(event);
+
+    if (keyCode !== keyboardKey.Escape && keyCode !== keyboardKey.Tab &&
+        keyCode !== keyboardKey.ArrowLeft && keyCode !== keyboardKey.ArrowDown &&
+        keyCode !== keyboardKey.ArrowRight && keyCode !== keyboardKey.ArrowUp) {
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(event);
+    }
   }
 
   /**
