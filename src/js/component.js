@@ -1226,9 +1226,9 @@ class Component {
    *    {@link Component#dispose} gets called.
    * 2. The function callback will gets turned into a {@link Component~GenericCallback}
    *
-   * > Note: You can use `window.clearTimeout` on the id returned by this function. This
+   * > Note: You can't use `window.clearTimeout` on the id returned by this function. This
    *         will cause its dispose listener not to get cleaned up! Please use
-   *         {@link Component#clearTimeout} or {@link Component#dispose}.
+   *         {@link Component#clearTimeout} or {@link Component#dispose} instead.
    *
    * @param {Component~GenericCallback} fn
    *        The function that will be run after `timeout`.
@@ -1245,10 +1245,18 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout}
    */
   setTimeout(fn, timeout) {
+    // declare as variables so they are properly available in timeout function
+    // eslint-disable-next-line
+    var timeoutId, disposeFn;
+
     fn = Fn.bind(this, fn);
 
-    const timeoutId = window.setTimeout(fn, timeout);
-    const disposeFn = () => this.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      this.off('dispose', disposeFn);
+      fn();
+    }, timeout);
+
+    disposeFn = () => this.clearTimeout(timeoutId);
 
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
@@ -1371,11 +1379,19 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
+    // declare as variables so they are properly available in rAF function
+    // eslint-disable-next-line
+    var id, disposeFn;
+
     if (this.supportsRaf_) {
       fn = Fn.bind(this, fn);
 
-      const id = window.requestAnimationFrame(fn);
-      const disposeFn = () => this.cancelAnimationFrame(id);
+      id = window.requestAnimationFrame(() => {
+        this.off('dispose', disposeFn);
+        fn();
+      });
+
+      disposeFn = () => this.cancelAnimationFrame(id);
 
       disposeFn.guid = `vjs-raf-${id}`;
       this.on('dispose', disposeFn);

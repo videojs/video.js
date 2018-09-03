@@ -39,10 +39,6 @@ class ControlBar extends Component {
     return super.createEl('div', {
       className: 'vjs-control-bar',
       dir: 'ltr'
-    }, {
-      // The control bar is a group, but we don't aria-label it to avoid
-      //  over-announcing by JAWS
-      role: 'group'
     });
   }
 }

@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware is a Video.js feature that allows interaction with and modification of how the `Player` and `Tech` talk to each other. For more in-depth information, check out our [feature spotlight](http://blog.videojs.com/feature-spotlight-middleware/).
+Middleware is a Video.js feature that allows interaction with and modification of how the `Player` and `Tech` talk to each other. For more in-depth information, check out our [feature spotlight](https://blog.videojs.com/feature-spotlight-middleware/).
 
 ## Table of Contents
 
@@ -21,10 +21,13 @@ Middleware are functions that return an object, a class instance, a prototype, e
 There are a few special methods that affect middleware: `setSource` and `setTech`. These are called internally by Video.js when you call `player.src()`.
 
 ### setSource
+> *NOTE*: In versions of Video.js 7.0.5 and older, `setSource` was required for all middleware and had be included in the returned objects.
 
-`setSource` is a required method for all middleware and must be included in the returned object. This method will setup the routing between a specific source and middleware and eventually sets the source on the `Tech`.
+This method will setup the routing between a specific source and middleware and eventually sets the source on the `Tech`.
 
-If your middleware is not manipulating, redirecting or rejecting the source, you can pass along the source by doing the following:
+If your middleware is not manipulating, redirecting or rejecting the source, you may leave this method out on newer versions of Video.js. Doing so will select middleware implicitly.
+
+In versions 7.0.5 and older, to get your middleware selected, you can pass along the source by doing the following:
 
 ```javascript
 videojs.use('*', function(player) {
@@ -133,6 +136,23 @@ var myMiddleware = function(player) {
       // pass null as the first argument to indicate that the source is not rejected
       next(null, srcObj);
     },
+    currentTime: function(ct) {
+      return ct / 2;
+    },
+    setCurrentTime: function(time) {
+      return time * 2;
+    }
+  };
+};
+
+videojs.use('*', myMiddleware);
+```
+
+And the same example with `setSource` omitted:
+
+```javascript
+var myMiddleware = function(player) {
+  return {
     currentTime: function(ct) {
       return ct / 2;
     },

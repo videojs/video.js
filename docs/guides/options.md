@@ -19,6 +19,7 @@
   * [width](#width)
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
+  * [autoSetup](#autosetup)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -52,11 +53,34 @@ Each of these options is also available as a [standard `<video>` element attribu
 
 ### `autoplay`
 
-> Type: `boolean`
+> Type: `boolean|string`
+> NOTE: At this point, the autoplay attribute and option are NOT a guarantee that your video will autoplay.
+> NOTE2: If there is an attribute on the media element the option will be ignored.
+> NOTE3: You cannot pass a string value in the attribute, you must pass it in the videojs options
 
-If `true`/present as an attribute, begins playback when the player is ready.
+Instead of using the `autoplay` attribute you should pass an `autoplay` option to the `videojs` function. The following values
+are valid:
 
-> **Note:** As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
+* a boolean value of `false`: the same as having no attribute on the video element, won't `autoplay`
+* a boolean value of `true`: the same as having attribute on the video element, will use browsers `autoplay`
+* a string value of `'muted'`: will mute the video element and then manually call `play()` on `loadstart`. This is likely to work.
+* a string value of `'play'`: will call `play()` on `loadstart`, similar to browsers `autoplay`
+* a string value of `'any'`: will call `play()` on `loadstart` and if the promise is rejected it will mute the video element then call `play()`.
+
+To pass the option
+
+```js
+var player = videojs('my-video', {
+  autoplay: 'muted'
+});
+
+// or
+
+player.autoplay('muted');
+```
+
+#### More info on autoplay support and changes:
+* See our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
 
 ### `controls`
 
@@ -129,6 +153,15 @@ Each option is `undefined` by default unless otherwise specified.
 > Type: `string`
 
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
+
+### `autoSetup`
+
+> Type: `boolean`
+
+Prevents the player from running the autoSetup for media elements with `data-setup` attribute.
+
+> **Note**: this must be set globally with `videojs.options.autoSetup = false` in the same tick as videojs source is loaded to take effect.
+
 
 ### `children`
 
@@ -389,7 +422,7 @@ Can be set to `false` to disable native video track support. Most commonly used 
 
 [ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
 
-[lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+[lang-codes]: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
 [video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes
 

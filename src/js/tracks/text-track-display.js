@@ -24,22 +24,30 @@ const fontMap = {
  * Construct an rgba color from a given hex color code.
  *
  * @param {number} color
- *        Hex number for color, like #f0e.
+ *        Hex number for color, like #f0e or #f604e2.
  *
  * @param {number} opacity
  *        Value for opacity, 0.0 - 1.0.
  *
  * @return {string}
  *         The rgba color that was created, like 'rgba(255, 0, 0, 0.3)'.
- *
- * @private
  */
-function constructColor(color, opacity) {
-  return 'rgba(' +
+export function constructColor(color, opacity) {
+  let hex;
+
+  if (color.length === 4) {
     // color looks like "#f0e"
-    parseInt(color[1] + color[1], 16) + ',' +
-    parseInt(color[2] + color[2], 16) + ',' +
-    parseInt(color[3] + color[3], 16) + ',' +
+    hex = color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+  } else if (color.length === 7) {
+    // color looks like "#f604e2"
+    hex = color.slice(1);
+  } else {
+    throw new Error('Invalid color code provided, ' + color + '; must be formatted as e.g. #f0e or #f604e2.');
+  }
+  return 'rgba(' +
+    parseInt(hex.slice(0, 2), 16) + ',' +
+    parseInt(hex.slice(2, 4), 16) + ',' +
+    parseInt(hex.slice(4, 6), 16) + ',' +
     opacity + ')';
 }
 

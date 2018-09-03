@@ -45,8 +45,8 @@ Video.js uses a JSON object to describe a language, where the keys are English a
   "Play": "Reproducción",
   "Pause": "Pausa",
   "Current Time": "Tiempo reproducido",
-  "Duration Time": "Duración total",
-  "Remaining Time": "Tiempo restante"
+  "Duration": "Duración total",
+  "Remaining Time": "Tiempo restante",
 }
 ```
 
@@ -89,7 +89,7 @@ videojs.addLanguage('es', {
   Play: 'Reproducción',
   Pause: 'Pausa',
   'Current Time': 'Tiempo reproducido',
-  'Duration Time': 'Duración total',
+  'Duration': 'Duración total',
   'Remaining Time': 'Tiempo restante',
   ...
 });
@@ -152,6 +152,6 @@ For all existing/supported languages, please see the [languages folder (`lang/`)
 
 [lang-supported]: /lang
 
-[lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+[lang-codes]: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
 [translations-needed]: https://github.com/videojs/video.js/blob/master/docs/translations-needed.md

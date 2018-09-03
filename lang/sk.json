@@ -5,7 +5,7 @@
   "Pause": "Pozastaviť",
   "Replay": "Prehrať znova",
   "Current Time": "Aktuálny čas",
-  "Duration Time": "Čas trvania",
+  "Duration": "Čas trvania",
   "Remaining Time": "Zostávajúci čas",
   "Stream Type": "Typ stopy",
   "LIVE": "NAŽIVO",
@@ -80,5 +80,6 @@
   "Done": "Hotovo",
   "Caption Settings Dialog": "Okno nastavení popiskov",
   "Beginning of dialog window. Escape will cancel and close the window.": "Začiatok okna. Klávesa Escape zruší a zavrie okno.",
-  "End of dialog window.": "Koniec okna."
+  "End of dialog window.": "Koniec okna.",
+	"{1} is loading.": "{1} sa načíta."
 }

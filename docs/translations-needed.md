@@ -6,7 +6,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 
 ## Progress Bar Translations
 
-The progress bar as a translation with a few token replacements.
+The progress bar has a translation with a few token replacements.
 They key is `progress bar timing: currentTime={1} duration={2}` and the default English value is `{1} of {2}`.
 This default value is hardcoded as a default to the localize method in the SeekBar component.
 

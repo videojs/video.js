@@ -288,7 +288,6 @@ module.exports = function(grunt) {
       dev: [
         'skin',
         'shell:babel',
-        'shell:rollupwatch',
         'browserify:tests',
         'watch:skin',
         'watch:lang',
@@ -340,11 +339,8 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
-      rollupwatch: {
-        command: 'npm run rollup-dev',
-        optoins: {
-          preferLocal: true
-        }
+      autoprefixer: {
+        command: 'npm run autoprefixer'
       },
       babel: {
         command: 'npm run babel -- --watch --quiet',
@@ -408,6 +404,7 @@ module.exports = function(grunt) {
     'shell:rollupall',
 
     'skin',
+    'shell:autoprefixer',
     'version:css',
     'cssmin',
 

@@ -350,9 +350,9 @@ These events work for both basic and advanced plugins. They are triggered on the
 
 [tech]: /docs/guides/tech.md
 
-[api-player]: http://docs.videojs.com/Player.html
+[api-player]: https://docs.videojs.com/Player.html
 
-[api-plugin]: http://docs.videojs.com/Plugin.html
+[api-plugin]: https://docs.videojs.com/Plugin.html
 
 [generator]: https://github.com/videojs/generator-videojs-plugin
 

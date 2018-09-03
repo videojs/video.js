@@ -49,6 +49,48 @@ QUnit.test('dispose should not throw if styleEl is missing', function(assert) {
   assert.ok(player.el() === null, 'element disposed');
 });
 
+QUnit.test('dispose should not throw if techEl is missing', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag);
+
+  player.tech_.el_.parentNode.removeChild(player.tech_.el_);
+  player.tech_.el_ = null;
+  let error;
+
+  try {
+    player.dispose();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on dispose');
+});
+
+QUnit.test('dispose should not throw if playerEl is missing', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag);
+
+  player.el_.parentNode.removeChild(player.el_);
+  player.el_ = null;
+  let error;
+
+  try {
+    player.dispose();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on dispose');
+});
+
 // technically, all uses of videojs.options should be replaced with
 // Player.prototype.options_ in this file and a equivalent test using
 // videojs.options should be made in video.test.js. Keeping this here
@@ -1094,6 +1136,7 @@ if (window.Promise) {
 }
 
 QUnit.test('play promise should resolve to native value if returned', function(assert) {
+  const done = assert.async();
   const player = TestHelpers.makePlayer({});
 
   player.src({
@@ -1106,7 +1149,18 @@ QUnit.test('play promise should resolve to native value if returned', function(a
   player.tech_.play = () => 'foo';
   const p = player.play();
 
-  assert.equal(p, 'foo', 'play returns foo');
+  const finish = (v) => {
+    assert.equal(v, 'foo', 'play returns foo');
+    done();
+  };
+
+  if (typeof p === 'string') {
+    finish(p);
+  } else {
+    p.then((v) => {
+      finish(v);
+    });
+  }
 });
 
 QUnit.test('should throw on startup no techs are specified', function(assert) {
@@ -1861,4 +1915,18 @@ QUnit.test('disposing a tech that dit NOT set a poster, should keep the poster',
   assert.equal(player.poster(), posterUrl, 'player poster should stay the same after unloading / dispoing tech');
 
   player.dispose();
+});
+
+QUnit.test('source options are retained', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const source = {
+    src: 'https://some.url',
+    type: 'someType',
+    sourceOption: 'someOption'
+  };
+
+  player.src(source);
+
+  assert.equal(player.currentSource().sourceOption, 'someOption', 'source option retained');
 });
