@@ -448,11 +448,9 @@ QUnit.test('should add listeners to other components and remove when them other 
   const player = getFakePlayer();
   const comp1 = new Component(player);
   const comp2 = new Component(player);
-  let listenerFired = 0;
 
   const testListener = function() {
     assert.equal(this, comp1, 'listener has the first component as context');
-    listenerFired++;
   };
 
   comp1.on(comp2, 'test-event', testListener);
