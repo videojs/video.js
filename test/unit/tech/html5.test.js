@@ -201,18 +201,18 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   Html5.patchCanPlayType();
 
   assert.notStrictEqual(video.canPlayType,
-                 canPlayType,
-                 'original canPlayType and patched canPlayType should not be equal');
+    canPlayType,
+    'original canPlayType and patched canPlayType should not be equal');
 
   const patchedCanPlayType = video.canPlayType;
   const unpatchedCanPlayType = Html5.unpatchCanPlayType();
 
   assert.strictEqual(canPlayType,
-                    Html5.TEST_VID.constructor.prototype.canPlayType,
-                    'original canPlayType and unpatched canPlayType should be equal');
+    Html5.TEST_VID.constructor.prototype.canPlayType,
+    'original canPlayType and unpatched canPlayType should be equal');
   assert.strictEqual(patchedCanPlayType,
-                    unpatchedCanPlayType,
-                    'patched canPlayType and function returned from unpatch are equal');
+    unpatchedCanPlayType,
+    'patched canPlayType and function returned from unpatch are equal');
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_FIREFOX = oldIsFirefox;
@@ -236,8 +236,8 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType,
-                 canPlayType,
-                 'original canPlayType and patched canPlayType should be equal');
+    canPlayType,
+    'original canPlayType and patched canPlayType should be equal');
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_CHROME = oldIsChrome;
@@ -261,8 +261,8 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType,
-                 canPlayType,
-                 'original canPlayType and patched canPlayType should be equal');
+    canPlayType,
+    'original canPlayType and patched canPlayType should be equal');
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_FIREFOX = oldIsFirefox;
@@ -282,18 +282,18 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType('application/x-mpegurl'),
-                    'maybe',
-                    'android version 4.0 or above should be a maybe for x-mpegurl');
+    'maybe',
+    'android version 4.0 or above should be a maybe for x-mpegurl');
   assert.strictEqual(video.canPlayType('application/x-mpegURL'),
-                    'maybe',
-                    'android version 4.0 or above should be a maybe for x-mpegURL');
+    'maybe',
+    'android version 4.0 or above should be a maybe for x-mpegURL');
   assert.strictEqual(video.canPlayType('application/vnd.apple.mpegurl'),
-                    'maybe',
-                    'android version 4.0 or above should be a ' +
+    'maybe',
+    'android version 4.0 or above should be a ' +
                     'maybe for vnd.apple.mpegurl');
   assert.strictEqual(video.canPlayType('application/vnd.apple.mpegURL'),
-                    'maybe',
-                    'android version 4.0 or above should be a ' +
+    'maybe',
+    'android version 4.0 or above should be a ' +
                     'maybe for vnd.apple.mpegurl');
 
   browser.ANDROID_VERSION = oldAV;
@@ -310,8 +310,8 @@ QUnit.test('should return a maybe for mp4 on OLD ANDROID', function(assert) {
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType('video/mp4'),
-                    'maybe',
-                    'old android should return a maybe for video/mp4');
+    'maybe',
+    'old android should return a maybe for video/mp4');
 
   browser.IS_OLD_ANDROID = isOldAndroid;
   Html5.unpatchCanPlayType();
@@ -341,8 +341,8 @@ QUnit.test('native source handler canPlayType', function(assert) {
   const canPlayType = Html5.nativeSourceHandler.canPlayType;
 
   assert.equal(canPlayType('video/mp4'),
-              'maybe',
-              'Native source handler reported type support');
+    'maybe',
+    'Native source handler reported type support');
   assert.equal(canPlayType('foo'), '', 'Native source handler handled bad type');
 
   // Reset test video canPlayType
@@ -363,31 +363,31 @@ QUnit.test('native source handler canHandleSource', function(assert) {
   const canHandleSource = Html5.nativeSourceHandler.canHandleSource;
 
   assert.equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }, {}),
-              'maybe',
-              'Native source handler reported type support');
+    'maybe',
+    'Native source handler reported type support');
   assert.equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }, {}),
-              'maybe',
-              'Native source handler reported extension support');
+    'maybe',
+    'Native source handler reported extension support');
   assert.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }, {}),
-              'maybe',
-              'Native source handler reported extension support');
+    'maybe',
+    'Native source handler reported extension support');
   assert.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }, {}),
-              'maybe',
-              'Native source handler reported extension support');
+    'maybe',
+    'Native source handler reported extension support');
 
   // Test for issue videojs/video.js#1785 and other potential failures
   assert.equal(canHandleSource({ src: '' }, {}),
-              '',
-              'Native source handler handled empty src');
+    '',
+    'Native source handler handled empty src');
   assert.equal(canHandleSource({}, {}),
-              '',
-              'Native source handler handled empty object');
+    '',
+    'Native source handler handled empty object');
   assert.equal(canHandleSource({ src: 'foo' }, {}),
-              '',
-              'Native source handler handled bad src');
+    '',
+    'Native source handler handled bad src');
   assert.equal(canHandleSource({ type: 'foo' }, {}),
-              '',
-              'Native source handler handled bad type');
+    '',
+    'Native source handler handled bad type');
 
   // Reset test video canPlayType
   Html5.TEST_VID.canPlayType = origCPT;
@@ -708,15 +708,15 @@ QUnit.test('should always return currentSource_ if set', function(assert) {
   const currentSrc = Html5.prototype.currentSrc;
 
   assert.equal(currentSrc.call({el_: {currentSrc: 'test1'}}),
-              'test1',
-              'sould return source from element if nothing else set');
+    'test1',
+    'sould return source from element if nothing else set');
   assert.equal(currentSrc.call({currentSource_: {src: 'test2'}}),
-              'test2',
-              'sould return source from currentSource_, if nothing else set');
+    'test2',
+    'sould return source from currentSource_, if nothing else set');
   assert.equal(currentSrc.call({currentSource_: {src: 'test2'},
-                               el_: {currentSrc: 'test1'}}),
-              'test2',
-              'sould return source from  source set, not from element');
+    el_: {currentSrc: 'test1'}}),
+  'test2',
+  'sould return source from  source set, not from element');
 });
 
 QUnit.test('should fire makeup events when a video tag is initialized late', function(assert) {
@@ -743,8 +743,8 @@ QUnit.test('should fire makeup events when a video tag is initialized late', fun
     lateInit.call(mockHtml5, statesObject);
     mockHtml5.triggerReady();
     assert.deepEqual(triggeredEvents,
-                    expectedEvents,
-                    'wrong events triggered for ' +
+      expectedEvents,
+      'wrong events triggered for ' +
                     `networkState:${statesObject.networkState} ` +
                     `and readyState:${statesObject.readyState || 'no readyState'}`);
 
@@ -763,11 +763,11 @@ QUnit.test('should fire makeup events when a video tag is initialized late', fun
   testStates({ networkState: 1, readyState: 0 }, ['loadstart']);
   testStates({ networkState: 1, readyState: 1 }, ['loadstart', 'loadedmetadata']);
   testStates({ networkState: 1, readyState: 2 },
-             ['loadstart', 'loadedmetadata', 'loadeddata']);
+    ['loadstart', 'loadedmetadata', 'loadeddata']);
   testStates({ networkState: 1, readyState: 3 },
-             ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay']);
+    ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay']);
   testStates({ networkState: 1, readyState: 4 },
-             ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough']);
+    ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough']);
 });
 
 QUnit.test('Html5.resetMediaElement should remove sources and call load', function(assert) {
@@ -798,8 +798,8 @@ QUnit.test('Html5.resetMediaElement should remove sources and call load', functi
   Html5.resetMediaElement(testEl);
   assert.equal(selector, 'source', 'we got the source elements from the test el');
   assert.deepEqual(removedChildren,
-                  children.reverse(),
-                  'we removed the children that were present');
+    children.reverse(),
+    'we removed the children that were present');
   assert.equal(removedAttribute, 'src', 'we removed the src attribute');
   assert.ok(loaded, 'we called load on the element');
 });
@@ -855,8 +855,8 @@ QUnit.test('supports getting available media playback quality metrics', function
     getVideoPlaybackQuality: () => videoPlaybackQuality
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   videoPlaybackQuality,
-                   'uses native implementation when supported');
+    videoPlaybackQuality,
+    'uses native implementation when supported');
 
   tech.el_ = {
     webkitDroppedFrameCount: 1,
@@ -866,8 +866,8 @@ QUnit.test('supports getting available media playback quality metrics', function
     now: () => 4
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 4 },
-                   'uses webkit prefixed metrics and performance.now when supported');
+    { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 4 },
+    'uses webkit prefixed metrics and performance.now when supported');
 
   tech.el_ = {
     webkitDroppedFrameCount: 1,
@@ -882,8 +882,8 @@ QUnit.test('supports getting available media playback quality metrics', function
     }
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 7 },
-                   'uses webkit prefixed metrics and Date.now() - navigationStart when ' +
+    { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 7 },
+    'uses webkit prefixed metrics and Date.now() - navigationStart when ' +
                    'supported');
 
   tech.el_ = {};
@@ -894,8 +894,8 @@ QUnit.test('supports getting available media playback quality metrics', function
     now: () => 5
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   { creationTime: 5 },
-                   'only creation time when it\'s the only piece available');
+    { creationTime: 5 },
+    'only creation time when it\'s the only piece available');
 
   window.performance = {
     timing: {
@@ -903,8 +903,8 @@ QUnit.test('supports getting available media playback quality metrics', function
     }
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   { creationTime: 7 },
-                   'only creation time when it\'s the only piece available');
+    { creationTime: 7 },
+    'only creation time when it\'s the only piece available');
 
   tech.el_ = {
     getVideoPlaybackQuality: () => videoPlaybackQuality,
@@ -912,8 +912,8 @@ QUnit.test('supports getting available media playback quality metrics', function
     webkitDecodedFrameCount: 2
   };
   assert.deepEqual(tech.getVideoPlaybackQuality(),
-                   videoPlaybackQuality,
-                   'prefers native implementation when supported');
+    videoPlaybackQuality,
+    'prefers native implementation when supported');
 
   tech.el_ = oldEl;
   window.performance = origPerformance;

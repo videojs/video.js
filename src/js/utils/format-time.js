@@ -3,7 +3,7 @@
  * @module format-time
  */
 
- /**
+/**
  * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in seconds)
  * will force a number of leading zeros to cover the length of the guide.
  *

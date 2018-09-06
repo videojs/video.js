@@ -78,7 +78,8 @@ export function each(object, fn) {
  */
 export function reduce(object, fn, initial = 0) {
   return keys(object).reduce(
-    (accum, key) => fn(accum, object[key], key), initial);
+    (accum, key) => fn(accum, object[key], key), initial
+  );
 }
 
 /**
@@ -114,7 +115,7 @@ export function assign(target, ...sources) {
  * results in `'object'`.
  *
  * @param  {Object} value
- * @return {Boolean}
+ * @return {boolean}
  */
 export function isObject(value) {
   return !!value && typeof value === 'object';
@@ -125,7 +126,7 @@ export function isObject(value) {
  * direct instance of `Object`.
  *
  * @param  {Object} value
- * @return {Boolean}
+ * @return {boolean}
  */
 export function isPlain(value) {
   return isObject(value) &&

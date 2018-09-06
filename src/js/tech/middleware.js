@@ -172,11 +172,11 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
       // if it's the same type, continue down the current chain
       // otherwise, we want to go down the new chain
       setSourceHelper(_src,
-          src.type === _src.type ? mwrest : middlewares[_src.type],
-          next,
-          player,
-          acc,
-          lastRun);
+        src.type === _src.type ? mwrest : middlewares[_src.type],
+        next,
+        player,
+        acc,
+        lastRun);
     });
 
   } else if (mwrest.length) {

@@ -58,10 +58,10 @@ function classRegExp(className) {
 /**
  * Whether the current DOM interface appears to be real.
  *
- * @return {Boolean}
+ * @return {boolean}
  */
 export function isReal() {
-    // Both document and window will never be undefined thanks to `global`.
+  // Both document and window will never be undefined thanks to `global`.
   return document === window.document;
 }
 
@@ -663,7 +663,7 @@ export function emptyEl(el) {
  * The content for an element can be passed in multiple types and
  * combinations, whose behavior is as follows:
  *
- * @param {String|Element|TextNode|Array|Function} content
+ * @param {string|Element|TextNode|Array|Function} content
  *        - String: Normalized into a text node.
  *        - Element/TextNode: Passed through.
  *        - Array: A one-dimensional array of strings, elements, nodes, or functions
@@ -709,7 +709,7 @@ export function normalizeContent(content) {
  *        Element to append normalized content to.
  *
  *
- * @param {String|Element|TextNode|Array|Function} content
+ * @param {string|Element|TextNode|Array|Function} content
  *        See the `content` argument of {@link dom:normalizeContent}
  *
  * @return {Element}
@@ -727,7 +727,7 @@ export function appendContent(el, content) {
  * @param {Element} el
  *        Element to insert normalized content into.
  *
- * @param {String|Element|TextNode|Array|Function} content
+ * @param {string|Element|TextNode|Array|Function} content
  *        See the `content` argument of {@link dom:normalizeContent}
  *
  * @return {Element}

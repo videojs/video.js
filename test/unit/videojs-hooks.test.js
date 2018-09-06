@@ -153,7 +153,7 @@ QUnit.test('should trigger beforesetup and setup during videojs setup', function
     assert.ok(player, 'created player from tag');
     assert.ok(player.id() === 'test_vid_id');
     assert.ok(videojs.getPlayers().test_vid_id === player,
-              'added player to global reference');
+      'added player to global reference');
   };
 
   const fixture = document.getElementById('qunit-fixture');

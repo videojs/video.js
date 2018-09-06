@@ -25,7 +25,7 @@ QUnit.test('should be displayed when text tracks list is not empty', function(as
   this.clock.tick(1000);
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-hidden'),
-           'control is displayed');
+    'control is displayed');
   assert.equal(player.textTracks().length, 1, 'textTracks contains one item');
 
   player.dispose();
@@ -37,7 +37,7 @@ QUnit.test('should be displayed when a text track is added to an empty track lis
   player.addRemoteTextTrack(track, true);
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-hidden'),
-           'control is displayed');
+    'control is displayed');
   assert.equal(player.textTracks().length, 1, 'textTracks contains one item');
 
   player.dispose();
@@ -47,7 +47,7 @@ QUnit.test('should not be displayed when text tracks list is empty', function(as
   const player = TestHelpers.makePlayer();
 
   assert.ok(player.controlBar.subsCapsButton.hasClass('vjs-hidden'),
-           'control is not displayed');
+    'control is not displayed');
   assert.equal(player.textTracks().length, 0, 'textTracks is empty');
 
   player.dispose();
@@ -61,7 +61,7 @@ QUnit.test('should not be displayed when last text track is removed', function(a
   player.removeRemoteTextTrack(player.textTracks()[0]);
 
   assert.ok(player.controlBar.subsCapsButton.hasClass('vjs-hidden'),
-           'control is not displayed');
+    'control is not displayed');
   assert.equal(player.textTracks().length, 0, 'textTracks is empty');
 
   player.dispose();
@@ -79,8 +79,8 @@ QUnit.test('menu should contain "Settings", "Off" and one track', function(asser
 
   assert.equal(menuItems.length, 3, 'menu contains three items');
   assert.equal(menuItems[0].track.label,
-              'captions settings',
-              'menu contains "captions settings"');
+    'captions settings',
+    'menu contains "captions settings"');
   assert.equal(menuItems[1].track.label, 'captions off', 'menu contains "captions off"');
   assert.equal(menuItems[2].track.label, 'test', 'menu contains "test" track');
 
@@ -102,8 +102,8 @@ QUnit.test('menu should contain "Settings", "Off", one captions and one subtitle
 
   assert.equal(menuItems.length, 4, 'menu contains three items');
   assert.equal(menuItems[0].track.label,
-              'captions settings',
-              'menu contains "captions settings"');
+    'captions settings',
+    'menu contains "captions settings"');
   assert.equal(menuItems[1].track.label, 'captions off', 'menu contains "captions off"');
   assert.equal(menuItems[2].track.label, 'test', 'menu contains "test" track');
 
@@ -120,8 +120,8 @@ QUnit.test('menu should update with addRemoteTextTrack', function(assert) {
   player.addRemoteTextTrack(track, true);
 
   assert.equal(player.controlBar.subsCapsButton.items.length,
-              4,
-              'menu does contain added track');
+    4,
+    'menu does contain added track');
   assert.equal(player.textTracks().length, 2, 'textTracks contains two items');
 
   player.dispose();
@@ -137,8 +137,8 @@ QUnit.test('menu should update with removeRemoteTextTrack', function(assert) {
   player.removeRemoteTextTrack(player.textTracks()[0]);
 
   assert.equal(player.controlBar.subsCapsButton.items.length,
-              3,
-              'menu does not contain removed track');
+    3,
+    'menu does not contain removed track');
   assert.equal(player.textTracks().length, 1, 'textTracks contains one item');
 
   player.dispose();
@@ -157,7 +157,7 @@ QUnit.test('descriptions should be displayed when text tracks list is not empty'
   this.clock.tick(1000);
 
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'),
-           'descriptions control is displayed');
+    'descriptions control is displayed');
   assert.equal(player.textTracks().length, 1, 'textTracks contains one item');
 
   player.dispose();
@@ -169,7 +169,7 @@ QUnit.test('descriptions should be displayed when a text track is added to an em
   player.addRemoteTextTrack(descriptionstrack, true);
 
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'),
-           'control is displayed');
+    'control is displayed');
   assert.equal(player.textTracks().length, 1, 'textTracks contains one item');
 
   player.dispose();
@@ -179,7 +179,7 @@ QUnit.test('descriptions should not be displayed when text tracks list is empty'
   const player = TestHelpers.makePlayer();
 
   assert.ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'),
-           'control is not displayed');
+    'control is not displayed');
   assert.equal(player.textTracks().length, 0, 'textTracks is empty');
 
   player.dispose();
@@ -193,7 +193,7 @@ QUnit.test('descriptions should not be displayed when last text track is removed
   player.removeRemoteTextTrack(player.textTracks()[0]);
 
   assert.ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'),
-           'control is not displayed');
+    'control is not displayed');
   assert.equal(player.textTracks().length, 0, 'textTracks is empty');
 
   player.dispose();
@@ -210,8 +210,8 @@ QUnit.test('descriptions menu should contain "Off" and one track', function(asse
 
   assert.equal(menuItems.length, 2, 'descriptions menu contains two items');
   assert.equal(menuItems[0].track.label,
-              'descriptions off',
-              'menu contains "descriptions off"');
+    'descriptions off',
+    'menu contains "descriptions off"');
   assert.equal(menuItems[1].track.label, 'desc', 'menu contains "desc" track');
 
   player.dispose();
@@ -227,63 +227,63 @@ QUnit.test('enabling a captions track should disable the descriptions menu butto
   this.clock.tick(1000);
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-hidden'),
-           'captions control is displayed');
+    'captions control is displayed');
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'),
-           'descriptions control is displayed');
+    'descriptions control is displayed');
   assert.equal(player.textTracks().length, 2, 'textTracks contains two items');
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-disabled'),
-           'captions control is NOT disabled');
+    'captions control is NOT disabled');
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'),
-           'descriptions control is NOT disabled');
+    'descriptions control is NOT disabled');
 
   for (let i = 0; i < player.textTracks().length; i++) {
     if (player.textTracks()[i].kind === 'descriptions') {
       player.textTracks()[i].mode = 'showing';
       assert.ok(player.textTracks()[i].kind === 'descriptions' &&
                player.textTracks()[i].mode === 'showing',
-               'descriptions mode set to showing');
+      'descriptions mode set to showing');
     }
   }
 
   this.clock.tick(1000);
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-disabled'),
-           'captions control is NOT disabled');
+    'captions control is NOT disabled');
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'),
-           'descriptions control is NOT disabled');
+    'descriptions control is NOT disabled');
 
   for (let i = 0; i < player.textTracks().length; i++) {
     if (player.textTracks()[i].kind === 'captions') {
       player.textTracks()[i].mode = 'showing';
       assert.ok(player.textTracks()[i].kind === 'captions' &&
                player.textTracks()[i].mode === 'showing',
-               'captions mode set to showing');
+      'captions mode set to showing');
     }
   }
 
   this.clock.tick(1000);
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-disabled'),
-           'captions control is NOT disabled');
+    'captions control is NOT disabled');
   assert.ok(player.controlBar.descriptionsButton.hasClass('vjs-disabled'),
-           'descriptions control IS disabled');
+    'descriptions control IS disabled');
 
   for (let i = 0; i < player.textTracks().length; i++) {
     if (player.textTracks()[i].kind === 'captions') {
       player.textTracks()[i].mode = 'disabled';
       assert.ok(player.textTracks()[i].kind === 'captions' &&
                player.textTracks()[i].mode === 'disabled',
-               'captions mode set to disabled');
+      'captions mode set to disabled');
     }
   }
 
   this.clock.tick(1000);
 
   assert.ok(!player.controlBar.subsCapsButton.hasClass('vjs-disabled'),
-           'captions control is NOT disabled');
+    'captions control is NOT disabled');
   assert.ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'),
-           'descriptions control is NOT disabled');
+    'descriptions control is NOT disabled');
 
   player.dispose();
 });

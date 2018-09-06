@@ -409,8 +409,8 @@ QUnit.test('should return correct remote text track values', function(assert) {
 
   assert.equal(player.remoteTextTracks().length, 1, 'remove text track via method');
   assert.equal(player.remoteTextTrackEls().length,
-              1,
-              'remove html track element via method');
+    1,
+    'remove html track element via method');
 
   player.dispose();
 });
@@ -430,25 +430,25 @@ QUnit.test('should uniformly create html track element when adding text track', 
   const htmlTrackElement = player.addRemoteTextTrack(track, true);
 
   assert.equal(htmlTrackElement.kind,
-              htmlTrackElement.track.kind,
-              'verify html track element kind');
+    htmlTrackElement.track.kind,
+    'verify html track element kind');
   assert.equal(htmlTrackElement.src,
-              htmlTrackElement.track.src,
-              'verify html track element src');
+    htmlTrackElement.track.src,
+    'verify html track element src');
   assert.equal(htmlTrackElement.srclang,
-              htmlTrackElement.track.language,
-              'verify html track element language');
+    htmlTrackElement.track.language,
+    'verify html track element language');
   assert.equal(htmlTrackElement.label,
-              htmlTrackElement.track.label,
-              'verify html track element label');
+    htmlTrackElement.track.label,
+    'verify html track element label');
   assert.equal(htmlTrackElement.default,
-              htmlTrackElement.track.default,
-              'verify html track element default');
+    htmlTrackElement.track.default,
+    'verify html track element default');
 
   assert.equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
   assert.equal(player.remoteTextTrackEls().getTrackElementByTrack_(htmlTrackElement.track),
-              htmlTrackElement,
-              'verify same html track element');
+    htmlTrackElement,
+    'verify same html track element');
 
   player.dispose();
 });
@@ -526,16 +526,16 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
   player.removeRemoteTextTrack(htmlTrackElement);
 
   assert.equal(player.remoteTextTrackEls().length,
-              0,
-              'the track element was removed correctly');
+    0,
+    'the track element was removed correctly');
 
   htmlTrackElement = player.addRemoteTextTrack(track, true);
   assert.equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
 
   player.removeRemoteTextTrack(htmlTrackElement.track);
   assert.equal(player.remoteTextTrackEls().length,
-              0,
-              'the track element was removed correctly');
+    0,
+    'the track element was removed correctly');
   player.dispose();
 });
 

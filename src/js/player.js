@@ -1,7 +1,7 @@
 /**
  * @file player.js
  */
- // Subclasses Component
+// Subclasses Component
 import Component from './component.js';
 
 import {version} from '../../package.json';
@@ -1729,9 +1729,9 @@ class Player extends Component {
     // we do not want to toggle fullscreen state
     // when double-clicking inside a control bar or a modal
     const inAllowedEls = Array.prototype.some.call(
-        this.$$('.vjs-control-bar, .vjs-modal-dialog'),
-        el => el.contains(event.target)
-      );
+      this.$$('.vjs-control-bar, .vjs-modal-dialog'),
+      el => el.contains(event.target)
+    );
 
     if (!inAllowedEls) {
       if (this.isFullscreen()) {
@@ -2740,7 +2740,7 @@ class Player extends Component {
    * @param {Tech~SourceObject} source
    *        The source object to set on the Tech
    *
-   * @return {Boolean}
+   * @return {boolean}
    *         - True if there is no Tech to playback this source
    *         - False otherwise
    *
