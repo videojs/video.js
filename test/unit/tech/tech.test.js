@@ -146,15 +146,21 @@ QUnit.test('dispose() should clear all tracks that are passed when its created',
 
   const tech = new Tech({audioTracks, videoTracks, textTracks});
 
-  assert.equal(tech.videoTracks().length,
+  assert.equal(
+    tech.videoTracks().length,
     videoTracks.length,
-    'should hold video tracks that we passed');
-  assert.equal(tech.audioTracks().length,
+    'should hold video tracks that we passed'
+  );
+  assert.equal(
+    tech.audioTracks().length,
     audioTracks.length,
-    'should hold audio tracks that we passed');
-  assert.equal(tech.textTracks().length,
+    'should hold audio tracks that we passed'
+  );
+  assert.equal(
+    tech.textTracks().length,
     textTracks.length,
-    'should hold text tracks that we passed');
+    'should hold text tracks that we passed'
+  );
 
   tech.dispose();
 
@@ -178,22 +184,30 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     2,
-    'should have two remote text tracks els');
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   tech.dispose();
 
-  assert.equal(tech.audioTracks().length,
+  assert.equal(
+    tech.audioTracks().length,
     0,
-    'should have zero audio tracks after dispose');
-  assert.equal(tech.videoTracks().length,
+    'should have zero audio tracks after dispose'
+  );
+  assert.equal(
+    tech.videoTracks().length,
     0,
-    'should have zero video tracks after dispose');
-  assert.equal(tech.remoteTextTrackEls().length,
+    'should have zero video tracks after dispose'
+  );
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     0,
-    'should have zero remote text tracks els');
+    'should have zero remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 0, 'should have zero remote text tracks');
   assert.equal(tech.textTracks().length, 0, 'should have zero video tracks after dispose');
 });
@@ -237,39 +251,53 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   tech.addRemoteTextTrack({});
   this.clock.tick(1);
 
-  assert.equal(warning,
+  assert.equal(
+    warning,
     'Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js',
-    'we log a warning when `addRemoteTextTrack` is called without a manualCleanup argument');
+    'we log a warning when `addRemoteTextTrack` is called without a manualCleanup argument'
+  );
 
   // should be automatically cleaned up when source changes
   tech.addRemoteTextTrack({}, false);
   this.clock.tick(1);
 
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     2,
-    'should have two remote text tracks els');
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
-  assert.equal(tech.autoRemoteTextTracks_.length,
+  assert.equal(
+    tech.autoRemoteTextTracks_.length,
     1,
-    'should have one auto-cleanup remote text track');
+    'should have one auto-cleanup remote text track'
+  );
 
   // change source to force cleanup of auto remote text tracks
   tech.setSource({src: 'bar.mp4', type: 'mp4'});
   this.clock.tick(1);
 
-  assert.equal(tech.textTracks().length,
+  assert.equal(
+    tech.textTracks().length,
     1,
-    'should have one text track after source change');
-  assert.equal(tech.remoteTextTrackEls().length,
+    'should have one text track after source change'
+  );
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     1,
-    'should have one remote remote text track els after source change');
-  assert.equal(tech.remoteTextTracks().length,
+    'should have one remote remote text track els after source change'
+  );
+  assert.equal(
+    tech.remoteTextTracks().length,
     1,
-    'should have one remote text track after source change');
-  assert.equal(tech.autoRemoteTextTracks_.length,
+    'should have one remote text track after source change'
+  );
+  assert.equal(
+    tech.autoRemoteTextTracks_.length,
     0,
-    'should have zero auto-cleanup remote text tracks');
+    'should have zero auto-cleanup remote text tracks'
+  );
 
   log.warn = oldLogWarn;
 });
@@ -285,10 +313,14 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   Tech.withSourceHandlers(MyTech);
 
   // Check for the expected class methods
-  assert.ok(MyTech.registerSourceHandler,
-    'added a registerSourceHandler function to the Tech');
-  assert.ok(MyTech.selectSourceHandler,
-    'added a selectSourceHandler function to the Tech');
+  assert.ok(
+    MyTech.registerSourceHandler,
+    'added a registerSourceHandler function to the Tech'
+  );
+  assert.ok(
+    MyTech.selectSourceHandler,
+    'added a selectSourceHandler function to the Tech'
+  );
 
   // Create an instance of Tech
   const tech = new MyTech();
@@ -316,24 +348,32 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
       return '';
     },
     canHandleSource(source, options) {
-      assert.strictEqual(tech.options_,
+      assert.strictEqual(
+        tech.options_,
         options,
-        'tech options passed to canHandleSource');
+        'tech options passed to canHandleSource'
+      );
       if (source.type !== 'no-support') {
         return 'probably';
       }
       return '';
     },
     handleSource(s, t, o) {
-      assert.strictEqual(tech,
+      assert.strictEqual(
+        tech,
         t,
-        'tech instance passed to source handler');
-      assert.strictEqual(sourceA,
+        'tech instance passed to source handler'
+      );
+      assert.strictEqual(
+        sourceA,
         s,
-        'tech instance passed to the source handler');
-      assert.strictEqual(tech.options_,
+        'tech instance passed to the source handler'
+      );
+      assert.strictEqual(
+        tech.options_,
         o,
-        'tech options passed to the source handler handleSource');
+        'tech options passed to the source handler handleSource'
+      );
       return new HandlerInternalState();
     }
   };
@@ -354,37 +394,53 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
 
   // Test registering source handlers
   MyTech.registerSourceHandler(handlerOne);
-  assert.strictEqual(MyTech.sourceHandlers[0],
+  assert.strictEqual(
+    MyTech.sourceHandlers[0],
     handlerOne,
-    'handlerOne was added to the source handler array');
+    'handlerOne was added to the source handler array'
+  );
   MyTech.registerSourceHandler(handlerTwo, 0);
-  assert.strictEqual(MyTech.sourceHandlers[0],
+  assert.strictEqual(
+    MyTech.sourceHandlers[0],
     handlerTwo,
-    'handlerTwo was registered at the correct index (0)');
+    'handlerTwo was registered at the correct index (0)'
+  );
 
   // Test handler selection
-  assert.strictEqual(MyTech.selectSourceHandler(sourceA, tech.options_),
+  assert.strictEqual(
+    MyTech.selectSourceHandler(sourceA, tech.options_),
     handlerOne,
-    'handlerOne was selected to handle the valid source');
-  assert.strictEqual(MyTech.selectSourceHandler(sourceB, tech.options_),
+    'handlerOne was selected to handle the valid source'
+  );
+  assert.strictEqual(
+    MyTech.selectSourceHandler(sourceB, tech.options_),
     null,
-    'no handler was selected to handle the invalid source');
+    'no handler was selected to handle the invalid source'
+  );
 
   // Test canPlayType return values
-  assert.strictEqual(MyTech.canPlayType(sourceA.type),
+  assert.strictEqual(
+    MyTech.canPlayType(sourceA.type),
     'probably',
-    'the Tech returned probably for the valid source');
-  assert.strictEqual(MyTech.canPlayType(sourceB.type),
+    'the Tech returned probably for the valid source'
+  );
+  assert.strictEqual(
+    MyTech.canPlayType(sourceB.type),
     '',
-    'the Tech returned an empty string for the invalid source');
+    'the Tech returned an empty string for the invalid source'
+  );
 
   // Test canPlaySource return values
-  assert.strictEqual(MyTech.canPlaySource(sourceA, tech.options_),
+  assert.strictEqual(
+    MyTech.canPlaySource(sourceA, tech.options_),
     'probably',
-    'the Tech returned probably for the valid source');
-  assert.strictEqual(MyTech.canPlaySource(sourceB, tech.options_),
+    'the Tech returned probably for the valid source'
+  );
+  assert.strictEqual(
+    MyTech.canPlaySource(sourceB, tech.options_),
     '',
-    'the Tech returned an empty string for the invalid source');
+    'the Tech returned an empty string for the invalid source'
+  );
 
   tech.addRemoteTextTrack({}, true);
   tech.addRemoteTextTrack({}, true);
@@ -398,9 +454,11 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
   assert.equal(tech.textTracks().length, 2, 'should have two video tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     2,
-    'should have two remote text tracks els');
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   // Pass a source through the source handler process of a tech instance
@@ -410,9 +468,11 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
   assert.equal(tech.textTracks().length, 2, 'should have two video tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     2,
-    'should have two remote text tracks els');
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   assert.strictEqual(tech.currentSource_, sourceA, 'sourceA was handled and stored');
@@ -427,17 +487,21 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   assert.equal(tech.audioTracks().length, 0, 'should have zero audio tracks');
   assert.equal(tech.videoTracks().length, 0, 'should have zero video tracks');
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks');
-  assert.equal(tech.remoteTextTrackEls().length,
+  assert.equal(
+    tech.remoteTextTrackEls().length,
     2,
-    'should have two remote text tracks els');
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   // Check that the handler dipose method works
   assert.ok(disposeCalled, 'dispose has been called for the handler yet');
   disposeCalled = false;
   tech.dispose();
-  assert.ok(disposeCalled,
-    'the handler dispose method was called when the tech was disposed');
+  assert.ok(
+    disposeCalled,
+    'the handler dispose method was called when the tech was disposed'
+  );
 });
 
 QUnit.test('should handle unsupported sources with the source handler API', function(assert) {
@@ -457,8 +521,10 @@ QUnit.test('should handle unsupported sources with the source handler API', func
   };
 
   tech.setSource('');
-  assert.ok(usedNative,
-    'native source handler was used when an unsupported source was set');
+  assert.ok(
+    usedNative,
+    'native source handler was used when an unsupported source was set'
+  );
 });
 
 QUnit.test('should allow custom error events to be set', function(assert) {

@@ -375,11 +375,13 @@ class Html5 extends Tech {
           delete attributes.controls;
         }
 
-        Dom.setAttributes(el,
+        Dom.setAttributes(
+          el,
           assign(attributes, {
             id: this.options_.techId,
             class: 'vjs-tech'
-          }));
+          })
+        );
       }
 
       el.playerId = this.options_.playerId;
