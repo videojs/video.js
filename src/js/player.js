@@ -591,17 +591,27 @@ class Player extends Component {
 
     // set tabindex to -1 to remove the video element from the focus order
     tag.setAttribute('tabindex', '-1');
+    attrs.tabindex = '-1';
+
     // Workaround for #4583 (JAWS+IE doesn't announce BPB or play button)
     // See https://github.com/FreedomScientific/VFO-standards-support/issues/78
     // Note that we can't detect if JAWS is being used, but this ARIA attribute
     //  doesn't change behavior of IE11 if JAWS is not being used
     if (IE_VERSION) {
       tag.setAttribute('role', 'application');
+      attrs.role = 'application';
     }
 
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
     tag.removeAttribute('height');
+
+    if ('width' in attrs) {
+      delete attrs.width;
+    }
+    if ('height' in attrs) {
+      delete attrs.height;
+    }
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
       // don't copy over the class attribute to the player element when we're in a div embed
