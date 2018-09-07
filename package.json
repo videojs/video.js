@@ -69,7 +69,7 @@
     "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-register": "^6.9.0",
-    "babelify": "^8.0.0",
+    "babelify": "^10.0.0",
     "bluebird": "^3.5.1",
     "browserify-derequire": "^0.9.4",
     "browserify-istanbul": "^2.0.0",
