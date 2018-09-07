@@ -20,7 +20,7 @@ import VideoTrack from './tracks/video-track.js';
 
 import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
-import log from './utils/log.js';
+import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
@@ -548,6 +548,7 @@ videojs.addLanguage = function(code, data) {
  * @borrows log:log as videojs.log
  */
 videojs.log = log;
+videojs.createLogger = createLogger;
 
 /**
  * Creates an emulated TimeRange object.
