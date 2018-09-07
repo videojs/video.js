@@ -562,10 +562,6 @@ class Player extends Component {
       el = this.el_ = super.createEl('div');
     }
 
-    // Copy over all the attributes from the tag, including ID and class
-    // ID will now reference player box, not the video tag
-    const attrs = Dom.getAttributes(tag);
-
     if (divEmbed) {
       el = this.el_ = tag;
       tag = this.tag = document.createElement('video');
@@ -602,6 +598,10 @@ class Player extends Component {
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
     tag.removeAttribute('height');
+
+    // Copy over all the attributes from the tag, including ID and class
+    // ID will now reference player box, not the video tag
+    const attrs = Dom.getAttributes(tag);
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
       // don't copy over the class attribute to the player element when we're in a div embed
