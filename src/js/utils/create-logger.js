@@ -4,6 +4,60 @@
  */
 import window from 'global/window';
 
+/**
+ * Log messages to the console and history based on the type of message
+ *
+ * @private
+ * @param  {string} type
+ *         The name of the console method to use.
+ *
+ * @param  {Array} args
+ *         The arguments to be passed to the matching console method.
+ */
+const logByType = (type, args) => {
+  const lvl = log.levels[level];
+  const lvlRegExp = new RegExp(`^(${lvl})$`);
+
+  if (type !== 'log') {
+
+    // Add the type to the front of the message when it's not "log".
+    args.unshift(type.toUpperCase() + ':');
+  }
+
+  // Add a clone of the args at this point to history.
+  if (history) {
+    history.push([].concat(args));
+  }
+
+  // Add console prefix after adding to history.
+  args.unshift(name + ':');
+
+  // If there's no console then don't try to output messages, but they will
+  // still be stored in history.
+  if (!window.console) {
+    return;
+  }
+
+  // Was setting these once outside of this function, but containing them
+  // in the function makes it easier to test cases where console doesn't exist
+  // when the module is executed.
+  let fn = window.console[type];
+
+  if (!fn && type === 'debug') {
+    // Certain browsers don't have support for console.debug. For those, we
+    // should default to the closest comparable log.
+    fn = window.console.info || window.console.log;
+  }
+
+  // Bail out if there's no console or if this type is not allowed by the
+  // current logging level.
+  if (!fn || !lvl || !lvlRegExp.test(type)) {
+    return;
+  }
+
+  fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
+};
+
 export default function createLogger(name) {
   let log;
 
@@ -13,59 +67,6 @@ export default function createLogger(name) {
   // This is the private tracking variable for the logging history.
   let history = [];
 
-  /**
-   * Log messages to the console and history based on the type of message
-   *
-   * @private
-   * @param  {string} type
-   *         The name of the console method to use.
-   *
-   * @param  {Array} args
-   *         The arguments to be passed to the matching console method.
-   */
-  const logByType = (type, args) => {
-    const lvl = log.levels[level];
-    const lvlRegExp = new RegExp(`^(${lvl})$`);
-
-    if (type !== 'log') {
-
-      // Add the type to the front of the message when it's not "log".
-      args.unshift(type.toUpperCase() + ':');
-    }
-
-    // Add a clone of the args at this point to history.
-    if (history) {
-      history.push([].concat(args));
-    }
-
-    // Add console prefix after adding to history.
-    args.unshift(name + ':');
-
-    // If there's no console then don't try to output messages, but they will
-    // still be stored in history.
-    if (!window.console) {
-      return;
-    }
-
-    // Was setting these once outside of this function, but containing them
-    // in the function makes it easier to test cases where console doesn't exist
-    // when the module is executed.
-    let fn = window.console[type];
-
-    if (!fn && type === 'debug') {
-      // Certain browsers don't have support for console.debug. For those, we
-      // should default to the closest comparable log.
-      fn = window.console.info || window.console.log;
-    }
-
-    // Bail out if there's no console or if this type is not allowed by the
-    // current logging level.
-    if (!fn || !lvl || !lvlRegExp.test(type)) {
-      return;
-    }
-
-    fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
-  };
 
   /**
    * Logs plain debug messages. Similar to `console.log`.
@@ -167,8 +168,6 @@ export default function createLogger(name) {
       history = [];
     }
   };
-
-  log.logByType = logByType;
 
   /**
    * Logs error messages. Similar to `console.error`.

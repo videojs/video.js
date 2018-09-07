@@ -198,7 +198,7 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   log.level('debug');
 
   window.console.debug = null;
-  logByType('debug', ['debug1', 'debug2']);
+  log.debug('debug1', 'debug2');
 
   assert.ok(window.console.info.called, 'info was called');
   assert.notOk(window.console.log.called, 'log was not called');
@@ -211,7 +211,7 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   );
 
   window.console.info = null;
-  logByType('debug', ['debug3', 'debug4']);
+  log.debug('debug3', 'debug4');
 
   assert.ok(window.console.log.called, 'log was called');
   assert.notOk(window.console.warn.called, 'warn was not called');
@@ -224,7 +224,7 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
 
   // when no comparable level logs are available, there should not be any logging
   window.console.log = null;
-  logByType('debug', ['debug5', 'debug6']);
+  log.debug('debug5', 'debug6');
 
   assert.notOk(window.console.warn.called, 'warn was not called');
   assert.notOk(window.console.error.called, 'error was not called');
