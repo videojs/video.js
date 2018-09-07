@@ -14,7 +14,7 @@ import window from 'global/window';
  * @param  {Array} args
  *         The arguments to be passed to the matching console method.
  */
-const logByType = (type, args) => {
+const LogByTypeFactory = (name, log) => (history) => (type, level, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
 
@@ -67,6 +67,11 @@ export default function createLogger(name) {
   // This is the private tracking variable for the logging history.
   let history = [];
 
+  // bind the log and name and allow us to bind the history later
+  let LogWithHistoryFactory;
+
+  // the curried logByType bound to the specific log and history
+  let logByType;
 
   /**
    * Logs plain debug messages. Similar to `console.log`.
@@ -76,8 +81,11 @@ export default function createLogger(name) {
    *           One or more messages or objects that should be logged.
    */
   log = function(...args) {
-    logByType('log', args);
+    logByType('log', level, args);
   };
+
+  LogWithHistoryFactory = LogByTypeFactory(name, log)
+  logByType = LogWithHistoryFactory(history);
 
   /**
    * Enumeration of available logging levels, where the keys are the level names
@@ -157,6 +165,7 @@ export default function createLogger(name) {
     if (history !== null) {
       history.length = 0;
       history = null;
+      logByType = LogWithHistoryFactory(history);
     }
   };
 
@@ -166,6 +175,7 @@ export default function createLogger(name) {
   log.history.enable = () => {
     if (history === null) {
       history = [];
+      logByType = LogWithHistoryFactory(history);
     }
   };
 
@@ -175,7 +185,7 @@ export default function createLogger(name) {
    * @param {Mixed[]} args
    *        One or more messages or objects that should be logged as an error
    */
-  log.error = (...args) => logByType('error', args);
+  log.error = (...args) => logByType('error', level, args);
 
   /**
    * Logs warning messages. Similar to `console.warn`.
@@ -183,7 +193,7 @@ export default function createLogger(name) {
    * @param {Mixed[]} args
    *        One or more messages or objects that should be logged as a warning.
    */
-  log.warn = (...args) => logByType('warn', args);
+  log.warn = (...args) => logByType('warn', level, args);
 
   /**
    * Logs debug messages. Similar to `console.debug`, but may also act as a comparable
@@ -192,7 +202,7 @@ export default function createLogger(name) {
    * @param {Mixed[]} args
    *        One or more messages or objects that should be logged as debug.
    */
-  log.debug = (...args) => logByType('debug', args);
+  log.debug = (...args) => logByType('debug', level, args);
 
   return log;
 }
