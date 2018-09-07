@@ -1,7 +1,6 @@
 /* eslint-env qunit */
 import {IE_VERSION} from '../../../src/js/utils/browser';
 import log from '../../../src/js/utils/log.js';
-import {logByType} from '../../../src/js/utils/log.js';
 import window from 'global/window';
 import sinon from 'sinon';
 

@@ -59,16 +59,11 @@ const LogByTypeFactory = (name, log) => (history) => (type, level, args) => {
 };
 
 export default function createLogger(name) {
-  let log;
-
   // This is the private tracking variable for logging level.
   let level = 'info';
 
   // This is the private tracking variable for the logging history.
   let history = [];
-
-  // bind the log and name and allow us to bind the history later
-  let LogWithHistoryFactory;
 
   // the curried logByType bound to the specific log and history
   let logByType;
@@ -80,11 +75,13 @@ export default function createLogger(name) {
    * @param    {Mixed[]} args
    *           One or more messages or objects that should be logged.
    */
-  log = function(...args) {
+  const log = function(...args) {
     logByType('log', level, args);
   };
 
-  LogWithHistoryFactory = LogByTypeFactory(name, log)
+  // bind the log and name and allow us to bind the history later
+  const LogWithHistoryFactory = LogByTypeFactory(name, log);
+
   logByType = LogWithHistoryFactory(history);
 
   /**
