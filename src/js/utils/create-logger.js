@@ -4,7 +4,6 @@
  */
 import window from 'global/window';
 
-
 // This is the private tracking variable for the logging history.
 let history = [];
 
@@ -142,6 +141,12 @@ export default function createLogger(name) {
    * @return {Array}
    */
   log.history = () => history ? [].concat(history) : [];
+
+  log.history.filter = (fname) => {
+    return (history || []).filter((item) => {
+      return item.some((subitem) => subitem === (fname + ':'));
+    });
+  };
 
   /**
    * Clears the internal history tracking, but does not prevent further history
