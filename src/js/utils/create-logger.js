@@ -4,6 +4,10 @@
  */
 import window from 'global/window';
 
+
+// This is the private tracking variable for the logging history.
+let history = [];
+
 /**
  * Log messages to the console and history based on the type of message
  *
@@ -14,7 +18,7 @@ import window from 'global/window';
  * @param  {Array} args
  *         The arguments to be passed to the matching console method.
  */
-const LogByTypeFactory = (name, log) => (history) => (type, level, args) => {
+const LogByTypeFactory = (name, log) => (type, level, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
 
@@ -62,9 +66,6 @@ export default function createLogger(name) {
   // This is the private tracking variable for logging level.
   let level = 'info';
 
-  // This is the private tracking variable for the logging history.
-  let history = [];
-
   // the curried logByType bound to the specific log and history
   let logByType;
 
@@ -79,10 +80,7 @@ export default function createLogger(name) {
     logByType('log', level, args);
   };
 
-  // bind the log and name and allow us to bind the history later
-  const LogWithHistoryFactory = LogByTypeFactory(name, log);
-
-  logByType = LogWithHistoryFactory(history);
+  logByType = LogByTypeFactory(name, log);
 
   /**
    * Enumeration of available logging levels, where the keys are the level names
@@ -162,7 +160,6 @@ export default function createLogger(name) {
     if (history !== null) {
       history.length = 0;
       history = null;
-      logByType = LogWithHistoryFactory(history);
     }
   };
 
@@ -172,7 +169,6 @@ export default function createLogger(name) {
   log.history.enable = () => {
     if (history === null) {
       history = [];
-      logByType = LogWithHistoryFactory(history);
     }
   };
 
