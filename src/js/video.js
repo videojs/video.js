@@ -434,26 +434,6 @@ videojs.bind = Fn.bind;
 /**
  * Register a Video.js plugin.
  *
- * @borrows plugin:usePlugin as videojs.usePlugin
- * @method usePlugin
- *
- * @param  {string} name
- *         The name of the plugin to be registered. Must be a string and
- *         must not match an existing plugin or a method on the `Player`
- *         prototype.
- *
- * @param  {Function} plugin
- *         A sub-class of `Plugin` or a function for basic plugins.
- *
- * @return {Function}
- *         For advanced plugins, a factory function for that plugin. For
- *         basic plugins, a wrapper function that initializes the plugin.
- */
-videojs.usePlugin = Plugin.usePlugin;
-
-/**
- * Register a Video.js plugin.
- *
  * @borrows plugin:registerPlugin as videojs.registerPlugin
  * @method registerPlugin
  *
