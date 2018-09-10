@@ -79,7 +79,22 @@ export default function createLogger(name) {
     logByType('log', level, args);
   };
 
+  // This is the logByType helper that the logging methods below use
   logByType = LogByTypeFactory(name, log);
+
+  /**
+   * Create a new sublogger which chains the old name to the new name.
+   *
+   * For example, doing `videojs.log.createLogger('player')` and then using that logger will log the following:
+   * ```js
+   *  mylogger('foo');
+   *  // > VIDEOJS: player: foo
+   * ```
+   *
+   * @param {string} name
+   *        The name to add call the new logger
+   * @returns {Object}
+   */
   log.createLogger = (subname) => createLogger(name + ': ' + subname);
 
   /**
@@ -143,6 +158,15 @@ export default function createLogger(name) {
    */
   log.history = () => history ? [].concat(history) : [];
 
+  /**
+   * Allows you to filter the history by the given logger name
+   *
+   * @param {string} fname
+   *        The name to filter by
+   *
+   * @return {Array}
+   *         The filtered list to return
+   */
   log.history.filter = (fname) => {
     return (history || []).filter((item) => {
       return item.some((subitem) => subitem === (fname + ':'));
