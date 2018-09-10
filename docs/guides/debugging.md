@@ -6,9 +6,12 @@
   * [API Overview](#api-overview)
   * [Log Safely](#log-safely)
   * [Log Objects Usefully](#log-objects-usefully)
+  * [Creating new Loggers](#creating-new-loggers)
   * [Log Levels](#log-levels)
   * [Available Log Levels](#available-log-levels)
+  * [Debug Logging](#debug-logging)
   * [History](#history)
+    * [History filtering](#history-filtering)
 
 ## Logging
 
@@ -18,19 +21,19 @@ Video.js includes `videojs.log`, a lightweight wrapper around a subset of [the `
 
 Most of these methods should be fairly self-explanatory, but for complete details, see [the API docs][api].
 
-| Method                          | Alias Of         | Matching Level(s)              |
-| ------------------------------- | ---------------- | ------------------------------ |
-| `videojs.log()`                 | `console.log`    | all, debug, info               |
-| `videojs.log.debug()`           | `console.debug`  | all, debug                     |
-| `videojs.log.warn()`            | `console.warn`   | all, debug, info, warn         |
-| `videojs.log.error()`           | `console.error`  | all, debug, info, warn, error  |
-| `videojs.log.createLogger()`    | n/a              | n/a                            |
-| `videojs.log.level()`           | n/a              | n/a                            |
-| `videojs.log.history()`         | n/a              | n/a                            |
-| `videojs.log.history.clear()`   | n/a              | n/a                            |
-| `videojs.log.history.disable()` | n/a              | n/a                            |
-| `videojs.log.history.enable()`  | n/a              | n/a                            |
-| `videojs.log.history.filter()`  | n/a              | n/a                            |
+| Method                          | Alias Of        | Matching Level(s)             |
+| ------------------------------- | --------------- | ----------------------------- |
+| `videojs.log()`                 | `console.log`   | all, debug, info              |
+| `videojs.log.debug()`           | `console.debug` | all, debug                    |
+| `videojs.log.warn()`            | `console.warn`  | all, debug, info, warn        |
+| `videojs.log.error()`           | `console.error` | all, debug, info, warn, error |
+| `videojs.log.createLogger()`    | n/a             | n/a                           |
+| `videojs.log.level()`           | n/a             | n/a                           |
+| `videojs.log.history()`         | n/a             | n/a                           |
+| `videojs.log.history.clear()`   | n/a             | n/a                           |
+| `videojs.log.history.disable()` | n/a             | n/a                           |
+| `videojs.log.history.enable()`  | n/a             | n/a                           |
+| `videojs.log.history.filter()`  | n/a             | n/a                           |
 
 For descriptions of these features, please refer to the sections below.
 
@@ -49,6 +52,7 @@ videojs.log('this is a string', {butThis: 'is an object'});
 ### Creating new Loggers
 
 Sometimes, you want to make a new module or plugin and log messages with a label. Kind of how all these logs are prepended with `VIDEOJS:`. You can do that via the `createLog` method. It takes a name and gives you back a log object like `videojs.log`. Here's an example:
+
 ```js
 const mylogger = videojs.log.createLogger('mylogger');
 
@@ -125,6 +129,7 @@ videojs.log.history.clear();
 If you want to find all the history that was created by a particular logger, you can do so via `history.filter()`.
 Given a specific logger with name `foo`, you can pass `foo` to `history.filter()` and get all items logger by foo.
 Let me show you an example:
+
 ```js
 const mylogger = videojs.log.createLogger('mylogger');
 const anotherlogger = mylogger.createLogger('anotherlogger');
