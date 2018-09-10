@@ -8,7 +8,7 @@ import {version} from '../../package.json';
 import document from 'global/document';
 import window from 'global/window';
 import tsml from 'tsml';
-import evented from './mixins/evented';
+import evented from './mixins/evented';i
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -3892,7 +3892,7 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  */
 
 /**
- * Register and imediatly use plugin on Player.
+ * Register and immediately use plugin on Player.
  *
  * @method Player#usePlugin
  * @param   {string} name
