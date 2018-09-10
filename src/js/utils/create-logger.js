@@ -27,13 +27,13 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
     args.unshift(type.toUpperCase() + ':');
   }
 
+  // Add console prefix after adding to history.
+  args.unshift(name + ':');
+
   // Add a clone of the args at this point to history.
   if (history) {
     history.push([].concat(args));
   }
-
-  // Add console prefix after adding to history.
-  args.unshift(name + ':');
 
   // If there's no console then don't try to output messages, but they will
   // still be stored in history.
@@ -168,8 +168,9 @@ export default function createLogger(name) {
    *         The filtered list to return
    */
   log.history.filter = (fname) => {
-    return (history || []).filter((item) => {
-      return item.some((subitem) => subitem === (fname + ':'));
+    return (history || []).filter((historyItem) => {
+      // if the first item in each historyItem includes `fname`, then it's a match
+      return new RegExp(`.*${fname}.*`).test(historyItem[0]);
     });
   };
 
