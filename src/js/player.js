@@ -8,7 +8,7 @@ import {version} from '../../package.json';
 import document from 'global/document';
 import window from 'global/window';
 import tsml from 'tsml';
-import evented from './mixins/evented';i
+import evented from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
