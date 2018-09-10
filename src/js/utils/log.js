@@ -2,9 +2,10 @@
  * @file log.js
  * @module log
  */
-import createLogger from './create-logger.js';
+import CreateLogger from './create-logger.js';
 
-const log = createLogger('VIDEOJS');
+const log = CreateLogger('VIDEOJS');
+const createLogger = log.createLogger;
 
 export default log;
 export { createLogger };

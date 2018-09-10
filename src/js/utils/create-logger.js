@@ -80,6 +80,7 @@ export default function createLogger(name) {
   };
 
   logByType = LogByTypeFactory(name, log);
+  log.createLogger = (subname) => createLogger(name + ': ' + subname);
 
   /**
    * Enumeration of available logging levels, where the keys are the level names
