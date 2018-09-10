@@ -47,6 +47,36 @@ QUnit.test('setup', function(assert) {
   assert.ok(this.player.hasPlugin('basic'), 'player has the plugin available');
 });
 
+QUnit.test('usePlugin syntax', function(assert) {
+  const argumentLessPlugin = sinon.spy(() => {});
+  const simplePlugin = sinon.spy(arg1 => {});
+  const multipleArgumentPlugin = sinon.spy((arg1, arg2) => {});
+
+  const spy = sinon.spy();
+  const advancedPlugin = new class MockPlugin extends Plugin {
+    constructor(...args) {
+      super(...args);
+      spy.apply(this, args);
+    }
+  };
+
+  this.player.usePlugin('argumentLess', argumentLessPlugin);
+  assert.ok(this.player.usingPlugin('argumentLess'));
+  assert.ok(argumentLessPlugin.calledOnceWith());
+
+  this.player.usePlugin('simple', simplePlugin, 'simple1');
+  assert.ok(this.player.usingPlugin('simple'));
+  assert.ok(simplePlugin.calledOnceWith('simple1'));
+
+  this.player.usePlugin('multipleArgument', multipleArgumentPlugin, 'multiple1', 'multiple2');
+  assert.ok(this.player.usingPlugin('multipleArgument'));
+  assert.ok(multipleArgumentPlugin.calledOnceWith('multiple1', 'multiple2'));
+
+  this.player.usePlugin('advanced', advancedPlugin, 'advanced1');
+  assert.ok(this.player.usingPlugin('advanced'));
+  assert.ok(spy.calledOnceWith('advanced1'));
+});
+
 QUnit.test('all "pluginsetup" events', function(assert) {
   const setupSpy = sinon.spy();
   const events = [

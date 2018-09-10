@@ -71,6 +71,20 @@ QUnit.test('setup', function(assert) {
   );
 });
 
+QUnit.test('usePlugin syntax', function(assert) {
+  const spy = sinon.spy();
+  const advancedPlugin = new class SingleUsePlugin extends Plugin {
+    constructor(...args) {
+      super(...args);
+      spy.apply(this, args);
+    }
+  };
+
+  this.player.usePlugin('advanced', advancedPlugin, 'advanced1');
+  assert.ok(this.player.usingPlugin('advanced'));
+  assert.ok(spy.calledOnceWith('advanced1'));
+});
+
 QUnit.test('all "pluginsetup" events', function(assert) {
   const setupSpy = sinon.spy();
   const events = [

@@ -456,6 +456,16 @@ Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
  *
  * @ignore
  */
+Player.prototype.usePlugin = function(name, plugin, ...options) {
+  Plugin.registerPlugin(name, plugin);
+  this[name](...options);
+};
+
+/**
+ * Documented in player.js
+ *
+ * @ignore
+ */
 Player.prototype.usingPlugin = function(name) {
   return !!this[PLUGIN_CACHE_KEY] && this[PLUGIN_CACHE_KEY][name] === true;
 };
