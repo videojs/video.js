@@ -51,7 +51,7 @@ videojs.log('this is a string', {butThis: 'is an object'});
 
 ### Creating new Loggers
 
-Sometimes, you want to make a new module or plugin and log messages with a label. Kind of how all these logs are prepended with `VIDEOJS:`. You can do that via the `createLog` method. It takes a name and gives you back a log object like `videojs.log`. Here's an example:
+Sometimes, you want to make a new module or plugin and log messages with a label. Kind of how all these logs are prepended with `VIDEOJS:`. You can do that via the `createLogger` method. It takes a name and gives you back a log object like `videojs.log`. Here's an example:
 
 ```js
 const mylogger = videojs.log.createLogger('mylogger');
