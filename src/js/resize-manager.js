@@ -67,7 +67,7 @@ class ResizeManager extends Component {
 
     } else {
       this.loadListener_ = () => {
-        if (!this.el_ || this.el_.contentWindow) {
+        if (!this.el_ || !this.el_.contentWindow) {
           return;
         }
 
