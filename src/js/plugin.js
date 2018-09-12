@@ -457,8 +457,18 @@ Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
  * @ignore
  */
 Player.prototype.usePlugin = function(name, plugin, ...options) {
-  Plugin.registerPlugin(name, plugin);
-  this[name](...options);
+  let wrappedPlugin;
+
+  if (name !== BASE_PLUGIN_NAME) {
+    if (Plugin.isBasic(plugin)) {
+      wrappedPlugin = createBasicPlugin(name, plugin);
+    } else {
+      wrappedPlugin = createPluginFactory(name, plugin);
+    }
+    wrappedPlugin(...options);
+  } else {
+    throw new Error('Please help with nice error...');
+  }
 };
 
 /**

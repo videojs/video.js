@@ -85,6 +85,15 @@ QUnit.test('usePlugin syntax', function(assert) {
   assert.ok(spy.calledOnceWith('advanced1'));
 });
 
+QUnit.test('usePlugin does not register plugin to other', function(assert) {
+  const advancedPlugin = new class SingleUsePlugin extends Plugin { }();
+  const otherPlayer = TestHelpers.makePlayer();
+  const name = 'advanced';
+
+  this.player.usePlugin(name, advancedPlugin, 'advanced1');
+  assert.notOk(otherPlayer[name]);
+});
+
 QUnit.test('all "pluginsetup" events', function(assert) {
   const setupSpy = sinon.spy();
   const events = [

@@ -52,14 +52,6 @@ QUnit.test('usePlugin syntax', function(assert) {
   const simplePlugin = sinon.spy(arg1 => {});
   const multipleArgumentPlugin = sinon.spy((arg1, arg2) => {});
 
-  const spy = sinon.spy();
-  const advancedPlugin = new class MockPlugin extends Plugin {
-    constructor(...args) {
-      super(...args);
-      spy.apply(this, args);
-    }
-  };
-
   this.player.usePlugin('argumentLess', argumentLessPlugin);
   assert.ok(this.player.usingPlugin('argumentLess'));
   assert.ok(argumentLessPlugin.calledOnceWith());
@@ -71,10 +63,15 @@ QUnit.test('usePlugin syntax', function(assert) {
   this.player.usePlugin('multipleArgument', multipleArgumentPlugin, 'multiple1', 'multiple2');
   assert.ok(this.player.usingPlugin('multipleArgument'));
   assert.ok(multipleArgumentPlugin.calledOnceWith('multiple1', 'multiple2'));
+});
 
-  this.player.usePlugin('advanced', advancedPlugin, 'advanced1');
-  assert.ok(this.player.usingPlugin('advanced'));
-  assert.ok(spy.calledOnceWith('advanced1'));
+QUnit.test('usePlugin does not register plugin to other', function(assert) {
+  const simplePlugin = () => {};
+  const otherPlayer = TestHelpers.makePlayer();
+  const name = 'simple';
+
+  this.player.usePlugin(name, simplePlugin);
+  assert.notOk(otherPlayer[name]);
 });
 
 QUnit.test('all "pluginsetup" events', function(assert) {
