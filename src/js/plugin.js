@@ -456,7 +456,7 @@ Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
  *
  * @ignore
  */
-Player.prototype.usePlugin = function(name, plugin, ...options) {
+Player.prototype.usePlugin = function(name, plugin, ...args) {
   let wrappedPlugin;
 
   if (name !== BASE_PLUGIN_NAME) {
@@ -465,7 +465,7 @@ Player.prototype.usePlugin = function(name, plugin, ...options) {
     } else {
       wrappedPlugin = createPluginFactory(name, plugin);
     }
-    wrappedPlugin(...options);
+    wrappedPlugin(...args);
   } else {
     throw new Error('Please help with nice error...');
   }

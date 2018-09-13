@@ -3896,14 +3896,14 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  *
  * @method Player#usePlugin
  * @param   {string} name
- *          The name under witch the plugin will be saved. Under this same
+ *          The name under which the plugin will be saved. Under this same
  *          name `player.usingPlugin(name)`. Must be a string and must not
  *          match an existing plugin or a method on the `Player` prototype.
  *
  * @param   {Function} plugin
  *          A sub-class of `Plugin` or a function for basic plugins.
  *
- * @param   {...any} options
+ * @param   {...any} args
  *          Options that the plugin should be called with.
  */
 
