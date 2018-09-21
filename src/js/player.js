@@ -3489,7 +3489,7 @@ class Player extends Component {
    * @return {undefined}
    *         does not return anything
    */
-  removeRemoteTextTrack(obj) {
+  removeRemoteTextTrack(obj = {}) {
     let {track} = obj;
 
     if (!track) {
