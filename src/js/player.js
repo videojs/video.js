@@ -3489,7 +3489,13 @@ class Player extends Component {
    * @return {undefined}
    *         does not return anything
    */
-  removeRemoteTextTrack({track = arguments[0]} = {}) {
+  removeRemoteTextTrack(obj) {
+    let {track} = obj;
+
+    if (!track) {
+      track = obj;
+    }
+
     // destructure the input into an object with a track argument, defaulting to arguments[0]
     // default the whole argument to an empty object if nothing was passed in
 
