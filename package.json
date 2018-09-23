@@ -118,7 +118,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
-    "klaw-sync": "^5.0.0",
+    "klaw-sync": "^6.0.0",
     "load-grunt-tasks": "^4.0.0",
     "lodash": "^4.17.10",
     "markdown-table": "^1.0.0",
