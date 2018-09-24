@@ -325,6 +325,58 @@ QUnit.test('fires cuechange when cues become active and inactive', function(asse
   player.dispose();
 });
 
+QUnit.test('enabled and disabled cuechange handler when changing mode', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let changes = 0;
+  const tt = new TextTrack({
+    tech: player.tech_
+  });
+  const cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.mode = 'hidden';
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 5
+  });
+
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 1, 'a cuechange event trigger');
+
+  tt.mode = 'disabled';
+
+  player.tech_.currentTime = function() {
+    return 7;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 1, 'NO cuechange event trigger');
+
+  tt.mode = 'showing';
+
+  player.tech_.currentTime = function() {
+    return 0;
+  };
+  player.tech_.trigger('timeupdate');
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 2, 'a cuechange event trigger');
+
+  player.dispose();
+});
+
 QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;
