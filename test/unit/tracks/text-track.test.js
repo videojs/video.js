@@ -327,6 +327,86 @@ QUnit.test('fires cuechange when cues become active and inactive', function(asse
   player.dispose();
 });
 
+QUnit.test('enabled and disabled cuechange handler when changing mode to hidden', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let changes = 0;
+  const tt = new TextTrack({
+    tech: player.tech_
+  });
+  const cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.mode = 'hidden';
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 5
+  });
+
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 1, 'a cuechange event trigger');
+
+  changes = 0;
+  tt.mode = 'disabled';
+
+  player.tech_.currentTime = function() {
+    return 7;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 0, 'NO cuechange event trigger');
+
+  player.dispose();
+});
+
+QUnit.test('enabled and disabled cuechange handler when changing mode to showing', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let changes = 0;
+  const tt = new TextTrack({
+    tech: player.tech_
+  });
+  const cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.mode = 'showing';
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 5
+  });
+
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 1, 'a cuechange event trigger');
+
+  changes = 0;
+  tt.mode = 'disabled';
+
+  player.tech_.currentTime = function() {
+    return 7;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 0, 'NO cuechange event trigger');
+
+  player.dispose();
+});
+
 QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;
