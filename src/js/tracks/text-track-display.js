@@ -118,7 +118,7 @@ class TextTrackDisplay extends Component {
       player.on('playerresize', updateDisplayHandler);
 
       window.addEventListener('orientationchange', updateDisplayHandler);
-      player.on('dipose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
+      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
 
       const tracks = this.options_.playerOptions.tracks || [];
 
