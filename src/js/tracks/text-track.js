@@ -230,7 +230,7 @@ class TextTrack extends Track {
             this.tech_.ready(() => {
               this.tech_.on('timeupdate', timeupdateHandler);
             }, true);
-          } else if (mode === 'disabled') {
+          } else {
             this.tech_.off('timeupdate', timeupdateHandler);
           }
           /**
