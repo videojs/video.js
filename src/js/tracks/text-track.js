@@ -226,11 +226,12 @@ class TextTrack extends Track {
             return;
           }
           mode = newMode;
-          if (mode === 'showing') {
-
+          if (mode !== 'disabled') {
             this.tech_.ready(() => {
               this.tech_.on('timeupdate', timeupdateHandler);
             }, true);
+          } else {
+            this.tech_.off('timeupdate', timeupdateHandler);
           }
           /**
            * An event that fires when mode changes on this track. This allows
