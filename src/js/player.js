@@ -962,7 +962,7 @@ class Player extends Component {
       autoplay,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
-      'techId': `${this.id()}_${titleTechName}_api`,
+      'techId': `${this.id()}_${camelTechName}_api`,
       'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
