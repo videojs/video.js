@@ -14,7 +14,7 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
-import log from './utils/log.js';
+import log, { createLogger } from './utils/log.js';
 import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
@@ -312,6 +312,9 @@ class Player extends Component {
 
     // Run base component initializing with new options
     super(null, options, ready);
+
+    // create logger
+    this.log = createLogger(this.id_);
 
     // Tracks when a tech changes the poster
     this.isPosterFromTech_ = false;
