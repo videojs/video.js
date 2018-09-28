@@ -33,6 +33,7 @@
     "docs": "npm run docs:lint && npm run docs:api",
     "jsdoc": "jsdoc",
     "predocs:api": "node -e \"var s=require('shelljs'),d=['docs/api'];s.rm('-rf',d);\"",
+    "checktranslations": "grunt check-translations",
     "docs:api": "jsdoc -c .jsdoc.json",
     "postdocs:api": "node ./build/fix-api-docs.js",
     "netlify": "babel-node ./build/netlify-docs.js",
@@ -41,7 +42,6 @@
     "babel": "babel src/js -d es5",
     "prepublish": "not-in-install && run-p build || in-install",
     "publish": "node build/gh-release.js",
-    "prepush": "npm run lint -- --errors",
     "version": "node build/version.js && git add CHANGELOG.md",
     "autoprefixer": "npm-run-all -p autoprefixer:*",
     "autoprefixer:main": "postcss --verbose --config postcss.config.js -d build/temp build/temp/video-js.css",
@@ -101,7 +101,7 @@
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.18.1",
     "humanize-duration": "^3.12.1",
-    "husky": "^0.14.1",
+    "husky": "^1.0.1",
     "in-publish": "^2.0.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.2",
@@ -135,7 +135,7 @@
     "remark-toc": "^5.0.0",
     "remark-validate-links": "^7.0.0",
     "replace": "^0.3.0",
-    "rollup": "^0.66.0",
+    "rollup": "^0.66.2",
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
@@ -176,5 +176,10 @@
       "sinon",
       "webpack"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint -- --errors"
+    }
   }
 }

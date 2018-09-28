@@ -3782,7 +3782,10 @@ TRACK_TYPES.names.forEach(function(name) {
 });
 
 /**
- * Global player list
+ * Global enumeration of players.
+ *
+ * The keys are the player IDs and the values are either the {@link Player}
+ * instance or `null` for disposed players.
  *
  * @type {Object}
  */
