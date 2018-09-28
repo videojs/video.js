@@ -98,8 +98,10 @@ class TextTrackDisplay extends Component {
   constructor(player, options, ready) {
     super(player, options, ready);
 
+    const updateDisplayHandler = Fn.bind(this, this.updateDisplay);
+
     player.on('loadstart', Fn.bind(this, this.toggleDisplay));
-    player.on('texttrackchange', Fn.bind(this, this.updateDisplay));
+    player.on('texttrackchange', updateDisplayHandler);
     player.on('loadstart', Fn.bind(this, this.preselectTrack));
 
     // This used to be called during player init, but was causing an error
@@ -112,7 +114,11 @@ class TextTrackDisplay extends Component {
         return;
       }
 
-      player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
+      player.on('fullscreenchange', updateDisplayHandler);
+      player.on('playerresize', updateDisplayHandler);
+
+      window.addEventListener('orientationchange', updateDisplayHandler);
+      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
 
       const tracks = this.options_.playerOptions.tracks || [];
 
