@@ -164,14 +164,14 @@ let EVENT_MAP;
 EventTarget.prototype.queueTrigger = function(event) {
   // only set up EVENT_MAP if it'll be used
   if (!EVENT_MAP) {
-    EVENT_MAP = new window.Map();
+    EVENT_MAP = new Map();
   }
 
   const type = event.type || event;
   let map = EVENT_MAP.get(this);
 
   if (!map) {
-    map = new window.Map();
+    map = new Map();
     EVENT_MAP.set(this, map);
   }
 
