@@ -98,8 +98,13 @@ export const throttle = function(fn, wait) {
 export const debounce = function(func, wait, immediate, context = window) {
   let timeout;
 
+  const cancel = () => {
+    context.clearTimeout(timeout);
+    timeout = null;
+  };
+
   /* eslint-disable consistent-this */
-  return function() {
+  const debounced = function() {
     const self = this;
     const args = arguments;
 
@@ -119,4 +124,8 @@ export const debounce = function(func, wait, immediate, context = window) {
     timeout = context.setTimeout(later, wait);
   };
   /* eslint-enable consistent-this */
+
+  debounced.cancel = cancel;
+
+  return debounced;
 };
