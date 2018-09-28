@@ -373,8 +373,12 @@ class Plugin {
   /**
    * De-register a Video.js plugin.
    *
-   * @param {string} name
-   *        The name of the plugin to be deregistered.
+   * @param  {string} name
+   *         The name of the plugin to be de-registered. Must be a string that
+   *         matches an existing plugin.
+   *
+   * @throws {Error}
+   *         If an attempt is made to de-register the base plugin.
    */
   static deregisterPlugin(name) {
     if (name === BASE_PLUGIN_NAME) {

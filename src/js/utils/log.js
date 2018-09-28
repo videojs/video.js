@@ -69,7 +69,21 @@ export const logByType = (type, args) => {
 /**
  * Logs plain debug messages. Similar to `console.log`.
  *
- * @class
+ * Due to [limitations](https://github.com/jsdoc3/jsdoc/issues/955#issuecomment-313829149)
+ * of our JSDoc template, we cannot properly document this as both a function
+ * and a namespace, so its function signature is documented here.
+ *
+ * #### Arguments
+ * ##### *args
+ * Mixed[]
+ *
+ * Any combination of values that could be passed to `console.log()`.
+ *
+ * #### Return Value
+ *
+ * `undefined`
+ *
+ * @namespace
  * @param    {Mixed[]} args
  *           One or more messages or objects that should be logged.
  */
@@ -83,7 +97,7 @@ log = function(...args) {
  * in that logging level. These strings are used to create a regular expression
  * matching the function name being called.
  *
- * Levels provided by video.js are:
+ * Levels provided by Video.js are:
  *
  * - `off`: Matches no calls. Any value that can be cast to `false` will have
  *   this effect. The most restrictive.
@@ -107,12 +121,13 @@ log.levels = {
 };
 
 /**
- * Get or set the current logging level. If a string matching a key from
- * {@link log.levels} is provided, acts as a setter. Regardless of argument,
- * returns the current logging level.
+ * Get or set the current logging level.
+ *
+ * If a string matching a key from {@link module:log.levels} is provided, acts
+ * as a setter.
  *
  * @param  {string} [lvl]
- *         Pass to set a new logging level.
+ *         Pass a valid level to set a new logging level.
  *
  * @return {string}
  *         The current logging level.
