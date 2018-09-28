@@ -32,15 +32,21 @@ QUnit.test('length is updated when new tracks are added or removed', function(as
   const ttcl = new TextTrackCueList(genericTracks);
 
   ttcl.setCues_(genericTracks.concat([{id: '100'}]));
-  assert.equal(ttcl.length, genericTracks.length + 1,
-              'the length is ' + (genericTracks.length + 1));
+  assert.equal(
+    ttcl.length, genericTracks.length + 1,
+    'the length is ' + (genericTracks.length + 1)
+  );
   ttcl.setCues_(genericTracks.concat([{id: '100'}, {id: '101'}]));
-  assert.equal(ttcl.length, genericTracks.length + 2,
-              'the length is ' + (genericTracks.length + 2));
+  assert.equal(
+    ttcl.length, genericTracks.length + 2,
+    'the length is ' + (genericTracks.length + 2)
+  );
 
   ttcl.setCues_(genericTracks.concat([{id: '100'}]));
-  assert.equal(ttcl.length, genericTracks.length + 1,
-              'the length is ' + (genericTracks.length + 1));
+  assert.equal(
+    ttcl.length, genericTracks.length + 1,
+    'the length is ' + (genericTracks.length + 1)
+  );
   ttcl.setCues_(genericTracks);
   assert.equal(ttcl.length, genericTracks.length, 'the length is ' + genericTracks.length);
 });

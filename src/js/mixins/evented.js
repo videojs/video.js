@@ -326,7 +326,7 @@ const EventedMixin = {
    * @param   {Object} [hash]
    *          An additional object to pass along to listeners.
    *
-   * @returns {boolean}
+   * @return {boolean}
    *          Whether or not the default behavior was prevented.
    */
   trigger(event, hash) {
@@ -343,7 +343,7 @@ const EventedMixin = {
  * @param  {Object} [options={}]
  *         Options for customizing the mixin behavior.
  *
- * @param  {String} [options.eventBusKey]
+ * @param  {string} [options.eventBusKey]
  *         By default, adds a `eventBusEl_` DOM element to the target object,
  *         which is used as an event bus. If the target object already has a
  *         DOM element that should be used, pass its key here.

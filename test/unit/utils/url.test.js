@@ -7,9 +7,11 @@ const proxyquire = proxyquireify(require);
 
 QUnit.module('url');
 QUnit.test('should parse the details of a url correctly', function(assert) {
-  assert.equal(Url.parseUrl('#').protocol,
-              window.location.protocol,
-              'parsed relative url protocol');
+  assert.equal(
+    Url.parseUrl('#').protocol,
+    window.location.protocol,
+    'parsed relative url protocol'
+  );
   assert.equal(Url.parseUrl('#').host, window.location.host, 'parsed relative url host');
 
   assert.equal(Url.parseUrl('http://example.com').protocol, 'http:', 'parsed example url protocol');

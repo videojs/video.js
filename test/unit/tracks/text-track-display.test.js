@@ -246,12 +246,18 @@ if (!Html5.supportsNativeTextTracks()) {
     esCaptionMenuItem.trigger('click');
 
     // Track mode changes on user-selection
-    assert.ok(esCaptionMenuItem.track.mode === 'showing',
-      'Spanish should be showing after selection');
-    assert.ok(enCaptionMenuItem.track.mode === 'disabled',
-      'English should be disabled after selecting Spanish');
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: true, language: 'es', kind: 'captions' });
+    assert.ok(
+      esCaptionMenuItem.track.mode === 'showing',
+      'Spanish should be showing after selection'
+    );
+    assert.ok(
+      enCaptionMenuItem.track.mode === 'disabled',
+      'English should be disabled after selecting Spanish'
+    );
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: true, language: 'es', kind: 'captions' }
+    );
 
     // Switch source and remove old tracks
     player.tech_.src({type: 'video/mp4', src: 'http://example.com'});
@@ -273,12 +279,18 @@ if (!Html5.supportsNativeTextTracks()) {
     enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
 
     // The user-selection should have persisted
-    assert.ok(esCaptionMenuItem.track.mode === 'showing',
-      'Spanish should remain showing');
-    assert.ok(enCaptionMenuItem.track.mode === 'disabled',
-      'English should remain disabled');
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: true, language: 'es', kind: 'captions' });
+    assert.ok(
+      esCaptionMenuItem.track.mode === 'showing',
+      'Spanish should remain showing'
+    );
+    assert.ok(
+      enCaptionMenuItem.track.mode === 'disabled',
+      'English should remain disabled'
+    );
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: true, language: 'es', kind: 'captions' }
+    );
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish track remains showing');
     assert.ok(englishTrack.mode === 'disabled', 'English track remains disabled');
@@ -307,15 +319,19 @@ if (!Html5.supportsNativeTextTracks()) {
     player.play();
     enCaptionMenuItem.trigger('click');
 
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: true, language: 'en', kind: 'captions' }, 'English track is selected');
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: true, language: 'en', kind: 'captions' }, 'English track is selected'
+    );
     assert.ok(englishTrack.mode === 'showing', 'English track should be showing');
 
     // Select the off button
     offMenuItem.trigger('click');
 
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: false }, 'selectedLanguage is cleared');
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: false }, 'selectedLanguage is cleared'
+    );
     assert.ok(englishTrack.mode === 'disabled', 'English track is disabled');
     player.dispose();
   });

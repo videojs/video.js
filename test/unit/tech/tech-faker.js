@@ -3,7 +3,7 @@
 import Tech from '../../../src/js/tech/tech.js';
 
 /**
- * @constructor
+ * @class
  */
 class TechFaker extends Tech {
 

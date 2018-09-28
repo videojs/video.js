@@ -80,7 +80,7 @@ QUnit.test('should remove all listeners of a type', function(assert) {
 
   Events.on(el, 'click', listener);
   Events.on(el, 'click', listener2);
-    // 2 clicks
+  // 2 clicks
   Events.trigger(el, 'click');
 
   assert.ok(clicks === 2, 'both click listeners fired');

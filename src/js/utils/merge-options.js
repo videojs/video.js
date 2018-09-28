@@ -11,7 +11,7 @@ import {each, isPlain} from './obj';
  * @param   {Object[]} sources
  *          One or more objects to merge into a new object.
  *
- * @returns {Object}
+ * @return {Object}
  *          A new object that is the merged result of all sources.
  */
 export default function mergeOptions(...sources) {

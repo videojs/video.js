@@ -6,8 +6,10 @@ QUnit.module('Setup');
 QUnit.test('should set options from data-setup even if autoSetup is not called before initialisation', function(assert) {
   const el = TestHelpers.makeTag();
 
-  el.setAttribute('data-setup',
-                  '{"controls": true, "autoplay": false, "preload": "auto", "playsinline": true}');
+  el.setAttribute(
+    'data-setup',
+    '{"controls": true, "autoplay": false, "preload": "auto", "playsinline": true}'
+  );
 
   const player = TestHelpers.makePlayer({}, el);
 

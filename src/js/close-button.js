@@ -12,7 +12,7 @@ import Component from './component';
  */
 class CloseButton extends Button {
 
- /**
+  /**
   * Creates an instance of the this class.
   *
   * @param  {Player} player
@@ -26,7 +26,7 @@ class CloseButton extends Button {
     this.controlText(options && options.controlText || this.localize('Close'));
   }
 
- /**
+  /**
   * Builds the default DOM `className`.
   *
   * @return {string}

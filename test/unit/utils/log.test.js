@@ -77,19 +77,27 @@ QUnit.test('logging functions should work', function(assert) {
   const history = log.history();
 
   assert.equal(history.length, 4, 'there should be four messages in the log history');
-  assert.deepEqual(history[0],
-                   ['log1', 'log2'],
-                   'history recorded the correct arguments');
+  assert.deepEqual(
+    history[0],
+    ['log1', 'log2'],
+    'history recorded the correct arguments'
+  );
   // although not enabled by default, history should still maintain the record
-  assert.deepEqual(history[1],
-                   ['DEBUG:', 'debug1', 'debug2'],
-                   'history recorded the correct arguments');
-  assert.deepEqual(history[2],
-                   ['WARN:', 'warn1', 'warn2'],
-                   'history recorded the correct arguments');
-  assert.deepEqual(history[3],
-                   ['ERROR:', 'error1', 'error2'],
-                   'history recorded the correct arguments');
+  assert.deepEqual(
+    history[1],
+    ['DEBUG:', 'debug1', 'debug2'],
+    'history recorded the correct arguments'
+  );
+  assert.deepEqual(
+    history[2],
+    ['WARN:', 'warn1', 'warn2'],
+    'history recorded the correct arguments'
+  );
+  assert.deepEqual(
+    history[3],
+    ['ERROR:', 'error1', 'error2'],
+    'history recorded the correct arguments'
+  );
 });
 
 QUnit.test('setting the log level changes what is actually logged', function(assert) {
@@ -196,9 +204,11 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   assert.notOk(window.console.log.called, 'log was not called');
   assert.notOk(window.console.warn.called, 'warn was not called');
   assert.notOk(window.console.error.called, 'error was not called');
-  assert.deepEqual(window.console.info.firstCall.args,
-                   getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'),
-                   'logged the right message');
+  assert.deepEqual(
+    window.console.info.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'),
+    'logged the right message'
+  );
 
   window.console.info = null;
   logByType('debug', ['debug3', 'debug4']);
@@ -206,9 +216,11 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   assert.ok(window.console.log.called, 'log was called');
   assert.notOk(window.console.warn.called, 'warn was not called');
   assert.notOk(window.console.error.called, 'error was not called');
-  assert.deepEqual(window.console.log.firstCall.args,
-                   getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug3', 'debug4'),
-                   'logged the right message');
+  assert.deepEqual(
+    window.console.log.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug3', 'debug4'),
+    'logged the right message'
+  );
 
   // when no comparable level logs are available, there should not be any logging
   window.console.log = null;

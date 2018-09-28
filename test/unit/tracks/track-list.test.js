@@ -34,22 +34,30 @@ QUnit.test('length is updated when new tracks are added or removed', function(as
   const trackList = new TrackList(this.tracks);
 
   trackList.addTrack(newTrack('100'));
-  assert.equal(trackList.length,
-              this.tracks.length + 1,
-              'the length is ' + (this.tracks.length + 1));
+  assert.equal(
+    trackList.length,
+    this.tracks.length + 1,
+    'the length is ' + (this.tracks.length + 1)
+  );
   trackList.addTrack(newTrack('101'));
-  assert.equal(trackList.length,
-              this.tracks.length + 2,
-              'the length is ' + (this.tracks.length + 2));
+  assert.equal(
+    trackList.length,
+    this.tracks.length + 2,
+    'the length is ' + (this.tracks.length + 2)
+  );
 
   trackList.removeTrack(trackList.getTrackById('101'));
-  assert.equal(trackList.length,
-              this.tracks.length + 1,
-              'the length is ' + (this.tracks.length + 1));
+  assert.equal(
+    trackList.length,
+    this.tracks.length + 1,
+    'the length is ' + (this.tracks.length + 1)
+  );
   trackList.removeTrack(trackList.getTrackById('100'));
-  assert.equal(trackList.length,
-              this.tracks.length,
-              'the length is ' + this.tracks.length);
+  assert.equal(
+    trackList.length,
+    this.tracks.length,
+    'the length is ' + this.tracks.length
+  );
 });
 
 QUnit.test('can access items by index', function(assert) {
@@ -59,9 +67,11 @@ QUnit.test('can access items by index', function(assert) {
   assert.expect(length);
 
   for (let i = 0; i < length; i++) {
-    assert.equal(trackList[i].id,
-                String(i + 1),
-                'the id of a track matches the index + 1');
+    assert.equal(
+      trackList[i].id,
+      String(i + 1),
+      'the id of a track matches the index + 1'
+    );
   }
 });
 
