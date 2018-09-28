@@ -41,7 +41,6 @@
     "babel": "babel src/js -d es5",
     "prepublish": "not-in-install && run-p build || in-install",
     "publish": "node build/gh-release.js",
-    "prepush": "npm run lint -- --errors",
     "version": "node build/version.js && git add CHANGELOG.md",
     "autoprefixer": "npm-run-all -p autoprefixer:*",
     "autoprefixer:main": "postcss --verbose --config postcss.config.js -d build/temp build/temp/video-js.css",
@@ -101,7 +100,7 @@
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.18.1",
     "humanize-duration": "^3.12.1",
-    "husky": "^0.14.1",
+    "husky": "^1.0.1",
     "in-publish": "^2.0.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.2",
@@ -176,5 +175,10 @@
       "sinon",
       "webpack"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint -- --errors"
+    }
   }
 }
