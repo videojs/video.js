@@ -93,7 +93,7 @@ export default function createLogger(name) {
    *
    * @param {string} name
    *        The name to add call the new logger
-   * @returns {Object}
+   * @return {Object}
    */
   log.createLogger = (subname) => createLogger(name + ': ' + subname);
 
