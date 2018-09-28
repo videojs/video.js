@@ -23,9 +23,11 @@ import merge from '../utils/merge-options';
  * @private
  */
 const parseCues = function(srcContent, track) {
-  const parser = new window.WebVTT.Parser(window,
-                                          window.vttjs,
-                                          window.WebVTT.StringDecoder());
+  const parser = new window.WebVTT.Parser(
+    window,
+    window.vttjs,
+    window.WebVTT.StringDecoder()
+  );
   const errors = [];
 
   parser.oncue = function(cue) {

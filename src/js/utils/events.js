@@ -407,8 +407,8 @@ export function trigger(elem, event, hash) {
   // so checking hasElData first.
   const elemData = (DomData.hasData(elem)) ? DomData.getData(elem) : {};
   const parent = elem.parentNode || elem.ownerDocument;
-      // type = event.type || event,
-      // handler;
+  // type = event.type || event,
+  // handler;
 
   // If an event name was passed as a string, creates an event out of it
   if (typeof event === 'string') {

@@ -39,7 +39,7 @@ import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
  * @param   {string} id
  *          A string, maybe with a leading `#`.
  *
- * @returns {string}
+ * @return {string}
  *          The string, without any leading `#`.
  */
 const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
@@ -116,6 +116,7 @@ videojs.hooks_ = {};
 
 /**
  * Get a list of hooks for a specific lifecycle
+ *
  * @function videojs.hooks
  *
  * @param {string} type
@@ -255,7 +256,7 @@ videojs.getPlayers = () => Player.players;
  *          An HTML element - `<video>`, `<audio>`, or `<video-js>` -
  *          or a string matching the `id` of such an element.
  *
- * @returns {Player|undefined}
+ * @return {Player|undefined}
  *          A player instance or `undefined` if there is no player instance
  *          matching the argument.
  */

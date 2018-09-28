@@ -5,7 +5,7 @@
  * @param  {Object}  value
  *         An object that may or may not be `Promise`-like.
  *
- * @return {Boolean}
+ * @return {boolean}
  *         Whether or not the object is `Promise`-like.
  */
 export function isPromise(value) {

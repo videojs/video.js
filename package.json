@@ -117,7 +117,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-safaritechpreview-launcher": "0.0.6",
     "karma-sinon": "^1.0.5",
-    "klaw-sync": "^5.0.0",
+    "klaw-sync": "^6.0.0",
     "load-grunt-tasks": "^4.0.0",
     "lodash": "^4.17.10",
     "markdown-table": "^1.0.0",
@@ -134,7 +134,7 @@
     "remark-toc": "^5.0.0",
     "remark-validate-links": "^7.0.0",
     "replace": "^0.3.0",
-    "rollup": "^0.65.0",
+    "rollup": "^0.66.0",
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
@@ -151,7 +151,7 @@
     "uglify-js": "^3.3.21",
     "unified": "^7.0.0",
     "videojs-flash": "^2.1.0",
-    "videojs-standard": "^6.0.1",
+    "videojs-standard": "^8.0.2",
     "webpack": "^1.15.0"
   },
   "vjsstandard": {

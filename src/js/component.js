@@ -545,39 +545,39 @@ class Component {
       workingChildren
       // children that are in this.options_ but also in workingChildren  would
       // give us extra children we do not want. So, we want to filter them out.
-      .concat(Object.keys(this.options_)
-              .filter(function(child) {
-                return !workingChildren.some(function(wchild) {
-                  if (typeof wchild === 'string') {
-                    return child === wchild;
-                  }
-                  return child === wchild.name;
-                });
-              }))
-      .map((child) => {
-        let name;
-        let opts;
+        .concat(Object.keys(this.options_)
+          .filter(function(child) {
+            return !workingChildren.some(function(wchild) {
+              if (typeof wchild === 'string') {
+                return child === wchild;
+              }
+              return child === wchild.name;
+            });
+          }))
+        .map((child) => {
+          let name;
+          let opts;
 
-        if (typeof child === 'string') {
-          name = child;
-          opts = children[name] || this.options_[name] || {};
-        } else {
-          name = child.name;
-          opts = child;
-        }
+          if (typeof child === 'string') {
+            name = child;
+            opts = children[name] || this.options_[name] || {};
+          } else {
+            name = child.name;
+            opts = child;
+          }
 
-        return {name, opts};
-      })
-      .filter((child) => {
+          return {name, opts};
+        })
+        .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
         // techs are registerd as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
-        const c = Component.getComponent(child.opts.componentClass ||
+          const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
 
-        return c && !Tech.isTech(c);
-      })
-      .forEach(handleAdd);
+          return c && !Tech.isTech(c);
+        })
+        .forEach(handleAdd);
     }
   }
 
