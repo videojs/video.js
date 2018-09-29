@@ -6,20 +6,24 @@ import { newGUID } from './guid.js';
 import window from 'global/window';
 
 /**
- * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
- * It also stores a unique id on the function so it can be easily removed from events.
+ * Bind (a.k.a proxy or context). A simple method for changing the context of
+ * a function.
  *
- * @param {Mixed} context
- *        The object to bind as scope.
+ * It also stores a unique id on the function so it can be easily removed from
+ * events.
  *
- * @param {Function} fn
- *        The function to be bound to a scope.
+ * @function
+ * @param    {Mixed} context
+ *           The object to bind as scope.
  *
- * @param {number} [uid]
- *        An optional unique ID for the function to be set
+ * @param    {Function} fn
+ *           The function to be bound to a scope.
  *
- * @return {Function}
- *         The new function that will be bound into the context given
+ * @param    {number} [uid]
+ *           An optional unique ID for the function to be set
+ *
+ * @return   {Function}
+ *           The new function that will be bound into the context given
  */
 export const bind = function(context, fn, uid) {
   // Make sure the function has a unique ID
@@ -47,13 +51,14 @@ export const bind = function(context, fn, uid) {
  * Wraps the given function, `fn`, with a new function that only invokes `fn`
  * at most once per every `wait` milliseconds.
  *
- * @param  {Function} fn
- *         The function to be throttled.
+ * @function
+ * @param    {Function} fn
+ *           The function to be throttled.
  *
- * @param  {Number}   wait
- *         The number of milliseconds by which to throttle.
+ * @param    {Number}   wait
+ *           The number of milliseconds by which to throttle.
  *
- * @return {Function}
+ * @return   {Function}
  */
 export const throttle = function(fn, wait) {
   let last = Date.now();
@@ -77,23 +82,24 @@ export const throttle = function(fn, wait) {
  *
  * Inspired by lodash and underscore implementations.
  *
- * @param  {Function} func
- *         The function to wrap with debounce behavior.
+ * @function
+ * @param    {Function} func
+ *           The function to wrap with debounce behavior.
  *
- * @param  {number} wait
- *         The number of milliseconds to wait after the last invocation.
+ * @param    {number} wait
+ *           The number of milliseconds to wait after the last invocation.
  *
- * @param  {boolean} [immediate]
- *         Whether or not to invoke the function immediately upon creation.
+ * @param    {boolean} [immediate]
+ *           Whether or not to invoke the function immediately upon creation.
  *
- * @param  {Object} [context=window]
- *         The "context" in which the debounced function should debounce. For
- *         example, if this function should be tied to a Video.js player,
- *         the player can be passed here. Alternatively, defaults to the
- *         global `window` object.
+ * @param    {Object} [context=window]
+ *           The "context" in which the debounced function should debounce. For
+ *           example, if this function should be tied to a Video.js player,
+ *           the player can be passed here. Alternatively, defaults to the
+ *           global `window` object.
  *
- * @return {Function}
- *         A debounced function.
+ * @return   {Function}
+ *           A debounced function.
  */
 export const debounce = function(func, wait, immediate, context = window) {
   let timeout;

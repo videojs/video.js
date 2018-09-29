@@ -82,7 +82,7 @@ function createTrackHelper(self, kind, label, language, options = {}) {
  */
 class Tech extends Component {
 
- /**
+  /**
   * Create an instance of this Tech.
   *
   * @param {Object} [options]
@@ -492,21 +492,21 @@ class Tech extends Component {
    * @fires Tech#texttrackchange
    */
   initTrackListeners() {
-     /**
+    /**
       * Triggered when tracks are added or removed on the Tech {@link AudioTrackList}
       *
       * @event Tech#audiotrackchange
       * @type {EventTarget~Event}
       */
 
-     /**
+    /**
       * Triggered when tracks are added or removed on the Tech {@link VideoTrackList}
       *
       * @event Tech#videotrackchange
       * @type {EventTarget~Event}
       */
 
-     /**
+    /**
       * Triggered when tracks are added or removed on the Tech {@link TextTrackList}
       *
       * @event Tech#texttrackchange
@@ -788,7 +788,7 @@ class Tech extends Component {
   /**
    * Attempt to force override of native audio tracks.
    *
-   * @param {Boolean} override - If set to true native audio will be overridden,
+   * @param {boolean} override - If set to true native audio will be overridden,
    * otherwise native audio will potentially be used.
    *
    * @abstract
@@ -798,7 +798,7 @@ class Tech extends Component {
   /**
    * Attempt to force override of native video tracks.
    *
-   * @param {Boolean} override - If set to true native video will be overridden,
+   * @param {boolean} override - If set to true native video will be overridden,
    * otherwise native video will potentially be used.
    *
    * @abstract
@@ -841,6 +841,7 @@ class Tech extends Component {
 
   /**
    * Check if the tech can support the given source
+   *
    * @param {Object} srcObj
    *        The source object
    * @param {Object} options

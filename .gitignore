@@ -8,6 +8,7 @@ projects
 test/*.map
 .bunyipconfig.js
 .s3config.json
+.eslintcache
 
 node_modules
 npm-debug.log*

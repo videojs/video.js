@@ -14,7 +14,7 @@ import {IS_CHROME} from '../utils/browser.js';
  */
 class Slider extends Component {
 
-/**
+  /**
  * Create an instance of this class
  *
  * @param {Player} player
@@ -225,7 +225,7 @@ class Slider extends Component {
   /**
    * Update the progress bar of the `Slider`.
    *
-   * @returns {number}
+   * @return {number}
    *          The percentage of progress the progress bar represents as a
    *          number from 0 to 1.
    */

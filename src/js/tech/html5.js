@@ -23,7 +23,7 @@ import setupSourceset from './setup-sourceset';
  */
 class Html5 extends Tech {
 
- /**
+  /**
   * Create an instance of this Tech.
   *
   * @param {Object} [options]
@@ -207,9 +207,9 @@ class Html5 extends Tech {
   /**
    * Attempt to force override of tracks for the given type
    *
-   * @param {String} type - Track type to override, possible values include 'Audio',
+   * @param {string} type - Track type to override, possible values include 'Audio',
    * 'Video', and 'Text'.
-   * @param {Boolean} override - If set to true native audio/video will be overridden,
+   * @param {boolean} override - If set to true native audio/video will be overridden,
    * otherwise native audio/video will potentially be used.
    * @private
    */
@@ -238,7 +238,7 @@ class Html5 extends Tech {
   /**
    * Attempt to force override of native audio tracks.
    *
-   * @param {Boolean} override - If set to true native audio will be overridden,
+   * @param {boolean} override - If set to true native audio will be overridden,
    * otherwise native audio will potentially be used.
    */
   overrideNativeAudioTracks(override) {
@@ -248,14 +248,14 @@ class Html5 extends Tech {
   /**
    * Attempt to force override of native video tracks.
    *
-   * @param {Boolean} override - If set to true native video will be overridden,
+   * @param {boolean} override - If set to true native video will be overridden,
    * otherwise native video will potentially be used.
    */
   overrideNativeVideoTracks(override) {
     this.overrideNative_('Video', override);
   }
 
- /**
+  /**
    * Proxy native track list events for the given type to our track
    * lists if the browser we are playing in supports that type of track list.
    *
@@ -375,7 +375,8 @@ class Html5 extends Tech {
           delete attributes.controls;
         }
 
-        Dom.setAttributes(el,
+        Dom.setAttributes(
+          el,
           assign(attributes, {
             id: this.options_.techId,
             class: 'vjs-tech'
@@ -797,7 +798,7 @@ class Html5 extends Tech {
    *
    * @param {Object} options The object should contain values for
    * kind, language, label, and src (location of the WebVTT file)
-   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
    * automatically removed from the video element whenever the source changes
    * @return {HTMLTrackElement} An Html Track Element.
    * This can be an emulated {@link HTMLTrackElement} or a native one.
@@ -922,6 +923,7 @@ Html5.canPlayType = function(type) {
 
 /**
  * Check if the tech can support the given source
+ *
  * @param {Object} srcObj
  *        The source object
  * @param {Object} options

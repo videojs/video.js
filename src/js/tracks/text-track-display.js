@@ -313,25 +313,35 @@ class TextTrackDisplay extends Component {
         cueDiv.firstChild.style.color = overrides.color;
       }
       if (overrides.textOpacity) {
-        tryUpdateStyle(cueDiv.firstChild,
-                       'color',
-                       constructColor(overrides.color || '#fff',
-                                      overrides.textOpacity));
+        tryUpdateStyle(
+          cueDiv.firstChild,
+          'color',
+          constructColor(
+            overrides.color || '#fff',
+            overrides.textOpacity
+          )
+        );
       }
       if (overrides.backgroundColor) {
         cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
       }
       if (overrides.backgroundOpacity) {
-        tryUpdateStyle(cueDiv.firstChild,
-                       'backgroundColor',
-                       constructColor(overrides.backgroundColor || '#000',
-                                      overrides.backgroundOpacity));
+        tryUpdateStyle(
+          cueDiv.firstChild,
+          'backgroundColor',
+          constructColor(
+            overrides.backgroundColor || '#000',
+            overrides.backgroundOpacity
+          )
+        );
       }
       if (overrides.windowColor) {
         if (overrides.windowOpacity) {
-          tryUpdateStyle(cueDiv,
-                         'backgroundColor',
-                         constructColor(overrides.windowColor, overrides.windowOpacity));
+          tryUpdateStyle(
+            cueDiv,
+            'backgroundColor',
+            constructColor(overrides.windowColor, overrides.windowOpacity)
+          );
         } else {
           cueDiv.style.backgroundColor = overrides.windowColor;
         }

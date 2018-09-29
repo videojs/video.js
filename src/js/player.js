@@ -1,7 +1,7 @@
 /**
  * @file player.js
  */
- // Subclasses Component
+// Subclasses Component
 import Component from './component.js';
 
 import {version} from '../../package.json';
@@ -14,7 +14,7 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
-import log from './utils/log.js';
+import log, { createLogger } from './utils/log.js';
 import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
@@ -312,6 +312,9 @@ class Player extends Component {
 
     // Run base component initializing with new options
     super(null, options, ready);
+
+    // create logger
+    this.log = createLogger(this.id_);
 
     // Tracks when a tech changes the poster
     this.isPosterFromTech_ = false;
@@ -1739,9 +1742,9 @@ class Player extends Component {
     // we do not want to toggle fullscreen state
     // when double-clicking inside a control bar or a modal
     const inAllowedEls = Array.prototype.some.call(
-        this.$$('.vjs-control-bar, .vjs-modal-dialog'),
-        el => el.contains(event.target)
-      );
+      this.$$('.vjs-control-bar, .vjs-modal-dialog'),
+      el => el.contains(event.target)
+    );
 
     if (!inAllowedEls) {
       if (this.isFullscreen()) {
@@ -2750,7 +2753,7 @@ class Player extends Component {
    * @param {Tech~SourceObject} source
    *        The source object to set on the Tech
    *
-   * @return {Boolean}
+   * @return {boolean}
    *         - True if there is no Tech to playback this source
    *         - False otherwise
    *
@@ -3499,7 +3502,13 @@ class Player extends Component {
    * @return {undefined}
    *         does not return anything
    */
-  removeRemoteTextTrack({track = arguments[0]} = {}) {
+  removeRemoteTextTrack(obj = {}) {
+    let {track} = obj;
+
+    if (!track) {
+      track = obj;
+    }
+
     // destructure the input into an object with a track argument, defaulting to arguments[0]
     // default the whole argument to an empty object if nothing was passed in
 
@@ -3773,7 +3782,10 @@ TRACK_TYPES.names.forEach(function(name) {
 });
 
 /**
- * Global player list
+ * Global enumeration of players.
+ *
+ * The keys are the player IDs and the values are either the {@link Player}
+ * instance or `null` for disposed players.
  *
  * @type {Object}
  */

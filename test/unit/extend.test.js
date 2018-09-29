@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import extendFn from '../../src/js/extend.js';
+import extend from '../../src/js/extend.js';
 
 QUnit.module('extend.js');
 
@@ -8,7 +8,7 @@ QUnit.test('should add implicit parent constructor call', function(assert) {
   const Parent = function() {
     superCalled = true;
   };
-  const Child = extendFn(Parent, {
+  const Child = extend(Parent, {
     foo: 'bar'
   });
   const child = new Child();
