@@ -163,6 +163,44 @@ Prevents the player from running the autoSetup for media elements with `data-set
 
 > **Note**: this must be set globally with `videojs.options.autoSetup = false` in the same tick as videojs source is loaded to take effect.
 
+### `breakpoints`
+
+> Type: `boolean|Array`, Default: `false`
+
+Set layout breakpoints that will toggle classes on the player and adjust the player UI based on the player's dimensions.
+
+By default, no breakpoints are supported, but passing `true` will set some sensible default breakpoints:
+
+Class                | Width Range
+---------------------|------------
+`vjs-layout-tiny`    | 0-210
+`vjs-layout-x-small` | 211-320
+`vjs-layout-small`   | 321-425
+`vjs-layout-medium`  | 426-768
+`vjs-layout-large`   | 769-1440
+`vjs-layout-x-large` | 1441-2560
+`vjs-layout-huge`    | 2561+
+
+These can be overridden by passing an **ordered** array that looks like this:
+
+```js
+breakpoints: [{
+  className: 'vjs-layout-tiny',
+  maxWidth: 300
+}, {
+  className: 'vjs-layout-x-small',
+  maxWidth: 400
+}, {
+  // ...
+}]
+```
+
+When the player's size changes, the breakpoints will be inspected in the order until a matching breakpoint is found (comparing the player's computed width to the `maxWidth` for the breakpoint).
+
+That breakpoint's `className` will be added as a class to the player. The previous breakpoint's class will be removed. The `className` values are completely user-defined - when defining your own breakpoints, you may not want to use our chosen class names because some of them have certain styles associated.
+
+See the file `sandbox/responsive.html.example` for an example of a fluid/responsive player using the default breakpoints.
+
 ### `children`
 
 > Type: `Array|Object`

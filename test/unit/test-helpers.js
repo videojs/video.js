@@ -7,7 +7,7 @@ const TestHelpers = {
     const videoTag = document.createElement('video');
 
     videoTag.id = 'example_1';
-    videoTag.className = 'video-js vjs-default-skin';
+    videoTag.className = 'video-js';
     return videoTag;
   },
 

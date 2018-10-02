@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Video.js Sandbox - Responsive</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <style type="text/css">
+
+    .breakpoints, .video-js, table {
+      margin: 1em 0;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5em 1em;
+    }
+
+    .breakpoints div {
+      background-color: red;
+      color: white;
+      padding: 0.5em 1em;
+    }
+
+    @media (max-width: 319px) {
+      .breakpoints .tiny {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 320px) and (max-width: 575.98px) {
+      .breakpoints .x-small {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 576px) and (max-width: 767.98px) {
+      .breakpoints .small {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      .breakpoints .medium {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+      .breakpoints .large {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .breakpoints .x-large {
+        background-color: green;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="breakpoints">
+    <div class="tiny">vjs-layout-tiny</div>
+    <div class="x-small">vjs-layout-x-small</div>
+    <div class="small">vjs-layout-small</div>
+    <div class="medium">vjs-layout-medium</div>
+    <div class="large">vjs-layout-large</div>
+    <div class="x-large">vjs-layout-x-large</div>
+  </div>
+
+  <video-js
+    class="vjs-fluid"
+    controls
+    preload="auto"
+    poster="http://vjs.zencdn.net/v/oceans.png">
+    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Window Width</th>
+        <th>Device Pixel Ratio</th>
+        <th>Player Computed Width</th>
+        <th>Player CSS Width</th>
+        <th>Class</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    var vid = document.querySelector('video-js');
+    var player = videojs(vid);
+    var tbody = document.querySelector('table tbody');
+
+    player.on('playerresize', function() {
+      var values = {
+        className: player.el().className.match(/vjs-layout-([a-z\-]+)/)[0],
+        computedWidth: player.currentWidth(),
+        devicePixelRatio: window.devicePixelRatio,
+        cssWidth: player.currentCssWidth(),
+        innerWidth: window.innerWidth
+      };
+
+      videojs.log('playerresize', values);
+
+      var tr = document.createElement('tr');
+
+      tr.innerHTML = '<td>' +
+        values.innerWidth +
+        '</td><td>' +
+        values.devicePixelRatio +
+        '</td><td>' +
+        values.computedWidth +
+        '</td><td>' +
+        values.cssWidth +
+        '</td><td>' +
+        values.className +
+        '</td>';
+
+      tbody.appendChild(tr);
+    });
+  </script>
+
+</body>
+</html>

@@ -240,6 +240,30 @@ const TECH_EVENTS_QUEUE = {
   seeked: 'Seeked'
 };
 
+// The default set of responsive breakpoints. Passing `true` as the `breakpoints`
+// option will cause the player to use these breakpoints.
+const DEFAULT_BREAKPOINTS = [{
+  className: 'vjs-layout-tiny',
+  maxWidth: 210
+}, {
+  className: 'vjs-layout-x-small',
+  maxWidth: 320
+}, {
+  className: 'vjs-layout-small',
+  maxWidth: 425
+}, {
+  className: 'vjs-layout-medium',
+  maxWidth: 768
+}, {
+  className: 'vjs-layout-large',
+  maxWidth: 1440
+}, {
+  className: 'vjs-layout-x-large',
+  maxWidth: 2560
+}, {
+  className: 'vjs-layout-huge'
+}];
+
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
  * are used to initialize a video.
@@ -486,6 +510,13 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
+
+    if (this.options_.breakpoints) {
+      if (!Array.isArray(this.options_.breakpoints)) {
+        this.options_.breakpoints = DEFAULT_BREAKPOINTS.map(o => assign({}, o));
+      }
+      this.on('playerresize', this.updateCurrentBreakpoint);
+    }
 
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
@@ -3676,6 +3707,57 @@ class Player extends Component {
   }
 
   /**
+   * Change layout breakpoint classes when the player resizes.
+   *
+   * @private
+   */
+  updateCurrentBreakpoint() {
+    const {breakpoints} = this.options_;
+
+    if (!Array.isArray(breakpoints)) {
+      return;
+    }
+
+    const currentBreakpoint = this.currentBreakpoint();
+    const width = this.currentWidth();
+
+    for (let i = 0; i < breakpoints.length; i++) {
+      const breakpoint = breakpoints[i];
+      const maxWidth = breakpoint.maxWidth || Infinity;
+
+      if (width <= maxWidth) {
+
+        // The current breakpoint did not change, nothing to do.
+        if (currentBreakpoint && currentBreakpoint.className === breakpoint.className) {
+          return;
+        }
+
+        // Only remove a class if there is a current breakpoint.
+        if (currentBreakpoint) {
+          this.removeClass(currentBreakpoint.className);
+        }
+
+        this.addClass(breakpoint.className);
+        this.breakpoint_ = breakpoint;
+        break;
+      }
+    }
+  }
+
+  /**
+   * Get current layout breakpoint object, if any.
+   *
+   * This object will have a `name` and may have a `maxWidth` property.
+   *
+   * @return {object|null}
+   *         If there is currently a layout breakpoint set, returns it.
+   *         Otherwise, returns `null`.
+   */
+  currentBreakpoint() {
+    return this.breakpoint_ && mergeOptions(this.breakpoint_);
+  }
+
+  /**
    * Gets tag settings
    *
    * @param {Element} tag
@@ -3874,7 +3956,9 @@ Player.prototype.options_ = {
   languages: {},
 
   // Default message to show when a video cannot be played.
-  notSupportedMessage: 'No compatible source was found for this media.'
+  notSupportedMessage: 'No compatible source was found for this media.',
+
+  breakpoints: false
 };
 
 [
