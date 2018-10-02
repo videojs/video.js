@@ -2,6 +2,7 @@
  * @file menu.js
  */
 import Component from '../component.js';
+import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
@@ -107,13 +108,15 @@ class Menu extends Component {
    * @listens blur
    */
   handleBlur(event) {
+    const relatedTarget = event.relatedTarget || document.activeElement;
+
     // Close menu popup when a user clicks outside the menu
     if (!this.children().some((element) => {
-      return element.el() === event.relatedTarget;
+      return element.el() === relatedTarget;
     })) {
       const btn = this.menuButton_;
 
-      if (btn && btn.buttonPressed_ && event.relatedTarget !== btn.el().firstChild) {
+      if (btn && btn.buttonPressed_ && relatedTarget !== btn.el().firstChild) {
         btn.unpressButton();
       }
     }
