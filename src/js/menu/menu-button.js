@@ -51,7 +51,9 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'click', this.handleClick);
     this.on(this.menuButton_, 'focus', this.handleFocus);
     this.on(this.menuButton_, 'blur', this.handleBlur);
-
+    this.on(this.menuButton_, 'mouseenter', () => {
+      this.menu.show();
+    });
     this.on('keydown', this.handleSubmenuKeyPress);
   }
 
@@ -223,10 +225,6 @@ class MenuButton extends Component {
   handleClick(event) {
     if (this.buttonPressed_) {
       this.unpressButton();
-      this.menu.hide();
-      this.one(this.menuButton_, 'mouseleave', Fn.bind(this, function() {
-        this.menu.show();
-      }));
     } else {
       this.pressButton();
     }
@@ -335,6 +333,7 @@ class MenuButton extends Component {
   pressButton() {
     if (this.enabled_) {
       this.buttonPressed_ = true;
+      this.menu.show();
       this.menu.lockShowing();
       this.menuButton_.el_.setAttribute('aria-expanded', 'true');
 
@@ -356,6 +355,7 @@ class MenuButton extends Component {
     if (this.enabled_) {
       this.buttonPressed_ = false;
       this.menu.unlockShowing();
+      this.menu.hide();
       this.menuButton_.el_.setAttribute('aria-expanded', 'false');
     }
   }

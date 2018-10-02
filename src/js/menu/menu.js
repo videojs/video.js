@@ -45,7 +45,8 @@ class Menu extends Component {
    */
   addItem(component) {
     this.addChild(component);
-    component.on('click', Fn.bind(this, function(event) {
+    component.on('blur', Fn.bind(this, this.handleBlur));
+    component.on(['tap', 'click'], Fn.bind(this, function(event) {
       // Unpress the associated MenuButton, and move focus back to it
       if (this.menuButton_) {
         this.menuButton_.unpressButton();
@@ -95,6 +96,27 @@ class Menu extends Component {
     this.contentEl_ = null;
 
     super.dispose();
+  }
+
+  /**
+   * Called when a `MenuItem` loses focus.
+   *
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
+   */
+  handleBlur(event) {
+    // Close menu popup when a user clicks outside the menu
+    if (!this.children().some((element) => {
+      return element.el() === event.relatedTarget;
+    })) {
+      const btn = this.menuButton_;
+
+      if (btn && btn.buttonPressed_ && event.relatedTarget !== btn.el().firstChild) {
+        btn.unpressButton();
+      }
+    }
   }
 
   /**
