@@ -167,11 +167,11 @@ Prevents the player from running the autoSetup for media elements with `data-set
 
 > Type: `boolean|Array`, Default: `false`
 
-Set layout breakpoints that will toggle classes on the player and adjust the player UI based on the player's dimensions.
+Set layout breakpoints that will configure how class names are toggled on the player to adjust the UI based on the player's dimensions.
 
 By default, no breakpoints are supported, but passing `true` will set some sensible default breakpoints:
 
-Class                | Width Range
+Class Name           | Width Range
 ---------------------|------------
 `vjs-layout-tiny`    | 0-210
 `vjs-layout-x-small` | 211-320
@@ -181,23 +181,27 @@ Class                | Width Range
 `vjs-layout-x-large` | 1441-2560
 `vjs-layout-huge`    | 2561+
 
-These can be overridden by passing an **ordered** array that looks like this:
+While the class names cannot be changed, the width ranges can be configured via an object like this:
 
 ```js
-breakpoints: [{
-  className: 'vjs-layout-tiny',
-  maxWidth: 300
-}, {
-  className: 'vjs-layout-x-small',
-  maxWidth: 400
-}, {
-  // ...
-}]
+breakpoints: {
+  tiny: 300,
+  xsmall: 400,
+  small: 500,
+  medium: 600,
+  large: 700,
+  xlarge: 800,
+  huge: 900
+}
 ```
 
-When the player's size changes, the breakpoints will be inspected in the order until a matching breakpoint is found (comparing the player's computed width to the `maxWidth` for the breakpoint).
+* The _keys_ of the `breakpoints` object are derived from the associated class names by removing the `vjs-layout-` prefix and any `-` characters.
+* The _values_ of the `breakpoints` object define the max width for a range.
+* Not all keys need to be defined. You can easily override a single breakpoint by passing an object with one key/value pair! Customized breakpoints will be merged with default breakpoints when the player is created.
 
-That breakpoint's `className` will be added as a class to the player. The previous breakpoint's class will be removed. The `className` values are completely user-defined - when defining your own breakpoints, you may not want to use our chosen class names because some of them have certain styles associated.
+When the player's size changes, the merged breakpoints will be inspected in the size order until a matching breakpoint is found.
+
+That breakpoint's associated class name will be added as a class to the player. The previous breakpoint's class will be removed.
 
 See the file `sandbox/responsive.html.example` for an example of a fluid/responsive player using the default breakpoints.
 

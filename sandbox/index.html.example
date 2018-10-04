@@ -15,6 +15,7 @@
   </div>
 
   <video-js
+    id="vid1"
     controls
     preload="auto"
     width="640"
@@ -28,7 +29,7 @@
   </video-js>
 
   <script>
-    var vid = document.querySelector('video-js');
+    var vid = document.getElementById('vid1');
     var player = videojs(vid);
   </script>
 

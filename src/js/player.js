@@ -22,7 +22,7 @@ import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign} from './utils/obj';
+import {assign, isObject} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
 import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
@@ -240,29 +240,40 @@ const TECH_EVENTS_QUEUE = {
   seeked: 'Seeked'
 };
 
-// The default set of responsive breakpoints. Passing `true` as the `breakpoints`
-// option will cause the player to use these breakpoints.
-const DEFAULT_BREAKPOINTS = [{
-  className: 'vjs-layout-tiny',
-  maxWidth: 210
-}, {
-  className: 'vjs-layout-x-small',
-  maxWidth: 320
-}, {
-  className: 'vjs-layout-small',
-  maxWidth: 425
-}, {
-  className: 'vjs-layout-medium',
-  maxWidth: 768
-}, {
-  className: 'vjs-layout-large',
-  maxWidth: 1440
-}, {
-  className: 'vjs-layout-x-large',
-  maxWidth: 2560
-}, {
-  className: 'vjs-layout-huge'
-}];
+const BREAKPOINT_ORDER = [
+  'tiny',
+  'xsmall',
+  'small',
+  'medium',
+  'large',
+  'xlarge',
+  'huge'
+];
+
+const BREAKPOINT_CLASSES = {};
+
+// grep: vjs-layout-tiny
+// grep: vjs-layout-x-small
+// grep: vjs-layout-small
+// grep: vjs-layout-medium
+// grep: vjs-layout-large
+// grep: vjs-layout-x-large
+// grep: vjs-layout-huge
+BREAKPOINT_ORDER.forEach(k => {
+  const v = k.charAt(0) === 'x' ? `x-${k.substring(1)}` : k;
+
+  BREAKPOINT_CLASSES[k] = `vjs-layout-${v}`;
+});
+
+const DEFAULT_BREAKPOINTS = {
+  tiny: 210,
+  xsmall: 320,
+  small: 425,
+  medium: 768,
+  large: 1440,
+  xlarge: 2560,
+  huge: Infinity
+};
 
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
@@ -511,12 +522,7 @@ class Player extends Component {
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
 
-    if (this.options_.breakpoints) {
-      if (!Array.isArray(this.options_.breakpoints)) {
-        this.options_.breakpoints = DEFAULT_BREAKPOINTS.map(o => assign({}, o));
-      }
-      this.on('playerresize', this.updateCurrentBreakpoint);
-    }
+    this.setBreakpoints(this.options_.breakpoints);
 
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
@@ -3711,50 +3717,87 @@ class Player extends Component {
    *
    * @private
    */
-  updateCurrentBreakpoint() {
-    const {breakpoints} = this.options_;
-
-    if (!Array.isArray(breakpoints)) {
+  updateCurrentBreakpoint_() {
+    if (!this.breakpoints_) {
       return;
     }
 
     const currentBreakpoint = this.currentBreakpoint();
-    const width = this.currentWidth();
+    const currentWidth = this.currentWidth();
 
-    for (let i = 0; i < breakpoints.length; i++) {
-      const breakpoint = breakpoints[i];
-      const maxWidth = breakpoint.maxWidth || Infinity;
+    for (let i = 0; i < BREAKPOINT_ORDER.length; i++) {
+      const candidateBreakpoint = BREAKPOINT_ORDER[i];
+      const maxWidth = this.breakpoints_[candidateBreakpoint];
 
-      if (width <= maxWidth) {
+      if (currentWidth <= maxWidth) {
 
         // The current breakpoint did not change, nothing to do.
-        if (currentBreakpoint && currentBreakpoint.className === breakpoint.className) {
+        if (currentBreakpoint === candidateBreakpoint) {
           return;
         }
 
         // Only remove a class if there is a current breakpoint.
         if (currentBreakpoint) {
-          this.removeClass(currentBreakpoint.className);
+          this.removeClass(BREAKPOINT_CLASSES[currentBreakpoint]);
         }
 
-        this.addClass(breakpoint.className);
-        this.breakpoint_ = breakpoint;
+        this.addClass(BREAKPOINT_CLASSES[candidateBreakpoint]);
+        this.breakpoint_ = candidateBreakpoint;
         break;
       }
     }
   }
 
   /**
-   * Get current layout breakpoint object, if any.
+   * Set layout breakpoints on the player.
    *
-   * This object will have a `name` and may have a `maxWidth` property.
+   * @param {boolean|Object} breakpoints
+   *        A boolean indicating whether breakpoints should or should not be
+   *        used - or an object describing custom max widths for the supported
+   *        breakpoints.
+   */
+  setBreakpoints(breakpoints) {
+    const hadBps = Boolean(this.breakpoints_);
+
+    if (!breakpoints) {
+      this.breakpoint_ = null;
+      this.breakpoints_ = null;
+      this.off('playerresize', this.updateCurrentBreakpoint_);
+      return;
+    }
+
+    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS);
+
+    if (isObject(breakpoints)) {
+      assign(this.breakpoints_, breakpoints);
+    }
+
+    // If we were not previously supporting breakpoints, add a listener.
+    if (!hadBps) {
+      this.on('playerresize', this.updateCurrentBreakpoint_);
+    }
+  }
+
+  /**
+   * Get current layout breakpoints for the player.
    *
-   * @return {object|null}
-   *         If there is currently a layout breakpoint set, returns it.
-   *         Otherwise, returns `null`.
+   * @return {Object}
+   *         An object describing the current layout breakpoints and their
+   *         max widths.
+   */
+  getBreakpoints() {
+    return this.breakpoints_ && assign(this.breakpoints_);
+  }
+
+  /**
+   * Get current layout breakpoint name, if any.
+   *
+   * @return {string|null}
+   *         If there is currently a layout breakpoint set, returns a the key
+   *         from the breakpoints object matching it. Otherwise, returns `null`.
    */
   currentBreakpoint() {
-    return this.breakpoint_ && mergeOptions(this.breakpoint_);
+    return this.breakpoint_;
   }
 
   /**
