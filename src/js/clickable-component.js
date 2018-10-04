@@ -254,7 +254,7 @@ class ClickableComponent extends Component {
   /**
    * This gets called when a `ClickableComponent` gets `mousedown` event.
    *
-   * @param {EventTarget~Event} event 
+   * @param {EventTarget~Event} event
    *        `mousedown` event that caused this function to be called.
    *
    */
