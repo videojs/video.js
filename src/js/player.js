@@ -786,7 +786,7 @@ class Player extends Component {
 
     if (bool) {
       this.addClass('vjs-fluid');
-      // this.fill(false);
+      this.fill(false);
     } else {
       this.removeClass('vjs-fluid');
     }
@@ -817,7 +817,7 @@ class Player extends Component {
 
     if (bool) {
       this.addClass('vjs-fill');
-      // this.fluid(false);
+      this.fluid(false);
     } else {
       this.removeClass('vjs-fill');
     }

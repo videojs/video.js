@@ -423,13 +423,13 @@ QUnit.test('fill turns off fluid', function(assert) {
 
   const player = TestHelpers.makePlayer({}, tag);
 
-  assert.ok(player.fill(), 'fill is false');
+  assert.notOk(player.fill(), 'fill is false');
   assert.ok(player.fluid(), 'fluid is true');
 
   player.fill(true);
 
   assert.ok(player.fill(), 'fill is true');
-  assert.ok(player.fluid(), 'fluid is false');
+  assert.notOk(player.fluid(), 'fluid is false');
 
   player.dispose();
 });
@@ -442,11 +442,11 @@ QUnit.test('fluid turns off fill', function(assert) {
   const player = TestHelpers.makePlayer({}, tag);
 
   assert.ok(player.fill(), 'fill is true');
-  assert.ok(player.fluid(), 'fluid is false');
+  assert.notOk(player.fluid(), 'fluid is false');
 
-  player.fill(true);
+  player.fluid(true);
 
-  assert.ok(player.fill(), 'fill is false');
+  assert.notOk(player.fill(), 'fill is false');
   assert.ok(player.fluid(), 'fluid is true');
 
   player.dispose();
