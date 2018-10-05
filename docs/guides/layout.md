@@ -6,15 +6,15 @@ Video.js generally lays out the player to the dimensions that are set as attribu
 
 Video.js has a fluid mode that keeps the player sized to a particular aspect ratio.
 By default, fluid mode will use the intrinsic size of the video once loaded but you can change it with classes or with the `aspectRatio` option.
-Enabling fluid mode will disable fill mode. If both are enabled, fluid mode takes precedence, currently.
+Enabling fluid mode will disable fill mode. If both are enabled, fluid mode takes precedence.
 
-You can enable fluid one in a few ways:
+You can enable fluid in a few ways:
 
 - Add `vjs-fluid`, `vjs-16-9`, or `vjs-4-3` as a class to the player element.
 - pass `fluid` option to the player.
 - call `player.fluid(true)`.
 - pass `aspectRatio` option to the player.
-- call `player.aspectRatio('16:9)`.
+- call `player.aspectRatio('16:9')`.
 
 ### Classes
 
@@ -22,7 +22,7 @@ There are three classes associated with fluid mode, `vjs-fluid`, `vjs-16-9`, and
 `vjs-fluid` turns on the general fluid mode which will wait for the video to load to calculate the aspect ratio of the video.
 Alternatively, because 16:9 and 4:3 aspect ratios are so common, we provided them as classes by default for you to use if you know that your videos are 16:9 or 4:3.
 
-### fluid option
+### Enabling fluid mode
 
 You can pass in the `fluid` option to the player or call `player.fluid(true)`. This will enable the generic fluid mode.
 
@@ -38,15 +38,7 @@ var player = videojs('vid2');
 player.fluid(true);
 ```
 
-### Disabling fluid mode
-
-You can disable fluid mode by remove the associated classes or by calling passing in `false` to the method.
-
-```js
-player.fluid(false);
-```
-
-### aspectRatio
+#### Setting Aspect Ratio
 
 You can specify an aspect ratio for us to use if you don't want to use the intrinsic values from the video element or if you have a specific ratio in mind. It works as either a method call or an option to the player.
 
@@ -66,17 +58,26 @@ var player = videojs('vid2');
 player.aspectRatio('1:1');
 ```
 
+
+### Disabling fluid mode
+
+You can disable fluid mode by remove the associated classes or by calling passing in `false` to the method.
+
+```js
+player.fluid(false);
+```
+
 ## Fill mode
 
 Fill mode will make the player fit and fill out its container. This is often useful if you have a responsive website and already have a container for Video.js that resizes properly to your design. It can be set either via a class or an option.
 
-If fill is enabled, it'll turn off fluid mode.
+If fill is enabled, it'll turn off fluid mode. If the player is configured with both fluid and fill options, fluid mode takes precedence.
 
 ## Class
 
 There's just one class for this one: `vjs-fill`. When available, Video.js will enter fill mode.
 
-## fill option
+## Enabling fill mode
 
 You can pass in the `fill` option to the player or call `player.fill(true)`. This will enable fill mode.
 
