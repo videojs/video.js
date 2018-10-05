@@ -158,6 +158,7 @@ class ClickableComponent extends Component {
       this.on(['tap', 'click'], this.handleClick);
       this.on('focus', this.handleFocus);
       this.on('blur', this.handleBlur);
+      this.on('mousedown', this.handleMouseDown);
     }
   }
 
@@ -174,6 +175,7 @@ class ClickableComponent extends Component {
     this.off(['tap', 'click'], this.handleClick);
     this.off('focus', this.handleFocus);
     this.off('blur', this.handleBlur);
+    this.off('mousedown', this.handleMouseDown);
   }
 
   /**
@@ -247,6 +249,18 @@ class ClickableComponent extends Component {
    */
   handleBlur(event) {
     Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * This gets called when a `ClickableComponent` gets `mousedown` event.
+   *
+   * @param {EventTarget~Event} event
+   *        `mousedown` event that caused this function to be called.
+   *
+   */
+  handleMouseDown(event) {
+    // Prevent button from being focused on mousedown
+    event.preventDefault();
   }
 }
 

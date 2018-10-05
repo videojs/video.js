@@ -51,7 +51,10 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'click', this.handleClick);
     this.on(this.menuButton_, 'focus', this.handleFocus);
     this.on(this.menuButton_, 'blur', this.handleBlur);
-
+    // Prevent button from being focused on mousedown
+    this.on(this.menuButton_, 'mousedown', (e) => {
+      e.preventDefault();
+    });
     this.on('keydown', this.handleSubmenuKeyPress);
   }
 
