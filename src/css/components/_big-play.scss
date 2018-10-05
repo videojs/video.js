@@ -42,6 +42,10 @@
   @include transition(all 0s);
 }
 
+.video-js .vjs-big-play-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
 // Hide if controls are disabled, the video is playing, or native controls are used.
 .vjs-controls-disabled .vjs-big-play-button,
 .vjs-has-started .vjs-big-play-button,
