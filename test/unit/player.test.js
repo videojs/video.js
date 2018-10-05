@@ -404,6 +404,54 @@ QUnit.test('should set fluid to true if element has vjs-fluid class', function(a
   player.dispose();
 });
 
+QUnit.test('should set fill to true if element has vjs-fill class', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fill';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.fill(), 'fill is true with vjs-fill class');
+
+  player.dispose();
+});
+
+QUnit.test('fill turns off fluid', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fluid';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.notOk(player.fill(), 'fill is false');
+  assert.ok(player.fluid(), 'fluid is true');
+
+  player.fill(true);
+
+  assert.ok(player.fill(), 'fill is true');
+  assert.notOk(player.fluid(), 'fluid is false');
+
+  player.dispose();
+});
+
+QUnit.test('fluid turns off fill', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fill';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.fill(), 'fill is true');
+  assert.notOk(player.fluid(), 'fluid is false');
+
+  player.fluid(true);
+
+  assert.notOk(player.fill(), 'fill is false');
+  assert.ok(player.fluid(), 'fluid is true');
+
+  player.dispose();
+});
+
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
   const alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
   const numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });

@@ -667,9 +667,13 @@ class Player extends Component {
       head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
     }
 
+    this.fill_ = false;
+    this.fluid_ = false;
+
     // Pass in the width/height/aspectRatio options which will update the style el
     this.width(this.options_.width);
     this.height(this.options_.height);
+    this.fill(this.options_.fill);
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
 
@@ -779,10 +783,12 @@ class Player extends Component {
   /**
    * A getter/setter/toggler for the vjs-fluid `className` on the `Player`.
    *
+   * Turning this on will turn off fill mode.
+   *
    * @param {boolean} [bool]
    *        - A value of true adds the class.
    *        - A value of false removes the class.
-   *        - No value will toggle the fluid class.
+   *        - No value will be a getter.
    *
    * @return {boolean|undefined}
    *         - The value of fluid when getting.
@@ -797,11 +803,41 @@ class Player extends Component {
 
     if (bool) {
       this.addClass('vjs-fluid');
+      this.fill(false);
     } else {
       this.removeClass('vjs-fluid');
     }
 
     this.updateStyleEl_();
+  }
+
+  /**
+   * A getter/setter/toggler for the vjs-fill `className` on the `Player`.
+   *
+   * Turning this on will turn off fluid mode.
+   *
+   * @param {boolean} [bool]
+   *        - A value of true adds the class.
+   *        - A value of false removes the class.
+   *        - No value will be a getter.
+   *
+   * @return {boolean|undefined}
+   *         - The value of fluid when getting.
+   *         - `undefined` when setting.
+   */
+  fill(bool) {
+    if (bool === undefined) {
+      return !!this.fill_;
+    }
+
+    this.fill_ = !!bool;
+
+    if (bool) {
+      this.addClass('vjs-fill');
+      this.fluid(false);
+    } else {
+      this.removeClass('vjs-fill');
+    }
   }
 
   /**
@@ -3647,6 +3683,9 @@ class Player extends Component {
     const tagOptions = Dom.getAttributes(tag);
     const dataSetup = tagOptions['data-setup'];
 
+    if (Dom.hasClass(tag, 'vjs-fill')) {
+      tagOptions.fill = true;
+    }
     if (Dom.hasClass(tag, 'vjs-fluid')) {
       tagOptions.fluid = true;
     }
