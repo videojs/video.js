@@ -3,8 +3,8 @@
  * @module videojs
  */
 import {version} from '../../package.json';
-import window from 'global/window';
-import document from 'global/document';
+const window$1 = require('global/window');
+const document = require('global/document');
 import * as setup from './setup';
 import * as stylesheet from './utils/stylesheet.js';
 import Component from './component';
