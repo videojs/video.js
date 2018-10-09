@@ -91,14 +91,17 @@
     Use these to validate that the default breakpoints match up with how
     CSS media queries work.
   </p>
+  <p>
+    <b>Because these bars are updated by CSS, they will change before the <code>playerresize</code> event occurs!</b>
+  </p>
   <div class="breakpoints">
-    <div class="tiny">vjs-layout-tiny</div>
-    <div class="x-small">vjs-layout-x-small</div>
-    <div class="small">vjs-layout-small</div>
-    <div class="medium">vjs-layout-medium</div>
-    <div class="large">vjs-layout-large</div>
-    <div class="x-large">vjs-layout-x-large</div>
-    <div class="huge">vjs-layout-huge</div>
+    <div class="tiny">vjs-layout-tiny (0px-210px)</div>
+    <div class="x-small">vjs-layout-x-small (211px-320px)</div>
+    <div class="small">vjs-layout-small (321px-425px)</div>
+    <div class="medium">vjs-layout-medium (426px-768px)</div>
+    <div class="large">vjs-layout-large (769px-1440px)</div>
+    <div class="x-large">vjs-layout-x-large (1441px-2560px)</div>
+    <div class="huge">vjs-layout-huge (2561px+)</div>
   </div>
 
   <video-js
