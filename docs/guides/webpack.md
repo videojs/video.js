@@ -17,7 +17,7 @@ npm install --save-dev file-loader url-loader
 
 With both packages installed, simply add the following to you webpack.config file in the 'loaders' section:
 
-```json
+```js
 {
   loader: 'url-loader?limit=100000',
   test: /\.(png|woff|woff2|eot|ttf|svg)$/
@@ -40,7 +40,7 @@ npm install --save-dev webworkify-webpack-dropin
 
 To utilize this in your page, simply create an alias in your webpack.config.js file with:
 
-```json
+```js
 resolve: {
   alias: {
     webworkify: 'webworkify-webpack-dropin'
