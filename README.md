@@ -26,14 +26,17 @@ Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted
 <link href="//vjs.zencdn.net/7.0/video-js.min.css" rel="stylesheet">
 <script src="//vjs.zencdn.net/7.0/video.min.js"></script>
 ```
-> For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
 
+> For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
+>
 > In the `vjs.zencdn.net` CDN-hosted versions of Video.js we include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
 >
 > ```html
 > <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
 > ```
-> Alternatively, you can include Video.js by getting it from [npm](http://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases *do not* include Google Analytics tracking at all.
+>
+> Alternatively, you can include Video.js by getting it from [npm](http://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
+>
 > ```html
 > <!-- unpkg -->
 > <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">

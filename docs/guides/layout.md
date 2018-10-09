@@ -10,11 +10,11 @@ Enabling fluid mode will disable fill mode. If both are enabled, fluid mode take
 
 You can enable fluid in a few ways:
 
-- Add `vjs-fluid`, `vjs-16-9`, or `vjs-4-3` as a class to the player element.
-- pass `fluid` option to the player.
-- call `player.fluid(true)`.
-- pass `aspectRatio` option to the player.
-- call `player.aspectRatio('16:9')`.
+* Add `vjs-fluid`, `vjs-16-9`, or `vjs-4-3` as a class to the player element.
+* pass `fluid` option to the player.
+* call `player.fluid(true)`.
+* pass `aspectRatio` option to the player.
+* call `player.aspectRatio('16:9')`.
 
 ### Classes
 
@@ -57,7 +57,6 @@ var player = videojs('vid2');
 // make a square video
 player.aspectRatio('1:1');
 ```
-
 
 ### Disabling fluid mode
 
