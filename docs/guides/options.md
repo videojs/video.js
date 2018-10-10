@@ -6,6 +6,7 @@
 
 * [Standard &lt;video> Element Options](#standard-video-element-options)
   * [autoplay](#autoplay)
+    * [More info on autoplay support and changes:](#more-info-on-autoplay-support-and-changes)
   * [controls](#controls)
   * [height](#height)
   * [loop](#loop)
@@ -29,9 +30,8 @@
   * [notSupportedMessage](#notsupportedmessage)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
-  * [sourceOrder](#sourceorder)
   * [sources](#sources)
-  * [techCanOverridePoster](#techCanOverridePoster)
+  * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
@@ -80,7 +80,8 @@ player.autoplay('muted');
 ```
 
 #### More info on autoplay support and changes:
-* See our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
+
+* See our blog post: <https://blog.videojs.com/autoplay-best-practices-with-video-js/>
 
 ### `controls`
 
@@ -161,7 +162,6 @@ Puts the player in [fluid](#fluid) mode and the value is used when calculating t
 Prevents the player from running the autoSetup for media elements with `data-setup` attribute.
 
 > **Note**: this must be set globally with `videojs.options.autoSetup = false` in the same tick as videojs source is loaded to take effect.
-
 
 ### `children`
 
