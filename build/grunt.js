@@ -1,5 +1,6 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import isDocsOnly from './docs-only.js';
+import sass from 'node-sass';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -137,6 +138,9 @@ module.exports = function(grunt) {
       }
     },
     sass: {
+      options: {
+        implementation: sass
+      },
       build: {
         files: {
           'build/temp/video-js.css': 'src/css/vjs.scss',
