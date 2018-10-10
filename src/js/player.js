@@ -22,7 +22,7 @@ import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign} from './utils/obj';
+import {assign, isObject} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
 import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
@@ -238,6 +238,41 @@ const TECH_EVENTS_QUEUE = {
   canplaythrough: 'CanPlayThrough',
   playing: 'Playing',
   seeked: 'Seeked'
+};
+
+const BREAKPOINT_ORDER = [
+  'tiny',
+  'xsmall',
+  'small',
+  'medium',
+  'large',
+  'xlarge',
+  'huge'
+];
+
+const BREAKPOINT_CLASSES = {};
+
+// grep: vjs-layout-tiny
+// grep: vjs-layout-x-small
+// grep: vjs-layout-small
+// grep: vjs-layout-medium
+// grep: vjs-layout-large
+// grep: vjs-layout-x-large
+// grep: vjs-layout-huge
+BREAKPOINT_ORDER.forEach(k => {
+  const v = k.charAt(0) === 'x' ? `x-${k.substring(1)}` : k;
+
+  BREAKPOINT_CLASSES[k] = `vjs-layout-${v}`;
+});
+
+const DEFAULT_BREAKPOINTS = {
+  tiny: 210,
+  xsmall: 320,
+  small: 425,
+  medium: 768,
+  large: 1440,
+  xlarge: 2560,
+  huge: Infinity
 };
 
 /**
@@ -486,6 +521,8 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
+
+    this.setBreakpoints(this.options_.breakpoints);
 
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
@@ -3676,6 +3713,96 @@ class Player extends Component {
   }
 
   /**
+   * Change layout breakpoint classes when the player resizes.
+   *
+   * @private
+   */
+  updateCurrentBreakpoint_() {
+    if (!this.breakpoints_) {
+      return;
+    }
+
+    const currentBreakpoint = this.currentBreakpoint();
+    const currentWidth = this.currentWidth();
+
+    for (let i = 0; i < BREAKPOINT_ORDER.length; i++) {
+      const candidateBreakpoint = BREAKPOINT_ORDER[i];
+      const maxWidth = this.breakpoints_[candidateBreakpoint];
+
+      if (currentWidth <= maxWidth) {
+
+        // The current breakpoint did not change, nothing to do.
+        if (currentBreakpoint === candidateBreakpoint) {
+          return;
+        }
+
+        // Only remove a class if there is a current breakpoint.
+        if (currentBreakpoint) {
+          this.removeClass(BREAKPOINT_CLASSES[currentBreakpoint]);
+        }
+
+        this.addClass(BREAKPOINT_CLASSES[candidateBreakpoint]);
+        this.breakpoint_ = candidateBreakpoint;
+        break;
+      }
+    }
+  }
+
+  /**
+   * Set layout breakpoints on the player.
+   *
+   * @param {boolean|Object} breakpoints
+   *        A boolean indicating whether breakpoints should or should not be
+   *        used - or an object describing custom max widths for the supported
+   *        breakpoints.
+   */
+  setBreakpoints(breakpoints) {
+    const hadBps = Boolean(this.breakpoints_);
+
+    if (!breakpoints) {
+      this.breakpoint_ = null;
+      this.breakpoints_ = null;
+      this.off('playerresize', this.updateCurrentBreakpoint_);
+      return;
+    }
+
+    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS);
+
+    if (isObject(breakpoints)) {
+      assign(this.breakpoints_, breakpoints);
+    }
+
+    this.updateCurrentBreakpoint_();
+
+    // If we were not previously supporting breakpoints, add a listener.
+    if (!hadBps) {
+      this.on('playerresize', this.updateCurrentBreakpoint_);
+    }
+  }
+
+  /**
+   * Get current layout breakpoints for the player.
+   *
+   * @return {Object}
+   *         An object describing the current layout breakpoints and their
+   *         max widths.
+   */
+  getBreakpoints() {
+    return this.breakpoints_ && assign(this.breakpoints_);
+  }
+
+  /**
+   * Get current layout breakpoint name, if any.
+   *
+   * @return {string|null}
+   *         If there is currently a layout breakpoint set, returns a the key
+   *         from the breakpoints object matching it. Otherwise, returns `null`.
+   */
+  currentBreakpoint() {
+    return this.breakpoint_;
+  }
+
+  /**
    * Gets tag settings
    *
    * @param {Element} tag
@@ -3874,7 +4001,9 @@ Player.prototype.options_ = {
   languages: {},
 
   // Default message to show when a video cannot be played.
-  notSupportedMessage: 'No compatible source was found for this media.'
+  notSupportedMessage: 'No compatible source was found for this media.',
+
+  breakpoints: false
 };
 
 [
