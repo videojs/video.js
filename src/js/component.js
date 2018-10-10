@@ -960,8 +960,9 @@ class Component {
   }
 
   /**
-   * Get the width or the height of the `Component` elements computed style. Uses
-   * `window.getComputedStyle`.
+   * Get the computed width or the height of the component's element.
+   *
+   * Uses `window.getComputedStyle`.
    *
    * @param {string} widthOrHeight
    *        A string containing 'width' or 'height'. Whichever one you want to get.
@@ -1012,11 +1013,13 @@ class Component {
    */
 
   /**
-   * Get an object that contains width and height values of the `Component`s
-   * computed style.
+   * Get an object that contains computed width and height values of the
+   * component's element.
+   *
+   * Uses `window.getComputedStyle`.
    *
    * @return {Component~DimensionObject}
-   *         The dimensions of the components element
+   *         The computed dimensions of the component's element.
    */
   currentDimensions() {
     return {
@@ -1026,20 +1029,24 @@ class Component {
   }
 
   /**
-   * Get the width of the `Component`s computed style. Uses `window.getComputedStyle`.
+   * Get the computed width of the component's element.
    *
-   * @return {number} width
-   *           The width of the `Component`s computed style.
+   * Uses `window.getComputedStyle`.
+   *
+   * @return {number}
+   *         The computed width of the component's element.
    */
   currentWidth() {
     return this.currentDimension('width');
   }
 
   /**
-   * Get the height of the `Component`s computed style. Uses `window.getComputedStyle`.
+   * Get the computed height of the component's element.
    *
-   * @return {number} height
-   *           The height of the `Component`s computed style.
+   * Uses `window.getComputedStyle`.
+   *
+   * @return {number}
+   *         The computed height of the component's element.
    */
   currentHeight() {
     return this.currentDimension('height');

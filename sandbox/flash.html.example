@@ -26,7 +26,7 @@
     <pre>open http://localhost:9999/sandbox/flash.html</pre>
   </div>
 
-  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
+  <video id="vid1" class="video-js" controls preload="auto" width="640" height="264"
       poster="http://vjs.zencdn.net/v/oceans.png"
       data-setup=''>
     <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
