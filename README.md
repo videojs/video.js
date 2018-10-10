@@ -40,11 +40,15 @@ In older versions of Video.js (6 and earlier), in the `vjs.zencdn.net` CDN-hoste
 Alternatively, you can include Video.js by getting it from [npm](http://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
 
 ```html
-<!-- unpkg : use the latest version if video.js (or use a different syntax of URL for a specific version) -->
+<!-- unpkg : use the latest version of Video.js -->
 <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
 <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
 
-<!-- cdnjs : change the version numbers as necessary -->
+<!-- unpkg : use a specific version of Video.js (change the version numbers as necessary) -->
+<link href="https://unpkg.com/video.js@6.11.0/dist/video-js.min.css" rel="stylesheet">
+<script src="https://unpkg.com/video.js@6.11.0/dist/video.min.js"></script>
+
+<!-- cdnjs : use a specific version of Video.js (change the version numbers as necessary) -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video-js.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video.min.js"></script>
 ```
