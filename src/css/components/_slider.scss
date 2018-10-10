@@ -13,13 +13,8 @@
   cursor: default;
 }
 
-.video-js .vjs-slider {
-  &:focus {
-    text-shadow: 0em 0em 1em rgba($primary-foreground-color, 1);
-  
-    @include box-shadow(0 0 1em $primary-foreground-color);
-  }
-  &:focus:not(:focus-visible) {
-    outline: none;
-  }
+.video-js .vjs-slider:focus {
+  text-shadow: 0em 0em 1em rgba($primary-foreground-color, 1);
+
+  @include box-shadow(0 0 1em $primary-foreground-color);
 }

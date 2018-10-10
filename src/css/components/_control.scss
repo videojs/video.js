@@ -25,10 +25,6 @@
   text-shadow: 0em 0em 1em rgba($primary-foreground-color, 1);
 }
 
-.video-js .vjs-control:focus:not(:focus-visible) {
-  outline: none;
-}
-
 // Hide control text visually, but have it available for screenreaders
 .video-js .vjs-control-text {
   @include hide-visually;

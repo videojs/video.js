@@ -98,14 +98,8 @@
   color: #2B333F;
   cursor: pointer;
   border-radius: 2px;
-  &:focus:not(:focus-visible) {
-    outline: none;
-  }
 }
 
 .vjs-track-settings-controls .vjs-default-button {
   margin-right: 1em;
-  &:focus:not(:focus-visible) {
-    outline: none;
-  }
 }
