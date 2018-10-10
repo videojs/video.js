@@ -52,3 +52,7 @@
   border: none;
   visibility: hidden;
 }
+
+.video-js *:focus:not(:focus-visible) {
+  outline: none;
+}
