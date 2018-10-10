@@ -124,6 +124,7 @@
     "markdown-table": "^1.0.0",
     "maxmin": "^2.1.0",
     "minimist": "^1.2.0",
+    "node-sass": "^4.9.3",
     "npm-run-all": "^4.1.2",
     "postcss-cli": "^6.0.0",
     "proxyquireify": "^3.0.0",
