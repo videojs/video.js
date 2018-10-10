@@ -29,12 +29,12 @@
 // - Play button
 // - Progress bar
 // - Volume menu button
-// - Captions Button
+// - Subs-Caps Button
 // - Fullscreen button
 .video-js.vjs-layout-small:not(.vjs-fullscreen) {
   .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
   .vjs-playback-rate,
   .vjs-mute-control, .vjs-volume-control, .vjs-volume-panel,
   .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
-  .vjs-subtitles-button, .vjs-subs-caps-button, .vjs-audio-button { display: none; }
+  .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }

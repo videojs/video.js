@@ -12,7 +12,7 @@
 
 // Video has started playing
 .vjs-has-started .vjs-control-bar {
-  @include display-flex;
+  @include display-flex(flex-start, space-between);
   visibility: visible;
   opacity: 1;
 
