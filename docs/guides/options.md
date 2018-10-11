@@ -165,11 +165,11 @@ Prevents the player from running the autoSetup for media elements with `data-set
 
 ### `breakpoints`
 
-> Type: `boolean|Array`, Default: `false`
+> Type: `Object`
 
-Set layout breakpoints that will configure how class names are toggled on the player to adjust the UI based on the player's dimensions.
+When used with the [`responsive` option](#responsive), sets breakpoints that will configure how class names are toggled on the player to adjust the UI based on the player's dimensions.
 
-By default, no breakpoints are supported, but passing `true` will set some sensible default breakpoints:
+By default, the breakpoints are:
 
 Class Name           | Width Range
 ---------------------|------------
@@ -203,7 +203,7 @@ When the player's size changes, the merged breakpoints will be inspected in the 
 
 That breakpoint's associated class name will be added as a class to the player. The previous breakpoint's class will be removed.
 
-See the file `sandbox/responsive.html.example` for an example of a fluid/responsive player using the default breakpoints.
+See the file `sandbox/responsive.html.example` for an example of a responsive player using the default breakpoints.
 
 ### `children`
 
@@ -302,6 +302,14 @@ player.boo({baz: false});
 Although, since the `plugins` option is an object, the order of initialization is not guaranteed!
 
 See [the plugins guide][plugins] for more information on Video.js plugins.
+
+### `responsive`
+
+> Type: `boolean`, Default: `false`
+
+Setting this option to `true` will cause the player to customize itself based on responsive breakpoints (see: [`breakpoints` option](#breakpoints)).
+
+When this option is `false` (the default), responsive breakpoints will be ignored.
 
 ### `sources`
 
