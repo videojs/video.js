@@ -522,8 +522,8 @@ class Player extends Component {
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
 
-    this.setBreakpoints(this.options_.breakpoints);
-    this.setResponsive(Boolean(this.options_.responsive));
+    this.breakpoints(this.options_.breakpoints);
+    this.responsive(this.options_.responsive);
 
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
@@ -3719,7 +3719,7 @@ class Player extends Component {
    * @private
    */
   updateCurrentBreakpoint_() {
-    if (!this.isResponsive()) {
+    if (!this.responsive()) {
       return;
     }
 
@@ -3765,99 +3765,94 @@ class Player extends Component {
   }
 
   /**
-   * Set breakpoints on the player.
+   * Get or set breakpoints on the player.
    *
-   * Calling this method will remove any previous custom breakpoints and start
-   * from the defaults again.
+   * Calling this method with an object or `true` will remove any previous
+   * custom breakpoints and start from the defaults again.
    *
-   * @param {Object} [breakpoints]
-   *        An object describing custom breakpoints. Leave this option off to
-   *        set default breakpoints.
+   * @param  {Object|boolean} [breakpoints]
+   *         If an object is given, it can be used to provide custom
+   *         breakpoints. If `true` is given, will set default breakpoints.
+   *         If this argument is not given, will simply return the current
+   *         breakpoints.
    *
-   * @param {number} [breakpoints.tiny]
-   *        The maximum width for the "vjs-layout-tiny" class.
+   * @param  {number} [breakpoints.tiny]
+   *         The maximum width for the "vjs-layout-tiny" class.
    *
-   * @param {number} [breakpoints.xsmall]
-   *        The maximum width for the "vjs-layout-x-small" class.
+   * @param  {number} [breakpoints.xsmall]
+   *         The maximum width for the "vjs-layout-x-small" class.
    *
-   * @param {number} [breakpoints.small]
-   *        The maximum width for the "vjs-layout-small" class.
+   * @param  {number} [breakpoints.small]
+   *         The maximum width for the "vjs-layout-small" class.
    *
-   * @param {number} [breakpoints.medium]
-   *        The maximum width for the "vjs-layout-medium" class.
+   * @param  {number} [breakpoints.medium]
+   *         The maximum width for the "vjs-layout-medium" class.
    *
-   * @param {number} [breakpoints.large]
-   *        The maximum width for the "vjs-layout-large" class.
+   * @param  {number} [breakpoints.large]
+   *         The maximum width for the "vjs-layout-large" class.
    *
-   * @param {number} [breakpoints.xlarge]
-   *        The maximum width for the "vjs-layout-x-large" class.
+   * @param  {number} [breakpoints.xlarge]
+   *         The maximum width for the "vjs-layout-x-large" class.
    *
-   * @param {number} [breakpoints.huge]
-   *        The maximum width for the "vjs-layout-huge" class.
+   * @param  {number} [breakpoints.huge]
+   *         The maximum width for the "vjs-layout-huge" class.
+   *
+   * @return {Object}
+   *         An object mapping breakpoint names to maximum width values.
    */
-  setBreakpoints(breakpoints = {}) {
-    this.breakpoint_ = '';
-    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+  breakpoints(breakpoints) {
+    if (breakpoints !== undefined) {
+      this.breakpoint_ = '';
+      this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
 
-    // When breakpoint definitions change, we need to update the currently
-    // selected breakpoint.
-    this.updateCurrentBreakpoint_();
+      // When breakpoint definitions change, we need to update the currently
+      // selected breakpoint.
+      this.updateCurrentBreakpoint_();
+    }
+
+    // Clone the breakpoints before returning.
+    return assign(this.breakpoints_);
   }
 
   /**
-   * Set a flag indicating whether or not this player should adjust its UI
-   * based on its dimensions.
+   * Get or set a flag indicating whether or not this player should adjust
+   * its UI based on its dimensions.
    *
    * @param  {boolean} value
    *         Should be `true` if the player should adjust its UI based on its
    *         dimensions; otherwise, should be `false`.
-   */
-  setResponsive(value) {
-    value = Boolean(value);
-    const current = this.responsive_;
-
-    // Nothing changed.
-    if (value === current) {
-      return;
-    }
-
-    // The value actually changed, set it.
-    this.responsive_ = value;
-
-    // Start listening for breakpoints and set the initial breakpoint if the
-    // player is now responsive.
-    if (value) {
-      this.on('playerresize', this.updateCurrentBreakpoint_);
-      this.updateCurrentBreakpoint_();
-
-    // Stop listening for breakpoints if the player is no longer responsive.
-    } else {
-      this.off('playerresize', this.updateCurrentBreakpoint_);
-      this.removeCurrentBreakpoint_();
-    }
-  }
-
-  /**
-   * Get a value indicating whether or not this player should adjust its UI
-   * based on its dimensions.
    *
    * @return {boolean}
-   *         Will be `true` if the player should adjust its UI based on its
+   *         Will be `true` if this player should adjust its UI based on its
    *         dimensions; otherwise, will be `false`.
    */
-  isResponsive() {
-    return this.responsive_;
-  }
+  responsive(value) {
+    if (value !== undefined) {
+      value = Boolean(value);
+      const current = this.responsive_;
 
-  /**
-   * Get current breakpoints for the player.
-   *
-   * @return {Object}
-   *         An object describing the current breakpoints and their
-   *         max widths.
-   */
-  getBreakpoints() {
-    return this.breakpoints_ && assign(this.breakpoints_);
+      // Nothing changed.
+      if (value === current) {
+        return;
+      }
+
+      // The value actually changed, set it.
+      this.responsive_ = value;
+
+      // Start listening for breakpoints and set the initial breakpoint if the
+      // player is now responsive.
+      if (value) {
+        this.on('playerresize', this.updateCurrentBreakpoint_);
+        this.updateCurrentBreakpoint_();
+
+      // Stop listening for breakpoints if the player is no longer responsive.
+      } else {
+        this.off('playerresize', this.updateCurrentBreakpoint_);
+        this.removeCurrentBreakpoint_();
+      }
+    }
+
+    return this.responsive_;
   }
 
   /**
@@ -3872,20 +3867,6 @@ class Player extends Component {
   }
 
   /**
-   * Gets the class name of a breakpoint by its name.
-   *
-   * @param  {string} name
-   *         The name of a breakpoint (e.g. `"tiny"` or `"large"`).
-   *
-   * @return {string}
-   *         The matching class name (e.g. `"vjs-layout-tiny"` or
-   *         `"vjs-layout-large"`). Empty string if not found.
-   */
-  getBreakpointClass(name) {
-    return BREAKPOINT_CLASSES[name] || '';
-  }
-
-  /**
    * Get the current breakpoint class name.
    *
    * @return {string}
@@ -3894,7 +3875,7 @@ class Player extends Component {
    *         there is no current breakpoint.
    */
   currentBreakpointClass() {
-    return this.getBreakpointClass(this.breakpoint_);
+    return BREAKPOINT_CLASSES[this.breakpoint_] || '';
   }
 
   /**
@@ -4098,7 +4079,8 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.',
 
-  breakpoints: false
+  breakpoints: {},
+  responsive: false
 };
 
 [
