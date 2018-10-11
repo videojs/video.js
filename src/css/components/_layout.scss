@@ -96,6 +96,9 @@
   left: 0;
   width: 100%;
   height: 100%;
+  &[tabindex="-1"] {
+    outline: none;
+  }
 }
 
 // Fullscreen Styles
