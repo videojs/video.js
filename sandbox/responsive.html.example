@@ -132,7 +132,7 @@
 
   <script>
     var vid = document.querySelector('video-js');
-    var player = videojs(vid, {breakpoints: true});
+    var player = videojs(vid, {responsive: true});
     var tbody = document.querySelector('table tbody');
 
     player.on('playerresize', function() {

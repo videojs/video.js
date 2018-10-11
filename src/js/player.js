@@ -22,7 +22,7 @@ import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign, isObject} from './utils/obj';
+import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
 import {silencePromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
@@ -523,6 +523,7 @@ class Player extends Component {
     this.on('stageclick', this.handleStageClick_);
 
     this.setBreakpoints(this.options_.breakpoints);
+    this.setResponsive(Boolean(this.options_.responsive));
 
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
@@ -3713,12 +3714,12 @@ class Player extends Component {
   }
 
   /**
-   * Change layout breakpoint classes when the player resizes.
+   * Change breakpoint classes when the player resizes.
    *
    * @private
    */
   updateCurrentBreakpoint_() {
-    if (!this.breakpoints_) {
+    if (!this.isResponsive()) {
       return;
     }
 
@@ -3749,42 +3750,110 @@ class Player extends Component {
   }
 
   /**
-   * Set layout breakpoints on the player.
+   * Removes the current breakpoint.
    *
-   * @param {boolean|Object} breakpoints
-   *        A boolean indicating whether breakpoints should or should not be
-   *        used - or an object describing custom max widths for the supported
-   *        breakpoints.
+   * @private
    */
-  setBreakpoints(breakpoints) {
-    const hadBps = Boolean(this.breakpoints_);
+  removeCurrentBreakpoint_() {
+    const className = this.currentBreakpointClass();
 
-    if (!breakpoints) {
-      this.breakpoint_ = null;
-      this.breakpoints_ = null;
-      this.off('playerresize', this.updateCurrentBreakpoint_);
-      return;
-    }
+    this.breakpoint_ = '';
 
-    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS);
-
-    if (isObject(breakpoints)) {
-      assign(this.breakpoints_, breakpoints);
-    }
-
-    this.updateCurrentBreakpoint_();
-
-    // If we were not previously supporting breakpoints, add a listener.
-    if (!hadBps) {
-      this.on('playerresize', this.updateCurrentBreakpoint_);
+    if (className) {
+      this.removeClass(className);
     }
   }
 
   /**
-   * Get current layout breakpoints for the player.
+   * Set breakpoints on the player.
+   *
+   * Calling this method will remove any previous custom breakpoints and start
+   * from the defaults again.
+   *
+   * @param {Object} [breakpoints]
+   *        An object describing custom breakpoints. Leave this option off to
+   *        set default breakpoints.
+   *
+   * @param {number} [breakpoints.tiny]
+   *        The maximum width for the "vjs-layout-tiny" class.
+   *
+   * @param {number} [breakpoints.xsmall]
+   *        The maximum width for the "vjs-layout-x-small" class.
+   *
+   * @param {number} [breakpoints.small]
+   *        The maximum width for the "vjs-layout-small" class.
+   *
+   * @param {number} [breakpoints.medium]
+   *        The maximum width for the "vjs-layout-medium" class.
+   *
+   * @param {number} [breakpoints.large]
+   *        The maximum width for the "vjs-layout-large" class.
+   *
+   * @param {number} [breakpoints.xlarge]
+   *        The maximum width for the "vjs-layout-x-large" class.
+   *
+   * @param {number} [breakpoints.huge]
+   *        The maximum width for the "vjs-layout-huge" class.
+   */
+  setBreakpoints(breakpoints = {}) {
+    this.breakpoint_ = '';
+    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+
+    // When breakpoint definitions change, we need to update the currently
+    // selected breakpoint.
+    this.updateCurrentBreakpoint_();
+  }
+
+  /**
+   * Set a flag indicating whether or not this player should adjust its UI
+   * based on its dimensions.
+   *
+   * @param  {boolean} value
+   *         Should be `true` if the player should adjust its UI based on its
+   *         dimensions; otherwise, should be `false`.
+   */
+  setResponsive(value) {
+    value = Boolean(value);
+    const current = this.responsive_;
+
+    // Nothing changed.
+    if (value === current) {
+      return;
+    }
+
+    // The value actually changed, set it.
+    this.responsive_ = value;
+
+    // Start listening for breakpoints and set the initial breakpoint if the
+    // player is now responsive.
+    if (value) {
+      this.on('playerresize', this.updateCurrentBreakpoint_);
+      this.updateCurrentBreakpoint_();
+
+    // Stop listening for breakpoints if the player is no longer responsive.
+    } else {
+      this.off('playerresize', this.updateCurrentBreakpoint_);
+      this.removeCurrentBreakpoint_();
+    }
+  }
+
+  /**
+   * Get a value indicating whether or not this player should adjust its UI
+   * based on its dimensions.
+   *
+   * @return {boolean}
+   *         Will be `true` if the player should adjust its UI based on its
+   *         dimensions; otherwise, will be `false`.
+   */
+  isResponsive() {
+    return this.responsive_;
+  }
+
+  /**
+   * Get current breakpoints for the player.
    *
    * @return {Object}
-   *         An object describing the current layout breakpoints and their
+   *         An object describing the current breakpoints and their
    *         max widths.
    */
   getBreakpoints() {
@@ -3792,14 +3861,40 @@ class Player extends Component {
   }
 
   /**
-   * Get current layout breakpoint name, if any.
+   * Get current breakpoint name, if any.
    *
-   * @return {string|null}
-   *         If there is currently a layout breakpoint set, returns a the key
-   *         from the breakpoints object matching it. Otherwise, returns `null`.
+   * @return {string}
+   *         If there is currently a breakpoint set, returns a the key from the
+   *         breakpoints object matching it. Otherwise, returns an empty string.
    */
   currentBreakpoint() {
     return this.breakpoint_;
+  }
+
+  /**
+   * Gets the class name of a breakpoint by its name.
+   *
+   * @param  {string} name
+   *         The name of a breakpoint (e.g. `"tiny"` or `"large"`).
+   *
+   * @return {string}
+   *         The matching class name (e.g. `"vjs-layout-tiny"` or
+   *         `"vjs-layout-large"`). Empty string if not found.
+   */
+  getBreakpointClass(name) {
+    return BREAKPOINT_CLASSES[name] || '';
+  }
+
+  /**
+   * Get the current breakpoint class name.
+   *
+   * @return {string}
+   *         The matching class name (e.g. `"vjs-layout-tiny"` or
+   *         `"vjs-layout-large"`) for the current breakpoint. Empty string if
+   *         there is no current breakpoint.
+   */
+  currentBreakpointClass() {
+    return this.getBreakpointClass(this.breakpoint_);
   }
 
   /**
