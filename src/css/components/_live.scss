@@ -12,3 +12,18 @@
   width: auto;
   text-align: left;
 }
+
+.vjs-live-circle {
+  border-radius: 50%;
+  width: 1.25em;
+  height: 1.25em;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 0.3em;
+  margin-left: 0.3em;
+  background: radial-gradient(#808080, #666666);
+}
+
+.video-js .vjs-live-control.vjs-control.vjs-at-live-edge .vjs-live-circle {
+  background: radial-gradient(#ff0000, #990000);
+}
