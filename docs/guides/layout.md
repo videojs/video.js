@@ -108,7 +108,7 @@ player.fill(false);
 
 Responsive mode will make the player's UI customize itself based on the size of the player. This is useful if you have embeds of varying sizes - or if you want a fluid/fill player to adjust its UI based on its size.
 
-Responsive mode is independent of fluid mode or fill mode - it only deals with the arrangements of the UI within the player.
+Responsive mode is independent of fluid mode or fill mode - it only deals with the arrangements of the UI within the player, not with the size of the player. However, it is often useful to use responsive mode in conjunction with either fluid mode or fill mode!
 
 ### Class
 
