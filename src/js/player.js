@@ -3801,14 +3801,18 @@ class Player extends Component {
    *         An object mapping breakpoint names to maximum width values.
    */
   breakpoints(breakpoints) {
-    if (breakpoints !== undefined) {
-      this.breakpoint_ = '';
-      this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
 
-      // When breakpoint definitions change, we need to update the currently
-      // selected breakpoint.
-      this.updateCurrentBreakpoint_();
+    // Used as a getter.
+    if (breakpoints === undefined) {
+      return assign(this.breakpoints_);
     }
+
+    this.breakpoint_ = '';
+    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+
+    // When breakpoint definitions change, we need to update the currently
+    // selected breakpoint.
+    this.updateCurrentBreakpoint_();
 
     // Clone the breakpoints before returning.
     return assign(this.breakpoints_);
@@ -3827,32 +3831,36 @@ class Player extends Component {
    *         dimensions; otherwise, will be `false`.
    */
   responsive(value) {
-    if (value !== undefined) {
-      value = Boolean(value);
-      const current = this.responsive_;
 
-      // Nothing changed.
-      if (value === current) {
-        return;
-      }
-
-      // The value actually changed, set it.
-      this.responsive_ = value;
-
-      // Start listening for breakpoints and set the initial breakpoint if the
-      // player is now responsive.
-      if (value) {
-        this.on('playerresize', this.updateCurrentBreakpoint_);
-        this.updateCurrentBreakpoint_();
-
-      // Stop listening for breakpoints if the player is no longer responsive.
-      } else {
-        this.off('playerresize', this.updateCurrentBreakpoint_);
-        this.removeCurrentBreakpoint_();
-      }
+    // Used as a getter.
+    if (value === undefined) {
+      return this.responsive_;
     }
 
-    return this.responsive_;
+    value = Boolean(value);
+    const current = this.responsive_;
+
+    // Nothing changed.
+    if (value === current) {
+      return;
+    }
+
+    // The value actually changed, set it.
+    this.responsive_ = value;
+
+    // Start listening for breakpoints and set the initial breakpoint if the
+    // player is now responsive.
+    if (value) {
+      this.on('playerresize', this.updateCurrentBreakpoint_);
+      this.updateCurrentBreakpoint_();
+
+    // Stop listening for breakpoints if the player is no longer responsive.
+    } else {
+      this.off('playerresize', this.updateCurrentBreakpoint_);
+      this.removeCurrentBreakpoint_();
+    }
+
+    return value;
   }
 
   /**
