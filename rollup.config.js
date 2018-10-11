@@ -49,8 +49,7 @@ const primedBabel = babel({
       loose: true,
       modules: false
     }]
-  ],
-  plugins: ['@babel/plugin-external-helpers']
+  ]
 });
 
 export default cliargs => [
