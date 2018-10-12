@@ -3,8 +3,9 @@
 .video-js .vjs-live-control {
   @include display-flex(flex-start);
   @include flex(auto);
-  font-size: 1em;
-  line-height: 3em;
+  font-size: 1.5em;
+  line-height: 2em;
+  margin-left: 0.3em;
 }
 
 .vjs-no-flex .vjs-live-control {
@@ -15,12 +16,11 @@
 
 .vjs-live-circle {
   border-radius: 50%;
-  width: 1.25em;
-  height: 1.25em;
+  width: 0.75em;
+  height: 0.75em;
   margin-top: auto;
   margin-bottom: auto;
   margin-right: 0.3em;
-  margin-left: 0.3em;
   background: radial-gradient(#808080, #666666);
 }
 
