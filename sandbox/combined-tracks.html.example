@@ -22,7 +22,7 @@
     <pre>open http://localhost:9999/sandbox/index.html</pre>
   </div>
 
-  <video id="vid1" class="video-js vjs-default-skin" lang="en" controls preload="auto" width="640" height="360" poster="//d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
+  <video id="vid1" class="video-js" lang="en" controls preload="auto" width="640" height="360" poster="//d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
     <track kind="captions" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.en.vtt" srclang="en" label="English">

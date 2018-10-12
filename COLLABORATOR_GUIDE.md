@@ -15,10 +15,16 @@
       * [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
 * [video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
-    * [Install contrib](#install-contrib)
     * [npm access](#npm-access)
     * [GitHub personal access token](#github-personal-access-token)
+  * [Deciding what type of version release](#deciding-what-type-of-version-release)
   * [Doing a release](#doing-a-release)
+    * [Video.js 6](#videojs-6)
+    * [Video.js 5](#videojs-5)
+      * [Edit git-semver-tags](#edit-git-semver-tags)
+    * [And now for the release](#and-now-for-the-release)
+  * [Deploy as a patch to the CDN](#deploy-as-a-patch-to-the-cdn)
+  * [Announcement](#announcement)
 * [Doc credit](#doc-credit)
 
 ## Issues and Pull Requests
@@ -35,18 +41,17 @@ If issues or PRs are very short and don't contain much information, ask for more
 
 There are labels that are useful to include on issues and PRs. A few of them are defined below:
 
-| Label | Issue or PR | Description |
-|-------|-------------|-------------|
-| confirmed | Issue and PR | Issue: marks as reproducible. PR: marks as ready to be merged|
-| 5.x | PR | Marks as a change to the 5.x branch only |
-| bug | Issue | Marks as a confirmed bug |
-| good first issue | Issue | Marks as a good bug or enhancement for first time contributors to Video.js |
-| first-timers-only | Issue | Marks as a good bug or enhancement to be done by a newcomer to open source |
-| minor, patch, major | PR | Marks PR with the expected semver classification of the change |
-| needs: LGTM | PR | Marks PR to be reviewed by a collaborator |
-| needs: more info | Issue | Marks as needing more information from the issue reporter |
-| needs: reduced test case | Issue | Marks as needing a reduced test case from the issue reporter |
-
+| Label                    | Issue or PR  | Description                                                                |
+| ------------------------ | ------------ | -------------------------------------------------------------------------- |
+| confirmed                | Issue and PR | Issue: marks as reproducible. PR: marks as ready to be merged              |
+| 5.x                      | PR           | Marks as a change to the 5.x branch only                                   |
+| bug                      | Issue        | Marks as a confirmed bug                                                   |
+| good first issue         | Issue        | Marks as a good bug or enhancement for first time contributors to Video.js |
+| first-timers-only        | Issue        | Marks as a good bug or enhancement to be done by a newcomer to open source |
+| minor, patch, major      | PR           | Marks PR with the expected semver classification of the change             |
+| needs: LGTM              | PR           | Marks PR to be reviewed by a collaborator                                  |
+| needs: more info         | Issue        | Marks as needing more information from the issue reporter                  |
+| needs: reduced test case | Issue        | Marks as needing a reduced test case from the issue reporter               |
 
 ## Accepting changes
 
@@ -382,12 +387,14 @@ git checkout 5.x
 git pull origin 5.x
 ```
 
-> *Note:* you probably need to delete v6 tags due to the way that the our CHANGELOG lib works.
+> _Note:_ you probably need to delete v6 tags due to the way that the our CHANGELOG lib works.
 >
 > You can run this to delete them:
+>
 > ```sh
 > git tag | grep '^v6' | xargs git tag -d
 > ```
+>
 > This will find all tags that start with `^v6` and delete them.
 
 At this point, you should run `npm install` because dependencies may have changed.
@@ -398,6 +405,7 @@ Then, we have a script that automates most of the steps for publishing. It's a l
 
 You'll need to edit `git-semver-tags` to support our usage of tags that are not part of the branch.
 In the file `node_modules/conventional-changelog-cli/node_modules/conventional-changelog/node_modules/conventional-changelog-core/node_modules/git-semver-tags/index.js`, edit the line that says sets the `cmd` to be:
+
 ```js
 var cmd = 'git log --all --date-order --decorate --no-color';
 ```
@@ -432,7 +440,7 @@ and then pasted into the correct [GitHub release](https://github.com/videojs/vid
 
 ### Deploy as a patch to the CDN
 
-Follow the steps on the [CDN repo][] for the CDN release process.
+Follow the steps on the [CDN repo][cdn repo] for the CDN release process.
 If it's a `next` or `next-5` release, only publish the patch version to the CDN.
 
 When the version gets promoted to `latest` or `latest-5`, the corresponding `minor` or `latest` version should be published to the CDN.
@@ -461,6 +469,6 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 
 [slack]: http://slack.videojs.com
 
-[CDN repo]: https://github.com/videojs/cdn
+[cdn repo]: https://github.com/videojs/cdn
 
 [raw chg]: https://raw.githubusercontent.com/videojs/video.js/5.x/CHANGELOG.md

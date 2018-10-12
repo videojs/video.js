@@ -45,12 +45,11 @@ const primedBabel = babel({
   exclude: 'node_modules/**(!http-streaming)',
   compact: false,
   presets: [
-    ['es2015', {
+    ['@babel/preset-env', {
       loose: true,
       modules: false
     }]
-  ],
-  plugins: ['external-helpers']
+  ]
 });
 
 export default cliargs => [
