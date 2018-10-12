@@ -68,7 +68,7 @@ class LiveDisplay extends ClickableComponent {
 
     // we are "live" if the live current time and the current time are within half a second
     // of each other
-    if (liveCurrentTime === Infinity || (liveCurrentTime - currentTime) <= 0.5) {
+    if (liveCurrentTime === Infinity || (liveCurrentTime - currentTime) < 0.5) {
       return true;
     }
 
@@ -135,21 +135,27 @@ class LiveDisplay extends ClickableComponent {
       return;
     }
 
-    this.trackingInterval_ = this.setInterval(() => {
+    const trackingFunction = () => {
       const seekable = this.player().seekable();
       const seekEnd = seekable && seekable.length && seekable.end(0);
 
+      // if seek end just changed, set live current time to
+      // seek end so that it is more accurate
       if (this.lastSeekEnd_ !== seekEnd) {
         this.liveCurrentTime_ = seekEnd;
+        this.lastSeekEnd_ = seekEnd;
         this.trigger('live-seekable-change');
+      } else {
+        this.liveCurrentTime_ += 0.25;
       }
 
-      this.lastSeekEnd_ = seekEnd;
-      this.liveCurrentTime_ += 0.25;
       this.updateLiveStatus();
-    }, 250);
+    };
 
-    this.liveCurrentTime_ = this.player().currentTime();
+    this.trackingInterval_ = this.setInterval(trackingFunction, 250);
+
+    // initial run
+    trackingFunction();
   }
 
   /**
@@ -165,7 +171,7 @@ class LiveDisplay extends ClickableComponent {
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
-    this.liveCurrentTime_ = 0;
+    this.liveCurrentTime_ = null;
     this.lastSeekEnd_ = null;
   }
 
