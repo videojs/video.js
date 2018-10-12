@@ -93,7 +93,7 @@
     "grunt-contrib-connect": "~2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "~3.0.0",
-    "grunt-contrib-watch": "~1.1.0",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-coveralls": "^1.0.0",
     "grunt-karma": "^3.0.0",
     "grunt-sass": "^3.0.2",
