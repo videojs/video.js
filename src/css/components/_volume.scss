@@ -52,6 +52,9 @@
     opacity: 1;
     position: relative;
 
+    &.vjs-volume-vertical {
+      left: -3.5em;
+    }
     $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
     @include transition($transition-property);
   }
@@ -75,7 +78,7 @@
 .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
   height: 8em;
   width: 3em;
-  left: -3.5em;
+  left: -3000em;
 
   $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s 1s, left 1s 1s, top 1s 1s;
   @include transition($transition-property)
