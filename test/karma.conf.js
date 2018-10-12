@@ -40,7 +40,16 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       plugin: ['proxyquireify/plugin'],
-      transform: ['babelify']
+      transform: [['babelify', {
+        "presets": [
+          [
+            "@babel/preset-env",
+            {
+              "loose": true
+            }
+          ]
+        ]
+      }]]
     },
 
     plugins: [
