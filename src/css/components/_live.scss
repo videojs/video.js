@@ -3,8 +3,8 @@
 .video-js .vjs-live-control {
   @include display-flex(flex-start);
   @include flex(auto);
-  font-size: 1.5em;
-  line-height: 2em;
+  font-size: 1em;
+  line-height: 3em;
   margin-left: 0.3em;
 }
 
