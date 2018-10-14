@@ -51,8 +51,9 @@
     visibility: visible;
     opacity: 1;
     position: relative;
+    transform: scale(1) translate(0, 0) !important;
 
-    $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
+    $transition-property: transform 0.1s, visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
     @include transition($transition-property);
   }
 
@@ -76,8 +77,12 @@
   height: 8em;
   width: 3em;
   left: -3.5em;
+  
+  &.vjs-volume-vertical {
+      transform: scale(0) translate(0, 100%);
+    }
 
-  $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s 1s, left 1s 1s, top 1s 1s;
+  $transition-property: transform 0.1s, visibility 1s, opacity 1s, height 1s 1s, width 1s 1s, left 1s 1s, top 1s 1s;
   @include transition($transition-property)
 }
 .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
