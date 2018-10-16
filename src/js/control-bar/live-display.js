@@ -1,7 +1,7 @@
 /**
  * @file live-display.js
  */
-import ClickableComponent from '../clickable-component';
+import Button from '../button';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
@@ -10,7 +10,7 @@ import * as Dom from '../utils/dom.js';
  *
  * @extends Component
  */
-class LiveDisplay extends ClickableComponent {
+class LiveDisplay extends Button {
 
   /**
    * Creates an instance of this class.
@@ -35,7 +35,7 @@ class LiveDisplay extends ClickableComponent {
    *         The element that was created.
    */
   createEl() {
-    const el = super.createEl('div', {
+    const el = super.createEl('button', {
       className: 'vjs-live-control vjs-control'
     });
 
