@@ -1,17 +1,9 @@
-// We are assuming there is no progress bar and using the live display
-// to fill in the middle space. Live+DVR will need to adjust this.
 .video-js .vjs-live-control {
-  @include display-flex(flex-start);
-  @include flex(auto);
-  font-size: 1em;
-  line-height: 3em;
+  cursor: pointer;
+  @include flex(none);
+  display: inline-flex;
+  height: 100%;
   margin-left: 0.3em;
-}
-
-.vjs-no-flex .vjs-live-control {
-  display: table-cell;
-  width: auto;
-  text-align: left;
 }
 
 .vjs-live-circle {

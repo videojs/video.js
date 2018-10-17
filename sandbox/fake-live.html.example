@@ -23,11 +23,12 @@
     // fake a livestream for easy testing
     var vid = document.getElementById('vid1');
     var player = videojs(vid, {muted: true, loop: true});
-    var segmentLength = 6;
+    var segmentLength = 2;
 
-    window.currentLiveTimeRange = videojs.createTimeRanges(0, 0);
+    window.currentLiveTimeRange = videojs.createTimeRanges(0, segmentLength);
 
     player.ready(function() {
+      player.currentTime(segmentLength);
       player.tech_.duration = function() {return Infinity;};
       player.tech_.trigger('durationchange');
       player.tech_.seekable = function() {return window.currentLiveTimeRange;};

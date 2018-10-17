@@ -62,8 +62,26 @@ class MouseTimeDisplay extends Component {
     }
 
     this.rafId_ = this.requestAnimationFrame(() => {
-      const duration = this.player_.duration();
-      const content = formatTime(seekBarPoint * duration, duration);
+      let content;
+
+      if (this.player_.duration() === Infinity) {
+        const seekEnd = this.player_.seekable().end(0);
+        const timeBehindLive = seekEnd - (seekBarPoint * seekEnd);
+
+        content = formatTime(timeBehindLive, seekEnd);
+
+        // the live tooltip shows the time as a number
+        // indicating the time from the live point. Everything but
+        // 0 will be negative
+        if (timeBehindLive !== 0) {
+          content = `-${content}`;
+        }
+      } else {
+        // the normal time tooltip shows the time that will be seeked to
+        const duration = this.player_.duration();
+
+        content = formatTime(seekBarPoint * duration, duration);
+      }
 
       this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
       this.getChild('timeTooltip').update(seekBarRect, seekBarPoint, content);

@@ -51,6 +51,7 @@ class SeekBar extends Slider {
 
     this.on(this.player_, 'timeupdate', this.update);
     this.on(this.player_, 'ended', this.handleEnded);
+    this.on(this.player_, 'durationchange', this.update);
 
     // when playing, let's ensure we smoothly update the play progress bar
     // via an interval
@@ -67,6 +68,10 @@ class SeekBar extends Slider {
     });
 
     this.on(this.player_, ['ended', 'pause', 'waiting'], () => {
+      if (this.isLive()) {
+        return;
+      }
+
       this.clearInterval(this.updateInterval);
     });
 
@@ -100,7 +105,11 @@ class SeekBar extends Slider {
    * @private
    */
   update_(currentTime, percent) {
-    const duration = this.player_.duration();
+    let duration = this.player_.duration();
+
+    if (this.isLive()) {
+      duration = this.player_.seekable().end(0);
+    }
 
     // machine readable value of progress bar (percentage complete)
     this.el_.setAttribute('aria-valuenow', (percent * 100).toFixed(2));
@@ -173,9 +182,27 @@ class SeekBar extends Slider {
    *         The percentage of media played so far (0 to 1).
    */
   getPercent() {
-    const percent = this.getCurrentTime_() / this.player_.duration();
+    const currentTime = this.getCurrentTime_();
+    const seekable = this.player_.seekable();
+    let percent;
+
+    if (!this.isLive() || !seekable || !seekable.length) {
+      percent = currentTime / this.player_.duration();
+    } else {
+      percent = (currentTime - seekable.start(0)) / this.liveTimeWindow();
+    }
 
     return percent >= 1 ? 1 : (percent || 0);
+  }
+
+  liveTimeWindow() {
+    const seekable = this.player_.seekable();
+
+    if (!seekable || !seekable.length) {
+      return 0;
+    }
+
+    return seekable.end(0) - seekable.start(0);
   }
 
   /**
@@ -201,6 +228,10 @@ class SeekBar extends Slider {
     super.handleMouseDown(event);
   }
 
+  isLive() {
+    return this.player_.duration() === Infinity;
+  }
+
   /**
    * Handle mouse move on seek bar
    *
@@ -213,12 +244,34 @@ class SeekBar extends Slider {
     if (!Dom.isSingleLeftClick(event)) {
       return;
     }
+    const distance = this.calculateDistance(event);
+    let newTime;
+    const seekable = this.player_.seekable();
 
-    let newTime = this.calculateDistance(event) * this.player_.duration();
+    if (!this.isLive() || !seekable || !seekable.length) {
+      newTime = distance * this.player_.duration();
 
-    // Don't let video end while scrubbing.
-    if (newTime === this.player_.duration()) {
-      newTime = newTime - 0.1;
+      // Don't let video end while scrubbing.
+      if (newTime === this.player_.duration()) {
+        newTime = newTime - 0.1;
+      }
+    } else {
+      newTime = seekable.start(0) + (distance * this.liveTimeWindow());
+
+      if (newTime === Infinity) {
+        return;
+      }
+
+      // Don't let video end while scrubbing.
+      if (newTime >= seekable.end(0)) {
+        newTime = seekable.end(0) - 0.1;
+      }
+
+      // Compensate for precision differences so that currentTime is not less
+      // than seekable start
+      if (newTime <= seekable.start(0)) {
+        newTime = seekable.start(0) + 0.1;
+      }
     }
 
     // Set new time (tell player to seek to new time)

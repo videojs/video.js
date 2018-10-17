@@ -47,16 +47,34 @@ class PlayProgressBar extends Component {
     }
 
     this.rafId_ = this.requestAnimationFrame(() => {
-      const time = (this.player_.scrubbing()) ?
-        this.player_.getCache().currentTime :
-        this.player_.currentTime();
-
-      const content = formatTime(time, this.player_.duration());
       const timeTooltip = this.getChild('timeTooltip');
 
-      if (timeTooltip) {
-        timeTooltip.update(seekBarRect, seekBarPoint, content);
+      if (!timeTooltip) {
+        return;
       }
+      let content;
+
+      if (this.player_.duration() === Infinity) {
+        const seekEnd = this.player_.seekable().end(0);
+        const timeBehindLive = seekEnd - (seekBarPoint * seekEnd);
+
+        // the live tooltip shows the time as a negative number
+        // indicating the time from the live point.
+        content = formatTime(timeBehindLive, seekEnd);
+
+        if (timeBehindLive !== 0) {
+          content = `-${content}`;
+        }
+      } else {
+
+        const time = (this.player_.scrubbing()) ?
+          this.player_.getCache().currentTime :
+          this.player_.currentTime();
+
+        content = formatTime(time, this.player_.duration());
+      }
+
+      timeTooltip.update(seekBarRect, seekBarPoint, content);
     });
   }
 }

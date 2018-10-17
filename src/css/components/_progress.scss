@@ -13,10 +13,6 @@
   cursor: default;
 }
 
-.vjs-live .vjs-progress-control {
-  display: none;
-}
-
 .vjs-no-flex .vjs-progress-control {
   width: auto;
 }
@@ -172,4 +168,8 @@
 .vjs-mouse-display .vjs-time-tooltip {
   color: #fff;
   @include background-color-with-alpha(#000, 0.8);
+}
+
+.vjs-live .vjs-load-progress {
+  display: none;
 }

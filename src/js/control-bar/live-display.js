@@ -24,7 +24,7 @@ class LiveDisplay extends Button {
   constructor(player, options) {
     super(player, options);
 
-    this.updateShowing();
+    player.ready(() => this.updateShowing());
     this.on(this.player(), 'durationchange', this.updateShowing);
   }
 
@@ -66,9 +66,9 @@ class LiveDisplay extends Button {
     const currentTime = this.player().currentTime();
     const liveCurrentTime = this.liveCurrentTime();
 
-    // we are "live" if the live current time and the current time are within half a second
+    // we are "live" if the live current time and the current time are within two seconds
     // of each other
-    if (liveCurrentTime === Infinity || (liveCurrentTime - currentTime) < 0.5) {
+    if (liveCurrentTime === Infinity || (liveCurrentTime - currentTime) < 2) {
       return true;
     }
 
@@ -146,13 +146,13 @@ class LiveDisplay extends Button {
         this.lastSeekEnd_ = seekEnd;
         this.trigger('live-seekable-change');
       } else {
-        this.liveCurrentTime_ += 0.25;
+        this.liveCurrentTime_ += 0.025;
       }
 
       this.updateLiveStatus();
     };
 
-    this.trackingInterval_ = this.setInterval(trackingFunction, 250);
+    this.trackingInterval_ = this.setInterval(trackingFunction, 30);
 
     // initial run
     trackingFunction();
