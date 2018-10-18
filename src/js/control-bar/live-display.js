@@ -24,7 +24,7 @@ class LiveDisplay extends Button {
   constructor(player, options) {
     super(player, options);
 
-    player.ready(() => this.updateShowing());
+    this.hide();
     this.on(this.player(), 'durationchange', this.updateShowing);
   }
 
@@ -66,9 +66,10 @@ class LiveDisplay extends Button {
     const currentTime = this.player().currentTime();
     const liveCurrentTime = this.liveCurrentTime();
 
-    // we are "live" if the live current time and the current time are within two seconds
-    // of each other
-    if (liveCurrentTime === Infinity || (liveCurrentTime - currentTime) < 2) {
+    // we are "live" if the live time and current time are within 2.06 seconds
+    // we use .06 because we update liveCurrentTime every 30ms so we want to have a two tick
+    // buffer
+    if (liveCurrentTime === Infinity || Math.abs(currentTime - liveCurrentTime) <= 2.06) {
       return true;
     }
 

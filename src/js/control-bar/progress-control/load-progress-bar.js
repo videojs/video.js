@@ -54,7 +54,7 @@ class LoadProgressBar extends Component {
    * @listens Player#progress
    */
   update(event) {
-    const buffered = this.player_.seekable();
+    const buffered = this.player_.buffered();
     // const duration = this.player_.duration();
     const bufferedEnd = this.player_.bufferedEnd();
     const children = this.partEls_;

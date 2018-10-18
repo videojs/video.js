@@ -45,7 +45,7 @@ QUnit.test('at live edge if currentTime is within 500ms of liveCurrentTime', fun
   this.clock.tick(1000);
 
   assert.ok(this.liveDisplay.hasClass('vjs-at-live-edge'), 'has at live edge class');
-  assert.strictEqual(this.liveDisplay.liveCurrentTime(), 1, 'live current time is incremented');
+  assert.ok(this.liveDisplay.liveCurrentTime() > 0, 'live current time is incremented');
 });
 
 QUnit.test('at live edge if seekEnd is Infinity', function(assert) {
@@ -65,6 +65,57 @@ QUnit.test('not at live edge if currentTime is not within 500ms of liveCurrentTi
   assert.ok(!this.liveDisplay.hasClass('vjs-at-live-edge'), 'does not have live edge class');
 });
 
+QUnit.test('at live edge if seekable has no length', function(assert) {
+  this.player.tech_.seekable = () => [];
+
+  this.clock.tick(250);
+
+  assert.ok(this.liveDisplay.hasClass('vjs-at-live-edge'), 'has live edge class');
+});
+
+QUnit.test('should stay at live edge after a long time', function(assert) {
+  const segmentLength = 6;
+  let currentTime = segmentLength;
+  let seekable = createTimeRanges(0, segmentLength);
+
+  this.player.tech_.seekable = () => seekable;
+  this.player.currentTime = () => currentTime;
+
+  const currentTimeInterval = this.player.setInterval(function() {
+    const liveEdge = seekable.end(0) + segmentLength;
+
+    seekable = createTimeRanges(seekable.start(0), liveEdge);
+    currentTime = liveEdge;
+  }, 6000);
+
+  const seekableInterval = this.player.setInterval(function() {
+    currentTime += 0.03;
+  }, 30);
+
+  let removeLiveEdge = 0;
+
+  this.liveDisplay.removeClass = (className) => {
+    if (className === 'vjs-at-live-edge') {
+      removeLiveEdge++;
+    }
+  };
+
+  // 2 hours in ms
+  this.clock.tick(1000 * 60 * 60 * 2);
+
+  assert.strictEqual(removeLiveEdge, 0, 'no calls to remove live edge class');
+
+  this.player.clearInterval(currentTimeInterval);
+  this.player.clearInterval(seekableInterval);
+});
+
+QUnit.test('switch to non live', function(assert) {
+  this.player.duration = () => 4;
+  this.player.trigger('durationchange');
+  assert.ok(this.liveDisplay.hasClass('vjs-hidden'), 'is hidden');
+  assert.ok(!this.liveDisplay.trackingInterval_, 'is not tracking');
+});
+
 QUnit.module('LiveDisplay - not live', {
   beforeEach() {
     this.player = TestHelpers.makePlayer();
@@ -78,4 +129,11 @@ QUnit.module('LiveDisplay - not live', {
 QUnit.test('should not show or track', function(assert) {
   assert.ok(this.liveDisplay.hasClass('vjs-hidden'), 'is hidden');
   assert.ok(!this.liveDisplay.trackingInterval_, 'is not tracking');
+});
+
+QUnit.test('switch to live', function(assert) {
+  this.player.duration = () => Infinity;
+  this.player.trigger('durationchange');
+  assert.ok(!this.liveDisplay.hasClass('vjs-hidden'), 'is not hidden');
+  assert.ok(this.liveDisplay.trackingInterval_, 'is tracking');
 });
