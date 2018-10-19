@@ -3,6 +3,7 @@
  */
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
+import formatTime from '../../utils/format-time.js';
 
 /**
  * Time tooltips display a time above the progress bar.
@@ -80,6 +81,29 @@ class TimeTooltip extends Component {
 
     this.el_.style.right = `-${pullTooltipBy}px`;
     Dom.textContent(this.el_, content);
+  }
+
+  updateTime(seekBarRect, seekBarPoint, time) {
+    // If there is an existing rAF ID, cancel it so we don't over-queue.
+    if (this.rafId_) {
+      this.cancelAnimationFrame(this.rafId_);
+    }
+
+    this.rafId_ = this.requestAnimationFrame(() => {
+      let content;
+      const duration = this.player_.duration();
+
+      if (this.player_.liveTracker.isLive()) {
+        const liveTimeWindow = this.player_.liveTracker.liveTimeWindow();
+        const secondsBehind = liveTimeWindow - (seekBarPoint * liveTimeWindow);
+
+        content = (secondsBehind === 0 ? '' : '-') + formatTime(secondsBehind, liveTimeWindow);
+      } else {
+        content = formatTime(time, duration);
+      }
+
+      this.update(seekBarRect, seekBarPoint, content);
+    });
   }
 }
 

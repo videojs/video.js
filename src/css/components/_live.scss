@@ -6,6 +6,11 @@
   margin-left: 0.3em;
 }
 
+// only show as a pointer when we will seek to live edge
+.video-js .vjs-live-control.vjs-control.vjs-at-live-edge {
+  cursor: auto;
+}
+
 .vjs-live-circle {
   border-radius: 50%;
   width: 0.75em;

@@ -25,7 +25,8 @@ class LiveDisplay extends Button {
     super(player, options);
 
     this.hide();
-    this.on(this.player(), 'durationchange', this.updateShowing);
+
+    this.on(this.player_, 'durationchange', this.updateShowing);
   }
 
   /**
@@ -56,46 +57,15 @@ class LiveDisplay extends Button {
   }
 
   /**
-   * Determines whether the currentTime is also
-   * at the live edge of playback by using the seekable end.
-   *
-   * @return {boolean}
-   *         True if the current time is at the live edge and false otherwise.
+   * Update the state of this button if we are at the live edge
+   * or not
    */
-  atLiveEdge() {
-    const currentTime = this.player().currentTime();
-    const liveCurrentTime = this.liveCurrentTime();
-
-    // we are "live" if the live time and current time are within 2.06 seconds
-    // we use .06 because we update liveCurrentTime every 30ms so we want to have a two tick
-    // buffer
-    if (liveCurrentTime === Infinity || Math.abs(currentTime - liveCurrentTime) <= 2.06) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Update the the css class of this element with `vjs-at-live-edge` when
-   * we are at the live edge.
-   */
-  updateLiveStatus() {
-    if (!this.atLiveEdge()) {
+  updateLiveEdgeStatus(e) {
+    if (this.player_.liveTracker.behindLiveEdge()) {
       this.removeClass('vjs-at-live-edge');
     } else {
       this.addClass('vjs-at-live-edge');
     }
-  }
-
-  /**
-   * A getter for the internal liveCurrentTime_ tracking
-   *
-   * @return {number}
-   *         What we expect the live current time to be.
-   */
-  liveCurrentTime() {
-    return this.liveCurrentTime_;
   }
 
   /**
@@ -104,76 +74,7 @@ class LiveDisplay extends Button {
    * event which will happen every segment length seconds.
    */
   handleClick() {
-    // don't attempt to seek to live if we are already live
-    if (this.atLiveEdge()) {
-      return;
-    }
-
-    this.player().pause();
-    this.player().addClass('vjs-waiting');
-    this.one('live-seekable-change', () => {
-      this.player().removeClass('vjs-waiting');
-      this.player().currentTime(this.liveCurrentTime());
-      this.player().play();
-    });
-  }
-
-  /**
-   * This function tracks whether the user is at the current
-   * live edge or not. It does this by setting an interval that
-   * goes off every 250ms and adding 250ms to our internal count
-   * of the live current time. It is kept in check by the seekable end
-   * of the current buffer, which is always the live point at the very second
-   * that it changes.
-   *
-   * This function also triggers `live-seekable-change` whenever it detects
-   * that the live edge has changed. This helps the handleClick function
-   * seek to the live edge.
-   */
-  startTracking() {
-    // if we are already tracking do nothing
-    if (this.trackingInterval_) {
-      return;
-    }
-
-    const trackingFunction = () => {
-      const seekable = this.player().seekable();
-      const seekEnd = seekable && seekable.length && seekable.end(0);
-
-      // if seek end just changed, set live current time to
-      // seek end so that it is more accurate
-      if (this.lastSeekEnd_ !== seekEnd) {
-        this.liveCurrentTime_ = seekEnd;
-        this.lastSeekEnd_ = seekEnd;
-        this.trigger('live-seekable-change');
-      } else {
-        this.liveCurrentTime_ += 0.025;
-      }
-
-      this.updateLiveStatus();
-    };
-
-    this.trackingInterval_ = this.setInterval(trackingFunction, 30);
-
-    // initial run
-    trackingFunction();
-  }
-
-  /**
-   * In order to determine when the user is behind a live stream
-   * we have to keep track of the live current time using an interval.
-   * this function clears that interval if it is set.
-   */
-  stopTracking() {
-    // if we are not tracking do nothing
-    if (!this.trackingInterval_) {
-      return;
-    }
-
-    this.clearInterval(this.trackingInterval_);
-    this.trackingInterval_ = null;
-    this.liveCurrentTime_ = null;
-    this.lastSeekEnd_ = null;
+    this.player_.liveTracker.seekToLiveEdge();
   }
 
   /**
@@ -181,7 +82,7 @@ class LiveDisplay extends Button {
    */
   show() {
     super.show();
-    this.startTracking();
+    this.on(this.player_.liveTracker, 'live-edge-change', this.updateLiveEdgeStatus);
   }
 
   /**
@@ -189,7 +90,7 @@ class LiveDisplay extends Button {
    */
   hide() {
     super.hide();
-    this.stopTracking();
+    this.off(this.player_.liveTracker, 'live-edge-change', this.updateLiveEdgeStatus);
   }
 
   /**
@@ -202,7 +103,7 @@ class LiveDisplay extends Button {
    * @listens Player#durationchange
    */
   updateShowing(event) {
-    if (this.player().duration() === Infinity) {
+    if (this.player_.liveTracker.isLive()) {
       this.show();
     } else {
       this.hide();
@@ -213,8 +114,8 @@ class LiveDisplay extends Button {
    * Dispose of the element and stop tracking
    */
   dispose() {
+    this.hide();
     this.contentEl_ = null;
-    this.stopTracking();
 
     super.dispose();
   }

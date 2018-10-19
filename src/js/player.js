@@ -48,6 +48,7 @@ import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
+import './live-tracker.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -2288,8 +2289,10 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
+        this.liveTracker.start();
       } else {
         this.removeClass('vjs-live');
+        this.liveTracker.stop();
       }
       if (!isNaN(seconds)) {
         // Do not fire durationchange unless the duration value is known.
@@ -4120,7 +4123,8 @@ Player.prototype.options_ = {
     'controlBar',
     'errorDisplay',
     'textTrackSettings',
-    'resizeManager'
+    'resizeManager',
+    'liveTracker'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',

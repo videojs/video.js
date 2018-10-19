@@ -3,7 +3,6 @@
  */
 import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
-import formatTime from '../../utils/format-time.js';
 
 import './time-tooltip';
 
@@ -40,42 +39,17 @@ class PlayProgressBar extends Component {
    *        from the left edge of the {@link SeekBar}
    */
   update(seekBarRect, seekBarPoint) {
+    const timeTooltip = this.getChild('timeTooltip');
 
-    // If there is an existing rAF ID, cancel it so we don't over-queue.
-    if (this.rafId_) {
-      this.cancelAnimationFrame(this.rafId_);
+    if (!timeTooltip) {
+      return;
     }
 
-    this.rafId_ = this.requestAnimationFrame(() => {
-      const timeTooltip = this.getChild('timeTooltip');
+    const time = (this.player_.scrubbing()) ?
+      this.player_.getCache().currentTime :
+      this.player_.currentTime();
 
-      if (!timeTooltip) {
-        return;
-      }
-      let content;
-
-      if (this.player_.duration() === Infinity) {
-        const seekEnd = this.player_.seekable().end(0);
-        const timeBehindLive = seekEnd - (seekBarPoint * seekEnd);
-
-        // the live tooltip shows the time as a negative number
-        // indicating the time from the live point.
-        content = formatTime(timeBehindLive, seekEnd);
-
-        if (timeBehindLive !== 0) {
-          content = `-${content}`;
-        }
-      } else {
-
-        const time = (this.player_.scrubbing()) ?
-          this.player_.getCache().currentTime :
-          this.player_.currentTime();
-
-        content = formatTime(time, this.player_.duration());
-      }
-
-      timeTooltip.update(seekBarRect, seekBarPoint, content);
-    });
+    timeTooltip.updateTime(seekBarRect, seekBarPoint, time);
   }
 }
 

@@ -55,7 +55,7 @@ class LoadProgressBar extends Component {
    */
   update(event) {
     const buffered = this.player_.buffered();
-    // const duration = this.player_.duration();
+    const duration = this.player_.duration();
     const bufferedEnd = this.player_.bufferedEnd();
     const children = this.partEls_;
 
@@ -68,7 +68,9 @@ class LoadProgressBar extends Component {
     };
 
     // update the width of the progress bar
-    // this.el_.style.width = percentify(bufferedEnd, duration);
+    if (duration !== Infinity) {
+      this.el_.style.width = percentify(bufferedEnd, duration);
+    }
 
     // add child elements to represent the individual buffered time ranges
     for (let i = 0; i < buffered.length; i++) {
