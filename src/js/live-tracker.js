@@ -167,8 +167,12 @@ class LiveTracker extends Component {
       return;
     }
 
+    this.player().pause();
+    this.player().addClass('vjs-waiting');
     this.one('seek-end-change', () => {
-      this.player_.currentTime(this.seekEnd());
+      this.player().removeClass('vjs-waiting');
+      this.player().currentTime(this.seekEnd());
+      this.player().play();
     });
   }
 }

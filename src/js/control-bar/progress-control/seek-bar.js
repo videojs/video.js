@@ -244,10 +244,8 @@ class SeekBar extends Slider {
       const seekStart = liveTracker.seekStart();
       const seekEnd = liveTracker.seekEnd();
 
-      // if they are seeking to live, but already at live
-      // this would cause them to seek away from the live edge
-      // we should ignore this
-      if (distance === 1 && liveTracker.atLiveEdge()) {
+      if (distance === 1) {
+        liveTracker.seekToLiveEdge();
         return;
       }
 
