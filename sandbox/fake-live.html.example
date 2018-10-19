@@ -22,7 +22,7 @@
   <script>
     // fake a livestream for easy testing
     var vid = document.getElementById('vid1');
-    var player = videojs(vid, {muted: true, loop: true});
+    var player = videojs(vid, {muted: true, loop: true, liveui: true});
     var segmentLength = 2;
 
     window.currentLiveTimeRange = videojs.createTimeRanges(0, segmentLength);

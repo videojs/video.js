@@ -1,4 +1,19 @@
+// css for the old live ui, assumes that the progress bar is hidden
 .video-js .vjs-live-control {
+  @include display-flex(flex-start);
+  @include flex(auto);
+  font-size: 1em;
+  line-height: 3em;
+}
+
+.vjs-no-flex .vjs-live-control {
+  display: table-cell;
+  width: auto;
+  text-align: left;
+}
+
+// css for the new live ui
+.video-js.vjs-liveui .vjs-live-control {
   cursor: pointer;
   @include flex(none);
   display: inline-flex;
@@ -7,7 +22,7 @@
 }
 
 // only show as a pointer when we will seek to live edge
-.video-js .vjs-live-control.vjs-control.vjs-at-live-edge {
+.vjs-live-control.vjs-control.vjs-at-live-edge {
   cursor: auto;
 }
 
@@ -21,6 +36,6 @@
   background: radial-gradient(#808080, #666666);
 }
 
-.video-js .vjs-live-control.vjs-control.vjs-at-live-edge .vjs-live-circle {
+.vjs-live-control.vjs-control.vjs-at-live-edge .vjs-live-circle {
   background: radial-gradient(#ff0000, #990000);
 }

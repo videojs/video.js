@@ -24,8 +24,7 @@ class LiveDisplay extends Button {
   constructor(player, options) {
     super(player, options);
 
-    this.hide();
-
+    this.updateShowing();
     this.on(this.player_, 'durationchange', this.updateShowing);
   }
 
@@ -95,7 +94,7 @@ class LiveDisplay extends Button {
 
   /**
    * Check the duration to see if the LiveDisplay should be showing or not. Then show/hide
-   * it accordingly. Note that hide and show will also start and stop live tracking
+   * it accordingly.
    *
    * @param {EventTarget~Event} [event]
    *        The {@link Player#durationchange} event that caused this function to run.

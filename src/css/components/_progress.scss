@@ -13,6 +13,14 @@
   cursor: default;
 }
 
+.vjs-live .vjs-progress-control {
+  display: none;
+}
+
+.vjs-live.vjs-liveui .vjs-progress-control {
+  @include display-flex(center);
+}
+
 .vjs-no-flex .vjs-progress-control {
   width: auto;
 }
