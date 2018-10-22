@@ -67,8 +67,8 @@ class LoadProgressBar extends Component {
       return ((percent >= 1 ? 1 : percent) * 100) + '%';
     };
 
-    // update the width of the progress bar
-    if (duration !== Infinity) {
+    // update the width of the progress bar if not live
+    if (!this.player_.liveTracker.isLive()) {
       this.el_.style.width = percentify(bufferedEnd, duration);
     }
 
