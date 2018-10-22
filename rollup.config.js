@@ -4,7 +4,6 @@ import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
-import filesize from 'rollup-plugin-filesize';
 import progress from 'rollup-plugin-progress';
 import ignore from 'rollup-plugin-ignore';
 import alias from 'rollup-plugin-alias';
@@ -71,8 +70,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
+      cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
     watch
@@ -100,8 +98,7 @@ export default cliargs => [
       }),
       json(),
       primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
+      cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
     watch
@@ -125,8 +122,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
+      cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
     watch
@@ -143,8 +139,7 @@ export default cliargs => [
     plugins: [
       json(),
       primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
+      cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
     watch
@@ -164,8 +159,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
+      cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
     watch
@@ -186,8 +180,7 @@ export default cliargs => [
       json(),
       primedCjs,
       primedBabel,
-      cliargs.progress !== false ? progress() : {},
-      filesize()
+      cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
     watch
