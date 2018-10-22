@@ -1,6 +1,5 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import isDocsOnly from './docs-only.js';
-import sass from 'node-sass';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -85,19 +84,6 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      dist: {
-        files: [
-          'build/temp/video.js',
-          'build/temp/alt/video.novtt.js',
-          'build/temp/video-js.css',
-          'build/temp/alt/video-js-cdn.css'
-        ],
-        tasks: ['copy:dist']
-      },
-      skin: {
-        files: ['src/css/**/*'],
-        tasks: ['skin']
-      },
       lang: {
         files: ['lang/**/*.json'],
         tasks: ['vjslanguages']
@@ -128,27 +114,7 @@ module.exports = function(grunt) {
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
     },
-    cssmin: {
-      minify: {
-        expand: true,
-        cwd: 'build/temp/',
-        src: ['video-js.css', 'alt/video-js-cdn.css'],
-        dest: 'build/temp/',
-        ext: '.min.css'
-      }
-    },
-    sass: {
-      options: {
-        implementation: sass
-      },
-      build: {
-        files: {
-          'build/temp/video-js.css': 'src/css/vjs.scss',
-          'build/temp/alt/video-js-cdn.css': 'src/css/vjs-cdn.scss'
-        }
-      }
-    },
-    karma: {
+        karma: {
       // this config file applies to all following configs except if overwritten
       options: {
         configFile: 'test/karma.conf.js'
@@ -198,14 +164,6 @@ module.exports = function(grunt) {
         // compression: 'DEFLATE',
         src: ['dist/**/*'],
         dest: 'dist/video-js-' + version.full + '.zip'
-      }
-    },
-    version: {
-      css: {
-        options: {
-          prefix: '@version\\s*'
-        },
-        src: 'build/temp/video-js.css'
       }
     },
     browserify: {
@@ -290,12 +248,10 @@ module.exports = function(grunt) {
         'browserify:tests'
       ],
       dev: [
-        'skin',
+        'shell:sass',
         'shell:babel',
         'browserify:tests',
-        'watch:skin',
         'watch:lang',
-        'watch:dist',
         'copy:dist'
       ],
       // Run multiple watch tasks in parallel
@@ -331,6 +287,18 @@ module.exports = function(grunt) {
       }
     },
     shell: {
+      cssmin: {
+        command: 'npm run cssmin',
+        options: {
+          preferLocal: true
+        }
+      },
+      sass: {
+        command: 'npm run sass',
+        options: {
+          preferLocal: true
+        }
+      },
       rollup: {
         command: 'npm run rollup',
         options: {
@@ -407,10 +375,9 @@ module.exports = function(grunt) {
 
     'shell:rollupall',
 
-    'skin',
+    'shell:sass',
     'shell:autoprefixer',
-    'version:css',
-    'cssmin',
+    'shell:cssmin',
 
     'copy:fonts',
     'vjslanguages'
@@ -424,7 +391,7 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass']);
+  grunt.registerTask('skin', ['shell:sass']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);
