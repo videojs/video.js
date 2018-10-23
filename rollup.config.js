@@ -14,8 +14,19 @@ const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt',
 const bannerData = _.pick(pkg, ['version', 'copyright']);
 const banner = compiledLicense(Object.assign({includesVtt: true}, bannerData));
 
-// to prevent going into a screen during rollup
-process.stderr.isTTY = false;
+const watch = {
+  clearScreen: false
+};
+
+const onwarn = (warning) => {
+  // ignore unknow option for --no-progress
+  if (warning.code === 'UNKNOWN_OPTION' && warning.message.indexOf('progress') !== -1) {
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.warn(warning.message);
+};
 
 const primedIgnore = ignore(['videojs-vtt.js']);
 const primedResolve = resolve({
@@ -90,7 +101,9 @@ export default cliargs => [
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
-    ]
+    ],
+    onwarn,
+    watch
   },
   // es, cjs
   {
@@ -121,7 +134,9 @@ export default cliargs => [
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
-    ]
+    ],
+    onwarn,
+    watch
   },
   // novtt umd
   {
@@ -145,7 +160,9 @@ export default cliargs => [
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
-    ]
+    ],
+    onwarn,
+    watch
   },
   // core
   {
@@ -164,7 +181,9 @@ export default cliargs => [
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
-    ]
+    ],
+    onwarn,
+    watch
   },
   // core umd
   {
@@ -184,7 +203,9 @@ export default cliargs => [
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
-    ]
+    ],
+    onwarn,
+    watch
   },
   // core novtt umd
   {
@@ -205,6 +226,8 @@ export default cliargs => [
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
-    ]
+    ],
+    onwarn,
+    watch
   }
 ];
