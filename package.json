@@ -23,9 +23,12 @@
     "cssmin": "npm-run-all cssmin:*",
     "cssmin:cdn": "cleancss dist/alt/video-js-cdn.css -o dist/alt/video-js-cdn.min.css",
     "cssmin:default": "cleancss dist/video-js.css -o dist/video-js.min.css",
-    "sass": "npm-run-all sass:*",
+    "sass": "npm-run-all sass:* autoprefixer",
     "sass:cdn": "node-sass src/css/vjs-cdn.scss dist/alt/video-js-cdn.css",
     "sass:default": "node-sass src/css/vjs.scss dist/video-js.css",
+    "autoprefixer": "npm-run-all -p autoprefixer:*",
+    "autoprefixer:main": "postcss --verbose --config postcss.config.js -d dist/ dist/video-js.css",
+    "autoprefixer:cdn": "postcss --verbose --config postcss.config.js -d dist/alt dist/alt/video-js-cdn.css",
     "rollup": "rollup -c",
     "rollup-dev": "rollup -c -w",
     "watch": "npm-run-all -p watch:*",
@@ -51,10 +54,7 @@
     "babel": "babel src/js -d es5",
     "prepublishOnly": "run-p build",
     "publish": "node build/gh-release.js",
-    "version": "node build/version.js && git add CHANGELOG.md",
-    "autoprefixer": "npm-run-all -p autoprefixer:*",
-    "autoprefixer:main": "postcss --verbose --config postcss.config.js -d build/temp build/temp/video-js.css",
-    "autoprefixer:cdn": "postcss --verbose --config postcss.config.js -d build/temp/alt build/temp/alt/video-js-cdn.css"
+    "version": "node build/version.js && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",

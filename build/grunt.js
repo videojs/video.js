@@ -311,9 +311,6 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
-      autoprefixer: {
-        command: 'npm run autoprefixer'
-      },
       babel: {
         command: 'npm run babel -- --watch --quiet',
         options: {
@@ -376,7 +373,6 @@ module.exports = function(grunt) {
     'shell:rollupall',
 
     'shell:sass',
-    'shell:autoprefixer',
     'shell:cssmin',
 
     'copy:fonts',
