@@ -4069,6 +4069,7 @@ Player.prototype.options_ = {
 
   // Included control sets
   children: [
+    'resizeManager',
     'mediaLoader',
     'posterImage',
     'textTrackDisplay',
@@ -4076,8 +4077,7 @@ Player.prototype.options_ = {
     'bigPlayButton',
     'controlBar',
     'errorDisplay',
-    'textTrackSettings',
-    'resizeManager'
+    'textTrackSettings'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
