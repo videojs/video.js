@@ -80,7 +80,7 @@ class ResizeManager extends Component {
 
   createEl() {
     return super.createEl('iframe', {
-      className: 'vjs-resize-manager'
+      className: 'vjs-resize-manager vjs-hidden'
     });
   }
 
