@@ -2879,7 +2879,8 @@ class Player extends Component {
 
   /**
    * Reset the player. Loads the first tech in the techOrder,
-   * and calls `reset` on the tech`.
+   * removes all the text tracks in the existing `tech`,
+   * and calls `reset` on the `tech`.
    */
   reset() {
     if (this.tech_) {
