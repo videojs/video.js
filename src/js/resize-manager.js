@@ -57,6 +57,7 @@ class ResizeManager extends Component {
     this.ResizeObserver = options.ResizeObserver || window.ResizeObserver;
     this.loadListener_ = null;
     this.resizeObserver_ = null;
+    this.handleContextmenu_ = this.handleContextmenu_.bind(this);
     this.debouncedHandler_ = debounce(() => {
       this.resizeHandler();
     }, 100, false, this);
@@ -72,6 +73,7 @@ class ResizeManager extends Component {
         }
 
         Events.on(this.el_.contentWindow, 'resize', this.debouncedHandler_);
+        Events.on(this.el_.contentWindow, 'contextmenu', this.handleContextmenu_);
       };
 
       this.one('load', this.loadListener_);
@@ -82,6 +84,18 @@ class ResizeManager extends Component {
     return super.createEl('iframe', {
       className: 'vjs-resize-manager'
     });
+  }
+
+  /**
+   * Due to an issue on safari, the iframe for this object takes over
+   * right clicks on the player. So we have to re-trigger them from the
+   * iframe to the player.
+   * @see https://github.com/videojs/video.js/pull/5522
+   *
+   * @param {Event} e the contextmenu event that fired
+   */
+  handleContextmenu_(e) {
+    this.player_.trigger(e);
   }
 
   /**
@@ -119,6 +133,7 @@ class ResizeManager extends Component {
 
     if (this.el_ && this.el_.contentWindow) {
       Events.off(this.el_.contentWindow, 'resize', this.debouncedHandler_);
+      Events.off(this.el_.contentWindow, 'contextmenu', this.handleContextmenu_);
     }
 
     if (this.loadListener_) {
