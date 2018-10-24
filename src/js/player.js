@@ -1379,13 +1379,6 @@ class Player extends Component {
       type = srcObj.type;
     }
 
-    // if we are a blob url, don't update the source cache
-    // blob urls can arise when playback is done via Media Source Extension (MSE)
-    // such as m3u8 sources with @videojs/http-streaming (VHS)
-    if (/^blob:/.test(src)) {
-      return;
-    }
-
     // make sure all the caches are set to default values
     // to prevent null checking
     this.cache_.source = this.cache_.source || {};
@@ -1467,9 +1460,26 @@ class Player extends Component {
     // only update the source cache when the source
     // was not updated using the player api
     if (!this.changingSrc_) {
+      let updateSourceCaches = (src) => this.updateSourceCaches_(src);
+      const playerSrc = this.currentSource().src;
+      const eventSrc = event.src;
+
+      // if we have a playerSrc that is not a blob, and a tech src that is a blob
+      // we may skip the source cache update
+      if (playerSrc && !(/^blob:/).test(playerSrc) && (/^blob:/).test(eventSrc)) {
+
+        // we skip updating the source cache if
+        // 1. if we do not have a `lastSource_`
+        // 2. if lastSource.tech is not the current tech source and lastSource.player is not
+        //    the current player source
+        if (!this.lastSource_ || (this.lastSource_.tech !== eventSrc && this.lastSource_.player !== playerSrc)) {
+          updateSourceCaches = () => {};
+        }
+      }
+
       // update the source to the intial source right away
       // in some cases this will be empty string
-      this.updateSourceCaches_(event.src);
+      updateSourceCaches(eventSrc);
 
       // if the `sourceset` `src` was an empty string
       // wait for a `loadstart` to update the cache to `currentSrc`.
@@ -1478,7 +1488,10 @@ class Player extends Component {
       if (!event.src) {
         const updateCache = (e) => {
           if (e.type !== 'sourceset') {
-            this.updateSourceCaches_(this.techGet_('currentSrc'));
+            const techSrc = this.techGet('currentSrc');
+
+            this.lastSource_.tech = techSrc;
+            this.updateSourceCaches_(techSrc);
           }
 
           this.tech_.off(['sourceset', 'loadstart'], updateCache);
@@ -1487,6 +1500,7 @@ class Player extends Component {
         this.tech_.one(['sourceset', 'loadstart'], updateCache);
       }
     }
+    this.lastSource_ = {player: this.currentSource().src, tech: event.src};
 
     this.trigger({
       src: event.src,
