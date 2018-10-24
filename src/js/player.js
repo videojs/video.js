@@ -1465,13 +1465,10 @@ class Player extends Component {
       const eventSrc = event.src;
 
       // if we have a playerSrc that is not a blob, and a tech src that is a blob
-      // we may skip the source cache update
       if (playerSrc && !(/^blob:/).test(playerSrc) && (/^blob:/).test(eventSrc)) {
 
-        // we skip updating the source cache if
-        // 1. if we do not have a `lastSource_`
-        // 2. if lastSource.tech is not the current tech source and lastSource.player is not
-        //    the current player source
+        // if both the tech source and the player source were updated we assume
+        // something like @videojs/http-streaming did the sourceset and skip updating the source cache.
         if (!this.lastSource_ || (this.lastSource_.tech !== eventSrc && this.lastSource_.player !== playerSrc)) {
           updateSourceCaches = () => {};
         }
