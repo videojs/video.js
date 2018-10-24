@@ -240,6 +240,41 @@ const TECH_EVENTS_QUEUE = {
   seeked: 'Seeked'
 };
 
+const BREAKPOINT_ORDER = [
+  'tiny',
+  'xsmall',
+  'small',
+  'medium',
+  'large',
+  'xlarge',
+  'huge'
+];
+
+const BREAKPOINT_CLASSES = {};
+
+// grep: vjs-layout-tiny
+// grep: vjs-layout-x-small
+// grep: vjs-layout-small
+// grep: vjs-layout-medium
+// grep: vjs-layout-large
+// grep: vjs-layout-x-large
+// grep: vjs-layout-huge
+BREAKPOINT_ORDER.forEach(k => {
+  const v = k.charAt(0) === 'x' ? `x-${k.substring(1)}` : k;
+
+  BREAKPOINT_CLASSES[k] = `vjs-layout-${v}`;
+});
+
+const DEFAULT_BREAKPOINTS = {
+  tiny: 210,
+  xsmall: 320,
+  small: 425,
+  medium: 768,
+  large: 1440,
+  xlarge: 2560,
+  huge: Infinity
+};
+
 /**
  * An instance of the `Player` class is created when any of the Video.js setup methods
  * are used to initialize a video.
@@ -486,6 +521,9 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
+
+    this.breakpoints(this.options_.breakpoints);
+    this.responsive(this.options_.responsive);
 
     this.changingSrc_ = false;
     this.playWaitingForReady_ = false;
@@ -2841,7 +2879,8 @@ class Player extends Component {
 
   /**
    * Reset the player. Loads the first tech in the techOrder,
-   * and calls `reset` on the tech`.
+   * removes all the text tracks in the existing `tech`,
+   * and calls `reset` on the `tech`.
    */
   reset() {
     if (this.tech_) {
@@ -3676,6 +3715,179 @@ class Player extends Component {
   }
 
   /**
+   * Change breakpoint classes when the player resizes.
+   *
+   * @private
+   */
+  updateCurrentBreakpoint_() {
+    if (!this.responsive()) {
+      return;
+    }
+
+    const currentBreakpoint = this.currentBreakpoint();
+    const currentWidth = this.currentWidth();
+
+    for (let i = 0; i < BREAKPOINT_ORDER.length; i++) {
+      const candidateBreakpoint = BREAKPOINT_ORDER[i];
+      const maxWidth = this.breakpoints_[candidateBreakpoint];
+
+      if (currentWidth <= maxWidth) {
+
+        // The current breakpoint did not change, nothing to do.
+        if (currentBreakpoint === candidateBreakpoint) {
+          return;
+        }
+
+        // Only remove a class if there is a current breakpoint.
+        if (currentBreakpoint) {
+          this.removeClass(BREAKPOINT_CLASSES[currentBreakpoint]);
+        }
+
+        this.addClass(BREAKPOINT_CLASSES[candidateBreakpoint]);
+        this.breakpoint_ = candidateBreakpoint;
+        break;
+      }
+    }
+  }
+
+  /**
+   * Removes the current breakpoint.
+   *
+   * @private
+   */
+  removeCurrentBreakpoint_() {
+    const className = this.currentBreakpointClass();
+
+    this.breakpoint_ = '';
+
+    if (className) {
+      this.removeClass(className);
+    }
+  }
+
+  /**
+   * Get or set breakpoints on the player.
+   *
+   * Calling this method with an object or `true` will remove any previous
+   * custom breakpoints and start from the defaults again.
+   *
+   * @param  {Object|boolean} [breakpoints]
+   *         If an object is given, it can be used to provide custom
+   *         breakpoints. If `true` is given, will set default breakpoints.
+   *         If this argument is not given, will simply return the current
+   *         breakpoints.
+   *
+   * @param  {number} [breakpoints.tiny]
+   *         The maximum width for the "vjs-layout-tiny" class.
+   *
+   * @param  {number} [breakpoints.xsmall]
+   *         The maximum width for the "vjs-layout-x-small" class.
+   *
+   * @param  {number} [breakpoints.small]
+   *         The maximum width for the "vjs-layout-small" class.
+   *
+   * @param  {number} [breakpoints.medium]
+   *         The maximum width for the "vjs-layout-medium" class.
+   *
+   * @param  {number} [breakpoints.large]
+   *         The maximum width for the "vjs-layout-large" class.
+   *
+   * @param  {number} [breakpoints.xlarge]
+   *         The maximum width for the "vjs-layout-x-large" class.
+   *
+   * @param  {number} [breakpoints.huge]
+   *         The maximum width for the "vjs-layout-huge" class.
+   *
+   * @return {Object}
+   *         An object mapping breakpoint names to maximum width values.
+   */
+  breakpoints(breakpoints) {
+
+    // Used as a getter.
+    if (breakpoints === undefined) {
+      return assign(this.breakpoints_);
+    }
+
+    this.breakpoint_ = '';
+    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+
+    // When breakpoint definitions change, we need to update the currently
+    // selected breakpoint.
+    this.updateCurrentBreakpoint_();
+
+    // Clone the breakpoints before returning.
+    return assign(this.breakpoints_);
+  }
+
+  /**
+   * Get or set a flag indicating whether or not this player should adjust
+   * its UI based on its dimensions.
+   *
+   * @param  {boolean} value
+   *         Should be `true` if the player should adjust its UI based on its
+   *         dimensions; otherwise, should be `false`.
+   *
+   * @return {boolean}
+   *         Will be `true` if this player should adjust its UI based on its
+   *         dimensions; otherwise, will be `false`.
+   */
+  responsive(value) {
+
+    // Used as a getter.
+    if (value === undefined) {
+      return this.responsive_;
+    }
+
+    value = Boolean(value);
+    const current = this.responsive_;
+
+    // Nothing changed.
+    if (value === current) {
+      return;
+    }
+
+    // The value actually changed, set it.
+    this.responsive_ = value;
+
+    // Start listening for breakpoints and set the initial breakpoint if the
+    // player is now responsive.
+    if (value) {
+      this.on('playerresize', this.updateCurrentBreakpoint_);
+      this.updateCurrentBreakpoint_();
+
+    // Stop listening for breakpoints if the player is no longer responsive.
+    } else {
+      this.off('playerresize', this.updateCurrentBreakpoint_);
+      this.removeCurrentBreakpoint_();
+    }
+
+    return value;
+  }
+
+  /**
+   * Get current breakpoint name, if any.
+   *
+   * @return {string}
+   *         If there is currently a breakpoint set, returns a the key from the
+   *         breakpoints object matching it. Otherwise, returns an empty string.
+   */
+  currentBreakpoint() {
+    return this.breakpoint_;
+  }
+
+  /**
+   * Get the current breakpoint class name.
+   *
+   * @return {string}
+   *         The matching class name (e.g. `"vjs-layout-tiny"` or
+   *         `"vjs-layout-large"`) for the current breakpoint. Empty string if
+   *         there is no current breakpoint.
+   */
+  currentBreakpointClass() {
+    return BREAKPOINT_CLASSES[this.breakpoint_] || '';
+  }
+
+  /**
    * Gets tag settings
    *
    * @param {Element} tag
@@ -3874,7 +4086,10 @@ Player.prototype.options_ = {
   languages: {},
 
   // Default message to show when a video cannot be played.
-  notSupportedMessage: 'No compatible source was found for this media.'
+  notSupportedMessage: 'No compatible source was found for this media.',
+
+  breakpoints: {},
+  responsive: false
 };
 
 [

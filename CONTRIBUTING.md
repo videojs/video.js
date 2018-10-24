@@ -79,16 +79,16 @@ A good bug report should be as detailed as possible, so that others won't have t
 
 There are a few labels that might be added to your issue or PR by a maintainer. Here's a quick rundown of what they mean:
 
-| Label | Issue or PR | Description |
-|-------|-------------|-------------|
-| confirmed | Issue and PR | Issue: marks as reproducible by a maintainer. PR: marked by a maintainer as ready to be merged|
-| 5.x | PR | Marks as a change to the 5.x branch only |
-| bug | Issue | Marks as a confirmed bug by a maintainer |
-| good first issue | Issue | Marked as a good bug or enhancement for first time contributors to Video.js |
-| first-timers-only | Issue | Marked as a good bug or enhancement to be done by a newcomer to open source |
-| minor, patch, major | PR | Marks PR with the expected [semver](https://semver.org/) classification of the change |
-| needs: more info | Issue | Marked by a maintainer as needing more information from the issue reporter. Please update your issue with more information to help us reproduce the bug. |
-| needs: reduced test case | Issue | Marked by a maintainer as needing a reduced test case from the issue reporter. Please create a test page that we can inspect to help us indentify a bug. |
+| Label                    | Issue or PR  | Description                                                                                                                                              |
+| ------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| confirmed                | Issue and PR | Issue: marks as reproducible by a maintainer. PR: marked by a maintainer as ready to be merged                                                           |
+| 5.x                      | PR           | Marks as a change to the 5.x branch only                                                                                                                 |
+| bug                      | Issue        | Marks as a confirmed bug by a maintainer                                                                                                                 |
+| good first issue         | Issue        | Marked as a good bug or enhancement for first time contributors to Video.js                                                                              |
+| first-timers-only        | Issue        | Marked as a good bug or enhancement to be done by a newcomer to open source                                                                              |
+| minor, patch, major      | PR           | Marks PR with the expected [semver](https://semver.org/) classification of the change                                                                    |
+| needs: more info         | Issue        | Marked by a maintainer as needing more information from the issue reporter. Please update your issue with more information to help us reproduce the bug. |
+| needs: reduced test case | Issue        | Marked by a maintainer as needing a reduced test case from the issue reporter. Please create a test page that we can inspect to help us indentify a bug. |
 
 ## Contributing code
 
