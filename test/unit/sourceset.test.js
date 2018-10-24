@@ -774,6 +774,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
     QUnit.test('hls -> hls -> blob -> hls', function(assert) {
       this.totalSourcesets = 5;
+      this.player.options_.techOrder = ['techFaker'];
       this.player.options_.techFaker = this.player.options_.techFaker || {};
       const done = assert.async();
       const m3u8One = {
@@ -827,6 +828,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
     QUnit.test('hls -> mp4 -> hls -> blob', function(assert) {
       this.totalSourcesets = 5;
+      this.player.options_.techOrder = ['techFaker'];
       this.player.options_.techFaker = this.player.options_.techFaker || {};
       const done = assert.async();
       const m3u8One = {
