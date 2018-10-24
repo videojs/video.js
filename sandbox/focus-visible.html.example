@@ -36,6 +36,6 @@
     var player = videojs(vid);
 
   </script>
-  <script src="../node_modules/focus-visible/dist/focus-visible.min.js"></script>
+  <script src="https://unpkg.com/focus-visible"></script>
 </body>
 </html>
