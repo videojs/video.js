@@ -129,9 +129,7 @@ export default cliargs => [
         'video.js': path.resolve(__dirname, './src/js/video.js'),
         '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
-      primedResolve,
       json(),
-      primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
