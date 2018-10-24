@@ -81,7 +81,6 @@
     "es5-shim": "^4.5.10",
     "es6-shim": "^0.35.3",
     "filesize": "^3.5.11",
-    "focus-visible": "^4.1.5",
     "gh-release": "^3.2.1",
     "grunt": "^1.0.3",
     "grunt-accessibility": "^6.0.0",
