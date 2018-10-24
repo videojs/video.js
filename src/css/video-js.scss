@@ -53,6 +53,6 @@
   visibility: hidden;
 }
 
-.video-js *:focus:not(:focus-visible) {
+.video-js *:focus:not(.focus-visible) {
   outline: none;
 }
