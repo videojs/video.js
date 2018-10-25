@@ -19,19 +19,13 @@ module.exports = function(config) {
 
     // Compling tests here
     files: [
-      '../build/temp/video-js.css',
+      '../dist/video-js.css',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
       '../build/temp/browserify.js',
       '../build/temp/webpack.js',
       { pattern: '../src/**/*.js', watched: true, included: false, served: false }
     ],
-
-    // Using precompiled tests
-    // files: [
-    //   '../build/temp/video-js.css',
-    //   '../build/temp/tests.js'
-    // ],
 
     preprocessors: {
       '../test/**/*.js': [ 'browserify' ]

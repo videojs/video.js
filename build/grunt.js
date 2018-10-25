@@ -1,6 +1,5 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import isDocsOnly from './docs-only.js';
-import sass from 'node-sass';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -85,19 +84,6 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      dist: {
-        files: [
-          'build/temp/video.js',
-          'build/temp/alt/video.novtt.js',
-          'build/temp/video-js.css',
-          'build/temp/alt/video-js-cdn.css'
-        ],
-        tasks: ['copy:dist']
-      },
-      skin: {
-        files: ['src/css/**/*'],
-        tasks: ['skin']
-      },
       lang: {
         files: ['lang/**/*.json'],
         tasks: ['vjslanguages']
@@ -113,40 +99,10 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      minor: {
-        files: [
-          {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.majorMinor+'/', filter: 'isFile'} // includes files in path
-        ]
-      },
-      patch: {
-        files: [
-          {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
-        ]
-      },
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
-    },
-    cssmin: {
-      minify: {
-        expand: true,
-        cwd: 'build/temp/',
-        src: ['video-js.css', 'alt/video-js-cdn.css'],
-        dest: 'build/temp/',
-        ext: '.min.css'
-      }
-    },
-    sass: {
-      options: {
-        implementation: sass
-      },
-      build: {
-        files: {
-          'build/temp/video-js.css': 'src/css/vjs.scss',
-          'build/temp/alt/video-js-cdn.css': 'src/css/vjs-cdn.scss'
-        }
-      }
     },
     karma: {
       // this config file applies to all following configs except if overwritten
@@ -200,50 +156,7 @@ module.exports = function(grunt) {
         dest: 'dist/video-js-' + version.full + '.zip'
       }
     },
-    version: {
-      css: {
-        options: {
-          prefix: '@version\\s*'
-        },
-        src: 'build/temp/video-js.css'
-      }
-    },
     browserify: {
-      build: {
-        options: browserifyGruntOptions(),
-        files: {
-          'build/temp/video.js': ['es5/video.js']
-        }
-      },
-      buildnovtt: {
-        options: browserifyGruntOptions({transform: [
-          ['aliasify', {aliases: {'videojs-vtt.js': false}}]
-        ]}),
-        files: {
-          'build/temp/alt/video.novtt.js': ['es5/video.js']
-        }
-      },
-      watch: {
-        options: browserifyGruntOptions({
-          watch: true,
-          keepAlive: true,
-        }),
-        files: {
-          'build/temp/video.js': ['es5/video.js']
-        }
-      },
-      watchnovtt: {
-        options: browserifyGruntOptions({
-          transform: [
-            ['aliasify', {aliases: {'videojs-vtt.js': false}}]
-          ],
-          watch: true,
-          keepAlive: true,
-        }),
-        files: {
-          'build/temp/alt/video.novtt.js': ['es5/video.js']
-        }
-      },
       tests: {
         options: {
           browserifyOptions: {
@@ -276,11 +189,6 @@ module.exports = function(grunt) {
         src: 'test/coverage/lcov.info'
       }
     },
-    concat: {
-      options: {
-        separator: '\n'
-      }
-    },
     concurrent: {
       options: {
         logConcurrentOutput: true
@@ -290,12 +198,10 @@ module.exports = function(grunt) {
         'browserify:tests'
       ],
       dev: [
-        'skin',
+        'shell:sass',
         'shell:babel',
         'browserify:tests',
-        'watch:skin',
         'watch:lang',
-        'watch:dist',
         'copy:dist'
       ],
       // Run multiple watch tasks in parallel
@@ -312,25 +218,19 @@ module.exports = function(grunt) {
         'browserify:watch'
       ]
     },
-    usebanner: {
-      novtt: {
+    shell: {
+      cssmin: {
+        command: 'npm run cssmin',
         options: {
-          process: createLicenseProcessor({includesVtt: false})
-        },
-        files: {
-          src: ['build/temp/alt/video.novtt.js']
+          preferLocal: true
         }
       },
-      vtt: {
+      sass: {
+        command: 'npm run sass',
         options: {
-          process: createLicenseProcessor({includesVtt: true})
-        },
-        files: {
-          src: ['build/temp/video.js']
+          preferLocal: true
         }
-      }
-    },
-    shell: {
+      },
       rollup: {
         command: 'npm run rollup',
         options: {
@@ -342,9 +242,6 @@ module.exports = function(grunt) {
         options: {
           preferLocal: true
         }
-      },
-      autoprefixer: {
-        command: 'npm run autoprefixer'
       },
       babel: {
         command: 'npm run babel -- --watch --quiet',
@@ -407,10 +304,8 @@ module.exports = function(grunt) {
 
     'shell:rollupall',
 
-    'skin',
-    'shell:autoprefixer',
-    'version:css',
-    'cssmin',
+    'shell:sass',
+    'shell:cssmin',
 
     'copy:fonts',
     'vjslanguages'
@@ -424,7 +319,7 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass']);
+  grunt.registerTask('skin', ['shell:sass']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);
