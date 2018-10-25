@@ -52,3 +52,12 @@
   border: none;
   z-index: -1000;
 }
+
+// The rule is needed for :focus-visible polyfill
+.js-focus-visible .video-js *:focus:not(.focus-visible) {
+  outline: none;
+}
+
+.video-js *:focus:not(:focus-visible) {
+  outline: none;
+}
