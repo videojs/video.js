@@ -19,8 +19,8 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg,
     clean: {
-      build: ['build/temp/*', 'es5'],
-      dist: ['dist/*']
+      build: ['build/temp/*', 'es5', 'test/dist'],
+      dist: ['dist/*', 'test/dist']
     },
     dist: {},
     watch: {
