@@ -73,7 +73,15 @@ const externals = {
     'xhr',
     'tsml',
     'safe-json-parse/tuple',
-    'videojs-vtt.js'
+    'videojs-vtt.js',
+    'url-toolkit',
+    'm3u8-parser',
+    'mpd-parser',
+    'mux.js',
+    'mux.js/lib/mp4',
+    'mux.js/lib/tools/ts-inspector.js',
+    'mux.js/lib/mp4/probe',
+    'aes-decrypter'
   ]),
   test: Object.keys(globals.test).concat([
   ])
@@ -174,9 +182,7 @@ export default cliargs => [
     },
     external: externals.module,
     plugins: [
-      primedResolve,
       json(),
-      primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
