@@ -27,11 +27,6 @@ module.exports = function(config) {
       { pattern: '../src/**/*.js', watched: true, included: false, served: false }
     ],
 
-    // Using precompiled tests
-    // files: [
-    //   '../build/temp/tests.js'
-    // ],
-
     preprocessors: {
       '../test/**/*.js': [ 'browserify' ]
     },
