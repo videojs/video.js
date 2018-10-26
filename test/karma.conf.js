@@ -5,16 +5,6 @@ module.exports = function(config) {
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
-    browserStackLaunchers(defaults) {
-      return Object.assign(defaults, {
-        bsSafariElCapitan: {
-          base: 'BrowserStack',
-          browser: 'safari',
-          os: 'OS X',
-          os_version: 'El Capitan'
-        }
-      });
-    },
     serverBrowsers(defaults) {
       return [];
     }
@@ -32,8 +22,9 @@ module.exports = function(config) {
     {pattern: 'src/**/*.js', watched: true, included: false, served: false }
   ];
 
+  config.browserStack.project = 'Video.js';
+
   config.frameworks.push('browserify');
-  config.plugins.push('karma-browserify');
   config.browserify = {
     debug: true,
     plugin: ['proxyquireify/plugin'],
@@ -45,7 +36,7 @@ module.exports = function(config) {
 
 
   config.preprocessors = {
-    'test/**/*.js': [ 'browserify' ]
+    'test/**/*.js': ['browserify']
   };
 
   config.reporters = ['dots'];
