@@ -2292,11 +2292,9 @@ class Player extends Component {
         if (this.options_.liveui) {
           this.addClass('vjs-liveui');
         }
-        this.liveTracker.start();
       } else {
         this.removeClass('vjs-live');
         this.removeClass('vjs-liveui');
-        this.liveTracker.stop();
       }
       if (!isNaN(seconds)) {
         // Do not fire durationchange unless the duration value is known.

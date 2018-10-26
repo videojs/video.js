@@ -3,6 +3,12 @@ import Component from './component.js';
 /* track when we are at the live edge, and other helpers for live playback */
 class LiveTracker extends Component {
 
+  constructor(player, options, ready) {
+    super(player, options, ready);
+
+    this.on(this.player_, 'durationchange', this.handleDurationchange);
+  }
+
   isBehind_() {
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
@@ -43,19 +49,24 @@ class LiveTracker extends Component {
   }
 
   /**
+   * handle a durationchange event on the player
+   * and start/stop tracking accordingly.
+   */
+  handleDurationchange() {
+    if (this.player_.duration() === Infinity) {
+      this.start();
+    } else {
+      this.stop();
+    }
+  }
+
+  /**
    * start tracking live playback
    */
   start() {
     if (this.started()) {
       return;
     }
-    /*
-    this.on(this.player_, 'seeked', this.handleSeekEndChange);
-    this.on(this.player_, 'playing', this.handleSeekEndChange);
-
-    // 'playing'
-    this.on(this.player_, ['ended', 'pause', 'waiting']);
-    this.on(this.player_, ['timeupdate', 'ended'], this.update);*/
 
     this.trackingInterval_ = this.setInterval(this.trackLive_, 30);
     this.trackLive_();
