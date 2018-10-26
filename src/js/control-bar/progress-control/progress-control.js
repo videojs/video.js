@@ -30,7 +30,6 @@ class ProgressControl extends Component {
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
 
     this.enable();
-    // this.on(this.player_, 'durationchange', this.updateShowing);
   }
 
   /**
@@ -196,24 +195,6 @@ class ProgressControl extends Component {
     this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
     this.off(doc, 'mouseup', this.handleMouseUp);
     this.off(doc, 'touchend', this.handleMouseUp);
-  }
-
-  /**
-   * Check to the duration and liveui class to see if the ProgressControl should be showing or not.
-   * Then show/hide it accordingly
-   *
-   * @param {EventTarget~Event} [event]
-   *        The {@link Player#durationchange} event that caused this function to run.
-   *
-   * @listens Player#durationchange
-   */
-  updateShowing(event) {
-    // we only hide the progress bar when live, without liveui
-    if (this.player_.liveTracker.isLive() && !this.player_.options_.liveui) {
-      this.hide();
-    } else {
-      this.show();
-    }
   }
 }
 
