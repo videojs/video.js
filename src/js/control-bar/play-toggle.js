@@ -17,10 +17,10 @@ class PlayToggle extends Button {
    * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
-   * @param {Object} [options]
+   * @param {Object} [options={}]
    *        The key/value store of player options.
    */
-  constructor(player, options) {
+  constructor(player, options = {}) {
     super(player, options);
 
     // show or hide replay icon
