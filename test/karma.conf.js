@@ -2,7 +2,7 @@ const generate = require('videojs-generate-karma-config');
 
 module.exports = function(config) {
   const coverageFlag = process.env.npm_config_coverage;
-  const reportCoverage = process.env.TRAVIS || coverageFlag || false;
+  const reportCoverage = false; // process.env.TRAVIS || coverageFlag || false;
 
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
