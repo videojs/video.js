@@ -1,14 +1,16 @@
 const generate = require('videojs-generate-karma-config');
 
 module.exports = function(config) {
+  const coverageFlag = process.env.npm_config_coverage;
+  const reportCoverage = process.env.TRAVIS || coverageFlag || false;
 
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
     serverBrowsers(defaults) {
       return [];
-    }
-
+    },
+    coverage: reportCoverage,
   };
 
   config = generate(config, options);
@@ -30,15 +32,16 @@ module.exports = function(config) {
     plugin: ['proxyquireify/plugin'],
     transform: [
       ['babelify', {"presets": [["@babel/preset-env", {"loose": true}]]}],
-      'browserify-istanbul'
     ]
   };
+
+  if (reportCoverage) {
+    config.browserify.transform.push('browserify-istanbul');
+  }
 
 
   config.preprocessors = {
     'test/**/*.js': ['browserify']
   };
-
-  config.reporters = ['dots'];
 
 };
