@@ -1593,7 +1593,18 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('waiting');
-    this.one('timeupdate', () => this.removeClass('vjs-waiting'));
+
+    // Browsers may emit a timeupdate event after a waiting event. In order to prevent
+    // premature removal of the waiting class, wait for the time to change.
+    const timeWhenWaiting = this.currentTime();
+    const timeUpdateListener = () => {
+      if (timeWhenWaiting !== this.currentTime()) {
+        this.removeClass('vjs-waiting');
+        this.off('timeupdate', timeUpdateListener);
+      }
+    };
+
+    this.on('timeupdate', timeUpdateListener);
   }
 
   /**
