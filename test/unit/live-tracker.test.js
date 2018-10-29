@@ -67,7 +67,7 @@ QUnit.module('LiveTracker', () => {
 
   QUnit.test('Triggers live-edge-change when we fall behind and catch up', function(assert) {
     this.player.currentTime = () => 0;
-    this.clock.tick(1030);
+    this.clock.tick(1070);
 
     assert.equal(this.liveEdgeChanges, 1, 'should have one live edge change');
     assert.ok(this.liveTracker.behindLiveEdge(), 'behind live edge');
