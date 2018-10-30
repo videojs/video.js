@@ -17,7 +17,7 @@
 }
 
 .vjs-text-track-settings .vjs-track-settings-controls {
-  text-align: right;
+  text-align: center;
   vertical-align: bottom;
 }
 
@@ -41,21 +41,36 @@
   }
 
   .vjs-text-track-settings .vjs-track-settings-controls {
-    grid-column: 2;
+    grid-column: 1 / -1;
     grid-row: 2;
-
   }
+
+
+  // 1 column for small players
+  @media (max-width: 425px) {
+
+    .vjs-text-track-settings .vjs-track-settings-font {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .vjs-text-track-settings .vjs-track-settings-controls {
+      grid-column: 1 / -1;
+      grid-row: 3;
+    }
+  }
+
 }
 
 // Form elements
 .vjs-track-setting > select {
-  margin-right: 5px;
+  width: 15em;
 }
 
 .vjs-text-track-settings fieldset {
-  margin: 5px;
-  padding: 3px;
   border: none;
+  height: 8em;
+  width: 1em;
 }
 
 .vjs-text-track-settings fieldset span {
@@ -64,7 +79,7 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
-  margin: 0 0 5px 0;
+  margin: 0 0 1px 0;
 }
 
 // Hide labels, so they are only for screen reader users
@@ -102,4 +117,5 @@
 
 .vjs-track-settings-controls .vjs-default-button {
   margin-right: 1em;
+  margin-bottom: 1em;
 }

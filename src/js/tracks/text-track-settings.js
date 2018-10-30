@@ -351,7 +351,7 @@ class TextTrackSettings extends ModalDialog {
       this.localize('Text'),
       '</legend>',
       this.createElSelect_('color', legendId),
-      '<span class="vjs-text-opacity vjs-opacity">',
+      '<span class="vjs-text-opacity vjs-opacity vjs-track-setting">',
       this.createElSelect_('textOpacity', legendId),
       '</span>',
       '</fieldset>'
@@ -375,7 +375,7 @@ class TextTrackSettings extends ModalDialog {
       this.localize('Background'),
       '</legend>',
       this.createElSelect_('backgroundColor', legendId),
-      '<span class="vjs-bg-opacity vjs-opacity">',
+      '<span class="vjs-bg-opacity vjs-opacity vjs-track-setting">',
       this.createElSelect_('backgroundOpacity', legendId),
       '</span>',
       '</fieldset>'
@@ -399,7 +399,7 @@ class TextTrackSettings extends ModalDialog {
       this.localize('Window'),
       '</legend>',
       this.createElSelect_('windowColor', legendId),
-      '<span class="vjs-window-opacity vjs-opacity">',
+      '<span class="vjs-window-opacity vjs-opacity vjs-track-setting">',
       this.createElSelect_('windowOpacity', legendId),
       '</span>',
       '</fieldset>'
