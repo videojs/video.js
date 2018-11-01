@@ -104,6 +104,12 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
+      'zip': {
+        command: 'npm run zip',
+        options: {
+          preferLocal: true
+        }
+      },
       cssmin: {
         command: 'npm run cssmin',
         options: {
