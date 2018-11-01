@@ -31,17 +31,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    zip: {
-      dist: {
-        router: function (filepath) {
-          var path = require('path');
-          return path.relative('dist', filepath);
-        },
-        // compression: 'DEFLATE',
-        src: ['dist/**/*'],
-        dest: 'dist/video-js-' + version.full + '.zip'
-      }
-    },
     concurrent: {
       options: {
         logConcurrentOutput: true
@@ -209,11 +198,10 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('dist', [
-    'shell:clean',
     'build',
     'shell:copy-dist',
     'shell:copy-examples',
-    'zip:dist'
+    'shell:zip'
   ]);
 
   grunt.registerTask('skin', ['shell:sass']);
