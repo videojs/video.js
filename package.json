@@ -86,7 +86,7 @@
     "browserify-istanbul": "^3.0.1",
     "clean-css-cli": "^4.2.1",
     "cli-table": "^0.3.1",
-    "conventional-changelog-cli": "^2.0.1",
+    "conventional-changelog-cli": "^2.0.11",
     "conventional-changelog-videojs": "^3.0.0",
     "es5-shim": "^4.5.10",
     "es6-shim": "^0.35.3",
