@@ -17,6 +17,11 @@
   "homepage": "https://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
+    "copy-fonts": "shx cp -R node_modules/videojs-font/fonts build/temp/font",
+    "copy-dist": "shx cp -R build/temp/* dist/",
+    "copy-a11y": "shx cp sandbox/descriptions.html.example sandbox/descriptions.html",
+    "copy-examples": "shx cp -R docs/examples dist/",
+    "copy-examples": "shx cp -R lang/* dist/lang/",
     "clean": "shx rm -rf ./dist ./test/dist",
     "postclean": "shx mkdir -p ./dist ./test/dist",
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
