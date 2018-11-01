@@ -63,7 +63,7 @@
     "prepublishOnly": "run-p build",
     "publish": "node build/gh-release.js",
     "version": "node build/version.js && git add CHANGELOG.md",
-    "zip": "cd dist && bestzip \"./video-js-${npm_package_version}.zip\" * && cd .."
+    "zip": "cd dist && cross-var bestzip \"./video-js-${npm_package_version}.zip\" * && cd .."
   },
   "repository": {
     "type": "git",
@@ -96,6 +96,7 @@
     "cli-table": "^0.3.1",
     "conventional-changelog-cli": "^2.0.11",
     "conventional-changelog-videojs": "^3.0.0",
+    "cross-var": "^1.1.0",
     "es5-shim": "^4.5.10",
     "es6-shim": "^0.35.4",
     "filesize": "^3.5.11",
