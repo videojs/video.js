@@ -136,7 +136,7 @@
     "semver": "^5.5.0",
     "shelljs": "^0.8.1",
     "sinon": "^1.16.1",
-    "time-grunt": "^1.1.1",
+    "time-grunt": "^2.0.0",
     "tui-jsdoc-template": "^1.1.0",
     "uglify-js": "^3.3.21",
     "unified": "^7.0.0",
