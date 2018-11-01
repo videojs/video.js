@@ -18,11 +18,6 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg,
-    clean: {
-      build: ['build/temp/*', 'es5', 'test/dist'],
-      dist: ['dist/*', 'test/dist']
-    },
-    dist: {},
     watch: {
       lang: {
         files: ['lang/**/*.json'],
@@ -79,6 +74,12 @@ module.exports = function(grunt) {
       ]
     },
     shell: {
+      clean: {
+        command: 'npm run clean',
+        options: {
+          preferLocal: true
+        }
+      },
       'karma-server': {
         command: 'npm run karma-server',
         options: {
@@ -172,7 +173,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'shell:lint',
-    'clean:build',
+    'shell:clean',
 
     'shell:rollupall',
 
@@ -185,7 +186,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('dist', [
-    'clean:dist',
+    'shell:clean',
     'build',
     'copy:dist',
     'copy:examples',
