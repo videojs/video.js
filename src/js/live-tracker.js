@@ -12,17 +12,13 @@ class LiveTracker extends Component {
   isBehind_() {
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
-    let liveTimeWindow = this.liveTimeWindow();
-
-    if (liveTimeWindow === Infinity || liveTimeWindow === 0) {
-      liveTimeWindow = 2;
-    }
+    const segmentLength = this.segmentLength_ || 12;
 
     // the live edge window is the amount of seconds away from live
     // that a player can be, but still be considered live.
     // we add 0.07 because the live tracking happens every 30ms
     // and we want some wiggle room for short segment live playback
-    const liveEdgeWindow = (liveTimeWindow / 2) + 0.07;
+    const liveEdgeWindow = segmentLength + 0.07;
     const isBehind = liveCurrentTime !== Infinity &&
       (liveCurrentTime - liveEdgeWindow) >= currentTime;
 
@@ -36,7 +32,6 @@ class LiveTracker extends Component {
   // and for tracking how far past seek end we should be
   trackLive_() {
     this.pastSeekEnd_ = this.pastSeekEnd_ || 0;
-    const lastSeekEnd = this.lastSeekEnd_;
     const seekable = this.player_.seekable();
 
     // skip undefined seekable
@@ -49,7 +44,11 @@ class LiveTracker extends Component {
     // we can only tell if we are behing live, when seekable changes
     // once we detect that seekable has changed we check the new seek
     // end against current time, with a fudge value of half a second.
-    if (newSeekEnd !== lastSeekEnd) {
+    if (newSeekEnd !== this.lastSeekEnd_) {
+      if (this.lastSeekEnd_) {
+        this.segmentLength_ = newSeekEnd - this.lastSeekEnd_;
+      }
+
       this.pastSeekEnd_ = 0;
       this.lastSeekEnd_ = newSeekEnd;
       this.trigger('seek-end-change');
