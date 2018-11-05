@@ -31,6 +31,7 @@ module.exports = function(grunt) {
     },
     copy: {
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
+      lang:  { cwd: 'lang/', src: ['*'], dest: 'dist/lang/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
@@ -189,6 +190,7 @@ module.exports = function(grunt) {
     'shell:cssmin',
 
     'copy:fonts',
+    'copy:lang',
     'vjslanguages'
   ]);
 
