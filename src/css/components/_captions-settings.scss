@@ -25,27 +25,11 @@
 @supports (display: grid) {
   .vjs-text-track-settings .vjs-modal-dialog-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    // grid-template-rows: repeat(425, minmax(1fr 1fr));
   }
 
-  .vjs-text-track-settings .vjs-track-settings-colors {
-    display: block;
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .vjs-text-track-settings .vjs-track-settings-font {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .vjs-text-track-settings .vjs-track-settings-controls {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-
-
+  /*
   // 1 column for small players
   @media (max-width: 425px) {
 
@@ -58,9 +42,10 @@
       grid-column: 1 / -1;
       grid-row: 3;
     }
-  }
+  }*/
 
 }
+
 
 // Form elements
 .vjs-track-setting > select {
@@ -69,8 +54,6 @@
 
 .vjs-text-track-settings fieldset {
   border: none;
-  height: 8em;
-  width: 1em;
 }
 
 .vjs-text-track-settings fieldset span {
