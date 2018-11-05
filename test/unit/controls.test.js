@@ -2,6 +2,7 @@
 import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
 import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
 import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
+import PlayToggle from '../../src/js/control-bar/play-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
@@ -31,6 +32,48 @@ QUnit.test('should hide volume and mute toggle control if it\'s not supported', 
 
   assert.ok(volumeControl.hasClass('vjs-hidden'), 'volumeControl is not hidden');
   assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
+
+  player.dispose();
+});
+
+QUnit.test('should show replay icon when video playback ended', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player);
+
+  player.trigger('ended');
+
+  assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
+
+  player.dispose();
+});
+
+QUnit.test('should show replay icon when video playback ended and replay option is set to true', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player, {replay: true});
+
+  player.trigger('ended');
+
+  assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
+
+  player.dispose();
+});
+
+QUnit.test('should not show the replay icon when video playback ended', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player, {replay: false});
+
+  player.trigger('ended');
+
+  assert.equal(playToggle.hasClass('vjs-ended'), false, 'playToogle is not in the ended state');
 
   player.dispose();
 });

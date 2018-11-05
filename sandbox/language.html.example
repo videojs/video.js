@@ -47,7 +47,7 @@
 
 </head>
 <body>
-  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" data-setup=''>
+  <video id="vid1" class="video-js" controls preload="auto" width="640" height="264" data-setup=''>
     <!--
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>

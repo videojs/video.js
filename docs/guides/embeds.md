@@ -10,7 +10,9 @@ However, this is kind of weird to have a `<video>` element embed with a `<div>` 
 Below, the three kinds of embeds are detailed.
 
 ## Embeds
+
 ### `<video>` embed
+
 The classic Video.js embed. You can then initialize it via `data-setup` or via the `videojs` method.
 
 ```html
@@ -24,11 +26,13 @@ The classic Video.js embed. You can then initialize it via `data-setup` or via t
   <source src="//vjs.zencdn.net/v/oceans.mp4">
 </video>
 ```
+
 ```js
 const player = videojs('vid1', {});
 ```
 
 ### Player div ingest
+
 The enhanced classic embed. You can also initialize it via `data-setup` or via the `videojs` method.
 
 ```html
@@ -46,6 +50,7 @@ The enhanced classic embed. You can also initialize it via `data-setup` or via t
   </video>
 </div>
 ```
+
 ```js
 const player = videojs('vid1', {});
 ```
@@ -53,6 +58,7 @@ const player = videojs('vid1', {});
 As you can see, it isn't much different from the classic `<video>` embed. It also does make it easier to work with [React](/docs/guides/react.md).
 
 ### `<video-js>` embed
+
 This is the [I Can't Believe It's Not Custom Elements](https://developers.google.com/web/fundamentals/web-components/customelements) embed code.
 It looks very much like the `<video>` embed but instead of `video` it's a `video-js` embed.
 This is useful for all the things that the player div ingest is useful for and it matches our library name!
@@ -68,6 +74,7 @@ This is useful for all the things that the player div ingest is useful for and i
   <source src="//vjs.zencdn.net/v/oceans.mp4">
 </video-js>
 ```
+
 ```js
 const player = videojs('vid1', {});
 ```
@@ -75,8 +82,10 @@ const player = videojs('vid1', {});
 Adding `class="video-js"` with this embed is no longer necessary as it will automatically add the class `video-js` if missing.
 
 #### Custom Elements
-Native Custom Elements support is relatively small according to [Can I Use](http://caniuse.com/#feat=custom-elementsv1) and because we didn't want to include a polyfill we're going with just an element called `video-js` rather than a full blown custom element.
+
+Native Custom Elements support is relatively small according to [Can I Use](https://caniuse.com/#feat=custom-elementsv1) and because we didn't want to include a polyfill we're going with just an element called `video-js` rather than a full blown custom element.
 
 ## data-setup
+
 This is an ease-of-use method for having Video.js set up the player automatically. It is an HTML attribute and it takes a JSON string representation of the [player options](/docs/guides/options.md) as the value.
 Using the programmatic approach is probably preferable.

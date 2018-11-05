@@ -172,9 +172,9 @@ By offering a built-in events system, advanced plugins offer a wider range of op
 
 All events triggered by plugins include an additional data object as a second argument. This object has three properties:
 
-- `name`: The name of the plugin (e.g. `"examplePlugin"`) as a string.
-- `plugin`: The plugin constructor (e.g. `ExamplePlugin`).
-- `instance`: The plugin constructor instance.
+* `name`: The name of the plugin (e.g. `"examplePlugin"`) as a string.
+* `plugin`: The plugin constructor (e.g. `ExamplePlugin`).
+* `instance`: The plugin constructor instance.
 
 #### Statefulness
 
@@ -332,10 +332,10 @@ Occasionally, a use-case arises where some code needs to wait for a plugin to be
 
 For any given plugin initialization, there are four events to be aware of:
 
-- `beforepluginsetup`: Triggered immediately before any plugin is initialized.
-- `beforepluginsetup:examplePlugin` Triggered immediately before the `examplePlugin` is initialized.
-- `pluginsetup`: Triggered after any plugin is initialized.
-- `pluginsetup:examplePlugin`: Triggered after he `examplePlugin` is initialized.
+* `beforepluginsetup`: Triggered immediately before any plugin is initialized.
+* `beforepluginsetup:examplePlugin` Triggered immediately before the `examplePlugin` is initialized.
+* `pluginsetup`: Triggered after any plugin is initialized.
+* `pluginsetup:examplePlugin`: Triggered after he `examplePlugin` is initialized.
 
 These events work for both basic and advanced plugins. They are triggered on the player and each includes an object of [extra event data](#extra-event-data) as a second argument to its listeners.
 
@@ -350,9 +350,9 @@ These events work for both basic and advanced plugins. They are triggered on the
 
 [tech]: /docs/guides/tech.md
 
-[api-player]: http://docs.videojs.com/Player.html
+[api-player]: https://docs.videojs.com/Player.html
 
-[api-plugin]: http://docs.videojs.com/Plugin.html
+[api-plugin]: https://docs.videojs.com/Plugin.html
 
 [generator]: https://github.com/videojs/generator-videojs-plugin
 

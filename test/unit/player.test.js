@@ -404,6 +404,54 @@ QUnit.test('should set fluid to true if element has vjs-fluid class', function(a
   player.dispose();
 });
 
+QUnit.test('should set fill to true if element has vjs-fill class', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fill';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.fill(), 'fill is true with vjs-fill class');
+
+  player.dispose();
+});
+
+QUnit.test('fill turns off fluid', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fluid';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.notOk(player.fill(), 'fill is false');
+  assert.ok(player.fluid(), 'fluid is true');
+
+  player.fill(true);
+
+  assert.ok(player.fill(), 'fill is true');
+  assert.notOk(player.fluid(), 'fluid is false');
+
+  player.dispose();
+});
+
+QUnit.test('fluid turns off fill', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fill';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.fill(), 'fill is true');
+  assert.notOk(player.fluid(), 'fluid is false');
+
+  player.fluid(true);
+
+  assert.notOk(player.fill(), 'fill is false');
+  assert.ok(player.fluid(), 'fluid is true');
+
+  player.dispose();
+});
+
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
   const alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
   const numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });
@@ -1136,6 +1184,7 @@ if (window.Promise) {
 }
 
 QUnit.test('play promise should resolve to native value if returned', function(assert) {
+  const done = assert.async();
   const player = TestHelpers.makePlayer({});
 
   player.src({
@@ -1148,7 +1197,18 @@ QUnit.test('play promise should resolve to native value if returned', function(a
   player.tech_.play = () => 'foo';
   const p = player.play();
 
-  assert.equal(p, 'foo', 'play returns foo');
+  const finish = (v) => {
+    assert.equal(v, 'foo', 'play returns foo');
+    done();
+  };
+
+  if (typeof p === 'string') {
+    finish(p);
+  } else {
+    p.then((v) => {
+      finish(v);
+    });
+  }
 });
 
 QUnit.test('should throw on startup no techs are specified', function(assert) {
@@ -1400,13 +1460,26 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
 
-QUnit.test('Remove waiting class on timeupdate after tech waiting', function(assert) {
+QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
   const player = TestHelpers.makePlayer();
 
+  player.currentTime = () => 1;
   player.tech_.trigger('waiting');
-  assert.ok(/vjs-waiting/.test(player.el().className), 'vjs-waiting is added to the player el on tech waiting');
+  assert.ok(
+    /vjs-waiting/.test(player.el().className),
+    'vjs-waiting is added to the player el on tech waiting'
+  );
   player.trigger('timeupdate');
-  assert.ok(!(/vjs-waiting/).test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
+  assert.ok(
+    /vjs-waiting/.test(player.el().className),
+    'vjs-waiting still exists on the player el when time hasn\'t changed on timeupdate'
+  );
+  player.currentTime = () => 2;
+  player.trigger('timeupdate');
+  assert.notOk(
+    (/vjs-waiting/).test(player.el().className),
+    'vjs-waiting removed from the player el when time has changed on timeupdate'
+  );
   player.dispose();
 });
 

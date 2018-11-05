@@ -6,11 +6,18 @@ Hooks exist so that users can globally hook into certain Video.js lifecycle mome
 
 * [Current Hooks](#current-hooks)
   * [beforesetup](#beforesetup)
+    * [Example](#example)
   * [setup](#setup)
+    * [Example](#example-1)
 * [Usage](#usage)
   * [Adding](#adding)
+    * [Example](#example-2)
+  * [Adding Once](#adding-once)
+    * [Example](#example-3)
   * [Getting](#getting)
+    * [Example](#example-4)
   * [Removing](#removing)
+    * [Example](#example-5)
 
 ## Current Hooks
 
@@ -145,7 +152,6 @@ To access the array of functions that currently exists for any hook, use the `vi
 #### Example
 
 ```js
-
 // Get an array of all the 'beforesetup' hooks.
 var beforeSetupHooks = videojs.hooks('beforesetup');
 

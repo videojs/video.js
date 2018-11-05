@@ -31,11 +31,11 @@ Either can be created programmatically, but _only remote text tracks can be remo
 
 ## Creating the Text File
 
-Timed text requires a text file in [WebVTT](http://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, an end time, and text to display. [Microsoft has a builder](https://dev.modern.ie/testdrive/demos/captionmaker/) that can help you get started on the file.
+Timed text requires a text file in [WebVTT](https://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, an end time, and text to display. [Microsoft has a builder](https://dev.modern.ie/testdrive/demos/captionmaker/) that can help you get started on the file.
 
-> **Note:** When creating captions, there are additional [caption formatting techniques](http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) to make captions more meaningful, like brackets around sound effects (e.g. `[ birds chirping ]`).
+> **Note:** When creating captions, there are additional [caption formatting techniques](https://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) to make captions more meaningful, like brackets around sound effects (e.g. `[ birds chirping ]`).
 >
-> For a more in depth style guide for captioning, see the [Captioning Key](http://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
+> For a more in depth style guide for captioning, see the [Captioning Key](https://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
 
 ## Adding Text Tracks to Video.js
 
@@ -95,7 +95,7 @@ For supported language translations, please see the [languages folder (/lang)](h
 
 ### Text Tracks from Another Domain
 
-Because Video.js loads the text track file via JavaScript, the [same-origin policy](http://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain, but the text track served from another, you'll need to [enable CORS](http://enable-cors.org/) on the server that is serving your text tracks.
+Because Video.js loads the text track file via JavaScript, the [same-origin policy](https://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain, but the text track served from another, you'll need to [enable CORS](https://enable-cors.org/) on the server that is serving your text tracks.
 
 In addition to enabling CORS, you will need to add the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) to the video element itself. This attribute has two possible values `"anonymous"` and `"use-credentials"`. Most users will want to use `"anonymous"` with cross-origin tracks:
 
@@ -214,7 +214,7 @@ In general, `"descriptions"` tracks are of lower precedence than `"captions"` an
 
 ## API
 
-For more complete information, refer to the [Video.js API docs](http://docs.videojs.com/).
+For more complete information, refer to the [Video.js API docs](https://docs.videojs.com/).
 
 ### Remote Text Tracks
 
@@ -225,8 +225,9 @@ As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represen
 * `Player#addRemoteTextTrack(Object options)`
 
   Available options are the same as the [available `track` attributes](#track-attributes). And `language` is a supported option as an alias for the `srclang` attribute - either works here.
-  
+
   **Note**: If you need a callback, instead of a callback you could use the technique below:
+
   ```js
   const trackEl = player.addRemoteTextTrack({src: 'en.vtt'}, false);
   trackEl.addEventListener('load', function() {

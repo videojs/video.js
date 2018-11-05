@@ -36,7 +36,7 @@ For more specifics on the programmatic interface of a component, see [the compon
 
 Video.js components can be inherited and registered with Video.js to add new features and UI to the player.
 
-For a working example, [we have a JSBin](http://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
+For a working example, [we have a JSBin](https://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
 
 In addition, there are a couple methods worth recognizing:
 
@@ -319,6 +319,22 @@ Player
 
 ## Specific Component Details
 
+### Play Toggle
+
+The `PlayToggle` has one option `replay` which can show or hide replay icon. This can be set by passing `{replay: false}` as the default behavior replay icon is shown after video end playback.
+
+Example of how to hide a replay icon
+
+```js
+let player = videojs('myplayer', {
+  controlBar: {
+    playToggle: {
+      replay: false
+    }
+  }
+});
+```
+
 ### Volume Panel
 
 The `VolumePanel` includes the `MuteToggle` and the `VolumeControl` Components, which will be hidden if volume changes are not supported. There is one important option for the `VolumePanel` which can make your `VolumeControl` appear vertically over the `MuteToggle`. This can be set by passing `VolumePanel` `{inline: false}` as the default behavior is a horizontal `VolumeControl` with `{inline: true}`.
@@ -339,7 +355,7 @@ let player = videojs('myplayer', {
 
 The text track settings component is only available when using emulated text tracks.
 
-[api]: http://docs.videojs.com/Component.html
+[api]: https://docs.videojs.com/Component.html
 
 ### Resize Manager
 

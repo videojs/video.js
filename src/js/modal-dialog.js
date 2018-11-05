@@ -341,7 +341,7 @@ class ModalDialog extends Component {
     const parentEl = contentEl.parentNode;
     const nextSiblingEl = contentEl.nextSibling;
 
-     /**
+    /**
       * Fired just before a `ModalDialog` is filled with content.
       *
       * @event ModalDialog#beforemodalfill
@@ -385,7 +385,7 @@ class ModalDialog extends Component {
    * @fires ModalDialog#modalempty
    */
   empty() {
-   /**
+    /**
     * Fired just before a `ModalDialog` is emptied.
     *
     * @event ModalDialog#beforemodalempty
@@ -394,7 +394,7 @@ class ModalDialog extends Component {
     this.trigger('beforemodalempty');
     Dom.emptyEl(this.contentEl());
 
-   /**
+    /**
     * Fired just after a `ModalDialog` is emptied.
     *
     * @event ModalDialog#modalempty

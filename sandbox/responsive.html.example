@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Video.js Sandbox - Responsive</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .breakpoints, .video-js, table {
+      margin: 1em 0;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5em 1em;
+    }
+
+    tbody tr {
+      color: #999;
+    }
+
+    tbody tr:first-child {
+      color: #000;
+    }
+
+    .breakpoints div {
+      background-color: red;
+      color: white;
+      padding: 0.5em 1em;
+    }
+
+    @media (max-width: 210px) {
+      .breakpoints .tiny {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 211px) and (max-width: 320px) {
+      .breakpoints .x-small {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 321px) and (max-width: 425px) {
+      .breakpoints .small {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 426px) and (max-width: 768px) {
+      .breakpoints .medium {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1440px) {
+      .breakpoints .large {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 1441px) and (max-width: 2560px) {
+      .breakpoints .x-large {
+        background-color: green;
+      }
+    }
+
+    @media (min-width: 2561px) {
+      .breakpoints .huge {
+        background-color: green;
+      }
+    }
+  </style>
+</head>
+<body>
+  <p>
+    The following boxes indicate which breakpoint should be applied to the
+    player when it fills the width of its containing viewport.
+  </p>
+  <p>
+    Use these to validate that the default breakpoints match up with how
+    CSS media queries work.
+  </p>
+  <p>
+    <b>Because these bars are updated by CSS, they will change before the <code>playerresize</code> event occurs!</b>
+  </p>
+  <div class="breakpoints">
+    <div class="tiny">vjs-layout-tiny (0px-210px)</div>
+    <div class="x-small">vjs-layout-x-small (211px-320px)</div>
+    <div class="small">vjs-layout-small (321px-425px)</div>
+    <div class="medium">vjs-layout-medium (426px-768px)</div>
+    <div class="large">vjs-layout-large (769px-1440px)</div>
+    <div class="x-large">vjs-layout-x-large (1441px-2560px)</div>
+    <div class="huge">vjs-layout-huge (2561px+)</div>
+  </div>
+
+  <video-js
+    class="vjs-fluid"
+    controls
+    preload="auto"
+    poster="http://vjs.zencdn.net/v/oceans.png">
+    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+
+  <p>
+    Each time the player size changes, a row is prepended to this table.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Class</th>
+        <th>Player Width</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    var vid = document.querySelector('video-js');
+    var player = videojs(vid, {responsive: true});
+    var tbody = document.querySelector('table tbody');
+
+    player.on('playerresize', function() {
+      var values = {
+        breakpoint: player.currentBreakpoint(),
+        className: player.el().className.match(/vjs-layout-([a-z\-]+)/)[0],
+        playerWidth: player.currentWidth()
+      };
+
+      videojs.log('playerresize', values);
+
+      var tr = document.createElement('tr');
+
+      tr.innerHTML = '<td>' +
+        values.className +
+        '</td><td>' +
+        values.playerWidth +
+        '</td>';
+
+      tbody.insertBefore(tr, tbody.firstChild);
+    });
+  </script>
+
+</body>
+</html>

@@ -545,39 +545,39 @@ class Component {
       workingChildren
       // children that are in this.options_ but also in workingChildren  would
       // give us extra children we do not want. So, we want to filter them out.
-      .concat(Object.keys(this.options_)
-              .filter(function(child) {
-                return !workingChildren.some(function(wchild) {
-                  if (typeof wchild === 'string') {
-                    return child === wchild;
-                  }
-                  return child === wchild.name;
-                });
-              }))
-      .map((child) => {
-        let name;
-        let opts;
+        .concat(Object.keys(this.options_)
+          .filter(function(child) {
+            return !workingChildren.some(function(wchild) {
+              if (typeof wchild === 'string') {
+                return child === wchild;
+              }
+              return child === wchild.name;
+            });
+          }))
+        .map((child) => {
+          let name;
+          let opts;
 
-        if (typeof child === 'string') {
-          name = child;
-          opts = children[name] || this.options_[name] || {};
-        } else {
-          name = child.name;
-          opts = child;
-        }
+          if (typeof child === 'string') {
+            name = child;
+            opts = children[name] || this.options_[name] || {};
+          } else {
+            name = child.name;
+            opts = child;
+          }
 
-        return {name, opts};
-      })
-      .filter((child) => {
+          return {name, opts};
+        })
+        .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
         // techs are registerd as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
-        const c = Component.getComponent(child.opts.componentClass ||
+          const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
 
-        return c && !Tech.isTech(c);
-      })
-      .forEach(handleAdd);
+          return c && !Tech.isTech(c);
+        })
+        .forEach(handleAdd);
     }
   }
 
@@ -960,8 +960,9 @@ class Component {
   }
 
   /**
-   * Get the width or the height of the `Component` elements computed style. Uses
-   * `window.getComputedStyle`.
+   * Get the computed width or the height of the component's element.
+   *
+   * Uses `window.getComputedStyle`.
    *
    * @param {string} widthOrHeight
    *        A string containing 'width' or 'height'. Whichever one you want to get.
@@ -1012,11 +1013,13 @@ class Component {
    */
 
   /**
-   * Get an object that contains width and height values of the `Component`s
-   * computed style.
+   * Get an object that contains computed width and height values of the
+   * component's element.
+   *
+   * Uses `window.getComputedStyle`.
    *
    * @return {Component~DimensionObject}
-   *         The dimensions of the components element
+   *         The computed dimensions of the component's element.
    */
   currentDimensions() {
     return {
@@ -1026,20 +1029,24 @@ class Component {
   }
 
   /**
-   * Get the width of the `Component`s computed style. Uses `window.getComputedStyle`.
+   * Get the computed width of the component's element.
    *
-   * @return {number} width
-   *           The width of the `Component`s computed style.
+   * Uses `window.getComputedStyle`.
+   *
+   * @return {number}
+   *         The computed width of the component's element.
    */
   currentWidth() {
     return this.currentDimension('width');
   }
 
   /**
-   * Get the height of the `Component`s computed style. Uses `window.getComputedStyle`.
+   * Get the computed height of the component's element.
    *
-   * @return {number} height
-   *           The height of the `Component`s computed style.
+   * Uses `window.getComputedStyle`.
+   *
+   * @return {number}
+   *         The computed height of the component's element.
    */
   currentHeight() {
     return this.currentDimension('height');

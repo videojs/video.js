@@ -47,7 +47,10 @@ class ResizeManager extends Component {
     }
 
     // Only create an element when ResizeObserver isn't available
-    const options_ = mergeOptions({createEl: !RESIZE_OBSERVER_AVAILABLE}, options);
+    const options_ = mergeOptions({
+      createEl: !RESIZE_OBSERVER_AVAILABLE,
+      reportTouchActivity: false
+    }, options);
 
     super(player, options_);
 
@@ -56,7 +59,7 @@ class ResizeManager extends Component {
     this.resizeObserver_ = null;
     this.debouncedHandler_ = debounce(() => {
       this.resizeHandler();
-    }, 100, false, player);
+    }, 100, false, this);
 
     if (RESIZE_OBSERVER_AVAILABLE) {
       this.resizeObserver_ = new this.ResizeObserver(this.debouncedHandler_);
@@ -64,13 +67,14 @@ class ResizeManager extends Component {
 
     } else {
       this.loadListener_ = () => {
-        if (this.el_.contentWindow) {
-          Events.on(this.el_.contentWindow, 'resize', this.debouncedHandler_);
+        if (!this.el_ || !this.el_.contentWindow) {
+          return;
         }
-        this.off('load', this.loadListener_);
+
+        Events.on(this.el_.contentWindow, 'resize', this.debouncedHandler_);
       };
 
-      this.on('load', this.loadListener_);
+      this.one('load', this.loadListener_);
     }
   }
 
@@ -92,10 +96,20 @@ class ResizeManager extends Component {
      * @event Player#playerresize
      * @type {EventTarget~Event}
      */
+    // make sure player is still around to trigger
+    // prevents this from causing an error after dispose
+    if (!this.player_ || !this.player_.trigger) {
+      return;
+    }
+
     this.player_.trigger('playerresize');
   }
 
   dispose() {
+    if (this.debouncedHandler_) {
+      this.debouncedHandler_.cancel();
+    }
+
     if (this.resizeObserver_) {
       if (this.player_.el()) {
         this.resizeObserver_.unobserve(this.player_.el());

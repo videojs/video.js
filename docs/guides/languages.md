@@ -13,10 +13,9 @@ Some translations may be less complete than others - see the [translations neede
   * [File Naming](#file-naming)
   * [Updating an Existing Translation](#updating-an-existing-translation)
   * [Writing a New Translation](#writing-a-new-translation)
-* [Advanced Language Usage](#advanced-language-usage)
   * [Adding Languages via the API](#adding-languages-via-the-api)
-  * [Per-Player Languages](#per-player-languages)
-  * [Setting Default Player Language](#setting-default-player-language)
+  * [Per-Player Translations](#per-player-translations)
+  * [Setting Player Language](#setting-player-language)
   * [Determining Player Language](#determining-player-language)
     * [Internal Language Selection](#internal-language-selection)
 * [References](#references)
@@ -152,6 +151,6 @@ For all existing/supported languages, please see the [languages folder (`lang/`)
 
 [lang-supported]: /lang
 
-[lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+[lang-codes]: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
 [translations-needed]: https://github.com/videojs/video.js/blob/master/docs/translations-needed.md

@@ -11,7 +11,7 @@ import Component from '../../component.js';
  */
 class Spacer extends Component {
 
- /**
+  /**
   * Builds the default DOM `className`.
   *
   * @return {string}
