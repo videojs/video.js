@@ -123,7 +123,7 @@
     "remark-stringify": "^6.0.1",
     "remark-toc": "^5.0.0",
     "remark-validate-links": "^7.0.0",
-    "replace": "^0.3.0",
+    "replace": "^1.0.0",
     "rollup": "^0.66.2",
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^4.0.1",
