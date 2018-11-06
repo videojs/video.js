@@ -214,7 +214,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.equal(spanishTrack.mode, 'disabled', 'Spanish captions should be disabled');
     assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
-    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should be not be showing');
+    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should not be showing');
 
     // Force es as "user-selected" track
     player.cache_.selectedLanguage = { enabled: true, language: 'es', kind: 'captions' };
@@ -222,7 +222,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.equal(spanishTrack.mode, 'showing', 'Spanish captions should be showing');
     assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
-    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should be not be showing');
+    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should not be showing');
 
     player.dispose();
   });
