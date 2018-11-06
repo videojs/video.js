@@ -9,6 +9,7 @@ import document from 'global/document';
 import window from 'global/window';
 import tsml from 'tsml';
 import evented from './mixins/evented';
+import {isEvented, addEventedCallback} from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -442,6 +443,9 @@ class Player extends Component {
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
+    if (this.fluid_) {
+      this.on('playerreset', this.updateStyleEl_);
+    }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
@@ -825,9 +829,15 @@ class Player extends Component {
 
     this.fluid_ = !!bool;
 
+    if (isEvented(this)) {
+      this.off('playerreset', this.updateStyleEl_);
+    }
     if (bool) {
       this.addClass('vjs-fluid');
       this.fill(false);
+      addEventedCallback(function() {
+        this.on('playerreset', this.updateStyleEl_);
+      });
     } else {
       this.removeClass('vjs-fluid');
     }
@@ -1604,7 +1614,18 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('waiting');
-    this.one('timeupdate', () => this.removeClass('vjs-waiting'));
+
+    // Browsers may emit a timeupdate event after a waiting event. In order to prevent
+    // premature removal of the waiting class, wait for the time to change.
+    const timeWhenWaiting = this.currentTime();
+    const timeUpdateListener = () => {
+      if (timeWhenWaiting !== this.currentTime()) {
+        this.removeClass('vjs-waiting');
+        this.off('timeupdate', timeUpdateListener);
+      }
+    };
+
+    this.on('timeupdate', timeUpdateListener);
   }
 
   /**
@@ -2899,6 +2920,9 @@ class Player extends Component {
     }
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
+    if (isEvented(this)) {
+      this.trigger('playerreset');
+    }
   }
 
   /**

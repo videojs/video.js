@@ -23,8 +23,8 @@
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
 
 ```html
-<link href="//vjs.zencdn.net/7.2/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/7.2/video.min.js"></script>
+<link href="//vjs.zencdn.net/7.3.0/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/7.3.0/video.min.js"></script>
 ```
 
 > For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.

@@ -319,6 +319,22 @@ Player
 
 ## Specific Component Details
 
+### Play Toggle
+
+The `PlayToggle` has one option `replay` which can show or hide replay icon. This can be set by passing `{replay: false}` as the default behavior replay icon is shown after video end playback.
+
+Example of how to hide a replay icon
+
+```js
+let player = videojs('myplayer', {
+  controlBar: {
+    playToggle: {
+      replay: false
+    }
+  }
+});
+```
+
 ### Volume Panel
 
 The `VolumePanel` includes the `MuteToggle` and the `VolumeControl` Components, which will be hidden if volume changes are not supported. There is one important option for the `VolumePanel` which can make your `VolumeControl` appear vertically over the `MuteToggle`. This can be set by passing `VolumePanel` `{inline: false}` as the default behavior is a horizontal `VolumeControl` with `{inline: true}`.

@@ -1460,13 +1460,26 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
 
-QUnit.test('Remove waiting class on timeupdate after tech waiting', function(assert) {
+QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
   const player = TestHelpers.makePlayer();
 
+  player.currentTime = () => 1;
   player.tech_.trigger('waiting');
-  assert.ok(/vjs-waiting/.test(player.el().className), 'vjs-waiting is added to the player el on tech waiting');
+  assert.ok(
+    /vjs-waiting/.test(player.el().className),
+    'vjs-waiting is added to the player el on tech waiting'
+  );
   player.trigger('timeupdate');
-  assert.ok(!(/vjs-waiting/).test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
+  assert.ok(
+    /vjs-waiting/.test(player.el().className),
+    'vjs-waiting still exists on the player el when time hasn\'t changed on timeupdate'
+  );
+  player.currentTime = () => 2;
+  player.trigger('timeupdate');
+  assert.notOk(
+    (/vjs-waiting/).test(player.el().className),
+    'vjs-waiting removed from the player el when time has changed on timeupdate'
+  );
   player.dispose();
 });
 
