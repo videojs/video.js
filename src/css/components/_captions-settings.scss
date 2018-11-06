@@ -34,7 +34,9 @@
   }
 
   // 1 column for small players
-  .vjs-layout-small .vjs-text-track-settings .vjs-modal-dialog-content {
+  .vjs-layout-small .vjs-text-track-settings .vjs-modal-dialog-content ,
+  .vjs-layout-x-small .vjs-text-track-settings .vjs-modal-dialog-content,
+  .vjs-layout-tiny .vjs-text-track-settings .vjs-modal-dialog-content {
     grid-template-columns: 1fr;
   }
 
@@ -43,7 +45,7 @@
 
 // Form elements
 .vjs-track-setting > select {
-  width: 15em;
+  width: 10em;
 }
 
 .vjs-text-track-settings fieldset {
