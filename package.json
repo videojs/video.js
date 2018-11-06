@@ -99,7 +99,6 @@
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-coveralls": "^1.0.0",
     "grunt-shell": "^2.0.0",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.18.1",

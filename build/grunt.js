@@ -54,16 +54,6 @@ module.exports = function(grunt) {
         dest: 'dist/video-js-' + version.full + '.zip'
       }
     },
-    coveralls: {
-      options: {
-        // warn instead of failing when coveralls errors
-        // we've seen coveralls 503 relatively frequently
-        force: true
-      },
-      all: {
-        src: 'test/dist/coverage/lcov.info'
-      }
-    },
     concurrent: {
       options: {
         logConcurrentOutput: true
@@ -207,7 +197,6 @@ module.exports = function(grunt) {
   // Default task - build and test
   grunt.registerTask('default', ['test']);
 
-  // The test script includes coveralls only when the TRAVIS env var is set.
   grunt.registerTask('test', function() {
     const tasks = [
       'build',
@@ -223,8 +212,6 @@ module.exports = function(grunt) {
         grunt.log.write('Not running any tests because only docs were changed');
         return;
       }
-
-      tasks.concat(process.env.TRAVIS && 'coveralls').filter(Boolean);
     }
 
     grunt.task.run(tasks);
