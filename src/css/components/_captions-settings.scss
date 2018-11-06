@@ -25,24 +25,18 @@
 @supports (display: grid) {
   .vjs-text-track-settings .vjs-modal-dialog-content {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    // grid-template-rows: repeat(425, minmax(1fr 1fr));
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
   }
 
-  /*
+  .vjs-text-track-settings .vjs-track-settings-controls {
+    grid-column: 1 / -1;
+  }
+
   // 1 column for small players
-  @media (max-width: 425px) {
-
-    .vjs-text-track-settings .vjs-track-settings-font {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    .vjs-text-track-settings .vjs-track-settings-controls {
-      grid-column: 1 / -1;
-      grid-row: 3;
-    }
-  }*/
+  .vjs-layout-small .vjs-text-track-settings .vjs-modal-dialog-content {
+    grid-template-columns: 1fr;
+  }
 
 }
 
@@ -99,6 +93,5 @@
 }
 
 .vjs-track-settings-controls .vjs-default-button {
-  margin-right: 1em;
-  margin-bottom: 1em;
+  margin: 1em;
 }
