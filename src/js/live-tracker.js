@@ -9,7 +9,7 @@ class LiveTracker extends Component {
     this.on(this.player_, 'durationchange', this.handleDurationchange);
   }
 
-  isBehind_() {
+  isBehind() {
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
     const segmentLength = this.segmentLength_ || 12;
@@ -19,13 +19,8 @@ class LiveTracker extends Component {
     // we add 0.07 because the live tracking happens every 30ms
     // and we want some wiggle room for short segment live playback
     const liveEdgeWindow = segmentLength + 0.07;
-    const isBehind = liveCurrentTime !== Infinity &&
-      (liveCurrentTime - liveEdgeWindow) >= currentTime;
 
-    if (isBehind !== this.behindLiveEdge()) {
-      this.behindLiveEdge_ = isBehind;
-      this.trigger('live-edge-change');
-    }
+    return liveCurrentTime !== Infinity && (liveCurrentTime - liveEdgeWindow) >= currentTime;
   }
 
   // all the functionality for tracking when seek end changes
@@ -56,7 +51,10 @@ class LiveTracker extends Component {
 
     this.pastSeekEnd_ = this.pastSeekEnd() + 0.03;
 
-    this.isBehind_();
+    if (this.isBehind() !== this.behindLiveEdge()) {
+      this.behindLiveEdge_ = this.isBehind();
+      this.trigger('live-edge-change');
+    }
   }
 
   /**
