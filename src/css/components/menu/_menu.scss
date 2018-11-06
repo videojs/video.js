@@ -43,13 +43,13 @@
 }
 
 .vjs-menu li.vjs-menu-item:focus,
-.vjs-menu li.vjs-menu-item:hover {
+.vjs-menu .vjs-menu-content li.vjs-menu-item:hover {
   @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
 }
 
 .vjs-menu li.vjs-selected,
 .vjs-menu li.vjs-selected:focus,
-.vjs-menu li.vjs-selected:hover {
+.vjs-menu li.vjs-menu-item.vjs-selected:hover {
   background-color: $primary-foreground-color;
   color: $primary-background-color;
 }
