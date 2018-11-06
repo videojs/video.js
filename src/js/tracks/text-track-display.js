@@ -150,8 +150,11 @@ class TextTrackDisplay extends Component {
     for (let i = 0; i < trackList.length; i++) {
       const track = trackList[i];
 
-      if (userPref && userPref.enabled &&
-        userPref.language === track.language) {
+      if (
+        userPref && userPref.enabled &&
+        userPref.language && userPref.language === track.language &&
+        track.kind in modes
+      ) {
         // Always choose the track that matches both language and kind
         if (track.kind === userPref.kind) {
           preferredTrack = track;
