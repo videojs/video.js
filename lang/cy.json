@@ -80,5 +80,6 @@
   "Done":"Gorffenwyd",
   "Caption Settings Dialog":"Blwch Gosodiadau Capsiynau",
   "Beginning of dialog window. Escape will cancel and close the window.":"Dechrau ffenestr deialog. Bydd Escape yn canslo a chau'r ffenestr.",
-  "End of dialog window.":"Diwedd ffenestr deialog."
+  "End of dialog window.":"Diwedd ffenestr deialog.",
+  "{1} is loading.": "{1} yn llwytho."
 }
