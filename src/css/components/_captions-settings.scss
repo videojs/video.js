@@ -8,6 +8,9 @@
 // Layout divs
 .vjs-text-track-settings .vjs-modal-dialog-content {
   display: table;
+  // we use this so that the bottom of the
+  // modal dialog keeps its padding at small sizes
+  overflow: scroll;
 }
 
 .vjs-text-track-settings .vjs-track-settings-colors,
@@ -97,5 +100,5 @@
 }
 
 .vjs-track-settings-controls .vjs-default-button {
-  margin: 1em;
+  margin-right: 1em;
 }
