@@ -27,6 +27,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
+    min-height: 23em;
   }
 
   .vjs-text-track-settings .vjs-track-settings-controls {
@@ -38,6 +39,7 @@
   .vjs-layout-x-small .vjs-text-track-settings .vjs-modal-dialog-content,
   .vjs-layout-tiny .vjs-text-track-settings .vjs-modal-dialog-content {
     grid-template-columns: 1fr;
+    min-height: 34.2em;
   }
 
 }
@@ -46,7 +48,6 @@
 .vjs-track-setting > select {
   margin-right: 1em;
   margin-bottom: 0.5em;
-  width: 10em;
 }
 
 .vjs-text-track-settings fieldset {
@@ -57,6 +58,11 @@
 
 .vjs-text-track-settings fieldset span {
   display: inline-block;
+}
+
+// style the second select for text colors
+.vjs-text-track-settings fieldset span > select {
+  max-width: 7.3em;
 }
 
 .vjs-text-track-settings legend {
@@ -99,31 +105,4 @@
 
 .vjs-track-settings-controls .vjs-default-button {
   margin-right: 1em;
-}
-
-
-// halfway through vjs-layout-medium side-by-side selects in
-// track-settings-colors collapse, apply fixes as needed
-@media (max-width: 563px) {
-  // font settings become un-aligned, re-align them
-  .vjs-layout-medium .vjs-track-settings-font fieldset {
-    padding-bottom: 2.2em;
-  }
-}
-
-
-// at small sizes the settings controls touch the bottom of the modal
-// to fix that we have to add padding
-.vjs-layout-small .vjs-track-settings-controls,
-.vjs-layout-x-small .vjs-track-settings-controls,
-.vjs-layout-tiny .vjs-track-settings-controls,
-.vjs-layout-medium .vjs-track-settings-controls {
-  padding-bottom: 20px;
-}
-
-// at tiny and x-small the settings controls get too close
-// to the last select, so we add some padding to the top
-.vjs-layout-tiny .vjs-track-settings-controls,
-.vjs-layout-x-small .vjs-track-settings-controls {
-  padding-top: 20px;
 }
