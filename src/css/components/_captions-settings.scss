@@ -17,7 +17,7 @@
 }
 
 .vjs-text-track-settings .vjs-track-settings-controls {
-  text-align: center;
+  text-align: right;
   vertical-align: bottom;
 }
 
@@ -42,13 +42,15 @@
 
 }
 
-
 // Form elements
 .vjs-track-setting > select {
+  margin-right: 5px;
   width: 10em;
 }
 
 .vjs-text-track-settings fieldset {
+  margin: 5px;
+  padding: 3px;
   border: none;
 }
 
@@ -58,7 +60,7 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
-  margin: 0 0 1px 0;
+  margin: 0 0 5px 0;
 }
 
 // Hide labels, so they are only for screen reader users
