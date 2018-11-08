@@ -44,7 +44,8 @@
 
 // Form elements
 .vjs-track-setting > select {
-  margin-right: 5px;
+  margin-right: 1em;
+  margin-bottom: 0.5em;
   width: 10em;
 }
 
@@ -99,6 +100,17 @@
 .vjs-track-settings-controls .vjs-default-button {
   margin-right: 1em;
 }
+
+
+// halfway through vjs-layout-medium side-by-side selects in
+// track-settings-colors collapse, apply fixes as needed
+@media (max-width: 563px) {
+  // font settings become un-aligned, re-align them
+  .vjs-layout-medium .vjs-track-settings-font fieldset {
+    padding-bottom: 2.2em;
+  }
+}
+
 
 // at small sizes the settings controls touch the bottom of the modal
 // to fix that we have to add padding
