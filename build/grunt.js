@@ -18,40 +18,17 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg,
-    clean: {
-      build: ['build/temp/*', 'es5', 'test/dist'],
-      dist: ['dist/*', 'test/dist']
-    },
-    dist: {},
     watch: {
       lang: {
         files: ['lang/**/*.json'],
         tasks: ['vjslanguages']
       }
     },
-    copy: {
-      fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
-      lang:  { cwd: 'lang/', src: ['*'], dest: 'dist/lang/', expand: true, filter: 'isFile' },
-      dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
-      a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
-      examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
-    },
     vjslanguages: {
       defaults: {
         files: {
           'build/temp/lang': ['lang/*.json']
         }
-      }
-    },
-    zip: {
-      dist: {
-        router: function (filepath) {
-          var path = require('path');
-          return path.relative('dist', filepath);
-        },
-        // compression: 'DEFLATE',
-        src: ['dist/**/*'],
-        dest: 'dist/video-js-' + version.full + '.zip'
       }
     },
     concurrent: {
@@ -65,7 +42,7 @@ module.exports = function(grunt) {
         'shell:sass',
         'shell:babel',
         'watch:lang',
-        'copy:dist',
+        'shell:copy-dist',
         'shell:karma-server'
       ],
       // Run multiple watch tasks in parallel
@@ -79,6 +56,42 @@ module.exports = function(grunt) {
       ]
     },
     shell: {
+      'copy-dist': {
+        command: 'npm run copy-dist',
+        options: {
+          preferLocal: true
+        }
+      },
+      'copy-fonts': {
+        command: 'npm run copy-fonts',
+        options: {
+          preferLocal: true
+        }
+      },
+      'copy-lang': {
+        command: 'npm run copy-lang',
+        options: {
+          preferLocal: true
+        }
+      },
+      'copy-a11y': {
+        command: 'npm run copy-a11y',
+        options: {
+          preferLocal: true
+        }
+      },
+      'copy-examples': {
+        command: 'npm run copy-examples',
+        options: {
+          preferLocal: true
+        }
+      },
+      clean: {
+        command: 'npm run clean',
+        options: {
+          preferLocal: true
+        }
+      },
       'karma-server': {
         command: 'npm run karma-server',
         options: {
@@ -87,6 +100,12 @@ module.exports = function(grunt) {
       },
       'karma-run': {
         command: 'npm run karma-run',
+        options: {
+          preferLocal: true
+        }
+      },
+      'zip': {
+        command: 'npm run zip',
         options: {
           preferLocal: true
         }
@@ -172,24 +191,23 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'shell:lint',
-    'clean:build',
+    'shell:clean',
 
     'shell:rollupall',
 
     'shell:sass',
     'shell:cssmin',
 
-    'copy:fonts',
-    'copy:lang',
+    'shell:copy-fonts',
+    'shell:copy-lang',
     'vjslanguages'
   ]);
 
   grunt.registerTask('dist', [
-    'clean:dist',
     'build',
-    'copy:dist',
-    'copy:examples',
-    'zip:dist'
+    'shell:copy-dist',
+    'shell:copy-examples',
+    'shell:zip'
   ]);
 
   grunt.registerTask('skin', ['shell:sass']);
@@ -220,7 +238,7 @@ module.exports = function(grunt) {
   // Run while developing
   grunt.registerTask('dev', ['sandbox', 'concurrent:dev']);
   grunt.registerTask('watchAll', ['build', 'concurrent:watchAll']);
-  grunt.registerTask('test-a11y', ['copy:a11y', 'accessibility']);
+  grunt.registerTask('test-a11y', ['shell:copy-a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['shell:karma-server']);
