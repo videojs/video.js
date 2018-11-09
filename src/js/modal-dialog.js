@@ -132,7 +132,7 @@ class ModalDialog extends Component {
     } else {
 
       // Pass keypress handling up for unsupported keys
-      super.handleKeyPress(e);
+      super.handleKeyPress(event);
     }
   }
 

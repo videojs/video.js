@@ -108,9 +108,7 @@ class Button extends ClickableComponent {
     const keyCode = keyboardKey.getCode(event);
 
     // Ignore Space or Enter key operation, which is handled by the browser for a button.
-    if (keyCode === keyboardKey.Spacebar || keyCode === keyboardKey.Enter) {
-      return;
-    } else {
+    if (keyCode !== keyboardKey.Spacebar && keyCode !== keyboardKey.Enter) {
 
       // Pass keypress handling up for unsupported keys
       super.handleKeyPress(event);

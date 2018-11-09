@@ -1,4 +1,4 @@
-*/**
+/**
  * @file seek-bar.js
  */
 import Slider from '../../slider/slider.js';
@@ -401,7 +401,7 @@ class SeekBar extends Slider {
     } else if (keyCode === keyboardKey.PageDown) {
       event.preventDefault();
       this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
-    } else if (keyCode ===keyboardKey.PageUp) {
+    } else if (keyCode === keyboardKey.PageUp) {
       event.preventDefault();
       this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else {

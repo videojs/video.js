@@ -297,17 +297,14 @@ class MenuButton extends Component {
         this.menuButton_.el_.focus();
       }
     // Enter, Up Arrow or Down Arrow press the 'button'
-  } else if (keyCode === keyboardKey.Enter || keyCode === keyboardKey.ArrowUp || keyCode === keyboardKey.ArrowDown) {
+    } else if (keyCode === keyboardKey.Enter || keyCode === keyboardKey.ArrowUp || keyCode === keyboardKey.ArrowDown) {
       if (!this.buttonPressed_) {
         event.preventDefault();
         this.pressButton();
       }
     } else {
       // NOTE: This is a special case where we don't pass unhandled
-      //  keypress events up to the Component handler, because this
-      //  is just adding a keypress handler on top of the menuButton_'s
-      //  existing keypress handler, which handles that passing keypress
-      //  events up.
+      //  keypress events up to the Component handler
     }
   }
 
