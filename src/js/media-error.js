@@ -82,9 +82,9 @@ MediaError.prototype.status = null;
  * @enum {array}
  * @readonly
  * @property {string} 0 - MEDIA_ERR_CUSTOM
- * @property {string} 1 - MEDIA_ERR_CUSTOM
- * @property {string} 2 - MEDIA_ERR_ABORTED
- * @property {string} 3 - MEDIA_ERR_NETWORK
+ * @property {string} 1 - MEDIA_ERR_ABORTED
+ * @property {string} 2 - MEDIA_ERR_NETWORK
+ * @property {string} 3 - MEDIA_ERR_DECODE
  * @property {string} 4 - MEDIA_ERR_SRC_NOT_SUPPORTED
  * @property {string} 5 - MEDIA_ERR_ENCRYPTED
  */
