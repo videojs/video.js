@@ -2711,13 +2711,59 @@ class Player extends Component {
   }
 
   /**
-   * Handle keydown events from any Component of this player which is not
-   *  andled by that Component; allows for player-wide keyboard shortcuts
+   * Handle a keydown event from any Component of this player which is not
+   *  handled by that Component to support player-wide hotkeys.
    *
    * @param {EventTarget~Event} event
-   *        The `keydown` event that caused this function to be called.
+   *        The `keydown` event that was passed from a Component.
    */
   handleKeyPress(event) {
+
+    if (this.options_.hotkeys !== false) {
+
+      if (typeof this.options_.hotkeys === 'function') {
+
+        this.options_.hotkeys(event);
+
+      // Trigger the ControlBar equivalent for each key, if possible
+      } else if (keycode.isEventKey(event, 'f')) {
+        // "f" = toggle fullscreen
+
+        event.preventDefault();
+
+        const cb = this.player_.controlBar;
+        const fullscreenToggle = cb && cb.fullscreenToggle;
+
+        if (fullscreenToggle && fullscreenToggle.handleClick) {
+          fullscreenToggle.handleClick();
+        }
+      } else if (keycode.isEventKey(event, 'm')) {
+        // "m" = toggle mute
+
+        event.preventDefault();
+
+        const cb = this.player_.controlBar;
+        const volumePanel = cb && cb.volumePanel;
+        const muteToggle = (cb && cb.muteToggle) || (volumePanel && volumePanel.muteToggle);
+
+        if (muteToggle && muteToggle.handleClick) {
+          muteToggle.handleClick();
+        } else {
+          this.player_.muted(this.player_.muted() ? false : true);
+        }
+      } else if (keycode.isEventKey(event, 'k')) {
+        // "k" = toggle play/pause
+
+        event.preventDefault();
+
+        const cb = this.player_.controlBar;
+        const playToggle = cb && cb.playToggle;
+
+        if (playToggle && playToggle.handleClick) {
+          playToggle.handleClick();
+        }
+      }
+    }
   }
 
   /**
