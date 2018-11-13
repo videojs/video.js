@@ -27,7 +27,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
-    // flex an grid for firefox, ie, edge remove bottom padding/margin in a container as size decreases
+    // Flex and Grid for Firefox, IE, and Edge remove the bottom padding/margin in a container as size decreases
     // so we add bottom padding/margin to the last item in the grid instead of here
     // see https://stackoverflow.com/a/23754080
     padding: 20px 24px 0px 24px;
