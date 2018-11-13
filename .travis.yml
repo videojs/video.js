@@ -1,6 +1,9 @@
 language: node_js
 node_js:
-  - lts/*
+  - 'node'
+  - '10'
+  - '8'
+  - '6'
 before_install:
   - npm install -g greenkeeper-lockfile@1
   - export CHROME_BIN=/usr/bin/google-chrome
