@@ -7,7 +7,7 @@ QUnit.module('LiveDisplay', () => {
     beforeEach() {
       this.clock = sinon.useFakeTimers();
 
-      this.player = TestHelpers.makePlayer();
+      this.player = TestHelpers.makePlayer({liveui: true});
       this.liveDisplay = this.player.controlBar.liveDisplay;
 
       // mock live state

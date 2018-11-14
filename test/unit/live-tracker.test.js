@@ -9,7 +9,7 @@ QUnit.module('LiveTracker', () => {
     beforeEach() {
       this.clock = sinon.useFakeTimers();
 
-      this.player = TestHelpers.makePlayer();
+      this.player = TestHelpers.makePlayer({liveui: true});
 
       this.liveTracker = this.player.liveTracker;
     },
