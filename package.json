@@ -114,11 +114,13 @@
     "karma": "^3.0.0",
     "karma-browserify": "^5.3.0",
     "klaw-sync": "^6.0.0",
+    "lint-staged": "^8.0.4",
     "load-grunt-tasks": "^4.0.0",
     "markdown-table": "^1.0.0",
     "maxmin": "^2.1.0",
     "minimist": "^1.2.0",
     "node-sass": "^4.10.0",
+    "npm-merge-driver-install": "^1.1.1",
     "npm-run-all": "^4.1.2",
     "postcss-cli": "^6.0.0",
     "proxyquireify": "^3.0.0",
@@ -176,7 +178,13 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run lint -- --errors"
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.js": [
+      "vjsstandard --fix --errors",
+      "git add"
+    ]
   }
 }
