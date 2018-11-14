@@ -1290,6 +1290,9 @@ class Player extends Component {
     // reset the error state
     this.error(null);
 
+    // Update the duration
+    this.handleTechDurationChange_();
+
     // If it's already playing we want to trigger a firstplay event now.
     // The firstplay event relies on both the play and loadstart events
     // which can happen in any order for a new source
@@ -2288,11 +2291,16 @@ class Player extends Component {
       } else {
         this.removeClass('vjs-live');
       }
-      /**
-       * @event Player#durationchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('durationchange');
+      if (!isNaN(seconds)) {
+         // Do not fire durationchange unless the duration value is known.
+         // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
+
+        /**
+         * @event Player#durationchange
+         * @type {EventTarget~Event}
+         */
+        this.trigger('durationchange');
+      }
     }
   }
 
