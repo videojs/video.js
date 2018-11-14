@@ -68,9 +68,11 @@ class SeekBar extends Slider {
     });
 
     this.on(this.player_, ['ended', 'pause', 'waiting'], (e) => {
-      if (!this.player_.liveTracker.isLive()) {
-        this.clearInterval(this.updateInterval);
+      if (this.player_.liveTracker.isLive() && e.type !== 'ended') {
+        return;
       }
+
+      this.clearInterval(this.updateInterval);
     });
 
     this.on(this.player_, ['timeupdate', 'ended'], this.update);
