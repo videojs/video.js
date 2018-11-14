@@ -1,6 +1,6 @@
 ## Description
 Briefly describe the issue.
-Include a [reduced test case](https://css-tricks.com/reduced-test-cases/), we have a [starter template](http://jsbin.com/axedog/edit?html,output) on JSBin you can use.
+Include a [reduced test case](https://css-tricks.com/reduced-test-cases/), we have a [starter template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) on JSBin you can use.
 
 ## Steps to reproduce
 Explain in detail the exact steps necessary to reproduce the issue.
