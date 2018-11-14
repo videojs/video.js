@@ -2292,8 +2292,8 @@ class Player extends Component {
         this.removeClass('vjs-live');
       }
       if (!isNaN(seconds)) {
-         // Do not fire durationchange unless the duration value is known.
-         // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
+        // Do not fire durationchange unless the duration value is known.
+        // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
 
         /**
          * @event Player#durationchange
