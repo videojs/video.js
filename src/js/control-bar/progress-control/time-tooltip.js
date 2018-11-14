@@ -83,7 +83,24 @@ class TimeTooltip extends Component {
     Dom.textContent(this.el_, content);
   }
 
-  updateTime(seekBarRect, seekBarPoint, time) {
+  /**
+   * Updates the position of the time tooltip relative to the `SeekBar`.
+   *
+   * @param {Object} seekBarRect
+   *        The `ClientRect` for the {@link SeekBar} element.
+   *
+   * @param {number} seekBarPoint
+   *        A number from 0 to 1, representing a horizontal reference point
+   *        from the left edge of the {@link SeekBar}
+   *
+   * @param {number} time
+   *        The time to update the tooltip to, not used during live playback
+   *
+   * @param {Function} cb
+   *        A function that will be called during the request animation frame
+   *        for tooltips that need to do additional animations from the default
+   */
+  updateTime(seekBarRect, seekBarPoint, time, cb) {
     // If there is an existing rAF ID, cancel it so we don't over-queue.
     if (this.rafId_) {
       this.cancelAnimationFrame(this.rafId_);
@@ -103,6 +120,9 @@ class TimeTooltip extends Component {
       }
 
       this.update(seekBarRect, seekBarPoint, content);
+      if (cb) {
+        cb();
+      }
     });
   }
 }
