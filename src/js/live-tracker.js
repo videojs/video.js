@@ -3,8 +3,8 @@ import Component from './component.js';
 /* track when we are at the live edge, and other helpers for live playback */
 class LiveTracker extends Component {
 
-  constructor(player, options, ready) {
-    super(player, options, ready);
+  constructor(player) {
+    super(player, {createEl: false});
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
   }
