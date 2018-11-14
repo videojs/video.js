@@ -46,14 +46,14 @@ class LiveTracker extends Component {
 
       this.pastSeekEnd_ = 0;
       this.lastSeekEnd_ = newSeekEnd;
-      this.trigger('seek-end-change');
+      this.trigger('seekableendchange');
     }
 
     this.pastSeekEnd_ = this.pastSeekEnd() + 0.03;
 
     if (this.isBehind() !== this.behindLiveEdge()) {
       this.behindLiveEdge_ = this.isBehind();
-      this.trigger('live-edge-change');
+      this.trigger('liveedgechange');
     }
   }
 
@@ -147,7 +147,7 @@ class LiveTracker extends Component {
 
   /**
    * Determines if currentTime is at the live edge and won't fall behind
-   * on each seek-end-change
+   * on each seekableendchange
    */
   atLiveEdge() {
     return !this.behindLiveEdge();
@@ -169,7 +169,7 @@ class LiveTracker extends Component {
 
   /**
    * If we are currently behind the live edge, aka currentTime will be
-   * behind on a seek-end-change
+   * behind on a seekableendchange
    */
   behindLiveEdge() {
     return this.behindLiveEdge_;
@@ -189,7 +189,7 @@ class LiveTracker extends Component {
 
     this.player().pause();
     this.player().addClass('vjs-waiting');
-    this.one('seek-end-change', () => {
+    this.one('seekableendchange', () => {
       this.player().removeClass('vjs-waiting');
       this.player().currentTime(this.seekEnd());
       this.player().play();

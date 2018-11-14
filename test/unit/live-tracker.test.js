@@ -19,24 +19,24 @@ QUnit.module('LiveTracker', () => {
     }
   });
 
-  QUnit.test('starts/stop with durationchange and triggers live-edge-change', function(assert) {
+  QUnit.test('starts/stop with durationchange and triggers liveedgechange', function(assert) {
     let liveEdgeChange = 0;
 
-    this.liveTracker.on('live-edge-change', () => {
+    this.liveTracker.on('liveedgechange', () => {
       liveEdgeChange++;
     });
     assert.notOk(this.liveTracker.started(), 'not started');
 
     this.player.duration(Infinity);
     assert.ok(this.liveTracker.started(), 'started');
-    assert.equal(liveEdgeChange, 1, 'live-edge-change fired');
+    assert.equal(liveEdgeChange, 1, 'liveedgechange fired');
 
     this.player.duration(5);
     assert.notOk(this.liveTracker.started(), 'not started');
 
     this.player.duration(Infinity);
     assert.ok(this.liveTracker.started(), 'started');
-    assert.equal(liveEdgeChange, 2, 'live-edge-change fired again');
+    assert.equal(liveEdgeChange, 2, 'liveedgechange fired again');
   });
 
   QUnit.module('tracking', {
@@ -51,11 +51,11 @@ QUnit.module('LiveTracker', () => {
       this.liveEdgeChanges = 0;
       this.seekEndChanges = 0;
 
-      this.liveTracker.on('seek-end-change', () => {
+      this.liveTracker.on('seekableendchange', () => {
         this.seekEndChanges++;
       });
 
-      this.liveTracker.on('live-edge-change', () => {
+      this.liveTracker.on('liveedgechange', () => {
         this.liveEdgeChanges++;
       });
     },
@@ -65,7 +65,7 @@ QUnit.module('LiveTracker', () => {
     }
   });
 
-  QUnit.test('Triggers live-edge-change when we fall behind and catch up', function(assert) {
+  QUnit.test('Triggers liveedgechange when we fall behind and catch up', function(assert) {
     this.player.currentTime = () => 0;
     this.clock.tick(20000);
 
@@ -93,7 +93,7 @@ QUnit.module('LiveTracker', () => {
     assert.equal(this.seekEndChanges, 1, 'should be one seek end change');
   });
 
-  QUnit.test('seeks to live edge on seek-end-change', function(assert) {
+  QUnit.test('seeks to live edge on seekableendchange', function(assert) {
     this.liveTracker.segmentLength_ = 2;
     let pauseCalls = 0;
     let playCalls = 0;
