@@ -1,9 +1,14 @@
 import Component from './component.js';
+import mergeOptions from './utils/merge-options.js';
 
 /* track when we are at the live edge, and other helpers for live playback */
 class LiveTracker extends Component {
 
-  constructor(player) {
+  constructor(player, options) {
+		// LiveTracker does not need an element
+    const options_ = mergeOptions({createEl: false}, options);
+
+    super(player, options_, ready);
     super(player, {createEl: false});
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
