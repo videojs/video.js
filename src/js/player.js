@@ -1602,6 +1602,88 @@ class Player extends Component {
   }
 
   /**
+   * Get or set vjs-waiting class on the player. This shows the loading spinner.
+   *
+   * @param  {boolean} [waiting]
+   *         - True if the player should be in the waiting state
+   *         - False otherwise[
+   *
+   * @param {boolean} [changeControls]
+   *        - Should the controls be enabled/disabled along with the waiting value?
+   *
+   * @return {boolean}
+   *         The current waiting state of the player
+   */
+  waiting(waiting, changeControls) {
+    if (typeof waiting === 'undefined') {
+      return this.hasClass('vjs-waiting');
+    }
+
+    // remove the current listner, since there will either be a new one
+    // or no need for one
+    if (this.waitingListener_) {
+      this.off('timeupdate', this.waitingListener_);
+      this.waitingListener_ = null;
+    }
+
+    // if waiting is false do the following and return
+    if (!waiting) {
+      this.removeClass('vjs-waiting');
+      if (changeControls) {
+        this.enableControls();
+      }
+      return;
+    }
+
+    // if waiting is true do the following
+
+    if (changeControls) {
+      this.disableControls();
+    }
+    this.addClass('vjs-waiting');
+
+    // Browsers may emit a timeupdate event after a waiting event. In order to prevent
+    // premature removal of the waiting class, wait for the time to change.
+    const timeWhenWaiting = this.currentTime();
+
+    this.waitingListener_ = () => {
+      if (timeWhenWaiting !== this.currentTime()) {
+        this.waiting(false, changeControls);
+      }
+    };
+
+    this.on('timeupdate', this.waitingListener_);
+  }
+
+  /**
+   * Disable playToggle and progress controls, effectively disabling playback
+   */
+  disableControls() {
+    if (!this.controlBar) {
+      return;
+    }
+    ['progressControl', 'playToggle'].forEach(function(k) {
+      if (this.controlBar[k]) {
+        this.controlBar[k].enable();
+      }
+    });
+  }
+
+  /**
+   * Enable playToggle and progress controls by default
+   */
+  enableControls() {
+    if (!this.controlBar) {
+      return;
+    }
+    ['progressControl', 'playToggle'].forEach(function(k) {
+      if (this.controlBar[k]) {
+        this.controlBar[k].enable();
+      }
+    });
+  }
+
+  /**
    * Retrigger the `waiting` event that was triggered by the {@link Tech}.
    *
    * @fires Player#waiting
@@ -1609,7 +1691,7 @@ class Player extends Component {
    * @private
    */
   handleTechWaiting_() {
-    this.addClass('vjs-waiting');
+    this.waiting(true);
     /**
      * A readyState change on the DOM element has caused playback to stop.
      *
@@ -1618,17 +1700,6 @@ class Player extends Component {
      */
     this.trigger('waiting');
 
-    // Browsers may emit a timeupdate event after a waiting event. In order to prevent
-    // premature removal of the waiting class, wait for the time to change.
-    const timeWhenWaiting = this.currentTime();
-    const timeUpdateListener = () => {
-      if (timeWhenWaiting !== this.currentTime()) {
-        this.removeClass('vjs-waiting');
-        this.off('timeupdate', timeUpdateListener);
-      }
-    };
-
-    this.on('timeupdate', timeUpdateListener);
   }
 
   /**
@@ -1640,7 +1711,7 @@ class Player extends Component {
    * @private
    */
   handleTechCanPlay_() {
-    this.removeClass('vjs-waiting');
+    this.waiting(false);
     /**
      * The media has a readyState of HAVE_FUTURE_DATA or greater.
      *
@@ -1658,7 +1729,7 @@ class Player extends Component {
    * @private
    */
   handleTechCanPlayThrough_() {
-    this.removeClass('vjs-waiting');
+    this.waiting(false);
     /**
      * The media has a readyState of HAVE_ENOUGH_DATA or greater. This means that the
      * entire media file can be played without buffering.
@@ -1677,7 +1748,7 @@ class Player extends Component {
    * @private
    */
   handleTechPlaying_() {
-    this.removeClass('vjs-waiting');
+    this.waiting(false);
     /**
      * The media is no longer blocked from playback, and has started playing.
      *
