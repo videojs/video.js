@@ -94,10 +94,10 @@ class TimeTooltip extends Component {
       const duration = this.player_.duration();
 
       if (this.player_.liveTracker.isLive()) {
-        const liveTimeWindow = this.player_.liveTracker.liveTimeWindow();
-        const secondsBehind = liveTimeWindow - (seekBarPoint * liveTimeWindow);
+        const liveWindow = this.player_.liveTracker.liveWindow();
+        const secondsBehind = liveWindow - (seekBarPoint * liveWindow);
 
-        content = (secondsBehind < 1 ? '' : '-') + formatTime(secondsBehind, liveTimeWindow);
+        content = (secondsBehind < 1 ? '' : '-') + formatTime(secondsBehind, liveWindow);
       } else {
         content = formatTime(time, duration);
       }

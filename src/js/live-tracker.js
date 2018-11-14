@@ -5,10 +5,9 @@ import mergeOptions from './utils/merge-options.js';
 class LiveTracker extends Component {
 
   constructor(player, options) {
-		// LiveTracker does not need an element
+    // LiveTracker does not need an element
     const options_ = mergeOptions({createEl: false}, options);
 
-    super(player, options_, ready);
     super(player, {createEl: false});
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
@@ -39,7 +38,7 @@ class LiveTracker extends Component {
       return;
     }
 
-    const newSeekEnd = seekable.end(0);
+    const newSeekEnd = this.seekableEnd(0);
 
     // we can only tell if we are behing live, when seekable changes
     // once we detect that seekable has changed we check the new seek
@@ -105,7 +104,7 @@ class LiveTracker extends Component {
    * A helper to get the player seekable end
    * so that we don't have to null check everywhere
    */
-  seekEnd() {
+  seekableEnd() {
     const seekable = this.player_.seekable();
 
     if (!seekable || !seekable.length) {
@@ -119,7 +118,7 @@ class LiveTracker extends Component {
    * A helper to get the player seekable start
    * so that we don't have to null check everywhere
    */
-  seekStart() {
+  seekableStart() {
     const seekable = this.player_.seekable();
 
     if (!seekable || !seekable.length) {
@@ -132,14 +131,8 @@ class LiveTracker extends Component {
   /**
    * Get the live time window
    */
-  liveTimeWindow() {
-    const seekable = this.player_.seekable();
-
-    if (!seekable || !seekable.length) {
-      return 0;
-    }
-
-    return seekable.end(0) - seekable.start(0);
+  liveWindow() {
+    return this.seekableEnd() - this.seekableStart();
   }
 
   /**
@@ -162,7 +155,7 @@ class LiveTracker extends Component {
    * get what we expect the live current time to be
    */
   liveCurrentTime() {
-    return this.pastSeekEnd() + this.seekEnd();
+    return this.pastSeekEnd() + this.seekableEnd();
   }
 
   /**
@@ -196,7 +189,7 @@ class LiveTracker extends Component {
     this.player().addClass('vjs-waiting');
     this.one('seekableendchange', () => {
       this.player().removeClass('vjs-waiting');
-      this.player().currentTime(this.seekEnd());
+      this.player().currentTime(this.seekableEnd());
       this.player().play();
     });
   }

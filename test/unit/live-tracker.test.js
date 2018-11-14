@@ -49,10 +49,10 @@ QUnit.module('LiveTracker', () => {
       this.player.duration(Infinity);
 
       this.liveEdgeChanges = 0;
-      this.seekEndChanges = 0;
+      this.seekableEndChanges = 0;
 
       this.liveTracker.on('seekableendchange', () => {
-        this.seekEndChanges++;
+        this.seekableEndChanges++;
       });
 
       this.liveTracker.on('liveedgechange', () => {
@@ -90,7 +90,7 @@ QUnit.module('LiveTracker', () => {
     this.clock.tick(30);
     assert.strictEqual(this.liveTracker.pastSeekEnd(), 0.03, 'pastSeekEnd start at 0.03 again');
     assert.strictEqual(this.liveTracker.liveCurrentTime(), 2.03, 'liveCurrentTime is now 2.03');
-    assert.equal(this.seekEndChanges, 1, 'should be one seek end change');
+    assert.equal(this.seekableEndChanges, 1, 'should be one seek end change');
   });
 
   QUnit.test('seeks to live edge on seekableendchange', function(assert) {
@@ -124,8 +124,8 @@ QUnit.module('LiveTracker', () => {
     this.player.seekable = () => createTimeRanges(0, 2);
 
     this.clock.tick(30);
-    assert.equal(this.seekEndChanges, 1, 'should be one seek end change');
-    assert.equal(currentTime, 2, 'should have seeked to seekEnd');
+    assert.equal(this.seekableEndChanges, 1, 'should be one seek end change');
+    assert.equal(currentTime, 2, 'should have seeked to seekableEnd');
     assert.equal(playCalls, 1, 'should be playing');
     assert.notOk(this.player.hasClass('vjs-waiting'), 'player should not be waiting');
   });
@@ -160,17 +160,17 @@ QUnit.module('LiveTracker', () => {
     this.player.seekable = () => createTimeRanges(0, 2);
 
     this.clock.tick(30);
-    assert.equal(this.seekEndChanges, 1, 'should be one seek end change');
-    assert.equal(currentTime, 0, 'should not have seeked to seekEnd');
+    assert.equal(this.seekableEndChanges, 1, 'should be one seek end change');
+    assert.equal(currentTime, 0, 'should not have seeked to seekableEnd');
     assert.equal(playCalls, 0, 'should not have called play');
   });
 
   QUnit.test('Helper functions should be correct', function(assert) {
     this.player.seekable = () => createTimeRanges(10, 50);
 
-    assert.strictEqual(this.liveTracker.liveTimeWindow(), 40, 'liveTimeWindow is 40s');
-    assert.strictEqual(this.liveTracker.seekStart(), 10, 'seekStart is 10s');
-    assert.strictEqual(this.liveTracker.seekEnd(), 50, 'seekStart is 50s');
+    assert.strictEqual(this.liveTracker.liveWindow(), 40, 'liveWindow is 40s');
+    assert.strictEqual(this.liveTracker.seekableStart(), 10, 'seekableStart is 10s');
+    assert.strictEqual(this.liveTracker.seekableEnd(), 50, 'seekableEnd is 50s');
   });
 
 });

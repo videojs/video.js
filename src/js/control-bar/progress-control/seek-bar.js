@@ -106,7 +106,7 @@ class SeekBar extends Slider {
     let duration = this.player_.duration();
 
     if (this.player_.liveTracker.isLive()) {
-      duration = this.player_.liveTracker.seekEnd();
+      duration = this.player_.liveTracker.seekableEnd();
     }
 
     // machine readable value of progress bar (percentage complete)
@@ -185,7 +185,7 @@ class SeekBar extends Slider {
     const liveTracker = this.player_.liveTracker;
 
     if (liveTracker.isLive()) {
-      percent = (this.player_.currentTime() - liveTracker.seekStart()) / liveTracker.liveTimeWindow();
+      percent = (this.player_.currentTime() - liveTracker.seekableStart()) / liveTracker.liveWindow();
 
       // prevent the percent from changing at the live edge
       if (liveTracker.atLiveEdge()) {
@@ -245,25 +245,25 @@ class SeekBar extends Slider {
         newTime = newTime - 0.1;
       }
     } else {
-      const seekStart = liveTracker.seekStart();
-      const seekEnd = liveTracker.seekEnd();
+      const seekableStart = liveTracker.seekableStart();
+      const seekableEnd = liveTracker.seekableEnd();
 
       if (distance === 1) {
         liveTracker.seekToLiveEdge();
         return;
       }
 
-      newTime = seekStart + (distance * liveTracker.liveTimeWindow());
+      newTime = seekableStart + (distance * liveTracker.liveWindow());
 
       // Don't let video end while scrubbing.
-      if (newTime >= seekEnd) {
-        newTime = seekEnd;
+      if (newTime >= seekableEnd) {
+        newTime = seekableEnd;
       }
 
       // Compensate for precision differences so that currentTime is not less
       // than seekable start
-      if (newTime <= seekStart) {
-        newTime = seekStart + 0.1;
+      if (newTime <= seekableStart) {
+        newTime = seekableStart + 0.1;
       }
     }
 
