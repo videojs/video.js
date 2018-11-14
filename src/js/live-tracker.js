@@ -8,7 +8,7 @@ class LiveTracker extends Component {
     // LiveTracker does not need an element
     const options_ = mergeOptions({createEl: false}, options);
 
-    super(player, {createEl: false});
+    super(player, options_);
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
   }
@@ -192,6 +192,11 @@ class LiveTracker extends Component {
       this.player().currentTime(this.seekableEnd());
       this.player().play();
     });
+  }
+
+  dispose() {
+    this.stop();
+    super.dispose();
   }
 }
 
