@@ -292,10 +292,10 @@ class MenuButton extends Component {
       if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
-        this.menuButton_.el_.focus();
+        this.menuButton_.focus();
       }
-    // Enter, Up Arrow or Down Arrow press the 'button'
-    } else if (keycode.isEventKey(event, 'Enter') || keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) {
+    // Up Arrow or Down Arrow also 'press' the button to open the menu
+    } else if (keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) {
       if (!this.buttonPressed_) {
         event.preventDefault();
         this.pressButton();
@@ -325,7 +325,7 @@ class MenuButton extends Component {
       if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
-        this.menuButton_.el_.focus();
+        this.menuButton_.focus();
       }
     } else {
       // NOTE: This is a special case where we don't pass unhandled

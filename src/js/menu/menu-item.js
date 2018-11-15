@@ -4,6 +4,7 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {assign} from '../utils/obj';
+import {MenuKeys} from './menu-keys.js';
 import keycode from 'keycode';
 
 /**
@@ -79,10 +80,10 @@ class MenuItem extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
-    if (!(keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab') ||
-          keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down') ||
-          keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up'))) {
-      // Pass keypress handling up for unsupported keys
+    if (!MenuKeys.some((key) => {
+      return keycode.isEventKey(event, key);
+    })) {
+      // Pass keypress handling up for unused keys
       super.handleKeyPress(event);
     }
   }
