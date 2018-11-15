@@ -34,6 +34,8 @@ import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
+import {IE_VERSION} from './utils/browser';
+import keycode from 'keycode';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -2675,7 +2677,7 @@ class Player extends Component {
    *        Event to check for key press
    */
   fullWindowOnEscKey(event) {
-    if (event.keyCode === 27) {
+    if (keycode.isEventKey(event, 'Esc')) {
       if (this.isFullscreen() === true) {
         this.exitFullscreen();
       } else {

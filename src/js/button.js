@@ -5,7 +5,7 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
 import {assign} from './utils/obj';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 /**
  * Base class for all buttons.
@@ -105,10 +105,8 @@ class Button extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
     // Ignore Space or Enter key operation, which is handled by the browser for a button.
-    if (keyCode !== keyboardKey.Spacebar && keyCode !== keyboardKey.Enter) {
+    if (!(keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter'))) {
 
       // Pass keypress handling up for unsupported keys
       super.handleKeyPress(event);

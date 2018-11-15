@@ -10,7 +10,7 @@ import * as Events from '../utils/events.js';
 import toTitleCase from '../utils/to-title-case.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 /**
  * A `MenuButton` class for any popup {@link Menu}.
@@ -283,21 +283,19 @@ class MenuButton extends Component {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
     // Escape or Tab unpress the 'button'
-    if (keyCode === keyboardKey.Escape || keyCode === keyboardKey.Tab) {
+    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (keyCode !== keyboardKey.Tab) {
+      if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
         this.menuButton_.el_.focus();
       }
     // Enter, Up Arrow or Down Arrow press the 'button'
-    } else if (keyCode === keyboardKey.Enter || keyCode === keyboardKey.ArrowUp || keyCode === keyboardKey.ArrowDown) {
+    } else if (keycode.isEventKey(event, 'Enter') || keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) {
       if (!this.buttonPressed_) {
         event.preventDefault();
         this.pressButton();
@@ -318,15 +316,13 @@ class MenuButton extends Component {
    * @listens keydown
    */
   handleSubmenuKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
     // Escape or Tab unpress the 'button'
-    if (keyCode === keyboardKey.Escape || keyCode === keyboardKey.Tab) {
+    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (keyCode !== keyboardKey.Tab) {
+      if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
         this.menuButton_.el_.focus();

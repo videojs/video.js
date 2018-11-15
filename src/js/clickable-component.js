@@ -8,7 +8,7 @@ import * as Fn from './utils/fn.js';
 import log from './utils/log.js';
 import document from 'global/document';
 import {assign} from './utils/obj';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 /**
  * Clickable Component which is clickable or keyboard actionable,
@@ -225,10 +225,8 @@ class ClickableComponent extends Component {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
     // Support Space or Enter key operation to fire a click event
-    if (keyCode === keyboardKey.Spacebar || keyCode === keyboardKey.Enter) {
+    if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
       event.preventDefault();
       this.trigger('click');
     } else {

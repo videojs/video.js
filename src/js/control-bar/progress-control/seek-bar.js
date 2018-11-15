@@ -8,7 +8,7 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -382,26 +382,24 @@ class SeekBar extends Slider {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
-    if (keyCode === keyboardKey.Spacebar || keyCode === keyboardKey.Enter) {
+    if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
       event.preventDefault();
       this.handleAction(event);
-    } else if (keyCode === keyboardKey.Home) {
+    } else if (keycode.isEventKey(event, 'Home')) {
       event.preventDefault();
       this.player_.currentTime(0);
-    } else if (keyCode === keyboardKey.End) {
+    } else if (keycode.isEventKey(event, 'End')) {
       event.preventDefault();
       this.player_.currentTime(this.player_.duration());
-    } else if (keyCode >= keyboardKey.Digit0 && keyCode <= keyboardKey.Digit9) {
+    } else if (/^[0-9]$/.test(keycode(event))) {
       event.preventDefault();
-      const gotoFraction = (keyCode - keyboardKey.Digit0) * 10.0 / 100.0;
+      const gotoFraction = (keycode.codes[keycode(event)] - keycode.codes['0']) * 10.0 / 100.0;
 
       this.player_.currentTime(this.player_.duration() * gotoFraction);
-    } else if (keyCode === keyboardKey.PageDown) {
+    } else if (keycode.isEventKey(event, 'PgDn')) {
       event.preventDefault();
       this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
-    } else if (keyCode === keyboardKey.PageUp) {
+    } else if (keycode.isEventKey(event, 'PgUp')) {
       event.preventDefault();
       this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else {

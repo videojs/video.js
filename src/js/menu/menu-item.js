@@ -4,7 +4,7 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {assign} from '../utils/obj';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 /**
  * The component for a menu item. `<li>`
@@ -79,11 +79,9 @@ class MenuItem extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
-    if (keyCode !== keyboardKey.Escape && keyCode !== keyboardKey.Tab &&
-        keyCode !== keyboardKey.ArrowLeft && keyCode !== keyboardKey.ArrowDown &&
-        keyCode !== keyboardKey.ArrowRight && keyCode !== keyboardKey.ArrowUp) {
+    if (!(keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab') ||
+          keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down') ||
+          keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up'))) {
       // Pass keypress handling up for unsupported keys
       super.handleKeyPress(event);
     }

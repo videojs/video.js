@@ -91,7 +91,7 @@ const externals = {
     'mux.js/lib/tools/ts-inspector.js',
     'mux.js/lib/mp4/probe',
     'aes-decrypter',
-    'keyboard-key'
+    'keycode'
   ]),
   test: Object.keys(globals.test).concat([
   ])

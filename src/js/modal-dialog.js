@@ -6,7 +6,7 @@ import * as Fn from './utils/fn';
 import Component from './component';
 import window from 'global/window';
 import document from 'global/document';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 
@@ -125,9 +125,7 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
-    if (keyCode === keyboardKey.Escape && this.closeable()) {
+    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
       this.close();
     } else {
 
@@ -471,10 +469,8 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
-    const keyCode = keyboardKey.getCode(event);
-
     // exit early if it isn't a tab key
-    if (keyCode !== keyboardKey.Tab) {
+    if (!keycode.isEventKey(event, 'Tab')) {
       return;
     }
 

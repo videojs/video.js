@@ -6,7 +6,7 @@ import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
-import keyboardKey from 'keyboard-key';
+import keycode from 'keycode';
 
 /**
  * The Menu component is used to build popup menus, including subtitle and
@@ -113,7 +113,7 @@ class Menu extends Component {
 
     // Close menu popup when a user clicks outside the menu
     if (!this.children().some((element) => {
-      return element.el() === relatedTarget;
+      return element.el && (element.el() === relatedTarget);
     })) {
       const btn = this.menuButton_;
 
@@ -132,15 +132,13 @@ class Menu extends Component {
    * @listens keydown
    */
   handleKeyPress(event) {
-    const keyCode = keyboardKey.getCode(event);
-
     // Left and Down Arrows
-    if (keyCode === keyboardKey.ArrowLeft || keyCode === keyboardKey.ArrowDown) {
+    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
       event.preventDefault();
       this.stepForward();
 
     // Up and Right Arrows
-    } else if (keyCode === keyboardKey.ArrowRight || keyCode === keyboardKey.ArrowUp) {
+    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
       event.preventDefault();
       this.stepBack();
     } else {
