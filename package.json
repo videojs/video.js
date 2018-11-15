@@ -25,7 +25,7 @@
     "copy-examples": "shx cp -R docs/examples dist/",
     "build:lang": "npm-run-all build:lang:*",
     "build:lang:js": "vjslang --dir dist/lang",
-    "build:lang:copy": "shx --verbose cp -R lang/* dist/lang/",
+    "build:lang:copy": "shx cp -R lang/* dist/lang/",
     "pretest:a11y": "shx cp sandbox/descriptions.html.example sandbox/descriptions.test-a11y.html",
     "test:a11y": "node build/test-a11y.js",
     "clean": "shx rm -rf ./dist ./test/dist build/temp/*",
