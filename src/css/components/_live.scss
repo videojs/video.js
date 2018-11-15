@@ -12,8 +12,15 @@
   text-align: left;
 }
 
-// css for the new live ui
+// hide the LiveDisplay when not live or when
+// the new liveui is in use
+.video-js:not(.vjs-live) .vjs-live-control,
 .video-js.vjs-liveui .vjs-live-control {
+  display: none;
+}
+
+// css for the new live ui below
+.video-js .vjs-seek-to-live-control {
   cursor: pointer;
   @include flex(none);
   display: inline-flex;
@@ -21,12 +28,25 @@
   margin-left: 0.3em;
 }
 
+.vjs-no-flex .vjs-seek-to-live-control {
+  display: table-cell;
+  width: auto;
+  text-align: left;
+}
+
+// hide the SeekToLive button when not live and
+// when the liveui is not in use
+.video-js.vjs-live:not(.vjs-liveui) .vjs-seek-to-live-control,
+.video-js:not(.vjs-live) .vjs-seek-to-live-control {
+  display: none;
+}
+
 // only show as a pointer when we will seek to live edge
-.vjs-live-control.vjs-control.vjs-at-live-edge {
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge {
   cursor: auto;
 }
 
-.vjs-live-circle {
+.vjs-seek-to-live-control .vjs-seek-to-live-circle {
   border-radius: 50%;
   width: 0.75em;
   height: 0.75em;
@@ -36,6 +56,7 @@
   background: radial-gradient(#808080, #666666);
 }
 
-.vjs-live-control.vjs-control.vjs-at-live-edge .vjs-live-circle {
+// make the live circle red when at the live edge
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-seek-to-live-circle {
   background: radial-gradient(#ff0000, #990000);
 }
