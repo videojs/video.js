@@ -183,7 +183,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "vjsstandard --fix --errors",
+      "vjsstandard --fix",
       "git add"
     ]
   }
