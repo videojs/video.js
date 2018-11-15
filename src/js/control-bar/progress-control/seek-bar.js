@@ -269,10 +269,6 @@ class SeekBar extends Slider {
       }
     }
 
-    if (newTime === Infinity) {
-      return;
-    }
-
     // Set new time (tell player to seek to new time)
     this.player_.currentTime(newTime);
   }
