@@ -17,7 +17,7 @@
   display: none;
 }
 
-.vjs-live.vjs-liveui .vjs-progress-control {
+.vjs-liveui .vjs-progress-control {
   @include display-flex(center);
 }
 
