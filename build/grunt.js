@@ -18,19 +18,6 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg,
-    watch: {
-      lang: {
-        files: ['lang/**/*.json'],
-        tasks: ['vjslanguages']
-      }
-    },
-    vjslanguages: {
-      defaults: {
-        files: {
-          'build/temp/lang': ['lang/*.json']
-        }
-      }
-    },
     concurrent: {
       options: {
         logConcurrentOutput: true
@@ -41,7 +28,6 @@ module.exports = function(grunt) {
       dev: [
         'shell:sass',
         'shell:babel',
-        'watch:lang',
         'shell:copy-dist',
         'shell:karma-server'
       ],
@@ -68,14 +54,8 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
-      'copy-lang': {
-        command: 'npm run copy-lang',
-        options: {
-          preferLocal: true
-        }
-      },
-      'copy-a11y': {
-        command: 'npm run copy-a11y',
+      'lang': {
+        command: 'npm run build:lang',
         options: {
           preferLocal: true
         }
@@ -146,48 +126,35 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
-      noderequire: {
-        command: 'node test/require/node.js',
+      a11y: {
+        command: 'npm run test:a11y',
         options: {
-          failOnError: true
+          preferLocal: true
+        }
+      },
+      noderequire: {
+        command: 'npm run test:node-require',
+        options: {
+          preferLocal: true
         }
       },
       browserify: {
-        command: 'browserify test/require/browserify.js -o build/temp/browserify.js',
+        command: 'npm run build:browserify-test',
         options: {
           preferLocal: true
         }
       },
       webpack: {
-        command: 'webpack --hide-modules test/require/webpack.js build/temp/webpack.js',
+        command: 'npm run build:webpack-test',
         options: {
           preferLocal: true
         }
       }
     },
-    accessibility: {
-      options: {
-        accessibilityLevel: 'WCAG2AA',
-        reportLevels: {
-          notice: false,
-          warning: true,
-          error: true
-        },
-        ignore: [
-          // Ignore warning about contrast of the "vjs-no-js" fallback link
-          'WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.BgImage'
-        ]
-
-      },
-      test: {
-        src: ['sandbox/descriptions.test-a11y.html']
-      }
-    }
   });
 
   // load all the npm grunt tasks
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('grunt-accessibility');
 
   grunt.registerTask('build', [
     'shell:lint',
@@ -199,8 +166,7 @@ module.exports = function(grunt) {
     'shell:cssmin',
 
     'shell:copy-fonts',
-    'shell:copy-lang',
-    'vjslanguages'
+    'shell:lang'
   ]);
 
   grunt.registerTask('dist', [
@@ -222,7 +188,7 @@ module.exports = function(grunt) {
       'shell:browserify',
       'shell:webpack',
       'shell:karma-run',
-      'test-a11y'
+      'shell:a11y'
     ];
 
     if (process.env.TRAVIS) {
@@ -238,7 +204,6 @@ module.exports = function(grunt) {
   // Run while developing
   grunt.registerTask('dev', ['sandbox', 'concurrent:dev']);
   grunt.registerTask('watchAll', ['build', 'concurrent:watchAll']);
-  grunt.registerTask('test-a11y', ['shell:copy-a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['shell:karma-server']);
