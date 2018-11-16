@@ -13,6 +13,7 @@ import document from 'global/document';
 import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
+import pkg from '../../package.json';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -628,13 +629,13 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   // Fake touch support. Real touch support isn't needed for this test.
   const origTouch = browser.TOUCH_ENABLED;
 
-  browser.TOUCH_ENABLED = true;
+  browser.stub_TOUCH_ENABLED(true);
 
   const player = TestHelpers.makePlayer({});
 
   assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
 
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   player.dispose();
 });
 
@@ -1846,7 +1847,7 @@ QUnit.test('options: plugins', function(assert) {
 });
 
 QUnit.test('should add a class with major version', function(assert) {
-  const majorVersion = require('../../package.json').version.split('.')[0];
+  const majorVersion = pkg.version.split('.')[0];
   const player = TestHelpers.makePlayer();
 
   assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');

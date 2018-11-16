@@ -774,7 +774,7 @@ QUnit.test('should emit a tap event', function(assert) {
 
   assert.expect(3);
   // Fake touch support. Real touch support isn't needed for this test.
-  browser.TOUCH_ENABLED = true;
+  browser.stub_TOUCH_ENABLED(true);
 
   comp.emitTapEvents();
   comp.on('tap', function() {
@@ -822,7 +822,7 @@ QUnit.test('should emit a tap event', function(assert) {
   comp.trigger('touchend');
 
   // Reset to orignial value
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   comp.dispose();
 });
 

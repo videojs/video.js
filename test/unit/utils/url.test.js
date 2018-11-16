@@ -2,8 +2,6 @@
 import document from 'global/document';
 import window from 'global/window';
 import * as Url from '../../../src/js/utils/url.js';
-import proxyquireify from 'proxyquireify';
-const proxyquire = proxyquireify(require);
 
 QUnit.module('url');
 QUnit.test('should parse the details of a url correctly', function(assert) {
@@ -75,28 +73,23 @@ QUnit.test('should get the file extension of the passed path', function(assert) 
 
 // isCrossOrigin tests
 QUnit.test('isCrossOrigin can identify cross origin urls', function(assert) {
-  const win = {
-    location: {}
-  };
-  const Url_ = proxyquire('../../../src/js/utils/url.js', {
-    'global/window': win
-  });
 
-  win.location.protocol = window.location.protocol;
-  win.location.host = window.location.host;
-  assert.ok(!Url_.isCrossOrigin(`http://${win.location.host}/example.vtt`), 'http://google.com from http://google.com is not cross origin');
-  assert.ok(Url_.isCrossOrigin(`https://${win.location.host}/example.vtt`), 'https://google.com from http://google.com is cross origin');
-  assert.ok(!Url_.isCrossOrigin(`//${win.location.host}/example.vtt`), '//google.com from http://google.com is not cross origin');
-  assert.ok(Url_.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from http://google.com is cross origin');
-  assert.ok(Url_.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from http://google.com is cross origin');
-  assert.ok(Url_.isCrossOrigin('//example.com/example.vtt'), '//example.com from http://google.com is cross origin');
+  assert.ok(!Url.isCrossOrigin(`http://${window.location.host}/example.vtt`), 'http://google.com from http://google.com is not cross origin');
+  assert.ok(Url.isCrossOrigin(`https://${window.location.host}/example.vtt`), 'https://google.com from http://google.com is cross origin');
+  assert.ok(!Url.isCrossOrigin(`//${window.location.host}/example.vtt`), '//google.com from http://google.com is not cross origin');
+  assert.ok(Url.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from http://google.com is cross origin');
+  assert.ok(Url.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from http://google.com is cross origin');
+  assert.ok(Url.isCrossOrigin('//example.com/example.vtt'), '//example.com from http://google.com is cross origin');
   // we cannot test that relative urls work on https, though
-  assert.ok(!Url_.isCrossOrigin('example.vtt'), 'relative url is not cross origin');
+  assert.ok(!Url.isCrossOrigin('example.vtt'), 'relative url is not cross origin');
 
-  win.location.protocol = 'https:';
-  win.location.host = 'google.com';
-  assert.ok(Url_.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from https://google.com is cross origin');
-  assert.ok(Url_.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from https://google.com is cross origin');
-  assert.ok(Url_.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from https://google.com is cross origin');
-  assert.ok(Url_.isCrossOrigin('//example.com/example.vtt'), '//example.com from https://google.com is cross origin');
+  const location = {
+    protocol: 'https:',
+    host: 'google.com'
+  };
+
+  assert.ok(Url.isCrossOrigin('http://google.com/example.vtt', location), 'http://google.com from https://google.com is cross origin');
+  assert.ok(Url.isCrossOrigin('http://example.com/example.vtt', location), 'http://example.com from https://google.com is cross origin');
+  assert.ok(Url.isCrossOrigin('https://example.com/example.vtt', location), 'https://example.com from https://google.com is cross origin');
+  assert.ok(Url.isCrossOrigin('//example.com/example.vtt', location), '//example.com from https://google.com is cross origin');
 });
