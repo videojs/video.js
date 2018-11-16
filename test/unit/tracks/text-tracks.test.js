@@ -231,16 +231,16 @@ QUnit.test('emulated tracks are always used, except in safari', function(assert)
     textTracks: []
   };
 
-  browser.IS_ANY_SAFARI = false;
+  browser.stub_IS_ANY_SAFARI(false);
 
   assert.ok(!Html5.supportsNativeTextTracks(), 'Html5 does not support native text tracks, in non-safari');
 
-  browser.IS_ANY_SAFARI = true;
+  browser.stub_IS_ANY_SAFARI(true);
 
   assert.ok(Html5.supportsNativeTextTracks(), 'Html5 does support native text tracks in safari');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_ANY_SAFARI = oldIsAnySafari;
+  browser.stub_IS_ANY_SAFARI(oldIsAnySafari);
 });
 
 QUnit.test('when switching techs, we should not get a new text track', function(assert) {

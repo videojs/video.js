@@ -14,6 +14,7 @@ import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
 import * as Events from '../../src/js/utils/events.js';
+import pkg from '../../package.json';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -703,13 +704,13 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   // Fake touch support. Real touch support isn't needed for this test.
   const origTouch = browser.TOUCH_ENABLED;
 
-  browser.TOUCH_ENABLED = true;
+  browser.stub_TOUCH_ENABLED(true);
 
   const player = TestHelpers.makePlayer({});
 
   assert.notEqual(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname added');
 
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   player.dispose();
 });
 
@@ -719,13 +720,13 @@ QUnit.test('should not add a touch-enabled classname when touch is not supported
   // Fake not having touch support in case that the browser running the test supports it
   const origTouch = browser.TOUCH_ENABLED;
 
-  browser.TOUCH_ENABLED = false;
+  browser.stub_TOUCH_ENABLED(false);
 
   const player = TestHelpers.makePlayer({});
 
   assert.equal(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname not added');
 
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   player.dispose();
 });
 
@@ -1997,7 +1998,7 @@ QUnit.test('options: plugins', function(assert) {
 });
 
 QUnit.test('should add a class with major version', function(assert) {
-  const majorVersion = require('../../package.json').version.split('.')[0];
+  const majorVersion = pkg.version.split('.')[0];
   const player = TestHelpers.makePlayer();
 
   assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');

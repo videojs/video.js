@@ -18,35 +18,35 @@ QUnit.test('create a real player and dispose', function(assert) {
   // see https://github.com/videojs/video.js/issues/5858
   old.bind = Fn.bind;
 
-  Fn.bind = function(context, fn, uid) {
+  Fn.stub_bind(function(context, fn, uid) {
     const retval = old.bind(context, fn, uid);
 
     retval.og_ = fn.og_ || fn;
     retval.cx_ = fn.cx_ || context;
 
     return retval;
-  };
+  });
 
   old.throttle = Fn.throttle;
-  Fn.throttle = function(fn, wait) {
+  Fn.stub_throttle(function(fn, wait) {
     const retval = old.throttle(fn, wait);
 
     retval.og_ = fn.og_ || fn;
     retval.cx_ = fn.cx_;
 
     return retval;
-  };
+  });
 
   old.debounce = Fn.debounce;
 
-  Fn.debounce = function(func, wait, immediate, context = window) {
+  Fn.stub_debounce(function(func, wait, immediate, context = window) {
     const retval = old.debounce(func, wait, immediate, context);
 
     retval.og_ = func.og_ || func;
     retval.cx_ = func.cx_;
 
     return retval;
-  };
+  });
 
   // TODO: use a local source rather than a remote one
   fixture.innerHTML = `
@@ -77,7 +77,7 @@ QUnit.test('create a real player and dispose', function(assert) {
     player.dispose();
 
     Object.keys(old).forEach(function(k) {
-      Fn[k] = old[k];
+      Fn[`stub_${k}`](old[k]);
     });
     done();
   }, true);
