@@ -17,6 +17,7 @@
   "homepage": "https://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
+    "start": "npm-run-all -p watch karma-server",
     "clean": "shx rm -rf ./dist ./test/dist ./docs/api",
     "postclean": "shx mkdir -p ./dist/lang ./test/dist",
     "changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
@@ -51,7 +52,6 @@
     "assets": "node build/assets.js",
     "lint": "vjsstandard",
     "lint-errors": "vjsstandard --errors",
-    "start": "npm-run-all -p watch karma-server",
     "karma-server": "karma start test/karma.conf.js --singleRun=false --auto-watch",
     "test": "npm-run-all build-dev test:*",
     "test:node-require": "node test/require/node.js",
