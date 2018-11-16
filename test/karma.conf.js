@@ -29,7 +29,7 @@ module.exports = function(config) {
   config.frameworks.push('browserify');
   config.browserify = {
     debug: true,
-    plugin: ['proxyquireify/plugin'],
+    plugin: [],
     transform: [
       ['babelify', {"presets": [["@babel/preset-env", {"loose": true}]]}],
     ]
