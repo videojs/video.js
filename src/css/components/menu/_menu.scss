@@ -48,15 +48,6 @@
   @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
 }
 
-.vjs-menu li.vjs-menu-item:focus:not(:focus-visible) {
-  outline: none;
-  background: none;
-}
-
-.vjs-menu li.vjs-menu-item:hover:not(:focus-visible) {
-  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
-}
-
 .vjs-menu li.vjs-selected,
 .vjs-menu li.vjs-selected:focus,
 .vjs-menu li.vjs-selected:hover,
