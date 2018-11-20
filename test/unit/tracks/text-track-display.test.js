@@ -218,7 +218,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     // Force es as "user-selected" track
     player.cache_.selectedLanguage = { enabled: true, language: 'es', kind: 'captions' };
-    player.trigger('loadstart');
+    player.trigger('loadedmetadata');
 
     assert.equal(spanishTrack.mode, 'showing', 'Spanish captions should be showing');
     assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
