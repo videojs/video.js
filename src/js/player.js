@@ -1856,10 +1856,19 @@ class Player extends Component {
     );
 
     if (!inAllowedEls) {
-      if (this.isFullscreen()) {
-        this.exitFullscreen();
-      } else {
-        this.requestFullscreen();
+      /*
+       * options.dblclick
+       * Set to false to disable double click handling
+       * Set to a function to substitute an external double click handler
+       */
+      if (this.options_.dblclick !== false) {
+        if (typeof this.options_.dblclick === 'function') {
+          this.options_.dblclick(event);
+        } else if (this.isFullscreen()) {
+          this.exitFullscreen();
+        } else {
+          this.requestFullscreen();
+        }
       }
     }
   }
