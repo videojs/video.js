@@ -40,7 +40,7 @@ class LiveTracker extends Component {
 
     const newSeekEnd = this.seekableEnd(0);
 
-    // we can only tell if we are behing live, when seekable changes
+    // we can only tell if we are behind live, when seekable changes
     // once we detect that seekable has changed we check the new seek
     // end against current time, with a fudge value of half a second.
     if (newSeekEnd !== this.lastSeekEnd_) {
@@ -136,7 +136,7 @@ class LiveTracker extends Component {
   }
 
   /**
-   * Determines if the player is live, only checks wether this component
+   * Determines if the player is live, only checks if this component
    * is tracking live playback or not
    */
   isLive() {
