@@ -16,13 +16,13 @@ class LiveTracker extends Component {
   isBehind() {
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
-    const segmentLength = this.segmentLength_ || 12;
+    const seekableIncrement = this.seekableIncrement_ || 12;
 
     // the live edge window is the amount of seconds away from live
     // that a player can be, but still be considered live.
     // we add 0.07 because the live tracking happens every 30ms
     // and we want some wiggle room for short segment live playback
-    const liveEdgeWindow = segmentLength + 0.07;
+    const liveEdgeWindow = seekableIncrement + 0.07;
 
     return liveCurrentTime !== Infinity && (liveCurrentTime - liveEdgeWindow) >= currentTime;
   }
@@ -45,7 +45,7 @@ class LiveTracker extends Component {
     // end against current time, with a fudge value of half a second.
     if (newSeekEnd !== this.lastSeekEnd_) {
       if (this.lastSeekEnd_) {
-        this.segmentLength_ = newSeekEnd - this.lastSeekEnd_;
+        this.seekableIncrement_ = newSeekEnd - this.lastSeekEnd_;
       }
 
       this.pastSeekEnd_ = 0;
