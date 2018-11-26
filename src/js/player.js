@@ -1664,7 +1664,7 @@ class Player extends Component {
     }
     ['progressControl', 'playToggle'].forEach(function(k) {
       if (this.controlBar[k]) {
-        this.controlBar[k].enable();
+        this.controlBar[k].disable();
       }
     });
   }
