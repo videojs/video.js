@@ -131,15 +131,18 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('data-setup one source', function(assert) {
       const done = assert.async();
 
-      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
-      this.player = videojs(this.mediaEl, {
-        enableSourceset: true
+      videojs.hook('setup', (player) => {
+        player.one('sourceset', (e) => {
+          validateSource(this.player, [testSrc], e);
+          videojs.hooks_ = {};
+          done();
+        });
       });
 
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [testSrc], e);
-        done();
-      });
+      this.mediaEl.setAttribute('data-setup', JSON.stringify({
+        enableSourceset: true,
+        sources: [testSrc]
+      }));
     });
 
     QUnit.test('data-setup one blob', function(assert) {
@@ -158,9 +161,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
     QUnit.test('data-setup preload auto', function(assert) {
       const done = assert.async();
-
-      // eslint-disable-next-line
-      console.log('#####################', document.body.contains(this.mediaEl));
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
       this.mediaEl.setAttribute('preload', 'auto');
