@@ -169,10 +169,10 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
       videojs.hook('setup', hook);
 
-      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [blobSrc]}));
-      this.player = videojs(this.mediaEl, {
-        enableSourceset: true
-      });
+      this.mediaEl.setAttribute('data-setup', JSON.stringify({
+        enableSourceset: true,
+        sources: [blobSrc]
+      }));
 
       setup.autoSetupTimeout(0, videojs);
     });
@@ -192,11 +192,11 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       };
 
       videojs.hook('setup', hook);
-      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
+      this.mediaEl.setAttribute('data-setup', JSON.stringify({
+        enableSourceset: true,
+        sources: [testSrc]
+      }));
       this.mediaEl.setAttribute('preload', 'auto');
-      this.player = videojs(this.mediaEl, {
-        enableSourceset: true
-      });
 
       setup.autoSetupTimeout(0, videojs);
     });
@@ -217,10 +217,10 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
       videojs.hook('setup', hook);
 
-      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [sourceOne, sourceTwo]}));
-      this.player = videojs(this.mediaEl, {
-        enableSourceset: true
-      });
+      this.mediaEl.setAttribute('data-setup', JSON.stringify({
+        enableSourceset: true,
+        sources: [sourceOne, sourceTwo]
+      }));
 
       setup.autoSetupTimeout(0, videojs);
     });
