@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import videojs from '../../src/js/video.js';
+import * as setup from '../../src/js/setup.js';
 import document from 'global/document';
 import window from 'global/window';
 import log from '../../src/js/utils/log.js';
@@ -131,61 +132,97 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('data-setup one source', function(assert) {
       const done = assert.async();
 
-      videojs.hook('setup', (player) => {
+      const hook = (player) => {
+        this.player = player;
+
         player.one('sourceset', (e) => {
           validateSource(this.player, [testSrc], e);
-          videojs.hooks_ = {};
+
+          videojs.removeHook('setup', hook);
           done();
         });
-      });
+      };
+
+      videojs.hook('setup', hook);
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({
         enableSourceset: true,
         sources: [testSrc]
       }));
+
+      setup.autoSetupTimeout(0, videojs);
     });
 
     QUnit.test('data-setup one blob', function(assert) {
       const done = assert.async();
+
+      const hook = (player) => {
+        this.player = player;
+
+        player.one('sourceset', (e) => {
+          validateSource(this.player, [blobSrc], e);
+
+          videojs.removeHook('setup', hook);
+          done();
+        });
+      };
+
+      videojs.hook('setup', hook);
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [blobSrc]}));
       this.player = videojs(this.mediaEl, {
         enableSourceset: true
       });
 
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [blobSrc], e);
-        done();
-      });
+      setup.autoSetupTimeout(0, videojs);
     });
 
     QUnit.test('data-setup preload auto', function(assert) {
       const done = assert.async();
 
+      const hook = (player) => {
+        this.player = player;
+
+        player.one('sourceset', (e) => {
+          validateSource(this.player, [testSrc], e);
+
+          videojs.removeHook('setup', hook);
+          done();
+        });
+      };
+
+      videojs.hook('setup', hook);
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
       this.mediaEl.setAttribute('preload', 'auto');
       this.player = videojs(this.mediaEl, {
         enableSourceset: true
       });
 
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [testSrc], e);
-        done();
-      });
+      setup.autoSetupTimeout(0, videojs);
     });
 
     QUnit.test('data-setup two sources', function(assert) {
       const done = assert.async();
+
+      const hook = (player) => {
+        this.player = player;
+
+        player.one('sourceset', (e) => {
+          validateSource(this.player, [sourceOne, sourceTwo], e);
+
+          videojs.removeHook('setup', hook);
+          done();
+        });
+      };
+
+      videojs.hook('setup', hook);
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [sourceOne, sourceTwo]}));
       this.player = videojs(this.mediaEl, {
         enableSourceset: true
       });
 
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [sourceOne, sourceTwo], e);
-        done();
-      });
+      setup.autoSetupTimeout(0, videojs);
     });
 
     QUnit.test('videojs({sources: [...]}) one source', function(assert) {
