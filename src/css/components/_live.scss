@@ -25,7 +25,9 @@
   @include flex(none);
   display: inline-flex;
   height: 100%;
-  margin-left: 0.3em;
+  margin-left: 0.7em;
+  font-size: 1em;
+  line-height: 3em;
 }
 
 .vjs-no-flex .vjs-seek-to-live-control {
