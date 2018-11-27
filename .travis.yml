@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - lts/*
+  - lts/carbon
 before_install:
   - npm install -g greenkeeper-lockfile@1
   - export CHROME_BIN=/usr/bin/google-chrome
@@ -33,7 +33,7 @@ cache:
   directories:
     - node_modules
 addons:
-  firefox: "60.0"
+  firefox: latest
   apt:
     packages:
       - google-chrome-stable
