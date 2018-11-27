@@ -39,6 +39,7 @@ module.exports = function(config) {
     config.browserify.transform.push('browserify-istanbul');
   }
 
+  config.client.qunit.testTimeout = 30000;
 
   config.preprocessors = {
     'test/**/*.js': ['browserify']
