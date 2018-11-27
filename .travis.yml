@@ -33,7 +33,7 @@ cache:
   directories:
     - node_modules
 addons:
-  firefox: "62.0"
+  firefox: "60.0"
   apt:
     packages:
       - google-chrome-stable
