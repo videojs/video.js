@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
-const wait = 1;
+const wait = 100;
 let qunitFn = 'module';
 const blobSrc = {
   src: 'blob:something',
