@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
-const wait = 100;
+const wait = 1;
 let qunitFn = 'module';
 const blobSrc = {
   src: 'blob:something',
@@ -136,34 +136,34 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       });
     });
 
-    QUnit.test('data-setup one blob', function(assert) {
-      const done = assert.async();
+    // QUnit.test('data-setup one blob', function(assert) {
+    //   const done = assert.async();
+    //
+    //   this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [blobSrc]}));
+    //   this.player = videojs(this.mediaEl, {
+    //     enableSourceset: true
+    //   });
+    //
+    //   this.player.one('sourceset', (e) => {
+    //     validateSource(this.player, [blobSrc], e);
+    //     done();
+    //   });
+    // });
 
-      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [blobSrc]}));
-      this.player = videojs(this.mediaEl, {
-        enableSourceset: true
-      });
-
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [blobSrc], e);
-        done();
-      });
-    });
-
-    QUnit.test('data-setup preload auto', function(assert) {
-      const done = assert.async();
-
-      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
-      this.mediaEl.setAttribute('preload', 'auto');
-      this.player = videojs(this.mediaEl, {
-        enableSourceset: true
-      });
-
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [testSrc], e);
-        done();
-      });
-    });
+    // QUnit.test('data-setup preload auto', function(assert) {
+    //   const done = assert.async();
+    //
+    //   this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
+    //   this.mediaEl.setAttribute('preload', 'auto');
+    //   this.player = videojs(this.mediaEl, {
+    //     enableSourceset: true
+    //   });
+    //
+    //   this.player.one('sourceset', (e) => {
+    //     validateSource(this.player, [testSrc], e);
+    //     done();
+    //   });
+    // });
 
     QUnit.test('data-setup two sources', function(assert) {
       const done = assert.async();
