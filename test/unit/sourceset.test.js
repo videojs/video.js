@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
-const wait = 1000;
+const wait = 1;
 let qunitFn = 'module';
 const blobSrc = {
   src: 'blob:something',
@@ -84,7 +84,13 @@ const setupEnv = function(env, testName) {
   } else {
     env.mediaEl = document.createElement('video');
   }
+
   env.mediaEl.className = 'video-js';
+  env.mediaEl.setAttribute('playsinline', 'playsinline');
+  env.mediaEl.setAttribute('muted', 'muted');
+  env.mediaEl.muted = true;
+  env.mediaEl.playsinline = true;
+
   env.fixture.appendChild(env.mediaEl);
 };
 
@@ -97,8 +103,6 @@ const setupAfterEach = function(totalSourcesets) {
     }
 
     window.setTimeout(() => {
-      /* eslint-disable-next-line */
-      console.error('############################');
       assert.equal(this.sourcesets, this.totalSourcesets, 'no additional sourcesets');
 
       this.player.dispose();
@@ -154,6 +158,9 @@ QUnit[qunitFn]('sourceset', function(hooks) {
 
     QUnit.test('data-setup preload auto', function(assert) {
       const done = assert.async();
+
+      // eslint-disable-next-line
+      console.log('#####################', document.body.contains(this.mediaEl));
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
       this.mediaEl.setAttribute('preload', 'auto');
