@@ -14,7 +14,7 @@ const blobSrc = {
   type: 'video/mp4'
 };
 const testSrc = {
-  src: 'http://vjs.zencdn.net/v/oceans.mp4',
+  src: 'http://example.com/testSrc.mp4',
   type: 'video/mp4'
 };
 const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
@@ -126,6 +126,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
+      console.log(this.mediaEl.dataset.setup) // eslint-disable-line
       this.player = videojs(this.mediaEl, {
         enableSourceset: true
       });
