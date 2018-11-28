@@ -125,6 +125,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     QUnit.test('data-setup one source', function(assert) {
       const done = assert.async();
 
+      console.log('here') // eslint-disable-line
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
       this.player = videojs(this.mediaEl, {
         enableSourceset: true
