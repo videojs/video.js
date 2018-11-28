@@ -245,12 +245,13 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       this.player = videojs(this.mediaEl, {
         enableSourceset: true,
         sources: [blobSrc]
+      }, () => {
+        this.player.one('sourceset', (e) => {
+          validateSource(this.player, [blobSrc], e);
+          done();
+        });
       });
 
-      this.player.one('sourceset', (e) => {
-        validateSource(this.player, [blobSrc], e);
-        done();
-      });
     });
 
     QUnit.test('videojs({sources: [...]}) two sources', function(assert) {
