@@ -9,7 +9,7 @@ import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
-let qunitFn = 'skip';
+let qunitFn = 'module';
 const blobSrc = {
   src: 'blob:something',
   type: 'video/mp4'

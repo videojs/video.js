@@ -1,6 +1,4 @@
 language: node_js
-node_js:
-  - lts/carbon
 before_install:
   - npm install -g greenkeeper-lockfile@1
   - export CHROME_BIN=/usr/bin/google-chrome
@@ -27,7 +25,6 @@ env:
   global:
     - secure: K6JpKwMkfNaJix3Bb0tLjVMzHMJgtBXdd/dvfw1BMb9DCBpd81PqXbDs7yXCddUxnUPTBPxZCrQgWsw71Wn+qEoIG5MU3uOT5A2rBbx/yZonVAGv5ed/9w0xk0OzO383CmPMFqwqtp9YmdmqGjQBkYXVXJjTvNTOAExFSdhO+3U=
     - secure: GIbhjUJapvC70nIZVlhVyK+3KAD2TVKpiY/q412OO7V2izbvcM1tvU3LBoMZbROzrt5TT84tCoJDvHnrpL0OvxPwrzL5CUU7h4UTxhTOyQkEinbYAnWlW9wdrvtdczsEvANkFPqBZ53B3hVHZHMLOG8QRWaTBicF68vSHEJFqb4=
-sudo: false
 dist: trusty
 cache:
   directories:
