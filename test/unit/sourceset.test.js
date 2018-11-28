@@ -8,7 +8,7 @@ import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
-let qunitFn = 'skip';
+let qunitFn = 'module';
 const blobSrc = {
   src: 'blob:something',
   type: 'video/mp4'
@@ -126,6 +126,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       const done = assert.async();
 
       this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
+      console.log(this.mediaEl.dataset.setup) // eslint-disable-line
       this.player = videojs(this.mediaEl, {
         enableSourceset: true
       });

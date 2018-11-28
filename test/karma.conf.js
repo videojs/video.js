@@ -16,7 +16,6 @@ module.exports = function(config) {
   config = generate(config, options);
 
   config.proxies = config.proxies || {};
-  config.client.qunit.testTimeout = 30000;
 
   // disable warning logs for sourceset tests, by proxing to a remote host
   Object.assign(config.proxies, {

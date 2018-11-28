@@ -320,23 +320,6 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
   Html5.unpatchCanPlayType();
 });
 
-QUnit.test('should return a maybe for mp4 on OLD ANDROID', function(assert) {
-  const isOldAndroid = browser.IS_OLD_ANDROID;
-  const video = document.createElement('video');
-
-  browser.IS_OLD_ANDROID = true;
-  Html5.patchCanPlayType();
-
-  assert.strictEqual(
-    video.canPlayType('video/mp4'),
-    'maybe',
-    'old android should return a maybe for video/mp4'
-  );
-
-  browser.IS_OLD_ANDROID = isOldAndroid;
-  Html5.unpatchCanPlayType();
-});
-
 QUnit.test('error events may not set the errors property', function(assert) {
   assert.equal(tech.error(), undefined, 'no tech-level error');
   tech.trigger('error');
