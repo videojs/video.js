@@ -251,9 +251,6 @@ QUnit[qunitFn]('sourceset', function(hooks) {
           done();
         });
       });
-
-      // eslint-disable-next-line
-      console.log(this.player.el());
     });
 
     QUnit.test('videojs({sources: [...]}) two sources', function(assert) {
