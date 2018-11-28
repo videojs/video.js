@@ -8,7 +8,6 @@ import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
-let qunitFn = 'module';
 const blobSrc = {
   src: 'blob:something',
   type: 'video/mp4'
@@ -20,6 +19,8 @@ const testSrc = {
 const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
 const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
 const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
+
+let qunitFn = 'module';
 
 if (!Html5.canOverrideAttributes()) {
   qunitFn = 'skip';
