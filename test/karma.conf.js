@@ -15,6 +15,8 @@ module.exports = function(config) {
 
   config = generate(config, options);
 
+  config.browsers = ['Firefox'];
+
   config.files = [
     'node_modules/sinon/pkg/sinon.js',
     'dist/video-js.css',
