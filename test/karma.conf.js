@@ -39,6 +39,8 @@ module.exports = function(config) {
     config.browserify.transform.push('browserify-istanbul');
   }
 
+  config.concurrency = 1;
+
   config.preprocessors = {
     'test/**/*.js': ['browserify']
   };
