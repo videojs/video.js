@@ -7,6 +7,10 @@ module.exports = function(config) {
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
+    travisLaunchers(defaults) {
+      delete defaults.travisFirefox;
+      return defaults;
+    },
     serverBrowsers(defaults) {
       return [];
     },
