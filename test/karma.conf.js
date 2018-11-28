@@ -16,6 +16,8 @@ module.exports = function(config) {
   config = generate(config, options);
 
   config.files = [
+    'node_modules/es5-shim/es5-shim.js',
+    'node_modules/es6-shim/es6-shim.js',
     'node_modules/sinon/pkg/sinon.js',
     'dist/video-js.css',
     'test/dist/bundle.js',
