@@ -18,6 +18,7 @@
   "author": "Steve Heffernan",
   "scripts": {
     "cdn-links": "node build/cdn-links.js",
+    "sandbox": "node build/sandbox.js",
     "start": "npm-run-all -p watch karma-server",
     "clean": "shx rm -rf ./dist ./test/dist ./docs/api",
     "postclean": "shx mkdir -p ./dist/lang ./test/dist",
