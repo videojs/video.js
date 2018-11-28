@@ -10,38 +10,18 @@ module.exports = function(config) {
     serverBrowsers(defaults) {
       return [];
     },
-    coverage: reportCoverage,
+    coverage: reportCoverage
   };
 
   config = generate(config, options);
 
   config.files = [
+    'node_modules/sinon/pkg/sinon.js',
     'dist/video-js.css',
-    'test/globals-shim.js',
-    'test/unit/**/*.js',
+    'test/dist/bundle.js',
     'build/temp/browserify.js',
     'build/temp/webpack.js',
-    {pattern: 'src/**/*.js', watched: true, included: false, served: false }
   ];
 
   config.browserStack.project = 'Video.js';
-
-  config.frameworks.push('browserify');
-  config.browserify = {
-    debug: true,
-    plugin: [],
-    transform: [
-      ['babelify', {"presets": [["@babel/preset-env", {"loose": true}]]}],
-    ]
-  };
-
-  if (reportCoverage) {
-    config.browserify.transform.push('browserify-istanbul');
-  }
-
-
-  config.preprocessors = {
-    'test/**/*.js': ['browserify']
-  };
-
 };

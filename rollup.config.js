@@ -9,6 +9,8 @@ import ignore from 'rollup-plugin-ignore';
 import alias from 'rollup-plugin-alias';
 import _ from 'lodash';
 import pkg from './package.json';
+import multiEntry from 'rollup-plugin-multi-entry';
+import stub from 'rollup-plugin-stub';
 
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
@@ -233,5 +235,30 @@ export default cliargs => [
     ],
     onwarn,
     watch
+  },
+  {
+    input: 'test/unit/**/*.test.js',
+    output: {
+      format: 'iife',
+      name: 'videojsTests',
+      file: 'test/dist/bundle.js',
+      globals: globals.test
+    },
+    external: externals.test,
+    plugins: [
+      multiEntry({exports: false}),
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      stub(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
   }
+
 ];

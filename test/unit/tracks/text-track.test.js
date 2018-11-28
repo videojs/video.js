@@ -7,14 +7,23 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import sinon from 'sinon';
 import log from '../../../src/js/utils/log.js';
+import XHR from 'xhr';
 
 QUnit.module('Text Track', {
   beforeEach() {
     this.tech = new TechFaker();
+    this.oldXMLHttpRequest = XHR.XMLHttpRequest;
+    this.oldXDomainRequest = XHR.XDomainRequest;
+    this.xhr = sinon.useFakeXMLHttpRequest();
+    XHR.XMLHttpRequest = this.xhr;
+    XHR.XDomainRequest = this.xhr;
   },
   afterEach() {
     this.tech.dispose();
     this.tech = null;
+    XHR.XMLHttpRequest = this.oldXMLHttpRequest;
+    XHR.XDomainRequest = this.oldXDomainRequest;
+    this.xhr.restore();
   }
 });
 
@@ -411,7 +420,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   let parserCreated = false;
   const reqs = [];
 
-  window.xhr.onCreate = function(req) {
+  this.xhr.onCreate = function(req) {
     reqs.push(req);
   };
 
@@ -449,7 +458,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   let parserCreated = false;
   const reqs = [];
 
-  window.xhr.onCreate = function(req) {
+  this.xhr.onCreate = function(req) {
     reqs.push(req);
   };
 
@@ -502,7 +511,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   const parserCreated = false;
   const reqs = [];
 
-  window.xhr.onCreate = function(req) {
+  this.xhr.onCreate = function(req) {
     reqs.push(req);
   };
 
