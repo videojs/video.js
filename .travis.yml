@@ -1,5 +1,4 @@
-sudo: false
-dist: trusty
+dist: xenial
 language: node_js
 cache: npm
 before_install:
