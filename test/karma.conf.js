@@ -7,6 +7,10 @@ module.exports = function(config) {
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
+    travisLaunchers(defaults) {
+      delete defaults.travisFirefox;
+      return defaults;
+    },
     serverBrowsers(defaults) {
       return [];
     },
@@ -14,6 +18,15 @@ module.exports = function(config) {
   };
 
   config = generate(config, options);
+
+  config.proxies = config.proxies || {};
+
+  // disable warning logs for sourceset tests, by proxing to a remote host
+  Object.assign(config.proxies, {
+    '/test/relative-one.mp4': 'http://example.com/relative-one.mp4',
+    '/test/relative-two.mp4': 'http://example.com/relative-two.mp4',
+    '/test/relative-three.mp4': 'http://example.com/relative-three.mp4'
+  });
 
   config.files = [
     'dist/video-js.css',
