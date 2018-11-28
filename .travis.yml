@@ -30,6 +30,7 @@ cache:
   directories:
     - node_modules
 addons:
+  firefox: latest
   apt:
     packages:
       - google-chrome-stable
