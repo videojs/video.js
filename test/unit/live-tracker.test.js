@@ -94,7 +94,8 @@ QUnit.module('LiveTracker', () => {
   });
 
   QUnit.test('seeks to live edge on seekableendchange', function(assert) {
-    this.liveTracker.segmentLength_ = 2;
+
+    this.liveTracker.seekableIncrement_ = 2;
     let pauseCalls = 0;
     let playCalls = 0;
     let currentTime = 0;

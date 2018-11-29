@@ -26,14 +26,14 @@ QUnit.module('SeekToLive', () => {
 
   QUnit.test('at live edge if liveTracker says we are', function(assert) {
     this.player.liveTracker.behindLiveEdge = () => false;
-    this.player.liveTracker.trigger('live-edge-change');
+    this.player.liveTracker.trigger('liveedgechange');
 
     assert.ok(this.seekToLive.hasClass('vjs-at-live-edge'), 'has at live edge class');
   });
 
   QUnit.test('behind live edge if liveTracker says we are', function(assert) {
     this.player.liveTracker.behindLiveEdge = () => true;
-    this.player.liveTracker.trigger('live-edge-change');
+    this.player.liveTracker.trigger('liveedgechange');
 
     assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have live edge class');
   });
