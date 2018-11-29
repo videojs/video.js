@@ -82,6 +82,7 @@ class SeekToLive extends Button {
   dispose() {
     this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
     this.contentEl_ = null;
+    this.circleEl_ = null;
 
     super.dispose();
   }
