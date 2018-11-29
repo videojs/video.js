@@ -187,7 +187,7 @@ class LiveTracker extends Component {
    * Returns how far past seek end we expect current time to be
    */
   pastSeekEnd() {
-    return this.pastSeekEnd_ || 0;
+    return this.pastSeekEnd_;
   }
 
   /**
