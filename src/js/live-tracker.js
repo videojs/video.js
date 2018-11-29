@@ -38,7 +38,7 @@ class LiveTracker extends Component {
       return;
     }
 
-    const newSeekEnd = this.seekableEnd(0);
+    const newSeekEnd = this.seekableEnd();
 
     // we can only tell if we are behind live, when seekable changes
     // once we detect that seekable has changed we check the new seek
