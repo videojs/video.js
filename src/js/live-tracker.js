@@ -117,12 +117,16 @@ class LiveTracker extends Component {
    */
   seekableEnd() {
     const seekable = this.player_.seekable();
+    const seekableEnds = [];
+    let i = seekable.length;
 
-    if (!seekable || !seekable.length) {
-      return Infinity;
+    while (i--) {
+      seekableEnds.push(seekable.end(i));
     }
 
-    return seekable.end(0);
+    // grab the furthest seekable end after sorting, or if there are none
+    // default to Infinity
+    return seekableEnds.length ? seekableEnds.sort()[seekableEnds.length - 1] : Infinity;
   }
 
   /**
@@ -131,19 +135,29 @@ class LiveTracker extends Component {
    */
   seekableStart() {
     const seekable = this.player_.seekable();
+    const seekableStarts = [];
+    let i = seekable.length;
 
-    if (!seekable || !seekable.length) {
-      return 0;
+    while (i--) {
+      seekableStarts.push(seekable.start(i));
     }
 
-    return seekable.start(0);
+    // grab the first seekable start after sorting, or if there are none
+    // default to 0
+    return seekableStarts.length ? seekableStarts.sort()[0] : 0;
   }
 
   /**
    * Get the live time window
    */
   liveWindow() {
-    return this.seekableEnd() - this.seekableStart();
+    const seekableEnd = this.seekableEnd();
+
+    if (seekableEnd === Infinity) {
+      return Infinity;
+    }
+
+    return seekableEnd - this.seekableStart();
   }
 
   /**

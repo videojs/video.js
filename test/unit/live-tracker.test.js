@@ -166,12 +166,45 @@ QUnit.module('LiveTracker', () => {
     assert.equal(playCalls, 0, 'should not have called play');
   });
 
-  QUnit.test('Helper functions should be correct', function(assert) {
+  QUnit.test('single seekable, helpers should be correct', function(assert) {
+    // simple
     this.player.seekable = () => createTimeRanges(10, 50);
-
     assert.strictEqual(this.liveTracker.liveWindow(), 40, 'liveWindow is 40s');
     assert.strictEqual(this.liveTracker.seekableStart(), 10, 'seekableStart is 10s');
     assert.strictEqual(this.liveTracker.seekableEnd(), 50, 'seekableEnd is 50s');
+  });
+
+  QUnit.test('multiple seekables, helpers should be correct', function(assert) {
+    // multiple
+    this.player.seekable = () => createTimeRanges([[0, 1], [2, 3], [4, 5]]);
+    assert.strictEqual(this.liveTracker.liveWindow(), 5, 'liveWindow is 5s');
+    assert.strictEqual(this.liveTracker.seekableStart(), 0, 'seekableStart is 0s');
+    assert.strictEqual(this.liveTracker.seekableEnd(), 5, 'seekableEnd is 5s');
+  });
+
+  QUnit.test('single seekable with Infinity, helpers should be correct', function(assert) {
+    // single with Infinity
+    this.player.seekable = () => createTimeRanges(0, Infinity);
+    assert.strictEqual(this.liveTracker.liveWindow(), Infinity, 'liveWindow is Infinity');
+    assert.strictEqual(this.liveTracker.seekableStart(), 0, 'seekableStart is 0s');
+    assert.strictEqual(this.liveTracker.seekableEnd(), Infinity, 'seekableEnd is Infinity');
+  });
+
+  QUnit.test('multiple seekables with Infinity, helpers should be correct', function(assert) {
+    // multiple with Infinity
+    this.player.seekable = () => createTimeRanges([[0, Infinity], [1, Infinity]]);
+    assert.strictEqual(this.liveTracker.liveWindow(), Infinity, 'liveWindow is Infinity');
+    assert.strictEqual(this.liveTracker.seekableStart(), 0, 'seekableStart is 0s');
+    assert.strictEqual(this.liveTracker.seekableEnd(), Infinity, 'seekableEnd is Infinity');
+  });
+
+  QUnit.test('No seekables, helpers should be defaults', function(assert) {
+    // defaults
+    this.player.seekable = () => createTimeRanges();
+
+    assert.strictEqual(this.liveTracker.liveWindow(), Infinity, 'liveWindow is Infinity');
+    assert.strictEqual(this.liveTracker.seekableStart(), 0, 'seekableStart is 0s');
+    assert.strictEqual(this.liveTracker.seekableEnd(), Infinity, 'seekableEnd is Infinity');
   });
 
 });
