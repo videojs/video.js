@@ -20,7 +20,6 @@
   visibility: hidden;
 }
 
-.vjs-seeking .vjs-loading-spinner,
 .vjs-waiting .vjs-loading-spinner {
   display: block;
   // add a delay before actual show the spinner
@@ -44,20 +43,16 @@
 }
 
 // only animate when showing because it can be processor heavy
-.vjs-seeking .vjs-loading-spinner:before,
-.vjs-seeking .vjs-loading-spinner:after,
 .vjs-waiting .vjs-loading-spinner:before,
 .vjs-waiting .vjs-loading-spinner:after {
   -webkit-animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
   animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
 }
 
-.vjs-seeking .vjs-loading-spinner:before,
 .vjs-waiting .vjs-loading-spinner:before {
   border-top-color: rgb(255,255,255);
 }
 
-.vjs-seeking .vjs-loading-spinner:after,
 .vjs-waiting .vjs-loading-spinner:after {
   border-top-color: rgb(255,255,255);
   -webkit-animation-delay: 0.44s;
