@@ -22,7 +22,12 @@
   <script>
     // fake a livestream for easy testing
     var vid = document.getElementById('vid1');
-    var player = videojs(vid, {liveui: true});
+    var liveui = true
+
+    if (videojs.browser.IS_ANDROID) {
+      liveui = false;
+    }
+    var player = videojs(vid, {liveui: liveui});
   </script>
 
 </body>
