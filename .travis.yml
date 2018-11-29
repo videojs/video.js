@@ -1,18 +1,25 @@
+dist: xenial
 language: node_js
-node_js:
-  - lts/*
+cache: npm
 before_install:
   - npm install -g greenkeeper-lockfile@1
-  - export CHROME_BIN=/usr/bin/google-chrome
+before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-before_script: greenkeeper-lockfile-update
+  - greenkeeper-lockfile-update
 after_script: greenkeeper-lockfile-upload
-
 after_failure:
   - npm ls --depth=1
 after_success:
   - npm run assets
+addons:
+  chrome: stable
+
+env:
+  global:
+    - secure: K6JpKwMkfNaJix3Bb0tLjVMzHMJgtBXdd/dvfw1BMb9DCBpd81PqXbDs7yXCddUxnUPTBPxZCrQgWsw71Wn+qEoIG5MU3uOT5A2rBbx/yZonVAGv5ed/9w0xk0OzO383CmPMFqwqtp9YmdmqGjQBkYXVXJjTvNTOAExFSdhO+3U=
+    - secure: GIbhjUJapvC70nIZVlhVyK+3KAD2TVKpiY/q412OO7V2izbvcM1tvU3LBoMZbROzrt5TT84tCoJDvHnrpL0OvxPwrzL5CUU7h4UTxhTOyQkEinbYAnWlW9wdrvtdczsEvANkFPqBZ53B3hVHZHMLOG8QRWaTBicF68vSHEJFqb4=
+
 notifications:
   irc:
     channels:
@@ -23,17 +30,4 @@ notifications:
     - http://pam.videojs.com/savage/travis
   slack:
     secure: LrF8K6mCYWlUt6SvdbGHazyQZSk/opKoiB/wgoGYaGc9+3wYXkVexY0WkO1m6wBKhUqXRAMVMFszr1wqKgdcxtItmFMMj8HqTLI1MVqgKqYX4Ux3CnEHJQiwxIk0aVL7lHLsZTXV/2Y0QIOYmAnCrgy46klETrk0ZuXf5okpu2Q=
-env:
-  global:
-    - secure: K6JpKwMkfNaJix3Bb0tLjVMzHMJgtBXdd/dvfw1BMb9DCBpd81PqXbDs7yXCddUxnUPTBPxZCrQgWsw71Wn+qEoIG5MU3uOT5A2rBbx/yZonVAGv5ed/9w0xk0OzO383CmPMFqwqtp9YmdmqGjQBkYXVXJjTvNTOAExFSdhO+3U=
-    - secure: GIbhjUJapvC70nIZVlhVyK+3KAD2TVKpiY/q412OO7V2izbvcM1tvU3LBoMZbROzrt5TT84tCoJDvHnrpL0OvxPwrzL5CUU7h4UTxhTOyQkEinbYAnWlW9wdrvtdczsEvANkFPqBZ53B3hVHZHMLOG8QRWaTBicF68vSHEJFqb4=
-sudo: false
-dist: trusty
-cache:
-  directories:
-    - node_modules
-addons:
-  firefox: latest
-  apt:
-    packages:
-      - google-chrome-stable
+
