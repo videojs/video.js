@@ -13,7 +13,7 @@ class LiveTracker extends Component {
     this.on(this.player_, 'durationchange', this.handleDurationchange);
   }
 
-  isBehind() {
+  isBehind_() {
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
     const seekableIncrement = this.seekableIncrement_ || 12;
@@ -55,8 +55,8 @@ class LiveTracker extends Component {
 
     this.pastSeekEnd_ = this.pastSeekEnd() + 0.03;
 
-    if (this.isBehind() !== this.behindLiveEdge()) {
-      this.behindLiveEdge_ = this.isBehind();
+    if (this.isBehind_() !== this.behindLiveEdge()) {
+      this.behindLiveEdge_ = this.isBehind_();
       this.trigger('liveedgechange');
     }
   }
