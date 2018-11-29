@@ -2289,7 +2289,11 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
-        if (this.options_.liveui) {
+        // on Android the seekable end is often Infinity,
+        // this makes the new liveui useless since we cannot
+        // seek within the live window at all. Android will
+        // revert back to the old liveui.
+        if (this.options_.liveui && !browser.IS_ANDROID) {
           this.addClass('vjs-liveui');
         }
       } else {
