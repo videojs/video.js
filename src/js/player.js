@@ -2931,6 +2931,33 @@ class Player extends Component {
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
+    this.resetControlBarUI();
+  }
+
+  /**
+   * Reset Control Bar's UI by calling sub-methods that reset
+   * all of Control Bar's components
+   */
+  resetControlBarUI() {
+    this.resetProgressBar();
+    this.resetPlaybackRate();
+    // this.resetSoundVolume();
+  }
+
+  /**
+   * Reset tech's progress so progress bar is reset in the UI
+   */
+  resetProgressBar() {
+    this.currentTime(0);
+    this.tech_.trigger({ type: 'timeupdate', target: this.tech_, manuallyTriggered: true });
+  }
+
+  /**
+   * Reset Playback ratio
+   */
+  resetPlaybackRate() {
+    this.playbackRate(1);
+    this.handleTechRateChange_();
   }
 
   /**
