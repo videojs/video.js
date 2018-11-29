@@ -105,10 +105,17 @@ class SeekBar extends Slider {
    * @private
    */
   update_(currentTime, percent) {
+    const liveTracker = this.player_.liveTracker;
     let duration = this.player_.duration();
 
-    if (this.player_.liveTracker.isLive()) {
+    if (liveTracker.isLive()) {
       duration = this.player_.liveTracker.seekableEnd();
+    }
+
+    if (liveTracker.seekableEnd() === Infinity) {
+      this.disable();
+    } else {
+      this.enable();
     }
 
     // machine readable value of progress bar (percentage complete)
@@ -266,6 +273,13 @@ class SeekBar extends Slider {
       // than seekable start
       if (newTime <= seekableStart) {
         newTime = seekableStart + 0.1;
+      }
+
+      // On android seekableEnd can be Infinity sometimes,
+      // this will cause newTime to be Infinity, which is
+      // not a valid currentTime.
+      if (newTime === Infinity) {
+        return;
       }
     }
 
