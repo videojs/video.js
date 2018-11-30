@@ -32,8 +32,8 @@ module.exports = function(config) {
     'dist/video-js.css',
     'test/globals-shim.js',
     'test/unit/**/*.js',
-    'build/temp/browserify.js',
-    'build/temp/webpack.js',
+    'test/dist/browserify.js',
+    'test/dist/webpack.js',
     {pattern: 'src/**/*.js', watched: true, included: false, served: false }
   ];
 
@@ -54,7 +54,8 @@ module.exports = function(config) {
 
 
   config.preprocessors = {
-    'test/**/*.js': ['browserify']
+    'test/globals-shim.js': ['browserify'],
+    'test/unit/**/*.js': ['browserify'],
   };
 
 };
