@@ -25,10 +25,12 @@
   @include flex(none);
   display: inline-flex;
   height: 100%;
-  margin-left: 0.7em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
   font-size: 1em;
   line-height: 3em;
   width: auto;
+  min-width: 4em;
 }
 
 .vjs-no-flex .vjs-seek-to-live-control {
@@ -50,16 +52,12 @@
 }
 
 .vjs-seek-to-live-control .vjs-seek-to-live-circle {
-  border-radius: 50%;
-  width: 0.75em;
-  height: 0.75em;
-  margin-top: auto;
-  margin-bottom: auto;
-  margin-right: 0.3em;
-  background: radial-gradient(#808080, #666666);
+  margin-right: 0.5em;
+  @extend .vjs-icon-circle;
+  color: #888;
 }
 
 // make the live circle red when at the live edge
 .vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-seek-to-live-circle {
-  background: radial-gradient(#ff0000, #990000);
+  color: red;
 }
