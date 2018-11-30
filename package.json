@@ -32,7 +32,7 @@
     "copy": "npm-run-all copy:*",
     "copy:fonts": "shx cp -R node_modules/videojs-font/fonts dist/font",
     "copy:examples": "shx cp -R docs/examples dist/",
-    "build:js": "rollup -c --no-progress",
+    "build:js": "rollup -c",
     "build:css": "npm-run-all build:css:*",
     "build:css:cdn": "node-sass src/css/vjs-cdn.scss dist/alt/video-js-cdn.css",
     "postbuild:css:cdn": "postcss --verbose --config postcss.config.js -d dist/alt dist/alt/video-js-cdn.css",
