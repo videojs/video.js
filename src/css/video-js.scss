@@ -56,8 +56,11 @@
 // The rule is needed for :focus-visible polyfill
 .js-focus-visible .video-js *:focus:not(.focus-visible) {
   outline: none;
+  background: none;
 }
 
-.video-js *:focus:not(:focus-visible) {
+.video-js *:focus:not(:focus-visible),
+.video-js .vjs-menu *:focus:not(:focus-visible) {
   outline: none;
+  background: none;
 }
