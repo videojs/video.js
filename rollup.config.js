@@ -50,7 +50,7 @@ const primedBabel = babel({
 });
 
 const progress = () => {
-  if (process.env.TRAVIS) {
+  if (process.env.TRAVIS || process.env.NETLIFY) {
     return {};
   }
 
