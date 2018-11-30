@@ -244,6 +244,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
 | cs.json (Complete)      |                                                                                     |
+| cy.json (Complete)      |                                                                                     |
 | da.json (missing 59)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -941,6 +942,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
+| oc.json (missing 1)     | {1} is loading.                                                                     |
 | pl.json (missing 51)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -1037,7 +1039,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ru.json (missing 1)     | {1} is loading.                                                                     |
+| ru.json (Complete)      |                                                                                     |
 | sk.json (Complete)      |                                                                                     |
 | sr.json (missing 59)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
