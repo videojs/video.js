@@ -54,8 +54,9 @@ class LoadProgressBar extends Component {
    * @listens Player#progress
    */
   update(event) {
+    const liveTracker = this.player_.liveTracker;
     const buffered = this.player_.buffered();
-    const duration = this.player_.duration();
+    const duration = liveTracker.isLive() ? liveTracker.seekableEnd() : this.player_.duration();
     const bufferedEnd = this.player_.bufferedEnd();
     const children = this.partEls_;
 
@@ -67,10 +68,8 @@ class LoadProgressBar extends Component {
       return ((percent >= 1 ? 1 : percent) * 100) + '%';
     };
 
-    // update the width of the progress bar if not live
-    if (!this.player_.liveTracker.isLive()) {
-      this.el_.style.width = percentify(bufferedEnd, duration);
-    }
+    // update the width of the progress bar
+    this.el_.style.width = percentify(bufferedEnd, duration);
 
     // add child elements to represent the individual buffered time ranges
     for (let i = 0; i < buffered.length; i++) {
