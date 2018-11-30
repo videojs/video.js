@@ -25,17 +25,17 @@ QUnit.module('LiveTracker', () => {
     this.liveTracker.on('liveedgechange', () => {
       liveEdgeChange++;
     });
-    assert.notOk(this.liveTracker.started(), 'not started');
+    assert.notOk(this.liveTracker.isTracking(), 'not started');
 
     this.player.duration(Infinity);
-    assert.ok(this.liveTracker.started(), 'started');
+    assert.ok(this.liveTracker.isTracking(), 'started');
     assert.equal(liveEdgeChange, 1, 'liveedgechange fired');
 
     this.player.duration(5);
-    assert.notOk(this.liveTracker.started(), 'not started');
+    assert.notOk(this.liveTracker.isTracking(), 'not started');
 
     this.player.duration(Infinity);
-    assert.ok(this.liveTracker.started(), 'started');
+    assert.ok(this.liveTracker.isTracking(), 'started');
     assert.equal(liveEdgeChange, 2, 'liveedgechange fired again');
   });
 
