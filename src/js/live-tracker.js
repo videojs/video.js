@@ -69,17 +69,17 @@ class LiveTracker extends Component {
    */
   handleDurationchange() {
     if (this.player_.duration() === Infinity) {
-      this.start();
+      this.startTracking();
     } else {
-      this.stop();
+      this.stopTracking();
     }
   }
 
   /**
    * start tracking live playback
    */
-  start() {
-    if (this.started()) {
+  startTracking() {
+    if (this.isTracking()) {
       return;
     }
 
@@ -110,8 +110,8 @@ class LiveTracker extends Component {
   /**
    * stop tracking live playback
    */
-  stop() {
-    if (!this.started()) {
+  stopTracking() {
+    if (!this.isTracking()) {
       return;
     }
     this.reset_();
@@ -171,7 +171,7 @@ class LiveTracker extends Component {
    * is tracking live playback or not
    */
   isLive() {
-    return this.started();
+    return this.isTracking();
   }
 
   /**
@@ -204,7 +204,7 @@ class LiveTracker extends Component {
     return this.behindLiveEdge_;
   }
 
-  started() {
+  isTracking() {
     return typeof this.trackingInterval_ === 'number';
   }
 
@@ -226,7 +226,7 @@ class LiveTracker extends Component {
   }
 
   dispose() {
-    this.stop();
+    this.stopTracking();
     super.dispose();
   }
 }
