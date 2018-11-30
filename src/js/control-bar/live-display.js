@@ -24,6 +24,9 @@ class LiveDisplay extends Component {
    */
   constructor(player, options) {
     super(player, options);
+
+    this.updateShowing();
+    this.on(this.player(), 'durationchange', this.updateShowing);
   }
 
   /**
@@ -53,6 +56,24 @@ class LiveDisplay extends Component {
 
     super.dispose();
   }
+
+  /**
+   * Check the duration to see if the LiveDisplay should be showing or not. Then show/hide
+   * it accordingly
+   *
+   * @param {EventTarget~Event} [event]
+   *        The {@link Player#durationchange} event that caused this function to run.
+   *
+   * @listens Player#durationchange
+   */
+  updateShowing(event) {
+    if (this.player().duration() === Infinity) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  }
+
 }
 
 Component.registerComponent('LiveDisplay', LiveDisplay);

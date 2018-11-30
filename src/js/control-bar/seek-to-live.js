@@ -1,5 +1,5 @@
 /**
- * @file live-display.js
+ * @file seek-to-live.js
  */
 import Button from '../button';
 import Component from '../component';
