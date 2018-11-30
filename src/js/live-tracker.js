@@ -85,6 +85,9 @@ class LiveTracker extends Component {
 
     this.trackingInterval_ = this.setInterval(this.trackLive_, 30);
     this.trackLive_();
+
+    this.on(this.player_, 'play', this.trackLive_);
+    this.on(this.player_, 'pause', this.trackLive_);
   }
 
   /**
@@ -99,6 +102,9 @@ class LiveTracker extends Component {
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
     this.seekableIncrement_ = 12;
+
+    this.off(this.player_, 'play', this.trackLive_);
+    this.off(this.player_, 'pause', this.trackLive_);
   }
 
   /**
