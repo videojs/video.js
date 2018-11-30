@@ -14,7 +14,7 @@ const blobSrc = {
   type: 'video/mp4'
 };
 const testSrc = {
-  src: 'http://vjs.zencdn.net/v/oceans.mp4',
+  src: 'http://example.com/testSrc.mp4',
   type: 'video/mp4'
 };
 const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};

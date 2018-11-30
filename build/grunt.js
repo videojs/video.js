@@ -18,52 +18,6 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg,
-    clean: {
-      build: ['build/temp/*', 'es5', 'test/dist'],
-      dist: ['dist/*', 'test/dist']
-    },
-    dist: {},
-    watch: {
-      lang: {
-        files: ['lang/**/*.json'],
-        tasks: ['vjslanguages']
-      }
-    },
-    copy: {
-      fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
-      lang:  { cwd: 'lang/', src: ['*'], dest: 'dist/lang/', expand: true, filter: 'isFile' },
-      dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
-      a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
-      examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
-    },
-    vjslanguages: {
-      defaults: {
-        files: {
-          'build/temp/lang': ['lang/*.json']
-        }
-      }
-    },
-    zip: {
-      dist: {
-        router: function (filepath) {
-          var path = require('path');
-          return path.relative('dist', filepath);
-        },
-        // compression: 'DEFLATE',
-        src: ['dist/**/*'],
-        dest: 'dist/video-js-' + version.full + '.zip'
-      }
-    },
-    coveralls: {
-      options: {
-        // warn instead of failing when coveralls errors
-        // we've seen coveralls 503 relatively frequently
-        force: true
-      },
-      all: {
-        src: 'test/dist/coverage/lcov.info'
-      }
-    },
     concurrent: {
       options: {
         logConcurrentOutput: true
@@ -74,8 +28,7 @@ module.exports = function(grunt) {
       dev: [
         'shell:sass',
         'shell:babel',
-        'watch:lang',
-        'copy:dist',
+        'shell:copy-dist',
         'shell:karma-server'
       ],
       // Run multiple watch tasks in parallel
@@ -89,6 +42,36 @@ module.exports = function(grunt) {
       ]
     },
     shell: {
+      'copy-dist': {
+        command: 'npm run copy-dist',
+        options: {
+          preferLocal: true
+        }
+      },
+      'copy-fonts': {
+        command: 'npm run copy-fonts',
+        options: {
+          preferLocal: true
+        }
+      },
+      'lang': {
+        command: 'npm run build:lang',
+        options: {
+          preferLocal: true
+        }
+      },
+      'copy-examples': {
+        command: 'npm run copy-examples',
+        options: {
+          preferLocal: true
+        }
+      },
+      clean: {
+        command: 'npm run clean',
+        options: {
+          preferLocal: true
+        }
+      },
       'karma-server': {
         command: 'npm run karma-server',
         options: {
@@ -97,6 +80,12 @@ module.exports = function(grunt) {
       },
       'karma-run': {
         command: 'npm run karma-run',
+        options: {
+          preferLocal: true
+        }
+      },
+      'zip': {
+        command: 'npm run zip',
         options: {
           preferLocal: true
         }
@@ -137,69 +126,54 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       },
-      noderequire: {
-        command: 'node test/require/node.js',
+      a11y: {
+        command: 'npm run test:a11y',
         options: {
-          failOnError: true
+          preferLocal: true
+        }
+      },
+      noderequire: {
+        command: 'npm run test:node-require',
+        options: {
+          preferLocal: true
         }
       },
       browserify: {
-        command: 'browserify test/require/browserify.js -o build/temp/browserify.js',
+        command: 'npm run build:browserify-test',
         options: {
           preferLocal: true
         }
       },
       webpack: {
-        command: 'webpack --hide-modules test/require/webpack.js build/temp/webpack.js',
+        command: 'npm run build:webpack-test',
         options: {
           preferLocal: true
         }
       }
     },
-    accessibility: {
-      options: {
-        accessibilityLevel: 'WCAG2AA',
-        reportLevels: {
-          notice: false,
-          warning: true,
-          error: true
-        },
-        ignore: [
-          // Ignore warning about contrast of the "vjs-no-js" fallback link
-          'WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.BgImage'
-        ]
-
-      },
-      test: {
-        src: ['sandbox/descriptions.test-a11y.html']
-      }
-    }
   });
 
   // load all the npm grunt tasks
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('grunt-accessibility');
 
   grunt.registerTask('build', [
     'shell:lint',
-    'clean:build',
+    'shell:clean',
 
     'shell:rollupall',
 
     'shell:sass',
     'shell:cssmin',
 
-    'copy:fonts',
-    'copy:lang',
-    'vjslanguages'
+    'shell:copy-fonts',
+    'shell:lang'
   ]);
 
   grunt.registerTask('dist', [
-    'clean:dist',
     'build',
-    'copy:dist',
-    'copy:examples',
-    'zip:dist'
+    'shell:copy-dist',
+    'shell:copy-examples',
+    'shell:zip'
   ]);
 
   grunt.registerTask('skin', ['shell:sass']);
@@ -207,7 +181,6 @@ module.exports = function(grunt) {
   // Default task - build and test
   grunt.registerTask('default', ['test']);
 
-  // The test script includes coveralls only when the TRAVIS env var is set.
   grunt.registerTask('test', function() {
     const tasks = [
       'build',
@@ -215,7 +188,7 @@ module.exports = function(grunt) {
       'shell:browserify',
       'shell:webpack',
       'shell:karma-run',
-      'test-a11y'
+      'shell:a11y'
     ];
 
     if (process.env.TRAVIS) {
@@ -223,8 +196,6 @@ module.exports = function(grunt) {
         grunt.log.write('Not running any tests because only docs were changed');
         return;
       }
-
-      tasks.concat(process.env.TRAVIS && 'coveralls').filter(Boolean);
     }
 
     grunt.task.run(tasks);
@@ -233,7 +204,6 @@ module.exports = function(grunt) {
   // Run while developing
   grunt.registerTask('dev', ['sandbox', 'concurrent:dev']);
   grunt.registerTask('watchAll', ['build', 'concurrent:watchAll']);
-  grunt.registerTask('test-a11y', ['copy:a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['shell:karma-server']);
