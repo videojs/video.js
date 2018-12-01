@@ -2941,7 +2941,7 @@ class Player extends Component {
   resetControlBarUI() {
     this.resetProgressBar();
     this.resetPlaybackRate();
-    // this.resetSoundVolume();
+    this.resetVolumeBar();
   }
 
   /**
@@ -2956,8 +2956,16 @@ class Player extends Component {
    * Reset Playback ratio
    */
   resetPlaybackRate() {
-    this.playbackRate(1);
+    this.playbackRate(this.defaultPlaybackRate());
     this.handleTechRateChange_();
+  }
+
+  /**
+   * Reset Volume bar
+   */
+  resetVolumeBar() {
+    this.cache_.volume = 1.0;
+    this.techCall_('setVolume', this.cache_.volume);
   }
 
   /**
