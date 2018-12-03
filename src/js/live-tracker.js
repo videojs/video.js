@@ -166,13 +166,13 @@ class LiveTracker extends Component {
    * Get the live time window
    */
   liveWindow() {
-    const seekableEnd = this.seekableEnd();
+    const liveCurrentTime = this.liveCurrentTime();
 
-    if (seekableEnd === Infinity) {
+    if (liveCurrentTime === Infinity) {
       return Infinity;
     }
 
-    return seekableEnd - this.seekableStart();
+    return liveCurrentTime - this.seekableStart();
   }
 
   /**
@@ -225,13 +225,11 @@ class LiveTracker extends Component {
       return;
     }
 
-    this.player().pause();
-    this.player().addClass('vjs-waiting');
-    this.one('seekableendchange', () => {
-      this.player().removeClass('vjs-waiting');
-      this.player().currentTime(this.seekableEnd());
-      this.player().play();
-    });
+    this.player_.currentTime(this.liveCurrentTime());
+
+    if (this.player_.paused()) {
+      this.player_.play();
+    }
   }
 
   dispose() {

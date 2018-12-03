@@ -52,6 +52,7 @@ class SeekBar extends Slider {
     this.on(this.player_, 'timeupdate', this.update);
     this.on(this.player_, 'ended', this.handleEnded);
     this.on(this.player_, 'durationchange', this.update);
+    this.on(this.player_.liveTracker, 'liveedgechange', this.update);
 
     // when playing, let's ensure we smoothly update the play progress bar
     // via an interval
@@ -109,7 +110,7 @@ class SeekBar extends Slider {
     let duration = this.player_.duration();
 
     if (liveTracker.isLive()) {
-      duration = this.player_.liveTracker.seekableEnd();
+      duration = this.player_.liveTracker.liveCurrentTime();
     }
 
     if (liveTracker.seekableEnd() === Infinity) {
@@ -255,12 +256,7 @@ class SeekBar extends Slider {
       }
     } else {
       const seekableStart = liveTracker.seekableStart();
-      const seekableEnd = liveTracker.seekableEnd();
-
-      if (distance === 1) {
-        liveTracker.seekToLiveEdge();
-        return;
-      }
+      const seekableEnd = liveTracker.liveCurrentTime();
 
       newTime = seekableStart + (distance * liveTracker.liveWindow());
 
