@@ -126,7 +126,7 @@ class LiveTracker extends Component {
   seekableEnd() {
     const seekable = this.player_.seekable();
     const seekableEnds = [];
-    let i = seekable.length;
+    let i = seekable ? seekable.length : 0;
 
     while (i--) {
       seekableEnds.push(seekable.end(i));
@@ -144,7 +144,7 @@ class LiveTracker extends Component {
   seekableStart() {
     const seekable = this.player_.seekable();
     const seekableStarts = [];
-    let i = seekable.length;
+    let i = seekable ? seekable.length : 0;
 
     while (i--) {
       seekableStarts.push(seekable.start(i));
