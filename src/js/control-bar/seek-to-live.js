@@ -42,11 +42,11 @@ class SeekToLive extends Button {
       className: 'vjs-seek-to-live-control vjs-control'
     });
 
-    this.contentEl_ = Dom.createEl('div', {
-      className: 'vjs-seek-to-live',
-      innerHTML: `<span class="vjs-control-text">${this.localize('Stream Type')}\u00a0</span>${this.localize('LIVE')}`
+    this.textEl_ = Dom.createEl('span', {
+      className: 'vjs-seek-to-live-text',
+      innerHTML: this.localize('LIVE')
     }, {
-      'aria-live': 'off'
+      'aria-hidden': 'true'
     });
 
     this.circleEl_ = Dom.createEl('span', {
@@ -54,7 +54,7 @@ class SeekToLive extends Button {
     });
 
     el.appendChild(this.circleEl_);
-    el.appendChild(this.contentEl_);
+    el.appendChild(this.textEl_);
     return el;
   }
 
@@ -66,8 +66,12 @@ class SeekToLive extends Button {
     // default to live edge
     if (!this.player_.liveTracker || this.player_.liveTracker.atLiveEdge()) {
       this.addClass('vjs-at-live-edge');
+      this.controlText('At LIVE edge');
+      this.setAttribute('aria-disabled', true);
     } else {
+      this.setAttribute('aria-disabled', false);
       this.removeClass('vjs-at-live-edge');
+      this.controlText('Seek To LIVE');
     }
   }
 
@@ -87,13 +91,14 @@ class SeekToLive extends Button {
     if (this.player_.liveTracker) {
       this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
     }
-    this.contentEl_ = null;
+    this.textEl_ = null;
     this.circleEl_ = null;
 
     super.dispose();
   }
-
 }
+
+SeekToLive.prototype.controlText_ = 'Seek to LIVE';
 
 Component.registerComponent('SeekToLive', SeekToLive);
 export default SeekToLive;
