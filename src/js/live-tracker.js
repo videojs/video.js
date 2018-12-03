@@ -26,6 +26,8 @@ class LiveTracker extends Component {
     // and we want some wiggle room for short segment live playback
     const liveEdgeWindow = seekableIncrement + 0.07;
 
+    // on Android liveCurrentTime can bee Infinity, because seekableEnd
+    // can be Infinity, so we handle that case.
     return liveCurrentTime !== Infinity && (liveCurrentTime - liveEdgeWindow) >= currentTime;
   }
 
