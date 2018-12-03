@@ -49,7 +49,7 @@ class LiveTracker extends Component {
     // end against current time, with a fudge value of half a second.
     if (newSeekEnd !== this.lastSeekEnd_) {
       if (this.lastSeekEnd_) {
-        this.seekableIncrement_ = newSeekEnd - this.lastSeekEnd_;
+        this.seekableIncrement_ = Math.abs(newSeekEnd - this.lastSeekEnd_);
       }
 
       this.pastSeekEnd_ = 0;
