@@ -90,6 +90,11 @@ class LiveTracker extends Component {
 
     this.on(this.player_, 'play', this.trackLive_);
     this.on(this.player_, 'pause', this.trackLive_);
+    this.on(this.player_, 'firstplay', this.handleFirstplay);
+  }
+
+  handleFirstplay() {
+    this.one(this.player_, 'timeupdate', this.seekToLiveEdge);
   }
 
   /**
@@ -107,6 +112,8 @@ class LiveTracker extends Component {
 
     this.off(this.player_, 'play', this.trackLive_);
     this.off(this.player_, 'pause', this.trackLive_);
+    this.off(this.player_, 'firstplay', this.handleFirstplay);
+    this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
   }
 
   /**
