@@ -16,6 +16,10 @@ class LiveTracker extends Component {
   }
 
   isBehind_() {
+    // don't report that we are behind until a timeupdate has been seen
+    if (!this.timeupdateSeen_) {
+      return false;
+    }
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
     const seekableIncrement = this.seekableIncrement_;
@@ -91,6 +95,16 @@ class LiveTracker extends Component {
     this.on(this.player_, 'play', this.trackLive_);
     this.on(this.player_, 'pause', this.trackLive_);
     this.on(this.player_, 'firstplay', this.handleFirstplay);
+
+    // this is to prevent showing that we are not live
+    // before a video starts to play
+    if (!this.timeupdateSeen_) {
+      this.handleTimeupdate = () => {
+        this.timeupdateSeen_ = true;
+        this.handleTimeupdate = null;
+      };
+      this.one(this.player_, 'timeupdate', this.handleTimeupdate);
+    }
   }
 
   handleFirstplay() {
@@ -114,6 +128,9 @@ class LiveTracker extends Component {
     this.off(this.player_, 'pause', this.trackLive_);
     this.off(this.player_, 'firstplay', this.handleFirstplay);
     this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
+    if (this.handleTimeupdate) {
+      this.off(this.player_, 'timeupdate', this.handleTimeupdate);
+    }
   }
 
   /**
