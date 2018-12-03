@@ -17,6 +17,10 @@
   display: none;
 }
 
+.vjs-liveui .vjs-progress-control {
+  @include display-flex(center);
+}
+
 .vjs-no-flex .vjs-progress-control {
   width: auto;
 }
