@@ -94,7 +94,7 @@
     "@babel/preset-env": "^7.2.0",
     "@babel/register": "^7.0.0",
     "access-sniff": "^3.2.0",
-    "autoprefixer": "^9.4.0",
+    "autoprefixer": "^9.4.2",
     "babelify": "^10.0.0",
     "bestzip": "^2.1.2",
     "bluebird": "^3.5.3",
