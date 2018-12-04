@@ -1,24 +1,14 @@
-var ghrelease = require('gh-release');
-var currentChangelog = require('./current-changelog.js');
-var safeParse = require('safe-json-parse/tuple');
-var pkg = require('../package.json')
-var minimist = require('minimist');
+/* eslint-disable no-console */
 
-var args = minimist(process.argv.slice(2), {
-  boolean: ['prerelease'],
-  default: {
-    prerelease: false
-  },
-  alias: {
-    p: 'prerelease'
-  }
-});
-
-var options = {
+const ghrelease = require('gh-release');
+const currentChangelog = require('./current-changelog.js');
+const safeParse = require('safe-json-parse/tuple');
+const pkg = require('../package.json');
+const options = {
   owner: 'videojs',
   repo: 'video.js',
   body: currentChangelog(),
-  assets: ['./dist/video-js-'+pkg.version+'.zip'],
+  assets: ['./dist/video-js-' + pkg.version + '.zip'],
   endpoint: 'https://api.github.com',
   auth: {
     username: process.env.VJS_GITHUB_USER,
@@ -26,10 +16,22 @@ var options = {
   }
 };
 
-var tuple = safeParse(process.env.npm_config_argv);
-var npmargs = tuple[0] ? [] : tuple[1].cooked;
+let i = process.argv.length;
 
-if (args.prerelease || npmargs.some(function(arg) { return /next/.test(arg); })) {
+while (i--) {
+  const arg = process.argv[i];
+
+  if (arg === '-p' || arg === '--prerelease') {
+    options.prerelease = true;
+  }
+}
+
+const tuple = safeParse(process.env.npm_config_argv);
+const npmargs = tuple[0] ? [] : tuple[1].cooked;
+
+if (npmargs.some(function(arg) {
+  return /next/.test(arg);
+})) {
   options.prerelease = true;
 }
 

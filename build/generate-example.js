@@ -1,24 +1,23 @@
-import path from 'path';
-import fs from 'fs';
-import sh from 'shelljs';
-import klawSync from 'klaw-sync';
-import pkg from '../package.json';
+const path = require('path');
+const fs = require('fs');
+const sh = require('shelljs');
+const pkg = require('../package.json');
 
-const dest = 'docs/api/';
-const vjsFlash = 'node_modules/videojs-flash';
-const vjsSwf = 'node_modules/videojs-swf/';
+const dest = path.join(__dirname, '..', 'docs', 'api');
+const vjsFlash = path.join(__dirname, '..', 'node_modules', 'videojs-flash');
+const vjsSwf = path.join('node_modules', 'videojs-swf');
 const distDest = path.join(dest, 'dist');
 const exampleDest = path.join(dest, 'test-example');
 const vjsFlashDest = path.join(dest, vjsFlash, 'dist');
 const swfDest = path.join(dest, vjsFlash, vjsSwf, 'dist');
 
-export function cleanupExample() {
+const cleanupExample = function() {
   sh.rm('-rf', distDest);
   sh.rm('-rf', exampleDest);
   sh.rm('-rf', path.join(dest, 'node_modules'));
-}
+};
 
-export default function generateExample({skipBuild} = {}) {
+const generateExample = function({skipBuild} = {}) {
   // run the build
   if (!skipBuild) {
     sh.exec('npm run build');
@@ -42,11 +41,20 @@ export default function generateExample({skipBuild} = {}) {
     sh.cp(path.join(vjsSwf, 'dist', 'video-js.swf'), swfDest);
   }
 
-  const files = klawSync('sandbox/').filter((file) => path.extname(file.path) === '.example');
+  const filepaths = sh.find(path.join(__dirname, '..', 'sandbox', '**', '*.*'))
+    .filter((filepath) => path.extname(filepath) === '.example');
 
   // copy the sandbox example files
-  files.forEach(function(file) {
-    const p = path.parse(file.path);
-    sh.cp(file.path, path.join(exampleDest, p.name));
+  filepaths.forEach(function(filepath) {
+    const p = path.parse(filepath);
+
+    sh.cp(filepath, path.join(exampleDest, p.name));
   });
-}
+};
+
+generateExample({skipBuild: true});
+
+module.exports = {
+  cleanupExample,
+  generateExample
+};
