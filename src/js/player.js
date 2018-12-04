@@ -3960,7 +3960,7 @@ class Player extends Component {
    *           API. If not specified, will be populated via the `poster`, if
    *           available.
    *
-   * @property {Object[]} [poster]
+   * @property {string} [poster]
    *           URL to an image that will display before playback.
    *
    * @property {Tech~SourceObject|Tech~SourceObject[]|string} [src]
