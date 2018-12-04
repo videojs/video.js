@@ -2931,7 +2931,7 @@ class Player extends Component {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
-    this.media_ = null;
+    this.cache_.media = null;
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     if (isEvented(this)) {
@@ -3998,13 +3998,13 @@ class Player extends Component {
     this.reset();
 
     // Clone the media object so it cannot be mutated from outside.
-    this.media_ = mergeOptions(media);
+    this.cache_.media = mergeOptions(media);
 
-    const {artwork, poster, src, textTracks} = this.media_;
+    const {artwork, poster, src, textTracks} = this.cache_.media;
 
     // If `artwork` is not given, create it using `poster`.
     if (!artwork && poster) {
-      this.media_.artwork = [{
+      this.cache_.media.artwork = [{
         src: poster,
         type: getMimetype(poster)
       }];
@@ -4034,11 +4034,11 @@ class Player extends Component {
    * @return {Player~MediaObject|null}
    */
   getMedia() {
-    if (!this.media_) {
+    if (!this.cache_.media) {
       return null;
     }
 
-    const media = mergeOptions(this.media_);
+    const media = mergeOptions(this.cache_.media);
 
     return media;
   }
