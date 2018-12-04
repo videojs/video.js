@@ -66,6 +66,7 @@ QUnit.module('LiveTracker', () => {
   });
 
   QUnit.test('Triggers liveedgechange when we fall behind and catch up', function(assert) {
+    this.player.trigger('timeupdate');
     this.player.currentTime = () => 0;
     this.clock.tick(20000);
 
@@ -94,10 +95,9 @@ QUnit.module('LiveTracker', () => {
   });
 
   QUnit.test('seeks to live edge on seekableendchange', function(assert) {
+    this.player.trigger('timeupdate');
 
     this.liveTracker.seekableIncrement_ = 2;
-    let pauseCalls = 0;
-    let playCalls = 0;
     let currentTime = 0;
 
     this.player.currentTime = (ct) => {
@@ -107,28 +107,13 @@ QUnit.module('LiveTracker', () => {
       return 0;
     };
 
-    this.player.play = () => {
-      playCalls++;
-    };
-
-    this.player.pause = () => {
-      pauseCalls++;
-    };
     this.clock.tick(3000);
 
     assert.ok(this.liveTracker.pastSeekEnd() > 2, 'pastSeekEnd should be over 2s');
 
     this.liveTracker.seekToLiveEdge();
 
-    assert.ok(this.player.hasClass('vjs-waiting'), 'player should be waiting');
-    assert.equal(pauseCalls, 1, 'should be paused');
-    this.player.seekable = () => createTimeRanges(0, 2);
-
-    this.clock.tick(30);
-    assert.equal(this.seekableEndChanges, 1, 'should be one seek end change');
-    assert.equal(currentTime, 2, 'should have seeked to seekableEnd');
-    assert.equal(playCalls, 1, 'should be playing');
-    assert.notOk(this.player.hasClass('vjs-waiting'), 'player should not be waiting');
+    assert.equal(currentTime, this.liveTracker.liveCurrentTime(), 'should have seeked to liveCurrentTime');
   });
 
   QUnit.test('does not seek to to live edge if at live edge', function(assert) {
@@ -169,7 +154,7 @@ QUnit.module('LiveTracker', () => {
   QUnit.test('single seekable, helpers should be correct', function(assert) {
     // simple
     this.player.seekable = () => createTimeRanges(10, 50);
-    assert.strictEqual(this.liveTracker.liveWindow(), 40, 'liveWindow is 40s');
+    assert.strictEqual(this.liveTracker.liveWindow(), 40.03, 'liveWindow is 40s');
     assert.strictEqual(this.liveTracker.seekableStart(), 10, 'seekableStart is 10s');
     assert.strictEqual(this.liveTracker.seekableEnd(), 50, 'seekableEnd is 50s');
   });
@@ -177,7 +162,7 @@ QUnit.module('LiveTracker', () => {
   QUnit.test('multiple seekables, helpers should be correct', function(assert) {
     // multiple
     this.player.seekable = () => createTimeRanges([[0, 1], [2, 3], [4, 5]]);
-    assert.strictEqual(this.liveTracker.liveWindow(), 5, 'liveWindow is 5s');
+    assert.strictEqual(this.liveTracker.liveWindow(), 5.03, 'liveWindow is 5s');
     assert.strictEqual(this.liveTracker.seekableStart(), 0, 'seekableStart is 0s');
     assert.strictEqual(this.liveTracker.seekableEnd(), 5, 'seekableEnd is 5s');
   });
