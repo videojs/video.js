@@ -8,7 +8,7 @@ import {bind, throttle} from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
- * Displays the time left in the video
+ * Displays time information about the video
  *
  * @extends Component
  */
@@ -39,14 +39,18 @@ class TimeDisplay extends Component {
     const className = this.buildCSSClass();
     const el = super.createEl('div', {
       className: `${className} vjs-time-control vjs-control`,
-      innerHTML: `<span class="vjs-control-text">${this.localize(this.labelText_)}\u00a0</span>`
+      innerHTML: `<span class="vjs-control-text" role="presentation">${this.localize(this.labelText_)}\u00a0</span>`
     });
 
     this.contentEl_ = Dom.createEl('span', {
       className: `${className}-display`
     }, {
       // tell screen readers not to automatically read the time as it changes
-      'aria-live': 'off'
+      'aria-live': 'off',
+      // span elements should have no implicit role semantics, but make this
+      // presentational just in case to make sure that only the text content is
+      // exposed to assistive techs
+      'role': 'presentation'
     });
 
     this.updateTextNode_();
