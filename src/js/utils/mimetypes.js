@@ -17,7 +17,17 @@ export const MimetypesKind = {
   mp3: 'audio/mpeg',
   aac: 'audio/aac',
   oga: 'audio/ogg',
-  m3u8: 'application/x-mpegURL'
+  m3u8: 'application/x-mpegURL',
+  bmp: 'image/bmp',
+  ico: 'image/x-icon',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  png: 'image/png',
+  svg: 'image/svg+xml',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  webp: 'image/webp'
 };
 
 /**
