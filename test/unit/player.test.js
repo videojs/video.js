@@ -1473,6 +1473,23 @@ QUnit.test('player#reset removes the poster', function(assert) {
   assert.strictEqual(player.poster(), '', 'the poster was reset');
 });
 
+QUnit.test('player#reset removes remote text tracks', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
+  player.addRemoteTextTrack({
+    kind: 'captions',
+    src: 'foo.vtt',
+    language: 'en',
+    label: 'English'
+  });
+
+  assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
+  player.reset();
+  assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
+});
+
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
   const player = TestHelpers.makePlayer();
 
