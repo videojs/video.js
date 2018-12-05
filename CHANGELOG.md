@@ -1,3 +1,38 @@
+<a name="6.13.0"></a>
+# [6.13.0](https://github.com/videojs/video.js/compare/v6.12.1...v6.13.0) (2018-12-05)
+
+### Features
+
+* **fill:** make vjs-fill a player mode ([#5478](https://github.com/videojs/video.js/issues/5478)) ([fba3e98](https://github.com/videojs/video.js/commit/fba3e98))
+* Add breakpoints option to support toggling classes based on player width. ([#5471](https://github.com/videojs/video.js/issues/5471)) ([f857523](https://github.com/videojs/video.js/commit/f857523)), closes [videojs/video.js#4371](https://github.com/videojs/video.js/issues/4371)
+* Add responsive option, which enables breakpoints support. ([#5496](https://github.com/videojs/video.js/issues/5496)) ([368dae3](https://github.com/videojs/video.js/commit/368dae3)), closes [#5471](https://github.com/videojs/video.js/issues/5471)
+* createLogger for easier logging in individual modules ([#5418](https://github.com/videojs/video.js/issues/5418)) ([4aee891](https://github.com/videojs/video.js/commit/4aee891))
+
+### Bug Fixes
+
+* **lang:** Fixed typos in cs translation ([#5407](https://github.com/videojs/video.js/issues/5407)) ([2241e77](https://github.com/videojs/video.js/commit/2241e77))
+* **text track display:** update on playerresize and orientationchange ([#5447](https://github.com/videojs/video.js/issues/5447)) ([ae23f1e](https://github.com/videojs/video.js/commit/ae23f1e))
+* **text-tracks:** cuechange handler not triggering correctly ([#5446](https://github.com/videojs/video.js/issues/5446)) ([404afb7](https://github.com/videojs/video.js/commit/404afb7)), closes [#5308](https://github.com/videojs/video.js/issues/5308)
+* **TextTrackSetting:** Do not use default button type. ([#5512](https://github.com/videojs/video.js/issues/5512)) ([3f6b909](https://github.com/videojs/video.js/commit/3f6b909))
+* add support for :focus-visible selector ([#5483](https://github.com/videojs/video.js/issues/5483)) ([9592a69](https://github.com/videojs/video.js/commit/9592a69)), closes [#5474](https://github.com/videojs/video.js/issues/5474)
+* blob urls being ignored as valid sources ([#5525](https://github.com/videojs/video.js/issues/5525)) ([1295d90](https://github.com/videojs/video.js/commit/1295d90)), closes [#5504](https://github.com/videojs/video.js/issues/5504)
+* make sure all attributes are updated before applying to tag ([#5416](https://github.com/videojs/video.js/issues/5416)) ([933a6c0](https://github.com/videojs/video.js/commit/933a6c0)), closes [#5309](https://github.com/videojs/video.js/issues/5309)
+* Prevent ResizeManager from being clicked on safari, fix playerresize on firefox ([#5522](https://github.com/videojs/video.js/issues/5522)) ([7f6441f](https://github.com/videojs/video.js/commit/7f6441f))
+* Set correct techName after call to reset() ([#5453](https://github.com/videojs/video.js/issues/5453)) ([baf64be](https://github.com/videojs/video.js/commit/baf64be)), closes [#5411](https://github.com/videojs/video.js/issues/5411)
+
+### Chores
+
+* **package:** update npm-run-all to 4.1.5 to remove event-stream ([#5614](https://github.com/videojs/video.js/issues/5614)) ([30fa2a8](https://github.com/videojs/video.js/commit/30fa2a8))
+
+### Documentation
+
+* **layout:** document fluid and fill mode ([#5481](https://github.com/videojs/video.js/issues/5481)) ([7dac368](https://github.com/videojs/video.js/commit/7dac368))
+* **player:** make reset() method more clear ([#5501](https://github.com/videojs/video.js/issues/5501)) ([ff3b4d2](https://github.com/videojs/video.js/commit/ff3b4d2))
+
+### Tests
+
+* fix travis ci issues with resize-manager tests ([#5405](https://github.com/videojs/video.js/issues/5405)) ([7fc09de](https://github.com/videojs/video.js/commit/7fc09de)), closes [videojs/video.js#5390](https://github.com/videojs/video.js/issues/5390)
+
 <a name="6.12.1"></a>
 ## [6.12.1](https://github.com/videojs/video.js/compare/v6.12.0...v6.12.1) (2018-08-14)
 
