@@ -21,6 +21,7 @@
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
   * [autoSetup](#autosetup)
+  * [breakpoints](#breakpoints)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -30,6 +31,7 @@
   * [notSupportedMessage](#notsupportedmessage)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
+  * [responsive](#responsive)
   * [sources](#sources)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
@@ -171,15 +173,15 @@ When used with the [`responsive` option](#responsive), sets breakpoints that wil
 
 By default, the breakpoints are:
 
-Class Name           | Width Range
----------------------|------------
-`vjs-layout-tiny`    | 0-210
-`vjs-layout-x-small` | 211-320
-`vjs-layout-small`   | 321-425
-`vjs-layout-medium`  | 426-768
-`vjs-layout-large`   | 769-1440
-`vjs-layout-x-large` | 1441-2560
-`vjs-layout-huge`    | 2561+
+| Class Name           | Width Range |
+| -------------------- | ----------- |
+| `vjs-layout-tiny`    | 0-210       |
+| `vjs-layout-x-small` | 211-320     |
+| `vjs-layout-small`   | 321-425     |
+| `vjs-layout-medium`  | 426-768     |
+| `vjs-layout-large`   | 769-1440    |
+| `vjs-layout-x-large` | 1441-2560   |
+| `vjs-layout-huge`    | 2561+       |
 
 While the class names cannot be changed, the width ranges can be configured via an object like this:
 

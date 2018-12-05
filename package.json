@@ -157,7 +157,6 @@
   },
   "vjsstandard": {
     "ignore": [
-      "**/Gruntfile.js",
       "**/es5/**",
       "**/build/**",
       "!build/rollup.js",
