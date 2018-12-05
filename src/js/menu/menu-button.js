@@ -10,6 +10,7 @@ import * as Events from '../utils/events.js';
 import toTitleCase from '../utils/to-title-case.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
+import { eventMatchesKeys } from '../utils/keyboard-handler.js';
 
 /**
  * A `MenuButton` class for any popup {@link Menu}.
@@ -283,18 +284,18 @@ class MenuButton extends Component {
   handleKeyPress(event) {
 
     // Escape (27) key or Tab (9) key unpress the 'button'
-    if (event.which === 27 || event.which === 9) {
+    if (eventMatchesKeys(event, ['escape', 'tab'])) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (event.which !== 9) {
+      if (!eventMatchesKeys(event, 'tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
         this.menuButton_.el_.focus();
       }
     // Enter (13) or Up (38) key or Down (40) key press the 'button'
-    } else if (event.which === 13 || event.which === 38 || event.which === 40) {
+    } else if (eventMatchesKeys(event, ['enter', 'up', 'down'])) {
       if (!this.buttonPressed_) {
         this.pressButton();
         event.preventDefault();
@@ -314,12 +315,12 @@ class MenuButton extends Component {
   handleSubmenuKeyPress(event) {
 
     // Escape (27) key or Tab (9) key unpress the 'button'
-    if (event.which === 27 || event.which === 9) {
+    if (eventMatchesKeys(event, ['escape', 'tab'])) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (event.which !== 9) {
+      if (!eventMatchesKeys(event, 'tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
         this.menuButton_.el_.focus();

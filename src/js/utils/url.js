@@ -126,7 +126,7 @@ export const getAbsoluteURL = function(url) {
  * @param    {string} path
  *           The fileName path like '/path/to/file.mp4'
  *
- * @returns  {string}
+ * @return  {string}
  *           The extension in lower case or an empty string if no
  *           extension could be found.
  */

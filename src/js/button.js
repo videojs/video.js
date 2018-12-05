@@ -5,6 +5,7 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
 import {assign} from './utils/obj';
+import { eventMatchesKeys } from './utils/keyboard-handler';
 
 /**
  * Base class for all buttons.
@@ -106,7 +107,7 @@ class Button extends ClickableComponent {
   handleKeyPress(event) {
 
     // Ignore Space (32) or Enter (13) key operation, which is handled by the browser for a button.
-    if (event.which === 32 || event.which === 13) {
+    if (eventMatchesKeys(event, ['space', 'enter'])) {
       return;
     }
 

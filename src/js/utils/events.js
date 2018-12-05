@@ -182,6 +182,7 @@ export function fixEvent(event) {
     }
 
     // Handle key presses
+    // No longer used because the 'keycode' package does it itself
     event.which = event.charCode || event.keyCode;
 
     // Fix button for mouse clicks:

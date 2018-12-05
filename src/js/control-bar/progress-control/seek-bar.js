@@ -8,6 +8,7 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
+import {eventMatchesKeys} from '../../utils/keyboard-handler';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -319,7 +320,7 @@ class SeekBar extends Slider {
   handleKeyPress(event) {
 
     // Support Space (32) or Enter (13) key operation to fire a click event
-    if (event.which === 32 || event.which === 13) {
+    if (eventMatchesKeys(event, ['space', 'enter'])) {
       event.preventDefault();
       this.handleAction(event);
     } else if (super.handleKeyPress) {

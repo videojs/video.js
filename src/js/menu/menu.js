@@ -6,6 +6,7 @@ import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
+import { eventMatchesKeys } from '../utils/keyboard-handler';
 
 /**
  * The Menu component is used to build popup menus, including subtitle and
@@ -132,12 +133,12 @@ class Menu extends Component {
    */
   handleKeyPress(event) {
     // Left and Down Arrows
-    if (event.which === 37 || event.which === 40) {
+    if (eventMatchesKeys(event, ['left', 'down'])) {
       event.preventDefault();
       this.stepForward();
 
     // Up and Right Arrows
-    } else if (event.which === 38 || event.which === 39) {
+    } else if (eventMatchesKeys(event, ['up', 'right'])) {
       event.preventDefault();
       this.stepBack();
     }
