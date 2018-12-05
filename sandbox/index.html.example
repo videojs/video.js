@@ -8,9 +8,8 @@
 </head>
 <body>
   <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
-    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started make a copy of index.html.example and rename it to index.html.</p>
-    <pre>cp sandbox/index.html.example sandbox/index.html</pre>
-    <pre>npm run start</pre>
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
+    <pre>npm start</pre>
     <pre>open http://localhost:9999/sandbox/index.html</pre>
   </div>
 
