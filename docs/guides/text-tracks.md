@@ -21,7 +21,7 @@ Text tracks are a feature of HTML5 for displaying time-triggered text to the end
 * [Text Track Precedence](#text-track-precedence)
 * [API](#api)
   * [Remote Text Tracks](#remote-text-tracks)
-  * [Text Tracks](#text-tracks-1)
+  * [Text Tracks](#text-tracks)
 
 ## A Note on "Remote" Text Tracks
 
@@ -221,7 +221,9 @@ For more complete information, refer to the [Video.js API docs](https://docs.vid
 As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represent the recommended API offered by Video.js as they can be removed.
 
 * `Player#remoteTextTracks()`
+
 * `Player#remoteTextTrackEls()`
+
 * `Player#addRemoteTextTrack(Object options)`
 
   Available options are the same as the [available `track` attributes](#track-attributes). And `language` is a supported option as an alias for the `srclang` attribute - either works here.
@@ -242,6 +244,7 @@ As mentioned [above](#a-note-on-remote-text-tracks), remote text tracks represen
 It is generally recommended that you use _remote_ text tracks rather than these purely programmatic text tracks for the majority of use-cases.
 
 * `Player#textTracks()`
+
 * `Player#addTextTrack(String kind, [String label [, String language]])`
 
   > **Note:** Non-remote text tracks are intended for _purely programmatic usage_ of tracks and have the important limitation that they _cannot be removed once created_.
@@ -249,4 +252,5 @@ It is generally recommended that you use _remote_ text tracks rather than these 
   > The standard `addTextTrack` does **not** have a corresponding `removeTextTrack` method; so, we actually discourage the use of this method!
 
 * `TextTrackList()`
+
 * `TextTrack()`

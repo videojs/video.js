@@ -114,15 +114,15 @@ Responsive mode is independent of fluid mode or fill mode - it only deals with t
 
 A player in responsive mode will add and remove classes based on its size breakpoints. The default breakpoints, classes, and sizes are outlined below:
 
-Name     | Class                | Min. Width | Max. Width
----------|----------------------|------------|-----------
-`tiny`   | `vjs-layout-tiny`    | 0          | 210
-`xsmall` | `vjs-layout-x-small` | 211        | 320
-`small`  | `vjs-layout-small`   | 321        | 425
-`medium` | `vjs-layout-medium`  | 426        | 768
-`large`  | `vjs-layout-large`   | 769        | 1440
-`xlarge` | `vjs-layout-x-large` | 1441       | 2560
-`huge`   | `vjs-layout-huge`    | 2561       | Infinity
+| Name     | Class                | Min. Width | Max. Width |
+| -------- | -------------------- | ---------- | ---------- |
+| `tiny`   | `vjs-layout-tiny`    | 0          | 210        |
+| `xsmall` | `vjs-layout-x-small` | 211        | 320        |
+| `small`  | `vjs-layout-small`   | 321        | 425        |
+| `medium` | `vjs-layout-medium`  | 426        | 768        |
+| `large`  | `vjs-layout-large`   | 769        | 1440       |
+| `xlarge` | `vjs-layout-x-large` | 1441       | 2560       |
+| `huge`   | `vjs-layout-huge`    | 2561       | Infinity   |
 
 ### Enabling Responsive Mode
 
