@@ -2,7 +2,7 @@
 
 The currently available translations are in the lang dir. This table shows the completeness of those translations. Anything not listed does not exist yet, so go ahead and create it by copying `en.json`.
 
-If you add or update a translation run `grunt check-translations` to update the list and include this modified doc in the pull request.
+If you add or update a translation run `npm run docs:lang` to update the list and include this modified doc in the pull request.
 
 ## Progress Bar Translations
 
@@ -1168,51 +1168,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | restore all settings to the default values                                          |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| uk.json (missing 45)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Volume Level                                                                        |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
+| uk.json (Complete)      |                                                                                     |
 | vi.json (missing 1)     | {1} is loading.                                                                     |
 | zh-CN.json (missing 2)  | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | {1} is loading.                                                                     |
