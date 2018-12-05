@@ -2934,6 +2934,7 @@ class Player extends Component {
     if (this.cache_) {
       this.cache_.media = null;
     }
+    this.poster('');
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     if (isEvented(this)) {

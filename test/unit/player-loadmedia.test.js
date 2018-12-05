@@ -139,6 +139,8 @@ QUnit.test('getMedia returns a clone of the media object', function(assert) {
   }, 'the object has the expected structure');
 });
 
+// This only tests the relevant aspect of the reset function. The rest of its
+// effects are tested in player.test.js
 QUnit.test('reset discards the media object', function(assert) {
   this.player.loadMedia({
     src: 'foo.mp4'
