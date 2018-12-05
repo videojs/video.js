@@ -61,15 +61,25 @@ class LoadProgressBar extends Component {
     const children = this.partEls_;
 
     // get the percent width of a time compared to the total end
-    const percentify = function(time, end) {
+    const percentify = function(time, end, rounded) {
       // no NaN
-      const percent = (time / end) || 0;
+      let percent = (time / end) || 0;
 
-      return ((percent >= 1 ? 1 : percent) * 100) + '%';
+      percent = (percent >= 1 ? 1 : percent) * 100;
+
+      if (rounded) {
+        percent = percent.toFixed(2);
+      }
+
+      return percent + '%';
     };
 
     // update the width of the progress bar
     this.el_.style.width = percentify(bufferedEnd, duration);
+
+    // update the control-text
+    // TODO: Need a better way to reference the node that needs its textContent set
+    Dom.textContent(this.el_.childNodes[0].childNodes[1], ': ' + percentify(bufferedEnd, duration, true));
 
     // add child elements to represent the individual buffered time ranges
     for (let i = 0; i < buffered.length; i++) {
