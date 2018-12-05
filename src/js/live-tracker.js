@@ -94,7 +94,7 @@ class LiveTracker extends Component {
 
     this.on(this.player_, 'play', this.trackLive_);
     this.on(this.player_, 'pause', this.trackLive_);
-    this.on(this.player_, 'firstplay', this.handleFirstplay);
+    this.one(this.player_, 'play', this.handlePlay);
 
     // this is to prevent showing that we are not live
     // before a video starts to play
@@ -107,7 +107,7 @@ class LiveTracker extends Component {
     }
   }
 
-  handleFirstplay() {
+  handlePlay() {
     this.one(this.player_, 'timeupdate', this.seekToLiveEdge);
   }
 
@@ -119,6 +119,7 @@ class LiveTracker extends Component {
     this.pastSeekEnd_ = 0;
     this.lastSeekEnd_ = null;
     this.behindLiveEdge_ = null;
+    this.timeupdateSeen_ = false;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
@@ -126,10 +127,11 @@ class LiveTracker extends Component {
 
     this.off(this.player_, 'play', this.trackLive_);
     this.off(this.player_, 'pause', this.trackLive_);
-    this.off(this.player_, 'firstplay', this.handleFirstplay);
+    this.off(this.player_, 'play', this.handlePlay);
     this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
     if (this.handleTimeupdate) {
       this.off(this.player_, 'timeupdate', this.handleTimeupdate);
+      this.handleTimeupdate = null;
     }
   }
 
