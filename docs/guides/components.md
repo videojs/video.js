@@ -16,6 +16,7 @@ The architecture of the Video.js player is centered around components. The `Play
   * [Using trigger](#using-trigger)
 * [Default Component Tree](#default-component-tree)
 * [Specific Component Details](#specific-component-details)
+  * [Play Toggle](#play-toggle)
   * [Volume Panel](#volume-panel)
   * [Text Track Settings](#text-track-settings)
   * [Resize Manager](#resize-manager)

@@ -48,6 +48,7 @@ import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
+import './live-tracker.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -2288,8 +2289,12 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
+        if (this.options_.liveui) {
+          this.addClass('vjs-liveui');
+        }
       } else {
         this.removeClass('vjs-live');
+        this.removeClass('vjs-liveui');
       }
       if (!isNaN(seconds)) {
         // Do not fire durationchange unless the duration value is known.
@@ -4109,6 +4114,7 @@ Player.prototype.options_ = {
   playbackRates: [],
   // Add playback rate selection by adding rates
   // 'playbackRates': [0.5, 1, 1.5, 2],
+  liveui: false,
 
   // Included control sets
   children: [
@@ -4117,6 +4123,7 @@ Player.prototype.options_ = {
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',
+    'liveTracker',
     'controlBar',
     'errorDisplay',
     'textTrackSettings',
