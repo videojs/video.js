@@ -1286,7 +1286,11 @@ class Player extends Component {
 
     this.removeClass('vjs-ended');
     this.removeClass('vjs-seeking');
-    this.getChild('loadingSpinner').hide();
+    const loadingSpinner = this.getChild('loadingSpinner');
+
+    if(loadingSpinner) {
+      loadingSpinner.hide();
+    }
 
     // reset the error state
     this.error(null);
@@ -1608,7 +1612,12 @@ class Player extends Component {
    */
   handleTechWaiting_() {
     this.addClass('vjs-waiting');
-    this.getChild('loadingSpinner').show();
+    const loadingSpinner = this.getChild('loadingSpinner');
+    
+    if(loadingSpinner) {
+
+      loadingSpinner.show();
+    }
     /**
      * A readyState change on the DOM element has caused playback to stop.
      *
@@ -1623,7 +1632,11 @@ class Player extends Component {
     const timeUpdateListener = () => {
       if (timeWhenWaiting !== this.currentTime()) {
         this.removeClass('vjs-waiting');
-        this.getChild('loadingSpinner').hide();
+        const loadingSpinner = this.getChild('loadingSpinner');
+
+        if(loadingSpinner) {
+          loadingSpinner.hide();
+        }
         this.off('timeupdate', timeUpdateListener);
       }
     };
@@ -1641,7 +1654,12 @@ class Player extends Component {
    */
   handleTechCanPlay_() {
     this.removeClass('vjs-waiting');
-    this.getChild('loadingSpinner').hide();
+    const loadingSpinner = this.getChild('loadingSpinner');
+
+    if(loadingSpinner) {
+      loadingSpinner.hide();
+    }
+
     /**
      * The media has a readyState of HAVE_FUTURE_DATA or greater.
      *
@@ -1660,7 +1678,11 @@ class Player extends Component {
    */
   handleTechCanPlayThrough_() {
     this.removeClass('vjs-waiting');
-    this.getChild('loadingSpinner').hide();
+    const loadingSpinner = this.getChild('loadingSpinner');
+
+    if(loadingSpinner) {
+      loadingSpinner.hide();
+    }
     /**
      * The media has a readyState of HAVE_ENOUGH_DATA or greater. This means that the
      * entire media file can be played without buffering.
@@ -1680,7 +1702,11 @@ class Player extends Component {
    */
   handleTechPlaying_() {
     this.removeClass('vjs-waiting');
-    this.getChild('loadingSpinner').hide();
+    const loadingSpinner = this.getChild('loadingSpinner');
+
+    if(loadingSpinner) {
+      loadingSpinner.hide();
+    }
     /**
      * The media is no longer blocked from playback, and has started playing.
      *
@@ -1699,8 +1725,11 @@ class Player extends Component {
    */
   handleTechSeeking_() {
     this.addClass('vjs-seeking');
-    this.getChild('loadingSpinner').show();
 
+    const loadingSpinner = this.getChild('loadingSpinner');
+    if(loadingSpinner) {
+      loadingSpinner.show();
+    }
     /**
      * Fired whenever the player is jumping to a new time
      *
@@ -1719,7 +1748,11 @@ class Player extends Component {
    */
   handleTechSeeked_() {
     this.removeClass('vjs-seeking');
-    this.getChild('loadingSpinner').hide();
+    const loadingSpinner = this.getChild('loadingSpinner');
+
+    if(loadingSpinner) {
+      loadingSpinner.hide();
+    }
     /**
      * Fired when the player has finished jumping to a new time
      *
