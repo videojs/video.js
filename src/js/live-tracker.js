@@ -16,6 +16,10 @@ class LiveTracker extends Component {
   }
 
   isBehind_() {
+    // don't report that we are behind until a timeupdate has been seen
+    if (!this.timeupdateSeen_) {
+      return false;
+    }
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
     const seekableIncrement = this.seekableIncrement_;
@@ -49,7 +53,7 @@ class LiveTracker extends Component {
     // end against current time, with a fudge value of half a second.
     if (newSeekEnd !== this.lastSeekEnd_) {
       if (this.lastSeekEnd_) {
-        this.seekableIncrement_ = newSeekEnd - this.lastSeekEnd_;
+        this.seekableIncrement_ = Math.abs(newSeekEnd - this.lastSeekEnd_);
       }
 
       this.pastSeekEnd_ = 0;
@@ -90,6 +94,21 @@ class LiveTracker extends Component {
 
     this.on(this.player_, 'play', this.trackLive_);
     this.on(this.player_, 'pause', this.trackLive_);
+    this.one(this.player_, 'play', this.handlePlay);
+
+    // this is to prevent showing that we are not live
+    // before a video starts to play
+    if (!this.timeupdateSeen_) {
+      this.handleTimeupdate = () => {
+        this.timeupdateSeen_ = true;
+        this.handleTimeupdate = null;
+      };
+      this.one(this.player_, 'timeupdate', this.handleTimeupdate);
+    }
+  }
+
+  handlePlay() {
+    this.one(this.player_, 'timeupdate', this.seekToLiveEdge);
   }
 
   /**
@@ -100,6 +119,7 @@ class LiveTracker extends Component {
     this.pastSeekEnd_ = 0;
     this.lastSeekEnd_ = null;
     this.behindLiveEdge_ = null;
+    this.timeupdateSeen_ = false;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
@@ -107,6 +127,12 @@ class LiveTracker extends Component {
 
     this.off(this.player_, 'play', this.trackLive_);
     this.off(this.player_, 'pause', this.trackLive_);
+    this.off(this.player_, 'play', this.handlePlay);
+    this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
+    if (this.handleTimeupdate) {
+      this.off(this.player_, 'timeupdate', this.handleTimeupdate);
+      this.handleTimeupdate = null;
+    }
   }
 
   /**
@@ -159,13 +185,13 @@ class LiveTracker extends Component {
    * Get the live time window
    */
   liveWindow() {
-    const seekableEnd = this.seekableEnd();
+    const liveCurrentTime = this.liveCurrentTime();
 
-    if (seekableEnd === Infinity) {
+    if (liveCurrentTime === Infinity) {
       return Infinity;
     }
 
-    return seekableEnd - this.seekableStart();
+    return liveCurrentTime - this.seekableStart();
   }
 
   /**
@@ -218,13 +244,11 @@ class LiveTracker extends Component {
       return;
     }
 
-    this.player().pause();
-    this.player().addClass('vjs-waiting');
-    this.one('seekableendchange', () => {
-      this.player().removeClass('vjs-waiting');
-      this.player().currentTime(this.seekableEnd());
-      this.player().play();
-    });
+    this.player_.currentTime(this.liveCurrentTime());
+
+    if (this.player_.paused()) {
+      this.player_.play();
+    }
   }
 
   dispose() {
