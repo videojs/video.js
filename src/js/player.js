@@ -1288,7 +1288,7 @@ class Player extends Component {
     this.removeClass('vjs-seeking');
     const loadingSpinner = this.getChild('loadingSpinner');
 
-    if(loadingSpinner) {
+    if (loadingSpinner) {
       loadingSpinner.hide();
     }
 
@@ -1613,9 +1613,8 @@ class Player extends Component {
   handleTechWaiting_() {
     this.addClass('vjs-waiting');
     const loadingSpinner = this.getChild('loadingSpinner');
-    
-    if(loadingSpinner) {
 
+    if (loadingSpinner) {
       loadingSpinner.show();
     }
     /**
@@ -1632,9 +1631,8 @@ class Player extends Component {
     const timeUpdateListener = () => {
       if (timeWhenWaiting !== this.currentTime()) {
         this.removeClass('vjs-waiting');
-        const loadingSpinner = this.getChild('loadingSpinner');
 
-        if(loadingSpinner) {
+        if (loadingSpinner) {
           loadingSpinner.hide();
         }
         this.off('timeupdate', timeUpdateListener);
@@ -1656,7 +1654,7 @@ class Player extends Component {
     this.removeClass('vjs-waiting');
     const loadingSpinner = this.getChild('loadingSpinner');
 
-    if(loadingSpinner) {
+    if (loadingSpinner) {
       loadingSpinner.hide();
     }
 
@@ -1680,7 +1678,7 @@ class Player extends Component {
     this.removeClass('vjs-waiting');
     const loadingSpinner = this.getChild('loadingSpinner');
 
-    if(loadingSpinner) {
+    if (loadingSpinner) {
       loadingSpinner.hide();
     }
     /**
@@ -1704,7 +1702,7 @@ class Player extends Component {
     this.removeClass('vjs-waiting');
     const loadingSpinner = this.getChild('loadingSpinner');
 
-    if(loadingSpinner) {
+    if (loadingSpinner) {
       loadingSpinner.hide();
     }
     /**
@@ -1727,7 +1725,8 @@ class Player extends Component {
     this.addClass('vjs-seeking');
 
     const loadingSpinner = this.getChild('loadingSpinner');
-    if(loadingSpinner) {
+
+    if (loadingSpinner) {
       loadingSpinner.show();
     }
     /**
@@ -1750,7 +1749,7 @@ class Player extends Component {
     this.removeClass('vjs-seeking');
     const loadingSpinner = this.getChild('loadingSpinner');
 
-    if(loadingSpinner) {
+    if (loadingSpinner) {
       loadingSpinner.hide();
     }
     /**
