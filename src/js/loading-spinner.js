@@ -42,7 +42,7 @@ class LoadingSpinner extends Component {
     super.show();
     this.el().classList.add('show');
   }
-  
+
   /**
    * Hide the `LoadingSpinner`s DOM element, by removing the `show` css class from it.
    */
