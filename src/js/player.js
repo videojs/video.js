@@ -496,9 +496,9 @@ class Player extends Component {
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
-    // if (browser.TOUCH_ENABLED) {
-    //   this.addClass('vjs-touch-enabled');
-    // }
+    if (browser.TOUCH_ENABLED) {
+      this.addClass('vjs-touch-enabled');
+    }
 
     // iOS Safari has broken hover handling
     if (!browser.IS_IOS) {
