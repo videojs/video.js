@@ -1285,6 +1285,7 @@ class Player extends Component {
     // TODO: Update to use `emptied` event instead. See #1277.
 
     this.removeClass('vjs-ended');
+    this.removeClass('vjs-seeking');
     this.getChild('loadingSpinner').hide();
 
     // reset the error state
@@ -1606,6 +1607,7 @@ class Player extends Component {
    * @private
    */
   handleTechWaiting_() {
+    this.addClass('vjs-waiting');
     this.getChild('loadingSpinner').show();
     /**
      * A readyState change on the DOM element has caused playback to stop.
@@ -1620,6 +1622,7 @@ class Player extends Component {
     const timeWhenWaiting = this.currentTime();
     const timeUpdateListener = () => {
       if (timeWhenWaiting !== this.currentTime()) {
+        this.removeClass('vjs-waiting');
         this.getChild('loadingSpinner').hide();
         this.off('timeupdate', timeUpdateListener);
       }
@@ -1637,6 +1640,7 @@ class Player extends Component {
    * @private
    */
   handleTechCanPlay_() {
+    this.removeClass('vjs-waiting');
     this.getChild('loadingSpinner').hide();
     /**
      * The media has a readyState of HAVE_FUTURE_DATA or greater.
@@ -1655,6 +1659,7 @@ class Player extends Component {
    * @private
    */
   handleTechCanPlayThrough_() {
+    this.removeClass('vjs-waiting');
     this.getChild('loadingSpinner').hide();
     /**
      * The media has a readyState of HAVE_ENOUGH_DATA or greater. This means that the
@@ -1674,6 +1679,7 @@ class Player extends Component {
    * @private
    */
   handleTechPlaying_() {
+    this.removeClass('vjs-waiting');
     this.getChild('loadingSpinner').hide();
     /**
      * The media is no longer blocked from playback, and has started playing.
@@ -1692,7 +1698,9 @@ class Player extends Component {
    * @private
    */
   handleTechSeeking_() {
-    this.player().getChild('loadingSpinner').show();
+    this.addClass('vjs-seeking');
+    this.getChild('loadingSpinner').show();
+
     /**
      * Fired whenever the player is jumping to a new time
      *
@@ -1710,6 +1718,7 @@ class Player extends Component {
    * @private
    */
   handleTechSeeked_() {
+    this.removeClass('vjs-seeking');
     this.getChild('loadingSpinner').hide();
     /**
      * Fired when the player has finished jumping to a new time

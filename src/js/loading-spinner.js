@@ -36,19 +36,19 @@ class LoadingSpinner extends Component {
   }
 
   /**
-   * Show the `LoadingSpinner`s DOM element, by adding the `vjs-waiting` css class to it.
+   * Show the `LoadingSpinner`s DOM element, by adding the `show` css class to it.
    */
   show() {
     super.show();
-    this.player().addClass('vjs-waiting');
+    this.el().classList.add('show');
   }
-
+  
   /**
-   * Hide the `LoadingSpinner`s DOM element, by removing the `vjs-waiting` css class from it.
+   * Hide the `LoadingSpinner`s DOM element, by removing the `show` css class from it.
    */
   hide() {
     super.hide();
-    this.player().removeClass('vjs-waiting');
+    this.el().classList.remove('show');
   }
 }
 
