@@ -145,7 +145,7 @@ class Menu extends Component {
       // NOTE: This is a special case where we don't pass unhandled
       //  keypress events up to the Component handler, because this
       //  is just adding a keypress handler on top of the MenuItem's
-      //  existing keypress handler, which handles that passing keypress
+      //  existing keypress handler, which already handles passing keypress
       //  events up.
     }
   }
