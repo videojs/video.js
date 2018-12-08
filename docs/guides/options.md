@@ -35,6 +35,8 @@
   * [sources](#sources)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
+  * [userActions](#useractions)
+  * [userActions.hotkeys](#useractions.hotkeys)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
   * [children](#children-1)
@@ -366,6 +368,47 @@ This can be useful when multiple techs are used and each has to set their own po
 > Type: `Array`, Default: `['html5']`
 
 Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other regisetered techs will be added after this tech in the order in which they are registered.
+
+### `userActions`
+
+> Type: `Object`
+
+### `userActions.hotkeys`
+
+> Type: `boolean|function`
+
+Controls how player-wide hotkeys operate. If set to `false`, or `undefined`, hotkeys are disabled. If set to
+`true`, hotkeys are enabled as described below. To override the default hotkey handling, set `userActions.hotkeys`
+to a function which accepts a `keydown` event:
+
+```js
+function myHandleHotkeys(event) = {
+  // `this` is the player in this context
+
+  // `p` key = pause
+  if (event.which === 80) {
+    this.pause();
+  }
+};
+
+videojs('my-player', {
+  userActions: {
+    hotkeys: myHandleHotkeys
+  }
+});
+```
+
+Default hotkey handling is:
+
+| Key | Action | Enabled by |
+| :-: | ------ | ---------- |
+| `f` | toggle fullscreen | only enabled if a Fullscreen button is present in the Control Bar
+| `m` | toggle mute | always enabled, even if no Control Bar is present
+| `k` | toggle play/pause | always enabled, even if no Control Bar is present
+| `Space` | toggle play/pause | always enabled, even if no Control Bar is present
+
+Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which
+control in the player has focus.
 
 ### `vtt.js`
 

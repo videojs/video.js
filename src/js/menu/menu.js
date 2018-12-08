@@ -112,9 +112,7 @@ class Menu extends Component {
     const relatedTarget = event.relatedTarget || document.activeElement;
 
     // Close menu popup when a user clicks outside the menu
-    if (!this.children().some((element) => {
-      return element.el && (element.el() === relatedTarget);
-    })) {
+    if (!this.children().some((element) => element.el && (element.el() === relatedTarget))) {
       const btn = this.menuButton_;
 
       if (btn && btn.buttonPressed_ && relatedTarget !== btn.el().firstChild) {

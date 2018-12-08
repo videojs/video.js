@@ -80,9 +80,7 @@ class MenuItem extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
-    if (!MenuKeys.some((key) => {
-      return keycode.isEventKey(event, key);
-    })) {
+    if (!MenuKeys.some((key) => keycode.isEventKey(event, key))) {
       // Pass keypress handling up for unused keys
       super.handleKeyPress(event);
     }

@@ -2711,57 +2711,119 @@ class Player extends Component {
   }
 
   /**
-   * Handle a keydown event from any Component of this player which is not
-   *  handled by that Component to support player-wide hotkeys.
+   * This gets called when a `Player` gains focus via a `focus` event.
+   * Turns on listening for `keydown` events. When they happen it
+   * calls `this.handleKeyPress`.
    *
    * @param {EventTarget~Event} event
-   *        The `keydown` event that was passed from a Component.
+   *        The `focus` event that caused this function to be called.
+   *
+   * @listens focus
+   */
+  handleFocus(event) {
+    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Called when a `Player` loses focus. Turns off the listener for
+   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
+   */
+  handleBlur(event) {
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Called when this Player has focus and a key gets pressed down, or when
+   * any Component of this player receives a key press that it doesn't handle.
+   * This allows player-wide hotkeys (either as defined below, or optionally
+   * by an external function).
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
    */
   handleKeyPress(event) {
 
-    if (this.options_.hotkeys !== false) {
+    if (this.options_.userActions && this.options_.userActions.hotkeys && (this.options_.userActions.hotkeys !== false)) {
 
-      if (typeof this.options_.hotkeys === 'function') {
+      if (typeof this.options_.userActions.hotkeys === 'function') {
 
-        this.options_.hotkeys(event);
+        this.options_.userActions.hotkeys.call(this, event);
 
-      // Trigger the ControlBar equivalent for each key, if possible
-      } else if (keycode.isEventKey(event, 'f')) {
-        // "f" = toggle fullscreen
+      } else {
 
-        event.preventDefault();
+        this.handleHotkeys(event);
 
-        const cb = this.player_.controlBar;
-        const fullscreenToggle = cb && cb.fullscreenToggle;
+      }
+    }
+  }
 
-        if (fullscreenToggle && fullscreenToggle.handleClick) {
-          fullscreenToggle.handleClick();
-        }
-      } else if (keycode.isEventKey(event, 'm')) {
-        // "m" = toggle mute
+  /**
+   * Called when this Player receives a hotkey keydown event.
+   * Supported player-wide hotkeys are:
+   *
+   *   f          - toggle fullscreen
+   *   m          - toggle mute
+   *   k or Space - toggle play/pause
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   */
+  handleHotkeys(event) {
 
-        event.preventDefault();
+    // Trigger the ControlBar equivalent for each key, if possible
+    const cb = this.controlBar;
 
-        const cb = this.player_.controlBar;
-        const volumePanel = cb && cb.volumePanel;
-        const muteToggle = (cb && cb.muteToggle) || (volumePanel && volumePanel.muteToggle);
+    if (keycode.isEventKey(event, 'f')) {
+      // "f" = toggle fullscreen
 
-        if (muteToggle && muteToggle.handleClick) {
-          muteToggle.handleClick();
-        } else {
-          this.player_.muted(this.player_.muted() ? false : true);
-        }
-      } else if (keycode.isEventKey(event, 'k')) {
-        // "k" = toggle play/pause
+      event.preventDefault();
 
-        event.preventDefault();
+      const fullscreenToggle = cb && cb.fullscreenToggle;
 
-        const cb = this.player_.controlBar;
-        const playToggle = cb && cb.playToggle;
+      // TODO: make sure that this hotkey doesn't "toggle fullscreen" if
+      //  fullscreen is disabled. For now, ONLY allow fullscreen if the
+      //  fullscreen button is present in the ControlBar.
 
-        if (playToggle && playToggle.handleClick) {
-          playToggle.handleClick();
-        }
+      if (fullscreenToggle && fullscreenToggle.handleClick) {
+        fullscreenToggle.handleClick();
+      }
+    } else if (keycode.isEventKey(event, 'm')) {
+      // "m" = toggle mute
+
+      event.preventDefault();
+
+      const volumePanel = cb && cb.volumePanel;
+      const muteToggle = (cb && cb.muteToggle) || (volumePanel && volumePanel.muteToggle);
+
+      // Allow "toggle mute" hotkey even when no control bar is present
+
+      if (muteToggle && muteToggle.handleClick) {
+        muteToggle.handleClick();
+      } else {
+        this.muted(this.muted() ? false : true);
+      }
+    } else if ((keycode.isEventKey(event, 'k')) || (keycode.isEventKey(event, 'Space'))) {
+      // "k" or "Space" = toggle play/pause
+
+      event.preventDefault();
+
+      const playToggle = cb && cb.playToggle;
+
+      // Allow "toggle play/pause" hotkey even when no control bar is present
+
+      if (playToggle && playToggle.handleClick) {
+        playToggle.handleClick();
+      } else if (this.paused()) {
+        this.play();
+      } else {
+        this.pause();
       }
     }
   }

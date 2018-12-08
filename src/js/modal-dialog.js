@@ -127,10 +127,6 @@ class ModalDialog extends Component {
   handleKeyPress(event) {
     if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
       this.close();
-    } else {
-
-      // Pass keypress handling up for unsupported keys
-      super.handleKeyPress(event);
     }
   }
 
