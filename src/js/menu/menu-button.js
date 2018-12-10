@@ -302,7 +302,9 @@ class MenuButton extends Component {
       }
     } else {
       // NOTE: This is a special case where we don't pass unhandled
-      //  keypress events up to the Component handler
+      //  keypress events up to the Component handler, because it is
+      //  just entending the keypress handling of the actual `Button`
+      //  in the `MenuButton` which already passes unused keys up.
     }
   }
 
@@ -329,7 +331,9 @@ class MenuButton extends Component {
       }
     } else {
       // NOTE: This is a special case where we don't pass unhandled
-      //  keypress events up to the Component handler
+      //  keypress events up to the Component handler, because it is
+      //  just entending the keypress handling of the `MenuItem`
+      //  in the `Menu` which already passes unused keys up.
     }
   }
 
