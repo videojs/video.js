@@ -247,6 +247,18 @@ Learn more about [languages in Video.js][languages]
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
 
+### `liveui`
+
+> Type: `boolean`
+> Default: `false`
+
+Allows the player to use the new live ui that includes:
+* A progress bar for seeking within the live window
+* A button that can be clicked to seek to the live edge with a circle indicating if you are at the live edge or not.
+
+Without this option the progress bar will be hidden and in its place will be text that indicates `LIVE` playback. There will be no progress control
+and you will not be able click the text to seek to the live edge. `liveui` will default to `true` in a future version!
+
 ### `nativeControlsForTouch`
 
 > Type: `boolean`

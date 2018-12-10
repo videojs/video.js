@@ -28,7 +28,7 @@ class LiveTracker extends Component {
     // that a player can be, but still be considered live.
     // we add 0.07 because the live tracking happens every 30ms
     // and we want some wiggle room for short segment live playback
-    const liveEdgeWindow = seekableIncrement + 0.07;
+    const liveEdgeWindow = (seekableIncrement * 2) + 0.07;
 
     // on Android liveCurrentTime can bee Infinity, because seekableEnd
     // can be Infinity, so we handle that case.
