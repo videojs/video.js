@@ -47,9 +47,10 @@ class TimeDisplay extends Component {
     }, {
       // tell screen readers not to automatically read the time as it changes
       'aria-live': 'off',
-      // span elements should have no implicit role semantics, but make this
-      // presentational just in case to make sure that only the text content is
-      // exposed to assistive techs
+      // span elements have no implicit role, but some screen readers (notably VoiceOver)
+      // treat them as a break between items in the DOM when using arrow keys
+      // (or left-to-right swipes on iOS) to read contents of a page. Using
+      // role='presentation' causes VoiceOver to NOT treat this span as a break.
       'role': 'presentation'
     });
 
