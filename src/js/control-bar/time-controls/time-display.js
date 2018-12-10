@@ -51,6 +51,10 @@ class TimeDisplay extends Component {
 
     this.updateTextNode_();
     el.appendChild(this.contentEl_);
+    if (className === 'vjs-remaining-time') {
+      el.insertBefore(Dom.createEl('span', {}, {'aria-hidden': true}, '-'), this.contentEl_);
+    }
+
     return el;
   }
 

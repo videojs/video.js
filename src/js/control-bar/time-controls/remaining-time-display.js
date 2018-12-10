@@ -48,7 +48,7 @@ class RemainingTimeDisplay extends TimeDisplay {
    */
   formatTime_(time) {
     // TODO: The "-" should be decorative, and not announced by a screen reader
-    return '-' + super.formatTime_(time);
+    return super.formatTime_(time);
   }
 
   /**
