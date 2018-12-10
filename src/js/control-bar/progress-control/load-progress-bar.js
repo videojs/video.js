@@ -56,7 +56,7 @@ class LoadProgressBar extends Component {
   update(event) {
     const liveTracker = this.player_.liveTracker;
     const buffered = this.player_.buffered();
-    const duration = liveTracker.isLive() ? liveTracker.seekableEnd() : this.player_.duration();
+    const duration = (liveTracker && liveTracker.isLive()) ? liveTracker.seekableEnd() : this.player_.duration();
     const bufferedEnd = this.player_.bufferedEnd();
     const children = this.partEls_;
     const controlTextPercentage = this.$('.vjs-control-text-loaded-percentage');

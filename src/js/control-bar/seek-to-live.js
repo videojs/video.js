@@ -25,7 +25,10 @@ class SeekToLive extends Button {
     super(player, options);
 
     this.updateLiveEdgeStatus();
-    this.on(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+
+    if (this.player_.liveTracker) {
+      this.on(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+    }
   }
 
   /**
@@ -60,10 +63,11 @@ class SeekToLive extends Button {
    * or not
    */
   updateLiveEdgeStatus(e) {
-    if (this.player_.liveTracker.behindLiveEdge()) {
-      this.removeClass('vjs-at-live-edge');
-    } else {
+    // default to live edge
+    if (!this.player_.liveTracker || this.player_.liveTracker.atLiveEdge()) {
       this.addClass('vjs-at-live-edge');
+    } else {
+      this.removeClass('vjs-at-live-edge');
     }
   }
 
@@ -80,7 +84,9 @@ class SeekToLive extends Button {
    * Dispose of the element and stop tracking
    */
   dispose() {
-    this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+    if (this.player_.liveTracker) {
+      this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+    }
     this.contentEl_ = null;
     this.circleEl_ = null;
 
