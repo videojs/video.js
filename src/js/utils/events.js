@@ -181,7 +181,6 @@ export function fixEvent(event) {
         (doc && doc.clientTop || body && body.clientTop || 0);
     }
 
-    // NOTE: this may no longer be needed since the adoption of the 'keycode' package
     // Handle key presses
     event.which = event.charCode || event.keyCode;
 
