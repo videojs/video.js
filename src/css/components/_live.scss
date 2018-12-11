@@ -51,13 +51,13 @@
   cursor: auto;
 }
 
-.vjs-seek-to-live-control .vjs-seek-to-live-circle {
+.vjs-seek-to-live-control .vjs-icon-placeholder {
   margin-right: 0.5em;
   @extend .vjs-icon-circle;
   color: #888;
 }
 
 // make the live circle red when at the live edge
-.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-seek-to-live-circle {
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-icon-placeholder {
   color: red;
 }
