@@ -3980,8 +3980,8 @@ class Player extends Component {
    *           For ease of removal, these will be created as "remote" text
    *           tracks and set to automatically clean up on source changes.
    *
-   *           For more information on what properties are available for
-   *           creating remote text tracks, see {@link Tech#createRemoteTextTrack}.
+   *           These objects may have properties like `src`, `kind`, `label`,
+   *           and `language`, see {@link Tech#createRemoteTextTrack}.
    */
 
   /**
@@ -4022,9 +4022,7 @@ class Player extends Component {
     }
 
     if (Array.isArray(textTracks)) {
-      this.ready(() => {
-        textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
-      });
+      textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
     }
 
     this.ready(ready);

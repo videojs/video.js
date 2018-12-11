@@ -35,14 +35,21 @@ QUnit.test('loadMedia sets source from an object', function(assert) {
 });
 
 QUnit.test('loadMedia sets source from an array', function(assert) {
+  const sources = [{
+    src: 'foo.mp4',
+    type: 'video/mp4'
+  }, {
+    src: 'foo.webm',
+    type: 'video/webm'
+  }];
+
   this.player.loadMedia({
-    src: [{
-      src: 'foo.mp4',
-      type: 'video/mp4'
-    }]
+    src: sources
   });
 
-  assert.strictEqual(this.player.currentSrc(), 'foo.mp4', 'currentSrc was correct');
+  assert.strictEqual(this.player.currentSrc(), sources[0].src, 'currentSrc was correct');
+  assert.deepEqual(this.player.currentSource(), sources[0], 'currentSource was correct');
+  assert.deepEqual(this.player.currentSources(), sources, 'currentSources were correct');
 });
 
 QUnit.test('loadMedia sets poster and backfills artwork', function(assert) {
