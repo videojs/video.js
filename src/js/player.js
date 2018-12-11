@@ -4029,19 +4029,38 @@ class Player extends Component {
   }
 
   /**
-   * Get a clone of the current {@link Player~MediaObject} for this player or
-   * `null` if there is none.
+   * Get a clone of the current {@link Player~MediaObject} for this player.
    *
-   * @return {Player~MediaObject|null}
+   * If the `loadMedia` method has not been used, will attempt to return a
+   * {@link Player~MediaObject} based on the current state of the player.
+   *
+   * @return {Player~MediaObject}
    */
   getMedia() {
     if (!this.cache_.media) {
-      return null;
+      const poster = this.poster();
+      const src = this.currentSources();
+      const textTracks = Array.prototype.map.call(this.remoteTextTracks(), (tt) => ({
+        kind: tt.kind,
+        label: tt.label,
+        language: tt.language,
+        src: tt.src
+      }));
+
+      const media = {src, textTracks};
+
+      if (poster) {
+        media.poster = poster;
+        media.artwork = [{
+          src: media.poster,
+          type: getMimetype(media.poster)
+        }];
+      }
+
+      return media;
     }
 
-    const media = mergeOptions(this.cache_.media);
-
-    return media;
+    return mergeOptions(this.cache_.media);
   }
 
   /**
