@@ -99,8 +99,6 @@ QUnit.test('loadMedia creates text tracks', function(assert) {
     }]
   });
 
-  this.clock.tick(1);
-
   const rtt = this.player.remoteTextTracks()[0];
 
   assert.ok(Boolean(rtt), 'the track exists');
@@ -124,7 +122,6 @@ QUnit.test('getMedia returns a clone of the media object', function(assert) {
   };
 
   this.player.loadMedia(original);
-  this.clock.tick(1);
 
   const result = this.player.getMedia();
 
