@@ -2002,7 +2002,9 @@ QUnit.test('setting children to false individually, does not cause an assertion'
 
     const player = TestHelpers.makePlayer(options);
 
-    this.clock.tick(1);
+    this.clock.tick(1000);
+
+    player.triggerReady();
     player.dispose();
     assert.ok(true, `${childName}: false. did not cause an assertion`);
   });
@@ -2018,7 +2020,9 @@ QUnit.test('setting all children to false, does not cause an assertion', functio
 
   const player = TestHelpers.makePlayer(options);
 
-  this.clock.tick(1);
+  this.clock.tick(1000);
+  player.triggerReady();
+
   player.dispose();
   assert.ok(true, 'did not cause an assertion');
 });
