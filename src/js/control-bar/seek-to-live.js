@@ -92,7 +92,7 @@ class SeekToLive extends Button {
   }
 }
 
-SeekToLive.prototype.controlText_ = 'Seek to LIVE';
+SeekToLive.prototype.controlText_ = 'Seek to live, currently playing live';
 
 Component.registerComponent('SeekToLive', SeekToLive);
 export default SeekToLive;
