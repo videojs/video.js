@@ -52,7 +52,9 @@ class SeekBar extends Slider {
     this.on(this.player_, 'timeupdate', this.update);
     this.on(this.player_, 'ended', this.handleEnded);
     this.on(this.player_, 'durationchange', this.update);
-    this.on(this.player_.liveTracker, 'liveedgechange', this.update);
+    if (this.player_.liveTracker) {
+      this.on(this.player_.liveTracker, 'liveedgechange', this.update);
+    }
 
     // when playing, let's ensure we smoothly update the play progress bar
     // via an interval
@@ -69,7 +71,7 @@ class SeekBar extends Slider {
     });
 
     this.on(this.player_, ['ended', 'pause', 'waiting'], (e) => {
-      if (this.player_.liveTracker.isLive() && e.type !== 'ended') {
+      if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
         return;
       }
 
@@ -109,11 +111,11 @@ class SeekBar extends Slider {
     const liveTracker = this.player_.liveTracker;
     let duration = this.player_.duration();
 
-    if (liveTracker.isLive()) {
+    if (liveTracker && liveTracker.isLive()) {
       duration = this.player_.liveTracker.liveCurrentTime();
     }
 
-    if (liveTracker.seekableEnd() === Infinity) {
+    if (liveTracker && liveTracker.seekableEnd() === Infinity) {
       this.disable();
     } else {
       this.enable();
@@ -194,7 +196,7 @@ class SeekBar extends Slider {
     let percent;
     const liveTracker = this.player_.liveTracker;
 
-    if (liveTracker.isLive()) {
+    if (liveTracker && liveTracker.isLive()) {
       percent = (currentTime - liveTracker.seekableStart()) / liveTracker.liveWindow();
 
       // prevent the percent from changing at the live edge
@@ -247,7 +249,7 @@ class SeekBar extends Slider {
     const distance = this.calculateDistance(event);
     const liveTracker = this.player_.liveTracker;
 
-    if (!liveTracker.isLive()) {
+    if (!liveTracker || !liveTracker.isLive()) {
       newTime = distance * this.player_.duration();
 
       // Don't let video end while scrubbing.

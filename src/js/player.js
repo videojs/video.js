@@ -2289,7 +2289,7 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
-        if (this.options_.liveui) {
+        if (this.options_.liveui && this.player_.liveTracker) {
           this.addClass('vjs-liveui');
         }
       } else {
