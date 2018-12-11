@@ -632,7 +632,7 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
 
   const player = TestHelpers.makePlayer({});
 
-  assert.ok(player.el().className.indexOf('vjs-touch-enabled') !== -1, 'touch-enabled classname added');
+  assert.notEqual(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname added');
 
   browser.TOUCH_ENABLED = origTouch;
   player.dispose();
@@ -648,7 +648,7 @@ QUnit.test('should not add a touch-enabled classname when touch is not supported
 
   const player = TestHelpers.makePlayer({});
 
-  assert.ok(player.el().className.indexOf('vjs-touch-enabled') === -1, 'touch-enabled classname not added');
+  assert.equal(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname not added');
 
   browser.TOUCH_ENABLED = origTouch;
   player.dispose();
