@@ -401,17 +401,13 @@ class Player extends Component {
       this.languages_ = Player.prototype.options_.languages;
     }
 
-    // Cache for video property values.
-    this.cache_ = {};
+    this.resetCache_();
 
     // Set poster
     this.poster_ = options.poster || '';
 
     // Set controls
     this.controls_ = !!options.controls;
-
-    // Set default values for lastVolume
-    this.cache_.lastVolume = 1;
 
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
@@ -437,9 +433,6 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
-
-    // Set default value for lastPlaybackRate
-    this.cache_.lastPlaybackRate = this.defaultPlaybackRate();
 
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
@@ -2010,6 +2003,24 @@ class Player extends Component {
   }
 
   /**
+   * Resets the internal cache object.
+   *
+   * Using this function outside the player constructor or reset method may
+   * have unintended side-effects.
+   *
+   * @private
+   */
+  resetCache_() {
+    this.cache_ = {
+      lastVolume: 1,
+      lastPlaybackRate: this.defaultPlaybackRate(),
+      src: '',
+      source: {},
+      sources: []
+    };
+  }
+
+  /**
    * Pass values to the playback tech
    *
    * @param {string} [method]
@@ -2931,6 +2942,7 @@ class Player extends Component {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
+    this.resetCache_();
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     if (isEvented(this)) {

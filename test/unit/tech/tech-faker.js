@@ -10,6 +10,10 @@ class TechFaker extends Tech {
   constructor(options, handleReady) {
     super(options, handleReady);
 
+    this.featuresPlaybackRate = true;
+    this.defaultPlaybackRate_ = 1;
+    this.playbackRate_ = 1;
+
     if (this.options_ && this.options_.sourceset) {
       this.fakeSourceset();
     }
@@ -37,7 +41,9 @@ class TechFaker extends Tech {
 
   setControls(val) {}
 
-  setVolume(newVolume) {}
+  setVolume(value) {
+    this.volume_ = value;
+  }
 
   setMuted() {}
 
@@ -47,6 +53,27 @@ class TechFaker extends Tech {
     }
 
     this.options_.autoplay = true;
+  }
+
+  defaultPlaybackRate(value) {
+    if (value !== undefined) {
+      this.defaultPlaybackRate_ = parseFloat(value);
+    }
+    return this.defaultPlaybackRate_;
+  }
+
+  setPlaybackRate(value) {
+    const last = this.playbackRate_;
+
+    this.playbackRate_ = parseFloat(value);
+
+    if (value !== last) {
+      this.trigger('ratechange');
+    }
+  }
+
+  playbackRate() {
+    return this.playbackRate_;
   }
 
   currentTime() {
@@ -73,7 +100,7 @@ class TechFaker extends Tech {
     return 'movie.mp4';
   }
   volume() {
-    return 0;
+    return this.volume_ || 0;
   }
   muted() {
     return false;

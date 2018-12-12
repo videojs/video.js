@@ -1419,6 +1419,7 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
     options_: {
       techOrder: ['html5', 'flash']
     },
+    resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
       loadedSource = source;
@@ -1444,6 +1445,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
     options_: {
       techOrder: ['flash', 'html5']
     },
+    resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
       loadedSource = source;
@@ -1458,6 +1460,39 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
   assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
   assert.equal(loadedSource, null, 'with a null source');
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
+});
+
+QUnit.test('player#reset clears the player cache', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const sources = [{
+    src: '//vjs.zencdn.net/v/oceans.mp4',
+    type: 'video/mp4'
+  }, {
+    src: '//vjs.zencdn.net/v/oceans.webm',
+    type: 'video/webm'
+  }];
+
+  this.clock.tick(1);
+
+  player.src(sources);
+  player.playbackRate(0.5);
+  player.volume(0.2);
+
+  assert.strictEqual(player.currentSrc(), sources[0].src, 'currentSrc is correct');
+  assert.deepEqual(player.currentSource(), sources[0], 'currentSource is correct');
+  assert.deepEqual(player.currentSources(), sources, 'currentSources is correct');
+  assert.strictEqual(player.playbackRate(), 0.5, 'playbackRate is correct');
+  assert.strictEqual(player.volume(), 0.2, 'volume is correct');
+  assert.strictEqual(player.lastVolume_(), 0.2, 'lastVolume_ is correct');
+
+  player.reset();
+
+  assert.strictEqual(player.currentSrc(), '', 'currentSrc is correct');
+  assert.deepEqual(player.currentSource(), {}, 'currentSource is correct');
+  assert.deepEqual(player.currentSources(), [], 'currentSources is correct');
+  assert.strictEqual(player.playbackRate(), 1, 'playbackRate is correct');
+  assert.strictEqual(player.volume(), 0, 'volume is correct');
+  assert.strictEqual(player.lastVolume_(), 1, 'lastVolume_ is correct');
 });
 
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
