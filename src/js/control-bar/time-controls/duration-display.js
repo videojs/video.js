@@ -51,6 +51,7 @@ class DurationDisplay extends TimeDisplay {
 
   /**
    * Update duration time display.
+   * In case of the duration passed as argument being NaN, the result of the formatted time will be '-:-'.
    *
    * @param {EventTarget~Event} [event]
    *        The `durationchange`, `timeupdate`, or `loadedmetadata` event that caused
@@ -63,6 +64,8 @@ class DurationDisplay extends TimeDisplay {
   updateContent(event) {
     const duration = this.player_.duration();
 
+    // If the duration isn't the previous duration, the duration display will
+    // be updated with a formatted time.
     if (this.duration_ !== duration) {
       this.duration_ = duration;
       this.updateFormattedTime_(duration);

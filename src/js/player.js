@@ -2296,16 +2296,12 @@ class Player extends Component {
         this.removeClass('vjs-live');
         this.removeClass('vjs-liveui');
       }
-      if (!isNaN(seconds)) {
-        // Do not fire durationchange unless the duration value is known.
-        // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
 
-        /**
-         * @event Player#durationchange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('durationchange');
-      }
+      /**
+       * @event Player#durationchange
+       * @type {EventTarget~Event}
+       */
+      this.trigger('durationchange');
     }
   }
 
