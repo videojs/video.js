@@ -1291,9 +1291,6 @@ class Player extends Component {
     // reset the error state
     this.error(null);
 
-    // Update the duration
-    this.handleTechDurationChange_();
-
     // If it's already playing we want to trigger a firstplay event now.
     // The firstplay event relies on both the play and loadstart events
     // which can happen in any order for a new source
@@ -2823,6 +2820,12 @@ class Player extends Component {
 
     // intial sources
     this.changingSrc_ = true;
+
+    // Sets the duration in case of preload='none'.
+    // Since preload='none', this.duration is NaN and '-:-' will be displayed.
+    if (this.options_.preload === 'none') {
+      this.duration(this.duration);
+    }
 
     this.cache_.sources = sources;
     this.updateSourceCaches_(sources[0]);

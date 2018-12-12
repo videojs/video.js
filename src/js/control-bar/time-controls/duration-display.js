@@ -28,11 +28,6 @@ class DurationDisplay extends TimeDisplay {
     // it has changed
     this.on(player, 'durationchange', this.updateContent);
 
-    // Listen to loadstart because the player duration is reset when a new media element is loaded,
-    // but the durationchange on the user agent will not fire.
-    // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
-    this.on(player, 'loadstart', this.updateContent);
-
     // Also listen for timeupdate (in the parent) and loadedmetadata because removing those
     // listeners could have broken dependent applications/libraries. These
     // can likely be removed for 7.0.
