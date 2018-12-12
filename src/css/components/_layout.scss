@@ -29,7 +29,7 @@
     width: 100% !important;
     height: 100% !important;
   }
-  
+
   // reset word-break inside the player div
   word-break: initial;
 }
@@ -96,6 +96,13 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+// Prevents the focus outline appearing on the .vjs-tech div, without breaking
+// the accessibility for keyboard users, as tabindex=-1 is not accessible via
+// keyboard.
+.video-js .vjs-tech[tabindex="-1"]:focus{
+  outline: none;
 }
 
 // Fullscreen Styles
