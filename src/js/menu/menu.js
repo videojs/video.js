@@ -37,6 +37,19 @@ class Menu extends Component {
     this.on('keydown', this.handleKeyPress);
   }
 
+
+  setSelectedFocus() {
+    const children = this.children().slice();
+    for(let i=0; i < children.length;i++) {
+      if(children[i].isSelected_){
+        this.focusedChild_ = i;
+
+        children[i].el_.focus();
+        break;
+      }
+    }
+  }
+
   /**
    * Add a {@link MenuItem} to the menu.
    *

@@ -344,7 +344,7 @@ class MenuButton extends Component {
         return;
       }
 
-      this.menu.focus();
+      this.menu.setSelectedFocus();
     }
   }
 
