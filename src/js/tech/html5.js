@@ -112,6 +112,12 @@ class Html5 extends Tech {
     this.proxyWebkitFullscreen_();
 
     this.triggerReady();
+
+    // On load, confirms if autoplay is turned on and if the
+    // player is paused, forcing the video to be played
+    if (this.autoplay() && this.paused()) {
+      this.play();
+    }
   }
 
   /**
