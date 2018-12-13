@@ -7,10 +7,10 @@ The default user interface hides the `ProgressControl` component on the controlb
 
 > Note: It does this by adding the `vjs-live` class to the player and the showing/hiding of components is all handled in css.
 
-This makes the player have now progress/seek bar and display text indicating that the player is live. This will then be switched back to normal if a non-live video is switched to (via another `durationchange`) event.
+This makes the player have hide the  progress bar, seek bar, and display text indicating that the player is live. All of those will be shown again if a non-live video is switched to (via another `durationchange` event).
 
 To view a sample of this user interface please:
-1. clone the repository, and cd into that directory
+1. clone the repository, and move into that directory
 2. run `npm install` or `npm ci` to install all necessary packages
 3. run `npm start` to start the local server
 4. open `localhost:9999/sandbox/live.html`
@@ -18,11 +18,11 @@ To view a sample of this user interface please:
 ## The new user interface
 > Note: This user interface is currently disabled on Android due to the live HLS implementation not supporting seekable ranges during live streams.
 
-The new user interface is currently opt-in to prevent breaking backwards compatablity. We feel that the new user interface is much better and it will likely become the new default in the next major version. If you want to use the new user interface you will have to pass `{liveui: true}` during player setup. This can be done in two ways:
+The new user interface is currently opt-in to prevent breaking backwards compatiblity. We feel that the new user interface is much better and it will likely become the new default in the next major version. If you want to use the new user interface you will have to pass `{liveui: true}` during player setup. This can be done in two ways:
 
-During `data-setup`
+Using `data-setup`
 ```html
-  <video-js data-setup="{liveui: true}">
+  <video-js data-setup='{"liveui": true}'>
   </video-js>
 ```
 
@@ -32,14 +32,14 @@ Using the `videojs` function
 var player = videojs('some-player-id', {liveui: true});
 ```
 
-The new user interface shows the `ProgressControl` component on the controlbar, hides the `LiveDisplay` component, and shows the new `SeekToLive` component when Video.js detects that the video that it is playing is live (via a `durationchange` event). Along with the `ProgressControl` update we also updated all the time tooltips on the player to indicate a negative number from the live current time, rather than seeking to a specific time.
+The new user interface shows the `ProgressControl` component on the control bar, hides the `LiveDisplay` component, and shows the new `SeekToLive` component when Video.js detects that the video that it is playing is live (via a `durationchange` event). Along with the `ProgressControl` update we also updated all the time tooltips on the player to indicate a negative number from the live current time, rather than seeking to a specific time.
 
 > Note: It does this by adding the `vjs-live` and `vjs-liveui` class to the player and the showing/hiding of components is all handled in css.
 
 The new live user interface shows the progress/seek bar and lets the user seek backwards/forwards within the live window. Next it adds a button, via the `SeekToLive` component that can be clicked when the user is behind live that will seek to the live current time. That same button indicates if the `currentTime` of the player is live via a grey circle when not live and a red circle when live.
 
 To view a sample of this user interface please:
-1. clone the repository, and cd into that directory
+1. clone the repository, and move into that directory
 2. run `npm install` or `npm ci` to install all necessary packages
 3. run `npm start` to start the local server
 4. open `localhost:9999/sandbox/liveui.html`
@@ -48,7 +48,7 @@ To view a sample of this user interface please:
 ## LiveTracker
 > Note: this component can be turned off by passing `liveTracker: false` to the player during initialization.
 
-Along with the new liveui we implemented an API that can be used ragardless of which user interface is in use. This API is a child of the player and should be on the player at `player.liveTracker`. `LiveTracker` provides several useful helper functions and events for dealing with live playback, all of which are used and tested internally. Internally this component keeps track of the live current time through a function that runs on a 30ms interval.
+Along with the new liveui we implemented an API that can be used regardless of which user interface is in use. This API is a child of the player and should be on the player at `player.liveTracker`. `LiveTracker` provides several useful helper functions and events for dealing with live playback, all of which are used and tested internally. Internally this component keeps track of the live current time through a function that runs on a 30ms interval.
 
 ### The seekableendchange event
 The live tracker will fire this event every time that the `seekableEnd` for the player changes. This is used internally to keep our `pastSeekEnd()` function up to date.
