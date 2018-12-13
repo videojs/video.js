@@ -1991,3 +1991,38 @@ QUnit.test('source options are retained', function(assert) {
 
   assert.equal(player.currentSource().sourceOption, 'someOption', 'source option retained');
 });
+
+QUnit.test('setting children to false individually, does not cause an assertion', function(assert) {
+  const defaultChildren = Player.prototype.options_.children;
+
+  defaultChildren.forEach((childName) => {
+    const options = {};
+
+    options[childName] = false;
+
+    const player = TestHelpers.makePlayer(options);
+
+    this.clock.tick(1000);
+
+    player.triggerReady();
+    player.dispose();
+    assert.ok(true, `${childName}: false. did not cause an assertion`);
+  });
+});
+
+QUnit.test('setting all children to false, does not cause an assertion', function(assert) {
+  const defaultChildren = Player.prototype.options_.children;
+  const options = {};
+
+  defaultChildren.forEach((childName) => {
+    options[childName] = false;
+  });
+
+  const player = TestHelpers.makePlayer(options);
+
+  this.clock.tick(1000);
+  player.triggerReady();
+
+  player.dispose();
+  assert.ok(true, 'did not cause an assertion');
+});

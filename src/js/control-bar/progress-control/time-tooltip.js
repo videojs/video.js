@@ -21,6 +21,8 @@ class TimeTooltip extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-time-tooltip'
+    }, {
+      'aria-hidden': 'true'
     });
   }
 
@@ -110,7 +112,7 @@ class TimeTooltip extends Component {
       let content;
       const duration = this.player_.duration();
 
-      if (this.player_.liveTracker.isLive()) {
+      if (this.player_.liveTracker && this.player_.liveTracker.isLive()) {
         const liveWindow = this.player_.liveTracker.liveWindow();
         const secondsBehind = liveWindow - (seekBarPoint * liveWindow);
 
