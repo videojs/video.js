@@ -2949,6 +2949,10 @@ class Player extends Component {
    */
   resetProgressBar() {
     this.currentTime(0);
+    if (isNaN(this.duration())) {
+      this.duration(0);
+    }
+    this.tech_.trigger({ type: 'durationchange', target: this.tech_, manuallyTriggered: true });
     this.tech_.trigger({ type: 'timeupdate', target: this.tech_, manuallyTriggered: true });
   }
 
@@ -2964,8 +2968,8 @@ class Player extends Component {
    * Reset Volume bar
    */
   resetVolumeBar() {
-    this.cache_.volume = 1.0;
-    this.techCall_('setVolume', this.cache_.volume);
+    this.volume(1.0);
+    this.trigger('volumechange');
   }
 
   /**
