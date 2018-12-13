@@ -496,6 +496,8 @@ class Player extends Component {
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
+    // TODO: Make this check be performed again when the window switches between monitors
+    // (See https://github.com/videojs/video.js/issues/5683)
     if (browser.TOUCH_ENABLED) {
       this.addClass('vjs-touch-enabled');
     }
