@@ -16,7 +16,36 @@
   position: absolute;
   width: 100%;
   bottom: 1.5em; // Same bottom as vjs-menu border-top
-  max-height: 15em;
+}
+
+@media (min-width: 321px) and (max-width: 425px) { // small
+  .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    max-height: 100px;
+  }
+}
+
+@media (min-width: 426px) and (max-width: 768px) { // medium
+  .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    max-height: 150px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1440px) { // large
+  .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    max-height: 275px;
+  }
+}
+
+@media (min-width: 1441px) and (max-width: 2560px) { // x-large
+  .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    max-height: 350px;
+  }
+}
+
+@media (min-width: 2561px) { // huge
+  .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    max-height: 400px;
+  }
 }
 
 .vjs-workinghover .vjs-menu-button-popup:hover .vjs-menu,
