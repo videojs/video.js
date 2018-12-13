@@ -55,7 +55,7 @@ export const bind = function(context, fn, uid) {
  * @param    {Function} fn
  *           The function to be throttled.
  *
- * @param    {Number}   wait
+ * @param    {number}   wait
  *           The number of milliseconds by which to throttle.
  *
  * @return   {Function}
