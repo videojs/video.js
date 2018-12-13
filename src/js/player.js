@@ -9,6 +9,7 @@ import document from 'global/document';
 import window from 'global/window';
 import tsml from 'tsml';
 import evented from './mixins/evented';
+import {isEvented, addEventedCallback} from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -47,6 +48,7 @@ import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
+import './live-tracker.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -442,6 +444,9 @@ class Player extends Component {
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
+    if (this.fluid_) {
+      this.on('playerreset', this.updateStyleEl_);
+    }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
@@ -827,9 +832,15 @@ class Player extends Component {
 
     this.fluid_ = !!bool;
 
+    if (isEvented(this)) {
+      this.off('playerreset', this.updateStyleEl_);
+    }
     if (bool) {
       this.addClass('vjs-fluid');
       this.fill(false);
+      addEventedCallback(function() {
+        this.on('playerreset', this.updateStyleEl_);
+      });
     } else {
       this.removeClass('vjs-fluid');
     }
@@ -1281,6 +1292,9 @@ class Player extends Component {
 
     // reset the error state
     this.error(null);
+
+    // Update the duration
+    this.handleTechDurationChange_();
 
     // If it's already playing we want to trigger a firstplay event now.
     // The firstplay event relies on both the play and loadstart events
@@ -2277,14 +2291,23 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
+        if (this.options_.liveui && this.player_.liveTracker) {
+          this.addClass('vjs-liveui');
+        }
       } else {
         this.removeClass('vjs-live');
+        this.removeClass('vjs-liveui');
       }
-      /**
-       * @event Player#durationchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('durationchange');
+      if (!isNaN(seconds)) {
+        // Do not fire durationchange unless the duration value is known.
+        // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
+
+        /**
+         * @event Player#durationchange
+         * @type {EventTarget~Event}
+         */
+        this.trigger('durationchange');
+      }
     }
   }
 
@@ -2912,6 +2935,9 @@ class Player extends Component {
     }
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
+    if (isEvented(this)) {
+      this.trigger('playerreset');
+    }
   }
 
   /**
@@ -4090,6 +4116,7 @@ Player.prototype.options_ = {
   playbackRates: [],
   // Add playback rate selection by adding rates
   // 'playbackRates': [0.5, 1, 1.5, 2],
+  liveui: false,
 
   // Included control sets
   children: [
@@ -4098,6 +4125,7 @@ Player.prototype.options_ = {
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',
+    'liveTracker',
     'controlBar',
     'errorDisplay',
     'textTrackSettings',

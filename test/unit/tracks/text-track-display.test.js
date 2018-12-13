@@ -183,6 +183,50 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 
+  QUnit.test("don't select user langauge if it is an empty string", function(assert) {
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt'
+    };
+    const track2 = {
+      kind: 'captions',
+      label: 'Spanish',
+      language: 'es',
+      src: 'es.vtt'
+    };
+    const track3 = {
+      kind: 'metadata',
+      label: 'segment-metadata'
+    };
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    // manualCleanUp = true by default
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
+    const spanishTrack = player.addRemoteTextTrack(track2, true).track;
+    const metadataTrack = player.addRemoteTextTrack(track3, true).track;
+
+    // Force empty string ('') as "user-selected" track
+    player.cache_.selectedLanguage = { enabled: true, language: '', kind: 'captions' };
+    this.clock.tick(1);
+
+    assert.equal(spanishTrack.mode, 'disabled', 'Spanish captions should be disabled');
+    assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
+    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should not be showing');
+
+    // Force es as "user-selected" track
+    player.cache_.selectedLanguage = { enabled: true, language: 'es', kind: 'captions' };
+    player.trigger('loadedmetadata');
+
+    assert.equal(spanishTrack.mode, 'showing', 'Spanish captions should be showing');
+    assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
+    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should not be showing');
+
+    player.dispose();
+  });
+
   QUnit.test("matching both the selectedLanguage's language and kind takes priority over just matching the language", function(assert) {
     const player = TestHelpers.makePlayer();
     const track1 = {

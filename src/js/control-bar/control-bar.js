@@ -10,6 +10,7 @@ import './time-controls/duration-display.js';
 import './time-controls/time-divider.js';
 import './time-controls/remaining-time-display.js';
 import './live-display.js';
+import './seek-to-live.js';
 import './progress-control/progress-control.js';
 import './fullscreen-toggle.js';
 import './volume-panel.js';
@@ -58,6 +59,7 @@ ControlBar.prototype.options_ = {
     'durationDisplay',
     'progressControl',
     'liveDisplay',
+    'seekToLive',
     'remainingTimeDisplay',
     'customControlSpacer',
     'playbackRateMenuButton',
