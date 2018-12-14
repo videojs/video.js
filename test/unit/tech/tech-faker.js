@@ -13,6 +13,7 @@ class TechFaker extends Tech {
     this.featuresPlaybackRate = true;
     this.defaultPlaybackRate_ = 1;
     this.playbackRate_ = 1;
+    this.currentTime_ = 0;
 
     if (this.options_ && this.options_.sourceset) {
       this.fakeSourceset();
@@ -76,9 +77,20 @@ class TechFaker extends Tech {
     return this.playbackRate_;
   }
 
-  currentTime() {
-    return 0;
+  setCurrentTime(value) {
+    const last = this.currentTime_;
+
+    this.currentTime_ = parseFloat(value);
+
+    if (value !== last) {
+      this.trigger('timeupdate');
+    }
   }
+
+  currentTime() {
+    return this.currentTime_;
+  }
+
   seekable() {
     return createTimeRanges(0, 0);
   }

@@ -1475,12 +1475,14 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   this.clock.tick(1);
 
   player.src(sources);
+  player.duration(10);
   player.playbackRate(0.5);
   player.volume(0.2);
 
   assert.strictEqual(player.currentSrc(), sources[0].src, 'currentSrc is correct');
   assert.deepEqual(player.currentSource(), sources[0], 'currentSource is correct');
   assert.deepEqual(player.currentSources(), sources, 'currentSources is correct');
+  assert.strictEqual(player.duration(), 10, 'duration is correct');
   assert.strictEqual(player.playbackRate(), 0.5, 'playbackRate is correct');
   assert.strictEqual(player.volume(), 0.2, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 0.2, 'lastVolume_ is correct');
@@ -1490,8 +1492,15 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   assert.strictEqual(player.currentSrc(), '', 'currentSrc is correct');
   assert.deepEqual(player.currentSource(), {}, 'currentSource is correct');
   assert.deepEqual(player.currentSources(), [], 'currentSources is correct');
+
+  // Right now, the currentTime is not _really_ cached because it is always
+  // retrieved from the tech. However, for completeness, we set it to zero in
+  // the `resetCache_` method to ensure that if we do start actually caching it,
+  // we reset it along with everything else.
+  assert.strictEqual(player.getCache().currentTime, 0, 'currentTime is correct');
+  assert.ok(isNaN(player.duration()), 'duration is correct');
   assert.strictEqual(player.playbackRate(), 1, 'playbackRate is correct');
-  assert.strictEqual(player.volume(), 0, 'volume is correct');
+  assert.strictEqual(player.volume(), 1, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 1, 'lastVolume_ is correct');
 });
 

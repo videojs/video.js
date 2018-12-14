@@ -2012,11 +2012,19 @@ class Player extends Component {
    */
   resetCache_() {
     this.cache_ = {
+
+      // Right now, the currentTime is not _really_ cached because it is always
+      // retrieved from the tech (see: currentTime). However, for completeness,
+      // we set it to zero here to ensure that if we do start actually caching
+      // it, we reset it along with everything else.
+      currentTime: 0,
+      duration: NaN,
       lastVolume: 1,
       lastPlaybackRate: this.defaultPlaybackRate(),
       src: '',
       source: {},
-      sources: []
+      sources: [],
+      volume: 1
     };
   }
 
