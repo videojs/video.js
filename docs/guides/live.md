@@ -13,10 +13,10 @@ To view a sample of this user interface please:
 1. clone the repository, and move into that directory
 2. run `npm install` or `npm ci` to install all necessary packages
 3. run `npm start` to start the local server
-4. open `localhost:9999/sandbox/live.html`
+4. open `http://localhost:9999/sandbox/live.html` in a web browser
 
 ## The new user interface
-> Note: This user interface is currently disabled on Android due to the live HLS implementation not supporting seekable ranges during live streams.
+> Note: This user interface is will not work on Android due to the live HLS implementation not supporting seekable ranges during live streams. We reccommend overriding the native hls implementation with @videojs/http-streaming this will make the new liveui work.
 
 The new user interface is currently opt-in to prevent breaking backwards compatiblity. We feel that the new user interface is much better and it will likely become the new default in the next major version. If you want to use the new user interface you will have to pass `{liveui: true}` during player setup. This can be done in two ways:
 
@@ -42,7 +42,7 @@ To view a sample of this user interface please:
 1. clone the repository, and move into that directory
 2. run `npm install` or `npm ci` to install all necessary packages
 3. run `npm start` to start the local server
-4. open `localhost:9999/sandbox/liveui.html`
+4. open `http://localhost:9999/sandbox/liveui.html` in a web browser
 
 
 ## LiveTracker
@@ -60,28 +60,29 @@ As the name implies the live tracker will fire this event when it detects that t
 These functions can be called to arbitrarily start/stop tracking live playback. Normally these are handled by automatically when the player triggers a `durationchange` with a duration of `Infinity`. You won't want to call them unless you are doing something fairly specific.
 
 ### seekableEnd()
-This function gets the time in seconds of the furthest seekable end. For instance if we have an array of seekable `TimeRanges` where the first element in the array is the `start()` second and the last is the `end()` second:
+seekableEnd gets the time in seconds of the furthest seekable end. For instance if we have an array of seekable `TimeRanges` where the first element in the array is the `start()` second and the last is the `end()` second:
 
 ```js
 // seekable index 0: 0 is start, 1 is end
 // seekable index 1: 2 is the start, 3 is the end
-const seekableExample [[0, 1], [2, 3]];
+const seekableExample = [[0, 1], [2, 3]];
 ```
 
-This function would return `3` as that is the furthest seekable point for the current media.
+seekableEnd would return `3` as that is the furthest seekable point for the current media.
 
 > Note: that if Infinity is anywhere in seekable end, this will return Infinity
 
 ### seekableStart()
-This function gets the time in seconds of the earliest seekable start. For instance if we have an array of seekable `TimeRanges` where the first element in the array is the `start()` second and the last is the `end()` second:
+seekableStart gets the time in seconds of the earliest seekable start. For instance if we have an array of seekable `TimeRanges` where the first element in the array is the `start()` second and the last is the `end()` second:
+
 
 ```js
 // seekable index 0: 0 is start, 1 is end
 // seekable index 1: 2 is the start, 3 is the end
-const seekableExample [[0, 1], [2, 3]];
+const seekableExample = [[0, 1], [2, 3]];
 ```
 
-This function would return `0` as that is the first seekable point for the current media.
+seekableStart would return `0` as that is the first seekable point for the current media.
 
 > Note: that if Infinity is anywhere in seekable start, this will return Infinity
 
