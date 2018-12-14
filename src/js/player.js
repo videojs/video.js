@@ -519,7 +519,7 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
-    this.on('fullscreenchange', this.handleFullscreenChange_);
+    this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -1913,12 +1913,24 @@ class Player extends Component {
    *
    * @private
    * @listens Player#fullscreenchange
+   * @listens Player#webkitfullscreenchange
+   * @listens Player#mozfullscreenchange
+   * @listens Player#MSFullscreenChange
+   * @fires Player#fullscreenchange
    */
-  handleFullscreenChange_() {
+  handleFullscreenChange_(event = {}) {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
       this.removeClass('vjs-fullscreen');
+    }
+
+    if (event.type !== 'fullscreenchange') {
+      /**
+       * @event Player#fullscreenchange
+       * @type {EventTarget~Event}
+       */
+      this.trigger('fullscreenchange');
     }
   }
 
@@ -2579,12 +2591,8 @@ class Player extends Component {
         // If cancelling fullscreen, remove event listener.
         if (this.isFullscreen() === false) {
           Events.off(document, fsApi.fullscreenchange, documentFullscreenChange);
+          this.handleFullscreenChange_();
         }
-        /**
-         * @event Player#fullscreenchange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('fullscreenchange');
       }));
 
       this.el_[fsApi.requestFullscreen]();
