@@ -230,6 +230,9 @@ class SeekBar extends Slider {
     this.videoWasPlaying = !this.player_.paused();
     this.player_.pause();
 
+    // To close the subtitles menu when clicking the progress bar
+    this.player().getChild('controlBar').getChild('subsCapsButton').unpressButton();
+
     super.handleMouseDown(event);
   }
 
