@@ -22,7 +22,6 @@
   * [aspectRatio](#aspectratio)
   * [autoSetup](#autosetup)
   * [children](#children)
-  * [dblclick](#dblclick)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
   * [language](#language)
@@ -213,12 +212,6 @@ See the file `sandbox/responsive.html.example` for an example of a responsive pl
 > Type: `Array|Object`
 
 This option is inherited from the [`Component` base class](#component-options).
-
-### `dblclick`
-
-> Type: `boolean|function`
-
-This option can be set to `false` to disable the default double-click handling (toggle full-screen), or to a function to override the default handling. The function takes an argument of the double-click event.
 
 ### `fluid`
 
