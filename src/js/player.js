@@ -15,6 +15,7 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
+import {IE_VERSION} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
 import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
@@ -33,7 +34,6 @@ import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
-import {IE_VERSION} from './utils/browser';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -520,6 +520,11 @@ class Player extends Component {
 
     this.one('play', this.listenForUserActivity_);
     this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+
+    if (IE_VERSION) {
+      this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+    }
+
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -548,6 +553,11 @@ class Player extends Component {
     this.trigger('dispose');
     // prevent dispose from being called twice
     this.off('dispose');
+
+    // make sure to remove fs handler on IE from the document
+    if (IE_VERSION) {
+      this.off(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+    }
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
