@@ -2928,10 +2928,10 @@ class Player extends Component {
     }
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
+    this.resetControlBarUI();
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
-    this.resetControlBarUI();
   }
 
   /**
