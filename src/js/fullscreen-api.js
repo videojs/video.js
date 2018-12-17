@@ -81,4 +81,7 @@ if (browserApi) {
   }
 }
 
+const prefixedAPI = browserApi[0] !== specApi[0];
+
 export default FullscreenApi;
+export { prefixedAPI };
