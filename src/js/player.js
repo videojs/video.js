@@ -2939,15 +2939,15 @@ class Player extends Component {
    * all of Control Bar's components
    */
   resetControlBarUI() {
-    this.resetProgressBar();
-    this.resetPlaybackRate();
-    this.resetVolumeBar();
+    this.resetProgressBar_();
+    this.resetPlaybackRate_();
+    this.resetVolumeBar_();
   }
 
   /**
    * Reset tech's progress so progress bar is reset in the UI
    */
-  resetProgressBar() {
+  resetProgressBar_() {
     this.currentTime(0);
     if (isNaN(this.duration())) {
       this.duration(0);
@@ -2959,7 +2959,7 @@ class Player extends Component {
   /**
    * Reset Playback ratio
    */
-  resetPlaybackRate() {
+  resetPlaybackRate_() {
     this.playbackRate(this.defaultPlaybackRate());
     this.handleTechRateChange_();
   }
@@ -2967,7 +2967,7 @@ class Player extends Component {
   /**
    * Reset Volume bar
    */
-  resetVolumeBar() {
+  resetVolumeBar_() {
     this.volume(1.0);
     this.trigger('volumechange');
   }

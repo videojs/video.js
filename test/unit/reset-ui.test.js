@@ -6,7 +6,7 @@ QUnit.test('Calling resetProgressBar player method should place progress bar at 
 
   player.currentTime(20);
   player.trigger('timeupdate');
-  player.resetProgressBar();
+  player.resetProgressBar_();
   assert.ok(
     /0/.test(player.controlBar.progressControl.seekBar.playProgressBar.el().offsetWidth),
     'progress bar is reset to width 0%'
@@ -23,7 +23,7 @@ QUnit.test('Calling resetPlaybackRate player method should place play rate at 1x
 
   player.playbackRate(2);
   player.handleTechRateChange_();
-  player.resetPlaybackRate();
+  player.resetPlaybackRate_();
   const defaultRate = player.defaultPlaybackRate();
 
   assert.ok(
@@ -46,7 +46,7 @@ QUnit.test('Calling resetVolumeBar player method should reset volume bar', funct
 
   assert.equal(player.controlBar.volumePanel.volumeControl.volumeBar.el_.getAttribute('aria-valuenow'), 50, 'UI value of VolumeBar is 50');
 
-  player.resetVolumeBar();
+  player.resetVolumeBar_();
 
   assert.equal(player.controlBar.volumePanel.volumeControl.volumeBar.el_.getAttribute('aria-valuenow'), 100, 'UI value of VolumeBar is 100');
 
