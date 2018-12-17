@@ -752,12 +752,11 @@ class Player extends Component {
    *         The current crossorigin value of the `Player`.
    */
   crossOrigin(value){
-    if(value != "anonymous" && value != "use-credentials")
+    if(value !== "anonymous" && value !== "use-credentials")
     {
       log.error(`Improper value "${value}" supplied for crossorigin`);
       return;
     }
-
     this.el_.setAttribute('crossorigin', value); 
     return this.el_.getAttribute('crossorigin');
   }
