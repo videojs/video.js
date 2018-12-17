@@ -742,8 +742,8 @@ class Player extends Component {
     return el;
   }
 
-   /**
-   * A setter for the `Player`'s crossOrigin. Returns the player's configured value.
+  /**
+   * A getter/setter for the `Player`'s crossOrigin. Returns the player's configured value.
    *
    * @param {number} [value]
    *        The value to set the `Player`'s crossorigin to.
@@ -751,13 +751,12 @@ class Player extends Component {
    * @return {number}
    *         The current crossorigin value of the `Player`.
    */
-  crossOrigin(value){
-    if(value !== "anonymous" && value !== "use-credentials")
-    {
+  crossOrigin(value) {
+    if (value !== 'anonymous' && value !== 'use-credentials') {
       log.error(`Improper value "${value}" supplied for crossorigin`);
       return;
     }
-    this.el_.setAttribute('crossorigin', value); 
+    this.el_.setAttribute('crossorigin', value);
     return this.el_.getAttribute('crossorigin');
   }
   
