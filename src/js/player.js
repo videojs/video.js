@@ -3444,6 +3444,16 @@ class Player extends Component {
     this.on('mousemove', handleMouseMove);
     this.on('mouseup', handleMouseUp);
 
+    this.on(this.getChild('controlBar'), 'mouseenter', function(event) {
+      this.options_.inactivityTimeout = 0;
+
+    });
+
+    this.on(this.getChild('controlBar'), 'mouseleave', function(event) {
+      this.options_.inactivityTimeout = 2000;
+
+    });
+
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
     this.on('keydown', handleActivity);
