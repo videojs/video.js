@@ -1955,8 +1955,8 @@ class Player extends Component {
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
       Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
-      this.handleFullscreenChange_();
-      // this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      // this.handleFullscreenChange_();
+      this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
     }
   }
 
@@ -2606,7 +2606,7 @@ class Player extends Component {
       // the browser supports going fullscreen at the element level so we can
       // take the controls fullscreen as well as the video
 
-      // this.off(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      this.off(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
 
       // Trigger fullscreenchange event after change
       // We have to specifically add this each time, and remove
