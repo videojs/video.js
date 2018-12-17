@@ -21,7 +21,7 @@ import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
-import FullscreenApi from './fullscreen-api.js';
+import FullscreenApi, {prefixedAPI as prefixedFS} from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
@@ -1939,14 +1939,14 @@ class Player extends Component {
    * @listens Player#MSFullscreenChange
    * @fires Player#fullscreenchange
    */
-  handleFullscreenChange_(event = {}) {
+  handleFullscreenChange_(event = {}, retriggerEvent = true) {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
       this.removeClass('vjs-fullscreen');
     }
 
-    if (event.type !== 'fullscreenchange') {
+    if (prefixedFS && retriggerEvent) {
       /**
        * @event Player#fullscreenchange
        * @type {EventTarget~Event}
@@ -1966,8 +1966,11 @@ class Player extends Component {
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
       Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
-      // this.handleFullscreenChange_();
-      this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      if (prefixedFS) {
+        this.handleFullscreenChange_({}, false);
+      } else {
+        this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      }
     }
   }
 
@@ -2606,7 +2609,9 @@ class Player extends Component {
       // the browser supports going fullscreen at the element level so we can
       // take the controls fullscreen as well as the video
 
-      this.off(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      if (!prefixedFS) {
+        this.off(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      }
 
       // Trigger fullscreenchange event after change
       // We have to specifically add this each time, and remove
