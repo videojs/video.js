@@ -759,7 +759,7 @@ class Player extends Component {
     this.el_.setAttribute('crossorigin', value);
     return this.el_.getAttribute('crossorigin');
   }
-  
+
   /**
    * A getter/setter for the `Player`'s width. Returns the player's configured value.
    * To get the current width use `currentWidth()`.
