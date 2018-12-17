@@ -34,6 +34,8 @@
   * [sources](#sources)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
+  * [userActions](#useractions)
+  * [userActions.doubleClick](#useractions.doubleclick)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
   * [children](#children-1)
@@ -358,7 +360,33 @@ This can be useful when multiple techs are used and each has to set their own po
 
 > Type: `Array`, Default: `['html5']`
 
-Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other regisetered techs will be added after this tech in the order in which they are registered.
+Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other registered techs will be added after this tech in the order in which they are registered.
+
+### `userActions`
+
+> Type: `Object`
+
+### `userActions.doubleClick`
+
+> Type: `boolean|function`
+
+Controls how double-clicking on the player/tech operates. If set to `false`, double-clicking is disabled. If undefined or set to
+`true`, double-clicking is enabled and toggles fullscreen mode. To override the default double-click handling, set `userActions.doubleClick`
+to a function which accepts a `dblclick` event:
+
+```js
+function myDoubleClickHandler(event) = {
+  // `this` is the player in this context
+
+  this.pause();
+};
+
+videojs('my-player', {
+  userActions: {
+    doubleClick: myDoubleClickHandler
+  }
+});
+```
 
 ### `vtt.js`
 
