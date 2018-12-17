@@ -519,10 +519,13 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
-    this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
 
-    if (IE_VERSION) {
-      this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+    if (FullscreenApi.fullscreenchange) {
+      this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+
+      if (IE_VERSION) {
+        this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
+      }
     }
 
     this.on('stageclick', this.handleStageClick_);
