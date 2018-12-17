@@ -1919,6 +1919,17 @@ class Player extends Component {
   }
 
   /**
+   * native click events on the SWF aren't triggered on IE11, Win8.1RT
+   * use stageclick events triggered from inside the SWF instead
+   *
+   * @private
+   * @listens stageclick
+   */
+  handleStageClick_() {
+    this.reportUserActivity();
+  }
+
+  /**
    * Fired when the player switches in or out of fullscreen mode
    *
    * @private
@@ -1958,17 +1969,6 @@ class Player extends Component {
       // this.handleFullscreenChange_();
       this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
     }
-  }
-
-  /**
-   * native click events on the SWF aren't triggered on IE11, Win8.1RT
-   * use stageclick events triggered from inside the SWF instead
-   *
-   * @private
-   * @listens stageclick
-   */
-  handleStageClick_() {
-    this.reportUserActivity();
   }
 
   /**
