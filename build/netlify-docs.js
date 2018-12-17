@@ -12,14 +12,15 @@ if (process.env.BRANCH === 'master' && semver.valid(output.trim()) === null) {
 
 // if we're on any other branch, we can regenerate docs
 } else {
+  if (process.env.BRANCH !== 'master') {
+    // generate the example
+    generateExample();
+  }
+
   // generate the docs
   sh.exec('npm run docs:api');
 
   // copy the legacy docs over
   sh.cp('-R', 'docs/legacy-docs', 'docs/api/docs');
 
-  if (process.env.BRANCH !== 'master') {
-    // generate the example
-    generateExample();
-  }
 }
