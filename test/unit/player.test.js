@@ -2046,7 +2046,7 @@ QUnit.test('controlBar behaviour with mouseenter and mouseleave events', functio
   // move mouse out of controlBar bounds
   Events.trigger(el, 'mouseleave');
 
-  assert.equal(player.options_.inactivityTimeout, 2000, 'mouse leaves control-bar, inactivityTimeout is set to default value (2000)');
+  assert.equal(player.options_.inactivityTimeout, player.cache_.inactivityTimeout, 'mouse leaves control-bar, inactivityTimeout is set to default value (2000)');
 
   player.dispose();
 });
