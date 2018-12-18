@@ -3445,12 +3445,14 @@ class Player extends Component {
     this.on('mouseup', handleMouseUp);
 
     this.on(this.getChild('controlBar'), 'mouseenter', function(event) {
+
+      this.cache_.inactivityTimeout = this.options_.inactivityTimeout;
       this.options_.inactivityTimeout = 0;
 
     });
 
     this.on(this.getChild('controlBar'), 'mouseleave', function(event) {
-      this.options_.inactivityTimeout = 2000;
+      this.options_.inactivityTimeout = this.cache_.inactivityTimeout;
 
     });
 
