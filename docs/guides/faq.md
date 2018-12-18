@@ -336,7 +336,7 @@ Yes! See [ReactJS integration example][react-guide].
 
 [slack]: https://videojs.slack.com
 
-[starter-example]: https://jsbin.com/axedog/edit?html,output
+[starter-example]: https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0
 
 [techorder]: /docs/guides/options.md#techorder
 

@@ -59,7 +59,7 @@ Guidelines for bug reports:
 1. If your issue is with a particular video.js plugin or subproject, please open an issue against that project. See [list of some potential other projects above](#other-repositories-where-issues-could-be-filed)
 1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) — check if the issue has already been reported.
 1. Check if the issue has already been fixed — try to reproduce it using the latest `master` branch in the repository.
-1. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/edit) as a starting point -- don't forget to update it to the videojs version you use.
+1. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this codepen template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) as a starting point -- don't forget to update it to the videojs version you use.
 1. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
@@ -96,19 +96,6 @@ To contibute code you'll need to be able to build a copy of Video.js and run tes
 
 * Node.js
   Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
-
-* `grunt-cli`
-  Optionally, install `grunt-cli` globally to use grunt directly. It can always be run via an npm script:
-
-```sh
-npm run grunt
-```
-
-```sh
-npm install -g grunt-cli
-```
-
-Depending on how you have node and npm set up, you may need to run the global install (`-g`) as a superuser by prepending `sudo`.
 
 ### Building video.js locally
 
@@ -199,17 +186,11 @@ This ties in nicely with the sandbox directory. You can always open the `sandbox
 > Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you must use a local web server.
 
-To run the local webserver, you can run it in a couple of ways.
-
-```sh
-grunt connect
-open http://localhost:9999/sandbox/index.html
-```
-
-or
+To run the local webserver:
 
 ```sh
 npm start
+open http://localhost:9999/sandbox/index.html
 ```
 
 The latter does some extra work which will be described in the next section.

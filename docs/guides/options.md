@@ -21,6 +21,7 @@
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
   * [autoSetup](#autosetup)
+  * [breakpoints](#breakpoints)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -30,6 +31,7 @@
   * [notSupportedMessage](#notsupportedmessage)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
+  * [responsive](#responsive)
   * [sources](#sources)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
@@ -171,15 +173,15 @@ When used with the [`responsive` option](#responsive), sets breakpoints that wil
 
 By default, the breakpoints are:
 
-Class Name           | Width Range
----------------------|------------
-`vjs-layout-tiny`    | 0-210
-`vjs-layout-x-small` | 211-320
-`vjs-layout-small`   | 321-425
-`vjs-layout-medium`  | 426-768
-`vjs-layout-large`   | 769-1440
-`vjs-layout-x-large` | 1441-2560
-`vjs-layout-huge`    | 2561+
+| Class Name           | Width Range |
+| -------------------- | ----------- |
+| `vjs-layout-tiny`    | 0-210       |
+| `vjs-layout-x-small` | 211-320     |
+| `vjs-layout-small`   | 321-425     |
+| `vjs-layout-medium`  | 426-768     |
+| `vjs-layout-large`   | 769-1440    |
+| `vjs-layout-x-large` | 1441-2560   |
+| `vjs-layout-huge`    | 2561+       |
 
 While the class names cannot be changed, the width ranges can be configured via an object like this:
 
@@ -244,6 +246,18 @@ Customize which languages are available in a player. The keys of this object wil
 Learn more about [languages in Video.js][languages]
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
+
+### `liveui`
+
+> Type: `boolean`
+> Default: `false`
+
+Allows the player to use the new live ui that includes:
+* A progress bar for seeking within the live window
+* A button that can be clicked to seek to the live edge with a circle indicating if you are at the live edge or not.
+
+Without this option the progress bar will be hidden and in its place will be text that indicates `LIVE` playback. There will be no progress control
+and you will not be able click the text to seek to the live edge. `liveui` will default to `true` in a future version!
 
 ### `nativeControlsForTouch`
 
