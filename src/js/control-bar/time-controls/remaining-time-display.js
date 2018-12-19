@@ -61,7 +61,7 @@ class RemainingTimeDisplay extends TimeDisplay {
    * @listens Player#durationchange
    */
   updateContent(event) {
-    if (!this.player_.duration() && this.player_.duration() !== 0) {
+    if (typeof this.player_.duration() !== 'number') {
       return;
     }
 
