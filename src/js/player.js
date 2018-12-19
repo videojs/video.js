@@ -2928,7 +2928,7 @@ class Player extends Component {
     }
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
-    this.resetControlBarUI();
+    this.resetControlBarUI_();
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
@@ -2938,7 +2938,7 @@ class Player extends Component {
    * Reset Control Bar's UI by calling sub-methods that reset
    * all of Control Bar's components
    */
-  resetControlBarUI() {
+  resetControlBarUI_() {
     this.resetProgressBar_();
     this.resetPlaybackRate_();
     this.resetVolumeBar_();
