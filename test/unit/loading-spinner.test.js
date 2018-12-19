@@ -6,14 +6,14 @@ QUnit.test('Loading Spinner should show when calling loadingSpinner.show() and h
 
   player.getChild('loadingSpinner').show();
   assert.ok(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show is added to the player el on loadingSpinner.show()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show is added to the player el on loadingSpinner.show()'
   );
 
   player.getChild('loadingSpinner').hide();
   assert.notOk(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show removed from the player el on loadingSpinner.hide()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show removed from the player el on loadingSpinner.hide()'
   );
   player.dispose();
 });
@@ -24,8 +24,8 @@ QUnit.test('Loading Spinner should not be visible after calling handleTechCanPla
   player.handleTechCanPlay_();
 
   assert.notOk(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show removed from the player el on handleTechCanPlay_()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show removed from the player el on handleTechCanPlay_()'
   );
   player.dispose();
 });
@@ -36,8 +36,8 @@ QUnit.test('Loading Spinner should be visible after calling handleTechSeeking_()
   player.handleTechSeeking_();
 
   assert.ok(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show added to the player el on handleTechSeeking_()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show added to the player el on handleTechSeeking_()'
   );
   player.dispose();
 });
@@ -48,8 +48,8 @@ QUnit.test('Loading Spinner should not be visible after calling handleTechSeeked
   player.handleTechSeeked_();
 
   assert.notOk(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show removed from the player el on handleTechSeeked_()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show removed from the player el on handleTechSeeked_()'
   );
   player.dispose();
 });
@@ -60,8 +60,8 @@ QUnit.test('Loading Spinner should not be visible after calling handleTechCanPla
   player.handleTechCanPlay_();
 
   assert.notOk(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show removed from the player el on handleTechCanPlay_()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show removed from the player el on handleTechCanPlay_()'
   );
   player.dispose();
 });
@@ -72,8 +72,8 @@ QUnit.test('Loading Spinner should not be visible after calling handleTechCanPla
   player.handleTechCanPlayThrough_();
 
   assert.notOk(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show removed from the player el on handleTechCanPlayThrough_()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show removed from the player el on handleTechCanPlayThrough_()'
   );
   player.dispose();
 });
@@ -84,8 +84,8 @@ QUnit.test('Loading Spinner should not be visible after calling handleTechPlayin
   player.handleTechPlaying_();
 
   assert.notOk(
-    /show/.test(player.getChild('loadingSpinner').el().className),
-    'show removed from the player el on handleTechPlaying_()'
+    /vjs-loading-spinner-show/.test(player.getChild('loadingSpinner').el().className),
+    'vjs-loading-spinner-show removed from the player el on handleTechPlaying_()'
   );
   player.dispose();
 });
