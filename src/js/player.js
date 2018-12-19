@@ -1857,15 +1857,15 @@ class Player extends Component {
     );
 
     if (!inAllowedEls) {
-      if(this.player_.controlBar.fullscreenToggle.el_){
-       if (this.isFullscreen()) {
-        this.exitFullscreen();
-       } else {
-        this.requestFullscreen();
-       }
-      }
+      if (this.player_.controlBar.fullscreenToggle.el_) {
+        if (this.isFullscreen()) {
+          this.exitFullscreen();
+        } else {
+          this.requestFullscreen();
+        }
     }
   }
+}
 
   /**
    * Handle a tap on the media element. It will toggle the user
