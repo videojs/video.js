@@ -2949,10 +2949,9 @@ class Player extends Component {
    */
   resetProgressBar_() {
     this.currentTime(0);
-    if (isNaN(this.duration())) {
-      this.duration(0);
-    }
-    this.tech_.trigger({ type: 'durationchange', target: this.tech_, manuallyTriggered: true });
+    this.duration(0);
+    this.controlBar.durationDisplay.updateContent();
+    this.controlBar.remainingTimeDisplay.updateContent();
     this.tech_.trigger({ type: 'timeupdate', target: this.tech_, manuallyTriggered: true });
   }
 

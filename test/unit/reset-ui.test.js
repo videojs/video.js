@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import TestHelpers from './test-helpers.js';
+QUnit.module('player reset-ui');
 
 QUnit.test('Calling resetProgressBar player method should place progress bar at 0% width', function(assert) {
   const player = TestHelpers.makePlayer();
@@ -7,12 +8,12 @@ QUnit.test('Calling resetProgressBar player method should place progress bar at 
   player.currentTime(20);
   player.trigger('timeupdate');
   player.resetProgressBar_();
-  assert.ok(
-    /0/.test(player.controlBar.progressControl.seekBar.playProgressBar.el().offsetWidth),
+  assert.equal(
+    player.controlBar.progressControl.seekBar.playProgressBar.el().offsetWidth, 0,
     'progress bar is reset to width 0%'
   );
-  assert.ok(
-    /0/.test(player.currentTime()),
+  assert.equal(
+    player.currentTime(), 0,
     'player current time is 0'
   );
   player.dispose();
@@ -26,12 +27,12 @@ QUnit.test('Calling resetPlaybackRate player method should place play rate at 1x
   player.resetPlaybackRate_();
   const defaultRate = player.defaultPlaybackRate();
 
-  assert.ok(
-    player.controlBar.playbackRateMenuButton.labelEl_.textContent === defaultRate + 'x',
+  assert.equal(
+    player.controlBar.playbackRateMenuButton.labelEl_.textContent, defaultRate + 'x',
     'Playback rate is the default one on the UI'
   );
-  assert.ok(
-    player.playbackRate() === defaultRate,
+  assert.equal(
+    player.playbackRate(), defaultRate,
     'Playback rate is the default one on the player object'
   );
   player.dispose();
