@@ -1857,10 +1857,12 @@ class Player extends Component {
     );
 
     if (!inAllowedEls) {
-      if (this.isFullscreen()) {
+      if(this.player_.controlBar.fullscreenToggle.el_){
+       if (this.isFullscreen()) {
         this.exitFullscreen();
-      } else {
+       } else {
         this.requestFullscreen();
+       }
       }
     }
   }
