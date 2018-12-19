@@ -3444,17 +3444,22 @@ class Player extends Component {
     this.on('mousemove', handleMouseMove);
     this.on('mouseup', handleMouseUp);
 
-    this.on(this.getChild('controlBar'), 'mouseenter', function(event) {
+    const controlBar = this.getChild('controlBar');
 
-      this.cache_.inactivityTimeout = this.options_.inactivityTimeout;
-      this.options_.inactivityTimeout = 0;
+    if (controlBar) {
 
-    });
+      controlBar.on('mouseenter', function(event) {
 
-    this.on(this.getChild('controlBar'), 'mouseleave', function(event) {
-      this.options_.inactivityTimeout = this.cache_.inactivityTimeout;
+        this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
+        this.player().options_.inactivityTimeout = 0;
 
-    });
+      });
+
+      controlBar.on('mouseleave', function(event) {
+        this.player().options_.inactivityTimeout = this.player().cache_.inactivityTimeout;
+      });
+
+    }
 
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
