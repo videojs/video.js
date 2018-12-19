@@ -40,7 +40,7 @@ class LoadingSpinner extends Component {
    */
   show() {
     super.show();
-    this.el().classList.add('show');
+    this.addClass('vjs-loading-spinner-show');
   }
 
   /**
@@ -48,7 +48,7 @@ class LoadingSpinner extends Component {
    */
   hide() {
     super.hide();
-    this.el().classList.remove('show');
+    this.removeClass('vjs-loading-spinner-show');
   }
 }
 

@@ -20,7 +20,7 @@
   visibility: hidden;
 }
 
-.vjs-loading-spinner.show {
+.vjs-loading-spinner.vjs-loading-spinner-show {
   display: block;
   // add a delay before actual show the spinner
   animation: 0s linear 0.3s forwards vjs-spinner-show;
@@ -43,17 +43,17 @@
 }
 
 // only animate when showing because it can be processor heavy
-.vjs-loading-spinner.show:before,
-.vjs-loading-spinner.show:after {
+.vjs-loading-spinner.vjs-loading-spinner-show:before,
+.vjs-loading-spinner.vjs-loading-spinner-show:after {
   -webkit-animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
   animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
 }
 
-.vjs-loading-spinner.show:before {
+.vjs-loading-spinner.vjs-loading-spinner-show:before {
   border-top-color: rgb(255,255,255);
 }
 
-.vjs-loading-spinner.show:after {
+.vjs-loading-spinner.vjs-loading-spinner-show:after {
   border-top-color: rgb(255,255,255);
   -webkit-animation-delay: 0.44s;
   animation-delay: 0.44s;
