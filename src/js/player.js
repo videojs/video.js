@@ -523,7 +523,7 @@ class Player extends Component {
     if (FullscreenApi.fullscreenchange) {
       this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
 
-      if (IE_VERSION) {
+      if (IE_VERSION || browser.IS_FIREFOX && prefixedFS) {
         this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
       }
     }
@@ -558,7 +558,7 @@ class Player extends Component {
     this.off('dispose');
 
     // make sure to remove fs handler on IE from the document
-    if (IE_VERSION) {
+    if (IE_VERSION || browser.IS_FIREFOX && prefixedFS) {
       this.off(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
     }
 
