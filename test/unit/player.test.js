@@ -13,6 +13,7 @@ import document from 'global/document';
 import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
+import * as Events from '../../src/js/utils/events.js';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -2025,4 +2026,27 @@ QUnit.test('setting all children to false, does not cause an assertion', functio
 
   player.dispose();
   assert.ok(true, 'did not cause an assertion');
+});
+
+QUnit.test('controlBar behaviour with mouseenter and mouseleave events', function(assert) {
+
+  const player = TestHelpers.makePlayer();
+
+  player.listenForUserActivity_();
+
+  assert.equal(player.options_.inactivityTimeout, 2000, 'inactivityTimeout default value is 2000');
+
+  const el = player.getChild('controlBar').el();
+
+  // move mouse to controlBar
+  Events.trigger(el, 'mouseenter');
+
+  assert.equal(player.options_.inactivityTimeout, 0, 'mouseenter on control-bar, inactivityTimeout is set to 0');
+
+  // move mouse out of controlBar bounds
+  Events.trigger(el, 'mouseleave');
+
+  assert.equal(player.options_.inactivityTimeout, player.cache_.inactivityTimeout, 'mouse leaves control-bar, inactivityTimeout is set to default value (2000)');
+
+  player.dispose();
 });
