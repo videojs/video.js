@@ -53,6 +53,8 @@
   "Replay": "Spela upp igen",
   "Reset": "Återställ",
   "Script": "Manus",
+  "Seek to live, currently behind live": "Återgå till live, uppspelningen är inte live",
+  "Seek to live, currently playing live": "Återgå till live, uppspelningen är live",
   "Semi-Transparent": "Semi-transparent",
   "Small Caps": "Small-Caps",
   "Stream Type": "Strömningstyp",
