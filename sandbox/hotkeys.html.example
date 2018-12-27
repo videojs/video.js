@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Hotkeys - Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <style>
+    .hotkeys-function { background: #FF6961; }
+    .hotkeys-override { background: #77DD77; }
+    .hotkeys-normal { background: #AEC6CF; }
+
+    .video-js {
+      height: 150px;
+      width: 300px;
+    }
+
+    .wrapper {
+      display: grid;
+      margin: 0 auto;
+      grid-gap: 10px;
+      grid-template-columns: 300px 300px 300px;
+    }
+    .panel > p:first-child {
+      border-bottom: black 1px solid;
+    }
+  </style>
+</head>
+<body>
+  <h1>Video.js Hotkeys</h1>
+  <p>All the various ways to configure hotkeys.</p>
+  <div class="wrapper">
+    <div class="panel hotkeys-normal">
+      <p>Default (no) hotkeys</p>
+      <video-js
+        id="vid0"
+        controls
+        preload="auto"
+        poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+        <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+        <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+        <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+      </video-js>
+    </div>
+    <div class="panel hotkeys-normal">
+      <p>Disable hotkeys</p>
+      <video-js
+        id="vid1"
+        controls
+        preload="auto"
+        poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+        <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+        <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+        <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+      </video-js>
+    </div>
+    <div class="panel hotkeys-normal">
+      <p>Enable default hotkeys (k = play/pause, m = mute/unmute, f = fullscreen)</p>
+      <video-js
+        id="vid12"
+        controls
+        preload="auto"
+        poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+        <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+        <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+        <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+      </video-js>
+    </div>
+    <div class="panel hotkeys-function">
+      <p>Custom hotkey function (x = pause, y = play)</p>
+      <video-js
+        id="vid2"
+        controls
+        preload="auto"
+        poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+        <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+        <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+        <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+      </video-js>
+    </div>
+    <div class="panel hotkeys-override">
+      <p>Customize specific hotkeys (z = play/pause, v = fullscreen)</p>
+      <video-js
+        id="vid3"
+        controls
+        preload="auto"
+        poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+        <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+        <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+        <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+      </video-js>
+    </div>
+  </div>
+
+  <script>
+    var player0 = videojs('vid0', {});
+
+    // Note that we support both explicitly disbling and explicitly enabling Hotkeys
+    //  because one day the default may change from disabled to enabled.
+    var player1 = videojs('vid1', {
+      userActions: {
+        hotkeys: false
+      }
+    });
+
+    var player12 = videojs('vid12', {
+      userActions: {
+        hotkeys: true
+      }
+    });
+
+    var player2 = videojs('vid2', {
+      userActions: {
+        hotkeys: function(event) {
+          // `this` is the player in this context
+
+          // `x` key = pause
+          if (event.which === 88) {
+            this.pause();
+          }
+          // `y` key = play
+          if (event.which === 89) {
+            this.play();
+          }
+        }
+      }
+    });
+
+    var player3 = videojs('vid3', {
+      userActions: {
+        hotkeys: {
+          playPauseKey: function(event) {
+            // override play/pause to trigger when pressing the z key
+            return (event.which === 90);
+          },
+          muteKey: function(event) {
+            // disable mute key
+          },
+          fullscreenKey: function(event) {
+            // override fullscreen to trigger when pressing the v key
+            return (event.which === 86);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -37,6 +37,9 @@
   * [techOrder](#techorder)
   * [userActions](#useractions)
   * [userActions.hotkeys](#useractions.hotkeys)
+  * [userActions.hotkeys.fullscreenKey](#useractions.hotkeys.fullscreenkey)
+  * [userActions.hotkeys.muteKey](#useractions.hotkeys.mutekey)
+  * [userActions.hotkeys.playPauseKey](#useractions.hotkeys.playpausekey)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
   * [children](#children-1)
@@ -367,7 +370,7 @@ This can be useful when multiple techs are used and each has to set their own po
 
 > Type: `Array`, Default: `['html5']`
 
-Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other regisetered techs will be added after this tech in the order in which they are registered.
+Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other registered techs will be added after this tech in the order in which they are registered.
 
 ### `userActions`
 
@@ -375,25 +378,25 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 
 ### `userActions.hotkeys`
 
-> Type: `boolean|function`
+> Type: `boolean|function|object`
 
-Controls how player-wide hotkeys operate. If set to `false`, or `undefined`, hotkeys are disabled. If set to
-`true`, hotkeys are enabled as described below. To override the default hotkey handling, set `userActions.hotkeys`
-to a function which accepts a `keydown` event:
+Controls how player-wide hotkeys operate. If set to `false`, or `undefined`, hotkeys are disabled. If set to `true` or an object (to allow definitions of `fullscreenKey` etc. below), hotkeys are enabled as described below. To override the default hotkey handling, set `userActions.hotkeys` to a function which accepts a `keydown` event:
 
 ```js
-function myHandleHotkeys(event) = {
-  // `this` is the player in this context
-
-  // `p` key = pause
-  if (event.which === 80) {
-    this.pause();
-  }
-};
-
-videojs('my-player', {
+var player = videojs('my-player', {
   userActions: {
-    hotkeys: myHandleHotkeys
+    hotkeys: function(event) {
+      // `this` is the player in this context
+
+      // `x` key = pause
+      if (event.which === 88) {
+        this.pause();
+      }
+      // `y` key = play
+      if (event.which === 89) {
+        this.play();
+      }
+    }
   }
 });
 ```
@@ -409,6 +412,40 @@ Default hotkey handling is:
 
 Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which
 control in the player has focus.
+
+### `userActions.hotkeys.fullscreenKey`
+
+> Type: `function`
+
+Override the fullscreen key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the fullscreen toggle action is performed.
+
+```js
+var player = videojs('my-player', {
+  userActions: {
+    hotkeys: {
+      muteKey: function(event) {
+        // disable mute key
+      },
+      fullscreenKey: function(event) {
+        // override fullscreen to trigger when pressing the v key
+        return (event.which === 86);
+      }
+    }
+  }
+});
+```
+
+### `userActions.hotkeys.muteKey`
+
+> Type: `function`
+
+Override the mute key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the mute toggle action is performed.
+
+### `userActions.hotkeys.playPauseKey`
+
+> Type: `function`
+
+Override the play/pause key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the play/pause toggle action is performed.
 
 ### `vtt.js`
 

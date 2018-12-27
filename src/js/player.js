@@ -2776,12 +2776,31 @@ class Player extends Component {
    *        The `keydown` event that caused this function to be called.
    */
   handleHotkeys(event) {
+    const hotkeys = this.options_.userActions ? this.options_.userActions.hotkeys : null;
+    let fullscreenKey;
+    let muteKey;
+    let playPauseKey;
+
+    if (hotkeys) {
+      fullscreenKey = hotkeys.fullscreenKey;
+      muteKey = hotkeys.muteKey;
+      playPauseKey = hotkeys.playPauseKey;
+    }
+
+    if (typeof fullscreenKey !== 'function') {
+      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f');
+    }
+    if (typeof muteKey !== 'function') {
+      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm');
+    }
+    if (typeof playPauseKey !== 'function') {
+      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'));
+    }
 
     // Trigger the ControlBar equivalent for each key, if possible
     const cb = this.controlBar;
 
-    if (keycode.isEventKey(event, 'f')) {
-      // "f" = toggle fullscreen
+    if (fullscreenKey.call(this, event)) {
 
       event.preventDefault();
 
@@ -2794,8 +2813,8 @@ class Player extends Component {
       if (fullscreenToggle && fullscreenToggle.handleClick) {
         fullscreenToggle.handleClick();
       }
-    } else if (keycode.isEventKey(event, 'm')) {
-      // "m" = toggle mute
+
+    } else if (muteKey.call(this, event)) {
 
       event.preventDefault();
 
@@ -2809,8 +2828,8 @@ class Player extends Component {
       } else {
         this.muted(this.muted() ? false : true);
       }
-    } else if ((keycode.isEventKey(event, 'k')) || (keycode.isEventKey(event, 'Space'))) {
-      // "k" or "Space" = toggle play/pause
+
+    } else if (playPauseKey.call(this, event)) {
 
       event.preventDefault();
 
