@@ -401,17 +401,13 @@ class Player extends Component {
       this.languages_ = Player.prototype.options_.languages;
     }
 
-    // Cache for video property values.
-    this.cache_ = {};
+    this.resetCache_();
 
     // Set poster
     this.poster_ = options.poster || '';
 
     // Set controls
     this.controls_ = !!options.controls;
-
-    // Set default values for lastVolume
-    this.cache_.lastVolume = 1;
 
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
@@ -437,9 +433,6 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
-
-    // Set default value for lastPlaybackRate
-    this.cache_.lastPlaybackRate = this.defaultPlaybackRate();
 
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
@@ -2012,6 +2005,33 @@ class Player extends Component {
   }
 
   /**
+   * Resets the internal cache object.
+   *
+   * Using this function outside the player constructor or reset method may
+   * have unintended side-effects.
+   *
+   * @private
+   */
+  resetCache_() {
+    this.cache_ = {
+
+      // Right now, the currentTime is not _really_ cached because it is always
+      // retrieved from the tech (see: currentTime). However, for completeness,
+      // we set it to zero here to ensure that if we do start actually caching
+      // it, we reset it along with everything else.
+      currentTime: 0,
+      duration: NaN,
+      lastVolume: 1,
+      lastPlaybackRate: this.defaultPlaybackRate(),
+      media: null,
+      src: '',
+      source: {},
+      sources: [],
+      volume: 1
+    };
+  }
+
+  /**
    * Pass values to the playback tech
    *
    * @param {string} [method]
@@ -2933,9 +2953,7 @@ class Player extends Component {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
-    if (this.cache_) {
-      this.cache_.media = null;
-    }
+    this.resetCache_();
     this.poster('');
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
