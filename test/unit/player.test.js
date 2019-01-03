@@ -1426,7 +1426,8 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
     },
     techCall_(method) {
       techCallMethod = method;
-    }
+    },
+    poster() {}
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1451,7 +1452,8 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
     },
     techCall_(method) {
       techCallMethod = method;
-    }
+    },
+    poster() {}
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1459,6 +1461,34 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
   assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
   assert.equal(loadedSource, null, 'with a null source');
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
+});
+
+QUnit.test('player#reset removes the poster', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
+  player.poster('foo.jpg');
+  assert.strictEqual(player.poster(), 'foo.jpg', 'the poster was set');
+  player.reset();
+  assert.strictEqual(player.poster(), '', 'the poster was reset');
+});
+
+QUnit.test('player#reset removes remote text tracks', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
+  player.addRemoteTextTrack({
+    kind: 'captions',
+    src: 'foo.vtt',
+    language: 'en',
+    label: 'English'
+  });
+
+  assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
+  player.reset();
+  assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
 });
 
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
