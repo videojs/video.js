@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@videojs/http-streaming": "1.5.1",
+    "@videojs/http-streaming": "1.6.0",
     "global": "4.3.2",
     "safe-json-parse": "4.0.0",
     "tsml": "1.0.1",
@@ -88,8 +88,8 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
-    "@babel/core": "^7.2.0",
-    "@babel/node": "^7.2.0",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.2.0",
     "@babel/register": "^7.0.0",
@@ -133,7 +133,7 @@
     "remark-toc": "^5.1.1",
     "remark-validate-links": "^7.1.2",
     "replace": "^1.0.0",
-    "rollup": "^0.67.4",
+    "rollup": "^0.68.0",
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-commonjs": "^9.2.0",

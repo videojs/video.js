@@ -13,6 +13,7 @@ import document from 'global/document';
 import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
+import * as Events from '../../src/js/utils/events.js';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -632,7 +633,23 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
 
   const player = TestHelpers.makePlayer({});
 
-  assert.ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
+  assert.notEqual(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname added');
+
+  browser.TOUCH_ENABLED = origTouch;
+  player.dispose();
+});
+
+QUnit.test('should not add a touch-enabled classname when touch is not supported', function(assert) {
+  assert.expect(1);
+
+  // Fake not having touch support in case that the browser running the test supports it
+  const origTouch = browser.TOUCH_ENABLED;
+
+  browser.TOUCH_ENABLED = false;
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.equal(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname not added');
 
   browser.TOUCH_ENABLED = origTouch;
   player.dispose();
@@ -1426,7 +1443,8 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
     },
     techCall_(method) {
       techCallMethod = method;
-    }
+    },
+    poster() {}
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1452,7 +1470,8 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
     },
     techCall_(method) {
       techCallMethod = method;
-    }
+    },
+    poster() {}
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1502,6 +1521,34 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   assert.strictEqual(player.playbackRate(), 1, 'playbackRate is correct');
   assert.strictEqual(player.volume(), 1, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 1, 'lastVolume_ is correct');
+});
+
+QUnit.test('player#reset removes the poster', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
+  player.poster('foo.jpg');
+  assert.strictEqual(player.poster(), 'foo.jpg', 'the poster was set');
+  player.reset();
+  assert.strictEqual(player.poster(), '', 'the poster was reset');
+});
+
+QUnit.test('player#reset removes remote text tracks', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1);
+
+  player.addRemoteTextTrack({
+    kind: 'captions',
+    src: 'foo.vtt',
+    language: 'en',
+    label: 'English'
+  });
+
+  assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
+  player.reset();
+  assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
 });
 
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
@@ -2069,4 +2116,27 @@ QUnit.test('setting all children to false, does not cause an assertion', functio
 
   player.dispose();
   assert.ok(true, 'did not cause an assertion');
+});
+
+QUnit.test('controlBar behaviour with mouseenter and mouseleave events', function(assert) {
+
+  const player = TestHelpers.makePlayer();
+
+  player.listenForUserActivity_();
+
+  assert.equal(player.options_.inactivityTimeout, 2000, 'inactivityTimeout default value is 2000');
+
+  const el = player.getChild('controlBar').el();
+
+  // move mouse to controlBar
+  Events.trigger(el, 'mouseenter');
+
+  assert.equal(player.options_.inactivityTimeout, 0, 'mouseenter on control-bar, inactivityTimeout is set to 0');
+
+  // move mouse out of controlBar bounds
+  Events.trigger(el, 'mouseleave');
+
+  assert.equal(player.options_.inactivityTimeout, player.cache_.inactivityTimeout, 'mouse leaves control-bar, inactivityTimeout is set to default value (2000)');
+
+  player.dispose();
 });

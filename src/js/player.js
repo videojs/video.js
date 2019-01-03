@@ -32,7 +32,7 @@ import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
-import {findMimetype} from './utils/mimetypes';
+import {getMimetype, findMimetype} from './utils/mimetypes';
 import {IE_VERSION} from './utils/browser';
 
 // The following imports are used only to ensure that the corresponding modules
@@ -494,9 +494,11 @@ class Player extends Component {
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
-    // if (browser.TOUCH_ENABLED) {
-    //   this.addClass('vjs-touch-enabled');
-    // }
+    // TODO: Make this check be performed again when the window switches between monitors
+    // (See https://github.com/videojs/video.js/issues/5683)
+    if (browser.TOUCH_ENABLED) {
+      this.addClass('vjs-touch-enabled');
+    }
 
     // iOS Safari has broken hover handling
     if (!browser.IS_IOS) {
@@ -2021,6 +2023,7 @@ class Player extends Component {
       duration: NaN,
       lastVolume: 1,
       lastPlaybackRate: this.defaultPlaybackRate(),
+      media: null,
       src: '',
       source: {},
       sources: [],
@@ -2951,6 +2954,7 @@ class Player extends Component {
       this.tech_.clearTracks('text');
     }
     this.resetCache_();
+    this.poster('');
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     if (isEvented(this)) {
@@ -3464,6 +3468,23 @@ class Player extends Component {
     this.on('mousemove', handleMouseMove);
     this.on('mouseup', handleMouseUp);
 
+    const controlBar = this.getChild('controlBar');
+
+    if (controlBar) {
+
+      controlBar.on('mouseenter', function(event) {
+
+        this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
+        this.player().options_.inactivityTimeout = 0;
+
+      });
+
+      controlBar.on('mouseleave', function(event) {
+        this.player().options_.inactivityTimeout = this.player().cache_.inactivityTimeout;
+      });
+
+    }
+
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
     this.on('keydown', handleActivity);
@@ -3953,6 +3974,130 @@ class Player extends Component {
    */
   currentBreakpointClass() {
     return BREAKPOINT_CLASSES[this.breakpoint_] || '';
+  }
+
+  /**
+   * An object that describes a single piece of media.
+   *
+   * Properties that are not part of this type description will be retained; so,
+   * this can be viewed as a generic metadata storage mechanism as well.
+   *
+   * @see      {@link https://wicg.github.io/mediasession/#the-mediametadata-interface}
+   * @typedef  {Object} Player~MediaObject
+   *
+   * @property {string} [album]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API.
+   *
+   * @property {string} [artist]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API.
+   *
+   * @property {Object[]} [artwork]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API. If not specified, will be populated via the `poster`, if
+   *           available.
+   *
+   * @property {string} [poster]
+   *           URL to an image that will display before playback.
+   *
+   * @property {Tech~SourceObject|Tech~SourceObject[]|string} [src]
+   *           A single source object, an array of source objects, or a string
+   *           referencing a URL to a media source. It is _highly recommended_
+   *           that an object or array of objects is used here, so that source
+   *           selection algorithms can take the `type` into account.
+   *
+   * @property {string} [title]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API.
+   *
+   * @property {Object[]} [textTracks]
+   *           An array of objects to be used to create text tracks, following
+   *           the {@link https://www.w3.org/TR/html50/embedded-content-0.html#the-track-element|native track element format}.
+   *           For ease of removal, these will be created as "remote" text
+   *           tracks and set to automatically clean up on source changes.
+   *
+   *           These objects may have properties like `src`, `kind`, `label`,
+   *           and `language`, see {@link Tech#createRemoteTextTrack}.
+   */
+
+  /**
+   * Populate the player using a {@link Player~MediaObject|MediaObject}.
+   *
+   * @param  {Player~MediaObject} media
+   *         A media object.
+   *
+   * @param  {Function} ready
+   *         A callback to be called when the player is ready.
+   */
+  loadMedia(media, ready) {
+    if (!media || typeof media !== 'object') {
+      return;
+    }
+
+    this.reset();
+
+    // Clone the media object so it cannot be mutated from outside.
+    this.cache_.media = mergeOptions(media);
+
+    const {artwork, poster, src, textTracks} = this.cache_.media;
+
+    // If `artwork` is not given, create it using `poster`.
+    if (!artwork && poster) {
+      this.cache_.media.artwork = [{
+        src: poster,
+        type: getMimetype(poster)
+      }];
+    }
+
+    if (src) {
+      this.src(src);
+    }
+
+    if (poster) {
+      this.poster(poster);
+    }
+
+    if (Array.isArray(textTracks)) {
+      textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
+    }
+
+    this.ready(ready);
+  }
+
+  /**
+   * Get a clone of the current {@link Player~MediaObject} for this player.
+   *
+   * If the `loadMedia` method has not been used, will attempt to return a
+   * {@link Player~MediaObject} based on the current state of the player.
+   *
+   * @return {Player~MediaObject}
+   */
+  getMedia() {
+    if (!this.cache_.media) {
+      const poster = this.poster();
+      const src = this.currentSources();
+      const textTracks = Array.prototype.map.call(this.remoteTextTracks(), (tt) => ({
+        kind: tt.kind,
+        label: tt.label,
+        language: tt.language,
+        src: tt.src
+      }));
+
+      const media = {src, textTracks};
+
+      if (poster) {
+        media.poster = poster;
+        media.artwork = [{
+          src: media.poster,
+          type: getMimetype(media.poster)
+        }];
+      }
+
+      return media;
+    }
+
+    return mergeOptions(this.cache_.media);
   }
 
   /**
