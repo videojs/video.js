@@ -97,19 +97,6 @@ To contibute code you'll need to be able to build a copy of Video.js and run tes
 * Node.js
   Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
 
-* `grunt-cli`
-  Optionally, install `grunt-cli` globally to use grunt directly. It can always be run via an npm script:
-
-```sh
-npm run grunt
-```
-
-```sh
-npm install -g grunt-cli
-```
-
-Depending on how you have node and npm set up, you may need to run the global install (`-g`) as a superuser by prepending `sudo`.
-
 ### Building video.js locally
 
 #### Forking and cloning the repository
@@ -199,17 +186,11 @@ This ties in nicely with the sandbox directory. You can always open the `sandbox
 > Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you must use a local web server.
 
-To run the local webserver, you can run it in a couple of ways.
-
-```sh
-grunt connect
-open http://localhost:9999/sandbox/index.html
-```
-
-or
+To run the local webserver:
 
 ```sh
 npm start
+open http://localhost:9999/sandbox/index.html
 ```
 
 The latter does some extra work which will be described in the next section.

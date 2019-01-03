@@ -35,7 +35,7 @@ class LoadProgressBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-load-progress',
-      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Loaded')}</span>: 0%</span>`
+      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Loaded')}</span>: <span class="vjs-control-text-loaded-percentage">0%</span></span>`
     });
   }
 
@@ -54,21 +54,32 @@ class LoadProgressBar extends Component {
    * @listens Player#progress
    */
   update(event) {
+    const liveTracker = this.player_.liveTracker;
     const buffered = this.player_.buffered();
-    const duration = this.player_.duration();
+    const duration = (liveTracker && liveTracker.isLive()) ? liveTracker.seekableEnd() : this.player_.duration();
     const bufferedEnd = this.player_.bufferedEnd();
     const children = this.partEls_;
+    const controlTextPercentage = this.$('.vjs-control-text-loaded-percentage');
 
     // get the percent width of a time compared to the total end
-    const percentify = function(time, end) {
+    const percentify = function(time, end, rounded) {
       // no NaN
-      const percent = (time / end) || 0;
+      let percent = (time / end) || 0;
 
-      return ((percent >= 1 ? 1 : percent) * 100) + '%';
+      percent = (percent >= 1 ? 1 : percent) * 100;
+
+      if (rounded) {
+        percent = percent.toFixed(2);
+      }
+
+      return percent + '%';
     };
 
     // update the width of the progress bar
     this.el_.style.width = percentify(bufferedEnd, duration);
+
+    // update the control-text
+    Dom.textContent(controlTextPercentage, percentify(bufferedEnd, duration, true));
 
     // add child elements to represent the individual buffered time ranges
     for (let i = 0; i < buffered.length; i++) {
