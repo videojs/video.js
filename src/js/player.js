@@ -1863,7 +1863,12 @@ class Player extends Component {
        * Set to `false` to disable double-click handling
        * Set to a function to substitute an external double-click handler
        */
-      if ((this.options_ === undefined) || (this.options_.userActions === undefined) || (this.options_.userActions.doubleClick === undefined) || (this.options_.userActions.doubleClick !== false)) {
+      if (
+        this.options_ === undefined ||
+        this.options_.userActions === undefined || 
+        this.options_.userActions.doubleClick === undefined || 
+        this.options_.userActions.doubleClick !== false
+      ) {
 
         if ((this.options_ !== undefined) && (this.options_.userActions !== undefined) && (typeof this.options_.userActions.doubleClick === 'function')) {
 
