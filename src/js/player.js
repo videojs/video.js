@@ -1865,14 +1865,14 @@ class Player extends Component {
        */
       if (
         this.options_ === undefined ||
-        this.options_.userActions === undefined || 
-        this.options_.userActions.doubleClick === undefined || 
+        this.options_.userActions === undefined ||
+        this.options_.userActions.doubleClick === undefined ||
         this.options_.userActions.doubleClick !== false
       ) {
 
         if (
-          this.options_ !== undefined && 
-          this.options_.userActions !== undefined && 
+          this.options_ !== undefined &&
+          this.options_.userActions !== undefined &&
           typeof this.options_.userActions.doubleClick === 'function'
         ) {
 
