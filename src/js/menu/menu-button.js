@@ -106,6 +106,7 @@ class MenuButton extends Component {
      */
     this.hideThreshold_ = 0;
 
+    // A test commit
     // Add a title list item to the top
     if (this.options_.title) {
       const title = Dom.createEl('li', {
