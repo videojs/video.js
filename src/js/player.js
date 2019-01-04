@@ -1870,7 +1870,11 @@ class Player extends Component {
         this.options_.userActions.doubleClick !== false
       ) {
 
-        if ((this.options_ !== undefined) && (this.options_.userActions !== undefined) && (typeof this.options_.userActions.doubleClick === 'function')) {
+        if (
+          this.options_ !== undefined && 
+          this.options_.userActions !== undefined && 
+          typeof this.options_.userActions.doubleClick === 'function'
+        ) {
 
           this.options_.userActions.doubleClick.call(this, event);
 
