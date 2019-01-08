@@ -52,6 +52,9 @@ module.exports = function(config) {
     config.browserify.transform.push('browserify-istanbul');
   }
 
+  config.browserNoActivityTimeout = 30000;
+  config.captureTimeout = 30000;
+  config.browserDisconnectTimeout = 30000;
 
   config.preprocessors = {
     'test/globals-shim.js': ['browserify'],
