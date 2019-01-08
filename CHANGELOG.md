@@ -1,3 +1,27 @@
+<a name="7.4.2"></a>
+## [7.4.2](https://github.com/videojs/video.js/compare/v7.4.1...v7.4.2) (2019-01-08)
+
+### Bug Fixes
+
+* Control-bar autohide when cursor placed over it [#5258](https://github.com/videojs/video.js/issues/5258) ([#5692](https://github.com/videojs/video.js/issues/5692)) ([6ebc772](https://github.com/videojs/video.js/commit/6ebc772))
+* css animation shorthand property order ([#5687](https://github.com/videojs/video.js/issues/5687)) ([0e69ce9](https://github.com/videojs/video.js/commit/0e69ce9))
+* **fs:** make sure there's only one fullscreenchange event ([#5686](https://github.com/videojs/video.js/issues/5686)) ([2bc90a1](https://github.com/videojs/video.js/commit/2bc90a1)), closes [#5685](https://github.com/videojs/video.js/issues/5685)
+* **lang:** adds sv translation used by liveui component ([#5704](https://github.com/videojs/video.js/issues/5704)) ([f38726e](https://github.com/videojs/video.js/commit/f38726e))
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.6.0 🚀 ([#5705](https://github.com/videojs/video.js/issues/5705)) ([3d093ed](https://github.com/videojs/video.js/commit/3d093ed))
+* **player:** remove vjs-ended class on seeked ([#5728](https://github.com/videojs/video.js/issues/5728)) ([f1637cd](https://github.com/videojs/video.js/commit/f1637cd)), closes [#5654](https://github.com/videojs/video.js/issues/5654)
+* **remaining-time-display:** make the '-' be visual and not readable by screen readers ([#5671](https://github.com/videojs/video.js/issues/5671)) ([05513f8](https://github.com/videojs/video.js/commit/05513f8)), closes [#5168](https://github.com/videojs/video.js/issues/5168)
+* **seekbar:** don't disable if live tracker's seekable is infinity ([#5721](https://github.com/videojs/video.js/issues/5721)) ([7f507df](https://github.com/videojs/video.js/commit/7f507df))
+* remove child from old parent when moving to new parent via addChild ([#5702](https://github.com/videojs/video.js/issues/5702)) ([8a3e2a7](https://github.com/videojs/video.js/commit/8a3e2a7))
+
+### Chores
+
+* **package:** update babel to version 7.2.2 ([#5697](https://github.com/videojs/video.js/issues/5697)) ([30d0b98](https://github.com/videojs/video.js/commit/30d0b98)), closes [#5689](https://github.com/videojs/video.js/issues/5689)
+* **package:** update rollup to version 0.68.0 🚀 ([#5690](https://github.com/videojs/video.js/issues/5690)) ([f0ba1f5](https://github.com/videojs/video.js/commit/f0ba1f5))
+
+### Documentation
+
+* **liveui:** Add a guide for the live ui and live api ([#5677](https://github.com/videojs/video.js/issues/5677)) ([c147581](https://github.com/videojs/video.js/commit/c147581))
+
 <a name="7.4.1"></a>
 ## [7.4.1](https://github.com/videojs/video.js/compare/v7.4.0...v7.4.1) (2018-12-11)
 
