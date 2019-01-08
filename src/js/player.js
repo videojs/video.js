@@ -1728,6 +1728,7 @@ class Player extends Component {
    */
   handleTechSeeked_() {
     this.removeClass('vjs-seeking');
+    this.removeClass('vjs-ended');
     /**
      * Fired when the player has finished jumping to a new time
      *
