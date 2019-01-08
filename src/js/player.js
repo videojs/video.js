@@ -2996,9 +2996,45 @@ class Player extends Component {
     this.poster('');
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
+    this.resetControlBarUI_();
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
+  }
+
+  /**
+   * Reset Control Bar's UI by calling sub-methods that reset
+   * all of Control Bar's components
+   */
+  resetControlBarUI_() {
+    this.resetProgressBar_();
+    this.resetPlaybackRate_();
+    this.resetVolumeBar_();
+  }
+
+  /**
+   * Reset tech's progress so progress bar is reset in the UI
+   */
+  resetProgressBar_() {
+    this.currentTime(0);
+    this.controlBar.durationDisplay.updateContent();
+    this.controlBar.remainingTimeDisplay.updateContent();
+  }
+
+  /**
+   * Reset Playback ratio
+   */
+  resetPlaybackRate_() {
+    this.playbackRate(this.defaultPlaybackRate());
+    this.handleTechRateChange_();
+  }
+
+  /**
+   * Reset Volume bar
+   */
+  resetVolumeBar_() {
+    this.volume(1.0);
+    this.trigger('volumechange');
   }
 
   /**
