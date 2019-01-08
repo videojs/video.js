@@ -39,7 +39,6 @@ class SeekBar extends Slider {
   constructor(player, options) {
     super(player, options);
     this.setEventHandlers_();
-    this.disabledForLive_ = false;
   }
 
   /**
@@ -114,16 +113,6 @@ class SeekBar extends Slider {
 
     if (liveTracker && liveTracker.isLive()) {
       duration = this.player_.liveTracker.liveCurrentTime();
-    }
-
-    if (liveTracker && liveTracker.seekableEnd() === Infinity) {
-      if (this.player_.readyState() === 0) {
-        this.disabledForLive_ = true;
-        this.disable();
-      }
-    } else if (this.disabledForLive_) {
-      this.disabledForLive_ = false;
-      this.enable();
     }
 
     // machine readable value of progress bar (percentage complete)
