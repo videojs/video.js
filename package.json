@@ -131,7 +131,7 @@
     "remark-parse": "^6.0.3",
     "remark-stringify": "^6.0.4",
     "remark-toc": "^5.1.1",
-    "remark-validate-links": "^7.1.2",
+    "remark-validate-links": "^8.0.0",
     "replace": "^1.0.0",
     "rollup": "^1.0.1",
     "rollup-plugin-alias": "^1.4.0",
