@@ -102,7 +102,8 @@ class TextTrackMenuItem extends MenuItem {
       return;
     }
 
-    // Determine the relevant kind(s) of tracks for this component.
+    // Determine the relevant kind(s) of tracks for this component and filter
+    // out empty kinds.
     const kinds = (referenceTrack.kinds || [referenceTrack.kind]).filter(Boolean);
 
     for (let i = 0; i < tracks.length; i++) {

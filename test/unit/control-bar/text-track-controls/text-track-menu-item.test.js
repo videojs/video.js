@@ -1,16 +1,13 @@
 /* eslint-env qunit */
 import TextTrackMenuItem from '../../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
 import TestHelpers from '../../test-helpers.js';
-import sinon from 'sinon';
 
 QUnit.module('TextTrackMenuItem', {
   beforeEach(assert) {
-    this.clock = sinon.useFakeTimers();
     this.player = TestHelpers.makePlayer();
   },
   afterEach(assert) {
     this.player.dispose();
-    this.clock.restore();
   }
 });
 
