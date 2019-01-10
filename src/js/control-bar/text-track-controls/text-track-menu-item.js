@@ -93,13 +93,8 @@ class TextTrackMenuItem extends MenuItem {
    * @listens click
    */
   handleClick(event) {
-    const kind = this.track.kind;
-    let kinds = this.track.kinds;
+    const referenceTrack = this.track;
     const tracks = this.player_.textTracks();
-
-    if (!kinds) {
-      kinds = [kind];
-    }
 
     super.handleClick(event);
 
@@ -107,13 +102,28 @@ class TextTrackMenuItem extends MenuItem {
       return;
     }
 
+    // Determine the relevant kind(s) of tracks for this component and filter
+    // out empty kinds.
+    const kinds = (referenceTrack.kinds || [referenceTrack.kind]).filter(Boolean);
+
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
 
-      if (track === this.track && (kinds.indexOf(track.kind) > -1)) {
+      // If the track from the text tracks list is not of the right kind,
+      // skip it. We do not want to affect tracks of incompatible kind(s).
+      if (kinds.indexOf(track.kind) === -1) {
+        continue;
+      }
+
+      // If this text track is the component's track and it is not showing,
+      // set it to showing.
+      if (track === referenceTrack) {
         if (track.mode !== 'showing') {
           track.mode = 'showing';
         }
+
+      // If this text track is not the component's track and it is not
+      // disabled, set it to disabled.
       } else if (track.mode !== 'disabled') {
         track.mode = 'disabled';
       }
