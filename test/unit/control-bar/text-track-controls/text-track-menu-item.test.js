@@ -25,6 +25,8 @@ QUnit.test('clicking should enable the selected track', function(assert) {
   fooItem.trigger('click');
 
   assert.strictEqual(foo.mode, 'showing', 'clicking set track "foo" to "showing"');
+
+  fooItem.dispose();
 });
 
 QUnit.test('clicking should disable non-selected tracks of the same kind', function(assert) {
@@ -59,4 +61,7 @@ QUnit.test('clicking should disable non-selected tracks of the same kind', funct
   assert.strictEqual(foo.mode, 'showing', 'captions track "foo" is now "showing"');
   assert.strictEqual(bar.mode, 'disabled', 'captions track "bar" is now "disabled"');
   assert.strictEqual(bop.mode, 'hidden', 'metadata track "bop" is still "hidden"');
+
+  fooItem.dispose();
+  barItem.dispose();
 });
