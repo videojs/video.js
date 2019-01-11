@@ -35,19 +35,25 @@ class Menu extends Component {
     this.focusedChild_ = -1;
 
     this.on('keydown', this.handleKeyPress);
+
+    // All the menu item instances share the same blur handler provided by the menu container.
+    this.handleBlurBindItself_ = Fn.bind(this, this.handleBlur);
+    this.itemOnMethodArgumentStore_ = new Map();
   }
 
   /**
-   * Add a {@link MenuItem} to the menu.
+   * Add event listeners to the {@link MenuItem}.
    *
-   * @param {Object|string} component
-   *        The name or instance of the `MenuItem` to add.
+   * @param {Object} component
+   *        The instance of the `MenuItem` to add listeners to.
    *
    */
-  addItem(component) {
-    this.addChild(component);
-    component.on('blur', Fn.bind(this, this.handleBlur));
-    component.on(['tap', 'click'], Fn.bind(this, function(event) {
+  addEventListenerForItem(component) {
+    if (!(component instanceof Component)) {
+      return;
+    }
+
+    const handleTapClick = Fn.bind(this, function(event) {
       // Unpress the associated MenuButton, and move focus back to it
       if (this.menuButton_) {
         this.menuButton_.unpressButton();
@@ -58,7 +64,79 @@ class Menu extends Component {
           this.menuButton_.focus();
         }
       }
-    }));
+    });
+
+    if (!this.itemOnMethodArgumentStore_.has(component)) {
+      this.itemOnMethodArgumentStore_.set(component, []);
+    }
+
+    const itemOnMethodArgument = [['tap', 'click'], handleTapClick];
+
+    component.on('blur', this.handleBlurBindItself_);
+    component.on(...itemOnMethodArgument);
+
+    this.itemOnMethodArgumentStore_.get(component).push(itemOnMethodArgument);
+  }
+
+  /**
+   * Remove event listeners from the {@link MenuItem}.
+   *
+   * @param {Object} component
+   *        The instance of the `MenuItem` to remove listeners.
+   *
+   */
+  removeEventListenerForItem(component) {
+    if (!(component instanceof Component)) {
+      return;
+    }
+
+    const eventArgumentList = this.itemOnMethodArgumentStore_.get(component);
+
+    // If the arguments of on/off methods of the component are missing,
+    // the component never adds to this menu instance and should ignore it.
+    if (!eventArgumentList) {
+      return;
+    }
+
+    component.off('blur', this.handleBlurBindItself_);
+    eventArgumentList.forEach(eventArgument => {
+      component.off(...eventArgument);
+    });
+
+    this.itemOnMethodArgumentStore_.delete(component);
+  }
+
+  /**
+   * This method will be called indirectly when the component has been added
+   * before the component adds to the new menu instance by `addItem`.
+   * In this case, the original menu instance will remove the component
+   * by calling `removeChild`.
+   *
+   * @param {Object} component
+   *        The instance of the `MenuItem`
+   */
+  removeChild(component) {
+    if (typeof component === 'string') {
+      component = this.getChild(component);
+    }
+
+    this.removeEventListenerForItem(component);
+    super.removeChild(component);
+  }
+
+  /**
+   * Add a {@link MenuItem} to the menu.
+   *
+   * @param {Object|string} component
+   *        The name or instance of the `MenuItem` to add.
+   *
+   */
+  addItem(component) {
+    const childComponent = this.addChild(component);
+
+    if (childComponent) {
+      this.addEventListenerForItem(childComponent);
+    }
   }
 
   /**
@@ -95,6 +173,9 @@ class Menu extends Component {
 
   dispose() {
     this.contentEl_ = null;
+    this.handleBlurBindItself_ = null;
+    this.itemOnMethodArgumentStore_.clear();
+    this.itemOnMethodArgumentStore_ = null;
 
     super.dispose();
   }
