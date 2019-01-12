@@ -24,7 +24,7 @@
 .vjs-waiting .vjs-loading-spinner {
   display: block;
   // add a delay before actual show the spinner
-  animation: 0s linear 0.3s forwards vjs-spinner-show;
+  animation: vjs-spinner-show 0s linear 0.3s forwards;
 }
 
 .vjs-loading-spinner:before,

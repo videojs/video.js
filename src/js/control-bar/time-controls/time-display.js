@@ -35,7 +35,7 @@ class TimeDisplay extends Component {
    * @return {Element}
    *         The element that was created.
    */
-  createEl(plainName) {
+  createEl() {
     const className = this.buildCSSClass();
     const el = super.createEl('div', {
       className: `${className} vjs-time-control vjs-control`,

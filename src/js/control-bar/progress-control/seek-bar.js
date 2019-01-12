@@ -115,12 +115,6 @@ class SeekBar extends Slider {
       duration = this.player_.liveTracker.liveCurrentTime();
     }
 
-    if (liveTracker && liveTracker.seekableEnd() === Infinity) {
-      this.disable();
-    } else {
-      this.enable();
-    }
-
     // machine readable value of progress bar (percentage complete)
     this.el_.setAttribute('aria-valuenow', (percent * 100).toFixed(2));
 
