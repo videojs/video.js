@@ -1909,17 +1909,6 @@ class Player extends Component {
   }
 
   /**
-   * @private
-   */
-  toggleFullscreenClass_() {
-    if (this.isFullscreen()) {
-      this.addClass('vjs-fullscreen');
-    } else {
-      this.removeClass('vjs-fullscreen');
-    }
-  }
-
-  /**
    * native click events on the SWF aren't triggered on IE11, Win8.1RT
    * use stageclick events triggered from inside the SWF instead
    *
@@ -1928,6 +1917,17 @@ class Player extends Component {
    */
   handleStageClick_() {
     this.reportUserActivity();
+  }
+
+  /**
+   * @private
+   */
+  toggleFullscreenClass_() {
+    if (this.isFullscreen()) {
+      this.addClass('vjs-fullscreen');
+    } else {
+      this.removeClass('vjs-fullscreen');
+    }
   }
 
   /**
