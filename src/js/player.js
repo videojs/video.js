@@ -521,11 +521,7 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
 
     if (FullscreenApi.fullscreenchange) {
-      this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-
-      if (IE_VERSION || browser.IS_FIREFOX && prefixedFS) {
-        this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-      }
+      this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
     }
 
     this.on('stageclick', this.handleStageClick_);
@@ -2581,14 +2577,20 @@ class Player extends Component {
    * @param  {boolean} [isFS]
    *         Set the players current fullscreen state
    *
-   * @return {boolean}
+   * @return {boolean|undefined}
    *         - true if fullscreen is on and getting
    *         - false if fullscreen is off and getting
+   *         - undefined if setting
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
       this.isFullscreen_ = !!isFS;
       return;
+    }
+    // if the fullscreenElement api is available, use it to determine if we are in fullscreen or not.
+    // Otherwise, use the old legacy get/set manual update method
+    if (FullscreenApi.fullscreenElement) {
+      this.isFullscreen_ = document[FullscreenApi.fullscreenElement] === (this.options_.fullscreenElement || this.el_);
     }
     return !!this.isFullscreen_;
   }
@@ -2624,7 +2626,10 @@ class Player extends Component {
       // events
       Events.on(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
 
-      this.el_[fsApi.requestFullscreen]();
+      // Use the fullscreenElement that has been specified in video.js options
+      // for this player. If no element has been specified in the options, then
+      // fallback to the main videojs container as a default.
+      (this.options_.fullscreenElement || this.el_)[fsApi.requestFullscreen]();
 
     } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen

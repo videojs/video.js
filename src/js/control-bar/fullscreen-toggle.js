@@ -24,7 +24,7 @@ class FullscreenToggle extends Button {
    */
   constructor(player, options) {
     super(player, options);
-    this.on(player, 'fullscreenchange', this.handleFullscreenChange);
+    this.on(document, 'fullscreenchange', this.handleFullscreenChange);
 
     if (document[FullscreenApi.fullscreenEnabled] === false) {
       this.disable();
