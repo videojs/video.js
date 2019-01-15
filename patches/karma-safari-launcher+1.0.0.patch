@@ -1,7 +1,7 @@
 patch-package
 --- a/node_modules/karma-safari-launcher/index.js
 +++ b/node_modules/karma-safari-launcher/index.js
-@@ -13,6 +13,12 @@ var SafariBrowser = function(baseBrowserDecorator) {
+@@ -13,6 +13,11 @@ var SafariBrowser = function(baseBrowserDecorator) {
        var content = data.toString().replace('%URL%', url);
        var staticHtmlPath = self._tempDir + '/redirect.html';
  
@@ -9,7 +9,6 @@ patch-package
 +      if (fs.existsSync(pathForMojave)) {
 +        staticHtmlPath = pathForMojave;
 +      }
-+
 +
        fs.writeFile(staticHtmlPath, content, function(err) {
          self._execCommand(self._getCommand(), [staticHtmlPath]);
