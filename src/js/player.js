@@ -1931,6 +1931,29 @@ class Player extends Component {
   }
 
   /**
+   * when the document fschange event triggers it calls this
+   */
+  documentFullscreenChange_(e) {
+    const fsApi = FullscreenApi;
+
+    this.isFullscreen(document[fsApi.fullscreenElement]);
+    this.toggleFullscreenClass_();
+
+    // If cancelling fullscreen, remove event listener.
+    if (this.isFullscreen() === false) {
+      Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+    }
+
+    if (!prefixedFS) {
+      /**
+       * @event Player#fullscreenchange
+       * @type {EventTarget~Event}
+       */
+      this.trigger('fullscreenchange');
+    }
+  }
+
+  /**
    * Handle Tech Fullscreen Change
    *
    * @param {EventTarget~Event} event
@@ -2573,23 +2596,7 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, function documentFullscreenChange(e) {
-        this.isFullscreen(document[fsApi.fullscreenElement]);
-        this.toggleFullscreenClass_();
-
-        // If cancelling fullscreen, remove event listener.
-        if (this.isFullscreen() === false) {
-          Events.off(document, fsApi.fullscreenchange, documentFullscreenChange);
-        }
-
-        if (!prefixedFS) {
-          /**
-           * @event Player#fullscreenchange
-           * @type {EventTarget~Event}
-           */
-          this.trigger('fullscreenchange');
-        }
-      }));
+      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
 
       this.el_[fsApi.requestFullscreen]();
 
