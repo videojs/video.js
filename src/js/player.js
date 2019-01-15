@@ -2621,6 +2621,9 @@ class Player extends Component {
 
     // Check for browser element fullscreen support
     if (fsApi.requestFullscreen) {
+      // remove the document level handler if we're getting called directly.
+      Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+
       document[fsApi.exitFullscreen]();
     } else if (this.tech_.supportsFullScreen()) {
       this.techCall_('exitFullScreen');
