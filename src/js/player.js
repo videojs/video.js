@@ -20,7 +20,7 @@ import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
-import FullscreenApi from './fullscreen-api.js';
+import FullscreenApi, { prefixedAPI as prefixedFS } from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
@@ -519,7 +519,7 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
-    this.on('fullscreenchange', this.handleFullscreenChange_);
+    // this.on('fullscreenchange', this.handleFullscreenChange_);
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -1910,12 +1910,9 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the player switches in or out of fullscreen mode
-   *
    * @private
-   * @listens Player#fullscreenchange
    */
-  handleFullscreenChange_() {
+  toggleFullscreenClass_() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
@@ -1951,6 +1948,9 @@ class Player extends Component {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
+
+    this.toggleFullscreenClass_();
+
     /**
      * Fired when going in and out of fullscreen.
      *
@@ -2576,16 +2576,20 @@ class Player extends Component {
       // events
       Events.on(document, fsApi.fullscreenchange, Fn.bind(this, function documentFullscreenChange(e) {
         this.isFullscreen(document[fsApi.fullscreenElement]);
+        this.toggleFullscreenClass_();
 
         // If cancelling fullscreen, remove event listener.
         if (this.isFullscreen() === false) {
           Events.off(document, fsApi.fullscreenchange, documentFullscreenChange);
         }
-        /**
-         * @event Player#fullscreenchange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('fullscreenchange');
+
+        if (!prefixedFS) {
+          /**
+           * @event Player#fullscreenchange
+           * @type {EventTarget~Event}
+           */
+          this.trigger('fullscreenchange');
+        }
       }));
 
       this.el_[fsApi.requestFullscreen]();
