@@ -1937,7 +1937,6 @@ class Player extends Component {
     const fsApi = FullscreenApi;
 
     this.isFullscreen(document[fsApi.fullscreenElement]);
-    this.toggleFullscreenClass_();
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
@@ -1970,8 +1969,6 @@ class Player extends Component {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
-
-    this.toggleFullscreenClass_();
 
     /**
      * Fired when going in and out of fullscreen.
@@ -2566,6 +2563,7 @@ class Player extends Component {
   isFullscreen(isFS) {
     if (isFS !== undefined) {
       this.isFullscreen_ = !!isFS;
+      this.toggleFullscreenClass_();
       return;
     }
     return !!this.isFullscreen_;
