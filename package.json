@@ -79,7 +79,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@videojs/http-streaming": "1.6.0",
+    "@videojs/http-streaming": "1.8.0",
     "global": "4.3.2",
     "safe-json-parse": "4.0.0",
     "tsml": "1.0.1",
