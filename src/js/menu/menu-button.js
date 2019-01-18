@@ -108,7 +108,7 @@ class MenuButton extends Component {
 
     // Add a title list item to the top
     if (this.options_.title) {
-      const title = Dom.createEl('li', {
+      const titleEl = Dom.createEl('li', {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.options_.title),
         tabIndex: -1
@@ -116,8 +116,9 @@ class MenuButton extends Component {
 
       this.hideThreshold_ += 1;
 
-      menu.children_.unshift(title);
-      Dom.prependTo(title, menu.contentEl());
+      const titleComponent = new Component(this.player_, {el: titleEl});
+
+      menu.addItem(titleComponent);
     }
 
     this.items = this.createItems();
