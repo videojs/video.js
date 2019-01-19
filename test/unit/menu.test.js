@@ -120,7 +120,7 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
 
   const menuItem = oldMenu.children()[0];
 
-  assert.strictEqual(menuItem instanceof MenuItem, true, '`menuItem` should be the instanceof of `MenuItem`');
+  assert.ok(menuItem instanceof MenuItem, '`menuItem` should be the instanceof of `MenuItem`');
 
   /**
    * A reusable collection of assertions.
@@ -128,7 +128,10 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
   function validateMenuEventListeners(watchedMenu) {
     const eventData = DomData.getData(menuItem.eventBusEl_);
     // `MenuButton`.`unpressButton` will be called when triggering click event on the menu item.
-    const menuButtonSpy = sinon.spy(menuButton, 'unpressButton');
+    const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
+    // `MenuButton`.`focus` will be called when triggering click event on the menu item.
+    const focusSpy = sinon.spy(menuButton, 'focus');
+
     // `Menu`.`children` will be called when triggering blur event on the menu item.
     const menuChildrenSpy = sinon.spy(watchedMenu, 'children');
 
@@ -159,17 +162,19 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
 
     TestHelpers.triggerDomEvent(menuItem.el(), 'blur');
 
-    assert.strictEqual(blurListenerSpy.calledOnce, true, 'blur event listener should be called');
+    assert.ok(blurListenerSpy.calledOnce, 'blur event listener should be called');
     assert.strictEqual(blurListenerSpy.getCall(0).args[0].target, menuItem.el(), 'event target should be the `menuItem`');
-    assert.strictEqual(menuChildrenSpy.calledOnce, true, '`watchedMenu`.`children` has been called');
+    assert.ok(menuChildrenSpy.calledOnce, '`watchedMenu`.`children` has been called');
 
     TestHelpers.triggerDomEvent(menuItem.el(), 'click');
 
-    assert.strictEqual(clickListenerSpy.calledOnce, true, 'click event listener should be called');
+    assert.ok(clickListenerSpy.calledOnce, 'click event listener should be called');
     assert.strictEqual(clickListenerSpy.getCall(0).args[0].target, menuItem.el(), 'event target should be the `menuItem`');
-    assert.strictEqual(menuButtonSpy.calledOnce, true, '`menuButton`.`unpressButtion` has been called');
+    assert.ok(unpressButtonSpy.calledOnce, '`menuButton`.`unpressButtion` has been called');
+    assert.ok(focusSpy.calledOnce, '`menuButton`.`focus` has been called');
 
-    menuButtonSpy.restore();
+    unpressButtonSpy.restore();
+    focusSpy.restore();
     menuChildrenSpy.restore();
   }
 

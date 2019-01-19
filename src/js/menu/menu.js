@@ -37,8 +37,8 @@ class Menu extends Component {
     this.on('keydown', this.handleKeyPress);
 
     // All the menu item instances share the same blur handler provided by the menu container.
-    this.handleBlurBindItself_ = Fn.bind(this, this.handleBlur);
-    this.itemOnMethodArgumentStore_ = new Map();
+    this.boundHandleBlur_ = Fn.bind(this, this.handleBlur);
+    this.boundHandleTapClick_ = Fn.bind(this, this.handleTapClick);
   }
 
   /**
@@ -53,29 +53,8 @@ class Menu extends Component {
       return;
     }
 
-    const handleTapClick = Fn.bind(this, function(event) {
-      // Unpress the associated MenuButton, and move focus back to it
-      if (this.menuButton_) {
-        this.menuButton_.unpressButton();
-
-        // don't focus menu button if item is a caption settings item
-        // because focus will move elsewhere
-        if (component.name() !== 'CaptionSettingsMenuItem') {
-          this.menuButton_.focus();
-        }
-      }
-    });
-
-    if (!this.itemOnMethodArgumentStore_.has(component)) {
-      this.itemOnMethodArgumentStore_.set(component, []);
-    }
-
-    const itemOnMethodArgument = [['tap', 'click'], handleTapClick];
-
-    component.on('blur', this.handleBlurBindItself_);
-    component.on(...itemOnMethodArgument);
-
-    this.itemOnMethodArgumentStore_.get(component).push(itemOnMethodArgument);
+    component.on('blur', this.boundHandleBlur_);
+    component.on(['tap', 'click'], this.boundHandleTapClick_);
   }
 
   /**
@@ -90,20 +69,8 @@ class Menu extends Component {
       return;
     }
 
-    const eventArgumentList = this.itemOnMethodArgumentStore_.get(component);
-
-    // If the arguments of on/off methods of the component are missing,
-    // the component never adds to this menu instance and should ignore it.
-    if (!eventArgumentList) {
-      return;
-    }
-
-    component.off('blur', this.handleBlurBindItself_);
-    eventArgumentList.forEach(eventArgument => {
-      component.off(...eventArgument);
-    });
-
-    this.itemOnMethodArgumentStore_.delete(component);
+    component.off('blur', this.boundHandleBlur_);
+    component.off(['tap', 'click'], this.boundHandleTapClick_);
   }
 
   /**
@@ -173,9 +140,8 @@ class Menu extends Component {
 
   dispose() {
     this.contentEl_ = null;
-    this.handleBlurBindItself_ = null;
-    this.itemOnMethodArgumentStore_.clear();
-    this.itemOnMethodArgumentStore_ = null;
+    this.boundHandleBlur_ = null;
+    this.boundHandleTapClick_ = null;
 
     super.dispose();
   }
@@ -199,6 +165,43 @@ class Menu extends Component {
 
       if (btn && btn.buttonPressed_ && relatedTarget !== btn.el().firstChild) {
         btn.unpressButton();
+      }
+    }
+  }
+
+  /**
+   * Called when a `MenuItem` gets clicked or tapped.
+   *
+   * @param {EventTarget~Event} event
+   *        The `click` or `tap` event that caused this function to be called.
+   *
+   * @listens click,tap
+   */
+  handleTapClick(event) {
+    // Unpress the associated MenuButton, and move focus back to it
+    if (this.menuButton_) {
+      this.menuButton_.unpressButton();
+
+      const childComponents = this.children();
+
+      if (!Array.isArray(childComponents)) {
+        return;
+      }
+
+      const foundComponent = childComponents.find(component => {
+        if (component.el() === event.target) {
+          return component;
+        }
+      });
+
+      if (!foundComponent) {
+        return;
+      }
+
+      // don't focus menu button if item is a caption settings item
+      // because focus will move elsewhere
+      if (foundComponent.name() !== 'CaptionSettingsMenuItem') {
+        this.menuButton_.focus();
       }
     }
   }
