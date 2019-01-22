@@ -519,15 +519,6 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
-
-    if (FullscreenApi.fullscreenchange) {
-      this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-
-      if (IE_VERSION || browser.IS_FIREFOX && prefixedFS) {
-        this.on(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-      }
-    }
-
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -556,11 +547,6 @@ class Player extends Component {
     this.trigger('dispose');
     // prevent dispose from being called twice
     this.off('dispose');
-
-    // make sure to remove fs handler on IE from the document
-    if (IE_VERSION || browser.IS_FIREFOX && prefixedFS) {
-      this.off(document, FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-    }
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
@@ -1934,28 +1920,13 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the player switches in or out of fullscreen mode
-   *
    * @private
-   * @listens Player#fullscreenchange
-   * @listens Player#webkitfullscreenchange
-   * @listens Player#mozfullscreenchange
-   * @listens Player#MSFullscreenChange
-   * @fires Player#fullscreenchange
    */
-  handleFullscreenChange_(event = {}, retriggerEvent = true) {
+  toggleFullscreenClass_() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
       this.removeClass('vjs-fullscreen');
-    }
-
-    if (prefixedFS && retriggerEvent) {
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
     }
   }
 
@@ -1970,11 +1941,14 @@ class Player extends Component {
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
       Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
-      if (prefixedFS) {
-        this.handleFullscreenChange_({}, false);
-      } else {
-        this.on(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-      }
+    }
+
+    if (!prefixedFS) {
+      /**
+       * @event Player#fullscreenchange
+       * @type {EventTarget~Event}
+       */
+      this.trigger('fullscreenchange');
     }
   }
 
@@ -1995,6 +1969,7 @@ class Player extends Component {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
+
     /**
      * Fired when going in and out of fullscreen.
      *
@@ -2588,6 +2563,7 @@ class Player extends Component {
   isFullscreen(isFS) {
     if (isFS !== undefined) {
       this.isFullscreen_ = !!isFS;
+      this.toggleFullscreenClass_();
       return;
     }
     return !!this.isFullscreen_;
@@ -2612,10 +2588,6 @@ class Player extends Component {
     if (fsApi.requestFullscreen) {
       // the browser supports going fullscreen at the element level so we can
       // take the controls fullscreen as well as the video
-
-      if (!prefixedFS) {
-        this.off(FullscreenApi.fullscreenchange, this.handleFullscreenChange_);
-      }
 
       // Trigger fullscreenchange event after change
       // We have to specifically add this each time, and remove
@@ -2654,8 +2626,6 @@ class Player extends Component {
 
     // Check for browser element fullscreen support
     if (fsApi.requestFullscreen) {
-      // remove the document level handler if we're getting called directly.
-      Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
       document[fsApi.exitFullscreen]();
     } else if (this.tech_.supportsFullScreen()) {
       this.techCall_('exitFullScreen');
