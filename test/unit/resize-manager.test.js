@@ -18,6 +18,8 @@ QUnit.test('ResizeManager creates an iframe if ResizeObserver is not available',
   const rm = new ResizeManager(this.player, {ResizeObserver: null});
 
   assert.equal(rm.el().tagName.toLowerCase(), 'iframe', 'we got an iframe');
+  assert.equal(rm.el().getAttribute('tabIndex'), '-1', 'TabIndex is set to -1');
+  assert.equal(rm.el().getAttribute('aria-hidden'), 'true', 'aria-hidden property is set');
 
   rm.dispose();
 });
