@@ -1,3 +1,17 @@
+<a name="7.4.3"></a>
+## [7.4.3](https://github.com/videojs/video.js/compare/v7.4.2...v7.4.3) (2019-01-22)
+
+### Bug Fixes
+
+* TextTrackMenuItem components should not disable text tracks of different kind(s). ([#5741](https://github.com/videojs/video.js/issues/5741)) ([0969850](https://github.com/videojs/video.js/commit/0969850))
+* **fs:** fix double fullscreenchange event ([#5756](https://github.com/videojs/video.js/issues/5756)) ([3144ba7](https://github.com/videojs/video.js/commit/3144ba7)), closes [#5685](https://github.com/videojs/video.js/issues/5685) [#5745](https://github.com/videojs/video.js/issues/5745)
+* **resize-manager:** Prevent tabbing into RM and hide from Screen Readers ([#5754](https://github.com/videojs/video.js/issues/5754)) ([b0f9cde](https://github.com/videojs/video.js/commit/b0f9cde))
+
+### Chores
+
+* fix xvfb in travis config, patch safari karma launchers ([#5755](https://github.com/videojs/video.js/issues/5755)) ([aa1ec12](https://github.com/videojs/video.js/commit/aa1ec12))
+* update package-lock urls to https ([891acbd](https://github.com/videojs/video.js/commit/891acbd))
+
 <a name="7.4.2"></a>
 ## [7.4.2](https://github.com/videojs/video.js/compare/v7.4.1...v7.4.2) (2019-01-08)
 
