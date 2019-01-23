@@ -2,6 +2,7 @@
 import * as DomData from '../../src/js/utils/dom-data';
 import MenuButton from '../../src/js/menu/menu-button.js';
 import Menu from '../../src/js/menu/menu.js';
+import CaptionSettingsMenuItem from '../../src/js/control-bar/text-track-controls/caption-settings-menu-item';
 import MenuItem from '../../src/js/menu/menu-item.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
@@ -182,4 +183,15 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
 
   newMenu.addItem(menuItem);
   validateMenuEventListeners(newMenu);
+
+  const focusSpy = sinon.spy(menuButton, 'focus');
+  const captionMenuItem = new CaptionSettingsMenuItem(player, {
+    kind: 'subtitles'
+  });
+
+  newMenu.addItem(captionMenuItem);
+  TestHelpers.triggerDomEvent(captionMenuItem.el(), 'click');
+  assert.ok(!focusSpy.called, '`menuButton`.`focus` should never be called');
+
+  focusSpy.restore();
 });
