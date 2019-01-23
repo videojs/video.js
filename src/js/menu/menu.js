@@ -188,11 +188,7 @@ class Menu extends Component {
         return;
       }
 
-      const foundComponent = childComponents.filter(component => {
-        if (component.el() === event.target) {
-          return component;
-        }
-      })[0];
+      const foundComponent = childComponents.filter(component => component.el() === event.target)[0];
 
       if (!foundComponent) {
         return;
