@@ -521,6 +521,8 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -2721,6 +2723,8 @@ class Player extends Component {
    * @listens focus
    */
   handleFocus(event) {
+    // call off first to make sure we don't keep adding keydown handlers
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
     Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }
 
@@ -2776,74 +2780,40 @@ class Player extends Component {
    *        The `keydown` event that caused this function to be called.
    */
   handleHotkeys(event) {
-    const hotkeys = this.options_.userActions ? this.options_.userActions.hotkeys : null;
-    let fullscreenKey;
-    let muteKey;
-    let playPauseKey;
+    const hotkeys = this.options_.userActions ? this.options_.userActions.hotkeys : {};
 
-    if (hotkeys) {
-      fullscreenKey = hotkeys.fullscreenKey;
-      muteKey = hotkeys.muteKey;
-      playPauseKey = hotkeys.playPauseKey;
-    }
-
-    if (typeof fullscreenKey !== 'function') {
-      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f');
-    }
-    if (typeof muteKey !== 'function') {
-      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm');
-    }
-    if (typeof playPauseKey !== 'function') {
-      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'));
-    }
-
-    // Trigger the ControlBar equivalent for each key, if possible
-    const cb = this.controlBar;
+    // set fullscreenKey, muteKey, playPauseKey from `hotkeys`, use defaults if not set
+    const {
+      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f'),
+      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm'),
+      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'))
+    } = hotkeys;
 
     if (fullscreenKey.call(this, event)) {
 
       event.preventDefault();
 
-      const fullscreenToggle = cb && cb.fullscreenToggle;
+      const FSToggle = Component.getComponent('FullscreenToggle');
 
-      // TODO: make sure that this hotkey doesn't "toggle fullscreen" if
-      //  fullscreen is disabled. For now, ONLY allow fullscreen if the
-      //  fullscreen button is present in the ControlBar.
-
-      if (fullscreenToggle && fullscreenToggle.handleClick) {
-        fullscreenToggle.handleClick();
+      if (document[FullscreenApi.fullscreenEnabled] !== false) {
+        FSToggle.prototype.handleClick.call(this);
       }
 
     } else if (muteKey.call(this, event)) {
 
       event.preventDefault();
 
-      const volumePanel = cb && cb.volumePanel;
-      const muteToggle = (cb && cb.muteToggle) || (volumePanel && volumePanel.muteToggle);
+      const MuteToggle = Component.getComponent('MuteToggle');
 
-      // Allow "toggle mute" hotkey even when no control bar is present
-
-      if (muteToggle && muteToggle.handleClick) {
-        muteToggle.handleClick();
-      } else {
-        this.muted(this.muted() ? false : true);
-      }
+      MuteToggle.prototype.handleClick.call(this);
 
     } else if (playPauseKey.call(this, event)) {
 
       event.preventDefault();
 
-      const playToggle = cb && cb.playToggle;
+      const PlayToggle = Component.getComponent('PlayToggle');
 
-      // Allow "toggle play/pause" hotkey even when no control bar is present
-
-      if (playToggle && playToggle.handleClick) {
-        playToggle.handleClick();
-      } else if (this.paused()) {
-        this.play();
-      } else {
-        this.pause();
-      }
+      PlayToggle.prototype.handleClick.call(this);
     }
   }
 
