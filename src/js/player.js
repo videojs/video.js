@@ -34,7 +34,6 @@ import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
-import {IE_VERSION} from './utils/browser';
 import keycode from 'keycode';
 
 // The following imports are used only to ensure that the corresponding modules
