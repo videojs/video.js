@@ -36,6 +36,7 @@
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
+  * [userActions.doubleClick](#useractions.doubleclick)
   * [userActions.hotkeys](#useractions.hotkeys)
   * [userActions.hotkeys.fullscreenKey](#useractions.hotkeys.fullscreenkey)
   * [userActions.hotkeys.muteKey](#useractions.hotkeys.mutekey)
@@ -375,6 +376,28 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 ### `userActions`
 
 > Type: `Object`
+
+### `userActions.doubleClick`
+
+> Type: `boolean|function`
+
+Controls how double-clicking on the player/tech operates. If set to `false`, double-clicking is disabled. If undefined or set to
+`true`, double-clicking is enabled and toggles fullscreen mode. To override the default double-click handling, set `userActions.doubleClick`
+to a function which accepts a `dblclick` event:
+
+```js
+function myDoubleClickHandler(event) = {
+  // `this` is the player in this context
+
+  this.pause();
+};
+
+videojs('my-player', {
+  userActions: {
+    doubleClick: myDoubleClickHandler
+  }
+});
+```
 
 ### `userActions.hotkeys`
 
