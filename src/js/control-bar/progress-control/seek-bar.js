@@ -8,6 +8,7 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
+import keycode from 'keycode';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -15,6 +16,9 @@ import './mouse-time-display.js';
 
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
+
+// The multiplier of STEP_SECONDS that PgUp/PgDown move the timeline.
+const PAGE_KEY_MULTIPLIER = 12;
 
 // The interval at which the bar should update as it progresses.
 const UPDATE_REFRESH_INTERVAL = 30;
@@ -362,8 +366,15 @@ class SeekBar extends Slider {
   }
 
   /**
-   * Called when this SeekBar has focus and a key gets pressed down. By
-   * default it will call `this.handleAction` when the key is space or enter.
+   * Called when this SeekBar has focus and a key gets pressed down.
+   * Supports the following keys:
+   *
+   *   Space or Enter key fire a click event
+   *   Home key moves to start of the timeline
+   *   End key moves to end of the timeline
+   *   Digit "0" through "9" keys move to 0%, 10% ... 80%, 90% of the timeline
+   *   PageDown key moves back a larger step than ArrowDown
+   *   PageUp key moves forward a large step
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
@@ -371,13 +382,27 @@ class SeekBar extends Slider {
    * @listens keydown
    */
   handleKeyPress(event) {
-
-    // Support Space (32) or Enter (13) key operation to fire a click event
-    if (event.which === 32 || event.which === 13) {
+    if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
       event.preventDefault();
       this.handleAction(event);
-    } else if (super.handleKeyPress) {
+    } else if (keycode.isEventKey(event, 'Home')) {
+      event.preventDefault();
+      this.player_.currentTime(0);
+    } else if (keycode.isEventKey(event, 'End')) {
+      event.preventDefault();
+      this.player_.currentTime(this.player_.duration());
+    } else if (/^[0-9]$/.test(keycode(event))) {
+      event.preventDefault();
+      const gotoFraction = (keycode.codes[keycode(event)] - keycode.codes['0']) * 10.0 / 100.0;
 
+      this.player_.currentTime(this.player_.duration() * gotoFraction);
+    } else if (keycode.isEventKey(event, 'PgDn')) {
+      event.preventDefault();
+      this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+    } else if (keycode.isEventKey(event, 'PgUp')) {
+      event.preventDefault();
+      this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+    } else {
       // Pass keypress handling up for unsupported keys
       super.handleKeyPress(event);
     }

@@ -1078,6 +1078,19 @@ class Component {
   }
 
   /**
+   * When this Component receives a keydown event which it does not process,
+   *  it passes the event to the Player for handling.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   */
+  handleKeyPress(event) {
+    if (this.player_) {
+      this.player_.handleKeyPress(event);
+    }
+  }
+
+  /**
    * Emit a 'tap' events when touch event support gets detected. This gets used to
    * support toggling the controls through a tap on the video. They get enabled
    * because every sub-component would have extra overhead otherwise.

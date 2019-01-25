@@ -34,6 +34,7 @@ import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
+import keycode from 'keycode';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -519,6 +520,8 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -2675,7 +2678,7 @@ class Player extends Component {
    *        Event to check for key press
    */
   fullWindowOnEscKey(event) {
-    if (event.keyCode === 27) {
+    if (keycode.isEventKey(event, 'Esc')) {
       if (this.isFullscreen() === true) {
         this.exitFullscreen();
       } else {
@@ -2706,6 +2709,111 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('exitFullWindow');
+  }
+
+  /**
+   * This gets called when a `Player` gains focus via a `focus` event.
+   * Turns on listening for `keydown` events. When they happen it
+   * calls `this.handleKeyPress`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `focus` event that caused this function to be called.
+   *
+   * @listens focus
+   */
+  handleFocus(event) {
+    // call off first to make sure we don't keep adding keydown handlers
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Called when a `Player` loses focus. Turns off the listener for
+   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
+   */
+  handleBlur(event) {
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Called when this Player has focus and a key gets pressed down, or when
+   * any Component of this player receives a key press that it doesn't handle.
+   * This allows player-wide hotkeys (either as defined below, or optionally
+   * by an external function).
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+
+    if (this.options_.userActions && this.options_.userActions.hotkeys && (this.options_.userActions.hotkeys !== false)) {
+
+      if (typeof this.options_.userActions.hotkeys === 'function') {
+
+        this.options_.userActions.hotkeys.call(this, event);
+
+      } else {
+
+        this.handleHotkeys(event);
+
+      }
+    }
+  }
+
+  /**
+   * Called when this Player receives a hotkey keydown event.
+   * Supported player-wide hotkeys are:
+   *
+   *   f          - toggle fullscreen
+   *   m          - toggle mute
+   *   k or Space - toggle play/pause
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   */
+  handleHotkeys(event) {
+    const hotkeys = this.options_.userActions ? this.options_.userActions.hotkeys : {};
+
+    // set fullscreenKey, muteKey, playPauseKey from `hotkeys`, use defaults if not set
+    const {
+      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f'),
+      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm'),
+      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'))
+    } = hotkeys;
+
+    if (fullscreenKey.call(this, event)) {
+
+      event.preventDefault();
+
+      const FSToggle = Component.getComponent('FullscreenToggle');
+
+      if (document[FullscreenApi.fullscreenEnabled] !== false) {
+        FSToggle.prototype.handleClick.call(this);
+      }
+
+    } else if (muteKey.call(this, event)) {
+
+      event.preventDefault();
+
+      const MuteToggle = Component.getComponent('MuteToggle');
+
+      MuteToggle.prototype.handleClick.call(this);
+
+    } else if (playPauseKey.call(this, event)) {
+
+      event.preventDefault();
+
+      const PlayToggle = Component.getComponent('PlayToggle');
+
+      PlayToggle.prototype.handleClick.call(this);
+    }
   }
 
   /**
