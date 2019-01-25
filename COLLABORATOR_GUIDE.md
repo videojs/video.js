@@ -19,8 +19,8 @@
     * [GitHub personal access token](#github-personal-access-token)
   * [Deciding what type of version release](#deciding-what-type-of-version-release)
   * [Doing a release](#doing-a-release)
-    * [Video.js 6](#videojs-6)
-    * [Video.js 5](#videojs-5)
+    * [Current Video.js](#current-videojs)
+    * [Legacy Video.js (5)](#legacy-videojs-5)
       * [Edit git-semver-tags](#edit-git-semver-tags)
     * [And now for the release](#and-now-for-the-release)
   * [Deploy as a patch to the CDN](#deploy-as-a-patch-to-the-cdn)
@@ -332,7 +332,7 @@ git clone git@github.com:videojs/video.js.git videojs-6-release
 git clone git@github.com:videojs/video.js.git videojs-5-release
 ```
 
-#### Video.js 6
+#### Current Video.js
 
 Make sure go to the master branch and grab the latest updates.
 
@@ -378,7 +378,7 @@ you can run it manually:
 VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 node build/gh-release.js --prelease
 ```
 
-#### Video.js 5
+#### Legacy Video.js (5)
 
 Make sure to go to the 5.x branch and grab the latest updates.
 
@@ -463,7 +463,7 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 
 [conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md
 
-[vjs npm]: http://npmjs.com/org/videojs
+[vjs npm]: https://www.npmjs.com/org/videojs
 
 [npm org]: https://docs.npmjs.com/misc/orgs
 

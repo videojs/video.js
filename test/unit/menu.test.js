@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import MenuButton from '../../src/js/menu/menu-button.js';
+import MenuItem from '../../src/js/menu/menu-item.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
 
@@ -74,4 +75,34 @@ QUnit.test('clicking should display the menu', function(assert) {
 
   menuButton.dispose();
   player.dispose();
+});
+
+QUnit.test('should keep all the added menu items', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const menuItems = [];
+  const menuItem1 = new MenuItem(player, { label: 'menu-item1' });
+  const menuItem2 = new MenuItem(player, { label: 'menu-item2' });
+
+  MenuButton.prototype.createItems = function() {
+    return menuItems;
+  };
+
+  const menuButton = new MenuButton(player, {});
+
+  menuItems.push(menuItem1);
+  menuButton.update();
+
+  assert.strictEqual(menuButton.children()[1].children().length, 1, 'the children number of the menu is 1 ');
+  assert.strictEqual(menuButton.children()[1].children()[0], menuItem1, 'the first child of the menu is `menuItem1`');
+  assert.ok(menuButton.el().contains(menuItem1.el()), 'the menu button contains the DOM element of `menuItem1`');
+
+  menuItems.push(menuItem2);
+  menuButton.update();
+
+  assert.strictEqual(menuButton.children()[1].children().length, 2, 'the children number of the menu is 2 after second update');
+  assert.strictEqual(menuButton.children()[1].children()[0], menuItem1, 'the first child of the menu is `menuItem1` after second update');
+  assert.strictEqual(menuButton.children()[1].children()[1], menuItem2, 'the second child of the menu is `menuItem2` after second update');
+  assert.ok(menuButton.el().contains(menuItem1.el()), 'the menu button contains the DOM element of `menuItem1` after second update');
+  assert.ok(menuButton.el().contains(menuItem2.el()), 'the menu button contains the DOM element of `menuItem2` after second update');
 });

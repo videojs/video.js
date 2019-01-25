@@ -68,7 +68,7 @@ A good bug report should be as detailed as possible, so that others won't have t
 
 ### Requesting a Feature
 
-1. [Check the plugin list](http://videojs.com/plugins/) for any plugins that may already support the feature.
+1. [Check the plugin list](https://videojs.com/plugins/) for any plugins that may already support the feature.
 1. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
 1. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
 1. Once again, be as details as possible and follow the [issue template][]
@@ -96,19 +96,6 @@ To contibute code you'll need to be able to build a copy of Video.js and run tes
 
 * Node.js
   Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
-
-* `grunt-cli`
-  Optionally, install `grunt-cli` globally to use grunt directly. It can always be run via an npm script:
-
-```sh
-npm run grunt
-```
-
-```sh
-npm install -g grunt-cli
-```
-
-Depending on how you have node and npm set up, you may need to run the global install (`-g`) as a superuser by prepending `sudo`.
 
 ### Building video.js locally
 
@@ -199,17 +186,11 @@ This ties in nicely with the sandbox directory. You can always open the `sandbox
 > Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you must use a local web server.
 
-To run the local webserver, you can run it in a couple of ways.
-
-```sh
-grunt connect
-open http://localhost:9999/sandbox/index.html
-```
-
-or
+To run the local webserver:
 
 ```sh
 npm start
+open http://localhost:9999/sandbox/index.html
 ```
 
 The latter does some extra work which will be described in the next section.
@@ -303,7 +284,7 @@ See [Running tests](#running-tests) for more information.
 git push origin my-branch
 ```
 
-Then go to the [repo page](http://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
+Then go to the [repo page](https://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
 
 ### Code Style Guide
 

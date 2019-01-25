@@ -15,12 +15,13 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
+import {IE_VERSION} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
 import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
-import FullscreenApi from './fullscreen-api.js';
+import FullscreenApi, {prefixedAPI as prefixedFS} from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
@@ -32,8 +33,8 @@ import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
-import {findMimetype} from './utils/mimetypes';
-import {IE_VERSION} from './utils/browser';
+import {getMimetype, findMimetype} from './utils/mimetypes';
+import keycode from 'keycode';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -48,6 +49,7 @@ import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
+import './live-tracker.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -400,17 +402,13 @@ class Player extends Component {
       this.languages_ = Player.prototype.options_.languages;
     }
 
-    // Cache for video property values.
-    this.cache_ = {};
+    this.resetCache_();
 
     // Set poster
     this.poster_ = options.poster || '';
 
     // Set controls
     this.controls_ = !!options.controls;
-
-    // Set default values for lastVolume
-    this.cache_.lastVolume = 1;
 
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
@@ -436,9 +434,6 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
-
-    // Set default value for lastPlaybackRate
-    this.cache_.lastPlaybackRate = this.defaultPlaybackRate();
 
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
@@ -500,9 +495,11 @@ class Player extends Component {
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
-    // if (browser.TOUCH_ENABLED) {
-    //   this.addClass('vjs-touch-enabled');
-    // }
+    // TODO: Make this check be performed again when the window switches between monitors
+    // (See https://github.com/videojs/video.js/issues/5683)
+    if (browser.TOUCH_ENABLED) {
+      this.addClass('vjs-touch-enabled');
+    }
 
     // iOS Safari has broken hover handling
     if (!browser.IS_IOS) {
@@ -523,7 +520,8 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
-    this.on('fullscreenchange', this.handleFullscreenChange_);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
     this.on('stageclick', this.handleStageClick_);
 
     this.breakpoints(this.options_.breakpoints);
@@ -1714,6 +1712,7 @@ class Player extends Component {
    */
   handleTechSeeked_() {
     this.removeClass('vjs-seeking');
+    this.removeClass('vjs-ended');
     /**
      * Fired when the player has finished jumping to a new time
      *
@@ -1936,20 +1935,6 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the player switches in or out of fullscreen mode
-   *
-   * @private
-   * @listens Player#fullscreenchange
-   */
-  handleFullscreenChange_() {
-    if (this.isFullscreen()) {
-      this.addClass('vjs-fullscreen');
-    } else {
-      this.removeClass('vjs-fullscreen');
-    }
-  }
-
-  /**
    * native click events on the SWF aren't triggered on IE11, Win8.1RT
    * use stageclick events triggered from inside the SWF instead
    *
@@ -1958,6 +1943,39 @@ class Player extends Component {
    */
   handleStageClick_() {
     this.reportUserActivity();
+  }
+
+  /**
+   * @private
+   */
+  toggleFullscreenClass_() {
+    if (this.isFullscreen()) {
+      this.addClass('vjs-fullscreen');
+    } else {
+      this.removeClass('vjs-fullscreen');
+    }
+  }
+
+  /**
+   * when the document fschange event triggers it calls this
+   */
+  documentFullscreenChange_(e) {
+    const fsApi = FullscreenApi;
+
+    this.isFullscreen(document[fsApi.fullscreenElement]);
+
+    // If cancelling fullscreen, remove event listener.
+    if (this.isFullscreen() === false) {
+      Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+    }
+
+    if (!prefixedFS) {
+      /**
+       * @event Player#fullscreenchange
+       * @type {EventTarget~Event}
+       */
+      this.trigger('fullscreenchange');
+    }
   }
 
   /**
@@ -1977,6 +1995,7 @@ class Player extends Component {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
+
     /**
      * Fired when going in and out of fullscreen.
      *
@@ -2029,6 +2048,33 @@ class Player extends Component {
    */
   getCache() {
     return this.cache_;
+  }
+
+  /**
+   * Resets the internal cache object.
+   *
+   * Using this function outside the player constructor or reset method may
+   * have unintended side-effects.
+   *
+   * @private
+   */
+  resetCache_() {
+    this.cache_ = {
+
+      // Right now, the currentTime is not _really_ cached because it is always
+      // retrieved from the tech (see: currentTime). However, for completeness,
+      // we set it to zero here to ensure that if we do start actually caching
+      // it, we reset it along with everything else.
+      currentTime: 0,
+      duration: NaN,
+      lastVolume: 1,
+      lastPlaybackRate: this.defaultPlaybackRate(),
+      media: null,
+      src: '',
+      source: {},
+      sources: [],
+      volume: 1
+    };
   }
 
   /**
@@ -2311,8 +2357,12 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
+        if (this.options_.liveui && this.player_.liveTracker) {
+          this.addClass('vjs-liveui');
+        }
       } else {
         this.removeClass('vjs-live');
+        this.removeClass('vjs-liveui');
       }
       if (!isNaN(seconds)) {
         // Do not fire durationchange unless the duration value is known.
@@ -2539,6 +2589,7 @@ class Player extends Component {
   isFullscreen(isFS) {
     if (isFS !== undefined) {
       this.isFullscreen_ = !!isFS;
+      this.toggleFullscreenClass_();
       return;
     }
     return !!this.isFullscreen_;
@@ -2569,19 +2620,7 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, function documentFullscreenChange(e) {
-        this.isFullscreen(document[fsApi.fullscreenElement]);
-
-        // If cancelling fullscreen, remove event listener.
-        if (this.isFullscreen() === false) {
-          Events.off(document, fsApi.fullscreenchange, documentFullscreenChange);
-        }
-        /**
-         * @event Player#fullscreenchange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('fullscreenchange');
-      }));
+      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
 
       this.el_[fsApi.requestFullscreen]();
 
@@ -2662,7 +2701,7 @@ class Player extends Component {
    *        Event to check for key press
    */
   fullWindowOnEscKey(event) {
-    if (event.keyCode === 27) {
+    if (keycode.isEventKey(event, 'Esc')) {
       if (this.isFullscreen() === true) {
         this.exitFullscreen();
       } else {
@@ -2693,6 +2732,111 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('exitFullWindow');
+  }
+
+  /**
+   * This gets called when a `Player` gains focus via a `focus` event.
+   * Turns on listening for `keydown` events. When they happen it
+   * calls `this.handleKeyPress`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `focus` event that caused this function to be called.
+   *
+   * @listens focus
+   */
+  handleFocus(event) {
+    // call off first to make sure we don't keep adding keydown handlers
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Called when a `Player` loses focus. Turns off the listener for
+   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
+   */
+  handleBlur(event) {
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Called when this Player has focus and a key gets pressed down, or when
+   * any Component of this player receives a key press that it doesn't handle.
+   * This allows player-wide hotkeys (either as defined below, or optionally
+   * by an external function).
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+
+    if (this.options_.userActions && this.options_.userActions.hotkeys && (this.options_.userActions.hotkeys !== false)) {
+
+      if (typeof this.options_.userActions.hotkeys === 'function') {
+
+        this.options_.userActions.hotkeys.call(this, event);
+
+      } else {
+
+        this.handleHotkeys(event);
+
+      }
+    }
+  }
+
+  /**
+   * Called when this Player receives a hotkey keydown event.
+   * Supported player-wide hotkeys are:
+   *
+   *   f          - toggle fullscreen
+   *   m          - toggle mute
+   *   k or Space - toggle play/pause
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   */
+  handleHotkeys(event) {
+    const hotkeys = this.options_.userActions ? this.options_.userActions.hotkeys : {};
+
+    // set fullscreenKey, muteKey, playPauseKey from `hotkeys`, use defaults if not set
+    const {
+      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f'),
+      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm'),
+      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'))
+    } = hotkeys;
+
+    if (fullscreenKey.call(this, event)) {
+
+      event.preventDefault();
+
+      const FSToggle = Component.getComponent('FullscreenToggle');
+
+      if (document[FullscreenApi.fullscreenEnabled] !== false) {
+        FSToggle.prototype.handleClick.call(this);
+      }
+
+    } else if (muteKey.call(this, event)) {
+
+      event.preventDefault();
+
+      const MuteToggle = Component.getComponent('MuteToggle');
+
+      MuteToggle.prototype.handleClick.call(this);
+
+    } else if (playPauseKey.call(this, event)) {
+
+      event.preventDefault();
+
+      const PlayToggle = Component.getComponent('PlayToggle');
+
+      PlayToggle.prototype.handleClick.call(this);
+    }
   }
 
   /**
@@ -2949,11 +3093,49 @@ class Player extends Component {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
+    this.resetCache_();
+    this.poster('');
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
+    this.resetControlBarUI_();
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
+  }
+
+  /**
+   * Reset Control Bar's UI by calling sub-methods that reset
+   * all of Control Bar's components
+   */
+  resetControlBarUI_() {
+    this.resetProgressBar_();
+    this.resetPlaybackRate_();
+    this.resetVolumeBar_();
+  }
+
+  /**
+   * Reset tech's progress so progress bar is reset in the UI
+   */
+  resetProgressBar_() {
+    this.currentTime(0);
+    this.controlBar.durationDisplay.updateContent();
+    this.controlBar.remainingTimeDisplay.updateContent();
+  }
+
+  /**
+   * Reset Playback ratio
+   */
+  resetPlaybackRate_() {
+    this.playbackRate(this.defaultPlaybackRate());
+    this.handleTechRateChange_();
+  }
+
+  /**
+   * Reset Volume bar
+   */
+  resetVolumeBar_() {
+    this.volume(1.0);
+    this.trigger('volumechange');
   }
 
   /**
@@ -3462,6 +3644,23 @@ class Player extends Component {
     this.on('mousemove', handleMouseMove);
     this.on('mouseup', handleMouseUp);
 
+    const controlBar = this.getChild('controlBar');
+
+    if (controlBar) {
+
+      controlBar.on('mouseenter', function(event) {
+
+        this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
+        this.player().options_.inactivityTimeout = 0;
+
+      });
+
+      controlBar.on('mouseleave', function(event) {
+        this.player().options_.inactivityTimeout = this.player().cache_.inactivityTimeout;
+      });
+
+    }
+
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
     this.on('keydown', handleActivity);
@@ -3954,6 +4153,130 @@ class Player extends Component {
   }
 
   /**
+   * An object that describes a single piece of media.
+   *
+   * Properties that are not part of this type description will be retained; so,
+   * this can be viewed as a generic metadata storage mechanism as well.
+   *
+   * @see      {@link https://wicg.github.io/mediasession/#the-mediametadata-interface}
+   * @typedef  {Object} Player~MediaObject
+   *
+   * @property {string} [album]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API.
+   *
+   * @property {string} [artist]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API.
+   *
+   * @property {Object[]} [artwork]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API. If not specified, will be populated via the `poster`, if
+   *           available.
+   *
+   * @property {string} [poster]
+   *           URL to an image that will display before playback.
+   *
+   * @property {Tech~SourceObject|Tech~SourceObject[]|string} [src]
+   *           A single source object, an array of source objects, or a string
+   *           referencing a URL to a media source. It is _highly recommended_
+   *           that an object or array of objects is used here, so that source
+   *           selection algorithms can take the `type` into account.
+   *
+   * @property {string} [title]
+   *           Unused, except if this object is passed to the `MediaSession`
+   *           API.
+   *
+   * @property {Object[]} [textTracks]
+   *           An array of objects to be used to create text tracks, following
+   *           the {@link https://www.w3.org/TR/html50/embedded-content-0.html#the-track-element|native track element format}.
+   *           For ease of removal, these will be created as "remote" text
+   *           tracks and set to automatically clean up on source changes.
+   *
+   *           These objects may have properties like `src`, `kind`, `label`,
+   *           and `language`, see {@link Tech#createRemoteTextTrack}.
+   */
+
+  /**
+   * Populate the player using a {@link Player~MediaObject|MediaObject}.
+   *
+   * @param  {Player~MediaObject} media
+   *         A media object.
+   *
+   * @param  {Function} ready
+   *         A callback to be called when the player is ready.
+   */
+  loadMedia(media, ready) {
+    if (!media || typeof media !== 'object') {
+      return;
+    }
+
+    this.reset();
+
+    // Clone the media object so it cannot be mutated from outside.
+    this.cache_.media = mergeOptions(media);
+
+    const {artwork, poster, src, textTracks} = this.cache_.media;
+
+    // If `artwork` is not given, create it using `poster`.
+    if (!artwork && poster) {
+      this.cache_.media.artwork = [{
+        src: poster,
+        type: getMimetype(poster)
+      }];
+    }
+
+    if (src) {
+      this.src(src);
+    }
+
+    if (poster) {
+      this.poster(poster);
+    }
+
+    if (Array.isArray(textTracks)) {
+      textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
+    }
+
+    this.ready(ready);
+  }
+
+  /**
+   * Get a clone of the current {@link Player~MediaObject} for this player.
+   *
+   * If the `loadMedia` method has not been used, will attempt to return a
+   * {@link Player~MediaObject} based on the current state of the player.
+   *
+   * @return {Player~MediaObject}
+   */
+  getMedia() {
+    if (!this.cache_.media) {
+      const poster = this.poster();
+      const src = this.currentSources();
+      const textTracks = Array.prototype.map.call(this.remoteTextTracks(), (tt) => ({
+        kind: tt.kind,
+        label: tt.label,
+        language: tt.language,
+        src: tt.src
+      }));
+
+      const media = {src, textTracks};
+
+      if (poster) {
+        media.poster = poster;
+        media.artwork = [{
+          src: media.poster,
+          type: getMimetype(media.poster)
+        }];
+      }
+
+      return media;
+    }
+
+    return mergeOptions(this.cache_.media);
+  }
+
+  /**
    * Gets tag settings
    *
    * @param {Element} tag
@@ -4132,6 +4455,7 @@ Player.prototype.options_ = {
   playbackRates: [],
   // Add playback rate selection by adding rates
   // 'playbackRates': [0.5, 1, 1.5, 2],
+  liveui: false,
 
   // Included control sets
   children: [
@@ -4140,6 +4464,7 @@ Player.prototype.options_ = {
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',
+    'liveTracker',
     'controlBar',
     'errorDisplay',
     'textTrackSettings',

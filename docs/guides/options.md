@@ -21,6 +21,7 @@
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
   * [autoSetup](#autosetup)
+  * [breakpoints](#breakpoints)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -30,11 +31,16 @@
   * [notSupportedMessage](#notsupportedmessage)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
+  * [responsive](#responsive)
   * [sources](#sources)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
   * [userActions.doubleClick](#useractions.doubleclick)
+  * [userActions.hotkeys](#useractions.hotkeys)
+  * [userActions.hotkeys.fullscreenKey](#useractions.hotkeys.fullscreenkey)
+  * [userActions.hotkeys.muteKey](#useractions.hotkeys.mutekey)
+  * [userActions.hotkeys.playPauseKey](#useractions.hotkeys.playpausekey)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
   * [children](#children-1)
@@ -173,15 +179,15 @@ When used with the [`responsive` option](#responsive), sets breakpoints that wil
 
 By default, the breakpoints are:
 
-Class Name           | Width Range
----------------------|------------
-`vjs-layout-tiny`    | 0-210
-`vjs-layout-x-small` | 211-320
-`vjs-layout-small`   | 321-425
-`vjs-layout-medium`  | 426-768
-`vjs-layout-large`   | 769-1440
-`vjs-layout-x-large` | 1441-2560
-`vjs-layout-huge`    | 2561+
+| Class Name           | Width Range |
+| -------------------- | ----------- |
+| `vjs-layout-tiny`    | 0-210       |
+| `vjs-layout-x-small` | 211-320     |
+| `vjs-layout-small`   | 321-425     |
+| `vjs-layout-medium`  | 426-768     |
+| `vjs-layout-large`   | 769-1440    |
+| `vjs-layout-x-large` | 1441-2560   |
+| `vjs-layout-huge`    | 2561+       |
 
 While the class names cannot be changed, the width ranges can be configured via an object like this:
 
@@ -246,6 +252,18 @@ Customize which languages are available in a player. The keys of this object wil
 Learn more about [languages in Video.js][languages]
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
+
+### `liveui`
+
+> Type: `boolean`
+> Default: `false`
+
+Allows the player to use the new live ui that includes:
+* A progress bar for seeking within the live window
+* A button that can be clicked to seek to the live edge with a circle indicating if you are at the live edge or not.
+
+Without this option the progress bar will be hidden and in its place will be text that indicates `LIVE` playback. There will be no progress control
+and you will not be able click the text to seek to the live edge. `liveui` will default to `true` in a future version!
 
 ### `nativeControlsForTouch`
 
@@ -380,6 +398,77 @@ videojs('my-player', {
   }
 });
 ```
+
+### `userActions.hotkeys`
+
+> Type: `boolean|function|object`
+
+Controls how player-wide hotkeys operate. If set to `false`, or `undefined`, hotkeys are disabled. If set to `true` or an object (to allow definitions of `fullscreenKey` etc. below), hotkeys are enabled as described below. To override the default hotkey handling, set `userActions.hotkeys` to a function which accepts a `keydown` event:
+
+```js
+var player = videojs('my-player', {
+  userActions: {
+    hotkeys: function(event) {
+      // `this` is the player in this context
+
+      // `x` key = pause
+      if (event.which === 88) {
+        this.pause();
+      }
+      // `y` key = play
+      if (event.which === 89) {
+        this.play();
+      }
+    }
+  }
+});
+```
+
+Default hotkey handling is:
+
+| Key | Action | Enabled by |
+| :-: | ------ | ---------- |
+| `f` | toggle fullscreen | only enabled if a Fullscreen button is present in the Control Bar
+| `m` | toggle mute | always enabled, even if no Control Bar is present
+| `k` | toggle play/pause | always enabled, even if no Control Bar is present
+| `Space` | toggle play/pause | always enabled, even if no Control Bar is present
+
+Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which
+control in the player has focus.
+
+### `userActions.hotkeys.fullscreenKey`
+
+> Type: `function`
+
+Override the fullscreen key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the fullscreen toggle action is performed.
+
+```js
+var player = videojs('my-player', {
+  userActions: {
+    hotkeys: {
+      muteKey: function(event) {
+        // disable mute key
+      },
+      fullscreenKey: function(event) {
+        // override fullscreen to trigger when pressing the v key
+        return (event.which === 86);
+      }
+    }
+  }
+});
+```
+
+### `userActions.hotkeys.muteKey`
+
+> Type: `function`
+
+Override the mute key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the mute toggle action is performed.
+
+### `userActions.hotkeys.playPauseKey`
+
+> Type: `function`
+
+Override the play/pause key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the play/pause toggle action is performed.
 
 ### `vtt.js`
 

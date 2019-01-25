@@ -5,6 +5,7 @@ import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {assign} from '../utils/obj';
 import {IS_CHROME} from '../utils/browser.js';
+import keycode from 'keycode';
 
 /**
  * The base functionality for a slider. Can be vertical or horizontal.
@@ -316,14 +317,18 @@ class Slider extends Component {
    */
   handleKeyPress(event) {
     // Left and Down Arrows
-    if (event.which === 37 || event.which === 40) {
+    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
       event.preventDefault();
       this.stepBack();
 
     // Up and Right Arrows
-    } else if (event.which === 38 || event.which === 39) {
+    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
       event.preventDefault();
       this.stepForward();
+    } else {
+
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(event);
     }
   }
 

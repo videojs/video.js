@@ -1038,3 +1038,25 @@ QUnit.test('should use the stateful mixin', function(assert) {
 
   comp.dispose();
 });
+
+QUnit.test('should remove child when the child moves to the other parent', function(assert) {
+  const parentComponent1 = new Component(getFakePlayer(), {});
+  const parentComponent2 = new Component(getFakePlayer(), {});
+  const childComponent = new Component(getFakePlayer(), {});
+
+  parentComponent1.addChild(childComponent);
+
+  assert.strictEqual(parentComponent1.children().length, 1, 'the children number of `parentComponent1` is 1');
+  assert.strictEqual(parentComponent1.children()[0], childComponent, 'the first child of `parentComponent1` is `childComponent`');
+  assert.strictEqual(parentComponent1.el().childNodes[0], childComponent.el(), '`parentComponent1` contains the DOM element of `childComponent`');
+
+  parentComponent2.addChild(childComponent);
+
+  assert.strictEqual(parentComponent1.children().length, 0, 'the children number of `parentComponent1` is 0');
+  assert.strictEqual(parentComponent1.el().childNodes.length, 0, 'the length of `childNodes` of `parentComponent1` is 0');
+
+  assert.strictEqual(parentComponent2.children().length, 1, 'the children number of `parentComponent2` is 1');
+  assert.strictEqual(parentComponent2.children()[0], childComponent, 'the first child of `parentComponent2` is `childComponent`');
+  assert.strictEqual(parentComponent2.el().childNodes.length, 1, 'the length of `childNodes` of `parentComponent2` is 1');
+  assert.strictEqual(parentComponent2.el().childNodes[0], childComponent.el(), '`parentComponent2` contains the DOM element of `childComponent`');
+});

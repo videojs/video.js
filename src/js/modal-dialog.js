@@ -6,9 +6,9 @@ import * as Fn from './utils/fn';
 import Component from './component';
 import window from 'global/window';
 import document from 'global/document';
+import keycode from 'keycode';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
-const ESC = 27;
 
 /**
  * The `ModalDialog` displays over the video and its controls, which blocks
@@ -119,13 +119,13 @@ class ModalDialog extends Component {
    * Handles `keydown` events on the document, looking for ESC, which closes
    * the modal.
    *
-   * @param {EventTarget~Event} e
+   * @param {EventTarget~Event} event
    *        The keypress that triggered this event.
    *
    * @listens keydown
    */
-  handleKeyPress(e) {
-    if (e.which === ESC && this.closeable()) {
+  handleKeyPress(event) {
+    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
       this.close();
     }
   }
@@ -466,7 +466,7 @@ class ModalDialog extends Component {
    */
   handleKeyDown(event) {
     // exit early if it isn't a tab key
-    if (event.which !== 9) {
+    if (!keycode.isEventKey(event, 'Tab')) {
       return;
     }
 

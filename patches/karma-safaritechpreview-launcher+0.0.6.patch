@@ -1,0 +1,18 @@
+patch-package
+--- a/node_modules/karma-safaritechpreview-launcher/index.js
++++ b/node_modules/karma-safaritechpreview-launcher/index.js
+@@ -25,7 +25,13 @@ const SafariTechPreviewBrowser = function (baseBrowserDecorator) {
+       throw err;
+     }
+     const content = data.toString().replace('%URL%', url);
+-    const staticHtmlPath = self._tempDir + '/redirect.html';
++    var staticHtmlPath = self._tempDir + '/redirect.html';
++
++    var pathForMojave = path.join(process.env.HOME, 'Library/Containers/com.apple.SafariTechnologyPreview/Data/redirect.html');
++    if (fs.existsSync(pathForMojave)) {
++      staticHtmlPath = pathForMojave;
++    }
++
+     try {
+       yield fs.writeFile(staticHtmlPath, content);
+     } catch (err) {

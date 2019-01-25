@@ -3,6 +3,8 @@
  */
 import TimeDisplay from './time-display';
 import Component from '../../component.js';
+import * as Dom from '../../utils/dom.js';
+
 /**
  * Displays the time left in the video
  *
@@ -36,19 +38,16 @@ class RemainingTimeDisplay extends TimeDisplay {
   }
 
   /**
-   * The remaining time display prefixes numbers with a "minus" character.
+   * Create the `Component`'s DOM element with the "minus" characted prepend to the time
    *
-   * @param  {number} time
-   *         A numeric time, in seconds.
-   *
-   * @return {string}
-   *         A formatted time
-   *
-   * @private
+   * @return {Element}
+   *         The element that was created.
    */
-  formatTime_(time) {
-    // TODO: The "-" should be decorative, and not announced by a screen reader
-    return '-' + super.formatTime_(time);
+  createEl() {
+    const el = super.createEl();
+
+    el.insertBefore(Dom.createEl('span', {}, {'aria-hidden': true}, '-'), this.contentEl_);
+    return el;
   }
 
   /**
@@ -61,7 +60,7 @@ class RemainingTimeDisplay extends TimeDisplay {
    * @listens Player#durationchange
    */
   updateContent(event) {
-    if (!this.player_.duration()) {
+    if (typeof this.player_.duration() !== 'number') {
       return;
     }
 

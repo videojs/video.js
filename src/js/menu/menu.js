@@ -6,6 +6,7 @@ import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
+import keycode from 'keycode';
 
 /**
  * The Menu component is used to build popup menus, including subtitle and
@@ -132,14 +133,20 @@ class Menu extends Component {
    */
   handleKeyPress(event) {
     // Left and Down Arrows
-    if (event.which === 37 || event.which === 40) {
+    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
       event.preventDefault();
       this.stepForward();
 
     // Up and Right Arrows
-    } else if (event.which === 38 || event.which === 39) {
+    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
       event.preventDefault();
       this.stepBack();
+    } else {
+      // NOTE: This is a special case where we don't pass unhandled
+      //  keypress events up to the Component handler, because this
+      //  is just adding a keypress handler on top of the MenuItem's
+      //  existing keypress handler, which already handles passing keypress
+      //  events up.
     }
   }
 

@@ -1,5 +1,4 @@
-// We are assuming there is no progress bar and using the live display
-// to fill in the middle space. Live+DVR will need to adjust this.
+// css for the old live ui, assumes that the progress bar is hidden
 .video-js .vjs-live-control {
   @include display-flex(flex-start);
   @include flex(auto);
@@ -11,4 +10,54 @@
   display: table-cell;
   width: auto;
   text-align: left;
+}
+
+// hide the LiveDisplay when not live or when
+// the new liveui is in use
+.video-js:not(.vjs-live) .vjs-live-control,
+.video-js.vjs-liveui .vjs-live-control {
+  display: none;
+}
+
+// css for the new live ui below
+.video-js .vjs-seek-to-live-control {
+  cursor: pointer;
+  @include flex(none);
+  display: inline-flex;
+  height: 100%;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-size: 1em;
+  line-height: 3em;
+  width: auto;
+  min-width: 4em;
+}
+
+.vjs-no-flex .vjs-seek-to-live-control {
+  display: table-cell;
+  width: auto;
+  text-align: left;
+}
+
+// hide the SeekToLive button when not live and
+// when the liveui is not in use
+.video-js.vjs-live:not(.vjs-liveui) .vjs-seek-to-live-control,
+.video-js:not(.vjs-live) .vjs-seek-to-live-control {
+  display: none;
+}
+
+// only show as a pointer when we will seek to live edge
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge {
+  cursor: auto;
+}
+
+.vjs-seek-to-live-control .vjs-icon-placeholder {
+  margin-right: 0.5em;
+  @extend .vjs-icon-circle;
+  color: #888;
+}
+
+// make the live circle red when at the live edge
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-icon-placeholder {
+  color: red;
 }

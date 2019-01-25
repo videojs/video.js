@@ -58,6 +58,9 @@ class Component {
       this.player_ = player;
     }
 
+    // Hold the reference to the parent component via `addChild` method
+    this.parentComponent_ = null;
+
     // Make a copy of prototype.options_ to protect against overriding defaults
     this.options_ = mergeOptions({}, this.options_);
 
@@ -141,6 +144,8 @@ class Component {
     this.children_ = null;
     this.childIndex_ = null;
     this.childNameIndex_ = null;
+
+    this.parentComponent_ = null;
 
     if (this.el_) {
       // Remove element from DOM
@@ -416,7 +421,11 @@ class Component {
       component = child;
     }
 
+    if (component.parentComponent_) {
+      component.parentComponent_.removeChild(component);
+    }
     this.children_.splice(index, 0, component);
+    component.parentComponent_ = this;
 
     if (typeof component.id === 'function') {
       this.childIndex_[component.id()] = component;
@@ -472,6 +481,8 @@ class Component {
     if (!childFound) {
       return;
     }
+
+    component.parentComponent_ = null;
 
     this.childIndex_[component.id()] = null;
     this.childNameIndex_[component.name()] = null;
@@ -1064,6 +1075,19 @@ class Component {
    */
   blur() {
     this.el_.blur();
+  }
+
+  /**
+   * When this Component receives a keydown event which it does not process,
+   *  it passes the event to the Player for handling.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   */
+  handleKeyPress(event) {
+    if (this.player_) {
+      this.player_.handleKeyPress(event);
+    }
   }
 
   /**

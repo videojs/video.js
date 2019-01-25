@@ -4,7 +4,7 @@ import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
-import progress from 'rollup-plugin-progress';
+import progressPlugin from 'rollup-plugin-progress';
 import ignore from 'rollup-plugin-ignore';
 import alias from 'rollup-plugin-alias';
 import _ from 'lodash';
@@ -48,6 +48,15 @@ const primedBabel = babel({
     }]
   ]
 });
+
+const progress = () => {
+  if (process.env.TRAVIS || process.env.NETLIFY) {
+    return {};
+  }
+
+  return progressPlugin();
+};
+
 const globals = {
   browser: {
     'global': 'window',
@@ -81,7 +90,8 @@ const externals = {
     'mux.js/lib/mp4',
     'mux.js/lib/tools/ts-inspector.js',
     'mux.js/lib/mp4/probe',
-    'aes-decrypter'
+    'aes-decrypter',
+    'keycode'
   ]),
   test: Object.keys(globals.test).concat([
   ])

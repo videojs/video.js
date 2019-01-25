@@ -60,9 +60,9 @@ Each file's name should be the [standard language code][lang-codes] that is most
 If there is a [missing translation](/docs/translations-needed.md), mistake, or room for improvement in an existing translation, don't hesitate to open a pull request!
 
 1. Edit the relevant JSON file and make the necessary changes.
-1. Verify the language compiles by running `grunt dist`.
+1. Verify the language compiles by running the language specific build `npm run build:lang` or the full build `npm run build`.
 1. Verify the translation appears properly in the player UI.
-1. Run `grunt check-translations` to update the [missing translation document](/docs/translations-needed.md).
+1. Run `npm run docs:lang` to update the [missing translation document](/docs/translations-needed.md).
 1. Commit and open a pull request on GitHub.
 
 ### Writing a New Translation
