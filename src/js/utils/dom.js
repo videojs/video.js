@@ -612,8 +612,8 @@ export function getPointerPosition(el, event) {
   let offsetX = event.offsetX;
 
   if (event.changedTouches) {
-    offsetX = event.changedTouches[0].offsetX;
-    offsetY = event.changedTouches[0].offsetY;
+    offsetX = event.changedTouches[0].pageX - el.offsetLeft;
+    offsetY = event.changedTouches[0].pageY - el.offsetTop;
   }
 
   position.y = Math.max(0, Math.min(1, (offsetY + boxH) / boxH));
