@@ -32,6 +32,10 @@
   @include flex(auto);
   @include transition(all 0.2s);
   height: 0.3em;
+
+  * {
+    pointer-events: none;
+  }
 }
 
 .video-js .vjs-progress-control .vjs-progress-holder {

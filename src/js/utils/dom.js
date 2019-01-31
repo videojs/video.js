@@ -606,23 +606,18 @@ export function findPosition(el) {
  */
 export function getPointerPosition(el, event) {
   const position = {};
-  const box = findPosition(el);
   const boxW = el.offsetWidth;
   const boxH = el.offsetHeight;
-
-  const boxY = box.top;
-  const boxX = box.left;
-  let pageY = event.pageY;
-  let pageX = event.pageX;
+  let offsetY = event.offsetY;
+  let offsetX = event.offsetX;
 
   if (event.changedTouches) {
-    pageX = event.changedTouches[0].pageX;
-    pageY = event.changedTouches[0].pageY;
+    offsetX = event.changedTouches[0].offsetX;
+    offsetY = event.changedTouches[0].offsetY;
   }
 
-  position.y = Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
-  position.x = Math.max(0, Math.min(1, (pageX - boxX) / boxW));
-
+  position.y = Math.max(0, Math.min(1, (offsetY + boxH) / boxH));
+  position.x = Math.max(0, Math.min(1, offsetX / boxW));
   return position;
 }
 
