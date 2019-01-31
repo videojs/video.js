@@ -59,7 +59,7 @@ class ProgressControl extends Component {
     if (seekBar) {
       const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
       const seekBarEl = seekBar.el();
-      const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
+      const seekBarRect = Dom.findPosition(seekBarEl);
       let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
 
       // The default skin has a gap on either side of the `SeekBar`. This means
