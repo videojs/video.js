@@ -68,7 +68,7 @@ A good bug report should be as detailed as possible, so that others won't have t
 
 ### Requesting a Feature
 
-1. [Check the plugin list](http://videojs.com/plugins/) for any plugins that may already support the feature.
+1. [Check the plugin list](https://videojs.com/plugins/) for any plugins that may already support the feature.
 1. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
 1. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
 1. Once again, be as details as possible and follow the [issue template][]
@@ -284,7 +284,7 @@ See [Running tests](#running-tests) for more information.
 git push origin my-branch
 ```
 
-Then go to the [repo page](http://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
+Then go to the [repo page](https://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
 
 ### Code Style Guide
 

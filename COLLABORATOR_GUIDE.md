@@ -463,7 +463,7 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 
 [conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md
 
-[vjs npm]: http://npmjs.com/org/videojs
+[vjs npm]: https://www.npmjs.com/org/videojs
 
 [npm org]: https://docs.npmjs.com/misc/orgs
 

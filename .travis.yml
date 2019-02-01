@@ -4,8 +4,6 @@ cache: npm
 before_install:
   - npm install -g greenkeeper-lockfile@1
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
   - greenkeeper-lockfile-update
 after_script: greenkeeper-lockfile-upload
 after_failure:
@@ -14,6 +12,8 @@ after_success:
   - npm run assets
 addons:
   chrome: stable
+services:
+  - xvfb
 
 env:
   global:

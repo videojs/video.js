@@ -117,6 +117,9 @@ class PosterImage extends ClickableComponent {
     } else {
       this.player_.pause();
     }
+
+    // call handleFocus manually to get hotkeys working
+    this.player_.handleFocus({});
   }
 
 }

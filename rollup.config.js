@@ -90,7 +90,8 @@ const externals = {
     'mux.js/lib/mp4',
     'mux.js/lib/tools/ts-inspector.js',
     'mux.js/lib/mp4/probe',
-    'aes-decrypter'
+    'aes-decrypter',
+    'keycode'
   ]),
   test: Object.keys(globals.test).concat([
   ])
