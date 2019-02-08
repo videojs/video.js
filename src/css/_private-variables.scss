@@ -13,6 +13,8 @@ $secondary-background-transparency: 0.5 !default;
 $text-font-family: Arial, Helvetica, sans-serif !default;
 
 // Using the '--' naming for component-specific styles
+$big-play-button--border-size: 0.06666em !default;
 $big-play-button--width: 3em !default;
-$big-play-button--height: 1.5em !default;
+$big-play-button--line-height: 1.5em !default;
+$big-play-button--height: $big-play-button--line-height + ($big-play-button--border-size * 2) !default;
 $big-play-button--transparency: 0.8 !default;
