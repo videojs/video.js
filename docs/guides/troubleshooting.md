@@ -46,7 +46,7 @@ For older Video.js versions, [http-streaming][http-streaming] or its predecessor
 ### Make sure that the codec used in the file container is supported:
 
 * The MP4 format can contain video and audio data in many codecs, but MP4 playback in browsers typically only supports h264 video and MP3 or AAC audio.
-* The file extension is not always reflect the file contents. For example some low end phones save video in 3GP format but give it an MP4 extension. These files will not play.
+* The file extension does not always reflect the file contents. For example some low end phones save video in 3GP format but give it an MP4 extension. These files will not play.
 
 ### If you are using Flash videos:
 
