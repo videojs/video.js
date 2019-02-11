@@ -60,6 +60,9 @@ module.exports = function(config) {
 
   Object.keys(config.customLaunchers).forEach(function(cl) {
     if ('browserstack.video' in config.customLaunchers[cl]) {
+      if (cl === 'bsFirefox') {
+        config.customLaunchers[cl]['browser_version'] = '64.0';
+      }
       config.customLaunchers[cl]['browserstack.video'] = "true";
     }
   });
