@@ -58,4 +58,10 @@ module.exports = function(config) {
     'test/unit/**/*.js': ['browserify'],
   };
 
+  Object.keys(config.customLaunchers).forEach(function(cl) {
+    if ('browserstack.video' in config.customLaunchers[cl]) {
+      config.customLaunchers[cl]['browserstack.video'] = "true";
+    }
+  });
+
 };
