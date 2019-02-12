@@ -58,13 +58,19 @@ module.exports = function(config) {
     'test/unit/**/*.js': ['browserify'],
   };
 
+  // pin Browserstack Firefox version to 64
+  config.customLaunchers.bsFirefox.browser_version = '64.0';
+
+  // uncomment the section below to re-enable all browserstack video recording
+  // it is off by default because it slows the build
+  /*
   Object.keys(config.customLaunchers).forEach(function(cl) {
     if ('browserstack.video' in config.customLaunchers[cl]) {
-      if (cl === 'bsFirefox') {
-        config.customLaunchers[cl]['browser_version'] = '64.0';
-      }
       config.customLaunchers[cl]['browserstack.video'] = "true";
     }
   });
+  */
+
+  console.log(JSON.stringify(config, null, 2));
 
 };
