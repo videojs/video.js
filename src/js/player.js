@@ -2066,6 +2066,7 @@ class Player extends Component {
       // we set it to zero here to ensure that if we do start actually caching
       // it, we reset it along with everything else.
       currentTime: 0,
+      inactivityTimeout: this.options_.inactivityTimeout,
       duration: NaN,
       lastVolume: 1,
       lastPlaybackRate: this.defaultPlaybackRate(),
@@ -3647,7 +3648,6 @@ class Player extends Component {
     const controlBar = this.getChild('controlBar');
 
     if (controlBar) {
-      this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
 
       controlBar.on('mouseenter', function(event) {
 
