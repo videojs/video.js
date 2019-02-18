@@ -27,7 +27,9 @@
   max-height: 14em;
 }
 
-.vjs-layout-large .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+.vjs-layout-large .vjs-menu-button-popup .vjs-menu .vjs-menu-content,
+.vjs-layout-x-large .vjs-menu-button-popup .vjs-menu .vjs-menu-content,
+.vjs-layout-huge .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
   max-height: 25em;
 }
 
