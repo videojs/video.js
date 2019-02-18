@@ -19,6 +19,18 @@
   max-height: 15em;
 }
 
+.vjs-layout-small .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 10em;
+}
+
+.vjs-layout-medium .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 14em;
+}
+
+.vjs-layout-large .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 25em;
+}
+
 .vjs-workinghover .vjs-menu-button-popup:hover .vjs-menu,
 .vjs-menu-button-popup .vjs-menu.vjs-lock-showing {
   display: block;
