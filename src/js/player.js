@@ -2066,6 +2066,7 @@ class Player extends Component {
       // we set it to zero here to ensure that if we do start actually caching
       // it, we reset it along with everything else.
       currentTime: 0,
+      inactivityTimeout: this.options_.inactivityTimeout,
       duration: NaN,
       lastVolume: 1,
       lastPlaybackRate: this.defaultPlaybackRate(),
@@ -3291,7 +3292,7 @@ class Player extends Component {
    *        - true means that we should loop the video
    *        - false means that we should not loop the video
    *
-   * @return {string}
+   * @return {boolean}
    *         The current value of loop when getting
    */
   loop(value) {
