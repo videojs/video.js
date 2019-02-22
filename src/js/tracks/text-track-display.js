@@ -4,6 +4,7 @@
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import window from 'global/window';
+import document from 'global/document';
 
 const darkGray = '#222';
 const lightGray = '#ccc';
@@ -228,6 +229,7 @@ class TextTrackDisplay extends Component {
   clearDisplay() {
     if (typeof window.WebVTT === 'function') {
       window.WebVTT.processCues(window, [], this.el_);
+      this.el_.innerHTML = '';
     }
   }
 
@@ -240,8 +242,22 @@ class TextTrackDisplay extends Component {
    */
   updateDisplay() {
     const tracks = this.player_.textTracks();
+    const allowMultipleShowingTracks = this.options_.allowMultipleShowingTracks;
 
     this.clearDisplay();
+
+    if (allowMultipleShowingTracks) {
+      for (let i = 0; i < tracks.length; ++i) {
+        const track = tracks[i];
+        const textTrackDisplayLang = document.createElement('div');
+
+        textTrackDisplayLang.className = 'vjs-text-track-display-' + ((track.language) ? track.language : i);
+        const child = this.el_.appendChild(textTrackDisplayLang);
+
+        this.updateForTrack(track, child);
+      }
+      return;
+    }
 
     // Track display prioritization model: if multiple tracks are 'showing',
     //  display the first 'subtitles' or 'captions' track which is 'showing',
@@ -267,12 +283,12 @@ class TextTrackDisplay extends Component {
       if (this.getAttribute('aria-live') !== 'off') {
         this.setAttribute('aria-live', 'off');
       }
-      this.updateForTrack(captionsSubtitlesTrack);
+      this.updateForTrack(captionsSubtitlesTrack, this.el_);
     } else if (descriptionsTrack) {
       if (this.getAttribute('aria-live') !== 'assertive') {
         this.setAttribute('aria-live', 'assertive');
       }
-      this.updateForTrack(descriptionsTrack);
+      this.updateForTrack(descriptionsTrack, this.el_);
     }
   }
 
@@ -281,8 +297,11 @@ class TextTrackDisplay extends Component {
    *
    * @param {TextTrack} track
    *        Text track object to be added to the list.
+   *
+   * @param {HTMLElement} cueContainer
+   *        The container that will hold our cue tracks
    */
-  updateForTrack(track) {
+  updateForTrack(track, cueContainer) {
     if (typeof window.WebVTT !== 'function' || !track.activeCues) {
       return;
     }
@@ -293,7 +312,8 @@ class TextTrackDisplay extends Component {
       cues.push(track.activeCues[i]);
     }
 
-    window.WebVTT.processCues(window, cues, this.el_);
+    // removes all cues before it process new ones
+    window.WebVTT.processCues(window, cues, cueContainer);
 
     if (!this.player_.textTrackSettings) {
       return;
