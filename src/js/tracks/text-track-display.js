@@ -293,55 +293,18 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
+   * Style {@Link TextTrack} activeCues according to {@Link TextTrackSettings}.
    *
-   * @param {TextTrack || TextTrack[]} tracks
-   *        Text track object or text track array to be added to the list.
+   * @param {TextTrack} track
+   *        Text track object containing active cues to style.
    */
-  updateForTrack(tracks) {
-    if (!Array.isArray(tracks)) {
-      tracks = Array.from(tracks);
-    }
-    if (typeof window.WebVTT !== 'function' ||
-      tracks.every((track)=> {
-        return !track.activeCues;
-      })) {
-      return;
-    }
-
-    const cues = [];
-
-    // push all active track cues
-    for (let i = 0; i < tracks.length; ++i) {
-      const track = tracks[i];
-
-      for (let j = 0; j < track.activeCues.length; ++j) {
-        cues.push(track.activeCues[j]);
-      }
-    }
-
-    // removes all cues before it processes new ones
-    window.WebVTT.processCues(window, cues, this.el_);
-
-    // add unique class to each language in order to style individually if necessary
-    for (let i = 0; i < tracks.length; ++i) {
-      const track = tracks[i];
-
-      for (let j = 0; j < track.activeCues.length; ++j) {
-        track.activeCues[j].displayState.classList.add('vjs-text-track-display-' + ((track.language) ? track.language : i));
-      }
-    }
-
-    if (!this.player_.textTrackSettings) {
-      return;
-    }
-
+  updateDisplayState(track) {
     const overrides = this.player_.textTrackSettings.getValues();
 
-    let i = cues.length;
+    let i = track.activeCues.length;
 
     while (i--) {
-      const cue = cues[i];
+      const cue = track.activeCues[i];
 
       if (!cue) {
         continue;
@@ -411,6 +374,50 @@ class TextTrackDisplay extends Component {
         } else {
           cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
         }
+      }
+    }
+  }
+
+  /**
+   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
+   *
+   * @param {TextTrack || TextTrack[]} tracks
+   *        Text track object or text track array to be added to the list.
+   */
+  updateForTrack(tracks) {
+    if (!Array.isArray(tracks)) {
+      tracks = Array.from(tracks);
+    }
+    if (typeof window.WebVTT !== 'function' ||
+      tracks.every((track)=> {
+        return !track.activeCues;
+      })) {
+      return;
+    }
+
+    const cues = [];
+
+    // push all active track cues
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        cues.push(track.activeCues[j]);
+      }
+    }
+
+    // removes all cues before it processes new ones
+    window.WebVTT.processCues(window, cues, this.el_);
+
+    // add unique class to each language text track & add settings styling if necessary
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        track.activeCues[j].displayState.classList.add('vjs-text-track-display-' + ((track.language) ? track.language : i));
+      }
+      if (this.player_.textTrackSettings) {
+        this.updateDisplayState(track);
       }
     }
   }
