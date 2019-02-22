@@ -4,7 +4,6 @@
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import window from 'global/window';
-import * as Dom from '../utils/dom.js';
 
 const darkGray = '#222';
 const lightGray = '#ccc';
@@ -229,7 +228,6 @@ class TextTrackDisplay extends Component {
   clearDisplay() {
     if (typeof window.WebVTT === 'function') {
       window.WebVTT.processCues(window, [], this.el_);
-      this.el_.innerHTML = '';
     }
   }
 
@@ -247,19 +245,17 @@ class TextTrackDisplay extends Component {
     this.clearDisplay();
 
     if (allowMultipleShowingTracks) {
+      const showingTracks = [];
+
       for (let i = 0; i < tracks.length; ++i) {
         const track = tracks[i];
 
         if (track.mode !== 'showing') {
           continue;
         }
-        const textTrackDisplayLang = Dom.createEl('div');
-
-        textTrackDisplayLang.className = 'vjs-text-track-display-' + ((track.language) ? track.language : i);
-        const child = this.el_.appendChild(textTrackDisplayLang);
-
-        this.updateForTrack(track, child);
+        showingTracks.push(track);
       }
+      this.updateForTrack(showingTracks);
       return;
     }
 
@@ -287,37 +283,52 @@ class TextTrackDisplay extends Component {
       if (this.getAttribute('aria-live') !== 'off') {
         this.setAttribute('aria-live', 'off');
       }
-      this.updateForTrack(captionsSubtitlesTrack, this.el_);
+      this.updateForTrack(captionsSubtitlesTrack);
     } else if (descriptionsTrack) {
       if (this.getAttribute('aria-live') !== 'assertive') {
         this.setAttribute('aria-live', 'assertive');
       }
-      this.updateForTrack(descriptionsTrack, this.el_);
+      this.updateForTrack(descriptionsTrack);
     }
   }
 
   /**
    * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
    *
-   * @param {TextTrack} track
-   *        Text track object to be added to the list.
-   *
-   * @param {HTMLElement} cueContainer
-   *        The container that will hold our cue tracks
+   * @param {TextTrack || TextTrack[]} tracks
+   *        Text track object or text track array to be added to the list.
    */
-  updateForTrack(track, cueContainer) {
-    if (typeof window.WebVTT !== 'function' || !track.activeCues) {
+  updateForTrack(tracks) {
+    if (!Array.isArray(tracks)) {
+      tracks = Array.from(tracks);
+    }
+    if (typeof window.WebVTT !== 'function' ||
+      tracks.every((track)=> {
+        return !track.activeCues;
+      })) {
       return;
     }
 
     const cues = [];
 
-    for (let i = 0; i < track.activeCues.length; i++) {
-      cues.push(track.activeCues[i]);
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; j++) {
+        cues.push(track.activeCues[j]);
+      }
     }
 
-    // removes all cues before it process new ones
-    window.WebVTT.processCues(window, cues, cueContainer);
+    // removes all cues before it processes new ones
+    window.WebVTT.processCues(window, cues, this.el_);
+
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; j++) {
+        track.activeCues[j].displayState.classList.add('vjs-text-track-display-' + i);
+      }
+    }
 
     if (!this.player_.textTrackSettings) {
       return;
