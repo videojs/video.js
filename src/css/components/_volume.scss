@@ -19,7 +19,6 @@
 
 .video-js .vjs-volume-control {
   cursor: pointer;
-  margin-right: 1em;
   @include display-flex;
 }
 .video-js .vjs-volume-control.vjs-volume-horizontal {
@@ -63,7 +62,7 @@
     &:hover,
     &:active,
     &.vjs-slider-active {
-      width: 9em;
+      width: 10em;
 
       @include transition(width 0.1s);
     }
