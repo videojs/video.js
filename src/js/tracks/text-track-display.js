@@ -4,7 +4,7 @@
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import window from 'global/window';
-import document from 'global/document';
+import * as Dom from '../utils/dom.js';
 
 const darkGray = '#222';
 const lightGray = '#ccc';
@@ -249,7 +249,11 @@ class TextTrackDisplay extends Component {
     if (allowMultipleShowingTracks) {
       for (let i = 0; i < tracks.length; ++i) {
         const track = tracks[i];
-        const textTrackDisplayLang = document.createElement('div');
+
+        if (track.mode !== 'showing') {
+          return;
+        }
+        const textTrackDisplayLang = Dom.createEl('div');
 
         textTrackDisplayLang.className = 'vjs-text-track-display-' + ((track.language) ? track.language : i);
         const child = this.el_.appendChild(textTrackDisplayLang);
