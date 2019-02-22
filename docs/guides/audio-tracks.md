@@ -48,7 +48,7 @@ var track = new videojs.AudioTrack({
 player.audioTracks().addTrack(track);
 ```
 
-### Listen for a Video Track Becoming Enabled
+### Listen for an Audio Track Becoming Enabled
 
 When a track is enabled or disabled on an `AudioTrackList`, a `change` event will be
 fired. You can listen for that event and do something with it.
