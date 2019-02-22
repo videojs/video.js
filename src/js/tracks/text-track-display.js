@@ -251,7 +251,7 @@ class TextTrackDisplay extends Component {
         const track = tracks[i];
 
         if (track.mode !== 'showing') {
-          return;
+          continue;
         }
         const textTrackDisplayLang = Dom.createEl('div');
 
