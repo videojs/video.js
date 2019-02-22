@@ -259,7 +259,7 @@ class TextTrackDisplay extends Component {
       return;
     }
 
-    // Track display prioritization model: if multiple tracks are 'showing',
+    //  Track display prioritization model: if multiple tracks are 'showing',
     //  display the first 'subtitles' or 'captions' track which is 'showing',
     //  otherwise display the first 'descriptions' track which is 'showing'
 
@@ -311,10 +311,11 @@ class TextTrackDisplay extends Component {
 
     const cues = [];
 
+    // push all active track cues
     for (let i = 0; i < tracks.length; ++i) {
       const track = tracks[i];
 
-      for (let j = 0; j < track.activeCues.length; j++) {
+      for (let j = 0; j < track.activeCues.length; ++j) {
         cues.push(track.activeCues[j]);
       }
     }
@@ -322,11 +323,12 @@ class TextTrackDisplay extends Component {
     // removes all cues before it processes new ones
     window.WebVTT.processCues(window, cues, this.el_);
 
+    // add unique class to each language in order to style individually if necessary
     for (let i = 0; i < tracks.length; ++i) {
       const track = tracks[i];
 
-      for (let j = 0; j < track.activeCues.length; j++) {
-        track.activeCues[j].displayState.classList.add('vjs-text-track-display-' + i);
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        track.activeCues[j].displayState.classList.add('vjs-text-track-display-' + ((track.language) ? track.language : i));
       }
     }
 
