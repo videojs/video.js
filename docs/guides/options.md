@@ -6,6 +6,7 @@
 
 * [Standard &lt;video> Element Options](#standard-video-element-options)
   * [autoplay](#autoplay)
+    * [More info on autoplay support and changes:](#more-info-on-autoplay-support-and-changes)
   * [controls](#controls)
   * [height](#height)
   * [loop](#loop)
@@ -20,6 +21,7 @@
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
   * [autoSetup](#autosetup)
+  * [breakpoints](#breakpoints)
   * [children](#children)
   * [fluid](#fluid)
   * [inactivityTimeout](#inactivitytimeout)
@@ -29,10 +31,16 @@
   * [notSupportedMessage](#notsupportedmessage)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
-  * [sourceOrder](#sourceorder)
+  * [responsive](#responsive)
   * [sources](#sources)
-  * [techCanOverridePoster](#techCanOverridePoster)
+  * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
+  * [userActions](#useractions)
+  * [userActions.doubleClick](#useractions.doubleclick)
+  * [userActions.hotkeys](#useractions.hotkeys)
+  * [userActions.hotkeys.fullscreenKey](#useractions.hotkeys.fullscreenkey)
+  * [userActions.hotkeys.muteKey](#useractions.hotkeys.mutekey)
+  * [userActions.hotkeys.playPauseKey](#useractions.hotkeys.playpausekey)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
   * [children](#children-1)
@@ -80,7 +88,8 @@ player.autoplay('muted');
 ```
 
 #### More info on autoplay support and changes:
-* See our blog post: https://blog.videojs.com/autoplay-best-practices-with-video-js/
+
+* See our blog post: <https://blog.videojs.com/autoplay-best-practices-with-video-js/>
 
 ### `controls`
 
@@ -162,6 +171,47 @@ Prevents the player from running the autoSetup for media elements with `data-set
 
 > **Note**: this must be set globally with `videojs.options.autoSetup = false` in the same tick as videojs source is loaded to take effect.
 
+### `breakpoints`
+
+> Type: `Object`
+
+When used with the [`responsive` option](#responsive), sets breakpoints that will configure how class names are toggled on the player to adjust the UI based on the player's dimensions.
+
+By default, the breakpoints are:
+
+| Class Name           | Width Range |
+| -------------------- | ----------- |
+| `vjs-layout-tiny`    | 0-210       |
+| `vjs-layout-x-small` | 211-320     |
+| `vjs-layout-small`   | 321-425     |
+| `vjs-layout-medium`  | 426-768     |
+| `vjs-layout-large`   | 769-1440    |
+| `vjs-layout-x-large` | 1441-2560   |
+| `vjs-layout-huge`    | 2561+       |
+
+While the class names cannot be changed, the width ranges can be configured via an object like this:
+
+```js
+breakpoints: {
+  tiny: 300,
+  xsmall: 400,
+  small: 500,
+  medium: 600,
+  large: 700,
+  xlarge: 800,
+  huge: 900
+}
+```
+
+* The _keys_ of the `breakpoints` object are derived from the associated class names by removing the `vjs-layout-` prefix and any `-` characters.
+* The _values_ of the `breakpoints` object define the max width for a range.
+* Not all keys need to be defined. You can easily override a single breakpoint by passing an object with one key/value pair! Customized breakpoints will be merged with default breakpoints when the player is created.
+
+When the player's size changes, the merged breakpoints will be inspected in the size order until a matching breakpoint is found.
+
+That breakpoint's associated class name will be added as a class to the player. The previous breakpoint's class will be removed.
+
+See the file `sandbox/responsive.html.example` for an example of a responsive player using the default breakpoints.
 
 ### `children`
 
@@ -202,6 +252,18 @@ Customize which languages are available in a player. The keys of this object wil
 Learn more about [languages in Video.js][languages]
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
+
+### `liveui`
+
+> Type: `boolean`
+> Default: `false`
+
+Allows the player to use the new live ui that includes:
+* A progress bar for seeking within the live window
+* A button that can be clicked to seek to the live edge with a circle indicating if you are at the live edge or not.
+
+Without this option the progress bar will be hidden and in its place will be text that indicates `LIVE` playback. There will be no progress control
+and you will not be able click the text to seek to the live edge. `liveui` will default to `true` in a future version!
 
 ### `nativeControlsForTouch`
 
@@ -261,6 +323,14 @@ Although, since the `plugins` option is an object, the order of initialization i
 
 See [the plugins guide][plugins] for more information on Video.js plugins.
 
+### `responsive`
+
+> Type: `boolean`, Default: `false`
+
+Setting this option to `true` will cause the player to customize itself based on responsive breakpoints (see: [`breakpoints` option](#breakpoints)).
+
+When this option is `false` (the default), responsive breakpoints will be ignored.
+
 ### `sources`
 
 > Type: `Array`
@@ -301,7 +371,104 @@ This can be useful when multiple techs are used and each has to set their own po
 
 > Type: `Array`, Default: `['html5']`
 
-Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other regisetered techs will be added after this tech in the order in which they are registered.
+Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other registered techs will be added after this tech in the order in which they are registered.
+
+### `userActions`
+
+> Type: `Object`
+
+### `userActions.doubleClick`
+
+> Type: `boolean|function`
+
+Controls how double-clicking on the player/tech operates. If set to `false`, double-clicking is disabled. If undefined or set to
+`true`, double-clicking is enabled and toggles fullscreen mode. To override the default double-click handling, set `userActions.doubleClick`
+to a function which accepts a `dblclick` event:
+
+```js
+function myDoubleClickHandler(event) = {
+  // `this` is the player in this context
+
+  this.pause();
+};
+
+videojs('my-player', {
+  userActions: {
+    doubleClick: myDoubleClickHandler
+  }
+});
+```
+
+### `userActions.hotkeys`
+
+> Type: `boolean|function|object`
+
+Controls how player-wide hotkeys operate. If set to `false`, or `undefined`, hotkeys are disabled. If set to `true` or an object (to allow definitions of `fullscreenKey` etc. below), hotkeys are enabled as described below. To override the default hotkey handling, set `userActions.hotkeys` to a function which accepts a `keydown` event:
+
+```js
+var player = videojs('my-player', {
+  userActions: {
+    hotkeys: function(event) {
+      // `this` is the player in this context
+
+      // `x` key = pause
+      if (event.which === 88) {
+        this.pause();
+      }
+      // `y` key = play
+      if (event.which === 89) {
+        this.play();
+      }
+    }
+  }
+});
+```
+
+Default hotkey handling is:
+
+| Key | Action | Enabled by |
+| :-: | ------ | ---------- |
+| `f` | toggle fullscreen | only enabled if a Fullscreen button is present in the Control Bar
+| `m` | toggle mute | always enabled, even if no Control Bar is present
+| `k` | toggle play/pause | always enabled, even if no Control Bar is present
+| `Space` | toggle play/pause | always enabled, even if no Control Bar is present
+
+Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which
+control in the player has focus.
+
+### `userActions.hotkeys.fullscreenKey`
+
+> Type: `function`
+
+Override the fullscreen key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the fullscreen toggle action is performed.
+
+```js
+var player = videojs('my-player', {
+  userActions: {
+    hotkeys: {
+      muteKey: function(event) {
+        // disable mute key
+      },
+      fullscreenKey: function(event) {
+        // override fullscreen to trigger when pressing the v key
+        return (event.which === 86);
+      }
+    }
+  }
+});
+```
+
+### `userActions.hotkeys.muteKey`
+
+> Type: `function`
+
+Override the mute key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the mute toggle action is performed.
+
+### `userActions.hotkeys.playPauseKey`
+
+> Type: `function`
+
+Override the play/pause key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the play/pause toggle action is performed.
 
 ### `vtt.js`
 

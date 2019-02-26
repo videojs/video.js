@@ -59,7 +59,7 @@ Guidelines for bug reports:
 1. If your issue is with a particular video.js plugin or subproject, please open an issue against that project. See [list of some potential other projects above](#other-repositories-where-issues-could-be-filed)
 1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) — check if the issue has already been reported.
 1. Check if the issue has already been fixed — try to reproduce it using the latest `master` branch in the repository.
-1. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/edit) as a starting point -- don't forget to update it to the videojs version you use.
+1. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this codepen template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) as a starting point -- don't forget to update it to the videojs version you use.
 1. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
@@ -68,7 +68,7 @@ A good bug report should be as detailed as possible, so that others won't have t
 
 ### Requesting a Feature
 
-1. [Check the plugin list](http://videojs.com/plugins/) for any plugins that may already support the feature.
+1. [Check the plugin list](https://videojs.com/plugins/) for any plugins that may already support the feature.
 1. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
 1. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
 1. Once again, be as details as possible and follow the [issue template][]
@@ -79,16 +79,16 @@ A good bug report should be as detailed as possible, so that others won't have t
 
 There are a few labels that might be added to your issue or PR by a maintainer. Here's a quick rundown of what they mean:
 
-| Label | Issue or PR | Description |
-|-------|-------------|-------------|
-| confirmed | Issue and PR | Issue: marks as reproducible by a maintainer. PR: marked by a maintainer as ready to be merged|
-| 5.x | PR | Marks as a change to the 5.x branch only |
-| bug | Issue | Marks as a confirmed bug by a maintainer |
-| good first issue | Issue | Marked as a good bug or enhancement for first time contributors to Video.js |
-| first-timers-only | Issue | Marked as a good bug or enhancement to be done by a newcomer to open source |
-| minor, patch, major | PR | Marks PR with the expected [semver](https://semver.org/) classification of the change |
-| needs: more info | Issue | Marked by a maintainer as needing more information from the issue reporter. Please update your issue with more information to help us reproduce the bug. |
-| needs: reduced test case | Issue | Marked by a maintainer as needing a reduced test case from the issue reporter. Please create a test page that we can inspect to help us indentify a bug. |
+| Label                    | Issue or PR  | Description                                                                                                                                              |
+| ------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| confirmed                | Issue and PR | Issue: marks as reproducible by a maintainer. PR: marked by a maintainer as ready to be merged                                                           |
+| 5.x                      | PR           | Marks as a change to the 5.x branch only                                                                                                                 |
+| bug                      | Issue        | Marks as a confirmed bug by a maintainer                                                                                                                 |
+| good first issue         | Issue        | Marked as a good bug or enhancement for first time contributors to Video.js                                                                              |
+| first-timers-only        | Issue        | Marked as a good bug or enhancement to be done by a newcomer to open source                                                                              |
+| minor, patch, major      | PR           | Marks PR with the expected [semver](https://semver.org/) classification of the change                                                                    |
+| needs: more info         | Issue        | Marked by a maintainer as needing more information from the issue reporter. Please update your issue with more information to help us reproduce the bug. |
+| needs: reduced test case | Issue        | Marked by a maintainer as needing a reduced test case from the issue reporter. Please create a test page that we can inspect to help us indentify a bug. |
 
 ## Contributing code
 
@@ -96,19 +96,6 @@ To contibute code you'll need to be able to build a copy of Video.js and run tes
 
 * Node.js
   Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
-
-* `grunt-cli`
-  Optionally, install `grunt-cli` globally to use grunt directly. It can always be run via an npm script:
-
-```sh
-npm run grunt
-```
-
-```sh
-npm install -g grunt-cli
-```
-
-Depending on how you have node and npm set up, you may need to run the global install (`-g`) as a superuser by prepending `sudo`.
 
 ### Building video.js locally
 
@@ -199,17 +186,11 @@ This ties in nicely with the sandbox directory. You can always open the `sandbox
 > Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you must use a local web server.
 
-To run the local webserver, you can run it in a couple of ways.
-
-```sh
-grunt connect
-open http://localhost:9999/sandbox/index.html
-```
-
-or
+To run the local webserver:
 
 ```sh
 npm start
+open http://localhost:9999/sandbox/index.html
 ```
 
 The latter does some extra work which will be described in the next section.
@@ -303,7 +284,7 @@ See [Running tests](#running-tests) for more information.
 git push origin my-branch
 ```
 
-Then go to the [repo page](http://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
+Then go to the [repo page](https://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
 
 ### Code Style Guide
 

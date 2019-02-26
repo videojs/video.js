@@ -12,7 +12,7 @@ import Component from './component';
  */
 class CloseButton extends Button {
 
- /**
+  /**
   * Creates an instance of the this class.
   *
   * @param  {Player} player
@@ -26,7 +26,7 @@ class CloseButton extends Button {
     this.controlText(options && options.controlText || this.localize('Close'));
   }
 
- /**
+  /**
   * Builds the default DOM `className`.
   *
   * @return {string}
@@ -34,6 +34,21 @@ class CloseButton extends Button {
   */
   buildCSSClass() {
     return `vjs-close-button ${super.buildCSSClass()}`;
+  }
+
+  /**
+   * This gets called when a `CloseButton` has focus and `keydown` is triggered via a key
+   * press.
+   *
+   * @param {EventTarget~Event} event
+   *        The event that caused this function to get called.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+    // Override the default `Button` behavior, and don't pass the keypress event
+    //  up to the player because this button is part of a `ModalDialog`, which
+    //  doesn't pass keypresses to the player either.
   }
 
   /**

@@ -3,15 +3,17 @@
  * @module format-time
  */
 
- /**
- * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in seconds)
- * will force a number of leading zeros to cover the length of the guide.
+/**
+ * Format seconds as a time string, H:MM:SS or M:SS. Supplying a guide (in
+ * seconds) will force a number of leading zeros to cover the length of the
+ * guide.
  *
- * @param {number} seconds
- *        Number of seconds to be turned into a string
+ * @private
+ * @param  {number} seconds
+ *         Number of seconds to be turned into a string
  *
- * @param {number} guide
- *        Number (in seconds) to model the string after
+ * @param  {number} guide
+ *         Number (in seconds) to model the string after
  *
  * @return {string}
  *         Time formatted as H:MM:SS or M:SS
@@ -44,14 +46,16 @@ const defaultImplementation = function(seconds, guide) {
   return h + m + s;
 };
 
+// Internal pointer to the current implementation.
 let implementation = defaultImplementation;
 
 /**
  * Replaces the default formatTime implementation with a custom implementation.
  *
  * @param {Function} customImplementation
- *        A function which will be used in place of the default formatTime implementation.
- *        Will receive the current time in seconds and the guide (in seconds) as arguments.
+ *        A function which will be used in place of the default formatTime
+ *        implementation. Will receive the current time in seconds and the
+ *        guide (in seconds) as arguments.
  */
 export function setFormatTime(customImplementation) {
   implementation = customImplementation;
@@ -64,6 +68,27 @@ export function resetFormatTime() {
   implementation = defaultImplementation;
 }
 
-export default function(seconds, guide = seconds) {
+/**
+ * Delegates to either the default time formatting function or a custom
+ * function supplied via `setFormatTime`.
+ *
+ * Formats seconds as a time string (H:MM:SS or M:SS). Supplying a
+ * guide (in seconds) will force a number of leading zeros to cover the
+ * length of the guide.
+ *
+ * @static
+ * @example  formatTime(125, 600) === "02:05"
+ * @param    {number} seconds
+ *           Number of seconds to be turned into a string
+ *
+ * @param    {number} guide
+ *           Number (in seconds) to model the string after
+ *
+ * @return   {string}
+ *           Time formatted as H:MM:SS or M:SS
+ */
+function formatTime(seconds, guide = seconds) {
   return implementation(seconds, guide);
 }
+
+export default formatTime;

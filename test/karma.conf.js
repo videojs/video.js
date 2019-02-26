@@ -1,193 +1,76 @@
+const generate = require('videojs-generate-karma-config');
+
 module.exports = function(config) {
-  // build out a name for browserstack
-  // {TRAVIS_BUILD_NUMBER} [{TRAVIS_PULL_REQUEST} {PR_BRANCH}] {TRAVIS_BRANCH}
-  var browserstackName = process.env.TRAVIS_BUILD_NUMBER;
+  const coverageFlag = process.env.npm_config_coverage;
+  const reportCoverage = false; // process.env.TRAVIS || coverageFlag || false;
 
-  if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
-    browserstackName += ' ' + process.env.TRAVIS_PULL_REQUEST + ' ' + process.env.TRAVIS_PULL_REQUEST_BRANCH;
-  }
-
-  browserstackName +=  ' ' + process.env.TRAVIS_BRANCH;
-
-  // Creating settings object first so we can modify based on travis
-  var settings = {
-    basePath: '',
-
-    frameworks: ['browserify', 'qunit', 'detectBrowsers'],
-    autoWatch: false,
-    singleRun: true,
-
-    // Compling tests here
-    files: [
-      '../build/temp/video-js.css',
-      '../test/globals-shim.js',
-      '../test/unit/**/*.js',
-      '../build/temp/browserify.js',
-      '../build/temp/webpack.js',
-      { pattern: '../src/**/*.js', watched: true, included: false, served: false }
-    ],
-
-    // Using precompiled tests
-    // files: [
-    //   '../build/temp/video-js.css',
-    //   '../build/temp/tests.js'
-    // ],
-
-    preprocessors: {
-      '../test/**/*.js': [ 'browserify' ]
+  // see https://github.com/videojs/videojs-generate-karma-config
+  // for options
+  const options = {
+    travisLaunchers(defaults) {
+      delete defaults.travisFirefox;
+      return defaults;
     },
-
-    browserify: {
-      debug: true,
-      plugin: ['proxyquireify/plugin'],
-      transform: ['babelify']
+    serverBrowsers(defaults) {
+      return [];
     },
-
-    plugins: [
-      'karma-qunit',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-ie-launcher',
-      'karma-opera-launcher',
-      'karma-safari-launcher',
-      'karma-safaritechpreview-launcher',
-      'karma-browserstack-launcher',
-      'karma-browserify',
-      'karma-coverage',
-      'karma-detect-browsers',
-    ],
-
-    detectBrowsers: {
-      enabled: false,
-      usePhantomJS: false
-    },
-
-    reporters: ['dots'],
-
-    // web server port
-    port: 9876,
-
-    // cli runner port
-    runnerPort: 9100,
-    colors: true,
-    logLevel: config.LOG_INFO,
-    captureTimeout: 300000,
-    browserNoActivityTimeout: 300000,
-    browserDisconnectTimeout: 300000,
-    browserDisconnectTolerance: 3,
-
-    browserStack: {
-      project: 'Video.js',
-      name: browserstackName,
-      build: browserstackName,
-      pollingTimeout: 30000,
-      captureTimeout: 600,
-      timeout: 600
-    },
-    customLaunchers: getCustomLaunchers(),
-
-    // The HTML reporter seems to be busted right now, so we're just using text in the meantime
-    // along with the summary after the test run.
-    coverageReporter: {
-      reporters: [
-        {
-          type: 'text',
-          dir: 'coverage/',
-          file: 'coverage.txt'
-        },
-        {
-          type: 'lcovonly',
-          dir: 'coverage/',
-          subdir: '.'
-        },
-        { type: 'text-summary' }
-      ]
-    },
-
-    // make QUnit show the UI in karma runs
-    client: {
-      clearContext: false,
-      qunit: {
-        showUI: true,
-        testTimeout: 5000
-      }
-    }
+    coverage: reportCoverage,
   };
 
-  // Coverage reporting
-  // Coverage is enabled by passing the flag --coverage to npm test
-  var coverageFlag = process.env.npm_config_coverage;
-  var reportCoverage = process.env.TRAVIS || coverageFlag;
+  config = generate(config, options);
+
+  config.proxies = config.proxies || {};
+
+  // disable warning logs for sourceset tests, by proxing to a remote host
+  Object.assign(config.proxies, {
+    '/test/relative-one.mp4': 'http://example.com/relative-one.mp4',
+    '/test/relative-two.mp4': 'http://example.com/relative-two.mp4',
+    '/test/relative-three.mp4': 'http://example.com/relative-three.mp4'
+  });
+
+  config.files = [
+    'dist/video-js.css',
+    'test/globals-shim.js',
+    'test/unit/**/*.js',
+    'test/dist/browserify.js',
+    'test/dist/webpack.js',
+    {pattern: 'src/**/*.js', watched: true, included: false, served: false }
+  ];
+
+  config.browserStack.project = 'Video.js';
+
+  config.frameworks.push('browserify');
+  config.browserify = {
+    debug: true,
+    plugin: ['proxyquireify/plugin'],
+    transform: [
+      ['babelify', {"presets": [["@babel/preset-env", {"loose": true}]]}],
+    ]
+  };
+
   if (reportCoverage) {
-    settings.browserify.transform.push('browserify-istanbul');
-    settings.reporters.push('coverage');
+    config.browserify.transform.push('browserify-istanbul');
   }
 
-  if (process.env.TRAVIS) {
-    if (process.env.BROWSER_STACK_USERNAME) {
-      settings.browsers = [
-        'chrome_bs',
-        'firefox_bs',
-        'safari_bs',
-        'edge_bs',
-        'ie11_bs'
-      ];
-    } else {
-      settings.browsers = ['chrome_travis'];
-    }
-  }
 
-  config.set(settings);
-};
-
-function getCustomLaunchers(){
-  return {
-    chrome_travis: {
-      base: 'Chrome',
-      flags: ['--no-sandbox']
-    },
-
-    chrome_bs: {
-      base: 'BrowserStack',
-      browser: 'chrome',
-      os: 'Windows',
-      os_version: '10'
-    },
-
-    firefox_bs: {
-      base: 'BrowserStack',
-      browser: 'firefox',
-      os: 'Windows',
-      os_version: '10'
-    },
-
-    safari_bs: {
-      base: 'BrowserStack',
-      browser: 'safari',
-      os: 'OS X',
-      os_version: 'High Sierra'
-    },
-
-    safari9_bs: {
-      base: 'BrowserStack',
-      browser: 'safari',
-      os: 'OS X',
-      os_version: 'El Capitan'
-    },
-
-    edge_bs: {
-      base: 'BrowserStack',
-      browser: 'edge',
-      os: 'Windows',
-      os_version: '10'
-    },
-
-    ie11_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '11',
-      os: 'Windows',
-      os_version: '10'
-    }
+  config.preprocessors = {
+    'test/globals-shim.js': ['browserify'],
+    'test/unit/**/*.js': ['browserify'],
   };
-}
+
+  // pin Browserstack Firefox version to 64
+  config.customLaunchers.bsFirefox.browser_version = '64.0';
+
+  // uncomment the section below to re-enable all browserstack video recording
+  // it is off by default because it slows the build
+  /*
+  Object.keys(config.customLaunchers).forEach(function(cl) {
+    if ('browserstack.video' in config.customLaunchers[cl]) {
+      config.customLaunchers[cl]['browserstack.video'] = "true";
+    }
+  });
+  */
+
+  console.log(JSON.stringify(config, null, 2));
+
+};

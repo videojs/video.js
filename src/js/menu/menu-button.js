@@ -10,6 +10,7 @@ import * as Events from '../utils/events.js';
 import toTitleCase from '../utils/to-title-case.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
+import keycode from 'keycode';
 
 /**
  * A `MenuButton` class for any popup {@link Menu}.
@@ -51,7 +52,9 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'click', this.handleClick);
     this.on(this.menuButton_, 'focus', this.handleFocus);
     this.on(this.menuButton_, 'blur', this.handleBlur);
-
+    this.on(this.menuButton_, 'mouseenter', () => {
+      this.menu.show();
+    });
     this.on('keydown', this.handleSubmenuKeyPress);
   }
 
@@ -106,7 +109,7 @@ class MenuButton extends Component {
 
     // Add a title list item to the top
     if (this.options_.title) {
-      const title = Dom.createEl('li', {
+      const titleEl = Dom.createEl('li', {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.options_.title),
         tabIndex: -1
@@ -114,8 +117,9 @@ class MenuButton extends Component {
 
       this.hideThreshold_ += 1;
 
-      menu.children_.unshift(title);
-      Dom.prependTo(title, menu.contentEl());
+      const titleComponent = new Component(this.player_, {el: titleEl});
+
+      menu.addItem(titleComponent);
     }
 
     this.items = this.createItems();
@@ -221,14 +225,6 @@ class MenuButton extends Component {
    * @listens click
    */
   handleClick(event) {
-    // When you click the button it adds focus, which will show the menu.
-    // So we'll remove focus when the mouse leaves the button. Focus is needed
-    // for tab navigation.
-
-    this.one(this.menu.contentEl(), 'mouseleave', Fn.bind(this, function(e) {
-      this.unpressButton();
-      this.el_.blur();
-    }));
     if (this.buttonPressed_) {
       this.unpressButton();
     } else {
@@ -287,24 +283,28 @@ class MenuButton extends Component {
    * @listens keydown
    */
   handleKeyPress(event) {
-
-    // Escape (27) key or Tab (9) key unpress the 'button'
-    if (event.which === 27 || event.which === 9) {
+    // Escape or Tab unpress the 'button'
+    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (event.which !== 9) {
+      if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
-        this.menuButton_.el_.focus();
+        this.menuButton_.focus();
       }
-    // Up (38) key or Down (40) key press the 'button'
-    } else if (event.which === 38 || event.which === 40) {
+    // Up Arrow or Down Arrow also 'press' the button to open the menu
+    } else if (keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) {
       if (!this.buttonPressed_) {
-        this.pressButton();
         event.preventDefault();
+        this.pressButton();
       }
+    } else {
+      // NOTE: This is a special case where we don't pass unhandled
+      //  keypress events up to the Component handler, because it is
+      //  just entending the keypress handling of the actual `Button`
+      //  in the `MenuButton` which already passes unused keys up.
     }
   }
 
@@ -318,18 +318,22 @@ class MenuButton extends Component {
    * @listens keydown
    */
   handleSubmenuKeyPress(event) {
-
-    // Escape (27) key or Tab (9) key unpress the 'button'
-    if (event.which === 27 || event.which === 9) {
+    // Escape or Tab unpress the 'button'
+    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (event.which !== 9) {
+      if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
         // Set focus back to the menu button's button
-        this.menuButton_.el_.focus();
+        this.menuButton_.focus();
       }
+    } else {
+      // NOTE: This is a special case where we don't pass unhandled
+      //  keypress events up to the Component handler, because it is
+      //  just entending the keypress handling of the `MenuItem`
+      //  in the `Menu` which already passes unused keys up.
     }
   }
 
@@ -339,6 +343,7 @@ class MenuButton extends Component {
   pressButton() {
     if (this.enabled_) {
       this.buttonPressed_ = true;
+      this.menu.show();
       this.menu.lockShowing();
       this.menuButton_.el_.setAttribute('aria-expanded', 'true');
 
@@ -360,6 +365,7 @@ class MenuButton extends Component {
     if (this.enabled_) {
       this.buttonPressed_ = false;
       this.menu.unlockShowing();
+      this.menu.hide();
       this.menuButton_.el_.setAttribute('aria-expanded', 'false');
     }
   }

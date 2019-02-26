@@ -247,9 +247,11 @@ QUnit.test('should do a deep merge of child options', function(assert) {
   assert.strictEqual(children.childThree, false, 'object two levels deep removed');
   assert.ok(children.childFour, 'object two levels deep added');
 
-  assert.strictEqual(Component.prototype.options_.example.childOne.foo,
-                     'bar',
-                     'prototype options were not overridden');
+  assert.strictEqual(
+    Component.prototype.options_.example.childOne.foo,
+    'bar',
+    'prototype options were not overridden'
+  );
 
   // Reset default component options to none
   Component.prototype.options_ = null;
@@ -350,8 +352,10 @@ QUnit.test('should dispose of component and children', function(assert) {
   assert.ok(!child.children(), 'child children were deleted');
   assert.ok(!child.el(), 'child element was deleted');
   assert.ok(!DomData.hasData(el), 'listener data nulled');
-  assert.ok(!Object.getOwnPropertyNames(data).length,
-  'original listener data object was emptied');
+  assert.ok(
+    !Object.getOwnPropertyNames(data).length,
+    'original listener data object was emptied'
+  );
 });
 
 QUnit.test('should add and remove event listeners to element', function(assert) {
@@ -448,11 +452,9 @@ QUnit.test('should add listeners to other components and remove when them other 
   const player = getFakePlayer();
   const comp1 = new Component(player);
   const comp2 = new Component(player);
-  let listenerFired = 0;
 
   const testListener = function() {
     assert.equal(this, comp1, 'listener has the first component as context');
-    listenerFired++;
   };
 
   comp1.on(comp2, 'test-event', testListener);
@@ -757,8 +759,10 @@ QUnit.test('should use a defined content el for appending children', function(as
 
   assert.ok(comp.children().length === 0, 'Length should now be zero');
   assert.ok(comp.el().childNodes[0].id === 'contentEl', 'Content El should still exist');
-  assert.ok(comp.el().childNodes[0].childNodes[0] !== child.el(),
-  'Child el should be removed.');
+  assert.ok(
+    comp.el().childNodes[0].childNodes[0] !== child.el(),
+    'Child el should be removed.'
+  );
 
   comp.dispose();
 });
@@ -1033,4 +1037,26 @@ QUnit.test('should use the stateful mixin', function(assert) {
   assert.strictEqual(comp.state.foo, 'bar', 'the component passes a basic stateful test');
 
   comp.dispose();
+});
+
+QUnit.test('should remove child when the child moves to the other parent', function(assert) {
+  const parentComponent1 = new Component(getFakePlayer(), {});
+  const parentComponent2 = new Component(getFakePlayer(), {});
+  const childComponent = new Component(getFakePlayer(), {});
+
+  parentComponent1.addChild(childComponent);
+
+  assert.strictEqual(parentComponent1.children().length, 1, 'the children number of `parentComponent1` is 1');
+  assert.strictEqual(parentComponent1.children()[0], childComponent, 'the first child of `parentComponent1` is `childComponent`');
+  assert.strictEqual(parentComponent1.el().childNodes[0], childComponent.el(), '`parentComponent1` contains the DOM element of `childComponent`');
+
+  parentComponent2.addChild(childComponent);
+
+  assert.strictEqual(parentComponent1.children().length, 0, 'the children number of `parentComponent1` is 0');
+  assert.strictEqual(parentComponent1.el().childNodes.length, 0, 'the length of `childNodes` of `parentComponent1` is 0');
+
+  assert.strictEqual(parentComponent2.children().length, 1, 'the children number of `parentComponent2` is 1');
+  assert.strictEqual(parentComponent2.children()[0], childComponent, 'the first child of `parentComponent2` is `childComponent`');
+  assert.strictEqual(parentComponent2.el().childNodes.length, 1, 'the length of `childNodes` of `parentComponent2` is 1');
+  assert.strictEqual(parentComponent2.el().childNodes[0], childComponent.el(), '`parentComponent2` contains the DOM element of `childComponent`');
 });

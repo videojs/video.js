@@ -84,9 +84,7 @@ class PlaybackRateMenuButton extends MenuButton {
 
     if (rates) {
       for (let i = rates.length - 1; i >= 0; i--) {
-        menu.addChild(
-          new PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'})
-        );
+        menu.addChild(new PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'}));
       }
     }
 

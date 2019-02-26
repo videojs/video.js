@@ -3,7 +3,6 @@
  */
 import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
-import formatTime from '../../utils/format-time.js';
 
 import './time-tooltip';
 
@@ -23,8 +22,9 @@ class PlayProgressBar extends Component {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-play-progress vjs-slider-bar',
-      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
+      className: 'vjs-play-progress vjs-slider-bar'
+    }, {
+      'aria-hidden': 'true'
     });
   }
 
@@ -40,24 +40,17 @@ class PlayProgressBar extends Component {
    *        from the left edge of the {@link SeekBar}
    */
   update(seekBarRect, seekBarPoint) {
+    const timeTooltip = this.getChild('timeTooltip');
 
-    // If there is an existing rAF ID, cancel it so we don't over-queue.
-    if (this.rafId_) {
-      this.cancelAnimationFrame(this.rafId_);
+    if (!timeTooltip) {
+      return;
     }
 
-    this.rafId_ = this.requestAnimationFrame(() => {
-      const time = (this.player_.scrubbing()) ?
-        this.player_.getCache().currentTime :
-        this.player_.currentTime();
+    const time = (this.player_.scrubbing()) ?
+      this.player_.getCache().currentTime :
+      this.player_.currentTime();
 
-      const content = formatTime(time, this.player_.duration());
-      const timeTooltip = this.getChild('timeTooltip');
-
-      if (timeTooltip) {
-        timeTooltip.update(seekBarRect, seekBarPoint, content);
-      }
-    });
+    timeTooltip.updateTime(seekBarRect, seekBarPoint, time);
   }
 }
 

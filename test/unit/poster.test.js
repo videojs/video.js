@@ -57,16 +57,20 @@ QUnit.test('should remove itself from the document flow when there is no poster'
   // Update with an empty string
   this.mockPlayer.poster_ = '';
   this.mockPlayer.trigger('posterchange');
-  assert.equal(posterImage.hasClass('vjs-hidden'),
-              true,
-              'Poster image hides with an empty source');
+  assert.equal(
+    posterImage.hasClass('vjs-hidden'),
+    true,
+    'Poster image hides with an empty source'
+  );
 
   // Updated with a valid source
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  assert.equal(posterImage.hasClass('vjs-hidden'),
-              false,
-              'Poster image shows again when there is a source');
+  assert.equal(
+    posterImage.hasClass('vjs-hidden'),
+    false,
+    'Poster image shows again when there is a source'
+  );
 
   posterImage.dispose();
 });
@@ -86,14 +90,18 @@ QUnit.test('should hide the poster in the appropriate player states', function(a
   fixture.appendChild(playerDiv);
 
   playerDiv.className = 'video-js vjs-has-started';
-  assert.equal(TestHelpers.getComputedStyle(el, 'display'),
-              'none',
-              'The poster hides when the video has started (CSS may not be loaded)');
+  assert.equal(
+    TestHelpers.getComputedStyle(el, 'display'),
+    'none',
+    'The poster hides when the video has started (CSS may not be loaded)'
+  );
 
   playerDiv.className = 'video-js vjs-has-started vjs-audio';
-  assert.equal(TestHelpers.getComputedStyle(el, 'display'),
-              'block',
-              'The poster continues to show when playing audio');
+  assert.equal(
+    TestHelpers.getComputedStyle(el, 'display'),
+    'block',
+    'The poster continues to show when playing audio'
+  );
 
   posterImage.dispose();
 });

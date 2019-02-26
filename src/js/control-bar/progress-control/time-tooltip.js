@@ -3,6 +3,7 @@
  */
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
+import formatTime from '../../utils/format-time.js';
 
 /**
  * Time tooltips display a time above the progress bar.
@@ -20,6 +21,8 @@ class TimeTooltip extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-time-tooltip'
+    }, {
+      'aria-hidden': 'true'
     });
   }
 
@@ -80,6 +83,49 @@ class TimeTooltip extends Component {
 
     this.el_.style.right = `-${pullTooltipBy}px`;
     Dom.textContent(this.el_, content);
+  }
+
+  /**
+   * Updates the position of the time tooltip relative to the `SeekBar`.
+   *
+   * @param {Object} seekBarRect
+   *        The `ClientRect` for the {@link SeekBar} element.
+   *
+   * @param {number} seekBarPoint
+   *        A number from 0 to 1, representing a horizontal reference point
+   *        from the left edge of the {@link SeekBar}
+   *
+   * @param {number} time
+   *        The time to update the tooltip to, not used during live playback
+   *
+   * @param {Function} cb
+   *        A function that will be called during the request animation frame
+   *        for tooltips that need to do additional animations from the default
+   */
+  updateTime(seekBarRect, seekBarPoint, time, cb) {
+    // If there is an existing rAF ID, cancel it so we don't over-queue.
+    if (this.rafId_) {
+      this.cancelAnimationFrame(this.rafId_);
+    }
+
+    this.rafId_ = this.requestAnimationFrame(() => {
+      let content;
+      const duration = this.player_.duration();
+
+      if (this.player_.liveTracker && this.player_.liveTracker.isLive()) {
+        const liveWindow = this.player_.liveTracker.liveWindow();
+        const secondsBehind = liveWindow - (seekBarPoint * liveWindow);
+
+        content = (secondsBehind < 1 ? '' : '-') + formatTime(secondsBehind, liveWindow);
+      } else {
+        content = formatTime(time, duration);
+      }
+
+      this.update(seekBarRect, seekBarPoint, content);
+      if (cb) {
+        cb();
+      }
+    });
   }
 }
 

@@ -5,6 +5,7 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
 import {assign} from './utils/obj';
+import keycode from 'keycode';
 
 /**
  * Base class for all buttons.
@@ -104,14 +105,12 @@ class Button extends ClickableComponent {
    * @listens keydown
    */
   handleKeyPress(event) {
+    // Ignore Space or Enter key operation, which is handled by the browser for a button.
+    if (!(keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter'))) {
 
-    // Ignore Space (32) or Enter (13) key operation, which is handled by the browser for a button.
-    if (event.which === 32 || event.which === 13) {
-      return;
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(event);
     }
-
-    // Pass keypress handling up for unsupported keys
-    super.handleKeyPress(event);
   }
 }
 

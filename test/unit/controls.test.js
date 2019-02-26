@@ -2,9 +2,11 @@
 import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
 import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
 import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
+import PlayToggle from '../../src/js/control-bar/play-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
+import ControlBar from '../../src/js/control-bar/control-bar.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
@@ -31,6 +33,48 @@ QUnit.test('should hide volume and mute toggle control if it\'s not supported', 
 
   assert.ok(volumeControl.hasClass('vjs-hidden'), 'volumeControl is not hidden');
   assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
+
+  player.dispose();
+});
+
+QUnit.test('should show replay icon when video playback ended', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player);
+
+  player.trigger('ended');
+
+  assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
+
+  player.dispose();
+});
+
+QUnit.test('should show replay icon when video playback ended and replay option is set to true', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player, {replay: true});
+
+  player.trigger('ended');
+
+  assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
+
+  player.dispose();
+});
+
+QUnit.test('should not show the replay icon when video playback ended', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player, {replay: false});
+
+  player.trigger('ended');
+
+  assert.equal(playToggle.hasClass('vjs-ended'), false, 'playToogle is not in the ended state');
 
   player.dispose();
 });
@@ -212,4 +256,37 @@ QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', fun
   assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
 
   player.dispose();
+});
+
+QUnit.test('controlbar children to false individually, does not cause an assertion', function(assert) {
+  const defaultChildren = ControlBar.prototype.options_.children;
+
+  defaultChildren.forEach((childName) => {
+    const options = {controlBar: {}};
+
+    options.controlBar[childName] = false;
+
+    const player = TestHelpers.makePlayer(options);
+
+    this.clock.tick(1000);
+    player.triggerReady();
+    player.dispose();
+    assert.ok(true, `${childName}: false. did not cause an assertion`);
+  });
+});
+
+QUnit.test('all controlbar children to false, does not cause an assertion', function(assert) {
+  const defaultChildren = ControlBar.prototype.options_.children;
+  const options = {controlBar: {}};
+
+  defaultChildren.forEach((childName) => {
+    options.controlBar[childName] = false;
+  });
+
+  const player = TestHelpers.makePlayer(options);
+
+  this.clock.tick(1000);
+  player.triggerReady();
+  player.dispose();
+  assert.ok(true, 'did not cause an assertion');
 });

@@ -5,13 +5,13 @@
   <title>Video.js Sandbox</title>
 
   <!-- Load the source files -->
-  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
   <script src="../node_modules/videojs-flash/dist/videojs-flash.js"></script>
 
   <!-- Set the location of the flash SWF -->
   <script>
-    videojs.options.flash.swf = '../build/temp/video-js.swf';
+    videojs.options.flash.swf = '../node_modules/videojs-swf/dist/video-js.swf';
   </script>
 
   <style>

@@ -67,7 +67,7 @@ class ResizeManager extends Component {
 
     } else {
       this.loadListener_ = () => {
-        if (!this.el_ || this.el_.contentWindow) {
+        if (!this.el_ || !this.el_.contentWindow) {
           return;
         }
 
@@ -80,7 +80,10 @@ class ResizeManager extends Component {
 
   createEl() {
     return super.createEl('iframe', {
-      className: 'vjs-resize-manager'
+      className: 'vjs-resize-manager',
+      tabIndex: -1
+    }, {
+      'aria-hidden': 'true'
     });
   }
 

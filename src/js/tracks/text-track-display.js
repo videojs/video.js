@@ -98,9 +98,11 @@ class TextTrackDisplay extends Component {
   constructor(player, options, ready) {
     super(player, options, ready);
 
+    const updateDisplayHandler = Fn.bind(this, this.updateDisplay);
+
     player.on('loadstart', Fn.bind(this, this.toggleDisplay));
-    player.on('texttrackchange', Fn.bind(this, this.updateDisplay));
-    player.on('loadstart', Fn.bind(this, this.preselectTrack));
+    player.on('texttrackchange', updateDisplayHandler);
+    player.on('loadedmetadata', Fn.bind(this, this.preselectTrack));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
@@ -112,7 +114,11 @@ class TextTrackDisplay extends Component {
         return;
       }
 
-      player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
+      player.on('fullscreenchange', updateDisplayHandler);
+      player.on('playerresize', updateDisplayHandler);
+
+      window.addEventListener('orientationchange', updateDisplayHandler);
+      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
 
       const tracks = this.options_.playerOptions.tracks || [];
 
@@ -144,8 +150,11 @@ class TextTrackDisplay extends Component {
     for (let i = 0; i < trackList.length; i++) {
       const track = trackList[i];
 
-      if (userPref && userPref.enabled &&
-        userPref.language === track.language) {
+      if (
+        userPref && userPref.enabled &&
+        userPref.language && userPref.language === track.language &&
+        track.kind in modes
+      ) {
         // Always choose the track that matches both language and kind
         if (track.kind === userPref.kind) {
           preferredTrack = track;
@@ -307,25 +316,35 @@ class TextTrackDisplay extends Component {
         cueDiv.firstChild.style.color = overrides.color;
       }
       if (overrides.textOpacity) {
-        tryUpdateStyle(cueDiv.firstChild,
-                       'color',
-                       constructColor(overrides.color || '#fff',
-                                      overrides.textOpacity));
+        tryUpdateStyle(
+          cueDiv.firstChild,
+          'color',
+          constructColor(
+            overrides.color || '#fff',
+            overrides.textOpacity
+          )
+        );
       }
       if (overrides.backgroundColor) {
         cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
       }
       if (overrides.backgroundOpacity) {
-        tryUpdateStyle(cueDiv.firstChild,
-                       'backgroundColor',
-                       constructColor(overrides.backgroundColor || '#000',
-                                      overrides.backgroundOpacity));
+        tryUpdateStyle(
+          cueDiv.firstChild,
+          'backgroundColor',
+          constructColor(
+            overrides.backgroundColor || '#000',
+            overrides.backgroundOpacity
+          )
+        );
       }
       if (overrides.windowColor) {
         if (overrides.windowOpacity) {
-          tryUpdateStyle(cueDiv,
-                         'backgroundColor',
-                         constructColor(overrides.windowColor, overrides.windowOpacity));
+          tryUpdateStyle(
+            cueDiv,
+            'backgroundColor',
+            constructColor(overrides.windowColor, overrides.windowOpacity)
+          );
         } else {
           cueDiv.style.backgroundColor = overrides.windowColor;
         }

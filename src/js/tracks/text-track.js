@@ -23,9 +23,11 @@ import merge from '../utils/merge-options';
  * @private
  */
 const parseCues = function(srcContent, track) {
-  const parser = new window.WebVTT.Parser(window,
-                                          window.vttjs,
-                                          window.WebVTT.StringDecoder());
+  const parser = new window.WebVTT.Parser(
+    window,
+    window.vttjs,
+    window.WebVTT.StringDecoder()
+  );
   const errors = [];
 
   parser.oncue = function(cue) {
@@ -226,11 +228,12 @@ class TextTrack extends Track {
             return;
           }
           mode = newMode;
-          if (mode === 'showing') {
-
+          if (mode !== 'disabled') {
             this.tech_.ready(() => {
               this.tech_.on('timeupdate', timeupdateHandler);
             }, true);
+          } else {
+            this.tech_.off('timeupdate', timeupdateHandler);
           }
           /**
            * An event that fires when mode changes on this track. This allows

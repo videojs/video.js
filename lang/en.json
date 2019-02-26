@@ -9,6 +9,8 @@
   "Remaining Time": "Remaining Time",
   "Stream Type": "Stream Type",
   "LIVE": "LIVE",
+  "Seek to live, currently behind live": "Seek to live, currently behind live",
+  "Seek to live, currently playing live": "Seek to live, currently playing live",
   "Loaded": "Loaded",
   "Progress": "Progress",
   "Progress Bar": "Progress Bar",

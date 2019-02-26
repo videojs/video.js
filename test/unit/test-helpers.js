@@ -7,7 +7,7 @@ const TestHelpers = {
     const videoTag = document.createElement('video');
 
     videoTag.id = 'example_1';
-    videoTag.className = 'video-js vjs-default-skin';
+    videoTag.className = 'video-js';
     return videoTag;
   },
 
@@ -50,14 +50,14 @@ const TestHelpers = {
    * @param  {Array} [spec.classes]
    *         An array of classes that are expected on the element.
    *
-   * @param  {String} [spec.innerHTML]
+   * @param  {string} [spec.innerHTML]
    *         A string of text/html that is expected as the content of element.
    *         Both values will be trimmed, but remains case-sensitive.
    *
    * @param  {Object} [spec.props]
    *         An object mapping property names (keys) to strict values.
    *
-   * @param  {String} [spec.tagName]
+   * @param  {string} [spec.tagName]
    *         A string (case-insensitive) representing that element's tagName.
    *
    * @return {Function}

@@ -16,6 +16,7 @@ The architecture of the Video.js player is centered around components. The `Play
   * [Using trigger](#using-trigger)
 * [Default Component Tree](#default-component-tree)
 * [Specific Component Details](#specific-component-details)
+  * [Play Toggle](#play-toggle)
   * [Volume Panel](#volume-panel)
   * [Text Track Settings](#text-track-settings)
   * [Resize Manager](#resize-manager)
@@ -318,6 +319,22 @@ Player
 ```
 
 ## Specific Component Details
+
+### Play Toggle
+
+The `PlayToggle` has one option `replay` which can show or hide replay icon. This can be set by passing `{replay: false}` as the default behavior replay icon is shown after video end playback.
+
+Example of how to hide a replay icon
+
+```js
+let player = videojs('myplayer', {
+  controlBar: {
+    playToggle: {
+      replay: false
+    }
+  }
+});
+```
 
 ### Volume Panel
 
