@@ -2234,7 +2234,7 @@ class Player extends Component {
 
       // if we are in Safari, there is a high chance that loadstart will trigger after the gesture timeperiod
       // in that case, we need to prime the video element by calling load so it'll be ready in time
-      if (browser.IS_ANY_SAFARI) {
+      if (browser.IS_ANY_SAFARI || browser.IS_IOS) {
         this.load();
       }
       this.one('loadstart', this.playOnLoadstart_);
