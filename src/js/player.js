@@ -1962,7 +1962,7 @@ class Player extends Component {
   documentFullscreenChange_(e) {
     const fsApi = FullscreenApi;
 
-    this.isFullscreen(document[fsApi.fullscreenElement]);
+    this.isFullscreen(document[fsApi.fullscreenElement] === this.el());
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
