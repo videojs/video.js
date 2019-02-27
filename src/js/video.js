@@ -4,7 +4,6 @@
  */
 import {version} from '../../package.json';
 import window from 'global/window';
-import document from 'global/document';
 import * as setup from './setup';
 import * as stylesheet from './utils/stylesheet.js';
 import Component from './component';
@@ -143,7 +142,7 @@ function videojs(id, options, ready) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
-  if (!document.body.contains(el)) {
+  if (!el.ownerDocument.defaultView || !el.ownerDocument.contains(el)) {
     log.warn('The element supplied is not included in the DOM');
   }
 
