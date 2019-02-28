@@ -51,6 +51,25 @@ Alternatively, you can include Video.js by getting it from [npm](https://videojs
 <!-- cdnjs : use a specific version of Video.js (change the version numbers as necessary) -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video-js.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video.min.js"></script>
+
+<!-- jsDelivr : use the latest version of Video.js -->
+<link href="https://cdn.jsdelivr.net/npm/@latest/dist/video-js.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/video.js@latest/dist/video.min.js"></script>
+
+<!-- jsDelivr : use a specific version of Video.js (change the version numbers as necessary) -->
+<link href="https://cdn.jsdelivr.net/npm/video.js@7.5.0/dist/video-js.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/video.js@7.5.0/dist/video.min.js"></script>
+
+<!-- jsDelivr : use the current beta version of Video.js (auto-updates, will revert to latest if there is no beta) -->
+<link href="https://cdn.jsdelivr.net/npm/video.js@beta/dist/video-js.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/video.js@beta/dist/video.min.js"></script>
+
+<!-- jsDelivr : alias to fix only minor version; recommended (auto-updates v7.5.0 to 7.5.1 to 7.5.2, etc....) -->
+<link href="https://cdn.jsdelivr.net/npm/video.js@7.5/dist/video-js.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/video.js@7.5/dist/video.min.js"></script>
+
+<!-- jsDelivr : combine files to reduce requests -->
+<script src="https://cdn.jsdelivr.net/combine/npm/video.js@7.5/dist/video.min.js,npm/videojs-youtube@2.6/dist/Youtube.min.js"></script>
 ```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!
