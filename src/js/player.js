@@ -323,6 +323,7 @@ class Player extends Component {
     // don't auto mixin the evented mixin
     options.evented = false;
 
+    // options.baseUrl = '';
     // we don't want the player to report touch activity on itself
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
@@ -2976,7 +2977,7 @@ class Player extends Component {
     }
     // filter out invalid sources and turn our source into
     // an array of source objects
-    const sources = filterSource(source);
+    const sources = filterSource(source, this.options_.baseUrl);
 
     // if a source was passed in then it is invalid because
     // it was filtered to a zero length Array. So we have to
@@ -3165,6 +3166,13 @@ class Player extends Component {
    */
   currentSource() {
     return this.cache_.source || {};
+  }
+
+  baseUrl(url) {
+    if (typeof url === 'string' && url.length !== 0) {
+      this.options_.baseUrl = url;
+    }
+    return this.options_.baseUrl;
   }
 
   /**

@@ -17,13 +17,14 @@ import {getMimetype} from './mimetypes';
  *
  * @private
  */
-const filterSource = function(src) {
+const filterSource = function(src, baseUrl) {
   // traverse array
+
   if (Array.isArray(src)) {
     let newsrc = [];
 
     src.forEach(function(srcobj) {
-      srcobj = filterSource(srcobj);
+      srcobj = filterSource(srcobj, baseUrl);
 
       if (Array.isArray(srcobj)) {
         newsrc = newsrc.concat(srcobj);
@@ -35,10 +36,10 @@ const filterSource = function(src) {
     src = newsrc;
   } else if (typeof src === 'string' && src.trim()) {
     // convert string into object
-    src = [fixSource({src})];
+    src = [fixSource({src}, baseUrl)];
   } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
     // src is already valid
-    src = [fixSource(src)];
+    src = [fixSource(src, baseUrl)];
   } else {
     // invalid source, turn it into an empty array
     src = [];
@@ -55,13 +56,14 @@ const filterSource = function(src) {
  * @return {Tech~SourceObject}
  *        src Object with known type
  */
-function fixSource(src) {
+function fixSource(src, baseUrl) {
   const mimetype = getMimetype(src.src);
 
   if (!src.type && mimetype) {
     src.type = mimetype;
   }
 
+  src.src = baseUrl + src.src;
   return src;
 }
 
