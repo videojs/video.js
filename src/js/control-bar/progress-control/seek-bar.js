@@ -53,7 +53,6 @@ class SeekBar extends Slider {
   setEventHandlers_() {
     this.update = Fn.throttle(Fn.bind(this, this.update), UPDATE_REFRESH_INTERVAL);
 
-    this.on(this.player_, 'timeupdate', this.update);
     this.on(this.player_, 'ended', this.handleEnded);
     this.on(this.player_, 'durationchange', this.update);
     if (this.player_.liveTracker) {
@@ -427,13 +426,6 @@ SeekBar.prototype.options_ = {
 if (!IS_IOS && !IS_ANDROID) {
   SeekBar.prototype.options_.children.splice(1, 0, 'mouseTimeDisplay');
 }
-
-/**
- * Call the update event for this Slider when this event happens on the player.
- *
- * @type {string}
- */
-SeekBar.prototype.playerEvent = 'timeupdate';
 
 Component.registerComponent('SeekBar', SeekBar);
 export default SeekBar;
