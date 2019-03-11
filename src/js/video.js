@@ -22,6 +22,7 @@ import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
 import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
+import * as DomData from './utils/dom-data.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
@@ -552,6 +553,8 @@ videojs.computedStyle = computedStyle;
  * @see  {@link module:dom|dom}
  */
 videojs.dom = Dom;
+
+videojs.domData = DomData;
 
 /**
  * A reference to the {@link module:url|URL utility module} as an object.
