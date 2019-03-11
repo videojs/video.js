@@ -109,6 +109,7 @@ class ResizeManager extends Component {
   }
 
   dispose() {
+    this.trigger('dispose');
     if (this.debouncedHandler_) {
       this.debouncedHandler_.cancel();
     }
