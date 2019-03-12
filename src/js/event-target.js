@@ -141,6 +141,8 @@ EventTarget.prototype.trigger = function(event) {
   if (typeof event === 'string') {
     event = {type};
   }
+
+  event = Object.assign({target: this}, event);
   event = Events.fixEvent(event);
 
   if (this.allowedEvents_[type] && this['on' + type]) {
