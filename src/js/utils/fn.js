@@ -44,9 +44,6 @@ export const bind = function(context, fn, uid) {
   // currently used in text tracks
   bound.guid = (uid) ? uid + '_' + fn.guid : fn.guid;
 
-  bound.original_ = fn.original_ || fn;
-  bound.context_ = fn.context_ || context;
-
   return bound;
 };
 
@@ -74,8 +71,6 @@ export const throttle = function(fn, wait) {
       last = now;
     }
   };
-
-  throttled.original_ = fn.original_ || fn;
 
   return throttled;
 };
@@ -137,8 +132,6 @@ export const debounce = function(func, wait, immediate, context = window) {
   /* eslint-enable consistent-this */
 
   debounced.cancel = cancel;
-
-  debounced.original_ = func.original_ || func;
 
   return debounced;
 };

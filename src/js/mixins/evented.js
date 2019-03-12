@@ -280,7 +280,6 @@ const EventedMixin = {
       // Use the same function ID as the listener so we can remove it later
       // it using the ID of the original listener.
       wrapper.guid = listener.guid;
-      wrapper.original_ = listener.original_ || listener;
       listen(target, 'one', type, wrapper);
     }
   },

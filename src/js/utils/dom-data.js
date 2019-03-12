@@ -14,7 +14,7 @@ import * as Guid from './guid.js';
  * @type {Object}
  * @private
  */
-export const elData = {};
+const elData = {};
 
 /*
  * Unique attribute name to store an element's guid in
