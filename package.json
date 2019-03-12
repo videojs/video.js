@@ -102,7 +102,7 @@
     "bluebird": "^3.5.3",
     "browserify": "^16.2.3",
     "browserify-istanbul": "^3.0.1",
-    "chokidar-cli": "^1.2.2",
+    "chokidar-cli": "^1.2.1",
     "clean-css-cli": "^4.2.1",
     "cli-table": "^0.3.1",
     "conventional-changelog-cli": "^2.0.11",
@@ -115,7 +115,7 @@
     "humanize-duration": "^3.16.0",
     "husky": "^1.2.0",
     "jsdoc": "^3.5.5",
-    "karma": "^4.0.1",
+    "karma": "^4.0.0",
     "karma-browserify": "^5.3.0",
     "klaw-sync": "^6.0.0",
     "lint-staged": "^8.1.0",
@@ -155,9 +155,8 @@
     "videojs-generate-karma-config": "~5.0.0",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^8.0.2",
-    "watchify": "^3.11.1",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.2.3"
+    "watchify": "^3.11.0",
+    "webpack": "^1.15.0"
   },
   "vjsstandard": {
     "ignore": [
