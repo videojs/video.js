@@ -81,7 +81,7 @@ class SeekBar extends Slider {
       this.clearInterval(this.updateInterval);
     });
 
-    this.on(this.player_, ['timeupdate', 'ended'], this.update);
+    this.on(this.player_, 'timeupdate', this.update);
   }
 
   /**
