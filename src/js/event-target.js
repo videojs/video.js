@@ -142,7 +142,6 @@ EventTarget.prototype.trigger = function(event) {
     event = {type};
   }
 
-  event = Object.assign({target: this}, event);
   event = Events.fixEvent(event);
 
   if (this.allowedEvents_[type] && this['on' + type]) {
