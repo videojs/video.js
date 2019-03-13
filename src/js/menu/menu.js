@@ -54,8 +54,8 @@ class Menu extends Component {
       return;
     }
 
-    component.on('blur', this.boundHandleBlur_);
-    component.on(['tap', 'click'], this.boundHandleTapClick_);
+    this.on(component, 'blur', this.boundHandleBlur_);
+    this.on(component, ['tap', 'click'], this.boundHandleTapClick_);
   }
 
   /**
@@ -70,8 +70,8 @@ class Menu extends Component {
       return;
     }
 
-    component.off('blur', this.boundHandleBlur_);
-    component.off(['tap', 'click'], this.boundHandleTapClick_);
+    this.off(component, 'blur', this.boundHandleBlur_);
+    this.off(component, ['tap', 'click'], this.boundHandleTapClick_);
   }
 
   /**

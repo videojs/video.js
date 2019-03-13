@@ -95,8 +95,14 @@ class HtmlTrackElementList {
   removeTrackElement_(trackElement) {
     for (let i = 0, length = this.trackElements_.length; i < length; i++) {
       if (trackElement === this.trackElements_[i]) {
-        this.trackElements_.splice(i, 1);
+        if (this.trackElements_[i].track && typeof this.trackElements_[i].track.off === 'function') {
+          this.trackElements_[i].track.off();
+        }
 
+        if (typeof this.trackElements_[i].off === 'function') {
+          this.trackElements_[i].off();
+        }
+        this.trackElements_.splice(i, 1);
         break;
       }
     }
