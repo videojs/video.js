@@ -2142,3 +2142,4 @@ QUnit.test('controlBar behaviour with mouseenter and mouseleave events', functio
 
   player.dispose();
 });
+

@@ -603,3 +603,47 @@ QUnit.test('adds video-js class name with the video-js embed', function(assert) 
   assert.ok(player.hasClass('video-js'), 'video-js class was added to the first embed');
   assert.ok(player2.hasClass('video-js'), 'video-js class was preserved to the second embed');
 });
+
+QUnit.module('videojs integration');
+/**
+ * This test is very important for dom-data memory checking
+ * as it runs through a basic player lifecycle for real.
+ */
+QUnit.test('create a real player and play', function(assert) {
+  assert.timeout(30000);
+  const done = assert.async();
+  const fixture = document.getElementById('qunit-fixture');
+
+  // TODO: use a local source rather than a remote one
+  fixture.innerHTML = `
+    <video-js
+      id="vid1"
+      controls
+      preload="auto"
+      width="640"
+      height="264"
+      poster="http://vjs.zencdn.net/v/oceans.png">
+      <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+      <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+      <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+      <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+      <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    </video-js>
+  `.trim();
+
+  const player = videojs('vid1', {techOrder: ['html5']});
+
+  player.muted(true);
+
+  // play
+  player.play();
+  player.one('timeupdate', () => {
+    // then wait 1s and pause/dispose
+    player.setTimeout(function() {
+      assert.notEqual(player.currentTime(), 0, 'played video');
+      player.pause();
+      player.dispose();
+      done();
+    }, 2000);
+  });
+});
