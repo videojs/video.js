@@ -124,6 +124,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.strictEqual(spy.callCount, 1, 'selectedlanguagechange event was fired');
     player.dispose();
+    player.textTracks().removeEventListener('selectedlanguagechange', selectedLanguageHandler);
   });
 
   QUnit.test("if user-selected language is unavailable, don't pick a track to show", function(assert) {

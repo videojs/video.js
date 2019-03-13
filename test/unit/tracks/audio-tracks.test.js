@@ -64,9 +64,7 @@ QUnit.test('listen to remove and add track events in native audio tracks', funct
   player.player_ = player;
   player.options_ = {};
 
-  /* eslint-disable no-unused-vars */
   const html = new Html5({});
-  /* eslint-enable no-unused-vars */
 
   assert.ok(events.removetrack, 'removetrack listener was added');
   assert.ok(events.addtrack, 'addtrack listener was added');

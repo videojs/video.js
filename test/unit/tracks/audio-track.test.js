@@ -119,4 +119,6 @@ QUnit.test('when enabled is changed enabledchange event is fired', function(asse
   track.enabled = true;
   track.enabled = true;
   assert.equal(eventsTriggered, 3, 'still three enabled changes');
+
+  track.off();
 });

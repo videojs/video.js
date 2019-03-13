@@ -364,6 +364,8 @@ QUnit.test('menu items should polyfill mode change events', function(assert) {
   assert.equal(changes, 2, 'clicks trigger change events');
 
   player.dispose();
+  trackMenuItem.dispose();
+  player.textTracks().off('change');
 });
 
 const chaptersTrack = {

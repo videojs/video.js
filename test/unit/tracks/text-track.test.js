@@ -24,8 +24,9 @@ TrackBaseline(TextTrack, {
   kind: 'subtitles',
   mode: 'disabled',
   label: 'English',
-  language: 'en',
-  tech: new TechFaker()
+  language: 'en'
+  // tech is added in baseline
+  // tech: new TechFaker()
 });
 
 QUnit.test('requires a tech', function(assert) {
@@ -280,6 +281,7 @@ QUnit.test('does not fire cuechange before Tech is ready', function(assert) {
 
     assert.equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
 
+    tt.off();
     player.dispose();
     done();
   });
@@ -322,6 +324,7 @@ QUnit.test('fires cuechange when cues become active and inactive', function(asse
 
   assert.equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
 
+  tt.off();
   player.dispose();
 });
 
@@ -362,6 +365,7 @@ QUnit.test('enabled and disabled cuechange handler when changing mode to hidden'
 
   assert.equal(changes, 0, 'NO cuechange event trigger');
 
+  tt.off();
   player.dispose();
 });
 
@@ -402,6 +406,7 @@ QUnit.test('enabled and disabled cuechange handler when changing mode to showing
 
   assert.equal(changes, 0, 'NO cuechange event trigger');
 
+  tt.off();
   player.dispose();
 });
 
@@ -428,18 +433,17 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
     };
   };
 
-  /* eslint-disable no-unused-vars */
   const tt = new TextTrack({
     tech: this.tech,
     src: 'http://example.com'
   });
-  /* eslint-enable no-unused-vars */
 
   reqs.pop().respond(200, null, 'WEBVTT\n');
 
   assert.ok(parserCreated, 'WebVTT is loaded, so we can just parse');
 
   clock.restore();
+  tt.off();
   window.WebVTT = oldVTT;
 });
 
@@ -460,12 +464,10 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
 
-  /* eslint-disable no-unused-vars */
   const tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
   });
-  /* eslint-enable no-unused-vars */
 
   reqs.pop().respond(200, null, 'WEBVTT\n');
 
@@ -491,6 +493,8 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   assert.ok(parserCreated, 'WebVTT is loaded, so we can parse now');
 
   clock.restore();
+  tt.off();
+  testTech.off();
   window.WebVTT = oldVTT;
 });
 
@@ -518,12 +522,10 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   sinon.stub(testTech, 'off');
   testTech.off.withArgs('vttjsloaded');
 
-  /* eslint-disable no-unused-vars */
   const tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
   });
-  /* eslint-enable no-unused-vars */
 
   reqs.pop().respond(200, null, 'WEBVTT\n');
 
@@ -544,5 +546,8 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   clock.restore();
   window.WebVTT = oldVTT;
+  tt.off();
+  testTech.off.restore();
+  testTech.off();
   log.error = oldLogError;
 });
