@@ -433,8 +433,7 @@ Default hotkey handling is:
 | `k` | toggle play/pause | always enabled, even if no Control Bar is present
 | `Space` | toggle play/pause | always enabled, even if no Control Bar is present
 
-Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which
-control in the player has focus.
+Hotkeys require player focus first. Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which control in the player has focus.
 
 ### `userActions.hotkeys.fullscreenKey`
 
