@@ -592,7 +592,7 @@ class Player extends Component {
 
       // if it is not a native list
       // we have to manually remove event listeners
-      if (list.off) {
+      if (list && list.off) {
         list.off();
       }
     });
