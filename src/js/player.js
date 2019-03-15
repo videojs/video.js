@@ -590,7 +590,11 @@ class Player extends Component {
       const props = TRACK_TYPES[name];
       const list = this[props.getterName]();
 
-      list.off();
+      // if it is not a native list
+      // we have to manually remove event listeners
+      if (list.off) {
+        list.off();
+      }
     });
 
     // the actual .el_ is removed here
