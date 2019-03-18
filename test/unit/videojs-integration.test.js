@@ -114,11 +114,18 @@ QUnit.test('create a real player and play', function(assert) {
     });
   };
 
-  // wait for playing -> timeupdate -> and then 2s.
-  player.one('playing', () => player.one('timeupdate', () => player.setTimeout(function() {
+  const onError = function(e) {
+    videojs.log.error(e);
+    assert.ok(false, 'a player error happened');
+    done();
+  };
+
+  // wait for playing -> and then 2s.
+  player.one('playing', () => player.setTimeout(function() {
     assert.notEqual(player.currentTime(), 0, 'played video');
     player.pause();
 
+    player.off('error', onError);
     checkDomData();
     player.dispose();
 
@@ -126,13 +133,9 @@ QUnit.test('create a real player and play', function(assert) {
       Fn[k] = old[k];
     });
     done();
-  }, 2000)));
+  }, 2000));
 
-  player.one('errer', function(e) {
-    videojs.log.error(e);
-    assert.ok(false, 'a player error happened');
-    done();
-  });
+  player.one('errer', onError);
   // play
   player.play();
 });
