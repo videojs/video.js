@@ -34,6 +34,7 @@ QUnit.test('should place title list item into ul', function(assert) {
   assert.ok(titleElement.innerHTML === 'Chapters', 'title element placed in ul');
 
   player.dispose();
+  chaptersButton.dispose();
 });
 
 QUnit.test('Player track methods call the tech', function(assert) {
@@ -57,7 +58,6 @@ QUnit.test('Player track methods call the tech', function(assert) {
 
 QUnit.test('TextTrackDisplay initializes tracks on player ready', function(assert) {
   let calls = 0;
-  /* eslint-disable no-unused-vars */
   const ttd = new TextTrackDisplay({
     on() {},
     addTextTracks() {
@@ -70,9 +70,10 @@ QUnit.test('TextTrackDisplay initializes tracks on player ready', function(asser
       calls++;
     }
   }, {});
-  /* eslint-enable no-unused-vars */
 
   assert.equal(calls, 1, 'only a player.ready call was made');
+
+  ttd.dispose();
 });
 
 QUnit.test('listen to remove and add track events in native text tracks', function(assert) {
@@ -113,9 +114,7 @@ QUnit.test('listen to remove and add track events in native text tracks', functi
   player.player_ = player;
   player.options_ = {};
 
-  /* eslint-disable no-unused-vars */
   const html = new Html5({});
-  /* eslint-enable no-unused-vars */
 
   assert.ok(events.removetrack, 'removetrack listener was added');
   assert.ok(events.addtrack, 'addtrack listener was added');

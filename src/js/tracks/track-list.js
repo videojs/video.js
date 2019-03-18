@@ -72,7 +72,8 @@ class TrackList extends EventTarget {
        */
       this.trigger({
         track,
-        type: 'addtrack'
+        type: 'addtrack',
+        target: this
       });
     }
   }
@@ -115,7 +116,8 @@ class TrackList extends EventTarget {
      */
     this.trigger({
       track,
-      type: 'removetrack'
+      type: 'removetrack',
+      target: this
     });
   }
 

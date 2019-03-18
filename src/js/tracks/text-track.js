@@ -91,14 +91,21 @@ const loadTrack = function(src, track) {
     // NOTE: this is only used for the alt/video.novtt.js build
     if (typeof window.WebVTT !== 'function') {
       if (track.tech_) {
-        const loadHandler = () => parseCues(responseBody, track);
-
-        track.tech_.on('vttjsloaded', loadHandler);
-        track.tech_.on('vttjserror', () => {
+        // to prevent use before define eslint error, we define loadHandler
+        // as a let here
+        let loadHandler;
+        const errorHandler = () => {
           log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
           track.tech_.off('vttjsloaded', loadHandler);
-        });
+        };
 
+        loadHandler = () => {
+          track.tech_.off('vttjserror', errorHandler);
+          return parseCues(responseBody, track);
+        };
+
+        track.tech_.one('vttjsloaded', loadHandler);
+        track.tech_.one('vttjserror', errorHandler);
       }
     } else {
       parseCues(responseBody, track);
@@ -177,7 +184,7 @@ class TextTrack extends Track {
     const timeupdateHandler = Fn.bind(this, function() {
 
       // Accessing this.activeCues for the side-effects of updating itself
-      // due to it's nature as a getter function. Do not remove or cues will
+      // due to its nature as a getter function. Do not remove or cues will
       // stop updating!
       // Use the setter to prevent deletion from uglify (pure_getters rule)
       this.activeCues = this.activeCues;

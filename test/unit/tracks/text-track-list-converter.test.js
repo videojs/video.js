@@ -87,6 +87,9 @@ if (Html5.supportsNativeTextTracks()) {
       language: 'en',
       mode: 'disabled'
     }], 'the output is correct');
+
+    tt.removeTrack(nativeTrack.track);
+    tt.removeTrack(emulatedTrack);
   });
 
   QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(assert) {
@@ -210,6 +213,9 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
     language: 'en',
     mode: 'disabled'
   }], 'the output is correct');
+
+  tt.removeTrack(anotherTrack);
+  tt.removeTrack(emulatedTrack);
 });
 
 QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(assert) {
@@ -261,4 +267,7 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
   c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
   assert.equal(addRemotes, 2, 'we added two text tracks');
+
+  tt.removeTrack(anotherTrack);
+  tt.removeTrack(emulatedTrack);
 });

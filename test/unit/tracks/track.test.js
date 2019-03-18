@@ -1,5 +1,4 @@
 /* eslint-env qunit */
-import TechFaker from '../tech/tech-faker';
 import TrackBaseline from './track-baseline';
 import Track from '../../../src/js/tracks/track.js';
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
@@ -21,8 +20,9 @@ TrackBaseline(Track, {
   kind: 'subtitles',
   mode: 'disabled',
   label: 'English',
-  language: 'en',
-  tech: new TechFaker()
+  language: 'en'
+  // tech is added in baseline
+  // tech: new TechFaker()
 });
 
 QUnit.test('defaults when items not provided', function(assert) {

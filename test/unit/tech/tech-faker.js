@@ -108,6 +108,8 @@ class TechFaker extends Tech {
     }
     return 'movie.mp4';
   }
+  load() {
+  }
   currentSrc() {
     return 'movie.mp4';
   }

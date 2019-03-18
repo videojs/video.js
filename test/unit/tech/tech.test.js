@@ -70,6 +70,8 @@ QUnit.test('should synthesize timeupdate events by default', function(assert) {
 
   this.clock.tick(250);
   assert.equal(timeupdates, 1, 'triggered at least one timeupdate');
+
+  tech.dispose();
 });
 
 QUnit.test('stops manual timeupdates while paused', function(assert) {
@@ -92,6 +94,7 @@ QUnit.test('stops manual timeupdates while paused', function(assert) {
   tech.trigger('play');
   this.clock.tick(10 * 250);
   assert.ok(timeupdates > 0, 'timeupdates fire when playback resumes');
+  tech.dispose();
 });
 
 QUnit.test('should synthesize progress events by default', function(assert) {
@@ -117,6 +120,7 @@ QUnit.test('should synthesize progress events by default', function(assert) {
   bufferedPercent = 0.75;
   this.clock.tick(500);
   assert.equal(progresses, 2, 'repeated readies are ok');
+  tech.dispose();
 });
 
 QUnit.test('dispose() should stop time tracking', function(assert) {
@@ -300,6 +304,7 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   );
 
   log.warn = oldLogWarn;
+  tech.dispose();
 });
 
 QUnit.test('should add the source handler interface to a tech', function(assert) {
@@ -525,6 +530,7 @@ QUnit.test('should handle unsupported sources with the source handler API', func
     usedNative,
     'native source handler was used when an unsupported source was set'
   );
+  tech.dispose();
 });
 
 QUnit.test('should allow custom error events to be set', function(assert) {
@@ -544,6 +550,7 @@ QUnit.test('should allow custom error events to be set', function(assert) {
   tech.error(2);
   assert.equal(errors.length, 2, 'triggered an error event');
   assert.equal(errors[1].code, 2, 'wrapped the error code');
+  tech.dispose();
 });
 
 QUnit.test('should track whether a video has played', function(assert) {
@@ -552,6 +559,7 @@ QUnit.test('should track whether a video has played', function(assert) {
   assert.equal(tech.played().length, 0, 'starts with zero length');
   tech.trigger('playing');
   assert.equal(tech.played().length, 1, 'has length after playing');
+  tech.dispose();
 });
 
 QUnit.test('delegates deferrables to the source handler', function(assert) {
@@ -601,6 +609,7 @@ QUnit.test('delegates deferrables to the source handler', function(assert) {
   assert.equal(seekableCount, 1, 'called the source handler');
   assert.equal(seekingCount, 1, 'called the source handler');
   assert.equal(durationCount, 1, 'called the source handler');
+  tech.dispose();
 });
 
 QUnit.test('delegates only deferred deferrables to the source handler', function(assert) {
@@ -647,19 +656,25 @@ QUnit.test('delegates only deferred deferrables to the source handler', function
   assert.equal(seekableCount, 1, 'called the source handler');
   assert.equal(seekingCount, 1, 'called the tech itself');
   assert.equal(durationCount, 1, 'called the source handler');
+  tech.dispose();
 });
 
 QUnit.test('Tech.isTech returns correct answers for techs and components', function(assert) {
   const isTech = Tech.isTech;
+  const tech = new Html5({}, {});
+  const button = new Button({}, {});
 
   assert.ok(isTech(Tech), 'Tech is a Tech');
   assert.ok(isTech(Html5), 'Html5 is a Tech');
-  assert.ok(isTech(new Html5({}, {})), 'An html5 instance is a Tech');
+  assert.ok(isTech(tech), 'An html5 instance is a Tech');
   assert.ok(!isTech(5), 'A number is not a Tech');
   assert.ok(!isTech('this is a tech'), 'A string is not a Tech');
   assert.ok(!isTech(Button), 'A Button is not a Tech');
-  assert.ok(!isTech(new Button({}, {})), 'A Button instance is not a Tech');
+  assert.ok(!isTech(button), 'A Button instance is not a Tech');
   assert.ok(!isTech(isTech), 'A function is not a Tech');
+
+  tech.dispose();
+  button.dispose();
 });
 
 QUnit.test('setSource after tech dispose should dispose source handler once', function(assert) {
@@ -703,6 +718,7 @@ QUnit.test('setSource after tech dispose should dispose source handler once', fu
 
   tech.setSource('test');
   assert.equal(disposeCount, 2, 'did dispose on second setSource');
+  tech.dispose();
 
 });
 
@@ -740,6 +756,7 @@ QUnit.test('setSource after previous setSource should dispose source handler onc
 
   tech.setSource('test');
   assert.equal(disposeCount, 2, 'did dispose for third setSource');
+  tech.dispose();
 
 });
 
@@ -747,4 +764,5 @@ QUnit.test('returns an empty object for getVideoPlaybackQuality', function(asser
   const tech = new Tech();
 
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'returns an empty object');
+  tech.dispose();
 });

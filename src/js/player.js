@@ -425,6 +425,15 @@ class Player extends Component {
       this.autoplay(this.options_.autoplay);
     }
 
+    // check plugins
+    if (options.plugins) {
+      Object.keys(options.plugins).forEach((name) => {
+        if (typeof this[name] !== 'function') {
+          throw new Error(`plugin "${name}" does not exist`);
+        }
+      });
+    }
+
     /*
      * Store the internal state of scrubbing
      *
@@ -449,15 +458,9 @@ class Player extends Component {
 
     // Load plugins
     if (options.plugins) {
-      const plugins = options.plugins;
-
-      Object.keys(plugins).forEach(function(name) {
-        if (typeof this[name] === 'function') {
-          this[name](plugins[name]);
-        } else {
-          throw new Error(`plugin "${name}" does not exist`);
-        }
-      }, this);
+      Object.keys(options.plugins).forEach((name) => {
+        this[name](options.plugins[name]);
+      });
     }
 
     this.options_.playerOptions = playerOptionsCopy;
@@ -1962,7 +1965,7 @@ class Player extends Component {
   documentFullscreenChange_(e) {
     const fsApi = FullscreenApi;
 
-    this.isFullscreen(document[fsApi.fullscreenElement]);
+    this.isFullscreen(document[fsApi.fullscreenElement] === this.el());
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
@@ -2232,6 +2235,11 @@ class Player extends Component {
         callback(this.play());
       };
 
+      // if we are in Safari, there is a high chance that loadstart will trigger after the gesture timeperiod
+      // in that case, we need to prime the video element by calling load so it'll be ready in time
+      if (browser.IS_ANY_SAFARI || browser.IS_IOS) {
+        this.load();
+      }
       this.one('loadstart', this.playOnLoadstart_);
     }
 
@@ -3119,8 +3127,16 @@ class Player extends Component {
    */
   resetProgressBar_() {
     this.currentTime(0);
-    this.controlBar.durationDisplay.updateContent();
-    this.controlBar.remainingTimeDisplay.updateContent();
+
+    const { durationDisplay, remainingTimeDisplay } = this.controlBar;
+
+    if (durationDisplay) {
+      durationDisplay.updateContent();
+    }
+
+    if (remainingTimeDisplay) {
+      remainingTimeDisplay.updateContent();
+    }
   }
 
   /**

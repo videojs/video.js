@@ -431,7 +431,7 @@ export function trigger(elem, event, hash) {
     trigger.call(null, parent, event, hash);
 
   // If at the top of the DOM, triggers the default action unless disabled.
-  } else if (!parent && !event.defaultPrevented) {
+  } else if (!parent && !event.defaultPrevented && event.target && event.target[event.type]) {
     const targetData = DomData.getData(event.target);
 
     // Checks if the target has a default action for this event.

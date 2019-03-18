@@ -82,7 +82,6 @@ class SeekBar extends Slider {
       this.clearInterval(this.updateInterval);
     });
 
-    this.on(this.player_, ['timeupdate', 'ended'], this.update);
   }
 
   /**
@@ -427,13 +426,6 @@ SeekBar.prototype.options_ = {
 if (!IS_IOS && !IS_ANDROID) {
   SeekBar.prototype.options_.children.splice(1, 0, 'mouseTimeDisplay');
 }
-
-/**
- * Call the update event for this Slider when this event happens on the player.
- *
- * @type {string}
- */
-SeekBar.prototype.playerEvent = 'timeupdate';
 
 Component.registerComponent('SeekBar', SeekBar);
 export default SeekBar;
