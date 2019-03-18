@@ -114,21 +114,25 @@ QUnit.test('create a real player and play', function(assert) {
     });
   };
 
+  // wait for playing -> timeupdate -> and then 2s.
+  player.one('playing', () => player.one('timeupdate', () => player.setTimeout(function() {
+    assert.notEqual(player.currentTime(), 0, 'played video');
+    player.pause();
+
+    checkDomData();
+    player.dispose();
+
+    Object.keys(old).forEach(function(k) {
+      Fn[k] = old[k];
+    });
+    done();
+  }, 2000)));
+
+  player.one('errer', function(e) {
+    videojs.log.error(e);
+    assert.ok(false, 'a player error happened');
+    done();
+  });
   // play
   player.play();
-  player.one('timeupdate', () => {
-    // then wait 2s and pause/dispose
-    player.setTimeout(function() {
-      assert.notEqual(player.currentTime(), 0, 'played video');
-      player.pause();
-
-      checkDomData();
-      player.dispose();
-
-      Object.keys(old).forEach(function(k) {
-        Fn[k] = old[k];
-      });
-      done();
-    }, 2000);
-  });
 });
