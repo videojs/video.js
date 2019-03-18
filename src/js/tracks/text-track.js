@@ -184,7 +184,7 @@ class TextTrack extends Track {
     const timeupdateHandler = Fn.bind(this, function() {
 
       // Accessing this.activeCues for the side-effects of updating itself
-      // due to it's nature as a getter function. Do not remove or cues will
+      // due to its nature as a getter function. Do not remove or cues will
       // stop updating!
       // Use the setter to prevent deletion from uglify (pure_getters rule)
       this.activeCues = this.activeCues;
