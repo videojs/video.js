@@ -586,6 +586,20 @@ class Player extends Component {
 
     middleware.clearCacheForPlayer(this);
 
+    // remove all event handlers for track lists
+    // all tracks and track listeners are removed on
+    // tech dispose
+    TRACK_TYPES.names.forEach((name) => {
+      const props = TRACK_TYPES[name];
+      const list = this[props.getterName]();
+
+      // if it is not a native list
+      // we have to manually remove event listeners
+      if (list && list.off) {
+        list.off();
+      }
+    });
+
     // the actual .el_ is removed here
     super.dispose();
   }
