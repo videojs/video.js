@@ -27,6 +27,7 @@ test('EventTarget queueTrigger queues the event', function(t) {
 
   this.clock.tick(1);
   t.equal(changes, 1, 'EventTarget triggered a change event once the clock ticked');
+  et.off('change', changeHandler);
 });
 
 test('EventTarget will only trigger event once with queueTrigger', function(t) {
@@ -48,4 +49,6 @@ test('EventTarget will only trigger event once with queueTrigger', function(t) {
 
   this.clock.tick(100);
   t.equal(changes, 1, 'EventTarget *only* triggered a change event once');
+
+  et.off('change', changeHandler);
 });

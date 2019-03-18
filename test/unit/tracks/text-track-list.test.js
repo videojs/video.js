@@ -32,10 +32,13 @@ QUnit.test('trigger "change" event when "modechange" is fired on a track', funct
   tt.trigger('modechange');
   this.clock.tick(1);
   assert.equal(changes, 2, 'two change events should have fired');
+
+  ttl.removeTrack(tt);
 });
 
 QUnit.test('trigger "change" event when mode changes on a TextTrack', function(assert) {
-  const tt = new TextTrack({tech: new TechFaker()});
+  const tech = new TechFaker();
+  const tt = new TextTrack({tech});
   const ttl = new TextTrackList([tt]);
   let changes = 0;
   const changeHandler = function() {
@@ -54,4 +57,6 @@ QUnit.test('trigger "change" event when mode changes on a TextTrack', function(a
   this.clock.tick(1);
 
   assert.equal(changes, 2, 'two change events should have fired');
+  ttl.removeTrack(tt);
+  tech.dispose();
 });
