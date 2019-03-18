@@ -1245,7 +1245,17 @@ Html5.disposeMediaElement = function(el) {
     // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
     (function() {
       try {
-        el.load();
+        if (el.paused) {
+          el.load();
+        } else {
+          const playPromise = el.play();
+
+          if (playPromise) {
+            playPromise.then(() => el.load());
+          } else {
+            el.load();
+          }
+        }
       } catch (e) {
         // not supported
       }
@@ -1273,9 +1283,19 @@ Html5.resetMediaElement = function(el) {
     // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
     (function() {
       try {
-        el.load();
+        if (el.paused) {
+          el.load();
+        } else {
+          const playPromise = el.play();
+
+          if (playPromise) {
+            playPromise.then(() => el.load());
+          } else {
+            el.load();
+          }
+        }
       } catch (e) {
-        // satisfy linter
+        // not supported
       }
     }());
   }
