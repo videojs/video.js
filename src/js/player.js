@@ -3156,7 +3156,7 @@ class Player extends Component {
     } else {
       const playPromise = this.play();
 
-      playPromise.then(() => this.doReset_());
+      silencePromise(playPromise.then(() => this.doReset_()));
     }
   }
 
