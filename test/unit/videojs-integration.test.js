@@ -117,7 +117,7 @@ QUnit.test('create a real player and play', function(assert) {
   // play
   player.play();
   player.one('timeupdate', () => {
-    // then wait 200ms and pause/dispose
+    // then wait 2s and pause/dispose
     player.setTimeout(function() {
       assert.notEqual(player.currentTime(), 0, 'played video');
       player.pause();
