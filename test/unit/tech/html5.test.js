@@ -4,7 +4,6 @@ let tech;
 
 import Html5 from '../../../src/js/tech/html5.js';
 import * as browser from '../../../src/js/utils/browser.js';
-import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
 
 QUnit.module('HTML5', {
@@ -856,9 +855,9 @@ QUnit.test('should fire makeup events when a video tag is initialized late', fun
 
 QUnit.test('Html5.resetMediaElement should remove sources and call load', function(assert) {
   let selector;
-  const done = assert.async();
   const removedChildren = [];
   let removedAttribute;
+  let loaded;
   const children = ['source1', 'source2', 'source3'];
   const testEl = {
     querySelectorAll(input) {
@@ -875,22 +874,19 @@ QUnit.test('Html5.resetMediaElement should remove sources and call load', functi
     },
 
     load() {
-      assert.deepEqual(
-        removedChildren,
-        children.reverse(),
-        'we removed the children that were present'
-      );
-      assert.equal(removedAttribute, 'src', 'we removed the src attribute');
-      done();
-    },
-
-    play() {
-      return window.Promise.resolve('foo');
+      loaded = true;
     }
   };
 
   Html5.resetMediaElement(testEl);
   assert.equal(selector, 'source', 'we got the source elements from the test el');
+  assert.deepEqual(
+    removedChildren,
+    children.reverse(),
+    'we removed the children that were present'
+  );
+  assert.equal(removedAttribute, 'src', 'we removed the src attribute');
+  assert.ok(loaded, 'we called load on the element');
 });
 
 QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function(assert) {
@@ -927,28 +923,6 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
   browser.IS_ANDROID = oldIsAndroid;
   browser.IS_CHROME = oldIsChrome;
   tech.el_ = oldEl;
-});
-
-QUnit.test('No error is thrown when `load` is called `immediately` after play', function(assert) {
-  const done = assert.async();
-  const playerInstance = TestHelpers.makePlayer();
-
-  playerInstance.muted(true);
-  playerInstance.src('https://vjs.zencdn.net/v/oceans.mp4');
-
-  playerInstance.ready(() => {
-    const playPromise = playerInstance.play();
-
-    playerInstance.reset();
-    assert.ok(true, 'No error was thrown');
-
-    playPromise.then(() => {
-      window.setTimeout(() => {
-        playerInstance.dispose();
-        done();
-      }, 0);
-    });
-  });
 });
 
 QUnit.test('supports getting available media playback quality metrics', function(assert) {

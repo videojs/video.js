@@ -1374,22 +1374,59 @@ QUnit.test('Player#tech logs a warning when called without a safety argument', f
 });
 
 QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
-  this.clock.restore();
-  const done = assert.async();
-  const player = TestHelpers.makePlayer();
-  const loadTechSpy = sinon.spy(player, 'loadTech_');
-  const techCallSpy = sinon.spy(player, 'techCall_');
+  let loadedTech;
+  let loadedSource;
+  let techCallMethod;
 
-  player.ready(() => {
-    player.reset();
+  const testPlayer = {
+    options_: {
+      techOrder: ['html5', 'flash']
+    },
+    resetCache_() {},
+    loadTech_(tech, source) {
+      loadedTech = tech;
+      loadedSource = source;
+    },
+    techCall_(method) {
+      techCallMethod = method;
+    },
+    resetControlBarUI_() {},
+    poster() {}
+  };
 
-    assert.ok(loadTechSpy.calledWith('techFaker', null), 'The first tech was loaded');
-    assert.ok(techCallSpy.calledWith('reset'), 'The reset method was called on the tech');
+  Player.prototype.reset.call(testPlayer);
 
-    player.dispose();
+  assert.equal(loadedTech, 'html5', 'we loaded the html5 tech');
+  assert.equal(loadedSource, null, 'with a null source');
+  assert.equal(techCallMethod, 'reset', 'we then reset the tech');
+});
 
-    done();
-  });
+QUnit.test('player#reset loads the first item in the techOrder and then techCalls reset', function(assert) {
+  let loadedTech;
+  let loadedSource;
+  let techCallMethod;
+
+  const testPlayer = {
+    options_: {
+      techOrder: ['flash', 'html5']
+    },
+    resetCache_() {},
+    loadTech_(tech, source) {
+      loadedTech = tech;
+      loadedSource = source;
+    },
+    techCall_(method) {
+      techCallMethod = method;
+    },
+    resetControlBarUI_() {},
+    poster() {}
+  };
+
+  Player.prototype.reset.call(testPlayer);
+
+  assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
+  assert.equal(loadedSource, null, 'with a null source');
+  assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
 
 QUnit.test('player#reset clears the player cache', function(assert) {
