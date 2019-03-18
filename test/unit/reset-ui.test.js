@@ -19,6 +19,28 @@ QUnit.test('Calling resetProgressBar player method should place progress bar at 
   player.dispose();
 });
 
+QUnit.test('Calling resetProgressBar_ player method when no durationDisplay or remainingTimeDisplay controls exist', function(assert) {
+  const player = TestHelpers.makePlayer({
+    children: {
+      controlBar: {}
+    },
+    controlBar: {
+      children: {
+        playToggle: {}
+      }
+    }
+  });
+
+  player.currentTime(20);
+  player.resetProgressBar_();
+
+  assert.equal(
+    player.currentTime(), 0,
+    'player current time is 0'
+  );
+  player.dispose();
+});
+
 QUnit.test('Calling resetPlaybackRate player method should place play rate at 1x', function(assert) {
   const player = TestHelpers.makePlayer({techOrder: ['html5']});
 
