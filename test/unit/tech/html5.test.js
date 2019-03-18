@@ -4,7 +4,6 @@ let tech;
 
 import Html5 from '../../../src/js/tech/html5.js';
 import * as browser from '../../../src/js/utils/browser.js';
-import videojs from '../../../src/js/video.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
 
@@ -932,12 +931,7 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
 
 QUnit.test('No error is thrown when `load` is called `immediately` after play', function(assert) {
   const done = assert.async();
-  const videoTag = TestHelpers.makeTag();
-  const fixture = document.getElementById('qunit-fixture');
-
-  fixture.appendChild(videoTag);
-
-  const playerInstance = videojs(videoTag.id, { techOrder: ['html5']});
+  const playerInstance = TestHelpers.makePlayer();
 
   playerInstance.muted(true);
   playerInstance.src('https://vjs.zencdn.net/v/oceans.mp4');
