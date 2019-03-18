@@ -425,6 +425,15 @@ class Player extends Component {
       this.autoplay(this.options_.autoplay);
     }
 
+    // check plugins
+    if (options.plugins) {
+      Object.keys(options.plugins).forEach((name) => {
+        if (typeof this[name] !== 'function') {
+          throw new Error(`plugin "${name}" does not exist`);
+        }
+      });
+    }
+
     /*
      * Store the internal state of scrubbing
      *
@@ -449,15 +458,9 @@ class Player extends Component {
 
     // Load plugins
     if (options.plugins) {
-      const plugins = options.plugins;
-
-      Object.keys(plugins).forEach(function(name) {
-        if (typeof this[name] === 'function') {
-          this[name](plugins[name]);
-        } else {
-          throw new Error(`plugin "${name}" does not exist`);
-        }
-      }, this);
+      Object.keys(options.plugins).forEach((name) => {
+        this[name](options.plugins[name]);
+      });
     }
 
     this.options_.playerOptions = playerOptionsCopy;
