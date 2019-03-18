@@ -141,7 +141,7 @@
     "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-ignore": "^1.0.4",
-    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-progress": "^1.0.0",
     "semver": "^5.6.0",
