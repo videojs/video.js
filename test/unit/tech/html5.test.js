@@ -931,16 +931,30 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
 });
 
 QUnit.test('No error is thrown when `load` is called `immediately` after play', function(assert) {
+  const done = assert.async();
   const videoTag = TestHelpers.makeTag();
   const fixture = document.getElementById('qunit-fixture');
 
   fixture.appendChild(videoTag);
-  const playerInstance = videojs(videoTag.id, { techOrder: ['html5'] });
 
-  playerInstance.play();
-  // `load` is called as part of `disposeMediaElement`
-  Html5.disposeMediaElement();
-  assert.ok(true, 'No error was thrown');
+  const playerInstance = videojs(videoTag.id, { techOrder: ['html5']});
+
+  playerInstance.muted(true);
+  playerInstance.src('https://vjs.zencdn.net/v/oceans.mp4');
+
+  playerInstance.ready(() => {
+    const playPromise = playerInstance.play();
+
+    playerInstance.reset();
+    assert.ok(true, 'No error was thrown');
+
+    playPromise.then(() => {
+      window.setTimeout(() => {
+        playerInstance.dispose();
+        done();
+      }, 0);
+    });
+  });
 });
 
 QUnit.test('supports getting available media playback quality metrics', function(assert) {
