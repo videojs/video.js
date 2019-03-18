@@ -23,12 +23,17 @@ QUnit.test('should get and remove data from an element', function(assert) {
   assert.notOk(DomData.hasData(el), 'cached item emptied');
 });
 
+let memoryTestRun = false;
+
 QUnit.done(function(details) {
   // don't run the extra dom data test on failures, there will likely be
   // memory leaks
-  if (details.failed) {
+  if (details.failed || memoryTestRun) {
     return;
   }
+
+  memoryTestRun = true;
+
   QUnit.module('dom-data memory');
 
   /**
