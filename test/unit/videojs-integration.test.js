@@ -11,7 +11,8 @@ QUnit.module('videojs integration');
  * as it runs through a basic player lifecycle for real.
  */
 QUnit.test('create a real player and play', function(assert) {
-  assert.timeout(30000);
+  assert.timeout(45000);
+
   const done = assert.async();
   const fixture = document.getElementById('qunit-fixture');
   const old = {};
@@ -113,28 +114,37 @@ QUnit.test('create a real player and play', function(assert) {
       });
     });
   };
+  let onPlaying;
+  let playingTimeout;
 
   const onError = function(e) {
+    player.off('playing', onPlaying);
+    if (playingTimeout) {
+      player.clearTimeout(playingTimeout);
+    }
     videojs.log.error(e);
     assert.ok(false, 'a player error happened');
     done();
   };
 
+  onPlaying = () => {
+    playingTimeout = player.setTimeout(function() {
+      player.off('error', onError);
+      assert.notEqual(player.currentTime(), 0, 'played video');
+      player.pause();
+
+      checkDomData();
+      player.dispose();
+
+      Object.keys(old).forEach(function(k) {
+        Fn[k] = old[k];
+      });
+      done();
+    }, 2000);
+  };
+
   // wait for playing -> and then 2s.
-  player.one('playing', () => player.setTimeout(function() {
-    assert.notEqual(player.currentTime(), 0, 'played video');
-    player.pause();
-
-    player.off('error', onError);
-    checkDomData();
-    player.dispose();
-
-    Object.keys(old).forEach(function(k) {
-      Fn[k] = old[k];
-    });
-    done();
-  }, 2000));
-
+  player.one('playing', onPlaying);
   player.one('errer', onError);
   // play
   player.play();
