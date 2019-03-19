@@ -7,6 +7,9 @@ import log from '../../src/js/utils/log.js';
 QUnit.module('video.js:hooks ', {
   beforeEach() {
     videojs.hooks_ = {};
+  },
+  afterEach() {
+    videojs.hooks_ = {};
   }
 });
 
