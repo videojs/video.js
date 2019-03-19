@@ -2,6 +2,7 @@
 import document from 'global/document';
 import * as DomData from '../../../src/js/utils/dom-data';
 import videojs from '../../../src/js/video.js';
+import window from 'global/window';
 
 QUnit.module('dom-data');
 
@@ -32,11 +33,6 @@ QUnit.done(function(details) {
     return;
   }
 
-  // TODO: fix memory leaks on the following
-  if (videojs.browser.IS_SAFARI || videojs.browser.IS_EDGE || videojs.browser.IE_VERSION) {
-    return;
-  }
-
   memoryTestRun = true;
 
   QUnit.module('dom-data memory');
@@ -60,6 +56,7 @@ QUnit.done(function(details) {
   QUnit.test('Memory is not leaking', function(assert) {
     if (Object.keys(DomData.elData).length > 0) {
       videojs.domData = DomData;
+      window.videojs = videojs;
     }
     assert.equal(Object.keys(DomData.elData).length, 0, 'no leaks, check videojs.domData.elData if failure');
   });

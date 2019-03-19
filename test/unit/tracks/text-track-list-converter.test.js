@@ -140,6 +140,9 @@ if (Html5.supportsNativeTextTracks()) {
     c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
     assert.equal(addRemotes, 2, 'we added two text tracks');
+
+    tt.removeTrack(nativeTrack.track);
+    tt.removeTrack(emulatedTrack);
   });
 }
 
