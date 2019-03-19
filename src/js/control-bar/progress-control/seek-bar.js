@@ -169,6 +169,12 @@ class SeekBar extends Slider {
    *          The current percent at a number from 0-1
    */
   update(event) {
+    // if the offsetParent is null, then this element is hidden, in which case
+    // we don't need to update it.
+    if (this.el().offsetParent === null) {
+      return;
+    }
+
     const percent = super.update();
 
     this.update_(this.getCurrentTime_(), percent);
