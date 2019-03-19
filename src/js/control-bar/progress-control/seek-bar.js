@@ -9,6 +9,7 @@ import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
+import document from 'global/document';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -68,6 +69,22 @@ class SeekBar extends Slider {
 
     this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
 
+    // we don't need to update the play progress if the document is hidden,
+    // also, this causes the CPU to spike and eventually crash the page on IE11.
+    if ('hidden' in document && 'visibilityState' in document) {
+      this.on(document, 'visibilitychange', this.toggleVisibility_);
+    }
+  }
+
+  toggleVisibility_(e) {
+    if (document.hidden) {
+      this.disableInterval_(e);
+    } else {
+      this.enableInterval_();
+
+      // we just switched back to the page and someone may be looking, so, update ASAP
+      this.requestAnimationFrame(this.update);
+    }
   }
 
   enableInterval_() {
