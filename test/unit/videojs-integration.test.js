@@ -5,14 +5,12 @@ import document from 'global/document';
 import * as DomData from '../../src/js/utils/dom-data';
 import * as Fn from '../../src/js/utils/fn';
 
-QUnit.module('videojs integration');
 /**
  * This test is very important for dom-data memory checking
  * as it runs through a basic player lifecycle for real.
  */
-QUnit.test('create a real player and play', function(assert) {
-  assert.timeout(45000);
-
+QUnit.test('create a real player and dispose', function(assert) {
+  assert.timeout(30000);
   const done = assert.async();
   const fixture = document.getElementById('qunit-fixture');
   const old = {};
@@ -73,7 +71,6 @@ QUnit.test('create a real player and play', function(assert) {
   player.muted(true);
 
   const checkDomData = function() {
-
     Object.keys(DomData.elData).forEach(function(elId) {
       const data = DomData.elData[elId] || {};
 
@@ -114,38 +111,18 @@ QUnit.test('create a real player and play', function(assert) {
       });
     });
   };
-  let onPlaying;
-  let playingTimeout;
 
-  const onError = function(e) {
-    player.off('playing', onPlaying);
-    if (playingTimeout) {
-      player.clearTimeout(playingTimeout);
-    }
-    videojs.log.error(e);
-    assert.ok(false, 'a player error happened');
+  player.addTextTrack('captions', 'foo', 'en');
+  player.ready(function() {
+    assert.ok(player.tech_, 'tech exists');
+    assert.equal(player.textTracks().length, 1, 'should have one text track');
+
+    checkDomData();
+    player.dispose();
+
+    Object.keys(old).forEach(function(k) {
+      Fn[k] = old[k];
+    });
     done();
-  };
-
-  onPlaying = () => {
-    playingTimeout = player.setTimeout(function() {
-      player.off('error', onError);
-      assert.notEqual(player.currentTime(), 0, 'played video');
-      player.pause();
-
-      checkDomData();
-      player.dispose();
-
-      Object.keys(old).forEach(function(k) {
-        Fn[k] = old[k];
-      });
-      done();
-    }, 2000);
-  };
-
-  // wait for playing -> and then 2s.
-  player.one('playing', onPlaying);
-  player.one('errer', onError);
-  // play
-  player.play();
+  }, true);
 });
