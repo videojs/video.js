@@ -133,7 +133,9 @@ class SeekBar extends Slider {
     );
 
     // Update the `PlayProgressBar`.
-    this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
+    if (this.bar) {
+      this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
+    }
   }
 
   /**
