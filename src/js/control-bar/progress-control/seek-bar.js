@@ -64,24 +64,26 @@ class SeekBar extends Slider {
     // via an interval
     this.updateInterval = null;
 
-    this.on(this.player_, ['playing'], () => {
-      this.clearInterval(this.updateInterval);
+    this.on(this.player_, ['playing'], this.enableInterval_);
 
-      this.updateInterval = this.setInterval(() =>{
-        this.requestAnimationFrame(() => {
-          this.update();
-        });
-      }, UPDATE_REFRESH_INTERVAL);
-    });
+    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
 
-    this.on(this.player_, ['ended', 'pause', 'waiting'], (e) => {
-      if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
-        return;
-      }
+  }
 
-      this.clearInterval(this.updateInterval);
-    });
+  enableInterval_() {
+    this.clearInterval(this.updateInterval);
 
+    this.updateInterval = this.setInterval(() =>{
+      this.requestAnimationFrame(this.update);
+    }, UPDATE_REFRESH_INTERVAL);
+  }
+
+  disableInterval_(e) {
+    if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
+      return;
+    }
+
+    this.clearInterval(this.updateInterval);
   }
 
   /**
