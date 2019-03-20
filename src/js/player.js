@@ -367,6 +367,9 @@ class Player extends Component {
     // Init state hasStarted_
     this.hasStarted_ = false;
 
+    // Init state for playCalled_
+    this.playCalled_ = false;
+
     // Init state userActive_
     this.userActive_ = false;
 
@@ -1565,6 +1568,20 @@ class Player extends Component {
     }
   }
 
+  playCalled(val) {
+    if (val === undefined) {
+      return this.playCalled_;
+    }
+
+    if (val && !this.playCalled_) {
+      this.playCalled_ = true;
+      this.trigger('playcalled');
+      return;
+    }
+
+    this.playCalled_ = Boolean(val);
+  }
+
   /**
    * Fired whenever the media begins or resumes playback
    *
@@ -1580,6 +1597,9 @@ class Player extends Component {
 
     // hide the poster when the user hits play
     this.hasStarted(true);
+
+    // set/trigger play called
+    this.playCalled(true);
     /**
      * Triggered whenever an {@link Tech#play} event happens. Indicates that
      * playback has started or resumed.
@@ -2190,7 +2210,7 @@ class Player extends Component {
   play() {
     const PromiseClass = this.options_.Promise || window.Promise;
 
-    this.trigger('playcalled');
+    this.playCalled(true);
 
     if (PromiseClass) {
       return new PromiseClass((resolve) => {
@@ -3018,59 +3038,50 @@ class Player extends Component {
     this.cache_.sources = sources;
     this.updateSourceCaches_(sources[0]);
 
-    const finishSrc_ = () => {
-      // middlewareSource is the source after it has been changed by middleware
-      middleware.setSource(this, sources[0], (middlewareSource, mws) => {
-        this.middleware_ = mws;
+    if (this.srcAfterPlayCalled_) {
+      this.off('playcalled', this.srcAfterPlayCalled_);
+    }
 
-        // since sourceSet is async we have to update the cache again after we select a source since
-        // the source that is selected could be out of order from the cache update above this callback.
-        this.cache_.sources = sources;
-        this.updateSourceCaches_(middlewareSource);
-
-        const err = this.src_(middlewareSource);
-
-        if (err) {
-          if (sources.length > 1) {
-            return this.src(sources.slice(1));
-          }
-
-          this.changingSrc_ = false;
-
-          // We need to wrap this in a timeout to give folks a chance to add error event handlers
-          this.setTimeout(function() {
-            this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-          }, 0);
-
-          // we could not find an appropriate tech, but let's still notify the delegate that this is it
-          // this needs a better comment about why this is needed
-          this.triggerReady();
-
-          return;
-        }
-
-        middleware.setTech(mws, this.tech_);
-      });
-    };
-
-    if (!this.preloadNoneSrcCalled_ || this.preload() === 'none' && !this.autoplay()) {
-      if (this.preloadNoneSrc_) {
-        this.off(['playcalled', 'play'], this.preloadNoneSrc_);
-      }
-      this.preloadNoneSrc_ = () => {
-        this.off(['playcalled', 'play'], this.preloadNoneSrc_);
-        this.preloadNoneSrcCalled_ = true;
-        this.preloadNoneSrc_ = null;
-
-        finishSrc_();
-        this.preloadNoneSrcCalled_ = false;
-      };
-
-      this.one(['playcalled', 'play'], this.preloadNoneSrc_);
+    if (!this.playCalled() && this.preload() === 'none' && !this.autoplay()) {
+      this.srcAfterPlayCalled_ = () => this.src(source);
+      this.one('playcalled', this.srcAfterPlayCalled_);
       return;
     }
 
-    finishSrc_();
+    this.playCalled(false);
+
+    // middlewareSource is the source after it has been changed by middleware
+    middleware.setSource(this, sources[0], (middlewareSource, mws) => {
+      this.middleware_ = mws;
+
+      // since sourceSet is async we have to update the cache again after we select a source since
+      // the source that is selected could be out of order from the cache update above this callback.
+      this.cache_.sources = sources;
+      this.updateSourceCaches_(middlewareSource);
+
+      const err = this.src_(middlewareSource);
+
+      if (err) {
+        if (sources.length > 1) {
+          return this.src(sources.slice(1));
+        }
+
+        this.changingSrc_ = false;
+
+        // We need to wrap this in a timeout to give folks a chance to add error event handlers
+        this.setTimeout(function() {
+          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+        }, 0);
+
+        // we could not find an appropriate tech, but let's still notify the delegate that this is it
+        // this needs a better comment about why this is needed
+        this.triggerReady();
+
+        return;
+      }
+
+      middleware.setTech(mws, this.tech_);
+    });
   }
 
   /**
