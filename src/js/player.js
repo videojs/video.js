@@ -2190,6 +2190,8 @@ class Player extends Component {
   play() {
     const PromiseClass = this.options_.Promise || window.Promise;
 
+    this.trigger('playcalled');
+
     if (PromiseClass) {
       return new PromiseClass((resolve) => {
         this.play_(resolve);
@@ -3016,38 +3018,59 @@ class Player extends Component {
     this.cache_.sources = sources;
     this.updateSourceCaches_(sources[0]);
 
-    // middlewareSource is the source after it has been changed by middleware
-    middleware.setSource(this, sources[0], (middlewareSource, mws) => {
-      this.middleware_ = mws;
+    const finishSrc_ = () => {
+      // middlewareSource is the source after it has been changed by middleware
+      middleware.setSource(this, sources[0], (middlewareSource, mws) => {
+        this.middleware_ = mws;
 
-      // since sourceSet is async we have to update the cache again after we select a source since
-      // the source that is selected could be out of order from the cache update above this callback.
-      this.cache_.sources = sources;
-      this.updateSourceCaches_(middlewareSource);
+        // since sourceSet is async we have to update the cache again after we select a source since
+        // the source that is selected could be out of order from the cache update above this callback.
+        this.cache_.sources = sources;
+        this.updateSourceCaches_(middlewareSource);
 
-      const err = this.src_(middlewareSource);
+        const err = this.src_(middlewareSource);
 
-      if (err) {
-        if (sources.length > 1) {
-          return this.src(sources.slice(1));
+        if (err) {
+          if (sources.length > 1) {
+            return this.src(sources.slice(1));
+          }
+
+          this.changingSrc_ = false;
+
+          // We need to wrap this in a timeout to give folks a chance to add error event handlers
+          this.setTimeout(function() {
+            this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
+          }, 0);
+
+          // we could not find an appropriate tech, but let's still notify the delegate that this is it
+          // this needs a better comment about why this is needed
+          this.triggerReady();
+
+          return;
         }
 
-        this.changingSrc_ = false;
+        middleware.setTech(mws, this.tech_);
+      });
+    };
 
-        // We need to wrap this in a timeout to give folks a chance to add error event handlers
-        this.setTimeout(function() {
-          this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
-        }, 0);
-
-        // we could not find an appropriate tech, but let's still notify the delegate that this is it
-        // this needs a better comment about why this is needed
-        this.triggerReady();
-
-        return;
+    if (!this.preloadNoneSrcCalled_ || this.preload() === 'none' && !this.autoplay()) {
+      if (this.preloadNoneSrc_) {
+        this.off(['playcalled', 'play'], this.preloadNoneSrc_);
       }
+      this.preloadNoneSrc_ = () => {
+        this.off(['playcalled', 'play'], this.preloadNoneSrc_);
+        this.preloadNoneSrcCalled_ = true;
+        this.preloadNoneSrc_ = null;
 
-      middleware.setTech(mws, this.tech_);
-    });
+        finishSrc_();
+        this.preloadNoneSrcCalled_ = false;
+      };
+
+      this.one(['playcalled', 'play'], this.preloadNoneSrc_);
+      return;
+    }
+
+    finishSrc_();
   }
 
   /**
