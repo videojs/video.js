@@ -3038,16 +3038,19 @@ class Player extends Component {
     this.cache_.sources = sources;
     this.updateSourceCaches_(sources[0]);
 
+    // clear any previous src call that is waiting for `playcalled`
     if (this.srcAfterPlayCalled_) {
       this.off('playcalled', this.srcAfterPlayCalled_);
     }
 
+    // if preload is none, there is no autoplay, and play has not been called
     if (!this.playCalled() && this.preload() === 'none' && !this.autoplay()) {
       this.srcAfterPlayCalled_ = () => this.src(source);
       this.one('playcalled', this.srcAfterPlayCalled_);
       return;
     }
 
+    // reset play called to false now that we are past the loop
     this.playCalled(false);
 
     // middlewareSource is the source after it has been changed by middleware
