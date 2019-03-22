@@ -9,6 +9,7 @@ import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
+import document from 'global/document';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -64,24 +65,42 @@ class SeekBar extends Slider {
     // via an interval
     this.updateInterval = null;
 
-    this.on(this.player_, ['playing'], () => {
-      this.clearInterval(this.updateInterval);
+    this.on(this.player_, ['playing'], this.enableInterval_);
 
-      this.updateInterval = this.setInterval(() =>{
-        this.requestAnimationFrame(() => {
-          this.update();
-        });
-      }, UPDATE_REFRESH_INTERVAL);
-    });
+    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
 
-    this.on(this.player_, ['ended', 'pause', 'waiting'], (e) => {
-      if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
-        return;
-      }
+    // we don't need to update the play progress if the document is hidden,
+    // also, this causes the CPU to spike and eventually crash the page on IE11.
+    if ('hidden' in document && 'visibilityState' in document) {
+      this.on(document, 'visibilitychange', this.toggleVisibility_);
+    }
+  }
 
-      this.clearInterval(this.updateInterval);
-    });
+  toggleVisibility_(e) {
+    if (document.hidden) {
+      this.disableInterval_(e);
+    } else {
+      this.enableInterval_();
 
+      // we just switched back to the page and someone may be looking, so, update ASAP
+      this.requestAnimationFrame(this.update);
+    }
+  }
+
+  enableInterval_() {
+    this.clearInterval(this.updateInterval);
+
+    this.updateInterval = this.setInterval(() =>{
+      this.requestAnimationFrame(this.update);
+    }, UPDATE_REFRESH_INTERVAL);
+  }
+
+  disableInterval_(e) {
+    if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
+      return;
+    }
+
+    this.clearInterval(this.updateInterval);
   }
 
   /**
@@ -133,7 +152,9 @@ class SeekBar extends Slider {
     );
 
     // Update the `PlayProgressBar`.
-    this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
+    if (this.bar) {
+      this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
+    }
   }
 
   /**
@@ -148,6 +169,12 @@ class SeekBar extends Slider {
    *          The current percent at a number from 0-1
    */
   update(event) {
+    // if the offsetParent is null, then this element is hidden, in which case
+    // we don't need to update it.
+    if (this.el().offsetParent === null) {
+      return;
+    }
+
     const percent = super.update();
 
     this.update_(this.getCurrentTime_(), percent);
