@@ -272,12 +272,11 @@ if (Html5.supportsNativeTextTracks()) {
       assert.equal(emulatedTt.length, tt.length, 'we have matching tracks length');
       assert.equal(emulatedTt.length, 1, 'we have one text track');
 
-      emulatedTt.off('addtrack', addtrack);
       el.removeChild(track);
     };
 
-    emulatedTt.on('addtrack', addtrack);
-    emulatedTt.on('removetrack', function() {
+    emulatedTt.one('addtrack', addtrack);
+    emulatedTt.one('removetrack', function() {
       assert.equal(emulatedTt.length, tt.length, 'we have matching tracks length');
       assert.equal(emulatedTt.length, 0, 'we have no more text tracks');
 
