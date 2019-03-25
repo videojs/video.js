@@ -48,14 +48,14 @@ QUnit.test('only one track is ever enabled', function(assert) {
   assert.equal(track2.enabled, false, 'track2 is disabled');
   assert.equal(track3.enabled, true, 'track3 is enabled');
 
-  track.enabled = true;
-  assert.equal(track.enabled, true, 'track is disabled');
-  assert.equal(track2.enabled, false, 'track2 is disabled');
+  track2.enabled = true;
+  assert.equal(track.enabled, false, 'track is disabled');
+  assert.equal(track2.enabled, true, 'track2 is enabled');
   assert.equal(track3.enabled, false, 'track3 is disabled');
 
   list.addTrack(track4);
-  assert.equal(track.enabled, true, 'track is enabled');
-  assert.equal(track2.enabled, false, 'track2 is disabled');
+  assert.equal(track.enabled, false, 'track is disabled');
+  assert.equal(track2.enabled, true, 'track2 is enabled');
   assert.equal(track3.enabled, false, 'track3 is disabled');
   assert.equal(track4.enabled, false, 'track4 is disabled');
 

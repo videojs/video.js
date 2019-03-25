@@ -87,30 +87,29 @@ class VideoTrackList extends TrackList {
       return;
     }
 
-    if (!this.selectedChange_) {
-      this.selectedChange_ = () => {
-        if (this.changing_) {
-          return;
-        }
-        this.changing_ = true;
-        disableOthers(this, track);
-        this.changing_ = false;
-        this.trigger('change');
-      };
-    }
+    track.selectedChange_ = () => {
+      if (this.changing_) {
+        return;
+      }
+      this.changing_ = true;
+      disableOthers(this, track);
+      this.changing_ = false;
+      this.trigger('change');
+    };
 
     /**
      * @listens VideoTrack#selectedchange
      * @fires TrackList#change
      */
-    track.addEventListener('selectedchange', this.selectedChange_);
+    track.addEventListener('selectedchange', track.selectedChange_);
   }
 
   removeTrack(rtrack) {
     super.removeTrack(rtrack);
 
-    if (rtrack.removeEventListener && this.selectedChange_) {
-      rtrack.removeEventListener('selectedchange', this.selectedChange_);
+    if (rtrack.removeEventListener && rtrack.selectedChange_) {
+      rtrack.removeEventListener('selectedchange', rtrack.selectedChange_);
+      rtrack.selectedChange_ = null;
     }
   }
 }

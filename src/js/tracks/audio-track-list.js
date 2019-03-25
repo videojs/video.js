@@ -72,33 +72,32 @@ class AudioTrackList extends TrackList {
       return;
     }
 
-    if (!this.enabledChange_) {
-      this.enabledChange_ = () => {
-        // when we are disabling other tracks (since we don't support
-        // more than one track at a time) we will set changing_
-        // to true so that we don't trigger additional change events
-        if (this.changing_) {
-          return;
-        }
-        this.changing_ = true;
-        disableOthers(this, track);
-        this.changing_ = false;
-        this.trigger('change');
-      };
-    }
+    track.enabledChange_ = () => {
+      // when we are disabling other tracks (since we don't support
+      // more than one track at a time) we will set changing_
+      // to true so that we don't trigger additional change events
+      if (this.changing_) {
+        return;
+      }
+      this.changing_ = true;
+      disableOthers(this, track);
+      this.changing_ = false;
+      this.trigger('change');
+    };
 
     /**
      * @listens AudioTrack#enabledchange
      * @fires TrackList#change
      */
-    track.addEventListener('enabledchange', this.enabledChange_);
+    track.addEventListener('enabledchange', track.enabledChange_);
   }
 
   removeTrack(rtrack) {
     super.removeTrack(rtrack);
 
-    if (rtrack.removeEventListener && this.enabledChange_) {
-      rtrack.removeEventListener('enabledchange', this.enabledChange_);
+    if (rtrack.removeEventListener && rtrack.enabledChange_) {
+      rtrack.removeEventListener('enabledchange', rtrack.enabledChange_);
+      rtrack.enabledChange_ = null;
     }
   }
 }

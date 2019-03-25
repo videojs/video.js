@@ -48,14 +48,14 @@ QUnit.test('only one track is ever selected', function(assert) {
   assert.equal(track2.selected, false, 'track2 is unselected');
   assert.equal(track3.selected, true, 'track3 is selected');
 
-  track.selected = true;
-  assert.equal(track.selected, true, 'track is unselected');
-  assert.equal(track2.selected, false, 'track2 is unselected');
+  track2.selected = true;
+  assert.equal(track.selected, false, 'track is unselected');
+  assert.equal(track2.selected, true, 'track2 is selected');
   assert.equal(track3.selected, false, 'track3 is unselected');
 
   list.addTrack(track4);
-  assert.equal(track.selected, true, 'track is selected');
-  assert.equal(track2.selected, false, 'track2 is unselected');
+  assert.equal(track.selected, false, 'track is unselected');
+  assert.equal(track2.selected, true, 'track2 is selected');
   assert.equal(track3.selected, false, 'track3 is unselected');
   assert.equal(track4.selected, false, 'track4 is unselected');
 
