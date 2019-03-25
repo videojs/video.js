@@ -1,3 +1,10 @@
+<a name="7.5.2"></a>
+## [7.5.2](https://github.com/videojs/video.js/compare/v7.5.1...v7.5.2) (2019-03-25)
+
+### Bug Fixes
+
+* fix audio and video track selection ([#5890](https://github.com/videojs/video.js/issues/5890)) ([3dc6fbf](https://github.com/videojs/video.js/commit/3dc6fbf)), closes [#5887](https://github.com/videojs/video.js/issues/5887)
+
 <a name="7.5.1"></a>
 ## [7.5.1](https://github.com/videojs/video.js/compare/v7.5.0...v7.5.1) (2019-03-22)
 
