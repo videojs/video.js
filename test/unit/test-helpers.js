@@ -11,7 +11,7 @@ const TestHelpers = {
     return videoTag;
   },
 
-  makePlayer(playerOptions, videoTag) {
+  makePlayer(playerOptions, videoTag, addTechAsMiddleware = true) {
     videoTag = videoTag || TestHelpers.makeTag();
 
     const fixture = document.getElementById('qunit-fixture');
@@ -23,7 +23,9 @@ const TestHelpers = {
 
     const player = new Player(videoTag, playerOptions);
 
-    player.middleware_ = [player.tech_];
+    if (addTechAsMiddleware) {
+      player.middleware_ = [player.tech_];
+    }
 
     return player;
   },

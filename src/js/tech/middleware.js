@@ -5,7 +5,7 @@
 import { assign } from '../utils/obj.js';
 import toTitleCase from '../utils/to-title-case.js';
 
-const middlewares = {};
+export const middlewares = {};
 const middlewareInstances = {};
 
 export const TERMINATOR = {};
@@ -166,7 +166,7 @@ export function mediate(middleware, tech, method, arg = null) {
   const callMethod = 'call' + toTitleCase(method);
   const middlewareValue = middleware.reduce(middlewareIterator(callMethod), arg);
   const terminated = middlewareValue === TERMINATOR;
-  const returnValue = terminated ? null : tech[method](middlewareValue);
+  const returnValue = terminated ? TERMINATOR : tech[method](middlewareValue);
 
   executeRight(middleware, method, returnValue, terminated);
 

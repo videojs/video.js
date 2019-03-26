@@ -531,8 +531,8 @@ class Player extends Component {
     this.responsive(this.options_.responsive);
 
     this.changingSrc_ = false;
-    this.playWaitingForReady_ = false;
-    this.playOnLoadstart_ = null;
+    this.waitForPlay_ = false;
+    this.playSuccessCallbacks_ = [];
   }
 
   /**
@@ -2209,54 +2209,58 @@ class Player extends Component {
    *        The callback that should be called when the techs play is actually called
    */
   play_(callback = silencePromise) {
-    // If this is called while we have a play queued up on a loadstart, remove
-    // that listener to avoid getting in a potentially bad state.
-    if (this.playOnLoadstart_) {
-      this.off('loadstart', this.playOnLoadstart_);
+    this.playSuccessCallbacks_.push(callback);
+
+    const isSrcReady = Boolean(!this.changingSrc_ && (this.src() || this.currentSrc()));
+
+    if (this.waitToPlay_) {
+      this.off(['ready', 'loadstart'], this.waitToPlay_);
+      this.waitToPlay_ = null;
     }
 
-    // If the player/tech is not ready, queue up another call to `play()` for
-    // when it is. This will loop back into this method for another attempt at
-    // playback when the tech is ready.
-    if (!this.isReady_) {
-
-      // Bail out if we're already waiting for `ready`!
-      if (this.playWaitingForReady_) {
-        return;
-      }
-
-      this.playWaitingForReady_ = true;
-      this.ready(() => {
-        this.playWaitingForReady_ = false;
-        callback(this.play());
-      });
-
-    // If the player/tech is ready and we have a source, we can attempt playback.
-    } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
-      callback(this.techGet_('play'));
-      return;
-
-    // If the tech is ready, but we do not have a source, we'll need to wait
-    // for both the `ready` and a `loadstart` when the source is finally
-    // resolved by middleware and set on the player.
-    //
-    // This can happen if `play()` is called while changing sources or before
-    // one has been set on the player.
-    } else {
-
-      this.playOnLoadstart_ = () => {
-        this.playOnLoadstart_ = null;
-        callback(this.play());
+    // if the player/tech is not ready or the src itself is not ready
+    // queue up a call to play on `ready` or `loadstart`
+    if (!this.isReady_ || !isSrcReady) {
+      this.waitToPlay_ = (e) => {
+        this.play_();
       };
+      this.one(['ready', 'loadstart'], this.waitToPlay_);
 
       // if we are in Safari, there is a high chance that loadstart will trigger after the gesture timeperiod
       // in that case, we need to prime the video element by calling load so it'll be ready in time
-      if (browser.IS_ANY_SAFARI || browser.IS_IOS) {
+      if (!isSrcReady && (browser.IS_ANY_SAFARI || browser.IS_IOS)) {
         this.load();
       }
-      this.one('loadstart', this.playOnLoadstart_);
+      return;
     }
 
+    // If the player/tech is ready and we have a source, we can attempt playback.
+    const val = this.techGet_('play');
+
+    if (val === middleware.TERMINATOR) {
+      this.trigger('play-terminated');
+    } else {
+      this.runPlaySuccessCallbacks_(val);
+    }
+  }
+
+  /**
+   * When a callback to play is delayed we have to run these
+   * callbacks when play is actually called on the tech. This function
+   * runs the callbacks that were delayed and accepts the return value
+   * from the tech.
+   *
+   * @param {undefined|Promise} val
+   *        The return value from the tech.
+   */
+  runPlaySuccessCallbacks_(val) {
+    const callbacks = this.playSuccessCallbacks_.slice(0);
+
+    this.playSuccessCallbacks_ = [];
+
+    callbacks.forEach(function(cb) {
+      cb(val);
+    });
   }
 
   /**
