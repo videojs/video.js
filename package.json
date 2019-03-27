@@ -144,7 +144,7 @@
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-progress": "^1.0.0",
-    "semver": "^5.6.0",
+    "semver": "^6.0.0",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2",
     "sinon": "^1.16.1",
