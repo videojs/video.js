@@ -1,5 +1,5 @@
 # The live user interface and API in Video.js
-> Note the the "old" live user interface is currently the default, see the section on [the new user interface](#the-new-user-interface) for information on setting that up.
+> Note the "old" live user interface is currently the default, see the section on [the new user interface](#the-new-user-interface) for information on setting that up.
 
 
 ## The default live user interface
@@ -7,7 +7,7 @@ The default user interface hides the `ProgressControl` component on the controlb
 
 > Note: It does this by adding the `vjs-live` class to the player and the showing/hiding of components is all handled in css.
 
-This makes the player have hide the  progress bar, seek bar, and display text indicating that the player is live. All of those will be shown again if a non-live video is switched to (via another `durationchange` event).
+This makes the player have to hide the progress bar, seek bar, and display text indicating that the player is live. All of those will be shown again if a non-live video is switched to (via another `durationchange` event).
 
 To view a sample of this user interface please:
 1. clone the repository, and move into that directory
@@ -16,9 +16,9 @@ To view a sample of this user interface please:
 4. open `http://localhost:9999/sandbox/live.html` in a web browser
 
 ## The new user interface
-> Note: This user interface is will not work on Android due to the live HLS implementation not supporting seekable ranges during live streams. We reccommend overriding the native hls implementation with @videojs/http-streaming this will make the new liveui work.
+> Note: This user interface will not work on Android due to the native live HLS implementation not supporting seekable ranges during live streams. We recommend overriding the native hls implementation with @videojs/http-streaming; this will make the new liveui work.
 
-The new user interface is currently opt-in to prevent breaking backwards compatiblity. We feel that the new user interface is much better and it will likely become the new default in the next major version. If you want to use the new user interface you will have to pass `{liveui: true}` during player setup. This can be done in two ways:
+The new user interface is currently opt-in to prevent breaking backwards compatibility. We feel that the new user interface is much better and it will likely become the new default in the next major version. If you want to use the new user interface you will have to pass `{liveui: true}` during player setup. This can be done in two ways:
 
 Using `data-setup`
 ```html
@@ -36,7 +36,7 @@ The new user interface shows the `ProgressControl` component on the control bar,
 
 > Note: It does this by adding the `vjs-live` and `vjs-liveui` class to the player and the showing/hiding of components is all handled in css.
 
-The new live user interface shows the progress/seek bar and lets the user seek backwards/forwards within the live window. Next it adds a button, via the `SeekToLive` component that can be clicked when the user is behind live that will seek to the live current time. That same button indicates if the `currentTime` of the player is live via a grey circle when not live and a red circle when live.
+The new live user interface shows the progress/seek bar and lets the user seek backwards/forwards within the live window. Next, it adds a button, via the `SeekToLive` component that can be clicked when the user is behind live that will seek to the live current time. That same button indicates if the `currentTime` of the player is live via a grey circle when not live and a red circle when live.
 
 To view a sample of this user interface please:
 1. clone the repository, and move into that directory
@@ -90,7 +90,7 @@ seekableStart would return `0` as that is the first seekable point for the curre
 This function gets the amount of time between the `seekableStart()` and the `liveCurrentTime()`. We use this internally to update the total length of our bars, such as the progress/seek bar.
 
 ### atLiveEdge() and behindLiveEdge()
-Determines if the currentTime of the player is close enough to live to be considered live. We make sure its close enough, rather than absolutely live, because there are too many factors to determine when live actually is. We consider the currentTime live when it is within two seekable increments and 70ms (two ticks of the live tracking interval). The seekable increment is a number that is determined by the amount that seekable end changes as playback continues. See the `seekableendchange` event and the `pastSeekEnd()` function for more info.
+Determines if the currentTime of the player is close enough to live to be considered live. We make sure it's close enough, rather than absolutely live, because there are too many factors to determine when live actually is. We consider the currentTime live when it is within two seekable increments and 70ms (two ticks of the live tracking interval). The seekable increment is a number that is determined by the amount that seekable end changes as playback continues. See the `seekableendchange` event and the `pastSeekEnd()` function for more info.
 
 ### liveCurrentTime()
 live current time is our best approximation of what the live current time is. Internally it uses the `pastSeekEnd()` function and adds that to the `seekableEnd()` function. It is possible for this function to return `Infinity`.
