@@ -1,5 +1,7 @@
 import Component from './component.js';
 import mergeOptions from './utils/merge-options.js';
+import document from 'global/document';
+import * as browser from './utils/browser.js';
 
 /* track when we are at the live edge, and other helpers for live playback */
 class LiveTracker extends Component {
@@ -13,6 +15,25 @@ class LiveTracker extends Component {
     this.reset_();
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
+
+    // we don't need to track live playback if the document is hidden,
+    // also, tracking when the document is hidden can
+    // cause the CPU to spike and eventually crash the page on IE11.
+    if (browser.IE_VERSION && 'hidden' in document && 'visibilityState' in document) {
+      this.on(document, 'visibilitychange', this.handleVisibilityChange);
+    }
+  }
+
+  handleVisibilityChange() {
+    if (this.player_.duration() !== Infinity) {
+      return;
+    }
+
+    if (document.hidden) {
+      this.stopTracking();
+    } else {
+      this.startTracking();
+    }
   }
 
   isBehind_() {
