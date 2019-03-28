@@ -5,7 +5,7 @@
 import { assign } from '../utils/obj.js';
 import toTitleCase from '../utils/to-title-case.js';
 
-const middlewares = {};
+let middlewares = {};
 const middlewareInstances = {};
 
 export const TERMINATOR = {};
@@ -239,6 +239,7 @@ function executeRight(mws, method, value, terminated) {
  */
 export function clearCacheForPlayer(player) {
   middlewareInstances[player.id()] = null;
+  middlewares = {};
 }
 
 /**
