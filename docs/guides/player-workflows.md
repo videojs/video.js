@@ -19,6 +19,7 @@ This document outlines many considerations for using Video.js for advanced playe
   * [React](#react)
   * [Ember](#ember)
   * [Angular](#angular)
+  * [Vue](#vue)
 
 ## Accessing a player that has already been created on a page
 
@@ -371,3 +372,7 @@ See [ReactJS integration example](/docs/guides/react.md)
 ### Ember
 
 ### Angular
+
+### Vue
+
+See [Vue integration example](/docs/guides/vue.md)
