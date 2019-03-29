@@ -3,6 +3,7 @@
  * @module dom-data
  */
 import * as Guid from './guid.js';
+import window from 'global/window';
 
 /**
  * Element Data Store.
