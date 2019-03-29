@@ -1,3 +1,19 @@
+<a name="7.5.3"></a>
+## [7.5.3](https://github.com/videojs/video.js/compare/v7.5.2...v7.5.3) (2019-03-29)
+
+### Chores
+
+* add a sandbox for HLS ([#5897](https://github.com/videojs/video.js/issues/5897)) ([8e43cff](https://github.com/videojs/video.js/commit/8e43cff))
+
+### Documentation
+
+* **live:** minor spelling/grammar corrections ([#5894](https://github.com/videojs/video.js/issues/5894)) ([6c644fe](https://github.com/videojs/video.js/commit/6c644fe))
+* add an example Vue integration.md ([#5899](https://github.com/videojs/video.js/issues/5899)) ([4c277fd](https://github.com/videojs/video.js/commit/4c277fd))
+
+### Performance Improvements
+
+* **live-tracker:** disable live tracker on IE11 when document is hidden ([#5896](https://github.com/videojs/video.js/issues/5896)) ([511f729](https://github.com/videojs/video.js/commit/511f729)), closes [#5879](https://github.com/videojs/video.js/issues/5879)
+
 <a name="7.5.2"></a>
 ## [7.5.2](https://github.com/videojs/video.js/compare/v7.5.1...v7.5.2) (2019-03-25)
 
