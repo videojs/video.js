@@ -23,7 +23,7 @@ const elData = {};
  * @constant
  * @private
  */
-const elIdAttr = 'vdata' + (new Date()).getTime();
+const elIdAttr = 'vdata' + Math.floor(window.performance.now());
 
 /**
  * Returns the cache object where data for an element is stored
