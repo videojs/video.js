@@ -3647,15 +3647,13 @@ class Player extends Component {
 
     const controlBar = this.getChild('controlBar');
 
-    if (controlBar) {
+    // Fixes bug on Android & iOS where when tapping progressBar (when control bar is displayed)
+    // controlBar would no longer be hidden by default timeout.
+    if (controlBar && !browser.IS_IOS && !browser.IS_ANDROID) {
 
       controlBar.on('mouseenter', function(event) {
-        // Fixes bug on Android & iOS where when tapping progressBar (when control bar is displayed)
-        // controlBar would no longer be hidden by default timeout.
-        if (!browser.IS_IOS && !browser.IS_ANDROID) {
-          this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
-          this.player().options_.inactivityTimeout = 0;
-        }
+        this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
+        this.player().options_.inactivityTimeout = 0;
       });
 
       controlBar.on('mouseleave', function(event) {
