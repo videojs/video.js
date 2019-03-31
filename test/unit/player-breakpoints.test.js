@@ -62,6 +62,7 @@ QUnit.test('setting breakpoints/responsive via option', function(assert) {
   // Player should be 300x150 by default.
   assert.strictEqual(player.currentBreakpoint(), 'tiny', 'current breakpoint set');
   assert.strictEqual(player.currentBreakpointClass(), 'vjs-layout-tiny', 'current breakpoint set');
+  player.dispose();
 });
 
 QUnit.test('changing the player size triggers breakpoints', function(assert) {

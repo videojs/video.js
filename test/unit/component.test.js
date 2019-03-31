@@ -259,7 +259,8 @@ QUnit.test('should do a deep merge of child options', function(assert) {
 });
 
 QUnit.test('should init child components from component options', function(assert) {
-  const testComp = new TestComponent1(TestHelpers.makePlayer(), {
+  const player = TestHelpers.makePlayer();
+  const testComp = new TestComponent1(player, {
     testComponent2: false,
     testComponent4: {}
   });
@@ -267,6 +268,7 @@ QUnit.test('should init child components from component options', function(asser
   assert.ok(!testComp.childNameIndex_.TestComponent2, 'we do not have testComponent2');
   assert.ok(testComp.childNameIndex_.TestComponent4, 'we have a testComponent4');
 
+  player.dispose();
   testComp.dispose();
 });
 
@@ -344,6 +346,7 @@ QUnit.test('should dispose of component and children', function(assert) {
   });
 
   comp.dispose();
+  child.dispose();
 
   assert.ok(hasDisposed, 'component fired dispose event');
   assert.ok(bubbles === false, 'dispose event does not bubble');
@@ -764,6 +767,7 @@ QUnit.test('should use a defined content el for appending children', function(as
     'Child el should be removed.'
   );
 
+  child.dispose();
   comp.dispose();
 });
 
@@ -1059,4 +1063,8 @@ QUnit.test('should remove child when the child moves to the other parent', funct
   assert.strictEqual(parentComponent2.children()[0], childComponent, 'the first child of `parentComponent2` is `childComponent`');
   assert.strictEqual(parentComponent2.el().childNodes.length, 1, 'the length of `childNodes` of `parentComponent2` is 1');
   assert.strictEqual(parentComponent2.el().childNodes[0], childComponent.el(), '`parentComponent2` contains the DOM element of `childComponent`');
+
+  parentComponent1.dispose();
+  parentComponent2.dispose();
+  childComponent.dispose();
 });

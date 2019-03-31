@@ -39,6 +39,8 @@ QUnit.test('can create a html track element with various properties', function(a
   assert.equal(htmlTrackElement.label, label, 'we have a label');
   assert.equal(htmlTrackElement.readyState, 0, 'we have a readyState');
   assert.equal(htmlTrackElement.srclang, language, 'we have a srclang');
+
+  htmlTrackElement.track.off();
 });
 
 QUnit.test('defaults when items not provided', function(assert) {
@@ -53,6 +55,8 @@ QUnit.test('defaults when items not provided', function(assert) {
   assert.equal(typeof htmlTrackElement.src, 'undefined', 'we have a src');
   assert.equal(htmlTrackElement.srclang, '', 'we have a srclang');
   assert.equal(htmlTrackElement.track.cues.length, 0, 'we have a track');
+
+  htmlTrackElement.track.off();
 });
 
 QUnit.test('fires loadeddata when track cues become populated', function(assert) {
@@ -71,4 +75,7 @@ QUnit.test('fires loadeddata when track cues become populated', function(assert)
 
   assert.equal(changes, 1, 'a loadeddata event trigger addEventListener');
   assert.equal(htmlTrackElement.readyState, 2, 'readyState is loaded');
+
+  htmlTrackElement.track.off();
+  htmlTrackElement.off('load');
 });

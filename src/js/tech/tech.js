@@ -1261,7 +1261,7 @@ Tech.withSourceHandlers = function(_Tech) {
     }
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
-    this.on('dispose', this.disposeSourceHandler);
+    this.one('dispose', this.disposeSourceHandler);
   };
 
   /**

@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import TechFaker from '../tech/tech-faker';
 
 /**
  * Tests baseline functionality for all tracks
@@ -9,16 +10,20 @@
 const TrackBaseline = function(TrackClass, options) {
 
   QUnit.test('is setup with id, kind, label, and language', function(assert) {
-    const track = new TrackClass(options);
+    const tech = new TechFaker();
+    const track = new TrackClass(Object.assign({tech}, options));
 
     assert.equal(track.kind, options.kind, 'we have a kind');
     assert.equal(track.label, options.label, 'we have a label');
     assert.equal(track.language, options.language, 'we have a language');
     assert.equal(track.id, options.id, 'we have a id');
+
+    tech.dispose();
   });
 
   QUnit.test('kind, label, language, id, are read only', function(assert) {
-    const track = new TrackClass(options);
+    const tech = new TechFaker();
+    const track = new TrackClass(Object.assign({tech}, options));
 
     track.kind = 'subtitles';
     track.label = 'Spanish';
@@ -29,12 +34,17 @@ const TrackBaseline = function(TrackClass, options) {
     assert.equal(track.label, options.label, 'we have a label');
     assert.equal(track.language, options.language, 'we have a language');
     assert.equal(track.id, options.id, 'we have an id');
+
+    tech.dispose();
   });
 
   QUnit.test('returns an instance of itself on non ie8 browsers', function(assert) {
-    const track = new TrackClass(options);
+    const tech = new TechFaker();
+    const track = new TrackClass(Object.assign({tech}, options));
 
     assert.ok(track instanceof TrackClass, 'returns an instance');
+
+    tech.dispose();
   });
 };
 

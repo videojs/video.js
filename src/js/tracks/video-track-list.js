@@ -87,11 +87,7 @@ class VideoTrackList extends TrackList {
       return;
     }
 
-    /**
-     * @listens VideoTrack#selectedchange
-     * @fires TrackList#change
-     */
-    track.addEventListener('selectedchange', () => {
+    track.selectedChange_ = () => {
       if (this.changing_) {
         return;
       }
@@ -99,7 +95,22 @@ class VideoTrackList extends TrackList {
       disableOthers(this, track);
       this.changing_ = false;
       this.trigger('change');
-    });
+    };
+
+    /**
+     * @listens VideoTrack#selectedchange
+     * @fires TrackList#change
+     */
+    track.addEventListener('selectedchange', track.selectedChange_);
+  }
+
+  removeTrack(rtrack) {
+    super.removeTrack(rtrack);
+
+    if (rtrack.removeEventListener && rtrack.selectedChange_) {
+      rtrack.removeEventListener('selectedchange', rtrack.selectedChange_);
+      rtrack.selectedChange_ = null;
+    }
   }
 }
 
