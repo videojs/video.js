@@ -2213,6 +2213,7 @@ class Player extends Component {
 
     const isSrcReady = Boolean(!this.changingSrc_ && (this.src() || this.currentSrc()));
 
+    // treat calls to play_ somewhat like the `one` event function
     if (this.waitToPlay_) {
       this.off(['ready', 'loadstart'], this.waitToPlay_);
       this.waitToPlay_ = null;
