@@ -186,7 +186,8 @@ export const allowedGetters = {
   duration: 1,
   seekable: 1,
   played: 1,
-  paused: 1
+  paused: 1,
+  volume: 1
 };
 
 /**
@@ -195,7 +196,8 @@ export const allowedGetters = {
  * @type {Object}
  */
 export const allowedSetters = {
-  setCurrentTime: 1
+  setCurrentTime: 1,
+  setVolume: 1
 };
 
 /**
