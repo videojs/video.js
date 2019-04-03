@@ -532,7 +532,7 @@ class Player extends Component {
 
     this.changingSrc_ = false;
     this.waitForPlay_ = false;
-    this.playSuccessCallbacks_ = [];
+    this.playCallbacks_ = [];
   }
 
   /**
@@ -2209,7 +2209,7 @@ class Player extends Component {
    *        The callback that should be called when the techs play is actually called
    */
   play_(callback = silencePromise) {
-    this.playSuccessCallbacks_.push(callback);
+    this.playCallbacks_.push(callback);
 
     const isSrcReady = Boolean(!this.changingSrc_ && (this.src() || this.currentSrc()));
 
@@ -2241,7 +2241,7 @@ class Player extends Component {
     if (val === middleware.TERMINATOR) {
       this.trigger('play-terminated');
     } else {
-      this.runPlaySuccessCallbacks_(val);
+      this.runPlayCallbacks_(val);
     }
   }
 
@@ -2254,10 +2254,10 @@ class Player extends Component {
    * @param {undefined|Promise} val
    *        The return value from the tech.
    */
-  runPlaySuccessCallbacks_(val) {
-    const callbacks = this.playSuccessCallbacks_.slice(0);
+  runPlayCallbacks_(val) {
+    const callbacks = this.playCallbacks_.slice(0);
 
-    this.playSuccessCallbacks_ = [];
+    this.playCallbacks_ = [];
 
     callbacks.forEach(function(cb) {
       cb(val);
