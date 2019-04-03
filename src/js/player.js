@@ -1374,7 +1374,7 @@ class Player extends Component {
       promise = this.play();
     }
 
-    promise.then(() => {
+    return promise.then(() => {
       this.trigger({type: 'autoplay-success', autoplay: type});
     }).catch((e) => {
       this.trigger({type: 'autoplay-failure', autoplay: type});
@@ -3266,7 +3266,7 @@ class Player extends Component {
     const PromiseClass = this.options_.Promise || window.Promise;
 
     // if the value is a valid string and we have a promise class
-    // set it to that
+    // treat is a "manualAutopla".
     if (PromiseClass && typeof value === 'string' && (/(any|play|muted)/).test(value)) {
       this.options_.autoplay = value;
       this.manualAutoplay_(value);
