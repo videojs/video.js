@@ -49,6 +49,7 @@
 
   // Hide the subs-caps button for non-Live UI "x-small" and for "tiny" players.
   &.vjs-layout-x-small:not(.vjs-liveui),
+  &.vjs-layout-x-small:not(.vjs-live),
   &.vjs-layout-tiny {
     .vjs-subs-caps-button {
       display: none;
