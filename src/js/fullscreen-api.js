@@ -22,7 +22,8 @@ const apiMap = [
     'fullscreenElement',
     'fullscreenEnabled',
     'fullscreenchange',
-    'fullscreenerror'
+    'fullscreenerror',
+    'fullscreen'
   ],
   // WebKit
   [
@@ -31,16 +32,8 @@ const apiMap = [
     'webkitFullscreenElement',
     'webkitFullscreenEnabled',
     'webkitfullscreenchange',
-    'webkitfullscreenerror'
-  ],
-  // Old WebKit (Safari 5.1)
-  [
-    'webkitRequestFullScreen',
-    'webkitCancelFullScreen',
-    'webkitCurrentFullScreenElement',
-    'webkitCancelFullScreen',
-    'webkitfullscreenchange',
-    'webkitfullscreenerror'
+    'webkitfullscreenerror',
+    '-webkit-full-screen'
   ],
   // Mozilla
   [
@@ -49,7 +42,8 @@ const apiMap = [
     'mozFullScreenElement',
     'mozFullScreenEnabled',
     'mozfullscreenchange',
-    'mozfullscreenerror'
+    'mozfullscreenerror',
+    '-moz-full-screen'
   ],
   // Microsoft
   [
@@ -58,7 +52,8 @@ const apiMap = [
     'msFullscreenElement',
     'msFullscreenEnabled',
     'MSFullscreenChange',
-    'MSFullscreenError'
+    'MSFullscreenError',
+    '-ms-fullscreen'
   ]
 ];
 
