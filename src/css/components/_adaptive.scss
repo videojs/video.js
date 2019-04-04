@@ -47,14 +47,20 @@
     }
   }
 
-  &.vjs-layout-x-small,
+  // Hide the subs-caps button for non-Live UI "x-small" and for "tiny" players.
+  &.vjs-layout-x-small:not(.vjs-liveui),
   &.vjs-layout-tiny {
     .vjs-subs-caps-button {
       display: none;
     }
   }
 
+  // With the new Live UI, we can have the same treatment as "tiny". At
+  // "x-small", the Live UI makes the progress control very small and almost
+  // useless.
+  &.vjs-layout-x-small.vjs-liveui,
   &.vjs-layout-tiny {
+
     .vjs-custom-control-spacer {
       @include flex(auto);
       display: block;
