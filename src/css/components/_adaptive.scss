@@ -15,12 +15,6 @@
   .vjs-volume-control,
   .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
   .vjs-subtitles-button, .vjs-subs-caps-button, .vjs-audio-button { display: none; }
-
-  .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
-  .vjs-volume-panel.vjs-volume-panel-horizontal:active,
-  .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
-    width: auto;
-  }
 }
 
 // When the player is x-small, display nothing but:
@@ -34,12 +28,6 @@
   .vjs-volume-control,
   .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
   .vjs-subtitles-button, .vjs-subs-caps-button, .vjs-audio-button { display: none; }
-
-  .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
-  .vjs-volume-panel.vjs-volume-panel-horizontal:active,
-  .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
-    width: auto;
-  }
 }
 
 // When the player is small, display nothing but:
@@ -55,10 +43,14 @@
   .vjs-volume-control,
   .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
   .vjs-subtitles-button, .vjs-audio-button { display: none; }
+}
+.video-js.vjs-layout-tiny:not(.vjs-fullscreen),
+.video-js.vjs-layout-x-small:not(.vjs-fullscreen),
+.video-js.vjs-layout-small:not(.vjs-fullscreen) {
 
   .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
   .vjs-volume-panel.vjs-volume-panel-horizontal:active,
   .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
-    width: auto;
+    width: 4em;
   }
 }
