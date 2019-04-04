@@ -1,56 +1,74 @@
-// When the player is absurdly tiny, display nothing but:
-// - Play button
-// - Volume Mute button
-// - Fullscreen Button
-.video-js.vjs-layout-tiny:not(.vjs-fullscreen) {
-  .vjs-custom-control-spacer {
-    @include flex(auto);
-    display: block;
-  }
-
-  &.vjs-no-flex .vjs-custom-control-spacer { width: auto; }
-
-  .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
-  .vjs-playback-rate, .vjs-progress-control,
-  .vjs-volume-control,
-  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
-  .vjs-subtitles-button, .vjs-subs-caps-button, .vjs-audio-button { display: none; }
-}
-
-// When the player is x-small, display nothing but:
+// When the player is "medium" and higher, display everything by default.
+//
+// When the player is "small", display only:
 // - Play button
 // - Volume Mute button
 // - Progress bar
-// - Fullscreen Button
-.video-js.vjs-layout-x-small:not(.vjs-fullscreen) {
-  .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
-  .vjs-playback-rate,
-  .vjs-volume-control,
-  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
-  .vjs-subtitles-button, .vjs-subs-caps-button, .vjs-audio-button { display: none; }
-}
-
-// When the player is small, display nothing but:
-// - Play button
-// - Volume Mute button
-// - Progress bar
-// - Volume menu button
-// - Subs-Caps Button
+// - Subs-Caps button
 // - Fullscreen button
-.video-js.vjs-layout-small:not(.vjs-fullscreen) {
-  .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
-  .vjs-playback-rate,
-  .vjs-volume-control,
-  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
-  .vjs-subtitles-button, .vjs-audio-button { display: none; }
-}
-.video-js.vjs-layout-tiny:not(.vjs-fullscreen),
-.video-js.vjs-layout-x-small:not(.vjs-fullscreen),
-.video-js.vjs-layout-small:not(.vjs-fullscreen) {
+//
+// When the player is "small", display only:
+// - Play button
+// - Volume Mute button
+// - Progress bar
+// - Fullscreen button
+//
+// When the player is "tiny", display only:
+// - Play button
+// - Volume Mute button
+// - Fullscreen Button
+//
+.video-js:not(.vjs-fullscreen) {
 
-  .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
-  .vjs-volume-panel.vjs-volume-panel-horizontal:active,
-  .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
-    width: 4em;
+  &.vjs-layout-small,
+  &.vjs-layout-x-small,
+  &.vjs-layout-tiny {
+    .vjs-current-time,
+    .vjs-time-divider,
+    .vjs-duration,
+    .vjs-remaining-time,
+    .vjs-playback-rate,
+    .vjs-chapters-button,
+    .vjs-descriptions-button,
+    .vjs-captions-button,
+    .vjs-subtitles-button,
+    .vjs-audio-button,
+    .vjs-volume-control {
+      display: none;
+    }
+
+    // Reset the size of the volume panel to the default so we don't see a big
+    // empty space to the right of the mute button.
+    .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
+    .vjs-volume-panel.vjs-volume-panel-horizontal:active,
+    .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
+      width: 4em;
+    }
   }
+
+  &.vjs-layout-x-small,
+  &.vjs-layout-tiny {
+    .vjs-subs-caps-button {
+      display: none;
+    }
+  }
+
+  &.vjs-layout-tiny {
+    .vjs-custom-control-spacer {
+      @include flex(auto);
+      display: block;
+    }
+
+    &.vjs-no-flex .vjs-custom-control-spacer {
+      width: auto;
+    }
+
+    .vjs-progress-control {
+      display: none;
+    }
+  }
+}
+
+.video-js.vjs-layout-x-small:not(.vjs-fullscreen) {
+  .vjs-subs-caps-button, .vjs-audio-button { display: none; }
 }
