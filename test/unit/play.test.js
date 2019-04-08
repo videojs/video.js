@@ -6,11 +6,7 @@ import * as middleware from '../../src/js/tech/middleware.js';
 import videojs from '../../src/js/video.js';
 
 const middleWareTerminations = ['terminates', 'does not-terminate'];
-const playReturnValues = ['non-promise'];
-
-if (window.Promise) {
-  playReturnValues.push('promise');
-}
+const playReturnValues = ['non-promise', 'promise'];
 
 const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
   subhooks.beforeEach(function(assert) {
