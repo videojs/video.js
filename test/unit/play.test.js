@@ -87,7 +87,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
       this.checkState(assertName, options);
     };
 
-    middleware.use('*', () => {
+    this.middleware = () => {
       return {
         // pass along source
         setSource(srcObj, next) {
@@ -99,14 +99,20 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
           }
         }
       };
-    });
+    };
+
+    middleware.use('*', this.middleware);
   });
 
   subhooks.afterEach(function() {
     // remove added middleware
-    Object.keys(middleware.middlewares).forEach(function(k) {
-      delete middleware.middlewares[k];
-    });
+    const middlewareList = middleware.getMiddleware('*');
+
+    for (let i = 0; i < middlewareList.length; i++) {
+      if (middlewareList[i] === this.middleware) {
+        middlewareList.splice(i, 1);
+      }
+    }
     if (this.player) {
       this.player.dispose();
     }

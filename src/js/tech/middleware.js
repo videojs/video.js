@@ -5,7 +5,7 @@
 import { assign } from '../utils/obj.js';
 import toTitleCase from '../utils/to-title-case.js';
 
-export const middlewares = {};
+const middlewares = {};
 const middlewareInstances = {};
 
 export const TERMINATOR = {};
