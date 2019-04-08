@@ -42,7 +42,8 @@
     .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
     .vjs-volume-panel.vjs-volume-panel-horizontal:active,
     .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
-      width: 4em;
+      width: auto;
+      width: initial;
     }
   }
 
