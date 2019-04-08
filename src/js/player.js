@@ -2233,7 +2233,8 @@ class Player extends Component {
     // If the player/tech is ready and we have a source, we can attempt playback.
     const val = this.techGet_('play');
 
-    if (val === middleware.TERMINATOR) {
+    // play was terminated if the returned value is null
+    if (val === null) {
       this.trigger('play-terminated');
     } else {
       this.runPlayCallbacks_(val);
