@@ -533,6 +533,7 @@ class Player extends Component {
     this.changingSrc_ = false;
     this.waitForPlay_ = false;
     this.playCallbacks_ = [];
+    this.playTerminatedQueue_ = [];
   }
 
   /**
@@ -1350,16 +1351,13 @@ class Player extends Component {
       this.muted(true);
 
       const restoreMuted = () => {
-        this.off('play-terminated', restoreMuted);
         this.muted(previouslyMuted);
       };
 
-      // restore muted on play-terminated as well
-      this.one('play-terminated', restoreMuted);
+      // restore muted on play terminatation
+      this.playTerminatedQueue_.push(restoreMuted);
 
-      return this.play().then(() => {
-        this.off('play-terminated', restoreMuted);
-      }).catch(restoreMuted);
+      return this.play().catch(restoreMuted);
     };
 
     let promise;
@@ -2235,10 +2233,25 @@ class Player extends Component {
 
     // play was terminated if the returned value is null
     if (val === null) {
-      this.trigger('play-terminated');
+      this.runPlayTerminatedQueue_();
     } else {
       this.runPlayCallbacks_(val);
     }
+  }
+
+  /**
+   * These functions will be run when if play is terminated. If play
+   * runPlayCallbacks_ is run these function will not be run. This allows us
+   * to differenciate between a terminated play and an actual call to play.
+   */
+  runPlayTerminatedQueue_() {
+    const queue = this.playTerminatedQueue_.slice(0);
+
+    this.playTerminatedQueue_ = [];
+
+    queue.forEach(function(q) {
+      q();
+    });
   }
 
   /**
@@ -2254,6 +2267,8 @@ class Player extends Component {
     const callbacks = this.playCallbacks_.slice(0);
 
     this.playCallbacks_ = [];
+    // clear play terminatedQueue since we finished a real play
+    this.playTerminatedQueue_ = [];
 
     callbacks.forEach(function(cb) {
       cb(val);

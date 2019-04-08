@@ -12,6 +12,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
   subhooks.beforeEach(function(assert) {
     this.clock = sinon.useFakeTimers();
     this.techPlayCalls = 0;
+    this.playsTerminated = 0;
     this.playTests = [];
     this.terminate = false;
 
@@ -75,10 +76,11 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
       assert.deepEqual(currentState, expectedState, assertName);
     };
 
+    this.playTerminatedQueue = () => this.playsTerminated++;
+
     this.playTest = (assertName, options = {}) => {
-      if (this.player && typeof this.playsTerminated !== 'number') {
-        this.playsTerminated = 0;
-        this.player.on('play-terminated', () => this.playsTerminated++);
+      if (this.player.playTerminatedQueue_ !== this.playTerminatedQueue) {
+        this.player.runPlayTerminatedQueue_ = this.playTerminatedQueue;
       }
       if (this.player && this.player.tech_ && this.player.tech_.play !== this.techPlay) {
         this.player.tech_.play = this.techPlay;

@@ -384,7 +384,7 @@ QUnit.test('option = "any", play terminated restores muted', function(assert) {
 
   this.player.tech_.trigger('loadstart');
 
-  this.player.trigger('play-terminated');
+  this.player.runPlayTerminatedQueue_();
 
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
@@ -392,7 +392,7 @@ QUnit.test('option = "any", play terminated restores muted', function(assert) {
   assert.equal(this.counts.success, 0, 'success count');
   assert.equal(this.counts.failure, 0, 'failure count');
 
-  this.player.trigger('play-terminated');
+  this.player.runPlayTerminatedQueue_();
 
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
@@ -432,7 +432,7 @@ QUnit.test('option = "muted", play terminated restores muted', function(assert) 
   assert.equal(this.counts.success, 0, 'success count');
   assert.equal(this.counts.failure, 0, 'failure count');
 
-  this.player.trigger('play-terminated');
+  this.player.runPlayTerminatedQueue_();
   assert.equal(this.counts.play, 1, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
   assert.equal(this.mutedValue, false, 'no longer muted');
