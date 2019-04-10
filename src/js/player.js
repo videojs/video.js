@@ -1371,7 +1371,7 @@ class Player extends Component {
       promise = this.play();
 
       if (isPromise(promise)) {
-        promise.catch(muted);
+        promise = promise.catch(muted);
       }
     } else if (type === 'muted' && this.muted() !== true) {
       promise = muted();
@@ -3306,7 +3306,7 @@ class Player extends Component {
       this.options_.autoplay = true;
     }
 
-    techAutoplay = techAutoplay || this.options_.autoplay;
+    techAutoplay = typeof techAutoplay === 'undefined' ? this.options_.autoplay : techAutoplay;
 
     // if we don't have a tech then we do not queue up
     // a setAutoplay call on tech ready. We do this because the

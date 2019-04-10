@@ -170,7 +170,7 @@ QUnit.test('option = null, should be set to false no play/muted', function(asser
   assert.equal(this.counts.failure, 0, 'failure count');
 });
 
-QUnit.test('options = "play" play, no muted', function(assert) {
+QUnit.test('option = "play" play, no muted', function(assert) {
   this.createPlayer({autoplay: 'play'}, {}, this.resolvePromise);
 
   assert.equal(this.player.autoplay(), 'play', 'player.autoplay getter');
