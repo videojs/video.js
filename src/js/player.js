@@ -416,6 +416,10 @@ class Player extends Component {
     tag.controls = false;
     tag.removeAttribute('controls');
 
+    this.changingSrc_ = false;
+    this.playCallbacks_ = [];
+    this.playTerminatedQueue_ = [];
+
     // the attribute overrides the option
     if (tag.hasAttribute('autoplay')) {
       this.autoplay(true);
@@ -530,9 +534,6 @@ class Player extends Component {
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
 
-    this.changingSrc_ = false;
-    this.playCallbacks_ = [];
-    this.playTerminatedQueue_ = [];
   }
 
   /**
