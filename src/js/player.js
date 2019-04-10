@@ -26,7 +26,7 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
-import {silencePromise} from './utils/promise';
+import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
@@ -531,7 +531,6 @@ class Player extends Component {
     this.responsive(this.options_.responsive);
 
     this.changingSrc_ = false;
-    this.waitForPlay_ = false;
     this.playCallbacks_ = [];
     this.playTerminatedQueue_ = [];
   }
@@ -1339,9 +1338,7 @@ class Player extends Component {
    * found on the autoplay getter at Player#autoplay()
    */
   manualAutoplay_(type) {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (!this.tech_ || typeof type !== 'string' || !PromiseClass) {
+    if (!this.tech_ || typeof type !== 'string') {
       return;
     }
 
@@ -1357,7 +1354,13 @@ class Player extends Component {
       // restore muted on play terminatation
       this.playTerminatedQueue_.push(restoreMuted);
 
-      return this.play().catch(restoreMuted);
+      const mutedPromise = this.play();
+
+      if (!isPromise(mutedPromise)) {
+        return;
+      }
+
+      return mutedPromise.catch(restoreMuted);
     };
 
     let promise;
@@ -1365,11 +1368,19 @@ class Player extends Component {
     // if muted defaults to true
     // the only thing we can do is call play
     if (type === 'any' && this.muted() !== true) {
-      promise = this.play().catch(muted);
+      promise = this.play();
+
+      if (isPromise(promise)) {
+        promise.catch(muted);
+      }
     } else if (type === 'muted' && this.muted() !== true) {
       promise = muted();
     } else {
       promise = this.play();
+    }
+
+    if (!isPromise(promise)) {
+      return;
     }
 
     return promise.then(() => {
@@ -3278,12 +3289,9 @@ class Player extends Component {
     }
 
     let techAutoplay;
-    // manual autoplay is only supported where promises are
-    const PromiseClass = this.options_.Promise || window.Promise;
 
-    // if the value is a valid string and we have a promise class
-    // treat is a "manualAutopla".
-    if (PromiseClass && typeof value === 'string' && (/(any|play|muted)/).test(value)) {
+    // if the value is a valid string set it to that
+    if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
       this.options_.autoplay = value;
       this.manualAutoplay_(value);
       techAutoplay = false;
