@@ -3151,6 +3151,18 @@ class Player extends Component {
    * and calls `reset` on the `tech`.
    */
   reset() {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (this.paused() || !PromiseClass) {
+      this.doReset_();
+    } else {
+      const playPromise = this.play();
+
+      silencePromise(playPromise.then(() => this.doReset_()));
+    }
+  }
+
+  doReset_() {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
