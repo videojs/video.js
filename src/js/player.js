@@ -3151,7 +3151,9 @@ class Player extends Component {
    * and calls `reset` on the `tech`.
    */
   reset() {
-    if (this.paused()) {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (this.paused() || !PromiseClass) {
       this.doReset_();
     } else {
       const playPromise = this.play();
