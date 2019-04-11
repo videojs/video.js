@@ -351,6 +351,11 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+    // Create bound methods for document listeners.
+    this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
+    this.boundFullWindowOnEscKey = Fn.bind(this, this.fullWindowOnEscKey);
+    this.boundHandleKeyPress = Fn.bind(this, this.handleKeyPress);
+
     // create logger
     this.log = createLogger(this.id_);
 
@@ -553,6 +558,11 @@ class Player extends Component {
     this.trigger('dispose');
     // prevent dispose from being called twice
     this.off('dispose');
+
+    // Make sure all player-specific document listeners are unbound. This is
+    Events.off(document, FullscreenApi.fullscreenchange, this.boundDocumentFullscreenChange_);
+    Events.off(document, 'keydown', this.boundFullWindowOnEscKey);
+    Events.off(document, 'keydown', this.boundHandleKeyPress);
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
@@ -1983,7 +1993,7 @@ class Player extends Component {
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
-      Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+      Events.off(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
     }
 
     if (!prefixedFS) {
@@ -2643,7 +2653,7 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+      Events.on(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
 
       this.el_[fsApi.requestFullscreen]();
 
@@ -2701,7 +2711,7 @@ class Player extends Component {
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    Events.on(document, 'keydown', Fn.bind(this, this.fullWindowOnEscKey));
+    Events.on(document, 'keydown', this.boundFullWindowOnEscKey);
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
@@ -2740,7 +2750,7 @@ class Player extends Component {
    */
   exitFullWindow() {
     this.isFullWindow = false;
-    Events.off(document, 'keydown', this.fullWindowOnEscKey);
+    Events.off(document, 'keydown', this.boundFullWindowOnEscKey);
 
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
@@ -2769,8 +2779,8 @@ class Player extends Component {
    */
   handleFocus(event) {
     // call off first to make sure we don't keep adding keydown handlers
-    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
-    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+    Events.off(document, 'keydown', this.boundHandleKeyPress);
+    Events.on(document, 'keydown', this.boundHandleKeyPress);
   }
 
   /**
@@ -2783,7 +2793,7 @@ class Player extends Component {
    * @listens blur
    */
   handleBlur(event) {
-    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+    Events.off(document, 'keydown', this.boundHandleKeyPress);
   }
 
   /**
