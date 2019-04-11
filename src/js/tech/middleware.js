@@ -166,6 +166,8 @@ export function mediate(middleware, tech, method, arg = null) {
   const callMethod = 'call' + toTitleCase(method);
   const middlewareValue = middleware.reduce(middlewareIterator(callMethod), arg);
   const terminated = middlewareValue === TERMINATOR;
+  // deprecated. The `null` return value should instead return TERMINATOR to
+  // prevent confusion if a techs method actually returns null.
   const returnValue = terminated ? null : tech[method](middlewareValue);
 
   executeRight(middleware, method, returnValue, terminated);

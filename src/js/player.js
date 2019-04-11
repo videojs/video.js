@@ -26,7 +26,7 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
-import {silencePromise} from './utils/promise';
+import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
@@ -421,9 +421,13 @@ class Player extends Component {
     tag.controls = false;
     tag.removeAttribute('controls');
 
+    this.changingSrc_ = false;
+    this.playCallbacks_ = [];
+    this.playTerminatedQueue_ = [];
+
     // the attribute overrides the option
     if (tag.hasAttribute('autoplay')) {
-      this.options_.autoplay = true;
+      this.autoplay(true);
     } else {
       // otherwise use the setter to validate and
       // set the correct value.
@@ -535,9 +539,6 @@ class Player extends Component {
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
 
-    this.changingSrc_ = false;
-    this.playWaitingForReady_ = false;
-    this.playOnLoadstart_ = null;
   }
 
   /**
@@ -1357,35 +1358,39 @@ class Player extends Component {
 
       this.muted(true);
 
-      const playPromise = this.play();
+      const restoreMuted = () => {
+        this.muted(previouslyMuted);
+      };
 
-      if (!playPromise || !playPromise.then || !playPromise.catch) {
+      // restore muted on play terminatation
+      this.playTerminatedQueue_.push(restoreMuted);
+
+      const mutedPromise = this.play();
+
+      if (!isPromise(mutedPromise)) {
         return;
       }
 
-      return playPromise.catch((e) => {
-        // restore old value of muted on failure
-        this.muted(previouslyMuted);
-      });
+      return mutedPromise.catch(restoreMuted);
     };
 
     let promise;
 
-    if (type === 'any') {
+    // if muted defaults to true
+    // the only thing we can do is call play
+    if (type === 'any' && this.muted() !== true) {
       promise = this.play();
 
-      if (promise && promise.then && promise.catch) {
-        promise.catch(() => {
-          return muted();
-        });
+      if (isPromise(promise)) {
+        promise = promise.catch(muted);
       }
-    } else if (type === 'muted') {
+    } else if (type === 'muted' && this.muted() !== true) {
       promise = muted();
     } else {
       promise = this.play();
     }
 
-    if (!promise || !promise.then || !promise.catch) {
+    if (!isPromise(promise)) {
       return;
     }
 
@@ -2219,54 +2224,77 @@ class Player extends Component {
    *        The callback that should be called when the techs play is actually called
    */
   play_(callback = silencePromise) {
-    // If this is called while we have a play queued up on a loadstart, remove
-    // that listener to avoid getting in a potentially bad state.
-    if (this.playOnLoadstart_) {
-      this.off('loadstart', this.playOnLoadstart_);
+    this.playCallbacks_.push(callback);
+
+    const isSrcReady = Boolean(!this.changingSrc_ && (this.src() || this.currentSrc()));
+
+    // treat calls to play_ somewhat like the `one` event function
+    if (this.waitToPlay_) {
+      this.off(['ready', 'loadstart'], this.waitToPlay_);
+      this.waitToPlay_ = null;
     }
 
-    // If the player/tech is not ready, queue up another call to `play()` for
-    // when it is. This will loop back into this method for another attempt at
-    // playback when the tech is ready.
-    if (!this.isReady_) {
-
-      // Bail out if we're already waiting for `ready`!
-      if (this.playWaitingForReady_) {
-        return;
-      }
-
-      this.playWaitingForReady_ = true;
-      this.ready(() => {
-        this.playWaitingForReady_ = false;
-        callback(this.play());
-      });
-
-    // If the player/tech is ready and we have a source, we can attempt playback.
-    } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
-      callback(this.techGet_('play'));
-      return;
-
-    // If the tech is ready, but we do not have a source, we'll need to wait
-    // for both the `ready` and a `loadstart` when the source is finally
-    // resolved by middleware and set on the player.
-    //
-    // This can happen if `play()` is called while changing sources or before
-    // one has been set on the player.
-    } else {
-
-      this.playOnLoadstart_ = () => {
-        this.playOnLoadstart_ = null;
-        callback(this.play());
+    // if the player/tech is not ready or the src itself is not ready
+    // queue up a call to play on `ready` or `loadstart`
+    if (!this.isReady_ || !isSrcReady) {
+      this.waitToPlay_ = (e) => {
+        this.play_();
       };
+      this.one(['ready', 'loadstart'], this.waitToPlay_);
 
       // if we are in Safari, there is a high chance that loadstart will trigger after the gesture timeperiod
       // in that case, we need to prime the video element by calling load so it'll be ready in time
-      if (browser.IS_ANY_SAFARI || browser.IS_IOS) {
+      if (!isSrcReady && (browser.IS_ANY_SAFARI || browser.IS_IOS)) {
         this.load();
       }
-      this.one('loadstart', this.playOnLoadstart_);
+      return;
     }
 
+    // If the player/tech is ready and we have a source, we can attempt playback.
+    const val = this.techGet_('play');
+
+    // play was terminated if the returned value is null
+    if (val === null) {
+      this.runPlayTerminatedQueue_();
+    } else {
+      this.runPlayCallbacks_(val);
+    }
+  }
+
+  /**
+   * These functions will be run when if play is terminated. If play
+   * runPlayCallbacks_ is run these function will not be run. This allows us
+   * to differenciate between a terminated play and an actual call to play.
+   */
+  runPlayTerminatedQueue_() {
+    const queue = this.playTerminatedQueue_.slice(0);
+
+    this.playTerminatedQueue_ = [];
+
+    queue.forEach(function(q) {
+      q();
+    });
+  }
+
+  /**
+   * When a callback to play is delayed we have to run these
+   * callbacks when play is actually called on the tech. This function
+   * runs the callbacks that were delayed and accepts the return value
+   * from the tech.
+   *
+   * @param {undefined|Promise} val
+   *        The return value from the tech.
+   */
+  runPlayCallbacks_(val) {
+    const callbacks = this.playCallbacks_.slice(0);
+
+    this.playCallbacks_ = [];
+    // clear play terminatedQueue since we finished a real play
+    this.playTerminatedQueue_ = [];
+
+    callbacks.forEach(function(cb) {
+      cb(val);
+    });
   }
 
   /**
@@ -3289,7 +3317,7 @@ class Player extends Component {
       this.options_.autoplay = true;
     }
 
-    techAutoplay = techAutoplay || this.options_.autoplay;
+    techAutoplay = typeof techAutoplay === 'undefined' ? this.options_.autoplay : techAutoplay;
 
     // if we don't have a tech then we do not queue up
     // a setAutoplay call on tech ready. We do this because the
