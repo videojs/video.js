@@ -1391,7 +1391,11 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
       techCallMethod = method;
     },
     resetControlBarUI_() {},
-    poster() {}
+    poster() {},
+    paused() {
+      return true;
+    },
+    doReset_: Player.prototype.doReset_
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1419,7 +1423,11 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
       techCallMethod = method;
     },
     resetControlBarUI_() {},
-    poster() {}
+    poster() {},
+    paused() {
+      return true;
+    },
+    doReset_: Player.prototype.doReset_
   };
 
   Player.prototype.reset.call(testPlayer);
