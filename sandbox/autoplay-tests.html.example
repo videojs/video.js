@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+<style>p{margin: 0; padding:0}</style>
+</head>
+<body>
+  <div id="fixture">
+  </div>
+  <div id="start-test">
+    <video id='start-test-video' height=264 width=640 src="http://vjs.zencdn.net/v/oceans.mp4" controls></video>
+    <p>Press play on the video to start tests. (as we need user permission to autoplay)</p>
+  </div>
+  <script>
+    /* globals */
+    var startTestEl = document.getElementById('start-test')
+    var startTestVideo = document.getElementById('start-test-video')
+    var testSrc = {src: startTestVideo.src, type: 'video/mp4'};
+    var baseTests = [
+      {name: 'any', options: {autoplay: 'any'}},
+      {name: 'play', options: {autoplay: 'play'}},
+      {name: 'muted', options: {autoplay: 'muted'}},
+      {name: 'true', options: {autoplay: true}},
+
+      {name: 'after-init-any', player: function(p) {p.autoplay('any')}},
+      {name: 'after-init-play', player: function(p) {p.autoplay('play')}},
+      {name: 'after-init-muted', player: function(p) {p.autoplay('muted')}},
+      {name: 'after-init-true', player: function(p) {p.autoplay(true)}},
+
+      {name: 'ready-any', player: function(p) {p.ready(function() {p.autoplay('any')})}},
+      {name: 'ready-play', player: function(p) {p.ready(function() {p.autoplay('play')})}},
+      {name: 'ready-muted', player: function(p) {p.ready(function() {p.autoplay('muted')})}},
+      {name: 'ready-true', player: function(p) {p.ready(function() {p.autoplay(true)})}},
+      {name: 'attrib', video: function(v) {v.setAttribute('autoplay', true)}},
+    ];
+    var appendLine = function(line) {
+      var el = document.createElement('p');
+
+      el.innerText = line;
+      console.log(line);
+      fixture.appendChild(el);
+    };
+
+    var runTests;
+
+    startTestVideo.addEventListener('play', function() {
+      startTestVideo.load();
+      startTestVideo.src = testSrc.src;
+      startTestEl.style.display = 'none';
+      runTests();
+    });
+
+    runTests = function() {
+      var fixture = document.getElementById('fixture');
+
+      while(fixture.firstChild) {
+        fixture.removeChild(fixture.firstChild);
+      }
+
+      var tests = baseTests.slice(0);
+      var failure = 0;
+      var success = 0;
+      var total = tests.length;
+      var runTest;
+
+      var finishTest = function(name, pass) {
+        if (pass) {
+          success++;
+        } else {
+          failure++;
+        }
+        appendLine((pass ? 'success' : 'failure') + ' - ' + name);
+
+        if ((success + failure) === total) {
+          startTestEl.style.display = '';
+          appendLine(success + ' of ' + total + ' succeeded');
+        } else {
+          runTest();
+        }
+      }
+
+      runTest = function() {
+        var test = tests.shift();
+        var video = document.createElement('video');
+
+        video.setAttribute('class', 'video-js');
+        video.setAttribute('id', test.name);
+        video.setAttribute('controls', true);
+
+        if (test.video) {
+          test.video(video);
+        }
+
+        fixture.appendChild(video);
+
+        var player = videojs(video, test.options);
+
+        if (test.player) {
+          test.player(player);
+        }
+        player.setTimeout(function() {
+          player.dispose();
+          finishTest(test.name, false);
+        }, 5000);
+
+        player.on('timeupdate', function() {
+          if (player.currentTime() > 0) {
+            player.dispose();
+            finishTest(test.name, true);
+          }
+        });
+      };
+      runTest();
+    };
+
+  </script>
+
+</body>
+</html>
