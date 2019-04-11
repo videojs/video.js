@@ -353,8 +353,8 @@ class Player extends Component {
 
     // Create bound methods for document listeners.
     this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
-    this.boundFullWindowOnEscKey = Fn.bind(this, this.fullWindowOnEscKey);
-    this.boundHandleKeyPress = Fn.bind(this, this.handleKeyPress);
+    this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
+    this.boundHandleKeyPress_ = Fn.bind(this, this.handleKeyPress);
 
     // create logger
     this.log = createLogger(this.id_);
@@ -561,8 +561,8 @@ class Player extends Component {
 
     // Make sure all player-specific document listeners are unbound. This is
     Events.off(document, FullscreenApi.fullscreenchange, this.boundDocumentFullscreenChange_);
-    Events.off(document, 'keydown', this.boundFullWindowOnEscKey);
-    Events.off(document, 'keydown', this.boundHandleKeyPress);
+    Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
@@ -2711,7 +2711,7 @@ class Player extends Component {
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    Events.on(document, 'keydown', this.boundFullWindowOnEscKey);
+    Events.on(document, 'keydown', this.boundFullWindowOnEscKey_);
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
@@ -2750,7 +2750,7 @@ class Player extends Component {
    */
   exitFullWindow() {
     this.isFullWindow = false;
-    Events.off(document, 'keydown', this.boundFullWindowOnEscKey);
+    Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
@@ -2779,8 +2779,8 @@ class Player extends Component {
    */
   handleFocus(event) {
     // call off first to make sure we don't keep adding keydown handlers
-    Events.off(document, 'keydown', this.boundHandleKeyPress);
-    Events.on(document, 'keydown', this.boundHandleKeyPress);
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
+    Events.on(document, 'keydown', this.boundHandleKeyPress_);
   }
 
   /**
@@ -2793,7 +2793,7 @@ class Player extends Component {
    * @listens blur
    */
   handleBlur(event) {
-    Events.off(document, 'keydown', this.boundHandleKeyPress);
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
   }
 
   /**
