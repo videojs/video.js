@@ -1,3 +1,20 @@
+<a name="7.5.4"></a>
+## [7.5.4](https://github.com/videojs/video.js/compare/v7.5.3...v7.5.4) (2019-04-12)
+
+### Bug Fixes
+
+* always show the mute button by default in responsive mode ([#5914](https://github.com/videojs/video.js/issues/5914)) ([c85bc00](https://github.com/videojs/video.js/commit/c85bc00))
+* call reset if we are paused or no promises, otherwise wait for play promise to resolve ([#5876](https://github.com/videojs/video.js/issues/5876)) ([5973a62](https://github.com/videojs/video.js/commit/5973a62)), closes [#5875](https://github.com/videojs/video.js/issues/5875)
+* correctly resolve play promise when terminated via middleware ([#5895](https://github.com/videojs/video.js/issues/5895)) ([ad53b80](https://github.com/videojs/video.js/commit/ad53b80))
+* explicitly remove all document-level listeners on player dispose ([#5929](https://github.com/videojs/video.js/issues/5929)) ([458a5ea](https://github.com/videojs/video.js/commit/458a5ea))
+* fix bug preventing control bar from hiding on mobile ([#5836](https://github.com/videojs/video.js/issues/5836)) ([1844482](https://github.com/videojs/video.js/commit/1844482))
+* fix fullscreen detection when player is nested within document fullscreen ([#5912](https://github.com/videojs/video.js/issues/5912)) ([22d0514](https://github.com/videojs/video.js/commit/22d0514))
+* hide the progress control and show the subs-caps button when using Live UI at extra small size ([#5915](https://github.com/videojs/video.js/issues/5915)) ([55b3752](https://github.com/videojs/video.js/commit/55b3752))
+
+### Documentation
+
+* **ModalDialog:** add missing documentation for pauseOnOpen ([#5908](https://github.com/videojs/video.js/issues/5908)) ([b2eae7b](https://github.com/videojs/video.js/commit/b2eae7b))
+
 <a name="7.5.3"></a>
 ## [7.5.3](https://github.com/videojs/video.js/compare/v7.5.2...v7.5.3) (2019-03-29)
 
