@@ -152,7 +152,7 @@
     "uglify-js": "^3.4.9",
     "unified": "^7.0.2",
     "videojs-flash": "^2.1.2",
-    "videojs-generate-karma-config": "~5.1.0",
+    "videojs-generate-karma-config": "~5.2.0",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^8.0.2",
     "watchify": "^3.11.0",
