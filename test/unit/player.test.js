@@ -230,7 +230,7 @@ QUnit.test('should get current source from src set', function(assert) {
   fixture.innerHTML += html;
 
   const tag = document.getElementById('example_1');
-  const player = TestHelpers.makePlayer({}, tag);
+  const player = TestHelpers.makePlayer({}, tag, false);
 
   player.loadTech_('Html5');
 
@@ -268,7 +268,7 @@ QUnit.test('should get current sources from src set', function(assert) {
   fixture.innerHTML += html;
 
   const tag = document.getElementById('example_1');
-  const player = TestHelpers.makePlayer({}, tag);
+  const player = TestHelpers.makePlayer({}, tag, false);
 
   player.loadTech_('Html5');
 
@@ -1438,7 +1438,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 });
 
 QUnit.test('player#reset clears the player cache', function(assert) {
-  const player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer({}, null, false);
   const sources = [{
     src: '//vjs.zencdn.net/v/oceans.mp4',
     type: 'video/mp4'
