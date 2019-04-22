@@ -61,7 +61,7 @@ QUnit.test('Calling resetPlaybackRate player method should place play rate at 1x
 });
 
 QUnit.test('Calling resetVolumeBar player method should reset volume bar', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] }, null, false);
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
 
   player.volume(0.5);
 

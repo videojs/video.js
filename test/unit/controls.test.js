@@ -169,7 +169,7 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
 });
 
 QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] }, null, false);
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
   const muteToggle = new MuteToggle(player);
 
   assert.equal(player.volume(), 1, 'volume is above 0');
@@ -185,7 +185,7 @@ QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted prope
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] }, null, false);
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
   const muteToggle = new MuteToggle(player);
 
   player.volume(0);
@@ -202,7 +202,7 @@ QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set v
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] }, null, false);
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
   const muteToggle = new MuteToggle(player);
 
   player.volume(0);
@@ -219,7 +219,7 @@ QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set vo
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, and muted is true sets volume to 0.1 and muted to false', function(assert) {
-  const player = TestHelpers.makePlayer({ techOrder: ['html5'] }, null, false);
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
   const muteToggle = new MuteToggle(player);
 
   player.volume(0);
