@@ -11,7 +11,7 @@ const TestHelpers = {
     return videoTag;
   },
 
-  makePlayer(playerOptions, videoTag, addTechAsMiddleware = true) {
+  makePlayer(playerOptions, videoTag) {
     videoTag = videoTag || TestHelpers.makeTag();
 
     const fixture = document.getElementById('qunit-fixture');
@@ -21,13 +21,7 @@ const TestHelpers = {
     playerOptions = playerOptions || {};
     playerOptions.techOrder = playerOptions.techOrder || ['techFaker'];
 
-    const player = new Player(videoTag, playerOptions);
-
-    if (addTechAsMiddleware) {
-      player.middleware_ = [player.tech_];
-    }
-
-    return player;
+    return new Player(videoTag, playerOptions);
   },
 
   getComputedStyle(el, rule) {

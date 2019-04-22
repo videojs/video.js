@@ -414,7 +414,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
 
   // without enableSourceset this test will fail.
   QUnit.test('Player#play() resolves correctly on tech el src', function(assert) {
-    this.player = TestHelpers.makePlayer({techOrder: ['html5'], enableSourceset: true}, null, false);
+    this.player = TestHelpers.makePlayer({techOrder: ['html5'], enableSourceset: true});
 
     this.playTest('player/tech start out ready', {
       techReady: true,
