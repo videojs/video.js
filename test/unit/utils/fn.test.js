@@ -1,6 +1,5 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
-import window from 'global/window';
 import * as Fn from '../../../src/js/utils/fn.js';
 
 QUnit.module('fn', {
@@ -23,10 +22,6 @@ QUnit.test('should add context to a function', function(assert) {
 });
 
 QUnit.test('should throttle functions properly', function(assert) {
-  // stub performance.now for sinon, see:
-  // https://github.com/sinonjs/sinon/issues/803
-  sinon.stub(window.performance, 'now', Date.now);
-
   const tester = sinon.spy();
   const throttled = Fn.throttle(tester, 100);
 
