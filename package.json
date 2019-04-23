@@ -147,7 +147,7 @@
     "semver": "^5.6.0",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2",
-    "sinon": "^1.16.1",
+    "sinon": "^7.3.2",
     "tui-jsdoc-template": "^1.2.2",
     "uglify-js": "^3.4.9",
     "unified": "^7.0.2",
