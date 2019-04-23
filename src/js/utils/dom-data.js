@@ -6,6 +6,14 @@ import * as Guid from './guid.js';
 import window from 'global/window';
 
 /**
+ * Use performance.now or fallback to Date.now.
+ *
+ * @type {Object}
+ * @private
+ */
+const now = window.performance && window.performance.now || Date.now;
+
+/**
  * Element Data Store.
  *
  * Allows for binding data to an element without putting it directly on the
@@ -24,7 +32,7 @@ const elData = {};
  * @constant
  * @private
  */
-const elIdAttr = 'vdata' + Math.floor(window.performance.now());
+const elIdAttr = 'vdata' + Math.floor(now());
 
 /**
  * Returns the cache object where data for an element is stored
