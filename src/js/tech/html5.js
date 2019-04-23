@@ -859,7 +859,14 @@ class Html5 extends Tech {
       videoPlaybackQuality.totalVideoFrames = this.el().webkitDecodedFrameCount;
     }
 
-    videoPlaybackQuality.creationTime = window.performance.now();
+    if (window.performance && typeof window.performance.now === 'function') {
+      videoPlaybackQuality.creationTime = window.performance.now();
+    } else if (window.performance &&
+               window.performance.timing &&
+               typeof window.performance.timing.navigationStart === 'number') {
+      videoPlaybackQuality.creationTime =
+        window.Date.now() - window.performance.timing.navigationStart;
+    }
 
     return videoPlaybackQuality;
   }
