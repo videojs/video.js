@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
+import window from 'global/window';
 import * as Fn from '../../../src/js/utils/fn.js';
 
 QUnit.module('fn', {
@@ -7,7 +8,7 @@ QUnit.module('fn', {
     this.clock = sinon.useFakeTimers();
     // stub performance.now for sinon, see:
     // https://github.com/sinonjs/sinon/issues/803
-    sinon.stub(performance, 'now', Date.now);
+    sinon.stub(window.performance, 'now', Date.now);
   },
   afterEach() {
     this.clock.restore();
