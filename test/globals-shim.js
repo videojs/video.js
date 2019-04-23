@@ -15,7 +15,7 @@ window.xhr = sinon.useFakeXMLHttpRequest();
 
 // Stub performance.now for sinon's useFakeTimers.
 // For more details, see #5870 and https://github.com/sinonjs/sinon/issues/803
-sinon.stub(window.performance, 'now', Date.now);
+window.sinon.stub(window.performance, 'now', Date.now);
 
 // This may not be needed anymore, but double check before removing
 window.fixture = document.createElement('div');
