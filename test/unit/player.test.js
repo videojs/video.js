@@ -1687,12 +1687,16 @@ QUnit.test('should not allow to register custom player when any player has been 
 
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
+  let vols = 0;
   let durs = 0;
   let lps = 0;
 
   videojs.use('video/foo', () => ({
     currentTime() {
       cts++;
+    },
+    volume() {
+      vols++;
     },
     duration() {
       durs++;
@@ -1714,10 +1718,12 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
   player.middleware_ = [middleware.getMiddleware('video/foo')[0](player)];
 
   player.techGet_('currentTime');
+  player.techGet_('volume');
   player.techGet_('duration');
   player.techGet_('loop');
 
   assert.equal(cts, 1, 'currentTime is allowed');
+  assert.equal(vols, 1, 'volume is allowed');
   assert.equal(durs, 1, 'duration is allowed');
   assert.equal(lps, 0, 'loop is not allowed');
 
@@ -1728,6 +1734,7 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
 QUnit.test('techCall runs through middleware if allowedSetter', function(assert) {
   let cts = 0;
   let vols = 0;
+  let prs = 0;
 
   videojs.use('video/foo', () => ({
     setCurrentTime(ct) {
@@ -1736,6 +1743,11 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
     },
     setVolume() {
       vols++;
+      return vols;
+    },
+    setPlaybackRate() {
+      prs++;
+      return prs;
     }
   }));
 
@@ -1754,11 +1766,13 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
 
   player.techCall_('setCurrentTime', 10);
   player.techCall_('setVolume', 0.5);
+  player.techCall_('setPlaybackRate', 0.75);
 
   this.clock.tick(1);
 
   assert.equal(cts, 1, 'setCurrentTime is allowed');
-  assert.equal(vols, 0, 'setVolume is not allowed');
+  assert.equal(vols, 1, 'setVolume is allowed');
+  assert.equal(prs, 0, 'setPlaybackRate is not allowed');
 
   middleware.getMiddleware('video/foo').pop();
   player.dispose();
