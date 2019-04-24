@@ -1965,7 +1965,7 @@ QUnit.test('setPoster in tech with `techCanOverridePoster` in player should over
   assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
   assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
 
-  posterchangeSpy.reset();
+  posterchangeSpy.resetHistory();
 
   player.tech_.setPoster(techPosterUrl);
   assert.ok(posterchangeSpy.calledOnce, "posterchangeSpy should've been called");
@@ -1990,7 +1990,7 @@ QUnit.test('setPoster in tech WITHOUT `techCanOverridePoster` in player should N
   assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
   assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
 
-  posterchangeSpy.reset();
+  posterchangeSpy.resetHistory();
 
   player.tech_.setPoster(techPosterUrl);
   assert.ok(posterchangeSpy.notCalled, "posterchangeSpy shouldn't have been called");
