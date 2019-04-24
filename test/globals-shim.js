@@ -13,10 +13,6 @@ window.sinon = sinon;
 // so we need to stub XHR before the xhr module is included anywhere else.
 window.xhr = sinon.useFakeXMLHttpRequest();
 
-// Stub performance.now for sinon's useFakeTimers.
-// For more details, see #5870 and https://github.com/sinonjs/sinon/issues/803
-window.sinon.stub(window.performance, 'now', Date.now);
-
 // This may not be needed anymore, but double check before removing
 window.fixture = document.createElement('div');
 window.fixture.id = 'qunit-fixture';
