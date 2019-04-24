@@ -1128,7 +1128,7 @@ class Component {
           pageY: event.touches[0].pageY
         };
         // Record start time so we can detect a tap vs. "touch and hold"
-        touchStart = new Date().getTime();
+        touchStart = window.performance.now();
         // Reset couldBeTap tracking
         couldBeTap = true;
       }
@@ -1166,7 +1166,7 @@ class Component {
       // Proceed only if the touchmove/leave/cancel event didn't happen
       if (couldBeTap === true) {
         // Measure how long the touch lasted
-        const touchTime = new Date().getTime() - touchStart;
+        const touchTime = window.performance.now() - touchStart;
 
         // Make sure the touch was less than the threshold to be considered a tap
         if (touchTime < touchTimeThreshold) {
