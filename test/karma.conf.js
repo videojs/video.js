@@ -70,7 +70,4 @@ module.exports = function(config) {
     }
   });
   */
-
-  console.log(JSON.stringify(config, null, 2));
-
 };
