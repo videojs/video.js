@@ -41,6 +41,15 @@ Video.js supports all attributes of the `<video>` element (such as `controls`, `
 </video>
 ```
 
+You can use a `<video-js>` element instead of `<video>`. Using a `<video>` element is undesirable in some circumstances, as the browser may show unstyled controls or try to load a source in the moments before the player initialises, which does not happen with the `<video-js>` custom element. 
+
+```html
+<video-js>
+  <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
+</video-js>
+```
+
 For a high-level overview of all the various embed options, check out the [embeds page](/docs/guides/embeds.md), then follow the rest of this page.
 
 ### Automatic Setup
