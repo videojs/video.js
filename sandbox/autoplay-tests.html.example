@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <title>Video.js Sandbox</title>
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../node_modules/es6-shim/es6-shim.min.js"></script>
   <script src="../dist/video.js"></script>
 <style>p{margin: 0; padding:0}</style>
 </head>
