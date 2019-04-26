@@ -306,7 +306,7 @@ var myPlayer = videojs('some-player-id');
 myPlayer.src('http://www.example.com/path/to/video.mp4');
 ```
 
-When a string is provided as the source, Video.js will try to infer the video type from the file extension, but this iferrence will not work in all cases. It is recommended that the source is provided as an object including the type, as below.
+When a string is provided as the source, Video.js will try to infer the video type from the file extension, but this inference will not work in all cases. It is recommended that the source is provided as an object including the type, as below.
 
 **Source Object (or element):** A javascript object containing information
 about the source file. Use this method if you want the player to determine if
