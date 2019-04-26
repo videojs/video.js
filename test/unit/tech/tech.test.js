@@ -338,11 +338,12 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   // and provde a dispose method for the handler.
   // This is optional for source handlers
   let disposeCalled = false;
-  const HandlerInternalState = function() {};
 
-  HandlerInternalState.prototype.dispose = function() {
-    disposeCalled = true;
-  };
+  class HandlerInternalState {
+    dispose() {
+      disposeCalled = true;
+    }
+  }
 
   // Create source handlers
   const handlerOne = {
