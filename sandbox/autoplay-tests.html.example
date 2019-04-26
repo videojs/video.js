@@ -19,23 +19,38 @@
     var startTestEl = document.getElementById('start-test')
     var startTestVideo = document.getElementById('start-test-video')
     var testSrc = {src: startTestVideo.src, type: 'video/mp4'};
-    var baseTests = [
-      {name: 'any', options: {autoplay: 'any'}},
-      {name: 'play', options: {autoplay: 'play'}},
-      {name: 'muted', options: {autoplay: 'muted'}},
-      {name: 'true', options: {autoplay: true}},
+    var baseTests = [];
+    var setFirstFail = function(player) {
+      var oldPlay = player.tech_.play;
+      var fail = true;
 
-      {name: 'after-init-any', player: function(p) {p.autoplay('any')}},
-      {name: 'after-init-play', player: function(p) {p.autoplay('play')}},
-      {name: 'after-init-muted', player: function(p) {p.autoplay('muted')}},
-      {name: 'after-init-true', player: function(p) {p.autoplay(true)}},
+      player.tech_.play = function() {
+        if (fail) {
+          fail = false;
+          return window.Promise.reject();
+        }
 
-      {name: 'ready-any', player: function(p) {p.ready(function() {p.autoplay('any')})}},
-      {name: 'ready-play', player: function(p) {p.ready(function() {p.autoplay('play')})}},
-      {name: 'ready-muted', player: function(p) {p.ready(function() {p.autoplay('muted')})}},
-      {name: 'ready-true', player: function(p) {p.ready(function() {p.autoplay(true)})}},
-      {name: 'attrib', video: function(v) {v.setAttribute('autoplay', true)}},
-    ];
+        return oldPlay.call(player.tech_);
+      };
+    };
+    var noop = function() {};
+    ['any-first-fail', 'any', 'play', 'muted', true].forEach(function(name) {
+      var val = (name === 'any-first-fail') ? 'any' : name;
+      var firstFail = (name === 'any-first-fail') ? setFirstFail : noop;
+
+      var fn = function(player) {
+        player.autoplay(val);
+      };
+
+      baseTests.push({name: 'option-' + name, beforeSrc: firstFail, options: {autoplay: val}});
+      baseTests.push({name: 'before-src-' + name, beforeSrc: function(player) {
+        firstFail(player);
+        fn(player);
+      }});
+      baseTests.push({name: 'after-src-' + name, beforeSrc: firstFail, afterSrc: fn});
+      baseTests.push({name: 'on-ready-' + name, beforeSrc: firstFail, onReady: fn});
+    });
+
     var appendLine = function(line) {
       var el = document.createElement('p');
 
@@ -90,25 +105,33 @@
         video.setAttribute('id', test.name);
         video.setAttribute('controls', true);
 
-        if (test.video) {
-          test.video(video);
-        }
-
         fixture.appendChild(video);
 
-        var player = videojs(video, test.options);
+        var player = window.player = videojs(video, test.options);
 
-        if (test.player) {
-          test.player(player);
+        if (test.onReady) {
+          test.onReady(player);
+        }
+
+        if (test.beforeSrc) {
+          test.beforeSrc(player);
+        }
+
+        player.src(testSrc);
+
+        if (test.afterSrc) {
+          test.afterSrc(player);
         }
         player.setTimeout(function() {
           player.dispose();
+          window.player = null;
           finishTest(test.name, false);
         }, 5000);
 
         player.on('timeupdate', function() {
           if (player.currentTime() > 0) {
             player.dispose();
+            window.player = null;
             finishTest(test.name, true);
           }
         });

@@ -3109,16 +3109,18 @@ class Player extends Component {
       return true;
     }
 
-    if (titleCaseEquals(sourceTech.tech, this.techName_)) {
+    this.changingSrc_ = true;
+
+    // load this technology with the chosen source
+    if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
+      this.loadTech_(sourceTech.tech, sourceTech.source);
+      this.tech_.ready(() => {
+        this.changingSrc_ = false;
+      });
+
       return false;
     }
 
-    this.changingSrc_ = true;
-    // load this technology with the chosen source
-    this.loadTech_(sourceTech.tech, sourceTech.source);
-
-    // wait until the tech is ready to set the source
-    // and set it synchronously if possible (#2326)
     const handleTechInit = (e) => {
       this.off(['ready', 'loadstart'], handleTechInit);
       if (e.type === 'ready') {
@@ -3135,7 +3137,11 @@ class Player extends Component {
       this.changingSrc_ = false;
     };
 
-    this.on(['ready', 'loadstart'], handleTechInit);
+    if (this.isReady_) {
+      handleTechInit({type: 'ready'});
+    } else {
+      this.on(['ready', 'loadstart'], handleTechInit);
+    }
 
     return false;
   }
