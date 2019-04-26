@@ -35,7 +35,7 @@ class Menu extends Component {
 
     this.focusedChild_ = -1;
 
-    this.on('keydown', this.handleKeyPress);
+    this.on('keydown', this.handleKeyDown);
 
     // All the menu item instances share the same blur handler provided by the menu container.
     this.boundHandleBlur_ = Fn.bind(this, this.handleBlur);
@@ -211,22 +211,17 @@ class Menu extends Component {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
+
     // Left and Down Arrows
     if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.stepForward();
 
     // Up and Right Arrows
     } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.stepBack();
-    } else {
-      // NOTE: This is a special case where we don't pass unhandled
-      //  keypress events up to the Component handler, because this
-      //  is just adding a keypress handler on top of the MenuItem's
-      //  existing keypress handler, which already handles passing keypress
-      //  events up.
     }
   }
 

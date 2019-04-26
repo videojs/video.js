@@ -104,13 +104,19 @@ class Button extends ClickableComponent {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
-    // Ignore Space or Enter key operation, which is handled by the browser for a button.
-    if (!(keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter'))) {
+  handleKeyDown(event) {
 
-      // Pass keypress handling up for unsupported keys
-      super.handleKeyPress(event);
+    // Ignore Space or Enter key operation, which is handled by the browser for
+    // a button - though not for its super class, ClickableComponent. Also,
+    // prevent the event from propagating through the DOM and triggering Player
+    // hotkeys.
+    if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
+      event.stopPropagation();
+      return;
     }
+
+    // Pass keypress handling up for unsupported keys
+    super.handleKeyDown(event);
   }
 }
 

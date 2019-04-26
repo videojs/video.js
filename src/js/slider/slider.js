@@ -56,8 +56,7 @@ class Slider extends Component {
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
-    this.on('focus', this.handleFocus);
-    this.on('blur', this.handleBlur);
+    this.on('keydown', this.handleKeyDown);
     this.on('click', this.handleClick);
 
     this.on(this.player_, 'controlsvisible', this.update);
@@ -83,8 +82,7 @@ class Slider extends Component {
 
     this.off('mousedown', this.handleMouseDown);
     this.off('touchstart', this.handleMouseDown);
-    this.off('focus', this.handleFocus);
-    this.off('blur', this.handleBlur);
+    this.off('keydown', this.handleKeyDown);
     this.off('click', this.handleClick);
     this.off(this.player_, 'controlsvisible', this.update);
     this.off(doc, 'mousemove', this.handleMouseMove);
@@ -294,18 +292,6 @@ class Slider extends Component {
   }
 
   /**
-   * Handle a `focus` event on this `Slider`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `focus` event that caused this function to run.
-   *
-   * @listens focus
-   */
-  handleFocus() {
-    this.on(this.bar.el_.ownerDocument, 'keydown', this.handleKeyPress);
-  }
-
-  /**
    * Handle a `keydown` event on the `Slider`. Watches for left, rigth, up, and down
    * arrow keys. This function will only be called when the slider has focus. See
    * {@link Slider#handleFocus} and {@link Slider#handleBlur}.
@@ -315,34 +301,22 @@ class Slider extends Component {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
+
     // Left and Down Arrows
     if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.stepBack();
 
     // Up and Right Arrows
     } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.stepForward();
     } else {
 
-      // Pass keypress handling up for unsupported keys
-      super.handleKeyPress(event);
+      // Pass keydown handling up for unsupported keys
+      super.handleKeyDown(event);
     }
-  }
-
-  /**
-   * Handle a `blur` event on this `Slider`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `blur` event that caused this function to run.
-   *
-   * @listens blur
-   */
-
-  handleBlur() {
-    this.off(this.bar.el_.ownerDocument, 'keydown', this.handleKeyPress);
   }
 
   /**
@@ -353,7 +327,7 @@ class Slider extends Component {
    *        Event that caused this object to run
    */
   handleClick(event) {
-    event.stopImmediatePropagation();
+    event.stopPropagation();
     event.preventDefault();
   }
 

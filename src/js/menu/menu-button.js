@@ -5,11 +5,8 @@ import Button from '../button.js';
 import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
-import * as Fn from '../utils/fn.js';
-import * as Events from '../utils/events.js';
 import toTitleCase from '../utils/to-title-case.js';
 import { IS_IOS } from '../utils/browser.js';
-import document from 'global/document';
 import keycode from 'keycode';
 
 /**
@@ -50,12 +47,12 @@ class MenuButton extends Component {
 
     this.on(this.menuButton_, 'tap', this.handleClick);
     this.on(this.menuButton_, 'click', this.handleClick);
-    this.on(this.menuButton_, 'focus', this.handleFocus);
-    this.on(this.menuButton_, 'blur', this.handleBlur);
+    this.on(this.menuButton_, 'keydown', this.handleKeyDown);
     this.on(this.menuButton_, 'mouseenter', () => {
       this.menu.show();
     });
-    this.on('keydown', this.handleSubmenuKeyPress);
+
+    this.on('keydown', this.handleSubmenuKeyDown);
   }
 
   /**
@@ -247,47 +244,22 @@ class MenuButton extends Component {
   }
 
   /**
-   * This gets called when a `MenuButton` gains focus via a `focus` event.
-   * Turns on listening for `keydown` events. When they happen it
-   * calls `this.handleKeyPress`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `focus` event that caused this function to be called.
-   *
-   * @listens focus
-   */
-  handleFocus() {
-    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
-  }
-
-  /**
-   * Called when a `MenuButton` loses focus. Turns off the listener for
-   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
-   *
-   * @param {EventTarget~Event} event
-   *        The `blur` event that caused this function to be called.
-   *
-   * @listens blur
-   */
-  handleBlur() {
-    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
-  }
-
-  /**
    * Handle tab, escape, down arrow, and up arrow keys for `MenuButton`. See
-   * {@link ClickableComponent#handleKeyPress} for instances where this is called.
+   * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
+
     // Escape or Tab unpress the 'button'
     if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
+
       // Don't preventDefault for Tab key - we still want to lose focus
       if (!keycode.isEventKey(event, 'Tab')) {
         event.preventDefault();
@@ -300,12 +272,19 @@ class MenuButton extends Component {
         event.preventDefault();
         this.pressButton();
       }
-    } else {
-      // NOTE: This is a special case where we don't pass unhandled
-      //  keypress events up to the Component handler, because it is
-      //  just entending the keypress handling of the actual `Button`
-      //  in the `MenuButton` which already passes unused keys up.
     }
+  }
+
+  /**
+   * This method name now delegates to `handleSubmenuKeyDown`. This means
+   * anyone calling `handleSubmenuKeyPress` will not see their method calls
+   * stop working.
+   *
+   * @param {EventTarget~Event} event
+   *        The event that caused this function to be called.
+   */
+  handleSubmenuKeyPress(event) {
+    this.handleSubmenuKeyDown(event);
   }
 
   /**
@@ -317,7 +296,7 @@ class MenuButton extends Component {
    *
    * @listens keydown
    */
-  handleSubmenuKeyPress(event) {
+  handleSubmenuKeyDown(event) {
     // Escape or Tab unpress the 'button'
     if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
       if (this.buttonPressed_) {
@@ -331,8 +310,8 @@ class MenuButton extends Component {
       }
     } else {
       // NOTE: This is a special case where we don't pass unhandled
-      //  keypress events up to the Component handler, because it is
-      //  just entending the keypress handling of the `MenuItem`
+      //  keydown events up to the Component handler, because it is
+      //  just entending the keydown handling of the `MenuItem`
       //  in the `Menu` which already passes unused keys up.
     }
   }

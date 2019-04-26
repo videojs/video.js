@@ -47,8 +47,6 @@ class BigPlayButton extends Button {
     // exit early if clicked via the mouse
     if (this.mouseused_ && event.clientX && event.clientY) {
       silencePromise(playPromise);
-      // call handleFocus manually to get hotkeys working
-      this.player_.handleFocus({});
       return;
     }
 
@@ -69,10 +67,10 @@ class BigPlayButton extends Button {
     }
   }
 
-  handleKeyPress(event) {
+  handleKeyDown(event) {
     this.mouseused_ = false;
 
-    super.handleKeyPress(event);
+    super.handleKeyDown(event);
   }
 
   handleMouseDown(event) {

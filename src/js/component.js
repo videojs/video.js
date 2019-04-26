@@ -1078,16 +1078,31 @@ class Component {
   }
 
   /**
-   * When this Component receives a keydown event which it does not process,
+   * When this Component receives a `keydown` event which it does not process,
    *  it passes the event to the Player for handling.
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
     if (this.player_) {
-      this.player_.handleKeyPress(event);
+
+      event.stopPropagation();
+      this.player_.handleKeyDown(event);
     }
+  }
+
+  /**
+   * Many components used to have a `handleKeyPress` method, which was poorly
+   * named because it listened to a `keydown` event. This method name now
+   * delegates to `handleKeyDown`. This means anyone calling `handleKeyPress`
+   * will not see their method calls stop working.
+   *
+   * @param {EventTarget~Event} event
+   *        The event that caused this function to be called.
+   */
+  handleKeyPress(event) {
+    this.handleKeyDown(event);
   }
 
   /**

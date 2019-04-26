@@ -2,7 +2,6 @@
  * @file modal-dialog.js
  */
 import * as Dom from './utils/dom';
-import * as Fn from './utils/fn';
 import Component from './component';
 import window from 'global/window';
 import document from 'global/document';
@@ -120,21 +119,6 @@ class ModalDialog extends Component {
   }
 
   /**
-   * Handles `keydown` events on the document, looking for ESC, which closes
-   * the modal.
-   *
-   * @param {EventTarget~Event} event
-   *        The keypress that triggered this event.
-   *
-   * @listens keydown
-   */
-  handleKeyPress(event) {
-    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
-      this.close();
-    }
-  }
-
-  /**
    * Returns the label string for this modal. Primarily used for accessibility.
    *
    * @return {string}
@@ -195,9 +179,7 @@ class ModalDialog extends Component {
         player.pause();
       }
 
-      if (this.closeable()) {
-        this.on(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
-      }
+      this.on('keydown', this.handleKeyDown);
 
       // Hide controls and note if they were enabled.
       this.hadControls_ = player.controls();
@@ -260,9 +242,7 @@ class ModalDialog extends Component {
       player.play();
     }
 
-    if (this.closeable()) {
-      this.off(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
-    }
+    this.off('keydown', this.handleKeyDown);
 
     if (this.hadControls_) {
       player.controls(true);
@@ -444,8 +424,6 @@ class ModalDialog extends Component {
       this.previouslyActiveEl_ = activeEl;
 
       this.focus();
-
-      this.on(document, 'keydown', this.handleKeyDown);
     }
   }
 
@@ -459,8 +437,6 @@ class ModalDialog extends Component {
       this.previouslyActiveEl_.focus();
       this.previouslyActiveEl_ = null;
     }
-
-    this.off(document, 'keydown', this.handleKeyDown);
   }
 
   /**
@@ -469,6 +445,15 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
+
+    // Do not allow keydowns to reach out of the modal dialog.
+    event.stopPropagation();
+
+    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
+      this.close();
+      return;
+    }
+
     // exit early if it isn't a tab key
     if (!keycode.isEventKey(event, 'Tab')) {
       return;

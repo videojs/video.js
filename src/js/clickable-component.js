@@ -3,16 +3,13 @@
  */
 import Component from './component';
 import * as Dom from './utils/dom.js';
-import * as Events from './utils/events.js';
-import * as Fn from './utils/fn.js';
 import log from './utils/log.js';
-import document from 'global/document';
 import {assign} from './utils/obj';
 import keycode from 'keycode';
 
 /**
- * Clickable Component which is clickable or keyboard actionable,
- * but is not a native HTML button.
+ * Component which is clickable or keyboard actionable, but is not a
+ * native HTML button.
  *
  * @extends Component
  */
@@ -36,7 +33,7 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Create the `Component`s DOM element.
+   * Create the `ClickableComponent`s DOM element.
    *
    * @param {string} [tag=div]
    *        The element's node type.
@@ -83,7 +80,7 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Create a control text element on this `Component`
+   * Create a control text element on this `ClickableComponent`
    *
    * @param {Element} [el]
    *        Parent element for the control text.
@@ -109,7 +106,7 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Get or set the localize text to use for the controls on the `Component`.
+   * Get or set the localize text to use for the controls on the `ClickableComponent`.
    *
    * @param {string} [text]
    *        Control text for element.
@@ -146,7 +143,7 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Enable this `Component`s element.
+   * Enable this `ClickableComponent`
    */
   enable() {
     if (!this.enabled_) {
@@ -157,13 +154,12 @@ class ClickableComponent extends Component {
         this.el_.setAttribute('tabIndex', this.tabIndex_);
       }
       this.on(['tap', 'click'], this.handleClick);
-      this.on('focus', this.handleFocus);
-      this.on('blur', this.handleBlur);
+      this.on('keydown', this.handleKeyDown);
     }
   }
 
   /**
-   * Disable this `Component`s element.
+   * Disable this `ClickableComponent`
    */
   disable() {
     this.enabled_ = false;
@@ -173,27 +169,15 @@ class ClickableComponent extends Component {
       this.el_.removeAttribute('tabIndex');
     }
     this.off(['tap', 'click'], this.handleClick);
-    this.off('focus', this.handleFocus);
-    this.off('blur', this.handleBlur);
+    this.off('keydown', this.handleKeyDown);
   }
 
   /**
-   * This gets called when a `ClickableComponent` gets:
-   * - Clicked (via the `click` event, listening starts in the constructor)
-   * - Tapped (via the `tap` event, listening starts in the constructor)
-   * - The following things happen in order:
-   *   1. {@link ClickableComponent#handleFocus} is called via a `focus` event on the
-   *      `ClickableComponent`.
-   *   2. {@link ClickableComponent#handleFocus} adds a listener for `keydown` on using
-   *      {@link ClickableComponent#handleKeyPress}.
-   *   3. `ClickableComponent` has not had a `blur` event (`blur` means that focus was lost). The user presses
-   *      the space or enter key.
-   *   4. {@link ClickableComponent#handleKeyPress} calls this function with the `keydown`
-   *      event as a parameter.
+   * Event handler that is called when a `ClickableComponent` receives a
+   * `click` or `tap` event.
    *
    * @param {EventTarget~Event} event
-   *        The `keydown`, `tap`, or `click` event that caused this function to be
-   *        called.
+   *        The `tap` or `click` event that caused this function to be called.
    *
    * @listens tap
    * @listens click
@@ -202,51 +186,29 @@ class ClickableComponent extends Component {
   handleClick(event) {}
 
   /**
-   * This gets called when a `ClickableComponent` gains focus via a `focus` event.
-   * Turns on listening for `keydown` events. When they happen it
-   * calls `this.handleKeyPress`.
+   * Event handler that is called when a `ClickableComponent` receives a
+   * `keydown` event.
    *
-   * @param {EventTarget~Event} event
-   *        The `focus` event that caused this function to be called.
-   *
-   * @listens focus
-   */
-  handleFocus(event) {
-    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
-  }
-
-  /**
-   * Called when this ClickableComponent has focus and a key gets pressed down. By
-   * default it will call `this.handleClick` when the key is space or enter.
+   * By default, if the key is Space or Enter, it will trigger a `click` event.
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
-    // Support Space or Enter key operation to fire a click event
+  handleKeyDown(event) {
+
+    // Support Space or Enter key operation to fire a click event. Also,
+    // prevent the event from propagating through the DOM and triggering
+    // Player hotkeys.
     if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.trigger('click');
     } else {
 
       // Pass keypress handling up for unsupported keys
-      super.handleKeyPress(event);
+      super.handleKeyDown(event);
     }
-  }
-
-  /**
-   * Called when a `ClickableComponent` loses focus. Turns off the listener for
-   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
-   *
-   * @param {EventTarget~Event} event
-   *        The `blur` event that caused this function to be called.
-   *
-   * @listens blur
-   */
-  handleBlur(event) {
-    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }
 }
 

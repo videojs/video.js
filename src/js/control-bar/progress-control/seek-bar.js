@@ -407,30 +407,30 @@ class SeekBar extends Slider {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
     if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.handleAction(event);
     } else if (keycode.isEventKey(event, 'Home')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.player_.currentTime(0);
     } else if (keycode.isEventKey(event, 'End')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.player_.currentTime(this.player_.duration());
     } else if (/^[0-9]$/.test(keycode(event))) {
-      event.preventDefault();
+      event.stopPropagation();
       const gotoFraction = (keycode.codes[keycode(event)] - keycode.codes['0']) * 10.0 / 100.0;
 
       this.player_.currentTime(this.player_.duration() * gotoFraction);
     } else if (keycode.isEventKey(event, 'PgDn')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else if (keycode.isEventKey(event, 'PgUp')) {
-      event.preventDefault();
+      event.stopPropagation();
       this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else {
-      // Pass keypress handling up for unsupported keys
-      super.handleKeyPress(event);
+      // Pass keydown handling up for unsupported keys
+      super.handleKeyDown(event);
     }
   }
 }
