@@ -3109,39 +3109,32 @@ class Player extends Component {
       return true;
     }
 
-    this.changingSrc_ = true;
-
-    // load this technology with the chosen source
     if (!titleCaseEquals(sourceTech.tech, this.techName_)) {
+      this.changingSrc_ = true;
+      // load this technology with the chosen source
       this.loadTech_(sourceTech.tech, sourceTech.source);
       this.tech_.ready(() => {
         this.changingSrc_ = false;
       });
-
       return false;
     }
 
-    const handleTechInit = (e) => {
-      this.off(['ready', 'loadstart'], handleTechInit);
-      if (e.type === 'ready') {
-        // The setSource tech method was added with source handlers
-        // so older techs won't support it
-        // We need to check the direct prototype for the case where subclasses
-        // of the tech do not support source handlers
-        if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
-          this.techCall_('setSource', source);
-        } else {
-          this.techCall_('src', source.src);
-        }
-      }
-      this.changingSrc_ = false;
-    };
+    // wait until the tech is ready to set the source
+    // and set it synchronously if possible (#2326)
+    this.ready(function() {
 
-    if (this.isReady_) {
-      handleTechInit({type: 'ready'});
-    } else {
-      this.on(['ready', 'loadstart'], handleTechInit);
-    }
+      // The setSource tech method was added with source handlers
+      // so older techs won't support it
+      // We need to check the direct prototype for the case where subclasses
+      // of the tech do not support source handlers
+      if (this.tech_.constructor.prototype.hasOwnProperty('setSource')) {
+        this.techCall_('setSource', source);
+      } else {
+        this.techCall_('src', source.src);
+      }
+
+      this.changingSrc_ = false;
+    }, true);
 
     return false;
   }
