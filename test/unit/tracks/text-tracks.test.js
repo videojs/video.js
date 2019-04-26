@@ -155,10 +155,10 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
     oldSubsCapsUpdate.call(this);
   };
 
-  Tech.prototype.featuresNativeTextTracks = true;
-
+  const oldFeaturesNativeTextTracks = Tech.prototype.featuresNativeTextTracks;
   const oldTextTracks = Tech.prototype.textTracks;
 
+  Tech.prototype.featuresNativeTextTracks = true;
   Tech.prototype.textTracks = function() {
     return {
       length: 0,
@@ -213,11 +213,12 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
   assert.equal(update, 15, 'update was called on the five buttons for remove track');
 
   Tech.prototype.textTracks = oldTextTracks;
-  Tech.prototype.featuresNativeTextTracks = false;
+  Tech.prototype.featuresNativeTextTracks = oldFeaturesNativeTextTracks;
   CaptionsButton.prototype.update = oldCaptionsUpdate;
   SubtitlesButton.prototype.update = oldSubsUpdate;
   ChaptersButton.prototype.update = oldChaptersUpdate;
   SubsCapsButton.prototype.update = oldSubsCapsUpdate;
+  DescriptionsButton.prototype.update = oldDescriptionsUpdate;
 
   player.dispose();
 });

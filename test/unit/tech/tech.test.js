@@ -37,7 +37,7 @@ QUnit.module('Media Tech', {
   },
   afterEach(assert) {
     this.clock.restore();
-    Tech.prototype.featuresProgessEvents = this.featuresProgessEvents;
+    Tech.prototype.featuresProgressEvents = this.featuresProgessEvents;
   }
 });
 

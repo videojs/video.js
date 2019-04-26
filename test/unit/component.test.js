@@ -221,6 +221,8 @@ QUnit.test('should init child components from children array of objects', functi
 
 QUnit.test('should do a deep merge of child options', function(assert) {
   // Create a default option for component
+  const oldOptions = Component.prototype.options_;
+
   Component.prototype.options_ = {
     example: {
       childOne: { foo: 'bar', asdf: 'fdsa' },
@@ -253,8 +255,8 @@ QUnit.test('should do a deep merge of child options', function(assert) {
     'prototype options were not overridden'
   );
 
-  // Reset default component options to none
-  Component.prototype.options_ = null;
+  // Reset default component options
+  Component.prototype.options_ = oldOptions;
   comp.dispose();
 });
 
