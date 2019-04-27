@@ -21,11 +21,7 @@ const TestHelpers = {
     playerOptions = playerOptions || {};
     playerOptions.techOrder = playerOptions.techOrder || ['techFaker'];
 
-    const player = new Player(videoTag, playerOptions);
-
-    player.middleware_ = [player.tech_];
-
-    return player;
+    return new Player(videoTag, playerOptions);
   },
 
   getComputedStyle(el, rule) {

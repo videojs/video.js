@@ -24,6 +24,7 @@ QUnit.test('should not throw an error when there is no children', function(asser
   }
 
   player.dispose();
+  menuButton.dispose();
 });
 
 QUnit.test('should place title list item into ul', function(assert) {
@@ -109,6 +110,11 @@ QUnit.test('should keep all the added menu items', function(assert) {
   assert.strictEqual(menuButton.children()[1].children()[1], menuItem2, 'the second child of the menu is `menuItem2` after second update');
   assert.ok(menuButton.el().contains(menuItem1.el()), 'the menu button contains the DOM element of `menuItem1` after second update');
   assert.ok(menuButton.el().contains(menuItem2.el()), 'the menu button contains the DOM element of `menuItem2` after second update');
+
+  menuButton.dispose();
+  menuItem1.dispose();
+  menuItem2.dispose();
+  player.dispose();
 });
 
 QUnit.test('should remove old event listeners when the menu item adds to the new menu', function(assert) {
@@ -190,8 +196,14 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
   });
 
   newMenu.addItem(captionMenuItem);
+
   TestHelpers.triggerDomEvent(captionMenuItem.el(), 'click');
   assert.ok(!focusSpy.called, '`menuButton`.`focus` should never be called');
 
   focusSpy.restore();
+
+  player.dispose();
+  newMenu.dispose();
+  oldMenu.dispose();
+  menuButton.dispose();
 });

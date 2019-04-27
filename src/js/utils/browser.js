@@ -193,6 +193,15 @@ export const IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDRO
 export const IS_ANY_SAFARI = (IS_SAFARI || IS_IOS) && !IS_CHROME;
 
 /**
+ * Whether or not this is a Windows machine.
+ *
+ * @static
+ * @const
+ * @type {Boolean}
+ */
+export const IS_WINDOWS = (/Windows/i).test(USER_AGENT);
+
+/**
  * Whether or not this device is touch-enabled.
  *
  * @static

@@ -138,6 +138,11 @@ EventTarget.prototype.one = function(type, fn) {
 EventTarget.prototype.trigger = function(event) {
   const type = event.type || event;
 
+  // deprecation
+  // In a future version we should default target to `this`
+  // similar to how we default the target to `elem` in
+  // `Events.trigger`. Right now the default `target` will be
+  // `document` due to the `Event.fixEvent` call.
   if (typeof event === 'string') {
     event = {type};
   }

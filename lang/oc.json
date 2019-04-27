@@ -9,6 +9,8 @@
   "Remaining Time": "Temps restant",
   "Stream Type": "Tipe de difusion",
   "LIVE": "DIRÈCTE",
+  "Seek to live, currently behind live": "Trapar lo dirècte, actualament darrièr lo dirècte",
+  "Seek to live, currently playing live": "Trapar lo dirècte, actualament lo dirècte es en lectura",
   "Loaded": "Cargat",
   "Progress": "Progression",
   "Progress Bar": "Barra de progression",
@@ -61,7 +63,7 @@
   "Semi-Transparent": "Semitransparent",
   "Opaque": "Opac",
   "Font Size": "Talha de la polissa",
-  "Text Edge Style": "Estil dels contorn del tèxte",
+  "Text Edge Style": "Estil dels contorns del tèxte",
   "None": "Cap",
   "Raised": "Naut",
   "Depressed": "Enfonsat",
@@ -80,5 +82,6 @@
   "Done": "Acabat",
   "Caption Settings Dialog": "Fenèstra de paramètres de legenda",
   "Beginning of dialog window. Escape will cancel and close the window.": "Debuta de la fenèstra. Escapar anullarà e tamparà la fenèstra",
-  "End of dialog window.": "Fin de la fenèstra."
+  "End of dialog window.": "Fin de la fenèstra.",
+  "{1} is loading.": "{1} es a cargar."
 }

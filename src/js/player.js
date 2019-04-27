@@ -15,7 +15,7 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
-import {IE_VERSION} from './utils/browser.js';
+import {IE_VERSION, IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
 import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
@@ -26,7 +26,7 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
-import {silencePromise} from './utils/promise';
+import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
@@ -351,6 +351,11 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+    // Create bound methods for document listeners.
+    this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
+    this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
+    this.boundHandleKeyPress_ = Fn.bind(this, this.handleKeyPress);
+
     // create logger
     this.log = createLogger(this.id_);
 
@@ -416,13 +421,26 @@ class Player extends Component {
     tag.controls = false;
     tag.removeAttribute('controls');
 
+    this.changingSrc_ = false;
+    this.playCallbacks_ = [];
+    this.playTerminatedQueue_ = [];
+
     // the attribute overrides the option
     if (tag.hasAttribute('autoplay')) {
-      this.options_.autoplay = true;
+      this.autoplay(true);
     } else {
       // otherwise use the setter to validate and
       // set the correct value.
       this.autoplay(this.options_.autoplay);
+    }
+
+    // check plugins
+    if (options.plugins) {
+      Object.keys(options.plugins).forEach((name) => {
+        if (typeof this[name] !== 'function') {
+          throw new Error(`plugin "${name}" does not exist`);
+        }
+      });
     }
 
     /*
@@ -449,15 +467,9 @@ class Player extends Component {
 
     // Load plugins
     if (options.plugins) {
-      const plugins = options.plugins;
-
-      Object.keys(plugins).forEach(function(name) {
-        if (typeof this[name] === 'function') {
-          this[name](plugins[name]);
-        } else {
-          throw new Error(`plugin "${name}" does not exist`);
-        }
-      }, this);
+      Object.keys(options.plugins).forEach((name) => {
+        this[name](options.plugins[name]);
+      });
     }
 
     this.options_.playerOptions = playerOptionsCopy;
@@ -527,9 +539,6 @@ class Player extends Component {
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
 
-    this.changingSrc_ = false;
-    this.playWaitingForReady_ = false;
-    this.playOnLoadstart_ = null;
   }
 
   /**
@@ -550,6 +559,11 @@ class Player extends Component {
     this.trigger('dispose');
     // prevent dispose from being called twice
     this.off('dispose');
+
+    // Make sure all player-specific document listeners are unbound. This is
+    Events.off(document, FullscreenApi.fullscreenchange, this.boundDocumentFullscreenChange_);
+    Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
@@ -582,6 +596,20 @@ class Player extends Component {
     }
 
     middleware.clearCacheForPlayer(this);
+
+    // remove all event handlers for track lists
+    // all tracks and track listeners are removed on
+    // tech dispose
+    TRACK_TYPES.names.forEach((name) => {
+      const props = TRACK_TYPES[name];
+      const list = this[props.getterName]();
+
+      // if it is not a native list
+      // we have to manually remove event listeners
+      if (list && list.off) {
+        list.off();
+      }
+    });
 
     // the actual .el_ is removed here
     super.dispose();
@@ -636,11 +664,12 @@ class Player extends Component {
     tag.setAttribute('tabindex', '-1');
     attrs.tabindex = '-1';
 
-    // Workaround for #4583 (JAWS+IE doesn't announce BPB or play button)
+    // Workaround for #4583 (JAWS+IE doesn't announce BPB or play button), and
+    // for the same issue with Chrome (on Windows) with JAWS.
     // See https://github.com/FreedomScientific/VFO-standards-support/issues/78
     // Note that we can't detect if JAWS is being used, but this ARIA attribute
-    //  doesn't change behavior of IE11 if JAWS is not being used
-    if (IE_VERSION) {
+    //  doesn't change behavior of IE11 or Chrome if JAWS is not being used
+    if (IE_VERSION || (IS_CHROME && IS_WINDOWS)) {
       tag.setAttribute('role', 'application');
       attrs.role = 'application';
     }
@@ -1330,35 +1359,39 @@ class Player extends Component {
 
       this.muted(true);
 
-      const playPromise = this.play();
+      const restoreMuted = () => {
+        this.muted(previouslyMuted);
+      };
 
-      if (!playPromise || !playPromise.then || !playPromise.catch) {
+      // restore muted on play terminatation
+      this.playTerminatedQueue_.push(restoreMuted);
+
+      const mutedPromise = this.play();
+
+      if (!isPromise(mutedPromise)) {
         return;
       }
 
-      return playPromise.catch((e) => {
-        // restore old value of muted on failure
-        this.muted(previouslyMuted);
-      });
+      return mutedPromise.catch(restoreMuted);
     };
 
     let promise;
 
-    if (type === 'any') {
+    // if muted defaults to true
+    // the only thing we can do is call play
+    if (type === 'any' && this.muted() !== true) {
       promise = this.play();
 
-      if (promise && promise.then && promise.catch) {
-        promise.catch(() => {
-          return muted();
-        });
+      if (isPromise(promise)) {
+        promise = promise.catch(muted);
       }
-    } else if (type === 'muted') {
+    } else if (type === 'muted' && this.muted() !== true) {
       promise = muted();
     } else {
       promise = this.play();
     }
 
-    if (!promise || !promise.then || !promise.catch) {
+    if (!isPromise(promise)) {
       return;
     }
 
@@ -1962,11 +1995,11 @@ class Player extends Component {
   documentFullscreenChange_(e) {
     const fsApi = FullscreenApi;
 
-    this.isFullscreen(document[fsApi.fullscreenElement]);
+    this.isFullscreen(document[fsApi.fullscreenElement] === this.el() || this.el().matches(':' + fsApi.fullscreen));
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
-      Events.off(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+      Events.off(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
     }
 
     if (!prefixedFS) {
@@ -2192,49 +2225,77 @@ class Player extends Component {
    *        The callback that should be called when the techs play is actually called
    */
   play_(callback = silencePromise) {
-    // If this is called while we have a play queued up on a loadstart, remove
-    // that listener to avoid getting in a potentially bad state.
-    if (this.playOnLoadstart_) {
-      this.off('loadstart', this.playOnLoadstart_);
+    this.playCallbacks_.push(callback);
+
+    const isSrcReady = Boolean(!this.changingSrc_ && (this.src() || this.currentSrc()));
+
+    // treat calls to play_ somewhat like the `one` event function
+    if (this.waitToPlay_) {
+      this.off(['ready', 'loadstart'], this.waitToPlay_);
+      this.waitToPlay_ = null;
     }
 
-    // If the player/tech is not ready, queue up another call to `play()` for
-    // when it is. This will loop back into this method for another attempt at
-    // playback when the tech is ready.
-    if (!this.isReady_) {
+    // if the player/tech is not ready or the src itself is not ready
+    // queue up a call to play on `ready` or `loadstart`
+    if (!this.isReady_ || !isSrcReady) {
+      this.waitToPlay_ = (e) => {
+        this.play_();
+      };
+      this.one(['ready', 'loadstart'], this.waitToPlay_);
 
-      // Bail out if we're already waiting for `ready`!
-      if (this.playWaitingForReady_) {
-        return;
+      // if we are in Safari, there is a high chance that loadstart will trigger after the gesture timeperiod
+      // in that case, we need to prime the video element by calling load so it'll be ready in time
+      if (!isSrcReady && (browser.IS_ANY_SAFARI || browser.IS_IOS)) {
+        this.load();
       }
-
-      this.playWaitingForReady_ = true;
-      this.ready(() => {
-        this.playWaitingForReady_ = false;
-        callback(this.play());
-      });
+      return;
+    }
 
     // If the player/tech is ready and we have a source, we can attempt playback.
-    } else if (!this.changingSrc_ && (this.src() || this.currentSrc())) {
-      callback(this.techGet_('play'));
-      return;
+    const val = this.techGet_('play');
 
-    // If the tech is ready, but we do not have a source, we'll need to wait
-    // for both the `ready` and a `loadstart` when the source is finally
-    // resolved by middleware and set on the player.
-    //
-    // This can happen if `play()` is called while changing sources or before
-    // one has been set on the player.
+    // play was terminated if the returned value is null
+    if (val === null) {
+      this.runPlayTerminatedQueue_();
     } else {
-
-      this.playOnLoadstart_ = () => {
-        this.playOnLoadstart_ = null;
-        callback(this.play());
-      };
-
-      this.one('loadstart', this.playOnLoadstart_);
+      this.runPlayCallbacks_(val);
     }
+  }
 
+  /**
+   * These functions will be run when if play is terminated. If play
+   * runPlayCallbacks_ is run these function will not be run. This allows us
+   * to differenciate between a terminated play and an actual call to play.
+   */
+  runPlayTerminatedQueue_() {
+    const queue = this.playTerminatedQueue_.slice(0);
+
+    this.playTerminatedQueue_ = [];
+
+    queue.forEach(function(q) {
+      q();
+    });
+  }
+
+  /**
+   * When a callback to play is delayed we have to run these
+   * callbacks when play is actually called on the tech. This function
+   * runs the callbacks that were delayed and accepts the return value
+   * from the tech.
+   *
+   * @param {undefined|Promise} val
+   *        The return value from the tech.
+   */
+  runPlayCallbacks_(val) {
+    const callbacks = this.playCallbacks_.slice(0);
+
+    this.playCallbacks_ = [];
+    // clear play terminatedQueue since we finished a real play
+    this.playTerminatedQueue_ = [];
+
+    callbacks.forEach(function(cb) {
+      cb(val);
+    });
   }
 
   /**
@@ -2621,7 +2682,7 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, this.documentFullscreenChange_));
+      Events.on(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
 
       this.el_[fsApi.requestFullscreen]();
 
@@ -2679,7 +2740,7 @@ class Player extends Component {
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    Events.on(document, 'keydown', Fn.bind(this, this.fullWindowOnEscKey));
+    Events.on(document, 'keydown', this.boundFullWindowOnEscKey_);
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
@@ -2718,7 +2779,7 @@ class Player extends Component {
    */
   exitFullWindow() {
     this.isFullWindow = false;
-    Events.off(document, 'keydown', this.fullWindowOnEscKey);
+    Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
@@ -2747,8 +2808,8 @@ class Player extends Component {
    */
   handleFocus(event) {
     // call off first to make sure we don't keep adding keydown handlers
-    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
-    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
+    Events.on(document, 'keydown', this.boundHandleKeyPress_);
   }
 
   /**
@@ -2761,7 +2822,7 @@ class Player extends Component {
    * @listens blur
    */
   handleBlur(event) {
-    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
   }
 
   /**
@@ -3091,6 +3152,18 @@ class Player extends Component {
    * and calls `reset` on the `tech`.
    */
   reset() {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (this.paused() || !PromiseClass) {
+      this.doReset_();
+    } else {
+      const playPromise = this.play();
+
+      silencePromise(playPromise.then(() => this.doReset_()));
+    }
+  }
+
+  doReset_() {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
@@ -3119,8 +3192,16 @@ class Player extends Component {
    */
   resetProgressBar_() {
     this.currentTime(0);
-    this.controlBar.durationDisplay.updateContent();
-    this.controlBar.remainingTimeDisplay.updateContent();
+
+    const { durationDisplay, remainingTimeDisplay } = this.controlBar;
+
+    if (durationDisplay) {
+      durationDisplay.updateContent();
+    }
+
+    if (remainingTimeDisplay) {
+      remainingTimeDisplay.updateContent();
+    }
   }
 
   /**
@@ -3249,7 +3330,7 @@ class Player extends Component {
       this.options_.autoplay = true;
     }
 
-    techAutoplay = techAutoplay || this.options_.autoplay;
+    techAutoplay = typeof techAutoplay === 'undefined' ? this.options_.autoplay : techAutoplay;
 
     // if we don't have a tech then we do not queue up
     // a setAutoplay call on tech ready. We do this because the
@@ -3647,13 +3728,13 @@ class Player extends Component {
 
     const controlBar = this.getChild('controlBar');
 
-    if (controlBar) {
+    // Fixes bug on Android & iOS where when tapping progressBar (when control bar is displayed)
+    // controlBar would no longer be hidden by default timeout.
+    if (controlBar && !browser.IS_IOS && !browser.IS_ANDROID) {
 
       controlBar.on('mouseenter', function(event) {
-
         this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
         this.player().options_.inactivityTimeout = 0;
-
       });
 
       controlBar.on('mouseleave', function(event) {

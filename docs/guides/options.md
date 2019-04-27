@@ -36,11 +36,11 @@
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
-  * [userActions.doubleClick](#useractions.doubleclick)
-  * [userActions.hotkeys](#useractions.hotkeys)
-  * [userActions.hotkeys.fullscreenKey](#useractions.hotkeys.fullscreenkey)
-  * [userActions.hotkeys.muteKey](#useractions.hotkeys.mutekey)
-  * [userActions.hotkeys.playPauseKey](#useractions.hotkeys.playpausekey)
+  * [userActions.doubleClick](#useractionsdoubleclick)
+  * [userActions.hotkeys](#useractionshotkeys)
+  * [userActions.hotkeys.fullscreenKey](#useractionshotkeysfullscreenkey)
+  * [userActions.hotkeys.muteKey](#useractionshotkeysmutekey)
+  * [userActions.hotkeys.playPauseKey](#useractionshotkeysplaypausekey)
   * [vtt.js](#vttjs)
 * [Component Options](#component-options)
   * [children](#children-1)
@@ -433,8 +433,7 @@ Default hotkey handling is:
 | `k` | toggle play/pause | always enabled, even if no Control Bar is present
 | `Space` | toggle play/pause | always enabled, even if no Control Bar is present
 
-Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which
-control in the player has focus.
+Hotkeys require player focus first. Note that the `Space` key activates controls such as buttons and menus if that control has keyboard focus. The other hotkeys work regardless of which control in the player has focus.
 
 ### `userActions.hotkeys.fullscreenKey`
 

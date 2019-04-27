@@ -3,6 +3,7 @@
  * @module dom-data
  */
 import * as Guid from './guid.js';
+import window from 'global/window';
 
 /**
  * Element Data Store.
@@ -14,7 +15,7 @@ import * as Guid from './guid.js';
  * @type {Object}
  * @private
  */
-const elData = {};
+export const elData = {};
 
 /*
  * Unique attribute name to store an element's guid in
@@ -23,7 +24,7 @@ const elData = {};
  * @constant
  * @private
  */
-const elIdAttr = 'vdata' + (new Date()).getTime();
+const elIdAttr = 'vdata' + Math.floor(window.performance && window.performance.now() || Date.now());
 
 /**
  * Returns the cache object where data for an element is stored

@@ -452,6 +452,7 @@ QUnit.test('"content" option (fills on first open() invocation)', function(asser
   assert.strictEqual(modal.content(), modal.options_.content, 'has the expected content');
   assert.strictEqual(spy.callCount, 1, 'auto-fills only once');
   assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content in the DOM');
+  modal.dispose();
 });
 
 QUnit.test('"temporary" option', function(assert) {
@@ -470,6 +471,9 @@ QUnit.test('"temporary" option', function(assert) {
   assert.expect(2);
   assert.strictEqual(tempSpy.callCount, 1, 'temporary modals are disposed');
   assert.strictEqual(permSpy.callCount, 0, 'permanent modals are not disposed');
+
+  temp.dispose();
+  perm.dispose();
 });
 
 QUnit.test('"fillAlways" option', function(assert) {
@@ -488,6 +492,7 @@ QUnit.test('"fillAlways" option', function(assert) {
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 2, 'the modal was filled on each open call');
+  modal.dispose();
 });
 
 QUnit.test('"label" option', function(assert) {
@@ -496,6 +501,7 @@ QUnit.test('"label" option', function(assert) {
 
   assert.expect(1);
   assert.strictEqual(modal.el().getAttribute('aria-label'), label, 'uses the label as the aria-label');
+  modal.dispose();
 });
 
 QUnit.test('"uncloseable" option', function(assert) {
@@ -515,6 +521,7 @@ QUnit.test('"uncloseable" option', function(assert) {
   modal.open();
   modal.handleKeyPress({which: ESC});
   assert.strictEqual(spy.callCount, 0, 'ESC did not close the modal');
+  modal.dispose();
 });
 
 QUnit.test('handleKeyDown traps tab focus', function(assert) {

@@ -35,6 +35,8 @@ QUnit.test('should hide volume and mute toggle control if it\'s not supported', 
   assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
 
   player.dispose();
+  volumeControl.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('should show replay icon when video playback ended', function(assert) {
@@ -49,6 +51,7 @@ QUnit.test('should show replay icon when video playback ended', function(assert)
   assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
 
   player.dispose();
+  playToggle.dispose();
 });
 
 QUnit.test('should show replay icon when video playback ended and replay option is set to true', function(assert) {
@@ -63,6 +66,7 @@ QUnit.test('should show replay icon when video playback ended and replay option 
   assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
 
   player.dispose();
+  playToggle.dispose();
 });
 
 QUnit.test('should not show the replay icon when video playback ended', function(assert) {
@@ -77,6 +81,7 @@ QUnit.test('should not show the replay icon when video playback ended', function
   assert.equal(playToggle.hasClass('vjs-ended'), false, 'playToogle is not in the ended state');
 
   player.dispose();
+  playToggle.dispose();
 });
 
 QUnit.test('should test and toggle volume control on `loadstart`', function(assert) {
@@ -106,6 +111,8 @@ QUnit.test('should test and toggle volume control on `loadstart`', function(asse
   assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
 
   player.dispose();
+  volumeControl.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('calculateDistance should use changedTouches, if available', function(assert) {
@@ -130,6 +137,7 @@ QUnit.test('calculateDistance should use changedTouches, if available', function
   assert.equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
 
   player.dispose();
+  slider.dispose();
 });
 
 QUnit.test('should hide playback rate control if it\'s not supported', function(assert) {
@@ -141,6 +149,7 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
 
   player.dispose();
+  playbackRate.dispose();
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
@@ -156,6 +165,7 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
 
   player.dispose();
+  fullscreentoggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
@@ -171,6 +181,7 @@ QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted prope
   assert.equal(player.muted(), true, 'player is muted');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
@@ -187,6 +198,7 @@ QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set v
   assert.equal(player.muted(), false, 'muted remains false');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
@@ -203,6 +215,7 @@ QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set vo
   assert.equal(player.muted(), false, 'muted is set to false');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, and muted is true sets volume to 0.1 and muted to false', function(assert) {
@@ -220,6 +233,7 @@ QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, a
   assert.equal(player.muted(), false, 'muted is set to false');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
@@ -231,6 +245,7 @@ QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
   assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
 
   player.dispose();
+  volumeBar.dispose();
 });
 
 QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', function(assert) {
@@ -256,6 +271,8 @@ QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', fun
   assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
 
   player.dispose();
+  muteToggle.dispose();
+  volumeBar.dispose();
 });
 
 QUnit.test('controlbar children to false individually, does not cause an assertion', function(assert) {

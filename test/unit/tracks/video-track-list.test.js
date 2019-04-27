@@ -24,6 +24,9 @@ QUnit.test('trigger "change" when "selectedchange" is fired on a track', functio
 
   track.trigger('selectedchange');
   assert.equal(changes, 2, 'one change events for another trigger');
+
+  videoTrackList.removeTrack(track);
+  videoTrackList.off('change');
 });
 
 QUnit.test('only one track is ever selected', function(assert) {
@@ -45,25 +48,27 @@ QUnit.test('only one track is ever selected', function(assert) {
   assert.equal(track2.selected, false, 'track2 is unselected');
   assert.equal(track3.selected, true, 'track3 is selected');
 
-  track.selected = true;
-  assert.equal(track.selected, true, 'track is unselected');
-  assert.equal(track2.selected, false, 'track2 is unselected');
+  track2.selected = true;
+  assert.equal(track.selected, false, 'track is unselected');
+  assert.equal(track2.selected, true, 'track2 is selected');
   assert.equal(track3.selected, false, 'track3 is unselected');
 
   list.addTrack(track4);
-  assert.equal(track.selected, true, 'track is selected');
-  assert.equal(track2.selected, false, 'track2 is unselected');
+  assert.equal(track.selected, false, 'track is unselected');
+  assert.equal(track2.selected, true, 'track2 is selected');
   assert.equal(track3.selected, false, 'track3 is unselected');
   assert.equal(track4.selected, false, 'track4 is unselected');
 
+  list.removeTrack(track);
+  list.removeTrack(track2);
+  list.removeTrack(track3);
+  list.removeTrack(track4);
 });
 
 QUnit.test('all tracks can be unselected', function(assert) {
   const track = new VideoTrack();
   const track2 = new VideoTrack();
-  /* eslint-disable no-unused-vars */
   const list = new VideoTrackList([track, track2]);
-  /* eslint-enable no-unused-vars */
 
   assert.equal(track.selected, false, 'track is unselected');
   assert.equal(track2.selected, false, 'track2 is unselected');
@@ -75,6 +80,9 @@ QUnit.test('all tracks can be unselected', function(assert) {
   track.selected = false;
   assert.equal(track.selected, false, 'track is unselected');
   assert.equal(track2.selected, false, 'track2 is unselected');
+
+  list.removeTrack(track);
+  list.removeTrack(track2);
 });
 
 QUnit.test('trigger a change event per selected change', function(assert) {
@@ -100,4 +108,10 @@ QUnit.test('trigger a change event per selected change', function(assert) {
 
   list.addTrack(track4);
   assert.equal(change, 4, 'no change triggered by adding a unselected track');
+
+  list.removeTrack(track);
+  list.removeTrack(track2);
+  list.removeTrack(track3);
+  list.removeTrack(track4);
+  list.off('change');
 });

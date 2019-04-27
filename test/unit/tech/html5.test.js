@@ -444,13 +444,13 @@ if (Html5.supportsNativeTextTracks()) {
 
     el.textTracks = tt;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(adds[0][0], 'change', 'change event handler added');
     assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
     assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('does not add native textTrack listeners when disabled', function(assert) {
@@ -466,17 +466,16 @@ if (Html5.supportsNativeTextTracks()) {
       get: () => tt
     });
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeTextTracks: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
 
-    /* eslint-disable no-unused-vars */
     const htmlTechAlternate = new Html5({el, nativeCaptions: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
+
+    htmlTech.dispose();
+    htmlTechAlternate.dispose();
   });
 
   QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
@@ -520,13 +519,13 @@ if (Html5.supportsNativeAudioTracks()) {
 
     el.audioTracks = at;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(adds[0][0], 'change', 'change event handler added');
     assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
     assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('does not add native audioTrack listeners when disabled', function(assert) {
@@ -540,11 +539,11 @@ if (Html5.supportsNativeAudioTracks()) {
 
     el.audioTracks = at;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeAudioTracks: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
@@ -654,13 +653,13 @@ if (Html5.supportsNativeVideoTracks()) {
 
     el.videoTracks = vt;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(adds[0][0], 'change', 'change event handler added');
     assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
     assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('does not add native audioTrack listeners when disabled', function(assert) {
@@ -674,11 +673,11 @@ if (Html5.supportsNativeVideoTracks()) {
 
     el.videoTracks = vt;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeVideoTracks: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('remove all tracks from emulated list on dispose', function(assert) {

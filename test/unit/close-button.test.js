@@ -37,6 +37,8 @@ QUnit.test('should allow setting the controlText_ property as an option', functi
 
   assert.expect(1);
   assert.strictEqual(btn.controlText_, text, 'set the controlText_ property');
+
+  btn.dispose();
 });
 
 QUnit.test('should trigger an event on activation', function(assert) {

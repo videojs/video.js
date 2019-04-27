@@ -31,7 +31,7 @@ QUnit.module('mixins: evented', {
   },
 
   afterEach() {
-    Object.keys(this.targets).forEach(k => this.targets[k].trigger('dispose'));
+    Object.keys(this.targets).forEach((k) => this.targets[k].trigger('dispose'));
   }
 });
 
@@ -62,28 +62,32 @@ QUnit.test('evented() with custom element', function(assert) {
 });
 
 QUnit.test('on() and one() errors', function(assert) {
-  const target = this.targets.a = evented({});
+  const targeta = this.targets.a = evented({});
+  const targetb = this.targets.b = evented({});
 
   ['on', 'one'].forEach(method => {
-    assert.throws(() => target[method](), errors.type, 'the expected error is thrown');
-    assert.throws(() => target[method]('   '), errors.type, 'the expected error is thrown');
-    assert.throws(() => target[method]([]), errors.type, 'the expected error is thrown');
-    assert.throws(() => target[method]('x'), errors.listener, 'the expected error is thrown');
-    assert.throws(() => target[method]({}, 'x', () => {}), errors.target, 'the expected error is thrown');
-    assert.throws(() => target[method](evented({}), 'x', null), errors.listener, 'the expected error is thrown');
+    assert.throws(() => targeta[method](), errors.type, 'the expected error is thrown');
+    assert.throws(() => targeta[method]('   '), errors.type, 'the expected error is thrown');
+    assert.throws(() => targeta[method]([]), errors.type, 'the expected error is thrown');
+    assert.throws(() => targeta[method]('x'), errors.listener, 'the expected error is thrown');
+    assert.throws(() => targeta[method]({}, 'x', () => {}), errors.target, 'the expected error is thrown');
+    assert.throws(() => targeta[method](targetb, 'x', null), errors.listener, 'the expected error is thrown');
   });
 });
 
 QUnit.test('off() errors', function(assert) {
-  const target = this.targets.a = evented({});
+  const targeta = this.targets.a = evented({});
+  const targetb = this.targets.b = evented({});
+  const targetc = this.targets.c = evented({});
+  const targetd = this.targets.d = evented({});
 
   // An invalid event actually causes an invalid target error because it
   // gets passed into code that assumes the first argument is the target.
-  assert.throws(() => target.off([]), errors.target, 'the expected error is thrown');
-  assert.throws(() => target.off({}, 'x', () => {}), errors.target, 'the expected error is thrown');
-  assert.throws(() => target.off(evented({}), '', () => {}), errors.type, 'the expected error is thrown');
-  assert.throws(() => target.off(evented({}), [], () => {}), errors.type, 'the expected error is thrown');
-  assert.throws(() => target.off(evented({}), 'x', null), errors.listener, 'the expected error is thrown');
+  assert.throws(() => targeta.off([]), errors.target, 'the expected error is thrown');
+  assert.throws(() => targeta.off({}, 'x', () => {}), errors.target, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targetb, '', () => {}), errors.type, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targetc, [], () => {}), errors.type, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targetd, 'x', null), errors.listener, 'the expected error is thrown');
 });
 
 QUnit.test('on() can add a listener to one event type on this object', function(assert) {

@@ -61,10 +61,10 @@ export const bind = function(context, fn, uid) {
  * @return   {Function}
  */
 export const throttle = function(fn, wait) {
-  let last = Date.now();
+  let last = window.performance.now();
 
   const throttled = function(...args) {
-    const now = Date.now();
+    const now = window.performance.now();
 
     if (now - last >= wait) {
       fn(...args);

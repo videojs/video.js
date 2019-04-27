@@ -1174,60 +1174,6 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
   player.dispose();
 });
 
-if (window.Promise) {
-  QUnit.test('play promise should resolve to native promise if returned', function(assert) {
-    const player = TestHelpers.makePlayer({});
-    const done = assert.async();
-
-    player.src({
-      src: 'http://example.com/video.mp4',
-      type: 'video/mp4'
-    });
-
-    this.clock.tick(1);
-
-    player.tech_.play = () => window.Promise.resolve('foo');
-    const p = player.play();
-
-    assert.ok(p, 'play returns something');
-    assert.equal(typeof p.then, 'function', 'play returns a promise');
-    p.then(function(val) {
-      assert.equal(val, 'foo', 'should resolve to native promise value');
-
-      player.dispose();
-      done();
-    });
-  });
-}
-
-QUnit.test('play promise should resolve to native value if returned', function(assert) {
-  const done = assert.async();
-  const player = TestHelpers.makePlayer({});
-
-  player.src({
-    src: 'http://example.com/video.mp4',
-    type: 'video/mp4'
-  });
-
-  this.clock.tick(1);
-
-  player.tech_.play = () => 'foo';
-  const p = player.play();
-
-  const finish = (v) => {
-    assert.equal(v, 'foo', 'play returns foo');
-    done();
-  };
-
-  if (typeof p === 'string') {
-    finish(p);
-  } else {
-    p.then((v) => {
-      finish(v);
-    });
-  }
-});
-
 QUnit.test('should throw on startup no techs are specified', function(assert) {
   const techOrder = videojs.options.techOrder;
   const fixture = document.getElementById('qunit-fixture');
@@ -1445,7 +1391,11 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
       techCallMethod = method;
     },
     resetControlBarUI_() {},
-    poster() {}
+    poster() {},
+    paused() {
+      return true;
+    },
+    doReset_: Player.prototype.doReset_
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1473,7 +1423,11 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
       techCallMethod = method;
     },
     resetControlBarUI_() {},
-    poster() {}
+    poster() {},
+    paused() {
+      return true;
+    },
+    doReset_: Player.prototype.doReset_
   };
 
   Player.prototype.reset.call(testPlayer);
@@ -1733,12 +1687,16 @@ QUnit.test('should not allow to register custom player when any player has been 
 
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
+  let vols = 0;
   let durs = 0;
   let lps = 0;
 
   videojs.use('video/foo', () => ({
     currentTime() {
       cts++;
+    },
+    volume() {
+      vols++;
     },
     duration() {
       durs++;
@@ -1760,10 +1718,12 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
   player.middleware_ = [middleware.getMiddleware('video/foo')[0](player)];
 
   player.techGet_('currentTime');
+  player.techGet_('volume');
   player.techGet_('duration');
   player.techGet_('loop');
 
   assert.equal(cts, 1, 'currentTime is allowed');
+  assert.equal(vols, 1, 'volume is allowed');
   assert.equal(durs, 1, 'duration is allowed');
   assert.equal(lps, 0, 'loop is not allowed');
 
@@ -1774,6 +1734,7 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
 QUnit.test('techCall runs through middleware if allowedSetter', function(assert) {
   let cts = 0;
   let vols = 0;
+  let prs = 0;
 
   videojs.use('video/foo', () => ({
     setCurrentTime(ct) {
@@ -1782,6 +1743,11 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
     },
     setVolume() {
       vols++;
+      return vols;
+    },
+    setPlaybackRate() {
+      prs++;
+      return prs;
     }
   }));
 
@@ -1800,11 +1766,13 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
 
   player.techCall_('setCurrentTime', 10);
   player.techCall_('setVolume', 0.5);
+  player.techCall_('setPlaybackRate', 0.75);
 
   this.clock.tick(1);
 
   assert.equal(cts, 1, 'setCurrentTime is allowed');
-  assert.equal(vols, 0, 'setVolume is not allowed');
+  assert.equal(vols, 1, 'setVolume is allowed');
+  assert.equal(prs, 0, 'setPlaybackRate is not allowed');
 
   middleware.getMiddleware('video/foo').pop();
   player.dispose();
@@ -1997,7 +1965,7 @@ QUnit.test('setPoster in tech with `techCanOverridePoster` in player should over
   assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
   assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
 
-  posterchangeSpy.reset();
+  posterchangeSpy.resetHistory();
 
   player.tech_.setPoster(techPosterUrl);
   assert.ok(posterchangeSpy.calledOnce, "posterchangeSpy should've been called");
@@ -2022,7 +1990,7 @@ QUnit.test('setPoster in tech WITHOUT `techCanOverridePoster` in player should N
   assert.equal(player.poster(), firstPosterUrl, "ensure tech didn't change poster after setting from player");
   assert.equal(player.isPosterFromTech_, false, "ensure player didn't mark poster as changed by the tech");
 
-  posterchangeSpy.reset();
+  posterchangeSpy.resetHistory();
 
   player.tech_.setPoster(techPosterUrl);
   assert.ok(posterchangeSpy.notCalled, "posterchangeSpy shouldn't have been called");
