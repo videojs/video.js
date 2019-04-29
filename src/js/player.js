@@ -2684,7 +2684,7 @@ class Player extends Component {
       // events
       Events.on(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
 
-      this.el_[fsApi.requestFullscreen]();
+      silencePromise(this.el_[fsApi.requestFullscreen]());
 
     } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
@@ -2714,7 +2714,7 @@ class Player extends Component {
 
     // Check for browser element fullscreen support
     if (fsApi.requestFullscreen) {
-      document[fsApi.exitFullscreen]();
+      silencePromise(document[fsApi.exitFullscreen]());
     } else if (this.tech_.supportsFullScreen()) {
       this.techCall_('exitFullScreen');
     } else {
