@@ -149,14 +149,7 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
     // `MenuItem` inherits from `ClickableComponent`.
     assert.strictEqual(eventData.handlers.click.length, 2, 'the number of click listeners is two');
 
-    // const blurListenerAddedByMenu = eventData.handlers.blur[1];
     const clickListenerAddedByMenu = eventData.handlers.click[1];
-
-    // assert.strictEqual(
-    //   typeof blurListenerAddedByMenu.calledOnce,
-    //   'undefined',
-    //   'previous blur listener wrapped in the spy should be removed'
-    // );
 
     assert.strictEqual(
       typeof clickListenerAddedByMenu.calledOnce,
@@ -164,13 +157,10 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
       'previous click listener wrapped in the spy should be removed'
     );
 
-    // const blurListenerSpy = eventData.handlers.blur[1] = sinon.spy(blurListenerAddedByMenu);
     const clickListenerSpy = eventData.handlers.click[1] = sinon.spy(clickListenerAddedByMenu);
 
     TestHelpers.triggerDomEvent(menuItem.el(), 'blur');
 
-    // assert.ok(blurListenerSpy.calledOnce, 'blur event listener should be called');
-    // assert.strictEqual(blurListenerSpy.getCall(0).args[0].target, menuItem.el(), 'event target should be the `menuItem`');
     assert.ok(menuChildrenSpy.calledOnce, '`watchedMenu`.`children` has been called');
 
     TestHelpers.triggerDomEvent(menuItem.el(), 'click');
