@@ -88,8 +88,9 @@ const externals = {
     'mpd-parser',
     'mux.js',
     'mux.js/lib/mp4',
-    'mux.js/lib/tools/ts-inspector.js',
     'mux.js/lib/mp4/probe',
+    'mux.js/lib/tools/ts-inspector.js',
+    'mux.js/lib/tools/mp4-inspector',
     'aes-decrypter',
     'keycode'
   ]),
