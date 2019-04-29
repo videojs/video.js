@@ -305,11 +305,13 @@ class Slider extends Component {
 
     // Left and Down Arrows
     if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
+      event.preventDefault();
       event.stopPropagation();
       this.stepBack();
 
     // Up and Right Arrows
     } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
+      event.preventDefault();
       event.stopPropagation();
       this.stepForward();
     } else {

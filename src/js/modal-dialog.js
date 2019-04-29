@@ -450,6 +450,7 @@ class ModalDialog extends Component {
     event.stopPropagation();
 
     if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
+      event.preventDefault();
       this.close();
       return;
     }

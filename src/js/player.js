@@ -2825,7 +2825,6 @@ class Player extends Component {
     // Sometimes, people put forms in their player. In general, we do not want
     // to activate hotkey handling when the focus is on one of these elements.
     const hotkeysDisallowed = [
-      'button',
       'datalist',
       'input',
       'optgroup',
@@ -2867,14 +2866,9 @@ class Player extends Component {
       playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'))
     } = hotkeys;
 
-    const {keyCode, charCode, code, key} = event;
-
-    log('hotkey', {keyCode, charCode, code, key});
-
-    if (fullscreenKey(event)) {
-      log('fullscreen');
-
+    if (fullscreenKey.call(this, event)) {
       event.preventDefault();
+      event.stopPropagation();
 
       const FSToggle = Component.getComponent('FullscreenToggle');
 
@@ -2882,19 +2876,17 @@ class Player extends Component {
         FSToggle.prototype.handleClick.call(this);
       }
 
-    } else if (muteKey(event)) {
-      log('mute');
-
+    } else if (muteKey.call(this, event)) {
       event.preventDefault();
+      event.stopPropagation();
 
       const MuteToggle = Component.getComponent('MuteToggle');
 
       MuteToggle.prototype.handleClick.call(this);
 
-    } else if (playPauseKey(event)) {
-      log('play/pause');
-
+    } else if (playPauseKey.call(this, event)) {
       event.preventDefault();
+      event.stopPropagation();
 
       const PlayToggle = Component.getComponent('PlayToggle');
 

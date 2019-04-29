@@ -202,6 +202,7 @@ class ClickableComponent extends Component {
     // prevent the event from propagating through the DOM and triggering
     // Player hotkeys.
     if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
+      event.preventDefault();
       event.stopPropagation();
       this.trigger('click');
     } else {

@@ -1087,6 +1087,8 @@ class Component {
   handleKeyDown(event) {
     if (this.player_) {
 
+      // We only stop propagation here because we want unhandled events to fall
+      // back to the browser.
       event.stopPropagation();
       this.player_.handleKeyDown(event);
     }
