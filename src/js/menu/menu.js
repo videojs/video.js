@@ -215,11 +215,13 @@ class Menu extends Component {
 
     // Left and Down Arrows
     if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
+      event.preventDefault();
       event.stopPropagation();
       this.stepForward();
 
     // Up and Right Arrows
     } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
+      event.preventDefault();
       event.stopPropagation();
       this.stepBack();
     }
