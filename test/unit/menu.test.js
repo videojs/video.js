@@ -89,6 +89,8 @@ QUnit.test('should keep all the added menu items', function(assert) {
   const menuItem1 = new MenuItem(player, { label: 'menu-item1' });
   const menuItem2 = new MenuItem(player, { label: 'menu-item2' });
 
+  const oldCreateItems = MenuButton.prototype.createItems;
+
   MenuButton.prototype.createItems = function() {
     return menuItems;
   };
@@ -115,6 +117,8 @@ QUnit.test('should keep all the added menu items', function(assert) {
   menuItem1.dispose();
   menuItem2.dispose();
   player.dispose();
+
+  MenuButton.prototype.createItems = oldCreateItems;
 });
 
 QUnit.test('should remove old event listeners when the menu item adds to the new menu', function(assert) {

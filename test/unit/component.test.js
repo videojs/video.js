@@ -14,23 +14,32 @@ class TestComponent1 extends Component {}
 class TestComponent2 extends Component {}
 class TestComponent3 extends Component {}
 class TestComponent4 extends Component {}
+
 TestComponent1.prototype.options_ = {
   children: [
     'testComponent2',
     'testComponent3'
   ]
 };
-Component.registerComponent('TestComponent1', TestComponent1);
-Component.registerComponent('TestComponent2', TestComponent2);
-Component.registerComponent('TestComponent3', TestComponent3);
-Component.registerComponent('TestComponent4', TestComponent4);
 
 QUnit.module('Component', {
+  before() {
+    Component.registerComponent('TestComponent1', TestComponent1);
+    Component.registerComponent('TestComponent2', TestComponent2);
+    Component.registerComponent('TestComponent3', TestComponent3);
+    Component.registerComponent('TestComponent4', TestComponent4);
+  },
   beforeEach() {
     this.clock = sinon.useFakeTimers();
   },
   afterEach() {
     this.clock.restore();
+  },
+  after() {
+    delete Component.components_.TestComponent1;
+    delete Component.components_.TestComponent2;
+    delete Component.components_.TestComponent3;
+    delete Component.components_.TestComponent4;
   }
 });
 
@@ -221,6 +230,8 @@ QUnit.test('should init child components from children array of objects', functi
 
 QUnit.test('should do a deep merge of child options', function(assert) {
   // Create a default option for component
+  const oldOptions = Component.prototype.options_;
+
   Component.prototype.options_ = {
     example: {
       childOne: { foo: 'bar', asdf: 'fdsa' },
@@ -253,8 +264,8 @@ QUnit.test('should do a deep merge of child options', function(assert) {
     'prototype options were not overridden'
   );
 
-  // Reset default component options to none
-  Component.prototype.options_ = null;
+  // Reset default component options
+  Component.prototype.options_ = oldOptions;
   comp.dispose();
 });
 
@@ -739,17 +750,17 @@ QUnit.test('should get the computed dimensions', function(assert) {
 });
 
 QUnit.test('should use a defined content el for appending children', function(assert) {
-  class CompWithContent extends Component {}
+  class CompWithContent extends Component {
+    createEl() {
+      // Create the main component element
+      const el = Dom.createEl('div');
 
-  CompWithContent.prototype.createEl = function() {
-    // Create the main component element
-    const el = Dom.createEl('div');
-
-    // Create the element where children will be appended
-    this.contentEl_ = Dom.createEl('div', { id: 'contentEl' });
-    el.appendChild(this.contentEl_);
-    return el;
-  };
+      // Create the element where children will be appended
+      this.contentEl_ = Dom.createEl('div', { id: 'contentEl' });
+      el.appendChild(this.contentEl_);
+      return el;
+    }
+  }
 
   const comp = new CompWithContent(getFakePlayer());
   const child = comp.addChild('component');
