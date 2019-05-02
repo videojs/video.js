@@ -2819,22 +2819,34 @@ class Player extends Component {
       return;
     }
 
-    const activeEl = this.el_.ownerDocument.activeElement;
-    const activeTag = activeEl && activeEl.tagName.toLowerCase();
+    // Function that determines whether or not to exclude an element from
+    // hotkeys handling.
+    const excludeElement = (el) => {
+      const tagName = el.tagName.toLowerCase();
 
-    // Sometimes, people put forms in their player. In general, we do not want
-    // to activate hotkey handling when the focus is on one of these elements.
-    const hotkeysDisallowed = [
-      'datalist',
-      'input',
-      'optgroup',
-      'option',
-      'select',
-      'textarea'
-    ];
+      // These tags will be excluded entirely.
+      const excludedTags = ['textarea'];
+
+      // Inputs matching these types will still trigger hotkey handling as
+      // they are not text inputs.
+      const allowedInputTypes = [
+        'button',
+        'checkbox',
+        'hidden',
+        'radio',
+        'reset',
+        'submit'
+      ];
+
+      if (tagName === 'input') {
+        return allowedInputTypes.indexOf(el.type) === -1;
+      }
+
+      return excludedTags.indexOf(tagName) !== -1;
+    };
 
     // Bail out if the user is focused on an interactive form element.
-    if (activeTag && hotkeysDisallowed.indexOf(activeTag) !== -1) {
+    if (excludeElement(this.el_.ownerDocument.activeElement)) {
       return;
     }
 
