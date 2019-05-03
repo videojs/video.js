@@ -476,3 +476,29 @@ export function one(elem, type, fn) {
   func.guid = fn.guid = fn.guid || Guid.newGUID();
   on(elem, type, func);
 }
+
+/**
+ * Trigger a listener only once and then turn if off for all
+ * configured events
+ *
+ * @param {Element|Object} elem
+ *        Element or object to bind to.
+ *
+ * @param {string|string[]} type
+ *        Name/type of event
+ *
+ * @param {Event~EventListener} fn
+ *        Event listener function
+ */
+export function race(elem, type, fn) {
+  const func = function() {
+    off(elem, type, func);
+    fn.apply(this, arguments);
+  };
+
+  // copy the guid to the new function so it can removed using the original function's ID
+  func.guid = fn.guid = fn.guid || Guid.newGUID();
+
+  // multiple ons, but one off for everything
+  on(elem, type, func);
+}

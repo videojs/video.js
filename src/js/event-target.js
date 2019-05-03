@@ -119,6 +119,16 @@ EventTarget.prototype.one = function(type, fn) {
   this.addEventListener = ael;
 };
 
+EventTarget.prototype.race = function(type, fn) {
+  // Remove the addEventListener alialing Events.on
+  // so we don't get into an infinite type loop
+  const ael = this.addEventListener;
+
+  this.addEventListener = () => {};
+  Events.race(this, type, fn);
+  this.addEventListener = ael;
+};
+
 /**
  * This function causes an event to happen. This will then cause any `event listeners`
  * that are waiting for that event, to get called. If there are no `event listeners`

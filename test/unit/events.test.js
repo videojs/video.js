@@ -347,3 +347,39 @@ QUnit.test('retrigger with an object should use the old element as target', func
   Events.off(el1, 'click');
   Events.off(el2, 'click');
 });
+
+QUnit.test('should listen only once for race', function(assert) {
+  const el = document.createElement('div');
+  let triggered = 0;
+  const listener = () => triggered++;
+
+  Events.race(el, 'click', listener);
+  assert.equal(triggered, 0, 'listener was not yet triggered');
+  // 1 click
+  Events.trigger(el, 'click');
+
+  assert.equal(triggered, 1, 'listener was triggered');
+  // No click should happen.
+  Events.trigger(el, 'click');
+  assert.equal(triggered, 1, 'listener was not triggered again');
+});
+
+QUnit.test('only the first event should call listener via race', function(assert) {
+  const el = document.createElement('div');
+  let triggered = 0;
+  const listener = () => triggered++;
+
+  Events.race(el, ['click', 'event1', 'event2'], listener);
+  assert.equal(triggered, 0, 'listener was not yet triggered');
+
+  // 1 click
+  Events.trigger(el, 'click');
+  assert.equal(triggered, 1, 'listener was triggered');
+  // nothing below here should trigger the Callback
+  Events.trigger(el, 'click');
+  Events.trigger(el, 'event1');
+  Events.trigger(el, 'event1');
+  Events.trigger(el, 'event2');
+  Events.trigger(el, 'event2');
+  assert.equal(triggered, 1, 'listener was not triggered again');
+});
