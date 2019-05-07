@@ -22,56 +22,31 @@ QUnit.module('ModalDialog', {
   }
 });
 
-const mockFocusableEls = function(Modal, focuscallback) {
-  Modal.prototype.oldFocusableEls = Modal.prototype.focusableEls_;
-
-  const focus = function() {
-    return focuscallback(this.i);
-  };
-  const els = [ {
-    i: 0,
-    focus
-  }, {
-    i: 1,
-    focus
-  }, {
-    i: 2,
-    focus
-  }, {
-    i: 3,
-    focus
-  }];
-
-  Modal.prototype.focusableEls_ = () => els;
-};
-
-const restoreFocusableEls = function(Modal) {
-  Modal.prototype.focusableEls_ = Modal.prototype.oldFocusableEls;
-};
-
-const mockActiveEl = function(modal, index) {
-  modal.oldEl = modal.el_;
-  modal.el_ = {
-    querySelector() {
-      const focusableEls = modal.focusableEls_();
-
-      return focusableEls[index];
-    }
-  };
-};
-
-const restoreActiveEl = function(modal) {
-  modal.el_ = modal.oldEl;
-};
-
 const tabTestHelper = function(assert, player) {
-  return function(from, to, shift = false) {
-    mockFocusableEls(ModalDialog, (focusIndex) => {
-      assert.equal(focusIndex, to, `we should focus back on the ${to} element, we got ${focusIndex}.`);
-    });
-    const modal = new ModalDialog(player, {});
+  return function(fromIndex, toIndex, shift = false) {
+    const oldFocusableEls = ModalDialog.prototype.focusableEls_;
+    const focus = function() {
+      assert.equal(this.i, toIndex, `we should focus back on the ${toIndex} element, we got ${this.i}.`);
+    };
+    const els = [
+      {i: 0, focus},
+      {i: 1, focus},
+      {i: 2, focus},
+      {i: 3, focus}
+    ];
 
-    mockActiveEl(modal, from);
+    ModalDialog.prototype.focusableEls_ = () => els;
+
+    const modal = new ModalDialog(player, {});
+    const oldEl = modal.el_;
+
+    modal.el_ = {
+      querySelector() {
+        const focusableEls = modal.focusableEls_();
+
+        return focusableEls[fromIndex];
+      }
+    };
 
     let prevented = false;
 
@@ -84,7 +59,7 @@ const tabTestHelper = function(assert, player) {
     });
 
     if (!prevented) {
-      const newIndex = shift ? from - 1 : from + 1;
+      const newIndex = shift ? fromIndex - 1 : fromIndex + 1;
       const newEl = modal.focusableEls_()[newIndex];
 
       if (newEl) {
@@ -92,9 +67,9 @@ const tabTestHelper = function(assert, player) {
       }
     }
 
-    restoreActiveEl(modal);
+    modal.el_ = oldEl;
     modal.dispose();
-    restoreFocusableEls(ModalDialog);
+    ModalDialog.prototype.focusableEls_ = oldFocusableEls;
   };
 };
 

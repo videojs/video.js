@@ -171,8 +171,11 @@ QUnit.test('arbitrary events', function(assert) {
 QUnit.test('handleStateChanged() method is automatically bound to the "statechanged" event', function(assert) {
   const spy = sinon.spy();
 
-  class TestHandler extends Plugin {}
-  TestHandler.prototype.handleStateChanged = spy;
+  class TestHandler extends Plugin {
+    handleStateChanged(...args) {
+      spy.apply(this, args);
+    }
+  }
   Plugin.registerPlugin('testHandler', TestHandler);
 
   const instance = this.player.testHandler();
