@@ -300,6 +300,11 @@ QUnit.test('when userActions.hotkeys is an object, hotkeys are enabled', functio
 });
 
 QUnit.test('when userActions.hotkeys.fullscreenKey can be a function', function(assert) {
+  if (document[FullscreenApi.fullscreenEnabled] === false) {
+    assert.expect(0);
+    return;
+  }
+
   this.player.dispose();
   this.player = TestHelpers.makePlayer({
     controls: true,
