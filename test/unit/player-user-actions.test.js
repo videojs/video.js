@@ -3,6 +3,7 @@ import document from 'global/document';
 import keycode from 'keycode';
 import sinon from 'sinon';
 import TestHelpers from './test-helpers';
+import FullscreenApi from '../../src/js/fullscreen-api.js';
 
 QUnit.module('Player: User Actions: Double Click', {
 
@@ -123,6 +124,8 @@ QUnit.test('when userActions.doubleClick is a function, that function is called 
 QUnit.module('Player: User Actions: Hotkeys', {
 
   beforeEach() {
+    this.originalFullscreenEnabled = document[FullscreenApi.fullscreenEnabled];
+    document[FullscreenApi.fullscreenEnabled] = true;
     this.clock = sinon.useFakeTimers();
     this.player = TestHelpers.makePlayer();
   },
@@ -130,6 +133,7 @@ QUnit.module('Player: User Actions: Hotkeys', {
   afterEach() {
     this.player.dispose();
     this.clock.restore();
+    document[FullscreenApi.fullscreenEnabled] = this.originalFullscreenEnabled;
   }
 });
 
