@@ -152,6 +152,7 @@ const defaultKeyTests = {
       assert.ok(true, 'skipped fullscreen test because not supported');
       assert.ok(true, 'skipped fullscreen test because not supported');
       assert.ok(true, 'skipped fullscreen test because not supported');
+      return;
     }
 
     player.isFullscreen = () => fullscreen;
