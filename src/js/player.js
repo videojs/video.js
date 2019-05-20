@@ -1845,7 +1845,7 @@ class Player extends Component {
    * @param {EventTarget~Event} event
    *        the event that caused this function to trigger
    *
-   * @listens Tech#mousedown
+   * @listens Tech#mouseup
    * @private
    */
   handleTechClick_(event) {
