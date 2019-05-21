@@ -313,6 +313,7 @@ Player
 │ ├── CaptionsButton (hidden, unless there are relevant tracks)
 │ ├── AudioTrackButton (hidden, unless there are relevant tracks)
 │ └── FullscreenToggle
+│ └── PictureInPictureToggle
 ├── ErrorDisplay (hidden, until there is an error)
 ├── TextTrackSettings
 └── ResizeManager (hidden)

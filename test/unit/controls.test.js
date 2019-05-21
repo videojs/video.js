@@ -6,6 +6,7 @@ import PlayToggle from '../../src/js/control-bar/play-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
+import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
@@ -166,6 +167,22 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
 
   player.dispose();
   fullscreentoggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control text should be correct when pictureinpicturechange is triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.isInPictureInPicture(true);
+  player.trigger('pictureinpicturechange');
+  assert.equal(pictureInPictureToggle.controlText(), 'Exit Picture-in-Picture', 'Control Text is correct while switching to Picture-in-Picture mode');
+
+  player.isInPictureInPicture(false);
+  player.trigger('pictureinpicturechange');
+  assert.equal(pictureInPictureToggle.controlText(), 'Picture-in-Picture', 'Control Text is correct while switching back to normal mode');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {

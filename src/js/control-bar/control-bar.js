@@ -13,6 +13,7 @@ import './live-display.js';
 import './seek-to-live.js';
 import './progress-control/progress-control.js';
 import './fullscreen-toggle.js';
+import './picture-in-picture-toggle.js';
 import './volume-panel.js';
 import './text-track-controls/chapters-button.js';
 import './text-track-controls/descriptions-button.js';
@@ -67,7 +68,8 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subsCapsButton',
     'audioTrackButton',
-    'fullscreenToggle'
+    'fullscreenToggle',
+    'pictureInPictureToggle'
   ]
 };
 
