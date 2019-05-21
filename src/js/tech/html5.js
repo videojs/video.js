@@ -660,6 +660,13 @@ class Html5 extends Tech {
   }
 
   /**
+   * Request that the `HTML5` Tech enter Picture-in-Picture.
+   */
+  requestPictureInPicture() {
+    return this.el_.requestPictureInPicture();
+  }
+
+  /**
    * A getter/setter for the `Html5` Tech's source object.
    * > Note: Please use {@link Html5#setSource}
    *
