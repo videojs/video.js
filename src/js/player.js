@@ -2878,7 +2878,12 @@ class Player extends Component {
    * continue consuming media while they interact with other content sites, or
    * applications on their device.
    *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   *
    * @fires Player#pictureinpicturechange
+   *
+   * @return {Promise}
+   *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
     if ('pictureInPictureEnabled' in document) {
@@ -2887,9 +2892,14 @@ class Player extends Component {
   }
 
   /**
-   * Return the video to its normal size after having been in full screen mode
+   * Exit Picture-in-Picture mode.
+   *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
    *
    * @fires Player#pictureinpicturechange
+   *
+   * @return {Promise}
+   *         A promise.
    */
   exitPictureInPicture() {
     if ('pictureInPictureEnabled' in document) {

@@ -765,6 +765,22 @@ class Tech extends Component {
   }
 
   /**
+   * Create a floating video window always on top of other windows so that users may
+   * continue consuming media while they interact with other content sites, or
+   * applications on their device.
+   *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   *
+   * @return {Promise}
+   *         A promise with a Picture-in-Picture window.
+   *
+   * @abstract
+   */
+  requestPictureInPicture() {
+    return Promise.reject();
+  }
+
+  /**
    * A method to set a poster from a `Tech`.
    *
    * @abstract
