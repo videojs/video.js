@@ -35,7 +35,7 @@ class TextTrackMenuItem extends MenuItem {
     this.track = track;
     // Determine the relevant kind(s) of tracks for this component and filter
     // out empty kinds.
-    this.kinds = (options.kinds || [options.kind]).filter(Boolean);
+    this.kinds = (options.kinds || [options.kind || this.track.kind]).filter(Boolean);
 
     const changeHandler = (...args) => {
       this.handleTracksChange.apply(this, args);
