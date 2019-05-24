@@ -69,6 +69,8 @@ class TextTrackButton extends TrackButton {
 
         const item = new TrackMenuItem(this.player_, {
           track,
+          kinds: this.kinds_,
+          kind: this.kind_,
           // MenuItem is selectable
           selectable: true,
           // MenuItem is NOT multiSelectable (i.e. only one can be marked "selected" at a time)
