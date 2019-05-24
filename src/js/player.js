@@ -2661,6 +2661,21 @@ class Player extends Component {
       this.toggleFullscreenClass_();
       return;
     }
+
+    if (prefixedFS) {
+      const fsApi = FullscreenApi;
+      const el = this.el();
+      let isFs = document[fsApi.fullscreenElement] === el;
+
+      if (!isFs && el.matches) {
+        isFs = el.matches(':' + fsApi.fullscreen);
+      } else if (!isFs && el.msMatchesSelector) {
+        isFs = el.msMatchesSelector(':' + fsApi.fullscreen);
+      }
+
+      return isFs;
+    }
+
     return !!this.isFullscreen_;
   }
 
