@@ -1993,8 +1993,16 @@ class Player extends Component {
    */
   documentFullscreenChange_(e) {
     const fsApi = FullscreenApi;
+    const el = this.el();
+    let isFs = document[fsApi.fullscreenElement] === el;
 
-    this.isFullscreen(document[fsApi.fullscreenElement] === this.el() || this.el().matches(':' + fsApi.fullscreen));
+    if (!isFs && el.matches) {
+      isFs = el.matches(':' + fsApi.fullscreen);
+    } else if (!isFs && el.msMatchesSelector) {
+      isFs = el.msMatchesSelector(':' + fsApi.fullscreen);
+    }
+
+    this.isFullscreen(isFs);
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
