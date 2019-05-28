@@ -1246,7 +1246,7 @@ class Player extends Component {
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
-    this.on(this.tech_, 'mousedown', this.handleTechClick_);
+    this.on(this.tech_, 'mouseup', this.handleTechClick_);
     this.on(this.tech_, 'dblclick', this.handleTechDoubleClick_);
 
     // If the controls were hidden we don't want that to change without a tap event
@@ -1274,7 +1274,7 @@ class Player extends Component {
     this.off(this.tech_, 'touchstart', this.handleTechTouchStart_);
     this.off(this.tech_, 'touchmove', this.handleTechTouchMove_);
     this.off(this.tech_, 'touchend', this.handleTechTouchEnd_);
-    this.off(this.tech_, 'mousedown', this.handleTechClick_);
+    this.off(this.tech_, 'mouseup', this.handleTechClick_);
     this.off(this.tech_, 'dblclick', this.handleTechDoubleClick_);
   }
 
@@ -1845,7 +1845,7 @@ class Player extends Component {
    * @param {EventTarget~Event} event
    *        the event that caused this function to trigger
    *
-   * @listens Tech#mousedown
+   * @listens Tech#mouseup
    * @private
    */
   handleTechClick_(event) {
