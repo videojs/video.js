@@ -2,7 +2,6 @@
  * @file text-track-settings.js
  */
 import window from 'global/window';
-import document from 'global/document';
 import Component from '../component';
 import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
@@ -590,7 +589,6 @@ class TextTrackSettings extends ModalDialog {
    */
   conditionalBlur_() {
     this.previouslyActiveEl_ = null;
-    this.off(document, 'keydown', this.handleKeyDown);
 
     const cb = this.player_.controlBar;
     const subsCapsBtn = cb && cb.subsCapsButton;

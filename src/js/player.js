@@ -354,7 +354,6 @@ class Player extends Component {
     // Create bound methods for document listeners.
     this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
     this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
-    this.boundHandleKeyPress_ = Fn.bind(this, this.handleKeyPress);
 
     // create logger
     this.log = createLogger(this.id_);
@@ -532,9 +531,8 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
-    this.on('focus', this.handleFocus);
-    this.on('blur', this.handleBlur);
     this.on('stageclick', this.handleStageClick_);
+    this.on('keydown', this.handleKeyDown);
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -563,7 +561,6 @@ class Player extends Component {
     // Make sure all player-specific document listeners are unbound. This is
     Events.off(document, FullscreenApi.fullscreenchange, this.boundDocumentFullscreenChange_);
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
-    Events.off(document, 'keydown', this.boundHandleKeyPress_);
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
@@ -2819,35 +2816,6 @@ class Player extends Component {
   }
 
   /**
-   * This gets called when a `Player` gains focus via a `focus` event.
-   * Turns on listening for `keydown` events. When they happen it
-   * calls `this.handleKeyPress`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `focus` event that caused this function to be called.
-   *
-   * @listens focus
-   */
-  handleFocus(event) {
-    // call off first to make sure we don't keep adding keydown handlers
-    Events.off(document, 'keydown', this.boundHandleKeyPress_);
-    Events.on(document, 'keydown', this.boundHandleKeyPress_);
-  }
-
-  /**
-   * Called when a `Player` loses focus. Turns off the listener for
-   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
-   *
-   * @param {EventTarget~Event} event
-   *        The `blur` event that caused this function to be called.
-   *
-   * @listens blur
-   */
-  handleBlur(event) {
-    Events.off(document, 'keydown', this.boundHandleKeyPress_);
-  }
-
-  /**
    * Called when this Player has focus and a key gets pressed down, or when
    * any Component of this player receives a key press that it doesn't handle.
    * This allows player-wide hotkeys (either as defined below, or optionally
@@ -2858,19 +2826,49 @@ class Player extends Component {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
+    const {userActions} = this.options_;
 
-    if (this.options_.userActions && this.options_.userActions.hotkeys && (this.options_.userActions.hotkeys !== false)) {
+    // Bail out if hotkeys are not configured.
+    if (!userActions || !userActions.hotkeys) {
+      return;
+    }
 
-      if (typeof this.options_.userActions.hotkeys === 'function') {
+    // Function that determines whether or not to exclude an element from
+    // hotkeys handling.
+    const excludeElement = (el) => {
+      const tagName = el.tagName.toLowerCase();
 
-        this.options_.userActions.hotkeys.call(this, event);
+      // These tags will be excluded entirely.
+      const excludedTags = ['textarea'];
 
-      } else {
+      // Inputs matching these types will still trigger hotkey handling as
+      // they are not text inputs.
+      const allowedInputTypes = [
+        'button',
+        'checkbox',
+        'hidden',
+        'radio',
+        'reset',
+        'submit'
+      ];
 
-        this.handleHotkeys(event);
-
+      if (tagName === 'input') {
+        return allowedInputTypes.indexOf(el.type) === -1;
       }
+
+      return excludedTags.indexOf(tagName) !== -1;
+    };
+
+    // Bail out if the user is focused on an interactive form element.
+    if (excludeElement(this.el_.ownerDocument.activeElement)) {
+      return;
+    }
+
+    if (typeof userActions.hotkeys === 'function') {
+      userActions.hotkeys.call(this, event);
+    } else {
+      this.handleHotkeys(event);
     }
   }
 
@@ -2896,8 +2894,8 @@ class Player extends Component {
     } = hotkeys;
 
     if (fullscreenKey.call(this, event)) {
-
       event.preventDefault();
+      event.stopPropagation();
 
       const FSToggle = Component.getComponent('FullscreenToggle');
 
@@ -2906,16 +2904,16 @@ class Player extends Component {
       }
 
     } else if (muteKey.call(this, event)) {
-
       event.preventDefault();
+      event.stopPropagation();
 
       const MuteToggle = Component.getComponent('MuteToggle');
 
       MuteToggle.prototype.handleClick.call(this);
 
     } else if (playPauseKey.call(this, event)) {
-
       event.preventDefault();
+      event.stopPropagation();
 
       const PlayToggle = Component.getComponent('PlayToggle');
 
