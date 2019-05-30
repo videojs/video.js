@@ -158,20 +158,20 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   const fullscreentoggle = new FullscreenToggle(player);
   const oldfsel = document[FullscreenApi.fullscreenElement];
 
-  player.isFullscreen(true);
   if (prefixedFS) {
     document[FullscreenApi.fullscreenElement] = player.el();
   }
+  player.isFullscreen(true);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
-
+  
+  document[FullscreenApi.fullscreenElement] = oldfsel;
   player.isFullscreen(false);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
 
   player.dispose();
   fullscreentoggle.dispose();
-  document[FullscreenApi.fullscreenElement] = oldfsel;
 });
 
 QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
