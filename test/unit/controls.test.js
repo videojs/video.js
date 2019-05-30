@@ -7,6 +7,7 @@ import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
+import {prefixedAPI as prefixedFS} from '../../src/js/fullscreen-api.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
@@ -156,6 +157,22 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   const player = TestHelpers.makePlayer();
   const fullscreentoggle = new FullscreenToggle(player);
 
+  // because we now check against the fullscreen element in the non-prefixed case (which if(prefixedFS) checks for)
+  // we override isFullscreen to ignore that check for this test
+  if (prefixedFS) {
+    const originalIsFS = player.isFullscreen;
+    let currentFS;
+
+    player.isFullscreen = function(isFS) {
+      if (isFS !== undefined) {
+        currentFS = isFS;
+        originalIsFS.call(player, isFS);
+        return;
+      }
+
+      return currentFS;
+    };
+  }
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
