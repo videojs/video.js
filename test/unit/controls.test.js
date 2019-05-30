@@ -7,7 +7,7 @@ import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/
 import Slider from '../../src/js/slider/slider.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
-import FullscreenApi, {prefixedAPI as prefixedFS} from '../../src/js/fullscreen-api.js'
+import FullscreenApi, {prefixedAPI as prefixedFS} from '../../src/js/fullscreen-api.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
