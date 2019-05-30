@@ -164,7 +164,7 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
-  
+
   document[FullscreenApi.fullscreenElement] = oldfsel;
   player.isFullscreen(false);
   player.trigger('fullscreenchange');
