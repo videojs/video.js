@@ -156,21 +156,20 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
   const player = TestHelpers.makePlayer();
   const fullscreentoggle = new FullscreenToggle(player);
-  const oldfsel = document[FullscreenApi.fullscreenElement];
 
   // because we now check against the fullscreen element in the non-prefixed case (which if(prefixedFS) checks for)
   // we override isFullscreen to ignore that check for this test
   if (prefixedFS) {
     const originalIsFS = player.isFullscreen;
     let currentFS;
-    
+
     player.isFullscreen = function(isFS) {
       if (isFS !== undefined) {
         currentFS = isFS;
         originalIsFS.call(player, isFS);
         return;
       }
-      
+
       return currentFS;
     };
   }
