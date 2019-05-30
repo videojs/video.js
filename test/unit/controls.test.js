@@ -158,14 +158,26 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   const fullscreentoggle = new FullscreenToggle(player);
   const oldfsel = document[FullscreenApi.fullscreenElement];
 
+  // because we now check against the fullscreen element in the non-prefixed case (which if(prefixedFS) checks for)
+  // we override isFullscreen to ignore that check for this test
   if (prefixedFS) {
-    document[FullscreenApi.fullscreenElement] = player.el();
+    const originalIsFS = player.isFullscreen;
+    let currentFS;
+    
+    player.isFullscreen = function(isFS) {
+      if (isFS !== undefined) {
+        currentFS = isFS;
+        originalIsFS.call(player, isFS);
+        return;
+      }
+      
+      return currentFS;
+    };
   }
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
 
-  document[FullscreenApi.fullscreenElement] = oldfsel;
   player.isFullscreen(false);
   player.trigger('fullscreenchange');
   assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
