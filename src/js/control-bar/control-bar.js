@@ -68,8 +68,8 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subsCapsButton',
     'audioTrackButton',
-    'fullscreenToggle',
-    'pictureInPictureToggle'
+    'pictureInPictureToggle',
+    'fullscreenToggle'
   ]
 };
 
