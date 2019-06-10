@@ -3,6 +3,10 @@
  */
 import Component from '../component.js';
 import {isPlain} from '../utils/obj';
+import * as Events from '../utils/events.js';
+import * as Fn from '../utils/fn.js';
+import keycode from 'keycode';
+import document from 'global/document';
 
 // Required children
 import './volume-control/volume-control.js';
@@ -42,6 +46,9 @@ class VolumePanel extends Component {
     super(player, options);
 
     this.on(player, ['loadstart'], this.volumePanelState_);
+    this.on('keydown', this.handleKeyPress);
+    this.on('mouseover', this.handleMouseOver);
+    this.on('mouseout', this.handleMouseOut);
 
     // while the slider is active (the mouse has been pressed down and
     // is dragging) we do not want to hide the VolumeBar
@@ -109,6 +116,50 @@ class VolumePanel extends Component {
     });
   }
 
+  /**
+   * This gets called when a `VolumePanel` gains hover via a `mouseover` event.
+   * Turns on listening for `mouseover` event. When they happen it
+   * calls `this.handleMouseOver`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseover` event that caused this function to be called.
+   *
+   * @listens mouseover
+   */
+  handleMouseOver(event) {
+    this.addClass('vjs-hover');
+    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * This gets called when a `VolumePanel` gains hover via a `mouseout` event.
+   * Turns on listening for `mouseout` event. When they happen it
+   * calls `this.handleMouseOut`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseout` event that caused this function to be called.
+   *
+   * @listens mouseout
+   */
+  handleMouseOut(event) {
+    this.removeClass('vjs-hover');
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Handles `keydown` events on the document, looking for ESC, which closes
+   * the volume panel.
+   *
+   * @param {EventTarget~Event} event
+   *        The keypress that triggered this event.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+    if (keycode.isEventKey(event, 'Esc') && this.hasClass('vjs-hover')) {
+      this.removeClass('vjs-hover');
+    }
+  }
 }
 
 /**

@@ -5,6 +5,7 @@ import Component from '../../component.js';
 import checkVolumeSupport from './check-volume-support';
 import {isPlain} from '../../utils/obj';
 import { throttle, bind } from '../../utils/fn.js';
+import keycode from 'keycode';
 
 // Required children
 import './volume-bar.js';
@@ -42,6 +43,7 @@ class VolumeControl extends Component {
 
     this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
 
+    this.on('keydown', this.handleKeyPress);
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
 
@@ -76,6 +78,21 @@ class VolumeControl extends Component {
     return super.createEl('div', {
       className: `vjs-volume-control vjs-control ${orientationClass}`
     });
+  }
+
+  /**
+   * Handles `keydown` events on the document, looking for ESC, which closes
+   * the volume control.
+   *
+   * @param {EventTarget~Event} event
+   *        The keypress that triggered this event.
+   *
+   * @listens keydown
+   */
+  handleKeyPress(event) {
+    if (keycode.isEventKey(event, 'Esc')) {
+      this.parentComponent_.muteToggle.focus();
+    }
   }
 
   /**
