@@ -47,7 +47,9 @@ class BigPlayButton extends Button {
     // exit early if clicked via the mouse
     if (this.mouseused_ && event.clientX && event.clientY) {
       silencePromise(playPromise);
-      this.player_.tech(true).focus();
+      if (this.player_.tech(true)) {
+        this.player_.tech(true).focus();
+      }
       return;
     }
 

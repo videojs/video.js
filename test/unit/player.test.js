@@ -336,6 +336,68 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   log.error.restore();
 });
 
+QUnit.test('should suppress source error messages', function(assert) {
+  const clock = sinon.useFakeTimers();
+
+  const player = TestHelpers.makePlayer({
+    suppressNotSupportedMessage: true
+  });
+
+  let errors = 0;
+
+  player.on('error', function(e) {
+    errors++;
+  });
+
+  player.loadTech_('Html5');
+
+  player.src({src: 'http://example.com', type: 'video/null'});
+
+  clock.tick(1);
+
+  assert.ok(errors === 0, 'no error on bad source load');
+
+  player.trigger('click');
+
+  clock.tick(1);
+
+  assert.ok(errors === 1, 'error after click');
+
+  player.dispose();
+});
+
+QUnit.test('should cancel a suppressed error message on loadstart', function(assert) {
+  const clock = sinon.useFakeTimers();
+
+  const player = TestHelpers.makePlayer({
+    suppressNotSupportedMessage: true
+  });
+
+  let errors = 0;
+
+  player.on('error', function(e) {
+    errors++;
+  });
+
+  player.src({src: 'http://example.com', type: 'video/null'});
+
+  clock.tick(1);
+
+  assert.ok(errors === 0, 'no error on bad source load');
+
+  player.trigger('loadstart');
+
+  clock.tick(1);
+
+  player.trigger('click');
+
+  clock.tick(1);
+
+  assert.ok(errors === 0, 'no error after click after loadstart');
+
+  player.dispose();
+});
+
 QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
   const player = TestHelpers.makePlayer();
   const getStyleText = function(styleEl) {

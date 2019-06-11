@@ -35,6 +35,7 @@
   * [plugins](#plugins)
   * [responsive](#responsive)
   * [sources](#sources)
+  * [suppressNotSupportedMessage](#suppressNotSupportedMessage)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
@@ -373,6 +374,12 @@ Using `<source>` elements will have the same effect:
   <source src="//path/to/video.webm" type="video/webm">
 </video>
 ```
+
+### `suppressNotSupportedMessage`
+
+> Type: `boolean`
+
+If set to true, then the no compatible source error will not be triggered immediately and instead will occur on the first user interaction. This is useful for Google's "mobile friendly" test tool, which can't play video but where you might not want to see an error displayed.
 
 ### `techCanOverridePoster`
 
