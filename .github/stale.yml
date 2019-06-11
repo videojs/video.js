@@ -11,6 +11,7 @@ daysUntilClose: 7
 exemptLabels:
   - pinned
   - a11y
+  - "Affects: a11y"
   - confirmed
   - security
   - "[Status] Maybe Later"
@@ -22,7 +23,7 @@ exemptProjects: false
 exemptMilestones: false
 
 # Label to use when marking as stale
-staleLabel: wontfix
+staleLabel: outdated
 
 # Comment to post when marking as stale. Set to `false` to disable
 markComment: >
