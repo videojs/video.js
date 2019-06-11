@@ -782,9 +782,7 @@ class Tech extends Component {
     const PromiseClass = this.options_.Promise || window.Promise;
 
     if (PromiseClass) {
-      return new PromiseClass((resolve, reject) => {
-        reject();
-      });
+      return PromiseClass.reject();
     }
   }
 
