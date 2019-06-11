@@ -1076,7 +1076,8 @@ class Player extends Component {
       'playerElIngest': this.playerElIngest_ || false,
       'vtt.js': this.options_['vtt.js'],
       'canOverridePoster': !!this.options_.techCanOverridePoster,
-      'enableSourceset': this.options_.enableSourceset
+      'enableSourceset': this.options_.enableSourceset,
+      'Promise': this.options_.Promise
     };
 
     TRACK_TYPES.names.forEach((name) => {
@@ -1139,6 +1140,8 @@ class Player extends Component {
     this.on(this.tech_, 'pause', this.handleTechPause_);
     this.on(this.tech_, 'durationchange', this.handleTechDurationChange_);
     this.on(this.tech_, 'fullscreenchange', this.handleTechFullscreenChange_);
+    this.on(this.tech_, 'enterpictureinpicture', this.handleTechEnterPictureInPicture_);
+    this.on(this.tech_, 'leavepictureinpicture', this.handleTechLeavePictureInPicture_);
     this.on(this.tech_, 'error', this.handleTechError_);
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
     this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
@@ -2044,6 +2047,61 @@ class Player extends Component {
   }
 
   /**
+   * @private
+   */
+  togglePictureInPictureClass_() {
+    if (this.isInPictureInPicture()) {
+      this.addClass('vjs-picture-in-picture');
+    } else {
+      this.removeClass('vjs-picture-in-picture');
+    }
+  }
+
+  /**
+   * Handle Tech Enter Picture-in-Picture.
+   *
+   * @param {EventTarget~Event} event
+   *        the enterpictureinpicture event that triggered this function
+   *
+   * @private
+   * @listens Tech#enterpictureinpicture
+   * @fires Player#pictureinpicturechange
+   */
+  handleTechEnterPictureInPicture_(event) {
+    this.isInPictureInPicture(true);
+
+    /**
+     * Fired when going in and out of Picture-in-Picture.
+     *
+     * @event Player#pictureinpicturechange
+     * @type {EventTarget~Event}
+     */
+    this.trigger('pictureinpicturechange');
+  }
+
+  /**
+   * Handle Tech Leave Picture-in-Picture.
+   *
+   * @param {EventTarget~Event} event
+   *        the leavepictureinpicture event that triggered this function
+   *
+   * @private
+   * @listens Tech#leavepictureinpicture
+   * @fires Player#pictureinpicturechange
+   */
+  handleTechLeavePictureInPicture_(event) {
+    this.isInPictureInPicture(false);
+
+    /**
+     * Fired when going in and out of Picture-in-Picture.
+     *
+     * @event Player#pictureinpicturechange
+     * @type {EventTarget~Event}
+     */
+    this.trigger('pictureinpicturechange');
+  }
+
+  /**
    * Fires when an error occurred during the loading of an audio/video.
    *
    * @private
@@ -2799,6 +2857,89 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('exitFullWindow');
+  }
+
+  /**
+   * Check if the player is in Picture-in-Picture mode or tell the player that it
+   * is or is not in Picture-in-Picture mode.
+   *
+   * @param  {boolean} [isPiP]
+   *         Set the players current Picture-in-Picture state
+   *
+   * @return {boolean}
+   *         - true if Picture-in-Picture is on and getting
+   *         - false if Picture-in-Picture is off and getting
+   */
+  isInPictureInPicture(isPiP) {
+    if (isPiP !== undefined) {
+      this.isInPictureInPicture_ = !!isPiP;
+      this.togglePictureInPictureClass_();
+      return;
+    }
+    return !!this.isInPictureInPicture_;
+  }
+
+  /**
+   * Create a floating video window always on top of other windows so that users may
+   * continue consuming media while they interact with other content sites, or
+   * applications on their device.
+   *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   *
+   * @fires Player#pictureinpicturechange
+   *
+   * @return {Promise}
+   *         A promise with a Picture-in-Picture window.
+   */
+  requestPictureInPicture() {
+    if ('pictureInPictureEnabled' in document) {
+      return this.techGet_('requestPictureInPicture');
+    }
+  }
+
+  /**
+   * Exit Picture-in-Picture mode.
+   *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   *
+   * @fires Player#pictureinpicturechange
+   *
+   * @return {Promise}
+   *         A promise.
+   */
+  exitPictureInPicture() {
+    if ('pictureInPictureEnabled' in document) {
+      return document.exitPictureInPicture();
+    }
+  }
+
+  /**
+   * This gets called when a `Player` gains focus via a `focus` event.
+   * Turns on listening for `keydown` events. When they happen it
+   * calls `this.handleKeyPress`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `focus` event that caused this function to be called.
+   *
+   * @listens focus
+   */
+  handleFocus(event) {
+    // call off first to make sure we don't keep adding keydown handlers
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
+    Events.on(document, 'keydown', this.boundHandleKeyPress_);
+  }
+
+  /**
+   * Called when a `Player` loses focus. Turns off the listener for
+   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
+   */
+  handleBlur(event) {
+    Events.off(document, 'keydown', this.boundHandleKeyPress_);
   }
 
   /**
