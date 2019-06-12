@@ -1,3 +1,13 @@
+<a name="7.5.5"></a>
+## [7.5.5](https://github.com/videojs/video.js/compare/v7.5.4...v7.5.5) (2019-05-30)
+
+### Bug Fixes
+
+* **fs:** feature detect el.matches() for IE11 ([#6007](https://github.com/videojs/video.js/issues/6007)) ([9954470](https://github.com/videojs/video.js/commit/9954470))
+* group subtitles and captions when switching tracks ([#6008](https://github.com/videojs/video.js/issues/6008)) ([cd6be5b](https://github.com/videojs/video.js/commit/cd6be5b)), closes [#5741](https://github.com/videojs/video.js/issues/5741)
+* **fs:** fix isFullscreen check for spec-api ([#6009](https://github.com/videojs/video.js/issues/6009)) ([47d60ae](https://github.com/videojs/video.js/commit/47d60ae)), closes [#5814](https://github.com/videojs/video.js/issues/5814)
+* make sure hotkeys are not triggered outside the player or in form fields within the player ([#5969](https://github.com/videojs/video.js/issues/5969)) ([d251e97](https://github.com/videojs/video.js/commit/d251e97))
+
 <a name="7.5.4"></a>
 ## [7.5.4](https://github.com/videojs/video.js/compare/v7.5.3...v7.5.4) (2019-04-12)
 
