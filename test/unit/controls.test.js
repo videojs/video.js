@@ -5,8 +5,8 @@ import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
 import PlayToggle from '../../src/js/control-bar/play-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
-import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-toggle.js';
+import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
@@ -153,22 +153,6 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   playbackRate.dispose();
 });
 
-QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
-  const player = TestHelpers.makePlayer();
-  const fullscreentoggle = new FullscreenToggle(player);
-
-  player.isFullscreen(true);
-  player.trigger('fullscreenchange');
-  assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
-
-  player.isFullscreen(false);
-  player.trigger('fullscreenchange');
-  assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
-
-  player.dispose();
-  fullscreentoggle.dispose();
-});
-
 QUnit.test('Picture-in-Picture control text should be correct when pictureinpicturechange is triggered', function(assert) {
   const player = TestHelpers.makePlayer();
   const pictureInPictureToggle = new PictureInPictureToggle(player);
@@ -183,6 +167,22 @@ QUnit.test('Picture-in-Picture control text should be correct when pictureinpict
 
   player.dispose();
   pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const fullscreentoggle = new FullscreenToggle(player);
+
+  player.isFullscreen(true);
+  player.trigger('fullscreenchange');
+  assert.equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
+
+  player.isFullscreen(false);
+  player.trigger('fullscreenchange');
+  assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
+
+  player.dispose();
+  fullscreentoggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
