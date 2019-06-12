@@ -156,8 +156,6 @@ class ClickableComponent extends Component {
       if (typeof this.tabIndex_ !== 'undefined') {
         this.el_.setAttribute('tabIndex', this.tabIndex_);
       }
-      this.on('mouseover', this.handleMouseOver);
-      this.on('mouseout', this.handleMouseOut);
       this.on(['tap', 'click'], this.handleClick);
       this.on('focus', this.handleFocus);
       this.on('blur', this.handleBlur);
@@ -204,30 +202,6 @@ class ClickableComponent extends Component {
    * @abstract
    */
   handleClick(event) {}
-
-  /**
-   * This gets called when a `ClickableComponent` gains hover via a `mouseover` event.
-   * Turns on listening for `mouseover` event. When they happen it
-   * calls `this.handleMouseOver`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `mouseover` event that caused this function to be called.
-   *
-   * @listens mouseover
-   */
-  handleMouseOver(event) {}
-
-  /**
-   * This gets called when a `ClickableComponent` gains hover via a `mouseout` event.
-   * Turns on listening for `mouseout` event. When they happen it
-   * calls `this.handleMouseOut`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `mouseout` event that caused this function to be called.
-   *
-   * @listens mouseout
-   */
-  handleMouseOut(event) {}
 
   /**
    * This gets called when a `ClickableComponent` gains focus via a `focus` event.
