@@ -53,8 +53,11 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'focus', this.handleFocus);
     this.on(this.menuButton_, 'blur', this.handleBlur);
     this.on(this.menuButton_, 'mouseenter', () => {
+      this.addClass('vjs-hover');
       this.menu.show();
+      Events.on(document, 'keydown', Fn.bind(this, this.handleMenuKeyPress));
     });
+    this.on('mouseleave', this.handleMouseLeave);
     this.on('keydown', this.handleSubmenuKeyPress);
   }
 
@@ -233,6 +236,19 @@ class MenuButton extends Component {
   }
 
   /**
+   * Handle `mouseleave` for `MenuButton`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseleave` event that caused this function to be called.
+   *
+   * @listens mouseleave
+   */
+  handleMouseLeave(event) {
+    this.removeClass('vjs-hover');
+    Events.off(document, 'keydown', Fn.bind(this, this.handleMenuKeyPress));
+  }
+
+  /**
    * Set the focus to the actual button, not to this element
    */
   focus() {
@@ -305,6 +321,22 @@ class MenuButton extends Component {
       //  keypress events up to the Component handler, because it is
       //  just entending the keypress handling of the actual `Button`
       //  in the `MenuButton` which already passes unused keys up.
+    }
+  }
+
+  /**
+   * Handle a `keydown` event on a `MenuButton`. The listener for this is added in
+   * the constructor.
+   *
+   * @param {EventTarget~Event} event
+   *        Key press event
+   *
+   * @listens keydown
+   */
+  handleMenuKeyPress(event) {
+    // Escape hides popup menu
+    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
+      this.removeClass('vjs-hover');
     }
   }
 
