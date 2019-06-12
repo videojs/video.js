@@ -660,6 +660,20 @@ class Html5 extends Tech {
   }
 
   /**
+   * Create a floating video window always on top of other windows so that users may
+   * continue consuming media while they interact with other content sites, or
+   * applications on their device.
+   *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   *
+   * @return {Promise}
+   *         A promise with a Picture-in-Picture window.
+   */
+  requestPictureInPicture() {
+    return this.el_.requestPictureInPicture();
+  }
+
+  /**
    * A getter/setter for the `Html5` Tech's source object.
    * > Note: Please use {@link Html5#setSource}
    *
