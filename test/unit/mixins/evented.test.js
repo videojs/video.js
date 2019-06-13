@@ -61,11 +61,11 @@ QUnit.test('evented() with custom element', function(assert) {
   );
 });
 
-QUnit.test('on(), one(), and race() errors', function(assert) {
+QUnit.test('on(), one(), and any() errors', function(assert) {
   const targeta = this.targets.a = evented({});
   const targetb = this.targets.b = evented({});
 
-  ['on', 'one', 'race'].forEach(method => {
+  ['on', 'one', 'any'].forEach(method => {
     assert.throws(() => targeta[method](), errors.type, 'the expected error is thrown');
     assert.throws(() => targeta[method]('   '), errors.type, 'the expected error is thrown');
     assert.throws(() => targeta[method]([]), errors.type, 'the expected error is thrown');
@@ -188,11 +188,11 @@ QUnit.test('one() can add a listener to an array of event types on this object',
   });
 });
 
-QUnit.test('race() can add a listener to one event type on this object', function(assert) {
+QUnit.test('any() can add a listener to one event type on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
-  a.race('x', spy);
+  a.any('x', spy);
   a.trigger('x');
   a.trigger('x');
 
@@ -204,11 +204,11 @@ QUnit.test('race() can add a listener to one event type on this object', functio
   });
 });
 
-QUnit.test('race() can add a listener to an array of event types on this object', function(assert) {
+QUnit.test('any() can add a listener to an array of event types on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
-  a.race(['x', 'y'], spy);
+  a.any(['x', 'y'], spy);
   a.trigger('x');
   a.trigger('y');
   a.trigger('x');
@@ -312,12 +312,12 @@ QUnit.test('one() can add a listener to an array of event types on a different t
   });
 });
 
-QUnit.test('race() can add a listener to one event type on a different target object', function(assert) {
+QUnit.test('any() can add a listener to one event type on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
 
-  a.race(b, 'x', spy);
+  a.any(b, 'x', spy);
   b.trigger('x');
 
   // Make sure we aren't magically binding a listener to "a".
@@ -331,12 +331,12 @@ QUnit.test('race() can add a listener to one event type on a different target ob
   });
 });
 
-QUnit.test('race() can add a listener to an array of event types on a different target object', function(assert) {
+QUnit.test('any() can add a listener to an array of event types on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
 
-  a.race(b, ['x', 'y'], spy);
+  a.any(b, ['x', 'y'], spy);
   b.trigger('x');
   b.trigger('y');
   b.trigger('x');

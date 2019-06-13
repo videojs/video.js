@@ -312,12 +312,12 @@ const EventedMixin = {
    *         If the first argument was another evented object, this will be
    *         the listener function.
    */
-  race(...args) {
+  any(...args) {
     const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
 
     // Targeting this evented object.
     if (isTargetingSelf) {
-      listen(target, 'race', type, listener);
+      listen(target, 'any', type, listener);
 
     // Targeting another evented object.
     } else {
@@ -329,7 +329,7 @@ const EventedMixin = {
       // Use the same function ID as the listener so we can remove it later
       // it using the ID of the original listener.
       wrapper.guid = listener.guid;
-      listen(target, 'race', type, wrapper);
+      listen(target, 'any', type, wrapper);
     }
   },
 

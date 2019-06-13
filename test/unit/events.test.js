@@ -348,12 +348,12 @@ QUnit.test('retrigger with an object should use the old element as target', func
   Events.off(el2, 'click');
 });
 
-QUnit.test('should listen only once for race', function(assert) {
+QUnit.test('should listen only once for any', function(assert) {
   const el = document.createElement('div');
   let triggered = 0;
   const listener = () => triggered++;
 
-  Events.race(el, 'click', listener);
+  Events.any(el, 'click', listener);
   assert.equal(triggered, 0, 'listener was not yet triggered');
   // 1 click
   Events.trigger(el, 'click');
@@ -364,12 +364,12 @@ QUnit.test('should listen only once for race', function(assert) {
   assert.equal(triggered, 1, 'listener was not triggered again');
 });
 
-QUnit.test('only the first event should call listener via race', function(assert) {
+QUnit.test('only the first event should call listener via any', function(assert) {
   const el = document.createElement('div');
   let triggered = 0;
   const listener = () => triggered++;
 
-  Events.race(el, ['click', 'event1', 'event2'], listener);
+  Events.any(el, ['click', 'event1', 'event2'], listener);
   assert.equal(triggered, 0, 'listener was not yet triggered');
 
   // 1 click

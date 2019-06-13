@@ -490,7 +490,7 @@ export function one(elem, type, fn) {
  * @param {Event~EventListener} fn
  *        Event listener function
  */
-export function race(elem, type, fn) {
+export function any(elem, type, fn) {
   const func = function() {
     off(elem, type, func);
     fn.apply(this, arguments);
