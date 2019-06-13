@@ -3,6 +3,7 @@
  */
 import Button from './button';
 import Component from './component';
+import keycode from 'keycode';
 
 /**
  * The `CloseButton` is a `{@link Button}` that fires a `close` event when
@@ -62,6 +63,28 @@ class CloseButton extends Button {
      *           bubble up to parents if there is no listener
      */
     this.trigger({type: 'close', bubbles: false});
+  }
+  /**
+   * Event handler that is called when a `CloseButton` receives a
+   * `keydown` event.
+   *
+   * By default, if the key is Esc, it will trigger a `click` event.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    // Esc button will trigger `click` event
+    if (keycode.isEventKey(event, 'Esc')) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.trigger('click');
+    } else {
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyDown(event);
+    }
   }
 }
 
