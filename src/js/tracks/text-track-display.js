@@ -3,6 +3,7 @@
  */
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
+import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
 const darkGray = '#222';
@@ -415,7 +416,9 @@ class TextTrackDisplay extends Component {
       const track = tracks[i];
 
       for (let j = 0; j < track.activeCues.length; ++j) {
-        track.activeCues[j].displayState.classList.add('vjs-text-track-display-' + ((track.language) ? track.language : i));
+        const cueEl = track.activeCues[j].displayState;
+        Dom.addClass(cueEl, 'vjs-text-track-cue');
+        Dom.addClass(cueEl, 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
       }
       if (this.player_.textTrackSettings) {
         this.updateDisplayState(track);
