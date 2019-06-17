@@ -2755,7 +2755,7 @@ class Player extends Component {
 
       // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
       if (!this.fsApi_.prefixed) {
-        fsOptions = this.options_.fullscreenOptions;
+        fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
         if (fullscreenOptions !== undefined) {
           fsOptions = fullscreenOptions;
         }
@@ -4690,8 +4690,10 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.',
 
-  fullscreenOptions: {
-    navigationUI: 'hide'
+  fullscreen: {
+    options: {
+      navigationUI: 'hide'
+    }
   },
 
   breakpoints: {},
