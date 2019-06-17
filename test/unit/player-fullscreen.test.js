@@ -72,7 +72,9 @@ QUnit.test('fullscreenOptions should not be passed from player options on prefix
   };
 
   const player = FullscreenTestHelpers.makePlayer(true, {
-    fullscreenOptions
+    fullscreen: {
+      options: fullscreenOptions
+    }
   });
 
   let requestFullscreenCalled = false;
@@ -99,7 +101,9 @@ QUnit.test('fullscreenOptions should be passed from player options on unprefixed
   };
 
   const player = FullscreenTestHelpers.makePlayer(false, {
-    fullscreenOptions
+    fullscreen: {
+      options: fullscreenOptions
+    }
   });
 
   let requestFullscreenCalled = false;
@@ -178,9 +182,11 @@ QUnit.test('fullscreenOptions from function args should override player options'
   };
 
   const player = FullscreenTestHelpers.makePlayer(false, {
-    fullscreenOptions: {
-      navigationUI: 'playeroptions',
-      foo: 'bar'
+    fullscreen: {
+      options: {
+        navigationUI: 'playeroptions',
+        foo: 'bar'
+      }
     }
   });
 
