@@ -2914,35 +2914,6 @@ class Player extends Component {
   }
 
   /**
-   * This gets called when a `Player` gains focus via a `focus` event.
-   * Turns on listening for `keydown` events. When they happen it
-   * calls `this.handleKeyPress`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `focus` event that caused this function to be called.
-   *
-   * @listens focus
-   */
-  handleFocus(event) {
-    // call off first to make sure we don't keep adding keydown handlers
-    Events.off(document, 'keydown', this.boundHandleKeyPress_);
-    Events.on(document, 'keydown', this.boundHandleKeyPress_);
-  }
-
-  /**
-   * Called when a `Player` loses focus. Turns off the listener for
-   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
-   *
-   * @param {EventTarget~Event} event
-   *        The `blur` event that caused this function to be called.
-   *
-   * @listens blur
-   */
-  handleBlur(event) {
-    Events.off(document, 'keydown', this.boundHandleKeyPress_);
-  }
-
-  /**
    * Called when this Player has focus and a key gets pressed down, or when
    * any Component of this player receives a key press that it doesn't handle.
    * This allows player-wide hotkeys (either as defined below, or optionally
