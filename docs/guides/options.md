@@ -29,7 +29,8 @@
   * [languages](#languages)
   * [nativeControlsForTouch](#nativecontrolsfortouch)
   * [notSupportedMessage](#notsupportedmessage)
-  * [fullscreenOptions](#fullscreenoptions)
+  * [fullscreen](#fullscreen)
+    * [options](#options)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
   * [responsive](#responsive)
@@ -278,7 +279,14 @@ Explicitly set a default value for [the associated tech option](#nativecontrolsf
 
 Allows overriding the default message that is displayed when Video.js cannot play back a media source.
 
-### `fullscreenOptions`
+### `fullscreen`
+
+> Type: `Object`
+> Default: `{options: {navigationUI: 'hide'}`
+
+`fullscreen.options` can be set to pass in specific fullscreen options. At some point, it will be augmented with `element` and `handler` for more functionality.
+
+#### `options`
 
 > Type: `Object`
 > Default: `{navigationUI: 'hide'}`
