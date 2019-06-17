@@ -21,7 +21,7 @@ import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
-import FullscreenApi, {prefixedAPI as prefixedFS} from './fullscreen-api.js';
+import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import {assign} from './utils/obj';
@@ -357,6 +357,9 @@ class Player extends Component {
 
     // create logger
     this.log = createLogger(this.id_);
+
+    // Hold our own reference to fullscreen api so it can be mocked in tests
+    this.fsApi_ = FullscreenApi;
 
     // Tracks when a tech changes the poster
     this.isPosterFromTech_ = false;
@@ -2007,10 +2010,10 @@ class Player extends Component {
 
     // If cancelling fullscreen, remove event listener.
     if (this.isFullscreen() === false) {
-      Events.off(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
+      Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
     }
 
-    if (!prefixedFS) {
+    if (this.fsApi_.prefixed) {
       /**
        * @event Player#fullscreenchange
        * @type {EventTarget~Event}
@@ -2729,14 +2732,17 @@ class Player extends Component {
    * This includes most mobile devices (iOS, Android) and older versions of
    * Safari.
    *
+   * @param  {Object} [fullscreenOptions]
+   *         Override the player fullscreen options
+   *
    * @fires Player#fullscreenchange
    */
-  requestFullscreen() {
-    const fsApi = FullscreenApi;
+  requestFullscreen(fullscreenOptions) {
+    let fsOptions;
 
     this.isFullscreen(true);
 
-    if (fsApi.requestFullscreen) {
+    if (this.fsApi_.requestFullscreen) {
       // the browser supports going fullscreen at the element level so we can
       // take the controls fullscreen as well as the video
 
@@ -2745,10 +2751,17 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi.fullscreenchange, this.boundDocumentFullscreenChange_);
+      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
 
-      silencePromise(this.el_[fsApi.requestFullscreen]());
+      // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
+      if (!this.fsApi_.prefixed) {
+        fsOptions = this.options_.fullscreenOptions;
+        if (fullscreenOptions !== undefined) {
+          fsOptions = fullscreenOptions;
+        }
+      }
 
+      silencePromise(this.el_[this.fsApi_.requestFullscreen](fsOptions));
     } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
       // with native controls
@@ -2771,13 +2784,11 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    const fsApi = FullscreenApi;
-
     this.isFullscreen(false);
 
     // Check for browser element fullscreen support
-    if (fsApi.requestFullscreen) {
-      silencePromise(document[fsApi.exitFullscreen]());
+    if (this.fsApi_.requestFullscreen) {
+      silencePromise(document[this.fsApi_.exitFullscreen]());
     } else if (this.tech_.supportsFullScreen()) {
       this.techCall_('exitFullScreen');
     } else {
@@ -2997,7 +3008,7 @@ class Player extends Component {
 
       const FSToggle = Component.getComponent('FullscreenToggle');
 
-      if (document[FullscreenApi.fullscreenEnabled] !== false) {
+      if (document[this.fsApi_.fullscreenEnabled] !== false) {
         FSToggle.prototype.handleClick.call(this);
       }
 
@@ -4678,6 +4689,10 @@ Player.prototype.options_ = {
 
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.',
+
+  fullscreenOptions: {
+    navigationUI: 'hide'
+  },
 
   breakpoints: {},
   responsive: false

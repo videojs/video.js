@@ -3,7 +3,6 @@
  */
 import Button from '../button.js';
 import Component from '../component.js';
-import FullscreenApi from '../fullscreen-api.js';
 import document from 'global/document';
 
 /**
@@ -26,7 +25,7 @@ class FullscreenToggle extends Button {
     super(player, options);
     this.on(player, 'fullscreenchange', this.handleFullscreenChange);
 
-    if (document[FullscreenApi.fullscreenEnabled] === false) {
+    if (document[player.fsApi_.fullscreenEnabled] === false) {
       this.disable();
     }
   }
