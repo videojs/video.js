@@ -387,7 +387,7 @@ class TextTrackDisplay extends Component {
    */
   updateForTrack(tracks) {
     if (!Array.isArray(tracks)) {
-      tracks = Array.from(tracks);
+      tracks = [tracks];
     }
     if (typeof window.WebVTT !== 'function' ||
       tracks.every((track)=> {
