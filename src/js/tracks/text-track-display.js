@@ -300,11 +300,12 @@ class TextTrackDisplay extends Component {
    */
   updateDisplayState(track) {
     const overrides = this.player_.textTrackSettings.getValues();
+    const cues = track.activeCues;
 
-    let i = track.activeCues.length;
+    let i = cues.length;
 
     while (i--) {
-      const cue = track.activeCues[i];
+      const cue = cues[i];
 
       if (!cue) {
         continue;
