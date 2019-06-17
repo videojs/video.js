@@ -15,7 +15,8 @@ const FullscreenTestHelpers = {
       fullscreenElement: 'vjsFullscreenElement',
       fullscreenEnabled: 'vjsFullscreenEnabled',
       fullscreenchange: 'vjsfullscreenchange',
-      fullscreenerror: 'vjsfullscreenerror'
+      fullscreenerror: 'vjsfullscreenerror',
+      fullscreen: 'vjsfullscreen'
     };
 
     return player;

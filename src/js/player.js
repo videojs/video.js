@@ -562,7 +562,7 @@ class Player extends Component {
     this.off('dispose');
 
     // Make sure all player-specific document listeners are unbound. This is
-    Events.off(document, FullscreenApi.fullscreenchange, this.boundDocumentFullscreenChange_);
+    Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
@@ -1996,14 +1996,13 @@ class Player extends Component {
    * when the document fschange event triggers it calls this
    */
   documentFullscreenChange_(e) {
-    const fsApi = FullscreenApi;
     const el = this.el();
-    let isFs = document[fsApi.fullscreenElement] === el;
+    let isFs = document[this.fsApi_.fullscreenElement] === el;
 
     if (!isFs && el.matches) {
-      isFs = el.matches(':' + fsApi.fullscreen);
+      isFs = el.matches(':' + this.fsApi_.fullscreen);
     } else if (!isFs && el.msMatchesSelector) {
-      isFs = el.msMatchesSelector(':' + fsApi.fullscreen);
+      isFs = el.msMatchesSelector(':' + this.fsApi_.fullscreen);
     }
 
     this.isFullscreen(isFs);
