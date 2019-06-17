@@ -10,7 +10,6 @@ import * as Dom from './utils/dom.js';
 import * as DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
-import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import mergeOptions from './utils/merge-options.js';
 
@@ -181,12 +180,8 @@ class Component {
    *
    * @return {Object}
    *         A new object of `this.options_` and `obj` merged together.
-   *
-   * @deprecated since version 5
    */
   options(obj) {
-    log.warn('this.options() has been deprecated and will be moved to the constructor in 6.0');
-
     if (!obj) {
       return this.options_;
     }
