@@ -22,7 +22,6 @@
              useful way! Currently this means that iOS will not display
             ANY text tracks -->
   <video id="example_video_1" class="video-js" controls preload="none" width="640" height="360"
-      data-setup='{ "html5" : { "nativeTextTracks" : false } }'
       poster="http://d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
 
     <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
@@ -40,6 +39,20 @@
 
     <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
+  <script>
+    var vid = document.getElementById('example_video_1');
+    var player = videojs(vid, {
+      textTrackDisplay: {
+        allowMultipleShowingTracks: true
+      }
+    }, function() {
+      player.textTracks()[0].mode = true;
+      player.textTracks()[1].mode = true;
+      player.textTracks()[2].mode = true;
+      player.textTracks()[3].mode = true;
+      player.textTracks()[4].mode = true;
+    });
+  </script>
 
 </body>
 </html>
