@@ -45,7 +45,9 @@
       textTrackDisplay: {
         allowMultipleShowingTracks: true
       }
-    }, function() {
+    });
+    
+    player.on('loadedmetadata', function() {
       player.textTracks()[0].mode = true;
       player.textTracks()[1].mode = true;
       player.textTracks()[2].mode = true;
