@@ -3008,7 +3008,7 @@ class Player extends Component {
       const FSToggle = Component.getComponent('FullscreenToggle');
 
       if (document[this.fsApi_.fullscreenEnabled] !== false) {
-        FSToggle.prototype.handleClick.call(this);
+        FSToggle.prototype.handleClick.call(this, event);
       }
 
     } else if (muteKey.call(this, event)) {
@@ -3017,7 +3017,7 @@ class Player extends Component {
 
       const MuteToggle = Component.getComponent('MuteToggle');
 
-      MuteToggle.prototype.handleClick.call(this);
+      MuteToggle.prototype.handleClick.call(this, event);
 
     } else if (playPauseKey.call(this, event)) {
       event.preventDefault();
@@ -3025,7 +3025,7 @@ class Player extends Component {
 
       const PlayToggle = Component.getComponent('PlayToggle');
 
-      PlayToggle.prototype.handleClick.call(this);
+      PlayToggle.prototype.handleClick.call(this, event);
     }
   }
 
