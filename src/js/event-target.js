@@ -110,12 +110,22 @@ EventTarget.prototype.removeEventListener = EventTarget.prototype.off;
  *        The function to be called once for each event name.
  */
 EventTarget.prototype.one = function(type, fn) {
-  // Remove the addEventListener alialing Events.on
+  // Remove the addEventListener aliasing Events.on
   // so we don't get into an infinite type loop
   const ael = this.addEventListener;
 
   this.addEventListener = () => {};
   Events.one(this, type, fn);
+  this.addEventListener = ael;
+};
+
+EventTarget.prototype.any = function(type, fn) {
+  // Remove the addEventListener aliasing Events.on
+  // so we don't get into an infinite type loop
+  const ael = this.addEventListener;
+
+  this.addEventListener = () => {};
+  Events.any(this, type, fn);
   this.addEventListener = ael;
 };
 
