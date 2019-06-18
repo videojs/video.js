@@ -48,11 +48,11 @@
     });
     
     player.on('loadedmetadata', function() {
-      player.textTracks()[0].mode = true;
-      player.textTracks()[1].mode = true;
-      player.textTracks()[2].mode = true;
-      player.textTracks()[3].mode = true;
-      player.textTracks()[4].mode = true;
+      player.textTracks()[0].mode = 'showing';
+      player.textTracks()[1].mode = 'showing';
+      player.textTracks()[2].mode = 'showing';
+      player.textTracks()[3].mode = 'showing';
+      player.textTracks()[4].mode = 'showing';
     });
   </script>
 
