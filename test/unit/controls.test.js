@@ -5,6 +5,7 @@ import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
 import PlayToggle from '../../src/js/control-bar/play-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
+import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-toggle.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
 import TestHelpers from './test-helpers.js';
@@ -150,6 +151,22 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
 
   player.dispose();
   playbackRate.dispose();
+});
+
+QUnit.test('Picture-in-Picture control text should be correct when pictureinpicturechange is triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.isInPictureInPicture(true);
+  player.trigger('pictureinpicturechange');
+  assert.equal(pictureInPictureToggle.controlText(), 'Exit Picture-in-Picture', 'Control Text is correct while switching to Picture-in-Picture mode');
+
+  player.isInPictureInPicture(false);
+  player.trigger('pictureinpicturechange');
+  assert.equal(pictureInPictureToggle.controlText(), 'Picture-in-Picture', 'Control Text is correct while switching back to normal mode');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {

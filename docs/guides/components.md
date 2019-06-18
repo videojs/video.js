@@ -312,6 +312,7 @@ Player
 │ ├── SubtitlesButton (hidden, unless there are relevant tracks)
 │ ├── CaptionsButton (hidden, unless there are relevant tracks)
 │ ├── AudioTrackButton (hidden, unless there are relevant tracks)
+│ └── PictureInPictureToggle
 │ └── FullscreenToggle
 ├── ErrorDisplay (hidden, until there is an error)
 ├── TextTrackSettings
