@@ -3712,7 +3712,7 @@ class Player extends Component {
     // Suppress the first error message for no compatible source until
     // user interaction
     if (this.options_.suppressNotSupportedMessage &&
-        err & err.message &&
+        err && err.message &&
         err.message === this.localize(this.options_.notSupportedMessage)
     ) {
       const triggerSuppressedError = function() {
@@ -3720,7 +3720,7 @@ class Player extends Component {
       };
 
       this.options_.suppressNotSupportedMessage = false;
-      this.one(['click', 'touchstart'], triggerSuppressedError);
+      this.any(['click', 'touchstart'], triggerSuppressedError);
       this.one('loadstart', function() {
         this.off(['click', 'touchstart'], triggerSuppressedError);
       });
