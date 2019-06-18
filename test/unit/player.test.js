@@ -340,7 +340,8 @@ QUnit.test('should suppress source error messages', function(assert) {
   const clock = sinon.useFakeTimers();
 
   const player = TestHelpers.makePlayer({
-    suppressNotSupportedMessage: true
+    techOrder: ['foo'],
+    suppressNotSupportedError: true
   });
 
   let errors = 0;
@@ -349,19 +350,17 @@ QUnit.test('should suppress source error messages', function(assert) {
     errors++;
   });
 
-  player.loadTech_('Html5');
+  player.src({src: 'http://example.com', type: 'video/mp4'});
 
-  player.src({src: 'http://example.com', type: 'video/null'});
+  clock.tick(10);
 
-  clock.tick(1);
-
-  assert.ok(errors === 0, 'no error on bad source load');
+  assert.strictEqual(errors, 0, 'no error on bad source load');
 
   player.trigger('click');
 
-  clock.tick(1);
+  clock.tick(10);
 
-  assert.ok(errors === 1, 'error after click');
+  assert.strictEqual(errors, 1, 'error after click');
 
   player.dispose();
 });
@@ -370,7 +369,8 @@ QUnit.test('should cancel a suppressed error message on loadstart', function(ass
   const clock = sinon.useFakeTimers();
 
   const player = TestHelpers.makePlayer({
-    suppressNotSupportedMessage: true
+    techOrder: ['foo'],
+    suppressNotSupportedError: true
   });
 
   let errors = 0;
@@ -379,21 +379,26 @@ QUnit.test('should cancel a suppressed error message on loadstart', function(ass
     errors++;
   });
 
-  player.src({src: 'http://example.com', type: 'video/null'});
+  player.src({src: 'http://example.com', type: 'video/mp4'});
 
-  clock.tick(1);
+  clock.tick(10);
 
-  assert.ok(errors === 0, 'no error on bad source load');
+  assert.strictEqual(errors, 0, 'no error on bad source load');
+  assert.strictEqual(
+    player.options_.suppressNotSupportedError,
+    false,
+    'option was unset when error was suppressed'
+  );
 
   player.trigger('loadstart');
 
-  clock.tick(1);
+  clock.tick(10);
 
   player.trigger('click');
 
-  clock.tick(1);
+  clock.tick(10);
 
-  assert.ok(errors === 0, 'no error after click after loadstart');
+  assert.strictEqual(errors, 0, 'no error after click after loadstart');
 
   player.dispose();
 });

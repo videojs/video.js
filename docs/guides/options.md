@@ -35,7 +35,7 @@
   * [plugins](#plugins)
   * [responsive](#responsive)
   * [sources](#sources)
-  * [suppressNotSupportedMessage](#suppressNotSupportedMessage)
+  * [suppressNotSupportedError](#suppressNotSupportedError)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
@@ -375,7 +375,7 @@ Using `<source>` elements will have the same effect:
 </video>
 ```
 
-### `suppressNotSupportedMessage`
+### `suppressNotSupportedError`
 
 > Type: `boolean`
 
