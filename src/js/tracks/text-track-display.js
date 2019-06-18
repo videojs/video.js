@@ -383,7 +383,7 @@ class TextTrackDisplay extends Component {
   /**
    * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
    *
-   * @param {TextTrack || TextTrack[]} tracks
+   * @param {TextTrack|TextTrack[]} tracks
    *        Text track object or text track array to be added to the list.
    */
   updateForTrack(tracks) {
