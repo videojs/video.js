@@ -80,5 +80,9 @@
   "Video Player": "Video-Player",
   "Progress Bar": "Forschrittsbalken",
   "progress bar timing: currentTime={1} duration={2}": "{1} von {2}",
-  "Volume Level": "Lautstärkestufe"
+  "Volume Level": "Lautstärkestufe",
+  "{1} is loading.": "{1} wird geladen.",
+  "Seek to live, currently behind live": "Zur Live-Übertragung wechseln. Aktuell wird es nicht live abgespielt.",
+  "Seek to live, currently playing live": "Zur Live-Übertragung wechseln. Es wird aktuell live abgespielt."
+
 }
