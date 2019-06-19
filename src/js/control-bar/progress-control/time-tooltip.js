@@ -82,6 +82,16 @@ class TimeTooltip extends Component {
     }
 
     this.el_.style.right = `-${pullTooltipBy}px`;
+    this.write(content);
+  }
+
+  /**
+   * Write the time to the tooltip DOM element.
+   *
+   * @param {String} content
+   *        The formatted time for the tooltip.
+   */
+  write(content) {
     Dom.textContent(this.el_, content);
   }
 

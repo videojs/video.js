@@ -3,6 +3,7 @@
  */
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
+import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
 const darkGray = '#222';
@@ -240,10 +241,26 @@ class TextTrackDisplay extends Component {
    */
   updateDisplay() {
     const tracks = this.player_.textTracks();
+    const allowMultipleShowingTracks = this.options_.allowMultipleShowingTracks;
 
     this.clearDisplay();
 
-    // Track display prioritization model: if multiple tracks are 'showing',
+    if (allowMultipleShowingTracks) {
+      const showingTracks = [];
+
+      for (let i = 0; i < tracks.length; ++i) {
+        const track = tracks[i];
+
+        if (track.mode !== 'showing') {
+          continue;
+        }
+        showingTracks.push(track);
+      }
+      this.updateForTrack(showingTracks);
+      return;
+    }
+
+    //  Track display prioritization model: if multiple tracks are 'showing',
     //  display the first 'subtitles' or 'captions' track which is 'showing',
     //  otherwise display the first 'descriptions' track which is 'showing'
 
@@ -277,29 +294,14 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
+   * Style {@Link TextTrack} activeCues according to {@Link TextTrackSettings}.
    *
    * @param {TextTrack} track
-   *        Text track object to be added to the list.
+   *        Text track object containing active cues to style.
    */
-  updateForTrack(track) {
-    if (typeof window.WebVTT !== 'function' || !track.activeCues) {
-      return;
-    }
-
-    const cues = [];
-
-    for (let i = 0; i < track.activeCues.length; i++) {
-      cues.push(track.activeCues[i]);
-    }
-
-    window.WebVTT.processCues(window, cues, this.el_);
-
-    if (!this.player_.textTrackSettings) {
-      return;
-    }
-
+  updateDisplayState(track) {
     const overrides = this.player_.textTrackSettings.getValues();
+    const cues = track.activeCues;
 
     let i = cues.length;
 
@@ -374,6 +376,53 @@ class TextTrackDisplay extends Component {
         } else {
           cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
         }
+      }
+    }
+  }
+
+  /**
+   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
+   *
+   * @param {TextTrack|TextTrack[]} tracks
+   *        Text track object or text track array to be added to the list.
+   */
+  updateForTrack(tracks) {
+    if (!Array.isArray(tracks)) {
+      tracks = [tracks];
+    }
+    if (typeof window.WebVTT !== 'function' ||
+      tracks.every((track)=> {
+        return !track.activeCues;
+      })) {
+      return;
+    }
+
+    const cues = [];
+
+    // push all active track cues
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        cues.push(track.activeCues[j]);
+      }
+    }
+
+    // removes all cues before it processes new ones
+    window.WebVTT.processCues(window, cues, this.el_);
+
+    // add unique class to each language text track & add settings styling if necessary
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        const cueEl = track.activeCues[j].displayState;
+
+        Dom.addClass(cueEl, 'vjs-text-track-cue');
+        Dom.addClass(cueEl, 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
+      }
+      if (this.player_.textTrackSettings) {
+        this.updateDisplayState(track);
       }
     }
   }

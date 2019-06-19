@@ -12,6 +12,7 @@ import './time-controls/remaining-time-display.js';
 import './live-display.js';
 import './seek-to-live.js';
 import './progress-control/progress-control.js';
+import './picture-in-picture-toggle.js';
 import './fullscreen-toggle.js';
 import './volume-panel.js';
 import './text-track-controls/chapters-button.js';
@@ -67,6 +68,7 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subsCapsButton',
     'audioTrackButton',
+    'pictureInPictureToggle',
     'fullscreenToggle'
   ]
 };
