@@ -153,16 +153,16 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   playbackRate.dispose();
 });
 
-QUnit.test('Picture-in-Picture control text should be correct when pictureinpicturechange is triggered', function(assert) {
+QUnit.test('Picture-in-Picture control text should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
   const player = TestHelpers.makePlayer();
   const pictureInPictureToggle = new PictureInPictureToggle(player);
 
   player.isInPictureInPicture(true);
-  player.trigger('pictureinpicturechange');
+  player.trigger('enterpictureinpicture');
   assert.equal(pictureInPictureToggle.controlText(), 'Exit Picture-in-Picture', 'Control Text is correct while switching to Picture-in-Picture mode');
 
   player.isInPictureInPicture(false);
-  player.trigger('pictureinpicturechange');
+  player.trigger('leavepictureinpicture');
   assert.equal(pictureInPictureToggle.controlText(), 'Picture-in-Picture', 'Control Text is correct while switching back to normal mode');
 
   player.dispose();
