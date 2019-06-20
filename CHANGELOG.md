@@ -1,3 +1,10 @@
+<a name="7.5.6"></a>
+## [7.5.6](https://github.com/videojs/video.js/compare/v7.5.5...v7.5.6) (2019-06-20)
+
+### Bug Fixes
+
+* **liveui:** do not seek to live on first seek when autoplaying a live stream ([#6062](https://github.com/videojs/video.js/issues/6062)) ([8777c89](https://github.com/videojs/video.js/commit/8777c89))
+
 <a name="7.5.5"></a>
 ## [7.5.5](https://github.com/videojs/video.js/compare/v7.5.4...v7.5.5) (2019-05-30)
 
