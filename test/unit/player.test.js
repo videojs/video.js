@@ -336,6 +336,73 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   log.error.restore();
 });
 
+QUnit.test('should suppress source error messages', function(assert) {
+  const clock = sinon.useFakeTimers();
+
+  const player = TestHelpers.makePlayer({
+    techOrder: ['foo'],
+    suppressNotSupportedError: true
+  });
+
+  let errors = 0;
+
+  player.on('error', function(e) {
+    errors++;
+  });
+
+  player.src({src: 'http://example.com', type: 'video/mp4'});
+
+  clock.tick(10);
+
+  assert.strictEqual(errors, 0, 'no error on bad source load');
+
+  player.trigger('click');
+
+  clock.tick(10);
+
+  assert.strictEqual(errors, 1, 'error after click');
+
+  player.dispose();
+});
+
+QUnit.test('should cancel a suppressed error message on loadstart', function(assert) {
+  const clock = sinon.useFakeTimers();
+
+  const player = TestHelpers.makePlayer({
+    techOrder: ['foo'],
+    suppressNotSupportedError: true
+  });
+
+  let errors = 0;
+
+  player.on('error', function(e) {
+    errors++;
+  });
+
+  player.src({src: 'http://example.com', type: 'video/mp4'});
+
+  clock.tick(10);
+
+  assert.strictEqual(errors, 0, 'no error on bad source load');
+  assert.strictEqual(
+    player.options_.suppressNotSupportedError,
+    false,
+    'option was unset when error was suppressed'
+  );
+
+  player.trigger('loadstart');
+
+  clock.tick(10);
+
+  player.trigger('click');
+
+  clock.tick(10);
+
+  assert.strictEqual(errors, 0, 'no error after click after loadstart');
+
+  player.dispose();
+});
+
 QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
   const player = TestHelpers.makePlayer();
   const getStyleText = function(styleEl) {

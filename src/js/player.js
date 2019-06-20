@@ -3709,6 +3709,24 @@ class Player extends Component {
       return this.error_ || null;
     }
 
+    // Suppress the first error message for no compatible source until
+    // user interaction
+    if (this.options_.suppressNotSupportedError &&
+        err && err.message &&
+        err.message === this.localize(this.options_.notSupportedMessage)
+    ) {
+      const triggerSuppressedError = function() {
+        this.error(err);
+      };
+
+      this.options_.suppressNotSupportedError = false;
+      this.any(['click', 'touchstart'], triggerSuppressedError);
+      this.one('loadstart', function() {
+        this.off(['click', 'touchstart'], triggerSuppressedError);
+      });
+      return;
+    }
+
     // restoring to default
     if (err === null) {
       this.error_ = err;
