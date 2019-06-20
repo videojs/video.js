@@ -20,10 +20,13 @@ class PictureInPictureToggle extends Button {
    *
    * @param {Object} [options]
    *        The key/value store of player options.
+   *
+   * @listens Player#enterpictureinpicture
+   * @listens Player#leavepictureinpicture
    */
   constructor(player, options) {
     super(player, options);
-    this.on(player, 'pictureinpicturechange', this.handlePictureInPictureChange);
+    this.on(player, ['enterpictureinpicture', 'leavepictureinpicture'], this.handlePictureInPictureChange);
 
     // TODO: Activate button on player loadedmetadata event.
     // TODO: Deactivate button on player emptied event.
@@ -44,13 +47,14 @@ class PictureInPictureToggle extends Button {
   }
 
   /**
-   * Handles pictureinpicturechange on the player and change control text accordingly.
+   * Handles enterpictureinpicture and leavepictureinpicture on the player and change control text accordingly.
    *
    * @param {EventTarget~Event} [event]
-   *        The {@link Player#pictureinpicturechange} event that caused this function to be
+   *        The {@link Player#enterpictureinpicture} or {@link Player#leavepictureinpicture} event that caused this function to be
    *        called.
    *
-   * @listens Player#pictureinpicturechange
+   * @listens Player#enterpictureinpicture
+   * @listens Player#leavepictureinpicture
    */
   handlePictureInPictureChange(event) {
     if (this.player_.isInPictureInPicture()) {

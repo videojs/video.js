@@ -2067,18 +2067,9 @@ class Player extends Component {
    *
    * @private
    * @listens Tech#enterpictureinpicture
-   * @fires Player#pictureinpicturechange
    */
   handleTechEnterPictureInPicture_(event) {
     this.isInPictureInPicture(true);
-
-    /**
-     * Fired when going in and out of Picture-in-Picture.
-     *
-     * @event Player#pictureinpicturechange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('pictureinpicturechange');
   }
 
   /**
@@ -2089,18 +2080,9 @@ class Player extends Component {
    *
    * @private
    * @listens Tech#leavepictureinpicture
-   * @fires Player#pictureinpicturechange
    */
   handleTechLeavePictureInPicture_(event) {
     this.isInPictureInPicture(false);
-
-    /**
-     * Fired when going in and out of Picture-in-Picture.
-     *
-     * @event Player#pictureinpicturechange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('pictureinpicturechange');
   }
 
   /**
@@ -2896,13 +2878,19 @@ class Player extends Component {
    *
    * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
    *
-   * @fires Player#pictureinpicturechange
+   * @fires Player#enterpictureinpicture
    *
    * @return {Promise}
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
     if ('pictureInPictureEnabled' in document) {
+      /**
+       * This event fires when the player enters picture in picture mode
+       *
+       * @event Player#enterpictureinpicture
+       * @type {EventTarget~Event}
+       */
       return this.techGet_('requestPictureInPicture');
     }
   }
@@ -2912,13 +2900,19 @@ class Player extends Component {
    *
    * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
    *
-   * @fires Player#pictureinpicturechange
+   * @fires Player#leavepictureinpicture
    *
    * @return {Promise}
    *         A promise.
    */
   exitPictureInPicture() {
     if ('pictureInPictureEnabled' in document) {
+      /**
+       * This event fires when the player leaves picture in picture mode
+       *
+       * @event Player#leavepictureinpicture
+       * @type {EventTarget~Event}
+       */
       return document.exitPictureInPicture();
     }
   }
