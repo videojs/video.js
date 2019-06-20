@@ -153,6 +153,44 @@ QUnit.module('LiveTracker', () => {
     assert.equal(playCalls, 0, 'should not have called play');
   });
 
+  QUnit.test('seeks to live edge on the first timeupdate after playback is requested', function(assert) {
+    sinon.spy(this.liveTracker, 'seekToLiveEdge');
+
+    // Begin live tracking.
+    this.player.duration(Infinity);
+    assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called yet');
+
+    this.player.trigger('play');
+    this.player.trigger('playing');
+    assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called yet');
+
+    this.player.trigger('timeupdate');
+    assert.ok(this.liveTracker.seekToLiveEdge.calledOnce, 'seekToLiveEdge was called');
+
+    this.player.trigger('timeupdate');
+    assert.ok(this.liveTracker.seekToLiveEdge.calledOnce, 'seekToLiveEdge was not called on subsequent timeupdate');
+  });
+
+  QUnit.test('does not seek to live edge on the first timeupdate after playback is requested if playback already began', function(assert) {
+    sinon.spy(this.liveTracker, 'seekToLiveEdge');
+
+    // Begin live tracking.
+    this.liveTracker.stopTracking();
+    this.player.hasStarted = () => true;
+    this.liveTracker.startTracking();
+    assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called');
+
+    this.player.trigger('play');
+    this.player.trigger('playing');
+    assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called');
+
+    this.player.trigger('timeupdate');
+    assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called');
+
+    this.player.trigger('timeupdate');
+    assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called');
+  });
+
   QUnit.test('single seekable, helpers should be correct', function(assert) {
     // simple
     this.player.seekable = () => createTimeRanges(10, 50);
