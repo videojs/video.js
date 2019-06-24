@@ -2254,8 +2254,11 @@ class Player extends Component {
     const PromiseClass = this.options_.Promise || window.Promise;
 
     if (PromiseClass) {
-      return new PromiseClass((resolve) => {
-        this.play_(resolve);
+      return new PromiseClass(resolve => {
+        this.play_(promise => {
+          silencePromise(promise);
+          resolve();
+        });
       });
     }
 
