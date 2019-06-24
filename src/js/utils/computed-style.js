@@ -26,9 +26,9 @@ function computedStyle(el, prop) {
   }
 
   if (typeof window.getComputedStyle === 'function') {
-    const cs = window.getComputedStyle(el);
+    const computedStyleValue = window.getComputedStyle(el);
 
-    return cs ? cs[prop] : '';
+    return computedStyleValue ? computedStyleValue.getPropertyValue(prop) || computedStyleValue[prop] : '';
   }
 
   return '';
