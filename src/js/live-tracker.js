@@ -110,16 +110,23 @@ class LiveTracker extends Component {
       return;
     }
 
+    // If we haven't seen a timeupdate, we need to check whether playback
+    // began before this component started tracking. This can happen commonly
+    // when using autoplay.
+    if (!this.timeupdateSeen_) {
+      this.timeupdateSeen_ = this.player_.hasStarted();
+    }
+
     this.trackingInterval_ = this.setInterval(this.trackLive_, 30);
     this.trackLive_();
 
     this.on(this.player_, 'play', this.trackLive_);
     this.on(this.player_, 'pause', this.trackLive_);
-    this.one(this.player_, 'play', this.handlePlay);
 
     // this is to prevent showing that we are not live
     // before a video starts to play
     if (!this.timeupdateSeen_) {
+      this.one(this.player_, 'play', this.handlePlay);
       this.handleTimeupdate = () => {
         this.timeupdateSeen_ = true;
         this.handleTimeupdate = null;
