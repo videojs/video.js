@@ -1528,20 +1528,19 @@ class Player extends Component {
       // if the `sourceset` `src` was an empty string
       // wait for a `loadstart` to update the cache to `currentSrc`.
       // If a sourceset happens before a `loadstart`, we reset the state
-      // as this function will be called again.
       if (!event.src) {
-        const updateCache = (e) => {
-          if (e.type !== 'sourceset') {
-            const techSrc = this.techGet('currentSrc');
-
-            this.lastSource_.tech = techSrc;
-            this.updateSourceCaches_(techSrc);
+        this.tech_.any(['sourceset', 'loadstart'], (e) => {
+          // if a sourceset happens before a `loadstart` there
+          // is nothing to do as this function will be called again.
+          if (e.type === 'sourceset') {
+            return;
           }
 
-          this.tech_.off(['sourceset', 'loadstart'], updateCache);
-        };
+          const techSrc = this.techGet('currentSrc');
 
-        this.tech_.one(['sourceset', 'loadstart'], updateCache);
+          this.lastSource_.tech = techSrc;
+          this.updateSourceCaches_(techSrc);
+        });
       }
     }
     this.lastSource_ = {player: this.currentSource().src, tech: event.src};

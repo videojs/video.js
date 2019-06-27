@@ -93,19 +93,13 @@ const loadTrack = function(src, track) {
       if (track.tech_) {
         // to prevent use before define eslint error, we define loadHandler
         // as a let here
-        let loadHandler;
-        const errorHandler = () => {
-          log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
-          track.tech_.off('vttjsloaded', loadHandler);
-        };
-
-        loadHandler = () => {
-          track.tech_.off('vttjserror', errorHandler);
+        track.tech_.any(['vttjsloaded', 'vttjserror'], (event) => {
+          if (event.type === 'vttjserror') {
+            log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
+            return;
+          }
           return parseCues(responseBody, track);
-        };
-
-        track.tech_.one('vttjsloaded', loadHandler);
-        track.tech_.one('vttjserror', errorHandler);
+        });
       }
     } else {
       parseCues(responseBody, track);
