@@ -39,6 +39,8 @@
     "build:css:default": "sass --no-source-map src/css/vjs.scss dist/video-js.css",
     "postbuild:css:default": "postcss --verbose --config postcss.config.js -d dist/ dist/video-js.css",
     "build:lang": "npm-run-all build:lang:*",
+    "build:lang:chinese-s": "shx cp lang/zh-CN.json lang/zh-Hans.json",
+    "build:lang:chinese-t": "shx cp lang/zh-TW.json lang/zh-Hant.json",
     "build:lang:js": "vjslang --dir dist/lang",
     "build:lang:copy": "shx cp -R lang/* dist/lang/",
     "minify": "npm-run-all minify:*",
