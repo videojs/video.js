@@ -2,8 +2,6 @@
  * @file dom-data.js
  * @module dom-data
  */
-import * as Guid from './guid.js';
-import window from 'global/window';
 
 /**
  * Element Data Store.
@@ -15,16 +13,7 @@ import window from 'global/window';
  * @type {Object}
  * @private
  */
-export const elData = {};
-
-/*
- * Unique attribute name to store an element's guid in
- *
- * @type {String}
- * @constant
- * @private
- */
-const elIdAttr = 'vdata' + Math.floor(window.performance && window.performance.now() || Date.now());
+export const elData = new WeakMap();
 
 /**
  * Returns the cache object where data for an element is stored
@@ -36,17 +25,11 @@ const elIdAttr = 'vdata' + Math.floor(window.performance && window.performance.n
  *         The cache object for that el that was passed in.
  */
 export function getData(el) {
-  let id = el[elIdAttr];
-
-  if (!id) {
-    id = el[elIdAttr] = Guid.newGUID();
+  if (!elData.has(el)) {
+    elData.set(el, {});
   }
 
-  if (!elData[id]) {
-    elData[id] = {};
-  }
-
-  return elData[id];
+  return elData.get(el);
 }
 
 /**
@@ -60,13 +43,11 @@ export function getData(el) {
  *         - False otherwise.
  */
 export function hasData(el) {
-  const id = el[elIdAttr];
-
-  if (!id) {
+  if (!elData.has(el)) {
     return false;
   }
 
-  return !!Object.getOwnPropertyNames(elData[id]).length;
+  return !!Object.getOwnPropertyNames(elData.get(el)).length;
 }
 
 /**
@@ -76,24 +57,6 @@ export function hasData(el) {
  *        Remove cached data for this element.
  */
 export function removeData(el) {
-  const id = el[elIdAttr];
-
-  if (!id) {
-    return;
-  }
-
   // Remove all stored data
-  delete elData[id];
-
-  // Remove the elIdAttr property from the DOM node
-  try {
-    delete el[elIdAttr];
-  } catch (e) {
-    if (el.removeAttribute) {
-      el.removeAttribute(elIdAttr);
-    } else {
-      // IE doesn't appear to support removeAttribute on the document element
-      el[elIdAttr] = null;
-    }
-  }
+  delete elData.delete(el);
 }
