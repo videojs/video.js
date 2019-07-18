@@ -2,7 +2,7 @@
 import window from 'global/window';
 import Component from '../../src/js/component.js';
 import * as Dom from '../../src/js/utils/dom.js';
-import * as DomData from '../../src/js/utils/dom-data';
+import DomData from '../../src/js/utils/dom-data';
 import * as Events from '../../src/js/utils/events.js';
 import * as Obj from '../../src/js/utils/obj';
 import * as browser from '../../src/js/utils/browser.js';
@@ -346,7 +346,7 @@ QUnit.test('should dispose of component and children', function(assert) {
     return true;
   });
   const el = comp.el();
-  const data = DomData.getData(el);
+  const data = DomData.get(el);
 
   let hasDisposed = false;
   let bubbles = null;
@@ -365,7 +365,7 @@ QUnit.test('should dispose of component and children', function(assert) {
   assert.ok(!comp.el(), 'component element was deleted');
   assert.ok(!child.children(), 'child children were deleted');
   assert.ok(!child.el(), 'child element was deleted');
-  assert.ok(!DomData.hasData(el), 'listener data nulled');
+  assert.ok(!DomData.has(el), 'listener data nulled');
   assert.ok(
     !Object.getOwnPropertyNames(data).length,
     'original listener data object was emptied'
@@ -979,7 +979,7 @@ QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', f
 QUnit.test('setTimeout should remove dispose handler on trigger', function(assert) {
   const comp = new Component(getFakePlayer());
   const el = comp.el();
-  const data = DomData.getData(el);
+  const data = DomData.get(el);
 
   comp.setTimeout(() => {}, 1);
 
@@ -996,7 +996,7 @@ QUnit.test('setTimeout should remove dispose handler on trigger', function(asser
 QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
   const comp = new Component(getFakePlayer());
   const el = comp.el();
-  const data = DomData.getData(el);
+  const data = DomData.get(el);
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
 
