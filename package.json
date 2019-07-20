@@ -130,7 +130,7 @@
     "remark-cli": "^6.0.1",
     "remark-lint": "^6.0.4",
     "remark-parse": "^6.0.3",
-    "remark-stringify": "^6.0.4",
+    "remark-stringify": "^7.0.0",
     "remark-toc": "^5.1.1",
     "remark-validate-links": "^8.0.2",
     "replace": "^1.1.0",
