@@ -30,8 +30,7 @@ const onwarn = (warning) => {
 
 const primedIgnore = ignore(['videojs-vtt.js']);
 const primedResolve = resolve({
-  jsnext: true,
-  main: true,
+  mainFields: ['jsnext:main', 'module', 'main'],
   browser: true
 });
 const primedCjs = commonjs({
