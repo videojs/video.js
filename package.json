@@ -142,7 +142,6 @@
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-ignore": "^1.0.5",
     "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-progress": "^1.1.1",
     "sass": "^1.21.0",
