@@ -61,7 +61,6 @@ class PlayToggle extends Button {
     } else {
       this.player_.pause();
     }
-    event.stopPropagation();
   }
 
   /**
