@@ -1531,7 +1531,8 @@ class Player extends Component {
       if (!event.src) {
         this.tech_.any(['sourceset', 'loadstart'], (e) => {
           // if a sourceset happens before a `loadstart` there
-          // is nothing to do as this function will be called again.
+          // is nothing to do as this `handleTechSourceset_`
+          // will be called again and this will be handled there.
           if (e.type === 'sourceset') {
             return;
           }
