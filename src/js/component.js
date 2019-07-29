@@ -12,6 +12,7 @@ import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import toTitleCase from './utils/to-title-case.js';
 import mergeOptions from './utils/merge-options.js';
+import computedStyle from './utils/computed-style';
 
 /**
  * Base class for all UI Components.
@@ -984,11 +985,7 @@ class Component {
       throw new Error('currentDimension only accepts width or height value');
     }
 
-    if (typeof window.getComputedStyle === 'function') {
-      const computedStyle = window.getComputedStyle(this.el_);
-
-      computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[widthOrHeight];
-    }
+    computedWidthOrHeight = computedStyle(this.el_, widthOrHeight);
 
     // remove 'px' from variable and parse as integer
     computedWidthOrHeight = parseFloat(computedWidthOrHeight);
@@ -996,7 +993,7 @@ class Component {
     // if the computed value is still 0, it's possible that the browser is lying
     // and we want to check the offset values.
     // This code also runs wherever getComputedStyle doesn't exist.
-    if (computedWidthOrHeight === 0) {
+    if (computedWidthOrHeight === 0 || isNaN(computedWidthOrHeight)) {
       const rule = `offset${toTitleCase(widthOrHeight)}`;
 
       computedWidthOrHeight = this.el_[rule];
