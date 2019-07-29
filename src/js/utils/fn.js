@@ -32,9 +32,7 @@ export const bind = function(context, fn, uid) {
   }
 
   // Create the new function that changes the context
-  const bound = function() {
-    return fn.apply(context, arguments);
-  };
+  const bound = fn.bind(context);
 
   // Allow for the ability to individualize this function
   // Needed in the case where multiple objects might share the same prototype
