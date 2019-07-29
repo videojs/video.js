@@ -4,6 +4,7 @@
  */
 import document from 'global/document';
 import window from 'global/window';
+import {extname} from 'path';
 
 /**
  * @typedef {Object} url:URLObject
@@ -131,16 +132,13 @@ export const getAbsoluteURL = function(url) {
  *           extension could be found.
  */
 export const getFileExtension = function(path) {
-  if (typeof path === 'string') {
-    const splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/i;
-    const pathParts = splitPathRe.exec(path);
-
-    if (pathParts) {
-      return pathParts.pop().toLowerCase();
-    }
+  if (!path || typeof path !== 'string') {
+    return '';
   }
 
-  return '';
+  return extname(parseUrl(path).pathname)
+    .replace('.', '')
+    .toLowerCase();
 };
 
 /**

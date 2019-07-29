@@ -9,6 +9,7 @@ import ignore from 'rollup-plugin-ignore';
 import alias from 'rollup-plugin-alias';
 import _ from 'lodash';
 import pkg from './package.json';
+import builtins from 'rollup-plugin-node-builtins';
 
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
@@ -117,6 +118,7 @@ export default cliargs => [
       }),
       primedResolve,
       json(),
+      builtins(),
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -149,6 +151,7 @@ export default cliargs => [
         '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
       json(),
+      builtins(),
       primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
@@ -174,6 +177,7 @@ export default cliargs => [
       }),
       primedResolve,
       json(),
+      builtins(),
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -194,6 +198,7 @@ export default cliargs => [
     external: externals.module,
     plugins: [
       json(),
+      builtins(),
       primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
@@ -215,6 +220,7 @@ export default cliargs => [
     plugins: [
       primedResolve,
       json(),
+      builtins(),
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -238,6 +244,7 @@ export default cliargs => [
       primedIgnore,
       primedResolve,
       json(),
+      builtins(),
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
