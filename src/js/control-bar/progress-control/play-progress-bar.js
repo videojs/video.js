@@ -26,7 +26,7 @@ class PlayProgressBar extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.update = Fn.throttle(Fn.bind(this, this.update), 25);
+    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
   }
 
   /**

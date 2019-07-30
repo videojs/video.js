@@ -4,7 +4,7 @@
 import Component from '../../component.js';
 import checkVolumeSupport from './check-volume-support';
 import {isPlain} from '../../utils/obj';
-import { throttle, bind } from '../../utils/fn.js';
+import {throttle, bind, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 
 // Required children
 import './volume-bar.js';
@@ -40,7 +40,7 @@ class VolumeControl extends Component {
     // hide this control if volume support is missing
     checkVolumeSupport(this, player);
 
-    this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
+    this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);

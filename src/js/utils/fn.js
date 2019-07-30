@@ -5,6 +5,8 @@
 import { newGUID } from './guid.js';
 import window from 'global/window';
 
+export const UPDATE_REFRESH_INTERVAL = 30;
+
 /**
  * Bind (a.k.a proxy or context). A simple method for changing the context of
  * a function.
