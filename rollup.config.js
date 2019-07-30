@@ -45,6 +45,9 @@ const primedBabel = babel({
       loose: true,
       modules: false
     }]
+  ],
+  plugins: [
+    '@babel/plugin-transform-object-assign'
   ]
 });
 

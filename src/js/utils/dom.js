@@ -20,7 +20,7 @@ import computedStyle from './computed-style';
  *
  */
 function isNonBlankString(str) {
-  return typeof str === 'string' && (/\S/).test(str);
+  return typeof str === 'string' && str.trim();
 }
 
 /**
@@ -35,7 +35,7 @@ function isNonBlankString(str) {
  *         Throws an error if there is whitespace in the string.
  */
 function throwIfWhitespace(str) {
-  if ((/\s/).test(str)) {
+  if (str.indexOf(' ') >= 0) {
     throw new Error('class has illegal whitespace characters');
   }
 }
@@ -159,7 +159,7 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
     // method for it.
     } else if (propName === 'textContent') {
       textContent(el, val);
-    } else {
+    } else if (el[propName] !== val) {
       el[propName] = val;
     }
   });

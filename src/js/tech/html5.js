@@ -13,6 +13,7 @@ import mergeOptions from '../utils/merge-options.js';
 import {toTitleCase} from '../utils/string-cases.js';
 import {NORMAL as TRACK_TYPES} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
+import defineLazyProperty from '../utils/define-lazy-property.js';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -887,23 +888,27 @@ class Html5 extends Tech {
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 
-if (Dom.isReal()) {
-
-  /**
-   * Element for testing browser HTML5 media capabilities
-   *
-   * @type {Element}
-   * @constant
-   * @private
-   */
-  Html5.TEST_VID = document.createElement('video');
+/**
+ * Element for testing browser HTML5 media capabilities
+ *
+ * @type {Element}
+ * @constant
+ * @private
+ */
+defineLazyProperty(Html5, 'TEST_VID', function() {
+  if (!Dom.isReal()) {
+    return;
+  }
+  const el = document.createElement('video');
   const track = document.createElement('track');
 
   track.kind = 'captions';
   track.srclang = 'en';
   track.label = 'English';
-  Html5.TEST_VID.appendChild(track);
-}
+  el.appendChild(track);
+
+  return el;
+});
 
 /**
  * Check if HTML5 media is supported by this browser/device.
@@ -1115,15 +1120,12 @@ Html5.Events = [
  * @type {boolean}
  * @default {@link Html5.canControlVolume}
  */
-Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
-
 /**
  * Boolean indicating whether the `Tech` supports muting volume.
  *
  * @type {bolean}
  * @default {@link Html5.canMuteVolume}
  */
-Html5.prototype.featuresMuteControl = Html5.canMuteVolume();
 
 /**
  * Boolean indicating whether the `Tech` supports changing the speed at which the media
@@ -1134,7 +1136,6 @@ Html5.prototype.featuresMuteControl = Html5.canMuteVolume();
  * @type {boolean}
  * @default {@link Html5.canControlPlaybackRate}
  */
-Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
 /**
  * Boolean indicating whether the `Tech` supports the `sourceset` event.
@@ -1142,7 +1143,35 @@ Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
  * @type {boolean}
  * @default
  */
-Html5.prototype.featuresSourceset = Html5.canOverrideAttributes();
+/**
+ * Boolean indicating whether the `HTML5` tech currently supports native `TextTrack`s.
+ *
+ * @type {boolean}
+ * @default {@link Html5.supportsNativeTextTracks}
+ */
+/**
+ * Boolean indicating whether the `HTML5` tech currently supports native `VideoTrack`s.
+ *
+ * @type {boolean}
+ * @default {@link Html5.supportsNativeVideoTracks}
+ */
+/**
+ * Boolean indicating whether the `HTML5` tech currently supports native `AudioTrack`s.
+ *
+ * @type {boolean}
+ * @default {@link Html5.supportsNativeAudioTracks}
+ */
+[
+  ['featuresVolumeControl', 'canControlVolume'],
+  ['featuresMuteControl', 'canMuteVolume'],
+  ['featuresPlaybackRate', 'canControlPlaybackRate'],
+  ['featuresSourceset', 'canOverrideAttributes'],
+  ['featuresNativeTextTracks', 'supportsNativeTextTracks'],
+  ['featuresNativeVideoTracks', 'supportsNativeVideoTracks'],
+  ['featuresNativeAudioTracks', 'supportsNativeAudioTracks']
+].forEach(function([key, fn]) {
+  defineLazyProperty(Html5.prototype, key, () => Html5[fn](), false);
+});
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the media element
@@ -1182,40 +1211,18 @@ Html5.prototype.featuresProgressEvents = true;
  */
 Html5.prototype.featuresTimeupdateEvents = true;
 
-/**
- * Boolean indicating whether the `HTML5` tech currently supports native `TextTrack`s.
- *
- * @type {boolean}
- * @default {@link Html5.supportsNativeTextTracks}
- */
-Html5.prototype.featuresNativeTextTracks = Html5.supportsNativeTextTracks();
-
-/**
- * Boolean indicating whether the `HTML5` tech currently supports native `VideoTrack`s.
- *
- * @type {boolean}
- * @default {@link Html5.supportsNativeVideoTracks}
- */
-Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
-
-/**
- * Boolean indicating whether the `HTML5` tech currently supports native `AudioTrack`s.
- *
- * @type {boolean}
- * @default {@link Html5.supportsNativeAudioTracks}
- */
-Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
-
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-const canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
-const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
+let canPlayType;
 
 Html5.patchCanPlayType = function() {
 
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
   // Firefox and Chrome report correctly
   if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX && !browser.IS_CHROME) {
+    canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
     Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
+      const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
+
       if (type && mpegurlRE.test(type)) {
         return 'maybe';
       }
@@ -1227,7 +1234,9 @@ Html5.patchCanPlayType = function() {
 Html5.unpatchCanPlayType = function() {
   const r = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
+  if (canPlayType) {
+    Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
+  }
   return r;
 };
 
