@@ -978,25 +978,20 @@ QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', f
 
 QUnit.test('setTimeout should remove dispose handler on trigger', function(assert) {
   const comp = new Component(getFakePlayer());
-  const el = comp.el();
-  const data = DomData.get(el);
 
   comp.setTimeout(() => {}, 1);
 
-  assert.equal(data.handlers.dispose.length, 2, 'we got a new dispose handler');
-  assert.ok(/vjs-timeout-\d/.test(data.handlers.dispose[1].guid), 'we got a new dispose handler');
+  assert.equal(comp.setTimeoutIds_.length, 1, 'we removed our dispose handle');
 
   this.clock.tick(1);
 
-  assert.equal(data.handlers.dispose.length, 1, 'we removed our dispose handle');
+  assert.equal(comp.setTimeoutIds_.length, 0, 'we removed our dispose handle');
 
   comp.dispose();
 });
 
 QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
   const comp = new Component(getFakePlayer());
-  const el = comp.el();
-  const data = DomData.get(el);
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
 
@@ -1012,12 +1007,11 @@ QUnit.test('requestAnimationFrame should remove dispose handler on trigger', fun
 
   comp.requestAnimationFrame(spyRAF);
 
-  assert.equal(data.handlers.dispose.length, 2, 'we got a new dispose handler');
-  assert.ok(/vjs-raf-\d/.test(data.handlers.dispose[1].guid), 'we got a new dispose handler');
+  assert.equal(comp.rafIds_.length, 1, 'we got a new dispose handler');
 
   this.clock.tick(1);
 
-  assert.equal(data.handlers.dispose.length, 1, 'we removed our dispose handle');
+  assert.equal(comp.rafIds_.length, 0, 'we removed our dispose handle');
 
   comp.dispose();
 
