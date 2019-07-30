@@ -4,6 +4,7 @@
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
+import * as Fn from '../../utils/fn.js';
 
 /**
  * Time tooltips display a time above the progress bar.
@@ -11,6 +12,20 @@ import formatTime from '../../utils/format-time.js';
  * @extends Component
  */
 class TimeTooltip extends Component {
+
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The {@link Player} that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
+  constructor(player, options) {
+    super(player, options);
+    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
+  }
 
   /**
    * Create the time tooltip DOM element
@@ -88,7 +103,7 @@ class TimeTooltip extends Component {
   /**
    * Write the time to the tooltip DOM element.
    *
-   * @param {String} content
+   * @param {string} content
    *        The formatted time for the tooltip.
    */
   write(content) {

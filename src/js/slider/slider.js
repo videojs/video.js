@@ -59,6 +59,7 @@ class Slider extends Component {
     this.on('keydown', this.handleKeyDown);
     this.on('click', this.handleClick);
 
+    // TODO: deprecated, controlsvisible does not seem to be fired
     this.on(this.player_, 'controlsvisible', this.update);
 
     if (this.playerEvent) {
@@ -262,10 +263,10 @@ class Slider extends Component {
     const style = bar.el().style;
 
     // Set the new bar width or height
-    if (this.vertical()) {
-      style.height = percentage;
-    } else {
-      style.width = percentage;
+    const sizeKey = this.vertical() ? 'height' : 'width';
+
+    if (style[sizeKey] !== percentage) {
+      style[sizeKey] = percentage;
     }
 
     return progress;
