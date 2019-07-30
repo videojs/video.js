@@ -4,6 +4,7 @@
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
+import activeElement from '../../mixins/active-element.js';
 
 import './seek-bar.js';
 
@@ -28,8 +29,32 @@ class ProgressControl extends Component {
     super(player, options);
     this.handleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), UPDATE_REFRESH_INTERVAL);
+    this.throttledUpdate = throttle(bind(this, this.update), UPDATE_REFRESH_INTERVAL);
+    this.update = bind(this, this.update);
+
+    activeElement(this, {
+      extraComponents: [this.getChild('seekBar')],
+      update: this.throttledUpdate,
+      startUpdate: () => {
+        this.updateInterval_ = this.setInterval(this.throttledUpdate, UPDATE_REFRESH_INTERVAL);
+      },
+      stopUpdate: () => {
+        this.clearInterval(this.updateInterval_);
+        this.updateInterval_ = null;
+      }
+    });
 
     this.enable();
+  }
+
+  update() {
+    const seekBar = this.getChild('seekBar');
+
+    if (!seekBar) {
+      return;
+    }
+
+    seekBar.update();
   }
 
   /**

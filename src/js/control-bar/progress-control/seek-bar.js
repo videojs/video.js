@@ -5,11 +5,9 @@ import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
-import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
-import document from 'global/document';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -20,9 +18,6 @@ const STEP_SECONDS = 5;
 
 // The multiplier of STEP_SECONDS that PgUp/PgDown move the timeline.
 const PAGE_KEY_MULTIPLIER = 12;
-
-// The interval at which the bar should update as it progresses.
-const UPDATE_REFRESH_INTERVAL = 30;
 
 /**
  * Seek bar and container for the progress bars. Uses {@link PlayProgressBar}
@@ -43,64 +38,7 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-    this.setEventHandlers_();
-  }
-
-  /**
-   * Sets the event handlers
-   *
-   * @private
-   */
-  setEventHandlers_() {
-    this.update = Fn.throttle(Fn.bind(this, this.update), UPDATE_REFRESH_INTERVAL);
-
-    this.on(this.player_, 'timeupdate', this.update);
     this.on(this.player_, 'ended', this.handleEnded);
-    this.on(this.player_, 'durationchange', this.update);
-    if (this.player_.liveTracker) {
-      this.on(this.player_.liveTracker, 'liveedgechange', this.update);
-    }
-
-    // when playing, let's ensure we smoothly update the play progress bar
-    // via an interval
-    this.updateInterval = null;
-
-    this.on(this.player_, ['playing'], this.enableInterval_);
-
-    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
-
-    // we don't need to update the play progress if the document is hidden,
-    // also, this causes the CPU to spike and eventually crash the page on IE11.
-    if ('hidden' in document && 'visibilityState' in document) {
-      this.on(document, 'visibilitychange', this.toggleVisibility_);
-    }
-  }
-
-  toggleVisibility_(e) {
-    if (document.hidden) {
-      this.disableInterval_(e);
-    } else {
-      this.enableInterval_();
-
-      // we just switched back to the page and someone may be looking, so, update ASAP
-      this.requestAnimationFrame(this.update);
-    }
-  }
-
-  enableInterval_() {
-    this.clearInterval(this.updateInterval);
-
-    this.updateInterval = this.setInterval(() =>{
-      this.requestAnimationFrame(this.update);
-    }, UPDATE_REFRESH_INTERVAL);
-  }
-
-  disableInterval_(e) {
-    if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
-      return;
-    }
-
-    this.clearInterval(this.updateInterval);
   }
 
   /**
@@ -130,31 +68,33 @@ class SeekBar extends Slider {
    * @private
    */
   update_(currentTime, percent) {
-    const liveTracker = this.player_.liveTracker;
-    let duration = this.player_.duration();
+    this.requestAnimationFrame(() => {
+      const liveTracker = this.player_.liveTracker;
+      let duration = this.player_.duration();
 
-    if (liveTracker && liveTracker.isLive()) {
-      duration = this.player_.liveTracker.liveCurrentTime();
-    }
+      if (liveTracker && liveTracker.isLive()) {
+        duration = this.player_.liveTracker.liveCurrentTime();
+      }
 
-    // machine readable value of progress bar (percentage complete)
-    this.el_.setAttribute('aria-valuenow', (percent * 100).toFixed(2));
+      // machine readable value of progress bar (percentage complete)
+      this.el_.setAttribute('aria-valuenow', (percent * 100).toFixed(2));
 
-    // human readable value of progress bar (time complete)
-    this.el_.setAttribute(
-      'aria-valuetext',
-      this.localize(
-        'progress bar timing: currentTime={1} duration={2}',
-        [formatTime(currentTime, duration),
-          formatTime(duration, duration)],
-        '{1} of {2}'
-      )
-    );
+      // human readable value of progress bar (time complete)
+      this.el_.setAttribute(
+        'aria-valuetext',
+        this.localize(
+          'progress bar timing: currentTime={1} duration={2}',
+          [formatTime(currentTime, duration),
+            formatTime(duration, duration)],
+          '{1} of {2}'
+        )
+      );
 
-    // Update the `PlayProgressBar`.
-    if (this.bar) {
-      this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
-    }
+      // Update the `PlayProgressBar` when we are in mouse focus
+      if (this.bar && (!this.parentComponent_ || this.parentComponent_.mouseFocus_)) {
+        this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
+      }
+    });
   }
 
   /**
@@ -169,12 +109,6 @@ class SeekBar extends Slider {
    *          The current percent at a number from 0-1
    */
   update(event) {
-    // if the offsetParent is null, then this element is hidden, in which case
-    // we don't need to update it.
-    if (this.el().offsetParent === null) {
-      return;
-    }
-
     const percent = super.update();
 
     this.update_(this.getCurrentTime_(), percent);

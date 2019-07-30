@@ -4,8 +4,9 @@
 import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
+import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
+import activeElement from '../../mixins/active-element.js';
 
 /**
  * Displays time information about the video
@@ -26,7 +27,19 @@ class TimeDisplay extends Component {
   constructor(player, options) {
     super(player, options);
     this.throttledUpdateContent = throttle(bind(this, this.updateContent), UPDATE_REFRESH_INTERVAL);
-    this.on(player, 'timeupdate', this.throttledUpdateContent);
+
+    activeElement(this, Object.assign({
+      update: this.throttledUpdateContent,
+      startUpdate: () => {
+        this.on(player, 'timeupdate', this.throttledUpdateContent);
+        // update as soon as we are visible again
+        this.throttledUpdateContent();
+      },
+      stopUpdate: () => {
+        this.off(player, 'timeupdate', this.throttledUpdateContent);
+      }
+    }, options.activeElement || {}));
+    this.updateTextNode_();
   }
 
   /**
@@ -54,7 +67,6 @@ class TimeDisplay extends Component {
       'role': 'presentation'
     });
 
-    this.updateTextNode_();
     el.appendChild(this.contentEl_);
     return el;
   }
@@ -73,16 +85,25 @@ class TimeDisplay extends Component {
    * @private
    */
   updateTextNode_() {
-    if (!this.contentEl_) {
-      return;
-    }
+    this.requestAnimationFrame(() => {
+      if (!this.contentEl_) {
+        return;
+      }
 
-    while (this.contentEl_.firstChild) {
-      this.contentEl_.removeChild(this.contentEl_.firstChild);
-    }
+      const oldNode = this.textNode_;
 
-    this.textNode_ = document.createTextNode(this.formattedTime_ || this.formatTime_(0));
-    this.contentEl_.appendChild(this.textNode_);
+      this.textNode_ = document.createTextNode(this.formattedTime_ || this.formatTime_(0));
+
+      if (!this.textNode_) {
+        return;
+      }
+
+      if (oldNode) {
+        this.contentEl_.replaceChild(this.textNode_, oldNode);
+      } else {
+        this.contentEl_.appendChild(this.textNode_);
+      }
+    });
   }
 
   /**
@@ -117,7 +138,7 @@ class TimeDisplay extends Component {
     }
 
     this.formattedTime_ = formattedTime;
-    this.requestAnimationFrame(this.updateTextNode_);
+    this.updateTextNode_();
   }
 
   /**
