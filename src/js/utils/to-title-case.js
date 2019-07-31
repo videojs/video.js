@@ -17,7 +17,7 @@ function toTitleCase(string) {
     return string;
   }
 
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.replace(/./, (w) => w.toUpperCase());
 }
 
 export default toTitleCase;

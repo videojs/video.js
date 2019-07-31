@@ -14,6 +14,7 @@ import document from 'global/document';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
 import toTitleCase from '../utils/to-title-case';
+import toLowerCase from '../utils/to-lower-case';
 import vtt from 'videojs-vtt.js';
 
 /**
@@ -920,6 +921,7 @@ class Tech extends Component {
     name = toTitleCase(name);
 
     Tech.techs_[name] = tech;
+    Tech.techs_[toLowerCase(name)] = tech;
     if (name !== 'Tech') {
       // camel case the techName for use in techOrder
       Tech.defaultTechOrder_.push(name);
@@ -941,11 +943,11 @@ class Tech extends Component {
       return;
     }
 
-    name = toTitleCase(name);
-
     if (Tech.techs_ && Tech.techs_[name]) {
       return Tech.techs_[name];
     }
+
+    name = toTitleCase(name);
 
     if (window && window.videojs && window.videojs[name]) {
       log.warn(`The ${name} tech was added to the videojs object when it should be registered using videojs.registerTech(name, tech)`);

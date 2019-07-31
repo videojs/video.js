@@ -11,6 +11,7 @@ import * as DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import toTitleCase from './utils/to-title-case.js';
+import toLowerCase from './utils/to-lower-case.js';
 import mergeOptions from './utils/merge-options.js';
 import computedStyle from './utils/computed-style';
 
@@ -358,8 +359,6 @@ class Component {
       return;
     }
 
-    name = toTitleCase(name);
-
     return this.childNameIndex_[name];
   }
 
@@ -432,7 +431,8 @@ class Component {
     componentName = componentName || (component.name && toTitleCase(component.name()));
 
     if (componentName) {
-      this.childNameIndex_[componentName] = component;
+      this.childNameIndex_[toTitleCase(componentName)] = component;
+      this.childNameIndex_[toLowerCase(componentName)] = component;
     }
 
     // Add the UI object's element to the container div (box)
@@ -481,7 +481,8 @@ class Component {
     component.parentComponent_ = null;
 
     this.childIndex_[component.id()] = null;
-    this.childNameIndex_[component.name()] = null;
+    this.childNameIndex_[toTitleCase(component.name())] = null;
+    this.childNameIndex_[toLowerCase(component.name())] = null;
 
     const compEl = component.el();
 
@@ -1543,6 +1544,7 @@ class Component {
     }
 
     Component.components_[name] = ComponentToRegister;
+    Component.components_[toLowerCase(name)] = ComponentToRegister;
 
     return ComponentToRegister;
   }
@@ -1562,15 +1564,11 @@ class Component {
    *             return that if it exists.
    */
   static getComponent(name) {
-    if (!name) {
+    if (!name || !Component.components_) {
       return;
     }
 
-    name = toTitleCase(name);
-
-    if (Component.components_ && Component.components_[name]) {
-      return Component.components_[name];
-    }
+    return Component.components_[name];
   }
 }
 
