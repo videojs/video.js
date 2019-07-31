@@ -104,7 +104,7 @@
     "bluebird": "^3.5.5",
     "browserify": "^16.2.3",
     "browserify-istanbul": "^3.0.1",
-    "chokidar-cli": "^1.2.2",
+    "chokidar-cli": "^2.0.0",
     "clean-css-cli": "^4.3.0",
     "cli-table": "^0.3.1",
     "conventional-changelog-cli": "^2.0.21",
