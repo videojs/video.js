@@ -20,7 +20,12 @@ import computedStyle from './computed-style';
  *
  */
 function isNonBlankString(str) {
-  return typeof str === 'string' && str.trim();
+  // we use str.trim as it will trim any whitespace characters
+  // from the front or back of non-whitespace characters. aka
+  // Any string that contains non-whitespace characters will
+  // still contain them after `trim` but whitespace only strings
+  // will have a length of 0, failing this check.
+  return typeof str === 'string' && Boolean(str.trim());
 }
 
 /**
@@ -35,6 +40,7 @@ function isNonBlankString(str) {
  *         Throws an error if there is whitespace in the string.
  */
 function throwIfWhitespace(str) {
+  // str.indexOf instead of regex because str.indexOf is faster performance wise.
   if (str.indexOf(' ') >= 0) {
     throw new Error('class has illegal whitespace characters');
   }

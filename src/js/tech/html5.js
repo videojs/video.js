@@ -899,15 +899,15 @@ defineLazyProperty(Html5, 'TEST_VID', function() {
   if (!Dom.isReal()) {
     return;
   }
-  const el = document.createElement('video');
+  const video = document.createElement('video');
   const track = document.createElement('track');
 
   track.kind = 'captions';
   track.srclang = 'en';
   track.label = 'English';
-  el.appendChild(track);
+  video.appendChild(track);
 
-  return el;
+  return video;
 });
 
 /**
