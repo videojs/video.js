@@ -93,7 +93,9 @@ class LoadProgressBar extends Component {
       }
 
       // update the control-text
-      Dom.textContent(controlTextPercentage, percent);
+      if (controlTextPercentage.textContent !== percent) {
+        Dom.textContent(controlTextPercentage, percent);
+      }
 
       // add child elements to represent the individual buffered time ranges
       for (let i = 0; i < buffered.length; i++) {
