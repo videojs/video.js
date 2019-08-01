@@ -13,8 +13,7 @@ import window from 'global/window';
 import document from 'global/document';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
-import toTitleCase from '../utils/to-title-case';
-import toLowerCase from '../utils/to-lower-case';
+import {toTitleCase, toLowerCase} from '../utils/string-cases.js';
 import vtt from 'videojs-vtt.js';
 
 /**

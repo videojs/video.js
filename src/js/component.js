@@ -10,8 +10,7 @@ import * as Dom from './utils/dom.js';
 import * as DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
-import toTitleCase from './utils/to-title-case.js';
-import toLowerCase from './utils/to-lower-case.js';
+import {toTitleCase, toLowerCase} from './utils/string-cases.js';
 import mergeOptions from './utils/merge-options.js';
 import computedStyle from './utils/computed-style';
 
