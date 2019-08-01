@@ -430,7 +430,7 @@ class Component {
     componentName = componentName || (component.name && toTitleCase(component.name()));
 
     if (componentName) {
-      this.childNameIndex_[toTitleCase(componentName)] = component;
+      this.childNameIndex_[componentName] = component;
       this.childNameIndex_[toLowerCase(componentName)] = component;
     }
 
