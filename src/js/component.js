@@ -98,9 +98,9 @@ class Component {
     this.childIndex_ = {};
     this.childNameIndex_ = {};
 
-    this.setTimeoutIds_ = [];
-    this.setIntervalIds_ = [];
-    this.rafIds_ = [];
+    this.setTimeoutIds_ = new Set();
+    this.setIntervalIds_ = new Set();
+    this.rafIds_ = new Set();
 
     // Add any child components in options
     if (options.initChildren !== false) {
@@ -1303,16 +1303,13 @@ class Component {
     }
 
     timeoutId = window.setTimeout(() => {
-      const index = this.setTimeoutIds_.indexOf(timeoutId);
-
-      if (index !== -1) {
-        this.setTimeoutIds_.splice(index, 1);
+      if (this.setTimeoutIds_.has(timeoutId)) {
+        this.setTimeoutIds_.delete(timeoutId);
       }
-      this.clearTimeout(timeoutId);
       fn();
     }, timeout);
 
-    this.setTimeoutIds_.push(timeoutId);
+    this.setTimeoutIds_.add(timeoutId);
 
     return timeoutId;
   }
@@ -1333,11 +1330,9 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearTimeout}
    */
   clearTimeout(timeoutId) {
-    const index = this.setTimeoutIds_.indexOf(timeoutId);
-
-    if (index !== -1) {
+    if (this.setTimeoutIds_.has(timeoutId)) {
+      this.setTimeoutIds_.delete(timeoutId);
       window.clearTimeout(timeoutId);
-      this.setTimeoutIds_.splice(index, 1);
     }
 
     return timeoutId;
@@ -1373,7 +1368,7 @@ class Component {
 
     const intervalId = window.setInterval(fn, interval);
 
-    this.setIntervalIds_.push(intervalId);
+    this.setIntervalIds_.add(intervalId);
 
     return intervalId;
   }
@@ -1394,11 +1389,9 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearInterval}
    */
   clearInterval(intervalId) {
-    const index = this.setIntervalIds_.indexOf(intervalId);
-
-    if (index !== -1) {
+    if (this.setIntervalIds_.has(intervalId)) {
+      this.setIntervalIds_.delete(intervalId);
       window.clearInterval(intervalId);
-      this.setIntervalIds_.splice(index, 1);
     }
 
     return intervalId;
@@ -1446,16 +1439,12 @@ class Component {
     fn = Fn.bind(this, fn);
 
     id = window.requestAnimationFrame(() => {
-      const index = this.rafIds_.indexOf(id);
-
-      if (index !== -1) {
-        this.rafIds_.splice(index, 1);
+      if (this.rafIds_.has(id)) {
+        this.rafIds_.delete(id);
       }
-
-      this.cancelAnimationFrame(id);
       fn();
     });
-    this.rafIds_.push(id);
+    this.rafIds_.add(id);
 
     return id;
   }
@@ -1482,11 +1471,9 @@ class Component {
       return this.clearTimeout(id);
     }
 
-    const index = this.rafIds_.indexOf(id);
-
-    if (index !== -1) {
+    if (this.rafIds_.has(id)) {
+      this.rafIds_.delete(id);
       window.cancelAnimationFrame(id);
-      this.rafIds_.splice(index, 1);
     }
 
     return id;
@@ -1499,11 +1486,7 @@ class Component {
       ['setTimeoutIds_', 'clearTimeout'],
       ['setIntervalIds_', 'clearInterval']
     ].forEach(([idName, cancelName]) => {
-      let i = this[idName].length;
-
-      while (i--) {
-        this[cancelName](this[idName][i]);
-      }
+      this[idName].forEach(this[cancelName], this);
     });
   }
 

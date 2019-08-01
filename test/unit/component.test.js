@@ -981,11 +981,11 @@ QUnit.test('setTimeout should remove dispose handler on trigger', function(asser
 
   comp.setTimeout(() => {}, 1);
 
-  assert.equal(comp.setTimeoutIds_.length, 1, 'we removed our dispose handle');
+  assert.equal(comp.setTimeoutIds_.size, 1, 'we removed our dispose handle');
 
   this.clock.tick(1);
 
-  assert.equal(comp.setTimeoutIds_.length, 0, 'we removed our dispose handle');
+  assert.equal(comp.setTimeoutIds_.size, 0, 'we removed our dispose handle');
 
   comp.dispose();
 });
@@ -1007,11 +1007,11 @@ QUnit.test('requestAnimationFrame should remove dispose handler on trigger', fun
 
   comp.requestAnimationFrame(spyRAF);
 
-  assert.equal(comp.rafIds_.length, 1, 'we got a new dispose handler');
+  assert.equal(comp.rafIds_.size, 1, 'we got a new dispose handler');
 
   this.clock.tick(1);
 
-  assert.equal(comp.rafIds_.length, 0, 'we removed our dispose handle');
+  assert.equal(comp.rafIds_.size, 0, 'we removed our dispose handle');
 
   comp.dispose();
 
