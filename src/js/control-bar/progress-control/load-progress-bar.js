@@ -13,7 +13,8 @@ const percentify = function(time, end) {
 
   percent = (percent >= 1 ? 1 : percent) * 100;
 
-  return percent;
+  // round to two digits
+  return percent.toFixed(2) + '%';
 };
 
 /**
@@ -88,11 +89,11 @@ class LoadProgressBar extends Component {
 
       if (this.el_.style.width !== percent) {
         // update the width of the progress bar
-        this.el_.style.width = percent + '%';
+        this.el_.style.width = percent;
       }
 
       // update the control-text
-      Dom.textContent(controlTextPercentage, percent.toFixed(2) + '%');
+      Dom.textContent(controlTextPercentage, percent);
 
       // add child elements to represent the individual buffered time ranges
       for (let i = 0; i < buffered.length; i++) {
@@ -106,8 +107,8 @@ class LoadProgressBar extends Component {
         }
 
         // set the percent based on the width of the progress bar (bufferedEnd)
-        const leftPercent = percentify(start, bufferedEnd) + '%';
-        const widthPercent = percentify(end - start, bufferedEnd) + '%';
+        const leftPercent = percentify(start, bufferedEnd);
+        const widthPercent = percentify(end - start, bufferedEnd);
 
         if (part.style.left !== leftPercent) {
           part.style.left = leftPercent;
