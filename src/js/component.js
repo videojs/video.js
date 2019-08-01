@@ -7,7 +7,7 @@ import window from 'global/window';
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
-import * as DomData from './utils/dom-data';
+import DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import toTitleCase from './utils/to-title-case.js';
@@ -153,7 +153,9 @@ class Component {
         this.el_.parentNode.removeChild(this.el_);
       }
 
-      DomData.removeData(this.el_);
+      if (DomData.has(this.el_)) {
+        DomData.delete(this.el_);
+      }
       this.el_ = null;
     }
 
