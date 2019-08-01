@@ -74,6 +74,14 @@ function _handleMultipleEvents(fn, elem, types, callback) {
   });
 }
 
+function returnTrue() {
+  return true;
+}
+
+function returnFalse() {
+  return false;
+}
+
 /**
  * Fix a native event to have standard property values
  *
@@ -85,41 +93,17 @@ function _handleMultipleEvents(fn, elem, types, callback) {
  */
 export function fixEvent(event) {
 
-  function returnTrue() {
-    return true;
-  }
-
-  function returnFalse() {
-    return false;
-  }
-
   // Test if fixing up is needed
   // Used to check if !event.stopPropagation instead of isPropagationStopped
   // But native events return true for stopPropagation, but don't have
   // other expected methods like isPropagationStopped. Seems to be a problem
   // with the Javascript Ninja code. So we're just overriding all events now.
   if (!event || !event.isPropagationStopped) {
-    const old = event || window.event;
-
-    event = {};
-    // Clone the old object so that we can modify the values event = {};
-    // IE8 Doesn't like when you mess with native event properties
-    // Firefox returns false for event.hasOwnProperty('type') and other props
-    //  which makes copying more difficult.
-    // TODO: Probably best to create a whitelist of event props
-    for (const key in old) {
-      // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
-      // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
-      // and webkitMovementX/Y
-      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation' &&
-          key !== 'webkitMovementX' && key !== 'webkitMovementY') {
-        // Chrome 32+ warns if you try to copy deprecated returnValue, but
-        // we still want to if preventDefault isn't supported (IE8).
-        if (!(key === 'returnValue' && old.preventDefault)) {
-          event[key] = old[key];
-        }
-      }
-    }
+    const old = {
+      preventDefault: event.preventDefault,
+      stopPropagation: event.stopPropagation,
+      stopImmediatePropagation: event.stopImmediatePropagation
+    };
 
     // The event occurred on this element
     if (!event.target) {
@@ -139,7 +123,6 @@ export function fixEvent(event) {
         old.preventDefault();
       }
       event.returnValue = false;
-      old.returnValue = false;
       event.defaultPrevented = true;
     };
 
@@ -151,7 +134,6 @@ export function fixEvent(event) {
         old.stopPropagation();
       }
       event.cancelBubble = true;
-      old.cancelBubble = true;
       event.isPropagationStopped = returnTrue;
     };
 
