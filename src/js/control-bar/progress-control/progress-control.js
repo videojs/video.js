@@ -30,11 +30,9 @@ class ProgressControl extends Component {
     this.handleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), UPDATE_REFRESH_INTERVAL);
     this.throttledUpdate = throttle(bind(this, this.update), UPDATE_REFRESH_INTERVAL);
-    this.update = bind(this, this.update);
 
     activeElement(this, {
       extraComponents: [this.getChild('seekBar')],
-      update: this.throttledUpdate,
       startUpdate: () => {
         this.updateInterval_ = this.setInterval(this.throttledUpdate, UPDATE_REFRESH_INTERVAL);
       },

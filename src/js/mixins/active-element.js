@@ -2,14 +2,32 @@ import document from 'global/document';
 import {bind} from '../utils/fn.js';
 
 const defaults = {
-  liveUpdates: true,
   extraComponents: []
 };
 
+/**
+ * A mixin to start and stop an update function when depending on:
+ * 1. If the tab is in the background or not
+ * 2. If the player is paused or playing
+ * 3. If the component itself or any components passed as `extraComponents`
+ *    has mouse/keyboard focus
+ * 4. If the player reports that the is active via `userActive`
+ *
+ * @param {Component} target
+ *        the component to target
+ * @param {Object} options
+ *        the options for this activeElement
+ * @param {Function} options.startUpdate
+ *        The Function to run when updates should be started
+ * @param {Function} options.stopUpdate
+ *        The function to run when updates should be stopped
+ * @param {Array} options.extraComponents
+ *        Extra components to watch for keyboard focus.
+ */
 const activeElement = function(target, options = {}) {
   const settings = Object.assign({}, defaults, options);
 
-  if (!options.update || !options.startUpdate || !options.stopUpdate) {
+  if (!options.startUpdate || !options.stopUpdate) {
     throw new Error('activeElement mixin requires update, startUpdate, and stopUpdate functions');
   }
 
@@ -24,8 +42,9 @@ const activeElement = function(target, options = {}) {
   const shouldUpdate = bind(target, function() {
     const isActive = target.keyFocus_ || target.mouseFocus_ || player.userActive() ||
       els.some((el) => document.activeElement === el);
+    const isLive = settings.liveUpdates && player.liveTracker && player.liveTracker.isLive;
 
-    return !player.paused() && isActive && !document.hidden;
+    return (!player.paused() || isLive) && isActive && !document.hidden;
   });
 
   const startOrStopUpdate = bind(target, function() {
@@ -46,6 +65,7 @@ const activeElement = function(target, options = {}) {
       target.off(document, 'visibilitychange', startOrStopUpdate);
     });
   }
+
   target.on(player, ['playing', 'pause'], startOrStopUpdate);
 
   target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], function(e) {
@@ -60,8 +80,8 @@ const activeElement = function(target, options = {}) {
   target.one(player, 'playing', function() {
     target.on(player, ['useractive', 'userinactive'], startOrStopUpdate);
     target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], startOrStopUpdate);
-    if (settings.liveUpdates && player.liveTracker) {
-      target.on(player.liveTracker, 'liveedgechange', settings.update);
+    if (player.liveTracker) {
+      target.on(player.liveTracker, 'liveedgechange', startOrStopUpdate);
     }
   });
 };
