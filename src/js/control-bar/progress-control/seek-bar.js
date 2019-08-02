@@ -124,16 +124,20 @@ class SeekBar extends Slider {
    * This function updates the play progress bar and accessibility
    * attributes to whatever is passed in.
    *
-   * @param {number} currentTime
-   *        The currentTime value that should be used for accessibility
+   * @param {EventTarget~Event} [event]
+   *        The `timeupdate` or `ended` event that caused this to run.
    *
-   * @param {number} percent
-   *        The percentage as a decimal that the bar should be filled from 0-1.
+   * @listens Player#timeupdate
    *
-   * @private
+   * @return {number}
+   *          The current percent at a number from 0-1
    */
-  update_(currentTime, percent) {
+  update(event) {
+    const percent = super.update();
+
     this.requestAnimationFrame(() => {
+      const currentTime = this.player_.ended() ?
+        this.player.duration() : this.getCurrentTime_();
       const liveTracker = this.player_.liveTracker;
       let duration = this.player_.duration();
 
@@ -163,25 +167,7 @@ class SeekBar extends Slider {
         this.duration_ = duration;
       }
     });
-  }
 
-  /**
-   * Update the seek bar's UI.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `timeupdate` or `ended` event that caused this to run.
-   *
-   * @listens Player#timeupdate
-   *
-   * @return {number}
-   *          The current percent at a number from 0-1
-   */
-  update(event) {
-    const percent = super.update();
-    const currentTime = this.player_.ended() ?
-      this.player.duration() : this.getCurrentTime_();
-
-    this.update_(currentTime, percent);
     return percent;
   }
 

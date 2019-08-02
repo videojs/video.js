@@ -5,6 +5,7 @@ import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {assign} from '../utils/obj';
 import {IS_CHROME} from '../utils/browser.js';
+import clamp from '../utils/clamp.js';
 import keycode from 'keycode';
 
 /**
@@ -230,7 +231,6 @@ class Slider extends Component {
    *          number from 0 to 1.
    */
   update() {
-
     // In VolumeBar init we have a setTimeout for update that pops and update
     // to the end of the execution stack. The player is destroyed before then
     // update will cause an error
@@ -241,8 +241,7 @@ class Slider extends Component {
 
     // clamp progress between 0 and 1
     // and only round to four decimal places, as we round to two below
-    const percent = Number(this.getPercent()) || 0;
-    const progress = Math.max(0, Math.min(1, percent)).toFixed(4);
+    const progress = this.getProgress();
 
     if (progress === this.progress_) {
       return;
@@ -250,13 +249,26 @@ class Slider extends Component {
 
     this.progress_ = progress;
 
-    // Set the new bar width or height
-    const sizeKey = this.vertical() ? 'height' : 'width';
+    this.requestAnimationFrame(() => {
+      // Set the new bar width or height
+      const sizeKey = this.vertical() ? 'height' : 'width';
 
-    // Convert to a percentage for css value
-    this.bar.el().style[sizeKey] = (progress * 100).toFixed(2) + '%';
+      // Convert to a percentage for css value
+      this.bar.el().style[sizeKey] = (progress * 100).toFixed(2) + '%';
+    });
 
     return progress;
+  }
+
+  /**
+   * Get the percentage of the bar that should be filled
+   * but clamped and rounded.
+   *
+   * @return {number}
+   *         percentage filled that the slider is
+   */
+  getProgress() {
+    return clamp(this.getPercent(), 0, 1).toFixed(4);
   }
 
   /**

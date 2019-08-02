@@ -3,6 +3,7 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
+import clamp from '../../utils/clamp.js';
 import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 
 import './seek-bar.js';
@@ -74,14 +75,14 @@ class ProgressControl extends Component {
     // The default skin has a gap on either side of the `SeekBar`. This means
     // that it's possible to trigger this behavior outside the boundaries of
     // the `SeekBar`. This ensures we stay within it at all times.
-    seekBarPoint = Math.max(0, Math.min(1, seekBarPoint));
+    seekBarPoint = clamp(0, 1, seekBarPoint);
 
     if (mouseTimeDisplay) {
       mouseTimeDisplay.update(seekBarRect, seekBarPoint);
     }
 
     if (playProgressBar) {
-      playProgressBar.update(seekBarRect, seekBar.percent_);
+      playProgressBar.update(seekBarRect, seekBar.getProgress());
     }
 
   }
