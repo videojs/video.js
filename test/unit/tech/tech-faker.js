@@ -152,6 +152,9 @@ class TechFaker extends Tech {
   controls() {
     return false;
   }
+  ended() {
+    return false;
+  }
 
   // Support everything except for "video/unsupported-format"
   static isSupported() {

@@ -137,7 +137,7 @@ class SeekBar extends Slider {
 
     this.requestAnimationFrame(() => {
       const currentTime = this.player_.ended() ?
-        this.player.duration() : this.getCurrentTime_();
+        this.player_.duration() : this.getCurrentTime_();
       const liveTracker = this.player_.liveTracker;
       let duration = this.player_.duration();
 
