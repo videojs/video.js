@@ -234,7 +234,3 @@ QUnit.test('startUpdate and stopUpdate run correctly run for events', function(a
   this.liveTracker.trigger('liveedgechange');
   assert.equal(this.startUpdates, 6, 'liveedgechange runs startUpdate');
 });
-
-QUnit.test('some events before first playing do nothing', function(assert) {
-
-});
