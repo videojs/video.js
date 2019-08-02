@@ -2,7 +2,6 @@ import document from 'global/document';
 import {bind} from '../utils/fn.js';
 
 const defaults = {
-  extraComponents: [],
   doc: document
 };
 
@@ -24,8 +23,6 @@ const defaults = {
  *        The function to run when updates should be stopped
  * @param {Function} options.update
  *        The actual update function that is being started and stopped.
- * @param {Array} options.extraComponents
- *        Extra components to watch for keyboard focus.
  * @param {Object} options.doc
  *        pass in the document browser object, mostly for tests
  */
@@ -36,7 +33,6 @@ const activeElement = function(target, options = {}) {
     throw new Error('activeElement mixin requires startUpdate, stopUpdate, and update functions');
   }
 
-  const els = [target.el_].concat(settings.extraComponents.map((c) => c.el_));
   const player = target.player_;
 
   target.mouseFocus_ = false;
@@ -45,7 +41,7 @@ const activeElement = function(target, options = {}) {
 
   target.shouldUpdate = bind(target, function() {
     const isActive = target.keyFocus_ || target.mouseFocus_ || player.userActive() ||
-      els.some((el) => settings.doc.activeElement === el);
+      target.el_.contains(settings.doc.activeElement);
     const isLive = player.liveTracker && player.liveTracker.isLive();
 
     return Boolean((!player.paused() || isLive) && isActive && !settings.doc.hidden);
@@ -67,11 +63,11 @@ const activeElement = function(target, options = {}) {
   target.on(player, ['playing', 'pause'], target.startOrStopUpdate);
   target.on(player, ['pause'], settings.update);
 
-  target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], function(e) {
-    if ((/^mouse/).test(e.type)) {
+  target.on(['mouseenter', 'mouseleave', 'focusin', 'focusout'], function(e) {
+    if (e.type.indexOf('mouse') !== -1) {
       target.mouseFocus_ = e.type === 'mouseenter' ? true : false;
     } else {
-      target.keyFocus_ = e.type === 'focus' ? true : false;
+      target.keyFocus_ = e.type === 'focusin' ? true : false;
     }
   });
 
