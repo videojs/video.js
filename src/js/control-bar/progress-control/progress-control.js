@@ -56,25 +56,34 @@ class ProgressControl extends Component {
   handleMouseMove(event) {
     const seekBar = this.getChild('seekBar');
 
-    if (seekBar) {
-      const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
-      const seekBarEl = seekBar.el();
-      const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
-      let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
-
-      // The default skin has a gap on either side of the `SeekBar`. This means
-      // that it's possible to trigger this behavior outside the boundaries of
-      // the `SeekBar`. This ensures we stay within it at all times.
-      if (seekBarPoint > 1) {
-        seekBarPoint = 1;
-      } else if (seekBarPoint < 0) {
-        seekBarPoint = 0;
-      }
-
-      if (mouseTimeDisplay) {
-        mouseTimeDisplay.update(seekBarRect, seekBarPoint);
-      }
+    if (!seekBar) {
+      return;
     }
+
+    const playProgressBar = seekBar.getChild('playProgressBar');
+    const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
+
+    if (!playProgressBar && !mouseTimeDisplay) {
+      return;
+    }
+
+    const seekBarEl = seekBar.el();
+    const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
+    let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
+
+    // The default skin has a gap on either side of the `SeekBar`. This means
+    // that it's possible to trigger this behavior outside the boundaries of
+    // the `SeekBar`. This ensures we stay within it at all times.
+    seekBarPoint = Math.max(0, Math.min(1, seekBarPoint));
+
+    if (mouseTimeDisplay) {
+      mouseTimeDisplay.update(seekBarRect, seekBarPoint);
+    }
+
+    if (playProgressBar) {
+      playProgressBar.update(seekBarRect, seekBar.percent_);
+    }
+
   }
 
   /**

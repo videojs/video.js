@@ -5,6 +5,7 @@ import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 import * as Fn from '../../utils/fn.js';
+import * as browser from '../../utils/browser.js';
 
 /**
  * Time tooltips display a time above the progress bar.
@@ -24,6 +25,9 @@ class TimeTooltip extends Component {
    */
   constructor(player, options) {
     super(player, options);
+    if (browser.IS_IOS || browser.IS_ANDROID) {
+      this.hide();
+    }
     this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
   }
 

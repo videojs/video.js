@@ -234,40 +234,27 @@ class Slider extends Component {
     // In VolumeBar init we have a setTimeout for update that pops and update
     // to the end of the execution stack. The player is destroyed before then
     // update will cause an error
-    if (!this.el_) {
-      return;
-    }
-
-    // If scrubbing, we could use a cached value to make the handle keep up
-    // with the user's mouse. On HTML5 browsers scrubbing is really smooth, but
-    // some flash players are slow, so we might want to utilize this later.
-    // var progress =  (this.player_.scrubbing()) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
-    let progress = this.getPercent();
-    const bar = this.bar;
-
     // If there's no bar...
-    if (!bar) {
+    if (!this.el_ || !this.bar) {
       return;
     }
 
-    // Protect against no duration and other division issues
-    if (typeof progress !== 'number' ||
-        progress !== progress ||
-        progress < 0 ||
-        progress === Infinity) {
-      progress = 0;
+    // clamp progress between 0 and 1
+    // and only round to four decimal places, as we round to two below
+    const percent = Number(this.getPercent()) || 0;
+    const progress = Math.max(0, Math.min(1, percent)).toFixed(4);
+
+    if (progress === this.progress_) {
+      return;
     }
 
-    // Convert to a percentage for setting
-    const percentage = (progress * 100).toFixed(2) + '%';
-    const style = bar.el().style;
+    this.progress_ = progress;
 
     // Set the new bar width or height
     const sizeKey = this.vertical() ? 'height' : 'width';
 
-    if (style[sizeKey] !== percentage) {
-      style[sizeKey] = percentage;
-    }
+    // Convert to a percentage for css value
+    this.bar.el().style[sizeKey] = (progress * 100).toFixed(2) + '%';
 
     return progress;
   }
