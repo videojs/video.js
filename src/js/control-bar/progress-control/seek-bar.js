@@ -8,6 +8,7 @@ import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
+import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -38,7 +39,7 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-    this.on(this.player_, 'ended', this.handleEnded);
+    this.update = throttle(bind(this, this.update), UPDATE_REFRESH_INTERVAL);
   }
 
   /**
@@ -91,7 +92,7 @@ class SeekBar extends Slider {
       );
 
       // Update the `PlayProgressBar` when we are in mouse focus
-      if (this.bar && (!this.parentComponent_ || this.parentComponent_.mouseFocus_)) {
+      if (this.bar && (this.player_.ended() || (!this.parentComponent_ || this.parentComponent_.mouseFocus_))) {
         this.bar.update(Dom.getBoundingClientRect(this.el_), percent);
       }
     });
@@ -110,8 +111,9 @@ class SeekBar extends Slider {
    */
   update(event) {
     const percent = super.update();
+    const currentTime = !this.player_.ended() ? this.getCurrentTime_() : this.player_.duration();
 
-    this.update_(this.getCurrentTime_(), percent);
+    this.update_(currentTime, percent);
     return percent;
   }
 
@@ -128,19 +130,6 @@ class SeekBar extends Slider {
     return (this.player_.scrubbing()) ?
       this.player_.getCache().currentTime :
       this.player_.currentTime();
-  }
-
-  /**
-   * We want the seek bar to be full on ended
-   * no matter what the actual internal values are. so we force it.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `timeupdate` or `ended` event that caused this to run.
-   *
-   * @listens Player#ended
-   */
-  handleEnded(event) {
-    this.update_(this.player_.duration(), 1);
   }
 
   /**

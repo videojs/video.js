@@ -32,6 +32,7 @@ class ProgressControl extends Component {
     this.throttledUpdate = throttle(bind(this, this.update), UPDATE_REFRESH_INTERVAL);
 
     activeElement(this, {
+      update: this.throttledUpdate,
       extraComponents: [this.getChild('seekBar')],
       startUpdate: () => {
         this.updateInterval_ = this.setInterval(this.throttledUpdate, UPDATE_REFRESH_INTERVAL);

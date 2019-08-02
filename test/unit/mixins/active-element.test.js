@@ -61,6 +61,7 @@ QUnit.module('mixins: activeElement', {
     activeElement(this.comp, {
       startUpdate: () => this.startUpdates++,
       stopUpdate: () => this.stopUpdates++,
+      update: noop,
       doc: this.doc
     });
   },
@@ -74,11 +75,14 @@ QUnit.module('mixins: activeElement', {
 });
 
 QUnit.test('throws an error without startUpdate/stopUpdate functions', function(assert) {
-  const error = new Error('activeElement mixin requires startUpdate and stopUpdate functions');
+  const error = new Error('activeElement mixin requires startUpdate, stopUpdate, and update functions');
 
   assert.throws(() => activeElement(this.comp, {}), error, 'throws an error');
   assert.throws(() => activeElement(this.comp, {startUpdate: noop}), error, 'throws an error');
   assert.throws(() => activeElement(this.comp, {stopUpdate: noop}), error, 'throws an error');
+  assert.throws(() => activeElement(this.comp, {update: noop}), error, 'throws an error');
+  assert.throws(() => activeElement(this.comp, {startUpdate: noop, update: noop}), error, 'throws an error');
+  assert.throws(() => activeElement(this.comp, {stopUpdate: noop, update: noop}), error, 'throws an error');
 });
 
 QUnit.test('shouldUpdate is correct by default', function(assert) {

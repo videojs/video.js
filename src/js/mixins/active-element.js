@@ -22,6 +22,8 @@ const defaults = {
  *        The Function to run when updates should be started
  * @param {Function} options.stopUpdate
  *        The function to run when updates should be stopped
+ * @param {Function} options.update
+ *        The actual update function that is being started and stopped.
  * @param {Array} options.extraComponents
  *        Extra components to watch for keyboard focus.
  * @param {Object} options.doc
@@ -30,8 +32,8 @@ const defaults = {
 const activeElement = function(target, options = {}) {
   const settings = Object.assign({}, defaults, options);
 
-  if (!options.startUpdate || !options.stopUpdate) {
-    throw new Error('activeElement mixin requires startUpdate and stopUpdate functions');
+  if (!options.update || !options.startUpdate || !options.stopUpdate) {
+    throw new Error('activeElement mixin requires startUpdate, stopUpdate, and update functions');
   }
 
   const els = [target.el_].concat(settings.extraComponents.map((c) => c.el_));
@@ -61,7 +63,9 @@ const activeElement = function(target, options = {}) {
     }
   });
 
+  // we must call update on ended or pause, as the controls come back up
   target.on(player, ['playing', 'pause'], target.startOrStopUpdate);
+  target.on(player, ['pause'], settings.update);
 
   target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], function(e) {
     if ((/^mouse/).test(e.type)) {
