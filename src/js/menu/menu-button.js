@@ -216,6 +216,14 @@ class MenuButton extends Component {
   }
 
   /**
+   * Dispose of the `menu-button` and all child components.
+   */
+  dispose() {
+    this.handleMouseLeave();
+    super.dispose();
+  }
+
+  /**
    * Handle a click on a `MenuButton`.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *

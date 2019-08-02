@@ -119,6 +119,14 @@ class VolumePanel extends Component {
   }
 
   /**
+   * Dispose of the `volume-panel` and all child components.
+   */
+  dispose() {
+    this.handleMouseOut();
+    super.dispose();
+  }
+
+  /**
    * Handles `keyup` events on the `VolumeControl`, looking for ESC, which closes
    * the volume panel and sets focus on `MuteToggle`.
    *
