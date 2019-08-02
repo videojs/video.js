@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import activeElement from '../../../src/js/mixins/active-element.js';
 import Component from '../../../src/js/component.js';
+import document from 'global/document';
 
 const noop = () => {};
 
@@ -61,9 +62,11 @@ QUnit.module('mixins: activeElement', {
     activeElement(this.comp, {
       startUpdate: () => this.startUpdates++,
       stopUpdate: () => this.stopUpdates++,
-      update: noop,
       doc: this.doc
     });
+
+    this.child = document.createElement('div');
+    this.comp.el_.appendChild(this.child);
   },
 
   afterEach() {
@@ -75,26 +78,24 @@ QUnit.module('mixins: activeElement', {
 });
 
 QUnit.test('throws an error without startUpdate/stopUpdate functions', function(assert) {
-  const error = new Error('activeElement mixin requires startUpdate, stopUpdate, and update functions');
+  const error = new Error('activeElement mixin requires startUpdate and stopUpdate functions');
 
   assert.throws(() => activeElement(this.comp, {}), error, 'throws an error');
   assert.throws(() => activeElement(this.comp, {startUpdate: noop}), error, 'throws an error');
   assert.throws(() => activeElement(this.comp, {stopUpdate: noop}), error, 'throws an error');
-  assert.throws(() => activeElement(this.comp, {update: noop}), error, 'throws an error');
-  assert.throws(() => activeElement(this.comp, {startUpdate: noop, update: noop}), error, 'throws an error');
-  assert.throws(() => activeElement(this.comp, {stopUpdate: noop, update: noop}), error, 'throws an error');
 });
 
 QUnit.test('shouldUpdate is correct by default', function(assert) {
 
   assert.strictEqual(this.comp.shouldUpdate(), false, 'false by default');
 
-  const setters = {
-    userActive: () => true,
-    mouseFocus: () => true,
-    keyFocus: () => true,
-    activeElement: () => this.comp.el_
-  };
+  const activeTests = [
+    {key: 'userActive', getter: () => true},
+    {key: 'mouseFocus', getter: () => true},
+    {key: 'keyFocus', getter: () => true},
+    {key: 'activeElement', getter: () => this.comp.el_},
+    {key: 'activeElement', getter: () => this.child, name: 'child activeElement'}
+  ];
 
   const runTest = (state, trueOrFalse) => {
     let runActiveTests = false;
@@ -106,12 +107,16 @@ QUnit.test('shouldUpdate is correct by default', function(assert) {
     delete state.active;
     Object.assign(this, state);
     if (runActiveTests) {
-      Object.keys(setters).forEach((k) => {
-        const oldValue = this[k];
+      activeTests.forEach(({key, getter, name = key}) => {
+        const oldValue = this[key];
 
-        this[k] = setters[k]();
-        assert.strictEqual(this.comp.shouldUpdate(), trueOrFalse, `${trueOrFalse} when ${k} is set and ${JSON.stringify(state)}`);
-        this[k] = oldValue;
+        this[key] = getter();
+        assert.strictEqual(
+          this.comp.shouldUpdate(),
+          trueOrFalse,
+          `${trueOrFalse} when ${name} is set and ${JSON.stringify(state)}`
+        );
+        this[key] = oldValue;
       });
     } else {
       assert.strictEqual(this.comp.shouldUpdate(), trueOrFalse, `${trueOrFalse} when ${JSON.stringify(state)}`);
@@ -161,7 +166,7 @@ QUnit.test('shouldUpdate is correct by default', function(assert) {
 
 QUnit.test('startUpdate and stopUpdate run correctly run for events', function(assert) {
 
-  ['mouseenter', 'mouseleave', 'focus', 'blur'].forEach((event) => {
+  ['mouseenter', 'mouseleave', 'focusin', 'focusout'].forEach((event) => {
     this.comp.trigger(event);
   });
   ['useractive', 'userinactive'].forEach((event) => {
@@ -197,13 +202,14 @@ QUnit.test('startUpdate and stopUpdate run correctly run for events', function(a
 
   this.paused = true;
   this.player.trigger('pause');
+  assert.equal(this.startUpdates, 2, 'pause runs startUpdate');
   assert.equal(this.stopUpdates, 1, 'pause runs stopUpdate');
 
   // reset paused
   this.paused = false;
 
   this.doc.trigger('visibilitychange');
-  assert.equal(this.startUpdates, 2, 'visibilitychange without hidden runs startUpdate');
+  assert.equal(this.startUpdates, 3, 'visibilitychange without hidden runs startUpdate');
 
   this.hidden = true;
   this.doc.trigger('visibilitychange');
@@ -214,27 +220,27 @@ QUnit.test('startUpdate and stopUpdate run correctly run for events', function(a
 
   this.userActive = true;
   this.player.trigger('useractive');
-  assert.equal(this.startUpdates, 3, 'useractive runs startUpdate');
+  assert.equal(this.startUpdates, 4, 'useractive runs startUpdate');
 
   this.userActive = false;
   this.player.trigger('userinactive');
   assert.equal(this.stopUpdates, 3, 'userinactive runs stopUpdate');
 
   this.comp.trigger('mouseenter');
-  assert.equal(this.startUpdates, 4, 'mouseenter runs startUpdate');
+  assert.equal(this.startUpdates, 5, 'mouseenter runs startUpdate');
 
   this.comp.trigger('mouseleave');
   assert.equal(this.stopUpdates, 4, 'mouseleave runs stopUpdate');
 
-  this.comp.trigger('focus');
-  assert.equal(this.startUpdates, 5, 'focus runs startUpdate');
+  this.comp.trigger('focusin');
+  assert.equal(this.startUpdates, 6, 'focusin runs startUpdate');
 
-  this.comp.trigger('blur');
-  assert.equal(this.stopUpdates, 5, 'blur runs stopUpdate');
+  this.comp.trigger('focusout');
+  assert.equal(this.stopUpdates, 5, 'focusout runs stopUpdate');
 
   this.userActive = true;
   this.paused = false;
   this.live = true;
   this.liveTracker.trigger('liveedgechange');
-  assert.equal(this.startUpdates, 6, 'liveedgechange runs startUpdate');
+  assert.equal(this.startUpdates, 7, 'liveedgechange runs startUpdate');
 });

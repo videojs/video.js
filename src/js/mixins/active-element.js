@@ -29,8 +29,8 @@ const defaults = {
 const activeElement = function(target, options = {}) {
   const settings = Object.assign({}, defaults, options);
 
-  if (!options.update || !options.startUpdate || !options.stopUpdate) {
-    throw new Error('activeElement mixin requires startUpdate, stopUpdate, and update functions');
+  if (!options.startUpdate || !options.stopUpdate) {
+    throw new Error('activeElement mixin requires startUpdate and stopUpdate functions');
   }
 
   const player = target.player_;
@@ -82,7 +82,7 @@ const activeElement = function(target, options = {}) {
       });
     }
     target.on(player, ['useractive', 'userinactive'], target.startOrStopUpdate);
-    target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], target.startOrStopUpdate);
+    target.on(['mouseenter', 'mouseleave', 'focusin', 'focusout'], target.startOrStopUpdate);
     if (player.liveTracker) {
       target.on(player.liveTracker, 'liveedgechange', target.startOrStopUpdate);
     }
