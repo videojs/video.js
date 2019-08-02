@@ -38,7 +38,6 @@ class LoadProgressBar extends Component {
     this.partEls_ = [];
     this.update = bind(this, this.update);
     activeElement(this, {
-      update: this.update,
       startUpdate: () => {
         this.on(player, 'progress', this.update);
         this.update();

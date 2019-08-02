@@ -29,7 +29,6 @@ class TimeDisplay extends Component {
     this.throttledUpdateContent = throttle(bind(this, this.updateContent), UPDATE_REFRESH_INTERVAL);
 
     activeElement(this, Object.assign({
-      update: this.throttledUpdateContent,
       startUpdate: () => {
         this.on(player, 'timeupdate', this.throttledUpdateContent);
         // update as soon as we are visible again

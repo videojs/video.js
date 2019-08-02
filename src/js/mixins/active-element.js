@@ -47,7 +47,7 @@ const activeElement = function(target, options = {}) {
     return Boolean((!player.paused() || isLive) && isActive && !settings.doc.hidden);
   });
 
-  target.startOrStopUpdate = bind(target, function() {
+  target.startOrStopUpdate = bind(target, function(e) {
     const _shouldUpdate = target.shouldUpdate();
 
     if (!target.activeElementStarted_ && _shouldUpdate) {
@@ -59,9 +59,11 @@ const activeElement = function(target, options = {}) {
     }
   });
 
-  // we must call update on ended or pause, as the controls come back up
+  // startUpdate right away on pause, then toggle it off if neccessary in
+  // startOrStopUpdate. This prevents cases were pause happens, the controls come up
+  // and the ui is out of date and not going to update.
+  target.on(player, ['pause'], settings.startUpdate);
   target.on(player, ['playing', 'pause'], target.startOrStopUpdate);
-  target.on(player, ['pause'], settings.update);
 
   target.on(['mouseenter', 'mouseleave', 'focusin', 'focusout'], function(e) {
     if (e.type.indexOf('mouse') !== -1) {
