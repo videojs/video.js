@@ -2,7 +2,8 @@ import document from 'global/document';
 import {bind} from '../utils/fn.js';
 
 const defaults = {
-  extraComponents: []
+  extraComponents: [],
+  doc: document
 };
 
 /**
@@ -23,12 +24,14 @@ const defaults = {
  *        The function to run when updates should be stopped
  * @param {Array} options.extraComponents
  *        Extra components to watch for keyboard focus.
+ * @param {Object} options.doc
+ *        pass in the document browser object, mostly for tests
  */
 const activeElement = function(target, options = {}) {
   const settings = Object.assign({}, defaults, options);
 
   if (!options.startUpdate || !options.stopUpdate) {
-    throw new Error('activeElement mixin requires update, startUpdate, and stopUpdate functions');
+    throw new Error('activeElement mixin requires startUpdate and stopUpdate functions');
   }
 
   const els = [target.el_].concat(settings.extraComponents.map((c) => c.el_));
@@ -36,37 +39,29 @@ const activeElement = function(target, options = {}) {
 
   target.mouseFocus_ = false;
   target.keyFocus_ = false;
+  target.activeElementStarted_ = false;
 
-  let started = false;
-
-  const shouldUpdate = bind(target, function() {
+  target.shouldUpdate = bind(target, function() {
     const isActive = target.keyFocus_ || target.mouseFocus_ || player.userActive() ||
-      els.some((el) => document.activeElement === el);
-    const isLive = settings.liveUpdates && player.liveTracker && player.liveTracker.isLive;
+      els.some((el) => settings.doc.activeElement === el);
+    const isLive = player.liveTracker && player.liveTracker.isLive();
 
-    return (!player.paused() || isLive) && isActive && !document.hidden;
+    return Boolean((!player.paused() || isLive) && isActive && !settings.doc.hidden);
   });
 
-  const startOrStopUpdate = bind(target, function() {
-    const _shouldUpdate = shouldUpdate();
+  target.startOrStopUpdate = bind(target, function() {
+    const _shouldUpdate = target.shouldUpdate();
 
-    if (!started && _shouldUpdate) {
+    if (!target.activeElementStarted_ && _shouldUpdate) {
       settings.startUpdate();
-      started = true;
-    } else if (started && !_shouldUpdate) {
+      target.activeElementStarted_ = true;
+    } else if (target.activeElementStarted_ && !_shouldUpdate) {
       settings.stopUpdate();
-      started = false;
+      target.activeElementStarted_ = false;
     }
   });
 
-  if ('hidden' in document && 'visibilityState' in document) {
-    target.on(document, 'visibilitychange', startOrStopUpdate);
-    target.on('dispose', function() {
-      target.off(document, 'visibilitychange', startOrStopUpdate);
-    });
-  }
-
-  target.on(player, ['playing', 'pause'], startOrStopUpdate);
+  target.on(player, ['playing', 'pause'], target.startOrStopUpdate);
 
   target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], function(e) {
     if ((/^mouse/).test(e.type)) {
@@ -78,10 +73,16 @@ const activeElement = function(target, options = {}) {
 
   // do not start updaing the ui until playback starts
   target.one(player, 'playing', function() {
-    target.on(player, ['useractive', 'userinactive'], startOrStopUpdate);
-    target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], startOrStopUpdate);
+    if ('hidden' in settings.doc && 'visibilityState' in settings.doc) {
+      target.on(settings.doc, 'visibilitychange', target.startOrStopUpdate);
+      target.on('dispose', function() {
+        target.off(settings.doc, 'visibilitychange', target.startOrStopUpdate);
+      });
+    }
+    target.on(player, ['useractive', 'userinactive'], target.startOrStopUpdate);
+    target.on(['mouseenter', 'mouseleave', 'focus', 'blur'], target.startOrStopUpdate);
     if (player.liveTracker) {
-      target.on(player.liveTracker, 'liveedgechange', startOrStopUpdate);
+      target.on(player.liveTracker, 'liveedgechange', target.startOrStopUpdate);
     }
   });
 };
