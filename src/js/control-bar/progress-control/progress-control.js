@@ -35,6 +35,7 @@ class ProgressControl extends Component {
       extraComponents: [this.getChild('seekBar')],
       startUpdate: () => {
         this.updateInterval_ = this.setInterval(this.throttledUpdate, UPDATE_REFRESH_INTERVAL);
+        this.throttledUpdate();
       },
       stopUpdate: () => {
         this.clearInterval(this.updateInterval_);
