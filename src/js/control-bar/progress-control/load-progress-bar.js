@@ -39,11 +39,11 @@ class LoadProgressBar extends Component {
    */
   createEl() {
     const el = super.createEl('div', {className: 'vjs-load-progress'});
-    const wrapper = super.createEl('span', {className: 'vjs-control-text'});
-    const loadedText = super.createEl('span', {textContent: this.localize('Loaded')});
+    const wrapper = Dom.createEl('span', {className: 'vjs-control-text'});
+    const loadedText = Dom.createEl('span', {textContent: this.localize('Loaded')});
     const separator = document.createTextNode(': ');
 
-    this.percentageEl_ = super.createEl('span', {
+    this.percentageEl_ = Dom.createEl('span', {
       className: 'vjs-control-text-loaded-percentage',
       textContent: '0%'
     });
@@ -100,12 +100,12 @@ class LoadProgressBar extends Component {
         }
 
         //  only update if changed
-        if (part.start_ === start && part.end_ === end) {
+        if (part.dataset.start === start && part.dataset.end === end) {
           continue;
         }
 
-        part.start_ = start;
-        part.end_ = end;
+        part.dataset.start = start;
+        part.dataset.end = end;
 
         // set the percent based on the width of the progress bar (bufferedEnd)
         part.style.left = percentify(start, bufferedEnd);
