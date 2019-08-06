@@ -13,7 +13,9 @@
  *         the clamped number
  */
 const clamp = function(number, min, max) {
-  return Math.min(max, Math.max(min, Number(number)));
+  number = Number(number);
+
+  return Math.min(max, Math.max(min, isNaN(number) ? min : number));
 };
 
 export default clamp;
