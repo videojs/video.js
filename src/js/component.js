@@ -101,6 +101,7 @@ class Component {
     this.setTimeoutIds_ = new Set();
     this.setIntervalIds_ = new Set();
     this.rafIds_ = new Set();
+    this.clearingTimersOnDispose_ = false;
 
     // Add any child components in options
     if (options.initChildren !== false) {
@@ -1297,10 +1298,7 @@ class Component {
 
     fn = Fn.bind(this, fn);
 
-    if (!this.clearTimers_) {
-      this.clearTimers_ = true;
-      this.on('dispose', this.clearTimers);
-    }
+    this.clearTimersOnDispose_();
 
     timeoutId = window.setTimeout(() => {
       if (this.setTimeoutIds_.has(timeoutId)) {
@@ -1361,10 +1359,7 @@ class Component {
   setInterval(fn, interval) {
     fn = Fn.bind(this, fn);
 
-    if (!this.clearTimers_) {
-      this.clearTimers_ = true;
-      this.on('dispose', this.clearTimers);
-    }
+    this.clearTimersOnDispose_();
 
     const intervalId = window.setInterval(fn, interval);
 
@@ -1428,10 +1423,7 @@ class Component {
       return this.setTimeout(fn, 1000 / 60);
     }
 
-    if (!this.clearTimers_) {
-      this.clearTimers_ = true;
-      this.on('dispose', this.clearTimers);
-    }
+    this.clearTimersOnDispose_();
 
     // declare as variables so they are properly available in rAF function
     // eslint-disable-next-line
@@ -1480,13 +1472,32 @@ class Component {
 
   }
 
-  clearTimers() {
-    [
-      ['rafIds_', 'cancelAnimationFrame'],
-      ['setTimeoutIds_', 'clearTimeout'],
-      ['setIntervalIds_', 'clearInterval']
-    ].forEach(([idName, cancelName]) => {
-      this[idName].forEach(this[cancelName], this);
+  /**
+   * A function to setup `requestAnimationFrame`, `setTimeout`,
+   * and `setInterval`, clearing on dispose.
+   *
+   * > Previously each timer added and removed dispose listeners on it's own.
+   * For better performance it was decided to batch them all, and use `Set`s
+   * to track outstanding timer ids.
+   *
+   * @private
+   */
+  clearTimersOnDispose_() {
+    if (this.clearingTimersOnDispose_) {
+      return;
+    }
+
+    this.clearingTimersOnDispose_ = true;
+    this.one('dispose', () => {
+      [
+        ['rafIds_', 'cancelAnimationFrame'],
+        ['setTimeoutIds_', 'clearTimeout'],
+        ['setIntervalIds_', 'clearInterval']
+      ].forEach(([idName, cancelName]) => {
+        this[idName].forEach(this[cancelName], this);
+      });
+
+      this.clearingTimersOnDispose_ = false;
     });
   }
 
