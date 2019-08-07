@@ -98,6 +98,11 @@ class Component {
     this.childIndex_ = {};
     this.childNameIndex_ = {};
 
+    this.setTimeoutIds_ = new Set();
+    this.setIntervalIds_ = new Set();
+    this.rafIds_ = new Set();
+    this.clearingTimersOnDispose_ = false;
+
     // Add any child components in options
     if (options.initChildren !== false) {
       this.initChildren();
@@ -1293,16 +1298,16 @@ class Component {
 
     fn = Fn.bind(this, fn);
 
+    this.clearTimersOnDispose_();
+
     timeoutId = window.setTimeout(() => {
-      this.off('dispose', disposeFn);
+      if (this.setTimeoutIds_.has(timeoutId)) {
+        this.setTimeoutIds_.delete(timeoutId);
+      }
       fn();
     }, timeout);
 
-    disposeFn = () => this.clearTimeout(timeoutId);
-
-    disposeFn.guid = `vjs-timeout-${timeoutId}`;
-
-    this.on('dispose', disposeFn);
+    this.setTimeoutIds_.add(timeoutId);
 
     return timeoutId;
   }
@@ -1323,13 +1328,10 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearTimeout}
    */
   clearTimeout(timeoutId) {
-    window.clearTimeout(timeoutId);
-
-    const disposeFn = function() {};
-
-    disposeFn.guid = `vjs-timeout-${timeoutId}`;
-
-    this.off('dispose', disposeFn);
+    if (this.setTimeoutIds_.has(timeoutId)) {
+      this.setTimeoutIds_.delete(timeoutId);
+      window.clearTimeout(timeoutId);
+    }
 
     return timeoutId;
   }
@@ -1357,13 +1359,11 @@ class Component {
   setInterval(fn, interval) {
     fn = Fn.bind(this, fn);
 
+    this.clearTimersOnDispose_();
+
     const intervalId = window.setInterval(fn, interval);
 
-    const disposeFn = () => this.clearInterval(intervalId);
-
-    disposeFn.guid = `vjs-interval-${intervalId}`;
-
-    this.on('dispose', disposeFn);
+    this.setIntervalIds_.add(intervalId);
 
     return intervalId;
   }
@@ -1384,13 +1384,10 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearInterval}
    */
   clearInterval(intervalId) {
-    window.clearInterval(intervalId);
-
-    const disposeFn = function() {};
-
-    disposeFn.guid = `vjs-interval-${intervalId}`;
-
-    this.off('dispose', disposeFn);
+    if (this.setIntervalIds_.has(intervalId)) {
+      this.setIntervalIds_.delete(intervalId);
+      window.clearInterval(intervalId);
+    }
 
     return intervalId;
   }
@@ -1421,28 +1418,27 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
-    // declare as variables so they are properly available in rAF function
-    // eslint-disable-next-line
-    var id, disposeFn;
-
-    if (this.supportsRaf_) {
-      fn = Fn.bind(this, fn);
-
-      id = window.requestAnimationFrame(() => {
-        this.off('dispose', disposeFn);
-        fn();
-      });
-
-      disposeFn = () => this.cancelAnimationFrame(id);
-
-      disposeFn.guid = `vjs-raf-${id}`;
-      this.on('dispose', disposeFn);
-
-      return id;
+    // Fall back to using a timer.
+    if (!this.supportsRaf_) {
+      return this.setTimeout(fn, 1000 / 60);
     }
 
-    // Fall back to using a timer.
-    return this.setTimeout(fn, 1000 / 60);
+    this.clearTimersOnDispose_();
+
+    // declare as variables so they are properly available in rAF function
+    // eslint-disable-next-line
+    var id;
+    fn = Fn.bind(this, fn);
+
+    id = window.requestAnimationFrame(() => {
+      if (this.rafIds_.has(id)) {
+        this.rafIds_.delete(id);
+      }
+      fn();
+    });
+    this.rafIds_.add(id);
+
+    return id;
   }
 
   /**
@@ -1462,20 +1458,47 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
    */
   cancelAnimationFrame(id) {
-    if (this.supportsRaf_) {
-      window.cancelAnimationFrame(id);
-
-      const disposeFn = function() {};
-
-      disposeFn.guid = `vjs-raf-${id}`;
-
-      this.off('dispose', disposeFn);
-
-      return id;
+    // Fall back to using a timer.
+    if (!this.supportsRaf_) {
+      return this.clearTimeout(id);
     }
 
-    // Fall back to using a timer.
-    return this.clearTimeout(id);
+    if (this.rafIds_.has(id)) {
+      this.rafIds_.delete(id);
+      window.cancelAnimationFrame(id);
+    }
+
+    return id;
+
+  }
+
+  /**
+   * A function to setup `requestAnimationFrame`, `setTimeout`,
+   * and `setInterval`, clearing on dispose.
+   *
+   * > Previously each timer added and removed dispose listeners on it's own.
+   * For better performance it was decided to batch them all, and use `Set`s
+   * to track outstanding timer ids.
+   *
+   * @private
+   */
+  clearTimersOnDispose_() {
+    if (this.clearingTimersOnDispose_) {
+      return;
+    }
+
+    this.clearingTimersOnDispose_ = true;
+    this.one('dispose', () => {
+      [
+        ['rafIds_', 'cancelAnimationFrame'],
+        ['setTimeoutIds_', 'clearTimeout'],
+        ['setIntervalIds_', 'clearInterval']
+      ].forEach(([idName, cancelName]) => {
+        this[idName].forEach(this[cancelName], this);
+      });
+
+      this.clearingTimersOnDispose_ = false;
+    });
   }
 
   /**
