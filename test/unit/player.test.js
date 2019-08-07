@@ -337,6 +337,7 @@ QUnit.test('should asynchronously fire error events during source selection', fu
 });
 
 QUnit.test('should suppress source error messages', function(assert) {
+  sinon.stub(log, 'error');
   const clock = sinon.useFakeTimers();
 
   const player = TestHelpers.makePlayer({
@@ -363,9 +364,13 @@ QUnit.test('should suppress source error messages', function(assert) {
   assert.strictEqual(errors, 1, 'error after click');
 
   player.dispose();
+
+  assert.strictEqual(log.error.callCount, 2, 'two stubbed errors');
+  log.error.restore();
 });
 
 QUnit.test('should cancel a suppressed error message on loadstart', function(assert) {
+  sinon.stub(log, 'error');
   const clock = sinon.useFakeTimers();
 
   const player = TestHelpers.makePlayer({
@@ -399,8 +404,10 @@ QUnit.test('should cancel a suppressed error message on loadstart', function(ass
   clock.tick(10);
 
   assert.strictEqual(errors, 0, 'no error after click after loadstart');
+  assert.strictEqual(log.error.callCount, 3, 'one stubbed errors');
 
   player.dispose();
+  log.error.restore();
 });
 
 QUnit.test('should set the width, height, and aspect ratio via a css class', function(assert) {
@@ -1558,6 +1565,7 @@ QUnit.test('player#reset removes the poster', function(assert) {
 });
 
 QUnit.test('player#reset removes remote text tracks', function(assert) {
+  sinon.stub(log, 'warn');
   const player = TestHelpers.makePlayer();
 
   this.clock.tick(1);
@@ -1572,6 +1580,8 @@ QUnit.test('player#reset removes remote text tracks', function(assert) {
   assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
   player.reset();
   assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
+  assert.strictEqual(log.warn.callCount, 1, 'one warning about for manualCleanup');
+  log.warn.restore();
 });
 
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
