@@ -1,3 +1,25 @@
+<a name="7.6.2"></a>
+## [7.6.2](https://github.com/videojs/video.js/compare/v7.6.1...v7.6.2) (2019-08-07)
+
+### Bug Fixes
+
+* **lang:** Add missing strings for Chinese (Simplified) and Chinese (Traditional) ([#6149](https://github.com/videojs/video.js/issues/6149)) ([bd51e9e](https://github.com/videojs/video.js/commit/bd51e9e))
+* **lang:** update Spanish translations ([#6065](https://github.com/videojs/video.js/issues/6065)) ([1d2b206](https://github.com/videojs/video.js/commit/1d2b206))
+
+### Chores
+
+* fix lang watch loop caused by zh-* copy ([#6147](https://github.com/videojs/video.js/issues/6147)) ([4b325ea](https://github.com/videojs/video.js/commit/4b325ea))
+
+### Performance Improvements
+
+* Do not add/remove listeners for each timer ([#6144](https://github.com/videojs/video.js/issues/6144)) ([5ee2477](https://github.com/videojs/video.js/commit/5ee2477))
+* Improve performance of toTitleCase, register with lower and TitleCase ([#6148](https://github.com/videojs/video.js/issues/6148)) ([266cb15](https://github.com/videojs/video.js/commit/266cb15))
+* Use WeakMap for dom data ([#6103](https://github.com/videojs/video.js/issues/6103)) ([8610f99](https://github.com/videojs/video.js/commit/8610f99))
+
+### Tests
+
+* silence test logs ([#6165](https://github.com/videojs/video.js/issues/6165)) ([9d2e5f3](https://github.com/videojs/video.js/commit/9d2e5f3))
+
 <a name="7.6.1"></a>
 ## [7.6.1](https://github.com/videojs/video.js/compare/v7.6.0...v7.6.1) (2019-07-30)
 
