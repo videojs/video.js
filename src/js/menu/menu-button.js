@@ -5,7 +5,7 @@ import Button from '../button.js';
 import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
-import toTitleCase from '../utils/to-title-case.js';
+import {toTitleCase} from '../utils/string-cases.js';
 import { IS_IOS } from '../utils/browser.js';
 import keycode from 'keycode';
 

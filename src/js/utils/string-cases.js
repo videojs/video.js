@@ -1,7 +1,24 @@
 /**
- * @file to-title-case.js
- * @module to-title-case
+ * @file string-cases.js
+ * @module to-lower-case
  */
+
+/**
+ * Lowercase the first letter of a string.
+ *
+ * @param {string} string
+ *        String to be lowercased
+ *
+ * @return {string}
+ *         The string with a lowercased first letter
+ */
+export const toLowerCase = function(string) {
+  if (typeof string !== 'string') {
+    return string;
+  }
+
+  return string.replace(/./, (w) => w.toLowerCase());
+};
 
 /**
  * Uppercase the first letter of a string.
@@ -12,15 +29,13 @@
  * @return {string}
  *         The string with an uppercased first letter
  */
-function toTitleCase(string) {
+export const toTitleCase = function(string) {
   if (typeof string !== 'string') {
     return string;
   }
 
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-export default toTitleCase;
+  return string.replace(/./, (w) => w.toUpperCase());
+};
 
 /**
  * Compares the TitleCase versions of the two strings for equality.
@@ -34,6 +49,6 @@ export default toTitleCase;
  * @return {boolean}
  *         Whether the TitleCase versions of the strings are equal
  */
-export function titleCaseEquals(str1, str2) {
+export const titleCaseEquals = function(str1, str2) {
   return toTitleCase(str1) === toTitleCase(str2);
-}
+};

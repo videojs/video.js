@@ -3,7 +3,7 @@
  */
 import Component from '../component.js';
 import Tech from './tech.js';
-import toTitleCase from '../utils/to-title-case.js';
+import {toTitleCase} from '../utils/string-cases.js';
 import mergeOptions from '../utils/merge-options.js';
 
 /**
