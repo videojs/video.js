@@ -1051,12 +1051,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 | vi.json (missing 3)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
-| zh-CN.json (missing 4)  | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | {1} is loading.                                                                     |
-| zh-TW.json (missing 4)  | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | {1} is loading.                                                                     |
+| zh-CN.json (Complete)   |                                                                                     |
+| zh-Hans.json (Complete) |                                                                                     |
+| zh-Hant.json (Complete) |                                                                                     |
+| zh-TW.json (Complete)   |                                                                                     |
 <!-- END langtable -->
