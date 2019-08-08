@@ -7,7 +7,7 @@ import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
-import toTitleCase from '../utils/to-title-case.js';
+import {toTitleCase} from '../utils/string-cases.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
 import keycode from 'keycode';

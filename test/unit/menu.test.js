@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import * as DomData from '../../src/js/utils/dom-data';
+import DomData from '../../src/js/utils/dom-data';
 import MenuButton from '../../src/js/menu/menu-button.js';
 import Menu from '../../src/js/menu/menu.js';
 import CaptionSettingsMenuItem from '../../src/js/control-bar/text-track-controls/caption-settings-menu-item';
@@ -137,7 +137,7 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
    * A reusable collection of assertions.
    */
   function validateMenuEventListeners(watchedMenu) {
-    const eventData = DomData.getData(menuItem.eventBusEl_);
+    const eventData = DomData.get(menuItem.eventBusEl_);
     // `MenuButton`.`unpressButton` will be called when triggering click event on the menu item.
     const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
     // `MenuButton`.`focus` will be called when triggering click event on the menu item.

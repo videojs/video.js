@@ -4,7 +4,7 @@
 import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import {bind, throttle} from '../../utils/fn.js';
+import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -25,7 +25,7 @@ class TimeDisplay extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.throttledUpdateContent = throttle(bind(this, this.updateContent), 25);
+    this.throttledUpdateContent = throttle(bind(this, this.updateContent), UPDATE_REFRESH_INTERVAL);
     this.on(player, 'timeupdate', this.throttledUpdateContent);
   }
 

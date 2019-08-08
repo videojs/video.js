@@ -17,7 +17,7 @@ import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
 import {IE_VERSION, IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
-import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
+import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
@@ -1528,20 +1528,20 @@ class Player extends Component {
       // if the `sourceset` `src` was an empty string
       // wait for a `loadstart` to update the cache to `currentSrc`.
       // If a sourceset happens before a `loadstart`, we reset the state
-      // as this function will be called again.
       if (!event.src) {
-        const updateCache = (e) => {
-          if (e.type !== 'sourceset') {
-            const techSrc = this.techGet('currentSrc');
-
-            this.lastSource_.tech = techSrc;
-            this.updateSourceCaches_(techSrc);
+        this.tech_.any(['sourceset', 'loadstart'], (e) => {
+          // if a sourceset happens before a `loadstart` there
+          // is nothing to do as this `handleTechSourceset_`
+          // will be called again and this will be handled there.
+          if (e.type === 'sourceset') {
+            return;
           }
 
-          this.tech_.off(['sourceset', 'loadstart'], updateCache);
-        };
+          const techSrc = this.techGet('currentSrc');
 
-        this.tech_.one(['sourceset', 'loadstart'], updateCache);
+          this.lastSource_.tech = techSrc;
+          this.updateSourceCaches_(techSrc);
+        });
       }
     }
     this.lastSource_ = {player: this.currentSource().src, tech: event.src};
@@ -2067,18 +2067,9 @@ class Player extends Component {
    *
    * @private
    * @listens Tech#enterpictureinpicture
-   * @fires Player#pictureinpicturechange
    */
   handleTechEnterPictureInPicture_(event) {
     this.isInPictureInPicture(true);
-
-    /**
-     * Fired when going in and out of Picture-in-Picture.
-     *
-     * @event Player#pictureinpicturechange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('pictureinpicturechange');
   }
 
   /**
@@ -2089,18 +2080,9 @@ class Player extends Component {
    *
    * @private
    * @listens Tech#leavepictureinpicture
-   * @fires Player#pictureinpicturechange
    */
   handleTechLeavePictureInPicture_(event) {
     this.isInPictureInPicture(false);
-
-    /**
-     * Fired when going in and out of Picture-in-Picture.
-     *
-     * @event Player#pictureinpicturechange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('pictureinpicturechange');
   }
 
   /**
@@ -2896,13 +2878,19 @@ class Player extends Component {
    *
    * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
    *
-   * @fires Player#pictureinpicturechange
+   * @fires Player#enterpictureinpicture
    *
    * @return {Promise}
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
     if ('pictureInPictureEnabled' in document) {
+      /**
+       * This event fires when the player enters picture in picture mode
+       *
+       * @event Player#enterpictureinpicture
+       * @type {EventTarget~Event}
+       */
       return this.techGet_('requestPictureInPicture');
     }
   }
@@ -2912,13 +2900,19 @@ class Player extends Component {
    *
    * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
    *
-   * @fires Player#pictureinpicturechange
+   * @fires Player#leavepictureinpicture
    *
    * @return {Promise}
    *         A promise.
    */
   exitPictureInPicture() {
     if ('pictureInPictureEnabled' in document) {
+      /**
+       * This event fires when the player leaves picture in picture mode
+       *
+       * @event Player#leavepictureinpicture
+       * @type {EventTarget~Event}
+       */
       return document.exitPictureInPicture();
     }
   }
@@ -3707,6 +3701,24 @@ class Player extends Component {
   error(err) {
     if (err === undefined) {
       return this.error_ || null;
+    }
+
+    // Suppress the first error message for no compatible source until
+    // user interaction
+    if (this.options_.suppressNotSupportedError &&
+        err && err.message &&
+        err.message === this.localize(this.options_.notSupportedMessage)
+    ) {
+      const triggerSuppressedError = function() {
+        this.error(err);
+      };
+
+      this.options_.suppressNotSupportedError = false;
+      this.any(['click', 'touchstart'], triggerSuppressedError);
+      this.one('loadstart', function() {
+        this.off(['click', 'touchstart'], triggerSuppressedError);
+      });
+      return;
     }
 
     // restoring to default

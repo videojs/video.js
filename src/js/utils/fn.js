@@ -5,6 +5,8 @@
 import { newGUID } from './guid.js';
 import window from 'global/window';
 
+export const UPDATE_REFRESH_INTERVAL = 30;
+
 /**
  * Bind (a.k.a proxy or context). A simple method for changing the context of
  * a function.
@@ -32,9 +34,7 @@ export const bind = function(context, fn, uid) {
   }
 
   // Create the new function that changes the context
-  const bound = function() {
-    return fn.apply(context, arguments);
-  };
+  const bound = fn.bind(context);
 
   // Allow for the ability to individualize this function
   // Needed in the case where multiple objects might share the same prototype

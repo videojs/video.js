@@ -11,7 +11,7 @@ import document from 'global/document';
 import window from 'global/window';
 import {assign} from '../utils/obj';
 import mergeOptions from '../utils/merge-options.js';
-import toTitleCase from '../utils/to-title-case.js';
+import {toTitleCase} from '../utils/string-cases.js';
 import {NORMAL as TRACK_TYPES} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
 
