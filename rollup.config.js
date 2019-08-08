@@ -49,8 +49,7 @@ const primedBabel = babel({
     }]
   ],
   plugins: [
-    '@babel/plugin-transform-object-assign'
-    '@babel/external-helpers',
+    '@babel/plugin-transform-object-assign',
     '@babel/plugin-transform-runtime'
   ]
 });
