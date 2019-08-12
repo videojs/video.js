@@ -5,7 +5,6 @@
 import document from 'global/document';
 import window from 'global/window';
 import log from './log.js';
-import tsml from 'tsml';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
 
@@ -151,9 +150,9 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
     // We originally were accepting both properties and attributes in the
     // same object, but that doesn't work so well.
     if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
-      log.warn(tsml`Setting attributes in the second argument of createEl()
-                has been deprecated. Use the third argument instead.
-                createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
+      log.warn('Setting attributes in the second argument of createEl()\n' +
+               'has been deprecated. Use the third argument instead.\n' +
+               `createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
       el.setAttribute(propName, val);
 
     // Handle textContent since it's not supported everywhere and we have a
