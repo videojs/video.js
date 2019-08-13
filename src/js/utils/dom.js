@@ -788,7 +788,8 @@ export function isSingleLeftClick(event) {
 
   // `mouseup` event on a single left click has
   // `button` and `buttons` equal to 0
-  if (event.button === 0 && event.buttons === 0) {
+  if (event.type === 'mouseup' && event.button === 0 &&
+      event.buttons === 0) {
     return true;
   }
 

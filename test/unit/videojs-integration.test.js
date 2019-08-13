@@ -2,7 +2,6 @@
 import videojs from '../../src/js/video.js';
 import window from 'global/window';
 import document from 'global/document';
-import * as DomData from '../../src/js/utils/dom-data';
 import * as Fn from '../../src/js/utils/fn';
 
 /**
@@ -70,54 +69,11 @@ QUnit.test('create a real player and dispose', function(assert) {
 
   player.muted(true);
 
-  const checkDomData = function() {
-    Object.keys(DomData.elData).forEach(function(elId) {
-      const data = DomData.elData[elId] || {};
-
-      Object.keys(data.handlers || {}).forEach(function(eventName) {
-        const listeners = data.handlers[eventName];
-        const uniqueList = [];
-
-        (listeners || []).forEach(function(listener) {
-          let add = true;
-
-          for (let i = 0; i < uniqueList.length; i++) {
-            const obj = uniqueList[i];
-
-            if (listener.og_ && listener.cx_ && obj.fn === listener.og_ && obj.cx === listener.cx_) {
-              add = false;
-              break;
-            }
-
-            if (listener.og_ && !listener.cx_ && obj.fn === listener.og_) {
-              add = false;
-              break;
-            }
-
-            if (!listener.og_ && !listener.cx_ && obj.fn === listener) {
-              add = false;
-              break;
-            }
-          }
-          const obj = {fn: listener.og_ || listener, cx: listener.cx_};
-
-          if (add) {
-            uniqueList.push(obj);
-            assert.ok(true, `${elId}/${eventName}/${obj.fn.name} is unique`);
-          } else {
-            assert.ok(false, `${elId}/${eventName}/${obj.fn.name} is not unique`);
-          }
-        });
-      });
-    });
-  };
-
   player.addTextTrack('captions', 'foo', 'en');
   player.ready(function() {
     assert.ok(player.tech_, 'tech exists');
     assert.equal(player.textTracks().length, 1, 'should have one text track');
 
-    checkDomData();
     player.dispose();
 
     Object.keys(old).forEach(function(k) {

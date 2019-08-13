@@ -79,5 +79,9 @@
   "Done": "完成",
   "Caption Settings Dialog": "字幕設定視窗",
   "Beginning of dialog window. Escape will cancel and close the window.": "開始對話視窗。離開會取消及關閉視窗",
-  "End of dialog window.": "結束對話視窗"
+  "End of dialog window.": "結束對話視窗",
+  "Seek to live, currently behind live": "試圖直播，目前延時播放",
+  "Seek to live, currently playing live": "試圖直播，目前即時播放",
+  "progress bar timing: currentTime={1} duration={2}": "{1}/{2}",
+  "{1} is loading.": "{1} 正在載入。"
 }

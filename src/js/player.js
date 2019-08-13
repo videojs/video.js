@@ -17,7 +17,7 @@ import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
 import {IE_VERSION, IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
-import toTitleCase, { titleCaseEquals } from './utils/to-title-case.js';
+import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
@@ -1528,20 +1528,20 @@ class Player extends Component {
       // if the `sourceset` `src` was an empty string
       // wait for a `loadstart` to update the cache to `currentSrc`.
       // If a sourceset happens before a `loadstart`, we reset the state
-      // as this function will be called again.
       if (!event.src) {
-        const updateCache = (e) => {
-          if (e.type !== 'sourceset') {
-            const techSrc = this.techGet('currentSrc');
-
-            this.lastSource_.tech = techSrc;
-            this.updateSourceCaches_(techSrc);
+        this.tech_.any(['sourceset', 'loadstart'], (e) => {
+          // if a sourceset happens before a `loadstart` there
+          // is nothing to do as this `handleTechSourceset_`
+          // will be called again and this will be handled there.
+          if (e.type === 'sourceset') {
+            return;
           }
 
-          this.tech_.off(['sourceset', 'loadstart'], updateCache);
-        };
+          const techSrc = this.techGet('currentSrc');
 
-        this.tech_.one(['sourceset', 'loadstart'], updateCache);
+          this.lastSource_.tech = techSrc;
+          this.updateSourceCaches_(techSrc);
+        });
       }
     }
     this.lastSource_ = {player: this.currentSource().src, tech: event.src};

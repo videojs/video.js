@@ -2,6 +2,7 @@
 import document from 'global/document';
 import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
+import TestHelpers from '../test-helpers.js';
 
 QUnit.module('dom');
 
@@ -600,4 +601,56 @@ QUnit.test('getBoundingClientRect() returns an object for elements that support 
   Object.keys(expected).forEach(k => {
     assert.strictEqual(actual[k], expected[k], `the "${k}" returned by the Dom util matches what was returned by the mock element`);
   });
+});
+
+QUnit.test('isSingleLeftClick() returns false for mousemove event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mousemove');
+
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a mousemove event is not a single left click');
+});
+
+QUnit.test('isSingleLeftClick() returns true for mouseup event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mouseup');
+
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a mouseup event is a single left click');
+});
+
+QUnit.test('isSingleLeftClick() checks return values for mousedown event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mousedown');
+
+  // Left mouse click
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on an older browser (Safari) is a single left click');
+
+  // Left mouse click
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 1;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on browsers that supporting buttons property is a single left click');
+
+  // Right mouse click
+  mouseEvent.button = 2;
+  mouseEvent.buttons = 2;
+
+  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a right mouse click is not a single left click');
+
+  // Touch event on some mobiles
+  mouseEvent.button = 0;
+  mouseEvent.buttons = undefined;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on mobiles is a single left click');
+
+  // Chrome simulates mobile devices
+  mouseEvent.button = undefined;
+  mouseEvent.buttons = undefined;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
 });

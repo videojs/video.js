@@ -1,9 +1,9 @@
 /* eslint-env qunit */
-import toTitleCase, { titleCaseEquals } from '../../../src/js/utils/to-title-case.js';
+import {toLowerCase, toTitleCase, titleCaseEquals} from '../../../src/js/utils/string-cases.js';
 
-QUnit.module('to-title-case');
+QUnit.module('string-cases');
 
-QUnit.test('should make a string start with an uppercase letter', function(assert) {
+QUnit.test('toTitleCase should make a string start with an uppercase letter', function(assert) {
   const foo = toTitleCase('bar');
 
   assert.ok(foo === 'Bar');
@@ -19,4 +19,10 @@ QUnit.test('titleCaseEquals compares whether the TitleCase of two strings is equ
   assert.notOk(titleCaseEquals('fooBAR', 'fooBar'), 'fooBAR does not equal fooBar');
   assert.notOk(titleCaseEquals('foobar', 'fooBar'), 'foobar does not equal fooBar');
   assert.notOk(titleCaseEquals('fooBar', 'FOOBAR'), 'fooBar does not equal fooBAR');
+});
+
+QUnit.test('toLowerCase should make a string start with a lowercase letter', function(assert) {
+  const foo = toLowerCase('BAR');
+
+  assert.ok(foo === 'bAR');
 });

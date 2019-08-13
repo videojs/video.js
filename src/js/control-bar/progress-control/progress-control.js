@@ -3,7 +3,7 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import {throttle, bind} from '../../utils/fn.js';
+import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 
 import './seek-bar.js';
 
@@ -26,8 +26,8 @@ class ProgressControl extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.handleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
-    this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
+    this.handleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
+    this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), UPDATE_REFRESH_INTERVAL);
 
     this.enable();
   }

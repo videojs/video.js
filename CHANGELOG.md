@@ -1,3 +1,52 @@
+<a name="7.6.2"></a>
+## [7.6.2](https://github.com/videojs/video.js/compare/v7.6.1...v7.6.2) (2019-08-07)
+
+### Bug Fixes
+
+* **lang:** Add missing strings for Chinese (Simplified) and Chinese (Traditional) ([#6149](https://github.com/videojs/video.js/issues/6149)) ([bd51e9e](https://github.com/videojs/video.js/commit/bd51e9e))
+* **lang:** update Spanish translations ([#6065](https://github.com/videojs/video.js/issues/6065)) ([1d2b206](https://github.com/videojs/video.js/commit/1d2b206))
+
+### Chores
+
+* fix lang watch loop caused by zh-* copy ([#6147](https://github.com/videojs/video.js/issues/6147)) ([4b325ea](https://github.com/videojs/video.js/commit/4b325ea))
+
+### Performance Improvements
+
+* Do not add/remove listeners for each timer ([#6144](https://github.com/videojs/video.js/issues/6144)) ([5ee2477](https://github.com/videojs/video.js/commit/5ee2477))
+* Improve performance of toTitleCase, register with lower and TitleCase ([#6148](https://github.com/videojs/video.js/issues/6148)) ([266cb15](https://github.com/videojs/video.js/commit/266cb15))
+* Use WeakMap for dom data ([#6103](https://github.com/videojs/video.js/issues/6103)) ([8610f99](https://github.com/videojs/video.js/commit/8610f99))
+
+### Tests
+
+* silence test logs ([#6165](https://github.com/videojs/video.js/issues/6165)) ([9d2e5f3](https://github.com/videojs/video.js/commit/9d2e5f3))
+
+<a name="7.6.1"></a>
+## [7.6.1](https://github.com/videojs/video.js/compare/v7.6.0...v7.6.1) (2019-07-30)
+
+### Bug Fixes
+
+* Improves isSingleLeftClick() to handle mousemove ([#6138](https://github.com/videojs/video.js/issues/6138)) ([f2aedb7](https://github.com/videojs/video.js/commit/f2aedb7)), closes [#6132](https://github.com/videojs/video.js/issues/6132)
+* **component:** use safe computedStyle in currentDimension ([#6073](https://github.com/videojs/video.js/issues/6073)) ([20cae21](https://github.com/videojs/video.js/commit/20cae21)), closes [#3664](https://github.com/videojs/video.js/issues/3664)
+* **pip:** hide PiP button in browsers not support the WICG spec ([#6131](https://github.com/videojs/video.js/issues/6131)) ([3afa7d1](https://github.com/videojs/video.js/commit/3afa7d1))
+
+### Chores
+
+* switch from deprecated `jsnext`, `main` options to mainFields ([#6075](https://github.com/videojs/video.js/issues/6075)) ([2e69448](https://github.com/videojs/video.js/commit/2e69448))
+* update videojs-generate-karma-config to ~5.2.1 and remove patches ([#6104](https://github.com/videojs/video.js/issues/6104)) ([b9fbd0b](https://github.com/videojs/video.js/commit/b9fbd0b))
+
+### Code Refactoring
+
+* use the new `any` event function ([#6080](https://github.com/videojs/video.js/issues/6080)) ([3c932c5](https://github.com/videojs/video.js/commit/3c932c5))
+
+### Performance Improvements
+
+* save ~10ms on `player.src` call ([#6141](https://github.com/videojs/video.js/issues/6141)) ([2e495dd](https://github.com/videojs/video.js/commit/2e495dd))
+* throttle more timers and use native bind ([#6142](https://github.com/videojs/video.js/issues/6142)) ([6a93c8a](https://github.com/videojs/video.js/commit/6a93c8a))
+
+### Reverts
+
+* "fix(play-toggle): call event.stopPropagation in the click handler ([#5803](https://github.com/videojs/video.js/issues/5803))" ([#6128](https://github.com/videojs/video.js/issues/6128)) ([15ff8f7](https://github.com/videojs/video.js/commit/15ff8f7)), closes [#5624](https://github.com/videojs/video.js/issues/5624) [#6092](https://github.com/videojs/video.js/issues/6092)
+
 <a name="7.6.0"></a>
 # [7.6.0](https://github.com/videojs/video.js/compare/v7.5.4...v7.6.0) (2019-06-20)
 

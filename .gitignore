@@ -34,3 +34,6 @@ es5/*
 .idea/
 
 core.js
+
+# Ignore Chinese clones for now.
+lang/zh-Han*.json
