@@ -37,7 +37,6 @@ const primedCjs = commonjs({
   sourceMap: false
 });
 const primedBabel = babel({
-  externalHelpers: true,
   runtimeHelpers: true,
   babelrc: false,
   exclude: 'node_modules/**(!http-streaming)',
@@ -50,7 +49,7 @@ const primedBabel = babel({
   ],
   plugins: [
     '@babel/plugin-transform-object-assign',
-    '@babel/plugin-transform-runtime'
+    ['@babel/plugin-transform-runtime', {regenerator: false}]
   ]
 });
 
