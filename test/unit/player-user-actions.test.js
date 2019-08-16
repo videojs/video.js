@@ -410,6 +410,27 @@ QUnit.test('when userActions.hotkeys.playPauseKey can be a function', function(a
   assert.strictEqual(this.player.play.callCount, 1, 'has played');
 });
 
+QUnit.test('hotkeys are ignored when focus is in a contenteditable element', function(assert) {
+  this.player.dispose();
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    userActions: {
+      hotkeys: true
+    }
+  });
+
+  const div = document.createElement('div');
+
+  div.contentEditable = 'true';
+  this.player.el_.appendChild(div);
+  div.focus();
+
+  assert.expect(14);
+  defaultKeyTests.fullscreen(this.player, assert, false);
+  defaultKeyTests.mute(this.player, assert, false);
+  defaultKeyTests.playPause(this.player, assert, false);
+});
+
 QUnit.test('hotkeys are ignored when focus is in a textarea', function(assert) {
   this.player.dispose();
   this.player = TestHelpers.makePlayer({
