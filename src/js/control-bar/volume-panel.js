@@ -172,8 +172,8 @@ class VolumePanel extends Component {
   }
 
   /**
-   * Handles `keydown|keyup` events on the document, looking for ESC, which closes
-   * the volume panel.
+   * Handles `keyup` event on the document or `keydown` event on the `VolumePanel`, looking for ESC, which hides
+   * the `VolumeControl`.
    *
    * @param {EventTarget~Event} event
    *        The keypress that triggered this event.
@@ -182,7 +182,7 @@ class VolumePanel extends Component {
    */
   handleKeyPress(event) {
     if (keycode.isEventKey(event, 'Esc')) {
-      this.removeClass('vjs-hover');
+      this.handleMouseOut();
     }
   }
 }
