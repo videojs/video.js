@@ -5,7 +5,6 @@ import Tech from './tech.js';
 import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import log from '../utils/log.js';
-import tsml from 'tsml';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
@@ -91,8 +90,8 @@ class Html5 extends Tech {
 
     this.proxyNativeTracks_();
     if (this.featuresNativeTextTracks && crossoriginTracks) {
-      log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
-            This may prevent text tracks from loading.`);
+      log.warn('Text Tracks are being loaded from another origin but the crossorigin attribute isn\'t used.\n' +
+            'This may prevent text tracks from loading.');
     }
 
     // prevent iOS Safari from disabling metadata text tracks during native playback
