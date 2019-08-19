@@ -172,8 +172,8 @@ class VolumePanel extends Component {
   }
 
   /**
-   * Handles `keyup` event on the document or `keydown` event on the `VolumePanel`, looking for ESC, which hides
-   * the `VolumeControl`.
+   * Handles `keyup` event on the document or `keydown` event on the `VolumePanel`,
+   * looking for ESC, which hides the `VolumeControl`.
    *
    * @param {EventTarget~Event} event
    *        The keypress that triggered this event.
