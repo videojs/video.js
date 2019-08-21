@@ -5,8 +5,11 @@ import Button from '../button.js';
 import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
+import * as Fn from '../utils/fn.js';
+import * as Events from '../utils/events.js';
 import {toTitleCase} from '../utils/string-cases.js';
 import { IS_IOS } from '../utils/browser.js';
+import document from 'global/document';
 import keycode from 'keycode';
 
 /**
@@ -49,9 +52,11 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'click', this.handleClick);
     this.on(this.menuButton_, 'keydown', this.handleKeyDown);
     this.on(this.menuButton_, 'mouseenter', () => {
+      this.addClass('vjs-hover');
       this.menu.show();
+      Events.on(document, 'keyup', Fn.bind(this, this.handleMenuKeyUp));
     });
-
+    this.on('mouseleave', this.handleMouseLeave);
     this.on('keydown', this.handleSubmenuKeyDown);
   }
 
@@ -211,6 +216,14 @@ class MenuButton extends Component {
   }
 
   /**
+   * Dispose of the `menu-button` and all child components.
+   */
+  dispose() {
+    this.handleMouseLeave();
+    super.dispose();
+  }
+
+  /**
    * Handle a click on a `MenuButton`.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
@@ -227,6 +240,19 @@ class MenuButton extends Component {
     } else {
       this.pressButton();
     }
+  }
+
+  /**
+   * Handle `mouseleave` for `MenuButton`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseleave` event that caused this function to be called.
+   *
+   * @listens mouseleave
+   */
+  handleMouseLeave(event) {
+    this.removeClass('vjs-hover');
+    Events.off(document, 'keyup', Fn.bind(this, this.handleMenuKeyUp));
   }
 
   /**
@@ -272,6 +298,22 @@ class MenuButton extends Component {
         event.preventDefault();
         this.pressButton();
       }
+    }
+  }
+
+  /**
+   * Handle a `keyup` event on a `MenuButton`. The listener for this is added in
+   * the constructor.
+   *
+   * @param {EventTarget~Event} event
+   *        Key press event
+   *
+   * @listens keyup
+   */
+  handleMenuKeyUp(event) {
+    // Escape hides popup menu
+    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
+      this.removeClass('vjs-hover');
     }
   }
 
