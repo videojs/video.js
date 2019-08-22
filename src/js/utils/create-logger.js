@@ -33,6 +33,11 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
   // Add a clone of the args at this point to history.
   if (history) {
     history.push([].concat(args));
+
+    // remove old history
+    while (history.length > 1000) {
+      history.shift();
+    }
   }
 
   // If there's no console then don't try to output messages, but they will

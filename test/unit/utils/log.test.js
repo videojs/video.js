@@ -228,3 +228,18 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   assert.notOk(window.console.warn.called, 'warn was not called');
   assert.notOk(window.console.error.called, 'error was not called');
 });
+
+QUnit.test('history only retains 1000 items', function(assert) {
+  // Need to reset history here because there are extra messages logged
+  // when running via Karma.
+  log.history.clear();
+
+  for (let i = 1; i <= 1005; i++) {
+    log(i);
+  }
+
+  const hist = log.history();
+
+  assert.equal(hist.length, 1000, 'only 1000 items in history');
+  assert.deepEqual([hist[0], hist[hist.length - 1 ]], [['VIDEOJS:', 6], ['VIDEOJS:', 1005]], 'keeps most recent items');
+});
