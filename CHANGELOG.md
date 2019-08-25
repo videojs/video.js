@@ -1,3 +1,12 @@
+<a name="7.6.3"></a>
+## [7.6.3](https://github.com/videojs/video.js/compare/v7.6.2...v7.6.3) (2019-08-22)
+
+### Bug Fixes
+
+* do not handle hotkeys in contenteditable elements ([#6182](https://github.com/videojs/video.js/issues/6182)) ([51b9861](https://github.com/videojs/video.js/commit/51b9861))
+* make 'Esc' works for a vertical volume bar and menus ([#6046](https://github.com/videojs/video.js/issues/6046)) ([62465b8](https://github.com/videojs/video.js/commit/62465b8)), closes [#6004](https://github.com/videojs/video.js/issues/6004)
+* remove deprecated tsml dependency ([#6174](https://github.com/videojs/video.js/issues/6174)) ([549552e](https://github.com/videojs/video.js/commit/549552e))
+
 <a name="7.6.2"></a>
 ## [7.6.2](https://github.com/videojs/video.js/compare/v7.6.1...v7.6.2) (2019-08-07)
 

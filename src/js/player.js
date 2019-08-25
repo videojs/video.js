@@ -7,7 +7,6 @@ import Component from './component.js';
 import {version} from '../../package.json';
 import document from 'global/document';
 import window from 'global/window';
-import tsml from 'tsml';
 import evented from './mixins/evented';
 import {isEvented, addEventedCallback} from './mixins/evented';
 import * as Events from './utils/events.js';
@@ -1211,10 +1210,8 @@ class Player extends Component {
    */
   tech(safety) {
     if (safety === undefined) {
-      log.warn(tsml`
-        Using the tech directly can be dangerous. I hope you know what you're doing.
-        See https://github.com/videojs/video.js/issues/2617 for more info.
-      `);
+      log.warn('Using the tech directly can be dangerous. I hope you know what you\'re doing.\n' +
+        'See https://github.com/videojs/video.js/issues/2617 for more info.\n');
     }
 
     return this.tech_;
@@ -2941,8 +2938,10 @@ class Player extends Component {
     const excludeElement = (el) => {
       const tagName = el.tagName.toLowerCase();
 
-      // These tags will be excluded entirely.
-      const excludedTags = ['textarea'];
+      // The first and easiest test is for `contenteditable` elements.
+      if (el.isContentEditable) {
+        return true;
+      }
 
       // Inputs matching these types will still trigger hotkey handling as
       // they are not text inputs.
@@ -2958,6 +2957,9 @@ class Player extends Component {
       if (tagName === 'input') {
         return allowedInputTypes.indexOf(el.type) === -1;
       }
+
+      // The final test is by tag name. These tags will be excluded entirely.
+      const excludedTags = ['textarea'];
 
       return excludedTags.indexOf(tagName) !== -1;
     };

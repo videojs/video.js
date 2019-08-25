@@ -168,6 +168,8 @@ class ClickableComponent extends Component {
     if (typeof this.tabIndex_ !== 'undefined') {
       this.el_.removeAttribute('tabIndex');
     }
+    this.off('mouseover', this.handleMouseOver);
+    this.off('mouseout', this.handleMouseOut);
     this.off(['tap', 'click'], this.handleClick);
     this.off('keydown', this.handleKeyDown);
   }
