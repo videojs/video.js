@@ -119,7 +119,7 @@
     "karma": "^4.1.0",
     "karma-browserify": "^5.3.0",
     "klaw-sync": "^6.0.0",
-    "lint-staged": "^8.2.0",
+    "lint-staged": "^9.2.4",
     "markdown-table": "^1.1.3",
     "maxmin": "^2.1.0",
     "minimist": "^1.2.0",
