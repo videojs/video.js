@@ -1,4 +1,5 @@
 import Component from './component.js';
+import median from './utils/median.js';
 import mergeOptions from './utils/merge-options.js';
 import document from 'global/document';
 import * as browser from './utils/browser.js';
@@ -43,13 +44,12 @@ class LiveTracker extends Component {
     }
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
-    const seekableIncrement = this.seekableIncrement_;
 
     // the live edge window is the amount of seconds away from live
     // that a player can be, but still be considered live.
     // we add 0.07 because the live tracking happens every 30ms
     // and we want some wiggle room for short segment live playback
-    const liveEdgeWindow = (seekableIncrement * 2) + 0.07;
+    const liveEdgeWindow = (this.seekableIncrement_ * 2) + 0.07;
 
     // on Android liveCurrentTime can bee Infinity, because seekableEnd
     // can be Infinity, so we handle that case.
@@ -74,7 +74,13 @@ class LiveTracker extends Component {
     // end against current time, with a fudge value of half a second.
     if (newSeekEnd !== this.lastSeekEnd_) {
       if (this.lastSeekEnd_) {
-        this.seekableIncrement_ = Math.abs(newSeekEnd - this.lastSeekEnd_);
+        // we try to get the best fit value for the seeking increment
+        // variable from the last 12 values.
+        this.seekableIncrementList_ = this.seekableIncrementList_.slice(-11);
+        this.seekableIncrementList_.push(Math.abs(newSeekEnd - this.lastSeekEnd_));
+        if (this.seekableIncrementList_.length > 3) {
+          this.seekableIncrement_ = median(this.seekableIncrementList_);
+        }
       }
 
       this.pastSeekEnd_ = 0;
@@ -152,6 +158,7 @@ class LiveTracker extends Component {
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
     this.seekableIncrement_ = 12;
+    this.seekableIncrementList_ = [];
 
     this.off(this.player_, 'play', this.trackLive_);
     this.off(this.player_, 'pause', this.trackLive_);
