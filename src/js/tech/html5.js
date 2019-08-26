@@ -110,6 +110,10 @@ class Html5 extends Tech {
     // into a `fullscreenchange` event
     this.proxyWebkitFullscreen_();
 
+    if (browser.IS_IOS) {
+      this.handleIOSHeadphonesDisconnection_();
+    }
+
     this.triggerReady();
   }
 
@@ -200,6 +204,31 @@ class Html5 extends Tech {
 
       // remove the restoreTrackMode handler in case it wasn't triggered during fullscreen playback
       textTracks.removeEventListener('change', restoreTrackMode);
+    });
+  }
+
+  /**
+   * Handle IOS Headphone disconnection during playback
+   *
+   * @private
+  */
+  handleIOSHeadphonesDisconnection_() {
+
+    const TIME_FUDGE_FACTOR = 1 / 30;
+
+    const SAFE_TIME_DELTA = TIME_FUDGE_FACTOR * 3;
+
+    const disconnectionIOSListener = () => {
+      if ((!this.el_.paused && window.navigator.onLine) &&
+          (this.el_.buffered.end(this.el_.buffered.length - 1) + SAFE_TIME_DELTA >= this.el_.currentTime)) {
+        this.el_.pause();
+      }
+    };
+
+    // If iOS check if we have a real stalled or supend event or
+    // we got stalled/suspend due headphones where disconnected during playback
+    this.on(['stalled', 'suspend'], (e) => {
+      disconnectionIOSListener();
     });
   }
 
