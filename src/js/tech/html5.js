@@ -213,22 +213,22 @@ class Html5 extends Tech {
    * @private
   */
   handleIOSHeadphonesDisconnection_() {
-
+    // Fudge factor to account for TimeRanges rounding
     const TIME_FUDGE_FACTOR = 1 / 30;
-
+    // Comparisons between time values such as current time and the end of the buffered range
+    // can be misleading because of precision differences or when the current media has poorly
+    // aligned audio and video, which can cause values to be slightly off from what you would
+    // expect. This value is what we consider to be safe to use in such comparisons to account
+    // for these scenarios.
     const SAFE_TIME_DELTA = TIME_FUDGE_FACTOR * 3;
-
-    const disconnectionIOSListener = () => {
-      if ((!this.el_.paused && window.navigator.onLine) &&
-          (this.el_.buffered.end(this.el_.buffered.length - 1) + SAFE_TIME_DELTA >= this.el_.currentTime)) {
-        this.el_.pause();
-      }
-    };
 
     // If iOS check if we have a real stalled or supend event or
     // we got stalled/suspend due headphones where disconnected during playback
     this.on(['stalled', 'suspend'], (e) => {
-      disconnectionIOSListener();
+      if ((!this.el_.paused && window.navigator.onLine) &&
+          (this.el_.buffered.end(this.el_.buffered.length - 1) + SAFE_TIME_DELTA >= this.el_.currentTime)) {
+        this.el_.pause();
+      }
     });
   }
 
