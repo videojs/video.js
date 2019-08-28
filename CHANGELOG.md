@@ -1,3 +1,15 @@
+<a name="7.6.4"></a>
+## [7.6.4](https://github.com/videojs/video.js/compare/v7.6.3...v7.6.4) (2019-08-28)
+
+### Bug Fixes
+
+* adds space between vjs-live-display and vjs-volume-control controls. ([#6200](https://github.com/videojs/video.js/issues/6200)) ([3c1dd8f](https://github.com/videojs/video.js/commit/3c1dd8f)), closes [#5815](https://github.com/videojs/video.js/issues/5815)
+* make live UI button more consistent ([#6201](https://github.com/videojs/video.js/issues/6201)) ([714aba0](https://github.com/videojs/video.js/commit/714aba0))
+
+### Chores
+
+* **package:** update http-streaming to 1.10.6 ([#6205](https://github.com/videojs/video.js/issues/6205)) ([f47939c](https://github.com/videojs/video.js/commit/f47939c)), closes [videojs/http-streaming#312](https://github.com/videojs/http-streaming/issues/312)
+
 <a name="7.6.3"></a>
 ## [7.6.3](https://github.com/videojs/video.js/compare/v7.6.2...v7.6.3) (2019-08-22)
 
