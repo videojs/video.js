@@ -816,7 +816,7 @@ class Player extends Component {
       return this[privDimension] || 0;
     }
 
-    if (value === '') {
+    if (value === '' || value === 'auto') {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
       this.updateStyleEl_();
