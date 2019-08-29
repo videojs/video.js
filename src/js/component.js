@@ -58,6 +58,8 @@ class Component {
       this.player_ = player;
     }
 
+    this.isDisposed_ = false;
+
     // Hold the reference to the parent component via `addChild` method
     this.parentComponent_ = null;
 
