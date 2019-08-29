@@ -340,6 +340,7 @@ QUnit.test('should dispose of component and children', function(assert) {
   const child = comp.addChild('Component');
 
   assert.ok(comp.children().length === 1);
+  assert.notOk(comp.isDisposed(), 'the component reports that it is not disposed');
 
   // Add a listener
   comp.on('click', function() {
@@ -370,6 +371,7 @@ QUnit.test('should dispose of component and children', function(assert) {
     !Object.getOwnPropertyNames(data).length,
     'original listener data object was emptied'
   );
+  assert.ok(comp.isDisposed(), 'the component reports that it is disposed');
 });
 
 QUnit.test('should add and remove event listeners to element', function(assert) {

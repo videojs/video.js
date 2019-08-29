@@ -54,6 +54,10 @@ Additionally, these actions are recursively applied to _all_ the player's child 
 
 > **Note**: Do _not_ remove players via standard DOM removal methods: this will leave listeners and other objects in memory that you might not be able to clean up!
 
+### Checking if a Player is Disposed
+
+At times, it is useful to know whether or not a player reference in your code is stale. The `isDisposed()` method is available on all components (including players) for this purpose.
+
 ### Signs of an Undisposed Player
 
 Seeing an error such as:
