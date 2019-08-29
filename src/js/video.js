@@ -31,6 +31,7 @@ import xhr from 'xhr';
 // Include the built-in techs
 import Tech from './tech/tech.js';
 import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
+import defineLazyProperty from './utils/define-lazy-property.js';
 
 /**
  * Normalize an `id` value by trimming off a leading `#`
@@ -565,6 +566,8 @@ videojs.dom = Dom;
  * @see  {@link module:url|url}
  */
 videojs.url = Url;
+
+videojs.defineLazyProperty = defineLazyProperty;
 
 export default videojs;
 
