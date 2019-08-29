@@ -35,7 +35,9 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
     history.push([].concat(args));
 
     // only store 1000 history entries
-    history = history.length > 1000 ? history : history.slice(-1000);
+    const splice = history.length - 1000;
+
+    history.splice(0, splice > 0 ? splice : 0);
   }
 
   // If there's no console then don't try to output messages, but they will
