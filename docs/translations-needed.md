@@ -13,6 +13,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 ## Status of translations
 
 <!-- START langtable -->
+
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
 | ar.json (missing 53)    | Audio Player                                                                        |
@@ -1052,7 +1053,6 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 | zh-CN.json (Complete)   |                                                                                     |
-| zh-Hans.json (Complete) |                                                                                     |
-| zh-Hant.json (Complete) |                                                                                     |
 | zh-TW.json (Complete)   |                                                                                     |
+
 <!-- END langtable -->

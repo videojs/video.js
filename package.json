@@ -184,7 +184,7 @@
       "remark --output --",
       "git add"
     ],
-    "lang/*.json": [
+    "lang/**/!(zh-Hans|zh-Hant)*.json": [
       "node build/translations.js",
       "git add docs/translations-needed.md"
     ]

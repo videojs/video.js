@@ -11,7 +11,7 @@ const tableRegex = /(<!-- START langtable -->)(.|\n)*(<!-- END langtable -->)/;
 let doc = fs.readFileSync(path.join(__dirname, '..', 'docs', 'translations-needed.md'), 'utf8');
 const tableData = [['Language file', 'Missing translations']];
 
-const filepaths = sh.find(path.join(__dirname, '..', 'lang', '**', '*.json'));
+const filepaths = sh.find(path.join(__dirname, '..', 'lang', '**', '!(zh-Hans|zh-Hant)*.json'));
 
 filepaths.forEach((filepath) => {
   const filename = path.basename(filepath);
