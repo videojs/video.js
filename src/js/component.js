@@ -124,6 +124,11 @@ class Component {
    */
   dispose() {
 
+    // Bail out if the component has already been disposed.
+    if (this.isDisposed_) {
+      return;
+    }
+
     /**
      * Triggered when a `Component` is disposed.
      *
