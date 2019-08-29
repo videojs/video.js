@@ -8,7 +8,7 @@ import log from '../utils/log.js';
 import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
-import XHR from 'xhr';
+import XHR from '@videojs/xhr';
 import merge from '../utils/merge-options';
 
 /**
