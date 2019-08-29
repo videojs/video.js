@@ -50,8 +50,12 @@ Creation:
 ```js
 // adding a button to the player
 var player = videojs('some-video-id');
-var Component = videojs.getComponent('Component');
-var button = new Component(player);
+var Button = videojs.getComponent('Button');
+var button = new Button(player, {
+  clickHandler: function(event) {
+    videojs.log('Clicked');
+  }
+});
 
 console.log(button.el());
 ```
