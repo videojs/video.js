@@ -36,7 +36,7 @@ class DurationDisplay extends TimeDisplay {
     // Also listen for timeupdate (in the parent) and loadedmetadata because removing those
     // listeners could have broken dependent applications/libraries. These
     // can likely be removed for 7.0.
-    this.on(player, 'loadedmetadata', this.throttledUpdateContent);
+    this.on(player, 'loadedmetadata', this.updateContent);
   }
 
   /**
@@ -63,10 +63,7 @@ class DurationDisplay extends TimeDisplay {
   updateContent(event) {
     const duration = this.player_.duration();
 
-    if (this.duration_ !== duration) {
-      this.duration_ = duration;
-      this.updateFormattedTime_(duration);
-    }
+    this.updateTextNode_(duration);
   }
 }
 

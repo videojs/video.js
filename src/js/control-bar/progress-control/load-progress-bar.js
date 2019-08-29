@@ -3,6 +3,11 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
+import clamp from '../../utils/clamp';
+import document from 'global/document';
+
+// get the percent width of a time compared to the total end
+const percentify = (time, end) => clamp((time / end) * 100, 0, 100).toFixed(2) + '%';
 
 /**
  * Shows loading progress
@@ -33,14 +38,27 @@ class LoadProgressBar extends Component {
    *         The element that was created.
    */
   createEl() {
-    return super.createEl('div', {
-      className: 'vjs-load-progress',
-      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Loaded')}</span>: <span class="vjs-control-text-loaded-percentage">0%</span></span>`
+    const el = super.createEl('div', {className: 'vjs-load-progress'});
+    const wrapper = Dom.createEl('span', {className: 'vjs-control-text'});
+    const loadedText = Dom.createEl('span', {textContent: this.localize('Loaded')});
+    const separator = document.createTextNode(': ');
+
+    this.percentageEl_ = Dom.createEl('span', {
+      className: 'vjs-control-text-loaded-percentage',
+      textContent: '0%'
     });
+
+    el.appendChild(wrapper);
+    wrapper.appendChild(loadedText);
+    wrapper.appendChild(separator);
+    wrapper.appendChild(this.percentageEl_);
+
+    return el;
   }
 
   dispose() {
     this.partEls_ = null;
+    this.percentageEl_ = null;
 
     super.dispose();
   }
@@ -54,56 +72,53 @@ class LoadProgressBar extends Component {
    * @listens Player#progress
    */
   update(event) {
-    const liveTracker = this.player_.liveTracker;
-    const buffered = this.player_.buffered();
-    const duration = (liveTracker && liveTracker.isLive()) ? liveTracker.seekableEnd() : this.player_.duration();
-    const bufferedEnd = this.player_.bufferedEnd();
-    const children = this.partEls_;
-    const controlTextPercentage = this.$('.vjs-control-text-loaded-percentage');
+    this.requestAnimationFrame(() => {
+      const liveTracker = this.player_.liveTracker;
+      const buffered = this.player_.buffered();
+      const duration = (liveTracker && liveTracker.isLive()) ? liveTracker.seekableEnd() : this.player_.duration();
+      const bufferedEnd = this.player_.bufferedEnd();
+      const children = this.partEls_;
+      const percent = percentify(bufferedEnd, duration);
 
-    // get the percent width of a time compared to the total end
-    const percentify = function(time, end, rounded) {
-      // no NaN
-      let percent = (time / end) || 0;
-
-      percent = (percent >= 1 ? 1 : percent) * 100;
-
-      if (rounded) {
-        percent = percent.toFixed(2);
+      if (this.percent_ !== percent) {
+        // update the width of the progress bar
+        this.el_.style.width = percent;
+        // update the control-text
+        Dom.textContent(this.percentageEl_, percent);
+        this.percent_ = percent;
       }
 
-      return percent + '%';
-    };
+      // add child elements to represent the individual buffered time ranges
+      for (let i = 0; i < buffered.length; i++) {
+        const start = buffered.start(i);
+        const end = buffered.end(i);
+        let part = children[i];
 
-    // update the width of the progress bar
-    this.el_.style.width = percentify(bufferedEnd, duration);
+        if (!part) {
+          part = this.el_.appendChild(Dom.createEl());
+          children[i] = part;
+        }
 
-    // update the control-text
-    Dom.textContent(controlTextPercentage, percentify(bufferedEnd, duration, true));
+        //  only update if changed
+        if (part.dataset.start === start && part.dataset.end === end) {
+          continue;
+        }
 
-    // add child elements to represent the individual buffered time ranges
-    for (let i = 0; i < buffered.length; i++) {
-      const start = buffered.start(i);
-      const end = buffered.end(i);
-      let part = children[i];
+        part.dataset.start = start;
+        part.dataset.end = end;
 
-      if (!part) {
-        part = this.el_.appendChild(Dom.createEl());
-        children[i] = part;
+        // set the percent based on the width of the progress bar (bufferedEnd)
+        part.style.left = percentify(start, bufferedEnd);
+        part.style.width = percentify(end - start, bufferedEnd);
       }
 
-      // set the percent based on the width of the progress bar (bufferedEnd)
-      part.style.left = percentify(start, bufferedEnd);
-      part.style.width = percentify(end - start, bufferedEnd);
-    }
-
-    // remove unused buffered range elements
-    for (let i = children.length; i > buffered.length; i--) {
-      this.el_.removeChild(children[i - 1]);
-    }
-    children.length = buffered.length;
+      // remove unused buffered range elements
+      for (let i = children.length; i > buffered.length; i--) {
+        this.el_.removeChild(children[i - 1]);
+      }
+      children.length = buffered.length;
+    });
   }
-
 }
 
 Component.registerComponent('LoadProgressBar', LoadProgressBar);
