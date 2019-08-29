@@ -87,7 +87,7 @@
     "safe-json-parse": "4.0.0",
     "videojs-font": "3.2.0",
     "videojs-vtt.js": "^0.14.1",
-    "xhr": "github:brandonocasey/xhr#perf/less-external"
+    "@videojs/xhr": "2.5.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -95,7 +95,6 @@
     "@babel/node": "^7.4.5",
     "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/plugin-transform-runtime": "^7.5.5",
-    "@babel/plugin-external-helpers": "^7.2.0",
     "@babel/preset-env": "^7.4.5",
     "@babel/register": "^7.4.4",
     "access-sniff": "^3.2.0",
