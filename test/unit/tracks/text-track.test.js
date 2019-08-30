@@ -7,7 +7,7 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import sinon from 'sinon';
 import log from '../../../src/js/utils/log.js';
-import XHR from 'xhr';
+import XHR from '@videojs/xhr';
 
 QUnit.module('Text Track', {
   beforeEach() {
