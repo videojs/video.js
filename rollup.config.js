@@ -78,8 +78,7 @@ const globals = {
 
 const moduleExternals = [
   'global',
-  'xhr',
-  'tsml',
+  '@videojs/xhr',
   'safe-json-parse',
   'videojs-vtt.js',
   'url-toolkit',

@@ -1,9 +1,9 @@
 const sh = require('shelljs');
 const semver = require('semver');
-const generateExample = require('./generate-example.js').default;
+const generateExample = require('./generate-example.js').generateExample;
 
 const GIT_LOG = `git log --format=%B -n 1 ${process.env.COMMIT_REF}`;
-const output = sh.exec(GIT_LOG, {async: false, silent:true}).stdout;
+const output = sh.exec(GIT_LOG, {async: false, silent: true}).stdout;
 
 // if we're on master branch and not on a tagged commit,
 // error the build so it doesn't redeploy the docs
