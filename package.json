@@ -18,7 +18,6 @@
   "author": "Steve Heffernan",
   "scripts": {
     "sandbox": "node build/sandbox.js",
-    "assert": "node build/assets.js",
     "prestart": "npm-run-all sandbox",
     "start": "npm-run-all -p watch karma-server",
     "clean": "shx rm -rf ./dist ./test/dist ./docs/api ./lang/zh-Han*.json",
@@ -73,8 +72,7 @@
     "netlify": "node ./build/netlify-docs.js",
     "prepublishOnly": "run-p build",
     "publish": "node build/gh-release.js",
-    "update-changelog": "conventional-changelog -p videojs -i CHANGELOG.md -s",
-    "version": "is-prerelease || npm run update-changelog && git add CHANGELOG.md",
+    "version": "is-prerelease || npm run changelog && git add CHANGELOG.md",
     "zip": "cd dist && cross-env bestzip \"./video-js-${npm_package_version}.zip\" * && cd .."
   },
   "repository": {

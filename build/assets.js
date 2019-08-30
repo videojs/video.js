@@ -8,13 +8,9 @@ const sh = require('shelljs');
 
 // find all js/css files in the dist dir
 // but ignore any files in lang, example, or font directories
-const filepaths = sh.find(path.join(__dirname, '..', 'dist', '**', '*.{js,css}')).filter(function(filepath) {
-  if ((/\/(lang|example|font)\//).test(filepath)) {
-    return false;
-  }
-
-  return true;
-});
+const filepaths = sh
+  .find(path.join(__dirname, '..', 'dist', '**', '*.{js,css}'))
+  .filter((filepath) => !(/\/(lang|example|font)\//).test(filepath));
 
 // map all files that we found into an array of
 // table entries the filepath, file size, and gzip size.

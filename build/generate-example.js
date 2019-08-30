@@ -52,8 +52,6 @@ const generateExample = function({skipBuild} = {}) {
   });
 };
 
-generateExample({skipBuild: true});
-
 module.exports = {
   cleanupExample,
   generateExample
