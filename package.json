@@ -155,6 +155,7 @@
     "ignore": [
       "dist",
       "docs",
+      "sandbox",
       "test/dist",
       "test/api",
       "core.js"
