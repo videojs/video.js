@@ -26,7 +26,7 @@ import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
 import extend from './extend.js';
-import xhr from 'xhr';
+import xhr from '@videojs/xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
