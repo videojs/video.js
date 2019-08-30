@@ -7,12 +7,12 @@ const sh = require('shelljs');
 const files = sh.find(path.join(__dirname, '..', 'sandbox', '**', '*.*'))
   .filter((filepath) => path.extname(filepath) === '.example');
 
-const changes = files.map(function(file) {
-  const p = path.parse(file.path);
+const changes = files.map(function(filepath) {
+  const p = path.parse(filepath);
   const nonExample = path.join(p.dir, p.name);
 
   return {
-    file: file.path,
+    file: filepath,
     copy: nonExample
   };
 }).filter(function(change) {

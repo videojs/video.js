@@ -126,17 +126,17 @@ QUnit.test('blacklist playbackRate support on older verisons of Chrome on Androi
   const oldIsChrome = browser.IS_CHROME;
   const oldChromeVersion = browser.CHROME_VERSION;
 
-  browser.IS_ANDROID = true;
-  browser.IS_CHROME = true;
-  browser.CHROME_VERSION = 50;
+  browser.stub_IS_ANDROID(true);
+  browser.stub_IS_CHROME(true);
+  browser.stub_CHROME_VERSION(50);
   assert.strictEqual(Html5.canControlPlaybackRate(), false, 'canControlPlaybackRate should return false on older Chrome');
 
-  browser.CHROME_VERSION = 58;
+  browser.stub_CHROME_VERSION(58);
   assert.strictEqual(Html5.canControlPlaybackRate(), true, 'canControlPlaybackRate should return true on newer Chrome');
 
-  browser.IS_ANDROID = oldIsAndroid;
-  browser.IS_CHROME = oldIsChrome;
-  browser.CHROME_VERSION = oldChromeVersion;
+  browser.stub_IS_ANDROID(oldIsAndroid);
+  browser.stub_IS_CHROME(oldIsChrome);
+  browser.stub_CHROME_VERSION(oldChromeVersion);
 });
 
 QUnit.test('test volume', function(assert) {
@@ -195,9 +195,9 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_FIREFOX = false;
-  browser.IS_CHROME = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_FIREFOX(false);
+  browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
 
   assert.notStrictEqual(
@@ -220,9 +220,9 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
     'patched canPlayType and function returned from unpatch are equal'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_FIREFOX = oldIsFirefox;
-  browser.IS_CHROME = oldIsChrome;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
+  browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
@@ -236,9 +236,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_CHROME = true;
-  browser.IS_FIREFOX = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_CHROME(true);
+  browser.stub_IS_FIREFOX(false);
   Html5.patchCanPlayType();
 
   assert.strictEqual(
@@ -247,9 +247,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
     'original canPlayType and patched canPlayType should be equal'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_CHROME = oldIsChrome;
-  browser.IS_FIREFOX = oldIsFirefox;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_CHROME(oldIsChrome);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
   Html5.unpatchCanPlayType();
 });
 
@@ -263,9 +263,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_FIREFOX = true;
-  browser.IS_CHROME = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_FIREFOX(true);
+  browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
 
   assert.strictEqual(
@@ -274,9 +274,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
     'original canPlayType and patched canPlayType should be equal'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_FIREFOX = oldIsFirefox;
-  browser.IS_CHROME = oldIsChrome;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
+  browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
@@ -286,9 +286,9 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
   const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_FIREFOX = false;
-  browser.IS_CHROME = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_FIREFOX(false);
+  browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
 
   assert.strictEqual(
@@ -314,26 +314,9 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
                     'maybe for vnd.apple.mpegurl'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_FIREFOX = oldIsFirefox;
-  browser.IS_CHROME = oldIsChrome;
-  Html5.unpatchCanPlayType();
-});
-
-QUnit.test('should return a maybe for mp4 on OLD ANDROID', function(assert) {
-  const isOldAndroid = browser.IS_OLD_ANDROID;
-  const video = document.createElement('video');
-
-  browser.IS_OLD_ANDROID = true;
-  Html5.patchCanPlayType();
-
-  assert.strictEqual(
-    video.canPlayType('video/mp4'),
-    'maybe',
-    'old android should return a maybe for video/mp4'
-  );
-
-  browser.IS_OLD_ANDROID = isOldAndroid;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
+  browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
@@ -911,8 +894,8 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
   const oldIsChrome = browser.IS_CHROME;
   const oldEl = tech.el_;
 
-  browser.IS_ANDROID = true;
-  browser.IS_CHROME = true;
+  browser.stub_IS_ANDROID(true);
+  browser.stub_IS_CHROME(true);
 
   tech.el_ = {
     duration: Infinity,
@@ -920,8 +903,8 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
   };
   assert.ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
 
-  browser.IS_ANDROID = oldIsAndroid;
-  browser.IS_CHROME = oldIsChrome;
+  browser.stub_IS_ANDROID(oldIsAndroid);
+  browser.stub_IS_CHROME(oldIsChrome);
   tech.el_ = oldEl;
 });
 
