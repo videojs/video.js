@@ -88,18 +88,20 @@ function setWindowLoaded() {
   window.removeEventListener('load', setWindowLoaded);
 }
 
-if (Dom.isReal() && document.readyState === 'complete') {
-  setWindowLoaded();
-} else {
-  /**
-   * Listen for the load event on window, and set _windowLoaded to true.
-   *
-   * We use a standard event listener here to avoid incrementing the GUID
-   * before any players are created.
-   *
-   * @listens load
-   */
-  window.addEventListener('load', setWindowLoaded);
+if (Dom.isReal()) {
+  if (document.readyState === 'complete') {
+    setWindowLoaded();
+  } else {
+    /**
+     * Listen for the load event on window, and set _windowLoaded to true.
+     *
+     * We use a standard event listener here to avoid incrementing the GUID
+     * before any players are created.
+     *
+     * @listens load
+     */
+    window.addEventListener('load', setWindowLoaded);
+  }
 }
 
 /**
