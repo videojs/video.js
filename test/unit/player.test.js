@@ -15,6 +15,7 @@ import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
 import * as Events from '../../src/js/utils/events.js';
 import pkg from '../../package.json';
+import * as Guid from '../../src/js/utils/guid.js';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -30,6 +31,17 @@ QUnit.module('Player', {
   afterEach() {
     this.clock.restore();
   }
+});
+
+QUnit.test('the default ID of the first player remains "vjs_video_3"', function(assert) {
+  Guid.resetGuidInTestsOnly();
+  const tag = document.createElement('video');
+
+  tag.className = 'video-js';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.strictEqual(player.id(), 'vjs_video_3', 'id is correct');
 });
 
 QUnit.test('should create player instance that inherits from component and dispose it', function(assert) {
