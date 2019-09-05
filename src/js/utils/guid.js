@@ -4,13 +4,13 @@
  */
 
 // Default value for GUIDs. This allows us to reset the GUID counter in tests.
-const _guidStart = 2;
+const _initialGuid = 3;
 
 /**
  * Unique ID for an element or function
  * @type {Number}
  */
-let _guid = _guidStart;
+let _guid = _initialGuid;
 
 /**
  * Get a unique auto-incrementing ID by number that has not been returned before.
@@ -23,10 +23,8 @@ export function newGUID() {
 }
 
 /**
- * Reset the unique auto-incrementing ID.
- *
- * FOR TESTS ONLY!
+ * Reset the unique auto-incrementing ID for testing only.
  */
 export function resetGuidInTestsOnly() {
-  _guid = _guidStart;
+  _guid = _initialGuid;
 }

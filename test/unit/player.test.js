@@ -34,12 +34,6 @@ QUnit.module('Player', {
 
 QUnit.test('the default ID of the first player remains "vjs_video_3"', function(assert) {
   Guid.resetGuidInTestsOnly();
-
-  // When Video.js loads, the GUID is incremented once:
-  // https://github.com/videojs/video.js/blob/de2daead6526683ba2ff441ccb4d7dfd9ccf8a98/src/js/setup.js#L90
-  // To simulate that situation here, increment the Guid once.
-  Guid.newGUID();
-
   const tag = document.createElement('video');
 
   tag.className = 'video-js';
