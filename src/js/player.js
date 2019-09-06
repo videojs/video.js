@@ -3708,8 +3708,7 @@ class Player extends Component {
     // Suppress the first error message for no compatible source until
     // user interaction
     if (this.options_.suppressNotSupportedError &&
-        err && err.message &&
-        err.message === this.localize(this.options_.notSupportedMessage)
+        err && err.code === 4
     ) {
       const triggerSuppressedError = function() {
         this.error(err);
