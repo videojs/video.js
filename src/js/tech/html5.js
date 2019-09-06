@@ -229,11 +229,17 @@ class Html5 extends Tech {
       const buffered = this.buffered();
 
       if (buffered.length > 0) {
-        const end = buffered.end(buffered.length - 1);
+        let extraBuffer = false;
 
-        // if tech is not paused, browser has internet connection & end + safe delta >= current time
-        if ((!this.paused() && window.navigator.onLine) &&
-            (end + SAFE_TIME_DELTA >= this.currentTime())) {
+        // Establish if we have an extra buffer in the current time range playing.
+        for (let i = 0; i < buffered.length; i++) {
+          if (buffered.start(i) <= this.currentTime() <= buffered.end(i) + SAFE_TIME_DELTA) {
+            extraBuffer = true;
+          }
+        }
+
+        // if tech is not paused, browser has internet connection & player has extraBuffer inside the timeRange
+        if ((!this.paused() && window.navigator.onLine) && extraBuffer) {
           this.pause();
         }
       }
