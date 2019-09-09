@@ -233,8 +233,9 @@ class Html5 extends Tech {
 
         // Establish if we have an extra buffer in the current time range playing.
         for (let i = 0; i < buffered.length; i++) {
-          if (buffered.start(i) <= this.currentTime() <= buffered.end(i) + SAFE_TIME_DELTA) {
+          if (buffered.start(i) <= this.currentTime() < buffered.end(i) + SAFE_TIME_DELTA) {
             extraBuffer = true;
+            break;
           }
         }
 
