@@ -144,7 +144,7 @@
     "sinon": "^7.3.2",
     "tui-jsdoc-template": "^1.2.2",
     "uglify-js": "^3.6.0",
-    "unified": "^7.0.2",
+    "unified": "^8.4.0",
     "videojs-flash": "^2.2.0",
     "videojs-generate-karma-config": "~5.2.1",
     "videojs-languages": "^2.0.0",
