@@ -11,7 +11,6 @@ import document from 'global/document';
  * @extends Button
  */
 class FullscreenToggle extends Button {
-
   /**
    * Creates an instance of this class.
    *
@@ -74,8 +73,13 @@ class FullscreenToggle extends Button {
     } else {
       this.player_.exitFullscreen();
     }
+    /**
+     * On IE11 and Edge, focus is moved to the window when fullscreen is
+     * enabled. This ensures screen readers keep focus on the FullscreenToggle
+     * element after activating the button.
+     */
+    this.el().focus();
   }
-
 }
 
 /**
