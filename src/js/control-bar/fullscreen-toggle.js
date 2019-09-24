@@ -54,6 +54,15 @@ class FullscreenToggle extends Button {
     } else {
       this.controlText('Fullscreen');
     }
+    /**
+     * On IE11 and Edge, focus is moved to the window when fullscreen is
+     * enabled. This ensures screen readers keep focus on the FullscreenToggle
+     * element after activating the button.
+     */
+    if (this._clickElement === this.el()) {
+      this.el().focus();
+      this._clickElement = null;
+    }
   }
 
   /**
@@ -68,6 +77,7 @@ class FullscreenToggle extends Button {
    * @listens click
    */
   handleClick(event) {
+    this._clickElement = event.currentTarget;
     if (!this.player_.isFullscreen()) {
       this.player_.requestFullscreen();
     } else {
