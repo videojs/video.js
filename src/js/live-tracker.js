@@ -88,7 +88,13 @@ class LiveTracker extends Component {
       this.trigger('seekableendchange');
     }
 
-    this.pastSeekEnd_ = this.pastSeekEnd() + 0.03;
+    // we should reset pastSeekEnd when the value
+    // is much higher than seeking increment.
+    if (this.pastSeekEnd() > this.seekableIncrement_ * 1.5) {
+      this.pastSeekEnd_ = 0;
+    } else {
+      this.pastSeekEnd_ = this.pastSeekEnd() + 0.03;
+    }
 
     if (this.isBehind_() !== this.behindLiveEdge()) {
       this.behindLiveEdge_ = this.isBehind_();
