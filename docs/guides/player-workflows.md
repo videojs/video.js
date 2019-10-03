@@ -7,6 +7,7 @@ This document outlines many considerations for using Video.js for advanced playe
 * [Accessing a player that has already been created on a page](#accessing-a-player-that-has-already-been-created-on-a-page)
 * [Removing Players](#removing-players)
   * [dispose()](#dispose)
+  * [Checking if a Player is Disposed](#checking-if-a-player-is-disposed)
   * [Signs of an Undisposed Player](#signs-of-an-undisposed-player)
 * [Showing and Hiding a Player](#showing-and-hiding-a-player)
 * [Changing the volume of a player](#changing-the-volume-of-a-player)
