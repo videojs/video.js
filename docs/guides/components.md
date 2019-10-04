@@ -317,7 +317,7 @@ Player
 │ ├── DescriptionsButton (hidden, unless there are relevant tracks)
 │ ├── SubtitlesButton (hidden, unless there are relevant tracks)
 │ ├── CaptionsButton (hidden, unless there are relevant tracks)
-│ ├── SubsCapsButton
+│ ├── SubsCapsButton (hidden, unless there are relevant tracks)
 │ ├── AudioTrackButton (hidden, unless there are relevant tracks)
 │ ├── PictureInPictureToggle
 │ └── FullscreenToggle
