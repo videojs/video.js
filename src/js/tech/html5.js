@@ -111,6 +111,10 @@ class Html5 extends Tech {
     // into a `fullscreenchange` event
     this.proxyWebkitFullscreen_();
 
+    if (browser.IS_IOS) {
+      this.handleIOSHeadphonesDisconnection_();
+    }
+
     this.triggerReady();
   }
 
@@ -201,6 +205,50 @@ class Html5 extends Tech {
 
       // remove the restoreTrackMode handler in case it wasn't triggered during fullscreen playback
       textTracks.removeEventListener('change', restoreTrackMode);
+    });
+  }
+
+  /**
+   * Handle IOS Headphone disconnection during playback
+   *
+   * @private
+  */
+  handleIOSHeadphonesDisconnection_() {
+    // Fudge factor to account for TimeRanges rounding
+    const TIME_FUDGE_FACTOR = 1 / 30;
+
+    // Comparisons between time values such as current time and the end of the buffered range
+    // can be misleading because of precision differences or when the current media has poorly
+    // aligned audio and video, which can cause values to be slightly off from what you would
+    // expect. This value is what we consider to be safe to use in such comparisons to account
+    // for these scenarios.
+    const SAFE_TIME_DELTA = TIME_FUDGE_FACTOR * 3;
+
+    // If iOS check if we have a real stalled or supend event or
+    // we got stalled/suspend due headphones where disconnected during playback
+    this.on(['stalled', 'suspend'], (e) => {
+      const buffered = this.buffered();
+
+      if (!buffered.length) {
+        return;
+      }
+
+      let extraBuffer = false;
+      const currentTime = this.currentTime();
+
+      // Establish if we have an extra buffer in the current time range playing.
+      for (let i = 0; i < buffered.length; i++) {
+        if (buffered.start(i) <= currentTime &&
+          currentTime < buffered.end(i) + SAFE_TIME_DELTA) {
+          extraBuffer = true;
+          break;
+        }
+      }
+
+      // if tech is not paused, browser has internet connection & player has extraBuffer inside the timeRange
+      if (extraBuffer && !this.paused() && window.navigator.onLine) {
+        this.pause();
+      }
     });
   }
 
