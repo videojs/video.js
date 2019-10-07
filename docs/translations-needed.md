@@ -13,7 +13,6 @@ This default value is hardcoded as a default to the localize method in the SeekB
 ## Status of translations
 
 <!-- START langtable -->
-
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
 | ar.json (missing 53)    | Audio Player                                                                        |
@@ -743,131 +742,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| nb.json (missing 61)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
+| nb.json (Complete)      |                                                                                     |
 | nl.json (missing 3)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
-| nn.json (missing 61)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
+| nn.json (Complete)      |                                                                                     |
 | oc.json (Complete)      |                                                                                     |
 | pl.json (missing 53)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -1054,5 +933,4 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 | zh-CN.json (Complete)   |                                                                                     |
 | zh-TW.json (Complete)   |                                                                                     |
-
 <!-- END langtable -->
