@@ -116,10 +116,26 @@ class TextTrackDisplay extends Component {
       }
 
       player.on('fullscreenchange', updateDisplayHandler);
-      player.on('playerresize', updateDisplayHandler);
+
+      if (this.player_.resizeManager) {
+        this.ResizeObserver = this.player_.resizeManager.ResizeObserver || window.ResizeObserver;
+      }
+      if (this.ResizeObserver) {
+        this.resizeObserver_ = new this.ResizeObserver(Fn.debounce(() => {
+          updateDisplayHandler();
+        }, 100, false, this));
+        this.resizeObserver_.observe(this.el_);
+      } else {
+        player.on('playerresize', updateDisplayHandler);
+      }
 
       window.addEventListener('orientationchange', updateDisplayHandler);
-      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
+      player.on('dispose', () => {
+        window.removeEventListener('orientationchange', updateDisplayHandler);
+        if (this.resizeObserver_) {
+          this.resizeObserver_.disconnect();
+        }
+      });
 
       const tracks = this.options_.playerOptions.tracks || [];
 
