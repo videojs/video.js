@@ -117,11 +117,12 @@ class TextTrackDisplay extends Component {
 
       player.on('fullscreenchange', updateDisplayHandler);
 
-      if (this.player_.resizeManager) {
-        this.ResizeObserver = this.player_.resizeManager.ResizeObserver || window.ResizeObserver;
-      }
-      if (this.ResizeObserver) {
-        this.resizeObserver_ = new this.ResizeObserver(Fn.debounce(() => {
+      const {
+        ResizeObserver = this.player_.resizeManager ? this.player_.resizeManager.ResizeObserver : null
+      } = window;
+
+      if (ResizeObserver) {
+        this.resizeObserver_ = new ResizeObserver(Fn.debounce(() => {
           updateDisplayHandler();
         }, 100, false, this));
         this.resizeObserver_.observe(this.el_);
