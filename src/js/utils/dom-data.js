@@ -9,7 +9,7 @@ import window from 'global/window';
 
 let FakeWeakMap;
 
-if (!WeakMap) {
+if (!window.WeakMap) {
   FakeWeakMap = class {
     constructor() {
       this.vdata = 'vdata' + Math.floor(window.performance && window.performance.now() || Date.now());
@@ -69,4 +69,4 @@ if (!WeakMap) {
  * @type {Object}
  * @private
  */
-export default WeakMap ? new WeakMap() : new FakeWeakMap();
+export default window.WeakMap ? new WeakMap() : new FakeWeakMap();
