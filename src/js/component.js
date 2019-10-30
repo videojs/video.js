@@ -119,6 +119,11 @@ class Component {
           this.set_[key] = 1;
           return this;
         }
+        forEach(callback, thisArg) {
+          for (const key in this.set_) {
+            callback.call(thisArg, key, key, this);
+          }
+        }
       };
     }
 
