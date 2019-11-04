@@ -141,6 +141,8 @@ class Tech extends Component {
       this.emulateTextTracks();
     }
 
+    this.preloadTextTracks = options.preloadTextTracks !== false;
+
     this.autoRemoteTextTracks_ = new TRACK_TYPES.ALL.text.ListClass();
 
     this.initTrackListeners();
