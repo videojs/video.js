@@ -655,7 +655,11 @@ class Player extends Component {
       // `src` or `controls` that were set via js before the player
       // was initialized.
       Object.keys(el).forEach((k) => {
-        tag[k] = el[k];
+        try {
+          tag[k] = el[k];
+        } catch (e) {
+          // we got a a property like outerHTML which we can't actually copy, ignore it
+        }
       });
     }
 
