@@ -1,3 +1,17 @@
+<a name="7.6.6"></a>
+## [7.6.6](https://github.com/videojs/video.js/compare/v7.6.5...v7.6.6) (2019-11-07)
+
+### Bug Fixes
+
+* bring back Android 4.x support ([#6289](https://github.com/videojs/video.js/issues/6289)) ([bacd2b2](https://github.com/videojs/video.js/commit/bacd2b2))
+
+<a name="7.6.5"></a>
+## [7.6.5](https://github.com/videojs/video.js/compare/v7.6.4...v7.6.5) (2019-09-05)
+
+### Bug Fixes
+
+* ensure the default ID of the first player is 'vjs_video_3' as some people have relied on this ([#6216](https://github.com/videojs/video.js/issues/6216)) ([5ff5569](https://github.com/videojs/video.js/commit/5ff5569)), closes [#6103](https://github.com/videojs/video.js/issues/6103)
+
 <a name="7.6.4"></a>
 ## [7.6.4](https://github.com/videojs/video.js/compare/v7.6.3...v7.6.4) (2019-08-28)
 
