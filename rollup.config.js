@@ -192,7 +192,7 @@ export default cliargs => [
     output: [
       {
         format: 'es',
-        file: 'dist/alt/video.core.es.js',
+        file: 'core.es.js',
         strict: false,
         banner,
         globals: globals.module

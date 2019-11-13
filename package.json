@@ -158,7 +158,8 @@
       "sandbox",
       "test/dist",
       "test/api",
-      "core.js"
+      "core.js",
+      "core.es.js"
     ]
   },
   "greenkeeper": {
