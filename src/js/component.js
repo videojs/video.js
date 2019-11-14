@@ -492,8 +492,12 @@ class Component {
     // Add the UI object's element to the container div (box)
     // Having an element is not required
     if (typeof component.el === 'function' && component.el()) {
-      const childNodes = this.contentEl().children;
-      const refNode = childNodes[index] || null;
+      // If inserting before a component, insert before that component's element
+      let refNode = null;
+
+      if (this.children_[index + 1] && this.children_[index + 1].el_) {
+        refNode = this.children_[index + 1].el_;
+      }
 
       this.contentEl().insertBefore(component.el(), refNode);
     }
