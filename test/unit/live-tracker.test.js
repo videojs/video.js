@@ -68,9 +68,12 @@ QUnit.module('LiveTracker', () => {
   QUnit.test('Triggers liveedgechange when we fall behind and catch up', function(assert) {
 
     this.liveTracker.seekableIncrement_ = 6;
+    this.player.seekable = () => createTimeRanges(0, 20);
     this.player.trigger('timeupdate');
-    this.player.currentTime = () => 0;
-    this.clock.tick(20000);
+    this.player.currentTime = () => 14;
+    this.clock.tick(6000);
+    this.player.seekable = () => createTimeRanges(0, 26);
+    this.clock.tick(1000);
 
     assert.equal(this.liveEdgeChanges, 1, 'should have one live edge change');
     assert.ok(this.liveTracker.behindLiveEdge(), 'behind live edge');
@@ -99,6 +102,7 @@ QUnit.module('LiveTracker', () => {
   QUnit.test('seeks to live edge on seekableendchange', function(assert) {
     this.player.trigger('timeupdate');
 
+    this.player.seekable = () => createTimeRanges(0, 6);
     this.liveTracker.seekableIncrement_ = 2;
     let currentTime = 0;
 
