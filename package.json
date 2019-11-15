@@ -153,6 +153,7 @@
   },
   "vjsstandard": {
     "ignore": [
+      "build",
       "dist",
       "docs",
       "sandbox",
