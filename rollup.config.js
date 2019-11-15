@@ -186,16 +186,24 @@ export default cliargs => [
     onwarn,
     watch
   },
-  // core
+  // core cjs, es
   {
     input: 'src/js/video.js',
-    output: {
-      format: 'cjs',
-      file: 'core.js',
-      strict: false,
-      banner,
-      globals: globals.module
-    },
+    output: [
+      {
+        format: 'es',
+        file: 'core.es.js',
+        strict: false,
+        banner,
+        globals: globals.module
+      }, {
+        format: 'cjs',
+        file: 'core.js',
+        strict: false,
+        banner,
+        globals: globals.module
+      }
+    ],
     external: externals.module,
     plugins: [
       json(),
