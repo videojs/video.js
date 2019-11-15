@@ -4,6 +4,7 @@
 import Button from './button.js';
 import Component from './component.js';
 import {isPromise, silencePromise} from './utils/promise';
+import * as browser from './utils/browser.js';
 
 /**
  * The initial play button that shows before the video has played. The hiding of the
@@ -47,7 +48,10 @@ class BigPlayButton extends Button {
     // exit early if clicked via the mouse
     if (this.mouseused_ && event.clientX && event.clientY) {
       silencePromise(playPromise);
-      if (this.player_.tech(true)) {
+      if (this.player_.tech(true) &&
+         // We've observed a bug in IE and Edge when playing back DRM content where
+         // calling .focus() on the video element causes the video to go black
+         ((browser.IE_VERSION || browser.IS_EDGE) && this.player_.usingPlugin('eme'))) {
         this.player_.tech(true).focus();
       }
       return;
