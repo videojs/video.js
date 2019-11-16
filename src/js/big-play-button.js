@@ -48,8 +48,8 @@ class BigPlayButton extends Button {
     // exit early if clicked via the mouse
     if (this.mouseused_ && event.clientX && event.clientY) {
       const sourceIsEncrypted = this.player_.usingPlugin('eme') &&
-                          this.player_.eme.sessions &&
-                          this.player_.eme.sessions.length > 0;
+                                this.player_.eme.sessions &&
+                                this.player_.eme.sessions.length > 0;
 
       silencePromise(playPromise);
       if (this.player_.tech(true) &&
