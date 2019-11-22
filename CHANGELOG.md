@@ -1,3 +1,10 @@
+<a name="7.7.1"></a>
+## [7.7.1](https://github.com/videojs/video.js/compare/v7.7.0...v7.7.1) (2019-11-22)
+
+### Bug Fixes
+
+* **extend:** super_ should be available for backwards compatibility ([#6329](https://github.com/videojs/video.js/issues/6329)) ([25d15d4](https://github.com/videojs/video.js/commit/25d15d4)), closes [#6328](https://github.com/videojs/video.js/issues/6328)
+
 <a name="7.7.0"></a>
 # [7.7.0](https://github.com/videojs/video.js/compare/v7.6.4...v7.7.0) (2019-11-19)
 
