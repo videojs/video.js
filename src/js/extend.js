@@ -44,6 +44,11 @@ const extend = function(superClass, subClassMethods = {}) {
 
   _inherits(subClass, superClass);
 
+  // this is needed for backward-compatibility and node compatibility.
+  if (superClass) {
+    subClass.super_ = superClass;
+  }
+
   // Extend subObj's prototype with functions and other properties from props
   for (const name in methods) {
     if (methods.hasOwnProperty(name)) {
