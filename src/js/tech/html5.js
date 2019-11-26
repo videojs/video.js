@@ -1218,7 +1218,7 @@ Html5.Events = [
   ['featuresNativeVideoTracks', 'supportsNativeVideoTracks'],
   ['featuresNativeAudioTracks', 'supportsNativeAudioTracks']
 ].forEach(function([key, fn]) {
-  defineLazyProperty(Html5.prototype, key, () => Html5[fn](), false);
+  defineLazyProperty(Html5.prototype, key, () => Html5[fn](), true);
 });
 
 /**
