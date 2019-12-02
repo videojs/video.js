@@ -1,3 +1,12 @@
+<a name="7.7.2"></a>
+## [7.7.2](https://github.com/videojs/video.js/compare/v7.7.1...v7.7.2) (2019-12-02)
+
+### Bug Fixes
+
+* **sass:** import path has cwd once again ([#6326](https://github.com/videojs/video.js/issues/6326)) ([df3c14a](https://github.com/videojs/video.js/commit/df3c14a))
+* turn on strict mode again ([#6334](https://github.com/videojs/video.js/issues/6334)) ([ca84448](https://github.com/videojs/video.js/commit/ca84448)), closes [videojs/vtt.js#40](https://github.com/videojs/vtt.js/issues/40) [#6333](https://github.com/videojs/video.js/issues/6333) [videojs/vtt.js#15](https://github.com/videojs/vtt.js/issues/15)
+* **package:** update videojs-vtt.js to version 0.15.2 ([#6333](https://github.com/videojs/video.js/issues/6333)) ([7bbd0ca](https://github.com/videojs/video.js/commit/7bbd0ca)), closes [#6332](https://github.com/videojs/video.js/issues/6332)
+
 <a name="7.7.1"></a>
 ## [7.7.1](https://github.com/videojs/video.js/compare/v7.7.0...v7.7.1) (2019-11-22)
 
