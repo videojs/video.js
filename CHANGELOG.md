@@ -1,3 +1,10 @@
+<a name="7.7.3"></a>
+## [7.7.3](https://github.com/videojs/video.js/compare/v7.7.2...v7.7.3) (2019-12-02)
+
+### Chores
+
+* update package-lock.json ([221497f](https://github.com/videojs/video.js/commit/221497f))
+
 <a name="7.7.2"></a>
 ## [7.7.2](https://github.com/videojs/video.js/compare/v7.7.1...v7.7.2) (2019-12-02)
 
