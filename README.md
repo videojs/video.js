@@ -137,7 +137,7 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [license]: LICENSE
 
-[logo]: https://videojs.com/img/logo.png
+[logo]: https://videojs.com/logo-white.png
 
 [npm-icon]: https://nodei.co/npm/video.js.png?downloads=true&downloadRank=true
 
