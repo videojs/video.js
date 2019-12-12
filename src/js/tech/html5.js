@@ -224,9 +224,26 @@ class Html5 extends Tech {
     // for these scenarios.
     const SAFE_TIME_DELTA = TIME_FUDGE_FACTOR * 3;
 
+    // try to determine whether a successful playback occurred
+    const SUCCESFULL_PLAYBACK_TIME = 1; // second
+    const timeupdateAfterOneSecond = false;
+    this.on('loadedmetadata', function() {
+      timeupdateAfterOneSecond = false;
+      const timeUpdateListener = function() {
+        if (this.currentTime() > SUCCESFULL_PLAYBACK_TIME) {
+          this.off('timeupdate', timeUpdateListener);
+          timeupdateAfterOneSecond = true;
+        }
+      };
+      // disconnect previous listener
+      this.off('timeupdate', timeUpdateListener);
+      this.on('timeupdate', timeUpdateListener);
+    });
+
     // If iOS check if we have a real stalled or supend event or
     // we got stalled/suspend due headphones where disconnected during playback
     this.on(['stalled', 'suspend'], (e) => {
+      if (!timeupdateAfterOneSecond) return;
       const buffered = this.buffered();
 
       if (!buffered.length) {
