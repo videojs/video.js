@@ -225,12 +225,12 @@ class Html5 extends Tech {
     const SAFE_TIME_DELTA = TIME_FUDGE_FACTOR * 3;
 
     // try to determine whether a successful playback occurred
-    const SUCCESFULL_PLAYBACK_TIME = 1; // second
+    const SUCCESSFUL_PLAYBACK_TIME = 1; // second
     const timeupdateAfterOneSecond = false;
     this.on('loadedmetadata', function() {
       timeupdateAfterOneSecond = false;
       const timeUpdateListener = function() {
-        if (this.currentTime() > SUCCESFULL_PLAYBACK_TIME) {
+        if (this.currentTime() > SUCCESSFUL_PLAYBACK_TIME) {
           this.off('timeupdate', timeUpdateListener);
           timeupdateAfterOneSecond = true;
         }
