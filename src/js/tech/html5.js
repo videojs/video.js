@@ -231,6 +231,7 @@ class Html5 extends Tech {
       }
     };
 
+    // a new source got loaded
     this.on('loadedmetadata', function() {
       // disconnect previous listeners
       this.off('timeupdate', timeUpdateListener);
