@@ -226,8 +226,7 @@ class Html5 extends Tech {
 
         // If iOS check if we have a real stalled or supend event or
         // we got stalled/suspend due headphones where disconnected during playback
-        this.on('stalled', boundStalledAndSuspendHandler);
-        this.on('suspend', boundStalledAndSuspendHandler);
+        this.on(['stalled', 'suspend'], boundStalledAndSuspendHandler);
       }
     };
 
@@ -235,8 +234,7 @@ class Html5 extends Tech {
     this.on('loadedmetadata', function() {
       // disconnect previous listeners
       this.off('timeupdate', timeUpdateListener);
-      this.off('stalled', boundStalledAndSuspendHandler);
-      this.off('suspend', boundStalledAndSuspendHandler);
+      this.on(['stalled', 'suspend'], boundStalledAndSuspendHandler);
       // wait until we reached a succesful playback
       this.on('timeupdate', timeUpdateListener);
     });
