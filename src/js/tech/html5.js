@@ -209,11 +209,39 @@ class Html5 extends Tech {
   }
 
   /**
-   * Handle IOS Headphone disconnection during playback
+   * Handle IOS Headphone disconnection during playback after successful
+   * playback of each video source.
    *
    * @private
   */
   handleIOSHeadphonesDisconnection_() {
+    // try to determine whether a successful playback occurred before
+    // checking stalled and suspend events
+    const SUCCESSFUL_PLAYBACK_TIME_SECONDS = 1;
+    const boundStalledAndSuspendHandler = this.handleIOSHeadphoneStalledAndSuspendEvent_.bind(this);
+
+    const timeUpdateListener = function() {
+      if (this.currentTime() > SUCCESSFUL_PLAYBACK_TIME_SECONDS) {
+        this.off('timeupdate', timeUpdateListener);
+
+        // If iOS check if we have a real stalled or supend event or
+        // we got stalled/suspend due headphones where disconnected during playback
+        this.on('stalled', boundStalledAndSuspendHandler);
+        this.on('suspend', boundStalledAndSuspendHandler);
+      }
+    };
+
+    this.on('loadedmetadata', function() {
+      // disconnect previous listeners
+      this.off('timeupdate', timeUpdateListener);
+      this.off('stalled', boundStalledAndSuspendHandler);
+      this.off('suspend', boundStalledAndSuspendHandler);
+      // wait until we reached a succesful playback
+      this.on('timeupdate', timeUpdateListener);
+    });
+  }
+
+  handleIOSHeadphoneStalledAndSuspendEvent_() {
     // Fudge factor to account for TimeRanges rounding
     const TIME_FUDGE_FACTOR = 1 / 30;
 
@@ -224,55 +252,28 @@ class Html5 extends Tech {
     // for these scenarios.
     const SAFE_TIME_DELTA = TIME_FUDGE_FACTOR * 3;
 
-    // try to determine whether a successful playback occurred
-    const SUCCESSFUL_PLAYBACK_TIME = 1;
+    const buffered = this.buffered();
 
-    let successfulPlayback = false;
+    if (!buffered.length) {
+      return;
+    }
 
-    const timeUpdateListener = function() {
-      if (this.currentTime() > SUCCESSFUL_PLAYBACK_TIME) {
-        this.off('timeupdate', timeUpdateListener);
-        successfulPlayback = true;
+    let extraBuffer = false;
+    const currentTime = this.currentTime();
+
+    // Establish if we have an extra buffer in the current time range playing.
+    for (let i = 0; i < buffered.length; i++) {
+      if (buffered.start(i) <= currentTime &&
+        currentTime < buffered.end(i) + SAFE_TIME_DELTA) {
+        extraBuffer = true;
+        break;
       }
-    };
+    }
 
-    this.on('loadedmetadata', function() {
-      successfulPlayback = false;
-
-      // disconnect previous listener
-      this.off('timeupdate', timeUpdateListener);
-      this.on('timeupdate', timeUpdateListener);
-    });
-
-    // If iOS check if we have a real stalled or supend event or
-    // we got stalled/suspend due headphones where disconnected during playback
-    this.on(['stalled', 'suspend'], (e) => {
-      if (!successfulPlayback) {
-        return;
-      }
-      const buffered = this.buffered();
-
-      if (!buffered.length) {
-        return;
-      }
-
-      let extraBuffer = false;
-      const currentTime = this.currentTime();
-
-      // Establish if we have an extra buffer in the current time range playing.
-      for (let i = 0; i < buffered.length; i++) {
-        if (buffered.start(i) <= currentTime &&
-          currentTime < buffered.end(i) + SAFE_TIME_DELTA) {
-          extraBuffer = true;
-          break;
-        }
-      }
-
-      // if tech is not paused, browser has internet connection & player has extraBuffer inside the timeRange
-      if (extraBuffer && !this.paused() && window.navigator.onLine) {
-        this.pause();
-      }
-    });
+    // if tech is not paused, browser has internet connection & player has extraBuffer inside the timeRange
+    if (extraBuffer && !this.paused() && window.navigator.onLine) {
+      this.pause();
+    }
   }
 
   /**
