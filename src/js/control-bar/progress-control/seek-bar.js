@@ -326,6 +326,14 @@ class SeekBar extends Slider {
     }
     this.player_.scrubbing(false);
 
+    /**
+     * Trigger timeupdate because we're done seeking and the time has changed.
+     * This is particularly useful for if the player is paused to time the time displays.
+     *
+     * @event Tech#timeupdate
+     * @type {EventTarget~Event}
+     */
+    this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     if (this.videoWasPlaying) {
       silencePromise(this.player_.play());
     } else {
