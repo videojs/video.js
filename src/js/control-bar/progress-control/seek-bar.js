@@ -52,7 +52,8 @@ class SeekBar extends Slider {
    * @private
    */
   setEventHandlers_() {
-    this.update = Fn.throttle(Fn.bind(this, this.update), UPDATE_REFRESH_INTERVAL);
+    this.update_ = Fn.bind(this, this.update);
+    this.update = Fn.throttle(this.update_, UPDATE_REFRESH_INTERVAL);
 
     this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
     if (this.player_.liveTracker) {
@@ -325,16 +326,12 @@ class SeekBar extends Slider {
     }
     this.player_.scrubbing(false);
 
-    /**
-     * Trigger timeupdate because we're done seeking and the time has changed.
-     * This is particularly useful for if the player is paused to time the time displays.
-     *
-     * @event Tech#timeupdate
-     * @type {EventTarget~Event}
-     */
-    this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     if (this.videoWasPlaying) {
       silencePromise(this.player_.play());
+    } else {
+      // We're done seeking and the time has changed.
+      // If the player is paused, make sure we display the correct time on the seek bar.
+      this.update_();
     }
   }
 
