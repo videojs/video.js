@@ -43,15 +43,18 @@ const primedBabel = babel({
   babelrc: false,
   exclude: 'node_modules/**(!http-streaming)',
   compact: false,
+  plugins: [
+    '@babel/plugin-proposal-optional-chaining',
+    '@babel/plugin-proposal-nullish-coalescing-operator',
+    '@babel/plugin-transform-object-assign',
+    ['@babel/plugin-transform-runtime', {regenerator: false}]
+  ],
   presets: [
     ['@babel/preset-env', {
+      debug: true,
       loose: true,
       modules: false
     }]
-  ],
-  plugins: [
-    '@babel/plugin-transform-object-assign',
-    ['@babel/plugin-transform-runtime', {regenerator: false}]
   ]
 });
 
