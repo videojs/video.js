@@ -181,7 +181,8 @@ export const TOUCH_ENABLED = Dom.isReal() && (
  * @const
  * @type {Boolean}
  */
-export const IS_IPAD = (/iPad/i).test(USER_AGENT) || (IS_SAFARI && TOUCH_ENABLED);
+export const IS_IPAD = (/iPad/i).test(USER_AGENT) ||
+  (IS_SAFARI && TOUCH_ENABLED && !(/iPhone/i).test(USER_AGENT));
 
 /**
  * Whether or not this device is an iPhone.
