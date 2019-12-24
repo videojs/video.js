@@ -1,3 +1,16 @@
+<a name="7.7.4"></a>
+## [7.7.4](https://github.com/videojs/video.js/compare/v7.7.3...v7.7.4) (2019-12-24)
+
+### Bug Fixes
+
+* broken logo link in README and docs ([#6345](https://github.com/videojs/video.js/issues/6345)) ([274299b](https://github.com/videojs/video.js/commit/274299b)), closes [videojs/videojs.com#112](https://github.com/videojs/videojs.com/issues/112) [#6340](https://github.com/videojs/video.js/issues/6340)
+* IS_IPAD should be false on iPhone ([#6371](https://github.com/videojs/video.js/issues/6371)) ([917d898](https://github.com/videojs/video.js/commit/917d898))
+* updates seekbar position after mouse up event is triggered. ([#6372](https://github.com/videojs/video.js/issues/6372)) ([cd4076a](https://github.com/videojs/video.js/commit/cd4076a)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370)
+
+### Reverts
+
+* Revert "fix(iOS): pause player on suspend or stalled if extra buffer is available ([#6199](https://github.com/videojs/video.js/issues/6199))" ([#6373](https://github.com/videojs/video.js/issues/6373)) ([17d8046](https://github.com/videojs/video.js/commit/17d8046)), closes [#6330](https://github.com/videojs/video.js/issues/6330)
+
 <a name="7.7.3"></a>
 ## [7.7.3](https://github.com/videojs/video.js/compare/v7.7.2...v7.7.3) (2019-12-02)
 
