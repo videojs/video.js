@@ -5,7 +5,7 @@
 import * as Dom from './dom';
 import window from 'global/window';
 
-const USER_AGENT = window.navigator && window.navigator.userAgent || '';
+const USER_AGENT = window?.navigator?.userAgent ?? '';
 const webkitVersionMap = (/AppleWebKit\/([\d.]+)/i).exec(USER_AGENT);
 const appleWebkitVersion = webkitVersionMap ? parseFloat(webkitVersionMap.pop()) : null;
 
@@ -172,7 +172,7 @@ export const IS_WINDOWS = (/Windows/i).test(USER_AGENT);
 export const TOUCH_ENABLED = Dom.isReal() && (
   'ontouchstart' in window ||
   window.navigator.maxTouchPoints ||
-  window.DocumentTouch && window.document instanceof window.DocumentTouch);
+  window.document instanceof window?.DocumentTouch);
 
 /**
  * Whether or not this device is an iPad.

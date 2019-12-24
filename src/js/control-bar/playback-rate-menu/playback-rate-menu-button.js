@@ -134,7 +134,7 @@ class PlaybackRateMenuButton extends MenuButton {
    *         All possible playback rates
    */
   playbackRates() {
-    return this.options_.playbackRates || (this.options_.playerOptions && this.options_.playerOptions.playbackRates);
+    return this.options_.playbackRates ?? this.options_?.playerOptions.playbackRates;
   }
 
   /**
@@ -145,11 +145,8 @@ class PlaybackRateMenuButton extends MenuButton {
    *         Whether changing playback rate is supported
    */
   playbackRateSupported() {
-    return this.player().tech_ &&
-      this.player().tech_.featuresPlaybackRate &&
-      this.playbackRates() &&
-      this.playbackRates().length > 0
-    ;
+    return this.player()?.tech_?.featuresPlaybackRate &&
+      this.playbackRates()?.length > 0;
   }
 
   /**

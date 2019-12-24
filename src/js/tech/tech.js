@@ -944,13 +944,13 @@ class Tech extends Component {
       return;
     }
 
-    if (Tech.techs_ && Tech.techs_[name]) {
+    if (Tech.techs_?.[name]) {
       return Tech.techs_[name];
     }
 
     name = toTitleCase(name);
 
-    if (window && window.videojs && window.videojs[name]) {
+    if (window?.videojs?.[name]) {
       log.warn(`The ${name} tech was added to the videojs object when it should be registered using videojs.registerTech(name, tech)`);
       return window.videojs[name];
     }
@@ -1249,7 +1249,7 @@ Tech.withSourceHandlers = function(_Tech) {
     }
 
     this[fnName] = function() {
-      if (this.sourceHandler_ && this.sourceHandler_[fnName]) {
+      if (this.sourceHandler_?.[fnName]) {
         return this.sourceHandler_[fnName].apply(this.sourceHandler_, arguments);
       }
       return originalFn.apply(this, arguments);

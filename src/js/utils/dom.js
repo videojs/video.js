@@ -396,7 +396,7 @@ export function getAttributes(tag) {
   // and not all tags know about these attributes, so, we still want to check them manually
   const knownBooleans = ',' + 'autoplay,controls,playsinline,loop,muted,default,defaultMuted' + ',';
 
-  if (tag && tag.attributes && tag.attributes.length > 0) {
+  if (tag?.attributes?.length > 0) {
     const attrs = tag.attributes;
 
     for (let i = attrs.length - 1; i >= 0; i--) {
@@ -503,7 +503,7 @@ export function unblockTextSelection() {
  *         Always returns a plain object - or `undefined` if it cannot.
  */
 export function getBoundingClientRect(el) {
-  if (el && el.getBoundingClientRect && el.parentNode) {
+  if (el?.getBoundingClientRect && el?.parentNode) {
     const rect = el.getBoundingClientRect();
     const result = {};
 

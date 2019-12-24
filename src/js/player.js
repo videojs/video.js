@@ -564,7 +564,7 @@ class Player extends Component {
     Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 
-    if (this.styleEl_ && this.styleEl_.parentNode) {
+    if (this?.styleEl_?.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
       this.styleEl_ = null;
     }
@@ -576,7 +576,7 @@ class Player extends Component {
       this.tag.player = null;
     }
 
-    if (this.el_ && this.el_.player) {
+    if (this?.el_?.player) {
       this.el_.player = null;
     }
 
@@ -623,7 +623,7 @@ class Player extends Component {
   createEl() {
     let tag = this.tag;
     let el;
-    let playerElIngest = this.playerElIngest_ = tag.parentNode && tag.parentNode.hasAttribute && tag.parentNode.hasAttribute('data-vjs-player');
+    let playerElIngest = this.playerElIngest_ = tag?.parentNode?.hasAttribute('data-vjs-player');
     const divEmbed = this.tag.tagName.toLowerCase() === 'video-js';
 
     if (playerElIngest) {
@@ -952,7 +952,7 @@ class Player extends Component {
     if (window.VIDEOJS_NO_DYNAMIC_STYLE === true) {
       const width = typeof this.width_ === 'number' ? this.width_ : this.options_.width;
       const height = typeof this.height_ === 'number' ? this.height_ : this.options_.height;
-      const techEl = this.tech_ && this.tech_.el();
+      const techEl = this?.tech_?.el();
 
       if (techEl) {
         if (width >= 0) {
@@ -1100,7 +1100,7 @@ class Player extends Component {
       techOptions.tag = this.tag;
     }
 
-    if (source && source.src === this.cache_.src && this.cache_.currentTime > 0) {
+    if (source?.src === this.cache_.src && this.cache_.currentTime > 0) {
       techOptions.startTime = this.cache_.currentTime;
     }
 
@@ -1450,7 +1450,7 @@ class Player extends Component {
 
       sourceElSources.push(sourceObj);
 
-      if (sourceObj.src && sourceObj.src === src) {
+      if (sourceObj?.src === src) {
         matchingSourceEls.push(sourceObj.src);
       }
     }
@@ -2737,7 +2737,7 @@ class Player extends Component {
 
       // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
       if (!this.fsApi_.prefixed) {
-        fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
+        fsOptions = this?.options_?.fullscreen.options || {};
         if (fullscreenOptions !== undefined) {
           fsOptions = fullscreenOptions;
         }
@@ -3384,7 +3384,7 @@ class Player extends Component {
    *         The current source
    */
   currentSrc() {
-    return this.currentSource() && this.currentSource().src || '';
+    return this.currentSource()?.src ?? '';
   }
 
   /**
@@ -3396,7 +3396,7 @@ class Player extends Component {
    *         The source MIME type
    */
   currentType() {
-    return this.currentSource() && this.currentSource().type || '';
+    return this.currentSource()?.type ?? '';
   }
 
   /**
@@ -3570,7 +3570,7 @@ class Player extends Component {
    * @private
    */
   handleTechPosterChange_() {
-    if ((!this.poster_ || this.options_.techCanOverridePoster) && this.tech_ && this.tech_.poster) {
+    if ((!this.poster_ || this.options_.techCanOverridePoster) && this?.tech_?.poster) {
       const newPoster = this.tech_.poster() || '';
 
       if (newPoster !== this.poster_) {
@@ -3956,7 +3956,7 @@ class Player extends Component {
       return;
     }
 
-    if (this.tech_ && this.tech_.featuresPlaybackRate) {
+    if (this?.tech_?.featuresPlaybackRate) {
       return this.cache_.lastPlaybackRate || this.techGet_('playbackRate');
     }
     return 1.0;
@@ -3982,7 +3982,7 @@ class Player extends Component {
       return this.techCall_('setDefaultPlaybackRate', rate);
     }
 
-    if (this.tech_ && this.tech_.featuresPlaybackRate) {
+    if (this?.tech_?.featuresPlaybackRate) {
       return this.techGet_('defaultPlaybackRate');
     }
     return 1.0;
@@ -4105,7 +4105,7 @@ class Player extends Component {
    *         current video width
    */
   videoWidth() {
-    return this.tech_ && this.tech_.videoWidth && this.tech_.videoWidth() || 0;
+    return this?.tech_?.videoWidth() ?? 0;
   }
 
   /**
@@ -4115,7 +4115,7 @@ class Player extends Component {
    *         current video height
    */
   videoHeight() {
-    return this.tech_ && this.tech_.videoHeight && this.tech_.videoHeight() || 0;
+    return this?.tech_?.videoHeight() ?? 0;
   }
 
   /**
@@ -4698,7 +4698,7 @@ Player.prototype.options_ = {
     'resizeManager'
   ],
 
-  language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
+  language: (navigator?.languages?.[0] ?? navigator?.userLanguage ?? navigator?.language) ?? 'en',
 
   // locales and their language translations
   languages: {},

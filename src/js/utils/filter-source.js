@@ -36,7 +36,7 @@ const filterSource = function(src) {
   } else if (typeof src === 'string' && src.trim()) {
     // convert string into object
     src = [fixSource({src})];
-  } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
+  } else if (isObject(src) && typeof src.src === 'string' && src?.src?.trim?.()) {
     // src is already valid
     src = [fixSource(src)];
   } else {

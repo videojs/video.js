@@ -116,7 +116,7 @@ const getDescriptor = (priority, prop) => {
   for (let i = 0; i < priority.length; i++) {
     descriptor = Object.getOwnPropertyDescriptor(priority[i], prop);
 
-    if (descriptor && descriptor.set && descriptor.get) {
+    if (descriptor?.set && descriptor?.get) {
       break;
     }
   }

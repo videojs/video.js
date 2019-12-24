@@ -79,7 +79,7 @@ export const findMimetype = (player, src) => {
   for (let i = 0; i < sources.length; i++) {
     const s = sources[i];
 
-    if (s.type && s.src && s.src === src) {
+    if (s.type && s?.src === src) {
       return s.type;
     }
   }

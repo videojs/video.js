@@ -70,12 +70,12 @@ class Component {
     options = this.options_ = mergeOptions(this.options_, options);
 
     // Get ID from options or options element if one is supplied
-    this.id_ = options.id || (options.el && options.el.id);
+    this.id_ = options.id ?? (options?.el?.id);
 
     // If there was no ID from the options, generate one
     if (!this.id_) {
       // Don't require the player ID function in the case of mock players
-      const id = player && player.id && player.id() || 'no_player';
+      const id = player?.id?.() ?? 'no_player';
 
       this.id_ = `${id}_component_${Guid.newGUID()}`;
     }
@@ -314,11 +314,11 @@ class Component {
    *         The localized string or if no localization exists the english string.
    */
   localize(string, tokens, defaultValue = string) {
-    const code = this.player_.language && this.player_.language();
-    const languages = this.player_.languages && this.player_.languages();
-    const language = languages && languages[code];
+    const code = this.player_.language?.();
+    const languages = this.player_.languages?.();
+    const language = languages?.[code];
     const primaryCode = code && code.split('-')[0];
-    const primaryLang = languages && languages[primaryCode];
+    const primaryLang = languages?.[primaryCode];
 
     let localizedString = defaultValue;
 
@@ -495,7 +495,7 @@ class Component {
       // If inserting before a component, insert before that component's element
       let refNode = null;
 
-      if (this.children_[index + 1] && this.children_[index + 1].el_) {
+      if (this?.children_?.[index + 1]?.el_) {
         refNode = this.children_[index + 1].el_;
       }
 

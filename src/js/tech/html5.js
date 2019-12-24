@@ -118,7 +118,7 @@ class Html5 extends Tech {
    * Dispose of `HTML5` media element and remove all tracks.
    */
   dispose() {
-    if (this.el_ && this.el_.resetSourceset_) {
+    if (this.el_?.resetSourceset_) {
       this.el_.resetSourceset_();
     }
     Html5.disposeMediaElement(this.el_);
@@ -873,11 +873,9 @@ class Html5 extends Tech {
       videoPlaybackQuality.totalVideoFrames = this.el().webkitDecodedFrameCount;
     }
 
-    if (window.performance && typeof window.performance.now === 'function') {
+    if (typeof window?.performance?.now === 'function') {
       videoPlaybackQuality.creationTime = window.performance.now();
-    } else if (window.performance &&
-               window.performance.timing &&
-               typeof window.performance.timing.navigationStart === 'number') {
+    } else if (typeof window?.performance?.timing?.navigationStart === 'number') {
       videoPlaybackQuality.creationTime =
         window.Date.now() - window.performance.timing.navigationStart;
     }

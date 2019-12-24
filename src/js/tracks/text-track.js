@@ -47,13 +47,9 @@ const parseCues = function(srcContent, track) {
 
   parser.parse(srcContent);
   if (errors.length > 0) {
-    if (window.console && window.console.groupCollapsed) {
-      window.console.groupCollapsed(`Text Track parsing errors for ${track.src}`);
-    }
+    window?.console?.groupCollapsed?.(`Text Track parsing errors for ${track.src}`);
     errors.forEach((error) => log.error(error));
-    if (window.console && window.console.groupEnd) {
-      window.console.groupEnd();
-    }
+    window?.console?.groupEnd?.();
   }
 
   parser.flush();
@@ -352,7 +348,7 @@ class TextTrack extends Track {
   addCue(originalCue) {
     let cue = originalCue;
 
-    if (window.vttjs && !(originalCue instanceof window.vttjs.VTTCue)) {
+    if (!(originalCue instanceof window?.vttjs?.VTTCue)) {
       cue = new window.vttjs.VTTCue(originalCue.startTime, originalCue.endTime, originalCue.text);
 
       for (const prop in originalCue) {

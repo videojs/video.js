@@ -83,7 +83,7 @@ class MenuButton extends Component {
     this.buttonPressed_ = false;
     this.menuButton_.el_.setAttribute('aria-expanded', 'false');
 
-    if (this.items && this.items.length <= this.hideThreshold_) {
+    if (this?.items?.length <= this.hideThreshold_) {
       this.hide();
     } else {
       this.show();

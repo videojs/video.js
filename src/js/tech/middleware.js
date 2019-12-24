@@ -93,7 +93,7 @@ export function setSource(player, src, next) {
  *        A Video.js tech.
  */
 export function setTech(middleware, tech) {
-  middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
+  middleware.forEach((mw) => mw?.setTech(tech));
 }
 
 /**

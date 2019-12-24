@@ -95,7 +95,7 @@ class HtmlTrackElementList {
   removeTrackElement_(trackElement) {
     for (let i = 0, length = this.trackElements_.length; i < length; i++) {
       if (trackElement === this.trackElements_[i]) {
-        if (this.trackElements_[i].track && typeof this.trackElements_[i].track.off === 'function') {
+        if (typeof this.trackElements_[i]?.track.off === 'function') {
           this.trackElements_[i].track.off();
         }
 

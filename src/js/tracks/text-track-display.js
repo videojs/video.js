@@ -110,7 +110,7 @@ class TextTrackDisplay extends Component {
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(Fn.bind(this, function() {
-      if (player.tech_ && player.tech_.featuresNativeTextTracks) {
+      if (player?.tech_?.featuresNativeTextTracks) {
         this.hide();
         return;
       }
@@ -152,8 +152,8 @@ class TextTrackDisplay extends Component {
       const track = trackList[i];
 
       if (
-        userPref && userPref.enabled &&
-        userPref.language && userPref.language === track.language &&
+        userPref?.enabled &&
+        userPref?.language === track.language &&
         track.kind in modes
       ) {
         // Always choose the track that matches both language and kind
@@ -201,7 +201,7 @@ class TextTrackDisplay extends Component {
    * @listens Player#loadstart
    */
   toggleDisplay() {
-    if (this.player_.tech_ && this.player_.tech_.featuresNativeTextTracks) {
+    if (this.player_?.tech_?.featuresNativeTextTracks) {
       this.hide();
     } else {
       this.show();
@@ -362,7 +362,7 @@ class TextTrackDisplay extends Component {
           cueDiv.firstChild.style.textShadow = `0 0 4px ${darkGray}, 0 0 4px ${darkGray}, 0 0 4px ${darkGray}, 0 0 4px ${darkGray}`;
         }
       }
-      if (overrides.fontPercent && overrides.fontPercent !== 1) {
+      if (overrides?.fontPercent !== 1) {
         const fontSize = window.parseFloat(cueDiv.style.fontSize);
 
         cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
@@ -370,7 +370,7 @@ class TextTrackDisplay extends Component {
         cueDiv.style.top = 'auto';
         cueDiv.style.bottom = '2px';
       }
-      if (overrides.fontFamily && overrides.fontFamily !== 'default') {
+      if (overrides?.fontFamily !== 'default') {
         if (overrides.fontFamily === 'small-caps') {
           cueDiv.firstChild.style.fontVariant = 'small-caps';
         } else {

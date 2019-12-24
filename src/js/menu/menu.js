@@ -164,7 +164,7 @@ class Menu extends Component {
     })) {
       const btn = this.menuButton_;
 
-      if (btn && btn.buttonPressed_ && relatedTarget !== btn.el().firstChild) {
+      if (btn?.buttonPressed_ && relatedTarget !== btn.el().firstChild) {
         btn.unpressButton();
       }
     }
@@ -259,8 +259,7 @@ class Menu extends Component {
    */
   focus(item = 0) {
     const children = this.children().slice();
-    const haveTitle = children.length && children[0].className &&
-      (/vjs-menu-title/).test(children[0].className);
+    const haveTitle = (/vjs-menu-title/).test(children?.[0]?.className);
 
     if (haveTitle) {
       children.shift();
