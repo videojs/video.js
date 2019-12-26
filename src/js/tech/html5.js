@@ -77,8 +77,8 @@ class Html5 extends Tech {
             this.remoteTextTracks().addTrack(node.track);
             this.textTracks().addTrack(node.track);
             if (!crossoriginTracks &&
-                !this.el_.hasAttribute('crossorigin') &&
-                Url.isCrossOrigin(node.src)) {
+              !this.el_.hasAttribute('crossorigin') &&
+              Url.isCrossOrigin(node.src)) {
               crossoriginTracks = true;
             }
           }
@@ -93,7 +93,7 @@ class Html5 extends Tech {
     this.proxyNativeTracks_();
     if (this.featuresNativeTextTracks && crossoriginTracks) {
       log.warn('Text Tracks are being loaded from another origin but the crossorigin attribute isn\'t used.\n' +
-            'This may prevent text tracks from loading.');
+        'This may prevent text tracks from loading.');
     }
 
     // prevent iOS Safari from disabling metadata text tracks during native playback
@@ -104,7 +104,7 @@ class Html5 extends Tech {
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
     if ((browser.TOUCH_ENABLED || browser.IS_IPHONE ||
-        browser.IS_NATIVE_ANDROID) && options.nativeControlsForTouch === true) {
+      browser.IS_NATIVE_ANDROID) && options.nativeControlsForTouch === true) {
       this.setControls(true);
     }
 
@@ -269,8 +269,8 @@ class Html5 extends Tech {
     const techTracks = this[props.getterName]();
 
     if (!this[`featuresNative${props.capitalName}Tracks`] ||
-        !elTracks ||
-        !elTracks.addEventListener) {
+      !elTracks ||
+      !elTracks.addEventListener) {
       return;
     }
     const listeners = {
@@ -365,8 +365,8 @@ class Html5 extends Tech {
     // So we have to create a brand new element.
     // If we ingested the player div, we do not need to move the media element.
     if (!el ||
-        !(this.options_.playerElIngest ||
-          this.movingMediaElementInDOM)) {
+      !(this.options_.playerElIngest ||
+        this.movingMediaElementInDOM)) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
@@ -895,7 +895,7 @@ class Html5 extends Tech {
     const videoPlaybackQuality = {};
 
     if (typeof this.el().webkitDroppedFrameCount !== 'undefined' &&
-        typeof this.el().webkitDecodedFrameCount !== 'undefined') {
+      typeof this.el().webkitDecodedFrameCount !== 'undefined') {
       videoPlaybackQuality.droppedVideoFrames = this.el().webkitDroppedFrameCount;
       videoPlaybackQuality.totalVideoFrames = this.el().webkitDecodedFrameCount;
     }
@@ -903,8 +903,8 @@ class Html5 extends Tech {
     if (window.performance && typeof window.performance.now === 'function') {
       videoPlaybackQuality.creationTime = window.performance.now();
     } else if (window.performance &&
-               window.performance.timing &&
-               typeof window.performance.timing.navigationStart === 'number') {
+      window.performance.timing &&
+      typeof window.performance.timing.navigationStart === 'number') {
       videoPlaybackQuality.creationTime =
         window.Date.now() - window.performance.timing.navigationStart;
     }
@@ -1063,12 +1063,12 @@ Html5.canOverrideAttributes = function() {
   // if we cannot overwrite the src/innerHTML property, there is no support
   // iOS 7 safari for instance cannot do this.
   try {
-    const noop = () => {};
+    const noop = () => { };
 
-    Object.defineProperty(document.createElement('video'), 'src', {get: noop, set: noop});
-    Object.defineProperty(document.createElement('audio'), 'src', {get: noop, set: noop});
-    Object.defineProperty(document.createElement('video'), 'innerHTML', {get: noop, set: noop});
-    Object.defineProperty(document.createElement('audio'), 'innerHTML', {get: noop, set: noop});
+    Object.defineProperty(document.createElement('video'), 'src', { get: noop, set: noop });
+    Object.defineProperty(document.createElement('audio'), 'src', { get: noop, set: noop });
+    Object.defineProperty(document.createElement('video'), 'innerHTML', { get: noop, set: noop });
+    Object.defineProperty(document.createElement('audio'), 'innerHTML', { get: noop, set: noop });
   } catch (e) {
     return false;
   }
@@ -1764,7 +1764,20 @@ Html5.resetMediaElement = function(el) {
    *
    * @see [Spec] {@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-video-videowidth}
    */
-  'videoHeight'
+  'videoHeight',
+  /**
+   * Set the value of `crossorigin` from the media element. `crossorigin` indicates
+   * to the browser that should sent the cookies along with the requests for the
+   * different assets/playlists
+   *
+   * @method Html5#setCrossorigin
+   * @param {string} crossorigin
+   *         - anonymous indicates that the media should not sent cookies.
+   *         - use-credentials indicates that the media should sent cookies along the requests.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-media-crossorigin}
+   */
+  'crossorigin'
 ].forEach(function(prop) {
   Html5.prototype[prop] = function() {
     return this.el_[prop];
@@ -1774,7 +1787,7 @@ Html5.resetMediaElement = function(el) {
 // Wrap native properties with a setter in this format:
 // set + toTitleCase(name)
 // The list is as follows:
-// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate
+// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate, setCrossorigin
 [
   /**
    * Set the value of `volume` on the media element. `volume` indicates the current
@@ -1864,7 +1877,20 @@ Html5.resetMediaElement = function(el) {
    *
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultplaybackrate}
    */
-  'defaultPlaybackRate'
+  'defaultPlaybackRate',
+  /**
+   * Set the value of `crossorigin` from the media element. `crossorigin` indicates
+   * to the browser that should sent the cookies along with the requests for the
+   * different assets/playlists
+   *
+   * @method Html5#setCrossorigin
+   * @param {string} crossorigin
+   *         - anonymous indicates that the media should not sent cookies.
+   *         - use-credentials indicates that the media should sent cookies along the requests.
+   *
+   * @see [Spec]{@link https://html.spec.whatwg.org/#attr-media-crossorigin}
+   */
+  'crossorigin'
 
 ].forEach(function(prop) {
   Html5.prototype['set' + toTitleCase(prop)] = function(v) {
@@ -1957,7 +1983,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source, options) {
   if (source.type) {
     return Html5.nativeSourceHandler.canPlayType(source.type);
 
-  // If no type, fall back to checking 'video/[EXTENSION]'
+    // If no type, fall back to checking 'video/[EXTENSION]'
   } else if (source.src) {
     const ext = Url.getFileExtension(source.src);
 
@@ -1986,7 +2012,7 @@ Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
 /**
  * A noop for the native dispose function, as cleanup is not needed.
  */
-Html5.nativeSourceHandler.dispose = function() {};
+Html5.nativeSourceHandler.dispose = function() { };
 
 // Register the native source handler
 Html5.registerSourceHandler(Html5.nativeSourceHandler);

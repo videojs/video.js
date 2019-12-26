@@ -4,35 +4,35 @@
 // Subclasses Component
 import Component from './component.js';
 
-import {version} from '../../package.json';
+import { version } from '../../package.json';
 import document from 'global/document';
 import window from 'global/window';
 import evented from './mixins/evented';
-import {isEvented, addEventedCallback} from './mixins/evented';
+import { isEvented, addEventedCallback } from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
-import {IE_VERSION, IS_CHROME, IS_WINDOWS} from './utils/browser.js';
+import { IE_VERSION, IS_CHROME, IS_WINDOWS } from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
-import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
+import { toTitleCase, titleCaseEquals } from './utils/string-cases.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign} from './utils/obj';
+import { assign } from './utils/obj';
 import mergeOptions from './utils/merge-options.js';
-import {silencePromise, isPromise} from './utils/promise';
+import { silencePromise, isPromise } from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
 import * as middleware from './tech/middleware.js';
-import {ALL as TRACK_TYPES} from './tracks/track-types';
+import { ALL as TRACK_TYPES } from './tracks/track-types';
 import filterSource from './utils/filter-source';
-import {getMimetype, findMimetype} from './utils/mimetypes';
+import { getMimetype, findMimetype } from './utils/mimetypes';
 import keycode from 'keycode';
 
 // The following imports are used only to ensure that the corresponding modules
@@ -382,11 +382,11 @@ class Player extends Component {
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
-        !this.options_.techOrder ||
-        !this.options_.techOrder.length) {
+      !this.options_.techOrder ||
+      !this.options_.techOrder.length) {
       throw new Error('No techOrder specified. Did you overwrite ' +
-                      'videojs.options instead of just changing the ' +
-                      'properties you want to override?');
+        'videojs.options instead of just changing the ' +
+        'properties you want to override?');
     }
 
     // Store the original tag used to set options
@@ -458,7 +458,7 @@ class Player extends Component {
     this.el_ = this.createEl();
 
     // Make this an evented object and use `el_` as its event bus.
-    evented(this, {eventBusKey: 'el_'});
+    evented(this, { eventBusKey: 'el_' });
 
     // listen to document and player fullscreenchange handlers so we receive those events
     // before a user can receive them so we can update isFullscreen appropriately.
@@ -744,6 +744,7 @@ class Player extends Component {
     this.fill(this.options_.fill);
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
+    this.crossOrigin(this.options_.crossOrigin);
 
     // Hide any links within the video/audio tag,
     // because IE doesn't hide them completely from screen readers.
@@ -780,6 +781,32 @@ class Player extends Component {
     this.el_ = el;
 
     return el;
+  }
+
+  /**
+   * A getter/setter for the `Player`'s crossOrigin. Returns the player's configured value.
+   *
+   * @param {string} [value]
+   *        The value to set the `Player`'s crossorigin to.
+   *
+   * @return {string}
+   *         The current crossorigin value of the `Player`.
+   */
+  crossOrigin(value) {
+    if (!value) {
+      return this.techGet_('crossorigin');
+    }
+
+    const validCorsValues = ['anonymous', 'use-credentials'];
+
+    if (validCorsValues.indexOf(value) < 0) {
+      log.error(`Improper value "${value}" supplied for crossorigin`);
+      return;
+    }
+
+    this.techCall_('setCrossorigin', value);
+
+    return this.techGet_('crossorigin');
   }
 
   /**
@@ -1412,9 +1439,9 @@ class Player extends Component {
     }
 
     return promise.then(() => {
-      this.trigger({type: 'autoplay-success', autoplay: type});
+      this.trigger({ type: 'autoplay-success', autoplay: type });
     }).catch((e) => {
-      this.trigger({type: 'autoplay-failure', autoplay: type});
+      this.trigger({ type: 'autoplay-failure', autoplay: type });
     });
   }
 
@@ -1450,7 +1477,7 @@ class Player extends Component {
     }
 
     // update `currentSource` cache always
-    this.cache_.source = mergeOptions({}, srcObj, {src, type});
+    this.cache_.source = mergeOptions({}, srcObj, { src, type });
 
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
     const sourceElSources = [];
@@ -1471,8 +1498,8 @@ class Player extends Component {
     // the current source cache is not up to date
     if (matchingSourceEls.length && !matchingSources.length) {
       this.cache_.sources = sourceElSources;
-    // if we don't have matching source or source els set the
-    // sources cache to the `currentSource` cache
+      // if we don't have matching source or source els set the
+      // sources cache to the `currentSource` cache
     } else if (!matchingSources.length) {
       this.cache_.sources = [this.cache_.source];
     }
@@ -1530,7 +1557,7 @@ class Player extends Component {
         // if both the tech source and the player source were updated we assume
         // something like @videojs/http-streaming did the sourceset and skip updating the source cache.
         if (!this.lastSource_ || (this.lastSource_.tech !== eventSrc && this.lastSource_.player !== playerSrc)) {
-          updateSourceCaches = () => {};
+          updateSourceCaches = () => { };
         }
       }
 
@@ -1557,7 +1584,7 @@ class Player extends Component {
         });
       }
     }
-    this.lastSource_ = {player: this.currentSource().src, tech: event.src};
+    this.lastSource_ = { player: this.currentSource().src, tech: event.src };
 
     this.trigger({
       src: event.src,
@@ -3027,7 +3054,7 @@ class Player extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
-    const {userActions} = this.options_;
+    const { userActions } = this.options_;
 
     // Bail out if hotkeys are not configured.
     if (!userActions || !userActions.hotkeys) {
@@ -3223,7 +3250,7 @@ class Player extends Component {
     const flip = (fn) => (a, b) => fn(b, a);
     const finder = ([techName, tech], source) => {
       if (tech.canPlaySource(source, this.options_[techName.toLowerCase()])) {
-        return {source, tech: techName};
+        return { source, tech: techName };
       }
     };
 
@@ -3545,12 +3572,12 @@ class Player extends Component {
       this.manualAutoplay_(value);
       techAutoplay = false;
 
-    // any falsy value sets autoplay to false in the browser,
-    // lets do the same
+      // any falsy value sets autoplay to false in the browser,
+      // lets do the same
     } else if (!value) {
       this.options_.autoplay = false;
 
-    // any other value (ie truthy) sets autoplay to true
+      // any other value (ie truthy) sets autoplay to true
     } else {
       this.options_.autoplay = true;
     }
@@ -3809,7 +3836,7 @@ class Player extends Component {
     // Suppress the first error message for no compatible source until
     // user interaction
     if (this.options_.suppressNotSupportedError &&
-        err && err.code === 4
+      err && err.code === 4
     ) {
       const triggerSuppressedError = function() {
         this.error(err);
@@ -4169,7 +4196,7 @@ class Player extends Component {
    *         does not return anything
    */
   removeRemoteTextTrack(obj = {}) {
-    let {track} = obj;
+    let { track } = obj;
 
     if (!track) {
       track = obj;
@@ -4446,7 +4473,7 @@ class Player extends Component {
       this.on('playerresize', this.updateCurrentBreakpoint_);
       this.updateCurrentBreakpoint_();
 
-    // Stop listening for breakpoints if the player is no longer responsive.
+      // Stop listening for breakpoints if the player is no longer responsive.
     } else {
       this.off('playerresize', this.updateCurrentBreakpoint_);
       this.removeCurrentBreakpoint_();
@@ -4542,7 +4569,7 @@ class Player extends Component {
     // Clone the media object so it cannot be mutated from outside.
     this.cache_.media = mergeOptions(media);
 
-    const {artwork, poster, src, textTracks} = this.cache_.media;
+    const { artwork, poster, src, textTracks } = this.cache_.media;
 
     // If `artwork` is not given, create it using `poster`.
     if (!artwork && poster) {
@@ -4586,7 +4613,7 @@ class Player extends Component {
         src: tt.src
       }));
 
-      const media = {src, textTracks};
+      const media = { src, textTracks };
 
       if (poster) {
         media.poster = poster;
@@ -4675,11 +4702,11 @@ class Player extends Component {
     // Note: We don't actually use flexBasis (or flexOrder), but it's one of the more
     // common flex features that we can rely on when checking for flex support.
     return !('flexBasis' in elem.style ||
-            'webkitFlexBasis' in elem.style ||
-            'mozFlexBasis' in elem.style ||
-            'msFlexBasis' in elem.style ||
-            // IE10-specific (2012 flex spec), available for completeness
-            'msFlexOrder' in elem.style);
+      'webkitFlexBasis' in elem.style ||
+      'mozFlexBasis' in elem.style ||
+      'msFlexBasis' in elem.style ||
+      // IE10-specific (2012 flex spec), available for completeness
+      'msFlexOrder' in elem.style);
   }
 }
 
