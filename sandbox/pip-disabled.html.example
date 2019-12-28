@@ -27,11 +27,13 @@
     <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
     <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video-js>
-
+  <p>
+    PiP disabled via <b>disablepictureinpicture</b> attribute.
+  </p>
   <video-js
       id="vid2"
       controls
-      preload="none"
+      preload="auto"
       width="640"
       height="264"
       poster="http://vjs.zencdn.net/v/oceans.png">
@@ -41,7 +43,12 @@
       <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
       <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
     </video-js>
+    <p>
+      PiP disabled via <b>disablePictureInPicture</b> player option.
+    </p>
+    <button id="PiPToggleBtn">call disablePictureInPicture(false) for the player 2</button>
   <script>
+    var pipDisabled = true;
     var vid = document.getElementById('vid1');
     var player = videojs(vid);
 
@@ -51,6 +58,13 @@
         pictureInPictureToggle: true
       },
       disablePictureInPicture: true
+    });
+
+    var pipToggle = document.getElementById('PiPToggleBtn');
+    pipToggle.addEventListener('click', function() {
+      pipToggle.innerText = 'call disablePictureInPicture(' + pipDisabled + ') for the player 2';
+      pipDisabled = !pipDisabled;
+      player2.disablePictureInPicture(pipDisabled);
     });
   </script>
 
