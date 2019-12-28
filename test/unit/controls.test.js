@@ -160,10 +160,12 @@ QUnit.test('Picture-in-Picture control text should be correct when enterpicturei
   player.isInPictureInPicture(true);
   player.trigger('enterpictureinpicture');
   assert.equal(pictureInPictureToggle.controlText(), 'Exit Picture-in-Picture', 'Control Text is correct while switching to Picture-in-Picture mode');
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an enterpictureinpicture event');
 
   player.isInPictureInPicture(false);
   player.trigger('leavepictureinpicture');
   assert.equal(pictureInPictureToggle.controlText(), 'Picture-in-Picture', 'Control Text is correct while switching back to normal mode');
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an leavepictureinpicture event');
 
   player.dispose();
   pictureInPictureToggle.dispose();
