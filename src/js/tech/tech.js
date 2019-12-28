@@ -794,7 +794,7 @@ class Tech extends Component {
    * @abstract
    */
   disablePictureInPicture() {
-    return true;
+    return false;
   }
 
   /**
