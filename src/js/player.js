@@ -2861,17 +2861,16 @@ class Player extends Component {
    *                  - false will enable Picture-in-Picture mode
    */
   disablePictureInPicture(value) {
-    if (value !== undefined) {
-      this.techCall_('setDisablePictureInPicture', value);
-      this.options_.disablePictureInPicture = value;
-      const PiPToggle = this.controlBar.pictureInPictureToggle;
-
-      if (PiPToggle) {
-        PiPToggle.handlePiPEnabledChange();
-      }
-      return;
+    if (value === undefined) {
+      return this.techGet_('disablePictureInPicture');
     }
-    return this.techGet_('disablePictureInPicture');
+    this.techCall_('setDisablePictureInPicture', value);
+    this.options_.disablePictureInPicture = value;
+    const PiPToggle = this.controlBar.pictureInPictureToggle;
+
+    if (PiPToggle) {
+      PiPToggle.handlePiPEnabledChange();
+    }
   }
 
   /**
