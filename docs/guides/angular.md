@@ -61,5 +61,5 @@ Don't forget to include the Video.js CSS, located at `video.js/dist/video-js.css
 You can then use it like this.
 
 ```html
-<app-hls-player [options]="{ autoplay: true, controls: true, sources: [{ src: '/path/to/video.mp4', type: 'video/mp4' }]}"></app-hls-player>
+<app-vjs-player [options]="{ autoplay: true, controls: true, sources: [{ src: '/path/to/video.mp4', type: 'video/mp4' }]}"></app-vjs-player>
 ```
