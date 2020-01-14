@@ -244,7 +244,7 @@ class Slider extends Component {
     const progress = this.getProgress();
 
     if (progress === this.progress_) {
-      return;
+      return progress;
     }
 
     this.progress_ = progress;
@@ -268,7 +268,7 @@ class Slider extends Component {
    *         percentage filled that the slider is
    */
   getProgress() {
-    return clamp(this.getPercent(), 0, 1).toFixed(4);
+    return Number(clamp(this.getPercent(), 0, 1).toFixed(4));
   }
 
   /**
