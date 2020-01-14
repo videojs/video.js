@@ -1,8 +1,8 @@
 import Component from './component.js';
-import median from './utils/median.js';
 import mergeOptions from './utils/merge-options.js';
 import document from 'global/document';
 import * as browser from './utils/browser.js';
+import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
 const defaults = {
@@ -44,29 +44,9 @@ class LiveTracker extends Component {
     }
   }
 
-  isBehind_() {
-    // don't report that we are behind until a timeupdate has been seen
-    if (!this.timeupdateSeen_) {
-      return false;
-    }
-    const liveCurrentTime = this.liveCurrentTime();
-    const currentTime = this.player_.currentTime();
-
-    // the live edge window is the amount of seconds away from live
-    // that a player can be, but still be considered live.
-    // we add 0.07 because the live tracking happens every 30ms
-    // and we want some wiggle room for short segment live playback
-    const liveEdgeWindow = (this.seekableIncrement_ * 2) + 0.07;
-
-    // on Android liveCurrentTime can bee Infinity, because seekableEnd
-    // can be Infinity, so we handle that case.
-    return liveCurrentTime !== Infinity && (liveCurrentTime - liveEdgeWindow) >= currentTime;
-  }
-
   // all the functionality for tracking when seek end changes
   // and for tracking how far past seek end we should be
   trackLive_() {
-    this.pastSeekEnd_ = this.pastSeekEnd_;
     const seekable = this.player_.seekable();
 
     // skip undefined seekable
@@ -74,37 +54,28 @@ class LiveTracker extends Component {
       return;
     }
 
-    const newSeekEnd = this.seekableEnd();
+    const newTime = window.performance.now().toFixed(4);
+    const deltaTime = !this.lastTime_ ? 0 : (newTime - this.lastTime_) / 1000;
 
-    // we can only tell if we are behind live, when seekable changes
-    // once we detect that seekable has changed we check the new seek
-    // end against current time, with a fudge value of half a second.
-    if (newSeekEnd !== this.lastSeekEnd_) {
-      if (this.lastSeekEnd_) {
-        // we try to get the best fit value for the seeking increment
-        // variable from the last 12 values.
-        this.seekableIncrementList_ = this.seekableIncrementList_.slice(-11);
-        this.seekableIncrementList_.push(Math.abs(newSeekEnd - this.lastSeekEnd_));
-        if (this.seekableIncrementList_.length > 3) {
-          this.seekableIncrement_ = median(this.seekableIncrementList_);
-        }
-      }
+    this.lastTime_ = newTime;
 
-      this.pastSeekEnd_ = 0;
-      this.lastSeekEnd_ = newSeekEnd;
-      this.trigger('seekableendchange');
+    this.pastSeekEnd_ = this.pastSeekEnd() + deltaTime;
+
+    const liveCurrentTime = this.liveCurrentTime();
+    const currentTime = this.player_.currentTime();
+    // we are behind live if the difference between live and current time
+    // is greater liveTolerance which defaults to 15s
+    let isBehind = Math.abs(liveCurrentTime - currentTime) > this.options_.liveTolerance;
+
+    // we cannot be behind if
+    // 1. until we have not seen a timeupdate yet
+    // 2. liveCurrentTime is Infinity, which happens on Android
+    if (!this.timeupdateSeen_ || liveCurrentTime === Infinity) {
+      isBehind = false;
     }
 
-    // we should reset pastSeekEnd when the value
-    // is much higher than seeking increment.
-    if (this.pastSeekEnd() > this.seekableIncrement_ * 1.5) {
-      this.pastSeekEnd_ = 0;
-    } else {
-      this.pastSeekEnd_ = this.pastSeekEnd() + 0.03;
-    }
-
-    if (this.isBehind_() !== this.behindLiveEdge()) {
-      this.behindLiveEdge_ = this.isBehind_();
+    if (isBehind !== this.behindLiveEdge_) {
+      this.behindLiveEdge_ = isBehind;
       this.trigger('liveedgechange');
     }
   }
@@ -167,15 +138,14 @@ class LiveTracker extends Component {
    * their initial value.
    */
   reset_() {
+    this.lastTime_ = null;
     this.pastSeekEnd_ = 0;
     this.lastSeekEnd_ = null;
-    this.behindLiveEdge_ = null;
+    this.behindLiveEdge_ = true;
     this.timeupdateSeen_ = false;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
-    this.seekableIncrement_ = 12;
-    this.seekableIncrementList_ = [];
 
     this.off(this.player_, 'play', this.trackLive_);
     this.off(this.player_, 'pause', this.trackLive_);
@@ -195,6 +165,7 @@ class LiveTracker extends Component {
       return;
     }
     this.reset_();
+    this.trigger('liveedgechange');
   }
 
   /**
@@ -273,6 +244,12 @@ class LiveTracker extends Component {
    * Returns how far past seek end we expect current time to be
    */
   pastSeekEnd() {
+    const seekableEnd = this.seekableEnd();
+
+    if (typeof this.lastSeekEnd_ === 'number' && seekableEnd !== this.lastSeekEnd_) {
+      this.pastSeekEnd_ = 0;
+    }
+    this.lastSeekEnd_ = seekableEnd;
     return this.pastSeekEnd_;
   }
 
