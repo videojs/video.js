@@ -40,7 +40,24 @@ class SeekBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-    this.setEventHandlers_();
+    this.update_ = Fn.bind(this, this.update);
+    this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
+
+    // we don't need to update the play progress if the document is hidden,
+    // also, this causes the CPU to spike and eventually crash the page on IE11.
+    if ('hidden' in document && 'visibilityState' in document) {
+      this.on(document, 'visibilitychange', this.toggleVisibility_);
+    }
+
+    this.on(player, 'durationchange', function() {
+      if (player.duration() === Infinity) {
+        this.doEvents_('off');
+        this.doLiveEvents_('on');
+      } else {
+        this.doLiveEvents_('off');
+        this.doEvents_('on');
+      }
+    });
   }
 
   /**
@@ -48,54 +65,70 @@ class SeekBar extends Slider {
    *
    * @private
    */
-  setEventHandlers_() {
-    this.update_ = Fn.bind(this, this.update);
-    this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
+  doEvents_(type) {
+    if (this.eventState_ === type) {
+      return;
+    }
+    this.eventState_ = type;
 
-    this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
-    if (this.player_.liveTracker) {
-      this.on(this.player_.liveTracker, 'liveedgechange', this.update);
+    if (type === 'on' && !this.player_.paused()) {
+      this.enableInterval_();
+    } else {
+      this.disableInterval_();
     }
 
-    // when playing, let's ensure we smoothly update the play progress bar
-    // via an interval
-    this.updateInterval = null;
+    this[type](this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
+    this[type](this.player_, ['playing'], this.enableInterval_);
+    this[type](this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
 
-    this.on(this.player_, ['playing'], this.enableInterval_);
+  }
 
-    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
+  doLiveEvents_(type) {
+    if (this.liveEventState_ === type) {
+      return;
+    }
+    this.liveEventState_ = type;
 
-    // we don't need to update the play progress if the document is hidden,
-    // also, this causes the CPU to spike and eventually crash the page on IE11.
-    if ('hidden' in document && 'visibilityState' in document) {
-      this.on(document, 'visibilitychange', this.toggleVisibility_);
+    if (type === 'on' && this.player_.paused()) {
+      this.enableInterval_();
+    } else {
+      this.disableInterval_();
+    }
+
+    this[type](this.player_, ['pause', 'waiting'], this.enableInterval_);
+    this[type](this.player_, 'playing', this.disableInterval_);
+    if (this.player_.liveTracker) {
+      this[type](this.player_.liveTracker, 'liveedgechange', this.update);
     }
   }
 
-  toggleVisibility_(e) {
+  toggleVisibility_() {
+    // hidden
     if (document.hidden) {
-      this.disableInterval_(e);
-    } else {
-      this.enableInterval_();
+      // always disable, but store if we were enabled or not
+      this.wasEnabled_ = this.updateInterval;
+      this.disableInterval_();
+      return;
+    }
 
+    // only update/enable if we were enabled before the
+    // visibilitychange to hidden.
+    if (this.wasEnabled_) {
+      this.enableInterval_();
       // we just switched back to the page and someone may be looking, so, update ASAP
       this.update();
     }
+    this.wasEnabled_ = null;
   }
 
   enableInterval_() {
     if (this.updateInterval) {
       return;
-
     }
     this.updateInterval = this.setInterval(this.update, Fn.UPDATE_REFRESH_INTERVAL);
   }
 
-  disableInterval_(e) {
-    if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e && e.type !== 'ended') {
-      return;
-    }
-
+  disableInterval_() {
     if (!this.updateInterval) {
       return;
     }
