@@ -3,6 +3,7 @@ import median from './utils/median.js';
 import mergeOptions from './utils/merge-options.js';
 import document from 'global/document';
 import * as browser from './utils/browser.js';
+import * as Fn from './utils/fn.js';
 
 /* track when we are at the live edge, and other helpers for live playback */
 class LiveTracker extends Component {
@@ -129,7 +130,7 @@ class LiveTracker extends Component {
       this.timeupdateSeen_ = this.player_.hasStarted();
     }
 
-    this.trackingInterval_ = this.setInterval(this.trackLive_, 30);
+    this.trackingInterval_ = this.setInterval(this.trackLive_, Fn.UPDATE_REFRESH_INTERVAL);
     this.trackLive_();
 
     this.on(this.player_, 'play', this.trackLive_);
