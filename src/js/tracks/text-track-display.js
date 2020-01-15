@@ -397,6 +397,7 @@ class TextTrackDisplay extends Component {
     }
 
     const cues = [];
+    const regions = [];
 
     // push all active track cues
     for (let i = 0; i < tracks.length; ++i) {
@@ -405,10 +406,16 @@ class TextTrackDisplay extends Component {
       for (let j = 0; j < track.activeCues.length; ++j) {
         cues.push(track.activeCues[j]);
       }
+
+      if (track.regionList) {
+        for (let j = 0; j < track.regionList.length; ++j) {
+          regions.push(track.regionList[j]);
+        }
+      }
     }
 
     // removes all cues before it processes new ones
-    window.WebVTT.processCues(window, cues, this.el_);
+    window.WebVTT.processCues(window, cues, this.el_, regions);
 
     // add unique class to each language text track & add settings styling if necessary
     for (let i = 0; i < tracks.length; ++i) {
