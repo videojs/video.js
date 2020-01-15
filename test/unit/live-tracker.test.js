@@ -10,6 +10,7 @@ QUnit.module('LiveTracker', () => {
       this.clock = sinon.useFakeTimers();
 
       this.player = TestHelpers.makePlayer({liveui: true});
+      this.player.seekable = () => createTimeRanges(0, 31);
 
       this.liveTracker = this.player.liveTracker;
     },
@@ -46,6 +47,7 @@ QUnit.module('LiveTracker', () => {
       this.player = TestHelpers.makePlayer();
 
       this.liveTracker = this.player.liveTracker;
+      this.player.seekable = () => createTimeRanges(0, 31);
       this.player.duration(Infinity);
 
       this.liveEdgeChanges = 0;
@@ -63,6 +65,15 @@ QUnit.module('LiveTracker', () => {
       this.player.dispose();
       this.clock.restore();
     }
+  });
+  QUnit.test('trackingThreshold works', function(assert) {
+    assert.ok(this.liveTracker.isTracking(), 'starts off tracking');
+
+    // live window is now too low, stop tracking
+    this.player.seekable = () => createTimeRanges(0, 29);
+    this.player.trigger('durationchange');
+
+    assert.ok(!this.liveTracker.isTracking(), 'stops tracking on duration change');
   });
 
   QUnit.test('Triggers liveedgechange when we fall behind and catch up', function(assert) {
@@ -86,17 +97,16 @@ QUnit.module('LiveTracker', () => {
   });
 
   QUnit.test('pastSeekEnd should update when seekable changes', function(assert) {
-    assert.strictEqual(this.liveTracker.liveCurrentTime(), 0.03, 'liveCurrentTime is now 0.03');
-    this.clock.tick(2000);
+    assert.strictEqual(this.liveTracker.liveCurrentTime(), 31.03, 'liveCurrentTime is now 31');
+    this.clock.tick(2010);
 
     assert.ok(this.liveTracker.pastSeekEnd() > 2, 'pastSeekEnd should be over 2s');
 
-    this.player.seekable = () => createTimeRanges(0, 2);
+    this.player.seekable = () => createTimeRanges(31, 62);
 
     this.clock.tick(30);
     assert.strictEqual(this.liveTracker.pastSeekEnd(), 0.03, 'pastSeekEnd start at 0.03 again');
-    assert.strictEqual(this.liveTracker.liveCurrentTime(), 2.03, 'liveCurrentTime is now 2.03');
-    assert.equal(this.seekableEndChanges, 1, 'should be one seek end change');
+    assert.strictEqual(this.liveTracker.liveCurrentTime(), 62.03, 'liveCurrentTime is now 2.03');
   });
 
   QUnit.test('seeks to live edge on seekableendchange', function(assert) {

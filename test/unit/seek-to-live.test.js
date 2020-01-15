@@ -2,6 +2,7 @@
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import computedStyle from '../../src/js/utils/computed-style.js';
+import { createTimeRange } from '../../src/js/utils/time-ranges.js';
 
 QUnit.module('SeekToLive', () => {
   QUnit.module('live with liveui', {
@@ -10,6 +11,7 @@ QUnit.module('SeekToLive', () => {
 
       this.player = TestHelpers.makePlayer({liveui: true});
       this.seekToLive = this.player.controlBar.seekToLive;
+      this.player.seekable = () => createTimeRange(0, 45);
 
       this.getComputedDisplay = () => {
         return computedStyle(this.seekToLive.el(), 'display');
@@ -50,6 +52,7 @@ QUnit.module('SeekToLive', () => {
 
       this.player = TestHelpers.makePlayer();
       this.seekToLive = this.player.controlBar.seekToLive;
+      this.player.seekable = () => createTimeRange(0, 45);
 
       this.getComputedDisplay = () => {
         return computedStyle(this.seekToLive.el(), 'display');
@@ -89,6 +92,7 @@ QUnit.module('SeekToLive', () => {
   QUnit.test('switch to live', function(assert) {
     assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
 
+    this.player.seekable = () => createTimeRange(0, 45);
     this.player.duration(Infinity);
     this.player.trigger('durationchange');
 

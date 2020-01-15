@@ -2467,12 +2467,8 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
-        if (this.options_.liveui && this.player_.liveTracker) {
-          this.addClass('vjs-liveui');
-        }
       } else {
         this.removeClass('vjs-live');
-        this.removeClass('vjs-liveui');
       }
       if (!isNaN(seconds)) {
         // Do not fire durationchange unless the duration value is known.
