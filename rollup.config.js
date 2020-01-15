@@ -1,12 +1,12 @@
 import path from 'path';
 import fs from 'fs';
 import babel from 'rollup-plugin-babel';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import json from 'rollup-plugin-json';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import progressPlugin from 'rollup-plugin-progress';
 import ignore from 'rollup-plugin-ignore';
-import alias from 'rollup-plugin-alias';
+import alias from '@rollup/plugin-alias';
 import _ from 'lodash';
 import pkg from './package.json';
 import multiEntry from 'rollup-plugin-multi-entry';
@@ -44,8 +44,6 @@ const primedBabel = babel({
   exclude: 'node_modules/**(!http-streaming)',
   compact: false,
   plugins: [
-    '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-transform-object-assign',
     ['@babel/plugin-transform-runtime', {regenerator: false}]
   ],
@@ -119,13 +117,13 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      primedBabel,
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
       }),
       primedResolve,
       json(),
       primedCjs,
-      primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -149,12 +147,12 @@ export default cliargs => [
     ],
     external: externals.module,
     plugins: [
+      primedBabel,
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js'),
         '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
       json(),
-      primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -172,6 +170,7 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      primedBabel,
       primedIgnore,
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
@@ -179,7 +178,6 @@ export default cliargs => [
       primedResolve,
       json(),
       primedCjs,
-      primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -203,8 +201,8 @@ export default cliargs => [
     ],
     external: externals.module,
     plugins: [
-      json(),
       primedBabel,
+      json(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -222,10 +220,10 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      primedBabel,
       primedResolve,
       json(),
       primedCjs,
-      primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -243,11 +241,11 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      primedBabel,
       primedIgnore,
       primedResolve,
       json(),
       primedCjs,
-      primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -263,6 +261,7 @@ export default cliargs => [
     },
     external: externals.test,
     plugins: [
+      primedBabel,
       multiEntry({exports: false}),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
@@ -271,7 +270,6 @@ export default cliargs => [
       json(),
       stub(),
       primedCjs,
-      primedBabel,
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
