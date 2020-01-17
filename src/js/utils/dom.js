@@ -791,10 +791,11 @@ export function isSingleLeftClick(event) {
     return true;
   }
 
-  // `mouseup` event on a single left click has
-  // `button` and `buttons` equal to 0
-  if (event.type === 'mouseup' && event.button === 0 &&
-      event.buttons === 0) {
+  // `mouseup` event on a single left click and
+  // `mousedown` event on pressing a button on the remote controller (Samsung TV)
+  //  have `button` and `buttons` equal to 0
+  if ((event.type === 'mouseup' || event.type === 'mousedown') &&
+      event.button === 0 && event.buttons === 0) {
     return true;
   }
 

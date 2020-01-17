@@ -628,7 +628,13 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
   mouseEvent.button = 0;
   mouseEvent.buttons = 0;
 
-  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on an older browser (Safari) is a single left click');
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on an older browser (Safari) is a single left click');
+
+  // Remote controller button pressed
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a pressing button on remote controller over Samsung smart TV is treated as a single left click');
 
   // Left mouse click
   mouseEvent.button = 0;
