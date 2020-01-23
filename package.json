@@ -113,7 +113,7 @@
     "jsdoc": "^3.6.2",
     "karma": "^4.1.0",
     "lint-staged": "^8.2.0",
-    "markdown-table": "^1.1.3",
+    "markdown-table": "^2.0.0",
     "maxmin": "^2.1.0",
     "not-prerelease": "^1.0.1",
     "npm-merge-driver-install": "^1.1.1",
