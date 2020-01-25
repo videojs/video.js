@@ -103,7 +103,7 @@
     "cli-table": "^0.3.1",
     "conventional-changelog-cli": "^2.0.21",
     "conventional-changelog-videojs": "^3.0.0",
-    "cross-env": "^5.2.0",
+    "cross-env": "^7.0.0",
     "es5-shim": "^4.5.13",
     "es6-shim": "^0.35.5",
     "filesize": "^4.1.2",
