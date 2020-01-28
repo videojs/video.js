@@ -541,8 +541,10 @@ class Player extends Component {
 
     // listen to document and player fullscreenchange handlers so we receive those events
     // before a user can receive them so we can update isFullscreen appropriately.
-    Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-    this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+    if (this.fsApi_.requestFullscreen) {
+      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+      this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+    }
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
