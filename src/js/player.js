@@ -2758,54 +2758,24 @@ class Player extends Component {
       }
     }
 
-    const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
+    if (this.fsApi_.requestFullscreen) {
+      const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
-    if (promise) {
-      promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
+      if (promise) {
+        promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
+      }
+
+      return promise;
+    } else if (this.tech_.supportsFullScreen()) {
+      // we can't take the video.js controls fullscreen but we can go fullscreen
+      // with native controls
+      this.techCall_('enterFullScreen');
+    } else {
+      // fullscreen isn't supported so we'll just stretch the video element to
+      // fill the viewport
+      this.enterFullWindow();
     }
-
-    return promise;
   }
-  //
-  //   let fsOptions;
-  //
-  //   this.isFullscreen(true);
-  //
-  //   if (this.fsApi_.requestFullscreen) {
-  //     // the browser supports going fullscreen at the element level so we can
-  //     // take the controls fullscreen as well as the video
-  //
-  //     // Trigger fullscreenchange event after change
-  //     // We have to specifically add this each time, and remove
-  //     // when canceling fullscreen. Otherwise if there's multiple
-  //     // players on a page, they would all be reacting to the same fullscreen
-  //     // events
-  //     Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-  //
-  //     // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
-  //     if (!this.fsApi_.prefixed) {
-  //       fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
-  //       if (fullscreenOptions !== undefined) {
-  //         fsOptions = fullscreenOptions;
-  //       }
-  //     }
-  //
-  //     silencePromise(this.el_[this.fsApi_.requestFullscreen](fsOptions));
-  //   } else if (this.tech_.supportsFullScreen()) {
-  //     // we can't take the video.js controls fullscreen but we can go fullscreen
-  //     // with native controls
-  //     this.techCall_('enterFullScreen');
-  //   } else {
-  //     // fullscreen isn't supported so we'll just stretch the video element to
-  //     // fill the viewport
-  //     this.enterFullWindow();
-  //     #<{(|*
-  //      * @event Player#fullscreenchange
-  //      * @type {EventTarget~Event}
-  //      |)}>#
-  //     this.trigger('fullscreenchange');
-  //   }
-  // }
 
   /**
    * Return the video to its normal size after having been in full screen mode
@@ -2813,30 +2783,20 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    const promise = document[this.fsApi_.exitFullscreen]();
+    if (this.fsApi_.requestFullscreen) {
+      const promise = document[this.fsApi_.exitFullscreen]();
 
-    if (promise) {
-      promise.then(() => this.isFullscreen(false));
+      if (promise) {
+        promise.then(() => this.isFullscreen(false));
+      }
+
+      return promise;
+    } else if (this.tech_.supportsFullScreen()) {
+      this.techCall_('exitFullScreen');
+    } else {
+      this.exitFullWindow();
     }
-
-    return promise;
   }
-  //   this.isFullscreen(false);
-  //
-  //   // Check for browser element fullscreen support
-  //   if (this.fsApi_.requestFullscreen) {
-  //     silencePromise(document[this.fsApi_.exitFullscreen]());
-  //   } else if (this.tech_.supportsFullScreen()) {
-  //     this.techCall_('exitFullScreen');
-  //   } else {
-  //     this.exitFullWindow();
-  //     #<{(|*
-  //      * @event Player#fullscreenchange
-  //      * @type {EventTarget~Event}
-  //      |)}>#
-  //     this.trigger('fullscreenchange');
-  //   }
-  // }
 
   /**
    * When fullscreen isn't supported we can stretch the
@@ -2845,6 +2805,7 @@ class Player extends Component {
    * @fires Player#enterFullWindow
    */
   enterFullWindow() {
+    this.isFullscreen(true);
     this.isFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
@@ -2889,6 +2850,7 @@ class Player extends Component {
    * @fires Player#exitFullWindow
    */
   exitFullWindow() {
+    this.isFullscreen(false);
     this.isFullWindow = false;
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 
