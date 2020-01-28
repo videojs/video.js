@@ -2014,32 +2014,17 @@ class Player extends Component {
       return;
     }
 
-    this.isFullscreen(document[this.fsApi_.fullscreenElement] === this.el());
+    const el = this.el();
+    let isFs = document[this.fsApi_.fullscreenElement] === el;
+
+    if (!isFs && el.matches) {
+      isFs = el.matches(':' + this.fsApi_.fullscreen);
+    } else if (!isFs && el.msMatchesSelector) {
+      isFs = el.msMatchesSelector(':' + this.fsApi_.fullscreen);
+    }
+
+    this.isFullscreen(isFs);
   }
-  //   const el = this.el();
-  //   let isFs = document[this.fsApi_.fullscreenElement] === el;
-  //
-  //   if (!isFs && el.matches) {
-  //     isFs = el.matches(':' + this.fsApi_.fullscreen);
-  //   } else if (!isFs && el.msMatchesSelector) {
-  //     isFs = el.msMatchesSelector(':' + this.fsApi_.fullscreen);
-  //   }
-  //
-  //   this.isFullscreen(isFs);
-  //
-  //   // If cancelling fullscreen, remove event listener.
-  //   if (this.isFullscreen() === false) {
-  //     Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-  //   }
-  //
-  //   if (this.fsApi_.prefixed) {
-  //     #<{(|*
-  //      * @event Player#fullscreenchange
-  //      * @type {EventTarget~Event}
-  //      |)}>#
-  //     this.trigger('fullscreenchange');
-  //   }
-  // }
 
   /**
    * Handle Tech Fullscreen Change
