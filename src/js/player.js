@@ -536,9 +536,13 @@ class Player extends Component {
     this.on('stageclick', this.handleStageClick_);
     this.on('keydown', this.handleKeyDown);
 
+    // listen to document and player fullscreenchange handlers so we receive those events
+    // before a user can receive them so we can update isFullscreen appropriately.
+    Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+    this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
-
   }
 
   /**
@@ -1997,30 +2001,39 @@ class Player extends Component {
    * when the document fschange event triggers it calls this
    */
   documentFullscreenChange_(e) {
-    const el = this.el();
-    let isFs = document[this.fsApi_.fullscreenElement] === el;
+    const targetPlayer = e.target.player;
 
-    if (!isFs && el.matches) {
-      isFs = el.matches(':' + this.fsApi_.fullscreen);
-    } else if (!isFs && el.msMatchesSelector) {
-      isFs = el.msMatchesSelector(':' + this.fsApi_.fullscreen);
+    // if another player was fullscreen
+    if (targetPlayer !== this) {
+      return;
     }
 
-    this.isFullscreen(isFs);
-
-    // If cancelling fullscreen, remove event listener.
-    if (this.isFullscreen() === false) {
-      Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-    }
-
-    if (this.fsApi_.prefixed) {
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
-    }
+    this.isFullscreen(document.fullscreenElement === this.el());
   }
+  //   const el = this.el();
+  //   let isFs = document[this.fsApi_.fullscreenElement] === el;
+  //
+  //   if (!isFs && el.matches) {
+  //     isFs = el.matches(':' + this.fsApi_.fullscreen);
+  //   } else if (!isFs && el.msMatchesSelector) {
+  //     isFs = el.msMatchesSelector(':' + this.fsApi_.fullscreen);
+  //   }
+  //
+  //   this.isFullscreen(isFs);
+  //
+  //   // If cancelling fullscreen, remove event listener.
+  //   if (this.isFullscreen() === false) {
+  //     Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+  //   }
+  //
+  //   if (this.fsApi_.prefixed) {
+  //     #<{(|*
+  //      * @event Player#fullscreenchange
+  //      * @type {EventTarget~Event}
+  //      |)}>#
+  //     this.trigger('fullscreenchange');
+  //   }
+  // }
 
   /**
    * Handle Tech Fullscreen Change
