@@ -2008,7 +2008,7 @@ class Player extends Component {
       return;
     }
 
-    this.isFullscreen(document.fullscreenElement === this.el());
+    this.isFullscreen(document[this.fsApi_.fullscreenElement] === this.el());
   }
   //   const el = this.el();
   //   let isFs = document[this.fsApi_.fullscreenElement] === el;
@@ -2742,9 +2742,12 @@ class Player extends Component {
       }
     }
 
-    const promise = this.el_.requestFullscreen(fsOptions);
+    const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
-    promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
+    if (promise) {
+      promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
+    }
+
     return promise;
   }
   //
@@ -2794,7 +2797,13 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    return document.exitFullscreen().then(() => this.isFullscreen(false));
+    const promise = document[this.fsApi_.exitFullscreen]();
+
+    if (promise) {
+      promise.then(() => this.isFullscreen(false));
+    }
+
+    return promise;
   }
   //   this.isFullscreen(false);
   //
