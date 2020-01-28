@@ -352,8 +352,10 @@ class Player extends Component {
 
     // Create bound methods for document listeners.
     this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
-    this.boundPlayerFullscreenChange_ = Fn.bind(this, this.playerFullscreenChange_);
     this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
+
+    // default isFullscreen_ to false
+    this.isFullscreen_ = false;
 
     // create logger
     this.log = createLogger(this.id_);
@@ -540,7 +542,7 @@ class Player extends Component {
     // listen to document and player fullscreenchange handlers so we receive those events
     // before a user can receive them so we can update isFullscreen appropriately.
     Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-    this.on(this.fsApi_.fullscreenchange, this.boundPlayerFullscreenChange_);
+    this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -2012,22 +2014,6 @@ class Player extends Component {
 
     this.isFullscreen(document[this.fsApi_.fullscreenElement] === this.el());
   }
-
-  /**
-   * when the player fschange event triggers it calls this
-   * if we are in legacy mode, then trigger fullscreenchange on the player itself
-   */
-  playerFullscreenChange_(e) {
-    this.documentFullscreenChange_(e);
-
-    if (this.fsApi_.prefixed) {
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
-    }
-  }
   //   const el = this.el();
   //   let isFs = document[this.fsApi_.fullscreenElement] === el;
   //
@@ -2729,7 +2715,19 @@ class Player extends Component {
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
+      const oldValue = this.isFullscreen_;
+
       this.isFullscreen_ = Boolean(isFS);
+
+      // if we changed fullscreen state and we're in prefixed mode, trigger fullscreenchange
+      if (this.isFullscreen_ !== oldValue && this.fsApi_.prefixed) {
+        /**
+           * @event Player#fullscreenchange
+           * @type {EventTarget~Event}
+           */
+        this.trigger('fullscreenchange');
+      }
+
       this.toggleFullscreenClass_();
       return;
     }
