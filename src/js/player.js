@@ -2711,11 +2711,11 @@ class Player extends Component {
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
-      this.isFullscreen_ = !!isFS;
+      this.isFullscreen_ = Boolean(isFS);
       this.toggleFullscreenClass_();
       return;
     }
-    return !!this.isFullscreen_;
+    return this.isFullscreen_;
   }
 
   /**
