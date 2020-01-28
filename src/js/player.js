@@ -460,6 +460,15 @@ class Player extends Component {
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
+    // listen to document and player fullscreenchange handlers so we receive those events
+    // before a user can receive them so we can update isFullscreen appropriately.
+    // make sure that we listen to fullscreenchange events before everything else to make sure that
+    // our isFullscreen method is updated properly for internal components as well as external.
+    if (this.fsApi_.requestFullscreen) {
+      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+      this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+    }
+
     if (this.fluid_) {
       this.on('playerreset', this.updateStyleEl_);
     }
@@ -538,13 +547,6 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('stageclick', this.handleStageClick_);
     this.on('keydown', this.handleKeyDown);
-
-    // listen to document and player fullscreenchange handlers so we receive those events
-    // before a user can receive them so we can update isFullscreen appropriately.
-    if (this.fsApi_.requestFullscreen) {
-      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-      this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-    }
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
