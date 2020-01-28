@@ -2005,7 +2005,8 @@ class Player extends Component {
     const targetPlayer = e.target.player;
 
     // if another player was fullscreen
-    if (targetPlayer !== this) {
+    // do a null check for targetPlayer because older firefox's would put document as e.target
+    if (targetPlayer && targetPlayer !== this) {
       return;
     }
 
