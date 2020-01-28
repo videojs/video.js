@@ -2720,45 +2720,51 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   requestFullscreen(fullscreenOptions) {
-    let fsOptions;
+    const promise = this.el_.requestFullscreen();
 
-    this.isFullscreen(true);
-
-    if (this.fsApi_.requestFullscreen) {
-      // the browser supports going fullscreen at the element level so we can
-      // take the controls fullscreen as well as the video
-
-      // Trigger fullscreenchange event after change
-      // We have to specifically add this each time, and remove
-      // when canceling fullscreen. Otherwise if there's multiple
-      // players on a page, they would all be reacting to the same fullscreen
-      // events
-      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-
-      // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
-      if (!this.fsApi_.prefixed) {
-        fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
-        if (fullscreenOptions !== undefined) {
-          fsOptions = fullscreenOptions;
-        }
-      }
-
-      silencePromise(this.el_[this.fsApi_.requestFullscreen](fsOptions));
-    } else if (this.tech_.supportsFullScreen()) {
-      // we can't take the video.js controls fullscreen but we can go fullscreen
-      // with native controls
-      this.techCall_('enterFullScreen');
-    } else {
-      // fullscreen isn't supported so we'll just stretch the video element to
-      // fill the viewport
-      this.enterFullWindow();
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
-    }
+    promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
+    return promise;
   }
+  //
+  //   let fsOptions;
+  //
+  //   this.isFullscreen(true);
+  //
+  //   if (this.fsApi_.requestFullscreen) {
+  //     // the browser supports going fullscreen at the element level so we can
+  //     // take the controls fullscreen as well as the video
+  //
+  //     // Trigger fullscreenchange event after change
+  //     // We have to specifically add this each time, and remove
+  //     // when canceling fullscreen. Otherwise if there's multiple
+  //     // players on a page, they would all be reacting to the same fullscreen
+  //     // events
+  //     Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+  //
+  //     // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
+  //     if (!this.fsApi_.prefixed) {
+  //       fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
+  //       if (fullscreenOptions !== undefined) {
+  //         fsOptions = fullscreenOptions;
+  //       }
+  //     }
+  //
+  //     silencePromise(this.el_[this.fsApi_.requestFullscreen](fsOptions));
+  //   } else if (this.tech_.supportsFullScreen()) {
+  //     // we can't take the video.js controls fullscreen but we can go fullscreen
+  //     // with native controls
+  //     this.techCall_('enterFullScreen');
+  //   } else {
+  //     // fullscreen isn't supported so we'll just stretch the video element to
+  //     // fill the viewport
+  //     this.enterFullWindow();
+  //     #<{(|*
+  //      * @event Player#fullscreenchange
+  //      * @type {EventTarget~Event}
+  //      |)}>#
+  //     this.trigger('fullscreenchange');
+  //   }
+  // }
 
   /**
    * Return the video to its normal size after having been in full screen mode
@@ -2766,22 +2772,24 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    this.isFullscreen(false);
-
-    // Check for browser element fullscreen support
-    if (this.fsApi_.requestFullscreen) {
-      silencePromise(document[this.fsApi_.exitFullscreen]());
-    } else if (this.tech_.supportsFullScreen()) {
-      this.techCall_('exitFullScreen');
-    } else {
-      this.exitFullWindow();
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
-    }
+    return document.exitFullscreen().then(() => this.isFullscreen(false));
   }
+  //   this.isFullscreen(false);
+  //
+  //   // Check for browser element fullscreen support
+  //   if (this.fsApi_.requestFullscreen) {
+  //     silencePromise(document[this.fsApi_.exitFullscreen]());
+  //   } else if (this.tech_.supportsFullScreen()) {
+  //     this.techCall_('exitFullScreen');
+  //   } else {
+  //     this.exitFullWindow();
+  //     #<{(|*
+  //      * @event Player#fullscreenchange
+  //      * @type {EventTarget~Event}
+  //      |)}>#
+  //     this.trigger('fullscreenchange');
+  //   }
+  // }
 
   /**
    * When fullscreen isn't supported we can stretch the
