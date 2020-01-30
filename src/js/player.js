@@ -2551,7 +2551,7 @@ class Player extends Component {
   }
 
   /**
-   * Get the ending time oe the last buffered time range
+   * Get the ending time of the last buffered time range
    * This is used in the progress bar to encapsulate all time ranges.
    *
    * @return {number}
