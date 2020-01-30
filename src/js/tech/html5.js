@@ -14,6 +14,7 @@ import {toTitleCase} from '../utils/string-cases.js';
 import {NORMAL as TRACK_TYPES} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
 import defineLazyProperty from '../utils/define-lazy-property.js';
+import {silencePromise} from '../utils/promise';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -639,16 +640,24 @@ class Html5 extends Tech {
     if (video.paused && video.networkState <= video.HAVE_METADATA) {
       // attempt to prime the video element for programmatic access
       // this isn't necessary on the desktop but shouldn't hurt
-      this.el_.play();
+      silencePromise(this.el_.play());
 
       // playing and pausing synchronously during the transition to fullscreen
       // can get iOS ~6.1 devices into a play/pause loop
       this.setTimeout(function() {
         video.pause();
-        video.webkitEnterFullScreen();
+        try {
+          video.webkitEnterFullScreen();
+        } catch (e) {
+          this.trigger('fullscreenerror', e);
+        }
       }, 0);
     } else {
-      video.webkitEnterFullScreen();
+      try {
+        video.webkitEnterFullScreen();
+      } catch (e) {
+        this.trigger('fullscreenerror', e);
+      }
     }
   }
 

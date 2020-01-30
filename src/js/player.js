@@ -1157,6 +1157,7 @@ class Player extends Component {
     this.on(this.tech_, 'pause', this.handleTechPause_);
     this.on(this.tech_, 'durationchange', this.handleTechDurationChange_);
     this.on(this.tech_, 'fullscreenchange', this.handleTechFullscreenChange_);
+    this.on(this.tech_, 'fullscreenerror', this.handleTechFullscreenError_);
     this.on(this.tech_, 'enterpictureinpicture', this.handleTechEnterPictureInPicture_);
     this.on(this.tech_, 'leavepictureinpicture', this.handleTechLeavePictureInPicture_);
     this.on(this.tech_, 'error', this.handleTechError_);
@@ -2047,6 +2048,10 @@ class Player extends Component {
     }
   }
 
+  handleTechFullscreenError_(event, err) {
+    this.trigger('fullscreenerror', err);
+  }
+
   /**
    * @private
    */
@@ -2732,6 +2737,39 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   requestFullscreen(fullscreenOptions) {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (PromiseClass) {
+      return new PromiseClass((resolve, reject) => {
+        function offHandler() {
+          this.off(this.fsApi_.fullscreenerror, errorHandler);
+          this.off(this.fsApi_.fullscreenchange, changeHandler);
+        }
+        function changeHandler() {
+          offHandler();
+          resolve();
+        }
+        function errorHandler(e, err) {
+          offHandler();
+          reject(err);
+        }
+
+        this.one('fullscreenchange', changeHandler);
+        this.one('fullscreenerror', errorHandler);
+
+        const promise = this.requestFullscreenHelper_();
+
+        if (promise) {
+          promise.then(offHandler, offHandler);
+          return promise;
+        }
+      });
+    }
+
+    return this.requestFullscreenHelper_();
+  }
+
+  requestFullscreenHelper_(fullscreenOptions) {
     let fsOptions;
 
     // Only pass fullscreen options to requestFullscreen in spec-compliant browsers.
