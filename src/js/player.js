@@ -2045,14 +2045,6 @@ class Player extends Component {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
-
-    /**
-     * Fired when going in and out of fullscreen.
-     *
-     * @event Player#fullscreenchange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('fullscreenchange');
   }
 
   /**
@@ -2709,6 +2701,8 @@ class Player extends Component {
       this.isFullscreen_ = Boolean(isFS);
 
       // if we changed fullscreen state and we're in prefixed mode, trigger fullscreenchange
+      // this is the only place where we trigger fullscreenchange events for older browsers
+      // fullWindow mode is treated as a prefixed event and will get a fullscreenchange event as well
       if (this.isFullscreen_ !== oldValue && this.fsApi_.prefixed) {
         /**
            * @event Player#fullscreenchange
