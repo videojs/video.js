@@ -2757,7 +2757,7 @@ class Player extends Component {
         this.one('fullscreenchange', changeHandler);
         this.one('fullscreenerror', errorHandler);
 
-        const promise = this.requestFullscreenHelper_();
+        const promise = this.requestFullscreenHelper_(fullscreenOptions);
 
         if (promise) {
           promise.then(offHandler, offHandler);
