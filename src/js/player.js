@@ -2740,6 +2740,8 @@ class Player extends Component {
   requestFullscreen(fullscreenOptions) {
     let fsOptions;
 
+    // Only pass fullscreen options to requestFullscreen in spec-compliant browsers.
+    // Use defaults or player configured option unless passed directly to this method.
     if (!this.fsApi_.prefixed) {
       fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
       if (fullscreenOptions !== undefined) {
@@ -2747,6 +2749,13 @@ class Player extends Component {
       }
     }
 
+    // This method works as follows:
+    // 1. if a fullscreen api is available, use it
+    //   1. call requestFullscreen with potential options
+    //   2. if we got a promise from above, use it to update isFullscreen()
+    // 2. otherwise, if the tech supports fullscreen, call `enterFullScreen` on it.
+    //   This is particularly used for iPhone, older iPads, and non-safari browser on iOS.
+    // 3. otherwise, use "fullWindow" mode
     if (this.fsApi_.requestFullscreen) {
       const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
