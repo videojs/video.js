@@ -2740,10 +2740,12 @@ class Player extends Component {
     const PromiseClass = this.options_.Promise || window.Promise;
 
     if (PromiseClass) {
+      const self = this;
+
       return new PromiseClass((resolve, reject) => {
         function offHandler() {
-          this.off(this.fsApi_.fullscreenerror, errorHandler);
-          this.off(this.fsApi_.fullscreenchange, changeHandler);
+          self.off(self.fsApi_.fullscreenerror, errorHandler);
+          self.off(self.fsApi_.fullscreenchange, changeHandler);
         }
         function changeHandler() {
           offHandler();
@@ -2754,10 +2756,10 @@ class Player extends Component {
           reject(err);
         }
 
-        this.one('fullscreenchange', changeHandler);
-        this.one('fullscreenerror', errorHandler);
+        self.one('fullscreenchange', changeHandler);
+        self.one('fullscreenerror', errorHandler);
 
-        const promise = this.requestFullscreenHelper_(fullscreenOptions);
+        const promise = self.requestFullscreenHelper_(fullscreenOptions);
 
         if (promise) {
           promise.then(offHandler, offHandler);
