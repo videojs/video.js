@@ -354,6 +354,9 @@ class Player extends Component {
     this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
     this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
 
+    // default isFullscreen_ to false
+    this.isFullscreen_ = false;
+
     // create logger
     this.log = createLogger(this.id_);
 
@@ -457,6 +460,15 @@ class Player extends Component {
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
+    // listen to document and player fullscreenchange handlers so we receive those events
+    // before a user can receive them so we can update isFullscreen appropriately.
+    // make sure that we listen to fullscreenchange events before everything else to make sure that
+    // our isFullscreen method is updated properly for internal components as well as external.
+    if (this.fsApi_.requestFullscreen) {
+      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+      this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+    }
+
     if (this.fluid_) {
       this.on('playerreset', this.updateStyleEl_);
     }
@@ -538,7 +550,6 @@ class Player extends Component {
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
-
   }
 
   /**
@@ -1997,6 +2008,14 @@ class Player extends Component {
    * when the document fschange event triggers it calls this
    */
   documentFullscreenChange_(e) {
+    const targetPlayer = e.target.player;
+
+    // if another player was fullscreen
+    // do a null check for targetPlayer because older firefox's would put document as e.target
+    if (targetPlayer && targetPlayer !== this) {
+      return;
+    }
+
     const el = this.el();
     let isFs = document[this.fsApi_.fullscreenElement] === el;
 
@@ -2007,19 +2026,6 @@ class Player extends Component {
     }
 
     this.isFullscreen(isFs);
-
-    // If cancelling fullscreen, remove event listener.
-    if (this.isFullscreen() === false) {
-      Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-    }
-
-    if (this.fsApi_.prefixed) {
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
-    }
   }
 
   /**
@@ -2039,14 +2045,6 @@ class Player extends Component {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
-
-    /**
-     * Fired when going in and out of fullscreen.
-     *
-     * @event Player#fullscreenchange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('fullscreenchange');
   }
 
   /**
@@ -2698,11 +2696,25 @@ class Player extends Component {
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
-      this.isFullscreen_ = !!isFS;
+      const oldValue = this.isFullscreen_;
+
+      this.isFullscreen_ = Boolean(isFS);
+
+      // if we changed fullscreen state and we're in prefixed mode, trigger fullscreenchange
+      // this is the only place where we trigger fullscreenchange events for older browsers
+      // fullWindow mode is treated as a prefixed event and will get a fullscreenchange event as well
+      if (this.isFullscreen_ !== oldValue && this.fsApi_.prefixed) {
+        /**
+           * @event Player#fullscreenchange
+           * @type {EventTarget~Event}
+           */
+        this.trigger('fullscreenchange');
+      }
+
       this.toggleFullscreenClass_();
       return;
     }
-    return !!this.isFullscreen_;
+    return this.isFullscreen_;
   }
 
   /**
@@ -2722,28 +2734,30 @@ class Player extends Component {
   requestFullscreen(fullscreenOptions) {
     let fsOptions;
 
-    this.isFullscreen(true);
+    // Only pass fullscreen options to requestFullscreen in spec-compliant browsers.
+    // Use defaults or player configured option unless passed directly to this method.
+    if (!this.fsApi_.prefixed) {
+      fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
+      if (fullscreenOptions !== undefined) {
+        fsOptions = fullscreenOptions;
+      }
+    }
 
+    // This method works as follows:
+    // 1. if a fullscreen api is available, use it
+    //   1. call requestFullscreen with potential options
+    //   2. if we got a promise from above, use it to update isFullscreen()
+    // 2. otherwise, if the tech supports fullscreen, call `enterFullScreen` on it.
+    //   This is particularly used for iPhone, older iPads, and non-safari browser on iOS.
+    // 3. otherwise, use "fullWindow" mode
     if (this.fsApi_.requestFullscreen) {
-      // the browser supports going fullscreen at the element level so we can
-      // take the controls fullscreen as well as the video
+      const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
-      // Trigger fullscreenchange event after change
-      // We have to specifically add this each time, and remove
-      // when canceling fullscreen. Otherwise if there's multiple
-      // players on a page, they would all be reacting to the same fullscreen
-      // events
-      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-
-      // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
-      if (!this.fsApi_.prefixed) {
-        fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
-        if (fullscreenOptions !== undefined) {
-          fsOptions = fullscreenOptions;
-        }
+      if (promise) {
+        promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
       }
 
-      silencePromise(this.el_[this.fsApi_.requestFullscreen](fsOptions));
+      return promise;
     } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
       // with native controls
@@ -2752,11 +2766,6 @@ class Player extends Component {
       // fullscreen isn't supported so we'll just stretch the video element to
       // fill the viewport
       this.enterFullWindow();
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
     }
   }
 
@@ -2766,20 +2775,18 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    this.isFullscreen(false);
-
-    // Check for browser element fullscreen support
     if (this.fsApi_.requestFullscreen) {
-      silencePromise(document[this.fsApi_.exitFullscreen]());
+      const promise = document[this.fsApi_.exitFullscreen]();
+
+      if (promise) {
+        promise.then(() => this.isFullscreen(false));
+      }
+
+      return promise;
     } else if (this.tech_.supportsFullScreen()) {
       this.techCall_('exitFullScreen');
     } else {
       this.exitFullWindow();
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
     }
   }
 
@@ -2790,6 +2797,7 @@ class Player extends Component {
    * @fires Player#enterFullWindow
    */
   enterFullWindow() {
+    this.isFullscreen(true);
     this.isFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
@@ -2834,6 +2842,7 @@ class Player extends Component {
    * @fires Player#exitFullWindow
    */
   exitFullWindow() {
+    this.isFullscreen(false);
     this.isFullWindow = false;
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 

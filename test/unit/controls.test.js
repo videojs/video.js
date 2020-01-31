@@ -170,8 +170,11 @@ QUnit.test('Picture-in-Picture control text should be correct when enterpicturei
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
-  const player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer({controlBar: false});
   const fullscreentoggle = new FullscreenToggle(player);
+
+  // make the fullscreenchange handler doesn't trigger
+  player.off(player.fsApi_.fullscreenchange, player.boundDocumentFullscreenChange_);
 
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
