@@ -138,7 +138,7 @@
     "rollup-plugin-progress": "^1.1.1",
     "rollup-plugin-stub": "^1.2.0",
     "sass": "^1.21.0",
-    "semver": "^5.7.0",
+    "semver": "^7.1.2",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2",
     "sinon": "^7.3.2",
