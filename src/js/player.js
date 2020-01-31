@@ -2813,6 +2813,41 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (PromiseClass) {
+      const self = this;
+
+      return new PromiseClass((resolve, reject) => {
+        function offHandler() {
+          self.off(self.fsApi_.fullscreenerror, errorHandler);
+          self.off(self.fsApi_.fullscreenchange, changeHandler);
+        }
+        function changeHandler() {
+          offHandler();
+          resolve();
+        }
+        function errorHandler(e, err) {
+          offHandler();
+          reject(err);
+        }
+
+        self.one('fullscreenchange', changeHandler);
+        self.one('fullscreenerror', errorHandler);
+
+        const promise = self.exitFullscreenHelper_();
+
+        if (promise) {
+          promise.then(offHandler, offHandler);
+          return promise;
+        }
+      });
+    }
+
+    return this.exitFullscreenHelper_();
+  }
+
+  exitFullscreenHelper_() {
     if (this.fsApi_.requestFullscreen) {
       const promise = document[this.fsApi_.exitFullscreen]();
 

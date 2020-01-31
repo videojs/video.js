@@ -665,6 +665,11 @@ class Html5 extends Tech {
    * Request that the `HTML5` Tech exit fullscreen.
    */
   exitFullScreen() {
+    if (!this.el_.webkitDisplayingFullscreen) {
+      this.trigger('fullscreenerror', new Error('The video is not fullscreen'));
+      return;
+    }
+
     this.el_.webkitExitFullScreen();
   }
 
