@@ -311,7 +311,7 @@ vjs.trigger = function (elem, event) {
 
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
   // recursively calls this function to bubble the event up the DOM.
-  if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
+  if (parent && !event.isPropagationStopped() && event.bubbles === true) {
     vjs.trigger(parent, event);
 
     // If at the top of the DOM, triggers the default action unless disabled.
