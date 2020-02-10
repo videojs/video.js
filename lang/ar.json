@@ -37,7 +37,6 @@
   "Seek to live, currently behind live": "ذهاب إلى نقطة البث المباشر، متأخر عن البث المباشر حاليًا",
   "Seek to live, currently playing live": "ذهاب إلى نقطة البث المباشر، البث المباشر قيد التشغيل حاليًا",
   "Progress Bar": "شريط التقدم",
-  "progress bar timing: currentTime={1} duration={2}": "توقيت شريط التقدم: currentTime={1} duration={2}",
   "Descriptions": "الأوصاف",
   "descriptions off": "إخفاء الأوصاف",
   "Audio Track": "المسار الصوتي",

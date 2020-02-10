@@ -13,9 +13,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 ## Status of translations
 
 <!-- START langtable -->
+
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (Complete)      |                                                                                     |
+| ar.json (missing 1)     | progress bar timing: currentTime={1} duration={2}                                   |
 | ba.json (missing 61)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -881,4 +882,5 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 | zh-CN.json (Complete)   |                                                                                     |
 | zh-TW.json (Complete)   |                                                                                     |
+
 <!-- END langtable -->
