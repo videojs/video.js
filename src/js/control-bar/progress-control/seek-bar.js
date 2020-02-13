@@ -166,10 +166,9 @@ class SeekBar extends Slider {
       }
 
       // update the progress bar time tooltip with the current time
-      const playProgressBar = this.getChild('playProgressBar');
-      const barRect = Dom.getBoundingClientRect(this.el());
-
-      playProgressBar.update(barRect, this.getProgress());
+      if (this.bar) {
+        this.bar.update(Dom.getBoundingClientRect(this.el()), this.getProgress());
+      }
     });
 
     return percent;
