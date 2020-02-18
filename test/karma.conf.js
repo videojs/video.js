@@ -1,201 +1,63 @@
+const generate = require('videojs-generate-karma-config');
+
 module.exports = function(config) {
-  // Creating settings object first so we can modify based on travis
-  var settings = {
-    basePath: '',
+  // const coverageFlag = process.env.npm_config_coverage;
+  // process.env.TRAVIS || coverageFlag || false;
+  const reportCoverage = false;
 
-    frameworks: ['browserify', 'qunit', 'detectBrowsers'],
-    autoWatch: false,
-    singleRun: true,
-
-    // Compling tests here
-    files: [
-      '../build/temp/video-js.css',
-      '../build/temp/ie8/videojs-ie8.js',
-      '../test/globals-shim.js',
-      '../test/unit/**/*.js',
-      '../build/temp/browserify.js',
-      '../build/temp/webpack.js',
-      { pattern: '../src/**/*.js', watched: true, included: false, served: false }
-    ],
-
-    // Using precompiled tests
-    // files: [
-    //   '../build/temp/video-js.css',
-    //   '../build/temp/tests.js'
-    // ],
-
-    preprocessors: {
-      '../test/**/*.js': [ 'browserify' ]
+  // see https://github.com/videojs/videojs-generate-karma-config
+  // for options
+  const options = {
+    travisLaunchers(defaults) {
+      delete defaults.travisFirefox;
+      return defaults;
     },
-
-    browserify: {
-      debug: true,
-      plugin: ['proxyquireify/plugin'],
-      transform: ['babelify']
+    serverBrowsers(defaults) {
+      return [];
     },
-
-    plugins: [
-      'karma-qunit',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-ie-launcher',
-      'karma-opera-launcher',
-      'karma-safari-launcher',
-      'karma-browserstack-launcher',
-      'karma-browserify',
-      'karma-coverage',
-      'karma-detect-browsers',
-    ],
-
-    detectBrowsers: {
-      enabled: false,
-      usePhantomJS: false
-    },
-
-    reporters: ['dots'],
-
-    // web server port
-    port: 9876,
-
-    // cli runner port
-    runnerPort: 9100,
-    colors: true,
-    logLevel: config.LOG_INFO,
-    captureTimeout: 300000,
-    browserNoActivityTimeout: 300000,
-    browserDisconnectTimeout: 300000,
-    browserDisconnectTolerance: 3,
-
-    browserStack: {
-      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
-      pollingTimeout: 30000,
-      captureTimeout: 600,
-      timeout: 600
-    },
-    customLaunchers: getCustomLaunchers(),
-
-    // The HTML reporter seems to be busted right now, so we're just using text in the meantime
-    // along with the summary after the test run.
-    coverageReporter: {
-      reporters: [
-        {
-          type: 'text',
-          dir: 'coverage/',
-          file: 'coverage.txt'
-        },
-        {
-          type: 'lcovonly',
-          dir: 'coverage/',
-          subdir: '.'
-        },
-        { type: 'text-summary' }
-      ]
-    },
-
-    // make QUnit show the UI in karma runs
-    client: {
-      clearContext: false,
-      qunit: {
-        showUI: true,
-        testTimeout: 5000
-      }
-    }
+    coverage: reportCoverage
   };
 
-  // Coverage reporting
-  // Coverage is enabled by passing the flag --coverage to npm test
-  var coverageFlag = process.env.npm_config_coverage;
-  var reportCoverage = process.env.TRAVIS || coverageFlag;
-  if (reportCoverage) {
-    settings.browserify.transform.push('browserify-istanbul');
-    settings.reporters.push('coverage');
-  }
+  config = generate(config, options);
 
-  if (process.env.TRAVIS) {
-    if (process.env.BROWSER_STACK_USERNAME) {
-      settings.browsers = [
-        'chrome_bs',
-        'firefox_bs',
-        'safari_bs',
-        'edge_bs',
-        'ie11_bs',
-        'ie10_bs',
-        'ie9_bs',
-        'ie8_bs'
-      ];
-    } else {
-      settings.browsers = ['chrome_travis'];
+  config.proxies = config.proxies || {};
+
+  // disable warning logs for sourceset tests, by proxing to a remote host
+  Object.assign(config.proxies, {
+    '/test/relative-one.mp4': 'http://example.com/relative-one.mp4',
+    '/test/relative-two.mp4': 'http://example.com/relative-two.mp4',
+    '/test/relative-three.mp4': 'http://example.com/relative-three.mp4'
+  });
+
+  config.files = [
+    'node_modules/es5-shim/es5-shim.js',
+    'node_modules/es6-shim/es6-shim.js',
+    'node_modules/sinon/pkg/sinon.js',
+    'dist/video-js.css',
+    'test/dist/bundle.js',
+    'test/dist/browserify.js',
+    'test/dist/webpack.js'
+  ];
+
+  config.browserStack.project = 'Video.js';
+
+  // pin Browserstack Firefox version to 64
+  /* eslint-disable camelcase */
+  config.customLaunchers.bsFirefox.browser_version = '64.0';
+  /* eslint-enable camelcase */
+
+  // uncomment the section below to re-enable all browserstack video recording
+  // it is off by default because it slows the build
+  /*
+  Object.keys(config.customLaunchers).forEach(function(cl) {
+    if ('browserstack.video' in config.customLaunchers[cl]) {
+      config.customLaunchers[cl]['browserstack.video'] = "true";
     }
-  }
+  });
+  */
 
-  config.set(settings);
+  /* eslint-disable no-console */
+  console.log(JSON.stringify(config, null, 2));
+  /* eslint-enable no-console */
+
 };
-
-function getCustomLaunchers(){
-  return {
-    chrome_travis: {
-      base: 'Chrome',
-      flags: ['--no-sandbox']
-    },
-
-    chrome_bs: {
-      base: 'BrowserStack',
-      browser: 'chrome',
-      os: 'Windows',
-      os_version: '8.1'
-    },
-
-    firefox_bs: {
-      base: 'BrowserStack',
-      browser: 'firefox',
-      os: 'Windows',
-      os_version: '8.1'
-    },
-
-    safari_bs: {
-      base: 'BrowserStack',
-      browser: 'safari',
-      os: 'OS X',
-      os_version: 'Yosemite'
-    },
-
-    edge_bs: {
-      base: 'BrowserStack',
-      browser: 'edge',
-      os: 'Windows',
-      os_version: '10'
-    },
-
-    ie11_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '11',
-      os: 'Windows',
-      os_version: '8.1'
-    },
-
-    ie10_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '10',
-      os: 'Windows',
-      os_version: '7'
-    },
-
-    ie9_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '9',
-      os: 'Windows',
-      os_version: '7'
-    },
-
-    ie8_bs: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      browser_version: '8',
-      os: 'Windows',
-      os_version: '7'
-    }
-  };
-}

@@ -2,8 +2,6 @@
  * @file audio-track-list.js
  */
 import TrackList from './track-list';
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
 
 /**
  * Anywhere we call this function we diverge from the spec
@@ -42,8 +40,6 @@ class AudioTrackList extends TrackList {
    *        A list of `AudioTrack` to instantiate the list with.
    */
   constructor(tracks = []) {
-    let list;
-
     // make sure only 1 track is enabled
     // sorted from last index to first index
     for (let i = tracks.length - 1; i >= 0; i--) {
@@ -53,26 +49,8 @@ class AudioTrackList extends TrackList {
       }
     }
 
-    // IE8 forces us to implement inheritance ourselves
-    // as it does not support Object.defineProperty properly
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-      for (const prop in TrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TrackList.prototype[prop];
-        }
-      }
-      for (const prop in AudioTrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = AudioTrackList.prototype[prop];
-        }
-      }
-    }
-
-    list = super(tracks, list);
-    list.changing_ = false;
-
-    return list;
+    super(tracks);
+    this.changing_ = false;
   }
 
   /**
@@ -94,11 +72,7 @@ class AudioTrackList extends TrackList {
       return;
     }
 
-    /**
-     * @listens AudioTrack#enabledchange
-     * @fires TrackList#change
-     */
-    track.addEventListener('enabledchange', () => {
+    track.enabledChange_ = () => {
       // when we are disabling other tracks (since we don't support
       // more than one track at a time) we will set changing_
       // to true so that we don't trigger additional change events
@@ -109,7 +83,22 @@ class AudioTrackList extends TrackList {
       disableOthers(this, track);
       this.changing_ = false;
       this.trigger('change');
-    });
+    };
+
+    /**
+     * @listens AudioTrack#enabledchange
+     * @fires TrackList#change
+     */
+    track.addEventListener('enabledchange', track.enabledChange_);
+  }
+
+  removeTrack(rtrack) {
+    super.removeTrack(rtrack);
+
+    if (rtrack.removeEventListener && rtrack.enabledChange_) {
+      rtrack.removeEventListener('enabledchange', rtrack.enabledChange_);
+      rtrack.enabledChange_ = null;
+    }
   }
 }
 

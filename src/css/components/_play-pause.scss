@@ -1,5 +1,7 @@
-.video-js .vjs-play-control .vjs-icon-placeholder {
+.video-js .vjs-play-control {
   cursor: pointer;
+}
+.video-js .vjs-play-control .vjs-icon-placeholder {
   @include flex(none);
   @extend .vjs-icon-play;
 }

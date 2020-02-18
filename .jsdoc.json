@@ -19,7 +19,7 @@
       }
     },
     "logo": {
-      "url": "http://videojs.com/img/logo.png",
+      "url": "https://videojs.com/logo-white.png",
       "height": "30px",
       "width": "214px"
     },
@@ -27,7 +27,7 @@
     "tabNames": {
       "tutorials": "Guides"
     },
-    "footerText": "<span class='copyright'><a href='http://videojs.com'>Video.js</a> is a free and open source HTML5 video player. © <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>. <a href='https://github.com/videojs/video.js/blob/master/LICENSE' class='button blue' target='_blank'>View license</a></span> <ul class='other-links'><li><a href='http://videojs.com' class='button white'><i class='fa fa-external-link'></i> Video.js</a></li> <li><a href='https://twitter.com/videojs' class='button white' target='_blank'><i class='fa fa-twitter'></i> @videojs</a></li> <li><a href='http://github.com/videojs/video.js' class='button white' target='_blank'><i class='fa fa-github-alt'></i> Source</a></li> </ul>",
+    "footerText": "<span class='copyright'><a href='https://videojs.com'>Video.js</a> is a free and open source HTML5 video player. © <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>. <a href='https://github.com/videojs/video.js/blob/master/LICENSE' class='button blue' target='_blank'>View license</a></span> <ul class='other-links'><li><a href='https://videojs.com' class='button white'><i class='fa fa-external-link'></i> Video.js</a></li> <li><a href='https://twitter.com/videojs' class='button white' target='_blank'><i class='fa fa-twitter'></i> @videojs</a></li> <li><a href='https://github.com/videojs/video.js' class='button white' target='_blank'><i class='fa fa-github-alt'></i> Source</a></li> </ul>",
     "css": [
       "styles/videojs.css",
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"

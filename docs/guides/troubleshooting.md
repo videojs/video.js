@@ -21,51 +21,54 @@
 
 #### I want to have a single source and don't care about live/adaptive streaming:
 
-Most browsers now play MP4 with h264 video. If you want to have a single source, and neither live streaming
+Most browsers now play [MP4 with h264][can-mp4] video. If you want to have a single source, and neither live streaming
 nor adaptive streaming is a consideration, MP4 with h264 video and acc audio is a good choice.
+
+The most common browsers which do not support MP4 are found on Linux, where the user might need to install additional codec support, and in some cases won't want to.
+You can supply an array of alternate sources. [webm][can-webm] and/or [ogv][can-ogv] are useful as fallback, but neither are supported by all browsers that support MP4.
 
 #### I need adaptive streaming or live streaming
 
-Use HLS with [videojs-contrib-hls][hls] or
-Use Dash with [videojs-contrib-dash][dash].
-HLS is more convenient as mobile browsers have native support.
+Video.js 7+ supports HLS and MPEG-DASH as standard as it includes [http-streaming][http-streaming], which uses [Media Source Extensions][can-mse] to play these formats in modern browsers.
+If choosing a single format, HLS is more convenient as iOS and some Android browsers which do not support MSE do have native HLS support.
+
+HLS is also possible with Flash on IE 11 on Windows 7, which does not support MSE, if you add the [flashls source handler][flashls].
+
+For older Video.js versions, [http-streaming][http-streaming] or its predecessors [videojs-contrib-hls][hls] and [videojs-contrib-dash][dash] add similar support, but for best results use the latest Video.js.
 
 ### Make sure you are using formats that Video.js can play:
 
 * Does your browser/OS support the type of media that you are trying to play?
-* Do you have a Video.js plugin that will add support for a media format to Video.js? For example:
-  * [videojs-youtube][youtube]
-  * [videojs-contrib-hls][hls]
-  * [videojs-contrib-dash][dash]
+* Do you have a Video.js plugin that will add support for a media format to Video.js? For example [videojs-youtube][youtube]
 * Verify that you are using the correct [mime-type/content-type][media-types] for your videos.
   This is used to determine if Video.js can play a certain type of media.
 
 ### Make sure that the codec used in the file container is supported:
 
-* MP4 in browsers typically only supports h264 video and MP3 or AAC audio
-* Some low end phones save video in 3GP format but give it an MP4 extension. These files will not play.
+* The MP4 format can contain video and audio data in many codecs, but MP4 playback in browsers typically only supports h264 video and MP3 or AAC audio.
+* The file extension does not always reflect the file contents. For example some low end phones save video in 3GP format but give it an MP4 extension. These files will not play.
 
 ### If you are using Flash videos:
 
-* Make sure that Flash is installed
-* Make sure the Flash tech is included with Video.js (in `video.js >= v6.0.0` it won't be by default, see [videojs-flash][flash])
-* Flash media include RTMP streams and FLV format media.
-* SWF is not a media format
+* Consider using a different format. Some browsers do not support Flash and some users won't install it. Where it is installed, browsers make it increasingly difficult to use, e.g. requiring users to opt-in to run FLash on each site.
+* Make sure to add the [Flash tech][flash]. It was included by default in Video.js 5 and earlier.
+* Flash media formats include RTMP streams and FLV format media.
+* SWF is not a media format.
 
 ## Problems when hosting media
 
-* Your server must support byte-range requests as Chrome and Safari rely on them:
+* Your server _must_ properly support byte-range requests as Chrome and Safari rely on them:
   * Most servers support this by default.
   * If you are proxying the media files via a server side script (PHP), this script must implement ranges. PHP does not do this by default.
   * The impact of not doing this ranges from seeking being broken to no playback at all (on iOS).
-* Your server must return the correct [mime-type/content-type][media-types] for the media being sent.
+* Your server must return the correct [mime-type/content-type][media-types] header for the media being sent.
 * Your server must implement [CORS (cross-origin resource)][cors] headers if:
-  * You are using [videojs-contrib-hls][hls], [videojs-contrib-dash][dash] and your media is served from a different domain than your page.
+  * You are using formats like HLS or MPEG-DASH and your media is served from a different domain than your page.
   * You are using [text tracks][text-tracks] (captions, subtitles, etc.) and they are being served from a different domain than your page.
 
 ## Problems with fullscreen
 
-* If your player is in an iframe, the parent iframes must have the following attributes for fullscreen to be allowed:
+* If your player is in an iframe, that iframe _and_ any parent iframes must have the following attributes for fullscreen to be allowed:
   * `allowfullscreen`
   * `webkitallowfullscreen`
   * `mozallowfullscreen`
@@ -97,10 +100,22 @@ To fix this issue please make sure that all event listeners are cleaned up on di
 
 [dash]: https://github.com/videojs/videojs-contrib-dash
 
+[http-streaming]: https://github.com/videojs/http-streaming
+
 [youtube]: https://github.com/videojs/videojs-youtube
 
 [flash]: https://github.com/videojs/videojs-flash
 
-[media-types]: http://www.iana.org/assignments/media-types/media-types.xhtml#video
+[flashls]: https://github.com/brightcove/videojs-flashls-source-handler
 
-[cors]: http://enable-cors.org/
+[media-types]: https://www.iana.org/assignments/media-types/media-types.xhtml#video
+
+[cors]: https://enable-cors.org/
+
+[can-mp4]: https://caniuse.com/#feat=mpeg4
+
+[can-webm]: https://caniuse.com/#feat=webm
+
+[can-ogv]: https://caniuse.com/#feat=ogv
+
+[can-mse]: https://caniuse.com/#feat=mediasource

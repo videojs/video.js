@@ -3,7 +3,7 @@ import Tech from '../../../src/js/tech/tech.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Button from '../../../src/js/button.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
-import extendFn from '../../../src/js/extend.js';
+import extend from '../../../src/js/extend.js';
 import MediaError from '../../../src/js/media-error.js';
 import AudioTrack from '../../../src/js/tracks/audio-track';
 import VideoTrack from '../../../src/js/tracks/video-track';
@@ -14,6 +14,20 @@ import TextTrackList from '../../../src/js/tracks/text-track-list';
 import sinon from 'sinon';
 import log from '../../../src/js/utils/log.js';
 
+function stubbedSourceHandler(handler) {
+  return {
+    canPlayType() {
+      return true;
+    },
+    canHandleSource() {
+      return true;
+    },
+    handleSource(source, tech, options) {
+      return handler;
+    }
+  };
+}
+
 QUnit.module('Media Tech', {
   beforeEach(assert) {
     this.noop = function() {};
@@ -23,12 +37,12 @@ QUnit.module('Media Tech', {
   },
   afterEach(assert) {
     this.clock.restore();
-    Tech.prototype.featuresProgessEvents = this.featuresProgessEvents;
+    Tech.prototype.featuresProgressEvents = this.featuresProgessEvents;
   }
 });
 
 QUnit.test('Tech.registerTech and Tech.getTech', function(assert) {
-  const MyTech = extendFn(Tech);
+  const MyTech = extend(Tech);
   const oldTechs = Tech.techs_;
   const oldDefaultTechOrder = Tech.defaultTechOrder_;
 
@@ -56,6 +70,8 @@ QUnit.test('should synthesize timeupdate events by default', function(assert) {
 
   this.clock.tick(250);
   assert.equal(timeupdates, 1, 'triggered at least one timeupdate');
+
+  tech.dispose();
 });
 
 QUnit.test('stops manual timeupdates while paused', function(assert) {
@@ -78,6 +94,7 @@ QUnit.test('stops manual timeupdates while paused', function(assert) {
   tech.trigger('play');
   this.clock.tick(10 * 250);
   assert.ok(timeupdates > 0, 'timeupdates fire when playback resumes');
+  tech.dispose();
 });
 
 QUnit.test('should synthesize progress events by default', function(assert) {
@@ -103,6 +120,7 @@ QUnit.test('should synthesize progress events by default', function(assert) {
   bufferedPercent = 0.75;
   this.clock.tick(500);
   assert.equal(progresses, 2, 'repeated readies are ok');
+  tech.dispose();
 });
 
 QUnit.test('dispose() should stop time tracking', function(assert) {
@@ -124,7 +142,7 @@ QUnit.test('dispose() should clear all tracks that are passed when its created',
   const audioTracks = new AudioTrackList([new AudioTrack(), new AudioTrack()]);
   const videoTracks = new VideoTrackList([new VideoTrack(), new VideoTrack()]);
   const textTracks = new TextTrackList([new TextTrack({tech: {}}),
-                                        new TextTrack({tech: {}})]);
+    new TextTrack({tech: {}})]);
 
   assert.equal(audioTracks.length, 2, 'should have two audio tracks at the start');
   assert.equal(videoTracks.length, 2, 'should have two video tracks at the start');
@@ -132,15 +150,21 @@ QUnit.test('dispose() should clear all tracks that are passed when its created',
 
   const tech = new Tech({audioTracks, videoTracks, textTracks});
 
-  assert.equal(tech.videoTracks().length,
-              videoTracks.length,
-              'should hold video tracks that we passed');
-  assert.equal(tech.audioTracks().length,
-              audioTracks.length,
-              'should hold audio tracks that we passed');
-  assert.equal(tech.textTracks().length,
-              textTracks.length,
-              'should hold text tracks that we passed');
+  assert.equal(
+    tech.videoTracks().length,
+    videoTracks.length,
+    'should hold video tracks that we passed'
+  );
+  assert.equal(
+    tech.audioTracks().length,
+    audioTracks.length,
+    'should hold audio tracks that we passed'
+  );
+  assert.equal(
+    tech.textTracks().length,
+    textTracks.length,
+    'should hold text tracks that we passed'
+  );
 
   tech.dispose();
 
@@ -164,22 +188,30 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
-              2,
-              'should have two remote text tracks els');
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    2,
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   tech.dispose();
 
-  assert.equal(tech.audioTracks().length,
-              0,
-              'should have zero audio tracks after dispose');
-  assert.equal(tech.videoTracks().length,
-              0,
-              'should have zero video tracks after dispose');
-  assert.equal(tech.remoteTextTrackEls().length,
-              0,
-              'should have zero remote text tracks els');
+  assert.equal(
+    tech.audioTracks().length,
+    0,
+    'should have zero audio tracks after dispose'
+  );
+  assert.equal(
+    tech.videoTracks().length,
+    0,
+    'should have zero video tracks after dispose'
+  );
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    0,
+    'should have zero remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 0, 'should have zero remote text tracks');
   assert.equal(tech.textTracks().length, 0, 'should have zero video tracks after dispose');
 });
@@ -194,7 +226,7 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   };
 
   // Define a new tech class
-  const MyTech = extendFn(Tech);
+  const MyTech = extend(Tech);
 
   // Create source handler
   const handler = {
@@ -223,41 +255,56 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   tech.addRemoteTextTrack({});
   this.clock.tick(1);
 
-  assert.equal(warning,
-               'Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js',
-               'we log a warning when `addRemoteTextTrack` is called without a manualCleanup argument');
+  assert.equal(
+    warning,
+    'Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js',
+    'we log a warning when `addRemoteTextTrack` is called without a manualCleanup argument'
+  );
 
   // should be automatically cleaned up when source changes
   tech.addRemoteTextTrack({}, false);
   this.clock.tick(1);
 
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
-              2,
-              'should have two remote text tracks els');
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    2,
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
-  assert.equal(tech.autoRemoteTextTracks_.length,
-               1,
-               'should have one auto-cleanup remote text track');
+  assert.equal(
+    tech.autoRemoteTextTracks_.length,
+    1,
+    'should have one auto-cleanup remote text track'
+  );
 
   // change source to force cleanup of auto remote text tracks
   tech.setSource({src: 'bar.mp4', type: 'mp4'});
   this.clock.tick(1);
 
-  assert.equal(tech.textTracks().length,
-               1,
-               'should have one text track after source change');
-  assert.equal(tech.remoteTextTrackEls().length,
-              1,
-              'should have one remote remote text track els after source change');
-  assert.equal(tech.remoteTextTracks().length,
-               1,
-               'should have one remote text track after source change');
-  assert.equal(tech.autoRemoteTextTracks_.length,
-               0,
-               'should have zero auto-cleanup remote text tracks');
+  assert.equal(
+    tech.textTracks().length,
+    1,
+    'should have one text track after source change'
+  );
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    1,
+    'should have one remote remote text track els after source change'
+  );
+  assert.equal(
+    tech.remoteTextTracks().length,
+    1,
+    'should have one remote text track after source change'
+  );
+  assert.equal(
+    tech.autoRemoteTextTracks_.length,
+    0,
+    'should have zero auto-cleanup remote text tracks'
+  );
 
   log.warn = oldLogWarn;
+  tech.dispose();
 });
 
 QUnit.test('should add the source handler interface to a tech', function(assert) {
@@ -265,16 +312,20 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   const sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  const MyTech = extendFn(Tech);
+  const MyTech = extend(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
 
   // Check for the expected class methods
-  assert.ok(MyTech.registerSourceHandler,
-           'added a registerSourceHandler function to the Tech');
-  assert.ok(MyTech.selectSourceHandler,
-           'added a selectSourceHandler function to the Tech');
+  assert.ok(
+    MyTech.registerSourceHandler,
+    'added a registerSourceHandler function to the Tech'
+  );
+  assert.ok(
+    MyTech.selectSourceHandler,
+    'added a selectSourceHandler function to the Tech'
+  );
 
   // Create an instance of Tech
   const tech = new MyTech();
@@ -287,11 +338,12 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   // and provde a dispose method for the handler.
   // This is optional for source handlers
   let disposeCalled = false;
-  const HandlerInternalState = function() {};
 
-  HandlerInternalState.prototype.dispose = function() {
-    disposeCalled = true;
-  };
+  class HandlerInternalState {
+    dispose() {
+      disposeCalled = true;
+    }
+  }
 
   // Create source handlers
   const handlerOne = {
@@ -302,24 +354,32 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
       return '';
     },
     canHandleSource(source, options) {
-      assert.strictEqual(tech.options_,
-                        options,
-                        'tech options passed to canHandleSource');
+      assert.strictEqual(
+        tech.options_,
+        options,
+        'tech options passed to canHandleSource'
+      );
       if (source.type !== 'no-support') {
         return 'probably';
       }
       return '';
     },
     handleSource(s, t, o) {
-      assert.strictEqual(tech,
-                        t,
-                        'tech instance passed to source handler');
-      assert.strictEqual(sourceA,
-                        s,
-                        'tech instance passed to the source handler');
-      assert.strictEqual(tech.options_,
-                        o,
-                        'tech options passed to the source handler handleSource');
+      assert.strictEqual(
+        tech,
+        t,
+        'tech instance passed to source handler'
+      );
+      assert.strictEqual(
+        sourceA,
+        s,
+        'tech instance passed to the source handler'
+      );
+      assert.strictEqual(
+        tech.options_,
+        o,
+        'tech options passed to the source handler handleSource'
+      );
       return new HandlerInternalState();
     }
   };
@@ -340,37 +400,53 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
 
   // Test registering source handlers
   MyTech.registerSourceHandler(handlerOne);
-  assert.strictEqual(MyTech.sourceHandlers[0],
-                    handlerOne,
-                    'handlerOne was added to the source handler array');
+  assert.strictEqual(
+    MyTech.sourceHandlers[0],
+    handlerOne,
+    'handlerOne was added to the source handler array'
+  );
   MyTech.registerSourceHandler(handlerTwo, 0);
-  assert.strictEqual(MyTech.sourceHandlers[0],
-                    handlerTwo,
-                    'handlerTwo was registered at the correct index (0)');
+  assert.strictEqual(
+    MyTech.sourceHandlers[0],
+    handlerTwo,
+    'handlerTwo was registered at the correct index (0)'
+  );
 
   // Test handler selection
-  assert.strictEqual(MyTech.selectSourceHandler(sourceA, tech.options_),
-                    handlerOne,
-                    'handlerOne was selected to handle the valid source');
-  assert.strictEqual(MyTech.selectSourceHandler(sourceB, tech.options_),
-                    null,
-                    'no handler was selected to handle the invalid source');
+  assert.strictEqual(
+    MyTech.selectSourceHandler(sourceA, tech.options_),
+    handlerOne,
+    'handlerOne was selected to handle the valid source'
+  );
+  assert.strictEqual(
+    MyTech.selectSourceHandler(sourceB, tech.options_),
+    null,
+    'no handler was selected to handle the invalid source'
+  );
 
   // Test canPlayType return values
-  assert.strictEqual(MyTech.canPlayType(sourceA.type),
-                    'probably',
-                    'the Tech returned probably for the valid source');
-  assert.strictEqual(MyTech.canPlayType(sourceB.type),
-                    '',
-                    'the Tech returned an empty string for the invalid source');
+  assert.strictEqual(
+    MyTech.canPlayType(sourceA.type),
+    'probably',
+    'the Tech returned probably for the valid source'
+  );
+  assert.strictEqual(
+    MyTech.canPlayType(sourceB.type),
+    '',
+    'the Tech returned an empty string for the invalid source'
+  );
 
   // Test canPlaySource return values
-  assert.strictEqual(MyTech.canPlaySource(sourceA, tech.options_),
-                    'probably',
-                    'the Tech returned probably for the valid source');
-  assert.strictEqual(MyTech.canPlaySource(sourceB, tech.options_),
-                    '',
-                    'the Tech returned an empty string for the invalid source');
+  assert.strictEqual(
+    MyTech.canPlaySource(sourceA, tech.options_),
+    'probably',
+    'the Tech returned probably for the valid source'
+  );
+  assert.strictEqual(
+    MyTech.canPlaySource(sourceB, tech.options_),
+    '',
+    'the Tech returned an empty string for the invalid source'
+  );
 
   tech.addRemoteTextTrack({}, true);
   tech.addRemoteTextTrack({}, true);
@@ -384,9 +460,11 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
   assert.equal(tech.textTracks().length, 2, 'should have two video tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
-              2,
-              'should have two remote text tracks els');
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    2,
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   // Pass a source through the source handler process of a tech instance
@@ -396,9 +474,11 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
   assert.equal(tech.textTracks().length, 2, 'should have two video tracks at the start');
-  assert.equal(tech.remoteTextTrackEls().length,
-              2,
-              'should have two remote text tracks els');
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    2,
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   assert.strictEqual(tech.currentSource_, sourceA, 'sourceA was handled and stored');
@@ -413,22 +493,26 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   assert.equal(tech.audioTracks().length, 0, 'should have zero audio tracks');
   assert.equal(tech.videoTracks().length, 0, 'should have zero video tracks');
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks');
-  assert.equal(tech.remoteTextTrackEls().length,
-              2,
-              'should have two remote text tracks els');
+  assert.equal(
+    tech.remoteTextTrackEls().length,
+    2,
+    'should have two remote text tracks els'
+  );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
   // Check that the handler dipose method works
   assert.ok(disposeCalled, 'dispose has been called for the handler yet');
   disposeCalled = false;
   tech.dispose();
-  assert.ok(disposeCalled,
-           'the handler dispose method was called when the tech was disposed');
+  assert.ok(
+    disposeCalled,
+    'the handler dispose method was called when the tech was disposed'
+  );
 });
 
 QUnit.test('should handle unsupported sources with the source handler API', function(assert) {
   // Define a new tech class
-  const MyTech = extendFn(Tech);
+  const MyTech = extend(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -443,8 +527,11 @@ QUnit.test('should handle unsupported sources with the source handler API', func
   };
 
   tech.setSource('');
-  assert.ok(usedNative,
-           'native source handler was used when an unsupported source was set');
+  assert.ok(
+    usedNative,
+    'native source handler was used when an unsupported source was set'
+  );
+  tech.dispose();
 });
 
 QUnit.test('should allow custom error events to be set', function(assert) {
@@ -464,6 +551,7 @@ QUnit.test('should allow custom error events to be set', function(assert) {
   tech.error(2);
   assert.equal(errors.length, 2, 'triggered an error event');
   assert.equal(errors[1].code, 2, 'wrapped the error code');
+  tech.dispose();
 });
 
 QUnit.test('should track whether a video has played', function(assert) {
@@ -472,11 +560,18 @@ QUnit.test('should track whether a video has played', function(assert) {
   assert.equal(tech.played().length, 0, 'starts with zero length');
   tech.trigger('playing');
   assert.equal(tech.played().length, 1, 'has length after playing');
+  tech.dispose();
 });
 
-QUnit.test('delegates seekable to the source handler', function(assert) {
-  const MyTech = extendFn(Tech, {
+QUnit.test('delegates deferrables to the source handler', function(assert) {
+  const MyTech = extend(Tech, {
     seekable() {
+      throw new Error('You should not be calling me!');
+    },
+    seeking() {
+      throw new Error('You should not be calling me!');
+    },
+    duration() {
       throw new Error('You should not be calling me!');
     }
   });
@@ -484,24 +579,24 @@ QUnit.test('delegates seekable to the source handler', function(assert) {
   Tech.withSourceHandlers(MyTech);
 
   let seekableCount = 0;
+  let seekingCount = 0;
+  let durationCount = 0;
   const handler = {
     seekable() {
       seekableCount++;
       return createTimeRange(0, 0);
+    },
+    seeking() {
+      seekingCount++;
+      return false;
+    },
+    duration() {
+      durationCount++;
+      return 0;
     }
   };
 
-  MyTech.registerSourceHandler({
-    canPlayType() {
-      return true;
-    },
-    canHandleSource() {
-      return true;
-    },
-    handleSource(source, tech, options) {
-      return handler;
-    }
-  });
+  MyTech.registerSourceHandler(stubbedSourceHandler(handler));
 
   const tech = new MyTech();
 
@@ -510,24 +605,81 @@ QUnit.test('delegates seekable to the source handler', function(assert) {
     type: 'video/mp4'
   });
   tech.seekable();
+  tech.seeking();
+  tech.duration();
   assert.equal(seekableCount, 1, 'called the source handler');
+  assert.equal(seekingCount, 1, 'called the source handler');
+  assert.equal(durationCount, 1, 'called the source handler');
+  tech.dispose();
+});
+
+QUnit.test('delegates only deferred deferrables to the source handler', function(assert) {
+  let seekingCount = 0;
+  const MyTech = extend(Tech, {
+    seekable() {
+      throw new Error('You should not be calling me!');
+    },
+    seeking() {
+      seekingCount++;
+      return false;
+    },
+    duration() {
+      throw new Error('You should not be calling me!');
+    }
+  });
+
+  Tech.withSourceHandlers(MyTech);
+
+  let seekableCount = 0;
+  let durationCount = 0;
+  const handler = {
+    seekable() {
+      seekableCount++;
+      return createTimeRange(0, 0);
+    },
+    duration() {
+      durationCount++;
+      return 0;
+    }
+  };
+
+  MyTech.registerSourceHandler(stubbedSourceHandler(handler));
+
+  const tech = new MyTech();
+
+  tech.setSource({
+    src: 'example.mp4',
+    type: 'video/mp4'
+  });
+  tech.seekable();
+  tech.seeking();
+  tech.duration();
+  assert.equal(seekableCount, 1, 'called the source handler');
+  assert.equal(seekingCount, 1, 'called the tech itself');
+  assert.equal(durationCount, 1, 'called the source handler');
+  tech.dispose();
 });
 
 QUnit.test('Tech.isTech returns correct answers for techs and components', function(assert) {
   const isTech = Tech.isTech;
+  const tech = new Html5({}, {});
+  const button = new Button({}, {});
 
   assert.ok(isTech(Tech), 'Tech is a Tech');
   assert.ok(isTech(Html5), 'Html5 is a Tech');
-  assert.ok(isTech(new Html5({}, {})), 'An html5 instance is a Tech');
+  assert.ok(isTech(tech), 'An html5 instance is a Tech');
   assert.ok(!isTech(5), 'A number is not a Tech');
   assert.ok(!isTech('this is a tech'), 'A string is not a Tech');
   assert.ok(!isTech(Button), 'A Button is not a Tech');
-  assert.ok(!isTech(new Button({}, {})), 'A Button instance is not a Tech');
+  assert.ok(!isTech(button), 'A Button instance is not a Tech');
   assert.ok(!isTech(isTech), 'A function is not a Tech');
+
+  tech.dispose();
+  button.dispose();
 });
 
 QUnit.test('setSource after tech dispose should dispose source handler once', function(assert) {
-  const MyTech = extendFn(Tech);
+  const MyTech = extend(Tech);
 
   Tech.withSourceHandlers(MyTech);
 
@@ -567,11 +719,12 @@ QUnit.test('setSource after tech dispose should dispose source handler once', fu
 
   tech.setSource('test');
   assert.equal(disposeCount, 2, 'did dispose on second setSource');
+  tech.dispose();
 
 });
 
 QUnit.test('setSource after previous setSource should dispose source handler once', function(assert) {
-  const MyTech = extendFn(Tech);
+  const MyTech = extend(Tech);
 
   Tech.withSourceHandlers(MyTech);
 
@@ -604,6 +757,7 @@ QUnit.test('setSource after previous setSource should dispose source handler onc
 
   tech.setSource('test');
   assert.equal(disposeCount, 2, 'did dispose for third setSource');
+  tech.dispose();
 
 });
 
@@ -611,4 +765,5 @@ QUnit.test('returns an empty object for getVideoPlaybackQuality', function(asser
   const tech = new Tech();
 
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'returns an empty object');
+  tech.dispose();
 });

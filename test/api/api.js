@@ -39,6 +39,8 @@ QUnit.test('should be able to access expected player API methods', function(asse
   assert.ok(player.textTracks, 'textTracks exists');
   assert.ok(player.requestFullscreen, 'requestFullscreen exists');
   assert.ok(player.exitFullscreen, 'exitFullscreen exists');
+  assert.ok(player.requestPictureInPicture, 'requestPictureInPicture exists');
+  assert.ok(player.exitPictureInPicture, 'exitPictureInPicture exists');
   assert.ok(player.playbackRate, 'playbackRate exists');
   assert.ok(player.networkState, 'networkState exists');
   assert.ok(player.readyState, 'readyState exists');
@@ -118,6 +120,8 @@ QUnit.test('should be able to access expected component API methods', function(a
   assert.ok(comp.clearInterval, 'clearInterval exists');
   assert.ok(comp.setTimeout, 'setTimeout exists');
   assert.ok(comp.clearTimeout, 'clearTimeout exists');
+
+  comp.dispose();
 });
 
 QUnit.test('should be able to access expected MediaTech API methods', function(assert) {
@@ -161,6 +165,7 @@ QUnit.test('should export useful components to the public', function(assert) {
   assert.ok(videojs.getComponent('ControlBar'), 'ControlBar should be public');
   assert.ok(videojs.getComponent('Button'), 'Button should be public');
   assert.ok(videojs.getComponent('PlayToggle'), 'PlayToggle should be public');
+  assert.ok(videojs.getComponent('PictureInPictureToggle'), 'PictureInPictureToggle should be public');
   assert.ok(videojs.getComponent('FullscreenToggle'), 'FullscreenToggle should be public');
   assert.ok(videojs.getComponent('BigPlayButton'), 'BigPlayButton should be public');
   assert.ok(videojs.getComponent('LoadingSpinner'), 'LoadingSpinner should be public');
@@ -263,7 +268,7 @@ function testHelperMakeTag() {
   const videoTag = document.createElement('video');
 
   videoTag.id = 'example_1';
-  videoTag.className = 'video-js vjs-default-skin';
+  videoTag.className = 'video-js';
   return videoTag;
 }
 
@@ -289,4 +294,6 @@ QUnit.test('should extend Component', function(assert) {
   const noMethods = new NoMethods({});
 
   assert.ok(noMethods.on, 'should extend component with no methods or constructor');
+
+  myComponent.dispose();
 });

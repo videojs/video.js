@@ -4,6 +4,9 @@
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {assign} from '../utils/obj';
+import {IS_CHROME} from '../utils/browser.js';
+import clamp from '../utils/clamp.js';
+import keycode from 'keycode';
 
 /**
  * The base functionality for a slider. Can be vertical or horizontal.
@@ -13,7 +16,7 @@ import {assign} from '../utils/obj';
  */
 class Slider extends Component {
 
-/**
+  /**
  * Create an instance of this class
  *
  * @param {Player} player
@@ -54,10 +57,10 @@ class Slider extends Component {
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
-    this.on('focus', this.handleFocus);
-    this.on('blur', this.handleBlur);
+    this.on('keydown', this.handleKeyDown);
     this.on('click', this.handleClick);
 
+    // TODO: deprecated, controlsvisible does not seem to be fired
     this.on(this.player_, 'controlsvisible', this.update);
 
     if (this.playerEvent) {
@@ -81,8 +84,7 @@ class Slider extends Component {
 
     this.off('mousedown', this.handleMouseDown);
     this.off('touchstart', this.handleMouseDown);
-    this.off('focus', this.handleFocus);
-    this.off('blur', this.handleBlur);
+    this.off('keydown', this.handleKeyDown);
     this.off('click', this.handleClick);
     this.off(this.player_, 'controlsvisible', this.update);
     this.off(doc, 'mousemove', this.handleMouseMove);
@@ -100,7 +102,7 @@ class Slider extends Component {
   }
 
   /**
-   * Create the `Button`s DOM element.
+   * Create the `Slider`s DOM element.
    *
    * @param {string} type
    *        Type of element to create.
@@ -145,7 +147,16 @@ class Slider extends Component {
   handleMouseDown(event) {
     const doc = this.bar.el_.ownerDocument;
 
-    event.preventDefault();
+    if (event.type === 'mousedown') {
+      event.preventDefault();
+    }
+    // Do not call preventDefault() on touchstart in Chrome
+    // to avoid console warnings. Use a 'touch-action: none' style
+    // instead to prevent unintented scrolling.
+    // https://developers.google.com/web/updates/2017/01/scrolling-intervention
+    if (event.type === 'touchstart' && !IS_CHROME) {
+      event.preventDefault();
+    }
     Dom.blockTextSelection();
 
     this.addClass('vjs-sliding');
@@ -215,51 +226,49 @@ class Slider extends Component {
   /**
    * Update the progress bar of the `Slider`.
    *
-   * @returns {number}
+   * @return {number}
    *          The percentage of progress the progress bar represents as a
    *          number from 0 to 1.
    */
   update() {
-
     // In VolumeBar init we have a setTimeout for update that pops and update
     // to the end of the execution stack. The player is destroyed before then
     // update will cause an error
-    if (!this.el_) {
-      return;
-    }
-
-    // If scrubbing, we could use a cached value to make the handle keep up
-    // with the user's mouse. On HTML5 browsers scrubbing is really smooth, but
-    // some flash players are slow, so we might want to utilize this later.
-    // var progress =  (this.player_.scrubbing()) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
-    let progress = this.getPercent();
-    const bar = this.bar;
-
     // If there's no bar...
-    if (!bar) {
+    if (!this.el_ || !this.bar) {
       return;
     }
 
-    // Protect against no duration and other division issues
-    if (typeof progress !== 'number' ||
-        progress !== progress ||
-        progress < 0 ||
-        progress === Infinity) {
-      progress = 0;
+    // clamp progress between 0 and 1
+    // and only round to four decimal places, as we round to two below
+    const progress = this.getProgress();
+
+    if (progress === this.progress_) {
+      return progress;
     }
 
-    // Convert to a percentage for setting
-    const percentage = (progress * 100).toFixed(2) + '%';
-    const style = bar.el().style;
+    this.progress_ = progress;
 
-    // Set the new bar width or height
-    if (this.vertical()) {
-      style.height = percentage;
-    } else {
-      style.width = percentage;
-    }
+    this.requestAnimationFrame(() => {
+      // Set the new bar width or height
+      const sizeKey = this.vertical() ? 'height' : 'width';
+
+      // Convert to a percentage for css value
+      this.bar.el().style[sizeKey] = (progress * 100).toFixed(2) + '%';
+    });
 
     return progress;
+  }
+
+  /**
+   * Get the percentage of the bar that should be filled
+   * but clamped and rounded.
+   *
+   * @return {number}
+   *         percentage filled that the slider is
+   */
+  getProgress() {
+    return Number(clamp(this.getPercent(), 0, 1).toFixed(4));
   }
 
   /**
@@ -270,8 +279,8 @@ class Slider extends Component {
    *
    * @return {number}
    *         The current position of the Slider.
-   *         - postition.x for vertical `Slider`s
-   *         - postition.y for horizontal `Slider`s
+   *         - position.x for vertical `Slider`s
+   *         - position.y for horizontal `Slider`s
    */
   calculateDistance(event) {
     const position = Dom.getPointerPosition(this.el_, event);
@@ -280,18 +289,6 @@ class Slider extends Component {
       return position.y;
     }
     return position.x;
-  }
-
-  /**
-   * Handle a `focus` event on this `Slider`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `focus` event that caused this function to run.
-   *
-   * @listens focus
-   */
-  handleFocus() {
-    this.on(this.bar.el_.ownerDocument, 'keydown', this.handleKeyPress);
   }
 
   /**
@@ -304,30 +301,24 @@ class Slider extends Component {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
+
     // Left and Down Arrows
-    if (event.which === 37 || event.which === 40) {
+    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
       event.preventDefault();
+      event.stopPropagation();
       this.stepBack();
 
     // Up and Right Arrows
-    } else if (event.which === 38 || event.which === 39) {
+    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
       event.preventDefault();
+      event.stopPropagation();
       this.stepForward();
+    } else {
+
+      // Pass keydown handling up for unsupported keys
+      super.handleKeyDown(event);
     }
-  }
-
-  /**
-   * Handle a `blur` event on this `Slider`.
-   *
-   * @param {EventTarget~Event} event
-   *        The `blur` event that caused this function to run.
-   *
-   * @listens blur
-   */
-
-  handleBlur() {
-    this.off(this.bar.el_.ownerDocument, 'keydown', this.handleKeyPress);
   }
 
   /**
@@ -338,7 +329,7 @@ class Slider extends Component {
    *        Event that caused this object to run
    */
   handleClick(event) {
-    event.stopImmediatePropagation();
+    event.stopPropagation();
     event.preventDefault();
   }
 

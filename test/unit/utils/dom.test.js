@@ -1,8 +1,8 @@
 /* eslint-env qunit */
-import window from 'global/window';
 import document from 'global/document';
 import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
+import TestHelpers from '../test-helpers.js';
 
 QUnit.module('dom');
 
@@ -102,12 +102,16 @@ QUnit.test('hasClass()', function(assert) {
   assert.strictEqual(Dom.hasClass(el, 'test2_className'), true, 'class detected');
   assert.strictEqual(Dom.hasClass(el, 'FOO'), true, 'class detected');
   assert.strictEqual(Dom.hasClass(el, 'bar'), true, 'class detected');
-  assert.strictEqual(Dom.hasClass(el, 'test2'),
-                    false,
-                    'valid substring - but not a class - correctly not detected');
-  assert.strictEqual(Dom.hasClass(el, 'className'),
-                    false,
-                    'valid substring - but not a class - correctly not detected');
+  assert.strictEqual(
+    Dom.hasClass(el, 'test2'),
+    false,
+    'valid substring - but not a class - correctly not detected'
+  );
+  assert.strictEqual(
+    Dom.hasClass(el, 'className'),
+    false,
+    'valid substring - but not a class - correctly not detected'
+  );
 
   assert.throws(function() {
     Dom.hasClass(el, 'FOO bar');
@@ -286,9 +290,11 @@ QUnit.test('Dom.findPosition should find top and left position', function(assert
   d.style.left = '20px';
   d.style.position = 'absolute';
 
-  assert.deepEqual(position,
-                  {left: 0, top: 0},
-                  'If element isn\'t in the DOM, we should get zeros');
+  assert.deepEqual(
+    position,
+    {left: 0, top: 0},
+    'If element isn\'t in the DOM, we should get zeros'
+  );
 
   document.body.appendChild(d);
   position = Dom.findPosition(d);
@@ -296,9 +302,11 @@ QUnit.test('Dom.findPosition should find top and left position', function(assert
 
   d.getBoundingClientRect = null;
   position = Dom.findPosition(d);
-  assert.deepEqual(position,
-                  {left: 0, top: 0},
-                  'If there is no gBCR, we should get zeros');
+  assert.deepEqual(
+    position,
+    {left: 0, top: 0},
+    'If there is no gBCR, we should get zeros'
+  );
 });
 
 QUnit.test('Dom.isEl', function(assert) {
@@ -319,8 +327,10 @@ QUnit.test('Dom.isTextNode', function(assert) {
   assert.notOk(Dom.isTextNode({}), 'objects are not text nodes');
   assert.notOk(Dom.isTextNode([]), 'arrays are not text nodes');
   assert.notOk(Dom.isTextNode('hola mundo'), 'strings are not text nodes');
-  assert.ok(Dom.isTextNode(document.createTextNode('hello, world!')),
-            'text nodes are text nodes');
+  assert.ok(
+    Dom.isTextNode(document.createTextNode('hello, world!')),
+    'text nodes are text nodes'
+  );
   assert.ok(Dom.isTextNode({nodeType: 3}), 'duck typing is imperfect');
 });
 
@@ -365,9 +375,11 @@ QUnit.test('Dom.normalizeContent: functions returning strings and elements/nodes
 
   const str = Dom.normalizeContent(() => 'hello');
 
-  assert.strictEqual(str[0].data,
-                     'hello',
-                     'a function can return a string, which becomes a text node');
+  assert.strictEqual(
+    str[0].data,
+    'hello',
+    'a function can return a string, which becomes a text node'
+  );
 
   const elem = Dom.normalizeContent(() => Dom.createEl());
 
@@ -377,24 +389,36 @@ QUnit.test('Dom.normalizeContent: functions returning strings and elements/nodes
 
   assert.strictEqual(node[0].data, 'goodbye', 'a function can return a text node');
 
-  assert.strictEqual(Dom.normalizeContent(() => null).length,
-                     0,
-                     'a function CANNOT return falsy values');
-  assert.strictEqual(Dom.normalizeContent(() => false).length,
-                     0,
-                     'a function CANNOT return falsy values');
-  assert.strictEqual(Dom.normalizeContent(() => undefined).length,
-                     0,
-                     'a function CANNOT return falsy values');
-  assert.strictEqual(Dom.normalizeContent(() => 123).length,
-                     0,
-                     'a function CANNOT return numbers');
-  assert.strictEqual(Dom.normalizeContent(() => {}).length,
-                     0,
-                     'a function CANNOT return objects');
-  assert.strictEqual(Dom.normalizeContent(() => (() => null)).length,
-                     0,
-                     'a function CANNOT return a function');
+  assert.strictEqual(
+    Dom.normalizeContent(() => null).length,
+    0,
+    'a function CANNOT return falsy values'
+  );
+  assert.strictEqual(
+    Dom.normalizeContent(() => false).length,
+    0,
+    'a function CANNOT return falsy values'
+  );
+  assert.strictEqual(
+    Dom.normalizeContent(() => undefined).length,
+    0,
+    'a function CANNOT return falsy values'
+  );
+  assert.strictEqual(
+    Dom.normalizeContent(() => 123).length,
+    0,
+    'a function CANNOT return numbers'
+  );
+  assert.strictEqual(
+    Dom.normalizeContent(() => {}).length,
+    0,
+    'a function CANNOT return objects'
+  );
+  assert.strictEqual(
+    Dom.normalizeContent(() => (() => null)).length,
+    0,
+    'a function CANNOT return a function'
+  );
 });
 
 QUnit.test('Dom.normalizeContent: arrays of strings and objects', function(assert) {
@@ -411,19 +435,25 @@ QUnit.test('Dom.normalizeContent: arrays of strings and objects', function(asser
   ];
   const result = Dom.normalizeContent(source);
 
-  assert.strictEqual(result[0].data,
-                     'hello',
-                     'an array can include a string normalized to a text node');
+  assert.strictEqual(
+    result[0].data,
+    'hello',
+    'an array can include a string normalized to a text node'
+  );
   assert.ok(Dom.isEl(result[1]), 'an array can include an element');
   assert.strictEqual(result[2].data, 'goodbye', 'an array can include a text node');
-  assert.strictEqual(result[3].data,
-                     'it works',
-                     'an array can include a function, which is invoked');
+  assert.strictEqual(
+    result[3].data,
+    'it works',
+    'an array can include a function, which is invoked'
+  );
   assert.strictEqual(result.indexOf(source[1]), -1, 'an array CANNOT include an object');
   assert.strictEqual(result.indexOf(source[3]), -1, 'an array CANNOT include an array');
-  assert.strictEqual(result.indexOf(source[4]),
-                     -1,
-                     'an array CANNOT include falsy values');
+  assert.strictEqual(
+    result.indexOf(source[4]),
+    -1,
+    'an array CANNOT include falsy values'
+  );
 });
 
 QUnit.test('Dom.normalizeContent: functions returning arrays', function(assert) {
@@ -433,12 +463,16 @@ QUnit.test('Dom.normalizeContent: functions returning arrays', function(assert) 
   const result = Dom.normalizeContent(() => ['hello', Function.prototype, arr]);
 
   assert.strictEqual(result[0].data, 'hello', 'a function can return an array');
-  assert.strictEqual(result.indexOf(Function.prototype),
-                     -1,
-                     'a function can return an array, but it CANNOT include a function');
-  assert.strictEqual(result.indexOf(arr),
-                     -1,
-                     'a function can return an array, but it CANNOT include an array');
+  assert.strictEqual(
+    result.indexOf(Function.prototype),
+    -1,
+    'a function can return an array, but it CANNOT include a function'
+  );
+  assert.strictEqual(
+    result.indexOf(arr),
+    -1,
+    'a function can return an array, but it CANNOT include an array'
+  );
 });
 
 QUnit.test('Dom.insertContent', function(assert) {
@@ -479,45 +513,67 @@ QUnit.test('$() and $$()', function(assert) {
 
   assert.expect(12);
 
-  assert.strictEqual(Dom.$('#qunit-fixture'),
-                    fixture,
-                    'can find an element in the document context');
-  assert.strictEqual(Dom.$$('div').length,
-                    totalDivCount,
-                    'finds elements in the document context');
+  assert.strictEqual(
+    Dom.$('#qunit-fixture'),
+    fixture,
+    'can find an element in the document context'
+  );
+  assert.strictEqual(
+    Dom.$$('div').length,
+    totalDivCount,
+    'finds elements in the document context'
+  );
 
-  assert.strictEqual(Dom.$('div', container),
-                    children[0],
-                    'can find an element in a DOM element context');
-  assert.strictEqual(Dom.$$('div', container).length,
-                    children.length,
-                    'finds elements in a DOM element context');
+  assert.strictEqual(
+    Dom.$('div', container),
+    children[0],
+    'can find an element in a DOM element context'
+  );
+  assert.strictEqual(
+    Dom.$$('div', container).length,
+    children.length,
+    'finds elements in a DOM element context'
+  );
 
-  assert.strictEqual(Dom.$('#qunit-fixture', document.querySelector('unknown')),
-              fixture,
-              'falls back to document given a bad context element');
-  assert.strictEqual(Dom.$$('div', document.querySelector('unknown')).length,
-              totalDivCount,
-              'falls back to document given a bad context element');
+  assert.strictEqual(
+    Dom.$('#qunit-fixture', document.querySelector('unknown')),
+    fixture,
+    'falls back to document given a bad context element'
+  );
+  assert.strictEqual(
+    Dom.$$('div', document.querySelector('unknown')).length,
+    totalDivCount,
+    'falls back to document given a bad context element'
+  );
 
-  assert.strictEqual(Dom.$('#qunit-fixture', 'body'),
-              fixture,
-              'can find an element in a selector context');
-  assert.strictEqual(Dom.$$('div', '#qunit-fixture').length,
-              1 + children.length,
-              'finds elements in a selector context');
+  assert.strictEqual(
+    Dom.$('#qunit-fixture', 'body'),
+    fixture,
+    'can find an element in a selector context'
+  );
+  assert.strictEqual(
+    Dom.$$('div', '#qunit-fixture').length,
+    1 + children.length,
+    'finds elements in a selector context'
+  );
 
-  assert.strictEqual(Dom.$('#qunit-fixture', 'unknown'),
-              fixture,
-              'falls back to document given a bad context selector');
-  assert.strictEqual(Dom.$$('div', 'unknown').length,
-              totalDivCount,
-              'falls back to document given a bad context selector');
+  assert.strictEqual(
+    Dom.$('#qunit-fixture', 'unknown'),
+    fixture,
+    'falls back to document given a bad context selector'
+  );
+  assert.strictEqual(
+    Dom.$$('div', 'unknown').length,
+    totalDivCount,
+    'falls back to document given a bad context selector'
+  );
 
   assert.strictEqual(Dom.$('div', children[0]), null, 'returns null for missing elements');
-  assert.strictEqual(Dom.$$('div', children[0]).length,
-                    0,
-                    'returns 0 for missing elements');
+  assert.strictEqual(
+    Dom.$$('div', children[0]).length,
+    0,
+    'returns 0 for missing elements'
+  );
 });
 
 QUnit.test('getBoundingClientRect() returns an object for elements that support it', function(assert) {
@@ -547,29 +603,54 @@ QUnit.test('getBoundingClientRect() returns an object for elements that support 
   });
 });
 
-QUnit.test('getBoundingClientRect() shims only width and height for elements that do not return them', function(assert) {
-  const oldGCS = window.getComputedStyle;
+QUnit.test('isSingleLeftClick() returns false for mousemove event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mousemove');
 
-  // This is done so that we fall back to looking for the `currentStyle`
-  // property on the mock element.
-  window.getComputedStyle = null;
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
 
-  const mockEl = {
-    currentStyle: {
-      height: '123',
-      width: '456'
-    },
-    getBoundingClientRect: sinon.spy(() => {
-      return {};
-    }),
-    parentNode: true
-  };
+  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a mousemove event is not a single left click');
+});
 
-  const actual = Dom.getBoundingClientRect(mockEl);
+QUnit.test('isSingleLeftClick() returns true for mouseup event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mouseup');
 
-  assert.deepEqual(Object.keys(actual).sort(), ['height', 'width'], 'only "height" and "width" were shimmed');
-  assert.strictEqual(actual.height, 123, '"height" was shimmed because it was missing');
-  assert.strictEqual(actual.width, 456, '"width" was shimmed because it was missing');
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
 
-  window.getComputedStyle = oldGCS;
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a mouseup event is a single left click');
+});
+
+QUnit.test('isSingleLeftClick() checks return values for mousedown event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mousedown');
+
+  // Left mouse click
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on an older browser (Safari) is a single left click');
+
+  // Left mouse click
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 1;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on browsers that supporting buttons property is a single left click');
+
+  // Right mouse click
+  mouseEvent.button = 2;
+  mouseEvent.buttons = 2;
+
+  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a right mouse click is not a single left click');
+
+  // Touch event on some mobiles
+  mouseEvent.button = 0;
+  mouseEvent.buttons = undefined;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on mobiles is a single left click');
+
+  // Chrome simulates mobile devices
+  mouseEvent.button = undefined;
+  mouseEvent.buttons = undefined;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
 });

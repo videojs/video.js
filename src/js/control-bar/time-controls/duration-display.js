@@ -28,10 +28,15 @@ class DurationDisplay extends TimeDisplay {
     // it has changed
     this.on(player, 'durationchange', this.updateContent);
 
+    // Listen to loadstart because the player duration is reset when a new media element is loaded,
+    // but the durationchange on the user agent will not fire.
+    // @see [Spec]{@link https://www.w3.org/TR/2011/WD-html5-20110113/video.html#media-element-load-algorithm}
+    this.on(player, 'loadstart', this.updateContent);
+
     // Also listen for timeupdate (in the parent) and loadedmetadata because removing those
     // listeners could have broken dependent applications/libraries. These
     // can likely be removed for 7.0.
-    this.on(player, 'loadedmetadata', this.throttledUpdateContent);
+    this.on(player, 'loadedmetadata', this.updateContent);
   }
 
   /**
@@ -58,20 +63,27 @@ class DurationDisplay extends TimeDisplay {
   updateContent(event) {
     const duration = this.player_.duration();
 
-    if (duration && this.duration_ !== duration) {
-      this.duration_ = duration;
-      this.updateFormattedTime_(duration);
-    }
+    this.updateTextNode_(duration);
   }
 }
+
+/**
+ * The text that is added to the `DurationDisplay` for screen reader users.
+ *
+ * @type {string}
+ * @private
+ */
+DurationDisplay.prototype.labelText_ = 'Duration';
 
 /**
  * The text that should display over the `DurationDisplay`s controls. Added to for localization.
  *
  * @type {string}
  * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
  */
-DurationDisplay.prototype.controlText_ = 'Duration Time';
+DurationDisplay.prototype.controlText_ = 'Duration';
 
 Component.registerComponent('DurationDisplay', DurationDisplay);
 export default DurationDisplay;

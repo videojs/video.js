@@ -3,6 +3,8 @@
  */
 import Button from './button.js';
 import Component from './component.js';
+import {isPromise, silencePromise} from './utils/promise';
+import * as browser from './utils/browser.js';
 
 /**
  * The initial play button that shows before the video has played. The hiding of the
@@ -45,6 +47,18 @@ class BigPlayButton extends Button {
 
     // exit early if clicked via the mouse
     if (this.mouseused_ && event.clientX && event.clientY) {
+      const sourceIsEncrypted = this.player_.usingPlugin('eme') &&
+                                this.player_.eme.sessions &&
+                                this.player_.eme.sessions.length > 0;
+
+      silencePromise(playPromise);
+      if (this.player_.tech(true) &&
+         // We've observed a bug in IE and Edge when playing back DRM content where
+         // calling .focus() on the video element causes the video to go black,
+         // so we avoid it in that specific case
+         !((browser.IE_VERSION || browser.IS_EDGE) && sourceIsEncrypted)) {
+        this.player_.tech(true).focus();
+      }
       return;
     }
 
@@ -52,25 +66,23 @@ class BigPlayButton extends Button {
     const playToggle = cb && cb.getChild('playToggle');
 
     if (!playToggle) {
-      this.player_.focus();
+      this.player_.tech(true).focus();
       return;
     }
 
     const playFocus = () => playToggle.focus();
 
-    if (playPromise && playPromise.then) {
-      const ignoreRejectedPlayPromise = () => {};
-
-      playPromise.then(playFocus, ignoreRejectedPlayPromise);
+    if (isPromise(playPromise)) {
+      playPromise.then(playFocus, () => {});
     } else {
       this.setTimeout(playFocus, 1);
     }
   }
 
-  handleKeyPress(event) {
+  handleKeyDown(event) {
     this.mouseused_ = false;
 
-    super.handleKeyPress(event);
+    super.handleKeyDown(event);
   }
 
   handleMouseDown(event) {

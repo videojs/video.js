@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -34,13 +33,22 @@ class TextTrackMenuItem extends MenuItem {
     super(player, options);
 
     this.track = track;
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
-    const selectedLanguageChangeHandler = Fn.bind(this, this.handleSelectedLanguageChange);
+    // Determine the relevant kind(s) of tracks for this component and filter
+    // out empty kinds.
+    this.kinds = (options.kinds || [options.kind || this.track.kind]).filter(Boolean);
+
+    const changeHandler = (...args) => {
+      this.handleTracksChange.apply(this, args);
+    };
+    const selectedLanguageChangeHandler = (...args) => {
+      this.handleSelectedLanguageChange.apply(this, args);
+    };
 
     player.on(['loadstart', 'texttrackchange'], changeHandler);
     tracks.addEventListener('change', changeHandler);
     tracks.addEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     this.on('dispose', function() {
+      player.off(['loadstart', 'texttrackchange'], changeHandler);
       tracks.removeEventListener('change', changeHandler);
       tracks.removeEventListener('selectedlanguagechange', selectedLanguageChangeHandler);
     });
@@ -72,6 +80,9 @@ class TextTrackMenuItem extends MenuItem {
         tracks.dispatchEvent(event);
       });
     }
+
+    // set the default state based on current tracks
+    this.handleTracksChange();
   }
 
   /**
@@ -86,13 +97,8 @@ class TextTrackMenuItem extends MenuItem {
    * @listens click
    */
   handleClick(event) {
-    const kind = this.track.kind;
-    let kinds = this.track.kinds;
+    const referenceTrack = this.track;
     const tracks = this.player_.textTracks();
-
-    if (!kinds) {
-      kinds = [kind];
-    }
 
     super.handleClick(event);
 
@@ -103,10 +109,21 @@ class TextTrackMenuItem extends MenuItem {
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
 
-      if (track === this.track && (kinds.indexOf(track.kind) > -1)) {
+      // If the track from the text tracks list is not of the right kind,
+      // skip it. We do not want to affect tracks of incompatible kind(s).
+      if (this.kinds.indexOf(track.kind) === -1) {
+        continue;
+      }
+
+      // If this text track is the component's track and it is not showing,
+      // set it to showing.
+      if (track === referenceTrack) {
         if (track.mode !== 'showing') {
           track.mode = 'showing';
         }
+
+      // If this text track is not the component's track and it is not
+      // disabled, set it to disabled.
       } else if (track.mode !== 'disabled') {
         track.mode = 'disabled';
       }
@@ -122,7 +139,13 @@ class TextTrackMenuItem extends MenuItem {
    * @listens TextTrackList#change
    */
   handleTracksChange(event) {
-    this.selected(this.track.mode === 'showing');
+    const shouldBeSelected = this.track.mode === 'showing';
+
+    // Prevent redundant selected() calls because they may cause
+    // screen readers to read the appended control text unnecessarily
+    if (shouldBeSelected !== this.isSelected_) {
+      this.selected(shouldBeSelected);
+    }
   }
 
   handleSelectedLanguageChange(event) {
@@ -142,6 +165,13 @@ class TextTrackMenuItem extends MenuItem {
         kind: this.track.kind
       };
     }
+  }
+
+  dispose() {
+    // remove reference to track object on dispose
+    this.track = null;
+
+    super.dispose();
   }
 
 }

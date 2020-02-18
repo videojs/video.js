@@ -1,7 +1,6 @@
 /* eslint-env qunit */
 import {IE_VERSION} from '../../../src/js/utils/browser';
 import log from '../../../src/js/utils/log.js';
-import {logByType} from '../../../src/js/utils/log.js';
 import window from 'global/window';
 import sinon from 'sinon';
 
@@ -18,6 +17,8 @@ QUnit.module('utils/log', {
     //
     // Instead we'll temporarily replace them with no-op functions
     window.console = {
+      debug: sinon.spy(),
+      info: sinon.spy(),
       log: sinon.spy(),
       warn: sinon.spy(),
       error: sinon.spy()
@@ -47,6 +48,7 @@ QUnit.test('logging functions should work', function(assert) {
   log.history.clear();
 
   log('log1', 'log2');
+  log.debug('debug1', 'debug2');
   log.warn('warn1', 'warn2');
   log.error('error1', 'error2');
 
@@ -55,6 +57,9 @@ QUnit.test('logging functions should work', function(assert) {
     window.console.log.firstCall.args,
     getConsoleArgs('VIDEOJS:', 'log1', 'log2')
   );
+
+  // debug isn't enabled by default
+  assert.notOk(window.console.debug.called, 'debug was not called');
 
   assert.ok(window.console.warn.called, 'warn was called');
   assert.deepEqual(
@@ -70,31 +75,28 @@ QUnit.test('logging functions should work', function(assert) {
 
   const history = log.history();
 
-  assert.equal(history.length, 3, 'there should be three messages in the log history');
-  assert.deepEqual(history[0], ['log1', 'log2'], 'history recorded the correct arguments');
-  assert.deepEqual(history[1], ['WARN:', 'warn1', 'warn2'], 'history recorded the correct arguments');
-  assert.deepEqual(history[2], ['ERROR:', 'error1', 'error2'], 'history recorded the correct arguments');
-});
-
-QUnit.test('in IE pre-11 (or when requested) objects and arrays are stringified', function(assert) {
-
-  // Need to reset history here because there are extra messages logged
-  // when running via Karma.
-  log.history.clear();
-
-  // Run a custom log call, explicitly requesting object/array stringification.
-  logByType('log', [
-    'test',
-    {foo: 'bar'},
-    [1, 2, 3],
-    0,
-    false,
-    null
-  ], true);
-
-  assert.ok(window.console.log.called, 'log was called');
-  assert.deepEqual(window.console.log.firstCall.args,
-            ['VIDEOJS: test {"foo":"bar"} [1,2,3] 0 false null']);
+  assert.equal(history.length, 4, 'there should be four messages in the log history');
+  assert.deepEqual(
+    history[0],
+    ['VIDEOJS:', 'log1', 'log2'],
+    'history recorded the correct arguments'
+  );
+  // although not enabled by default, history should still maintain the record
+  assert.deepEqual(
+    history[1],
+    ['VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'],
+    'history recorded the correct arguments'
+  );
+  assert.deepEqual(
+    history[2],
+    ['VIDEOJS:', 'WARN:', 'warn1', 'warn2'],
+    'history recorded the correct arguments'
+  );
+  assert.deepEqual(
+    history[3],
+    ['VIDEOJS:', 'ERROR:', 'error1', 'error2'],
+    'history recorded the correct arguments'
+  );
 });
 
 QUnit.test('setting the log level changes what is actually logged', function(assert) {
@@ -115,9 +117,9 @@ QUnit.test('setting the log level changes what is actually logged', function(ass
 
   const history = log.history();
 
-  assert.deepEqual(history[0], ['log1', 'log2'], 'history is maintained even when logging is not performed');
-  assert.deepEqual(history[1], ['WARN:', 'warn1', 'warn2'], 'history is maintained even when logging is not performed');
-  assert.deepEqual(history[2], ['ERROR:', 'error1', 'error2'], 'history is maintained even when logging is not performed');
+  assert.deepEqual(history[0], ['VIDEOJS:', 'log1', 'log2'], 'history is maintained even when logging is not performed');
+  assert.deepEqual(history[1], ['VIDEOJS:', 'WARN:', 'warn1', 'warn2'], 'history is maintained even when logging is not performed');
+  assert.deepEqual(history[2], ['VIDEOJS:', 'ERROR:', 'error1', 'error2'], 'history is maintained even when logging is not performed');
 
   log.level('off');
 
@@ -159,4 +161,85 @@ QUnit.test('history can be enabled/disabled', function(assert) {
   history = log.history();
 
   assert.strictEqual(history.length, 3, 'history was tracked');
+});
+
+QUnit.test('supports debug logging', function(assert) {
+  // Need to reset history here because there are extra messages logged
+  // when running via Karma.
+  log.history.clear();
+
+  log.level('debug');
+
+  log('log1', 'log2');
+  log.debug('debug1', 'debug2');
+  log.warn('warn1', 'warn2');
+  log.error('error1', 'error2');
+
+  assert.ok(window.console.log.called, 'console.log was called');
+  assert.ok(window.console.debug.called, 'console.debug was called');
+  assert.ok(window.console.warn.called, 'console.warn was called');
+  assert.ok(window.console.error.called, 'console.error called');
+
+  const history = log.history();
+
+  assert.equal(history.length, 4, 'four messages in history');
+  assert.deepEqual(history[0], ['VIDEOJS:', 'log1', 'log2'], 'history is maintained');
+  assert.deepEqual(history[1], ['VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'], 'history is maintained');
+  assert.deepEqual(history[2], ['VIDEOJS:', 'WARN:', 'warn1', 'warn2'], 'history is maintained');
+  assert.deepEqual(history[3], ['VIDEOJS:', 'ERROR:', 'error1', 'error2'], 'history is maintained');
+});
+
+QUnit.test('falls back to info and log when debug is not supported', function(assert) {
+  // Need to reset history here because there are extra messages logged
+  // when running via Karma.
+  log.history.clear();
+
+  log.level('debug');
+
+  window.console.debug = null;
+  log.debug('debug1', 'debug2');
+
+  assert.ok(window.console.info.called, 'info was called');
+  assert.notOk(window.console.log.called, 'log was not called');
+  assert.notOk(window.console.warn.called, 'warn was not called');
+  assert.notOk(window.console.error.called, 'error was not called');
+  assert.deepEqual(
+    window.console.info.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'),
+    'logged the right message'
+  );
+
+  window.console.info = null;
+  log.debug('debug3', 'debug4');
+
+  assert.ok(window.console.log.called, 'log was called');
+  assert.notOk(window.console.warn.called, 'warn was not called');
+  assert.notOk(window.console.error.called, 'error was not called');
+  assert.deepEqual(
+    window.console.log.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug3', 'debug4'),
+    'logged the right message'
+  );
+
+  // when no comparable level logs are available, there should not be any logging
+  window.console.log = null;
+  log.debug('debug5', 'debug6');
+
+  assert.notOk(window.console.warn.called, 'warn was not called');
+  assert.notOk(window.console.error.called, 'error was not called');
+});
+
+QUnit.test('history only retains 1000 items', function(assert) {
+  // Need to reset history here because there are extra messages logged
+  // when running via Karma.
+  log.history.clear();
+
+  for (let i = 1; i <= 1005; i++) {
+    log(i);
+  }
+
+  const hist = log.history();
+
+  assert.equal(hist.length, 1000, 'only 1000 items in history');
+  assert.deepEqual([hist[0], hist[hist.length - 1 ]], [['VIDEOJS:', 6], ['VIDEOJS:', 1005]], 'keeps most recent items');
 });

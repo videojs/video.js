@@ -12,7 +12,9 @@ import document from 'global/document';
  * @see [Specification]{@link https://fullscreen.spec.whatwg.org}
  * @see [Map Approach From Screenfull.js]{@link https://github.com/sindresorhus/screenfull.js}
  */
-const FullscreenApi = {};
+const FullscreenApi = {
+  prefixed: true
+};
 
 // browser API methods
 const apiMap = [
@@ -22,7 +24,8 @@ const apiMap = [
     'fullscreenElement',
     'fullscreenEnabled',
     'fullscreenchange',
-    'fullscreenerror'
+    'fullscreenerror',
+    'fullscreen'
   ],
   // WebKit
   [
@@ -31,16 +34,8 @@ const apiMap = [
     'webkitFullscreenElement',
     'webkitFullscreenEnabled',
     'webkitfullscreenchange',
-    'webkitfullscreenerror'
-  ],
-  // Old WebKit (Safari 5.1)
-  [
-    'webkitRequestFullScreen',
-    'webkitCancelFullScreen',
-    'webkitCurrentFullScreenElement',
-    'webkitCancelFullScreen',
-    'webkitfullscreenchange',
-    'webkitfullscreenerror'
+    'webkitfullscreenerror',
+    '-webkit-full-screen'
   ],
   // Mozilla
   [
@@ -49,7 +44,8 @@ const apiMap = [
     'mozFullScreenElement',
     'mozFullScreenEnabled',
     'mozfullscreenchange',
-    'mozfullscreenerror'
+    'mozfullscreenerror',
+    '-moz-full-screen'
   ],
   // Microsoft
   [
@@ -58,7 +54,8 @@ const apiMap = [
     'msFullscreenElement',
     'msFullscreenEnabled',
     'MSFullscreenChange',
-    'MSFullscreenError'
+    'MSFullscreenError',
+    '-ms-fullscreen'
   ]
 ];
 
@@ -79,6 +76,8 @@ if (browserApi) {
   for (let i = 0; i < browserApi.length; i++) {
     FullscreenApi[specApi[i]] = browserApi[i];
   }
+
+  FullscreenApi.prefixed = browserApi[0] !== specApi[0];
 }
 
 export default FullscreenApi;

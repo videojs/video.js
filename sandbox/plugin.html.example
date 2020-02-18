@@ -4,11 +4,8 @@
   <meta charset="utf-8" />
   <title>Video.js Plugin Example</title>
 
-  <!-- Add ES5 shim and sham for IE8 -->
-  <script src="../dist/ie8/videojs-ie8.js"></script>
-
   <!-- Load the source files -->
-  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
 
   <!-- Set the location of the flash SWF -->
@@ -20,7 +17,7 @@
 <body>
   <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">This page shows you how to create, register and initialize a Video.js plugin.</p>
 
-  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="http://vjs.zencdn.net/v/oceans.png">
+  <video id="vid1" class="video-js" controls preload="auto" width="640" height="264" poster="http://vjs.zencdn.net/v/oceans.png">
     <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
     <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
     <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">

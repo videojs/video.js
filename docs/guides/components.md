@@ -16,8 +16,10 @@ The architecture of the Video.js player is centered around components. The `Play
   * [Using trigger](#using-trigger)
 * [Default Component Tree](#default-component-tree)
 * [Specific Component Details](#specific-component-details)
+  * [Play Toggle](#play-toggle)
   * [Volume Panel](#volume-panel)
   * [Text Track Settings](#text-track-settings)
+  * [Resize Manager](#resize-manager)
 
 ## What is a Component?
 
@@ -35,7 +37,7 @@ For more specifics on the programmatic interface of a component, see [the compon
 
 Video.js components can be inherited and registered with Video.js to add new features and UI to the player.
 
-For a working example, [we have a JSBin](http://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
+For a working example, [we have a JSBin](https://jsbin.com/vobacas/edit?html,css,js,output) demonstrating the creation of a component for displaying a title across the top of the player.
 
 In addition, there are a couple methods worth recognizing:
 
@@ -48,8 +50,12 @@ Creation:
 ```js
 // adding a button to the player
 var player = videojs('some-video-id');
-var Component = videojs.getComponent('Component');
-var button = new Component(player);
+var Button = videojs.getComponent('Button');
+var button = new Button(player, {
+  clickHandler: function(event) {
+    videojs.log('Clicked');
+  }
+});
 
 console.log(button.el());
 ```
@@ -290,18 +296,20 @@ Player
 ├── TextTrackDisplay
 ├── LoadingSpinner
 ├── BigPlayButton
+├── LiveTracker (has no DOM element)
 ├─┬ ControlBar
 │ ├── PlayToggle
 │ ├── VolumePanel
 │ ├── CurrentTimeDisplay (hidden by default)
 │ ├── TimeDivider (hidden by default)
 │ ├── DurationDisplay (hidden by default)
-│ ├─┬ ProgressControl (hidden during live playback)
+│ ├─┬ ProgressControl (hidden during live playback, except when liveui: true)
 │ │ └─┬ SeekBar
 │ │   ├── LoadProgressBar
 │ │   ├── MouseTimeDisplay
 │ │   └── PlayProgressBar
 │ ├── LiveDisplay (hidden during VOD playback)
+│ ├── SeekToLive (hidden during VOD playback)
 │ ├── RemainingTimeDisplay
 │ ├── CustomControlSpacer (has no UI)
 │ ├── PlaybackRateMenuButton (hidden, unless playback tech supports rate changes)
@@ -309,13 +317,32 @@ Player
 │ ├── DescriptionsButton (hidden, unless there are relevant tracks)
 │ ├── SubtitlesButton (hidden, unless there are relevant tracks)
 │ ├── CaptionsButton (hidden, unless there are relevant tracks)
+│ ├── SubsCapsButton (hidden, unless there are relevant tracks)
 │ ├── AudioTrackButton (hidden, unless there are relevant tracks)
+│ ├── PictureInPictureToggle
 │ └── FullscreenToggle
 ├── ErrorDisplay (hidden, until there is an error)
-└── TextTrackSettings
+├── TextTrackSettings
+└── ResizeManager (hidden)
 ```
 
 ## Specific Component Details
+
+### Play Toggle
+
+The `PlayToggle` has one option `replay` which can show or hide replay icon. This can be set by passing `{replay: false}` as the default behavior replay icon is shown after video end playback.
+
+Example of how to hide a replay icon
+
+```js
+let player = videojs('myplayer', {
+  controlBar: {
+    playToggle: {
+      replay: false
+    }
+  }
+});
+```
 
 ### Volume Panel
 
@@ -337,4 +364,38 @@ let player = videojs('myplayer', {
 
 The text track settings component is only available when using emulated text tracks.
 
-[api]: http://docs.videojs.com/Component.html
+[api]: https://docs.videojs.com/Component.html
+
+### Resize Manager
+
+This new component is in charge of triggering a `playerresize` event when the player size changed.
+It uses the ResizeObserver if available or a polyfill was provided. It has no element when using the ResizeObserver.
+If a ResizeObserver is not available, it will fallback to an iframe element and listen to its resize event via a debounced handler.
+
+A ResizeObserver polyfill can be passed in like so:
+
+```js
+var player = videojs('myplayer', {
+  resizeManager: {
+    ResizeObserver: ResizeObserverPoylfill
+  }
+});
+```
+
+To force using the iframe fallback, pass in `null` as the `ResizeObserver`:
+
+```js
+var player = videojs('myplayer', {
+  resizeManager: {
+    ResizeObserver: null
+  }
+});
+```
+
+The ResizeManager can also just be disabled like so:
+
+```js
+var player = videojs('myplayer', {
+  resizeManager: false
+});
+```

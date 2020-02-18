@@ -21,7 +21,43 @@
   vertical-align: bottom;
 }
 
+// code that will only run if CSS Grid is supported by the browser
+@supports (display: grid) {
+  .vjs-text-track-settings .vjs-modal-dialog-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    // Flex and Grid for Firefox, IE, and Edge remove the bottom padding/margin in a container as size decreases
+    // so we add bottom padding/margin to the last item in the grid instead of here
+    // see https://stackoverflow.com/a/23754080
+    padding: 20px 24px 0px 24px;
+  }
+
+  // see the comment for padding above
+  .vjs-track-settings-controls .vjs-default-button {
+    margin-bottom: 20px;
+  }
+
+  .vjs-text-track-settings .vjs-track-settings-controls {
+    // make this take up both columns
+    grid-column: 1 / -1;
+  }
+
+  // 1 column for small players
+  .vjs-layout-small .vjs-text-track-settings .vjs-modal-dialog-content ,
+  .vjs-layout-x-small .vjs-text-track-settings .vjs-modal-dialog-content,
+  .vjs-layout-tiny .vjs-text-track-settings .vjs-modal-dialog-content {
+    grid-template-columns: 1fr;
+  }
+
+}
+
 // Form elements
+.vjs-track-setting > select {
+  margin-right: 1em;
+  margin-bottom: 0.5em;
+}
+
 .vjs-text-track-settings fieldset {
   margin: 5px;
   padding: 3px;
@@ -30,7 +66,11 @@
 
 .vjs-text-track-settings fieldset span {
   display: inline-block;
-  margin-left: 5px;
+}
+
+// style the second select for text colors
+.vjs-text-track-settings fieldset span > select {
+  max-width: 7.3em;
 }
 
 .vjs-text-track-settings legend {

@@ -21,7 +21,7 @@ QUnit.test('middleware can be added with the use method', function(assert) {
   assert.equal(middleware.getMiddleware('foo').pop(), mwFactory, 'we are able to add middleware');
 });
 
-QUnit.test('middleware get iterates through the middleware array the right order', function(assert) {
+QUnit.test('middleware get iterates through the middleware array in the right order', function(assert) {
   const cts = [];
   const durs = [];
   const foos = [];
@@ -81,7 +81,7 @@ QUnit.test('middleware get iterates through the middleware array the right order
   assertion(foo, 4, foos, [5, 8], 'foo');
 });
 
-QUnit.test('middleware set iterates through the middleware array the right order', function(assert) {
+QUnit.test('middleware set iterates through the middleware array in the right order', function(assert) {
   const cts = [];
   const durs = [];
   const foos = [];
@@ -144,11 +144,115 @@ QUnit.test('middleware set iterates through the middleware array the right order
   assertion(foo, 8, foos, [10, 5, 8], 'foo');
 });
 
+QUnit.test('middleware mediate iterates through the middleware array twice', function(assert) {
+  let playsToTech = 0;
+  let playsToPlayer = 0;
+  let techPlays = 0;
+  let techPlay;
+  let pv1;
+  let pv2;
+  let pc1;
+  let pc2;
+
+  const mws = [{
+    callPlay() {
+      playsToTech++;
+    },
+    play(cancelled, value) {
+      playsToPlayer++;
+      pv1 = value;
+      pc1 = cancelled;
+    }
+  }, {
+    callPlay() {
+      playsToTech++;
+    },
+    play(cancelled, value) {
+      playsToPlayer++;
+      pv2 = value;
+      pc2 = cancelled;
+    }
+  }];
+  const tech = {
+    play() {
+      techPlays++;
+      techPlay = {then: () => {}};
+
+      return techPlay;
+    }
+  };
+
+  const pp = middleware.mediate(mws, tech, 'play');
+
+  assert.equal(playsToTech, playsToPlayer, 'middleware got called the same number of times');
+  assert.equal(playsToTech, 2, 'both middleware got called before the tech');
+  assert.equal(techPlays, 1, 'the tech method only gets called once');
+  assert.equal(playsToPlayer, 2, 'both middleware got called after the tech');
+
+  assert.deepEqual(pv1.then, techPlay.then, 'the value returned by the tech is passed through the middleware');
+  assert.deepEqual(pv2, techPlay, 'the value returned by the tech is passed through the middleware');
+  assert.deepEqual(pp, techPlay, 'the value returned to the player is the value returned from the tech');
+  assert.equal(pc1, false, 'the play has not been cancelled in middleware 1');
+  assert.equal(pc2, false, 'the play has not been cancelled in middleware 2');
+});
+
+QUnit.test('middleware mediate allows and can detect cancellation', function(assert) {
+  let playsToTech = 0;
+  let playsToPlayer = 0;
+  let techPlays = 0;
+  let pv1;
+  let pv2;
+  let pc1;
+  let pc2;
+
+  const mws = [{
+    callPlay() {
+      playsToTech++;
+    },
+    play(cancelled, value) {
+      playsToPlayer++;
+      pv1 = value;
+      pc1 = cancelled;
+    }
+  }, {
+    callPlay() {
+      playsToTech++;
+      return middleware.TERMINATOR;
+    },
+    play(cancelled, value) {
+      playsToPlayer++;
+      pv2 = value;
+      pc2 = cancelled;
+    }
+  }];
+  const tech = {
+    play() {
+      techPlays++;
+      return {then: () => {}};
+    }
+  };
+
+  const pp = middleware.mediate(mws, tech, 'play');
+
+  assert.equal(playsToTech, 2, 'both middleware run until middleware terminates');
+  assert.equal(techPlays, 0, 'the tech should not be called if a middleware terminates');
+  assert.equal(playsToPlayer, 2, 'both middleware run after the tech');
+
+  assert.equal(pv1, null, 'null is returned through the middleware if a middleware terminated previously');
+  assert.equal(pv2, null, 'null is returned through the middleware if a middleware terminated previously');
+  assert.equal(pp, null, 'null is returned to the player if a middleware terminated previously');
+  assert.equal(pc1, true, 'the play has been cancelled in middleware 1');
+  assert.equal(pc2, true, 'the play has been cancelled in middleware 2');
+});
+
 QUnit.test('setSource is run asynchronously', function(assert) {
   let src;
   let acc;
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, { src: 'foo', type: 'video/foo' }, function(_src, _acc) {
     src = _src;
@@ -180,6 +284,9 @@ QUnit.test('setSource selects a source based on the middleware given', function(
   middleware.use('video/foo', fooFactory);
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
@@ -222,6 +329,9 @@ QUnit.test('setSource can select multiple middleware from multiple types', funct
   middleware.use('video/bar', barFactory);
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
@@ -276,6 +386,9 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   middleware.use('video/foo', fooFactory3);
 
   middleware.setSource({
+    id() {
+      return 'vid1';
+    },
     setTimeout: window.setTimeout
   }, {src: 'foo', type: 'video/foo'}, function(_src, _acc) {
     src = _src;
@@ -291,5 +404,135 @@ QUnit.test('setSource will select all middleware of a given type, until src chan
   assert.equal(acc[1], foomw2, 'foomw is the first middleware');
 
   middleware.getMiddleware('video/foo').pop();
+  middleware.getMiddleware('video/foo').pop();
+  middleware.getMiddleware('video/foo').pop();
+});
+
+QUnit.test('a middleware without a mediator method will not throw an error', function(assert) {
+  let pauseCalled = 0;
+  const myMw = {};
+  const mwFactory = () => myMw;
+  const mwFactory2 = () => ({
+    pause() {
+      pauseCalled++;
+    }
+  });
+
+  middleware.mediate([mwFactory(), mwFactory2()], {pause: () => {}}, 'pause');
+
+  assert.equal(pauseCalled, 1, 'pauseCalled was called once and no error was thrown');
+});
+
+QUnit.test('a middleware factory is not called on source change', function(assert) {
+  let mwfactoryCalled = 0;
+  const mw = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  };
+  const fooFactory = () => {
+    mwfactoryCalled++;
+    return mw;
+  };
+
+  middleware.use('video/foo', fooFactory);
+
+  // set "initial" source"
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was called once');
+
+  // "change" source
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was not called again');
+
+  middleware.getMiddleware('video/foo').pop();
+});
+
+QUnit.test('a middleware factory is called on a new source with a new player', function(assert) {
+  let mwfactoryCalled = 0;
+  const mw = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  };
+  const fooFactory = () => {
+    mwfactoryCalled++;
+    return mw;
+  };
+
+  middleware.use('video/foo', fooFactory);
+
+  // set "initial" source with player vid1
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 1, 'the factory was called once');
+
+  // set "initial" source with player vid2
+  middleware.setSource({
+    id() {
+      return 'vid2';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/foo'}, function() {});
+
+  this.clock.tick(1);
+
+  assert.equal(mwfactoryCalled, 2, 'the factory was called again');
+
+  middleware.getMiddleware('video/foo').pop();
+});
+
+QUnit.test('a middleware without a setSource gets chosen implicitly', function(assert) {
+  let mws = [];
+  const mw = {
+    currentTime(ct) {
+    }
+  };
+  const mwFactory = () => mw;
+
+  middleware.use('video/foo', mwFactory);
+
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'foo', type: 'video/foo'}, function(src, _mws) {
+    mws = _mws;
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(mws.length, 1, 'we have 1 middleware set');
+
   middleware.getMiddleware('video/foo').pop();
 });

@@ -2,8 +2,11 @@
  * @file volume-control.js
  */
 import Component from '../component.js';
-import checkVolumeSupport from './volume-control/check-volume-support';
 import {isPlain} from '../utils/obj';
+import * as Events from '../utils/events.js';
+import * as Fn from '../utils/fn.js';
+import keycode from 'keycode';
+import document from 'global/document';
 
 // Required children
 import './volume-control/volume-control.js';
@@ -42,16 +45,18 @@ class VolumePanel extends Component {
 
     super(player, options);
 
-    // hide this control if volume support is missing
-    checkVolumeSupport(this, player);
+    this.on(player, ['loadstart'], this.volumePanelState_);
+    this.on(this.muteToggle, 'keyup', this.handleKeyPress);
+    this.on(this.volumeControl, 'keyup', this.handleVolumeControlKeyUp);
+    this.on('keydown', this.handleKeyPress);
+    this.on('mouseover', this.handleMouseOver);
+    this.on('mouseout', this.handleMouseOut);
 
     // while the slider is active (the mouse has been pressed down and
-    // is dragging) or in focus we do not want to hide the VolumeBar
+    // is dragging) we do not want to hide the VolumeBar
     this.on(this.volumeControl, ['slideractive'], this.sliderActive_);
-    this.on(this.muteToggle, 'focus', this.sliderActive_);
 
     this.on(this.volumeControl, ['sliderinactive'], this.sliderInactive_);
-    this.on(this.muteToggle, 'blur', this.sliderInactive_);
   }
 
   /**
@@ -75,6 +80,27 @@ class VolumePanel extends Component {
   }
 
   /**
+   * Adds vjs-hidden or vjs-mute-toggle-only to the VolumePanel
+   * depending on MuteToggle and VolumeControl state
+   *
+   * @listens Player#loadstart
+   * @private
+   */
+  volumePanelState_() {
+    // hide volume panel if neither volume control or mute toggle
+    // are displayed
+    if (this.volumeControl.hasClass('vjs-hidden') && this.muteToggle.hasClass('vjs-hidden')) {
+      this.addClass('vjs-hidden');
+    }
+
+    // if only mute toggle is visible we don't want
+    // volume panel expanding when hovered or active
+    if (this.volumeControl.hasClass('vjs-hidden') && !this.muteToggle.hasClass('vjs-hidden')) {
+      this.addClass('vjs-mute-toggle-only');
+    }
+  }
+
+  /**
    * Create the `Component`'s DOM element
    *
    * @return {Element}
@@ -92,6 +118,73 @@ class VolumePanel extends Component {
     });
   }
 
+  /**
+   * Dispose of the `volume-panel` and all child components.
+   */
+  dispose() {
+    this.handleMouseOut();
+    super.dispose();
+  }
+
+  /**
+   * Handles `keyup` events on the `VolumeControl`, looking for ESC, which closes
+   * the volume panel and sets focus on `MuteToggle`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keyup` event that caused this function to be called.
+   *
+   * @listens keyup
+   */
+  handleVolumeControlKeyUp(event) {
+    if (keycode.isEventKey(event, 'Esc')) {
+      this.muteToggle.focus();
+    }
+  }
+
+  /**
+   * This gets called when a `VolumePanel` gains hover via a `mouseover` event.
+   * Turns on listening for `mouseover` event. When they happen it
+   * calls `this.handleMouseOver`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseover` event that caused this function to be called.
+   *
+   * @listens mouseover
+   */
+  handleMouseOver(event) {
+    this.addClass('vjs-hover');
+    Events.on(document, 'keyup', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * This gets called when a `VolumePanel` gains hover via a `mouseout` event.
+   * Turns on listening for `mouseout` event. When they happen it
+   * calls `this.handleMouseOut`.
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseout` event that caused this function to be called.
+   *
+   * @listens mouseout
+   */
+  handleMouseOut(event) {
+    this.removeClass('vjs-hover');
+    Events.off(document, 'keyup', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Handles `keyup` event on the document or `keydown` event on the `VolumePanel`,
+   * looking for ESC, which hides the `VolumeControl`.
+   *
+   * @param {EventTarget~Event} event
+   *        The keypress that triggered this event.
+   *
+   * @listens keydown | keyup
+   */
+  handleKeyPress(event) {
+    if (keycode.isEventKey(event, 'Esc')) {
+      this.handleMouseOut();
+    }
+  }
 }
 
 /**

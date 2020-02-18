@@ -2,7 +2,7 @@
 import window from 'global/window';
 import Component from '../../src/js/component.js';
 import * as Dom from '../../src/js/utils/dom.js';
-import * as DomData from '../../src/js/utils/dom-data';
+import DomData from '../../src/js/utils/dom-data';
 import * as Events from '../../src/js/utils/events.js';
 import * as Obj from '../../src/js/utils/obj';
 import * as browser from '../../src/js/utils/browser.js';
@@ -14,23 +14,32 @@ class TestComponent1 extends Component {}
 class TestComponent2 extends Component {}
 class TestComponent3 extends Component {}
 class TestComponent4 extends Component {}
+
 TestComponent1.prototype.options_ = {
   children: [
     'testComponent2',
     'testComponent3'
   ]
 };
-Component.registerComponent('TestComponent1', TestComponent1);
-Component.registerComponent('TestComponent2', TestComponent2);
-Component.registerComponent('TestComponent3', TestComponent3);
-Component.registerComponent('TestComponent4', TestComponent4);
 
 QUnit.module('Component', {
+  before() {
+    Component.registerComponent('TestComponent1', TestComponent1);
+    Component.registerComponent('TestComponent2', TestComponent2);
+    Component.registerComponent('TestComponent3', TestComponent3);
+    Component.registerComponent('TestComponent4', TestComponent4);
+  },
   beforeEach() {
     this.clock = sinon.useFakeTimers();
   },
   afterEach() {
     this.clock.restore();
+  },
+  after() {
+    delete Component.components_.TestComponent1;
+    delete Component.components_.TestComponent2;
+    delete Component.components_.TestComponent3;
+    delete Component.components_.TestComponent4;
   }
 });
 
@@ -86,6 +95,8 @@ QUnit.test('should create an element', function(assert) {
   const comp = new Component(getFakePlayer(), {});
 
   assert.ok(comp.el().nodeName);
+
+  comp.dispose();
 });
 
 QUnit.test('should add a child component', function(assert) {
@@ -98,6 +109,8 @@ QUnit.test('should add a child component', function(assert) {
   assert.ok(comp.el().childNodes[0] === child.el());
   assert.ok(comp.getChild('component') === child);
   assert.ok(comp.getChildById(child.id()) === child);
+
+  comp.dispose();
 });
 
 QUnit.test('should add a child component to an index', function(assert) {
@@ -129,6 +142,26 @@ QUnit.test('should add a child component to an index', function(assert) {
   assert.ok(comp.children().length === 5);
   assert.ok(comp.children()[3] === child3);
   assert.ok(comp.children()[4] === child2);
+
+  comp.dispose();
+});
+
+QUnit.test('should insert element relative to the element of the component to insert before', function(assert) {
+
+  // for legibility of the test itself:
+  /* eslint-disable no-unused-vars */
+
+  const comp = new Component(getFakePlayer());
+
+  const child0 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c0'})});
+  const child1 = comp.addChild('component', {createEl: false});
+  const child2 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c2'})});
+  const child3 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c3'})});
+  const child4 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c4'})}, comp.children_.indexOf(child2));
+
+  assert.ok(child2.el_.previousSibling === child4.el_, 'addChild should insert el before its next sibling\'s element');
+
+  /* eslint-enable no-unused-vars */
 });
 
 QUnit.test('addChild should throw if the child does not exist', function(assert) {
@@ -138,6 +171,7 @@ QUnit.test('addChild should throw if the child does not exist', function(assert)
     comp.addChild('non-existent-child');
   }, new Error('Component Non-existent-child does not exist'), 'addChild threw');
 
+  comp.dispose();
 });
 
 QUnit.test('addChild with instance should allow getting child correctly', function(assert) {
@@ -151,6 +185,8 @@ QUnit.test('addChild with instance should allow getting child correctly', functi
   comp.addChild(comp2);
   assert.ok(comp.getChild('foo'), 'we can get child with camelCase');
   assert.ok(comp.getChild('Foo'), 'we can get child with TitleCase');
+
+  comp.dispose();
 });
 
 QUnit.test('should add a child component with title case name', function(assert) {
@@ -163,6 +199,8 @@ QUnit.test('should add a child component with title case name', function(assert)
   assert.ok(comp.el().childNodes[0] === child.el());
   assert.ok(comp.getChild('Component') === child);
   assert.ok(comp.getChildById(child.id()) === child);
+
+  comp.dispose();
 });
 
 QUnit.test('should init child components from options', function(assert) {
@@ -174,6 +212,8 @@ QUnit.test('should init child components from options', function(assert) {
 
   assert.ok(comp.children().length === 1);
   assert.ok(comp.el().childNodes.length === 1);
+
+  comp.dispose();
 });
 
 QUnit.test('should init child components from simple children array', function(assert) {
@@ -187,6 +227,8 @@ QUnit.test('should init child components from simple children array', function(a
 
   assert.ok(comp.children().length === 3);
   assert.ok(comp.el().childNodes.length === 3);
+
+  comp.dispose();
 });
 
 QUnit.test('should init child components from children array of objects', function(assert) {
@@ -200,10 +242,14 @@ QUnit.test('should init child components from children array of objects', functi
 
   assert.ok(comp.children().length === 3);
   assert.ok(comp.el().childNodes.length === 3);
+
+  comp.dispose();
 });
 
 QUnit.test('should do a deep merge of child options', function(assert) {
   // Create a default option for component
+  const oldOptions = Component.prototype.options_;
+
   Component.prototype.options_ = {
     example: {
       childOne: { foo: 'bar', asdf: 'fdsa' },
@@ -230,22 +276,29 @@ QUnit.test('should do a deep merge of child options', function(assert) {
   assert.strictEqual(children.childThree, false, 'object two levels deep removed');
   assert.ok(children.childFour, 'object two levels deep added');
 
-  assert.strictEqual(Component.prototype.options_.example.childOne.foo,
-                     'bar',
-                     'prototype options were not overridden');
+  assert.strictEqual(
+    Component.prototype.options_.example.childOne.foo,
+    'bar',
+    'prototype options were not overridden'
+  );
 
-  // Reset default component options to none
-  Component.prototype.options_ = null;
+  // Reset default component options
+  Component.prototype.options_ = oldOptions;
+  comp.dispose();
 });
 
 QUnit.test('should init child components from component options', function(assert) {
-  const testComp = new TestComponent1(TestHelpers.makePlayer(), {
+  const player = TestHelpers.makePlayer();
+  const testComp = new TestComponent1(player, {
     testComponent2: false,
     testComponent4: {}
   });
 
   assert.ok(!testComp.childNameIndex_.TestComponent2, 'we do not have testComponent2');
   assert.ok(testComp.childNameIndex_.TestComponent4, 'we have a testComponent4');
+
+  player.dispose();
+  testComp.dispose();
 });
 
 QUnit.test('should allows setting child options at the parent options level', function(assert) {
@@ -271,6 +324,7 @@ QUnit.test('should allows setting child options at the parent options level', fu
   }
   assert.equal(parent.children()[0].options_.foo, true, 'child options set when children array is used');
   assert.equal(parent.children().length, 1, 'we should only have one child');
+  parent.dispose();
 
   // using children object
   options = {
@@ -294,6 +348,7 @@ QUnit.test('should allows setting child options at the parent options level', fu
   }
   assert.equal(parent.children()[0].options_.foo, true, 'child options set when children object is used');
   assert.equal(parent.children().length, 1, 'we should only have one child');
+  parent.dispose();
 });
 
 QUnit.test('should dispose of component and children', function(assert) {
@@ -303,13 +358,14 @@ QUnit.test('should dispose of component and children', function(assert) {
   const child = comp.addChild('Component');
 
   assert.ok(comp.children().length === 1);
+  assert.notOk(comp.isDisposed(), 'the component reports that it is not disposed');
 
   // Add a listener
   comp.on('click', function() {
     return true;
   });
   const el = comp.el();
-  const data = DomData.getData(el);
+  const data = DomData.get(el);
 
   let hasDisposed = false;
   let bubbles = null;
@@ -320,6 +376,7 @@ QUnit.test('should dispose of component and children', function(assert) {
   });
 
   comp.dispose();
+  child.dispose();
 
   assert.ok(hasDisposed, 'component fired dispose event');
   assert.ok(bubbles === false, 'dispose event does not bubble');
@@ -327,9 +384,12 @@ QUnit.test('should dispose of component and children', function(assert) {
   assert.ok(!comp.el(), 'component element was deleted');
   assert.ok(!child.children(), 'child children were deleted');
   assert.ok(!child.el(), 'child element was deleted');
-  assert.ok(!DomData.hasData(el), 'listener data nulled');
-  assert.ok(!Object.getOwnPropertyNames(data).length,
-  'original listener data object was emptied');
+  assert.ok(!DomData.has(el), 'listener data nulled');
+  assert.ok(
+    !Object.getOwnPropertyNames(data).length,
+    'original listener data object was emptied'
+  );
+  assert.ok(comp.isDisposed(), 'the component reports that it is disposed');
 });
 
 QUnit.test('should add and remove event listeners to element', function(assert) {
@@ -349,6 +409,8 @@ QUnit.test('should add and remove event listeners to element', function(assert) 
   comp.trigger('test-event');
   comp.off('test-event', testListener);
   comp.trigger('test-event');
+
+  comp.dispose();
 });
 
 QUnit.test('should trigger a listener once using one()', function(assert) {
@@ -363,6 +425,8 @@ QUnit.test('should trigger a listener once using one()', function(assert) {
   comp.one('test-event', testListener);
   comp.trigger('test-event');
   comp.trigger('test-event');
+
+  comp.dispose();
 });
 
 QUnit.test('should be possible to pass data when you trigger an event', function(assert) {
@@ -381,6 +445,8 @@ QUnit.test('should be possible to pass data when you trigger an event', function
   comp.one('test-event', testListener);
   comp.trigger('test-event', {d1: data1, d2: data2});
   comp.trigger('test-event');
+
+  comp.dispose();
 });
 
 QUnit.test('should add listeners to other components and remove them', function(assert) {
@@ -420,11 +486,9 @@ QUnit.test('should add listeners to other components and remove when them other 
   const player = getFakePlayer();
   const comp1 = new Component(player);
   const comp2 = new Component(player);
-  let listenerFired = 0;
 
   const testListener = function() {
     assert.equal(this, comp1, 'listener has the first component as context');
-    listenerFired++;
   };
 
   comp1.on(comp2, 'test-event', testListener);
@@ -452,6 +516,9 @@ QUnit.test('should add listeners to other components that are fired once', funct
   assert.equal(listenerFired, 1, 'listener was executed once');
   comp2.trigger('test-event');
   assert.equal(listenerFired, 1, 'listener was executed only once');
+
+  comp1.dispose();
+  comp2.dispose();
 });
 
 QUnit.test('should add listeners to other element and remove them', function(assert) {
@@ -491,6 +558,8 @@ QUnit.test('should add listeners to other element and remove them', function(ass
   }
   Events.trigger(el, 'dispose');
   assert.ok(true, 'this component removed dispose listeners from other element');
+
+  comp1.dispose();
 });
 
 QUnit.test('should add listeners to other components that are fired once', function(assert) {
@@ -509,6 +578,8 @@ QUnit.test('should add listeners to other components that are fired once', funct
   assert.equal(listenerFired, 1, 'listener was executed once');
   Events.trigger(el, 'test-event');
   assert.equal(listenerFired, 1, 'listener was executed only once');
+
+  comp1.dispose();
 });
 
 QUnit.test('should trigger a listener when ready', function(assert) {
@@ -549,6 +620,8 @@ QUnit.test('should trigger a listener when ready', function(assert) {
   assert.ok(!initListenerFired, 'init listener should be removed');
   assert.ok(!methodListenerFired, 'method listener should be removed');
   assert.ok(!syncListenerFired, 'sync listener should be removed');
+
+  comp.dispose();
 });
 
 QUnit.test('should not retrigger a listener when the listener calls triggerReady', function(assert) {
@@ -573,6 +646,8 @@ QUnit.test('should not retrigger a listener when the listener calls triggerReady
   this.clock.tick(100);
 
   assert.equal(timesCalled, 1, 'triggerReady from inside a ready handler does not result in an infinite loop');
+
+  comp.dispose();
 });
 
 QUnit.test('should add and remove a CSS class', function(assert) {
@@ -586,6 +661,8 @@ QUnit.test('should add and remove a CSS class', function(assert) {
   assert.ok(comp.el().className.indexOf('test-class') !== -1);
   comp.toggleClass('test-class');
   assert.ok(comp.el().className.indexOf('test-class') === -1);
+
+  comp.dispose();
 });
 
 QUnit.test('should show and hide an element', function(assert) {
@@ -595,6 +672,8 @@ QUnit.test('should show and hide an element', function(assert) {
   assert.ok(comp.hasClass('vjs-hidden') === true);
   comp.show();
   assert.ok(comp.hasClass('vjs-hidden') === false);
+
+  comp.dispose();
 });
 
 QUnit.test('dimension() should treat NaN and null as zero', function(assert) {
@@ -624,6 +703,8 @@ QUnit.test('dimension() should treat NaN and null as zero', function(assert) {
   newWidth = comp.dimension('width', undefined);
 
   assert.equal(newWidth, width, 'we did not set the width with undefined');
+
+  comp.dispose();
 });
 
 QUnit.test('should change the width and height of a component', function(assert) {
@@ -654,6 +735,8 @@ QUnit.test('should change the width and height of a component', function(assert)
   comp.height('auto');
   assert.ok(comp.width() === 1000, 'forced width was removed');
   assert.ok(comp.height() === 0, 'forced height was removed');
+
+  comp.dispose();
 });
 
 QUnit.test('should get the computed dimensions', function(assert) {
@@ -683,20 +766,21 @@ QUnit.test('should get the computed dimensions', function(assert) {
   assert.equal(comp.currentDimensions().width + 'px', computedWidth, 'matches computed width');
   assert.equal(comp.currentDimensions().height + 'px', computedHeight, 'matches computed width');
 
+  comp.dispose();
 });
 
 QUnit.test('should use a defined content el for appending children', function(assert) {
-  class CompWithContent extends Component {}
+  class CompWithContent extends Component {
+    createEl() {
+      // Create the main component element
+      const el = Dom.createEl('div');
 
-  CompWithContent.prototype.createEl = function() {
-    // Create the main component element
-    const el = Dom.createEl('div');
-
-    // Create the element where children will be appended
-    this.contentEl_ = Dom.createEl('div', { id: 'contentEl' });
-    el.appendChild(this.contentEl_);
-    return el;
-  };
+      // Create the element where children will be appended
+      this.contentEl_ = Dom.createEl('div', { id: 'contentEl' });
+      el.appendChild(this.contentEl_);
+      return el;
+    }
+  }
 
   const comp = new CompWithContent(getFakePlayer());
   const child = comp.addChild('component');
@@ -709,8 +793,13 @@ QUnit.test('should use a defined content el for appending children', function(as
 
   assert.ok(comp.children().length === 0, 'Length should now be zero');
   assert.ok(comp.el().childNodes[0].id === 'contentEl', 'Content El should still exist');
-  assert.ok(comp.el().childNodes[0].childNodes[0] !== child.el(),
-  'Child el should be removed.');
+  assert.ok(
+    comp.el().childNodes[0].childNodes[0] !== child.el(),
+    'Child el should be removed.'
+  );
+
+  child.dispose();
+  comp.dispose();
 });
 
 QUnit.test('should emit a tap event', function(assert) {
@@ -720,7 +809,7 @@ QUnit.test('should emit a tap event', function(assert) {
 
   assert.expect(3);
   // Fake touch support. Real touch support isn't needed for this test.
-  browser.TOUCH_ENABLED = true;
+  browser.stub_TOUCH_ENABLED(true);
 
   comp.emitTapEvents();
   comp.on('tap', function() {
@@ -768,7 +857,8 @@ QUnit.test('should emit a tap event', function(assert) {
   comp.trigger('touchend');
 
   // Reset to orignial value
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
+  comp.dispose();
 });
 
 QUnit.test('should provide timeout methods that automatically get cleared on component disposal', function(assert) {
@@ -906,6 +996,159 @@ QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', f
   window.cancelAnimationFrame = oldCAF;
 });
 
+QUnit.test('setTimeout should remove dispose handler on trigger', function(assert) {
+  const comp = new Component(getFakePlayer());
+
+  comp.setTimeout(() => {}, 1);
+
+  assert.equal(comp.setTimeoutIds_.size, 1, 'we removed our dispose handle');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.setTimeoutIds_.size, 0, 'we removed our dispose handle');
+
+  comp.dispose();
+});
+
+QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  const spyRAF = sinon.spy();
+
+  comp.requestAnimationFrame(spyRAF);
+
+  assert.equal(comp.rafIds_.size, 1, 'we got a new dispose handler');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.rafIds_.size, 0, 'we removed our dispose handle');
+
+  comp.dispose();
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
+QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  const spyRAF = sinon.spy();
+
+  comp.requestAnimationFrame(spyRAF);
+
+  assert.equal(comp.rafIds_.size, 1, 'we got a new dispose handler');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.rafIds_.size, 0, 'we removed our dispose handle');
+
+  comp.dispose();
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
+QUnit.test('setTimeout should be canceled on dispose', function(assert) {
+  const comp = new Component(getFakePlayer());
+  let called = false;
+  let clearId;
+  const setId = comp.setTimeout(() => {
+    called = true;
+  }, 1);
+
+  const clearTimeout = comp.clearTimeout;
+
+  comp.clearTimeout = (id) => {
+    clearId = id;
+    return clearTimeout.call(comp, id);
+  };
+
+  assert.equal(comp.setTimeoutIds_.size, 1, 'we added a timeout id');
+
+  comp.dispose();
+
+  assert.equal(comp.setTimeoutIds_.size, 0, 'we removed our timeout id');
+  assert.equal(clearId, setId, 'clearTimeout was called');
+
+  this.clock.tick(1);
+
+  assert.equal(called, false, 'setTimeout was never called');
+});
+
+QUnit.test('requestAnimationFrame should be canceled on dispose', function(assert) {
+  const comp = new Component(getFakePlayer());
+  let called = false;
+  let clearId;
+  const setId = comp.requestAnimationFrame(() => {
+    called = true;
+  });
+
+  const cancelAnimationFrame = comp.cancelAnimationFrame;
+
+  comp.cancelAnimationFrame = (id) => {
+    clearId = id;
+    return cancelAnimationFrame.call(comp, id);
+  };
+
+  assert.equal(comp.rafIds_.size, 1, 'we added a raf id');
+
+  comp.dispose();
+
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.equal(clearId, setId, 'clearAnimationFrame was called');
+
+  this.clock.tick(1);
+
+  assert.equal(called, false, 'requestAnimationFrame was never called');
+});
+
+QUnit.test('setInterval should be canceled on dispose', function(assert) {
+  const comp = new Component(getFakePlayer());
+  let called = false;
+  let clearId;
+  const setId = comp.setInterval(() => {
+    called = true;
+  });
+
+  const clearInterval = comp.clearInterval;
+
+  comp.clearInterval = (id) => {
+    clearId = id;
+    return clearInterval.call(comp, id);
+  };
+
+  assert.equal(comp.setIntervalIds_.size, 1, 'we added an interval id');
+
+  comp.dispose();
+
+  assert.equal(comp.setIntervalIds_.size, 0, 'we removed a raf id');
+  assert.equal(clearId, setId, 'clearInterval was called');
+
+  this.clock.tick(1);
+
+  assert.equal(called, false, 'setInterval was never called');
+});
+
 QUnit.test('$ and $$ functions', function(assert) {
   const comp = new Component(getFakePlayer());
   const contentEl = document.createElement('div');
@@ -919,6 +1162,8 @@ QUnit.test('$ and $$ functions', function(assert) {
 
   assert.strictEqual(comp.$('div'), children[0], '$ defaults to contentEl as scope');
   assert.strictEqual(comp.$$('div').length, children.length, '$$ defaults to contentEl as scope');
+
+  comp.dispose();
 });
 
 QUnit.test('should use the stateful mixin', function(assert) {
@@ -929,4 +1174,32 @@ QUnit.test('should use the stateful mixin', function(assert) {
 
   comp.setState({foo: 'bar'});
   assert.strictEqual(comp.state.foo, 'bar', 'the component passes a basic stateful test');
+
+  comp.dispose();
+});
+
+QUnit.test('should remove child when the child moves to the other parent', function(assert) {
+  const parentComponent1 = new Component(getFakePlayer(), {});
+  const parentComponent2 = new Component(getFakePlayer(), {});
+  const childComponent = new Component(getFakePlayer(), {});
+
+  parentComponent1.addChild(childComponent);
+
+  assert.strictEqual(parentComponent1.children().length, 1, 'the children number of `parentComponent1` is 1');
+  assert.strictEqual(parentComponent1.children()[0], childComponent, 'the first child of `parentComponent1` is `childComponent`');
+  assert.strictEqual(parentComponent1.el().childNodes[0], childComponent.el(), '`parentComponent1` contains the DOM element of `childComponent`');
+
+  parentComponent2.addChild(childComponent);
+
+  assert.strictEqual(parentComponent1.children().length, 0, 'the children number of `parentComponent1` is 0');
+  assert.strictEqual(parentComponent1.el().childNodes.length, 0, 'the length of `childNodes` of `parentComponent1` is 0');
+
+  assert.strictEqual(parentComponent2.children().length, 1, 'the children number of `parentComponent2` is 1');
+  assert.strictEqual(parentComponent2.children()[0], childComponent, 'the first child of `parentComponent2` is `childComponent`');
+  assert.strictEqual(parentComponent2.el().childNodes.length, 1, 'the length of `childNodes` of `parentComponent2` is 1');
+  assert.strictEqual(parentComponent2.el().childNodes[0], childComponent.el(), '`parentComponent2` contains the DOM element of `childComponent`');
+
+  parentComponent1.dispose();
+  parentComponent2.dispose();
+  childComponent.dispose();
 });

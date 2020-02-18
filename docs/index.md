@@ -22,6 +22,7 @@ Guides explain general topics and use cases (e.g. setup). API docs are automatic
     * [Tech](#tech)
     * [Languages](#languages)
     * [Hooks](#hooks)
+    * [Debugging](#debugging)
 * [API Docs](#api-docs)
 
 ## Resolving Issues
@@ -80,16 +81,20 @@ Video.js has multi-language support! Follow this guide to see how you can contri
 
 A "hook" is functionality that wants to do when videojs creates a player. Right now only `beforesetup` and `setup` are supported. See the guide for more information on that.
 
+#### [Debugging](/docs/guides/debugging.md)
+
+Follow this guide to see how you can use `videojs.log` for debugging purposes.
+
 ## [API Docs][api]
 
 You can refer to the [full list of API docs][api], but the most relevant API doc is for the [Player][api-player].
 
-[plugins-list]: http://videojs.com/plugins
+[plugins-list]: https://videojs.com/plugins
 
 [skins-list]: https://github.com/videojs/video.js/wiki/Skins
 
-[api]: http://docs.videojs.com/
+[api]: https://docs.videojs.com/
 
-[api-player]: http://docs.videojs.com/Player.html
+[api-player]: https://docs.videojs.com/Player.html
 
-[vjs-website]: http://videojs.com
+[vjs-website]: https://videojs.com

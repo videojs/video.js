@@ -3,7 +3,8 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import {throttle, bind} from '../../utils/fn.js';
+import clamp from '../../utils/clamp.js';
+import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 
 import './seek-bar.js';
 
@@ -26,8 +27,8 @@ class ProgressControl extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.handleMouseMove = throttle(bind(this, this.handleMouseMove), 25);
-    this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), 25);
+    this.handleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
+    this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), UPDATE_REFRESH_INTERVAL);
 
     this.enable();
   }
@@ -55,7 +56,18 @@ class ProgressControl extends Component {
    */
   handleMouseMove(event) {
     const seekBar = this.getChild('seekBar');
+
+    if (!seekBar) {
+      return;
+    }
+
+    const playProgressBar = seekBar.getChild('playProgressBar');
     const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
+
+    if (!playProgressBar && !mouseTimeDisplay) {
+      return;
+    }
+
     const seekBarEl = seekBar.el();
     const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
     let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
@@ -63,15 +75,16 @@ class ProgressControl extends Component {
     // The default skin has a gap on either side of the `SeekBar`. This means
     // that it's possible to trigger this behavior outside the boundaries of
     // the `SeekBar`. This ensures we stay within it at all times.
-    if (seekBarPoint > 1) {
-      seekBarPoint = 1;
-    } else if (seekBarPoint < 0) {
-      seekBarPoint = 0;
-    }
+    seekBarPoint = clamp(0, 1, seekBarPoint);
 
     if (mouseTimeDisplay) {
       mouseTimeDisplay.update(seekBarRect, seekBarPoint);
     }
+
+    if (playProgressBar) {
+      playProgressBar.update(seekBarRect, seekBar.getProgress());
+    }
+
   }
 
   /**
@@ -97,7 +110,9 @@ class ProgressControl extends Component {
   handleMouseSeek(event) {
     const seekBar = this.getChild('seekBar');
 
-    seekBar.handleMouseMove(event);
+    if (seekBar) {
+      seekBar.handleMouseMove(event);
+    }
   }
 
   /**
@@ -157,6 +172,11 @@ class ProgressControl extends Component {
    */
   handleMouseDown(event) {
     const doc = this.el_.ownerDocument;
+    const seekBar = this.getChild('seekBar');
+
+    if (seekBar) {
+      seekBar.handleMouseDown(event);
+    }
 
     this.on(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.on(doc, 'touchmove', this.throttledHandleMouseSeek);
@@ -175,6 +195,11 @@ class ProgressControl extends Component {
    */
   handleMouseUp(event) {
     const doc = this.el_.ownerDocument;
+    const seekBar = this.getChild('seekBar');
+
+    if (seekBar) {
+      seekBar.handleMouseUp(event);
+    }
 
     this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.off(doc, 'touchmove', this.throttledHandleMouseSeek);

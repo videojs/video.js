@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <script src='../node_modules/es5-shim/es5-shim.js'></script>
+  <script src='../node_modules/es6-shim/es6-shim.js'></script>
+
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+
+  <script src='../node_modules/videojs-flash/dist/videojs-flash.js'></script>
+  <script src="https://unpkg.com/videojs-contrib-hls@latest/dist/videojs-contrib-hls.js"></script>
+
+  <script src="../dist/lang/es.js"></script>
+
+  <!-- Set the location of the flash SWF -->
+  <script>
+    // videojs.options.flash.swf = 'http://vjs.zencdn.net/swf/5.3/video-js.swf';
+    videojs.options.flash.swf = 'http://localhost:8000/video-js-swf/dist/video-js.swf';
+  </script>
+  <style>
+    .source-el { background: #FF6961; }
+    .source-js { background: #77DD77; }
+    .options-src { background: #AEC6CF; }
+    .source-el.data-setup { background: red; }
+    .source-js.data-setup { background: green; }
+    .options-src.data-setup { background: blue; }
+
+    .video-js {
+      height: 150px;
+      width: 300px;
+    }
+
+    .wrapper {
+      display: grid;
+      margin: 0 auto;
+      grid-gap: 10px;
+      grid-template-columns: 300px 300px 300px;
+    }
+    .panel > p:first-child {
+      border-bottom: black 1px solid;
+    }
+  </style>
+</head>
+<body>
+  <p>All the various ways to embed and source video elements.</p>
+  <p>Pastel color background represent programmatic setup.</p>
+  <p>Vibrant color background represent data-setup.</p>
+  <div class="wrapper">
+    <div class="panel source-el">
+      <p>js setup with source element</p>
+      <p>video-js embed", source element</p>
+      <video-js id="vid01" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="./oceans.mp4" type='video/mp4'>
+      </video-js>
+      <p>Video embed, source element</p>
+      <video id="vid11" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+        <source src="./oceans.mp4" type='video/mp4'>
+      </video>
+      <p>injested div el, source element</p>
+      <div data-vjs-player>
+        <video id="vid21" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+          <source src="./oceans.mp4" type='video/mp4'>
+        </video>
+      </div>
+    </div>
+    <div class="panel options-src">
+      <p>js setup with sources options</p>
+      <p>video-js embed", js source</p>
+      <video-js id="vid05" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+      </video-js>
+      <p>Video embed, js source</p>
+      <video id="vid15" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+      </video>
+      <p>injested div el, js source</p>
+      <div data-vjs-player>
+        <video id="vid25" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png">
+        </video>
+      </div>
+    </div>
+    <div class="panel source-js">
+      <p>js setup with js method sources</p>
+      <p>video-js embed", js source</p>
+      <video-js id="vid02" class="video-js" controls>
+      </video-js>
+      <p>Video embed, js source</p>
+      <video id="vid12" class="video-js" controls>
+      </video>
+      <p>injested div el, js source</p>
+      <div data-vjs-player>
+        <video id="vid22" class="video-js" controls>
+        </video>
+      </div>
+    </div>
+    <div class="panel source-el data-setup">
+      <p>data-setup with sourrce elements</p>
+      <p>video-js embed", source element</p>
+      <video-js id="vid03" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+        <source src="./oceans.mp4" type='video/mp4'>
+      </video-js>
+      <p>Video embed, source element</p>
+      <video id="vid13" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+        <source src="./oceans.mp4" type='video/mp4'>
+      </video>
+      <p>injested div el, source element</p>
+      <div data-vjs-player>
+        <video id="vid23" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+          <source src="./oceans.mp4" type='video/mp4'>
+        </video>
+      </div>
+    </div>
+    <div class="panel options-src data-setup">
+      <p>data-setup embeds with sources options</p>
+      <p>video-js embed", source element</p>
+      <video-js id="vid04" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup='{"sources": [{"src":"./oceans.mp4", "type":"video/mp4"}]}'>
+      </video-js>
+      <p>Video embed, source element</p>
+      <video id="vid14" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup='{"sources": [{"src":"./oceans.mp4", "type":"video/mp4"}]}'>
+      </video>
+      <p>injested div el, source element</p>
+      <div data-vjs-player>
+        <video id="vid24" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup='{"sources": [{"src":"./oceans.mp4", "type":"video/mp4"}]}'>
+        </video>
+      </div>
+    </div>
+    <div class="panel source-js data-setup">
+      <p>js setup with js method sources</p>
+      <p>video-js embed", js source</p>
+      <video-js id="vid06" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+      </video-js>
+      <p>Video embed, js source</p>
+      <video id="vid16" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+      </video>
+      <p>injested div el, js source</p>
+      <div data-vjs-player>
+        <video id="vid26" class="video-js" controls poster="//vjs.zencdn.net/v/oceans.png" data-setup="{}">
+        </video>
+      </div>
+    </div>
+  </div>
+  <script>
+    var player01 = videojs('vid01');
+    var player11 = videojs('vid11');
+    var player21 = videojs('vid21');
+    var player01 = videojs('vid02');
+    var player11 = videojs('vid12');
+    var player21 = videojs('vid22');
+    var player05 = videojs('vid05', {sources: [{src:'./oceans.mp4',type:'video/mp4'}]});
+    var player15 = videojs('vid15', {sources: [{src:'./oceans.mp4',type:'video/mp4'}]});
+    var player25 = videojs('vid25', {sources: [{src:'./oceans.mp4',type:'video/mp4'}]});
+    player01.src({src:'./oceans.mp4', type:'video/mp4'});
+    player11.src({src:'./oceans.mp4', type:'video/mp4'});
+    player21.src({src:'./oceans.mp4', type:'video/mp4'});
+    player01.poster('//vjs.zencdn.net/v/oceans.png');
+    player11.poster('//vjs.zencdn.net/v/oceans.png');
+    player21.poster('//vjs.zencdn.net/v/oceans.png');
+    setTimeout(function() {
+      videojs.players.vid06 && videojs.players.vid06.src({src:'./oceans.mp4', type:'video/mp4'});
+      videojs.players.vid16 && videojs.players.vid16.src({src:'./oceans.mp4', type:'video/mp4'});
+      videojs.players.vid26 && videojs.players.vid26.src({src:'./oceans.mp4', type:'video/mp4'});
+    });
+  </script>
+</body>
+</html>

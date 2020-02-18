@@ -94,4 +94,4 @@ Finally, we can save that as a `videojs-matrix.css` file and include it _after_ 
 <link rel="stylesheet" type="text/css" href="path/to/videojs-matrix.css">
 ```
 
-If you create a skin you're particularly proud of, you can share it by adding a link on the [Skins wiki page](https://github.com/videojs/video.js/wiki/Skins). One way to create shareable skins is by forking [this example on CodePen](http://codepen.io/heff/pen/EarCt).
+If you create a skin you're particularly proud of, you can share it by adding a link on the [Skins wiki page](https://github.com/videojs/video.js/wiki/Skins). One way to create shareable skins is by forking [this example on CodePen](https://codepen.io/heff/pen/EarCt).

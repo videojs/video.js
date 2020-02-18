@@ -33,6 +33,7 @@ QUnit.test('listen to remove and add track events in native audio tracks', funct
 
   Html5.prototype.audioTracks = function() {
     return {
+      removeEventListener() {},
       addEventListener(type, handler) {
         events[type] = true;
       }
@@ -63,15 +64,14 @@ QUnit.test('listen to remove and add track events in native audio tracks', funct
   player.player_ = player;
   player.options_ = {};
 
-  /* eslint-disable no-unused-vars */
   const html = new Html5({});
-  /* eslint-enable no-unused-vars */
 
   assert.ok(events.removetrack, 'removetrack listener was added');
   assert.ok(events.addtrack, 'addtrack listener was added');
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.audioTracks = oldAudioTracks;
+  html.dispose();
 });
 
 QUnit.test('html5 tech supports native audio tracks if the video supports it', function(assert) {

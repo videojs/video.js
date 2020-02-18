@@ -5,7 +5,6 @@
  * @module setup
  */
 import * as Dom from './utils/dom';
-import * as Events from './utils/events.js';
 import document from 'global/document';
 import window from 'global/window';
 
@@ -17,33 +16,15 @@ let videojs;
  */
 const autoSetup = function() {
 
-  // Protect against breakage in non-browser environments.
-  if (!Dom.isReal()) {
+  // Protect against breakage in non-browser environments and check global autoSetup option.
+  if (!Dom.isReal() || videojs.options.autoSetup === false) {
     return;
   }
 
-  // One day, when we stop supporting IE8, go back to this, but in the meantime...*hack hack hack*
-  // var vids = Array.prototype.slice.call(document.getElementsByTagName('video'));
-  // var audios = Array.prototype.slice.call(document.getElementsByTagName('audio'));
-  // var mediaEls = vids.concat(audios);
-
-  // Because IE8 doesn't support calling slice on a node list, we need to loop
-  // through each list of elements to build up a new, combined list of elements.
-  const vids = document.getElementsByTagName('video');
-  const audios = document.getElementsByTagName('audio');
-  const mediaEls = [];
-
-  if (vids && vids.length > 0) {
-    for (let i = 0, e = vids.length; i < e; i++) {
-      mediaEls.push(vids[i]);
-    }
-  }
-
-  if (audios && audios.length > 0) {
-    for (let i = 0, e = audios.length; i < e; i++) {
-      mediaEls.push(audios[i]);
-    }
-  }
+  const vids = Array.prototype.slice.call(document.getElementsByTagName('video'));
+  const audios = Array.prototype.slice.call(document.getElementsByTagName('audio'));
+  const divs = Array.prototype.slice.call(document.getElementsByTagName('video-js'));
+  const mediaEls = vids.concat(audios, divs);
 
   // Check if any media elements exist
   if (mediaEls && mediaEls.length > 0) {
@@ -52,8 +33,6 @@ const autoSetup = function() {
       const mediaEl = mediaEls[i];
 
       // Check if element exists, has getAttribute func.
-      // IE seems to consider typeof el.getAttribute == 'object' instead of
-      // 'function' like expected, at least when loading the player immediately.
       if (mediaEl && mediaEl.getAttribute) {
 
         // Make sure this player hasn't already been set up.
@@ -99,21 +78,34 @@ function autoSetupTimeout(wait, vjs) {
   window.setTimeout(autoSetup, wait);
 }
 
-if (Dom.isReal() && document.readyState === 'complete') {
+/**
+ * Used to set the internal tracking of window loaded state to true.
+ *
+ * @private
+ */
+function setWindowLoaded() {
   _windowLoaded = true;
-} else {
-  /**
-   * Listen for the load event on window, and set _windowLoaded to true.
-   *
-   * @listens load
-   */
-  Events.one(window, 'load', function() {
-    _windowLoaded = true;
-  });
+  window.removeEventListener('load', setWindowLoaded);
+}
+
+if (Dom.isReal()) {
+  if (document.readyState === 'complete') {
+    setWindowLoaded();
+  } else {
+    /**
+     * Listen for the load event on window, and set _windowLoaded to true.
+     *
+     * We use a standard event listener here to avoid incrementing the GUID
+     * before any players are created.
+     *
+     * @listens load
+     */
+    window.addEventListener('load', setWindowLoaded);
+  }
 }
 
 /**
- * check if the document has been loaded
+ * check if the window has been loaded
  */
 const hasLoaded = function() {
   return _windowLoaded;

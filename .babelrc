@@ -1,8 +1,10 @@
 {
   "presets": [
-    "es3",
-    ["es2015", {
-      "loose": true
-    }]
+    [
+      "@babel/preset-env",
+      {
+        "loose": true
+      }
+    ]
   ]
 }

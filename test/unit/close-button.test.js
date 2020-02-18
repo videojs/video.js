@@ -3,6 +3,12 @@ import CloseButton from '../../src/js/close-button';
 import sinon from 'sinon';
 import TestHelpers from './test-helpers';
 
+const getMockEscapeEvent = () => ({
+  which: 27,
+  preventDefault() {},
+  stopPropagation() {}
+});
+
 QUnit.module('CloseButton', {
 
   beforeEach() {
@@ -37,6 +43,8 @@ QUnit.test('should allow setting the controlText_ property as an option', functi
 
   assert.expect(1);
   assert.strictEqual(btn.controlText_, text, 'set the controlText_ property');
+
+  btn.dispose();
 });
 
 QUnit.test('should trigger an event on activation', function(assert) {
@@ -46,4 +54,13 @@ QUnit.test('should trigger an event on activation', function(assert) {
   this.btn.trigger('click');
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'the "close" event was triggered');
+});
+
+QUnit.test('pressing ESC triggers close()', function(assert) {
+  const spy = sinon.spy();
+
+  this.btn.on('close', spy);
+  this.btn.handleKeyDown(getMockEscapeEvent());
+  assert.expect(1);
+  assert.strictEqual(spy.callCount, 1, 'ESC closed the modal');
 });

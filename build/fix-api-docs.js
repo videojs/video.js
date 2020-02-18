@@ -1,8 +1,8 @@
-var replace = require("replace");
-var path = require('path')
-var apiPath = path.join(__dirname, '..', 'docs', 'api');
+const replace = require('replace');
+const path = require('path');
+const apiPath = path.join(__dirname, '..', 'docs', 'api');
 
-var replacements = [
+const replacements = [
   {find: /\/docs\/guides\/(.+)\.md/g, replace: 'tutorial-$1.html'},
   {find: /tutorial-tech.html/g, replace: 'tutorial-tech_.html'},
   {find: /\/docs\/guides\//g, replace: '#'},
@@ -21,17 +21,16 @@ var replacements = [
   {find: '<h3 id="videojs-(audio|video)track">', replace: '<h3 id="videojs$1track">'},
   {find: '<h3 id="text-tracks">', replace: '<h3 id="text-tracks-1">'},
   {find: '<h2 id="q-how-can-i-hide-the-links-to-my-video-subtitles-audio-tracks">',
-   replace: '<h2 id="q-how-can-i-hide-the-links-to-my-videosubtitlesaudiotracks">'},
+    replace: '<h2 id="q-how-can-i-hide-the-links-to-my-videosubtitlesaudiotracks">'},
   {find: '<h3 id="dispose-http-docs-videojs-com-player-html-dispose">',
-   replace: '<h3 id="dispose">'},
+    replace: '<h3 id="dispose">'},
   {find: '<h4 id="effect-on-player-width-and-player-height">',
-   replace: '<h4 id="effect-on-playerwidth-and-playerheight">'},
+    replace: '<h4 id="effect-on-playerwidth-and-playerheight">'},
   {find: '<h4 id="i-want-to-have-a-single-source-and-dont-care-about-live-adaptive-streaming">',
-   replace: '<h4 id="i-want-to-have-a-single-source-and-dont-care-about-liveadaptive-streaming">'},
+    replace: '<h4 id="i-want-to-have-a-single-source-and-dont-care-about-liveadaptive-streaming">'},
   {find: '<h2 id="api-docs-api">', replace: '<h2 id="api-docs">'},
   {find: '<h2 id="guides-docs-guides">', replace: '<h2 id="guides">'}
 ];
-
 
 replacements.forEach(function(obj) {
   replace({

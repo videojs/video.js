@@ -57,6 +57,20 @@ videojs("videoID", {
 });
 ```
 
+### Posters
+
+By default, techs will have to handle their own posters and are somewhat locked out of the player's poster lifecycle. 
+However, when the player is initialized with the `techCanOverridePoster` option 
+it will be possible for techs to integrate into that lifecycle  and the player's `PosterImage` component to be used.
+
+Techs can check if they have this capability by checking the `canOverridePoster` boolean in their options. 
+
+**`techCanOverridePoster` requirements**
+
+* `poster()` which returns the tech's current poster url
+* `setPoster()` which updates the tech's poster url and triggers a `posterchange` event
+  which the player will handle
+
 ## Technology Ordering
 
 When Video.js is given an array of sources, which to use is determined by finding the first supported source / tech combination. Each tech will be queried in the order specified in `techOrder` whether it can play the first source. The first match wins. If no tech can play the first source, then the next will be tested. It's important to set the `type` of each source correctly for this test to be accurate.
@@ -72,6 +86,7 @@ For example, given the following video element, assuming the [videojs-flash][fla
 ```
 
 The HLS source will be tested first. The first tech is html5.
+
 * Safari can play HLS in a standard HTML5 video element, so HLS will be played using the html5 tech
 * Chrome can't play HLS in the standard HTML5 video element on its own, but the videojs-contrib-hls source handler _can_ play HLS via [Media Source Extensions][mse] in HTML5. So HLS will be played in the html5 tech
 * IE 10 can't play HLS natively, and doesn't support Media Source Extensions. As the source cannot be played in HTML5, the Flash tech can be tested. The videojs-contrib-hls source handler can play HLS in the Flash tech, so HLS will be played in the Flash tech.

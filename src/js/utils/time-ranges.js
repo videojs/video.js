@@ -7,30 +7,31 @@
  * Returns the time for the specified index at the start or end
  * of a TimeRange object.
  *
- * @function time-ranges:indexFunction
+ * @typedef    {Function} TimeRangeIndex
  *
- * @param {number} [index=0]
- *        The range number to return the time for.
+ * @param      {number} [index=0]
+ *             The range number to return the time for.
  *
- * @return {number}
- *         The time that offset at the specified index.
+ * @return     {number}
+ *             The time offset at the specified index.
  *
- * @depricated index must be set to a value, in the future this will throw an error.
+ * @deprecated The index argument must be provided.
+ *             In the future, leaving it out will throw an error.
  */
 
 /**
- * An object that contains ranges of time for various reasons.
+ * An object that contains ranges of time.
  *
- * @typedef {Object} TimeRange
+ * @typedef  {Object} TimeRange
  *
  * @property {number} length
- *           The number of time ranges represented by this Object
+ *           The number of time ranges represented by this object.
  *
- * @property {time-ranges:indexFunction} start
+ * @property {module:time-ranges~TimeRangeIndex} start
  *           Returns the time offset at which a specified time range begins.
  *
- * @property {time-ranges:indexFunction} end
- *           Returns the time offset at which a specified time range begins.
+ * @property {module:time-ranges~TimeRangeIndex} end
+ *           Returns the time offset at which a specified time range ends.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/TimeRanges
  */
@@ -38,16 +39,17 @@
 /**
  * Check if any of the time ranges are over the maximum index.
  *
- * @param {string} fnName
- *        The function name to use for logging
+ * @private
+ * @param   {string} fnName
+ *          The function name to use for logging
  *
- * @param {number} index
- *        The index to check
+ * @param   {number} index
+ *          The index to check
  *
- * @param {number} maxIndex
- *        The maximum possible index
+ * @param   {number} maxIndex
+ *          The maximum possible index
  *
- * @throws {Error} if the timeRanges provided are over the maxIndex
+ * @throws  {Error} if the timeRanges provided are over the maxIndex
  */
 function rangeCheck(fnName, index, maxIndex) {
   if (typeof index !== 'number' || index < 0 || index > maxIndex) {
@@ -56,26 +58,28 @@ function rangeCheck(fnName, index, maxIndex) {
 }
 
 /**
- * Check if any of the time ranges are over the maximum index.
+ * Get the time for the specified index at the start or end
+ * of a TimeRange object.
  *
- * @param {string} fnName
- *        The function name to use for logging
+ * @private
+ * @param      {string} fnName
+ *             The function name to use for logging
  *
- * @param {string} valueIndex
- *        The proprety that should be used to get the time. should be 'start' or 'end'
+ * @param      {string} valueIndex
+ *             The property that should be used to get the time. should be
+ *             'start' or 'end'
  *
- * @param {Array} ranges
- *        An array of time ranges
+ * @param      {Array} ranges
+ *             An array of time ranges
  *
- * @param {Array} [rangeIndex=0]
- *        The index to start the search at
+ * @param      {Array} [rangeIndex=0]
+ *             The index to start the search at
  *
- * @return {number}
- *         The time that offset at the specified index.
+ * @return     {number}
+ *             The time that offset at the specified index.
  *
- *
- * @depricated rangeIndex must be set to a value, in the future this will throw an error.
- * @throws {Error} if rangeIndex is more than the length of ranges
+ * @deprecated rangeIndex must be set to a value, in the future this will throw an error.
+ * @throws     {Error} if rangeIndex is more than the length of ranges
  */
 function getRange(fnName, valueIndex, ranges, rangeIndex) {
   rangeCheck(fnName, rangeIndex, ranges.length - 1);
@@ -83,10 +87,11 @@ function getRange(fnName, valueIndex, ranges, rangeIndex) {
 }
 
 /**
- * Create a time range object givent ranges of time.
+ * Create a time range object given ranges of time.
  *
- * @param {Array} [ranges]
- *        An array of time ranges.
+ * @private
+ * @param   {Array} [ranges]
+ *          An array of time ranges.
  */
 function createTimeRangesObj(ranges) {
   if (ranges === undefined || ranges.length === 0) {
@@ -108,15 +113,16 @@ function createTimeRangesObj(ranges) {
 }
 
 /**
- * Should create a fake `TimeRange` object which mimics an HTML5 time range instance.
+ * Create a `TimeRange` object which mimics an
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/TimeRanges|HTML5 TimeRanges instance}.
  *
- * @param {number|Array} start
- *        The start of a single range or an array of ranges
+ * @param {number|Array[]} start
+ *        The start of a single range (a number) or an array of ranges (an
+ *        array of arrays of two numbers each).
  *
  * @param {number} end
- *        The end of a single range.
- *
- * @private
+ *        The end of a single range. Cannot be used with the array form of
+ *        the `start` argument.
  */
 export function createTimeRanges(start, end) {
   if (Array.isArray(start)) {

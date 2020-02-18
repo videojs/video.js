@@ -3,6 +3,8 @@
  */
 import TimeDisplay from './time-display';
 import Component from '../../component.js';
+import * as Dom from '../../utils/dom.js';
+
 /**
  * Displays the time left in the video
  *
@@ -21,8 +23,7 @@ class RemainingTimeDisplay extends TimeDisplay {
    */
   constructor(player, options) {
     super(player, options);
-    this.on(player, 'durationchange', this.throttledUpdateContent);
-    this.on(player, 'ended', this.handleEnded);
+    this.on(player, 'durationchange', this.updateContent);
   }
 
   /**
@@ -36,18 +37,16 @@ class RemainingTimeDisplay extends TimeDisplay {
   }
 
   /**
-   * The remaining time display prefixes numbers with a "minus" character.
+   * Create the `Component`'s DOM element with the "minus" characted prepend to the time
    *
-   * @param  {number} time
-   *         A numeric time, in seconds.
-   *
-   * @return {string}
-   *         A formatted time
-   *
-   * @private
+   * @return {Element}
+   *         The element that was created.
    */
-  formatTime_(time) {
-    return '-' + super.formatTime_(time);
+  createEl() {
+    const el = super.createEl();
+
+    el.insertBefore(Dom.createEl('span', {}, {'aria-hidden': true}, '-'), this.contentEl_);
+    return el;
   }
 
   /**
@@ -60,42 +59,41 @@ class RemainingTimeDisplay extends TimeDisplay {
    * @listens Player#durationchange
    */
   updateContent(event) {
-    if (!this.player_.duration()) {
+    if (typeof this.player_.duration() !== 'number') {
       return;
     }
+
+    let time;
 
     // @deprecated We should only use remainingTimeDisplay
     // as of video.js 7
-    if (this.player_.remainingTimeDisplay) {
-      this.updateFormattedTime_(this.player_.remainingTimeDisplay());
+    if (this.player_.ended()) {
+      time = 0;
+    } else if (this.player_.remainingTimeDisplay) {
+      time = this.player_.remainingTimeDisplay();
     } else {
-      this.updateFormattedTime_(this.player_.remainingTime());
+      time = this.player_.remainingTime();
     }
-  }
 
-  /**
-   * When the player fires ended there should be no time left. Sadly
-   * this is not always the case, lets make it seem like that is the case
-   * for users.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `ended` event that caused this to run.
-   *
-   * @listens Player#ended
-   */
-  handleEnded(event) {
-    if (!this.player_.duration()) {
-      return;
-    }
-    this.updateFormattedTime_(0);
+    this.updateTextNode_(time);
   }
 }
+
+/**
+ * The text that is added to the `RemainingTimeDisplay` for screen reader users.
+ *
+ * @type {string}
+ * @private
+ */
+RemainingTimeDisplay.prototype.labelText_ = 'Remaining Time';
 
 /**
  * The text that should display over the `RemainingTimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
  * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
  */
 RemainingTimeDisplay.prototype.controlText_ = 'Remaining Time';
 

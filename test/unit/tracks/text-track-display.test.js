@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import Html5 from '../../../src/js/tech/html5.js';
+import { constructColor } from '../../../src/js/tracks/text-track-display.js';
 import Component from '../../../src/js/component.js';
 
 import * as browser from '../../../src/js/utils/browser.js';
@@ -51,7 +52,7 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
     textTracks: []
   };
 
-  browser.IS_FIREFOX = true;
+  browser.stub_IS_FIREFOX(true);
 
   const fakeTTDSpy = sinon.spy();
 
@@ -69,7 +70,7 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   assert.strictEqual(fakeTTDSpy.callCount, 1, 'text track display was created');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_FIREFOX = oldIsFirefox;
+  browser.stub_IS_FIREFOX(oldIsFirefox);
   Component.registerComponent('TextTrackDisplay', oldTextTrackDisplay);
 
   player.dispose();
@@ -123,6 +124,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.strictEqual(spy.callCount, 1, 'selectedlanguagechange event was fired');
     player.dispose();
+    player.textTracks().removeEventListener('selectedlanguagechange', selectedLanguageHandler);
   });
 
   QUnit.test("if user-selected language is unavailable, don't pick a track to show", function(assert) {
@@ -179,6 +181,50 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish captions should be shown');
     assert.ok(englishTrack.mode === 'disabled', 'English captions should be hidden');
+    player.dispose();
+  });
+
+  QUnit.test("don't select user langauge if it is an empty string", function(assert) {
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt'
+    };
+    const track2 = {
+      kind: 'captions',
+      label: 'Spanish',
+      language: 'es',
+      src: 'es.vtt'
+    };
+    const track3 = {
+      kind: 'metadata',
+      label: 'segment-metadata'
+    };
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    // manualCleanUp = true by default
+    const englishTrack = player.addRemoteTextTrack(track1, true).track;
+    const spanishTrack = player.addRemoteTextTrack(track2, true).track;
+    const metadataTrack = player.addRemoteTextTrack(track3, true).track;
+
+    // Force empty string ('') as "user-selected" track
+    player.cache_.selectedLanguage = { enabled: true, language: '', kind: 'captions' };
+    this.clock.tick(1);
+
+    assert.equal(spanishTrack.mode, 'disabled', 'Spanish captions should be disabled');
+    assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
+    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should not be showing');
+
+    // Force es as "user-selected" track
+    player.cache_.selectedLanguage = { enabled: true, language: 'es', kind: 'captions' };
+    player.trigger('loadedmetadata');
+
+    assert.equal(spanishTrack.mode, 'showing', 'Spanish captions should be showing');
+    assert.equal(englishTrack.mode, 'disabled', 'English captions should be disabled');
+    assert.notEqual(metadataTrack.mode, 'showing', 'Metadata track should not be showing');
+
     player.dispose();
   });
 
@@ -245,12 +291,18 @@ if (!Html5.supportsNativeTextTracks()) {
     esCaptionMenuItem.trigger('click');
 
     // Track mode changes on user-selection
-    assert.ok(esCaptionMenuItem.track.mode === 'showing',
-      'Spanish should be showing after selection');
-    assert.ok(enCaptionMenuItem.track.mode === 'disabled',
-      'English should be disabled after selecting Spanish');
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: true, language: 'es', kind: 'captions' });
+    assert.ok(
+      esCaptionMenuItem.track.mode === 'showing',
+      'Spanish should be showing after selection'
+    );
+    assert.ok(
+      enCaptionMenuItem.track.mode === 'disabled',
+      'English should be disabled after selecting Spanish'
+    );
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: true, language: 'es', kind: 'captions' }
+    );
 
     // Switch source and remove old tracks
     player.tech_.src({type: 'video/mp4', src: 'http://example.com'});
@@ -272,12 +324,18 @@ if (!Html5.supportsNativeTextTracks()) {
     enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
 
     // The user-selection should have persisted
-    assert.ok(esCaptionMenuItem.track.mode === 'showing',
-      'Spanish should remain showing');
-    assert.ok(enCaptionMenuItem.track.mode === 'disabled',
-      'English should remain disabled');
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: true, language: 'es', kind: 'captions' });
+    assert.ok(
+      esCaptionMenuItem.track.mode === 'showing',
+      'Spanish should remain showing'
+    );
+    assert.ok(
+      enCaptionMenuItem.track.mode === 'disabled',
+      'English should remain disabled'
+    );
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: true, language: 'es', kind: 'captions' }
+    );
 
     assert.ok(spanishTrack.mode === 'showing', 'Spanish track remains showing');
     assert.ok(englishTrack.mode === 'disabled', 'English track remains disabled');
@@ -293,30 +351,63 @@ if (!Html5.supportsNativeTextTracks()) {
       src: 'en.vtt'
     };
     const captionsButton = player.controlBar.getChild('SubsCapsButton');
-    // we know the postition of the OffTextTrackMenuItem
-    const offMenuItem = captionsButton.items[1];
 
     player.src({type: 'video/mp4', src: 'http://google.com'});
     // manualCleanUp = true by default
     const englishTrack = player.addRemoteTextTrack(track1, true).track;
     // Keep track of menu items
     const enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
+    // we know the postition of the OffTextTrackMenuItem
+    const offMenuItem = captionsButton.items[1];
 
     // Select English initially
     player.play();
     enCaptionMenuItem.trigger('click');
 
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: true, language: 'en', kind: 'captions' }, 'English track is selected');
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: true, language: 'en', kind: 'captions' }, 'English track is selected'
+    );
     assert.ok(englishTrack.mode === 'showing', 'English track should be showing');
 
     // Select the off button
     offMenuItem.trigger('click');
 
-    assert.deepEqual(player.cache_.selectedLanguage,
-      { enabled: false }, 'selectedLanguage is cleared');
+    assert.deepEqual(
+      player.cache_.selectedLanguage,
+      { enabled: false }, 'selectedLanguage is cleared'
+    );
     assert.ok(englishTrack.mode === 'disabled', 'English track is disabled');
     player.dispose();
   });
 
+  QUnit.test('a color can be constructed from a three digit hex code', function(assert) {
+    const hex = '#f0e';
+
+    // f gets mapped to ff -> 255 in decimal,
+    // 0 gets mapped to 00 -> 0 in decimal,
+    // e gets mapped to ee -> 238 in decimal.
+    assert.equal(constructColor(hex, 1), 'rgba(255,0,238,1)');
+  });
+
+  QUnit.test('a color can be constructed from a six digit hex code', function(assert) {
+    const hex = '#f604e2';
+
+    // f6 -> 246 in decimal,
+    // 04 -> 4 in decimal,
+    // e2 -> 226 in decimal.
+    assert.equal(constructColor(hex, 1), 'rgba(246,4,226,1)');
+  });
+
+  QUnit.test('an invalid hex code will throw an error', function(assert) {
+    const hex = '#f';
+
+    assert.throws(
+      function() {
+        constructColor(hex, 1);
+      },
+      new Error('Invalid color code provided, #f; must be formatted as e.g. #f0e or #f604e2.'),
+      'colors must be valid hex codes.'
+    );
+  });
 }

@@ -4,6 +4,8 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {assign} from '../utils/obj';
+import {MenuKeys} from './menu-keys.js';
+import keycode from 'keycode';
 
 /**
  * The component for a menu item. `<li>`
@@ -26,13 +28,17 @@ class MenuItem extends ClickableComponent {
     super(player, options);
 
     this.selectable = options.selectable;
+    this.isSelected_ = options.selected || false;
+    this.multiSelectable = options.multiSelectable;
 
-    this.selected(options.selected);
+    this.selected(this.isSelected_);
 
     if (this.selectable) {
-      // TODO: May need to be either menuitemcheckbox or menuitemradio,
-      //       and may need logical grouping of menu items.
-      this.el_.setAttribute('role', 'menuitemcheckbox');
+      if (this.multiSelectable) {
+        this.el_.setAttribute('role', 'menuitemcheckbox');
+      } else {
+        this.el_.setAttribute('role', 'menuitemradio');
+      }
     } else {
       this.el_.setAttribute('role', 'menuitem');
     }
@@ -65,7 +71,23 @@ class MenuItem extends ClickableComponent {
   }
 
   /**
-   * Any click on a `MenuItem` puts int into the selected state.
+   * Ignore keys which are used by the menu, but pass any other ones up. See
+   * {@link ClickableComponent#handleKeyDown} for instances where this is called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    if (!MenuKeys.some((key) => keycode.isEventKey(event, key))) {
+      // Pass keydown handling up for unused keys
+      super.handleKeyDown(event);
+    }
+  }
+
+  /**
+   * Any click on a `MenuItem` puts it into the selected state.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
    * @param {EventTarget~Event} event
@@ -93,12 +115,13 @@ class MenuItem extends ClickableComponent {
         // aria-checked isn't fully supported by browsers/screen readers,
         // so indicate selected state to screen reader in the control text.
         this.controlText(', selected');
+        this.isSelected_ = true;
       } else {
         this.removeClass('vjs-selected');
         this.el_.setAttribute('aria-checked', 'false');
         // Indicate un-selected state to screen reader
-        // Note that a space clears out the selected state text
-        this.controlText(' ');
+        this.controlText('');
+        this.isSelected_ = false;
       }
     }
   }

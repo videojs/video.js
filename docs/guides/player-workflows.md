@@ -7,6 +7,7 @@ This document outlines many considerations for using Video.js for advanced playe
 * [Accessing a player that has already been created on a page](#accessing-a-player-that-has-already-been-created-on-a-page)
 * [Removing Players](#removing-players)
   * [dispose()](#dispose)
+  * [Checking if a Player is Disposed](#checking-if-a-player-is-disposed)
   * [Signs of an Undisposed Player](#signs-of-an-undisposed-player)
 * [Showing and Hiding a Player](#showing-and-hiding-a-player)
 * [Changing the volume of a player](#changing-the-volume-of-a-player)
@@ -19,6 +20,7 @@ This document outlines many considerations for using Video.js for advanced playe
   * [React](#react)
   * [Ember](#ember)
   * [Angular](#angular)
+  * [Vue](#vue)
 
 ## Accessing a player that has already been created on a page
 
@@ -31,9 +33,9 @@ After an instance has been created it can be accessed globally in two ways:
 
 No matter the term used for it, web applications are becoming common. Not everything is a static, load-once-and-done web page anymore! This means that developers need to be able to manage the full lifecycle of a video player - from creation to destruction. Video.js supports player removal through the `dispose()` method.
 
-### [`dispose()`](http://docs.videojs.com/Player.html#dispose)
+### [`dispose()`](https://docs.videojs.com/Player.html#dispose)
 
-This method is available on all Video.js players and [components](http://docs.videojs.com/Component.html#dispose). It is _the only_ supported method of removing a Video.js player from both the DOM and memory. For example, the following code sets up a player and then disposes it when media playback is complete:
+This method is available on all Video.js players and [components](https://docs.videojs.com/Component.html#dispose). It is _the only_ supported method of removing a Video.js player from both the DOM and memory. For example, the following code sets up a player and then disposes it when media playback is complete:
 
 ```js
 var player = videojs('my-player');
@@ -52,6 +54,10 @@ Calling `dispose()` will have a few effects:
 Additionally, these actions are recursively applied to _all_ the player's child components.
 
 > **Note**: Do _not_ remove players via standard DOM removal methods: this will leave listeners and other objects in memory that you might not be able to clean up!
+
+### Checking if a Player is Disposed
+
+At times, it is useful to know whether or not a player reference in your code is stale. The `isDisposed()` method is available on all components (including players) for this purpose.
 
 ### Signs of an Undisposed Player
 
@@ -99,7 +105,7 @@ Example
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   // get
   var howLoudIsIt = myPlayer.volume();
@@ -113,7 +119,7 @@ Volume can also be muted (without actually changing the volume value) using the 
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   // get, should be false
   console.log(myPlayer.muted());
@@ -131,7 +137,7 @@ To check if the player is currently fullscreen call the `isFullscreen` function 
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   // get, should be false
   console.log(myPlayer.isFullscreen());
@@ -149,7 +155,7 @@ To request that the player enter fullscreen call `requestFullscreen`.
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   myPlayer.requestFullscreen();
 });
@@ -160,7 +166,7 @@ To exit fullscreen call `exitFullscreen`
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   myPlayer.requestFullscreen();
   myPlayer.exitFullscreen();
@@ -174,7 +180,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   myPlayer.play();
 });
@@ -185,7 +191,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   myPlayer.play();
   myPlayer.pause();
@@ -197,7 +203,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 
 myPlayer.ready(function() {
   // true
@@ -224,7 +230,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   // set current time to 2 minutes into the video
   myPlayer.currentTime(120);
@@ -239,7 +245,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   var lengthOfVideo = myPlayer.duration();
 });
@@ -249,7 +255,7 @@ myPlayer.ready(function() {
 
 ```js
 var myPlayer = videojs('some-player-id');
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
    myPlayer.currentTime(10);
 
@@ -263,7 +269,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   var bufferedTimeRange = myPlayer.buffered();
 
@@ -288,7 +294,7 @@ myPlayer.ready(function() {
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
   // example 0.11 aka 11%
   var howMuchIsDownloaded = myPlayer.bufferedPercent();
@@ -305,6 +311,8 @@ var myPlayer = videojs('some-player-id');
 myPlayer.src('http://www.example.com/path/to/video.mp4');
 ```
 
+When a string is provided as the source, Video.js will try to infer the video type from the file extension, but this inference will not work in all cases. It is recommended that the source is provided as an object including the type, as below.
+
 **Source Object (or element):** A javascript object containing information
 about the source file. Use this method if you want the player to determine if
 it can support the file using the type information.
@@ -312,7 +320,7 @@ it can support the file using the type information.
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src({type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"});
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 ```
 
 **Array of Source Objects:** To provide multiple versions of the source so
@@ -324,9 +332,9 @@ file.
 var myPlayer = videojs('some-player-id');
 
 myPlayer.src([
-  {type: "video/mp4", src: "http://www.example.com/path/to/video.mp4"},
-  {type: "video/webm", src: "http://www.example.com/path/to/video.webm"},
-  {type: "video/ogg", src: "http://www.example.com/path/to/video.ogv"}
+  {type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'},
+  {type: 'video/webm', src: 'http://www.example.com/path/to/video.webm'},
+  {type: 'video/ogg', src: 'http://www.example.com/path/to/video.ogv'}
 ]);
 ```
 
@@ -351,7 +359,7 @@ function on the player.
 ```js
 var myPlayer = videojs('some-player-id');
 
-myPlayer.src('http://www.example.com/path/to/video.mp4');
+myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
    // tech() will error with no argument
    var tech = myPlayer.tech({IWillNotUseThisInPlugins: true});
@@ -371,3 +379,7 @@ See [ReactJS integration example](/docs/guides/react.md)
 ### Ember
 
 ### Angular
+
+### Vue
+
+See [Vue integration example](/docs/guides/vue.md)

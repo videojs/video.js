@@ -7,6 +7,9 @@ import log from '../../src/js/utils/log.js';
 QUnit.module('video.js:hooks ', {
   beforeEach() {
     videojs.hooks_ = {};
+  },
+  afterEach() {
+    videojs.hooks_ = {};
   }
 });
 
@@ -123,6 +126,17 @@ QUnit.test('should be able to add a hook that runs once', function(assert) {
   assert.equal(videojs.hooks_.foo.length, 0, 'should have 0 foo hooks');
 });
 
+QUnit.test('hooks registered using hookOnce should return the original callback return value', function(assert) {
+  let result;
+
+  videojs.hookOnce('foo', () => 'ok');
+  videojs.hooks('foo').forEach(fn => {
+    result = fn();
+  });
+
+  assert.equal(result, 'ok', 'the hookOnce callback returned "ok"');
+});
+
 QUnit.test('should trigger beforesetup and setup during videojs setup', function(assert) {
   const vjsOptions = {techOrder: ['techFaker']};
   let setupCalled = false;
@@ -141,8 +155,10 @@ QUnit.test('should trigger beforesetup and setup during videojs setup', function
     assert.equal(beforeSetupCalled, true, 'beforesetup should have been called already');
     assert.ok(player, 'created player from tag');
     assert.ok(player.id() === 'test_vid_id');
-    assert.ok(videojs.getPlayers().test_vid_id === player,
-              'added player to global reference');
+    assert.ok(
+      videojs.getPlayers().test_vid_id === player,
+      'added player to global reference'
+    );
   };
 
   const fixture = document.getElementById('qunit-fixture');

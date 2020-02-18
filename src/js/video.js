@@ -4,7 +4,6 @@
  */
 import {version} from '../../package.json';
 import window from 'global/window';
-import document from 'global/document';
 import * as setup from './setup';
 import * as stylesheet from './utils/stylesheet.js';
 import Component from './component';
@@ -19,101 +18,145 @@ import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
 
 import { createTimeRanges } from './utils/time-ranges.js';
-import formatTime from './utils/format-time.js';
-import log from './utils/log.js';
+import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
+import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
-import extendFn from './extend.js';
-import xhr from 'xhr';
+import extend from './extend.js';
+import xhr from '@videojs/xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
-import { use as middlewareUse } from './tech/middleware.js';
-
-// HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined' && Dom.isReal()) {
-  document.createElement('video');
-  document.createElement('audio');
-  document.createElement('track');
-}
+import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
+import defineLazyProperty from './utils/define-lazy-property.js';
 
 /**
- * Doubles as the main function for users to create a player instance and also
- * the main library object.
- * The `videojs` function can be used to initialize or retrieve a player.
-  *
- * @param {string|Element} id
- *        Video element or video element ID
+ * Normalize an `id` value by trimming off a leading `#`
  *
- * @param {Object} [options]
- *        Optional options object for config/settings
+ * @private
+ * @param   {string} id
+ *          A string, maybe with a leading `#`.
  *
- * @param {Component~ReadyCallback} [ready]
- *        Optional ready callback
+ * @return {string}
+ *          The string, without any leading `#`.
+ */
+const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
+
+/**
+ * The `videojs()` function doubles as the main function for users to create a
+ * {@link Player} instance as well as the main library namespace.
+ *
+ * It can also be used as a getter for a pre-existing {@link Player} instance.
+ * However, we _strongly_ recommend using `videojs.getPlayer()` for this
+ * purpose because it avoids any potential for unintended initialization.
+ *
+ * Due to [limitations](https://github.com/jsdoc3/jsdoc/issues/955#issuecomment-313829149)
+ * of our JSDoc template, we cannot properly document this as both a function
+ * and a namespace, so its function signature is documented here.
+ *
+ * #### Arguments
+ * ##### id
+ * string|Element, **required**
+ *
+ * Video element or video element ID.
+ *
+ * ##### options
+ * Object, optional
+ *
+ * Options object for providing settings.
+ * See: [Options Guide](https://docs.videojs.com/tutorial-options.html).
+ *
+ * ##### ready
+ * {@link Component~ReadyCallback}, optional
+ *
+ * A function to be called when the {@link Player} and {@link Tech} are ready.
+ *
+ * #### Return Value
+ *
+ * The `videojs()` function returns a {@link Player} instance.
+ *
+ * @namespace
+ *
+ * @borrows AudioTrack as AudioTrack
+ * @borrows Component.getComponent as getComponent
+ * @borrows module:computed-style~computedStyle as computedStyle
+ * @borrows module:events.on as on
+ * @borrows module:events.one as one
+ * @borrows module:events.off as off
+ * @borrows module:events.trigger as trigger
+ * @borrows EventTarget as EventTarget
+ * @borrows module:extend~extend as extend
+ * @borrows module:fn.bind as bind
+ * @borrows module:format-time.formatTime as formatTime
+ * @borrows module:format-time.resetFormatTime as resetFormatTime
+ * @borrows module:format-time.setFormatTime as setFormatTime
+ * @borrows module:merge-options.mergeOptions as mergeOptions
+ * @borrows module:middleware.use as use
+ * @borrows Player.players as players
+ * @borrows Plugin.registerPlugin as registerPlugin
+ * @borrows Plugin.deregisterPlugin as deregisterPlugin
+ * @borrows Plugin.getPlugins as getPlugins
+ * @borrows Plugin.getPlugin as getPlugin
+ * @borrows Plugin.getPluginVersion as getPluginVersion
+ * @borrows Tech.getTech as getTech
+ * @borrows Tech.registerTech as registerTech
+ * @borrows TextTrack as TextTrack
+ * @borrows module:time-ranges.createTimeRanges as createTimeRange
+ * @borrows module:time-ranges.createTimeRanges as createTimeRanges
+ * @borrows module:url.isCrossOrigin as isCrossOrigin
+ * @borrows module:url.parseUrl as parseUrl
+ * @borrows VideoTrack as VideoTrack
+ *
+ * @param  {string|Element} id
+ *         Video element or video element ID.
+ *
+ * @param  {Object} [options]
+ *         Options object for providing settings.
+ *         See: [Options Guide](https://docs.videojs.com/tutorial-options.html).
+ *
+ * @param  {Component~ReadyCallback} [ready]
+ *         A function to be called when the {@link Player} and {@link Tech} are
+ *         ready.
  *
  * @return {Player}
- *         A player instance
+ *         The `videojs()` function returns a {@link Player|Player} instance.
  */
 function videojs(id, options, ready) {
-  let tag;
+  let player = videojs.getPlayer(id);
 
-  // Allow for element or ID to be passed in
-  // String ID
-  if (typeof id === 'string') {
-    const players = videojs.getPlayers();
-
-    // Adjust for jQuery ID syntax
-    if (id.indexOf('#') === 0) {
-      id = id.slice(1);
+  if (player) {
+    if (options) {
+      log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
     }
-
-    // If a player instance has already been created for this ID return it.
-    if (players[id]) {
-
-      // If options or ready function are passed, warn
-      if (options) {
-        log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
-      }
-
-      if (ready) {
-        players[id].ready(ready);
-      }
-
-      return players[id];
+    if (ready) {
+      player.ready(ready);
     }
-
-    // Otherwise get element for ID
-    tag = Dom.$('#' + id);
-
-  // ID is a media element
-  } else {
-    tag = id;
+    return player;
   }
 
-  // Check for a useable element
-  // re: nodeName, could be a box div also
-  if (!tag || !tag.nodeName) {
+  const el = (typeof id === 'string') ? Dom.$('#' + normalizeId(id)) : id;
+
+  if (!Dom.isEl(el)) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
-  // Check if element is included in the DOM
-  if (Dom.isEl(tag) && !document.body.contains(tag)) {
+  // document.body.contains(el) will only check if el is contained within that one document.
+  // This causes problems for elements in iframes.
+  // Instead, use the element's ownerDocument instead of the global document.
+  // This will make sure that the element is indeed in the dom of that document.
+  // Additionally, check that the document in question has a default view.
+  // If the document is no longer attached to the dom, the defaultView of the document will be null.
+  if (!el.ownerDocument.defaultView || !el.ownerDocument.body.contains(el)) {
     log.warn('The element supplied is not included in the DOM');
-  }
-
-  // Element may have a player attr referring to an already created player instance.
-  // If so return that otherwise set up a new player below
-  if (tag.player || Player.players[tag.playerId]) {
-    return tag.player || Player.players[tag.playerId];
   }
 
   options = options || {};
 
-  videojs.hooks('beforesetup').forEach(function(hookFunction) {
-    const opts = hookFunction(tag, mergeOptions(options));
+  videojs.hooks('beforesetup').forEach((hookFunction) => {
+    const opts = hookFunction(el, mergeOptions(options));
 
     if (!isObject(opts) || Array.isArray(opts)) {
       log.error('please return an object in beforesetup hooks');
@@ -123,9 +166,11 @@ function videojs(id, options, ready) {
     options = mergeOptions(options, opts);
   });
 
+  // We get the current "Player" component here in case an integration has
+  // replaced it with a custom player.
   const PlayerComponent = Component.getComponent('Player');
-  // If not, set up a new player
-  const player = new PlayerComponent(tag, options, ready);
+
+  player = new PlayerComponent(el, options, ready);
 
   videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
 
@@ -135,18 +180,19 @@ function videojs(id, options, ready) {
 /**
  * An Object that contains lifecycle hooks as keys which point to an array
  * of functions that are run when a lifecycle is triggered
+ *
+ * @private
  */
 videojs.hooks_ = {};
 
 /**
  * Get a list of hooks for a specific lifecycle
- * @function videojs.hooks
  *
- * @param {string} type
- *        the lifecyle to get hooks from
+ * @param  {string} type
+ *         the lifecyle to get hooks from
  *
- * @param {Function|Function[]} [fn]
- *        Optionally add a hook (or hooks) to the lifecycle that your are getting.
+ * @param  {Function|Function[]} [fn]
+ *         Optionally add a hook (or hooks) to the lifecycle that your are getting.
  *
  * @return {Array}
  *         an array of hooks, or an empty array if there are none.
@@ -185,7 +231,7 @@ videojs.hookOnce = function(type, fn) {
   videojs.hooks(type, [].concat(fn).map(original => {
     const wrapper = (...args) => {
       videojs.removeHook(type, wrapper);
-      original(...args);
+      return original(...args);
     };
 
     return wrapper;
@@ -195,11 +241,11 @@ videojs.hookOnce = function(type, fn) {
 /**
  * Remove a hook from a specific videojs lifecycle.
  *
- * @param {string} type
- *        the lifecycle that the function hooked to
+ * @param  {string} type
+ *         the lifecycle that the function hooked to
  *
- * @param {Function} fn
- *        The hooked function to remove
+ * @param  {Function} fn
+ *         The hooked function to remove
  *
  * @return {boolean}
  *         The function that was removed or undef
@@ -247,7 +293,7 @@ if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
 setup.autoSetupTimeout(1, videojs);
 
 /**
- * Current software version. Follows semver.
+ * Current Video.js version. Follows [semantic versioning](https://semver.org/).
  *
  * @type {string}
  */
@@ -270,18 +316,63 @@ videojs.options = Player.prototype.options_;
 videojs.getPlayers = () => Player.players;
 
 /**
- * Expose players object.
+ * Get a single player based on an ID or DOM element.
  *
- * @memberOf videojs
- * @property {Object} players
+ * This is useful if you want to check if an element or ID has an associated
+ * Video.js player, but not create one if it doesn't.
+ *
+ * @param   {string|Element} id
+ *          An HTML element - `<video>`, `<audio>`, or `<video-js>` -
+ *          or a string matching the `id` of such an element.
+ *
+ * @return {Player|undefined}
+ *          A player instance or `undefined` if there is no player instance
+ *          matching the argument.
  */
-videojs.players = Player.players;
+videojs.getPlayer = (id) => {
+  const players = Player.players;
+  let tag;
+
+  if (typeof id === 'string') {
+    const nId = normalizeId(id);
+    const player = players[nId];
+
+    if (player) {
+      return player;
+    }
+
+    tag = Dom.$('#' + nId);
+  } else {
+    tag = id;
+  }
+
+  if (Dom.isEl(tag)) {
+    const {player, playerId} = tag;
+
+    // Element may have a `player` property referring to an already created
+    // player instance. If so, return that.
+    if (player || players[playerId]) {
+      return player || players[playerId];
+    }
+  }
+};
 
 /**
- * Get a component class object by name
+ * Returns an array of all current players.
  *
- * @borrows Component.getComponent as videojs.getComponent
+ * @return {Array}
+ *         An array of all players. The array will be in the order that
+ *         `Object.keys` provides, which could potentially vary between
+ *         JavaScript engines.
+ *
  */
+videojs.getAllPlayers = () =>
+
+  // Disposed players leave a key with a `null` value, so we need to make sure
+  // we filter those out.
+  Object.keys(Player.players).map(k => Player.players[k]).filter(Boolean);
+
+videojs.players = Player.players;
 videojs.getComponent = Component.getComponent;
 
 /**
@@ -309,94 +400,56 @@ videojs.registerComponent = (name, comp) => {
   Component.registerComponent.call(Component, name, comp);
 };
 
-/**
- * Get a Tech class object by name
- *
- * @borrows Tech.getTech as videojs.getTech
- */
 videojs.getTech = Tech.getTech;
-
-/**
- * Register a Tech so it can referred to by name.
- * This is used in the tech order for the player.
- *
- * @borrows Tech.registerTech as videojs.registerTech
- */
 videojs.registerTech = Tech.registerTech;
-
 videojs.use = middlewareUse;
 
 /**
- * A suite of browser and device tests from {@link browser}.
+ * An object that can be returned by a middleware to signify
+ * that the middleware is being terminated.
+ *
+ * @type {object}
+ * @property {object} middleware.TERMINATOR
+ */
+Object.defineProperty(videojs, 'middleware', {
+  value: {},
+  writeable: false,
+  enumerable: true
+});
+
+Object.defineProperty(videojs.middleware, 'TERMINATOR', {
+  value: TERMINATOR,
+  writeable: false,
+  enumerable: true
+});
+
+/**
+ * A reference to the {@link module:browser|browser utility module} as an object.
  *
  * @type {Object}
- * @private
+ * @see  {@link module:browser|browser}
  */
 videojs.browser = browser;
 
 /**
- * Whether or not the browser supports touch events. Included for backward
- * compatibility with 4.x, but deprecated. Use `videojs.browser.TOUCH_ENABLED`
- * instead going forward.
+ * Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead; only
+ * included for backward-compatibility with 4.x.
  *
- * @deprecated since version 5.0
+ * @deprecated Since version 5.0, use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED instead.
  * @type {boolean}
  */
 videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
-/**
- * Subclass an existing class
- * Mimics ES6 subclassing with the `extend` keyword
- *
- * @borrows extend:extendFn as videojs.extend
- */
-videojs.extend = extendFn;
-
-/**
- * Merge two options objects recursively
- * Performs a deep merge like lodash.merge but **only merges plain objects**
- * (not arrays, elements, anything else)
- * Other values will be copied directly from the second object.
- *
- * @borrows merge-options:mergeOptions as videojs.mergeOptions
- */
+videojs.extend = extend;
 videojs.mergeOptions = mergeOptions;
-
-/**
- * Change the context (this) of a function
- *
- * > NOTE: as of v5.0 we require an ES5 shim, so you should use the native
- * `function() {}.bind(newContext);` instead of this.
- *
- * @borrows fn:bind as videojs.bind
- */
 videojs.bind = Fn.bind;
-
-/**
- * Register a Video.js plugin.
- *
- * @borrows plugin:registerPlugin as videojs.registerPlugin
- * @method registerPlugin
- *
- * @param  {string} name
- *         The name of the plugin to be registered. Must be a string and
- *         must not match an existing plugin or a method on the `Player`
- *         prototype.
- *
- * @param  {Function} plugin
- *         A sub-class of `Plugin` or a function for basic plugins.
- *
- * @return {Function}
- *         For advanced plugins, a factory function for that plugin. For
- *         basic plugins, a wrapper function that initializes the plugin.
- */
 videojs.registerPlugin = Plugin.registerPlugin;
+videojs.deregisterPlugin = Plugin.deregisterPlugin;
 
 /**
  * Deprecated method to register a plugin with Video.js
  *
- * @deprecated
- *        videojs.plugin() is deprecated; use videojs.registerPlugin() instead
+ * @deprecated videojs.plugin() is deprecated; use videojs.registerPlugin() instead
  *
  * @param {string} name
  *        The plugin name
@@ -409,39 +462,8 @@ videojs.plugin = (name, plugin) => {
   return Plugin.registerPlugin(name, plugin);
 };
 
-/**
- * Gets an object containing multiple Video.js plugins.
- *
- * @param  {Array} [names]
- *         If provided, should be an array of plugin names. Defaults to _all_
- *         plugin names.
- *
- * @return {Object|undefined}
- *         An object containing plugin(s) associated with their name(s) or
- *         `undefined` if no matching plugins exist).
- */
 videojs.getPlugins = Plugin.getPlugins;
-
-/**
- * Gets a plugin by name if it exists.
- *
- * @param  {string} name
- *         The name of a plugin.
- *
- * @return {Function|undefined}
- *         The plugin (or `undefined`).
- */
 videojs.getPlugin = Plugin.getPlugin;
-
-/**
- * Gets a plugin's version, if available
- *
- * @param  {string} name
- *         The name of a plugin.
- *
- * @return {string}
- *         The plugin's version or an empty string.
- */
 videojs.getPluginVersion = Plugin.getPluginVersion;
 
 /**
@@ -469,241 +491,44 @@ videojs.addLanguage = function(code, data) {
 };
 
 /**
- * Log messages
+ * A reference to the {@link module:log|log utility module} as an object.
  *
- * @borrows log:log as videojs.log
+ * @type {Function}
+ * @see  {@link module:log|log}
  */
 videojs.log = log;
+videojs.createLogger = createLogger;
 
-/**
- * Creates an emulated TimeRange object.
- *
- * @borrows time-ranges:createTimeRanges as videojs.createTimeRange
- */
-/**
- * @borrows time-ranges:createTimeRanges as videojs.createTimeRanges
- */
 videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
-
-/**
- * Format seconds as a time string, H:MM:SS or M:SS
- * Supplying a guide (in seconds) will force a number of leading zeros
- * to cover the length of the guide
- *
- * @borrows format-time:formatTime as videojs.formatTime
- */
 videojs.formatTime = formatTime;
-
-/**
- * Resolve and parse the elements of a URL
- *
- * @borrows url:parseUrl as videojs.parseUrl
- */
+videojs.setFormatTime = setFormatTime;
+videojs.resetFormatTime = resetFormatTime;
 videojs.parseUrl = Url.parseUrl;
-
-/**
- * Returns whether the url passed is a cross domain request or not.
- *
- * @borrows url:isCrossOrigin as videojs.isCrossOrigin
- */
 videojs.isCrossOrigin = Url.isCrossOrigin;
-
-/**
- * Event target class.
- *
- * @borrows EventTarget as videojs.EventTarget
- */
 videojs.EventTarget = EventTarget;
-
-/**
- * Add an event listener to element
- * It stores the handler function in a separate cache object
- * and adds a generic handler to the element's event,
- * along with a unique id (guid) to the element.
- *
- * @borrows events:on as videojs.on
- */
 videojs.on = Events.on;
-
-/**
- * Trigger a listener only once for an event
- *
- * @borrows events:one as videojs.one
- */
 videojs.one = Events.one;
-
-/**
- * Removes event listeners from an element
- *
- * @borrows events:off as videojs.off
- */
 videojs.off = Events.off;
-
-/**
- * Trigger an event for an element
- *
- * @borrows events:trigger as videojs.trigger
- */
 videojs.trigger = Events.trigger;
 
 /**
- * A cross-browser XMLHttpRequest wrapper. Here's a simple example:
+ * A cross-browser XMLHttpRequest wrapper.
  *
- * @param {Object} options
- *        settings for the request.
+ * @function
+ * @param    {Object} options
+ *           Settings for the request.
  *
- * @return {XMLHttpRequest|XDomainRequest}
- *         The request object.
+ * @return   {XMLHttpRequest|XDomainRequest}
+ *           The request object.
  *
- * @see https://github.com/Raynos/xhr
+ * @see      https://github.com/Raynos/xhr
  */
 videojs.xhr = xhr;
 
-/**
- * TextTrack class
- *
- * @borrows TextTrack as videojs.TextTrack
- */
 videojs.TextTrack = TextTrack;
-
-/**
- * export the AudioTrack class so that source handlers can create
- * AudioTracks and then add them to the players AudioTrackList
- *
- * @borrows AudioTrack as videojs.AudioTrack
- */
 videojs.AudioTrack = AudioTrack;
-
-/**
- * export the VideoTrack class so that source handlers can create
- * VideoTracks and then add them to the players VideoTrackList
- *
- * @borrows VideoTrack as videojs.VideoTrack
- */
 videojs.VideoTrack = VideoTrack;
 
-/**
- * Determines, via duck typing, whether or not a value is a DOM element.
- *
- * @borrows dom:isEl as videojs.isEl
- * @deprecated Use videojs.dom.isEl() instead
- */
-
-/**
- * Determines, via duck typing, whether or not a value is a text node.
- *
- * @borrows dom:isTextNode as videojs.isTextNode
- * @deprecated Use videojs.dom.isTextNode() instead
- */
-
-/**
- * Creates an element and applies properties.
- *
- * @borrows dom:createEl as videojs.createEl
- * @deprecated Use videojs.dom.createEl() instead
- */
-
-/**
- * Check if an element has a CSS class
- *
- * @borrows dom:hasElClass as videojs.hasClass
- * @deprecated Use videojs.dom.hasClass() instead
- */
-
-/**
- * Add a CSS class name to an element
- *
- * @borrows dom:addElClass as videojs.addClass
- * @deprecated Use videojs.dom.addClass() instead
- */
-
-/**
- * Remove a CSS class name from an element
- *
- * @borrows dom:removeElClass as videojs.removeClass
- * @deprecated Use videojs.dom.removeClass() instead
- */
-
-/**
- * Adds or removes a CSS class name on an element depending on an optional
- * condition or the presence/absence of the class name.
- *
- * @borrows dom:toggleElClass as videojs.toggleClass
- * @deprecated Use videojs.dom.toggleClass() instead
- */
-
-/**
- * Apply attributes to an HTML element.
- *
- * @borrows dom:setElAttributes as videojs.setAttribute
- * @deprecated Use videojs.dom.setAttributes() instead
- */
-
-/**
- * Get an element's attribute values, as defined on the HTML tag
- * Attributes are not the same as properties. They're defined on the tag
- * or with setAttribute (which shouldn't be used with HTML)
- * This will return true or false for boolean attributes.
- *
- * @borrows dom:getElAttributes as videojs.getAttributes
- * @deprecated Use videojs.dom.getAttributes() instead
- */
-
-/**
- * Empties the contents of an element.
- *
- * @borrows dom:emptyEl as videojs.emptyEl
- * @deprecated Use videojs.dom.emptyEl() instead
- */
-
-/**
- * Normalizes and appends content to an element.
- *
- * The content for an element can be passed in multiple types and
- * combinations, whose behavior is as follows:
- *
- * - String
- *   Normalized into a text node.
- *
- * - Element, TextNode
- *   Passed through.
- *
- * - Array
- *   A one-dimensional array of strings, elements, nodes, or functions (which
- *   return single strings, elements, or nodes).
- *
- * - Function
- *   If the sole argument, is expected to produce a string, element,
- *   node, or array.
- *
- * @borrows dom:appendContents as videojs.appendContet
- * @deprecated Use videojs.dom.appendContent() instead
- */
-
-/**
- * Normalizes and inserts content into an element; this is identical to
- * `appendContent()`, except it empties the element first.
- *
- * The content for an element can be passed in multiple types and
- * combinations, whose behavior is as follows:
- *
- * - String
- *   Normalized into a text node.
- *
- * - Element, TextNode
- *   Passed through.
- *
- * - Array
- *   A one-dimensional array of strings, elements, nodes, or functions (which
- *   return single strings, elements, or nodes).
- *
- * - Function
- *   If the sole argument, is expected to produce a string, element,
- *   node, or array.
- *
- * @borrows dom:insertContent as videojs.insertContent
- * @deprecated Use videojs.dom.insertContent() instead
- */
 [
   'isEl',
   'isTextNode',
@@ -724,29 +549,25 @@ videojs.VideoTrack = VideoTrack;
   };
 });
 
-/**
- * A safe getComputedStyle with an IE8 fallback.
- *
- * This is because in Firefox, if the player is loaded in an iframe with `display:none`,
- * then `getComputedStyle` returns `null`, so, we do a null-check to make sure
- * that the player doesn't break in these cases.
- * See https://bugzilla.mozilla.org/show_bug.cgi?id=548397 for more details.
- *
- * @borrows computed-style:computedStyle as videojs.computedStyle
- */
 videojs.computedStyle = computedStyle;
 
 /**
- * Export the Dom utilities for use in external plugins
- * and Tech's
+ * A reference to the {@link module:dom|DOM utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:dom|dom}
  */
 videojs.dom = Dom;
 
 /**
- * Export the Url utilities for use in external plugins
- * and Tech's
+ * A reference to the {@link module:url|URL utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:url|url}
  */
 videojs.url = Url;
+
+videojs.defineLazyProperty = defineLazyProperty;
 
 export default videojs;
 

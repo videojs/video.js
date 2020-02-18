@@ -2,8 +2,6 @@
  * @file video-track-list.js
  */
 import TrackList from './track-list';
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
 
 /**
  * Un-select all other {@link VideoTrack}s that are selected.
@@ -41,8 +39,6 @@ class VideoTrackList extends TrackList {
    *        A list of `VideoTrack` to instantiate the list with.
    */
   constructor(tracks = []) {
-    let list;
-
     // make sure only 1 track is enabled
     // sorted from last index to first index
     for (let i = tracks.length - 1; i >= 0; i--) {
@@ -52,30 +48,14 @@ class VideoTrackList extends TrackList {
       }
     }
 
-    // IE8 forces us to implement inheritance ourselves
-    // as it does not support Object.defineProperty properly
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-      for (const prop in TrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TrackList.prototype[prop];
-        }
-      }
-      for (const prop in VideoTrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = VideoTrackList.prototype[prop];
-        }
-      }
-    }
-
-    list = super(tracks, list);
-    list.changing_ = false;
+    super(tracks);
+    this.changing_ = false;
 
     /**
      * @member {number} VideoTrackList#selectedIndex
      *         The current index of the selected {@link VideoTrack`}.
      */
-    Object.defineProperty(list, 'selectedIndex', {
+    Object.defineProperty(this, 'selectedIndex', {
       get() {
         for (let i = 0; i < this.length; i++) {
           if (this[i].selected) {
@@ -86,8 +66,6 @@ class VideoTrackList extends TrackList {
       },
       set() {}
     });
-
-    return list;
   }
 
   /**
@@ -109,11 +87,7 @@ class VideoTrackList extends TrackList {
       return;
     }
 
-    /**
-     * @listens VideoTrack#selectedchange
-     * @fires TrackList#change
-     */
-    track.addEventListener('selectedchange', () => {
+    track.selectedChange_ = () => {
       if (this.changing_) {
         return;
       }
@@ -121,7 +95,22 @@ class VideoTrackList extends TrackList {
       disableOthers(this, track);
       this.changing_ = false;
       this.trigger('change');
-    });
+    };
+
+    /**
+     * @listens VideoTrack#selectedchange
+     * @fires TrackList#change
+     */
+    track.addEventListener('selectedchange', track.selectedChange_);
+  }
+
+  removeTrack(rtrack) {
+    super.removeTrack(rtrack);
+
+    if (rtrack.removeEventListener && rtrack.selectedChange_) {
+      rtrack.removeEventListener('selectedchange', rtrack.selectedChange_);
+      rtrack.selectedChange_ = null;
+    }
   }
 }
 

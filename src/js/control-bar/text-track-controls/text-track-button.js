@@ -39,7 +39,7 @@ class TextTrackButton extends TrackButton {
    */
   createItems(items = [], TrackMenuItem = TextTrackMenuItem) {
 
-    // Label is an overide for the [track] off label
+    // Label is an override for the [track] off label
     // USed to localise captions/subtitles
     let label;
 
@@ -69,8 +69,12 @@ class TextTrackButton extends TrackButton {
 
         const item = new TrackMenuItem(this.player_, {
           track,
+          kinds: this.kinds_,
+          kind: this.kind_,
           // MenuItem is selectable
-          selectable: true
+          selectable: true,
+          // MenuItem is NOT multiSelectable (i.e. only one can be marked "selected" at a time)
+          multiSelectable: false
         });
 
         item.addClass(`vjs-${track.kind}-menu-item`);

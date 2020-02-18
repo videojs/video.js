@@ -8,8 +8,6 @@ import AudioTrack from './audio-track';
 import VideoTrack from './video-track';
 import HTMLTrackElement from './html-track-element';
 
-import mergeOptions from '../utils/merge-options';
-
 /*
  * This file contains all track properties that are used in
  * player.js, tech.js, html5.js and possibly other techs in the future.
@@ -55,7 +53,7 @@ const REMOTE = {
   }
 };
 
-const ALL = mergeOptions(NORMAL, REMOTE);
+const ALL = Object.assign({}, NORMAL, REMOTE);
 
 REMOTE.names = Object.keys(REMOTE);
 NORMAL.names = Object.keys(NORMAL);

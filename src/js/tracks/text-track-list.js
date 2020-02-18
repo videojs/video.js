@@ -2,9 +2,6 @@
  * @file text-track-list.js
  */
 import TrackList from './track-list';
-import * as Fn from '../utils/fn.js';
-import * as browser from '../utils/browser.js';
-import document from 'global/document';
 
 /**
  * The current list of {@link TextTrack} for a media file.
@@ -13,35 +10,6 @@ import document from 'global/document';
  * @extends TrackList
  */
 class TextTrackList extends TrackList {
-
-  /**
-   * Create an instance of this class.
-   *
-   * @param {TextTrack[]} [tracks=[]]
-   *        A list of `TextTrack` to instantiate the list with.
-   */
-  constructor(tracks = []) {
-    let list;
-
-    // IE8 forces us to implement inheritance ourselves
-    // as it does not support Object.defineProperty properly
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-      for (const prop in TrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TrackList.prototype[prop];
-        }
-      }
-      for (const prop in TextTrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TextTrackList.prototype[prop];
-        }
-      }
-    }
-
-    list = super(tracks, list);
-    return list;
-  }
 
   /**
    * Add a {@link TextTrack} to the `TextTrackList`
@@ -54,20 +22,36 @@ class TextTrackList extends TrackList {
   addTrack(track) {
     super.addTrack(track);
 
+    if (!this.queueChange_) {
+      this.queueChange_ = () => this.queueTrigger('change');
+    }
+    if (!this.triggerSelectedlanguagechange) {
+      this.triggerSelectedlanguagechange_ = () => this.trigger('selectedlanguagechange');
+    }
+
     /**
      * @listens TextTrack#modechange
      * @fires TrackList#change
      */
-    track.addEventListener('modechange', Fn.bind(this, function() {
-      this.trigger('change');
-    }));
-
+    track.addEventListener('modechange', this.queueChange_);
     const nonLanguageTextTrackKind = ['metadata', 'chapters'];
 
     if (nonLanguageTextTrackKind.indexOf(track.kind) === -1) {
-      track.addEventListener('modechange', Fn.bind(this, function() {
-        this.trigger('selectedlanguagechange');
-      }));
+      track.addEventListener('modechange', this.triggerSelectedlanguagechange_);
+    }
+  }
+
+  removeTrack(rtrack) {
+    super.removeTrack(rtrack);
+
+    // manually remove the event handlers we added
+    if (rtrack.removeEventListener) {
+      if (this.queueChange_) {
+        rtrack.removeEventListener('modechange', this.queueChange_);
+      }
+      if (this.selectedlanguagechange_) {
+        rtrack.removeEventListener('modechange', this.triggerSelectedlanguagechange_);
+      }
     }
   }
 }

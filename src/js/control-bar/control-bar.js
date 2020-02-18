@@ -2,6 +2,7 @@
  * @file control-bar.js
  */
 import Component from '../component.js';
+import document from 'global/document';
 
 // Required children
 import './play-toggle.js';
@@ -10,7 +11,9 @@ import './time-controls/duration-display.js';
 import './time-controls/time-divider.js';
 import './time-controls/remaining-time-display.js';
 import './live-display.js';
+import './seek-to-live.js';
 import './progress-control/progress-control.js';
+import './picture-in-picture-toggle.js';
 import './fullscreen-toggle.js';
 import './volume-panel.js';
 import './text-track-controls/chapters-button.js';
@@ -39,10 +42,6 @@ class ControlBar extends Component {
     return super.createEl('div', {
       className: 'vjs-control-bar',
       dir: 'ltr'
-    }, {
-      // The control bar is a group, but we don't aria-label it to avoid
-      //  over-announcing by JAWS
-      role: 'group'
     });
   }
 }
@@ -62,6 +61,7 @@ ControlBar.prototype.options_ = {
     'durationDisplay',
     'progressControl',
     'liveDisplay',
+    'seekToLive',
     'remainingTimeDisplay',
     'customControlSpacer',
     'playbackRateMenuButton',
@@ -72,6 +72,14 @@ ControlBar.prototype.options_ = {
     'fullscreenToggle'
   ]
 };
+
+if ('exitPictureInPicture' in document) {
+  ControlBar.prototype.options_.children.splice(
+    ControlBar.prototype.options_.children.length - 1,
+    0,
+    'pictureInPictureToggle'
+  );
+}
 
 Component.registerComponent('ControlBar', ControlBar);
 export default ControlBar;

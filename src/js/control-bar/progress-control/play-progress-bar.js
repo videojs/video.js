@@ -2,8 +2,8 @@
  * @file play-progress-bar.js
  */
 import Component from '../../component.js';
-import {IE_VERSION, IS_IOS, IS_ANDROID} from '../../utils/browser.js';
-import formatTime from '../../utils/format-time.js';
+import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
+import * as Fn from '../../utils/fn.js';
 
 import './time-tooltip';
 
@@ -16,6 +16,20 @@ import './time-tooltip';
 class PlayProgressBar extends Component {
 
   /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The {@link Player} that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
+  constructor(player, options) {
+    super(player, options);
+    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
+  }
+
+  /**
    * Create the the DOM element for this class.
    *
    * @return {Element}
@@ -23,8 +37,9 @@ class PlayProgressBar extends Component {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-play-progress vjs-slider-bar',
-      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
+      className: 'vjs-play-progress vjs-slider-bar'
+    }, {
+      'aria-hidden': 'true'
     });
   }
 
@@ -40,24 +55,17 @@ class PlayProgressBar extends Component {
    *        from the left edge of the {@link SeekBar}
    */
   update(seekBarRect, seekBarPoint) {
+    const timeTooltip = this.getChild('timeTooltip');
 
-    // If there is an existing rAF ID, cancel it so we don't over-queue.
-    if (this.rafId_) {
-      this.cancelAnimationFrame(this.rafId_);
+    if (!timeTooltip) {
+      return;
     }
 
-    this.rafId_ = this.requestAnimationFrame(() => {
-      const time = (this.player_.scrubbing()) ?
-        this.player_.getCache().currentTime :
-        this.player_.currentTime();
+    const time = (this.player_.scrubbing()) ?
+      this.player_.getCache().currentTime :
+      this.player_.currentTime();
 
-      const content = formatTime(time, this.player_.duration());
-      const timeTooltip = this.getChild('timeTooltip');
-
-      if (timeTooltip) {
-        timeTooltip.update(seekBarRect, seekBarPoint, content);
-      }
-    });
+    timeTooltip.updateTime(seekBarRect, seekBarPoint, time);
   }
 }
 
@@ -71,8 +79,8 @@ PlayProgressBar.prototype.options_ = {
   children: []
 };
 
-// Time tooltips should not be added to a player on mobile devices or IE8
-if ((!IE_VERSION || IE_VERSION > 8) && !IS_IOS && !IS_ANDROID) {
+// Time tooltips should not be added to a player on mobile devices
+if (!IS_IOS && !IS_ANDROID) {
   PlayProgressBar.prototype.options_.children.push('timeTooltip');
 }
 

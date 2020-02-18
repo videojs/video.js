@@ -48,6 +48,8 @@ QUnit.test('should add and remove multiple event listeners to an element with a 
   Events.off(el, 'event2', listener);
   // No event2 should happen.
   Events.trigger(el, 'event2');
+
+  Events.off(el, ['click', 'event1', 'event2'], listener);
 });
 
 QUnit.test('should be possible to pass data when you trigger an event', function(assert) {
@@ -66,6 +68,7 @@ QUnit.test('should be possible to pass data when you trigger an event', function
   Events.trigger(el, 'event1', { d1: fakeData1, d2: fakeData2});
   Events.trigger(el, 'event2', { d1: fakeData1, d2: fakeData2});
 
+  Events.off(el, ['event1', 'event2'], listener);
 });
 
 QUnit.test('should remove all listeners of a type', function(assert) {
@@ -80,7 +83,7 @@ QUnit.test('should remove all listeners of a type', function(assert) {
 
   Events.on(el, 'click', listener);
   Events.on(el, 'click', listener2);
-    // 2 clicks
+  // 2 clicks
   Events.trigger(el, 'click');
 
   assert.ok(clicks === 2, 'both click listeners fired');
@@ -142,6 +145,9 @@ QUnit.test('should remove all listeners from an element', function(assert) {
   // No listener should happen.
   Events.trigger(el, 'fake1');
   Events.trigger(el, 'fake2');
+
+  Events.off(el, 'fake1', listener);
+  Events.off(el, 'fake2', listener2);
 });
 
 QUnit.test('should listen only once', function(assert) {
@@ -197,6 +203,7 @@ QUnit.test('should stop immediate propagtion', function(assert) {
   });
 
   Events.trigger(el, 'test');
+  Events.off(el, 'test');
 });
 
 QUnit.test('should bubble up DOM unless bubbles == false', function(assert) {
@@ -222,6 +229,11 @@ QUnit.test('should bubble up DOM unless bubbles == false', function(assert) {
     assert.ok(false, 'Outer listener fired');
   });
   Events.trigger(inner, { type: 'nobub', target: inner, bubbles: false });
+
+  Events.off(inner, 'bubbles');
+  Events.off(outer, 'bubbles');
+  Events.off(inner, 'nobub');
+  Events.off(outer, 'nobub');
 });
 
 QUnit.test('should have a defaultPrevented property on an event that was prevent from doing default action', function(assert) {
@@ -239,6 +251,7 @@ QUnit.test('should have a defaultPrevented property on an event that was prevent
   });
 
   Events.trigger(el, 'test');
+  Events.off(el, 'test');
 });
 
 QUnit.test('should have relatedTarget correctly set on the event', function(assert) {
@@ -259,6 +272,9 @@ QUnit.test('should have relatedTarget correctly set on the event', function(asse
   });
 
   Events.trigger(el2, { type: 'click', relatedTarget: undefined });
+
+  Events.off(el1, 'click');
+  Events.off(el2, 'click');
 });
 
 QUnit.test('should execute remaining handlers after an exception in an event handler', function(assert) {
@@ -283,4 +299,87 @@ QUnit.test('should execute remaining handlers after an exception in an event han
   Events.trigger(el, 'click');
 
   log.error = oldLogError;
+
+  Events.off(el, 'click');
+});
+
+QUnit.test('trigger with an object should set the correct target property', function(assert) {
+  const el = document.createElement('div');
+
+  Events.on(el, 'click', function(e) {
+    assert.equal(e.target, el, 'the event object target should be our element');
+  });
+  Events.trigger(el, { type: 'click'});
+
+  Events.off(el, 'click');
+});
+
+QUnit.test('retrigger with a string should use the new element as target', function(assert) {
+  const el1 = document.createElement('div');
+  const el2 = document.createElement('div');
+
+  Events.on(el2, 'click', function(e) {
+    assert.equal(e.target, el2, 'the event object target should be the new element');
+  });
+  Events.on(el1, 'click', function(e) {
+    Events.trigger(el2, 'click');
+  });
+  Events.trigger(el1, 'click');
+  Events.trigger(el1, {type: 'click'});
+
+  Events.off(el1, 'click');
+  Events.off(el2, 'click');
+});
+
+QUnit.test('retrigger with an object should use the old element as target', function(assert) {
+  const el1 = document.createElement('div');
+  const el2 = document.createElement('div');
+
+  Events.on(el2, 'click', function(e) {
+    assert.equal(e.target, el1, 'the event object target should be the old element');
+  });
+  Events.on(el1, 'click', function(e) {
+    Events.trigger(el2, e);
+  });
+  Events.trigger(el1, 'click');
+  Events.trigger(el1, {type: 'click'});
+
+  Events.off(el1, 'click');
+  Events.off(el2, 'click');
+});
+
+QUnit.test('should listen only once for any', function(assert) {
+  const el = document.createElement('div');
+  let triggered = 0;
+  const listener = () => triggered++;
+
+  Events.any(el, 'click', listener);
+  assert.equal(triggered, 0, 'listener was not yet triggered');
+  // 1 click
+  Events.trigger(el, 'click');
+
+  assert.equal(triggered, 1, 'listener was triggered');
+  // No click should happen.
+  Events.trigger(el, 'click');
+  assert.equal(triggered, 1, 'listener was not triggered again');
+});
+
+QUnit.test('only the first event should call listener via any', function(assert) {
+  const el = document.createElement('div');
+  let triggered = 0;
+  const listener = () => triggered++;
+
+  Events.any(el, ['click', 'event1', 'event2'], listener);
+  assert.equal(triggered, 0, 'listener was not yet triggered');
+
+  // 1 click
+  Events.trigger(el, 'click');
+  assert.equal(triggered, 1, 'listener was triggered');
+  // nothing below here should trigger the Callback
+  Events.trigger(el, 'click');
+  Events.trigger(el, 'event1');
+  Events.trigger(el, 'event1');
+  Events.trigger(el, 'event2');
+  Events.trigger(el, 'event2');
+  assert.equal(triggered, 1, 'listener was not triggered again');
 });

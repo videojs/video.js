@@ -3,6 +3,7 @@
 ## Table of Contents
 
 * [Issues and Pull Requests](#issues-and-pull-requests)
+  * [Labels](#labels)
 * [Accepting changes](#accepting-changes)
   * [Involving the TSC](#involving-the-tsc)
 * [Landing a PR](#landing-a-pr)
@@ -14,10 +15,16 @@
       * [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
 * [video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
-    * [Install contrib](#install-contrib)
     * [npm access](#npm-access)
     * [GitHub personal access token](#github-personal-access-token)
+  * [Deciding what type of version release](#deciding-what-type-of-version-release)
   * [Doing a release](#doing-a-release)
+    * [Current Video.js](#current-videojs)
+    * [Legacy Video.js (5)](#legacy-videojs-5)
+      * [Edit git-semver-tags](#edit-git-semver-tags)
+    * [And now for the release](#and-now-for-the-release)
+  * [Deploy as a patch to the CDN](#deploy-as-a-patch-to-the-cdn)
+  * [Announcement](#announcement)
 * [Doc credit](#doc-credit)
 
 ## Issues and Pull Requests
@@ -29,6 +36,22 @@ Collaborators may manage issues they feel qualified to handle, being mindful of 
 Any issue and PR can be closed if they are not relevant, when in doubt leave it open for more discussion. Issues can always be re-opened if new information is made available.
 
 If issues or PRs are very short and don't contain much information, ask for more by linking to the [issue][issue template] or [PR][pr template] template. There is also a [response guide](https://github.com/videojs/video.js/wiki/New-Issue-Response-Guide) if you're unsure.
+
+### Labels
+
+There are labels that are useful to include on issues and PRs. A few of them are defined below:
+
+| Label                    | Issue or PR  | Description                                                                |
+| ------------------------ | ------------ | -------------------------------------------------------------------------- |
+| confirmed                | Issue and PR | Issue: marks as reproducible. PR: marks as ready to be merged              |
+| 5.x                      | PR           | Marks as a change to the 5.x branch only                                   |
+| bug                      | Issue        | Marks as a confirmed bug                                                   |
+| good first issue         | Issue        | Marks as a good bug or enhancement for first time contributors to Video.js |
+| first-timers-only        | Issue        | Marks as a good bug or enhancement to be done by a newcomer to open source |
+| minor, patch, major      | PR           | Marks PR with the expected semver classification of the change             |
+| needs: LGTM              | PR           | Marks PR to be reviewed by a collaborator                                  |
+| needs: more info         | Issue        | Marks as needing more information from the issue reporter                  |
+| needs: reduced test case | Issue        | Marks as needing a reduced test case from the issue reporter               |
 
 ## Accepting changes
 
@@ -64,7 +87,7 @@ When using the big green button on GitHub, make sure the "squash and merge" is s
 
 The commit message should follow our [conventional changelog conventions][conventions]. They are based on the angularjs changelog conventions. The changelog is then generated from these commit messages on release.
 
-The first line of the commit message -- the header and first text box on GitHub -- should be prefixed with a type and optional scope followed by a short description of the commit.
+The first line of the commit message -- the header, which is the first text box on GitHub -- should be prefixed with a type and optional scope followed by a short description of the commit.
 The type is required. Two common ones are `fix` and `feat` for bug fixes and new features. Scope is optional and can be anything.
 
 The body should contain extra information, potentially copied from the original comment of the PR.
@@ -309,7 +332,7 @@ git clone git@github.com:videojs/video.js.git videojs-6-release
 git clone git@github.com:videojs/video.js.git videojs-5-release
 ```
 
-#### Video.js 6
+#### Current Video.js
 
 Make sure go to the master branch and grab the latest updates.
 
@@ -355,7 +378,7 @@ you can run it manually:
 VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 node build/gh-release.js --prelease
 ```
 
-#### Video.js 5
+#### Legacy Video.js (5)
 
 Make sure to go to the 5.x branch and grab the latest updates.
 
@@ -364,12 +387,14 @@ git checkout 5.x
 git pull origin 5.x
 ```
 
-> *Note:* you probably need to delete v6 tags due to the way that the our CHANGELOG lib works.
+> _Note:_ you probably need to delete v6 tags due to the way that the our CHANGELOG lib works.
 >
 > You can run this to delete them:
+>
 > ```sh
 > git tag | grep '^v6' | xargs git tag -d
 > ```
+>
 > This will find all tags that start with `^v6` and delete them.
 
 At this point, you should run `npm install` because dependencies may have changed.
@@ -380,6 +405,7 @@ Then, we have a script that automates most of the steps for publishing. It's a l
 
 You'll need to edit `git-semver-tags` to support our usage of tags that are not part of the branch.
 In the file `node_modules/conventional-changelog-cli/node_modules/conventional-changelog/node_modules/conventional-changelog-core/node_modules/git-semver-tags/index.js`, edit the line that says sets the `cmd` to be:
+
 ```js
 var cmd = 'git log --all --date-order --decorate --no-color';
 ```
@@ -414,7 +440,7 @@ and then pasted into the correct [GitHub release](https://github.com/videojs/vid
 
 ### Deploy as a patch to the CDN
 
-Follow the steps on the [CDN repo][] for the CDN release process.
+Follow the steps on the [CDN repo][cdn repo] for the CDN release process.
 If it's a `next` or `next-5` release, only publish the patch version to the CDN.
 
 When the version gets promoted to `latest` or `latest-5`, the corresponding `minor` or `latest` version should be published to the CDN.
@@ -437,12 +463,12 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 
 [conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md
 
-[vjs npm]: http://npmjs.com/org/videojs
+[vjs npm]: https://www.npmjs.com/org/videojs
 
 [npm org]: https://docs.npmjs.com/misc/orgs
 
 [slack]: http://slack.videojs.com
 
-[CDN repo]: https://github.com/videojs/cdn
+[cdn repo]: https://github.com/videojs/cdn
 
 [raw chg]: https://raw.githubusercontent.com/videojs/video.js/5.x/CHANGELOG.md

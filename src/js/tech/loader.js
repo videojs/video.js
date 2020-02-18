@@ -3,7 +3,7 @@
  */
 import Component from '../component.js';
 import Tech from './tech.js';
-import toTitleCase from '../utils/to-title-case.js';
+import {toTitleCase} from '../utils/string-cases.js';
 import mergeOptions from '../utils/merge-options.js';
 
 /**
@@ -21,7 +21,7 @@ class MediaLoader extends Component {
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]
-   *        The key/value stroe of player options.
+   *        The key/value store of player options.
    *
    * @param {Component~ReadyCallback} [ready]
    *        The function that is run when this component is ready.

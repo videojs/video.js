@@ -3,6 +3,7 @@
  */
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
+import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
 const darkGray = '#222';
@@ -24,22 +25,30 @@ const fontMap = {
  * Construct an rgba color from a given hex color code.
  *
  * @param {number} color
- *        Hex number for color, like #f0e.
+ *        Hex number for color, like #f0e or #f604e2.
  *
  * @param {number} opacity
  *        Value for opacity, 0.0 - 1.0.
  *
  * @return {string}
  *         The rgba color that was created, like 'rgba(255, 0, 0, 0.3)'.
- *
- * @private
  */
-function constructColor(color, opacity) {
-  return 'rgba(' +
+export function constructColor(color, opacity) {
+  let hex;
+
+  if (color.length === 4) {
     // color looks like "#f0e"
-    parseInt(color[1] + color[1], 16) + ',' +
-    parseInt(color[2] + color[2], 16) + ',' +
-    parseInt(color[3] + color[3], 16) + ',' +
+    hex = color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+  } else if (color.length === 7) {
+    // color looks like "#f604e2"
+    hex = color.slice(1);
+  } else {
+    throw new Error('Invalid color code provided, ' + color + '; must be formatted as e.g. #f0e or #f604e2.');
+  }
+  return 'rgba(' +
+    parseInt(hex.slice(0, 2), 16) + ',' +
+    parseInt(hex.slice(2, 4), 16) + ',' +
+    parseInt(hex.slice(4, 6), 16) + ',' +
     opacity + ')';
 }
 
@@ -90,9 +99,11 @@ class TextTrackDisplay extends Component {
   constructor(player, options, ready) {
     super(player, options, ready);
 
+    const updateDisplayHandler = Fn.bind(this, this.updateDisplay);
+
     player.on('loadstart', Fn.bind(this, this.toggleDisplay));
-    player.on('texttrackchange', Fn.bind(this, this.updateDisplay));
-    player.on('loadstart', Fn.bind(this, this.preselectTrack));
+    player.on('texttrackchange', updateDisplayHandler);
+    player.on('loadedmetadata', Fn.bind(this, this.preselectTrack));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
@@ -104,7 +115,11 @@ class TextTrackDisplay extends Component {
         return;
       }
 
-      player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
+      player.on('fullscreenchange', updateDisplayHandler);
+      player.on('playerresize', updateDisplayHandler);
+
+      window.addEventListener('orientationchange', updateDisplayHandler);
+      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
 
       const tracks = this.options_.playerOptions.tracks || [];
 
@@ -136,8 +151,11 @@ class TextTrackDisplay extends Component {
     for (let i = 0; i < trackList.length; i++) {
       const track = trackList[i];
 
-      if (userPref && userPref.enabled &&
-        userPref.language === track.language) {
+      if (
+        userPref && userPref.enabled &&
+        userPref.language && userPref.language === track.language &&
+        track.kind in modes
+      ) {
         // Always choose the track that matches both language and kind
         if (track.kind === userPref.kind) {
           preferredTrack = track;
@@ -162,7 +180,7 @@ class TextTrackDisplay extends Component {
     }
 
     // The preferredTrack matches the user preference and takes
-    // precendence over all the other tracks.
+    // precedence over all the other tracks.
     // So, display the preferredTrack before the first default track
     // and the subtitles/captions track before the descriptions track
     if (preferredTrack) {
@@ -223,10 +241,26 @@ class TextTrackDisplay extends Component {
    */
   updateDisplay() {
     const tracks = this.player_.textTracks();
+    const allowMultipleShowingTracks = this.options_.allowMultipleShowingTracks;
 
     this.clearDisplay();
 
-    // Track display prioritization model: if multiple tracks are 'showing',
+    if (allowMultipleShowingTracks) {
+      const showingTracks = [];
+
+      for (let i = 0; i < tracks.length; ++i) {
+        const track = tracks[i];
+
+        if (track.mode !== 'showing') {
+          continue;
+        }
+        showingTracks.push(track);
+      }
+      this.updateForTrack(showingTracks);
+      return;
+    }
+
+    //  Track display prioritization model: if multiple tracks are 'showing',
     //  display the first 'subtitles' or 'captions' track which is 'showing',
     //  otherwise display the first 'descriptions' track which is 'showing'
 
@@ -260,24 +294,14 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add an {@link Texttrack} to to the {@link Tech}s {@link TextTrackList}.
+   * Style {@Link TextTrack} activeCues according to {@Link TextTrackSettings}.
    *
    * @param {TextTrack} track
-   *        Text track object to be added to the list.
+   *        Text track object containing active cues to style.
    */
-  updateForTrack(track) {
-    if (typeof window.WebVTT !== 'function' || !track.activeCues) {
-      return;
-    }
-
+  updateDisplayState(track) {
     const overrides = this.player_.textTrackSettings.getValues();
-    const cues = [];
-
-    for (let i = 0; i < track.activeCues.length; i++) {
-      cues.push(track.activeCues[i]);
-    }
-
-    window.WebVTT.processCues(window, cues, this.el_);
+    const cues = track.activeCues;
 
     let i = cues.length;
 
@@ -294,25 +318,35 @@ class TextTrackDisplay extends Component {
         cueDiv.firstChild.style.color = overrides.color;
       }
       if (overrides.textOpacity) {
-        tryUpdateStyle(cueDiv.firstChild,
-                       'color',
-                       constructColor(overrides.color || '#fff',
-                                      overrides.textOpacity));
+        tryUpdateStyle(
+          cueDiv.firstChild,
+          'color',
+          constructColor(
+            overrides.color || '#fff',
+            overrides.textOpacity
+          )
+        );
       }
       if (overrides.backgroundColor) {
         cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
       }
       if (overrides.backgroundOpacity) {
-        tryUpdateStyle(cueDiv.firstChild,
-                       'backgroundColor',
-                       constructColor(overrides.backgroundColor || '#000',
-                                      overrides.backgroundOpacity));
+        tryUpdateStyle(
+          cueDiv.firstChild,
+          'backgroundColor',
+          constructColor(
+            overrides.backgroundColor || '#000',
+            overrides.backgroundOpacity
+          )
+        );
       }
       if (overrides.windowColor) {
         if (overrides.windowOpacity) {
-          tryUpdateStyle(cueDiv,
-                         'backgroundColor',
-                         constructColor(overrides.windowColor, overrides.windowOpacity));
+          tryUpdateStyle(
+            cueDiv,
+            'backgroundColor',
+            constructColor(overrides.windowColor, overrides.windowOpacity)
+          );
         } else {
           cueDiv.style.backgroundColor = overrides.windowColor;
         }
@@ -342,6 +376,53 @@ class TextTrackDisplay extends Component {
         } else {
           cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
         }
+      }
+    }
+  }
+
+  /**
+   * Add an {@link TextTrack} to to the {@link Tech}s {@link TextTrackList}.
+   *
+   * @param {TextTrack|TextTrack[]} tracks
+   *        Text track object or text track array to be added to the list.
+   */
+  updateForTrack(tracks) {
+    if (!Array.isArray(tracks)) {
+      tracks = [tracks];
+    }
+    if (typeof window.WebVTT !== 'function' ||
+      tracks.every((track)=> {
+        return !track.activeCues;
+      })) {
+      return;
+    }
+
+    const cues = [];
+
+    // push all active track cues
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        cues.push(track.activeCues[j]);
+      }
+    }
+
+    // removes all cues before it processes new ones
+    window.WebVTT.processCues(window, cues, this.el_);
+
+    // add unique class to each language text track & add settings styling if necessary
+    for (let i = 0; i < tracks.length; ++i) {
+      const track = tracks[i];
+
+      for (let j = 0; j < track.activeCues.length; ++j) {
+        const cueEl = track.activeCues[j].displayState;
+
+        Dom.addClass(cueEl, 'vjs-text-track-cue');
+        Dom.addClass(cueEl, 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
+      }
+      if (this.player_.textTrackSettings) {
+        this.updateDisplayState(track);
       }
     }
   }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../css/guides.css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,600,600italic' rel='stylesheet' type='text/css'><link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/solarized_light.min.css" />
+<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+</head>
+<body>
+<div id="sidenav" class="sidenav"></div>
+<div id="main" class="main">
+<h1 id="components">Components</h1>
+<p>The Video.js player is built on top of a simple, custom UI components architecture. The player class and all control classes inherit from the <code>Component</code> class, or a subclass of <code>Component</code>.</p>
+<pre><code class="lang-js">videojs.registerComponent(&#39;Control&#39;, videojs.extends(Component));
+videojs.registerComponent(&#39;Button&#39;, videojs.extends(videojs.getComponent(&#39;Control&#39;)));
+videojs.registerComponent(&#39;PlayToggle&#39;, videojs.extends(videojs.getComponent(&#39;Button&#39;)));
+</code></pre>
+<p>The UI component architecture makes it easier to add child components to a parent component and build up an entire user interface, like the controls for the Video.js player.</p>
+<pre><code class="lang-js">// Adding a new control to the player
+myPlayer.addChild(&#39;BigPlayButton&#39;);
+</code></pre>
+<p>Every component has an associated DOM element, and when you add a child component, it inserts the element of that child into the element of the parent.</p>
+<pre><code class="lang-js">myPlayer.addChild(&#39;BigPlayButton&#39;);
+</code></pre>
+<p>Results in:</p>
+<pre><code class="lang-html">    &lt;!-- Player Element --&gt;
+    &lt;div class=&quot;video-js&quot;&gt;
+      &lt;!-- BigPlayButton Element --&gt;
+      &lt;div class=&quot;vjs-big-play-button&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+</code></pre>
+<p>The actual default component structure of the Video.js player looks something like this:</p>
+<pre><code>Player
+    PosterImage
+    TextTrackDisplay
+    LoadingSpinner
+    BigPlayButton
+    ControlBar
+        PlayToggle
+        VolumeMenuButton
+        CurrentTimeDisplay (Hidden by default)
+        TimeDivider (Hidden by default)
+        DurationDisplay (Hidden by default)
+        ProgressControl
+            SeekBar
+              LoadProgressBar
+              MouseTimeDisplay
+              PlayProgressBar
+        LiveDisplay (Hidden by default)
+        RemainingTimeDisplay
+        CustomControlsSpacer (No UI)
+        ChaptersButton (Hidden by default)
+        SubtitlesButton (Hidden by default)
+        CaptionsButton (Hidden by default)
+        PictureInPictureToggle
+        FullscreenToggle
+    ErrorDisplay
+    TextTrackSettings
+</code></pre><h2 id="progress-control">Progress Control</h2>
+<p>The progress control is made up of the SeekBar. The seekbar contains the load progress bar
+and the play progress bar. In addition, it contains the Mouse Time Display which
+is used to display the time tooltip that follows the mouse cursor.
+The play progress bar also has a time tooltip that show the current time.</p>
+<p>By default, the progress control is sandwiched between the volume menu button and
+the remaining time display inside the control bar, but in some cases, a skin would
+want to move the progress control above the control bar and have it span the full
+width of the player, in those cases, it is less than ideal to have the tooltips
+get cut off or leave the bounds of the player. This can be prevented by setting the
+<code>keepTooltipsInside</code> option on the progress control. This also makes the tooltips use 
+a real element instead of pseudo elements so targetting them with css will be different.</p>
+<pre><code class="lang-js">let player = videojs(&#39;myplayer&#39;, {
+  controlBar: {
+    progressControl: {
+      keepTooltipsInside: true
+    }
+  }
+});
+</code></pre>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="../js/guides.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

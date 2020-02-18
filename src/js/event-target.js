@@ -2,6 +2,7 @@
  * @file src/js/event-target.js
  */
 import * as Events from './utils/events.js';
+import window from 'global/window';
 
 /**
  * `EventTarget` is a class that can have the same API as the DOM `EventTarget`. It
@@ -109,12 +110,22 @@ EventTarget.prototype.removeEventListener = EventTarget.prototype.off;
  *        The function to be called once for each event name.
  */
 EventTarget.prototype.one = function(type, fn) {
-  // Remove the addEventListener alialing Events.on
+  // Remove the addEventListener aliasing Events.on
   // so we don't get into an infinite type loop
   const ael = this.addEventListener;
 
   this.addEventListener = () => {};
   Events.one(this, type, fn);
+  this.addEventListener = ael;
+};
+
+EventTarget.prototype.any = function(type, fn) {
+  // Remove the addEventListener aliasing Events.on
+  // so we don't get into an infinite type loop
+  const ael = this.addEventListener;
+
+  this.addEventListener = () => {};
+  Events.any(this, type, fn);
   this.addEventListener = ael;
 };
 
@@ -137,6 +148,11 @@ EventTarget.prototype.one = function(type, fn) {
 EventTarget.prototype.trigger = function(event) {
   const type = event.type || event;
 
+  // deprecation
+  // In a future version we should default target to `this`
+  // similar to how we default the target to `elem` in
+  // `Events.trigger`. Right now the default `target` will be
+  // `document` due to the `Event.fixEvent` call.
   if (typeof event === 'string') {
     event = {type};
   }
@@ -157,5 +173,39 @@ EventTarget.prototype.trigger = function(event) {
  * @see {@link EventTarget#trigger}
  */
 EventTarget.prototype.dispatchEvent = EventTarget.prototype.trigger;
+
+let EVENT_MAP;
+
+EventTarget.prototype.queueTrigger = function(event) {
+  // only set up EVENT_MAP if it'll be used
+  if (!EVENT_MAP) {
+    EVENT_MAP = new Map();
+  }
+
+  const type = event.type || event;
+  let map = EVENT_MAP.get(this);
+
+  if (!map) {
+    map = new Map();
+    EVENT_MAP.set(this, map);
+  }
+
+  const oldTimeout = map.get(type);
+
+  map.delete(type);
+  window.clearTimeout(oldTimeout);
+
+  const timeout = window.setTimeout(() => {
+    // if we cleared out all timeouts for the current target, delete its map
+    if (map.size === 0) {
+      map = null;
+      EVENT_MAP.delete(this);
+    }
+
+    this.trigger(event);
+  }, 0);
+
+  map.set(type, timeout);
+};
 
 export default EventTarget;

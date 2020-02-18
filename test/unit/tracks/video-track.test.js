@@ -26,9 +26,11 @@ QUnit.test('defaults when items not provided', function(assert) {
   const track = new VideoTrack();
 
   assert.equal(track.kind, '', 'kind defaulted to empty string');
-  assert.equal(track.selected,
-              false,
-              'selected defaulted to true since there is one track');
+  assert.equal(
+    track.selected,
+    false,
+    'selected defaulted to true since there is one track'
+  );
   assert.equal(track.label, '', 'label defaults to empty string');
   assert.equal(track.language, '', 'language defaults to empty string');
   assert.ok(track.id.match(/vjs_track_\d+/), 'id defaults to vjs_track_GUID');
@@ -113,4 +115,6 @@ QUnit.test('when selected is changed selectedchange event is fired', function(as
   // one event
   track.selected = true;
   assert.equal(eventsTriggered, 3, 'three selected changes');
+
+  track.off();
 });

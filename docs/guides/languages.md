@@ -13,10 +13,9 @@ Some translations may be less complete than others - see the [translations neede
   * [File Naming](#file-naming)
   * [Updating an Existing Translation](#updating-an-existing-translation)
   * [Writing a New Translation](#writing-a-new-translation)
-* [Advanced Language Usage](#advanced-language-usage)
   * [Adding Languages via the API](#adding-languages-via-the-api)
-  * [Per-Player Languages](#per-player-languages)
-  * [Setting Default Player Language](#setting-default-player-language)
+  * [Per-Player Translations](#per-player-translations)
+  * [Setting Player Language](#setting-player-language)
   * [Determining Player Language](#determining-player-language)
     * [Internal Language Selection](#internal-language-selection)
 * [References](#references)
@@ -45,9 +44,8 @@ Video.js uses a JSON object to describe a language, where the keys are English a
   "Play": "Reproducción",
   "Pause": "Pausa",
   "Current Time": "Tiempo reproducido",
-  "Duration Time": "Duración total",
+  "Duration": "Duración total",
   "Remaining Time": "Tiempo restante",
-  ...
 }
 ```
 
@@ -62,9 +60,9 @@ Each file's name should be the [standard language code][lang-codes] that is most
 If there is a [missing translation](/docs/translations-needed.md), mistake, or room for improvement in an existing translation, don't hesitate to open a pull request!
 
 1. Edit the relevant JSON file and make the necessary changes.
-1. Verify the language compiles by running `grunt dist`.
+1. Verify the language compiles by running the language specific build `npm run build:lang` or the full build `npm run build`.
 1. Verify the translation appears properly in the player UI.
-1. Run `grunt check-translations` to update the [missing translation document](/docs/translations-needed.md).
+1. Run `npm run docs:lang` to update the [missing translation document](/docs/translations-needed.md).
 1. Commit and open a pull request on GitHub.
 
 ### Writing a New Translation
@@ -90,7 +88,7 @@ videojs.addLanguage('es', {
   Play: 'Reproducción',
   Pause: 'Pausa',
   'Current Time': 'Tiempo reproducido',
-  'Duration Time': 'Duración total',
+  'Duration': 'Duración total',
   'Remaining Time': 'Tiempo restante',
   ...
 });
@@ -153,6 +151,6 @@ For all existing/supported languages, please see the [languages folder (`lang/`)
 
 [lang-supported]: /lang
 
-[lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+[lang-codes]: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
 [translations-needed]: https://github.com/videojs/video.js/blob/master/docs/translations-needed.md

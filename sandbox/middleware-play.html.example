@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+
+  <!-- Load the source files -->
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <script src="../node_modules/videojs-flash/dist/videojs-flash.js"></script>
+
+  <!-- Set the location of the flash SWF -->
+  <script>
+    videojs.options.flash.swf = '../node_modules/videojs-swf/dist/video-js.swf';
+  </script>
+
+  <style>
+    .terminate-btn {
+      margin: 2em 1em;
+    }
+
+    .terminated .vjs-progress-control .vjs-play-progress {
+      background: red;
+    }
+  </style>
+</head>
+<body>
+
+  <video id="vid1" class="video-js" lang="en" controls poster="//d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
+    <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
+    <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
+  </video>
+
+  <input id="stateToggle" type="checkbox" class="terminate-btn">
+    Terminate the play/pause middleware
+  </input>
+
+  <script>
+    var stateToggle = document.getElementById('stateToggle');
+
+    // Middleware 1
+    var m1 = function(player) {
+      return {
+        // Mediating play to the tech
+        callPlay: function() {
+          if (stateToggle.checked) {
+            console.log('Middleware 1: Play is set to terminate');
+
+            player.addClass('terminated');
+            return videojs.middleware.TERMINATOR;
+
+          } else {
+            console.log('Middleware 1: Play has been called');
+            player.removeClass('terminated');
+          }
+        },
+        // Mediating the results back to the player
+        play: function(cancelled, value) {
+          console.log('Middleware 1: play got from tech. What is the value passed?', value);
+
+          // Handle the promise if it is returned
+          if(value && value.then) {
+            value.then(() => {
+              console.log('Middleware 1: Promise resolved.')
+            })
+            .catch((err) => {
+              console.log('Middleware 1: Promise rejected.');
+            });
+          }
+
+          if (cancelled) {
+            console.log('Middleware 1: play has been cancelled prior to this middleware');
+          }
+        },
+        // Mediating to tech
+        callPause: function() {
+          if (stateToggle.checked) {
+            console.log('Middleware 1: Pause is set to terminate');
+
+            player.addClass('terminated');
+            return videojs.middleware.TERMINATOR;
+
+          } else {
+            console.log('Middleware 1: Pause has been called');
+            player.removeClass('terminated');
+          }
+        },
+        // Mediating the results back to the player
+        pause: function(cancelled, value) {
+          console.log('Middleware 1: pause got back from tech. What is the value passed?', value);
+
+          if (cancelled) {
+            console.log('Middleware 1: pause has been cancelled prior to this middleware');
+          }
+
+          return value;
+        },
+        // Required for middleware. Simply passes along the source
+        setSource: function(srcObj, next) {
+          next(null, srcObj);
+        }
+      };
+    };
+
+    // Middleware 2
+    var m2 = function(player) {
+      return {
+        callPlay: function() {
+          console.log('Middleware 2: play has been called');
+        },
+        play: function(cancelled, value) {
+          console.log('Middleware 2: got play from tech. What is the value passed?', value);
+
+          if (cancelled) {
+            console.log('Middleware 2: play has been cancelled prior to this middleware');
+          }
+
+          return value;
+        },
+        callPause: function() {
+          console.log('Middleware 2: pause has been called');
+        },
+        pause: function(cancelled, value) {
+          console.log('Middleware 2: got pause from tech. What is the value passed?', value);
+
+          if (cancelled) {
+            console.log('Middleware 2: pause has been cancelled prior to this middleware');
+          }
+
+          return value;
+        },
+        setSource: function(srcObj, next) {
+          next(null, srcObj);
+        }
+      };
+    }
+
+    videojs.use('*', m1);
+    videojs.use('*', m2);
+
+    // Initial set-up
+    var vid = document.getElementById("vid1");
+    var player = videojs(vid);
+
+    console.log('Calling play...');
+    player.setTimeout(() => {
+      player.play()
+        .then(() => {
+          console.log('The promise resolved, we are playing.');
+        },
+        (err) => {
+          console.log('The promise was rejected, we failed to play.');
+        });
+    }, 500);
+  </script>
+
+</body>
+</html>

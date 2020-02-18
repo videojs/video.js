@@ -5,7 +5,7 @@
   "Pause": "Приостановить",
   "Replay": "Воспроизвести снова",
   "Current Time": "Текущее время",
-  "Duration Time": "Продолжительность",
+  "Duration": "Продолжительность",
   "Remaining Time": "Оставшееся время",
   "Stream Type": "Тип потока",
   "LIVE": "ОНЛАЙН",
@@ -80,5 +80,6 @@
   "Done": "Готово",
   "Caption Settings Dialog": "Диалог настроек подписи",
   "Beginning of dialog window. Escape will cancel and close the window.": "Начало диалоговго окна. Кнопка Escape закроет или отменит окно",
-  "End of dialog window.": "Конец диалогового окна."
+  "End of dialog window.": "Конец диалогового окна.",
+  "{1} is loading.": "{1} загружается."
 }

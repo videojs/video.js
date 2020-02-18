@@ -8,6 +8,7 @@ projects
 test/*.map
 .bunyipconfig.js
 .s3config.json
+.eslintcache
 
 node_modules
 npm-debug.log*
@@ -23,7 +24,7 @@ sandbox/*
 *results.xml
 *.log
 
-test/coverage/*
+test/dist/*
 .coveralls.yml
 .sass-cache
 
@@ -31,3 +32,9 @@ dist/*
 es5/*
 
 .idea/
+
+core.js
+core.es.js
+
+# Ignore Chinese clones for now.
+lang/zh-Han*.json

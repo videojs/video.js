@@ -4,6 +4,7 @@
 
 [![Build Status][travis-icon]][travis-link]
 [![Coverage Status][coveralls-icon]][coveralls-link]
+[![Greenkeeper badge](https://badges.greenkeeper.io/videojs/video.js.svg)](https://greenkeeper.io/)
 [![Slack Status][slack-icon]][slack-link]
 
 [![NPM][npm-icon]][npm-link]
@@ -22,26 +23,35 @@
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
 
 ```html
-<link href="//vjs.zencdn.net/5.19/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/5.19/video.min.js"></script>
+<link href="//vjs.zencdn.net/7.3.0/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/7.3.0/video.min.js"></script>
 ```
+
 > For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
 
-> In the `vjs.zencdn.net` CDN-hosted versions of Video.js we include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
->
-> ```html
-> <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
-> ```
-> Alternatively, you can include Video.js by getting it from [npm](http://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases *do not* include Google Analytics tracking at all.
-> ```html
-> <!-- unpkg -->
-> <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
-> <script src="https://unpkg.com/video.js/dist/video.js"></script>
->
-> <!-- cdnjs -->
-> <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video-js.css" rel="stylesheet">
-> <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video.js"></script>
-> ```
+Video.js version 7 (and newer) CDN builds do not send any data to Google Analytics.
+
+In older versions of Video.js (6 and earlier), in the `vjs.zencdn.net` CDN-hosted versions we include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
+
+```html
+<script>window.HELP_IMPROVE_VIDEOJS = false;</script>
+```
+
+Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
+
+```html
+<!-- unpkg : use the latest version of Video.js -->
+<link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
+<script src="https://unpkg.com/video.js/dist/video.min.js"></script>
+
+<!-- unpkg : use a specific version of Video.js (change the version numbers as necessary) -->
+<link href="https://unpkg.com/video.js@6.11.0/dist/video-js.min.css" rel="stylesheet">
+<script src="https://unpkg.com/video.js@6.11.0/dist/video.min.js"></script>
+
+<!-- cdnjs : use a specific version of Video.js (change the version numbers as necessary) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video-js.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video.min.js"></script>
+```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!
 
@@ -59,7 +69,7 @@ Next, using Video.js is as simple as creating a `<video>` element, but with an a
   <p class="vjs-no-js">
     To view this video please enable JavaScript, and consider upgrading to a
     web browser that
-    <a href="http://videojs.com/html5-video-support/" target="_blank">
+    <a href="https://videojs.com/html5-video-support/" target="_blank">
       supports HTML5 video
     </a>
   </p>
@@ -119,15 +129,15 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [coveralls-link]: https://coveralls.io/github/videojs/video.js?branch=master
 
-[docs]: http://docs.videojs.com
+[docs]: https://docs.videojs.com
 
-[fastly]: http://www.fastly.com/
+[fastly]: https://www.fastly.com/
 
-[getting-started]: http://videojs.com/getting-started/
+[getting-started]: https://videojs.com/getting-started/
 
 [license]: LICENSE
 
-[logo]: http://videojs.com/img/logo.png
+[logo]: https://videojs.com/logo-white.png
 
 [npm-icon]: https://nodei.co/npm/video.js.png?downloads=true&downloadRank=true
 
@@ -135,7 +145,7 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [options]: docs/guides/options.md
 
-[plugins]: http://videojs.com/plugins/
+[plugins]: https://videojs.com/plugins/
 
 [slack-icon]: http://slack.videojs.com/badge.svg
 
@@ -145,6 +155,6 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [travis-link]: https://travis-ci.org/videojs/video.js
 
-[vjs]: http://videojs.com
+[vjs]: https://videojs.com
 
 [coc]: CODE_OF_CONDUCT.md

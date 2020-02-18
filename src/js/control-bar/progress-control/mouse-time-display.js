@@ -3,7 +3,6 @@
  */
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
-import formatTime from '../../utils/format-time.js';
 
 import './time-tooltip';
 
@@ -28,7 +27,7 @@ class MouseTimeDisplay extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.update = Fn.throttle(Fn.bind(this, this.update), 25);
+    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
   }
 
   /**
@@ -55,18 +54,10 @@ class MouseTimeDisplay extends Component {
    *        from the left edge of the {@link SeekBar}
    */
   update(seekBarRect, seekBarPoint) {
+    const time = seekBarPoint * this.player_.duration();
 
-    // If there is an existing rAF ID, cancel it so we don't over-queue.
-    if (this.rafId_) {
-      this.cancelAnimationFrame(this.rafId_);
-    }
-
-    this.rafId_ = this.requestAnimationFrame(() => {
-      const duration = this.player_.duration();
-      const content = formatTime(seekBarPoint * duration, duration);
-
+    this.getChild('timeTooltip').updateTime(seekBarRect, seekBarPoint, time, () => {
       this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
-      this.getChild('timeTooltip').update(seekBarRect, seekBarPoint, content);
     });
   }
 }

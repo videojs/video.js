@@ -56,6 +56,8 @@ QUnit.test('setState() works as expected', function(assert) {
 
   assert.strictEqual(event.type, 'statechanged', 'the event had the expected type');
   assert.strictEqual(event.changes, changes, 'the changes object is sent along with the event');
+
+  target.trigger('dispose');
 });
 
 QUnit.test('setState() without changes does not trigger the "statechanged" event', function(assert) {
@@ -68,6 +70,7 @@ QUnit.test('setState() without changes does not trigger the "statechanged" event
 
   assert.strictEqual(changes, undefined, 'no changes were returned');
   assert.strictEqual(spy.callCount, 0, 'no event was triggered');
+  target.trigger('dispose');
 });
 
 QUnit.test('handleStateChanged() is automatically bound to "statechanged" event', function(assert) {
@@ -84,4 +87,5 @@ QUnit.test('handleStateChanged() is automatically bound to "statechanged" event'
 
   assert.strictEqual(event.type, 'statechanged', 'the event had the expected type');
   assert.strictEqual(event.changes, changes, 'the handleStateChanged() method was called');
+  target.trigger('dispose');
 });

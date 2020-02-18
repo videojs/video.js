@@ -1,57 +1,37 @@
+/* eslint-disable no-console */
 const fs = require('fs');
 const zlib = require('zlib');
-const Promise = require('bluebird');
-const klawSync = require('klaw-sync');
 const filesize = require('filesize');
 const Table = require('cli-table');
+const path = require('path');
+const sh = require('shelljs');
 
-const files = klawSync('dist/', {
-  ignore: ['examples', 'lang', 'font', 'ie8', '*.zip', '*.gz'],
-  nodir: true
-});
+// find all js/css files in the dist dir
+// but ignore any files in lang, example, or font directories
+const filepaths = sh
+  .find(path.join(__dirname, '..', 'dist', '**', '*.{js,css}'))
+  .filter((filepath) => !(/\/(lang|example|font)\//).test(filepath));
 
-Promise.all(files.map(gzipAndStat))
-.then(mapFiles)
-.then(function(files) {
-  logTable(files);
-
-  return files;
-})
-.then(cleanup)
-.catch(function(err) {
-  console.error(err.stack);
-});
-
-function cleanup(files) {
-  files.forEach(function(file) {
-    fs.unlinkSync('dist/' + file[0] + '.gz');
-  });
-}
-
-function mapFiles(files) {
-  return files.map(function(file) {
-    const path = file[0].path;
-    const fileStat = file[0].stats;
-    const gzStat = file[1];
-    return [file[0].path.split('dist/')[1], filesize(fileStat.size), filesize(gzStat.size)];
-  });
-}
-
-function gzipAndStat(file) {
+// map all files that we found into an array of
+// table entries the filepath, file size, and gzip size.
+Promise.all(filepaths.map(function(filepath) {
   return new Promise(function(resolve, reject) {
-    const readStream = fs.createReadStream(file.path);
-    const writeStream = fs.createWriteStream(file.path + '.gz');
+    const readStream = fs.createReadStream(filepath);
+    const writeStream = fs.createWriteStream(filepath + '.gz');
     const gzip = zlib.createGzip();
+
     readStream.pipe(gzip).pipe(writeStream).on('close', function() {
-      const gzStat = fs.statSync(file.path + '.gz');
+      const gzStat = fs.statSync(filepath + '.gz');
+      const fileStat = fs.statSync(filepath);
 
-      resolve([file, gzStat]);
+      fs.unlinkSync(filepath + '.gz');
+
+      resolve([filepath.split('dist/')[1], filesize(fileStat.size), filesize(gzStat.size)]);
     })
-    .on('error', reject);
+      .on('error', reject);
   });
-}
-
-function logTable(files) {
+})).then(function(lines) {
+  // log all the files and there sizes using a cli table
   const table = new Table({
     head: ['filename', 'size', 'gzipped'],
     colAligns: ['left', 'right', 'right'],
@@ -60,6 +40,9 @@ function logTable(files) {
     }
   });
 
-  table.push.apply(table, files);
+  table.push.apply(table, lines);
   console.log(table.toString());
-}
+
+}).catch(function(err) {
+  console.error(err.stack);
+});

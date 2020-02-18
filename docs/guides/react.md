@@ -28,8 +28,10 @@ export default class VideoPlayer extends React.Component {
   // see https://github.com/videojs/video.js/pull/3856
   render() {
     return (
-      <div data-vjs-player>
-        <video ref={ node => this.videoNode = node } className="video-js"></video>
+      <div>	
+        <div data-vjs-player>
+          <video ref={ node => this.videoNode = node } className="video-js"></video>
+        </div>
       </div>
     )
   }
@@ -54,7 +56,6 @@ return <VideoPlayer { ...videoJsOptions } />
 Don't forget to include the Video.js CSS, located at `video.js/dist/video-js.css`.
 
 [options]: /docs/guides/options.md
-
 
 ## Using a React Component as a Video JS Component
 
@@ -102,6 +103,11 @@ class vjsEpisodeList extends vjsComponent {
     /* When player is ready, call method to mount React component */
     player.ready(() => {
       this.mount();
+    });
+    
+    /* Remove React root when component is destroyed */
+    this.on("dispose", () => {
+      ReactDOM.unmountComponentAtNode(this.el())
     });
   }
 

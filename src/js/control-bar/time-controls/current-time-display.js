@@ -12,20 +12,6 @@ import Component from '../../component.js';
 class CurrentTimeDisplay extends TimeDisplay {
 
   /**
-   * Creates an instance of this class.
-   *
-   * @param {Player} player
-   *        The `Player` that this class should be attached to.
-   *
-   * @param {Object} [options]
-   *        The key/value store of player options.
-   */
-  constructor(player, options) {
-    super(player, options);
-    this.on(player, 'ended', this.handleEnded);
-  }
-
-  /**
    * Builds the default DOM `className`.
    *
    * @return {string}
@@ -45,35 +31,33 @@ class CurrentTimeDisplay extends TimeDisplay {
    */
   updateContent(event) {
     // Allows for smooth scrubbing, when player can't keep up.
-    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    let time;
 
-    this.updateFormattedTime_(time);
-  }
-
-  /**
-   * When the player fires ended there should be no time left. Sadly
-   * this is not always the case, lets make it seem like that is the case
-   * for users.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `ended` event that caused this to run.
-   *
-   * @listens Player#ended
-   */
-  handleEnded(event) {
-    if (!this.player_.duration()) {
-      return;
+    if (this.player_.ended()) {
+      time = this.player_.duration();
+    } else {
+      time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     }
-    this.updateFormattedTime_(this.player_.duration());
-  }
 
+    this.updateTextNode_(time);
+  }
 }
+
+/**
+ * The text that is added to the `CurrentTimeDisplay` for screen reader users.
+ *
+ * @type {string}
+ * @private
+ */
+CurrentTimeDisplay.prototype.labelText_ = 'Current Time';
 
 /**
  * The text that should display over the `CurrentTimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
  * @private
+ *
+ * @deprecated in v7; controlText_ is not used in non-active display Components
  */
 CurrentTimeDisplay.prototype.controlText_ = 'Current Time';
 

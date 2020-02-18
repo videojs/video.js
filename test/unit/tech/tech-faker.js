@@ -1,14 +1,23 @@
 // Fake a media playback tech controller so that player tests
 // can run without HTML5 or Flash, of which PhantomJS supports neither.
 import Tech from '../../../src/js/tech/tech.js';
-
+import {createTimeRanges} from '../../../src/js/utils/time-ranges.js';
 /**
- * @constructor
+ * @class
  */
 class TechFaker extends Tech {
 
   constructor(options, handleReady) {
     super(options, handleReady);
+
+    this.featuresPlaybackRate = true;
+    this.defaultPlaybackRate_ = 1;
+    this.playbackRate_ = 1;
+    this.currentTime_ = 0;
+
+    if (this.options_ && this.options_.sourceset) {
+      this.fakeSourceset();
+    }
     if (!options || options.autoReady !== false) {
       this.triggerReady();
     }
@@ -28,37 +37,99 @@ class TechFaker extends Tech {
   }
   setPoster(val) {
     this.el().poster = val;
+    this.trigger('posterchange');
   }
 
   setControls(val) {}
 
-  setVolume(newVolume) {}
+  setVolume(value) {
+    this.volume_ = value;
+  }
 
   setMuted() {}
 
+  setAutoplay(v) {
+    if (!v) {
+      this.options_.autoplay = false;
+    }
+
+    this.options_.autoplay = true;
+  }
+
+  defaultPlaybackRate(value) {
+    if (value !== undefined) {
+      this.defaultPlaybackRate_ = parseFloat(value);
+    }
+    return this.defaultPlaybackRate_;
+  }
+
+  setPlaybackRate(value) {
+    const last = this.playbackRate_;
+
+    this.playbackRate_ = parseFloat(value);
+
+    if (value !== last) {
+      this.trigger('ratechange');
+    }
+  }
+
+  playbackRate() {
+    return this.playbackRate_;
+  }
+
+  setCurrentTime(value) {
+    const last = this.currentTime_;
+
+    this.currentTime_ = parseFloat(value);
+
+    if (value !== last) {
+      this.trigger('timeupdate');
+    }
+  }
+
   currentTime() {
-    return 0;
+    return this.currentTime_;
+  }
+
+  seekable() {
+    return createTimeRanges(0, 0);
   }
   seeking() {
     return false;
   }
-  src() {
+  fakeSourceset() {
+    this.el_.src = this.options_.sourceset;
+    this.el_.setAttribute('src', this.options_.sourceset);
+    super.triggerSourceset(this.options_.sourceset);
+  }
+  src(src) {
+    if (typeof src !== 'undefined' && this.options_ && this.options_.sourceset) {
+      this.fakeSourceset();
+    }
     return 'movie.mp4';
+  }
+  load() {
   }
   currentSrc() {
     return 'movie.mp4';
   }
   volume() {
-    return 0;
+    return this.volume_ || 0;
   }
   muted() {
     return false;
+  }
+  autoplay() {
+    return this.options_.autoplay || false;
   }
   pause() {
     return false;
   }
   paused() {
     return true;
+  }
+  loop() {
+    return false;
   }
   play() {
     this.trigger('play');
@@ -79,6 +150,9 @@ class TechFaker extends Tech {
     return 0;
   }
   controls() {
+    return false;
+  }
+  ended() {
     return false;
   }
 

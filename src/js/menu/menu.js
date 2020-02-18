@@ -2,9 +2,11 @@
  * @file menu.js
  */
 import Component from '../component.js';
+import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
+import keycode from 'keycode';
 
 /**
  * The Menu component is used to build popup menus, including subtitle and
@@ -33,7 +35,61 @@ class Menu extends Component {
 
     this.focusedChild_ = -1;
 
-    this.on('keydown', this.handleKeyPress);
+    this.on('keydown', this.handleKeyDown);
+
+    // All the menu item instances share the same blur handler provided by the menu container.
+    this.boundHandleBlur_ = Fn.bind(this, this.handleBlur);
+    this.boundHandleTapClick_ = Fn.bind(this, this.handleTapClick);
+  }
+
+  /**
+   * Add event listeners to the {@link MenuItem}.
+   *
+   * @param {Object} component
+   *        The instance of the `MenuItem` to add listeners to.
+   *
+   */
+  addEventListenerForItem(component) {
+    if (!(component instanceof Component)) {
+      return;
+    }
+
+    this.on(component, 'blur', this.boundHandleBlur_);
+    this.on(component, ['tap', 'click'], this.boundHandleTapClick_);
+  }
+
+  /**
+   * Remove event listeners from the {@link MenuItem}.
+   *
+   * @param {Object} component
+   *        The instance of the `MenuItem` to remove listeners.
+   *
+   */
+  removeEventListenerForItem(component) {
+    if (!(component instanceof Component)) {
+      return;
+    }
+
+    this.off(component, 'blur', this.boundHandleBlur_);
+    this.off(component, ['tap', 'click'], this.boundHandleTapClick_);
+  }
+
+  /**
+   * This method will be called indirectly when the component has been added
+   * before the component adds to the new menu instance by `addItem`.
+   * In this case, the original menu instance will remove the component
+   * by calling `removeChild`.
+   *
+   * @param {Object} component
+   *        The instance of the `MenuItem`
+   */
+  removeChild(component) {
+    if (typeof component === 'string') {
+      component = this.getChild(component);
+    }
+
+    this.removeEventListenerForItem(component);
+    super.removeChild(component);
   }
 
   /**
@@ -44,19 +100,11 @@ class Menu extends Component {
    *
    */
   addItem(component) {
-    this.addChild(component);
-    component.on('click', Fn.bind(this, function(event) {
-      // Unpress the associated MenuButton, and move focus back to it
-      if (this.menuButton_) {
-        this.menuButton_.unpressButton();
+    const childComponent = this.addChild(component);
 
-        // don't focus menu button if item is a caption settings item
-        // because focus will move elsewhere and it logs an error on IE8
-        if (component.name() !== 'CaptionSettingsMenuItem') {
-          this.menuButton_.focus();
-        }
-      }
-    }));
+    if (childComponent) {
+      this.addEventListenerForItem(childComponent);
+    }
   }
 
   /**
@@ -91,6 +139,70 @@ class Menu extends Component {
     return el;
   }
 
+  dispose() {
+    this.contentEl_ = null;
+    this.boundHandleBlur_ = null;
+    this.boundHandleTapClick_ = null;
+
+    super.dispose();
+  }
+
+  /**
+   * Called when a `MenuItem` loses focus.
+   *
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens blur
+   */
+  handleBlur(event) {
+    const relatedTarget = event.relatedTarget || document.activeElement;
+
+    // Close menu popup when a user clicks outside the menu
+    if (!this.children().some((element) => {
+      return element.el() === relatedTarget;
+    })) {
+      const btn = this.menuButton_;
+
+      if (btn && btn.buttonPressed_ && relatedTarget !== btn.el().firstChild) {
+        btn.unpressButton();
+      }
+    }
+  }
+
+  /**
+   * Called when a `MenuItem` gets clicked or tapped.
+   *
+   * @param {EventTarget~Event} event
+   *        The `click` or `tap` event that caused this function to be called.
+   *
+   * @listens click,tap
+   */
+  handleTapClick(event) {
+    // Unpress the associated MenuButton, and move focus back to it
+    if (this.menuButton_) {
+      this.menuButton_.unpressButton();
+
+      const childComponents = this.children();
+
+      if (!Array.isArray(childComponents)) {
+        return;
+      }
+
+      const foundComponent = childComponents.filter(component => component.el() === event.target)[0];
+
+      if (!foundComponent) {
+        return;
+      }
+
+      // don't focus menu button if item is a caption settings item
+      // because focus will move elsewhere
+      if (foundComponent.name() !== 'CaptionSettingsMenuItem') {
+        this.menuButton_.focus();
+      }
+    }
+  }
+
   /**
    * Handle a `keydown` event on this menu. This listener is added in the constructor.
    *
@@ -99,15 +211,18 @@ class Menu extends Component {
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
+
     // Left and Down Arrows
-    if (event.which === 37 || event.which === 40) {
+    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
       event.preventDefault();
+      event.stopPropagation();
       this.stepForward();
 
     // Up and Right Arrows
-    } else if (event.which === 38 || event.which === 39) {
+    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
       event.preventDefault();
+      event.stopPropagation();
       this.stepBack();
     }
   }

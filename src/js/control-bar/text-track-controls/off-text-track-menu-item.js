@@ -25,6 +25,9 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     // Requires options['kind']
     options.track = {
       player,
+      // it is no longer necessary to store `kind` or `kinds` on the track itself
+      // since they are now stored in the `kinds` property of all instances of
+      // TextTrackMenuItem, but this will remain for backwards compatibility
       kind: options.kind,
       kinds: options.kinds,
       default: false,
@@ -43,9 +46,10 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
 
     // MenuItem is selectable
     options.selectable = true;
+    // MenuItem is NOT multiSelectable (i.e. only one can be marked "selected" at a time)
+    options.multiSelectable = false;
 
     super(player, options);
-    this.selected(true);
   }
 
   /**
@@ -56,18 +60,22 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
    */
   handleTracksChange(event) {
     const tracks = this.player().textTracks();
-    let selected = true;
+    let shouldBeSelected = true;
 
     for (let i = 0, l = tracks.length; i < l; i++) {
       const track = tracks[i];
 
       if ((this.options_.kinds.indexOf(track.kind) > -1) && track.mode === 'showing') {
-        selected = false;
+        shouldBeSelected = false;
         break;
       }
     }
 
-    this.selected(selected);
+    // Prevent redundant selected() calls because they may cause
+    // screen readers to read the appended control text unnecessarily
+    if (shouldBeSelected !== this.isSelected_) {
+      this.selected(shouldBeSelected);
+    }
   }
 
   handleSelectedLanguageChange(event) {

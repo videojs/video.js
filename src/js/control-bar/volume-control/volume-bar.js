@@ -3,6 +3,7 @@
  */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
+import * as Dom from '../../utils/dom.js';
 
 // Required children
 import './volume-level.js';
@@ -46,6 +47,22 @@ class VolumeBar extends Slider {
   }
 
   /**
+   * Handle mouse down on volume bar
+   *
+   * @param {EventTarget~Event} event
+   *        The `mousedown` event that caused this to run.
+   *
+   * @listens mousedown
+   */
+  handleMouseDown(event) {
+    if (!Dom.isSingleLeftClick(event)) {
+      return;
+    }
+
+    super.handleMouseDown(event);
+  }
+
+  /**
    * Handle movement events on the {@link VolumeMenuButton}.
    *
    * @param {EventTarget~Event} event
@@ -54,6 +71,10 @@ class VolumeBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
+    if (!Dom.isSingleLeftClick(event)) {
+      return;
+    }
+
     this.checkMuted();
     this.player_.volume(this.calculateDistance(event));
   }

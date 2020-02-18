@@ -73,6 +73,6 @@ A common need for modals is to style them independently from one another. The re
 modal.addClass('vjs-my-fancy-modal');
 ```
 
-[api-doc]: http://docs.videojs.com/ModalDialog.html
+[api-doc]: https://docs.videojs.com/ModalDialog.html
 
 [creating-component]: /docs/guides/components.md#creating-a-component

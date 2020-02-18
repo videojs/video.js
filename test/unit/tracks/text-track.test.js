@@ -5,18 +5,25 @@ import TrackBaseline from './track-baseline';
 import TechFaker from '../tech/tech-faker';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
-import proxyquireify from 'proxyquireify';
 import sinon from 'sinon';
-
-const proxyquire = proxyquireify(require);
+import log from '../../../src/js/utils/log.js';
+import XHR from '@videojs/xhr';
 
 QUnit.module('Text Track', {
   beforeEach() {
     this.tech = new TechFaker();
+    this.oldXMLHttpRequest = XHR.XMLHttpRequest;
+    this.oldXDomainRequest = XHR.XDomainRequest;
+    this.xhr = sinon.useFakeXMLHttpRequest();
+    XHR.XMLHttpRequest = this.xhr;
+    XHR.XDomainRequest = this.xhr;
   },
   afterEach() {
     this.tech.dispose();
     this.tech = null;
+    XHR.XMLHttpRequest = this.oldXMLHttpRequest;
+    XHR.XDomainRequest = this.oldXDomainRequest;
+    this.xhr.restore();
   }
 });
 
@@ -26,8 +33,9 @@ TrackBaseline(TextTrack, {
   kind: 'subtitles',
   mode: 'disabled',
   label: 'English',
-  language: 'en',
-  tech: new TechFaker()
+  language: 'en'
+  // tech is added in baseline
+  // tech: new TechFaker()
 });
 
 QUnit.test('requires a tech', function(assert) {
@@ -282,6 +290,7 @@ QUnit.test('does not fire cuechange before Tech is ready', function(assert) {
 
     assert.equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
 
+    tt.off();
     player.dispose();
     done();
   });
@@ -324,6 +333,89 @@ QUnit.test('fires cuechange when cues become active and inactive', function(asse
 
   assert.equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
 
+  tt.off();
+  player.dispose();
+});
+
+QUnit.test('enabled and disabled cuechange handler when changing mode to hidden', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let changes = 0;
+  const tt = new TextTrack({
+    tech: player.tech_
+  });
+  const cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.mode = 'hidden';
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 5
+  });
+
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 1, 'a cuechange event trigger');
+
+  changes = 0;
+  tt.mode = 'disabled';
+
+  player.tech_.currentTime = function() {
+    return 7;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 0, 'NO cuechange event trigger');
+
+  tt.off();
+  player.dispose();
+});
+
+QUnit.test('enabled and disabled cuechange handler when changing mode to showing', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let changes = 0;
+  const tt = new TextTrack({
+    tech: player.tech_
+  });
+  const cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.mode = 'showing';
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 5
+  });
+
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 1, 'a cuechange event trigger');
+
+  changes = 0;
+  tt.mode = 'disabled';
+
+  player.tech_.currentTime = function() {
+    return 7;
+  };
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 0, 'NO cuechange event trigger');
+
+  tt.off();
   player.dispose();
 });
 
@@ -331,6 +423,11 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;
   let parserCreated = false;
+  const reqs = [];
+
+  this.xhr.onCreate = function(req) {
+    reqs.push(req);
+  };
 
   window.WebVTT = () => {};
   window.WebVTT.StringDecoder = () => {};
@@ -345,26 +442,17 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
     };
   };
 
-  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
-  let xhrHandler;
-  const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
-    xhr(options, fn) {
-      xhrHandler = fn;
-    }
-  }).default;
-
-  /* eslint-disable no-unused-vars */
-  const tt = new TextTrack_({
+  const tt = new TextTrack({
     tech: this.tech,
     src: 'http://example.com'
   });
-  /* eslint-enable no-unused-vars */
 
-  xhrHandler(null, {}, 'WEBVTT\n');
+  reqs.pop().respond(200, null, 'WEBVTT\n');
 
   assert.ok(parserCreated, 'WebVTT is loaded, so we can just parse');
 
   clock.restore();
+  tt.off();
   window.WebVTT = oldVTT;
 });
 
@@ -372,14 +460,11 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;
   let parserCreated = false;
+  const reqs = [];
 
-  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
-  let xhrHandler;
-  const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
-    xhr(options, fn) {
-      xhrHandler = fn;
-    }
-  }).default;
+  this.xhr.onCreate = function(req) {
+    reqs.push(req);
+  };
 
   window.WebVTT = true;
 
@@ -388,14 +473,12 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
 
-  /* eslint-disable no-unused-vars */
-  const tt = new TextTrack_({
+  const tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
   });
-  /* eslint-enable no-unused-vars */
 
-  xhrHandler(null, {}, 'WEBVTT\n');
+  reqs.pop().respond(200, null, 'WEBVTT\n');
 
   assert.ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
 
@@ -419,6 +502,8 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   assert.ok(parserCreated, 'WebVTT is loaded, so we can parse now');
 
   clock.restore();
+  tt.off();
+  testTech.off();
   window.WebVTT = oldVTT;
 });
 
@@ -426,22 +511,16 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   const clock = sinon.useFakeTimers();
   const errorSpy = sinon.spy();
   const oldVTT = window.WebVTT;
-  const parserCreated = false;
+  const oldLogError = log.error;
+  const reqs = [];
+
+  this.xhr.onCreate = function(req) {
+    reqs.push(req);
+  };
+
+  log.error = errorSpy;
 
   window.WebVTT = true;
-
-  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
-  let xhrHandler;
-  const TextTrack_ = proxyquire('../../../src/js/tracks/text-track.js', {
-    xhr(options, fn) {
-      xhrHandler = fn;
-    },
-    '../utils/log.js': {
-      default: {
-        error: errorSpy
-      }
-    }
-  }).default;
 
   const testTech = new EventTarget();
 
@@ -451,28 +530,26 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   sinon.stub(testTech, 'off');
   testTech.off.withArgs('vttjsloaded');
 
-  /* eslint-disable no-unused-vars */
-  const tt = new TextTrack_({
+  const tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
   });
-  /* eslint-enable no-unused-vars */
 
-  xhrHandler(null, {}, 'WEBVTT\n');
-
-  assert.ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+  reqs.pop().respond(200, null, 'WEBVTT\n');
 
   testTech.trigger('vttjserror');
-  const offSpyCall = testTech.off.getCall(0);
 
-  assert.ok(errorSpy.called, 'vttjs failed to load, so log.error was called');
-  if (errorSpy.called) {
-    assert.ok(/^vttjs failed to load, stopping trying to process/.test(errorSpy.getCall(0).args[0]),
-       'log.error was called with the expected message');
-  }
-  assert.ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
-  assert.ok(offSpyCall, 'tech.off was called');
+  assert.equal(errorSpy.callCount, 1, 'vttjs failed to load, so log.error was called');
+
+  testTech.trigger('vttjserror');
+
+  // vttjserror not called again
+  assert.equal(errorSpy.callCount, 1, 'vttjserror handler not called again');
 
   clock.restore();
   window.WebVTT = oldVTT;
+  tt.off();
+  testTech.off.restore();
+  testTech.off();
+  log.error = oldLogError;
 });
