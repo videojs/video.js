@@ -1,3 +1,24 @@
+<a name="7.7.5"></a>
+## [7.7.5](https://github.com/videojs/video.js/compare/v7.7.4...v7.7.5) (2020-02-19)
+
+### Bug Fixes
+
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.12.2 🚀 ([#6469](https://github.com/videojs/video.js/issues/6469)) ([30d5874](https://github.com/videojs/video.js/commit/30d5874))
+* current time tooltip does not update ([#6445](https://github.com/videojs/video.js/issues/6445)) ([e6c03c7](https://github.com/videojs/video.js/commit/e6c03c7))
+* **lang:** add missing Arabic translations ([#6435](https://github.com/videojs/video.js/issues/6435)) ([3b0f0b9](https://github.com/videojs/video.js/commit/3b0f0b9))
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.12.1 ([#6467](https://github.com/videojs/video.js/issues/6467)) ([e4e8837](https://github.com/videojs/video.js/commit/e4e8837)), closes [#6430](https://github.com/videojs/video.js/issues/6430)
+* improves control bar hiding functionality ([#6400](https://github.com/videojs/video.js/issues/6400)) ([6f77778](https://github.com/videojs/video.js/commit/6f77778)), closes [#6391](https://github.com/videojs/video.js/issues/6391)
+* slider screenreader value returning as NaN ([#6404](https://github.com/videojs/video.js/issues/6404)) ([7008777](https://github.com/videojs/video.js/commit/7008777)), closes [#5984](https://github.com/videojs/video.js/issues/5984)
+
+### Chores
+
+* **travis:** test on ubuntu 18 (bionic) ([#6399](https://github.com/videojs/video.js/issues/6399)) ([9bb7acb](https://github.com/videojs/video.js/commit/9bb7acb))
+
+### Code Refactoring
+
+* support requestFullscreen's promise, better internal handling of events ([#6422](https://github.com/videojs/video.js/issues/6422)) ([8a205d0](https://github.com/videojs/video.js/commit/8a205d0))
+* use Fn.UPDATE_REFRESH_INTERVAL in seekBar & liveTracker ([#6407](https://github.com/videojs/video.js/issues/6407)) ([bcaa869](https://github.com/videojs/video.js/commit/bcaa869)), closes [#6142](https://github.com/videojs/video.js/issues/6142)
+
 <a name="7.7.4"></a>
 ## [7.7.4](https://github.com/videojs/video.js/compare/v7.7.3...v7.7.4) (2019-12-24)
 
