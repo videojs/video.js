@@ -476,6 +476,31 @@ QUnit.test('should uniformly create html track element when adding text track', 
   player.dispose();
 });
 
+QUnit.test('remote text tracks change event should fire when using native text tracks', function(assert) {
+  const done = assert.async();
+
+  const player = TestHelpers.makePlayer({
+    techOrder: ['html5'],
+    html5: { nativeTextTracks: true }
+  });
+
+  player.remoteTextTracks().on('change', function(e) {
+    assert.ok(true, 'change event triggered');
+    player.dispose();
+    done();
+  });
+
+  const track = {
+    kind: 'kind',
+    src: 'src',
+    language: 'language',
+    label: 'label',
+    default: 'default'
+  };
+
+  player.addRemoteTextTrack(track, true);
+});
+
 QUnit.test('default text tracks should show by default', function(assert) {
   const tag = TestHelpers.makeTag();
   const capt = document.createElement('track');
