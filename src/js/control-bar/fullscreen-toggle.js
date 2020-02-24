@@ -4,6 +4,7 @@
 import Button from '../button.js';
 import Component from '../component.js';
 import document from 'global/document';
+import keycode from 'keycode';
 
 /**
  * Toggle fullscreen video
@@ -55,6 +56,34 @@ class FullscreenToggle extends Button {
     } else {
       this.controlText('Fullscreen');
     }
+  }
+
+  /**
+   * Handle tab key for `FullscreenToggle`. See
+   * {@link ClickableComponent#handleKeyDown} for instances where this is called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    // If not Fullscreen mode and Tab press the 'button'
+    if (!(this.player_.isFullscreen() && keycode.isEventKey(event, 'Tab'))) {
+      return;
+    }
+    event.preventDefault();
+
+    // Trap the keyboard focus by rewinding back to the play toggle button in the player
+    const cb = this.player_.getChild('controlBar');
+    const playToggle = cb && cb.getChild('playToggle');
+
+    if (!playToggle) {
+      this.player_.tech(true).focus();
+      return;
+    }
+
+    return playToggle.focus();
   }
 
   /**

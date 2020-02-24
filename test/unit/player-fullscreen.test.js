@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import Player from '../../src/js/player.js';
+import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import window from 'global/window';
@@ -206,4 +207,56 @@ QUnit.test('fullscreenOptions from function args should override player options'
   assert.deepEqual(fsOpts, fullscreenOptions, 'fullscreenOptions should match function args');
 
   player.dispose();
+});
+
+QUnit.test('fullscreen mode should trap focus within the player', function(assert) {
+  const fullscreenOptions = {
+    navigationUI: 'test',
+    foo: 'bar'
+  };
+
+  const player = FullscreenTestHelpers.makePlayer(true, {
+    fullscreen: {
+      options: fullscreenOptions
+    }
+  });
+
+  const fullscreenToggle = new FullscreenToggle(player, {});
+  const playToggle = player.getChild('controlBar').getChild('playToggle');
+  const focusSpy = sinon.spy(playToggle, 'focus');
+
+  let requestFullscreenCalled = false;
+  let prevented = false;
+
+  window.Element.prototype.vjsRequestFullscreen = function(opts) {
+    requestFullscreenCalled = true;
+  };
+
+  // When it's in fullscreen mode
+  player.requestFullscreen(fullscreenOptions);
+  player.isFullscreen(true);
+  fullscreenToggle.handleKeyDown({
+    which: 9,
+    preventDefault() {
+      prevented = true;
+    }
+  });
+
+  assert.ok(requestFullscreenCalled, 'vjsRequestFullscreen should be called');
+  assert.ok(prevented, 'event.preventDefault should have be called');
+  assert.equal(focusSpy.callCount, 1, 'PlayToggle should be focused');
+
+  // When it's not fullscreen mode
+  prevented = false;
+  player.isFullscreen(false);
+
+  fullscreenToggle.handleKeyDown({
+    which: 9,
+    preventDefault() {
+      prevented = true;
+    }
+  });
+
+  assert.notOk(prevented, 'event.preventDefault should have be called');
+  assert.equal(focusSpy.callCount, 1, 'PlayToggle should not be focused');
 });
