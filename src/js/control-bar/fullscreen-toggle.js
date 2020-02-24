@@ -68,12 +68,15 @@ class FullscreenToggle extends Button {
    * @listens keydown
    */
   handleKeyDown(event) {
-    // If not Fullscreen mode and Tab press the 'button'
-    if (!(this.player_.isFullscreen() && keycode.isEventKey(event, 'Tab'))) {
+    const isTabKey = !event.shiftKey && keycode.isEventKey(event, 'Tab');
+
+    if (!(this.player_.isFullscreen() && isTabKey)) {
       return;
     }
+
     event.preventDefault();
 
+    // If not Fullscreen mode and Tab press the 'button'
     // Trap the keyboard focus by rewinding back to the play toggle button in the player
     const cb = this.player_.getChild('controlBar');
     const playToggle = cb && cb.getChild('playToggle');

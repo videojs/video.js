@@ -3,6 +3,7 @@
  */
 import Button from '../button.js';
 import Component from '../component.js';
+import keycode from 'keycode';
 
 /**
  * Button to toggle between play and pause.
@@ -61,6 +62,37 @@ class PlayToggle extends Button {
     } else {
       this.player_.pause();
     }
+  }
+
+  /**
+   * Handle tab key for `PlayToggle`. See
+   * {@link ClickableComponent#handleKeyDown} for instances where this is called.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    const isShiftTab = event.shiftKey && keycode.isEventKey(event, 'Tab');
+
+    if (!(this.player_.isFullscreen() && isShiftTab)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    // If Fullscreen mode and Shift-Tab press the 'button'
+    // Trap the keyboard focus by rewinding back to the fullscreen toggle button in the player
+    const cb = this.player_.getChild('controlBar');
+    const fullscreenToggle = cb && cb.getChild('fullscreenToggle');
+
+    if (!fullscreenToggle) {
+      this.player_.tech(true).focus();
+      return;
+    }
+
+    return fullscreenToggle.focus();
   }
 
   /**

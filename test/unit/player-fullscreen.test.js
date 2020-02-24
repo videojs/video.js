@@ -237,6 +237,7 @@ QUnit.test('fullscreen mode should trap focus within the player', function(asser
   player.isFullscreen(true);
   fullscreenToggle.handleKeyDown({
     which: 9,
+    shiftKey: false,
     preventDefault() {
       prevented = true;
     }
@@ -252,6 +253,22 @@ QUnit.test('fullscreen mode should trap focus within the player', function(asser
 
   fullscreenToggle.handleKeyDown({
     which: 9,
+    shiftKey: false,
+    preventDefault() {
+      prevented = true;
+    }
+  });
+
+  assert.notOk(prevented, 'event.preventDefault should have be called');
+  assert.equal(focusSpy.callCount, 1, 'PlayToggle should not be focused');
+
+  // When pressing shift-tab
+  prevented = false;
+  player.isFullscreen(true);
+
+  fullscreenToggle.handleKeyDown({
+    which: 9,
+    shiftKey: true,
     preventDefault() {
       prevented = true;
     }
