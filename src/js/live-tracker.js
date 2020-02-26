@@ -46,7 +46,7 @@ class LiveTracker extends Component {
 
   // all the functionality for tracking when seek end changes
   // and for tracking how far past seek end we should be
-  trackLive_() {
+  trackLive_(event) {
     const seekable = this.player_.seekable();
 
     // skip undefined seekable
@@ -63,9 +63,14 @@ class LiveTracker extends Component {
 
     const liveCurrentTime = this.liveCurrentTime();
     const currentTime = this.player_.currentTime();
-    // we are behind live if the difference between live and current time
-    // is greater liveTolerance which defaults to 15s
-    let isBehind = Math.abs(liveCurrentTime - currentTime) > this.options_.liveTolerance;
+
+    // we are behind live if any are true
+    // 1. the player is paused
+    // 2. the user seeked backwards in the video
+    // 3. the difference between live and current time is greater
+    //    liveTolerance which defaults to 15s
+    let isBehind = this.player_.paused() || this.seekedBack_ ||
+      Math.abs(liveCurrentTime - currentTime) > this.options_.liveTolerance;
 
     // we cannot be behind if
     // 1. until we have not seen a timeupdate yet
@@ -114,8 +119,7 @@ class LiveTracker extends Component {
     this.trackingInterval_ = this.setInterval(this.trackLive_, Fn.UPDATE_REFRESH_INTERVAL);
     this.trackLive_();
 
-    this.on(this.player_, 'play', this.trackLive_);
-    this.on(this.player_, 'pause', this.trackLive_);
+    this.one(this.player_, 'seeking', this.handleSeeking);
 
     // this is to prevent showing that we are not live
     // before a video starts to play
@@ -127,6 +131,24 @@ class LiveTracker extends Component {
       };
       this.one(this.player_, 'timeupdate', this.handleTimeupdate);
     }
+  }
+
+  /**
+   * Keep track of what time a seek starts, and listen for seeked
+   * to find where a seek ends.
+   */
+  handleSeeking() {
+    this.seekStart_ = this.player_.currentTime();
+    this.one(this.player_, 'seeked', this.handleSeeked);
+  }
+
+  /**
+   * Handle the seeked event and determine if a seek was backwards or forwards.
+   */
+  handleSeeked() {
+    this.seekBack_ = this.seekStart_ > this.player_.currentTime();
+
+    this.one(this.player_, 'seeking', this.handleSeeking);
   }
 
   handlePlay() {
@@ -143,12 +165,14 @@ class LiveTracker extends Component {
     this.lastSeekEnd_ = null;
     this.behindLiveEdge_ = true;
     this.timeupdateSeen_ = false;
+    this.seekBack_ = false;
+    this.seekStart_ = null;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
 
-    this.off(this.player_, 'play', this.trackLive_);
-    this.off(this.player_, 'pause', this.trackLive_);
+    this.off(this.player_, 'seeking', this.handleSeeking);
+    this.off(this.player_, 'seeked', this.handleSeeked);
     this.off(this.player_, 'play', this.handlePlay);
     this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
     if (this.handleTimeupdate) {
