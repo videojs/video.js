@@ -119,6 +119,7 @@ class LiveTracker extends Component {
     this.trackingInterval_ = this.setInterval(this.trackLive_, Fn.UPDATE_REFRESH_INTERVAL);
     this.trackLive_();
 
+    this.on(this.player_, ['play', 'pause'], this.trackLive_);
     this.one(this.player_, 'seeking', this.handleSeeking);
 
     // this is to prevent showing that we are not live
@@ -146,7 +147,8 @@ class LiveTracker extends Component {
    * Handle the seeked event and determine if a seek was backwards or forwards.
    */
   handleSeeked() {
-    this.seekBack_ = this.seekStart_ > this.player_.currentTime();
+    this.seekedBack_ = this.seekStart_ > this.player_.currentTime();
+    this.trackLive_();
 
     this.one(this.player_, 'seeking', this.handleSeeking);
   }
@@ -165,12 +167,13 @@ class LiveTracker extends Component {
     this.lastSeekEnd_ = null;
     this.behindLiveEdge_ = true;
     this.timeupdateSeen_ = false;
-    this.seekBack_ = false;
+    this.seekedBack_ = false;
     this.seekStart_ = null;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
 
+    this.off(this.player_, ['play', 'pause'], this.trackLive_);
     this.off(this.player_, 'seeking', this.handleSeeking);
     this.off(this.player_, 'seeked', this.handleSeeked);
     this.off(this.player_, 'play', this.handlePlay);
