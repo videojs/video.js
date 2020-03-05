@@ -2145,6 +2145,7 @@ class Player extends Component {
       // we set it to zero here to ensure that if we do start actually caching
       // it, we reset it along with everything else.
       currentTime: 0,
+      initTime: 0,
       inactivityTimeout: this.options_.inactivityTimeout,
       duration: NaN,
       lastVolume: 1,
@@ -2416,6 +2417,12 @@ class Player extends Component {
       if (seconds < 0) {
         seconds = 0;
       }
+      if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_ && seconds > 0) {
+        this.cache_.initTime = seconds;
+        this.off('canplay', this.applyInitTime_);
+        this.one('canplay', this.applyInitTime_);
+        return;
+      }
       this.techCall_('setCurrentTime', seconds);
       return;
     }
@@ -2428,6 +2435,15 @@ class Player extends Component {
     // never get updated.
     this.cache_.currentTime = (this.techGet_('currentTime') || 0);
     return this.cache_.currentTime;
+  }
+
+  /**
+   * Apply the value of initTime stored in cache as currentTime.
+   *
+   * @private
+   */
+  applyInitTime_() {
+    this.techCall_('setCurrentTime', this.cache_.initTime);
   }
 
   /**
