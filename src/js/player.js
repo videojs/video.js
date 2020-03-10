@@ -2417,13 +2417,14 @@ class Player extends Component {
       if (seconds < 0) {
         seconds = 0;
       }
-      if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_ && seconds > 0) {
+      if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_) {
         this.cache_.initTime = seconds;
         this.off('canplay', this.applyInitTime_);
         this.one('canplay', this.applyInitTime_);
         return;
       }
       this.techCall_('setCurrentTime', seconds);
+      this.cache_.initTime = 0;
       return;
     }
 
@@ -2443,7 +2444,7 @@ class Player extends Component {
    * @private
    */
   applyInitTime_() {
-    this.techCall_('setCurrentTime', this.cache_.initTime);
+    this.currentTime(this.cache_.initTime);
   }
 
   /**
