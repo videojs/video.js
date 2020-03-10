@@ -113,7 +113,7 @@ class LiveTracker extends Component {
    * and start/stop tracking accordingly.
    */
   handleDurationchange() {
-    if (this.player_.duration() === Infinity && this.liveWindow() > this.options_.trackingThreshold) {
+    if (this.player_.duration() === Infinity && this.liveWindow() >= this.options_.trackingThreshold) {
       if (this.player_.options_.liveui) {
         this.player_.addClass('vjs-liveui');
       }
