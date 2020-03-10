@@ -18,7 +18,7 @@ QUnit.module('LiveTracker', () => {
     this.player = TestHelpers.makePlayer({liveui: true});
     this.player.seekable = () => createTimeRanges(0, 30);
 
-    this.player.duration('Infinity');
+    this.player.duration(Infinity);
 
     assert.ok(this.player.hasClass('vjs-liveui'), 'has vjs-liveui');
     assert.ok(this.player.liveTracker.isTracking(), 'is tracking');
@@ -28,7 +28,7 @@ QUnit.module('LiveTracker', () => {
     this.player = TestHelpers.makePlayer({liveui: true, liveTracker: {trackingThreshold: 31}});
     this.player.seekable = () => createTimeRanges(0, 30);
 
-    this.player.duration('Infinity');
+    this.player.duration(Infinity);
 
     assert.notOk(this.player.hasClass('vjs-liveui'), 'does not have vjs-iveui');
     assert.notOk(this.player.liveTracker.isTracking(), 'is not tracking');
@@ -38,7 +38,7 @@ QUnit.module('LiveTracker', () => {
     this.player = TestHelpers.makePlayer({liveui: false});
     this.player.seekable = () => createTimeRanges(0, 30);
 
-    this.player.duration('Infinity');
+    this.player.duration(Infinity);
 
     assert.notOk(this.player.hasClass('vjs-liveui'), 'does not have vjs-liveui');
     assert.ok(this.player.liveTracker.isTracking(), 'is tracking');
@@ -48,7 +48,7 @@ QUnit.module('LiveTracker', () => {
     this.player = TestHelpers.makePlayer({liveui: false, liveTracker: {trackingThreshold: 31}});
     this.player.seekable = () => createTimeRanges(0, 30);
 
-    this.player.duration('Infinity');
+    this.player.duration(Infinity);
 
     assert.notOk(this.player.hasClass('vjs-liveui'), 'does not have vjs-liveui');
     assert.notOk(this.player.liveTracker.isTracking(), 'is not tracking');
