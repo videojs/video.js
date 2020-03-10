@@ -104,26 +104,3 @@ QUnit.test('tech ready + has source + changing source = wait for loadstart', fun
   this.player.trigger('loadstart');
   assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
-
-QUnit.test('tech not ready +  currentTime =  wait until canplay event to apply currentTime value', function(assert) {
-  this.player.src('xyz.mp4');
-  this.player.currentTime(500);
-  assert.strictEqual(this.techCurrentTimeCallCount, 0);
-  this.clock.tick(100);
-  this.player.trigger('canplay');
-  assert.strictEqual(this.techCurrentTimeCallCount, 1);
-  assert.strictEqual(this.initTime, 500);
-});
-
-QUnit.test('tech not ready +  currentTime multiple times =  wait until canplay event to apply the last currentTime value', function(assert) {
-  this.player.src('xyz.mp4');
-  this.player.currentTime(500);
-  this.player.currentTime(600);
-  this.player.currentTime(700);
-  this.player.currentTime(800);
-  assert.strictEqual(this.techCurrentTimeCallCount, 0);
-  this.clock.tick(100);
-  this.player.trigger('canplay');
-  assert.strictEqual(this.techCurrentTimeCallCount, 1);
-  assert.strictEqual(this.initTime, 800);
-});
