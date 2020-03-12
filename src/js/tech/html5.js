@@ -11,7 +11,7 @@ import window from 'global/window';
 import {assign} from '../utils/obj';
 import mergeOptions from '../utils/merge-options.js';
 import {toTitleCase} from '../utils/string-cases.js';
-import {NORMAL as TRACK_TYPES} from '../tracks/track-types';
+import {NORMAL as TRACK_TYPES, REMOTE} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
 import defineLazyProperty from '../utils/define-lazy-property.js';
 
@@ -273,13 +273,26 @@ class Html5 extends Tech {
       return;
     }
     const listeners = {
-      change(e) {
-        techTracks.trigger({
+      change: (e) => {
+        const event = {
           type: 'change',
           target: techTracks,
           currentTarget: techTracks,
           srcElement: techTracks
-        });
+        };
+
+        techTracks.trigger(event);
+
+        // if we are a text track change event, we should also notify the
+        // remote text track list. This can potentially cause a false positive
+        // if we were to get a change event on a non-remote track and
+        // we triggered the event on the remote text track list which doesn't
+        // contain that track. However, best practices mean looping through the
+        // list of tracks and searching for the appropriate mode value, so,
+        // this shouldn't pose an issue
+        if (name === 'text') {
+          this[REMOTE.remoteText.getterName]().trigger(event);
+        }
       },
       addtrack(e) {
         techTracks.addTrack(e.track);
