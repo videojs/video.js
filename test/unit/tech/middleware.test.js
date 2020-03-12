@@ -536,3 +536,81 @@ QUnit.test('a middleware without a setSource gets chosen implicitly', function(a
 
   middleware.getMiddleware('video/foo').pop();
 });
+
+QUnit.test('a * middleware will be called even if the source type changes', function(assert) {
+  let src;
+  let acc;
+  let callCount = 0;
+
+  const mw1 = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'foo',
+        type: 'video/foo'
+      });
+    }
+  };
+
+  const mw2 = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.mp4',
+        type: 'video/mp4'
+      });
+    }
+  };
+
+  const mw3 = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'http://example.com/video.webm',
+        type: 'video/webm'
+      });
+    }
+  };
+
+  const factory1 = () => {
+    callCount++;
+    return mw1;
+  };
+
+  const factory2 = () => {
+    callCount++;
+    return mw2;
+  };
+
+  const factory3 = () => {
+    callCount++;
+    return mw3;
+  };
+
+  middleware.use('*', factory1);
+  middleware.use('*', factory2);
+  middleware.use('*', factory3);
+
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/bar'}, function(_src, _acc) {
+    src = _src;
+    acc = _acc;
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(src.type, 'video/webm', 'we selected a new type of video/webm');
+  assert.equal(src.src, 'http://example.com/video.webm', 'we selected a new src of video.webm');
+  assert.equal(acc.length, 3, 'we got three middleware');
+
+  assert.equal(acc[0], mw1, 'mw1 is the first middleware');
+  assert.equal(acc[1], mw2, 'mw2 is the second middleware');
+  assert.equal(acc[2], mw3, 'mw3 is the third middleware');
+
+  assert.equal(callCount, 3, 'we saw three middleware setSource calls');
+
+  middleware.getMiddleware('*').pop();
+  middleware.getMiddleware('*').pop();
+  middleware.getMiddleware('*').pop();
+});
