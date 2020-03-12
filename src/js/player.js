@@ -4041,15 +4041,16 @@ class Player extends Component {
   }
 
   /**
-   * Create a remote {@link TextTrack} and an {@link HTMLTrackElement}. It will
-   * automatically removed from the video element whenever the source changes, unless
-   * manualCleanup is set to false.
+   * Create a remote {@link TextTrack} and an {@link HTMLTrackElement}.
+   * When manualCleanup is set to false, the track will be automatically removed
+   * on source changes.
    *
    * @param {Object} options
    *        Options to pass to {@link HTMLTrackElement} during creation. See
    *        {@link HTMLTrackElement} for object properties that you should use.
    *
    * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   *                                       removed on a source change
    *
    * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
