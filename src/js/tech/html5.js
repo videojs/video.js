@@ -519,6 +519,10 @@ class Html5 extends Tech {
     });
   }
 
+  setScrubbing(isScrubbing) {
+    this.isScrubbing_ = isScrubbing;
+  }
+
   /**
    * Set current time for the `HTML5` tech.
    *
@@ -527,7 +531,11 @@ class Html5 extends Tech {
    */
   setCurrentTime(seconds) {
     try {
-      this.el_.currentTime = seconds;
+      if (this.isScrubbing_ && this.el_.fastSeek) {
+        this.el_.fastSeek(seconds);
+      } else {
+        this.el_.currentTime = seconds;
+      }
     } catch (e) {
       log(e, 'Video is not ready. (Video.js)');
       // this.warning(VideoJS.warnings.videoNotReady);
