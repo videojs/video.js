@@ -8,7 +8,12 @@ import * as Fn from './utils/fn.js';
 const defaults = {
   // Number of seconds of live window (seekableEnd - seekableStart) that
   // a video needs to have before the liveui will be shown.
-  trackingThreshold: 30
+  trackingThreshold: 30,
+
+  // number of seconds behind live that we have to be
+  // before we will be considered non-live. Note that we will always
+  // be non-live when seeking backwards or pausing regardless of this value.
+  liveTolerance: 15
 };
 
 /* track when we are at the live edge, and other helpers for live playback */

@@ -4,12 +4,62 @@ import {createTimeRanges} from '../../src/js/utils/time-ranges.js';
 import sinon from 'sinon';
 
 QUnit.module('LiveTracker', () => {
+  QUnit.module('options', {
+    beforeEach() {
+      this.clock = sinon.useFakeTimers();
+    },
+    afterEach() {
+      this.player.dispose();
+      this.clock.restore();
+    }
+  });
+
+  QUnit.test('liveui true, trackingThreshold is met', function(assert) {
+    this.player = TestHelpers.makePlayer({liveui: true});
+    this.player.seekable = () => createTimeRanges(0, 30);
+
+    this.player.duration(Infinity);
+
+    assert.ok(this.player.hasClass('vjs-liveui'), 'has vjs-liveui');
+    assert.ok(this.player.liveTracker.isTracking(), 'is tracking');
+  });
+
+  QUnit.test('liveui true, trackingThreshold is not met', function(assert) {
+    this.player = TestHelpers.makePlayer({liveui: true, liveTracker: {trackingThreshold: 31}});
+    this.player.seekable = () => createTimeRanges(0, 30);
+
+    this.player.duration(Infinity);
+
+    assert.notOk(this.player.hasClass('vjs-liveui'), 'does not have vjs-iveui');
+    assert.notOk(this.player.liveTracker.isTracking(), 'is not tracking');
+  });
+
+  QUnit.test('liveui false, trackingThreshold is met', function(assert) {
+    this.player = TestHelpers.makePlayer({liveui: false});
+    this.player.seekable = () => createTimeRanges(0, 30);
+
+    this.player.duration(Infinity);
+
+    assert.notOk(this.player.hasClass('vjs-liveui'), 'does not have vjs-liveui');
+    assert.ok(this.player.liveTracker.isTracking(), 'is tracking');
+  });
+
+  QUnit.test('liveui false, trackingThreshold is not met', function(assert) {
+    this.player = TestHelpers.makePlayer({liveui: false, liveTracker: {trackingThreshold: 31}});
+    this.player.seekable = () => createTimeRanges(0, 30);
+
+    this.player.duration(Infinity);
+
+    assert.notOk(this.player.hasClass('vjs-liveui'), 'does not have vjs-liveui');
+    assert.notOk(this.player.liveTracker.isTracking(), 'is not tracking');
+  });
 
   QUnit.module('start/stop', {
     beforeEach() {
       this.clock = sinon.useFakeTimers();
 
       this.player = TestHelpers.makePlayer({liveui: true});
+      this.player.seekable = () => createTimeRanges(0, 30);
 
       this.liveTracker = this.player.liveTracker;
     },
@@ -19,7 +69,7 @@ QUnit.module('LiveTracker', () => {
     }
   });
 
-  QUnit.test('starts/stop with durationchange and triggers liveedgechange', function(assert) {
+  QUnit.test('with durationchange and triggers liveedgechange', function(assert) {
     let liveEdgeChange = 0;
 
     this.liveTracker.on('liveedgechange', () => {
@@ -47,8 +97,9 @@ QUnit.module('LiveTracker', () => {
       this.player = TestHelpers.makePlayer();
 
       this.liveTracker = this.player.liveTracker;
-      this.player.duration(Infinity);
+      this.player.seekable = () => createTimeRanges(0, 30);
       this.player.paused = () => false;
+      this.player.duration(Infinity);
 
       this.liveEdgeChanges = 0;
 
@@ -115,7 +166,7 @@ QUnit.module('LiveTracker', () => {
   });
 
   QUnit.test('pastSeekEnd should update when seekable changes', function(assert) {
-    assert.strictEqual(this.liveTracker.liveCurrentTime(), 0, 'liveCurrentTime is now 0');
+    assert.strictEqual(this.liveTracker.liveCurrentTime(), 30, 'liveCurrentTime is now 30');
     this.clock.tick(2010);
 
     assert.ok(this.liveTracker.pastSeekEnd() > 2, 'pastSeekEnd should be over 2s');
