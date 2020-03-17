@@ -10,6 +10,7 @@ import formatTime from '../../utils/format-time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
 import document from 'global/document';
+import clamp from '../../utils/clamp.js';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';
@@ -156,7 +157,7 @@ class SeekBar extends Slider {
    * attributes to whatever is passed in.
    *
    * @param {EventTarget~Event} [event]
-   *        The `timeupdate` or `ended` event that caused this to run.
+   *        The event that caused this to run.
    *
    * @listens Player#timeupdate
    *
@@ -198,9 +199,26 @@ class SeekBar extends Slider {
         this.duration_ = duration;
       }
 
+      if (!this.bar && !this.mouseTimeDisplay) {
+        return;
+      }
+
+      const rect = Dom.findPosition(this.el());
+
       // update the progress bar time tooltip with the current time
       if (this.bar) {
-        this.bar.update(Dom.getBoundingClientRect(this.el()), this.getProgress());
+        this.bar.update(rect, this.getProgress());
+      }
+
+      if (this.mouseTimeDisplay && event && event.type === 'mousemove') {
+        let point = Dom.getPointerPosition(this.el_, event).x;
+
+        // The default skin has a gap on either side of the `SeekBar`. This means
+        // that it's possible to trigger this behavior outside the boundaries of
+        // the `SeekBar`. This ensures we stay within it at all times.
+        point = clamp(point, 0, 1);
+
+        this.mouseTimeDisplay.update(rect, point);
       }
     });
 
