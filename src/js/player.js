@@ -962,7 +962,7 @@ class Player extends Component {
    * A getter/setter for the `Player`'s aspect ratio.
    *
    * @param {string} [ratio]
-   *        The value to set the `Player's aspect ratio to.
+   *        The value to set the `Player`'s aspect ratio to.
    *
    * @return {string|undefined}
    *         - The current aspect ratio of the `Player` when getting.
