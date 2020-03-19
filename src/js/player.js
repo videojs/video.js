@@ -784,10 +784,16 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`'s crossOrigin. Returns the player's configured value.
+   * Get or set the `Player`'s crossOrigin option. For the HTML5 player, this
+   * sets the `crossorigin` attribute on the `<video>` tag to control the CORS
+   * behavior.
+   *
+   * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
    *
    * @param {string} [value]
-   *        The value to set the `Player`'s crossorigin to.
+   *        The value to set the `Player`'s crossorigin to. If an argument is
+   *        given, must be one of `anonymous` or `use-credentials`.
+   *
    *
    * @return {string}
    *         The current crossorigin value of the `Player`.
