@@ -45,6 +45,7 @@ const primedBabel = babel({
   compact: false,
   presets: [
     ['@babel/preset-env', {
+      bugfixes: true,
       loose: true,
       modules: false
     }]
