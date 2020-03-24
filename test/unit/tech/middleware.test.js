@@ -675,3 +675,64 @@ QUnit.test('a * middleware will be called even if the source type changes', func
   middleware.getMiddleware('*').pop();
   middleware.getMiddleware('*').pop();
 });
+
+QUnit.test('a * middleware is called after type-specific middleware', function(assert) {
+  let src;
+  let acc;
+  let callCount = 0;
+
+  const mw1 = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'foo',
+        type: 'video/foo'
+      });
+    }
+  };
+
+  const mw2 = {
+    setSource(_src, next) {
+      next(null, {
+        src: 'bar',
+        type: 'video/bar'
+      });
+    }
+  };
+
+  const factory1 = () => {
+    callCount++;
+    return mw1;
+  };
+
+  const factory2 = () => {
+    callCount++;
+    return mw2;
+  };
+
+  middleware.use('video/bar', factory1);
+  middleware.use('video/foo', factory2);
+
+  middleware.setSource({
+    id() {
+      return 'vid1';
+    },
+    setTimeout: window.setTimeout
+  }, {src: 'bar', type: 'video/bar'}, function(_src, _acc) {
+    src = _src;
+    acc = _acc;
+  });
+
+  this.clock.tick(1);
+
+  assert.equal(src.type, 'video/mp4', 'we selected a new type of video/mp4');
+  assert.equal(src.src, 'http://example.com/video.mp4', 'we selected a new src of video.mp4');
+  assert.equal(acc.length, 2, 'we got two middleware');
+
+  assert.equal(acc[0], mw1, 'mw1 is the first middleware');
+  assert.equal(acc[1], mw2, 'mw2 is the second middleware');
+
+  assert.equal(callCount, 2, 'we saw two middleware setSource calls');
+
+  middleware.getMiddleware('video/bar').pop();
+  middleware.getMiddleware('*').pop();
+});
