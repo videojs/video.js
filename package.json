@@ -80,7 +80,7 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "dependencies": {
-    "@babel/runtime": "^7.5.5",
+    "@babel/runtime": "^7.9.2",
     "@videojs/http-streaming": "1.12.3",
     "@videojs/xhr": "2.5.1",
     "global": "4.3.2",
@@ -90,10 +90,10 @@
     "videojs-vtt.js": "^0.15.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/plugin-transform-runtime": "^7.5.5",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-object-assign": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
     "access-sniff": "^3.2.0",
     "autoprefixer": "^9.6.0",
     "bestzip": "^2.1.4",
@@ -129,12 +129,12 @@
     "replace": "^1.1.0",
     "rollup": "^1.15.1",
     "rollup-plugin-alias": "^1.5.2",
-    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-ignore": "^1.0.5",
     "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-multi-entry": "^2.0.2",
+    "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-progress": "^1.1.1",
     "rollup-plugin-stub": "^1.2.0",
     "sass": "^1.21.0",
