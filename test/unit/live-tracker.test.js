@@ -157,8 +157,7 @@ QUnit.module('LiveTracker', () => {
 
     assert.ok(this.liveTracker.atLiveEdge(), 'at live edge');
 
-    this.player.trigger('seeking');
-    this.player.currentTime = () => 19;
+    this.player.currentTime = () => 17;
     this.player.trigger('seeked');
 
     assert.equal(this.liveEdgeChanges, 1, 'should have one live edge change');
@@ -243,7 +242,6 @@ QUnit.module('LiveTracker', () => {
     assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called yet');
 
     this.player.trigger('play');
-    this.player.trigger('playing');
     assert.ok(this.liveTracker.seekToLiveEdge.notCalled, 'seekToLiveEdge was not called yet');
 
     this.player.trigger('timeupdate');
