@@ -1,3 +1,25 @@
+<a name="7.7.6"></a>
+## [7.7.6](https://github.com/videojs/video.js/compare/v7.7.5...v7.7.6) (2020-03-25)
+
+### Bug Fixes
+
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.12.3 🚀 ([#6527](https://github.com/videojs/video.js/issues/6527)) ([0a7aba3](https://github.com/videojs/video.js/commit/0a7aba3))
+* add a threshold of 30s for the liveui to show ([#6409](https://github.com/videojs/video.js/issues/6409)) ([47349c8](https://github.com/videojs/video.js/commit/47349c8))
+* detect chromium-based Edge ([#6497](https://github.com/videojs/video.js/issues/6497)) ([749ef54](https://github.com/videojs/video.js/commit/749ef54))
+* DRM content goes black in IE/Edge when focus is placed on video element ([#6508](https://github.com/videojs/video.js/issues/6508)) ([cc2b82b](https://github.com/videojs/video.js/commit/cc2b82b)), closes [#6318](https://github.com/videojs/video.js/issues/6318)
+* fix a typo in en translation file ([#6505](https://github.com/videojs/video.js/issues/6505)) ([5682f14](https://github.com/videojs/video.js/commit/5682f14))
+* trigger change events on remoteTextTrack when nativeTextTrack is set to true ([#6410](https://github.com/videojs/video.js/issues/6410)) ([52c181d](https://github.com/videojs/video.js/commit/52c181d))
+* **lang:** improve Persian translation ([#6468](https://github.com/videojs/video.js/issues/6468)) ([31ac9d7](https://github.com/videojs/video.js/commit/31ac9d7))
+
+### Chores
+
+* **package:** upgrade to babel 7.9 and enable bugfixes ([#6541](https://github.com/videojs/video.js/issues/6541)) ([2c96875](https://github.com/videojs/video.js/commit/2c96875))
+
+### Documentation
+
+* add an example Angular integration ([#6390](https://github.com/videojs/video.js/issues/6390)) ([fce3ad2](https://github.com/videojs/video.js/commit/fce3ad2))
+* **player:** fix addRemoteTextTrack description of manualCleanup option ([#6521](https://github.com/videojs/video.js/issues/6521)) ([d1702d5](https://github.com/videojs/video.js/commit/d1702d5))
+
 <a name="7.7.5"></a>
 ## [7.7.5](https://github.com/videojs/video.js/compare/v7.7.4...v7.7.5) (2020-02-19)
 
