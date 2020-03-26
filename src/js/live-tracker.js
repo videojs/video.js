@@ -6,19 +6,38 @@ import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
 const defaults = {
-  // Number of seconds of live window (seekableEnd - seekableStart) that
-  // a video needs to have before the liveui will be shown.
   trackingThreshold: 30,
-
-  // number of seconds behind live that we have to be
-  // before we will be considered non-live. Note that we will always
-  // be non-live when seeking backwards or pausing regardless of this value.
   liveTolerance: 15
 };
 
-/* track when we are at the live edge, and other helpers for live playback */
+/*
+  track when we are at the live edge, and other helpers for live playback */
+
+/**
+ * A class for checking live current time and determining when the player
+ * is at or behind the live edge.
+ */
 class LiveTracker extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @param {number} [options.trackingThreshold=30]
+   *        Number of seconds of live window (seekableEnd - seekableStart) that
+   *        media needs to have before the liveui will be shown.
+   *
+   * @param {number} [options.liveTolerance=15]
+   *        Number of seconds behind live that we have to be
+   *        before we will be considered non-live. Note that this will only
+   *        be used when playing at the live edge. This allows large seekable end
+   *        changes to not effect wether we are live or not.
+   */
   constructor(player, options) {
     // LiveTracker does not need an element
     const options_ = mergeOptions(defaults, options, {createEl: false});
@@ -37,6 +56,9 @@ class LiveTracker extends Component {
     }
   }
 
+  /**
+   * toggle tracking based on document visiblility
+   */
   handleVisibilityChange() {
     if (this.player_.duration() !== Infinity) {
       return;
@@ -49,9 +71,11 @@ class LiveTracker extends Component {
     }
   }
 
-  // all the functionality for tracking when seek end changes
-  // and for tracking how far past seek end we should be
-  trackLive_(event) {
+  /**
+   * all the functionality for tracking when seek end changes
+   * and for tracking how far past seek end we should be
+   */
+  trackLive_() {
     const seekable = this.player_.seekable();
 
     // skip undefined seekable
@@ -128,13 +152,17 @@ class LiveTracker extends Component {
 
     if (!this.timeupdateSeen_) {
       this.one(this.player_, 'play', this.handlePlay);
-      this.one(this.player_, 'timeupdate', this.handleTimeupdate);
+      this.one(this.player_, 'timeupdate', this.handleFirstTimeupdate);
     } else {
       this.on(this.player_, 'seeked', this.handleSeeked);
     }
   }
 
-  handleTimeupdate() {
+  /**
+   * handle the first timeupdate on the player if it wasn't already playing
+   * when live tracker started tracking.
+   */
+  handleFirstTimeupdate() {
     this.timeupdateSeen_ = true;
     this.on(this.player_, 'seeked', this.handleSeeked);
   }
@@ -151,6 +179,10 @@ class LiveTracker extends Component {
     this.trackLive_();
   }
 
+  /**
+   * handle the first play on the player, and make sure that we seek
+   * right to the live edge.
+   */
   handlePlay() {
     this.one(this.player_, 'timeupdate', this.seekToLiveEdge);
   }
@@ -174,7 +206,7 @@ class LiveTracker extends Component {
     this.off(this.player_, ['play', 'pause'], this.trackLive_);
     this.off(this.player_, 'seeked', this.handleSeeked);
     this.off(this.player_, 'play', this.handlePlay);
-    this.off(this.player_, 'timeupdate', this.handleTimeupdate);
+    this.off(this.player_, 'timeupdate', this.handleFirstTimeupdate);
     this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
   }
 
@@ -192,6 +224,9 @@ class LiveTracker extends Component {
   /**
    * A helper to get the player seekable end
    * so that we don't have to null check everywhere
+   *
+   * @return {number}
+   *         The furthest seekable end or Infinity.
    */
   seekableEnd() {
     const seekable = this.player_.seekable();
@@ -210,6 +245,9 @@ class LiveTracker extends Component {
   /**
    * A helper to get the player seekable start
    * so that we don't have to null check everywhere
+   *
+   * @return {number}
+   *         The earliest seekable start or 0.
    */
   seekableStart() {
     const seekable = this.player_.seekable();
@@ -226,7 +264,13 @@ class LiveTracker extends Component {
   }
 
   /**
-   * Get the live time window
+   * Get the live time window aka
+   * the amount of time between seekable start and
+   * live current time.
+   *
+   * @return {number}
+   *         The amount of seconds that are seekable in
+   *         the live video.
    */
   liveWindow() {
     const liveCurrentTime = this.liveCurrentTime();
@@ -241,6 +285,9 @@ class LiveTracker extends Component {
   /**
    * Determines if the player is live, only checks if this component
    * is tracking live playback or not
+   *
+   * @return {boolean}
+   *         Wether liveTracker is tracking
    */
   isLive() {
     return this.isTracking();
@@ -249,6 +296,9 @@ class LiveTracker extends Component {
   /**
    * Determines if currentTime is at the live edge and won't fall behind
    * on each seekableendchange
+   *
+   * @return {boolean}
+   *         Wether playback is at the live edge
    */
   atLiveEdge() {
     return !this.behindLiveEdge();
@@ -256,13 +306,20 @@ class LiveTracker extends Component {
 
   /**
    * get what we expect the live current time to be
+   *
+   * @return {number}
+   *         The expected live current time
    */
   liveCurrentTime() {
     return this.pastSeekEnd() + this.seekableEnd();
   }
 
   /**
-   * Returns how far past seek end we expect current time to be
+   * The number of seconds that have occured after seekable end
+   * changed. This will be reset to 0 once seekable end changes.
+   *
+   * @return {number}
+   *         Seconds past the current seekable end
    */
   pastSeekEnd() {
     const seekableEnd = this.seekableEnd();
@@ -277,11 +334,17 @@ class LiveTracker extends Component {
   /**
    * If we are currently behind the live edge, aka currentTime will be
    * behind on a seekableendchange
+   *
+   * @return {boolean}
+   *         If we are behind the live edge
    */
   behindLiveEdge() {
     return this.behindLiveEdge_;
   }
 
+  /**
+   * Wether live tracker is currently tracking or not.
+   */
   isTracking() {
     return typeof this.trackingInterval_ === 'number';
   }
@@ -300,7 +363,11 @@ class LiveTracker extends Component {
 
   }
 
+  /**
+   * Dispose of liveTracker
+   */
   dispose() {
+    this.off(document, 'visibilitychange', this.handleVisibilityChange);
     this.stopTracking();
     super.dispose();
   }
