@@ -83,8 +83,8 @@ class LiveTracker extends Component {
       return;
     }
 
-    const newTime = window.performance.now().toFixed(4);
-    const deltaTime = !this.lastTime_ ? 0 : (newTime - this.lastTime_) / 1000;
+    const newTime = Number(window.performance.now().toFixed(4));
+    const deltaTime = this.lastTime_ === -1 ? 0 : (newTime - this.lastTime_) / 1000;
 
     this.lastTime_ = newTime;
 
@@ -192,9 +192,9 @@ class LiveTracker extends Component {
    * their initial value.
    */
   reset_() {
-    this.lastTime_ = null;
+    this.lastTime_ = -1;
     this.pastSeekEnd_ = 0;
-    this.lastSeekEnd_ = null;
+    this.lastSeekEnd_ = -1;
     this.behindLiveEdge_ = true;
     this.timeupdateSeen_ = false;
     this.seekedBehindLive_ = false;
@@ -324,7 +324,7 @@ class LiveTracker extends Component {
   pastSeekEnd() {
     const seekableEnd = this.seekableEnd();
 
-    if (typeof this.lastSeekEnd_ === 'number' && seekableEnd !== this.lastSeekEnd_) {
+    if (this.lastSeekEnd_ !== -1 && seekableEnd !== this.lastSeekEnd_) {
       this.pastSeekEnd_ = 0;
     }
     this.lastSeekEnd_ = seekableEnd;
