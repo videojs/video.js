@@ -1767,18 +1767,18 @@ Html5.resetMediaElement = function(el) {
   'videoHeight',
 
   /**
-   * Set the value of `crossorigin` from the media element. `crossorigin` indicates
+   * Get the value of `crossOrigin` from the media element. `crossOrigin` indicates
    * to the browser that should sent the cookies along with the requests for the
    * different assets/playlists
    *
-   * @method Html5#setCrossorigin
-   * @param {string} crossorigin
+   * @method Html5#crossOrigin
+   * @return {string}
    *         - anonymous indicates that the media should not sent cookies.
    *         - use-credentials indicates that the media should sent cookies along the requests.
    *
    * @see [Spec]{@link https://html.spec.whatwg.org/#attr-media-crossorigin}
    */
-  'crossorigin'
+  'crossOrigin'
 ].forEach(function(prop) {
   Html5.prototype[prop] = function() {
     return this.el_[prop];
@@ -1881,18 +1881,18 @@ Html5.resetMediaElement = function(el) {
   'defaultPlaybackRate',
 
   /**
-   * Set the value of `crossorigin` from the media element. `crossorigin` indicates
+   * Set the value of `crossOrigin` from the media element. `crossOrigin` indicates
    * to the browser that should sent the cookies along with the requests for the
    * different assets/playlists
    *
-   * @method Html5#setCrossorigin
-   * @param {string} crossorigin
+   * @method Html5#setCrossOrigin
+   * @param {string} crossOrigin
    *         - anonymous indicates that the media should not sent cookies.
    *         - use-credentials indicates that the media should sent cookies along the requests.
    *
    * @see [Spec]{@link https://html.spec.whatwg.org/#attr-media-crossorigin}
    */
-  'crossorigin'
+  'crossOrigin'
 
 ].forEach(function(prop) {
   Html5.prototype['set' + toTitleCase(prop)] = function(v) {

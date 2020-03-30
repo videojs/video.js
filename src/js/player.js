@@ -785,34 +785,32 @@ class Player extends Component {
 
   /**
    * Get or set the `Player`'s crossOrigin option. For the HTML5 player, this
-   * sets the `crossorigin` attribute on the `<video>` tag to control the CORS
+   * sets the `crossOrigin` property on the `<video>` tag to control the CORS
    * behavior.
    *
    * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
    *
    * @param {string} [value]
-   *        The value to set the `Player`'s crossorigin to. If an argument is
+   *        The value to set the `Player`'s crossOrigin to. If an argument is
    *        given, must be one of `anonymous` or `use-credentials`.
    *
-   *
-   * @return {string}
-   *         The current crossorigin value of the `Player`.
+   * @return {string|undefined}
+   *         - The current crossOrigin value of the `Player` when getting.
+   *         - undefined when setting
    */
   crossOrigin(value) {
     if (!value) {
-      return this.techGet_('crossorigin');
+      return this.techGet_('crossOrigin');
     }
 
-    const validCorsValues = ['anonymous', 'use-credentials'];
-
-    if (validCorsValues.indexOf(value) < 0) {
-      log.error(`Improper value "${value}" supplied for crossorigin`);
+    if (value != 'anonymous' || value != 'use-credentials') {
+      log.warn(`crossOrigin must be "anonymous" or "use-credentials", given "${value}"`);
       return;
     }
 
-    this.techCall_('setCrossorigin', value);
+    this.techCall_('setCrossOrigin', value);
 
-    return this.techGet_('crossorigin');
+    return;
   }
 
   /**
