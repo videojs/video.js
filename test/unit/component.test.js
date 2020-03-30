@@ -1203,3 +1203,24 @@ QUnit.test('should remove child when the child moves to the other parent', funct
   parentComponent2.dispose();
   childComponent.dispose();
 });
+
+QUnit.test('getDescendant should work as expected', function(assert) {
+  const comp = new Component(getFakePlayer(), {name: 'component'});
+  const descendant1 = new Component(getFakePlayer(), {name: 'descendant1'});
+  const descendant2 = new Component(getFakePlayer(), {name: 'descendant2'});
+  const descendant3 = new Component(getFakePlayer(), {name: 'descendant3'});
+
+  comp.addChild(descendant1);
+  descendant1.addChild(descendant2);
+  descendant2.addChild(descendant3);
+
+  assert.equal(comp.getDescendant('descendant1', 'descendant2', 'descendant3'), descendant3, 'can pass as args');
+  assert.equal(comp.getDescendant(['descendant1', 'descendant2', 'descendant3']), descendant3, 'can pass as array');
+  assert.equal(comp.getDescendant('descendant1'), descendant1, 'can pass as single string');
+  assert.equal(comp.getDescendant(), comp, 'no args returns base component');
+  assert.notOk(comp.getDescendant('descendant5'), 'undefined descendant returned');
+  assert.notOk(comp.getDescendant('descendant1', 'descendant5'), 'undefined descendant returned');
+  assert.notOk(comp.getDescendant(['descendant1', 'descendant5']), 'undefined descendant returned');
+
+  comp.dispose();
+});
