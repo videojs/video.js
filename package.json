@@ -122,7 +122,7 @@
     "qunit": "^2.9.2",
     "remark-cli": "^6.0.1",
     "remark-lint": "^6.0.4",
-    "remark-parse": "^6.0.3",
+    "remark-parse": "^8.0.0",
     "remark-stringify": "^6.0.4",
     "remark-toc": "^5.1.1",
     "remark-validate-links": "^8.0.2",
