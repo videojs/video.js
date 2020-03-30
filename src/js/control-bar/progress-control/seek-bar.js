@@ -261,6 +261,11 @@ class SeekBar extends Slider {
         newTime = newTime - 0.1;
       }
     } else {
+
+      if (distance >= 0.99) {
+        liveTracker.seekToLiveEdge();
+        return;
+      }
       const seekableStart = liveTracker.seekableStart();
       const seekableEnd = liveTracker.liveCurrentTime();
 
