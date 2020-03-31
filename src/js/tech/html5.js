@@ -1519,7 +1519,7 @@ Html5.resetMediaElement = function(el) {
 // The list is as followed
 // paused, currentTime, buffered, volume, poster, preload, error, seeking
 // seekable, ended, playbackRate, defaultPlaybackRate, played, networkState
-// readyState, videoWidth, videoHeight
+// readyState, videoWidth, videoHeight, crossOrigin
 [
   /**
    * Get the value of `paused` from the media element. `paused` indicates whether the media element
@@ -1788,7 +1788,7 @@ Html5.resetMediaElement = function(el) {
 // Wrap native properties with a setter in this format:
 // set + toTitleCase(name)
 // The list is as follows:
-// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate
+// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate, setCrossOrigin
 [
   /**
    * Set the value of `volume` on the media element. `volume` indicates the current
@@ -1893,7 +1893,6 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://html.spec.whatwg.org/#attr-media-crossorigin}
    */
   'crossOrigin'
-
 ].forEach(function(prop) {
   Html5.prototype['set' + toTitleCase(prop)] = function(v) {
     this.el_[prop] = v;
