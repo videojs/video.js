@@ -803,7 +803,7 @@ class Player extends Component {
       return this.techGet_('crossOrigin');
     }
 
-    if (value != 'anonymous' || value != 'use-credentials') {
+    if (value !== 'anonymous' || value !== 'use-credentials') {
       log.warn(`crossOrigin must be "anonymous" or "use-credentials", given "${value}"`);
       return;
     }
