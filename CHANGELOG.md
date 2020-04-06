@@ -1,3 +1,25 @@
+<a name="7.8.0"></a>
+# [7.8.0](https://github.com/videojs/video.js/compare/v7.7.6...v7.8.0) (2020-04-06)
+
+### Features
+
+* **cors:** allow both crossOrigin and crossorigin method and options ([#6571](https://github.com/videojs/video.js/issues/6571)) ([f711ddc](https://github.com/videojs/video.js/commit/f711ddc)), closes [#6533](https://github.com/videojs/video.js/issues/6533)
+* Add a function for getting descendants from components ([#6519](https://github.com/videojs/video.js/issues/6519)) ([47ba704](https://github.com/videojs/video.js/commit/47ba704))
+* **fs:** return a promise from requestFullscreen and exitFullscreen when we can ([#6424](https://github.com/videojs/video.js/issues/6424)) ([da37fab](https://github.com/videojs/video.js/commit/da37fab))
+* Improve currentTime to allow it to be called before player is ready ([#6507](https://github.com/videojs/video.js/issues/6507)) ([768adb1](https://github.com/videojs/video.js/commit/768adb1))
+
+### Bug Fixes
+
+* **lang:** update zn-CH translations ([#6546](https://github.com/videojs/video.js/issues/6546)) ([a8d4d82](https://github.com/videojs/video.js/commit/a8d4d82))
+* **liveui:** tweaks to prevent jitter ([#6405](https://github.com/videojs/video.js/issues/6405)) ([668c7f4](https://github.com/videojs/video.js/commit/668c7f4))
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.13.0 🚀 ([#6547](https://github.com/videojs/video.js/issues/6547)) ([8dc1e6f](https://github.com/videojs/video.js/commit/8dc1e6f))
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.13.1 🚀 ([#6548](https://github.com/videojs/video.js/issues/6548)) ([1dd06a2](https://github.com/videojs/video.js/commit/1dd06a2))
+* **package:** update [@videojs](https://github.com/videojs)/http-streaming to version 1.13.2 🚀 ([#6558](https://github.com/videojs/video.js/issues/6558)) ([6d18c40](https://github.com/videojs/video.js/commit/6d18c40))
+
+### Chores
+
+* **package:** update rollup to version 2.2.0 🚀 ([#6542](https://github.com/videojs/video.js/issues/6542)) ([2997b80](https://github.com/videojs/video.js/commit/2997b80))
+
 <a name="7.7.6"></a>
 ## [7.7.6](https://github.com/videojs/video.js/compare/v7.7.5...v7.7.6) (2020-03-25)
 
