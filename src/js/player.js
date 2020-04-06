@@ -744,7 +744,8 @@ class Player extends Component {
     this.fill(this.options_.fill);
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
-    this.crossOrigin(this.options_.crossOrigin);
+    // support both crossOrigin and crossorigin to reduce confusion and issues around the name
+    this.crossOrigin(this.options_.crossOrigin || this.options_.crossorigin);
 
     // Hide any links within the video/audio tag,
     // because IE doesn't hide them completely from screen readers.
@@ -4777,6 +4778,23 @@ TRACK_TYPES.names.forEach(function(name) {
     return this[props.privateName];
   };
 });
+
+/**
+ * Get or set the `Player`'s crossorigin option. For the HTML5 player, this
+ * sets the `crossOrigin` property on the `<video>` tag to control the CORS
+ * behavior.
+ *
+ * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
+ *
+ * @param {string} [value]
+ *        The value to set the `Player`'s crossorigin to. If an argument is
+ *        given, must be one of `anonymous` or `use-credentials`.
+ *
+ * @return {string|undefined}
+ *         - The current crossorigin value of the `Player` when getting.
+ *         - undefined when setting
+ */
+Player.prototype.crossorigin = Player.prototype.crossOrigin;
 
 /**
  * Global enumeration of players.
