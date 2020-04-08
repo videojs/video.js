@@ -95,7 +95,7 @@ export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
  * @const
  * @type {Boolean}
  */
-export const IS_EDGE = (/Edge/i).test(USER_AGENT);
+export const IS_EDGE = (/Edg/i).test(USER_AGENT);
 
 /**
  * Whether or not this is Google Chrome.

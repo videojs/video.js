@@ -417,6 +417,37 @@ class Component {
   }
 
   /**
+   * Returns the descendant `Component` following the givent
+   * descendant `names`. For instance ['foo', 'bar', 'baz'] would
+   * try to get 'foo' on the current component, 'bar' on the 'foo'
+   * component and 'baz' on the 'bar' component and return undefined
+   * if any of those don't exist.
+   *
+   * @param {...string[]|...string} names
+   *        The name of the child `Component` to get.
+   *
+   * @return {Component|undefined}
+   *         The descendant `Component` following the given descendant
+   *         `names` or undefined.
+   */
+  getDescendant(...names) {
+    // flatten array argument into the main array
+    names = names.reduce((acc, n) => acc.concat(n), []);
+
+    let currentChild = this;
+
+    for (let i = 0; i < names.length; i++) {
+      currentChild = currentChild.getChild(names[i]);
+
+      if (!currentChild || !currentChild.getChild) {
+        return;
+      }
+    }
+
+    return currentChild;
+  }
+
+  /**
    * Add a child `Component` inside the current `Component`.
    *
    *
