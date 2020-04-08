@@ -428,6 +428,14 @@ class SeekBar extends Slider {
       super.handleKeyDown(event);
     }
   }
+
+  dispose() {
+    if (this.player_.liveTracker) {
+      this.off(this.player_.liveTracker, 'liveedgechange', this.update);
+    }
+
+    super.dispose();
+  }
 }
 
 /**
