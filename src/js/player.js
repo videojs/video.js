@@ -2995,11 +2995,7 @@ class Player extends Component {
     }
     this.techCall_('setDisablePictureInPicture', value);
     this.options_.disablePictureInPicture = value;
-    const PiPToggle = this.controlBar.pictureInPictureToggle;
-
-    if (PiPToggle) {
-      PiPToggle.handlePiPEnabledChange();
-    }
+    this.trigger('disablepictureinpicturechanged');
   }
 
   /**
