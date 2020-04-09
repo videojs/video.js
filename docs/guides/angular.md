@@ -20,7 +20,7 @@ import videojs from 'video.js';
   encapsulation: ViewEncapsulation.None,
 })
 export class VjsPlayerComponent implements OnInit, OnDestroy {
-  @ViewChild('target') target: ElementRef;
+  @ViewChild('target', {static: true}) target: ElementRef;
   // see options: https://github.com/videojs/video.js/blob/master/docs/guides/options.md
   @Input() options: {
       fluid: boolean,
