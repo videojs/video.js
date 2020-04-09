@@ -430,8 +430,20 @@ class SeekBar extends Slider {
   }
 
   dispose() {
+    this.disableInterval_();
+
+    this.off(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
     if (this.player_.liveTracker) {
-      this.off(this.player_.liveTracker, 'liveedgechange', this.update);
+      this.on(this.player_.liveTracker, 'liveedgechange', this.update);
+    }
+
+    this.off(this.player_, ['playing'], this.enableInterval_);
+    this.off(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
+
+    // we don't need to update the play progress if the document is hidden,
+    // also, this causes the CPU to spike and eventually crash the page on IE11.
+    if ('hidden' in document && 'visibilityState' in document) {
+      this.off(document, 'visibilitychange', this.toggleVisibility_);
     }
 
     super.dispose();
