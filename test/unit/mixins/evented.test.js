@@ -504,3 +504,40 @@ QUnit.test('off() can remove a listener from an array of events on a different t
     target: b.eventBusEl_
   });
 });
+
+QUnit.test('on() with the same function on two different targets should be disposed correctly', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = evented({});
+  const c = this.targets.c = evented({});
+  let i = 0;
+  const update = () => {
+    i++;
+  };
+
+  a.on(b, 'foo', update);
+  a.on(c, 'bar', update);
+
+  // sanity test with b trigger
+  b.trigger('foo');
+  assert.strictEqual(i, 1, 'b trigger works');
+
+  // sanity test with c trigger
+  c.trigger('bar');
+  assert.strictEqual(i, 2, 'c trigger works');
+
+  b.trigger('dispose');
+  b.trigger('foo');
+  assert.strictEqual(i, 2, 'b trigger after b dispose, does nothing');
+
+  c.trigger('bar');
+  assert.strictEqual(i, 3, 'c trigger after b dispose works');
+
+  a.trigger('dispose');
+
+  c.trigger('bar');
+  assert.strictEqual(i, 3, 'c trigger after a dispose does nothing');
+
+  b.trigger('bar');
+  assert.strictEqual(i, 3, 'b trigger after a dispose does nothing');
+});
+
