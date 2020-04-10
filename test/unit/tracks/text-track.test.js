@@ -472,6 +472,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
 
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
+  testTech.crossOrigin = () => null;
 
   const tt = new TextTrack({
     tech: testTech,
@@ -526,6 +527,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
+  testTech.crossOrigin = () => null;
 
   sinon.stub(testTech, 'off');
   testTech.off.withArgs('vttjsloaded');
