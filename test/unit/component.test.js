@@ -91,6 +91,43 @@ QUnit.test('registerComponent() throws with bad arguments', function(assert) {
   );
 });
 
+QUnit.test('Component event handlers do not interfere with one another', function(assert) {
+  class Foo extends Component {
+    constructor(player, options) {
+      super(player, options);
+
+      this.count = 0;
+
+      this.on(this.player_, 'test', this.listener);
+    }
+
+    listener(e) {
+      this.count++;
+
+      if (this.count === this.options_.max) {
+        this.off(this.player_, 'test', this.listener);
+      }
+    }
+  }
+
+  const player = TestHelpers.makePlayer();
+  const comp1 = new Foo(player, {max: 10});
+  const comp2 = new Foo(player, {max: 20});
+
+  let i = 30;
+
+  while (i--) {
+    player.trigger('test');
+  }
+
+  assert.strictEqual(comp1.count, 10, 'should have 10');
+  assert.strictEqual(comp2.count, 20, 'should have 20');
+
+  player.dispose();
+  comp1.dispose();
+  comp2.dispose();
+});
+
 QUnit.test('should create an element', function(assert) {
   const comp = new Component(getFakePlayer(), {});
 
