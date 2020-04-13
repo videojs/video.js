@@ -92,7 +92,7 @@ class SeekBar extends Slider {
   }
 
   disableInterval_(e) {
-    if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e.type !== 'ended') {
+    if (this.player_.liveTracker && this.player_.liveTracker.isLive() && e && e.type !== 'ended') {
       return;
     }
 
