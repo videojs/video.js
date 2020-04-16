@@ -1,3 +1,14 @@
+<a name="7.8.1"></a>
+## [7.8.1](https://github.com/videojs/video.js/compare/v7.8.0...v7.8.1) (2020-04-16)
+
+### Bug Fixes
+
+* update being called on seekbar during dispose ([#6576](https://github.com/videojs/video.js/issues/6576)) ([3ac11d0](https://github.com/videojs/video.js/commit/3ac11d0))
+
+### Documentation
+
+* **angular:** fix demo for angular v8+. ([#6581](https://github.com/videojs/video.js/issues/6581)) ([8f930c5](https://github.com/videojs/video.js/commit/8f930c5))
+
 <a name="7.8.0"></a>
 # [7.8.0](https://github.com/videojs/video.js/compare/v7.7.6...v7.8.0) (2020-04-06)
 
