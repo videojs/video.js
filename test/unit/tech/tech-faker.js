@@ -97,6 +97,7 @@ class TechFaker extends Tech {
   seeking() {
     return false;
   }
+  setScrubbing() {}
   fakeSourceset() {
     this.el_.src = this.options_.sourceset;
     this.el_.setAttribute('src', this.options_.sourceset);
