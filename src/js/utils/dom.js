@@ -583,6 +583,23 @@ export function findPosition(el) {
 }
 
 /**
+ * Gets element zoom level (reads it from computed style)
+ *
+ * @param  {Element} el
+ *         Element we get the zoom value from
+ *
+ * @return {number} zoom value
+ */
+export function getElementZoomLevel(el) {
+  try {
+    return window.getComputedStyle(el).getPropertyValue('zoom') * 1.0 || 1;
+  } catch (ignore) {
+    log.warn('Can not detect zoom level', el);
+    return 1;
+  }
+}
+
+/**
  * Represents x and y coordinates for a DOM element or mouse pointer.
  *
  * @typedef  {Object} module:dom~Coordinates
@@ -609,7 +626,13 @@ export function findPosition(el) {
  *         A coordinates object corresponding to the mouse position.
  *
  */
+let zoomLevel;
+
 export function getPointerPosition(el, event) {
+  if (!zoomLevel) {
+    zoomLevel = getElementZoomLevel(document.body);
+  }
+
   const position = {};
   const box = findPosition(el);
   const boxW = el.offsetWidth;
@@ -624,6 +647,9 @@ export function getPointerPosition(el, event) {
     pageX = event.changedTouches[0].pageX;
     pageY = event.changedTouches[0].pageY;
   }
+
+  pageY = pageY / zoomLevel;
+  pageX = pageX / zoomLevel;
 
   position.y = Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
   position.x = Math.max(0, Math.min(1, (pageX - boxX) / boxW));
