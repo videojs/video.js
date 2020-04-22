@@ -48,7 +48,6 @@ QUnit.module('HTML5', {
     tech.dispose();
     player = null;
     tech = null;
-    sinon.restore();
   }
 });
 
