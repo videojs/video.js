@@ -82,5 +82,7 @@
   "Caption Settings Dialog": "Caíxa-de-Diálogo das configurações de Legendas",
   "Beginning of dialog window. Escape will cancel and close the window.": "Iniciando a Janela-de-Diálogo. Pressionar Escape irá cancelar e fechar a janela.",
   "End of dialog window.": "Fim da Janela-de-Diálogo",
-  "{1} is loading.": "{1} está carregando."
+  "{1} is loading.": "{1} está carregando.",
+  "Exit Picture-in-Picture": "Sair de Picture-in-Picture",
+  "Picture-in-Picture": "Picture-in-Picture"
 }
