@@ -80,6 +80,12 @@ const loadTrack = function(src, track) {
     opts.cors = crossOrigin;
   }
 
+  const withCredentials = track.tech_.crossOrigin() === 'use-credentials';
+
+  if (withCredentials) {
+    opts.withCredentials = withCredentials;
+  }
+
   XHR(opts, Fn.bind(this, function(err, response, responseBody) {
     if (err) {
       return log.error(err, response);

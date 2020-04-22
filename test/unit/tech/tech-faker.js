@@ -156,6 +156,9 @@ class TechFaker extends Tech {
   ended() {
     return false;
   }
+  crossOrigin() {
+    return null;
+  }
 
   // Support everything except for "video/unsupported-format"
   static isSupported() {

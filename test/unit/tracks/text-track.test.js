@@ -447,12 +447,66 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
     src: 'http://example.com'
   });
 
-  reqs.pop().respond(200, null, 'WEBVTT\n');
+  const req = reqs.pop();
+
+  req.respond(200, null, 'WEBVTT\n');
 
   assert.ok(parserCreated, 'WebVTT is loaded, so we can just parse');
+  assert.notOk(req.withCredentials, 'the request defaults not to send credentials');
 
   clock.restore();
   tt.off();
+  window.WebVTT = oldVTT;
+});
+
+QUnit.test('tracks are loaded withCredentials is crossorigin is set to use-credentials', function(assert) {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  const reqs = [];
+
+  this.xhr.onCreate = function(req) {
+    reqs.push(req);
+  };
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {};
+  window.WebVTT.Parser = () => {
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  this.tech.crossOrigin = () => 'use-credentials';
+
+  const tt = new TextTrack({
+    tech: this.tech,
+    src: 'http://example.com'
+  });
+
+  const req = reqs.pop();
+
+  assert.ok(req.withCredentials, 'the request was made withCredentials');
+
+  this.tech.crossOrigin = () => 'anonymous';
+
+  const tt2 = new TextTrack({
+    tech: this.tech,
+    src: 'http://example.com'
+  });
+
+  const req2 = reqs.pop();
+
+  assert.notOk(req2.withCredentials, 'the request was not made withCredentials');
+
+  req.abort();
+  req2.abort();
+  clock.restore();
+  tt.off();
+  tt2.off();
   window.WebVTT = oldVTT;
 });
 
@@ -472,6 +526,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
 
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
+  testTech.crossOrigin = () => null;
 
   const tt = new TextTrack({
     tech: testTech,
@@ -526,6 +581,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
 
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
+  testTech.crossOrigin = () => null;
 
   sinon.stub(testTech, 'off');
   testTech.off.withArgs('vttjsloaded');
