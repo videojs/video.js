@@ -1241,7 +1241,7 @@ QUnit.test('should add an audio player region if an audio el is used', function(
   player.dispose();
 });
 
-QUnit.skip('should setScrubbing when seeking or not seeking', function(assert) {
+QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
   const player = TestHelpers.makePlayer();
   let isScrubbing;
 
