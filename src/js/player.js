@@ -2432,6 +2432,7 @@ class Player extends Component {
       return this.scrubbing_;
     }
     this.scrubbing_ = !!isScrubbing;
+    this.techCall_('setScrubbing', this.scrubbing_);
 
     if (isScrubbing) {
       this.addClass('vjs-scrubbing');

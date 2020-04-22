@@ -5,6 +5,7 @@ let tech;
 import Html5 from '../../../src/js/tech/html5.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import document from 'global/document';
+import sinon from 'sinon';
 
 QUnit.module('HTML5', {
   beforeEach(assert) {
@@ -48,6 +49,38 @@ QUnit.module('HTML5', {
     player = null;
     tech = null;
   }
+});
+
+QUnit.test('if setScrubbing is true and fastSeek is available, use it', function(assert) {
+  Object.defineProperty(tech.el(), 'currentTime', {
+    get: () => {},
+    set: () => {},
+
+    writeable: true,
+    enumerable: false,
+    configurable: true
+  });
+
+  const currentTimeSpy = sinon.spy(tech.el(), 'currentTime', ['set']);
+
+  tech.setCurrentTime(5);
+  assert.ok(currentTimeSpy.set.called, 'currentTime setter was called');
+  assert.ok(currentTimeSpy.set.calledWith(5), 'currentTime setter was called with 5');
+
+  tech.setScrubbing(true);
+
+  // when scrubbing is set but fastSeek isn't available, currentTime should still be called
+  tech.el().fastSeek = null;
+  tech.setCurrentTime(10);
+  assert.ok(currentTimeSpy.set.called, 'currentTime setter was called');
+  assert.ok(currentTimeSpy.set.calledWith(10), 'currentTime setter was called with 10');
+
+  const fastSeekSpy = tech.el().fastSeek = sinon.spy();
+
+  tech.setCurrentTime(15);
+  assert.ok(currentTimeSpy.set.calledTwice, 'currentTime setter was only called twice and not a 3rd time for fastSeek');
+  assert.ok(fastSeekSpy.called, 'fastSeek called');
+  assert.ok(fastSeekSpy.calledWith(15), 'fastSeek called with 15');
 });
 
 QUnit.test('should be able to set playsinline attribute', function(assert) {
