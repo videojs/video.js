@@ -405,6 +405,10 @@ class Html5 extends Tech {
       Dom.setAttribute(el, 'preload', this.options_.preload);
     }
 
+    if (this.options_.disablePictureInPicture !== undefined) {
+      el.disablePictureInPicture = this.options_.disablePictureInPicture;
+    }
+
     // Update specific tag settings, in case they were overridden
     // `autoplay` has to be *last* so that `muted` and `playsinline` are present
     // when iOS/Safari or other browsers attempt to autoplay.
@@ -1526,8 +1530,8 @@ Html5.resetMediaElement = function(el) {
 // Wrap native properties with a getter
 // The list is as followed
 // paused, currentTime, buffered, volume, poster, preload, error, seeking
-// seekable, ended, playbackRate, defaultPlaybackRate, played, networkState
-// readyState, videoWidth, videoHeight, crossOrigin
+// seekable, ended, playbackRate, defaultPlaybackRate, disablePictureInPicture
+// played, networkState, readyState, videoWidth, videoHeight, crossOrigin
 [
   /**
    * Get the value of `paused` from the media element. `paused` indicates whether the media element
@@ -1700,6 +1704,19 @@ Html5.resetMediaElement = function(el) {
   'defaultPlaybackRate',
 
   /**
+   * Get the value of 'disablePictureInPicture' from the video element.
+   *
+   * @method Html5#disablePictureInPicture
+   * @return {boolean} value
+   *         - The value of `disablePictureInPicture` from the video element.
+   *         - True indicates that the video can't be played in Picture-In-Picture mode
+   *         - False indicates that the video can be played in Picture-In-Picture mode
+   *
+   * @see [Spec]{@link https://w3c.github.io/picture-in-picture/#disable-pip}
+   */
+  'disablePictureInPicture',
+
+  /**
    * Get the value of `played` from the media element. `played` returns a `TimeRange`
    * object representing points in the media timeline that have been played.
    *
@@ -1796,7 +1813,8 @@ Html5.resetMediaElement = function(el) {
 // Wrap native properties with a setter in this format:
 // set + toTitleCase(name)
 // The list is as follows:
-// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate, setCrossOrigin
+// setVolume, setSrc, setPoster, setPreload, setPlaybackRate, setDefaultPlaybackRate,
+// setDisablePictureInPicture, setCrossOrigin
 [
   /**
    * Set the value of `volume` on the media element. `volume` indicates the current
@@ -1887,6 +1905,18 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-defaultplaybackrate}
    */
   'defaultPlaybackRate',
+
+  /**
+   * Prevents the browser from suggesting a Picture-in-Picture context menu
+   * or to request Picture-in-Picture automatically in some cases.
+   *
+   * @method Html5#setDisablePictureInPicture
+   * @param {boolean} value
+   *         The true value will disable Picture-in-Picture mode.
+   *
+   * @see [Spec]{@link https://w3c.github.io/picture-in-picture/#disable-pip}
+   */
+  'disablePictureInPicture',
 
   /**
    * Set the value of `crossOrigin` from the media element. `crossOrigin` indicates

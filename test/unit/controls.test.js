@@ -169,6 +169,52 @@ QUnit.test('Picture-in-Picture control text should be correct when enterpicturei
   pictureInPictureToggle.dispose();
 });
 
+QUnit.test('Picture-in-Picture control enabled property value should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
+
+  if ('pictureInPictureEnabled' in document) {
+    player.isInPictureInPicture(true);
+    player.trigger('enterpictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an enterpictureinpicture event');
+
+    player.isInPictureInPicture(false);
+    player.trigger('leavepictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an leavepictureinpicture event');
+  } else {
+    player.isInPictureInPicture(true);
+    player.trigger('enterpictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an enterpictureinpicture event');
+
+    player.isInPictureInPicture(false);
+    player.trigger('leavepictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an leavepictureinpicture event');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control enabled property value should be correct when loadedmetadata is triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
+
+  if ('pictureInPictureEnabled' in document) {
+    player.trigger('loadedmetadata');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an loadedmetadata event');
+  } else {
+    player.trigger('loadedmetadata');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an loadedmetadata event');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
   const player = TestHelpers.makePlayer({controlBar: false});
   const fullscreentoggle = new FullscreenToggle(player);

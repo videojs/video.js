@@ -52,7 +52,9 @@ export class VjsPlayerComponent implements OnInit, OnDestroy {
   }
 }
 ```
+
 Don't forget to include the Video.js CSS, located at `video.js/dist/video-js.css`.
+
 ```css
 /* vjs-player.component.css */
 @import '~video.js/dist/video-js.css';

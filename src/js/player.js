@@ -1119,6 +1119,7 @@ class Player extends Component {
       'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
+      'disablePictureInPicture': this.options_.disablePictureInPicture,
       'muted': this.options_.muted,
       'poster': this.poster(),
       'language': this.language(),
@@ -2980,6 +2981,22 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('exitFullWindow');
+  }
+
+  /**
+   * Disable Picture-in-Picture mode.
+   *
+   * @param {boolean} value
+   *                  - true will disable Picture-in-Picture mode
+   *                  - false will enable Picture-in-Picture mode
+   */
+  disablePictureInPicture(value) {
+    if (value === undefined) {
+      return this.techGet_('disablePictureInPicture');
+    }
+    this.techCall_('setDisablePictureInPicture', value);
+    this.options_.disablePictureInPicture = value;
+    this.trigger('disablepictureinpicturechanged');
   }
 
   /**
