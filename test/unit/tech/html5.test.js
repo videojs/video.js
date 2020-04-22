@@ -70,6 +70,7 @@ QUnit.test('if setScrubbing is true and fastSeek is available, use it', function
   tech.setScrubbing(true);
 
   // when scrubbing is set but fastSeek isn't available, currentTime should still be called
+  tech.el().fastSeek = null;
   tech.setCurrentTime(10);
   assert.ok(currentTimeSpy.set.called, 'currentTime setter was called');
   assert.ok(currentTimeSpy.set.calledWith(10), 'currentTime setter was called with 10');
