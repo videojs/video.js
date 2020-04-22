@@ -54,6 +54,16 @@ QUnit.module('HTML5', {
 
 QUnit.test('if setScrubbing is true and fastSeek is available, use it', function(assert) {
   tech.createEl();
+
+  Object.defineProperty(tech.el(), 'currentTime', {
+    get: () => {},
+    set: () => {},
+
+    writeable: true,
+    enumerable: false,
+    configurable: true
+  });
+
   const currentTimeSpy = sinon.spy(tech.el(), 'currentTime', ['set']);
 
   tech.setCurrentTime(5);
