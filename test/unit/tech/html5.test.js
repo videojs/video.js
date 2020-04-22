@@ -52,7 +52,7 @@ QUnit.module('HTML5', {
   }
 });
 
-QUnit.test('if setScrubbing is true and fastSeek is available, use it', function(assert) {
+QUnit.skip('if setScrubbing is true and fastSeek is available, use it', function(assert) {
   tech.createEl();
 
   Object.defineProperty(tech.el(), 'currentTime', {
