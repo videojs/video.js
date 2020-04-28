@@ -28,6 +28,7 @@ class LoadProgressBar extends Component {
   constructor(player, options) {
     super(player, options);
     this.partEls_ = [];
+    this.needsRequestAnimationFrame = true;
     this.on(player, 'progress', this.update);
   }
 
@@ -72,6 +73,11 @@ class LoadProgressBar extends Component {
    * @listens Player#progress
    */
   update(event) {
+    // Prevent multiple RAF's from being called when tab is in background since setInterval runs in background, but RAF does not.
+    if (!this.needsRequestAnimationFrame) {
+      return;
+    }
+
     this.requestAnimationFrame(() => {
       const liveTracker = this.player_.liveTracker;
       const buffered = this.player_.buffered();
@@ -117,7 +123,13 @@ class LoadProgressBar extends Component {
         this.el_.removeChild(children[i - 1]);
       }
       children.length = buffered.length;
+
+      // Allow additional RAF's after update has completed
+      this.needsRequestAnimationFrame = true;
     });
+
+    // Prevent additional RAF's from being called
+    this.needsRequestAnimationFrame = false;
   }
 }
 
