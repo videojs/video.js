@@ -41,6 +41,7 @@ class SeekBar extends Slider {
   constructor(player, options) {
     super(player, options);
     this.setEventHandlers_();
+    this.needsRequestAnimationFrame = true;
   }
 
   /**
@@ -133,6 +134,11 @@ class SeekBar extends Slider {
   update(event) {
     const percent = super.update();
 
+    // Prevent multiple RAF's from being called when tab is in background since setInterval runs in background, but RAF does not.
+    if (!this.needsRequestAnimationFrame) {
+      return;
+    }
+
     this.requestAnimationFrame(() => {
       const currentTime = this.player_.ended() ?
         this.player_.duration() : this.getCurrentTime_();
@@ -169,7 +175,13 @@ class SeekBar extends Slider {
       if (this.bar) {
         this.bar.update(Dom.getBoundingClientRect(this.el()), this.getProgress());
       }
+
+      // Allow additional RAF's after update has completed
+      this.needsRequestAnimationFrame = true;
     });
+
+    // Prevent additional RAF's from being called
+    this.needsRequestAnimationFrame = false;
 
     return percent;
   }
