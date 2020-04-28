@@ -31,6 +31,8 @@ class Slider extends Component {
     // Set property names to bar to match with the child Slider class is looking for
     this.bar = this.getChild(this.options_.barName);
 
+    this.needsRequestAnimationFrame = true;
+
     // Set a horizontal or vertical class on the slider depending on the slider type
     this.vertical(!!this.options_.vertical);
 
@@ -249,13 +251,24 @@ class Slider extends Component {
 
     this.progress_ = progress;
 
+    // Prevent multiple RAF's from being called when tab is in background since setInterval runs in background, but RAF does not.
+    if (!this.needsRequestAnimationFrame) {
+      return;
+    }
+
     this.requestAnimationFrame(() => {
       // Set the new bar width or height
       const sizeKey = this.vertical() ? 'height' : 'width';
 
       // Convert to a percentage for css value
       this.bar.el().style[sizeKey] = (progress * 100).toFixed(2) + '%';
+
+      // Allow additional RAF's after update has completed
+      this.needsRequestAnimationFrame = true;
     });
+
+    // Prevent additional RAF's from being called
+    this.needsRequestAnimationFrame = false;
 
     return progress;
   }
