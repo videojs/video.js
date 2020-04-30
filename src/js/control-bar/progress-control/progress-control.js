@@ -75,7 +75,7 @@ class ProgressControl extends Component {
     // The default skin has a gap on either side of the `SeekBar`. This means
     // that it's possible to trigger this behavior outside the boundaries of
     // the `SeekBar`. This ensures we stay within it at all times.
-    seekBarPoint = clamp(0, 1, seekBarPoint);
+    seekBarPoint = clamp(seekBarPoint, 0, 1);
 
     if (mouseTimeDisplay) {
       mouseTimeDisplay.update(seekBarRect, seekBarPoint);
