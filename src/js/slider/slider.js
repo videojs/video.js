@@ -249,7 +249,7 @@ class Slider extends Component {
 
     this.progress_ = progress;
 
-    this.requestAnimationFrame(() => {
+    this.requestNamedAnimationFrame('Slider#update', () => {
       // Set the new bar width or height
       const sizeKey = this.vertical() ? 'height' : 'width';
 
