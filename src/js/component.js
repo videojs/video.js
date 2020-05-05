@@ -1523,7 +1523,7 @@ class Component {
       if (this.namedRafs_.has(name)) {
         this.namedRafs_.delete(name);
       }
-    }, false);
+    });
 
     this.namedRafs_.set(name, id);
   }
