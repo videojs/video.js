@@ -1226,12 +1226,19 @@ QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific n
   const cancelNames = [];
   const name = 'testing';
   const handlerOne = () => {
+    assert.equal(comp.namedRafs_.size, 1, 'named raf still exists while function runs');
+    assert.equal(comp.rafIds_.size, 0, 'raf id does not exist during run');
+
     calls.one++;
   };
   const handlerTwo = () => {
+    assert.equal(comp.namedRafs_.size, 1, 'named raf still exists while function runs');
+    assert.equal(comp.rafIds_.size, 0, 'raf id does not exist during run');
     calls.two++;
   };
   const handlerThree = () => {
+    assert.equal(comp.namedRafs_.size, 1, 'named raf still exists while function runs');
+    assert.equal(comp.rafIds_.size, 0, 'raf id does not exist during run');
     calls.three++;
   };
 

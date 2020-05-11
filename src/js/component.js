@@ -1599,6 +1599,9 @@ class Component {
         ['setTimeoutIds_', 'clearTimeout'],
         ['setIntervalIds_', 'clearInterval']
       ].forEach(([idName, cancelName]) => {
+        // for a `Set` key will actually be the value again
+        // so forEach((val, val) =>` but for maps we want to use
+        // the key.
         this[idName].forEach((val, key) => this[cancelName](key));
       });
 
