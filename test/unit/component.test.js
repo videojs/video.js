@@ -932,7 +932,7 @@ QUnit.test('should provide interval methods that automatically get cleared on co
   assert.ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });
 
-QUnit.test('should provide *AnimationFrame methods that automatically get cleared on component disposal', function(assert) {
+QUnit.test('should provide a requestAnimationFrame method that is cleared on disposal', function(assert) {
   const comp = new Component(getFakePlayer());
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
@@ -947,7 +947,7 @@ QUnit.test('should provide *AnimationFrame methods that automatically get cleare
 
   const spyRAF = sinon.spy();
 
-  comp.requestAnimationFrame(spyRAF);
+  comp.requestNamedAnimationFrame('testing', spyRAF);
 
   assert.strictEqual(spyRAF.callCount, 0, 'rAF callback was not called immediately');
   this.clock.tick(1);
@@ -955,11 +955,11 @@ QUnit.test('should provide *AnimationFrame methods that automatically get cleare
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was not called after a second "repaint"');
 
-  comp.cancelAnimationFrame(comp.requestAnimationFrame(spyRAF));
+  comp.cancelNamedAnimationFrame(comp.requestNamedAnimationFrame('testing', spyRAF));
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'second rAF callback was not called because it was cancelled');
 
-  comp.requestAnimationFrame(spyRAF);
+  comp.requestNamedAnimationFrame('testing', spyRAF);
   comp.dispose();
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
@@ -968,7 +968,43 @@ QUnit.test('should provide *AnimationFrame methods that automatically get cleare
   window.cancelAnimationFrame = oldCAF;
 });
 
-QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', function(assert) {
+QUnit.test('should provide a requestNamedAnimationFrame method that is cleared on disposal', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  const spyRAF = sinon.spy();
+
+  comp.requestNamedAnimationFrame('testing', spyRAF);
+
+  assert.strictEqual(spyRAF.callCount, 0, 'rAF callback was not called immediately');
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was called after a "repaint"');
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was not called after a second "repaint"');
+
+  comp.cancelNamedAnimationFrame(comp.requestNamedAnimationFrame('testing', spyRAF));
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'second rAF callback was not called because it was cancelled');
+
+  comp.requestNamedAnimationFrame('testing', spyRAF);
+  comp.dispose();
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
+QUnit.test('requestAnimationFrame falls back to timers if rAF not supported', function(assert) {
   const comp = new Component(getFakePlayer());
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
@@ -1010,7 +1046,7 @@ QUnit.test('setTimeout should remove dispose handler on trigger', function(asser
   comp.dispose();
 });
 
-QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
+QUnit.test('requestNamedAnimationFrame should remove dispose handler on trigger', function(assert) {
   const comp = new Component(getFakePlayer());
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
@@ -1025,13 +1061,15 @@ QUnit.test('requestAnimationFrame should remove dispose handler on trigger', fun
 
   const spyRAF = sinon.spy();
 
-  comp.requestAnimationFrame(spyRAF);
+  comp.requestNamedAnimationFrame('testFrame', spyRAF);
 
-  assert.equal(comp.rafIds_.size, 1, 'we got a new dispose handler');
+  assert.equal(comp.rafIds_.size, 1, 'we got a new raf dispose handler');
+  assert.equal(comp.namedRafs_.size, 1, 'we got a new named raf dispose handler');
 
   this.clock.tick(1);
 
-  assert.equal(comp.rafIds_.size, 0, 'we removed our dispose handle');
+  assert.equal(comp.rafIds_.size, 0, 'we removed our raf dispose handle');
+  assert.equal(comp.namedRafs_.size, 0, 'we removed our named raf dispose handle');
 
   comp.dispose();
 
@@ -1147,6 +1185,115 @@ QUnit.test('setInterval should be canceled on dispose', function(assert) {
   this.clock.tick(1);
 
   assert.equal(called, false, 'setInterval was never called');
+});
+
+QUnit.test('requestNamedAnimationFrame should be canceled on dispose', function(assert) {
+  const comp = new Component(getFakePlayer());
+  let called = false;
+  let clearName;
+  const setName = comp.requestNamedAnimationFrame('testing', () => {
+    called = true;
+  });
+
+  const cancelNamedAnimationFrame = comp.cancelNamedAnimationFrame;
+
+  comp.cancelNamedAnimationFrame = (name) => {
+    clearName = name;
+    return cancelNamedAnimationFrame.call(comp, name);
+  };
+
+  assert.equal(comp.namedRafs_.size, 1, 'we added a named raf');
+  assert.equal(comp.rafIds_.size, 1, 'we added a raf id');
+
+  comp.dispose();
+
+  assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.equal(clearName, setName, 'cancelNamedAnimationFrame was called');
+
+  this.clock.tick(1);
+
+  assert.equal(called, false, 'requestNamedAnimationFrame was never called');
+});
+
+QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific name at a time', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const calls = {
+    one: 0,
+    two: 0,
+    three: 0
+  };
+  const cancelNames = [];
+  const name = 'testing';
+  const handlerOne = () => {
+    calls.one++;
+  };
+  const handlerTwo = () => {
+    calls.two++;
+  };
+  const handlerThree = () => {
+    calls.three++;
+  };
+
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  const cancelNamedAnimationFrame = comp.cancelNamedAnimationFrame;
+
+  comp.cancelNamedAnimationFrame = (_name) => {
+    cancelNames.push(_name);
+    return cancelNamedAnimationFrame.call(comp, _name);
+  };
+
+  comp.requestNamedAnimationFrame(name, handlerOne);
+
+  assert.equal(comp.namedRafs_.size, 1, 'we added a named raf');
+  assert.equal(comp.rafIds_.size, 1, 'we added a raf id');
+
+  comp.requestNamedAnimationFrame(name, handlerTwo);
+
+  assert.deepEqual(cancelNames, [], 'no named cancels');
+  assert.equal(comp.namedRafs_.size, 1, 'still only one named raf');
+  assert.equal(comp.rafIds_.size, 1, 'still only one raf id');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.deepEqual(calls, {
+    one: 1,
+    two: 0,
+    three: 0
+  }, 'only handlerOne was called');
+
+  comp.requestNamedAnimationFrame(name, handlerOne);
+  comp.requestNamedAnimationFrame(name, handlerTwo);
+  comp.requestNamedAnimationFrame(name, handlerThree);
+
+  assert.deepEqual(cancelNames, [], 'no named cancels for testing');
+  assert.equal(comp.namedRafs_.size, 1, 'only added one named raf');
+  assert.equal(comp.rafIds_.size, 1, 'only added one named raf');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.deepEqual(calls, {
+    one: 2,
+    two: 0,
+    three: 0
+  }, 'only the handlerOne called');
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
 });
 
 QUnit.test('$ and $$ functions', function(assert) {

@@ -1,4 +1,6 @@
-export default class SetSham {
+import window from 'global/window';
+
+class SetSham {
   constructor() {
     this.set_ = {};
   }
@@ -22,3 +24,5 @@ export default class SetSham {
     }
   }
 }
+
+export default window.Set ? window.Set : SetSham;

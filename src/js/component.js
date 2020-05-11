@@ -13,8 +13,8 @@ import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/string-cases.js';
 import mergeOptions from './utils/merge-options.js';
 import computedStyle from './utils/computed-style';
-import MapSham from './utils/map-sham.js';
-import SetSham from './utils/set-sham.js';
+import Map from './utils/map.js';
+import Set from './utils/set.js';
 
 /**
  * Base class for all UI Components.
@@ -102,10 +102,10 @@ class Component {
     this.childIndex_ = {};
     this.childNameIndex_ = {};
 
-    this.setTimeoutIds_ = window.Set ? new Set() : new SetSham();
-    this.setIntervalIds_ = window.Set ? new Set() : new SetSham();
-    this.rafIds_ = window.Set ? new Set() : new SetSham();
-    this.namedRafs_ = window.Map ? new Map() : new MapSham();
+    this.setTimeoutIds_ = new Set();
+    this.setIntervalIds_ = new Set();
+    this.rafIds_ = new Set();
+    this.namedRafs_ = new Map();
     this.clearingTimersOnDispose_ = false;
 
     // Add any child components in options
@@ -1514,8 +1514,8 @@ class Component {
     if (this.namedRafs_.has(name)) {
       return;
     }
-
     this.clearTimersOnDispose_();
+
     fn = Fn.bind(this, fn);
 
     const id = this.requestAnimationFrame(() => {
@@ -1526,6 +1526,8 @@ class Component {
     });
 
     this.namedRafs_.set(name, id);
+
+    return name;
   }
 
   /**
@@ -1597,7 +1599,7 @@ class Component {
         ['setTimeoutIds_', 'clearTimeout'],
         ['setIntervalIds_', 'clearInterval']
       ].forEach(([idName, cancelName]) => {
-        this[idName].forEach(this[cancelName], this);
+        this[idName].forEach((val, key) => this[cancelName](key));
       });
 
       this.clearingTimersOnDispose_ = false;

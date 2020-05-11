@@ -1,4 +1,6 @@
-export default class MapSham {
+import window from 'global/window';
+
+class MapSham {
   constructor() {
     this.map_ = {};
   }
@@ -18,7 +20,9 @@ export default class MapSham {
   }
   forEach(callback, thisArg) {
     for (const key in this.map_) {
-      callback.call(thisArg, this.map_[key], key);
+      callback.call(thisArg, this.map_[key], key, this);
     }
   }
 }
+
+export default window.Map ? window.Map : MapSham;
