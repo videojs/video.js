@@ -47,6 +47,7 @@ class LiveTracker extends Component {
     this.reset_();
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
+    this.on(this.player_, 'timeupdate', this.handleDurationchange);
 
     // we don't need to track live playback if the document is hidden,
     // also, tracking when the document is hidden can
