@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the vertical-volume.html</p>
+    <pre>npm start</pre>
+    <pre>open http://localhost:9999/sandbox/vertical-video.html</pre>
+  </div>
+
+  <!--  To make this truly responsive, we have to constrain the container's width.        -->
+  <!--  Because vertical videos are concerned more with height, we base it off vh units.  -->
+  <!-- calc(100vh * 0.5625) is equivalant to "screen height * (9:16)"                     -->
+ <div style="
+        width: calc(100vh * 0.5625); 
+        max-width: 100%;
+        margin: 0 auto;">
+  <video-js
+    id="vid1"
+    controls
+    preload="auto"
+    class="vjs-fluid"
+    >
+    <source src="http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4" type="video/mp4">
+    <p class="vjs-no-js vjs-">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+</div>
+  <script>
+    var vid = document.getElementById('vid1');
+    var player = videojs(vid, {controlBar: {volumePanel: {inline: false}}});
+  </script>
+
+</body>
+</html>
