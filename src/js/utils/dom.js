@@ -592,7 +592,7 @@ export function findPosition(el) {
  */
 export function getElementZoomLevel(el) {
   try {
-    return window.getComputedStyle(el).getPropertyValue('zoom') * 1.0 || 1;
+    return parseFloat(computedStyle(el, 'zoom')) || 1;
   } catch (ignore) {
     log.warn('Can not detect zoom level', el);
     return 1;
