@@ -164,6 +164,26 @@ QUnit.test('should insert element relative to the element of the component to in
   /* eslint-enable no-unused-vars */
 });
 
+QUnit.test('should allow for children that are elements', function(assert) {
+
+  // for legibility of the test itself:
+  /* eslint-disable no-unused-vars */
+
+  const comp = new Component(getFakePlayer());
+  const testEl = Dom.createEl('div');
+
+  // Add element as video el gets added to player
+  comp.el().appendChild(testEl);
+  comp.children_.unshift(testEl);
+
+  const child1 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c1'})});
+  const child2 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c4'})}, 0);
+
+  assert.ok(child2.el_.nextSibling === testEl, 'addChild should insert el before a sibling that is an element');
+
+  /* eslint-enable no-unused-vars */
+});
+
 QUnit.test('addChild should throw if the child does not exist', function(assert) {
   const comp = new Component(getFakePlayer());
 
