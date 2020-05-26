@@ -1,3 +1,10 @@
+<a name="7.7.7"></a>
+## [7.7.7](https://github.com/videojs/video.js/compare/v7.7.6...v7.7.7) (2020-05-26)
+
+### Bug Fixes
+
+* addChild with index should allow for children that are elements ([#6672](https://github.com/videojs/video.js/issues/6672)) ([2afeb15](https://github.com/videojs/video.js/commit/2afeb15)), closes [#6644](https://github.com/videojs/video.js/issues/6644)
+
 <a name="7.7.6"></a>
 ## [7.7.6](https://github.com/videojs/video.js/compare/v7.7.5...v7.7.6) (2020-03-25)
 
