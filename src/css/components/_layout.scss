@@ -113,12 +113,13 @@ body.vjs-full-window {
   bottom: 0;
   right: 0;
 }
-.video-js.vjs-fullscreen {
+.video-js.vjs-fullscreen:not(.vjs-ios-native-fs) {
   width: 100% !important;
   height: 100% !important;
   // Undo any aspect ratio padding for fluid layouts
   padding-top: 0 !important;
 }
+
 .video-js.vjs-fullscreen.vjs-user-inactive {
   cursor: none;
 }
