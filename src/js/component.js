@@ -526,8 +526,13 @@ class Component {
       // If inserting before a component, insert before that component's element
       let refNode = null;
 
-      if (this.children_[index + 1] && this.children_[index + 1].el_) {
-        refNode = this.children_[index + 1].el_;
+      if (this.children_[index + 1]) {
+        // Most children are components, but the video tech is an HTML element
+        if (this.children_[index + 1].el_) {
+          refNode = this.children_[index + 1].el_;
+        } else if (Dom.isEl(this.children_[index + 1])) {
+          refNode = this.children_[index + 1];
+        }
       }
 
       this.contentEl().insertBefore(component.el(), refNode);
