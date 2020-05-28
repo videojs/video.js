@@ -2077,6 +2077,9 @@ class Player extends Component {
    */
   handleTechFullscreenChange_(event, data) {
     if (data) {
+      if (data.nativeIOSFullscreen) {
+        this.toggleClass('vjs-ios-native-fs');
+      }
       this.isFullscreen(data.isFullscreen);
     }
   }

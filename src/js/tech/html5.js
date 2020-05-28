@@ -626,7 +626,11 @@ class Html5 extends Tech {
         this.el_.webkitPresentationMode !== 'picture-in-picture') {
         this.one('webkitendfullscreen', endFn);
 
-        this.trigger('fullscreenchange', { isFullscreen: true });
+        this.trigger('fullscreenchange', {
+          isFullscreen: true,
+          // set a flag in case another tech triggers fullscreenchange
+          nativeIOSFullscreen: true
+        });
       }
     };
 
