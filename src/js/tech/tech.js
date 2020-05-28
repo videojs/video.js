@@ -789,12 +789,13 @@ class Tech extends Component {
   }
 
   /**
-   * A method to check for the presence of the 'disablePictureInPicture' <video> property.
+   * A method to check for the value of the 'disablePictureInPicture' <video> property.
+   * Defaults to true, as it should be considered disabled if the tech does not support pip
    *
    * @abstract
    */
   disablePictureInPicture() {
-    return false;
+    return true;
   }
 
   /**
