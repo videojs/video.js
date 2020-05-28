@@ -1,3 +1,10 @@
+<a name="7.8.3"></a>
+## [7.8.3](https://github.com/videojs/video.js/compare/v7.8.2...v7.8.3) (2020-05-28)
+
+### Bug Fixes
+
+* **fs:** don't set player element css props on native fullscreen ([#6677](https://github.com/videojs/video.js/issues/6677)) ([236b637](https://github.com/videojs/video.js/commit/236b637)), closes [#6673](https://github.com/videojs/video.js/issues/6673) [#6640](https://github.com/videojs/video.js/issues/6640)
+
 <a name="7.8.2"></a>
 ## [7.8.2](https://github.com/videojs/video.js/compare/v7.8.1...v7.8.2) (2020-05-26)
 
