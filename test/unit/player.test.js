@@ -2258,3 +2258,10 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.ok(spyCurrentTime.calledAfter(spyInitTime), 'currentTime was called on canplay event listener');
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
+
+QUnit.test('Should enable debug mode and store log level when calling options', function(assert) {
+  const player = TestHelpers.makePlayer({debug: true});
+
+  assert.ok(player.previousLogLevel_, 'info', 'previous log level is stored when enabling debug');
+});
+
