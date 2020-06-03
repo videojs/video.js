@@ -71,6 +71,12 @@ const parseCues = function(srcContent, track) {
  * @private
  */
 const loadTrack = function(src, track) {
+  if (track._loading === true) {
+    return;
+  }
+
+  track._loading = true;
+
   const opts = {
     uri: src
   };
@@ -87,6 +93,8 @@ const loadTrack = function(src, track) {
   }
 
   XHR(opts, Fn.bind(this, function(err, response, responseBody) {
+    track._loading = false;
+
     if (err) {
       return log.error(err, response);
     }
