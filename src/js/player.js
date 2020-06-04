@@ -379,6 +379,9 @@ class Player extends Component {
     // Init state userActive_
     this.userActive_ = false;
 
+    // Init debugEnabled_
+    this.debugEnabled_ = false;
+
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -4748,13 +4751,19 @@ class Player extends Component {
    * @fires Player#debugoff
    */
   debug(enabled) {
+    if (enabled === undefined) {
+      return this.debugEnabled_;
+    }
     if (enabled) {
       this.trigger('debugon');
       this.previousLogLevel_ = this.log.level;
-      this.log.level('info');
+      this.log.level('debug');
+      this.debugEnabled_ = true;
     } else {
       this.trigger('debugoff');
       this.log.level(this.previousLogLevel_);
+      this.previousLogLevel_ = undefined;
+      this.debugEnabled_ = false;
     }
   }
 }

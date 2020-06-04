@@ -2267,6 +2267,7 @@ QUnit.test('Should fire debugon event when debug mode is enabled', function(asse
   player.debug(true);
 
   assert.ok(debugOnSpy.calledOnce, 'debugon event was fired');
+  player.dispose();
 });
 
 QUnit.test('Should fire debugoff event when debug mode is disabled', function(assert) {
@@ -2277,12 +2278,14 @@ QUnit.test('Should fire debugoff event when debug mode is disabled', function(as
   player.debug(false);
 
   assert.ok(debugOffSpy.calledOnce, 'debugoff event was fired');
+  player.dispose();
 });
 
 QUnit.test('Should enable debug mode and store log level when calling options', function(assert) {
   const player = TestHelpers.makePlayer({debug: true});
 
-  assert.ok(player.previousLogLevel_, 'info', 'previous log level is stored when enabling debug');
+  assert.ok(player.previousLogLevel_, 'debug', 'previous log level is stored when enabling debug');
+  player.dispose();
 });
 
 QUnit.test('Should restore previous log level when disabling debug mode', function(assert) {
@@ -2290,9 +2293,24 @@ QUnit.test('Should restore previous log level when disabling debug mode', functi
 
   player.log.level('error');
   player.debug(true);
-  assert.ok(player.previousLogLevel_, 'info', 'log level is info when debug is enabled');
+  assert.ok(player.log.level(), 'debug', 'log level is debug when debug is enabled');
 
   player.debug(false);
-  assert.ok(player.previousLogLevel_, 'error', 'previous log level was restored');
+  assert.ok(player.log.level(), 'error', 'previous log level was restored');
+  player.dispose();
 });
 
+QUnit.test('Should return if debug is enabled or disabled', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.debug(true);
+  const enabled = player.debug();
+
+  assert.ok(enabled);
+
+  player.debug(false);
+  const disabled = player.debug();
+
+  assert.notOk(disabled);
+  player.dispose();
+});
