@@ -2259,9 +2259,40 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
 
+QUnit.test('Should fire debugon event when debug mode is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const debugOnSpy = sinon.spy();
+
+  player.on('debugon', debugOnSpy);
+  player.debug(true);
+
+  assert.ok(debugOnSpy.calledOnce, 'debugon event was fired');
+});
+
+QUnit.test('Should fire debugoff event when debug mode is disabled', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const debugOffSpy = sinon.spy();
+
+  player.on('debugoff', debugOffSpy);
+  player.debug(false);
+
+  assert.ok(debugOffSpy.calledOnce, 'debugoff event was fired');
+});
+
 QUnit.test('Should enable debug mode and store log level when calling options', function(assert) {
   const player = TestHelpers.makePlayer({debug: true});
 
   assert.ok(player.previousLogLevel_, 'info', 'previous log level is stored when enabling debug');
+});
+
+QUnit.test('Should restore previous log level when disabling debug mode', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.log.level('error');
+  player.debug(true);
+  assert.ok(player.previousLogLevel_, 'info', 'log level is info when debug is enabled');
+
+  player.debug(false);
+  assert.ok(player.previousLogLevel_, 'error', 'previous log level was restored');
 });
 
