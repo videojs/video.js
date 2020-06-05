@@ -1,6 +1,6 @@
 {
   "name": "video.js",
-  "description": "An HTML5 and Flash video player with a common API and skin for both.",
+  "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
   "version": "7.8.1",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
@@ -9,6 +9,7 @@
   "license": "Apache-2.0",
   "keywords": [
     "flash",
+    "hls",
     "html5",
     "player",
     "video",
