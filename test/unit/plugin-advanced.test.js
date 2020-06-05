@@ -78,7 +78,7 @@ QUnit.test('log is added by default', function(assert) {
   assert.strictEqual(typeof instance.log.debug, 'function', 'log.debug is a function');
   assert.strictEqual(typeof instance.log.error, 'function', 'log.error is a function');
   assert.strictEqual(typeof instance.log.history, 'function', 'log.history is a function');
-  assert.strictEqual(typeof instance.log.levels, 'function', 'log.levels is a function');
+  assert.strictEqual(typeof instance.log.levels, 'object', 'log.levels is a object');
   assert.strictEqual(typeof instance.log.warn, 'function', 'log.warn is a function');
 });
 
