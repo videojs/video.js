@@ -280,6 +280,10 @@ export function addClass(element, classToAdd) {
  *         The DOM element with class name removed.
  */
 export function removeClass(element, classToRemove) {
+  // Protect in case the player gets disposed
+  if (!element) {
+    return null;
+  }
   if (element.classList) {
     element.classList.remove(classToRemove);
   } else {
