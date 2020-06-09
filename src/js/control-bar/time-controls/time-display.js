@@ -94,7 +94,7 @@ class TimeDisplay extends Component {
         return;
       }
 
-      if (oldNode) {
+      if (oldNode && this.contentEl_.contains(oldNode)) {
         this.contentEl_.replaceChild(this.textNode_, oldNode);
       } else {
         this.contentEl_.appendChild(this.textNode_);
