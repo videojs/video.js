@@ -151,7 +151,7 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [slack-link]: http://slack.videojs.com
 
-[travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=master
+[travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=main
 
 [travis-link]: https://travis-ci.org/videojs/video.js
 
