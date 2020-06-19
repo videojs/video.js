@@ -2259,7 +2259,9 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
 
-QUnit.test('Should only allow requestfullscreen if the tech supports it', function(assert) {
+const testOrSkip = 'pictureInPictureEnabled' in document ? 'test' : 'skip';
+
+QUnit[testOrSkip]('Should only allow requestPictureInPicture if the tech supports it', function(assert) {
   const player = TestHelpers.makePlayer({});
   let count = 0;
 
