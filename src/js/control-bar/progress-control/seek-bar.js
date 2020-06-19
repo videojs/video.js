@@ -133,7 +133,7 @@ class SeekBar extends Slider {
   update(event) {
     const percent = super.update();
 
-    this.requestAnimationFrame(() => {
+    this.requestNamedAnimationFrame('SeekBar#update', () => {
       const currentTime = this.player_.ended() ?
         this.player_.duration() : this.getCurrentTime_();
       const liveTracker = this.player_.liveTracker;

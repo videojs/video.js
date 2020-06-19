@@ -128,12 +128,7 @@ class TimeTooltip extends Component {
    *        for tooltips that need to do additional animations from the default
    */
   updateTime(seekBarRect, seekBarPoint, time, cb) {
-    // If there is an existing rAF ID, cancel it so we don't over-queue.
-    if (this.rafId_) {
-      this.cancelAnimationFrame(this.rafId_);
-    }
-
-    this.rafId_ = this.requestAnimationFrame(() => {
+    this.requestNamedAnimationFrame('TimeTooltip#updateTime', () => {
       let content;
       const duration = this.player_.duration();
 

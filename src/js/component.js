@@ -13,6 +13,8 @@ import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/string-cases.js';
 import mergeOptions from './utils/merge-options.js';
 import computedStyle from './utils/computed-style';
+import Map from './utils/map.js';
+import Set from './utils/set.js';
 
 /**
  * Base class for all UI Components.
@@ -100,38 +102,10 @@ class Component {
     this.childIndex_ = {};
     this.childNameIndex_ = {};
 
-    let SetSham;
-
-    if (!window.Set) {
-      SetSham = class {
-        constructor() {
-          this.set_ = {};
-        }
-        has(key) {
-          return key in this.set_;
-        }
-        delete(key) {
-          const has = this.has(key);
-
-          delete this.set_[key];
-
-          return has;
-        }
-        add(key) {
-          this.set_[key] = 1;
-          return this;
-        }
-        forEach(callback, thisArg) {
-          for (const key in this.set_) {
-            callback.call(thisArg, key, key, this);
-          }
-        }
-      };
-    }
-
-    this.setTimeoutIds_ = window.Set ? new Set() : new SetSham();
-    this.setIntervalIds_ = window.Set ? new Set() : new SetSham();
-    this.rafIds_ = window.Set ? new Set() : new SetSham();
+    this.setTimeoutIds_ = new Set();
+    this.setIntervalIds_ = new Set();
+    this.rafIds_ = new Set();
+    this.namedRafs_ = new Map();
     this.clearingTimersOnDispose_ = false;
 
     // Add any child components in options
@@ -1530,6 +1504,53 @@ class Component {
   }
 
   /**
+   * Request an animation frame, but only one named animation
+   * frame will be queued. Another will never be added until
+   * the previous one finishes.
+   *
+   * @param {string} name
+   *        The name to give this requestAnimationFrame
+   *
+   * @param  {Component~GenericCallback} fn
+   *         A function that will be bound to this component and executed just
+   *         before the browser's next repaint.
+   */
+  requestNamedAnimationFrame(name, fn) {
+    if (this.namedRafs_.has(name)) {
+      return;
+    }
+    this.clearTimersOnDispose_();
+
+    fn = Fn.bind(this, fn);
+
+    const id = this.requestAnimationFrame(() => {
+      fn();
+      if (this.namedRafs_.has(name)) {
+        this.namedRafs_.delete(name);
+      }
+    });
+
+    this.namedRafs_.set(name, id);
+
+    return name;
+  }
+
+  /**
+   * Cancels a current named animation frame if it exists.
+   *
+   * @param {string} name
+   *        The name of the requestAnimationFrame to cancel.
+   */
+  cancelNamedAnimationFrame(name) {
+    if (!this.namedRafs_.has(name)) {
+      return;
+    }
+
+    this.cancelAnimationFrame(this.namedRafs_.get(name));
+    this.namedRafs_.delete(name);
+  }
+
+  /**
    * Cancels a queued callback passed to {@link Component#requestAnimationFrame}
    * (rAF).
    *
@@ -1578,11 +1599,15 @@ class Component {
     this.clearingTimersOnDispose_ = true;
     this.one('dispose', () => {
       [
+        ['namedRafs_', 'cancelNamedAnimationFrame'],
         ['rafIds_', 'cancelAnimationFrame'],
         ['setTimeoutIds_', 'clearTimeout'],
         ['setIntervalIds_', 'clearInterval']
       ].forEach(([idName, cancelName]) => {
-        this[idName].forEach(this[cancelName], this);
+        // for a `Set` key will actually be the value again
+        // so forEach((val, val) =>` but for maps we want to use
+        // the key.
+        this[idName].forEach((val, key) => this[cancelName](key));
       });
 
       this.clearingTimersOnDispose_ = false;
