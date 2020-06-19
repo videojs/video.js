@@ -175,7 +175,7 @@ QUnit.test('Picture-in-Picture control enabled property value should be correct 
 
   assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
 
-  if ('pictureInPictureEnabled' in document) {
+  if ('pictureInPictureEnabled' in document && player.disablePictureInPicture() === false) {
     player.isInPictureInPicture(true);
     player.trigger('enterpictureinpicture');
     assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an enterpictureinpicture event');
@@ -203,7 +203,7 @@ QUnit.test('Picture-in-Picture control enabled property value should be correct 
 
   assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
 
-  if ('pictureInPictureEnabled' in document) {
+  if ('pictureInPictureEnabled' in document && player.disablePictureInPicture() === false) {
     player.trigger('loadedmetadata');
     assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an loadedmetadata event');
   } else {

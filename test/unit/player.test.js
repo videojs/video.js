@@ -2258,3 +2258,34 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.ok(spyCurrentTime.calledAfter(spyInitTime), 'currentTime was called on canplay event listener');
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
+
+QUnit.test('Should only allow requestfullscreen if the tech supports it', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  let count = 0;
+
+  player.tech_.el_ = {
+    disablePictureInPicture: false,
+    requestPictureInPicture() {
+      count++;
+    }
+  };
+
+  player.tech_.requestPictureInPicture = function() {
+    return player.tech_.el_.requestPictureInPicture();
+  };
+  player.tech_.disablePictureInPicture = function() {
+    return this.el_.disablePictureInPicture;
+  };
+
+  player.requestPictureInPicture();
+  assert.equal(count, 1, 'requestPictureInPicture passed through to supporting tech');
+
+  player.tech_.el_.disablePictureInPicture = true;
+  player.requestPictureInPicture();
+  assert.equal(count, 1, 'requestPictureInPicture not passed through when disabled on tech');
+
+  delete player.tech_.el_.disablePictureInPicture;
+  player.requestPictureInPicture();
+  assert.equal(count, 1, 'requestPictureInPicture not passed through when tech does not support');
+
+});
