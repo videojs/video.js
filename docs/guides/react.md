@@ -75,12 +75,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = (options) => {
     const handlePlayerReady = () => console.log('Video Player Ready')
 
     useEffect(() => {
-        setPlayer(videojs(videoNode, options, handlePlayerReady))
+        setPlayer(videojs(videoNode.current, options, handlePlayerReady))
 
         return () => {
             player?.dispose()
         }
-    }, [videoNode, options])
+    }, [videoNode.current, options, player?.dispose])
 
     // wrap the player in a div with a `data-vjs-player` attribute
     // so videojs won't create additional wrapper in the DOM
