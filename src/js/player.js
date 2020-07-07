@@ -2794,8 +2794,8 @@ class Player extends Component {
 
       return new PromiseClass((resolve, reject) => {
         function offHandler() {
-          self.off(self.fsApi_.fullscreenerror, errorHandler);
-          self.off(self.fsApi_.fullscreenchange, changeHandler);
+          self.off('fullscreenerror', errorHandler);
+          self.off('fullscreenchange', changeHandler);
         }
         function changeHandler() {
           offHandler();
@@ -2872,8 +2872,8 @@ class Player extends Component {
 
       return new PromiseClass((resolve, reject) => {
         function offHandler() {
-          self.off(self.fsApi_.fullscreenerror, errorHandler);
-          self.off(self.fsApi_.fullscreenchange, changeHandler);
+          self.off('fullscreenerror', errorHandler);
+          self.off('fullscreenchange', changeHandler);
         }
         function changeHandler() {
           offHandler();
