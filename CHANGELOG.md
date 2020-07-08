@@ -1,3 +1,10 @@
+<a name="7.8.4"></a>
+## [7.8.4](https://github.com/videojs/video.js/compare/v7.8.3...v7.8.4) (2020-07-08)
+
+### Bug Fixes
+
+* Fullscreen broken in iOS ([#6735](https://github.com/videojs/video.js/issues/6735)) ([d9408ee](https://github.com/videojs/video.js/commit/d9408ee)), closes [#6707](https://github.com/videojs/video.js/issues/6707) [#6684](https://github.com/videojs/video.js/issues/6684) [#6645](https://github.com/videojs/video.js/issues/6645)
+
 <a name="7.8.3"></a>
 ## [7.8.3](https://github.com/videojs/video.js/compare/v7.8.2...v7.8.3) (2020-05-28)
 
