@@ -48,10 +48,10 @@ class PictureInPictureToggle extends Button {
    * or on value returned by player.disablePictureInPicture() method.
    */
   handlePictureInPictureEnabledChange() {
-    if (!document.pictureInPictureEnabled || this.player_.disablePictureInPicture()) {
-      this.disable();
-    } else {
+    if (document.pictureInPictureEnabled && this.player_.disablePictureInPicture() === false) {
       this.enable();
+    } else {
+      this.disable();
     }
   }
 

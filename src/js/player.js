@@ -2802,8 +2802,8 @@ class Player extends Component {
 
       return new PromiseClass((resolve, reject) => {
         function offHandler() {
-          self.off(self.fsApi_.fullscreenerror, errorHandler);
-          self.off(self.fsApi_.fullscreenchange, changeHandler);
+          self.off('fullscreenerror', errorHandler);
+          self.off('fullscreenchange', changeHandler);
         }
         function changeHandler() {
           offHandler();
@@ -2880,8 +2880,8 @@ class Player extends Component {
 
       return new PromiseClass((resolve, reject) => {
         function offHandler() {
-          self.off(self.fsApi_.fullscreenerror, errorHandler);
-          self.off(self.fsApi_.fullscreenchange, changeHandler);
+          self.off('fullscreenerror', errorHandler);
+          self.off('fullscreenchange', changeHandler);
         }
         function changeHandler() {
           offHandler();
@@ -3043,7 +3043,7 @@ class Player extends Component {
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
-    if ('pictureInPictureEnabled' in document) {
+    if ('pictureInPictureEnabled' in document && this.disablePictureInPicture() === false) {
       /**
        * This event fires when the player enters picture in picture mode
        *
