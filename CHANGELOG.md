@@ -1,3 +1,41 @@
+<a name="7.9.0"></a>
+# [7.9.0](https://github.com/videojs/video.js/compare/v7.8.1...v7.9.0) (2020-07-10)
+
+### Features
+
+* Add a default, plugin-specific logger to advanced plugins ([#6693](https://github.com/videojs/video.js/issues/6693)) ([f6a66e6](https://github.com/videojs/video.js/commit/f6a66e6))
+* add debug mode ([#6687](https://github.com/videojs/video.js/issues/6687)) ([3d505ef](https://github.com/videojs/video.js/commit/3d505ef))
+* Add named requestAnimationFrame to prevent performance issues ([#6627](https://github.com/videojs/video.js/issues/6627)) ([6e7cc75](https://github.com/videojs/video.js/commit/6e7cc75)), closes [#5937](https://github.com/videojs/video.js/issues/5937)
+* Add support for CAF, FLAC and WAV formats in known mimetypes ([#6657](https://github.com/videojs/video.js/issues/6657)) ([8d462bc](https://github.com/videojs/video.js/commit/8d462bc)), closes [#5982](https://github.com/videojs/video.js/issues/5982)
+* adds disablePictureInPicture method to the player API. ([#6378](https://github.com/videojs/video.js/issues/6378)) ([dbd5203](https://github.com/videojs/video.js/commit/dbd5203))
+* support fastSeek during scrubbing if available ([#6525](https://github.com/videojs/video.js/issues/6525)) ([8c66c58](https://github.com/videojs/video.js/commit/8c66c58))
+
+### Bug Fixes
+
+* add PiP to zh-CN.json ([#6680](https://github.com/videojs/video.js/issues/6680)) ([d90569f](https://github.com/videojs/video.js/commit/d90569f))
+* addChild with index should allow for children that are elements ([#6644](https://github.com/videojs/video.js/issues/6644)) ([0b91f74](https://github.com/videojs/video.js/commit/0b91f74)), closes [#6297](https://github.com/videojs/video.js/issues/6297)
+* Disable PIP if tech doesn't support it ([#6678](https://github.com/videojs/video.js/issues/6678)) ([907d1cd](https://github.com/videojs/video.js/commit/907d1cd)), closes [#6398](https://github.com/videojs/video.js/issues/6398)
+* Fullscreen broken in iOS ([#6735](https://github.com/videojs/video.js/issues/6735)) ([fdd807b](https://github.com/videojs/video.js/commit/fdd807b)), closes [#6707](https://github.com/videojs/video.js/issues/6707) [#6684](https://github.com/videojs/video.js/issues/6684) [#6645](https://github.com/videojs/video.js/issues/6645)
+* Use clamp correctly in progress control ([#6625](https://github.com/videojs/video.js/issues/6625)) ([cad9114](https://github.com/videojs/video.js/commit/cad9114))
+* **fs:** don't set player element css props on native fullscreen ([#6673](https://github.com/videojs/video.js/issues/6673)) ([d6b07f0](https://github.com/videojs/video.js/commit/d6b07f0)), closes [#6640](https://github.com/videojs/video.js/issues/6640)
+* **lang:** Update pt-BR.json ([#6598](https://github.com/videojs/video.js/issues/6598)) ([90e2b0f](https://github.com/videojs/video.js/commit/90e2b0f))
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@1](https://github.com/1).13.3 ([#6610](https://github.com/videojs/video.js/issues/6610)) ([f779bad](https://github.com/videojs/video.js/commit/f779bad))
+* **text-tracks:** set withCredentials on XHR if crossOrigin='use-credentials' ([#6588](https://github.com/videojs/video.js/issues/6588)) ([a4ea1f9](https://github.com/videojs/video.js/commit/a4ea1f9)), closes [#6587](https://github.com/videojs/video.js/issues/6587)
+
+### Chores
+
+* Remove "flash" and add "dash" in keywords about video.js ([#6692](https://github.com/videojs/video.js/issues/6692)) ([4d9e1bc](https://github.com/videojs/video.js/commit/4d9e1bc)), closes [#6603](https://github.com/videojs/video.js/issues/6603)
+* update travis-ci badge ([2e61990](https://github.com/videojs/video.js/commit/2e61990))
+
+### Documentation
+
+* **faq:** update FAQ about HLS and DASH with VHS ([#6608](https://github.com/videojs/video.js/issues/6608)) ([808d818](https://github.com/videojs/video.js/commit/808d818)), closes [#6590](https://github.com/videojs/video.js/issues/6590)
+* **README:** Update CDN version urls ([#6658](https://github.com/videojs/video.js/issues/6658)) ([756fbfc](https://github.com/videojs/video.js/commit/756fbfc))
+
+### Tests
+
+* skip requestPictureInPicture test if API isn't available ([#6719](https://github.com/videojs/video.js/issues/6719)) ([6d2e52a](https://github.com/videojs/video.js/commit/6d2e52a))
+
 <a name="7.8.1"></a>
 ## [7.8.1](https://github.com/videojs/video.js/compare/v7.8.0...v7.8.1) (2020-04-16)
 
