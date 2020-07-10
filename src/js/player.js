@@ -379,6 +379,9 @@ class Player extends Component {
     // Init state userActive_
     this.userActive_ = false;
 
+    // Init debugEnabled_
+    this.debugEnabled_ = false;
+
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -483,6 +486,11 @@ class Player extends Component {
       Object.keys(options.plugins).forEach((name) => {
         this[name](options.plugins[name]);
       });
+    }
+
+    // Enable debug mode to fire debugon event for all plugins.
+    if (options.debug) {
+      this.debug(true);
     }
 
     this.options_.playerOptions = playerOptionsCopy;
@@ -4733,6 +4741,30 @@ class Player extends Component {
             'msFlexBasis' in elem.style ||
             // IE10-specific (2012 flex spec), available for completeness
             'msFlexOrder' in elem.style);
+  }
+
+  /**
+   * Set debug mode to enable/disable logs at info level.
+   *
+   * @param {boolean} enabled
+   * @fires Player#debugon
+   * @fires Player#debugoff
+   */
+  debug(enabled) {
+    if (enabled === undefined) {
+      return this.debugEnabled_;
+    }
+    if (enabled) {
+      this.trigger('debugon');
+      this.previousLogLevel_ = this.log.level;
+      this.log.level('debug');
+      this.debugEnabled_ = true;
+    } else {
+      this.trigger('debugoff');
+      this.log.level(this.previousLogLevel_);
+      this.previousLogLevel_ = undefined;
+      this.debugEnabled_ = false;
+    }
   }
 }
 
