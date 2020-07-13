@@ -51,7 +51,7 @@ QUnit.module('HTML5', {
   }
 });
 
-QUnit.test('if setScrubbing is true and fastSeek is available, use it', function(assert) {
+QUnit[browser.IS_ANY_SAFARI ? 'test' : 'skip']('if setScrubbing is true and fastSeek is available, use it', function(assert) {
   Object.defineProperty(tech.el(), 'currentTime', {
     get: () => {},
     set: () => {},

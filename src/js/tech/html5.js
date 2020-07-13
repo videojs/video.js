@@ -536,7 +536,7 @@ class Html5 extends Tech {
    */
   setCurrentTime(seconds) {
     try {
-      if (this.isScrubbing_ && this.el_.fastSeek) {
+      if (this.isScrubbing_ && this.el_.fastSeek && browser.IS_ANY_SAFARI) {
         this.el_.fastSeek(seconds);
       } else {
         this.el_.currentTime = seconds;
