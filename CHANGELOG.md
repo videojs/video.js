@@ -1,3 +1,10 @@
+<a name="7.9.1"></a>
+## [7.9.1](https://github.com/videojs/video.js/compare/v7.9.0...v7.9.1) (2020-07-13)
+
+### Bug Fixes
+
+* limit fastSeek to Safari based browsers only ([#6752](https://github.com/videojs/video.js/issues/6752)) ([94bea35](https://github.com/videojs/video.js/commit/94bea35)), closes [#6722](https://github.com/videojs/video.js/issues/6722)
+
 <a name="7.9.0"></a>
 # [7.9.0](https://github.com/videojs/video.js/compare/v7.8.1...v7.9.0) (2020-07-10)
 
