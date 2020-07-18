@@ -85,7 +85,7 @@ QUnit.test(
 );
 
 QUnit.test(
-  'should log about already initalized players if options already passed',
+  'should log about already initialized players if options already passed',
   function(assert) {
     const origWarnLog = log.warn;
     const fixture = document.getElementById('qunit-fixture');
@@ -118,7 +118,7 @@ QUnit.test(
     assert.equal(warnLogs.length, 1, 'logged a warning');
     assert.equal(
       warnLogs[0],
-      'Player "test_vid_id" is already initialised. Options will not be applied.',
+      'Player "test_vid_id" is already initialized. Options will not be applied.',
       'logged the right message'
     );
 
@@ -469,7 +469,7 @@ QUnit.test('should add video-js class to video-js embed if missing', function(as
 });
 
 QUnit.test(
-  'should log about already initalized players if options already passed',
+  'should log about already initialized players if options already passed',
   function(assert) {
     const origWarnLog = log.warn;
     const fixture = document.getElementById('qunit-fixture');
@@ -502,7 +502,7 @@ QUnit.test(
     assert.equal(warnLogs.length, 1, 'logged a warning');
     assert.equal(
       warnLogs[0],
-      'Player "test_vid_id" is already initialised. Options will not be applied.',
+      'Player "test_vid_id" is already initialized. Options will not be applied.',
       'logged the right message'
     );
 

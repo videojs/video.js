@@ -32,7 +32,7 @@
   "You aborted the media playback": "Avètz copat la lectura del mèdia.",
   "A network error caused the media download to fail part-way.": "Una error de ret a provocat un fracàs del telecargament.",
   "The media could not be loaded, either because the server or network failed or because the format is not supported.": "Lo mèdia a pas pogut èsser cargat, siá perque lo servidor o lo ret a fracassat siá perque lo format es pas compatible.",
-  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "La lectura del mèdia es copada a causa d’un problèma de corrupcion o perque lo mèdia utiliza de foncionalitats pas suportadas pel navigador.",
+  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "La lectura del mèdia es copada a causa d’un problèma de corruption o perque lo mèdia utiliza de foncionalitats pas suportadas pel navigador.",
   "No compatible source was found for this media.": "Cap de font compatiblas pas trobada per aqueste mèdia.",
   "The media is encrypted and we do not have the keys to decrypt it.": "Lo mèdia es chifrat e avèm pas las claus per lo deschifrar.",
   "Play Video": "Legir la vidèo",

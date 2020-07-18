@@ -315,7 +315,7 @@ class LiveTracker extends Component {
   }
 
   /**
-   * The number of seconds that have occured after seekable end
+   * The number of seconds that have occurred after seekable end
    * changed. This will be reset to 0 once seekable end changes.
    *
    * @return {number}

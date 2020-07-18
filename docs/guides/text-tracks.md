@@ -65,8 +65,8 @@ Video.js will automatically read `track` elements from the `video` element. Trac
 
 One of the track types supported by Video.js:
 
-* `"subtitles"` (default): Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.
-* `"captions"`: Transcription of the dialogue, sound effects, musical cues, and other audio information for viewer who are deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
+* `"subtitles"` (default): Translations of the dialog in the video for when audio is available but not understood. Subtitles are shown over the video.
+* `"captions"`: Transcription of the dialog, sound effects, musical cues, and other audio information for viewer who are deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
 * `"chapters"`: Chapter titles that are used to create navigation within the video. Typically, these are in the form of a list of chapters that the viewer can use to navigate the video.
 * `"descriptions"`: Text descriptions of the action in the content for when the video portion isn't available or because the viewer is blind or not using a screen. Descriptions are read by a screen reader or turned into a separate audio track.
 * `"metadata"`: Tracks that have data meant for JavaScript to parse and do something with. These aren't shown to the user.

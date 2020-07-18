@@ -92,7 +92,7 @@ There are a few labels that might be added to your issue or PR by a maintainer. 
 
 ## Contributing code
 
-To contibute code you'll need to be able to build a copy of Video.js and run tests locally. There are a few requirements before getting started.
+To contribute code you'll need to be able to build a copy of Video.js and run tests locally. There are a few requirements before getting started.
 
 * Node.js
   Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)

@@ -4,7 +4,7 @@
 import EventTarget from '../event-target';
 
 /**
- * Common functionaliy between {@link TextTrackList}, {@link AudioTrackList}, and
+ * Common functionally between {@link TextTrackList}, {@link AudioTrackList}, and
  * {@link VideoTrackList}
  *
  * @extends EventTarget

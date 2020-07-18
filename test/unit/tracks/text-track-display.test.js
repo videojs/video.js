@@ -184,7 +184,7 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 
-  QUnit.test("don't select user langauge if it is an empty string", function(assert) {
+  QUnit.test("don't select user language if it is an empty string", function(assert) {
     const player = TestHelpers.makePlayer();
     const track1 = {
       kind: 'captions',

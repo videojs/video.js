@@ -225,7 +225,7 @@ myPlayer.ready(function() {
 });
 ```
 
-`currentTime` will give you the currentTime (in seconds) that playback is currently occuring at.
+`currentTime` will give you the currentTime (in seconds) that playback is currently occurring at.
 
 ```js
 var myPlayer = videojs('some-player-id');
@@ -251,7 +251,7 @@ myPlayer.ready(function() {
 });
 ```
 
-`remainingTime` will give you the seconds that are remaing in the video.
+`remainingTime` will give you the seconds that are remaining in the video.
 
 ```js
 var myPlayer = videojs('some-player-id');

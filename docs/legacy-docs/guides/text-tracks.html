@@ -13,8 +13,8 @@
 <h1 id="text-tracks">Text Tracks</h1>
 <p>Text Tracks are a function of HTML5 video for providing time triggered text to the viewer. Video.js makes tracks work across all browsers. There are currently five types of tracks:</p>
 <ul>
-<li><strong>Subtitles</strong>: Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.</li>
-<li><strong>Captions</strong>: Transcription of the dialogue, sound effects, musical cues, and other audio information for when the viewer is deaf/hard of hearing, or the video is muted. Captions are also shown over the video.</li>
+<li><strong>Subtitles</strong>: Translations of the dialog in the video for when audio is available but not understood. Subtitles are shown over the video.</li>
+<li><strong>Captions</strong>: Transcription of the dialog, sound effects, musical cues, and other audio information for when the viewer is deaf/hard of hearing, or the video is muted. Captions are also shown over the video.</li>
 <li><strong>Chapters</strong>: Chapter titles that are used to create navigation within the video. Typically they&#39;re in the form of a list of chapters that the viewer can click on to go to a specific chapter.</li>
 <li><strong>Descriptions</strong>: Text descriptions of what&#39;s happening in the video for when the video portion isn&#39;t available, because the viewer is blind, not using a screen, or driving and about to crash because they&#39;re trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track.</li>
 <li><strong>Metadata</strong>: Tracks that have data meant for javascript to parse and do something with. These aren&#39;t shown to the user.</li>
@@ -133,7 +133,7 @@ What this means for you?</p>
 <li>This only applied to the emulated captions support, native text tracks behavior will change depending on the browser</li>
 </ul>
 </li>
-<li>If you select a given track from the menu, videojs will turn off all the other tracks of the same kind. This may seem like you can have both subtitles and captions turned on at the same time but unfortuantely, at this time we only support one track being displayed at a time.<ul>
+<li>If you select a given track from the menu, videojs will turn off all the other tracks of the same kind. This may seem like you can have both subtitles and captions turned on at the same time but unfortunately, at this time we only support one track being displayed at a time.<ul>
 <li>This means that for emulated text tracks, we&#39;ll choose the first captions or subtitles track that is enabled to display.</li>
 <li>When native text tracks are supported, we will still disable the other tracks of the same kind but it is possible that multiple text tracks are shown.</li>
 <li>If a <code>descriptions</code> track is selected and subsequently a <code>subtitles</code> or <code>captions</code> track is selected, the <code>descriptions</code> track is disabled and its menu button is also disabled.</li>

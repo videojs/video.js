@@ -79,7 +79,7 @@ QUnit.test('off() errors', function(assert) {
   const targeta = this.targets.a = evented({});
   const targetb = this.targets.b = evented({});
   const targetc = this.targets.c = evented({});
-  const targetd = this.targets.d = evented({});
+  const targeted = this.targets.d = evented({});
 
   // An invalid event actually causes an invalid target error because it
   // gets passed into code that assumes the first argument is the target.
@@ -87,7 +87,7 @@ QUnit.test('off() errors', function(assert) {
   assert.throws(() => targeta.off({}, 'x', () => {}), errors.target, 'the expected error is thrown');
   assert.throws(() => targeta.off(targetb, '', () => {}), errors.type, 'the expected error is thrown');
   assert.throws(() => targeta.off(targetc, [], () => {}), errors.type, 'the expected error is thrown');
-  assert.throws(() => targeta.off(targetd, 'x', null), errors.listener, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targeted, 'x', null), errors.listener, 'the expected error is thrown');
 });
 
 QUnit.test('on() can add a listener to one event type on this object', function(assert) {
@@ -287,7 +287,7 @@ QUnit.test('one() can add a listener to one event type on a different target obj
 });
 
 // TODO: This test is incorrect! this listener should be called twice,
-//       but instead all listners are removed on the first trigger!
+//       but instead all listeners are removed on the first trigger!
 //       see https://github.com/videojs/video.js/issues/5962
 QUnit.test('one() can add a listener to an array of event types on a different target object', function(assert) {
   const a = this.targets.a = evented({});

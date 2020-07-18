@@ -81,7 +81,7 @@ function MyClass(name) {
 MyClass.prototype.sayMyName = function() {
   alert(this.myName);
 };
-// Subclass the exisitng class and change the name
+// Subclass the existing class and change the name
 // when initializing
 var MySubClass = videojs.extend(MyClass, {
   constructor: function(name) {

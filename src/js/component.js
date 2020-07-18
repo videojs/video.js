@@ -28,7 +28,7 @@ class Component {
 
   /**
    * A callback that is called when a component is ready. Does not have any
-   * paramters and any callback value will be ignored.
+   * parameters and any callback value will be ignored.
    *
    * @callback Component~ReadyCallback
    * @this Component
@@ -646,7 +646,7 @@ class Component {
         })
         .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
-        // techs are registerd as Components but can't aren't compatible
+        // techs are registered as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
           const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
@@ -658,7 +658,7 @@ class Component {
   }
 
   /**
-   * Builds the default DOM class name. Should be overriden by sub-components.
+   * Builds the default DOM class name. Should be overridden by sub-components.
    *
    * @return {string}
    *         The DOM class name for this object.

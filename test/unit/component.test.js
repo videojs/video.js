@@ -45,7 +45,7 @@ QUnit.module('Component', {
 
 const getFakePlayer = function() {
   return {
-    // Fake player requries an ID
+    // Fake player requires an ID
     id() {
       return 'player_1';
     },

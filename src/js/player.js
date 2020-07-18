@@ -1042,7 +1042,7 @@ class Player extends Component {
       // Use any width that's been specifically set
       width = this.width_;
     } else if (this.height_ !== undefined) {
-      // Or calulate the width from the aspect ratio if a height has been set
+      // Or calculate the width from the aspect ratio if a height has been set
       width = this.height_ / ratioMultiplier;
     } else {
       // Or use the video's metadata, or use the video el's default of 300
@@ -1575,7 +1575,7 @@ class Player extends Component {
         }
       }
 
-      // update the source to the intial source right away
+      // update the source to the initial source right away
       // in some cases this will be empty string
       updateSourceCaches(eventSrc);
 
@@ -2361,7 +2361,7 @@ class Player extends Component {
   /**
    * These functions will be run when if play is terminated. If play
    * runPlayCallbacks_ is run these function will not be run. This allows us
-   * to differenciate between a terminated play and an actual call to play.
+   * to differentiate between a terminated play and an actual call to play.
    */
   runPlayTerminatedQueue_() {
     const queue = this.playTerminatedQueue_.slice(0);
@@ -2560,7 +2560,7 @@ class Player extends Component {
   }
 
   /**
-   * A remaining time function that is intented to be used when
+   * A remaining time function that is intended to be used when
    * the time is to be displayed directly to the user.
    *
    * @return {number}
@@ -3335,7 +3335,7 @@ class Player extends Component {
       return;
     }
 
-    // intial sources
+    // initial sources
     this.changingSrc_ = true;
 
     this.cache_.sources = sources;
@@ -4944,7 +4944,7 @@ Player.prototype.options_ = {
    * Returns the current state of network activity for the element, from
    * the codes in the list below.
    * - NETWORK_EMPTY (numeric value 0)
-   *   The element has not yet been initialised. All attributes are in
+   *   The element has not yet been initialized. All attributes are in
    *   their initial states.
    * - NETWORK_IDLE (numeric value 1)
    *   The element's resource selection algorithm is active and has

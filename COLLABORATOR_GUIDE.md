@@ -236,7 +236,7 @@ fixup 433c582 Update TOC
 edit 259dee6 Add grunt and doctoc npm scripts
 ```
 
-When you get to the edit commits, git will give more information, but you'd want to run ammend the current commit while following our commit guidelines
+When you get to the edit commits, git will give more information, but you'd want to run amend the current commit while following our commit guidelines
 
 ```sh
 git commit --amend

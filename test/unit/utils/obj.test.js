@@ -134,7 +134,7 @@ QUnit.module('utils/obj.assign', function() {
     QUnit.test('override object', function(assert) {
       const foo = {foo: 'yellow'};
 
-      assert.deepEqual(Obj.assign(foo, {foo: 'blue'}), {foo: 'blue'}, 'Obj.assign should return overriden result');
+      assert.deepEqual(Obj.assign(foo, {foo: 'blue'}), {foo: 'blue'}, 'Obj.assign should return overridden result');
       assert.deepEqual(foo, {foo: 'blue'}, 'foo should be modified directly');
     });
 

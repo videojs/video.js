@@ -158,19 +158,19 @@ QUnit.test('middleware mediate iterates through the middleware array twice', fun
     callPlay() {
       playsToTech++;
     },
-    play(cancelled, value) {
+    play(canceled, value) {
       playsToPlayer++;
       pv1 = value;
-      pc1 = cancelled;
+      pc1 = canceled;
     }
   }, {
     callPlay() {
       playsToTech++;
     },
-    play(cancelled, value) {
+    play(canceled, value) {
       playsToPlayer++;
       pv2 = value;
-      pc2 = cancelled;
+      pc2 = canceled;
     }
   }];
   const tech = {
@@ -192,8 +192,8 @@ QUnit.test('middleware mediate iterates through the middleware array twice', fun
   assert.deepEqual(pv1.then, techPlay.then, 'the value returned by the tech is passed through the middleware');
   assert.deepEqual(pv2, techPlay, 'the value returned by the tech is passed through the middleware');
   assert.deepEqual(pp, techPlay, 'the value returned to the player is the value returned from the tech');
-  assert.equal(pc1, false, 'the play has not been cancelled in middleware 1');
-  assert.equal(pc2, false, 'the play has not been cancelled in middleware 2');
+  assert.equal(pc1, false, 'the play has not been canceled in middleware 1');
+  assert.equal(pc2, false, 'the play has not been canceled in middleware 2');
 });
 
 QUnit.test('middleware mediate allows and can detect cancellation', function(assert) {
@@ -209,20 +209,20 @@ QUnit.test('middleware mediate allows and can detect cancellation', function(ass
     callPlay() {
       playsToTech++;
     },
-    play(cancelled, value) {
+    play(canceled, value) {
       playsToPlayer++;
       pv1 = value;
-      pc1 = cancelled;
+      pc1 = canceled;
     }
   }, {
     callPlay() {
       playsToTech++;
       return middleware.TERMINATOR;
     },
-    play(cancelled, value) {
+    play(canceled, value) {
       playsToPlayer++;
       pv2 = value;
-      pc2 = cancelled;
+      pc2 = canceled;
     }
   }];
   const tech = {
@@ -241,8 +241,8 @@ QUnit.test('middleware mediate allows and can detect cancellation', function(ass
   assert.equal(pv1, null, 'null is returned through the middleware if a middleware terminated previously');
   assert.equal(pv2, null, 'null is returned through the middleware if a middleware terminated previously');
   assert.equal(pp, null, 'null is returned to the player if a middleware terminated previously');
-  assert.equal(pc1, true, 'the play has been cancelled in middleware 1');
-  assert.equal(pc2, true, 'the play has been cancelled in middleware 2');
+  assert.equal(pc1, true, 'the play has been canceled in middleware 1');
+  assert.equal(pc2, true, 'the play has been canceled in middleware 2');
 });
 
 QUnit.test('setSource is run asynchronously', function(assert) {

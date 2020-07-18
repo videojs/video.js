@@ -41,7 +41,7 @@ Video.js supports all attributes of the `<video>` element (such as `controls`, `
 </video>
 ```
 
-You can use a `<video-js>` element instead of `<video>`. Using a `<video>` element is undesirable in some circumstances, as the browser may show unstyled controls or try to load a source in the moments before the player initialises, which does not happen with the `<video-js>` custom element. 
+You can use a `<video-js>` element instead of `<video>`. Using a `<video>` element is undesirable in some circumstances, as the browser may show unstyled controls or try to load a source in the moments before the player initializes, which does not happen with the `<video-js>` custom element. 
 
 ```html
 <video-js>
@@ -107,7 +107,7 @@ If there is no player matching the argument, it will attempt to create one.
 
 #### Using `videojs.getPlayer()`
 
-Sometimes, you want to get a reference to a player without the potential side effects of calling `videojs()`. This can be acheived by calling `videojs.getPlayer()` with either a string matching the element's ID or the element itself.
+Sometimes, you want to get a reference to a player without the potential side effects of calling `videojs()`. This can be achieved by calling `videojs.getPlayer()` with either a string matching the element's ID or the element itself.
 
 #### Using `videojs.getPlayers()` or `videojs.players`
 

@@ -55,7 +55,7 @@
           }
         },
         // Mediating the results back to the player
-        play: function(cancelled, value) {
+        play: function(canceled, value) {
           console.log('Middleware 1: play got from tech. What is the value passed?', value);
 
           // Handle the promise if it is returned
@@ -68,8 +68,8 @@
             });
           }
 
-          if (cancelled) {
-            console.log('Middleware 1: play has been cancelled prior to this middleware');
+          if (canceled) {
+            console.log('Middleware 1: play has been canceled prior to this middleware');
           }
         },
         // Mediating to tech
@@ -86,11 +86,11 @@
           }
         },
         // Mediating the results back to the player
-        pause: function(cancelled, value) {
+        pause: function(canceled, value) {
           console.log('Middleware 1: pause got back from tech. What is the value passed?', value);
 
-          if (cancelled) {
-            console.log('Middleware 1: pause has been cancelled prior to this middleware');
+          if (canceled) {
+            console.log('Middleware 1: pause has been canceled prior to this middleware');
           }
 
           return value;
@@ -108,11 +108,11 @@
         callPlay: function() {
           console.log('Middleware 2: play has been called');
         },
-        play: function(cancelled, value) {
+        play: function(canceled, value) {
           console.log('Middleware 2: got play from tech. What is the value passed?', value);
 
-          if (cancelled) {
-            console.log('Middleware 2: play has been cancelled prior to this middleware');
+          if (canceled) {
+            console.log('Middleware 2: play has been canceled prior to this middleware');
           }
 
           return value;
@@ -120,11 +120,11 @@
         callPause: function() {
           console.log('Middleware 2: pause has been called');
         },
-        pause: function(cancelled, value) {
+        pause: function(canceled, value) {
           console.log('Middleware 2: got pause from tech. What is the value passed?', value);
 
-          if (cancelled) {
-            console.log('Middleware 2: pause has been cancelled prior to this middleware');
+          if (canceled) {
+            console.log('Middleware 2: pause has been canceled prior to this middleware');
           }
 
           return value;

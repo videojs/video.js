@@ -8093,7 +8093,7 @@ var docData =
         "scope": "global"
     },
     {
-        "comment": "/**\n* Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4\n* Can be used in conjuction with `currentType` to assist in rebuilding the current source object.\n*\n* @return {String} The current source\n* @method currentSrc\n*/",
+        "comment": "/**\n* Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4\n* Can be used in conjunction with `currentType` to assist in rebuilding the current source object.\n*\n* @return {String} The current source\n* @method currentSrc\n*/",
         "meta": {
             "range": [
                 18692,
@@ -8104,7 +8104,7 @@ var docData =
             "path": "/Users/mboles/git/BCL-LearningSamples/grunt-shell/videojs-src",
             "code": {}
         },
-        "description": "<p>Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4\nCan be used in conjuction with <code>currentType</code> to assist in rebuilding the current source object.</p>",
+        "description": "<p>Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4\nCan be used in conjunction with <code>currentType</code> to assist in rebuilding the current source object.</p>",
         "returns": [
             {
                 "type": {
@@ -8773,7 +8773,7 @@ var docData =
         "scope": "global"
     },
     {
-        "comment": "/**\n* Returns the current state of network activity for the element, from\n* the codes in the list below.\n* - NETWORK_EMPTY (numeric value 0)\n*   The element has not yet been initialised. All attributes are in\n*   their initial states.\n* - NETWORK_IDLE (numeric value 1)\n*   The element's resource selection algorithm is active and has\n*   selected a resource, but it is not actually using the network at\n*   this time.\n* - NETWORK_LOADING (numeric value 2)\n*   The user agent is actively trying to download data.\n* - NETWORK_NO_SOURCE (numeric value 3)\n*   The element's resource selection algorithm is active, but it has\n*   not yet found a resource to use.\n*\n* @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states\n* @return {Number} the current network activity state\n* @method networkState\n*/",
+        "comment": "/**\n* Returns the current state of network activity for the element, from\n* the codes in the list below.\n* - NETWORK_EMPTY (numeric value 0)\n*   The element has not yet been initialized. All attributes are in\n*   their initial states.\n* - NETWORK_IDLE (numeric value 1)\n*   The element's resource selection algorithm is active and has\n*   selected a resource, but it is not actually using the network at\n*   this time.\n* - NETWORK_LOADING (numeric value 2)\n*   The user agent is actively trying to download data.\n* - NETWORK_NO_SOURCE (numeric value 3)\n*   The element's resource selection algorithm is active, but it has\n*   not yet found a resource to use.\n*\n* @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states\n* @return {Number} the current network activity state\n* @method networkState\n*/",
         "meta": {
             "range": [
                 23900,
@@ -8784,7 +8784,7 @@ var docData =
             "path": "/Users/mboles/git/BCL-LearningSamples/grunt-shell/videojs-src",
             "code": {}
         },
-        "description": "<p>Returns the current state of network activity for the element, from\nthe codes in the list below.</p>\n<ul>\n<li>NETWORK_EMPTY (numeric value 0)\nThe element has not yet been initialised. All attributes are in\ntheir initial states.</li>\n<li>NETWORK_IDLE (numeric value 1)\nThe element's resource selection algorithm is active and has\nselected a resource, but it is not actually using the network at\nthis time.</li>\n<li>NETWORK_LOADING (numeric value 2)\nThe user agent is actively trying to download data.</li>\n<li>NETWORK_NO_SOURCE (numeric value 3)\nThe element's resource selection algorithm is active, but it has\nnot yet found a resource to use.</li>\n</ul>",
+        "description": "<p>Returns the current state of network activity for the element, from\nthe codes in the list below.</p>\n<ul>\n<li>NETWORK_EMPTY (numeric value 0)\nThe element has not yet been initialized. All attributes are in\ntheir initial states.</li>\n<li>NETWORK_IDLE (numeric value 1)\nThe element's resource selection algorithm is active and has\nselected a resource, but it is not actually using the network at\nthis time.</li>\n<li>NETWORK_LOADING (numeric value 2)\nThe user agent is actively trying to download data.</li>\n<li>NETWORK_NO_SOURCE (numeric value 3)\nThe element's resource selection algorithm is active, but it has\nnot yet found a resource to use.</li>\n</ul>",
         "see": [
             "https://html.spec.whatwg.org/multipage/embedded-content.html#network-states"
         ],
@@ -14762,7 +14762,7 @@ var docData =
         "scope": "global"
     },
     {
-        "comment": "/**\n* Subclass an existing class\n* Mimics ES6 subclassing with the `extends` keyword\n* ```js\n*     // Create a basic javascript 'class'\n*     function MyClass(name){\n*       // Set a property at initialization\n*       this.myName = name;\n*     }\n*     // Create an instance method\n*     MyClass.prototype.sayMyName = function(){\n*       alert(this.myName);\n*     };\n*     // Subclass the exisitng class and change the name\n*     // when initializing\n*     var MySubClass = videojs.extends(MyClass, {\n*       constructor: function(name) {\n*         // Call the super class constructor for the subclass\n*         MyClass.call(this, name)\n*       }\n*     });\n*     // Create an instance of the new sub class\n*     var myInstance = new MySubClass('John');\n*     myInstance.sayMyName(); // -> should alert \"John\"\n* ```\n*\n* @param {Function} The Class to subclass\n* @param {Object} An object including instace methods for the new class\n*                   Optionally including a `constructor` function\n* @return {Function} The newly created subclass\n* @mixes videojs\n* @method extends\n*/",
+        "comment": "/**\n* Subclass an existing class\n* Mimics ES6 subclassing with the `extends` keyword\n* ```js\n*     // Create a basic javascript 'class'\n*     function MyClass(name){\n*       // Set a property at initialization\n*       this.myName = name;\n*     }\n*     // Create an instance method\n*     MyClass.prototype.sayMyName = function(){\n*       alert(this.myName);\n*     };\n*     // Subclass the existing class and change the name\n*     // when initializing\n*     var MySubClass = videojs.extends(MyClass, {\n*       constructor: function(name) {\n*         // Call the super class constructor for the subclass\n*         MyClass.call(this, name)\n*       }\n*     });\n*     // Create an instance of the new sub class\n*     var myInstance = new MySubClass('John');\n*     myInstance.sayMyName(); // -> should alert \"John\"\n* ```\n*\n* @param {Function} The Class to subclass\n* @param {Object} An object including instace methods for the new class\n*                   Optionally including a `constructor` function\n* @return {Function} The newly created subclass\n* @mixes videojs\n* @method extends\n*/",
         "meta": {
             "range": [
                 2937,
@@ -14773,7 +14773,7 @@ var docData =
             "path": "/Users/mboles/git/BCL-LearningSamples/grunt-shell/videojs-src",
             "code": {}
         },
-        "description": "<p>Subclass an existing class\nMimics ES6 subclassing with the <code>extends</code> keyword</p>\n<pre class=\"prettyprint source lang-js\"><code>    // Create a basic javascript 'class'\n    function MyClass(name){\n      // Set a property at initialization\n      this.myName = name;\n    }\n    // Create an instance method\n    MyClass.prototype.sayMyName = function(){\n      alert(this.myName);\n    };\n    // Subclass the exisitng class and change the name\n    // when initializing\n    var MySubClass = videojs.extends(MyClass, {\n      constructor: function(name) {\n        // Call the super class constructor for the subclass\n        MyClass.call(this, name)\n      }\n    });\n    // Create an instance of the new sub class\n    var myInstance = new MySubClass('John');\n    myInstance.sayMyName(); // -> should alert &quot;John&quot;</code></pre>",
+        "description": "<p>Subclass an existing class\nMimics ES6 subclassing with the <code>extends</code> keyword</p>\n<pre class=\"prettyprint source lang-js\"><code>    // Create a basic javascript 'class'\n    function MyClass(name){\n      // Set a property at initialization\n      this.myName = name;\n    }\n    // Create an instance method\n    MyClass.prototype.sayMyName = function(){\n      alert(this.myName);\n    };\n    // Subclass the existing class and change the name\n    // when initializing\n    var MySubClass = videojs.extends(MyClass, {\n      constructor: function(name) {\n        // Call the super class constructor for the subclass\n        MyClass.call(this, name)\n      }\n    });\n    // Create an instance of the new sub class\n    var myInstance = new MySubClass('John');\n    myInstance.sayMyName(); // -> should alert &quot;John&quot;</code></pre>",
         "params": [
             {
                 "type": {
@@ -14813,7 +14813,7 @@ var docData =
         "scope": "global"
     },
     {
-        "comment": "/**\n* Merge two options objects recursively\n* Performs a deep merge like lodash.merge but **only merges plain objects**\n* (not arrays, elements, anything else)\n* Other values will be copied directly from the second object.\n* ```js\n*     var defaultOptions = {\n*       foo: true,\n*       bar: {\n*         a: true,\n*         b: [1,2,3]\n*       }\n*     };\n*     var newOptions = {\n*       foo: false,\n*       bar: {\n*         b: [4,5,6]\n*       }\n*     };\n*     var result = videojs.mergeOptions(defaultOptions, newOptions);\n*     // result.foo = false;\n*     // result.bar.a = true;\n*     // result.bar.b = [4,5,6];\n* ```\n*\n* @param {Object} The options object whose values will be overriden\n* @param {Object} The options object with values to override the first\n* @param {Object} Any number of additional options objects\n*\n* @return {Object} a new object with the merged values\n* @mixes videojs\n* @method mergeOptions\n*/",
+        "comment": "/**\n* Merge two options objects recursively\n* Performs a deep merge like lodash.merge but **only merges plain objects**\n* (not arrays, elements, anything else)\n* Other values will be copied directly from the second object.\n* ```js\n*     var defaultOptions = {\n*       foo: true,\n*       bar: {\n*         a: true,\n*         b: [1,2,3]\n*       }\n*     };\n*     var newOptions = {\n*       foo: false,\n*       bar: {\n*         b: [4,5,6]\n*       }\n*     };\n*     var result = videojs.mergeOptions(defaultOptions, newOptions);\n*     // result.foo = false;\n*     // result.bar.a = true;\n*     // result.bar.b = [4,5,6];\n* ```\n*\n* @param {Object} The options object whose values will be overridden\n* @param {Object} The options object with values to override the first\n* @param {Object} Any number of additional options objects\n*\n* @return {Object} a new object with the merged values\n* @mixes videojs\n* @method mergeOptions\n*/",
         "meta": {
             "range": [
                 4025,
@@ -14832,7 +14832,7 @@ var docData =
                         "Object"
                     ]
                 },
-                "description": "<p>options object whose values will be overriden</p>",
+                "description": "<p>options object whose values will be overridden</p>",
                 "name": "The"
             },
             {

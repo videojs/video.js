@@ -2039,7 +2039,7 @@ QUnit.test('player.duration() returns NaN if player.cache_.duration is undefined
   const player = TestHelpers.makePlayer();
 
   player.cache_.duration = undefined;
-  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unkown duration');
+  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unknown duration');
 });
 
 QUnit.test('player.duration() returns player.cache_.duration if it is defined', function(assert) {
@@ -2208,7 +2208,7 @@ QUnit.test('setting all children to false, does not cause an assertion', functio
   assert.ok(true, 'did not cause an assertion');
 });
 
-QUnit.test('controlBar behaviour with mouseenter and mouseleave events', function(assert) {
+QUnit.test('controlBar behavior with mouseenter and mouseleave events', function(assert) {
 
   const player = TestHelpers.makePlayer();
 

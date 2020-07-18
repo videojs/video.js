@@ -94,7 +94,7 @@ videojs.addLanguage('es', {
 });
 ```
 
-`addLanguage()` will overwrite existing translations if the object includes strings previously translated. However text that has already been localised will not be updated after generation.
+`addLanguage()` will overwrite existing translations if the object includes strings previously translated. However text that has already been localized will not be updated after generation.
 
 ### Per-Player Translations
 

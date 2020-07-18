@@ -40,7 +40,7 @@ class TextTrackButton extends TrackButton {
   createItems(items = [], TrackMenuItem = TextTrackMenuItem) {
 
     // Label is an override for the [track] off label
-    // USed to localise captions/subtitles
+    // USed to localize captions/subtitles
     let label;
 
     if (this.label_) {

@@ -129,7 +129,7 @@ function videojs(id, options, ready) {
 
   if (player) {
     if (options) {
-      log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
+      log.warn(`Player "${id}" is already initialized. Options will not be applied.`);
     }
     if (ready) {
       player.ready(ready);
