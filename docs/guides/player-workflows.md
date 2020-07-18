@@ -14,7 +14,7 @@ This document outlines many considerations for using Video.js for advanced playe
 * [Making the player fullscreen](#making-the-player-fullscreen)
 * [Using Playback information functions](#using-playback-information-functions)
 * [Dealing with the source or the poster on the player](#dealing-with-the-source-or-the-poster-on-the-player)
-* [Accesing the Tech on the player](#accesing-the-tech-on-the-player)
+* [Accessing the Tech on the player](#accessing-the-tech-on-the-player)
 * [Using Video.js with...](#using-videojs-with)
   * [jQuery](#jquery)
   * [React](#react)
@@ -351,7 +351,7 @@ console.log(myPlayer.poster());
 // 'http://example.com/myImage.jpg'
 ```
 
-## Accesing the Tech on the player
+## Accessing the Tech on the player
 
 The tech on the player can only be accesed by pasing `{IWillNotUseThisInPlugins: true}` into the `tech()`
 function on the player.
