@@ -431,6 +431,25 @@ class Tech extends Component {
   reset() {}
 
   /**
+   * Get the value of `crossOrigin` from the tech.
+   *
+   * @abstract
+   *
+   * @see {Html5#crossOrigin}
+   */
+  crossOrigin() {}
+
+  /**
+   * Set the value of `crossOrigin` on the tech.
+   *
+   * @abstract
+   *
+   * @param {string} crossOrigin the crossOrigin value
+   * @see {Html5#setCrossOrigin}
+   */
+  setCrossOrigin() {}
+
+  /**
    * Get or set an error on the Tech.
    *
    * @param {MediaError} [err]
