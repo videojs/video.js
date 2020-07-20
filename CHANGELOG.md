@@ -1,3 +1,10 @@
+<a name="7.9.2"></a>
+## [7.9.2](https://github.com/videojs/video.js/compare/v7.9.1...v7.9.2) (2020-07-20)
+
+### Bug Fixes
+
+* **tech:** add abstract crossOrigin method on Tech ([#6765](https://github.com/videojs/video.js/issues/6765)) ([245efac](https://github.com/videojs/video.js/commit/245efac)), closes [#6588](https://github.com/videojs/video.js/issues/6588)
+
 <a name="7.9.1"></a>
 ## [7.9.1](https://github.com/videojs/video.js/compare/v7.9.0...v7.9.1) (2020-07-13)
 
