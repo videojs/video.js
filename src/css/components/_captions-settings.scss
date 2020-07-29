@@ -48,6 +48,7 @@
   .vjs-layout-x-small .vjs-text-track-settings .vjs-modal-dialog-content,
   .vjs-layout-tiny .vjs-text-track-settings .vjs-modal-dialog-content {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
   }
 
 }
