@@ -37,7 +37,7 @@ In older versions of Video.js (6 and earlier), in the `vjs.zencdn.net` CDN-hoste
 <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
 ```
 
-Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
+Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#install-via-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
 
 ```html
 <!-- unpkg : use the latest version of Video.js -->
