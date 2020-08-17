@@ -1,3 +1,16 @@
+<a name="7.9.3"></a>
+## [7.9.3](https://github.com/videojs/video.js/compare/v7.9.2...v7.9.3) (2020-08-17)
+
+### Bug Fixes
+
+* **lang:** Add PiP to de ([#6803](https://github.com/videojs/video.js/issues/6803)) ([88850e9](https://github.com/videojs/video.js/commit/88850e9))
+* **tech:** add abstract setScrubbing in tech.js ([#6808](https://github.com/videojs/video.js/issues/6808)) ([c91b510](https://github.com/videojs/video.js/commit/c91b510))
+
+### Documentation
+
+* **README:** fix link to getting Video.js from npm ([#6761](https://github.com/videojs/video.js/issues/6761)) ([efa839b](https://github.com/videojs/video.js/commit/efa839b))
+* fix typo ([#6760](https://github.com/videojs/video.js/issues/6760)) ([1761fa5](https://github.com/videojs/video.js/commit/1761fa5))
+
 <a name="7.9.2"></a>
 ## [7.9.2](https://github.com/videojs/video.js/compare/v7.9.1...v7.9.2) (2020-07-20)
 
