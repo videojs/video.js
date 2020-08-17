@@ -524,6 +524,15 @@ class Html5 extends Tech {
     });
   }
 
+  /**
+   * Set whether we are scrubbing or not.
+   * This is used to decide whether we should use `fastSeek` or not.
+   * `fastSeek` is used to provide trick play on Safari browsers.
+   *
+   * @param {boolean} isScrubbing
+   *                  - true for we are currently scrubbing
+   *                  - false for we are no longer scrubbing
+   */
   setScrubbing(isScrubbing) {
     this.isScrubbing_ = isScrubbing;
   }
