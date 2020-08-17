@@ -484,6 +484,15 @@ class Tech extends Component {
   }
 
   /**
+   * Set whether we are scrubbing or not
+   *
+   * @abstract
+   *
+   * @see {Html5#setScrubbing}
+   */
+  setScrubbing() {}
+
+  /**
    * Causes a manual time update to occur if {@link Tech#manualTimeUpdatesOn} was
    * previously called.
    *
