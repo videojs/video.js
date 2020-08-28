@@ -57,7 +57,6 @@ class ProgressControl extends Component {
   handleMouseMove(event) {
     const seekBar = this.getChild('seekBar');
 
-
     if (!seekBar) {
       return;
     }
@@ -70,7 +69,7 @@ class ProgressControl extends Component {
     }
 
     const seekBarEl = seekBar.el();
-    const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
+    const seekBarRect = Dom.findPosition(seekBarEl);
     let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
 
     // The default skin has a gap on either side of the `SeekBar`. This means
