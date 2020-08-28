@@ -115,4 +115,6 @@ QUnit.test('when selected is changed selectedchange event is fired', function(as
   // one event
   track.selected = true;
   assert.equal(eventsTriggered, 3, 'three selected changes');
+
+  track.off();
 });

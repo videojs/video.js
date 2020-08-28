@@ -1,6 +1,6 @@
 .video-js .vjs-big-play-button {
   font-size: 3em;
-  line-height: $big-play-button--height;
+  line-height: $big-play-button--line-height;
   height: $big-play-button--height;
   width: $big-play-button--width; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
   display: block;
@@ -10,7 +10,7 @@
   padding: 0;
   cursor: pointer;
   opacity: 1;
-  border: 0.06666em solid $primary-foreground-color;
+  border: $big-play-button--border-size solid $primary-foreground-color;
 
   // Need a slightly gray bg so it can be seen on black backgrounds
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);

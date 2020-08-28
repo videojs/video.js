@@ -72,17 +72,17 @@ class MenuItem extends ClickableComponent {
 
   /**
    * Ignore keys which are used by the menu, but pass any other ones up. See
-   * {@link ClickableComponent#handleKeyPress} for instances where this is called.
+   * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
    */
-  handleKeyPress(event) {
+  handleKeyDown(event) {
     if (!MenuKeys.some((key) => keycode.isEventKey(event, key))) {
-      // Pass keypress handling up for unused keys
-      super.handleKeyPress(event);
+      // Pass keydown handling up for unused keys
+      super.handleKeyDown(event);
     }
   }
 

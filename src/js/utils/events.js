@@ -7,7 +7,7 @@
  * @file events.js
  * @module events
  */
-import * as DomData from './dom-data';
+import DomData from './dom-data';
 import * as Guid from './guid.js';
 import log from './log.js';
 import window from 'global/window';
@@ -23,7 +23,10 @@ import document from 'global/document';
  *        Type of event to clean up
  */
 function _cleanUpEvents(elem, type) {
-  const data = DomData.getData(elem);
+  if (!DomData.has(elem)) {
+    return;
+  }
+  const data = DomData.get(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -48,7 +51,7 @@ function _cleanUpEvents(elem, type) {
 
   // Finally remove the element data if there is no data left
   if (Object.getOwnPropertyNames(data).length === 0) {
-    DomData.removeData(elem);
+    DomData.delete(elem);
   }
 }
 
@@ -84,6 +87,9 @@ function _handleMultipleEvents(fn, elem, types, callback) {
  *         Fixed event object.
  */
 export function fixEvent(event) {
+  if (event.fixed_) {
+    return event;
+  }
 
   function returnTrue() {
     return true;
@@ -198,6 +204,7 @@ export function fixEvent(event) {
     }
   }
 
+  event.fixed_ = true;
   // Returns fixed-up instance
   return event;
 }
@@ -205,22 +212,27 @@ export function fixEvent(event) {
 /**
  * Whether passive event listeners are supported
  */
-let _supportsPassive = false;
+let _supportsPassive;
 
-(function() {
-  try {
-    const opts = Object.defineProperty({}, 'passive', {
-      get() {
-        _supportsPassive = true;
-      }
-    });
+const supportsPassive = function() {
+  if (typeof _supportsPassive !== 'boolean') {
+    _supportsPassive = false;
+    try {
+      const opts = Object.defineProperty({}, 'passive', {
+        get() {
+          _supportsPassive = true;
+        }
+      });
 
-    window.addEventListener('test', null, opts);
-    window.removeEventListener('test', null, opts);
-  } catch (e) {
-    // disregard
+      window.addEventListener('test', null, opts);
+      window.removeEventListener('test', null, opts);
+    } catch (e) {
+      // disregard
+    }
   }
-})();
+
+  return _supportsPassive;
+};
 
 /**
  * Touch events Chrome expects to be passive
@@ -250,7 +262,11 @@ export function on(elem, type, fn) {
     return _handleMultipleEvents(on, elem, type, fn);
   }
 
-  const data = DomData.getData(elem);
+  if (!DomData.has(elem)) {
+    DomData.set(elem, {});
+  }
+
+  const data = DomData.get(elem);
 
   // We need a place to store all our handler data
   if (!data.handlers) {
@@ -303,7 +319,7 @@ export function on(elem, type, fn) {
     if (elem.addEventListener) {
       let options = false;
 
-      if (_supportsPassive &&
+      if (supportsPassive() &&
         passiveEvents.indexOf(type) > -1) {
         options = {passive: true};
       }
@@ -329,11 +345,11 @@ export function on(elem, type, fn) {
  */
 export function off(elem, type, fn) {
   // Don't want to add a cache object through getElData if not needed
-  if (!DomData.hasData(elem)) {
+  if (!DomData.has(elem)) {
     return;
   }
 
-  const data = DomData.getData(elem);
+  const data = DomData.get(elem);
 
   // If no events exist, nothing to unbind
   if (!data.handlers) {
@@ -405,7 +421,7 @@ export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasElData first.
-  const elemData = (DomData.hasData(elem)) ? DomData.getData(elem) : {};
+  const elemData = DomData.has(elem) ? DomData.get(elem) : {};
   const parent = elem.parentNode || elem.ownerDocument;
   // type = event.type || event,
   // handler;
@@ -431,8 +447,11 @@ export function trigger(elem, event, hash) {
     trigger.call(null, parent, event, hash);
 
   // If at the top of the DOM, triggers the default action unless disabled.
-  } else if (!parent && !event.defaultPrevented) {
-    const targetData = DomData.getData(event.target);
+  } else if (!parent && !event.defaultPrevented && event.target && event.target[event.type]) {
+    if (!DomData.has(event.target)) {
+      DomData.set(event.target, {});
+    }
+    const targetData = DomData.get(event.target);
 
     // Checks if the target has a default action for this event.
     if (event.target[event.type]) {
@@ -474,5 +493,31 @@ export function one(elem, type, fn) {
 
   // copy the guid to the new function so it can removed using the original function's ID
   func.guid = fn.guid = fn.guid || Guid.newGUID();
+  on(elem, type, func);
+}
+
+/**
+ * Trigger a listener only once and then turn if off for all
+ * configured events
+ *
+ * @param {Element|Object} elem
+ *        Element or object to bind to.
+ *
+ * @param {string|string[]} type
+ *        Name/type of event
+ *
+ * @param {Event~EventListener} fn
+ *        Event listener function
+ */
+export function any(elem, type, fn) {
+  const func = function() {
+    off(elem, type, func);
+    fn.apply(this, arguments);
+  };
+
+  // copy the guid to the new function so it can removed using the original function's ID
+  func.guid = fn.guid = fn.guid || Guid.newGUID();
+
+  // multiple ons, but one off for everything
   on(elem, type, func);
 }

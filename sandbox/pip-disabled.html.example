@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
+    <pre>npm start</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+
+  <video-js
+    id="vid1"
+    controls
+    disablepictureinpicture
+    preload="none"
+    width="640"
+    height="264"
+    poster="http://vjs.zencdn.net/v/oceans.png">
+    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+  <p>
+    PiP disabled via <b>disablepictureinpicture</b> attribute.
+  </p>
+  <video-js
+      id="vid2"
+      controls
+      preload="auto"
+      width="640"
+      height="264"
+      poster="http://vjs.zencdn.net/v/oceans.png">
+      <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+      <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+      <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+      <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+      <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    </video-js>
+    <p>
+      PiP disabled via <b>disablePictureInPicture</b> player option.
+    </p>
+    <button id="PiPToggleBtn">call disablePictureInPicture(false) for the player 2</button>
+  <script>
+    var pipDisabled = true;
+    var vid = document.getElementById('vid1');
+    var player = videojs(vid);
+
+    var vid2 = document.getElementById('vid2');
+    var player2 = videojs(vid2, {
+      controlBar: {
+        pictureInPictureToggle: true
+      },
+      disablePictureInPicture: true
+    });
+
+    var pipToggle = document.getElementById('PiPToggleBtn');
+    pipToggle.addEventListener('click', function() {
+      pipToggle.innerText = 'call disablePictureInPicture(' + pipDisabled + ') for the player 2';
+      pipDisabled = !pipDisabled;
+      player2.disablePictureInPicture(pipDisabled);
+    });
+  </script>
+
+</body>
+</html>

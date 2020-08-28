@@ -5,6 +5,7 @@ let tech;
 import Html5 from '../../../src/js/tech/html5.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import document from 'global/document';
+import sinon from 'sinon';
 
 QUnit.module('HTML5', {
   beforeEach(assert) {
@@ -48,6 +49,38 @@ QUnit.module('HTML5', {
     player = null;
     tech = null;
   }
+});
+
+QUnit[browser.IS_ANY_SAFARI ? 'test' : 'skip']('if setScrubbing is true and fastSeek is available, use it', function(assert) {
+  Object.defineProperty(tech.el(), 'currentTime', {
+    get: () => {},
+    set: () => {},
+
+    writeable: true,
+    enumerable: false,
+    configurable: true
+  });
+
+  const currentTimeSpy = sinon.spy(tech.el(), 'currentTime', ['set']);
+
+  tech.setCurrentTime(5);
+  assert.ok(currentTimeSpy.set.called, 'currentTime setter was called');
+  assert.ok(currentTimeSpy.set.calledWith(5), 'currentTime setter was called with 5');
+
+  tech.setScrubbing(true);
+
+  // when scrubbing is set but fastSeek isn't available, currentTime should still be called
+  tech.el().fastSeek = null;
+  tech.setCurrentTime(10);
+  assert.ok(currentTimeSpy.set.called, 'currentTime setter was called');
+  assert.ok(currentTimeSpy.set.calledWith(10), 'currentTime setter was called with 10');
+
+  const fastSeekSpy = tech.el().fastSeek = sinon.spy();
+
+  tech.setCurrentTime(15);
+  assert.ok(currentTimeSpy.set.calledTwice, 'currentTime setter was only called twice and not a 3rd time for fastSeek');
+  assert.ok(fastSeekSpy.called, 'fastSeek called');
+  assert.ok(fastSeekSpy.calledWith(15), 'fastSeek called with 15');
 });
 
 QUnit.test('should be able to set playsinline attribute', function(assert) {
@@ -126,17 +159,17 @@ QUnit.test('blacklist playbackRate support on older verisons of Chrome on Androi
   const oldIsChrome = browser.IS_CHROME;
   const oldChromeVersion = browser.CHROME_VERSION;
 
-  browser.IS_ANDROID = true;
-  browser.IS_CHROME = true;
-  browser.CHROME_VERSION = 50;
+  browser.stub_IS_ANDROID(true);
+  browser.stub_IS_CHROME(true);
+  browser.stub_CHROME_VERSION(50);
   assert.strictEqual(Html5.canControlPlaybackRate(), false, 'canControlPlaybackRate should return false on older Chrome');
 
-  browser.CHROME_VERSION = 58;
+  browser.stub_CHROME_VERSION(58);
   assert.strictEqual(Html5.canControlPlaybackRate(), true, 'canControlPlaybackRate should return true on newer Chrome');
 
-  browser.IS_ANDROID = oldIsAndroid;
-  browser.IS_CHROME = oldIsChrome;
-  browser.CHROME_VERSION = oldChromeVersion;
+  browser.stub_IS_ANDROID(oldIsAndroid);
+  browser.stub_IS_CHROME(oldIsChrome);
+  browser.stub_CHROME_VERSION(oldChromeVersion);
 });
 
 QUnit.test('test volume', function(assert) {
@@ -195,9 +228,9 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_FIREFOX = false;
-  browser.IS_CHROME = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_FIREFOX(false);
+  browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
 
   assert.notStrictEqual(
@@ -220,9 +253,9 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
     'patched canPlayType and function returned from unpatch are equal'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_FIREFOX = oldIsFirefox;
-  browser.IS_CHROME = oldIsChrome;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
+  browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
@@ -236,9 +269,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_CHROME = true;
-  browser.IS_FIREFOX = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_CHROME(true);
+  browser.stub_IS_FIREFOX(false);
   Html5.patchCanPlayType();
 
   assert.strictEqual(
@@ -247,9 +280,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
     'original canPlayType and patched canPlayType should be equal'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_CHROME = oldIsChrome;
-  browser.IS_FIREFOX = oldIsFirefox;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_CHROME(oldIsChrome);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
   Html5.unpatchCanPlayType();
 });
 
@@ -263,9 +296,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_FIREFOX = true;
-  browser.IS_CHROME = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_FIREFOX(true);
+  browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
 
   assert.strictEqual(
@@ -274,9 +307,9 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
     'original canPlayType and patched canPlayType should be equal'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_FIREFOX = oldIsFirefox;
-  browser.IS_CHROME = oldIsChrome;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
+  browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
@@ -286,9 +319,9 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
   const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
 
-  browser.ANDROID_VERSION = 4.0;
-  browser.IS_FIREFOX = false;
-  browser.IS_CHROME = false;
+  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_FIREFOX(false);
+  browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
 
   assert.strictEqual(
@@ -314,26 +347,9 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
                     'maybe for vnd.apple.mpegurl'
   );
 
-  browser.ANDROID_VERSION = oldAV;
-  browser.IS_FIREFOX = oldIsFirefox;
-  browser.IS_CHROME = oldIsChrome;
-  Html5.unpatchCanPlayType();
-});
-
-QUnit.test('should return a maybe for mp4 on OLD ANDROID', function(assert) {
-  const isOldAndroid = browser.IS_OLD_ANDROID;
-  const video = document.createElement('video');
-
-  browser.IS_OLD_ANDROID = true;
-  Html5.patchCanPlayType();
-
-  assert.strictEqual(
-    video.canPlayType('video/mp4'),
-    'maybe',
-    'old android should return a maybe for video/mp4'
-  );
-
-  browser.IS_OLD_ANDROID = isOldAndroid;
+  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_FIREFOX(oldIsFirefox);
+  browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
@@ -444,13 +460,13 @@ if (Html5.supportsNativeTextTracks()) {
 
     el.textTracks = tt;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(adds[0][0], 'change', 'change event handler added');
     assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
     assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('does not add native textTrack listeners when disabled', function(assert) {
@@ -466,17 +482,16 @@ if (Html5.supportsNativeTextTracks()) {
       get: () => tt
     });
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeTextTracks: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
 
-    /* eslint-disable no-unused-vars */
     const htmlTechAlternate = new Html5({el, nativeCaptions: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
+
+    htmlTech.dispose();
+    htmlTechAlternate.dispose();
   });
 
   QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
@@ -520,13 +535,13 @@ if (Html5.supportsNativeAudioTracks()) {
 
     el.audioTracks = at;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(adds[0][0], 'change', 'change event handler added');
     assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
     assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('does not add native audioTrack listeners when disabled', function(assert) {
@@ -540,11 +555,11 @@ if (Html5.supportsNativeAudioTracks()) {
 
     el.audioTracks = at;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeAudioTracks: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
@@ -654,13 +669,13 @@ if (Html5.supportsNativeVideoTracks()) {
 
     el.videoTracks = vt;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(adds[0][0], 'change', 'change event handler added');
     assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
     assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('does not add native audioTrack listeners when disabled', function(assert) {
@@ -674,11 +689,11 @@ if (Html5.supportsNativeVideoTracks()) {
 
     el.videoTracks = vt;
 
-    /* eslint-disable no-unused-vars */
     const htmlTech = new Html5({el, nativeVideoTracks: false});
-    /* eslint-enable no-unused-vars */
 
     assert.equal(events.length, 0, 'no listeners added');
+
+    htmlTech.dispose();
   });
 
   QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
@@ -912,8 +927,8 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
   const oldIsChrome = browser.IS_CHROME;
   const oldEl = tech.el_;
 
-  browser.IS_ANDROID = true;
-  browser.IS_CHROME = true;
+  browser.stub_IS_ANDROID(true);
+  browser.stub_IS_CHROME(true);
 
   tech.el_ = {
     duration: Infinity,
@@ -921,8 +936,8 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
   };
   assert.ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
 
-  browser.IS_ANDROID = oldIsAndroid;
-  browser.IS_CHROME = oldIsChrome;
+  browser.stub_IS_ANDROID(oldIsAndroid);
+  browser.stub_IS_CHROME(oldIsChrome);
   tech.el_ = oldEl;
 });
 

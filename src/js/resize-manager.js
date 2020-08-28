@@ -71,7 +71,18 @@ class ResizeManager extends Component {
           return;
         }
 
-        Events.on(this.el_.contentWindow, 'resize', this.debouncedHandler_);
+        const debouncedHandler_ = this.debouncedHandler_;
+        let unloadListener_ = this.unloadListener_ = function() {
+          Events.off(this, 'resize', debouncedHandler_);
+          Events.off(this, 'unload', unloadListener_);
+
+          unloadListener_ = null;
+        };
+
+        // safari and edge can unload the iframe before resizemanager dispose
+        // we have to dispose of event handlers correctly before that happens
+        Events.on(this.el_.contentWindow, 'unload', unloadListener_);
+        Events.on(this.el_.contentWindow, 'resize', debouncedHandler_);
       };
 
       this.one('load', this.loadListener_);
@@ -120,18 +131,19 @@ class ResizeManager extends Component {
       this.resizeObserver_.disconnect();
     }
 
-    if (this.el_ && this.el_.contentWindow) {
-      Events.off(this.el_.contentWindow, 'resize', this.debouncedHandler_);
-    }
-
     if (this.loadListener_) {
       this.off('load', this.loadListener_);
+    }
+
+    if (this.el_ && this.el_.contentWindow && this.unloadListener_) {
+      this.unloadListener_.call(this.el_.contentWindow);
     }
 
     this.ResizeObserver = null;
     this.resizeObserver = null;
     this.debouncedHandler_ = null;
     this.loadListener_ = null;
+    super.dispose();
   }
 
 }

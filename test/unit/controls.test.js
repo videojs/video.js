@@ -5,6 +5,7 @@ import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
 import PlayToggle from '../../src/js/control-bar/play-toggle.js';
 import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
 import Slider from '../../src/js/slider/slider.js';
+import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-toggle.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
 import TestHelpers from './test-helpers.js';
@@ -35,6 +36,8 @@ QUnit.test('should hide volume and mute toggle control if it\'s not supported', 
   assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
 
   player.dispose();
+  volumeControl.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('should show replay icon when video playback ended', function(assert) {
@@ -49,6 +52,7 @@ QUnit.test('should show replay icon when video playback ended', function(assert)
   assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
 
   player.dispose();
+  playToggle.dispose();
 });
 
 QUnit.test('should show replay icon when video playback ended and replay option is set to true', function(assert) {
@@ -63,6 +67,7 @@ QUnit.test('should show replay icon when video playback ended and replay option 
   assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
 
   player.dispose();
+  playToggle.dispose();
 });
 
 QUnit.test('should not show the replay icon when video playback ended', function(assert) {
@@ -77,6 +82,7 @@ QUnit.test('should not show the replay icon when video playback ended', function
   assert.equal(playToggle.hasClass('vjs-ended'), false, 'playToogle is not in the ended state');
 
   player.dispose();
+  playToggle.dispose();
 });
 
 QUnit.test('should test and toggle volume control on `loadstart`', function(assert) {
@@ -106,6 +112,8 @@ QUnit.test('should test and toggle volume control on `loadstart`', function(asse
   assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
 
   player.dispose();
+  volumeControl.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('calculateDistance should use changedTouches, if available', function(assert) {
@@ -130,6 +138,7 @@ QUnit.test('calculateDistance should use changedTouches, if available', function
   assert.equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
 
   player.dispose();
+  slider.dispose();
 });
 
 QUnit.test('should hide playback rate control if it\'s not supported', function(assert) {
@@ -141,11 +150,77 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
 
   player.dispose();
+  playbackRate.dispose();
+});
+
+QUnit.test('Picture-in-Picture control text should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.isInPictureInPicture(true);
+  player.trigger('enterpictureinpicture');
+  assert.equal(pictureInPictureToggle.controlText(), 'Exit Picture-in-Picture', 'Control Text is correct while switching to Picture-in-Picture mode');
+
+  player.isInPictureInPicture(false);
+  player.trigger('leavepictureinpicture');
+  assert.equal(pictureInPictureToggle.controlText(), 'Picture-in-Picture', 'Control Text is correct while switching back to normal mode');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control enabled property value should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
+
+  if ('pictureInPictureEnabled' in document && player.disablePictureInPicture() === false) {
+    player.isInPictureInPicture(true);
+    player.trigger('enterpictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an enterpictureinpicture event');
+
+    player.isInPictureInPicture(false);
+    player.trigger('leavepictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an leavepictureinpicture event');
+  } else {
+    player.isInPictureInPicture(true);
+    player.trigger('enterpictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an enterpictureinpicture event');
+
+    player.isInPictureInPicture(false);
+    player.trigger('leavepictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an leavepictureinpicture event');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control enabled property value should be correct when loadedmetadata is triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
+
+  if ('pictureInPictureEnabled' in document && player.disablePictureInPicture() === false) {
+    player.trigger('loadedmetadata');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an loadedmetadata event');
+  } else {
+    player.trigger('loadedmetadata');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an loadedmetadata event');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
-  const player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer({controlBar: false});
   const fullscreentoggle = new FullscreenToggle(player);
+
+  // make the fullscreenchange handler doesn't trigger
+  player.off(player.fsApi_.fullscreenchange, player.boundDocumentFullscreenChange_);
 
   player.isFullscreen(true);
   player.trigger('fullscreenchange');
@@ -156,6 +231,7 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
 
   player.dispose();
+  fullscreentoggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
@@ -171,6 +247,7 @@ QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted prope
   assert.equal(player.muted(), true, 'player is muted');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
@@ -187,6 +264,7 @@ QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set v
   assert.equal(player.muted(), false, 'muted remains false');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
@@ -203,6 +281,7 @@ QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set vo
   assert.equal(player.muted(), false, 'muted is set to false');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, and muted is true sets volume to 0.1 and muted to false', function(assert) {
@@ -220,6 +299,7 @@ QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, a
   assert.equal(player.muted(), false, 'muted is set to false');
 
   player.dispose();
+  muteToggle.dispose();
 });
 
 QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
@@ -231,6 +311,7 @@ QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
   assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
 
   player.dispose();
+  volumeBar.dispose();
 });
 
 QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', function(assert) {
@@ -256,6 +337,8 @@ QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', fun
   assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
 
   player.dispose();
+  muteToggle.dispose();
+  volumeBar.dispose();
 });
 
 QUnit.test('controlbar children to false individually, does not cause an assertion', function(assert) {

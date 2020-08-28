@@ -57,7 +57,7 @@ class SeekToLive extends Button {
    * Update the state of this button if we are at the live edge
    * or not
    */
-  updateLiveEdgeStatus(e) {
+  updateLiveEdgeStatus() {
     // default to live edge
     if (!this.player_.liveTracker || this.player_.liveTracker.atLiveEdge()) {
       this.setAttribute('aria-disabled', true);

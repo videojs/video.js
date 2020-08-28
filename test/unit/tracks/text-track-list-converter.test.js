@@ -45,7 +45,11 @@ if (Html5.supportsNativeTextTracks()) {
       kind: 'captions',
       label: 'English',
       language: 'en',
-      tech: {}
+      tech: {
+        crossOrigin() {
+          return null;
+        }
+      }
     });
 
     const nativeTrack = document.createElement('track');
@@ -71,6 +75,9 @@ if (Html5.supportsNativeTextTracks()) {
           }
         };
       },
+      crossOrigin() {
+        return null;
+      },
       textTracks() {
         return tt;
       }
@@ -87,6 +94,9 @@ if (Html5.supportsNativeTextTracks()) {
       language: 'en',
       mode: 'disabled'
     }], 'the output is correct');
+
+    tt.removeTrack(nativeTrack.track);
+    tt.removeTrack(emulatedTrack);
   });
 
   QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(assert) {
@@ -95,7 +105,11 @@ if (Html5.supportsNativeTextTracks()) {
       label: 'English',
       language: 'en',
       src: 'example.com/english.vtt',
-      tech: {}
+      tech: {
+        crossOrigin() {
+          return null;
+        }
+      }
     });
 
     const nativeTrack = document.createElement('track');
@@ -123,6 +137,9 @@ if (Html5.supportsNativeTextTracks()) {
           }
         };
       },
+      crossOrigin() {
+        return null;
+      },
       textTracks() {
         return tt;
       },
@@ -137,6 +154,9 @@ if (Html5.supportsNativeTextTracks()) {
     c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
     assert.equal(addRemotes, 2, 'we added two text tracks');
+
+    tt.removeTrack(nativeTrack.track);
+    tt.removeTrack(emulatedTrack);
   });
 }
 
@@ -146,7 +166,11 @@ QUnit.test('trackToJson_ produces correct representation for emulated track obje
     label: 'English',
     language: 'en',
     src: 'example.com/english.vtt',
-    tech: {}
+    tech: {
+      crossOrigin() {
+        return null;
+      }
+    }
   });
 
   assert.deepEqual(cleanup(c.trackToJson_(track)), {
@@ -164,7 +188,11 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
     label: 'English',
     language: 'en',
     src: 'example.com/english.vtt',
-    tech: {}
+    tech: {
+      crossOrigin() {
+        return null;
+      }
+    }
   });
 
   const anotherTrack = new TextTrack({
@@ -172,7 +200,11 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
     kind: 'captions',
     srclang: 'es',
     label: 'Spanish',
-    tech: {}
+    tech: {
+      crossOrigin() {
+        return null;
+      }
+    }
   });
 
   const tt = new TextTrackList();
@@ -192,6 +224,9 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
         }
       };
     },
+    crossOrigin() {
+      return null;
+    },
     textTracks() {
       return tt;
     }
@@ -210,6 +245,9 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
     language: 'en',
     mode: 'disabled'
   }], 'the output is correct');
+
+  tt.removeTrack(anotherTrack);
+  tt.removeTrack(emulatedTrack);
 });
 
 QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(assert) {
@@ -218,7 +256,11 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
     label: 'English',
     language: 'en',
     src: 'example.com/english.vtt',
-    tech: {}
+    tech: {
+      crossOrigin() {
+        return null;
+      }
+    }
   });
 
   const anotherTrack = new TextTrack({
@@ -226,7 +268,11 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
     kind: 'captions',
     srclang: 'es',
     label: 'Spanish',
-    tech: {}
+    tech: {
+      crossOrigin() {
+        return null;
+      }
+    }
   });
 
   const tt = new TextTrackList();
@@ -247,6 +293,9 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
         }
       };
     },
+    crossOrigin() {
+      return null;
+    },
     textTracks() {
       return tt;
     },
@@ -261,4 +310,7 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
   c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
   assert.equal(addRemotes, 2, 'we added two text tracks');
+
+  tt.removeTrack(anotherTrack);
+  tt.removeTrack(emulatedTrack);
 });

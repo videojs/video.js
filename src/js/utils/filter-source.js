@@ -56,10 +56,12 @@ const filterSource = function(src) {
  *        src Object with known type
  */
 function fixSource(src) {
-  const mimetype = getMimetype(src.src);
+  if (!src.type) {
+    const mimetype = getMimetype(src.src);
 
-  if (!src.type && mimetype) {
-    src.type = mimetype;
+    if (mimetype) {
+      src.type = mimetype;
+    }
   }
 
   return src;

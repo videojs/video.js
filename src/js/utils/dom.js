@@ -5,7 +5,6 @@
 import document from 'global/document';
 import window from 'global/window';
 import log from './log.js';
-import tsml from 'tsml';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
 
@@ -21,7 +20,12 @@ import computedStyle from './computed-style';
  *
  */
 function isNonBlankString(str) {
-  return typeof str === 'string' && (/\S/).test(str);
+  // we use str.trim as it will trim any whitespace characters
+  // from the front or back of non-whitespace characters. aka
+  // Any string that contains non-whitespace characters will
+  // still contain them after `trim` but whitespace only strings
+  // will have a length of 0, failing this check.
+  return typeof str === 'string' && Boolean(str.trim());
 }
 
 /**
@@ -36,7 +40,8 @@ function isNonBlankString(str) {
  *         Throws an error if there is whitespace in the string.
  */
 function throwIfWhitespace(str) {
-  if ((/\s/).test(str)) {
+  // str.indexOf instead of regex because str.indexOf is faster performance wise.
+  if (str.indexOf(' ') >= 0) {
     throw new Error('class has illegal whitespace characters');
   }
 }
@@ -151,16 +156,16 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
     // We originally were accepting both properties and attributes in the
     // same object, but that doesn't work so well.
     if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
-      log.warn(tsml`Setting attributes in the second argument of createEl()
-                has been deprecated. Use the third argument instead.
-                createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
+      log.warn('Setting attributes in the second argument of createEl()\n' +
+               'has been deprecated. Use the third argument instead.\n' +
+               `createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
       el.setAttribute(propName, val);
 
     // Handle textContent since it's not supported everywhere and we have a
     // method for it.
     } else if (propName === 'textContent') {
       textContent(el, val);
-    } else {
+    } else if (el[propName] !== val) {
       el[propName] = val;
     }
   });
@@ -777,6 +782,13 @@ export function isSingleLeftClick(event) {
     // Touch screen, sometimes on some specific device, `buttons`
     // doesn't have anything (safari on ios, blackberry...)
 
+    return true;
+  }
+
+  // `mouseup` event on a single left click has
+  // `button` and `buttons` equal to 0
+  if (event.type === 'mouseup' && event.button === 0 &&
+      event.buttons === 0) {
     return true;
   }
 

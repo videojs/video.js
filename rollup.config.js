@@ -9,6 +9,8 @@ import ignore from 'rollup-plugin-ignore';
 import alias from 'rollup-plugin-alias';
 import _ from 'lodash';
 import pkg from './package.json';
+import multiEntry from 'rollup-plugin-multi-entry';
+import stub from 'rollup-plugin-stub';
 
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
@@ -30,22 +32,27 @@ const onwarn = (warning) => {
 
 const primedIgnore = ignore(['videojs-vtt.js']);
 const primedResolve = resolve({
-  jsnext: true,
-  main: true,
+  mainFields: ['jsnext:main', 'module', 'main'],
   browser: true
 });
 const primedCjs = commonjs({
   sourceMap: false
 });
 const primedBabel = babel({
+  runtimeHelpers: true,
   babelrc: false,
   exclude: 'node_modules/**(!http-streaming)',
   compact: false,
   presets: [
     ['@babel/preset-env', {
+      bugfixes: true,
       loose: true,
       modules: false
     }]
+  ],
+  plugins: [
+    '@babel/plugin-transform-object-assign',
+    ['@babel/plugin-transform-runtime', {regenerator: false}]
   ]
 });
 
@@ -72,27 +79,27 @@ const globals = {
   }
 };
 
+const moduleExternals = [
+  'global',
+  '@videojs/xhr',
+  'safe-json-parse',
+  'videojs-vtt.js',
+  'url-toolkit',
+  'm3u8-parser',
+  'mpd-parser',
+  'mux.js',
+  'aes-decrypter',
+  'keycode',
+  '@babel/runtime'
+];
 const externals = {
   browser: Object.keys(globals.browser).concat([
   ]),
-  module: Object.keys(globals.module).concat([
-    'global',
-    'global/document',
-    'global/window',
-    'xhr',
-    'tsml',
-    'safe-json-parse/tuple',
-    'videojs-vtt.js',
-    'url-toolkit',
-    'm3u8-parser',
-    'mpd-parser',
-    'mux.js',
-    'mux.js/lib/mp4',
-    'mux.js/lib/tools/ts-inspector.js',
-    'mux.js/lib/mp4/probe',
-    'aes-decrypter',
-    'keycode'
-  ]),
+  module(id) {
+    const result = moduleExternals.some((ext) => id.indexOf(ext) !== -1);
+
+    return result;
+  },
   test: Object.keys(globals.test).concat([
   ])
 };
@@ -105,7 +112,6 @@ export default cliargs => [
       format: 'umd',
       file: 'dist/video.js',
       name: 'videojs',
-      strict: false,
       banner,
       globals: globals.browser
     },
@@ -130,13 +136,11 @@ export default cliargs => [
       {
         format: 'es',
         file: 'dist/video.es.js',
-        strict: false,
         banner,
         globals: globals.module
       }, {
         format: 'cjs',
         file: 'dist/video.cjs.js',
-        strict: false,
         banner,
         globals: globals.module
       }
@@ -161,7 +165,6 @@ export default cliargs => [
       format: 'umd',
       file: 'dist/alt/video.novtt.js',
       name: 'videojs',
-      strict: false,
       banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
       globals: globals.browser
     },
@@ -180,16 +183,22 @@ export default cliargs => [
     onwarn,
     watch
   },
-  // core
+  // core cjs, es
   {
     input: 'src/js/video.js',
-    output: {
-      format: 'cjs',
-      file: 'core.js',
-      strict: false,
-      banner,
-      globals: globals.module
-    },
+    output: [
+      {
+        format: 'es',
+        file: 'core.es.js',
+        banner,
+        globals: globals.module
+      }, {
+        format: 'cjs',
+        file: 'core.js',
+        banner,
+        globals: globals.module
+      }
+    ],
     external: externals.module,
     plugins: [
       json(),
@@ -206,7 +215,6 @@ export default cliargs => [
       format: 'umd',
       name: 'videojs',
       file: 'dist/alt/video.core.js',
-      strict: false,
       banner,
       globals: globals.browser
     },
@@ -228,7 +236,6 @@ export default cliargs => [
       format: 'umd',
       name: 'videojs',
       file: 'dist/alt/video.core.novtt.js',
-      strict: false,
       banner: compiledLicense(Object.assign({includesVtt: true}, bannerData)),
       globals: globals.browser
     },
@@ -243,5 +250,30 @@ export default cliargs => [
     ],
     onwarn,
     watch
+  },
+  {
+    input: 'test/unit/**/*.test.js',
+    output: {
+      format: 'iife',
+      name: 'videojsTests',
+      file: 'test/dist/bundle.js',
+      globals: globals.test
+    },
+    external: externals.test,
+    plugins: [
+      multiEntry({exports: false}),
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      stub(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
   }
+
 ];

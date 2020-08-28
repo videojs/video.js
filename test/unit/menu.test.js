@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import * as DomData from '../../src/js/utils/dom-data';
+import DomData from '../../src/js/utils/dom-data';
 import MenuButton from '../../src/js/menu/menu-button.js';
 import Menu from '../../src/js/menu/menu.js';
 import CaptionSettingsMenuItem from '../../src/js/control-bar/text-track-controls/caption-settings-menu-item';
@@ -24,6 +24,7 @@ QUnit.test('should not throw an error when there is no children', function(asser
   }
 
   player.dispose();
+  menuButton.dispose();
 });
 
 QUnit.test('should place title list item into ul', function(assert) {
@@ -88,6 +89,8 @@ QUnit.test('should keep all the added menu items', function(assert) {
   const menuItem1 = new MenuItem(player, { label: 'menu-item1' });
   const menuItem2 = new MenuItem(player, { label: 'menu-item2' });
 
+  const oldCreateItems = MenuButton.prototype.createItems;
+
   MenuButton.prototype.createItems = function() {
     return menuItems;
   };
@@ -109,6 +112,13 @@ QUnit.test('should keep all the added menu items', function(assert) {
   assert.strictEqual(menuButton.children()[1].children()[1], menuItem2, 'the second child of the menu is `menuItem2` after second update');
   assert.ok(menuButton.el().contains(menuItem1.el()), 'the menu button contains the DOM element of `menuItem1` after second update');
   assert.ok(menuButton.el().contains(menuItem2.el()), 'the menu button contains the DOM element of `menuItem2` after second update');
+
+  menuButton.dispose();
+  menuItem1.dispose();
+  menuItem2.dispose();
+  player.dispose();
+
+  MenuButton.prototype.createItems = oldCreateItems;
 });
 
 QUnit.test('should remove old event listeners when the menu item adds to the new menu', function(assert) {
@@ -127,7 +137,7 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
    * A reusable collection of assertions.
    */
   function validateMenuEventListeners(watchedMenu) {
-    const eventData = DomData.getData(menuItem.eventBusEl_);
+    const eventData = DomData.get(menuItem.eventBusEl_);
     // `MenuButton`.`unpressButton` will be called when triggering click event on the menu item.
     const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
     // `MenuButton`.`focus` will be called when triggering click event on the menu item.
@@ -136,21 +146,14 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
     // `Menu`.`children` will be called when triggering blur event on the menu item.
     const menuChildrenSpy = sinon.spy(watchedMenu, 'children');
 
-    // The number of blur listeners is two because `ClickableComponent`
-    // adds the blur event listener during the construction and
+    assert.strictEqual(eventData.handlers.blur.length, 1, 'the number of blur listeners is one');
+
+    // The number of click listeners is two because `ClickableComponent`
+    // adds the click event listener during the construction and
     // `MenuItem` inherits from `ClickableComponent`.
-    assert.strictEqual(eventData.handlers.blur.length, 2, 'the number of blur listeners is two');
-    // Same reason mentioned above.
     assert.strictEqual(eventData.handlers.click.length, 2, 'the number of click listeners is two');
 
-    const blurListenerAddedByMenu = eventData.handlers.blur[1];
     const clickListenerAddedByMenu = eventData.handlers.click[1];
-
-    assert.strictEqual(
-      typeof blurListenerAddedByMenu.calledOnce,
-      'undefined',
-      'previous blur listener wrapped in the spy should be removed'
-    );
 
     assert.strictEqual(
       typeof clickListenerAddedByMenu.calledOnce,
@@ -158,13 +161,10 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
       'previous click listener wrapped in the spy should be removed'
     );
 
-    const blurListenerSpy = eventData.handlers.blur[1] = sinon.spy(blurListenerAddedByMenu);
     const clickListenerSpy = eventData.handlers.click[1] = sinon.spy(clickListenerAddedByMenu);
 
     TestHelpers.triggerDomEvent(menuItem.el(), 'blur');
 
-    assert.ok(blurListenerSpy.calledOnce, 'blur event listener should be called');
-    assert.strictEqual(blurListenerSpy.getCall(0).args[0].target, menuItem.el(), 'event target should be the `menuItem`');
     assert.ok(menuChildrenSpy.calledOnce, '`watchedMenu`.`children` has been called');
 
     TestHelpers.triggerDomEvent(menuItem.el(), 'click');
@@ -190,8 +190,14 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
   });
 
   newMenu.addItem(captionMenuItem);
+
   TestHelpers.triggerDomEvent(captionMenuItem.el(), 'click');
   assert.ok(!focusSpy.called, '`menuButton`.`focus` should never be called');
 
   focusSpy.restore();
+
+  player.dispose();
+  newMenu.dispose();
+  oldMenu.dispose();
+  menuButton.dispose();
 });

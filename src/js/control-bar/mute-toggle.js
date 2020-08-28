@@ -101,7 +101,7 @@ class MuteToggle extends Button {
     // in iOS when a player is loaded with muted attribute
     // and volume is changed with a native mute button
     // we want to make sure muted state is updated
-    if (browser.IS_IOS) {
+    if (browser.IS_IOS && this.player_.tech_ && this.player_.tech_.el_) {
       this.player_.muted(this.player_.tech_.el_.muted);
     }
 

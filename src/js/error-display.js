@@ -3,7 +3,6 @@
  */
 import Component from './component';
 import ModalDialog from './modal-dialog';
-import mergeOptions from './utils/merge-options';
 
 /**
  * A display that indicates an error has occurred. This means that the video
@@ -57,7 +56,7 @@ class ErrorDisplay extends ModalDialog {
  *
  * @private
  */
-ErrorDisplay.prototype.options_ = mergeOptions(ModalDialog.prototype.options_, {
+ErrorDisplay.prototype.options_ = Object.assign({}, ModalDialog.prototype.options_, {
   pauseOnOpen: false,
   fillAlways: true,
   temporary: false,

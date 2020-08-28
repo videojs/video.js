@@ -21,11 +21,7 @@ const TestHelpers = {
     playerOptions = playerOptions || {};
     playerOptions.techOrder = playerOptions.techOrder || ['techFaker'];
 
-    const player = new Player(videoTag, playerOptions);
-
-    player.middleware_ = [player.tech_];
-
-    return player;
+    return new Player(videoTag, playerOptions);
   },
 
   getComputedStyle(el, rule) {
@@ -129,12 +125,11 @@ const TestHelpers = {
   },
 
   /**
-   * Triggers an event on a DOM node natively.
+   * Creates an event.
    *
-   * @param  {Element} element
-   * @param  {string} eventType
+   * @param {string} eventType
    */
-  triggerDomEvent(element, eventType) {
+  createEvent(eventType) {
     let event;
 
     if (document.createEvent) {
@@ -146,6 +141,18 @@ const TestHelpers = {
     }
 
     event.eventName = eventType;
+
+    return event;
+  },
+
+  /**
+   * Triggers an event on a DOM node natively.
+   *
+   * @param  {Element} element
+   * @param  {string} eventType
+   */
+  triggerDomEvent(element, eventType) {
+    const event = TestHelpers.createEvent(eventType);
 
     if (document.createEvent) {
       element.dispatchEvent(event);

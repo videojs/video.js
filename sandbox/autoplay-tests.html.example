@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../node_modules/es6-shim/es6-shim.min.js"></script>
+  <script src="../dist/video.js"></script>
+<style>p{margin: 0; padding:0}</style>
+</head>
+<body>
+  <div id="fixture">
+  </div>
+  <div id="start-test">
+    <video id='start-test-video' height=264 width=640 src="http://vjs.zencdn.net/v/oceans.mp4" controls></video>
+    <p>Press play on the video to start tests. (as we need user permission to autoplay)</p>
+  </div>
+  <script>
+    /* globals */
+    var startTestEl = document.getElementById('start-test')
+    var startTestVideo = document.getElementById('start-test-video')
+    var testSrc = {src: startTestVideo.src, type: 'video/mp4'};
+    var baseTests = [];
+    var setFirstFail = function(player) {
+      var oldPlay = player.tech_.play;
+      var fail = true;
+
+      player.tech_.play = function() {
+        if (fail) {
+          fail = false;
+          return window.Promise.reject();
+        }
+
+        return oldPlay.call(player.tech_);
+      };
+    };
+    var noop = function() {};
+    ['any-first-fail', 'any', 'play', 'muted', true].forEach(function(name) {
+      var val = (name === 'any-first-fail') ? 'any' : name;
+      var firstFail = (name === 'any-first-fail') ? setFirstFail : noop;
+
+      var fn = function(player) {
+        player.autoplay(val);
+      };
+
+      baseTests.push({name: 'option-' + name, beforeSrc: firstFail, options: {autoplay: val}});
+      baseTests.push({name: 'before-src-' + name, beforeSrc: function(player) {
+        firstFail(player);
+        fn(player);
+      }});
+      baseTests.push({name: 'after-src-' + name, beforeSrc: firstFail, afterSrc: fn});
+      baseTests.push({name: 'on-ready-' + name, beforeSrc: firstFail, onReady: fn});
+    });
+
+    var appendLine = function(line) {
+      var el = document.createElement('p');
+
+      el.innerText = line;
+      console.log(line);
+      fixture.appendChild(el);
+    };
+
+    var runTests;
+
+    startTestVideo.addEventListener('play', function() {
+      startTestVideo.load();
+      startTestVideo.src = testSrc.src;
+      startTestEl.style.display = 'none';
+      runTests();
+    });
+
+    runTests = function() {
+      var fixture = document.getElementById('fixture');
+
+      while(fixture.firstChild) {
+        fixture.removeChild(fixture.firstChild);
+      }
+
+      var tests = baseTests.slice(0);
+      var failure = 0;
+      var success = 0;
+      var total = tests.length;
+      var runTest;
+
+      var finishTest = function(name, pass) {
+        if (pass) {
+          success++;
+        } else {
+          failure++;
+        }
+        appendLine((pass ? 'success' : 'failure') + ' - ' + name);
+
+        if ((success + failure) === total) {
+          startTestEl.style.display = '';
+          appendLine(success + ' of ' + total + ' succeeded');
+        } else {
+          runTest();
+        }
+      }
+
+      runTest = function() {
+        var test = tests.shift();
+        var video = document.createElement('video');
+
+        video.setAttribute('class', 'video-js');
+        video.setAttribute('id', test.name);
+        video.setAttribute('controls', true);
+
+        fixture.appendChild(video);
+
+        var player = window.player = videojs(video, test.options);
+
+        if (test.onReady) {
+          test.onReady(player);
+        }
+
+        if (test.beforeSrc) {
+          test.beforeSrc(player);
+        }
+
+        player.src(testSrc);
+
+        if (test.afterSrc) {
+          test.afterSrc(player);
+        }
+        player.setTimeout(function() {
+          player.dispose();
+          window.player = null;
+          finishTest(test.name, false);
+        }, 5000);
+
+        player.on('timeupdate', function() {
+          if (player.currentTime() > 0) {
+            player.dispose();
+            window.player = null;
+            finishTest(test.name, true);
+          }
+        });
+      };
+      runTest();
+    };
+
+  </script>
+
+</body>
+</html>

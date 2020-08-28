@@ -32,38 +32,37 @@
   width: 1px;
   height: 1px;
   margin-left: -1px;
-
 }
 
 .video-js .vjs-volume-panel {
-  &:hover  .vjs-volume-control,
+  &.vjs-hover .vjs-volume-control,
   &:active .vjs-volume-control,
   &:focus  .vjs-volume-control,
-  & .vjs-volume-control:hover  ,
-  & .vjs-volume-control:active ,
-  & .vjs-mute-control:hover  ~ .vjs-volume-control,
+  & .vjs-volume-control:active,
+  &.vjs-hover .vjs-mute-control  ~ .vjs-volume-control,
   & .vjs-volume-control.vjs-slider-active {
     &.vjs-volume-horizontal {
       width: 5em;
       height: 3em;
+      margin-right: 0;
     }
-
     visibility: visible;
     opacity: 1;
     position: relative;
 
     &.vjs-volume-vertical {
       left: -3.5em;
+      @include transition(left 0s);
     }
     $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
     @include transition($transition-property);
   }
 
   &.vjs-volume-panel-horizontal {
-    &:hover,
+    &.vjs-hover,
     &:active,
     &.vjs-slider-active {
-      width: 9em;
+      width: 10em;
 
       @include transition(width 0.1s);
     }
@@ -83,6 +82,7 @@
   $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s 1s, left 1s 1s, top 1s 1s;
   @include transition($transition-property)
 }
+
 .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
   $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s, left 1s 1s, top 1s 1s;
   @include transition($transition-property)

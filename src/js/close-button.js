@@ -3,6 +3,7 @@
  */
 import Button from './button';
 import Component from './component';
+import keycode from 'keycode';
 
 /**
  * The `CloseButton` is a `{@link Button}` that fires a `close` event when
@@ -37,24 +38,9 @@ class CloseButton extends Button {
   }
 
   /**
-   * This gets called when a `CloseButton` has focus and `keydown` is triggered via a key
-   * press.
-   *
-   * @param {EventTarget~Event} event
-   *        The event that caused this function to get called.
-   *
-   * @listens keydown
-   */
-  handleKeyPress(event) {
-    // Override the default `Button` behavior, and don't pass the keypress event
-    //  up to the player because this button is part of a `ModalDialog`, which
-    //  doesn't pass keypresses to the player either.
-  }
-
-  /**
    * This gets called when a `CloseButton` gets clicked. See
-   * {@link ClickableComponent#handleClick} for more information on when this will be
-   * triggered
+   * {@link ClickableComponent#handleClick} for more information on when
+   * this will be triggered
    *
    * @param {EventTarget~Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
@@ -77,6 +63,28 @@ class CloseButton extends Button {
      *           bubble up to parents if there is no listener
      */
     this.trigger({type: 'close', bubbles: false});
+  }
+  /**
+   * Event handler that is called when a `CloseButton` receives a
+   * `keydown` event.
+   *
+   * By default, if the key is Esc, it will trigger a `click` event.
+   *
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
+  handleKeyDown(event) {
+    // Esc button will trigger `click` event
+    if (keycode.isEventKey(event, 'Esc')) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.trigger('click');
+    } else {
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyDown(event);
+    }
   }
 }
 

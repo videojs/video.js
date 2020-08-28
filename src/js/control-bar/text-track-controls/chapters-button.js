@@ -4,7 +4,7 @@
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
-import toTitleCase from '../../utils/to-title-case.js';
+import {toTitleCase} from '../../utils/string-cases.js';
 
 /**
  * The button component for toggling and selecting chapters

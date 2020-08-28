@@ -4,7 +4,6 @@
  */
 import {version} from '../../package.json';
 import window from 'global/window';
-import document from 'global/document';
 import * as setup from './setup';
 import * as stylesheet from './utils/stylesheet.js';
 import Component from './component';
@@ -27,11 +26,12 @@ import * as Url from './utils/url.js';
 import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
 import extend from './extend.js';
-import xhr from 'xhr';
+import xhr from '@videojs/xhr';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
 import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
+import defineLazyProperty from './utils/define-lazy-property.js';
 
 /**
  * Normalize an `id` value by trimming off a leading `#`
@@ -143,7 +143,13 @@ function videojs(id, options, ready) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
-  if (!document.body.contains(el)) {
+  // document.body.contains(el) will only check if el is contained within that one document.
+  // This causes problems for elements in iframes.
+  // Instead, use the element's ownerDocument instead of the global document.
+  // This will make sure that the element is indeed in the dom of that document.
+  // Additionally, check that the document in question has a default view.
+  // If the document is no longer attached to the dom, the defaultView of the document will be null.
+  if (!el.ownerDocument.defaultView || !el.ownerDocument.body.contains(el)) {
     log.warn('The element supplied is not included in the DOM');
   }
 
@@ -560,6 +566,8 @@ videojs.dom = Dom;
  * @see  {@link module:url|url}
  */
 videojs.url = Url;
+
+videojs.defineLazyProperty = defineLazyProperty;
 
 export default videojs;
 

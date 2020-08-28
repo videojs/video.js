@@ -71,6 +71,31 @@ QUnit.test('setup', function(assert) {
   );
 });
 
+QUnit.test('log is added by default', function(assert) {
+  const instance = this.player.mock();
+
+  assert.strictEqual(typeof instance.log, 'function', 'log is a function');
+  assert.strictEqual(typeof instance.log.debug, 'function', 'log.debug is a function');
+  assert.strictEqual(typeof instance.log.error, 'function', 'log.error is a function');
+  assert.strictEqual(typeof instance.log.history, 'function', 'log.history is a function');
+  assert.strictEqual(typeof instance.log.levels, 'object', 'log.levels is a object');
+  assert.strictEqual(typeof instance.log.warn, 'function', 'log.warn is a function');
+});
+
+QUnit.test('log will not clobber pre-existing log property', function(assert) {
+  class MockLogPlugin extends Plugin {
+    log() {}
+  }
+
+  MockLogPlugin.VERSION = '1.0.0';
+  Plugin.registerPlugin('mockLog', MockLogPlugin);
+
+  const instance = this.player.mockLog();
+
+  assert.strictEqual(typeof instance.log, 'function', 'log is a function');
+  assert.strictEqual(instance.log, MockLogPlugin.prototype.log, 'log was not overridden');
+});
+
 QUnit.test('all "pluginsetup" events', function(assert) {
   const setupSpy = sinon.spy();
   const events = [
@@ -171,8 +196,11 @@ QUnit.test('arbitrary events', function(assert) {
 QUnit.test('handleStateChanged() method is automatically bound to the "statechanged" event', function(assert) {
   const spy = sinon.spy();
 
-  class TestHandler extends Plugin {}
-  TestHandler.prototype.handleStateChanged = spy;
+  class TestHandler extends Plugin {
+    handleStateChanged(...args) {
+      spy.apply(this, args);
+    }
+  }
   Plugin.registerPlugin('testHandler', TestHandler);
 
   const instance = this.player.testHandler();

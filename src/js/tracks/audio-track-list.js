@@ -72,11 +72,7 @@ class AudioTrackList extends TrackList {
       return;
     }
 
-    /**
-     * @listens AudioTrack#enabledchange
-     * @fires TrackList#change
-     */
-    track.addEventListener('enabledchange', () => {
+    track.enabledChange_ = () => {
       // when we are disabling other tracks (since we don't support
       // more than one track at a time) we will set changing_
       // to true so that we don't trigger additional change events
@@ -87,7 +83,22 @@ class AudioTrackList extends TrackList {
       disableOthers(this, track);
       this.changing_ = false;
       this.trigger('change');
-    });
+    };
+
+    /**
+     * @listens AudioTrack#enabledchange
+     * @fires TrackList#change
+     */
+    track.addEventListener('enabledchange', track.enabledChange_);
+  }
+
+  removeTrack(rtrack) {
+    super.removeTrack(rtrack);
+
+    if (rtrack.removeEventListener && rtrack.enabledChange_) {
+      rtrack.removeEventListener('enabledchange', rtrack.enabledChange_);
+      rtrack.enabledChange_ = null;
+    }
   }
 }
 

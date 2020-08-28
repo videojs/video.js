@@ -64,15 +64,15 @@ QUnit.test('listen to remove and add track events in native video tracks', funct
   player.player_ = player;
   player.options_ = {};
 
-  /* eslint-disable no-unused-vars */
   const html = new Html5({});
-  /* eslint-enable no-unused-vars */
 
   assert.ok(events.removetrack, 'removetrack listener was added');
   assert.ok(events.addtrack, 'addtrack listener was added');
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.videoTracks = oldVideoTracks;
+
+  html.dispose();
 });
 
 QUnit.test('html5 tech supports native video tracks if the video supports it', function(assert) {

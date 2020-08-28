@@ -13,7 +13,7 @@ import window from 'global/window';
 import document from 'global/document';
 import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
-import toTitleCase from '../utils/to-title-case';
+import {toTitleCase, toLowerCase} from '../utils/string-cases.js';
 import vtt from 'videojs-vtt.js';
 
 /**
@@ -140,6 +140,8 @@ class Tech extends Component {
     if (!this.featuresNativeTextTracks) {
       this.emulateTextTracks();
     }
+
+    this.preloadTextTracks = options.preloadTextTracks !== false;
 
     this.autoRemoteTextTracks_ = new TRACK_TYPES.ALL.text.ListClass();
 
@@ -429,6 +431,25 @@ class Tech extends Component {
   reset() {}
 
   /**
+   * Get the value of `crossOrigin` from the tech.
+   *
+   * @abstract
+   *
+   * @see {Html5#crossOrigin}
+   */
+  crossOrigin() {}
+
+  /**
+   * Set the value of `crossOrigin` on the tech.
+   *
+   * @abstract
+   *
+   * @param {string} crossOrigin the crossOrigin value
+   * @see {Html5#setCrossOrigin}
+   */
+  setCrossOrigin() {}
+
+  /**
    * Get or set an error on the Tech.
    *
    * @param {MediaError} [err]
@@ -461,6 +482,15 @@ class Tech extends Component {
     }
     return createTimeRange();
   }
+
+  /**
+   * Set whether we are scrubbing or not
+   *
+   * @abstract
+   *
+   * @see {Html5#setScrubbing}
+   */
+  setScrubbing() {}
 
   /**
    * Causes a manual time update to occur if {@link Tech#manualTimeUpdatesOn} was
@@ -765,6 +795,45 @@ class Tech extends Component {
   }
 
   /**
+   * Attempt to create a floating video window always on top of other windows
+   * so that users may continue consuming media while they interact with other
+   * content sites, or applications on their device.
+   *
+   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   *
+   * @return {Promise|undefined}
+   *         A promise with a Picture-in-Picture window if the browser supports
+   *         Promises (or one was passed in as an option). It returns undefined
+   *         otherwise.
+   *
+   * @abstract
+   */
+  requestPictureInPicture() {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (PromiseClass) {
+      return PromiseClass.reject();
+    }
+  }
+
+  /**
+   * A method to check for the value of the 'disablePictureInPicture' <video> property.
+   * Defaults to true, as it should be considered disabled if the tech does not support pip
+   *
+   * @abstract
+   */
+  disablePictureInPicture() {
+    return true;
+  }
+
+  /**
+   * A method to set or unset the 'disablePictureInPicture' <video> property.
+   *
+   * @abstract
+   */
+  setDisablePictureInPicture() {}
+
+  /**
    * A method to set a poster from a `Tech`.
    *
    * @abstract
@@ -898,6 +967,7 @@ class Tech extends Component {
     name = toTitleCase(name);
 
     Tech.techs_[name] = tech;
+    Tech.techs_[toLowerCase(name)] = tech;
     if (name !== 'Tech') {
       // camel case the techName for use in techOrder
       Tech.defaultTechOrder_.push(name);
@@ -919,11 +989,11 @@ class Tech extends Component {
       return;
     }
 
-    name = toTitleCase(name);
-
     if (Tech.techs_ && Tech.techs_[name]) {
       return Tech.techs_[name];
     }
+
+    name = toTitleCase(name);
 
     if (window && window.videojs && window.videojs[name]) {
       log.warn(`The ${name} tech was added to the videojs object when it should be registered using videojs.registerTech(name, tech)`);
@@ -1261,7 +1331,7 @@ Tech.withSourceHandlers = function(_Tech) {
     }
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
-    this.on('dispose', this.disposeSourceHandler);
+    this.one('dispose', this.disposeSourceHandler);
   };
 
   /**

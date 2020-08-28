@@ -31,7 +31,7 @@ QUnit.module('mixins: evented', {
   },
 
   afterEach() {
-    Object.keys(this.targets).forEach(k => this.targets[k].trigger('dispose'));
+    Object.keys(this.targets).forEach((k) => this.targets[k].trigger('dispose'));
   }
 });
 
@@ -61,29 +61,33 @@ QUnit.test('evented() with custom element', function(assert) {
   );
 });
 
-QUnit.test('on() and one() errors', function(assert) {
-  const target = this.targets.a = evented({});
+QUnit.test('on(), one(), and any() errors', function(assert) {
+  const targeta = this.targets.a = evented({});
+  const targetb = this.targets.b = evented({});
 
-  ['on', 'one'].forEach(method => {
-    assert.throws(() => target[method](), errors.type, 'the expected error is thrown');
-    assert.throws(() => target[method]('   '), errors.type, 'the expected error is thrown');
-    assert.throws(() => target[method]([]), errors.type, 'the expected error is thrown');
-    assert.throws(() => target[method]('x'), errors.listener, 'the expected error is thrown');
-    assert.throws(() => target[method]({}, 'x', () => {}), errors.target, 'the expected error is thrown');
-    assert.throws(() => target[method](evented({}), 'x', null), errors.listener, 'the expected error is thrown');
+  ['on', 'one', 'any'].forEach(method => {
+    assert.throws(() => targeta[method](), errors.type, 'the expected error is thrown');
+    assert.throws(() => targeta[method]('   '), errors.type, 'the expected error is thrown');
+    assert.throws(() => targeta[method]([]), errors.type, 'the expected error is thrown');
+    assert.throws(() => targeta[method]('x'), errors.listener, 'the expected error is thrown');
+    assert.throws(() => targeta[method]({}, 'x', () => {}), errors.target, 'the expected error is thrown');
+    assert.throws(() => targeta[method](targetb, 'x', null), errors.listener, 'the expected error is thrown');
   });
 });
 
 QUnit.test('off() errors', function(assert) {
-  const target = this.targets.a = evented({});
+  const targeta = this.targets.a = evented({});
+  const targetb = this.targets.b = evented({});
+  const targetc = this.targets.c = evented({});
+  const targetd = this.targets.d = evented({});
 
   // An invalid event actually causes an invalid target error because it
   // gets passed into code that assumes the first argument is the target.
-  assert.throws(() => target.off([]), errors.target, 'the expected error is thrown');
-  assert.throws(() => target.off({}, 'x', () => {}), errors.target, 'the expected error is thrown');
-  assert.throws(() => target.off(evented({}), '', () => {}), errors.type, 'the expected error is thrown');
-  assert.throws(() => target.off(evented({}), [], () => {}), errors.type, 'the expected error is thrown');
-  assert.throws(() => target.off(evented({}), 'x', null), errors.listener, 'the expected error is thrown');
+  assert.throws(() => targeta.off([]), errors.target, 'the expected error is thrown');
+  assert.throws(() => targeta.off({}, 'x', () => {}), errors.target, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targetb, '', () => {}), errors.type, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targetc, [], () => {}), errors.type, 'the expected error is thrown');
+  assert.throws(() => targeta.off(targetd, 'x', null), errors.listener, 'the expected error is thrown');
 });
 
 QUnit.test('on() can add a listener to one event type on this object', function(assert) {
@@ -161,6 +165,63 @@ QUnit.test('one() can add a listener to an array of event types on this object',
   });
 });
 
+QUnit.test('one() can add a listener to an array of event types on this object', function(assert) {
+  const a = this.targets.a = evented({});
+  const spy = sinon.spy();
+
+  a.one(['x', 'y'], spy);
+  a.trigger('x');
+  a.trigger('y');
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
+});
+
+QUnit.test('any() can add a listener to one event type on this object', function(assert) {
+  const a = this.targets.a = evented({});
+  const spy = sinon.spy();
+
+  a.any('x', spy);
+  a.trigger('x');
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+});
+
+QUnit.test('any() can add a listener to an array of event types on this object', function(assert) {
+  const a = this.targets.a = evented({});
+  const spy = sinon.spy();
+
+  a.any(['x', 'y'], spy);
+  a.trigger('x');
+  a.trigger('y');
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+});
+
 QUnit.test('on() can add a listener to one event type on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
@@ -225,14 +286,57 @@ QUnit.test('one() can add a listener to one event type on a different target obj
   });
 });
 
-// The behavior here unfortunately differs from the identical case where "a"
-// listens to itself. This is something that should be resolved...
+// TODO: This test is incorrect! this listener should be called twice,
+//       but instead all listners are removed on the first trigger!
+//       see https://github.com/videojs/video.js/issues/5962
 QUnit.test('one() can add a listener to an array of event types on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
 
   a.one(b, ['x', 'y'], spy);
+  b.trigger('x');
+  b.trigger('y');
+  b.trigger('x');
+  b.trigger('y');
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+  a.trigger('y');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
+});
+
+QUnit.test('any() can add a listener to one event type on a different target object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = evented({});
+  const spy = sinon.spy();
+
+  a.any(b, 'x', spy);
+  b.trigger('x');
+
+  // Make sure we aren't magically binding a listener to "a".
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
+});
+
+QUnit.test('any() can add a listener to an array of event types on a different target object', function(assert) {
+  const a = this.targets.a = evented({});
+  const b = this.targets.b = evented({});
+  const spy = sinon.spy();
+
+  a.any(b, ['x', 'y'], spy);
   b.trigger('x');
   b.trigger('y');
   b.trigger('x');

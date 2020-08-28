@@ -4,6 +4,7 @@
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
+import * as Fn from '../../utils/fn.js';
 
 /**
  * Time tooltips display a time above the progress bar.
@@ -11,6 +12,20 @@ import formatTime from '../../utils/format-time.js';
  * @extends Component
  */
 class TimeTooltip extends Component {
+
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The {@link Player} that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
+  constructor(player, options) {
+    super(player, options);
+    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
+  }
 
   /**
    * Create the time tooltip DOM element
@@ -82,6 +97,16 @@ class TimeTooltip extends Component {
     }
 
     this.el_.style.right = `-${pullTooltipBy}px`;
+    this.write(content);
+  }
+
+  /**
+   * Write the time to the tooltip DOM element.
+   *
+   * @param {string} content
+   *        The formatted time for the tooltip.
+   */
+  write(content) {
     Dom.textContent(this.el_, content);
   }
 
@@ -103,12 +128,7 @@ class TimeTooltip extends Component {
    *        for tooltips that need to do additional animations from the default
    */
   updateTime(seekBarRect, seekBarPoint, time, cb) {
-    // If there is an existing rAF ID, cancel it so we don't over-queue.
-    if (this.rafId_) {
-      this.cancelAnimationFrame(this.rafId_);
-    }
-
-    this.rafId_ = this.requestAnimationFrame(() => {
+    this.requestNamedAnimationFrame('TimeTooltip#updateTime', () => {
       let content;
       const duration = this.player_.duration();
 

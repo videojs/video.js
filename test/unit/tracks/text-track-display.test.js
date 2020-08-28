@@ -52,7 +52,7 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
     textTracks: []
   };
 
-  browser.IS_FIREFOX = true;
+  browser.stub_IS_FIREFOX(true);
 
   const fakeTTDSpy = sinon.spy();
 
@@ -70,7 +70,7 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   assert.strictEqual(fakeTTDSpy.callCount, 1, 'text track display was created');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_FIREFOX = oldIsFirefox;
+  browser.stub_IS_FIREFOX(oldIsFirefox);
   Component.registerComponent('TextTrackDisplay', oldTextTrackDisplay);
 
   player.dispose();
@@ -124,6 +124,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     assert.strictEqual(spy.callCount, 1, 'selectedlanguagechange event was fired');
     player.dispose();
+    player.textTracks().removeEventListener('selectedlanguagechange', selectedLanguageHandler);
   });
 
   QUnit.test("if user-selected language is unavailable, don't pick a track to show", function(assert) {

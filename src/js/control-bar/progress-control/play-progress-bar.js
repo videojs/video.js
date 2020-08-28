@@ -3,6 +3,7 @@
  */
 import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
+import * as Fn from '../../utils/fn.js';
 
 import './time-tooltip';
 
@@ -13,6 +14,20 @@ import './time-tooltip';
  * @extends Component
  */
 class PlayProgressBar extends Component {
+
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The {@link Player} that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
+  constructor(player, options) {
+    super(player, options);
+    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
+  }
 
   /**
    * Create the the DOM element for this class.

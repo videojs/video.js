@@ -53,8 +53,8 @@ Video.js is an extendable framework/library around the native video element. It 
 * Offers an extendable and themable UI
 * Ensures accessibility for keyboard and screen reader users
 * Has a set of core plugins that offer support for additional video formats:
-  * [videojs-contrib-hls][hls]
-  * [videojs-contrib-dash][dash]
+  * HLS and DASH are supported natively.
+  * [videojs-contrib-dash][dash] can be used for more complete DASH support
 * Supports  DRM video via a core plugin:
   * [videojs-contrib-eme][eme]
 * Is extensible with lots of plugins offering support for all kinds of features. See the [plugin list on videojs.com][plugin-list]
@@ -133,7 +133,7 @@ techs/plugins made available to Video.js. For more information on media formats 
 
 ## Q: How does Video.js choose which source to use?
 
-When an array of sources is available, Video.js test each source in the order given. For each source, each tech in the [`techOrder`][techorder] will be checked to see if it can play it whether directly or via source handler (such as videojs-contrib-hls). The first match will be chosen.
+When an array of sources is available, Video.js test each source in the order given. For each source, each tech in the [`techOrder`][techorder] will be checked to see if it can play it whether directly or via source handler (such as videojs-http-streaming). The first match will be chosen.
 
 ## Q: How do I autoplay a video?
 
@@ -238,23 +238,23 @@ Yes! See the [text tracks guide][text-tracks] for information on using text trac
 
 ## Q: Does Video.js support HLS (HTTP Live streaming) video?
 
-Video.js supports HLS video if the native HTML5 element supports HLS (e.g. Safari, Edge,
-Chrome for Android, and iOS). For browsers without native support the [videojs-contrib-hls][hls]
-project which adds support.
+Video.js supports HLS. It will play using native support if the HTML5 element supports HLS (e.g. Safari, iOS, legacy Edge, or Chrome for Android).
+On other browsers, it will play using our playback engine [videojs-http-streaming][hls].
 
 Note that for non-native playback of HLS it is essential that the server hosting the video sets [CORS headers][cors].
 
 ## Q: Does Video.js support MPEG DASH video?
 
-MPEG DASH support is provided byt the [videojs-contrib-dash][dash]
-package.
+Video.js provides support for some DASH streams with our playback engine [videojs-http-streaming][hls].
+
+Alternatively, [videojs-contrib-dash][dash] package can be used.
 
 Like HLS, DASH streams require [CORS headers][cors].
 
 ## Q: Does Video.js support live video?
 
 Yes! Common formats for live are HLS or historically RTMP.
-HLS is supported via [videojs-contrib-hls][hls]. and RTMP via [videojs-flash][flash].
+HLS is supported via [videojs-http-streaming][hls] and RTMP via [videojs-flash][flash].
 
 ## Q: Can Video.js play YouTube videos?
 
@@ -308,7 +308,7 @@ Yes! See [ReactJS integration example][react-guide].
 
 [google-ima]: https://github.com/googleads/videojs-ima
 
-[hls]: https://github.com/videojs/videojs-contrib-hls
+[hls]: https://github.com/videojs/http-streaming
 
 [install-guide]: https://videojs.com/getting-started/
 

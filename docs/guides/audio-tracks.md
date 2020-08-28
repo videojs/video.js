@@ -9,7 +9,7 @@ cross-browser implementation of audio tracks.
 * [Caveats](#caveats)
 * [Working with Audio Tracks](#working-with-audio-tracks)
   * [Add an Audio Track to the Player](#add-an-audio-track-to-the-player)
-  * [Listen for a Video Track Becoming Enabled](#listen-for-a-video-track-becoming-enabled)
+  * [Listen for an Audio Track Becoming Enabled](#listen-for-an-audio-track-becoming-enabled)
   * [Removing an Audio Track from the Player](#removing-an-audio-track-from-the-player)
 * [API](#api)
   * [videojs.AudioTrack](#videojsaudiotrack)
@@ -48,7 +48,7 @@ var track = new videojs.AudioTrack({
 player.audioTracks().addTrack(track);
 ```
 
-### Listen for a Video Track Becoming Enabled
+### Listen for an Audio Track Becoming Enabled
 
 When a track is enabled or disabled on an `AudioTrackList`, a `change` event will be
 fired. You can listen for that event and do something with it.

@@ -23,8 +23,8 @@
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
 
 ```html
-<link href="//vjs.zencdn.net/7.3.0/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/7.3.0/video.min.js"></script>
+<link href="//vjs.zencdn.net/7.8.2/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/7.8.2/video.min.js"></script>
 ```
 
 > For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
@@ -37,7 +37,7 @@ In older versions of Video.js (6 and earlier), in the `vjs.zencdn.net` CDN-hoste
 <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
 ```
 
-Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#download-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
+Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#install-via-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
 
 ```html
 <!-- unpkg : use the latest version of Video.js -->
@@ -45,12 +45,12 @@ Alternatively, you can include Video.js by getting it from [npm](https://videojs
 <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
 
 <!-- unpkg : use a specific version of Video.js (change the version numbers as necessary) -->
-<link href="https://unpkg.com/video.js@6.11.0/dist/video-js.min.css" rel="stylesheet">
-<script src="https://unpkg.com/video.js@6.11.0/dist/video.min.js"></script>
+<link href="https://unpkg.com/video.js@7.8.2/dist/video-js.min.css" rel="stylesheet">
+<script src="https://unpkg.com/video.js@7.8.2/dist/video.min.js"></script>
 
 <!-- cdnjs : use a specific version of Video.js (change the version numbers as necessary) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video-js.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.1/video-js.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.1/video.min.js"></script>
 ```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!
@@ -137,7 +137,7 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [license]: LICENSE
 
-[logo]: https://videojs.com/img/logo.png
+[logo]: https://videojs.com/logo-white.png
 
 [npm-icon]: https://nodei.co/npm/video.js.png?downloads=true&downloadRank=true
 
@@ -151,7 +151,7 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [slack-link]: http://slack.videojs.com
 
-[travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=master
+[travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=main
 
 [travis-link]: https://travis-ci.org/videojs/video.js
 
