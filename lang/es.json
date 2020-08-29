@@ -30,7 +30,7 @@
   "Seek to live, currently behind live": "Buscar en vivo, actualmente demorado con respecto a la transmisión en vivo",
   "Seek to live, currently playing live": "Buscar en vivo, actualmente reproduciendo en vivo",
   "Progress Bar": "Barra de progreso",
-  "progress bar timing: currentTime={1} duration={2}": "{1} de {2}",
+  "progress bar timing: currentTime={1} duration={2}": "Barra de progeso: Transcurrido{1} de {2}",
   "Descriptions": "Descripciones",
   "descriptions off": "descripciones desactivadas",
   "Audio Track": "Pista de audio",
