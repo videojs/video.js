@@ -138,6 +138,7 @@
   &:before {
     position: absolute;
     font-size: 0.9em; // Doing this to match the handle on play progress.
+    z-index: 1;
   }
 }
 
