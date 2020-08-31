@@ -286,26 +286,31 @@ QUnit.test('Dom.findPosition should find top and left position', function(assert
   const d = document.createElement('div');
   let position = Dom.findPosition(d);
 
+  d.style.width = '100px';
+  d.style.height = '50px';
   d.style.top = '10px';
   d.style.left = '20px';
   d.style.position = 'absolute';
 
   assert.deepEqual(
     position,
-    {left: 0, top: 0},
+    {left: 0, top: 0, width: 0, height: 0},
     'If element isn\'t in the DOM, we should get zeros'
   );
 
   document.body.appendChild(d);
   position = Dom.findPosition(d);
-  assert.deepEqual(position, {left: 20, top: 10}, 'The position was not correct');
+  assert.deepEqual(position.left, 20, 'The position left was not correct');
+  assert.deepEqual(position.top, 10, 'The position top was not correct');
+  assert.deepEqual(position.width, 100, 'The dimension width was not correct');
+  assert.deepEqual(position.height, 50, 'The dimension height was not correct');
 
-  d.getBoundingClientRect = null;
+  d.style.display = 'none';
   position = Dom.findPosition(d);
   assert.deepEqual(
     position,
-    {left: 0, top: 0},
-    'If there is no gBCR, we should get zeros'
+    {left: 0, top: 0, width: 0, height: 0},
+    'If there is no offsetParent, we should get zeros'
   );
 });
 

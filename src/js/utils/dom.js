@@ -551,34 +551,31 @@ export function getBoundingClientRect(el) {
  *         The position of the element that was passed in.
  */
 export function findPosition(el) {
-  let box;
-
-  if (el.getBoundingClientRect && el.parentNode) {
-    box = el.getBoundingClientRect();
-  }
-
-  if (!box) {
+  if (!el || (el && !el.offsetParent)) {
     return {
       left: 0,
-      top: 0
+      top: 0,
+      width: 0,
+      height: 0
     };
   }
+  const width = el.offsetWidth;
+  const height = el.offsetHeight;
+  let left = 0;
+  let top = 0;
 
-  const docEl = document.documentElement;
-  const body = document.body;
+  do {
+    left += el.offsetLeft;
+    top += el.offsetTop;
 
-  const clientLeft = docEl.clientLeft || body.clientLeft || 0;
-  const scrollLeft = window.pageXOffset || body.scrollLeft;
-  const left = box.left + scrollLeft - clientLeft;
+    el = el.offsetParent;
+  } while (el);
 
-  const clientTop = docEl.clientTop || body.clientTop || 0;
-  const scrollTop = window.pageYOffset || body.scrollTop;
-  const top = box.top + scrollTop - clientTop;
-
-  // Android sometimes returns slightly off decimal values, so need to round
   return {
-    left: Math.round(left),
-    top: Math.round(top)
+    left,
+    top,
+    width,
+    height
   };
 }
 
@@ -611,23 +608,20 @@ export function findPosition(el) {
  */
 export function getPointerPosition(el, event) {
   const position = {};
+  const boxTarget = findPosition(event.target);
   const box = findPosition(el);
-  const boxW = el.offsetWidth;
-  const boxH = el.offsetHeight;
-
-  const boxY = box.top;
-  const boxX = box.left;
-  let pageY = event.pageY;
-  let pageX = event.pageX;
+  const boxW = box.width;
+  const boxH = box.height;
+  let offsetY = event.offsetY - (box.top - boxTarget.top);
+  let offsetX = event.offsetX - (box.left - boxTarget.left);
 
   if (event.changedTouches) {
-    pageX = event.changedTouches[0].pageX;
-    pageY = event.changedTouches[0].pageY;
+    offsetX = event.changedTouches[0].pageX - box.left;
+    offsetY = event.changedTouches[0].pageY + box.top;
   }
 
-  position.y = Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
-  position.x = Math.max(0, Math.min(1, (pageX - boxX) / boxW));
-
+  position.y = Math.max(0, Math.min(1, (offsetY + boxH) / boxH));
+  position.x = Math.max(0, Math.min(1, offsetX / boxW));
   return position;
 }
 

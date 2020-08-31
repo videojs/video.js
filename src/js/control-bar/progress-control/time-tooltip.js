@@ -52,7 +52,7 @@ class TimeTooltip extends Component {
    *        from the left edge of the {@link SeekBar}
    */
   update(seekBarRect, seekBarPoint, content) {
-    const tooltipRect = Dom.getBoundingClientRect(this.el_);
+    const tooltipRect = Dom.findPosition(this.el_);
     const playerRect = Dom.getBoundingClientRect(this.player_.el());
     const seekBarPointPx = seekBarRect.width * seekBarPoint;
 
