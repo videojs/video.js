@@ -4,9 +4,12 @@
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
+import clamp from '../../utils/clamp.js';
+import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 
 // Required children
 import './volume-level.js';
+import './mouse-volume-level-display.js';
 
 /**
  * The bar that contains the volume level and can be clicked on to adjust the level
@@ -71,6 +74,23 @@ class VolumeBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
+    const mouseVolumeLevelDisplay = this.getChild('mouseVolumeLevelDisplay');
+
+    if (mouseVolumeLevelDisplay) {
+      const volumeBarEl = this.el();
+      const volumeBarRect = Dom.getBoundingClientRect(volumeBarEl);
+      const vertical = this.vertical();
+      let volumeBarPoint = Dom.getPointerPosition(volumeBarEl, event);
+
+      volumeBarPoint = vertical ? volumeBarPoint.y : volumeBarPoint.x;
+      // The default skin has a gap on either side of the `VolumeBar`. This means
+      // that it's possible to trigger this behavior outside the boundaries of
+      // the `VolumeBar`. This ensures we stay within it at all times.
+      volumeBarPoint = clamp(volumeBarPoint, 0, 1);
+
+      mouseVolumeLevelDisplay.update(volumeBarRect, volumeBarPoint, vertical);
+    }
+
     if (!Dom.isSingleLeftClick(event)) {
       return;
     }
@@ -173,6 +193,11 @@ VolumeBar.prototype.options_ = {
   ],
   barName: 'volumeLevel'
 };
+
+// MouseVolumeLevelDisplay tooltip should not be added to a player on mobile devices
+if (!IS_IOS && !IS_ANDROID) {
+  VolumeBar.prototype.options_.children.splice(0, 0, 'mouseVolumeLevelDisplay');
+}
 
 /**
  * Call the update event for this Slider when this event happens on the player.
