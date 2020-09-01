@@ -545,6 +545,10 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', this.listenForUserActivity_);
+    this.one('play', () => {
+      // ControlBar isn't visible until playback has started
+      this._focusableControls = this.getFocusableControls_();
+    });
     this.on('stageclick', this.handleStageClick_);
     this.on('keydown', this.handleKeyDown);
 
@@ -2199,6 +2203,49 @@ class Player extends Component {
     };
   }
 
+  getFocusableControls_() {
+    const controlComponents = this.controlBar && this.controlBar.children();
+    const focusableControls = [];
+
+    if (!controlComponents) {
+      return [];
+    }
+
+    controlComponents.forEach(controlComponent => {
+      const controlEl = controlComponent.el();
+
+      if (Dom.isFocusable(controlEl)) {
+        focusableControls.push(controlEl);
+      } else if (controlEl.children) {
+        const focusableChild = Array.from(controlEl.children).find(child => Dom.isFocusable(child));
+
+        if (focusableChild) {
+          focusableControls.push(focusableChild);
+        }
+      }
+    });
+
+    return focusableControls;
+  }
+
+  trapFullscreenTab_(event) {
+    // We'll use this to figure out if the user just tabbed on the first or last focusable control
+    const focusIndex = this._focusableControls.indexOf(event.target);
+    let indexToFocus;
+
+    if (event.shiftKey) {
+      if (focusIndex === 0) {
+        indexToFocus = this._focusableControls.length - 1;
+      }
+    } else if (focusIndex === this._focusableControls.length - 1) {
+      indexToFocus = 0;
+    }
+    if (typeof indexToFocus !== 'undefined') {
+      this._focusableControls[indexToFocus].focus();
+      event.preventDefault();
+    }
+  }
+
   /**
    * Pass values to the playback tech
    *
@@ -3081,6 +3128,10 @@ class Player extends Component {
    */
   handleKeyDown(event) {
     const {userActions} = this.options_;
+
+    if (this.isFullscreen() && keycode.isEventKey(event, 'Tab')) {
+      this.trapFullscreenTab_(event);
+    }
 
     // Bail out if hotkeys are not configured.
     if (!userActions || !userActions.hotkeys) {

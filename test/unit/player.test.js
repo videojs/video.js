@@ -2258,3 +2258,47 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.ok(spyCurrentTime.calledAfter(spyInitTime), 'currentTime was called on canplay event listener');
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
+
+QUnit.test('Tabbing through the control bar is trapped correctly', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controls: true
+  });
+  // Need hasStarted to be true so that the controlBar is visible and focusable
+
+  player.tech_.trigger('play');
+
+  const fullscreenStub = sinon.stub(player, 'isFullscreen').returns(true);
+  const children = player.controlBar.children();
+  const firstChild = children[0];
+  const lastChild = children[children.length - 1];
+
+  // Focus on the last control
+  lastChild.el().focus();
+
+  assert.ok(document.activeElement === lastChild.el(), 'The last control has focus');
+
+  /* eslint-disable no-undef */
+  lastChild.el().dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', keyCode: 9 }));
+
+  assert.ok(
+    document.activeElement === firstChild.el(),
+    'The focus was trapped and now the first control has focus'
+  );
+
+  /* eslint-disable no-undef */
+  firstChild.el().dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', keyCode: 9, shiftKey: true }));
+
+  assert.ok(document.activeElement === lastChild.el(), 'The last control has focus');
+
+  fullscreenStub.returns(false);
+
+  /* eslint-disable no-undef */
+  lastChild.el().dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', keyCode: 9 }));
+
+  assert.ok(
+    document.activeElement === lastChild.el(),
+    'The last control keeps its focus (tab was not trapped) since we are not in fullscreen mode'
+  );
+
+  fullscreenStub.restore();
+});

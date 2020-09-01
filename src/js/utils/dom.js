@@ -181,6 +181,23 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
   return el;
 }
 
+export function isFocusable(control) {
+  return (
+    ((control instanceof window.HTMLAnchorElement || control instanceof window.HTMLAreaElement) &&
+      control.hasAttribute('href')) ||
+    ((control instanceof window.HTMLInputElement ||
+      control instanceof window.HTMLSelectElement ||
+      control instanceof window.HTMLTextAreaElement ||
+      control instanceof window.HTMLButtonElement) &&
+      !control.hasAttribute('disabled')) ||
+    control instanceof window.HTMLIFrameElement ||
+    control instanceof window.HTMLObjectElement ||
+    control instanceof window.HTMLEmbedElement ||
+    (control.hasAttribute('tabindex') && control.getAttribute('tabindex') !== -1) ||
+    control.hasAttribute('contenteditable')
+  );
+}
+
 /**
  * Injects text into an element, replacing any existing contents entirely.
  *

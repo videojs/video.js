@@ -475,6 +475,58 @@ QUnit.test('Dom.normalizeContent: functions returning arrays', function(assert) 
   );
 });
 
+QUnit.test('Dom.isFocusable', function(assert) {
+  assert.expect(12);
+
+  const anchorNoHref = Dom.createEl('a');
+
+  assert.equal(Dom.isFocusable(anchorNoHref), false, 'An anchor with no href is not focusable');
+
+  const anchorWithHref = Dom.createEl('a', {}, { href: '#blah' });
+
+  assert.equal(Dom.isFocusable(anchorWithHref), true, 'An anchor with an href is focusable');
+
+  const inputEl = Dom.createEl('input');
+
+  assert.equal(Dom.isFocusable(inputEl), true, 'An input is focusable');
+
+  const selectEl = Dom.createEl('select');
+
+  assert.equal(Dom.isFocusable(selectEl), true, 'An select el is focusable');
+
+  const textareaEl = Dom.createEl('textarea');
+
+  assert.equal(Dom.isFocusable(textareaEl), true, 'An textarea is focusable');
+
+  const buttonEl = Dom.createEl('button');
+
+  assert.equal(Dom.isFocusable(buttonEl), true, 'An button is focusable');
+
+  const buttonDisabledEl = Dom.createEl('button', {}, { disabled: true });
+
+  assert.equal(Dom.isFocusable(buttonDisabledEl), false, 'A disabled button is not focusable');
+
+  const iframeEl = Dom.createEl('iframe');
+
+  assert.equal(Dom.isFocusable(iframeEl), true, 'An iframe is focusable');
+
+  const embedEl = Dom.createEl('embed');
+
+  assert.equal(Dom.isFocusable(embedEl), true, 'An embed is focusable');
+
+  const divEl = Dom.createEl('div');
+
+  assert.equal(Dom.isFocusable(divEl), false, 'A div is not focusable');
+
+  const focusableDivEl = Dom.createEl('div', {}, { tabIndex: 0 });
+
+  assert.equal(Dom.isFocusable(focusableDivEl), true, 'A non-focusable control with a tabIndex >= 0 is focusable');
+
+  const contentEditableDivEl = Dom.createEl('div', {}, { contenteditable: true });
+
+  assert.equal(Dom.isFocusable(contentEditableDivEl), true, 'A non-focusable control with a contenteditable=true is focusable');
+});
+
 QUnit.test('Dom.insertContent', function(assert) {
   const p = Dom.createEl('p');
   const text = document.createTextNode('hello');

@@ -3,7 +3,6 @@
  */
 import * as Dom from './utils/dom';
 import Component from './component';
-import window from 'global/window';
 import document from 'global/document';
 import keycode from 'keycode';
 
@@ -493,17 +492,7 @@ class ModalDialog extends Component {
     const allChildren = this.el_.querySelectorAll('*');
 
     return Array.prototype.filter.call(allChildren, (child) => {
-      return ((child instanceof window.HTMLAnchorElement ||
-               child instanceof window.HTMLAreaElement) && child.hasAttribute('href')) ||
-             ((child instanceof window.HTMLInputElement ||
-               child instanceof window.HTMLSelectElement ||
-               child instanceof window.HTMLTextAreaElement ||
-               child instanceof window.HTMLButtonElement) && !child.hasAttribute('disabled')) ||
-             (child instanceof window.HTMLIFrameElement ||
-               child instanceof window.HTMLObjectElement ||
-               child instanceof window.HTMLEmbedElement) ||
-             (child.hasAttribute('tabindex') && child.getAttribute('tabindex') !== -1) ||
-             (child.hasAttribute('contenteditable'));
+      return Dom.isFocusable(child);
     });
   }
 }
