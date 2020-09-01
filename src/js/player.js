@@ -2229,6 +2229,10 @@ class Player extends Component {
   }
 
   trapFullscreenTab_(event) {
+    if (!Array.isArray(this._focusableControls) || !this._focusableControls.length) {
+      return;
+    }
+
     // We'll use this to figure out if the user just tabbed on the first or last focusable control
     const focusIndex = this._focusableControls.indexOf(event.target);
     let indexToFocus;
