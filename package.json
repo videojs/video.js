@@ -82,7 +82,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",
-    "@videojs/http-streaming": "1.13.3",
+    "@videojs/http-streaming": "1.13.4",
     "@videojs/xhr": "2.5.1",
     "global": "4.3.2",
     "keycode": "^2.2.0",
