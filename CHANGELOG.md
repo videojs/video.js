@@ -1,3 +1,14 @@
+<a name="7.9.4"></a>
+## [7.9.4](https://github.com/videojs/video.js/compare/v7.9.3...v7.9.4) (2020-09-10)
+
+### Bug Fixes
+
+* Better mouse position handling ([#5773](https://github.com/videojs/video.js/issues/5773)) ([c4c8fc1](https://github.com/videojs/video.js/commit/c4c8fc1)), closes [#6726](https://github.com/videojs/video.js/issues/6726) [#1102](https://github.com/videojs/video.js/issues/1102)
+
+### Chores
+
+* **package:** Update [@videojs](https://github.com/videojs)/http-streaming to 1.13.4 ([#6839](https://github.com/videojs/video.js/issues/6839)) ([7192be6](https://github.com/videojs/video.js/commit/7192be6)), closes [#6812](https://github.com/videojs/video.js/issues/6812)
+
 <a name="7.9.3"></a>
 ## [7.9.3](https://github.com/videojs/video.js/compare/v7.9.2...v7.9.3) (2020-08-17)
 
