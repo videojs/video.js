@@ -475,9 +475,32 @@ QUnit.test('Dom.normalizeContent: functions returning arrays', function(assert) 
   );
 });
 
-QUnit.test('Dom.isFocusable', function(assert) {
-  assert.expect(12);
+QUnit.test('Dom.isVisible', function(assert) {
+  assert.expect(4);
 
+  const fixture = document.getElementById('qunit-fixture');
+
+  assert.equal(Dom.isVisible(), false, 'Returns false if control is non existent');
+
+  const visibleEl = Dom.createEl('div');
+
+  assert.equal(Dom.isVisible(visibleEl), true, 'Returns true if the control is visible');
+
+  const invisibleEl = Dom.createEl('div', {}, { style: 'visibility: hidden'});
+
+  fixture.appendChild(invisibleEl);
+  assert.equal(Dom.isVisible(invisibleEl), false, 'Returns false if the control is invisible');
+
+  const hiddenEl = Dom.createEl('div', {}, { style: 'display: none'});
+
+  fixture.appendChild(hiddenEl);
+  assert.equal(Dom.isVisible(hiddenEl), false, 'Returns false if the control is hidden via display: none');
+});
+
+QUnit.test('Dom.isFocusable', function(assert) {
+  assert.expect(15);
+
+  const fixture = document.getElementById('qunit-fixture');
   const anchorNoHref = Dom.createEl('a');
 
   assert.equal(Dom.isFocusable(anchorNoHref), false, 'An anchor with no href is not focusable');
@@ -489,6 +512,20 @@ QUnit.test('Dom.isFocusable', function(assert) {
   const inputEl = Dom.createEl('input');
 
   assert.equal(Dom.isFocusable(inputEl), true, 'An input is focusable');
+
+  const focusableNegativeTabindex = Dom.createEl('input', {}, { tabIndex: -1 });
+
+  assert.equal(Dom.isFocusable(focusableNegativeTabindex), false, 'A focusable control with a negative tabindex is not focusable');
+
+  const focusableNotVisible = Dom.createEl('input', {}, { style: 'display: none' });
+
+  fixture.appendChild(focusableNotVisible);
+  assert.equal(Dom.isFocusable(focusableNotVisible), false, 'Non visible controls are not focusable');
+
+  const focusableNotVisibleWithImportant = Dom.createEl('input', {}, { style: 'display: none !important' });
+
+  fixture.appendChild(focusableNotVisibleWithImportant);
+  assert.equal(Dom.isFocusable(focusableNotVisibleWithImportant), false, 'The important tag does not interfere with the visibility check');
 
   const selectEl = Dom.createEl('select');
 

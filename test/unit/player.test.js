@@ -2263,9 +2263,11 @@ QUnit.test('Tabbing through the control bar is trapped correctly', function(asse
   const player = TestHelpers.makePlayer({
     controls: true
   });
-  // Need hasStarted to be true so that the controlBar is visible and focusable
 
   player.tech_.trigger('play');
+
+  // Focusable controls are calculated when fullscreen is requested
+  player.requestFullscreen();
 
   const fullscreenStub = sinon.stub(player, 'isFullscreen').returns(true);
   const children = player.controlBar.children();
