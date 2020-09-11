@@ -133,6 +133,18 @@ class ClickableComponent extends Component {
   }
 
   /**
+   * Handles language change in ClickableComponent for the player in components
+   *
+   *
+   */
+  handleLanguageChange() {
+    if (!this.controlText_) {
+      return;
+    }
+    this.controlText(this.controlText_);
+  }
+
+  /**
    * Builds the default DOM `className`.
    *
    * @return {string}

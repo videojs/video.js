@@ -4133,6 +4133,7 @@ class Player extends Component {
     }
 
     this.language_ = String(code).toLowerCase();
+    this.trigger('languagechange');
   }
 
   /**

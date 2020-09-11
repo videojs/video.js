@@ -115,6 +115,8 @@ class Component {
     if (options.reportTouchActivity !== false) {
       this.enableTouchActivity();
     }
+
+    this.on('languagechange', this.handleLanguageChange);
   }
 
   /**
@@ -1500,6 +1502,13 @@ class Component {
       this.clearingTimersOnDispose_ = false;
     });
   }
+
+  /**
+   * Handles language change for the player in components. Should be overriden by sub-components.
+   *
+   * @abstract
+   */
+  handleLanguageChange() {}
 
   /**
    * Register a `Component` with `videojs` given the name and the component.
