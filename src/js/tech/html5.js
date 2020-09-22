@@ -1475,7 +1475,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Set the value of `defaultMuted` on the media element. `defaultMuted` indicates that the current
-   * audio level should be silent, but will only effect the muted level on intial playback..
+   * audio level should be silent, but will only effect the muted level on initial playback..
    *
    * @method Html5.prototype.setDefaultMuted
    * @param {boolean} defaultMuted

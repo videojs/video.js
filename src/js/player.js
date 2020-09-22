@@ -1575,7 +1575,7 @@ class Player extends Component {
         }
       }
 
-      // update the source to the intial source right away
+      // update the source to the initial source right away
       // in some cases this will be empty string
       updateSourceCaches(eventSrc);
 
@@ -3335,7 +3335,7 @@ class Player extends Component {
       return;
     }
 
-    // intial sources
+    // initial sources
     this.changingSrc_ = true;
 
     this.cache_.sources = sources;
