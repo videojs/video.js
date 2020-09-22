@@ -746,7 +746,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
           this.mediaEl = this.player.tech_.el();
         });
 
-        // intial sourceset should happen on player.ready
+        // initial sourceset should happen on player.ready
         this.player.one('sourceset', (e) => {
           validateSource(this.player, [testSrc], e);
           done();
