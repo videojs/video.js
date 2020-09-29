@@ -4,7 +4,6 @@
 import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -25,8 +24,9 @@ class TimeDisplay extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.throttledUpdateContent = throttle(bind(this, this.updateContent), UPDATE_REFRESH_INTERVAL);
-    this.on(player, 'timeupdate', this.throttledUpdateContent);
+
+    this.on(player, ['timeupdate', 'ended'], this.updateContent);
+    this.updateTextNode_();
   }
 
   /**
@@ -54,7 +54,6 @@ class TimeDisplay extends Component {
       'role': 'presentation'
     });
 
-    this.updateTextNode_();
     el.appendChild(this.contentEl_);
     return el;
   }
@@ -67,57 +66,40 @@ class TimeDisplay extends Component {
   }
 
   /**
-   * Updates the "remaining time" text node with new content using the
-   * contents of the `formattedTime_` property.
+   * Updates the time display text node with a new time
+   *
+   * @param {number} [time=0] the time to update to
    *
    * @private
    */
-  updateTextNode_() {
-    if (!this.contentEl_) {
+  updateTextNode_(time = 0) {
+    time = formatTime(time);
+
+    if (this.formattedTime_ === time) {
       return;
     }
 
-    while (this.contentEl_.firstChild) {
-      this.contentEl_.removeChild(this.contentEl_.firstChild);
-    }
+    this.formattedTime_ = time;
 
-    this.textNode_ = document.createTextNode(this.formattedTime_ || this.formatTime_(0));
-    this.contentEl_.appendChild(this.textNode_);
-  }
+    this.requestNamedAnimationFrame('TimeDisplay#updateTextNode_', () => {
+      if (!this.contentEl_) {
+        return;
+      }
 
-  /**
-   * Generates a formatted time for this component to use in display.
-   *
-   * @param  {number} time
-   *         A numeric time, in seconds.
-   *
-   * @return {string}
-   *         A formatted time
-   *
-   * @private
-   */
-  formatTime_(time) {
-    return formatTime(time);
-  }
+      const oldNode = this.textNode_;
 
-  /**
-   * Updates the time display text node if it has what was passed in changed
-   * the formatted time.
-   *
-   * @param {number} time
-   *        The time to update to
-   *
-   * @private
-   */
-  updateFormattedTime_(time) {
-    const formattedTime = this.formatTime_(time);
+      this.textNode_ = document.createTextNode(this.formattedTime_);
 
-    if (formattedTime === this.formattedTime_) {
-      return;
-    }
+      if (!this.textNode_) {
+        return;
+      }
 
-    this.formattedTime_ = formattedTime;
-    this.requestAnimationFrame(this.updateTextNode_);
+      if (oldNode) {
+        this.contentEl_.replaceChild(this.textNode_, oldNode);
+      } else {
+        this.contentEl_.appendChild(this.textNode_);
+      }
+    });
   }
 
   /**

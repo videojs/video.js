@@ -5,3 +5,4 @@ dist/video-js-*.zip
 !es5/**
 !src/css/**
 !core.js
+!core.es.js

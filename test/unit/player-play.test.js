@@ -9,8 +9,14 @@ QUnit.module('Player#play', {
     this.clock = sinon.useFakeTimers();
     this.player = TestHelpers.makePlayer({});
     this.techPlayCallCount = 0;
+    this.techCurrentTimeCallCount = 0;
+    this.initTime = 0;
     this.player.tech_.play = () => {
       this.techPlayCallCount++;
+    };
+    this.player.tech_.setCurrentTime = (seconds) => {
+      this.techCurrentTimeCallCount++;
+      this.initTime = seconds;
     };
   },
 

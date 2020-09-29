@@ -2,96 +2,91 @@
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import computedStyle from '../../src/js/utils/computed-style.js';
+import { createTimeRange } from '../../src/js/utils/time-ranges.js';
 
-QUnit.module('SeekToLive', () => {
-  QUnit.module('live with liveui', {
-    beforeEach() {
-      this.clock = sinon.useFakeTimers();
+QUnit.module('SeekToLive', {
+  beforeEach() {
+    this.clock = sinon.useFakeTimers();
+    this.player = TestHelpers.makePlayer();
+    this.seekToLive = this.player.controlBar.seekToLive;
+    this.getComputedDisplay = () => {
+      return computedStyle(this.seekToLive.el(), 'display');
+    };
 
-      this.player = TestHelpers.makePlayer({liveui: true});
-      this.seekToLive = this.player.controlBar.seekToLive;
-
-      this.getComputedDisplay = () => {
-        return computedStyle(this.seekToLive.el(), 'display');
-      };
-
-      // mock live state
+    this.mockLiveui = () => {
+      this.player.paused = () => false;
+      this.player.hasStarted = () => true;
+      this.player.options_.liveui = true;
+      this.player.seekable = () => createTimeRange(0, 45);
+      this.player.currentTime = () => this.player.liveTracker.liveCurrentTime();
       this.player.duration(Infinity);
-    },
-    afterEach() {
-      this.player.dispose();
-      this.clock.restore();
-    }
-  });
+    };
+  },
+  afterEach() {
+    this.player.dispose();
+    this.clock.restore();
+  }
+});
 
-  QUnit.test('at live edge if liveTracker says we are', function(assert) {
-    this.player.liveTracker.behindLiveEdge = () => false;
-    this.player.liveTracker.trigger('liveedgechange');
+QUnit.test('liveui enabled, can switch between at and behind live edge ', function(assert) {
+  this.mockLiveui();
 
-    assert.ok(this.seekToLive.hasClass('vjs-at-live-edge'), 'has at live edge class');
-  });
+  assert.notEqual(this.getComputedDisplay(), 'none', 'is not hidden');
+  assert.ok(this.seekToLive.hasClass('vjs-at-live-edge'), 'has at live edge class');
 
-  QUnit.test('behind live edge if liveTracker says we are', function(assert) {
-    this.player.liveTracker.behindLiveEdge = () => true;
-    this.player.liveTracker.trigger('liveedgechange');
+  this.player.currentTime = () => 0;
+  this.player.seekable = () => createTimeRange(0, 38);
+  this.clock.tick(30);
 
-    assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have live edge class');
-  });
+  assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
+});
 
-  QUnit.test('switch to non live', function(assert) {
-    this.player.duration(4);
-    this.player.trigger('durationchange');
-    assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
-  });
+QUnit.test('liveui enabled can show/hide on durationchange', function(assert) {
+  // start out non-live
+  assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
+  assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
 
-  QUnit.module('live without liveui', {
-    beforeEach() {
-      this.clock = sinon.useFakeTimers();
+  // switch to live
+  this.mockLiveui();
 
-      this.player = TestHelpers.makePlayer();
-      this.seekToLive = this.player.controlBar.seekToLive;
+  assert.notEqual(this.getComputedDisplay(), 'none', 'is not hidden');
+  assert.ok(this.seekToLive.hasClass('vjs-at-live-edge'), 'has at live edge class');
 
-      this.getComputedDisplay = () => {
-        return computedStyle(this.seekToLive.el(), 'display');
-      };
+  // switch to non-live
+  this.player.duration(20);
 
-      // mock live state
-      this.player.duration(Infinity);
-    },
-    afterEach() {
-      this.player.dispose();
-      this.clock.restore();
-    }
-  });
+  assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
+  assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
 
-  QUnit.test('should be hidden', function(assert) {
-    assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
-  });
+  // back to live again.
+  this.mockLiveui();
 
-  QUnit.module('not live', {
-    beforeEach() {
-      this.player = TestHelpers.makePlayer({liveui: true});
-      this.seekToLive = this.player.controlBar.seekToLive;
+  assert.notEqual(this.getComputedDisplay(), 'none', 'is not hidden');
+  assert.ok(this.seekToLive.hasClass('vjs-at-live-edge'), 'has at live edge class');
+});
 
-      this.getComputedDisplay = () => {
-        return computedStyle(this.seekToLive.el(), 'display');
-      };
-    },
-    afterEach() {
-      this.player.dispose();
-    }
-  });
+QUnit.test('liveui disabled live window is never shown', function(assert) {
+  assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
+  assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
 
-  QUnit.test('should not show or track', function(assert) {
-    assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
-  });
+  this.player.paused = () => false;
+  this.player.hasStarted = () => true;
+  this.player.currentTime = () => this.player.liveTracker.liveCurrentTime();
 
-  QUnit.test('switch to live', function(assert) {
-    assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
+  // liveui false, seekable range is good though
+  this.player.options_.liveui = false;
+  this.player.duration(Infinity);
 
-    this.player.duration(Infinity);
-    this.player.trigger('durationchange');
+  assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
+  assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
 
-    assert.notEqual(this.getComputedDisplay(), 'none', 'is not hidden');
-  });
+  this.player.duration(10);
+
+  // liveui false
+  this.player.options_.liveui = false;
+  this.player.seekable = () => createTimeRange(0, 29);
+  this.player.duration(Infinity);
+
+  assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
+  assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
 });

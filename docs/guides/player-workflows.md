@@ -7,6 +7,7 @@ This document outlines many considerations for using Video.js for advanced playe
 * [Accessing a player that has already been created on a page](#accessing-a-player-that-has-already-been-created-on-a-page)
 * [Removing Players](#removing-players)
   * [dispose()](#dispose)
+  * [Checking if a Player is Disposed](#checking-if-a-player-is-disposed)
   * [Signs of an Undisposed Player](#signs-of-an-undisposed-player)
 * [Showing and Hiding a Player](#showing-and-hiding-a-player)
 * [Changing the volume of a player](#changing-the-volume-of-a-player)
@@ -53,6 +54,10 @@ Calling `dispose()` will have a few effects:
 Additionally, these actions are recursively applied to _all_ the player's child components.
 
 > **Note**: Do _not_ remove players via standard DOM removal methods: this will leave listeners and other objects in memory that you might not be able to clean up!
+
+### Checking if a Player is Disposed
+
+At times, it is useful to know whether or not a player reference in your code is stale. The `isDisposed()` method is available on all components (including players) for this purpose.
 
 ### Signs of an Undisposed Player
 

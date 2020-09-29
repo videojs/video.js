@@ -231,16 +231,16 @@ QUnit.test('emulated tracks are always used, except in safari', function(assert)
     textTracks: []
   };
 
-  browser.IS_ANY_SAFARI = false;
+  browser.stub_IS_ANY_SAFARI(false);
 
   assert.ok(!Html5.supportsNativeTextTracks(), 'Html5 does not support native text tracks, in non-safari');
 
-  browser.IS_ANY_SAFARI = true;
+  browser.stub_IS_ANY_SAFARI(true);
 
   assert.ok(Html5.supportsNativeTextTracks(), 'Html5 does support native text tracks in safari');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_ANY_SAFARI = oldIsAnySafari;
+  browser.stub_IS_ANY_SAFARI(oldIsAnySafari);
 });
 
 QUnit.test('when switching techs, we should not get a new text track', function(assert) {
@@ -475,6 +475,36 @@ QUnit.test('should uniformly create html track element when adding text track', 
 
   player.dispose();
 });
+
+// disable in Firefox and IE because while the code works in practice,
+// during the tests, somehow the text track object isn't ready and thus it won't
+// allow us to change the mode of the track rendering the test non-functional.
+if (!browser.IS_FIREFOX && !browser.IE_VERSION === 11) {
+  QUnit.test('remote text tracks change event should fire when using native text tracks', function(assert) {
+    const done = assert.async();
+
+    const player = TestHelpers.makePlayer({
+      techOrder: ['html5'],
+      html5: { nativeTextTracks: true }
+    });
+
+    player.remoteTextTracks().on('change', function(e) {
+      assert.ok(true, 'change event triggered');
+      player.dispose();
+      done();
+    });
+
+    const track = {
+      kind: 'kind',
+      src: 'src',
+      language: 'language',
+      label: 'label',
+      default: 'default'
+    };
+
+    player.addRemoteTextTrack(track, true);
+  });
+}
 
 QUnit.test('default text tracks should show by default', function(assert) {
   const tag = TestHelpers.makeTag();

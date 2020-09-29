@@ -141,6 +141,8 @@ class Tech extends Component {
       this.emulateTextTracks();
     }
 
+    this.preloadTextTracks = options.preloadTextTracks !== false;
+
     this.autoRemoteTextTracks_ = new TRACK_TYPES.ALL.text.ListClass();
 
     this.initTrackListeners();
@@ -785,6 +787,22 @@ class Tech extends Component {
       return PromiseClass.reject();
     }
   }
+
+  /**
+   * A method to check for the presence of the 'disablePictureInPicture' <video> property.
+   *
+   * @abstract
+   */
+  disablePictureInPicture() {
+    return false;
+  }
+
+  /**
+   * A method to set or unset the 'disablePictureInPicture' <video> property.
+   *
+   * @abstract
+   */
+  setDisablePictureInPicture() {}
 
   /**
    * A method to set a poster from a `Tech`.

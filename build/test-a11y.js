@@ -20,7 +20,8 @@ const options = {
 
 AccessSniff.default(testFiles, options).then(function(report) {
   AccessSniff.report(report);
-}).catch(function(error) {
+}).catch(function() {
+
   // there were errors, which are already reported, exit with an error
   process.exit(1);
 });

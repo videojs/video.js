@@ -27,13 +27,10 @@ class PictureInPictureToggle extends Button {
   constructor(player, options) {
     super(player, options);
     this.on(player, ['enterpictureinpicture', 'leavepictureinpicture'], this.handlePictureInPictureChange);
+    this.on(player, ['disablepictureinpicturechanged', 'loadedmetadata'], this.handlePictureInPictureEnabledChange);
 
-    // TODO: Activate button on player loadedmetadata event.
     // TODO: Deactivate button on player emptied event.
-    // TODO: Deactivate button if disablepictureinpicture attribute is present.
-    if (!document.pictureInPictureEnabled) {
-      this.disable();
-    }
+    this.disable();
   }
 
   /**
@@ -44,6 +41,18 @@ class PictureInPictureToggle extends Button {
    */
   buildCSSClass() {
     return `vjs-picture-in-picture-control ${super.buildCSSClass()}`;
+  }
+
+  /**
+   * Enables or disables button based on document.pictureInPictureEnabled property value
+   * or on value returned by player.disablePictureInPicture() method.
+   */
+  handlePictureInPictureEnabledChange() {
+    if (!document.pictureInPictureEnabled || this.player_.disablePictureInPicture()) {
+      this.disable();
+    } else {
+      this.enable();
+    }
   }
 
   /**
@@ -62,6 +71,7 @@ class PictureInPictureToggle extends Button {
     } else {
       this.controlText('Picture-in-Picture');
     }
+    this.handlePictureInPictureEnabledChange();
   }
 
   /**

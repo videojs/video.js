@@ -14,6 +14,8 @@ import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
 import * as Events from '../../src/js/utils/events.js';
+import pkg from '../../package.json';
+import * as Guid from '../../src/js/utils/guid.js';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -29,6 +31,17 @@ QUnit.module('Player', {
   afterEach() {
     this.clock.restore();
   }
+});
+
+QUnit.test('the default ID of the first player remains "vjs_video_3"', function(assert) {
+  Guid.resetGuidInTestsOnly();
+  const tag = document.createElement('video');
+
+  tag.className = 'video-js';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.strictEqual(player.id(), 'vjs_video_3', 'id is correct');
 });
 
 QUnit.test('should create player instance that inherits from component and dispose it', function(assert) {
@@ -703,13 +716,13 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   // Fake touch support. Real touch support isn't needed for this test.
   const origTouch = browser.TOUCH_ENABLED;
 
-  browser.TOUCH_ENABLED = true;
+  browser.stub_TOUCH_ENABLED(true);
 
   const player = TestHelpers.makePlayer({});
 
   assert.notEqual(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname added');
 
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   player.dispose();
 });
 
@@ -719,13 +732,13 @@ QUnit.test('should not add a touch-enabled classname when touch is not supported
   // Fake not having touch support in case that the browser running the test supports it
   const origTouch = browser.TOUCH_ENABLED;
 
-  browser.TOUCH_ENABLED = false;
+  browser.stub_TOUCH_ENABLED(false);
 
   const player = TestHelpers.makePlayer({});
 
   assert.equal(player.el().className.indexOf('vjs-touch-enabled'), -1, 'touch-enabled classname not added');
 
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   player.dispose();
 });
 
@@ -1226,6 +1239,23 @@ QUnit.test('should add an audio player region if an audio el is used', function(
   assert.ok(player.el().getAttribute('role') === 'region', 'region role is present');
   assert.ok(player.el().getAttribute('aria-label') === 'Audio Player', 'Audio Player label present');
   player.dispose();
+});
+
+QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let isScrubbing;
+
+  player.tech_.setScrubbing = (_isScrubbing) => {
+    isScrubbing = _isScrubbing;
+  };
+
+  assert.equal(player.scrubbing(), false, 'player is not scrubbing');
+
+  player.scrubbing(true);
+  assert.ok(isScrubbing, "tech's setScrubbing was called with true");
+
+  player.scrubbing(false);
+  assert.notOk(isScrubbing, "tech's setScrubbing was called with false");
 });
 
 QUnit.test('should not be scrubbing while not seeking', function(assert) {
@@ -1764,6 +1794,7 @@ QUnit.test('should not allow to register custom player when any player has been 
 
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
+  let muts = 0;
   let vols = 0;
   let durs = 0;
   let lps = 0;
@@ -1772,14 +1803,17 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
     currentTime() {
       cts++;
     },
-    volume() {
-      vols++;
-    },
     duration() {
       durs++;
     },
     loop() {
       lps++;
+    },
+    muted() {
+      muts++;
+    },
+    volume() {
+      vols++;
     }
   }));
 
@@ -1798,10 +1832,12 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
   player.techGet_('volume');
   player.techGet_('duration');
   player.techGet_('loop');
+  player.techGet_('muted');
 
   assert.equal(cts, 1, 'currentTime is allowed');
   assert.equal(vols, 1, 'volume is allowed');
   assert.equal(durs, 1, 'duration is allowed');
+  assert.equal(muts, 1, 'muted is allowed');
   assert.equal(lps, 0, 'loop is not allowed');
 
   middleware.getMiddleware('video/foo').pop();
@@ -1810,6 +1846,7 @@ QUnit.test('techGet runs through middleware if allowedGetter', function(assert) 
 
 QUnit.test('techCall runs through middleware if allowedSetter', function(assert) {
   let cts = 0;
+  let muts = false;
   let vols = 0;
   let prs = 0;
 
@@ -1821,6 +1858,10 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
     setVolume() {
       vols++;
       return vols;
+    },
+    setMuted() {
+      muts = true;
+      return muts;
     },
     setPlaybackRate() {
       prs++;
@@ -1843,12 +1884,14 @@ QUnit.test('techCall runs through middleware if allowedSetter', function(assert)
 
   player.techCall_('setCurrentTime', 10);
   player.techCall_('setVolume', 0.5);
+  player.techCall_('setMuted', true);
   player.techCall_('setPlaybackRate', 0.75);
 
   this.clock.tick(1);
 
   assert.equal(cts, 1, 'setCurrentTime is allowed');
   assert.equal(vols, 1, 'setVolume is allowed');
+  assert.equal(muts, true, 'setMuted is allowed');
   assert.equal(prs, 0, 'setPlaybackRate is not allowed');
 
   middleware.getMiddleware('video/foo').pop();
@@ -1984,7 +2027,7 @@ QUnit.test('options: plugins', function(assert) {
 });
 
 QUnit.test('should add a class with major version', function(assert) {
-  const majorVersion = require('../../package.json').version.split('.')[0];
+  const majorVersion = pkg.version.split('.')[0];
   const player = TestHelpers.makePlayer();
 
   assert.ok(player.hasClass('vjs-v' + majorVersion), 'the version class should be added to the player');
@@ -2186,4 +2229,32 @@ QUnit.test('controlBar behaviour with mouseenter and mouseleave events', functio
   assert.equal(player.options_.inactivityTimeout, player.cache_.inactivityTimeout, 'mouse leaves control-bar, inactivityTimeout is set to default value (2000)');
 
   player.dispose();
+});
+
+QUnit.test('Should be able to set a currentTime after player initialization as soon the canplay event is fired', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.src('xyz.mp4');
+  player.currentTime(500);
+  assert.strictEqual(player.currentTime(), 0, 'currentTime value was not changed');
+  this.clock.tick(100);
+  player.trigger('canplay');
+  assert.strictEqual(player.currentTime(), 500, 'currentTime value is the one passed after initialization');
+});
+
+QUnit.test('Should accept multiple calls to currentTime after player initialization and apply the last value as soon the canplay event is fired', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const spyInitTime = sinon.spy(player, 'applyInitTime_');
+  const spyCurrentTime = sinon.spy(player, 'currentTime');
+
+  player.src('xyz.mp4');
+  player.currentTime(500);
+  player.currentTime(600);
+  player.currentTime(700);
+  player.currentTime(800);
+  this.clock.tick(100);
+  player.trigger('canplay');
+  assert.equal(spyInitTime.callCount, 1, 'After multiple calls to currentTime just apply the last one');
+  assert.ok(spyCurrentTime.calledAfter(spyInitTime), 'currentTime was called on canplay event listener');
+  assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });

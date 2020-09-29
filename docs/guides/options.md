@@ -58,6 +58,7 @@
     * [nativeAudioTracks](#nativeaudiotracks)
     * [nativeTextTracks](#nativetexttracks)
     * [nativeVideoTracks](#nativevideotracks)
+    * [preloadTextTracks](#preloadtexttracks)
 
 ## Standard `<video>` Element Options
 
@@ -606,6 +607,14 @@ Can be set to `false` to force emulation of text tracks instead of native suppor
 > Type: `boolean`
 
 Can be set to `false` to disable native video track support. Most commonly used with [videojs-contrib-hls][videojs-contrib-hls].
+
+#### `preloadTextTracks`
+
+> Type: `boolean`
+
+Can be set to `false` to delay loading of non-active text tracks until use. This can cause a short delay when switching captions during which there may be missing captions.
+
+The default behavior is to preload all text tracks.
 
 [plugins]: /docs/guides/plugins.md
 

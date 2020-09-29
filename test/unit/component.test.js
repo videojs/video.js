@@ -146,6 +146,44 @@ QUnit.test('should add a child component to an index', function(assert) {
   comp.dispose();
 });
 
+QUnit.test('should insert element relative to the element of the component to insert before', function(assert) {
+
+  // for legibility of the test itself:
+  /* eslint-disable no-unused-vars */
+
+  const comp = new Component(getFakePlayer());
+
+  const child0 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c0'})});
+  const child1 = comp.addChild('component', {createEl: false});
+  const child2 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c2'})});
+  const child3 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c3'})});
+  const child4 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c4'})}, comp.children_.indexOf(child2));
+
+  assert.ok(child2.el_.previousSibling === child4.el_, 'addChild should insert el before its next sibling\'s element');
+
+  /* eslint-enable no-unused-vars */
+});
+
+QUnit.test('should allow for children that are elements', function(assert) {
+
+  // for legibility of the test itself:
+  /* eslint-disable no-unused-vars */
+
+  const comp = new Component(getFakePlayer());
+  const testEl = Dom.createEl('div');
+
+  // Add element as video el gets added to player
+  comp.el().appendChild(testEl);
+  comp.children_.unshift(testEl);
+
+  const child1 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c1'})});
+  const child2 = comp.addChild('component', {el: Dom.createEl('div', {}, {class: 'c4'})}, 0);
+
+  assert.ok(child2.el_.nextSibling === testEl, 'addChild should insert el before a sibling that is an element');
+
+  /* eslint-enable no-unused-vars */
+});
+
 QUnit.test('addChild should throw if the child does not exist', function(assert) {
   const comp = new Component(getFakePlayer());
 
@@ -340,6 +378,7 @@ QUnit.test('should dispose of component and children', function(assert) {
   const child = comp.addChild('Component');
 
   assert.ok(comp.children().length === 1);
+  assert.notOk(comp.isDisposed(), 'the component reports that it is not disposed');
 
   // Add a listener
   comp.on('click', function() {
@@ -370,6 +409,7 @@ QUnit.test('should dispose of component and children', function(assert) {
     !Object.getOwnPropertyNames(data).length,
     'original listener data object was emptied'
   );
+  assert.ok(comp.isDisposed(), 'the component reports that it is disposed');
 });
 
 QUnit.test('should add and remove event listeners to element', function(assert) {
@@ -789,7 +829,7 @@ QUnit.test('should emit a tap event', function(assert) {
 
   assert.expect(3);
   // Fake touch support. Real touch support isn't needed for this test.
-  browser.TOUCH_ENABLED = true;
+  browser.stub_TOUCH_ENABLED(true);
 
   comp.emitTapEvents();
   comp.on('tap', function() {
@@ -837,7 +877,7 @@ QUnit.test('should emit a tap event', function(assert) {
   comp.trigger('touchend');
 
   // Reset to orignial value
-  browser.TOUCH_ENABLED = origTouch;
+  browser.stub_TOUCH_ENABLED(origTouch);
   comp.dispose();
 });
 
@@ -912,7 +952,7 @@ QUnit.test('should provide interval methods that automatically get cleared on co
   assert.ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });
 
-QUnit.test('should provide *AnimationFrame methods that automatically get cleared on component disposal', function(assert) {
+QUnit.test('should provide a requestAnimationFrame method that is cleared on disposal', function(assert) {
   const comp = new Component(getFakePlayer());
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
@@ -927,7 +967,7 @@ QUnit.test('should provide *AnimationFrame methods that automatically get cleare
 
   const spyRAF = sinon.spy();
 
-  comp.requestAnimationFrame(spyRAF);
+  comp.requestNamedAnimationFrame('testing', spyRAF);
 
   assert.strictEqual(spyRAF.callCount, 0, 'rAF callback was not called immediately');
   this.clock.tick(1);
@@ -935,11 +975,11 @@ QUnit.test('should provide *AnimationFrame methods that automatically get cleare
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was not called after a second "repaint"');
 
-  comp.cancelAnimationFrame(comp.requestAnimationFrame(spyRAF));
+  comp.cancelNamedAnimationFrame(comp.requestNamedAnimationFrame('testing', spyRAF));
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'second rAF callback was not called because it was cancelled');
 
-  comp.requestAnimationFrame(spyRAF);
+  comp.requestNamedAnimationFrame('testing', spyRAF);
   comp.dispose();
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
@@ -948,7 +988,43 @@ QUnit.test('should provide *AnimationFrame methods that automatically get cleare
   window.cancelAnimationFrame = oldCAF;
 });
 
-QUnit.test('*AnimationFrame methods fall back to timers if rAF not supported', function(assert) {
+QUnit.test('should provide a requestNamedAnimationFrame method that is cleared on disposal', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  const spyRAF = sinon.spy();
+
+  comp.requestNamedAnimationFrame('testing', spyRAF);
+
+  assert.strictEqual(spyRAF.callCount, 0, 'rAF callback was not called immediately');
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was called after a "repaint"');
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'rAF callback was not called after a second "repaint"');
+
+  comp.cancelNamedAnimationFrame(comp.requestNamedAnimationFrame('testing', spyRAF));
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'second rAF callback was not called because it was cancelled');
+
+  comp.requestNamedAnimationFrame('testing', spyRAF);
+  comp.dispose();
+  this.clock.tick(1);
+  assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
+QUnit.test('requestAnimationFrame falls back to timers if rAF not supported', function(assert) {
   const comp = new Component(getFakePlayer());
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
@@ -990,7 +1066,7 @@ QUnit.test('setTimeout should remove dispose handler on trigger', function(asser
   comp.dispose();
 });
 
-QUnit.test('requestAnimationFrame should remove dispose handler on trigger', function(assert) {
+QUnit.test('requestNamedAnimationFrame should remove dispose handler on trigger', function(assert) {
   const comp = new Component(getFakePlayer());
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
@@ -1005,13 +1081,15 @@ QUnit.test('requestAnimationFrame should remove dispose handler on trigger', fun
 
   const spyRAF = sinon.spy();
 
-  comp.requestAnimationFrame(spyRAF);
+  comp.requestNamedAnimationFrame('testFrame', spyRAF);
 
-  assert.equal(comp.rafIds_.size, 1, 'we got a new dispose handler');
+  assert.equal(comp.rafIds_.size, 1, 'we got a new raf dispose handler');
+  assert.equal(comp.namedRafs_.size, 1, 'we got a new named raf dispose handler');
 
   this.clock.tick(1);
 
-  assert.equal(comp.rafIds_.size, 0, 'we removed our dispose handle');
+  assert.equal(comp.rafIds_.size, 0, 'we removed our raf dispose handle');
+  assert.equal(comp.namedRafs_.size, 0, 'we removed our named raf dispose handle');
 
   comp.dispose();
 
@@ -1129,6 +1207,122 @@ QUnit.test('setInterval should be canceled on dispose', function(assert) {
   assert.equal(called, false, 'setInterval was never called');
 });
 
+QUnit.test('requestNamedAnimationFrame should be canceled on dispose', function(assert) {
+  const comp = new Component(getFakePlayer());
+  let called = false;
+  let clearName;
+  const setName = comp.requestNamedAnimationFrame('testing', () => {
+    called = true;
+  });
+
+  const cancelNamedAnimationFrame = comp.cancelNamedAnimationFrame;
+
+  comp.cancelNamedAnimationFrame = (name) => {
+    clearName = name;
+    return cancelNamedAnimationFrame.call(comp, name);
+  };
+
+  assert.equal(comp.namedRafs_.size, 1, 'we added a named raf');
+  assert.equal(comp.rafIds_.size, 1, 'we added a raf id');
+
+  comp.dispose();
+
+  assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.equal(clearName, setName, 'cancelNamedAnimationFrame was called');
+
+  this.clock.tick(1);
+
+  assert.equal(called, false, 'requestNamedAnimationFrame was never called');
+});
+
+QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific name at a time', function(assert) {
+  const comp = new Component(getFakePlayer());
+  const calls = {
+    one: 0,
+    two: 0,
+    three: 0
+  };
+  const cancelNames = [];
+  const name = 'testing';
+  const handlerOne = () => {
+    assert.equal(comp.namedRafs_.size, 1, 'named raf still exists while function runs');
+    assert.equal(comp.rafIds_.size, 0, 'raf id does not exist during run');
+
+    calls.one++;
+  };
+  const handlerTwo = () => {
+    assert.equal(comp.namedRafs_.size, 1, 'named raf still exists while function runs');
+    assert.equal(comp.rafIds_.size, 0, 'raf id does not exist during run');
+    calls.two++;
+  };
+  const handlerThree = () => {
+    assert.equal(comp.namedRafs_.size, 1, 'named raf still exists while function runs');
+    assert.equal(comp.rafIds_.size, 0, 'raf id does not exist during run');
+    calls.three++;
+  };
+
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  // Make sure the component thinks it supports rAF.
+  comp.supportsRaf_ = true;
+
+  // Stub the window.*AnimationFrame methods with window.setTimeout methods
+  // so we can control when the callbacks are called via sinon's timer stubs.
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  const cancelNamedAnimationFrame = comp.cancelNamedAnimationFrame;
+
+  comp.cancelNamedAnimationFrame = (_name) => {
+    cancelNames.push(_name);
+    return cancelNamedAnimationFrame.call(comp, _name);
+  };
+
+  comp.requestNamedAnimationFrame(name, handlerOne);
+
+  assert.equal(comp.namedRafs_.size, 1, 'we added a named raf');
+  assert.equal(comp.rafIds_.size, 1, 'we added a raf id');
+
+  comp.requestNamedAnimationFrame(name, handlerTwo);
+
+  assert.deepEqual(cancelNames, [], 'no named cancels');
+  assert.equal(comp.namedRafs_.size, 1, 'still only one named raf');
+  assert.equal(comp.rafIds_.size, 1, 'still only one raf id');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.deepEqual(calls, {
+    one: 1,
+    two: 0,
+    three: 0
+  }, 'only handlerOne was called');
+
+  comp.requestNamedAnimationFrame(name, handlerOne);
+  comp.requestNamedAnimationFrame(name, handlerTwo);
+  comp.requestNamedAnimationFrame(name, handlerThree);
+
+  assert.deepEqual(cancelNames, [], 'no named cancels for testing');
+  assert.equal(comp.namedRafs_.size, 1, 'only added one named raf');
+  assert.equal(comp.rafIds_.size, 1, 'only added one named raf');
+
+  this.clock.tick(1);
+
+  assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
+  assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
+  assert.deepEqual(calls, {
+    one: 2,
+    two: 0,
+    three: 0
+  }, 'only the handlerOne called');
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
 QUnit.test('$ and $$ functions', function(assert) {
   const comp = new Component(getFakePlayer());
   const contentEl = document.createElement('div');
@@ -1182,4 +1376,25 @@ QUnit.test('should remove child when the child moves to the other parent', funct
   parentComponent1.dispose();
   parentComponent2.dispose();
   childComponent.dispose();
+});
+
+QUnit.test('getDescendant should work as expected', function(assert) {
+  const comp = new Component(getFakePlayer(), {name: 'component'});
+  const descendant1 = new Component(getFakePlayer(), {name: 'descendant1'});
+  const descendant2 = new Component(getFakePlayer(), {name: 'descendant2'});
+  const descendant3 = new Component(getFakePlayer(), {name: 'descendant3'});
+
+  comp.addChild(descendant1);
+  descendant1.addChild(descendant2);
+  descendant2.addChild(descendant3);
+
+  assert.equal(comp.getDescendant('descendant1', 'descendant2', 'descendant3'), descendant3, 'can pass as args');
+  assert.equal(comp.getDescendant(['descendant1', 'descendant2', 'descendant3']), descendant3, 'can pass as array');
+  assert.equal(comp.getDescendant('descendant1'), descendant1, 'can pass as single string');
+  assert.equal(comp.getDescendant(), comp, 'no args returns base component');
+  assert.notOk(comp.getDescendant('descendant5'), 'undefined descendant returned');
+  assert.notOk(comp.getDescendant('descendant1', 'descendant5'), 'undefined descendant returned');
+  assert.notOk(comp.getDescendant(['descendant1', 'descendant5']), 'undefined descendant returned');
+
+  comp.dispose();
 });
