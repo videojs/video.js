@@ -93,3 +93,31 @@ QUnit.test('handleClick should not be triggered more than once when enabled', fu
   testClickableComponent.dispose();
   player.dispose();
 });
+
+QUnit.test('should localize its text', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({
+    language: 'es',
+    languages: {
+      es: {
+        Play: 'Juego'
+      },
+      en: {
+        Play: 'Play'
+      }
+    }
+  });
+
+  const testClickableComponent = new ClickableComponent(player);
+
+  testClickableComponent.controlText_ = 'Play';
+  player.language('en');
+
+  const el = testClickableComponent.createEl();
+
+  assert.equal(el.getAttribute('title'), 'Play');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});

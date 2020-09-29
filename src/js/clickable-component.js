@@ -167,6 +167,7 @@ class ClickableComponent extends Component {
       }
       this.on(['tap', 'click'], this.handleClick);
       this.on('keydown', this.handleKeyDown);
+      this.on('languagechange', this.handleLanguageChange);
     }
   }
 

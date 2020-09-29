@@ -1355,6 +1355,18 @@ QUnit.test('sets lang attribute on player el', function(assert) {
   }
 });
 
+QUnit.test('language changed should trigger languagechange event', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  assert.expect(1);
+
+  player.on('languagechange', function() {
+    assert.ok(true, 'languagechange event triggered');
+  });
+  player.language('es-MX');
+  player.dispose();
+});
+
 QUnit.test('should return correct values for canPlayType', function(assert) {
   const player = TestHelpers.makePlayer();
 

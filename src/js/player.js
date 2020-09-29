@@ -535,6 +535,7 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('stageclick', this.handleStageClick_);
     this.on('keydown', this.handleKeyDown);
+    this.on('languagechange', this.handleLanguageChange);
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -4132,8 +4133,16 @@ class Player extends Component {
       return this.language_;
     }
 
+    if (this.language_ !== String(code).toLowerCase() && this.language_ !== undefined) {
+      /**
+      * fires when the player language change
+      *
+      * @fires Player#languagechange
+      * @type {EventTarget~Event}
+      */
+      this.trigger('languagechange');
+    }
     this.language_ = String(code).toLowerCase();
-    this.trigger('languagechange');
   }
 
   /**

@@ -116,7 +116,7 @@ class Component {
       this.enableTouchActivity();
     }
 
-    this.on('languagechange', this.handleLanguageChange);
+    this.handleLanguageChange = this.handleLanguageChange.bind(this);
   }
 
   /**
