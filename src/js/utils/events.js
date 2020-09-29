@@ -87,6 +87,9 @@ function _handleMultipleEvents(fn, elem, types, callback) {
  *         Fixed event object.
  */
 export function fixEvent(event) {
+  if (event.fixed_) {
+    return event;
+  }
 
   function returnTrue() {
     return true;
@@ -201,6 +204,7 @@ export function fixEvent(event) {
     }
   }
 
+  event.fixed_ = true;
   // Returns fixed-up instance
   return event;
 }
@@ -208,22 +212,27 @@ export function fixEvent(event) {
 /**
  * Whether passive event listeners are supported
  */
-let _supportsPassive = false;
+let _supportsPassive;
 
-(function() {
-  try {
-    const opts = Object.defineProperty({}, 'passive', {
-      get() {
-        _supportsPassive = true;
-      }
-    });
+const supportsPassive = function() {
+  if (typeof _supportsPassive !== 'boolean') {
+    _supportsPassive = false;
+    try {
+      const opts = Object.defineProperty({}, 'passive', {
+        get() {
+          _supportsPassive = true;
+        }
+      });
 
-    window.addEventListener('test', null, opts);
-    window.removeEventListener('test', null, opts);
-  } catch (e) {
-    // disregard
+      window.addEventListener('test', null, opts);
+      window.removeEventListener('test', null, opts);
+    } catch (e) {
+      // disregard
+    }
   }
-})();
+
+  return _supportsPassive;
+};
 
 /**
  * Touch events Chrome expects to be passive
@@ -310,7 +319,7 @@ export function on(elem, type, fn) {
     if (elem.addEventListener) {
       let options = false;
 
-      if (_supportsPassive &&
+      if (supportsPassive() &&
         passiveEvents.indexOf(type) > -1) {
         options = {passive: true};
       }

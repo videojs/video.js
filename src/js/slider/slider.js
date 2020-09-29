@@ -5,6 +5,7 @@ import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {assign} from '../utils/obj';
 import {IS_CHROME} from '../utils/browser.js';
+import clamp from '../utils/clamp.js';
 import keycode from 'keycode';
 
 /**
@@ -230,46 +231,44 @@ class Slider extends Component {
    *          number from 0 to 1.
    */
   update() {
-
     // In VolumeBar init we have a setTimeout for update that pops and update
     // to the end of the execution stack. The player is destroyed before then
     // update will cause an error
-    if (!this.el_) {
-      return;
-    }
-
-    // If scrubbing, we could use a cached value to make the handle keep up
-    // with the user's mouse. On HTML5 browsers scrubbing is really smooth, but
-    // some flash players are slow, so we might want to utilize this later.
-    // var progress =  (this.player_.scrubbing()) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
-    let progress = this.getPercent();
-    const bar = this.bar;
-
     // If there's no bar...
-    if (!bar) {
+    if (!this.el_ || !this.bar) {
       return;
     }
 
-    // Protect against no duration and other division issues
-    if (typeof progress !== 'number' ||
-        progress !== progress ||
-        progress < 0 ||
-        progress === Infinity) {
-      progress = 0;
+    // clamp progress between 0 and 1
+    // and only round to four decimal places, as we round to two below
+    const progress = this.getProgress();
+
+    if (progress === this.progress_) {
+      return progress;
     }
 
-    // Convert to a percentage for setting
-    const percentage = (progress * 100).toFixed(2) + '%';
-    const style = bar.el().style;
+    this.progress_ = progress;
 
-    // Set the new bar width or height
-    const sizeKey = this.vertical() ? 'height' : 'width';
+    this.requestNamedAnimationFrame('Slider#update', () => {
+      // Set the new bar width or height
+      const sizeKey = this.vertical() ? 'height' : 'width';
 
-    if (style[sizeKey] !== percentage) {
-      style[sizeKey] = percentage;
-    }
+      // Convert to a percentage for css value
+      this.bar.el().style[sizeKey] = (progress * 100).toFixed(2) + '%';
+    });
 
     return progress;
+  }
+
+  /**
+   * Get the percentage of the bar that should be filled
+   * but clamped and rounded.
+   *
+   * @return {number}
+   *         percentage filled that the slider is
+   */
+  getProgress() {
+    return Number(clamp(this.getPercent(), 0, 1).toFixed(4));
   }
 
   /**

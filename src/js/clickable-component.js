@@ -23,6 +23,9 @@ class ClickableComponent extends Component {
    *
    * @param  {Object} [options]
    *         The key/value store of player options.
+   *
+   * @param  {function} [options.clickHandler]
+   *         The function to call when the button is clicked / activated
    */
   constructor(player, options) {
     super(player, options);
@@ -198,7 +201,11 @@ class ClickableComponent extends Component {
    * @listens click
    * @abstract
    */
-  handleClick(event) {}
+  handleClick(event) {
+    if (this.options_.clickHandler) {
+      this.options_.clickHandler.call(this, arguments);
+    }
+  }
 
   /**
    * Event handler that is called when a `ClickableComponent` receives a

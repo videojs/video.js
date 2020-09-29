@@ -8,7 +8,7 @@ import log from '../utils/log.js';
 import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
-import XHR from 'xhr';
+import XHR from '@videojs/xhr';
 import merge from '../utils/merge-options';
 
 /**
@@ -78,6 +78,12 @@ const loadTrack = function(src, track) {
 
   if (crossOrigin) {
     opts.cors = crossOrigin;
+  }
+
+  const withCredentials = track.tech_.crossOrigin() === 'use-credentials';
+
+  if (withCredentials) {
+    opts.withCredentials = withCredentials;
   }
 
   XHR(opts, Fn.bind(this, function(err, response, responseBody) {
@@ -172,6 +178,8 @@ class TextTrack extends Track {
     this.cues_ = [];
     this.activeCues_ = [];
 
+    this.preload_ = this.tech_.preloadTextTracks !== false;
+
     const cues = new TextTrackCueList(this.cues_);
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
@@ -229,6 +237,10 @@ class TextTrack extends Track {
             return;
           }
           mode = newMode;
+          if (!this.preload_ && mode !== 'disabled' && this.cues.length === 0) {
+            // On-demand load.
+            loadTrack(this.src, this);
+          }
           if (mode !== 'disabled') {
             this.tech_.ready(() => {
               this.tech_.on('timeupdate', timeupdateHandler);
@@ -324,7 +336,14 @@ class TextTrack extends Track {
 
     if (settings.src) {
       this.src = settings.src;
-      loadTrack(settings.src, this);
+      if (!this.preload_) {
+        // Tracks will load on-demand.
+        // Act like we're loaded for other purposes.
+        this.loaded_ = true;
+      }
+      if (this.preload_ || default_ || (settings.kind !== 'subtitles' && settings.kind !== 'captions')) {
+        loadTrack(this.src, this);
+      }
     } else {
       this.loaded_ = true;
     }

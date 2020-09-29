@@ -13,62 +13,13 @@ This default value is hardcoded as a default to the localize method in the SeekB
 ## Status of translations
 
 <!-- START langtable -->
+
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 53)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Close Modal Dialog                                                                  |
-|                         | , opens descriptions settings dialog                                                |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-| ba.json (missing 61)    | Audio Player                                                                        |
+| ar.json (missing 3)     | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| ba.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -129,7 +80,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| bg.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| bg.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -190,7 +143,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ca.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| ca.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -251,11 +206,17 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| cs.json (missing 2)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| cs.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-| cy.json (missing 2)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| cy.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-| da.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| da.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -316,8 +277,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| de.json (Complete)      |                                                                                     |
-| el.json (missing 47)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| de.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| el.json (missing 49)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -364,80 +328,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| es.json (Complete)      |                                                                                     |
-| fa.json (missing 3)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | {1} is loading.                                                                     |
-| fi.json (missing 61)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-| fr.json (missing 3)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | {1} is loading.                                                                     |
-| gd.json (Complete)      |                                                                                     |
-| gl.json (Complete)      |                                                                                     |
-| he.json (missing 3)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | {1} is loading.                                                                     |
-| hr.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| es.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| fa.json (Complete)      |                                                                                     |
+| fi.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -498,7 +394,23 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| hu.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| fr.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | {1} is loading.                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| gd.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| gl.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| he.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | {1} is loading.                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| hr.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -559,7 +471,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| it.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| hu.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -620,7 +534,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ja.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| it.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -681,7 +597,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ko.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| ja.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -742,7 +660,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| nb.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| ko.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -803,72 +723,20 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| nl.json (missing 3)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| nb.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| nl.json (missing 5)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
-| nn.json (missing 61)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-| oc.json (Complete)      |                                                                                     |
-| pl.json (missing 53)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| nn.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| oc.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| pl.json (missing 55)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -921,9 +789,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
 | pt-BR.json (missing 2)  | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-| pt-PT.json (missing 46) | Audio Player                                                                        |
+| pt-PT.json (missing 48) | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -969,11 +839,17 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| ru.json (missing 2)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| ru.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-| sk.json (missing 2)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| sk.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-| sr.json (missing 61)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| sr.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -1034,8 +910,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Beginning of dialog window. Escape will cancel and close the window.                |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| sv.json (Complete)      |                                                                                     |
-| tr.json (missing 11)    | Audio Player                                                                        |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| sv.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| tr.json (missing 13)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -1046,13 +925,20 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | restore all settings to the default values                                          |
 |                         | End of dialog window.                                                               |
 |                         | {1} is loading.                                                                     |
-| uk.json (missing 2)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| uk.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-| vi.json (missing 3)     | Seek to live, currently behind live                                                 |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| vi.json (missing 5)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
-| zh-CN.json (Complete)   |                                                                                     |
-| zh-Hans.json (Complete) |                                                                                     |
-| zh-Hant.json (Complete) |                                                                                     |
-| zh-TW.json (Complete)   |                                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| zh-CN.json (missing 2)  | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+| zh-TW.json (missing 2)  | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+
 <!-- END langtable -->

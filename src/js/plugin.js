@@ -203,6 +203,10 @@ class Plugin {
 
     this.player = player;
 
+    if (!this.log) {
+      this.log = this.player.log.createLogger(this.name);
+    }
+
     // Make this object evented, but remove the added `trigger` method so we
     // use the prototype version instead.
     evented(this);

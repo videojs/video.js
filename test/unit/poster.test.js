@@ -1,13 +1,11 @@
 /* eslint-env qunit */
 import PosterImage from '../../src/js/poster-image.js';
-import * as browser from '../../src/js/utils/browser.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 
 QUnit.module('PosterImage', {
   beforeEach() {
     // Store the original background support so we can test different vals
-    this.origVal = browser.BACKGROUND_SIZE_SUPPORTED;
     this.poster1 = '#poster1';
     this.poster2 = '#poster2';
 
@@ -27,14 +25,10 @@ QUnit.module('PosterImage', {
       }
     };
   },
-  afterEach() {
-    browser.BACKGROUND_SIZE_SUPPORTED = this.origVal;
-  }
+  afterEach() {}
 });
 
 QUnit.test('should create and update a poster image', function(assert) {
-  browser.BACKGROUND_SIZE_SUPPORTED = true;
-
   const posterImage = new PosterImage(this.mockPlayer);
   let backgroundImage = posterImage.el().style.backgroundImage;
 

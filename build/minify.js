@@ -1,6 +1,8 @@
-import fs from 'fs';
-import uglify from 'uglify-js';
-import maxmin from 'maxmin';
+/* eslint-disable no-console, camelcase */
+
+const fs = require('fs');
+const uglify = require('uglify-js');
+const maxmin = require('maxmin');
 
 const options = {
   nameCache: {},
@@ -38,7 +40,7 @@ const minify = (file, dest) => {
   console.log('File', dest, 'created:', maxmin(code, minified.code, true));
 };
 
-console.log('Minifying files\n'); 
+console.log('Minifying files\n');
 
 minify('dist/video.js', 'dist/video.min.js');
 minify('dist/alt/video.novtt.js', 'dist/alt/video.novtt.min.js');

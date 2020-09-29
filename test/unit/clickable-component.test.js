@@ -94,6 +94,24 @@ QUnit.test('handleClick should not be triggered more than once when enabled', fu
   player.dispose();
 });
 
+QUnit.test('handleClick should use handler from options', function(assert) {
+  let clicks = 0;
+
+  const player = TestHelpers.makePlayer({});
+  const testClickableComponent = new ClickableComponent(player, {
+    clickHandler() {
+      clicks++;
+    }
+  });
+  const el = testClickableComponent.el();
+
+  Events.trigger(el, 'click');
+  assert.equal(clicks, 1, 'options handler was called');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});
+
 QUnit.test('should localize its text', function(assert) {
   assert.expect(1);
 

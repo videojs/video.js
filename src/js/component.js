@@ -13,6 +13,8 @@ import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/string-cases.js';
 import mergeOptions from './utils/merge-options.js';
 import computedStyle from './utils/computed-style';
+import Map from './utils/map.js';
+import Set from './utils/set.js';
 
 /**
  * Base class for all UI Components.
@@ -58,6 +60,8 @@ class Component {
       this.player_ = player;
     }
 
+    this.isDisposed_ = false;
+
     // Hold the reference to the parent component via `addChild` method
     this.parentComponent_ = null;
 
@@ -101,6 +105,7 @@ class Component {
     this.setTimeoutIds_ = new Set();
     this.setIntervalIds_ = new Set();
     this.rafIds_ = new Set();
+    this.namedRafs_ = new Map();
     this.clearingTimersOnDispose_ = false;
 
     // Add any child components in options
@@ -126,6 +131,11 @@ class Component {
    */
   dispose() {
 
+    // Bail out if the component has already been disposed.
+    if (this.isDisposed_) {
+      return;
+    }
+
     /**
      * Triggered when a `Component` is disposed.
      *
@@ -133,10 +143,12 @@ class Component {
      * @type {EventTarget~Event}
      *
      * @property {boolean} [bubbles=false]
-     *           set to false so that the close event does not
+     *           set to false so that the dispose event does not
      *           bubble up
      */
     this.trigger({type: 'dispose', bubbles: false});
+
+    this.isDisposed_ = true;
 
     // Dispose all children.
     if (this.children_) {
@@ -168,6 +180,16 @@ class Component {
 
     // remove reference to the player after disposing of the element
     this.player_ = null;
+  }
+
+  /**
+   * Determine whether or not this component has been disposed.
+   *
+   * @return {boolean}
+   *         If the component has been disposed, will be `true`. Otherwise, `false`.
+   */
+  isDisposed() {
+    return Boolean(this.isDisposed_);
   }
 
   /**
@@ -371,6 +393,37 @@ class Component {
   }
 
   /**
+   * Returns the descendant `Component` following the givent
+   * descendant `names`. For instance ['foo', 'bar', 'baz'] would
+   * try to get 'foo' on the current component, 'bar' on the 'foo'
+   * component and 'baz' on the 'bar' component and return undefined
+   * if any of those don't exist.
+   *
+   * @param {...string[]|...string} names
+   *        The name of the child `Component` to get.
+   *
+   * @return {Component|undefined}
+   *         The descendant `Component` following the given descendant
+   *         `names` or undefined.
+   */
+  getDescendant(...names) {
+    // flatten array argument into the main array
+    names = names.reduce((acc, n) => acc.concat(n), []);
+
+    let currentChild = this;
+
+    for (let i = 0; i < names.length; i++) {
+      currentChild = currentChild.getChild(names[i]);
+
+      if (!currentChild || !currentChild.getChild) {
+        return;
+      }
+    }
+
+    return currentChild;
+  }
+
+  /**
    * Add a child `Component` inside the current `Component`.
    *
    *
@@ -446,8 +499,17 @@ class Component {
     // Add the UI object's element to the container div (box)
     // Having an element is not required
     if (typeof component.el === 'function' && component.el()) {
-      const childNodes = this.contentEl().children;
-      const refNode = childNodes[index] || null;
+      // If inserting before a component, insert before that component's element
+      let refNode = null;
+
+      if (this.children_[index + 1]) {
+        // Most children are components, but the video tech is an HTML element
+        if (this.children_[index + 1].el_) {
+          refNode = this.children_[index + 1].el_;
+        } else if (Dom.isEl(this.children_[index + 1])) {
+          refNode = this.children_[index + 1];
+        }
+      }
 
       this.contentEl().insertBefore(component.el(), refNode);
     }
@@ -1444,6 +1506,53 @@ class Component {
   }
 
   /**
+   * Request an animation frame, but only one named animation
+   * frame will be queued. Another will never be added until
+   * the previous one finishes.
+   *
+   * @param {string} name
+   *        The name to give this requestAnimationFrame
+   *
+   * @param  {Component~GenericCallback} fn
+   *         A function that will be bound to this component and executed just
+   *         before the browser's next repaint.
+   */
+  requestNamedAnimationFrame(name, fn) {
+    if (this.namedRafs_.has(name)) {
+      return;
+    }
+    this.clearTimersOnDispose_();
+
+    fn = Fn.bind(this, fn);
+
+    const id = this.requestAnimationFrame(() => {
+      fn();
+      if (this.namedRafs_.has(name)) {
+        this.namedRafs_.delete(name);
+      }
+    });
+
+    this.namedRafs_.set(name, id);
+
+    return name;
+  }
+
+  /**
+   * Cancels a current named animation frame if it exists.
+   *
+   * @param {string} name
+   *        The name of the requestAnimationFrame to cancel.
+   */
+  cancelNamedAnimationFrame(name) {
+    if (!this.namedRafs_.has(name)) {
+      return;
+    }
+
+    this.cancelAnimationFrame(this.namedRafs_.get(name));
+    this.namedRafs_.delete(name);
+  }
+
+  /**
    * Cancels a queued callback passed to {@link Component#requestAnimationFrame}
    * (rAF).
    *
@@ -1492,11 +1601,15 @@ class Component {
     this.clearingTimersOnDispose_ = true;
     this.one('dispose', () => {
       [
+        ['namedRafs_', 'cancelNamedAnimationFrame'],
         ['rafIds_', 'cancelAnimationFrame'],
         ['setTimeoutIds_', 'clearTimeout'],
         ['setIntervalIds_', 'clearInterval']
       ].forEach(([idName, cancelName]) => {
-        this[idName].forEach(this[cancelName], this);
+        // for a `Set` key will actually be the value again
+        // so forEach((val, val) =>` but for maps we want to use
+        // the key.
+        this[idName].forEach((val, key) => this[cancelName](key));
       });
 
       this.clearingTimersOnDispose_ = false;

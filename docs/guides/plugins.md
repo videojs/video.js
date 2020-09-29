@@ -244,6 +244,22 @@ console.log(version);  // 1.0.1
 
 Note that the [plugin generator](https://github.com/videojs/generator-videojs-plugin) already takes care of adding a version number for you.
 
+#### Logging
+
+By default, each advanced plugin instance has its own `log` property much like `videojs` and `Player` instances do. The log messages will be prefixed with the player's ID and the plugin's name:
+
+```js
+player.examplePlugin().log('hello world!');
+```
+
+The above will log the following:
+
+    VIDEOJS: $PLAYER_ID: examplePlugin: hello world!
+
+The `log` function will also have all the methods/properties of the default `videojs.log`; such as, `error()`, `warn()`, `level()`, etc.
+
+> **NOTE:** This method is added in the constructor and it _will not_ override any predefined `log` property of the plugin's prototype.
+
 ### Advanced Example Advanced Plugin
 
 What follows is a complete ES6 advanced plugin that logs a custom message when the player's state changes between playing and pause. It uses all the described advanced features:

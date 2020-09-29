@@ -44,6 +44,7 @@
     &.vjs-volume-horizontal {
       width: 5em;
       height: 3em;
+      margin-right: 0;
     }
     visibility: visible;
     opacity: 1;
@@ -61,7 +62,7 @@
     &.vjs-hover,
     &:active,
     &.vjs-slider-active {
-      width: 9em;
+      width: 10em;
 
       @include transition(width 0.1s);
     }

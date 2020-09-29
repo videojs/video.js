@@ -1,8 +1,9 @@
 const generate = require('videojs-generate-karma-config');
 
 module.exports = function(config) {
-  const coverageFlag = process.env.npm_config_coverage;
-  const reportCoverage = false; // process.env.TRAVIS || coverageFlag || false;
+  // const coverageFlag = process.env.npm_config_coverage;
+  // process.env.TRAVIS || coverageFlag || false;
+  const reportCoverage = false;
 
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
@@ -14,7 +15,7 @@ module.exports = function(config) {
     serverBrowsers(defaults) {
       return [];
     },
-    coverage: reportCoverage,
+    coverage: reportCoverage
   };
 
   config = generate(config, options);
@@ -29,37 +30,21 @@ module.exports = function(config) {
   });
 
   config.files = [
+    'node_modules/es5-shim/es5-shim.js',
+    'node_modules/es6-shim/es6-shim.js',
+    'node_modules/sinon/pkg/sinon.js',
     'dist/video-js.css',
-    'test/globals-shim.js',
-    'test/unit/**/*.js',
+    'test/dist/bundle.js',
     'test/dist/browserify.js',
-    'test/dist/webpack.js',
-    {pattern: 'src/**/*.js', watched: true, included: false, served: false }
+    'test/dist/webpack.js'
   ];
 
   config.browserStack.project = 'Video.js';
 
-  config.frameworks.push('browserify');
-  config.browserify = {
-    debug: true,
-    plugin: ['proxyquireify/plugin'],
-    transform: [
-      ['babelify', {"presets": [["@babel/preset-env", {"loose": true}]]}],
-    ]
-  };
-
-  if (reportCoverage) {
-    config.browserify.transform.push('browserify-istanbul');
-  }
-
-
-  config.preprocessors = {
-    'test/globals-shim.js': ['browserify'],
-    'test/unit/**/*.js': ['browserify'],
-  };
-
   // pin Browserstack Firefox version to 64
+  /* eslint-disable camelcase */
   config.customLaunchers.bsFirefox.browser_version = '64.0';
+  /* eslint-enable camelcase */
 
   // uncomment the section below to re-enable all browserstack video recording
   // it is off by default because it slows the build
@@ -70,4 +55,9 @@ module.exports = function(config) {
     }
   });
   */
+
+  /* eslint-disable no-console */
+  console.log(JSON.stringify(config, null, 2));
+  /* eslint-enable no-console */
+
 };

@@ -354,6 +354,9 @@ class Player extends Component {
     this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
     this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
 
+    // default isFullscreen_ to false
+    this.isFullscreen_ = false;
+
     // create logger
     this.log = createLogger(this.id_);
 
@@ -457,6 +460,15 @@ class Player extends Component {
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
 
+    // listen to document and player fullscreenchange handlers so we receive those events
+    // before a user can receive them so we can update isFullscreen appropriately.
+    // make sure that we listen to fullscreenchange events before everything else to make sure that
+    // our isFullscreen method is updated properly for internal components as well as external.
+    if (this.fsApi_.requestFullscreen) {
+      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+      this.on(this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
+    }
+
     if (this.fluid_) {
       this.on('playerreset', this.updateStyleEl_);
     }
@@ -539,7 +551,6 @@ class Player extends Component {
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
-
   }
 
   /**
@@ -656,7 +667,11 @@ class Player extends Component {
       // `src` or `controls` that were set via js before the player
       // was initialized.
       Object.keys(el).forEach((k) => {
-        tag[k] = el[k];
+        try {
+          tag[k] = el[k];
+        } catch (e) {
+          // we got a a property like outerHTML which we can't actually copy, ignore it
+        }
       });
     }
 
@@ -730,6 +745,8 @@ class Player extends Component {
     this.fill(this.options_.fill);
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
+    // support both crossOrigin and crossorigin to reduce confusion and issues around the name
+    this.crossOrigin(this.options_.crossOrigin || this.options_.crossorigin);
 
     // Hide any links within the video/audio tag,
     // because IE doesn't hide them completely from screen readers.
@@ -766,6 +783,36 @@ class Player extends Component {
     this.el_ = el;
 
     return el;
+  }
+
+  /**
+   * Get or set the `Player`'s crossOrigin option. For the HTML5 player, this
+   * sets the `crossOrigin` property on the `<video>` tag to control the CORS
+   * behavior.
+   *
+   * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
+   *
+   * @param {string} [value]
+   *        The value to set the `Player`'s crossOrigin to. If an argument is
+   *        given, must be one of `anonymous` or `use-credentials`.
+   *
+   * @return {string|undefined}
+   *         - The current crossOrigin value of the `Player` when getting.
+   *         - undefined when setting
+   */
+  crossOrigin(value) {
+    if (!value) {
+      return this.techGet_('crossOrigin');
+    }
+
+    if (value !== 'anonymous' && value !== 'use-credentials') {
+      log.warn(`crossOrigin must be "anonymous" or "use-credentials", given "${value}"`);
+      return;
+    }
+
+    this.techCall_('setCrossOrigin', value);
+
+    return;
   }
 
   /**
@@ -817,7 +864,7 @@ class Player extends Component {
       return this[privDimension] || 0;
     }
 
-    if (value === '') {
+    if (value === '' || value === 'auto') {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
       this.updateStyleEl_();
@@ -915,7 +962,7 @@ class Player extends Component {
    * A getter/setter for the `Player`'s aspect ratio.
    *
    * @param {string} [ratio]
-   *        The value to set the `Player's aspect ratio to.
+   *        The value to set the `Player`'s aspect ratio to.
    *
    * @return {string|undefined}
    *         - The current aspect ratio of the `Player` when getting.
@@ -1073,6 +1120,7 @@ class Player extends Component {
       'playsinline': this.options_.playsinline,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
+      'disablePictureInPicture': this.options_.disablePictureInPicture,
       'muted': this.options_.muted,
       'poster': this.poster(),
       'language': this.language(),
@@ -1143,6 +1191,7 @@ class Player extends Component {
     this.on(this.tech_, 'pause', this.handleTechPause_);
     this.on(this.tech_, 'durationchange', this.handleTechDurationChange_);
     this.on(this.tech_, 'fullscreenchange', this.handleTechFullscreenChange_);
+    this.on(this.tech_, 'fullscreenerror', this.handleTechFullscreenError_);
     this.on(this.tech_, 'enterpictureinpicture', this.handleTechEnterPictureInPicture_);
     this.on(this.tech_, 'leavepictureinpicture', this.handleTechLeavePictureInPicture_);
     this.on(this.tech_, 'error', this.handleTechError_);
@@ -1994,6 +2043,14 @@ class Player extends Component {
    * when the document fschange event triggers it calls this
    */
   documentFullscreenChange_(e) {
+    const targetPlayer = e.target.player;
+
+    // if another player was fullscreen
+    // do a null check for targetPlayer because older firefox's would put document as e.target
+    if (targetPlayer && targetPlayer !== this) {
+      return;
+    }
+
     const el = this.el();
     let isFs = document[this.fsApi_.fullscreenElement] === el;
 
@@ -2004,19 +2061,6 @@ class Player extends Component {
     }
 
     this.isFullscreen(isFs);
-
-    // If cancelling fullscreen, remove event listener.
-    if (this.isFullscreen() === false) {
-      Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-    }
-
-    if (this.fsApi_.prefixed) {
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
-    }
   }
 
   /**
@@ -2034,16 +2078,15 @@ class Player extends Component {
    */
   handleTechFullscreenChange_(event, data) {
     if (data) {
+      if (data.nativeIOSFullscreen) {
+        this.toggleClass('vjs-ios-native-fs');
+      }
       this.isFullscreen(data.isFullscreen);
     }
+  }
 
-    /**
-     * Fired when going in and out of fullscreen.
-     *
-     * @event Player#fullscreenchange
-     * @type {EventTarget~Event}
-     */
-    this.trigger('fullscreenchange');
+  handleTechFullscreenError_(event, err) {
+    this.trigger('fullscreenerror', err);
   }
 
   /**
@@ -2144,6 +2187,7 @@ class Player extends Component {
       // we set it to zero here to ensure that if we do start actually caching
       // it, we reset it along with everything else.
       currentTime: 0,
+      initTime: 0,
       inactivityTimeout: this.options_.inactivityTimeout,
       duration: NaN,
       lastVolume: 1,
@@ -2393,6 +2437,7 @@ class Player extends Component {
       return this.scrubbing_;
     }
     this.scrubbing_ = !!isScrubbing;
+    this.techCall_('setScrubbing', this.scrubbing_);
 
     if (isScrubbing) {
       this.addClass('vjs-scrubbing');
@@ -2415,7 +2460,14 @@ class Player extends Component {
       if (seconds < 0) {
         seconds = 0;
       }
+      if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_) {
+        this.cache_.initTime = seconds;
+        this.off('canplay', this.applyInitTime_);
+        this.one('canplay', this.applyInitTime_);
+        return;
+      }
       this.techCall_('setCurrentTime', seconds);
+      this.cache_.initTime = 0;
       return;
     }
 
@@ -2427,6 +2479,15 @@ class Player extends Component {
     // never get updated.
     this.cache_.currentTime = (this.techGet_('currentTime') || 0);
     return this.cache_.currentTime;
+  }
+
+  /**
+   * Apply the value of initTime stored in cache as currentTime.
+   *
+   * @private
+   */
+  applyInitTime_() {
+    this.currentTime(this.cache_.initTime);
   }
 
   /**
@@ -2464,12 +2525,8 @@ class Player extends Component {
 
       if (seconds === Infinity) {
         this.addClass('vjs-live');
-        if (this.options_.liveui && this.player_.liveTracker) {
-          this.addClass('vjs-liveui');
-        }
       } else {
         this.removeClass('vjs-live');
-        this.removeClass('vjs-liveui');
       }
       if (!isNaN(seconds)) {
         // Do not fire durationchange unless the duration value is known.
@@ -2695,11 +2752,25 @@ class Player extends Component {
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
-      this.isFullscreen_ = !!isFS;
+      const oldValue = this.isFullscreen_;
+
+      this.isFullscreen_ = Boolean(isFS);
+
+      // if we changed fullscreen state and we're in prefixed mode, trigger fullscreenchange
+      // this is the only place where we trigger fullscreenchange events for older browsers
+      // fullWindow mode is treated as a prefixed event and will get a fullscreenchange event as well
+      if (this.isFullscreen_ !== oldValue && this.fsApi_.prefixed) {
+        /**
+           * @event Player#fullscreenchange
+           * @type {EventTarget~Event}
+           */
+        this.trigger('fullscreenchange');
+      }
+
       this.toggleFullscreenClass_();
       return;
     }
-    return !!this.isFullscreen_;
+    return this.isFullscreen_;
   }
 
   /**
@@ -2717,30 +2788,67 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   requestFullscreen(fullscreenOptions) {
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (PromiseClass) {
+      const self = this;
+
+      return new PromiseClass((resolve, reject) => {
+        function offHandler() {
+          self.off(self.fsApi_.fullscreenerror, errorHandler);
+          self.off(self.fsApi_.fullscreenchange, changeHandler);
+        }
+        function changeHandler() {
+          offHandler();
+          resolve();
+        }
+        function errorHandler(e, err) {
+          offHandler();
+          reject(err);
+        }
+
+        self.one('fullscreenchange', changeHandler);
+        self.one('fullscreenerror', errorHandler);
+
+        const promise = self.requestFullscreenHelper_(fullscreenOptions);
+
+        if (promise) {
+          promise.then(offHandler, offHandler);
+          return promise;
+        }
+      });
+    }
+
+    return this.requestFullscreenHelper_();
+  }
+
+  requestFullscreenHelper_(fullscreenOptions) {
     let fsOptions;
 
-    this.isFullscreen(true);
+    // Only pass fullscreen options to requestFullscreen in spec-compliant browsers.
+    // Use defaults or player configured option unless passed directly to this method.
+    if (!this.fsApi_.prefixed) {
+      fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
+      if (fullscreenOptions !== undefined) {
+        fsOptions = fullscreenOptions;
+      }
+    }
 
+    // This method works as follows:
+    // 1. if a fullscreen api is available, use it
+    //   1. call requestFullscreen with potential options
+    //   2. if we got a promise from above, use it to update isFullscreen()
+    // 2. otherwise, if the tech supports fullscreen, call `enterFullScreen` on it.
+    //   This is particularly used for iPhone, older iPads, and non-safari browser on iOS.
+    // 3. otherwise, use "fullWindow" mode
     if (this.fsApi_.requestFullscreen) {
-      // the browser supports going fullscreen at the element level so we can
-      // take the controls fullscreen as well as the video
+      const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
-      // Trigger fullscreenchange event after change
-      // We have to specifically add this each time, and remove
-      // when canceling fullscreen. Otherwise if there's multiple
-      // players on a page, they would all be reacting to the same fullscreen
-      // events
-      Events.on(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
-
-      // only pass FullscreenOptions to requestFullscreen if it isn't prefixed
-      if (!this.fsApi_.prefixed) {
-        fsOptions = this.options_.fullscreen && this.options_.fullscreen.options || {};
-        if (fullscreenOptions !== undefined) {
-          fsOptions = fullscreenOptions;
-        }
+      if (promise) {
+        promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
       }
 
-      silencePromise(this.el_[this.fsApi_.requestFullscreen](fsOptions));
+      return promise;
     } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
       // with native controls
@@ -2749,11 +2857,6 @@ class Player extends Component {
       // fullscreen isn't supported so we'll just stretch the video element to
       // fill the viewport
       this.enterFullWindow();
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
     }
   }
 
@@ -2763,20 +2866,53 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    this.isFullscreen(false);
+    const PromiseClass = this.options_.Promise || window.Promise;
 
-    // Check for browser element fullscreen support
+    if (PromiseClass) {
+      const self = this;
+
+      return new PromiseClass((resolve, reject) => {
+        function offHandler() {
+          self.off(self.fsApi_.fullscreenerror, errorHandler);
+          self.off(self.fsApi_.fullscreenchange, changeHandler);
+        }
+        function changeHandler() {
+          offHandler();
+          resolve();
+        }
+        function errorHandler(e, err) {
+          offHandler();
+          reject(err);
+        }
+
+        self.one('fullscreenchange', changeHandler);
+        self.one('fullscreenerror', errorHandler);
+
+        const promise = self.exitFullscreenHelper_();
+
+        if (promise) {
+          promise.then(offHandler, offHandler);
+          return promise;
+        }
+      });
+    }
+
+    return this.exitFullscreenHelper_();
+  }
+
+  exitFullscreenHelper_() {
     if (this.fsApi_.requestFullscreen) {
-      silencePromise(document[this.fsApi_.exitFullscreen]());
+      const promise = document[this.fsApi_.exitFullscreen]();
+
+      if (promise) {
+        promise.then(() => this.isFullscreen(false));
+      }
+
+      return promise;
     } else if (this.tech_.supportsFullScreen()) {
       this.techCall_('exitFullScreen');
     } else {
       this.exitFullWindow();
-      /**
-       * @event Player#fullscreenchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('fullscreenchange');
     }
   }
 
@@ -2787,6 +2923,7 @@ class Player extends Component {
    * @fires Player#enterFullWindow
    */
   enterFullWindow() {
+    this.isFullscreen(true);
     this.isFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
@@ -2831,6 +2968,7 @@ class Player extends Component {
    * @fires Player#exitFullWindow
    */
   exitFullWindow() {
+    this.isFullscreen(false);
     this.isFullWindow = false;
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
 
@@ -2847,6 +2985,22 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('exitFullWindow');
+  }
+
+  /**
+   * Disable Picture-in-Picture mode.
+   *
+   * @param {boolean} value
+   *                  - true will disable Picture-in-Picture mode
+   *                  - false will enable Picture-in-Picture mode
+   */
+  disablePictureInPicture(value) {
+    if (value === undefined) {
+      return this.techGet_('disablePictureInPicture');
+    }
+    this.techCall_('setDisablePictureInPicture', value);
+    this.options_.disablePictureInPicture = value;
+    this.trigger('disablepictureinpicturechanged');
   }
 
   /**
@@ -3709,8 +3863,7 @@ class Player extends Component {
     // Suppress the first error message for no compatible source until
     // user interaction
     if (this.options_.suppressNotSupportedError &&
-        err && err.message &&
-        err.message === this.localize(this.options_.notSupportedMessage)
+        err && err.code === 4
     ) {
       const triggerSuppressedError = function() {
         this.error(err);
@@ -3858,7 +4011,7 @@ class Player extends Component {
       mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    const handleMouseUp = function(event) {
+    const handleMouseUpAndMouseLeave = function(event) {
       handleActivity();
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
@@ -3867,7 +4020,8 @@ class Player extends Component {
     // Any mouse movement will be considered user activity
     this.on('mousedown', handleMouseDown);
     this.on('mousemove', handleMouseMove);
-    this.on('mouseup', handleMouseUp);
+    this.on('mouseup', handleMouseUpAndMouseLeave);
+    this.on('mouseleave', handleMouseUpAndMouseLeave);
 
     const controlBar = this.getChild('controlBar');
 
@@ -4033,15 +4187,16 @@ class Player extends Component {
   }
 
   /**
-   * Create a remote {@link TextTrack} and an {@link HTMLTrackElement}. It will
-   * automatically removed from the video element whenever the source changes, unless
-   * manualCleanup is set to false.
+   * Create a remote {@link TextTrack} and an {@link HTMLTrackElement}.
+   * When manualCleanup is set to false, the track will be automatically removed
+   * on source changes.
    *
    * @param {Object} options
    *        Options to pass to {@link HTMLTrackElement} during creation. See
    *        {@link HTMLTrackElement} for object properties that you should use.
    *
    * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   *                                       removed on a source change
    *
    * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
@@ -4654,6 +4809,23 @@ TRACK_TYPES.names.forEach(function(name) {
     return this[props.privateName];
   };
 });
+
+/**
+ * Get or set the `Player`'s crossorigin option. For the HTML5 player, this
+ * sets the `crossOrigin` property on the `<video>` tag to control the CORS
+ * behavior.
+ *
+ * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
+ *
+ * @param {string} [value]
+ *        The value to set the `Player`'s crossorigin to. If an argument is
+ *        given, must be one of `anonymous` or `use-credentials`.
+ *
+ * @return {string|undefined}
+ *         - The current crossorigin value of the `Player` when getting.
+ *         - undefined when setting
+ */
+Player.prototype.crossorigin = Player.prototype.crossOrigin;
 
 /**
  * Global enumeration of players.

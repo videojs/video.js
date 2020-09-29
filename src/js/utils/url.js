@@ -150,11 +150,19 @@ export const getFileExtension = function(path) {
  * @param    {string} url
  *           The url to check.
  *
+ * @param    {Object} [winLoc]
+ *           the domain to check the url against, defaults to window.location
+ *
+ * @param    {string} [winLoc.protocol]
+ *           The window location protocol defaults to window.location.protocol
+ *
+ * @param    {string} [winLoc.host]
+ *           The window location host defaults to window.location.host
+ *
  * @return   {boolean}
  *           Whether it is a cross domain request or not.
  */
-export const isCrossOrigin = function(url) {
-  const winLoc = window.location;
+export const isCrossOrigin = function(url, winLoc = window.location) {
   const urlInfo = parseUrl(url);
 
   // IE8 protocol relative urls will return ':' for protocol

@@ -39,6 +39,7 @@ QUnit.test('should be able to access expected player API methods', function(asse
   assert.ok(player.textTracks, 'textTracks exists');
   assert.ok(player.requestFullscreen, 'requestFullscreen exists');
   assert.ok(player.exitFullscreen, 'exitFullscreen exists');
+  assert.ok(player.disablePictureInPicture, 'disablePictureInPicture exists');
   assert.ok(player.requestPictureInPicture, 'requestPictureInPicture exists');
   assert.ok(player.exitPictureInPicture, 'exitPictureInPicture exists');
   assert.ok(player.playbackRate, 'playbackRate exists');

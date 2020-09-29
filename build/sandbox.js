@@ -1,18 +1,21 @@
+/* eslint-disable no-console */
+
 const fs = require('fs');
 const path = require('path');
-const klawSync = require('klaw-sync');
+const sh = require('shelljs');
 
-const files = klawSync('sandbox/').filter((file) => path.extname(file.path) === '.example');
+const files = sh.find(path.join(__dirname, '..', 'sandbox', '**', '*.*'))
+  .filter((filepath) => path.extname(filepath) === '.example');
 
-const changes = files.map(function(file) {
-  const p = path.parse(file.path);
+const changes = files.map(function(filepath) {
+  const p = path.parse(filepath);
   const nonExample = path.join(p.dir, p.name);
+
   return {
-    file: file.path,
+    file: filepath,
     copy: nonExample
   };
-})
-.filter(function(change) {
+}).filter(function(change) {
   return !fs.existsSync(change.copy);
 });
 
@@ -21,8 +24,8 @@ changes.forEach(function(change) {
 });
 
 if (changes.length) {
-  console.log("Updated Sandbox files for:");
+  console.log('Updated Sandbox files for:');
   console.log('\t' + changes.map((chg) => chg.copy).join('\n\t'));
 } else {
-  console.log("No sandbox updates necessary");
+  console.log('No sandbox updates necessary');
 }

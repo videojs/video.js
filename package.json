@@ -1,7 +1,7 @@
 {
   "name": "video.js",
-  "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "7.6.3",
+  "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
+  "version": "7.8.1",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
@@ -9,6 +9,7 @@
   "license": "Apache-2.0",
   "keywords": [
     "flash",
+    "hls",
     "html5",
     "player",
     "video",
@@ -34,9 +35,9 @@
     "copy:examples": "shx cp -R docs/examples dist/",
     "build:js": "rollup -c",
     "build:css": "npm-run-all build:css:*",
-    "build:css:cdn": "sass --no-source-map src/css/vjs-cdn.scss dist/alt/video-js-cdn.css",
+    "build:css:cdn": "sass --load-path='./' --no-source-map src/css/vjs-cdn.scss dist/alt/video-js-cdn.css",
     "postbuild:css:cdn": "postcss --verbose --config postcss.config.js -d dist/alt dist/alt/video-js-cdn.css",
-    "build:css:default": "sass --no-source-map src/css/vjs.scss dist/video-js.css",
+    "build:css:default": "sass --load-path='./' --no-source-map src/css/vjs.scss dist/video-js.css",
     "postbuild:css:default": "postcss --verbose --config postcss.config.js -d dist/ dist/video-js.css",
     "prebuild:lang": "npm-run-all -s prebuild:lang:*",
     "prebuild:lang:chinese-s": "shx cp lang/zh-CN.json lang/zh-Hans.json",
@@ -44,7 +45,7 @@
     "build:lang": "vjslang --dir dist/lang",
     "postbuild:lang": "shx cp -R lang/* dist/lang/",
     "minify": "npm-run-all minify:*",
-    "minify:js": "babel-node build/minify.js",
+    "minify:js": "node build/minify.js",
     "minify:css": "npm-run-all minify:css:*",
     "minify:css:cdn": "cleancss dist/alt/video-js-cdn.css -o dist/alt/video-js-cdn.min.css",
     "minify:css:default": "cleancss dist/video-js.css -o dist/video-js.min.css",
@@ -69,10 +70,10 @@
     "docs:lint": "remark -- './{,!(node_modules)/**/}!(CHANGELOG)*.md'",
     "docs:fix": "remark --output -- './{,!(node_modules)/**/}!(CHANGELOG)*.md'",
     "docs:lang": "node build/translations.js",
-    "netlify": "babel-node ./build/netlify-docs.js",
+    "netlify": "node ./build/netlify-docs.js",
     "prepublishOnly": "run-p build",
     "publish": "node build/gh-release.js",
-    "version": "node build/version.js && git add CHANGELOG.md",
+    "version": "is-prerelease || npm run changelog && git add CHANGELOG.md",
     "zip": "cd dist && cross-env bestzip \"./video-js-${npm_package_version}.zip\" * && cd .."
   },
   "repository": {
@@ -80,29 +81,24 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "dependencies": {
-    "@babel/runtime": "^7.4.5",
-    "@videojs/http-streaming": "1.10.3",
+    "@babel/runtime": "^7.9.2",
+    "@videojs/http-streaming": "1.13.3",
+    "@videojs/xhr": "2.5.1",
     "global": "4.3.2",
     "keycode": "^2.2.0",
     "safe-json-parse": "4.0.0",
     "videojs-font": "3.2.0",
-    "videojs-vtt.js": "^0.14.1",
-    "xhr": "2.4.0"
+    "videojs-vtt.js": "^0.15.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/node": "^7.4.5",
-    "@babel/plugin-transform-runtime": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/register": "^7.4.4",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-object-assign": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
     "access-sniff": "^3.2.0",
     "autoprefixer": "^9.6.0",
-    "babelify": "^10.0.0",
     "bestzip": "^2.1.4",
-    "bluebird": "^3.5.5",
     "browserify": "^16.2.3",
-    "browserify-istanbul": "^3.0.1",
     "chokidar-cli": "^1.2.2",
     "clean-css-cli": "^4.3.0",
     "cli-table": "^0.3.1",
@@ -117,16 +113,13 @@
     "husky": "^1.2.0",
     "jsdoc": "^3.6.2",
     "karma": "^4.1.0",
-    "karma-browserify": "^5.3.0",
-    "klaw-sync": "^6.0.0",
     "lint-staged": "^8.2.0",
     "markdown-table": "^1.1.3",
     "maxmin": "^2.1.0",
-    "minimist": "^1.2.0",
+    "not-prerelease": "^1.0.1",
     "npm-merge-driver-install": "^1.1.1",
     "npm-run-all": "^4.1.5",
     "postcss-cli": "^6.1.2",
-    "proxyquireify": "^3.2.1",
     "qunit": "^2.9.2",
     "remark-cli": "^6.0.1",
     "remark-lint": "^6.0.4",
@@ -135,14 +128,16 @@
     "remark-toc": "^5.1.1",
     "remark-validate-links": "^8.0.2",
     "replace": "^1.1.0",
-    "rollup": "^1.15.1",
+    "rollup": "^2.2.0",
     "rollup-plugin-alias": "^1.5.2",
-    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-ignore": "^1.0.5",
     "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-multi-entry": "^2.0.2",
     "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-progress": "^1.1.1",
+    "rollup-plugin-stub": "^1.2.0",
     "sass": "^1.21.0",
     "semver": "^5.7.0",
     "shelljs": "^0.8.3",
@@ -155,22 +150,17 @@
     "videojs-generate-karma-config": "~5.2.1",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^8.0.3",
-    "watchify": "^3.11.1",
     "webpack": "^1.15.0"
   },
   "vjsstandard": {
     "ignore": [
-      "**/es5/**",
-      "**/build/**",
-      "!build/rollup.js",
+      "dist",
+      "docs",
+      "sandbox",
+      "test/dist",
+      "test/api",
       "core.js",
-      "**/dist/**",
-      "**/docs/**",
-      "**/lang/**",
-      "**/sandbox/**",
-      "**/test/api/**",
-      "**/test/dist/coverage/**",
-      "**/test/karma.conf.js"
+      "core.es.js"
     ]
   },
   "greenkeeper": {
@@ -187,6 +177,14 @@
     "*.js": [
       "vjsstandard --fix",
       "git add"
+    ],
+    "!(CHANGELOG)*.md": [
+      "remark --output --",
+      "git add"
+    ],
+    "lang/**/!(zh-Hans|zh-Hant)*.json": [
+      "node build/translations.js",
+      "git add docs/translations-needed.md"
     ]
   }
 }
