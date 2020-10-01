@@ -620,7 +620,7 @@ export function getPointerPosition(el, event) {
     offsetY = event.changedTouches[0].pageY + box.top;
   }
 
-  position.y = Math.max(0, Math.min(1, (offsetY + boxH) / boxH));
+  position.y = (1 - Math.max(0, Math.min(1, offsetY / boxH)));
   position.x = Math.max(0, Math.min(1, offsetX / boxW));
   return position;
 }
