@@ -1,3 +1,14 @@
+<a name="7.9.6"></a>
+## [7.9.6](https://github.com/videojs/video.js/compare/v7.9.5...v7.9.6) (2020-10-01)
+
+### Bug Fixes
+
+* **dom:** vertical getPointerPosition value ([#6864](https://github.com/videojs/video.js/issues/6864)) ([1963086](https://github.com/videojs/video.js/commit/1963086)), closes [#5773](https://github.com/videojs/video.js/issues/5773) [#6863](https://github.com/videojs/video.js/issues/6863)
+
+### Documentation
+
+* Fix simple typo, intial -> initial ([#6851](https://github.com/videojs/video.js/issues/6851)) ([f22ead1](https://github.com/videojs/video.js/commit/f22ead1))
+
 <a name="7.9.5"></a>
 ## [7.9.5](https://github.com/videojs/video.js/compare/v7.9.4...v7.9.5) (2020-09-10)
 
