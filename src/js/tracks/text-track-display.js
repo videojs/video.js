@@ -368,7 +368,6 @@ class TextTrackDisplay extends Component {
         cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
         cueDiv.style.height = 'auto';
         cueDiv.style.top = 'auto';
-        cueDiv.style.bottom = '2px';
       }
       if (overrides.fontFamily && overrides.fontFamily !== 'default') {
         if (overrides.fontFamily === 'small-caps') {
