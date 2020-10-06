@@ -1,3 +1,10 @@
+<a name="7.9.7"></a>
+## [7.9.7](https://github.com/videojs/video.js/compare/v7.9.6...v7.9.7) (2020-10-06)
+
+### Bug Fixes
+
+* **text-track:** don't overlap captions when font-size changes ([#6874](https://github.com/videojs/video.js/issues/6874)) ([affc061](https://github.com/videojs/video.js/commit/affc061)), closes [/github.com/videojs/video.js/commit/4e5c28cc561487ff29394d19dce3a420675e4f9d#diff-8169d53aa7eee6cab5f85b6641ef3117R176](https://github.com//github.com/videojs/video.js/commit/4e5c28cc561487ff29394d19dce3a420675e4f9d/issues/diff-8169d53aa7eee6cab5f85b6641ef3117R176)
+
 <a name="7.9.6"></a>
 ## [7.9.6](https://github.com/videojs/video.js/compare/v7.9.5...v7.9.6) (2020-10-01)
 
