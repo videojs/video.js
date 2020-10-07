@@ -290,6 +290,8 @@ class TextTrackDisplay extends Component {
         this.setAttribute('aria-live', 'assertive');
       }
       this.updateForTrack(descriptionsTrack);
+    } else {
+      this.clearDisplay();
     }
   }
 
