@@ -243,8 +243,6 @@ class TextTrackDisplay extends Component {
     const tracks = this.player_.textTracks();
     const allowMultipleShowingTracks = this.options_.allowMultipleShowingTracks;
 
-    // this.clearDisplay();
-
     if (allowMultipleShowingTracks) {
       const showingTracks = [];
 
