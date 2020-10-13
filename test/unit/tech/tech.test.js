@@ -13,6 +13,7 @@ import VideoTrackList from '../../../src/js/tracks/video-track-list';
 import TextTrackList from '../../../src/js/tracks/text-track-list';
 import sinon from 'sinon';
 import log from '../../../src/js/utils/log.js';
+import TestHelpers from '../test-helpers.js';
 
 function stubbedSourceHandler(handler) {
   return {
@@ -663,7 +664,7 @@ QUnit.test('delegates only deferred deferrables to the source handler', function
 QUnit.test('Tech.isTech returns correct answers for techs and components', function(assert) {
   const isTech = Tech.isTech;
   const tech = new Html5({}, {});
-  const button = new Button({}, {});
+  const button = new Button(TestHelpers.makePlayer(), {});
 
   assert.ok(isTech(Tech), 'Tech is a Tech');
   assert.ok(isTech(Html5), 'Html5 is a Tech');

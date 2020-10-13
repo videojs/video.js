@@ -178,6 +178,18 @@ class ClickableComponent extends Component {
   }
 
   /**
+   * Handles language change in ClickableComponent for the player in components
+   *
+   *
+   */
+  handleLanguagechange() {
+    if (!this.controlText_) {
+      return;
+    }
+    this.controlText(this.controlText_);
+  }
+
+  /**
    * Event handler that is called when a `ClickableComponent` receives a
    * `click` or `tap` event.
    *

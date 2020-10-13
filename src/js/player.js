@@ -398,6 +398,9 @@ class Player extends Component {
     // Store the tag attributes used to restore html5 element
     this.tagAttributes = tag && Dom.getAttributes(tag);
 
+    //  true if it is the firts time that we set language before evented
+    this.initLang_ = true;
+
     // Update current language
     this.language(this.options_.language);
 
@@ -555,6 +558,7 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('stageclick', this.handleStageClick_);
     this.on('keydown', this.handleKeyDown);
+    this.on('languagechange', this.handleLanguagechange);
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -4295,7 +4299,19 @@ class Player extends Component {
       return this.language_;
     }
 
-    this.language_ = String(code).toLowerCase();
+    if (this.language_ !== String(code).toLowerCase() && this.initLang_ === false) {
+      this.language_ = String(code).toLowerCase();
+      /**
+      * fires when the player language change
+      *
+      * @fires Player#languagechange
+      * @type {EventTarget~Event}
+      */
+      this.trigger('languagechange');
+    } else {
+      this.language_ = String(code).toLowerCase();
+      this.initLang_ = false;
+    }
   }
 
   /**

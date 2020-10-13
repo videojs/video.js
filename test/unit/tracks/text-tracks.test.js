@@ -58,18 +58,7 @@ QUnit.test('Player track methods call the tech', function(assert) {
 
 QUnit.test('TextTrackDisplay initializes tracks on player ready', function(assert) {
   let calls = 0;
-  const ttd = new TextTrackDisplay({
-    on() {},
-    addTextTracks() {
-      calls--;
-    },
-    getChild() {
-      calls--;
-    },
-    ready() {
-      calls++;
-    }
-  }, {});
+  const ttd = new TextTrackDisplay(TestHelpers.makePlayer(), {}, calls++);
 
   assert.equal(calls, 1, 'only a player.ready call was made');
 
