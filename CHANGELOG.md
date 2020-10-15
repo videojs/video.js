@@ -1,3 +1,6 @@
+<a name="7.10.1"></a>
+## [7.10.1](https://github.com/videojs/video.js/compare/v7.10.0...v7.10.1) (2020-10-15)
+
 <a name="7.10.0"></a>
 # [7.10.0](https://github.com/videojs/video.js/compare/v7.9.7...v7.10.0) (2020-10-14)
 
