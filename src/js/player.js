@@ -402,7 +402,7 @@ class Player extends Component {
     this.initLang_ = true;
 
     // Update current language
-    this.language(this.options_.language);
+    this.language(this.options_.language, true);
 
     // Update Supported Languages
     if (options.languages) {
@@ -4294,23 +4294,23 @@ class Player extends Component {
    * @return {string}
    *         The current language code when getting
    */
-  language(code) {
+  language(code, skipListeners) {
     if (code === undefined) {
       return this.language_;
     }
 
-    if (this.language_ !== String(code).toLowerCase() && this.initLang_ === false) {
+    if (this.language_ !== String(code).toLowerCase()) {
       this.language_ = String(code).toLowerCase();
-      /**
-      * fires when the player language change
-      *
-      * @fires Player#languagechange
-      * @type {EventTarget~Event}
-      */
-      this.trigger('languagechange');
-    } else {
-      this.language_ = String(code).toLowerCase();
-      this.initLang_ = false;
+      // skipListeners helps to avoid trigger on initialization  when component is not evented
+      if (!skipListeners) {
+        /**
+        * fires when the player language change
+        *
+        * @fires Player#languagechange
+        * @type {EventTarget~Event}
+        */
+        this.trigger('languagechange');
+      }
     }
   }
 

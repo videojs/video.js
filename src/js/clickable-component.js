@@ -183,9 +183,6 @@ class ClickableComponent extends Component {
    *
    */
   handleLanguagechange() {
-    if (!this.controlText_) {
-      return;
-    }
     this.controlText(this.controlText_);
   }
 

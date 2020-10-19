@@ -132,10 +132,10 @@ QUnit.test('language change should localize its text', function(assert) {
   const el = testClickableComponent.createEl();
 
   player.language('en');
-  assert.ok(el.innerHTML.match(/vjs-control-text"?[^<>]*>Play/));
+  assert.equal(el.querySelector('.vjs-control-text').textContent, 'Play', 'text localized');
 
   player.language('es');
-  assert.ok(el.innerHTML.match(/vjs-control-text"?[^<>]*>Juego/));
+  assert.equal(el.querySelector('.vjs-control-text').textContent, 'Juego', 'text localized');
 
   testClickableComponent.dispose();
   player.dispose();

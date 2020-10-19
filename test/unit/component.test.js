@@ -45,16 +45,6 @@ QUnit.module('Component', {
   }
 });
 
-// const getFakePlayer = function() {
-//   return {
-//     // Fake player requries an ID
-//     id() {
-//       return 'player_1';
-//     },
-//     reportUserActivity() {}
-//   };
-// };
-
 QUnit.test('registerComponent() throws with bad arguments', function(assert) {
   assert.throws(
     function() {
