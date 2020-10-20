@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware is a Video.js feature that allows interaction with and modification of how the `Player` and `Tech` talk to each other. For more in-depth information, check out our [feature spotlight](https://blog.videojs.com/feature-spotlight-middleware/).
+Middleware is a Video.js feature that allows interaction with and modification of how the `Player` and `Tech` talk to each other. For more in-depth information, check out our [feature spotlight](https://videojs.com/blog/feature-spotlight-middleware/).
 
 ## Table of Contents
 
