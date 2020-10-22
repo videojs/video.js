@@ -398,9 +398,6 @@ class Player extends Component {
     // Store the tag attributes used to restore html5 element
     this.tagAttributes = tag && Dom.getAttributes(tag);
 
-    //  true if it is the firts time that we set language before evented
-    this.initLang_ = true;
-
     // Update current language
     this.language(this.options_.language, true);
 
