@@ -96,10 +96,8 @@ class Component {
       // Make this an evented object and use `el_`, if available, as its event bus
       evented(this, {eventBusKey: this.el_ ? 'el_' : null});
 
-      if (this.player_) {
-        this.handleLanguagechange = this.handleLanguagechange.bind(this);
-        this.on(this.player_, 'languagechange', this.handleLanguagechange);
-      }
+      this.handleLanguagechange = this.handleLanguagechange.bind(this);
+      this.on(this.player_, 'languagechange', this.handleLanguagechange);
     }
     stateful(this, this.constructor.defaultState);
 
