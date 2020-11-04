@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import TrackList from '../../../src/js/tracks/track-list.js';
+import EventTarget from '../../../src/js/event-target.js';
 
 const newTrack = function(id) {
   return {
@@ -161,3 +162,16 @@ QUnit.test('a "removetrack" event is triggered when tracks are removed', functio
   assert.equal(rms, 3, 'we got ' + rms + ' "removetrack" events');
   assert.equal(tracks, 3, 'we got a track with every event');
 });
+
+QUnit.test('labelchange event is fired for the list when a child track fires labelchange', function(assert) {
+  const trackList = new TrackList([new EventTarget()]);
+  let labelchanges = 0;
+  const labelchangeHandler = (e) => {
+    labelchanges++;
+  };
+
+  trackList.on('labelchange', labelchangeHandler);
+  trackList[0].trigger('labelchange');
+  assert.equal(labelchanges, '1', 'labelchange event is fired on tracklist');
+});
+

@@ -21,17 +21,15 @@ const TrackBaseline = function(TrackClass, options) {
     tech.dispose();
   });
 
-  QUnit.test('kind, label, language, id, are read only', function(assert) {
+  QUnit.test('kind, language, id, are read only', function(assert) {
     const tech = new TechFaker();
     const track = new TrackClass(Object.assign({tech}, options));
 
     track.kind = 'subtitles';
-    track.label = 'Spanish';
     track.language = 'es';
     track.id = '2';
 
     assert.equal(track.kind, options.kind, 'we have a kind');
-    assert.equal(track.label, options.label, 'we have a label');
     assert.equal(track.language, options.language, 'we have a language');
     assert.equal(track.id, options.id, 'we have an id');
 
