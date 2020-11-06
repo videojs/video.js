@@ -57,8 +57,8 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   const fakeTTDSpy = sinon.spy();
 
   class FakeTTD extends Component {
-    constructor() {
-      super();
+    constructor(player, options) {
+      super(player, options);
       fakeTTDSpy();
     }
   }
