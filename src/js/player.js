@@ -399,7 +399,7 @@ class Player extends Component {
     this.tagAttributes = tag && Dom.getAttributes(tag);
 
     // Update current language
-    this.language(this.options_.language, true);
+    this.language(this.options_.language);
 
     // Update Supported Languages
     if (options.languages) {
@@ -4291,15 +4291,16 @@ class Player extends Component {
    * @return {string}
    *         The current language code when getting
    */
-  language(code, skipListeners) {
+  language(code) {
     if (code === undefined) {
       return this.language_;
     }
 
     if (this.language_ !== String(code).toLowerCase()) {
       this.language_ = String(code).toLowerCase();
+
       // skipListeners helps to avoid trigger on initialization  when component is not evented
-      if (!skipListeners) {
+      if (isEvented(this)) {
         /**
         * fires when the player language change
         *
