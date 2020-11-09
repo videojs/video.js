@@ -4280,10 +4280,9 @@ class Player extends Component {
   }
 
   /**
-   * The player's language code
-   * NOTE: The language should be set in the player options if you want the
-   * the controls to be built with a specific language. Changing the language
-   * later will not update controls text.
+   * The player's language code.
+   *
+   * Changing the langauge will trigger [languagechange]{@link Player#languagechange} which Components can use to update control text.
    *
    * @param {string} [code]
    *        the language code to set the player to
@@ -4299,7 +4298,7 @@ class Player extends Component {
     if (this.language_ !== String(code).toLowerCase()) {
       this.language_ = String(code).toLowerCase();
 
-      // skipListeners helps to avoid trigger on initialization  when component is not evented
+      // during first init, it's possible some things won't be evented
       if (isEvented(this)) {
         /**
         * fires when the player language change
