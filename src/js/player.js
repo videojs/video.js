@@ -399,7 +399,7 @@ class Player extends Component {
     this.tagAttributes = tag && Dom.getAttributes(tag);
 
     // Update current language
-    this.language(this.options_.language, true);
+    this.language(this.options_.language);
 
     // Update Supported Languages
     if (options.languages) {
@@ -4280,10 +4280,15 @@ class Player extends Component {
   }
 
   /**
-   * The player's language code
-   * NOTE: The language should be set in the player options if you want the
-   * the controls to be built with a specific language. Changing the language
-   * later will not update controls text.
+   * The player's language code.
+   *
+   * Changing the langauge will trigger
+   * [languagechange]{@link Player#event:languagechange}
+   * which Components can use to update control text.
+   * ClickableComponent will update its control text by default on
+   * [languagechange]{@link Player#event:languagechange}.
+   *
+   * @fires Player#languagechange
    *
    * @param {string} [code]
    *        the language code to set the player to
@@ -4291,19 +4296,20 @@ class Player extends Component {
    * @return {string}
    *         The current language code when getting
    */
-  language(code, skipListeners) {
+  language(code) {
     if (code === undefined) {
       return this.language_;
     }
 
     if (this.language_ !== String(code).toLowerCase()) {
       this.language_ = String(code).toLowerCase();
-      // skipListeners helps to avoid trigger on initialization  when component is not evented
-      if (!skipListeners) {
+
+      // during first init, it's possible some things won't be evented
+      if (isEvented(this)) {
         /**
         * fires when the player language change
         *
-        * @fires Player#languagechange
+        * @event Player#languagechange
         * @type {EventTarget~Event}
         */
         this.trigger('languagechange');
