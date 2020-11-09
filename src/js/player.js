@@ -4282,7 +4282,13 @@ class Player extends Component {
   /**
    * The player's language code.
    *
-   * Changing the langauge will trigger [languagechange]{@link Player#languagechange} which Components can use to update control text.
+   * Changing the langauge will trigger
+   * [languagechange]{@link Player#event:languagechange}
+   * which Components can use to update control text.
+   * ClickableComponent will update its control text by default on
+   * [languagechange]{@link Player#event:languagechange}.
+   *
+   * @fires Player#languagechange
    *
    * @param {string} [code]
    *        the language code to set the player to
@@ -4303,7 +4309,7 @@ class Player extends Component {
         /**
         * fires when the player language change
         *
-        * @fires Player#languagechange
+        * @event Player#languagechange
         * @type {EventTarget~Event}
         */
         this.trigger('languagechange');
