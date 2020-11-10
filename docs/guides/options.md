@@ -94,7 +94,7 @@ player.autoplay('muted');
 
 #### More info on autoplay support and changes:
 
-* See our blog post: <https://blog.videojs.com/autoplay-best-practices-with-video-js/>
+* See our blog post: <https://videojs.com/blog/autoplay-best-practices-with-video-js/>
 
 ### `controls`
 
