@@ -165,7 +165,7 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
     // method for it.
     } else if (propName === 'textContent') {
       textContent(el, val);
-    } else if (el[propName] !== val) {
+    } else if (el[propName] !== val || propName === 'tabIndex') {
       el[propName] = val;
     }
   });
