@@ -11,6 +11,7 @@ import _ from 'lodash';
 import pkg from './package.json';
 import multiEntry from 'rollup-plugin-multi-entry';
 import stub from 'rollup-plugin-stub';
+import isCI from 'is-ci';
 
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
@@ -57,7 +58,7 @@ const primedBabel = babel({
 });
 
 const progress = () => {
-  if (process.env.TRAVIS || process.env.NETLIFY) {
+  if (isCI) {
     return {};
   }
 

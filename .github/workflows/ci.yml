@@ -1,0 +1,64 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  ci:
+    env:
+      BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+      BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # TODO: test IE 11, Legacy Edge, and New Edge on windows-latest
+      #       test Safari on macos-latest
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.npm
+          **/node_modules
+        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+          ${{ runner.os }}-
+
+    - name: Read .nvmrc
+      run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      shell: bash
+      id: nvm
+
+    - name: Install ffmpeg/pulseaudio for firefox on linux w/o browserstack
+      run: sudo apt-get install ffmpeg pulseaudio
+      if: ${{ startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME }}
+
+    - name: start pulseaudio for firefox on linux w/o browserstack
+      run: pulseaudio -D
+      if: ${{ startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME }}
+
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '${{ steps.nvm.outputs.NVMRC }}'
+    - run: npm i --prefer-offline --no-audit
+
+    # run safari on macos
+    - name: Run Mac test
+      run: npm run test -- --browsers Safari
+      if: ${{ startsWith(matrix.os, 'macos') }}
+
+    # only run ie 11 on windows
+    - name: Run Windows test
+      run: npm run test -- --browsers IE
+      if: ${{ startsWith(matrix.os, 'windows') }}
+
+    # run chrome/firefox or browserstack in linux
+    - name: Run linux test
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: npm test
+      if: ${{ startsWith(matrix.os, 'ubuntu') }}

@@ -57,7 +57,7 @@ module.exports = function(config) {
   */
 
   /* eslint-disable no-console */
-  console.log(JSON.stringify(config, null, 2));
+  // console.log(JSON.stringify(config, null, 2));
   /* eslint-enable no-console */
 
 };
