@@ -54,6 +54,8 @@ class Html5 extends Tech {
       this.setupSourcesetHandling_();
     }
 
+    this.isScrubbing_ = false;
+
     if (this.el_.hasChildNodes()) {
 
       const nodes = this.el_.childNodes;
@@ -535,6 +537,17 @@ class Html5 extends Tech {
    */
   setScrubbing(isScrubbing) {
     this.isScrubbing_ = isScrubbing;
+  }
+
+  /**
+   * Get whether we are scrubbing or not.
+   *
+   * @return {boolean} isScrubbing
+   *                  - true for we are currently scrubbing
+   *                  - false for we are no longer scrubbing
+   */
+  scrubbing() {
+    return this.isScrubbing_;
   }
 
   /**
