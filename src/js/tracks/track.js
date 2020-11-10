@@ -42,9 +42,10 @@ class Track extends EventTarget {
     const trackProps = {
       id: options.id || 'vjs_track_' + Guid.newGUID(),
       kind: options.kind || '',
-      label: options.label || '',
       language: options.language || ''
     };
+
+    let label = options.label || '';
 
     /**
      * @memberof Track
@@ -59,15 +60,6 @@ class Track extends EventTarget {
      * @memberof Track
      * @member {string} kind
      *         The kind of track that this is. Cannot be changed after creation.
-     * @instance
-     *
-     * @readonly
-     */
-
-    /**
-     * @memberof Track
-     * @member {string} label
-     *         The label of this track. Cannot be changed after creation.
      * @instance
      *
      * @readonly
@@ -91,6 +83,35 @@ class Track extends EventTarget {
         set() {}
       });
     }
+
+    /**
+     * @memberof Track
+     * @member {string} label
+     *         The label of this track. Cannot be changed after creation.
+     * @instance
+     *
+     * @fires Track#labelchange
+     */
+    Object.defineProperty(this, 'label', {
+      get() {
+        return label;
+      },
+      set(newLabel) {
+        if (newLabel !== label) {
+          label = newLabel;
+
+          /**
+           * An event that fires when label changes on this track.
+           *
+           * > Note: This is not part of the spec!
+           *
+           * @event Track#labelchange
+           * @type {EventTarget~Event}
+           */
+          this.trigger('labelchange');
+        }
+      }
+    });
   }
 }
 

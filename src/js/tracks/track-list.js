@@ -2,6 +2,7 @@
  * @file track-list.js
  */
 import EventTarget from '../event-target';
+import {isEvented} from '../mixins/evented';
 
 /**
  * Common functionaliy between {@link TextTrackList}, {@link AudioTrackList}, and
@@ -75,6 +76,26 @@ class TrackList extends EventTarget {
         type: 'addtrack',
         target: this
       });
+    }
+
+    /**
+     * Triggered when a track label is changed.
+     *
+     * @event TrackList#addtrack
+     * @type {EventTarget~Event}
+     * @property {Track} track
+     *           A reference to track that was added.
+     */
+    track.labelchange_ = () => {
+      this.trigger({
+        track,
+        type: 'labelchange',
+        target: this
+      });
+    };
+
+    if (isEvented(track)) {
+      track.addEventListener('labelchange', track.labelchange_);
     }
   }
 
@@ -161,7 +182,8 @@ class TrackList extends EventTarget {
 TrackList.prototype.allowedEvents_ = {
   change: 'change',
   addtrack: 'addtrack',
-  removetrack: 'removetrack'
+  removetrack: 'removetrack',
+  labelchange: 'labelchange'
 };
 
 // emulate attribute EventHandler support to allow for feature detection
