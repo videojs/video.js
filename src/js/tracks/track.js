@@ -97,17 +97,19 @@ class Track extends EventTarget {
         return label;
       },
       set(newLabel) {
-        label = newLabel;
+        if (newLabel !== label) {
+          label = newLabel;
 
-        /**
-         * An event that fires when label changes on this track.
-         *
-         * > Note: This is not part of the spec!
-         *
-         * @event Track#labelchange
-         * @type {EventTarget~Event}
-         */
-        this.trigger('labelchange');
+          /**
+           * An event that fires when label changes on this track.
+           *
+           * > Note: This is not part of the spec!
+           *
+           * @event Track#labelchange
+           * @type {EventTarget~Event}
+           */
+          this.trigger('labelchange');
+        }
       }
     });
   }

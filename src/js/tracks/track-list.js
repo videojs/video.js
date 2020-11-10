@@ -2,6 +2,7 @@
  * @file track-list.js
  */
 import EventTarget from '../event-target';
+import {isEvented} from '../mixins/evented';
 
 /**
  * Common functionaliy between {@link TextTrackList}, {@link AudioTrackList}, and
@@ -93,7 +94,9 @@ class TrackList extends EventTarget {
       });
     };
 
-    track.addEventListener('labelchange', track.labelchange_);
+    if (isEvented(track)) {
+      track.addEventListener('labelchange', track.labelchange_);
+    }
   }
 
   /**

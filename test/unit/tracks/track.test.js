@@ -46,10 +46,12 @@ QUnit.test('label is updated and labelchange event is fired when label is change
     eventsTriggered++;
   });
 
-  // two events
   track.label = 'English (auto)';
   assert.equal(eventsTriggered, 1, 'one label change');
+  assert.equal(track.label, 'English (auto)');
 
+  track.label = 'English (auto)';
+  assert.equal(eventsTriggered, 1, 'additional label change not fired when new label is the same as old');
   assert.equal(track.label, 'English (auto)');
 
   track.off();
