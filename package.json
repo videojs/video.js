@@ -163,11 +163,6 @@
       "core.es.js"
     ]
   },
-  "greenkeeper": {
-    "ignore": [
-      "webpack"
-    ]
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
