@@ -555,6 +555,7 @@ class Player extends Component {
     this.one('play', this.listenForUserActivity_);
     this.on('stageclick', this.handleStageClick_);
     this.on('keydown', this.handleKeyDown);
+    this.on('languagechange', this.handleLanguagechange);
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -4279,10 +4280,15 @@ class Player extends Component {
   }
 
   /**
-   * The player's language code
-   * NOTE: The language should be set in the player options if you want the
-   * the controls to be built with a specific language. Changing the language
-   * later will not update controls text.
+   * The player's language code.
+   *
+   * Changing the langauge will trigger
+   * [languagechange]{@link Player#event:languagechange}
+   * which Components can use to update control text.
+   * ClickableComponent will update its control text by default on
+   * [languagechange]{@link Player#event:languagechange}.
+   *
+   * @fires Player#languagechange
    *
    * @param {string} [code]
    *        the language code to set the player to
@@ -4295,7 +4301,20 @@ class Player extends Component {
       return this.language_;
     }
 
-    this.language_ = String(code).toLowerCase();
+    if (this.language_ !== String(code).toLowerCase()) {
+      this.language_ = String(code).toLowerCase();
+
+      // during first init, it's possible some things won't be evented
+      if (isEvented(this)) {
+        /**
+        * fires when the player language change
+        *
+        * @event Player#languagechange
+        * @type {EventTarget~Event}
+        */
+        this.trigger('languagechange');
+      }
+    }
   }
 
   /**

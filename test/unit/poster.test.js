@@ -9,21 +9,9 @@ QUnit.module('PosterImage', {
     this.poster1 = '#poster1';
     this.poster2 = '#poster2';
 
-    // Create a mock player object that responds as a player would
-    this.mockPlayer = {
-      poster_: this.poster1,
-      poster() {
-        return this.poster_;
-      },
-      handler_: null,
-      off() {},
-      on(type, handler) {
-        this.handler_ = handler;
-      },
-      trigger(type) {
-        this.handler_.call();
-      }
-    };
+    this.mockPlayer = TestHelpers.makePlayer({
+      poster: this.poster1
+    });
   },
   afterEach() {}
 });

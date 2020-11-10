@@ -95,6 +95,9 @@ class Component {
     if (options.evented !== false) {
       // Make this an evented object and use `el_`, if available, as its event bus
       evented(this, {eventBusKey: this.el_ ? 'el_' : null});
+
+      this.handleLanguagechange = this.handleLanguagechange.bind(this);
+      this.on(this.player_, 'languagechange', this.handleLanguagechange);
     }
     stateful(this, this.constructor.defaultState);
 
@@ -120,6 +123,7 @@ class Component {
     if (options.reportTouchActivity !== false) {
       this.enableTouchActivity();
     }
+
   }
 
   /**
@@ -288,6 +292,7 @@ class Component {
    *         The localized string or if no localization exists the english string.
    */
   localize(string, tokens, defaultValue = string) {
+
     const code = this.player_.language && this.player_.language();
     const languages = this.player_.languages && this.player_.languages();
     const language = languages && languages[code];
@@ -317,6 +322,13 @@ class Component {
 
     return localizedString;
   }
+
+  /**
+   * Handles language change for the player in components. Should be overriden by sub-components.
+   *
+   * @abstract
+   */
+  handleLanguagechange() {}
 
   /**
    * Return the `Component`s DOM element. This is where children get inserted.
