@@ -1,3 +1,30 @@
+<a name="7.11.0"></a>
+# [7.11.0](https://github.com/videojs/video.js/compare/v7.10.2...v7.11.0) (2020-11-16)
+
+### Features
+
+* **lang:** add thai language translations ([#6945](https://github.com/videojs/video.js/issues/6945)) ([464b971](https://github.com/videojs/video.js/commit/464b971))
+* **tech:** add a scrubbing getter. ([#6920](https://github.com/videojs/video.js/issues/6920)) ([a803484](https://github.com/videojs/video.js/commit/a803484))
+* **track:** make label property mutable and fire a labelchange event when the label is changed ([#6928](https://github.com/videojs/video.js/issues/6928)) ([ee0637c](https://github.com/videojs/video.js/commit/ee0637c))
+* trigger languagechange event on a language change ([#6891](https://github.com/videojs/video.js/issues/6891)) ([a0d09c1](https://github.com/videojs/video.js/commit/a0d09c1))
+
+### Bug Fixes
+
+* cast TOUCH_ENABLED to boolean ([#6943](https://github.com/videojs/video.js/issues/6943)) ([dcce0e9](https://github.com/videojs/video.js/commit/dcce0e9))
+* **css:** set seek to live button's align-items prop to center ([#6942](https://github.com/videojs/video.js/issues/6942)) ([3901ab0](https://github.com/videojs/video.js/commit/3901ab0))
+* always set tabIndex to restore keydown a11y ([#6871](https://github.com/videojs/video.js/issues/6871)) ([0140b28](https://github.com/videojs/video.js/commit/0140b28)), closes [#6145](https://github.com/videojs/video.js/issues/6145) [#6870](https://github.com/videojs/video.js/issues/6870)
+* **menu:** focus correct MenuItem on keyboard open ([#6914](https://github.com/videojs/video.js/issues/6914)) ([694fe0f](https://github.com/videojs/video.js/commit/694fe0f)), closes [#6912](https://github.com/videojs/video.js/issues/6912)
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).3.0 ([#6941](https://github.com/videojs/video.js/issues/6941)) ([f74e45b](https://github.com/videojs/video.js/commit/f74e45b))
+
+### Chores
+
+* **sandbox:** switch all urls to https ([#6946](https://github.com/videojs/video.js/issues/6946)) ([ca2d78f](https://github.com/videojs/video.js/commit/ca2d78f))
+* setup Github CI ([#6940](https://github.com/videojs/video.js/issues/6940)) ([6a28562](https://github.com/videojs/video.js/commit/6a28562))
+
+### Documentation
+
+* change blog links to most recent blog version, fix typo ([#6904](https://github.com/videojs/video.js/issues/6904)) ([8617530](https://github.com/videojs/video.js/commit/8617530))
+
 <a name="7.10.2"></a>
 ## [7.10.2](https://github.com/videojs/video.js/compare/v7.10.1...v7.10.2) (2020-11-04)
 
