@@ -21,6 +21,7 @@
 
 // css for the new live ui below
 .video-js .vjs-seek-to-live-control {
+  align-items: center;
   cursor: pointer;
   @include flex(none);
   display: inline-flex;
