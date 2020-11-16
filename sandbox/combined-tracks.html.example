@@ -29,7 +29,7 @@
     <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.sv.vtt" srclang="sv" label="Swedish">
     <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.ru.vtt" srclang="ru" label="Russian">
     <track kind="subtitles" src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/captions.ja.vtt" srclang="ja" label="Japanese">
-    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
   <p>This player has the captions-only captionsButton, the subtiles-only subtitlesButton and the subsCapsButton which shows both kinds. Typically you'll use either just the subsCapsButton alone, or one or both of the captionsButton and subtitlesButton.</p>
   <script>

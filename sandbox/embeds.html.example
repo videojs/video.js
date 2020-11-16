@@ -16,7 +16,7 @@
 
   <!-- Set the location of the flash SWF -->
   <script>
-    // videojs.options.flash.swf = 'http://vjs.zencdn.net/swf/5.3/video-js.swf';
+    // videojs.options.flash.swf = 'https://vjs.zencdn.net/swf/5.3/video-js.swf';
     videojs.options.flash.swf = 'http://localhost:8000/video-js-swf/dist/video-js.swf';
   </script>
   <style>

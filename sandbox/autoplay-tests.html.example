@@ -12,7 +12,7 @@
   <div id="fixture">
   </div>
   <div id="start-test">
-    <video id='start-test-video' height=264 width=640 src="http://vjs.zencdn.net/v/oceans.mp4" controls></video>
+    <video id='start-test-video' height=264 width=640 src="https://vjs.zencdn.net/v/oceans.mp4" controls></video>
     <p>Press play on the video to start tests. (as we need user permission to autoplay)</p>
   </div>
   <script>
