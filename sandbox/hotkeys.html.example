@@ -41,7 +41,7 @@
         <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
         <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
         <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
-        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
       </video-js>
     </div>
     <div class="panel hotkeys-normal">
@@ -55,7 +55,7 @@
         <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
         <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
         <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
-        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
       </video-js>
     </div>
     <div class="panel hotkeys-normal">
@@ -69,7 +69,7 @@
         <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
         <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
         <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
-        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
       </video-js>
     </div>
     <div class="panel hotkeys-function">
@@ -83,7 +83,7 @@
         <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
         <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
         <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
-        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
       </video-js>
     </div>
     <div class="panel hotkeys-override">
@@ -97,7 +97,7 @@
         <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
         <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
         <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
-        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
       </video-js>
     </div>
   </div>

@@ -22,13 +22,13 @@
   </div>
 
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
-      poster="http://vjs.zencdn.net/v/oceans.png"
+      poster="https://vjs.zencdn.net/v/oceans.png"
       data-setup='{"controlBar": {"volumePanel": {"inline": false}}}'>
-    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
-    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
-    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
     <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
-    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
   <p>This demo shows how to implement polyfill for the <b>:focus-visible</b> selector. You can read more about the polyfill <a href="https://github.com/WICG/focus-visible"> here</a>.</p>
   <script>
