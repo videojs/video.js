@@ -169,10 +169,10 @@ export const IS_WINDOWS = (/Windows/i).test(USER_AGENT);
  * @const
  * @type {Boolean}
  */
-export const TOUCH_ENABLED = Dom.isReal() && (
+export const TOUCH_ENABLED = Boolean(Dom.isReal() && (
   'ontouchstart' in window ||
   window.navigator.maxTouchPoints ||
-  window.DocumentTouch && window.document instanceof window.DocumentTouch);
+  window.DocumentTouch && window.document instanceof window.DocumentTouch));
 
 /**
  * Whether or not this device is an iPad.
