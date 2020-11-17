@@ -6,6 +6,7 @@
 [![Coverage Status][coveralls-icon]][coveralls-link]
 [![Greenkeeper badge](https://badges.greenkeeper.io/videojs/video.js.svg)](https://greenkeeper.io/)
 [![Slack Status][slack-icon]][slack-link]
+[![Gitpod Ready-to-Code](gitpod-icon)](gitpod-link)
 
 [![NPM][npm-icon]][npm-link]
 
@@ -154,6 +155,10 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 [travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=main
 
 [travis-link]: https://travis-ci.org/videojs/video.js
+
+[gitpod-icon]: https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod
+
+[gitpod-link]: https://gitpod.io/from-referrer/
 
 [vjs]: https://videojs.com
 

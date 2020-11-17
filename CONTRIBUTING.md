@@ -15,6 +15,7 @@ So you want to help out? Great! There's a number of ways you can get involved.
     * [Installing local dependencies](#installing-local-dependencies)
     * [Running tests](#running-tests)
     * [Building videojs](#building-videojs)
+  * [Online one-click setup](#online-one-click-setup)
     * [Testing Locally](#testing-locally)
     * [Sandbox test directory](#sandbox-test-directory)
     * [Running a local web server](#running-a-local-web-server)
@@ -164,6 +165,17 @@ npm run build
 ```
 
 This outputs an `es5/` and `dist/` folder. The `es5/` folder is used by bundling tools like browserify and webpack to package video.js into projects. The `dist/` folder has pre-compiled versions of video.js, including a minified version and the CSS file. This file can be included in page via a `<script></script>` tag.
+
+### Online one-click setup
+
+You can use Gitpod(an online IDE which is free for Open Source) for contributing, with a single click it will launch a workspace and automatically:
+
+* clone the `video.js` repo.
+* install the dependencies.
+* run `yarn build`.
+* run `yarn start`.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
 #### Testing Locally
 
