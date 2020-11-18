@@ -8,6 +8,7 @@ import {version} from '../../package.json';
 import document from 'global/document';
 import window from 'global/window';
 import evented from './mixins/evented';
+import asyncTimers from './mixins/async-timers';
 import {isEvented, addEventedCallback} from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
@@ -322,6 +323,9 @@ class Player extends Component {
     // don't auto mixin the evented mixin
     options.evented = false;
 
+    // don't auto mixin the asyncTimers mixin
+    options.asyncTimers = false;
+
     // we don't want the player to report touch activity on itself
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
@@ -462,6 +466,7 @@ class Player extends Component {
 
     // Make this an evented object and use `el_` as its event bus.
     evented(this, {eventBusKey: 'el_'});
+    asyncTimers(this);
 
     // listen to document and player fullscreenchange handlers so we receive those events
     // before a user can receive them so we can update isFullscreen appropriately.
