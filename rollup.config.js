@@ -130,6 +130,30 @@ export default cliargs => [
     onwarn,
     watch
   },
+  {
+    input: 'test/unit/**/*.test.js',
+    output: {
+      format: 'iife',
+      name: 'videojsTests',
+      file: 'test/dist/bundle.js',
+      globals: globals.test
+    },
+    external: externals.test,
+    plugins: [
+      multiEntry({exports: false}),
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      stub(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
+  },
   // es, cjs
   {
     input: 'src/js/index.js',
@@ -251,30 +275,5 @@ export default cliargs => [
     ],
     onwarn,
     watch
-  },
-  {
-    input: 'test/unit/**/*.test.js',
-    output: {
-      format: 'iife',
-      name: 'videojsTests',
-      file: 'test/dist/bundle.js',
-      globals: globals.test
-    },
-    external: externals.test,
-    plugins: [
-      multiEntry({exports: false}),
-      alias({
-        'video.js': path.resolve(__dirname, './src/js/video.js')
-      }),
-      primedResolve,
-      json(),
-      stub(),
-      primedCjs,
-      primedBabel,
-      cliargs.progress !== false ? progress() : {}
-    ],
-    onwarn,
-    watch
   }
-
 ];
