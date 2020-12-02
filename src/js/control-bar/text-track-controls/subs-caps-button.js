@@ -59,6 +59,12 @@ class SubsCapsButton extends TextTrackButton {
     return items;
   }
 
+  /**
+   * Re-open the caption list after modal close to promote accessibility
+   */
+  reopenCaptionListAfterModalClose() {
+    this.pressButton();
+  }
 }
 
 /**

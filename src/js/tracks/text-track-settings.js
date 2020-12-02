@@ -601,6 +601,14 @@ class TextTrackSettings extends ModalDialog {
     }
   }
 
+  /**
+   * Re-open the menu that triggered the modal to increase accessibility
+   */
+  close() {
+    super.close();
+    this.player().getChild('ControlBar').getChild('subsCapsButton').reopenCaptionListAfterModalClose();
+  }
+
 }
 
 Component.registerComponent('TextTrackSettings', TextTrackSettings);
