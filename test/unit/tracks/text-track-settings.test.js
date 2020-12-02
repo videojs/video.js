@@ -231,7 +231,7 @@ QUnit.test('should open on click', function(assert) {
   clock.restore();
 });
 
-QUnit.test('should close on done click', function(assert) {
+QUnit.test('should close and re-open menu on done click', function(assert) {
   const clock = sinon.useFakeTimers();
   const player = TestHelpers.makePlayer({
     tracks
@@ -242,6 +242,7 @@ QUnit.test('should close on done click', function(assert) {
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
   Events.trigger(player.$('.vjs-done-button'), 'click');
   assert.ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
+  assert.ok(player.controlBar.subsCapsButton.menu.hasClass('vjs-lock-showing'), 'captions menu reopened');
 
   player.dispose();
   clock.restore();
