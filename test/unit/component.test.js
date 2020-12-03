@@ -1390,3 +1390,25 @@ QUnit.test('getDescendant should work as expected', function(assert) {
 
   comp.dispose();
 });
+
+QUnit.test('ready should not work after expose', function(assert) {
+  let option = false;
+  let callback = false;
+
+  const comp = new Component(this.player, {name: 'component'}, () => {
+    option = true;
+  });
+
+  comp.ready(() => {
+    callback = true;
+  });
+  const err = new Error('Invalid target for component#trigger; must be a DOM node or evented object.');
+
+  comp.dispose();
+  comp.triggerReady();
+  assert.throws(() => this.clock.tick(1), err, 'throws trigger error');
+
+  assert.notOk(option, 'ready option not run');
+  assert.notOk(callback, 'ready callback not run');
+
+});
