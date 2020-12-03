@@ -72,7 +72,7 @@ QUnit.test('on(), one(), and any() errors', function(assert) {
 
   ['on', 'one', 'any'].forEach(method => {
     [targeta, targetc, targetd].forEach((target) => {
-      const objName = target.name_ || target.constructor.name;
+      const objName = target.name_ || target.constructor.name || typeof target;
 
       assert.throws(() => target[method](), errors.type(objName, method), 'expected error');
       assert.throws(() => target[method]('   '), errors.type(objName, method), 'expected error');
@@ -98,7 +98,7 @@ QUnit.test('off() errors', function(assert) {
   // An invalid event actually causes an invalid target error because it
   // gets passed into code that assumes the first argument is the target.
   [targeta, targete, targetf].forEach(function(target) {
-    const objName = target.name_ || target.constructor.name;
+    const objName = target.name_ || target.constructor.name || typeof target;
 
     assert.throws(() => target.off([]), errors.target(objName, 'off'), 'expected error');
     assert.throws(() => target.off({}, 'x', () => {}), errors.target(objName, 'off'), 'expected error');

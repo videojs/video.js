@@ -26,7 +26,7 @@ const objName = (obj) => {
     return obj.constructor.name;
   }
 
-  return '';
+  return typeof obj;
 };
 
 /**
