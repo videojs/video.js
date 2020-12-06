@@ -5,6 +5,7 @@ import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
+import log from '../../utils/log.js';
 
 /**
  * Displays time information about the video
@@ -86,7 +87,13 @@ class TimeDisplay extends Component {
         return;
       }
 
-      const oldNode = this.textNode_;
+      let oldNode = this.textNode_;
+
+      if (oldNode && !this.contentEl_.contains(oldNode)) {
+        oldNode = null;
+
+        log.warn('Prevented to execute \'replaceChild\' on \'Node\' since the node to be replaced was not a child of this node.');
+      }
 
       this.textNode_ = document.createTextNode(this.formattedTime_);
 
