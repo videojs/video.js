@@ -65,7 +65,7 @@ QUnit.test('fires loadeddata when track cues become populated', function(assert)
     changes++;
   };
   const htmlTrackElement = new HTMLTrackElement({
-    tech() {}
+    tech: this.tech
   });
 
   htmlTrackElement.addEventListener('load', loadHandler);
