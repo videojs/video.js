@@ -1391,7 +1391,7 @@ QUnit.test('getDescendant should work as expected', function(assert) {
   comp.dispose();
 });
 
-QUnit.test('ready should not work after expose', function(assert) {
+QUnit.test('ready queue should not run after dispose', function(assert) {
   let option = false;
   let callback = false;
 
@@ -1402,7 +1402,7 @@ QUnit.test('ready should not work after expose', function(assert) {
   comp.ready(() => {
     callback = true;
   });
-  const err = new Error('Invalid target for component#trigger; must be a DOM node or evented object.');
+  const err = new RegExp('Cannot read property \'parentNode\' of null');
 
   comp.dispose();
   comp.triggerReady();

@@ -9,26 +9,6 @@ import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
 import EventTarget from '../event-target';
 
-const objName = (obj) => {
-  if (typeof obj.name === 'function') {
-    return obj.name();
-  }
-
-  if (typeof obj.name === 'string') {
-    return obj.name;
-  }
-
-  if (obj.name_) {
-    return obj.name_;
-  }
-
-  if (obj.constructor && obj.constructor.name) {
-    return obj.constructor.name;
-  }
-
-  return typeof obj;
-};
-
 /**
  * Returns whether or not an object has had the evented mixin applied.
  *
@@ -88,9 +68,9 @@ const isValidEventType = (type) =>
  * @param  {Object} target
  *         The object to test.
  */
-const validateTarget = (target, obj, fnName) => {
-  if (!target || (!target.nodeName && !isEvented(target))) {
-    throw new Error(`Invalid target for ${objName(obj)}#${fnName}; must be a DOM node or evented object.`);
+const validateTarget = (target) => {
+  if (!target.nodeName && !isEvented(target)) {
+    throw new Error('Invalid target; must be a DOM node or evented object.');
   }
 };
 
@@ -104,9 +84,9 @@ const validateTarget = (target, obj, fnName) => {
  * @param  {string|Array} type
  *         The type to test.
  */
-const validateEventType = (type, obj, fnName) => {
+const validateEventType = (type) => {
   if (!isValidEventType(type)) {
-    throw new Error(`Invalid event type for ${objName(obj)}#${fnName}; must be a non-empty string or array.`);
+    throw new Error('Invalid event type; must be a non-empty string or array.');
   }
 };
 
@@ -120,9 +100,9 @@ const validateEventType = (type, obj, fnName) => {
  * @param  {Function} listener
  *         The listener to test.
  */
-const validateListener = (listener, obj, fnName) => {
+const validateListener = (listener) => {
   if (typeof listener !== 'function') {
-    throw new Error(`Invalid listener for ${objName(obj)}#${fnName}; must be a function.`);
+    throw new Error('Invalid listener; must be a function.');
   }
 };
 
@@ -141,7 +121,7 @@ const validateListener = (listener, obj, fnName) => {
  * @return {Object}
  *         An object containing useful values for `on()` or `one()` calls.
  */
-const normalizeListenArgs = (self, args, fnName) => {
+const normalizeListenArgs = (self, args) => {
 
   // If the number of arguments is less than 3, the target is always the
   // evented object itself.
@@ -164,9 +144,9 @@ const normalizeListenArgs = (self, args, fnName) => {
     [target, type, listener] = args;
   }
 
-  validateTarget(target, self, fnName);
-  validateEventType(type, self, fnName);
-  validateListener(listener, self, fnName);
+  validateTarget(target);
+  validateEventType(type);
+  validateListener(listener);
 
   listener = Fn.bind(self, listener);
 
@@ -191,7 +171,7 @@ const normalizeListenArgs = (self, args, fnName) => {
  *         A listener function.
  */
 const listen = (target, method, type, listener) => {
-  validateTarget(target, target, method);
+  validateTarget(target);
 
   if (target.nodeName) {
     Events[method](target, type, listener);
@@ -232,7 +212,7 @@ const EventedMixin = {
    *         the listener function.
    */
   on(...args) {
-    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args, 'on');
+    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
 
     listen(target, 'on', type, listener);
 
@@ -284,7 +264,7 @@ const EventedMixin = {
    *         the listener function.
    */
   one(...args) {
-    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args, 'one');
+    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
 
     // Targeting this evented object.
     if (isTargetingSelf) {
@@ -333,7 +313,7 @@ const EventedMixin = {
    *         the listener function.
    */
   any(...args) {
-    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args, 'any');
+    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
 
     // Targeting this evented object.
     if (isTargetingSelf) {
@@ -384,9 +364,9 @@ const EventedMixin = {
       const type = typeOrListener;
 
       // Fail fast and in a meaningful way!
-      validateTarget(target, this, 'off');
-      validateEventType(type, this, 'off');
-      validateListener(listener, this, 'off');
+      validateTarget(target);
+      validateEventType(type);
+      validateListener(listener);
 
       // Ensure there's at least a guid, even if the function hasn't been used
       listener = Fn.bind(this, listener);
@@ -418,8 +398,6 @@ const EventedMixin = {
    *          Whether or not the default behavior was prevented.
    */
   trigger(event, hash) {
-    validateTarget(this.eventBusEl_, this, 'trigger');
-
     return Events.trigger(this.eventBusEl_, event, hash);
   }
 };
