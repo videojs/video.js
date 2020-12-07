@@ -1402,11 +1402,15 @@ QUnit.test('ready queue should not run after dispose', function(assert) {
   comp.ready(() => {
     callback = true;
   });
-  const err = new RegExp('Cannot read property \'parentNode\' of null');
 
   comp.dispose();
   comp.triggerReady();
-  assert.throws(() => this.clock.tick(1), err, 'throws trigger error');
+  // TODO: improve this error. It is a variant of:
+  // "Cannot read property 'parentNode' of null"
+  //
+  // but on some browsers such as IE 11 and safari 9 other errors are thrown,
+  // I think any error at all works for our purposes here.
+  assert.throws(() => this.clock.tick(1), /.*/, 'throws trigger error');
 
   assert.notOk(option, 'ready option not run');
   assert.notOk(callback, 'ready callback not run');
