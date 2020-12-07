@@ -420,6 +420,12 @@ const EventedMixin = {
   trigger(event, hash) {
     validateTarget(this.eventBusEl_, this, 'trigger');
 
+    const type = event && typeof event !== 'string' ? event.type : event;
+
+    if (!isValidEventType(type)) {
+      throw new Error(`Invalid event type for ${objName(this)}#trigger; ` +
+        'must be a non-empty string or object with a type key that has a non-empty value.');
+    }
     return Events.trigger(this.eventBusEl_, event, hash);
   }
 };

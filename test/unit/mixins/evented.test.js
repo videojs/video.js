@@ -8,7 +8,8 @@ import * as Obj from '../../../src/js/utils/obj';
 const errors = {
   type: (objName, fnName) => new Error(`Invalid event type for ${objName}#${fnName}; must be a non-empty string or array.`),
   listener: (objName, fnName) => new Error(`Invalid listener for ${objName}#${fnName}; must be a function.`),
-  target: (objName, fnName) => new Error(`Invalid target for ${objName}#${fnName}; must be a DOM node or evented object.`)
+  target: (objName, fnName) => new Error(`Invalid target for ${objName}#${fnName}; must be a DOM node or evented object.`),
+  trigger: (objName) => new Error(`Invalid event type for ${objName}#trigger; must be a non-empty string or object with a type key that has a non-empty value.`)
 };
 
 const validateListenerCall = (call, thisValue, eventExpectation) => {
@@ -59,6 +60,30 @@ QUnit.test('evented() with custom element', function(assert) {
     new Error('The eventBusKey "foo" does not refer to an element.'),
     'throws if the target does not have an element at the supplied key'
   );
+});
+
+QUnit.test('trigger() errors', function(assert) {
+  class Test {}
+  const targeta = evented({});
+  const targetb = evented(new Test());
+  const targetc = evented(new Test());
+
+  targetc.name_ = 'foo';
+
+  [targeta, targetb, targetc].forEach((target) => {
+    const objName = target.name_ || target.constructor.name || typeof target;
+    const triggerError = errors.trigger(objName);
+
+    assert.throws(() => target.trigger(), triggerError, 'expected error');
+    assert.throws(() => target.trigger('   '), triggerError, 'expected error');
+    assert.throws(() => target.trigger({}), triggerError, 'expected error');
+    assert.throws(() => target.trigger({type: ''}), triggerError, 'expected error');
+    assert.throws(() => target.trigger({type: '    '}), triggerError, 'expected error');
+
+    delete target.eventBusEl_;
+
+    assert.throws(() => target.trigger({type: 'foo'}), errors.target(objName, 'trigger'), 'expected error');
+  });
 });
 
 QUnit.test('on(), one(), and any() errors', function(assert) {
