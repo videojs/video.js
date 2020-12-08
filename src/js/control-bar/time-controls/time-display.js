@@ -92,7 +92,7 @@ class TimeDisplay extends Component {
       if (oldNode && !this.contentEl_.contains(oldNode)) {
         oldNode = null;
 
-        log.warn('Prevented to execute \'replaceChild\' on \'Node\' since the node to be replaced was not a child of this node.');
+        log.warn('TimeDisplay#updateTextnode_: Prevented replacement of text node element since it was no longer a child of this node. Appending a new node instead.');
       }
 
       this.textNode_ = document.createTextNode(this.formattedTime_);
