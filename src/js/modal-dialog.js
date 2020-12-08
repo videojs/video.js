@@ -461,7 +461,19 @@ class ModalDialog extends Component {
     }
 
     const focusableEls = this.focusableEls_();
-    const focusIndex = focusableEls.indexOf(document.activeElement);
+    const activeEl = this.el_.querySelector(':focus');
+    let focusIndex;
+
+    for (let i = 0; i < focusableEls.length; i++) {
+      if (activeEl === focusableEls[i]) {
+        focusIndex = i;
+        break;
+      }
+    }
+
+    if (document.activeElement === this.el_) {
+      focusIndex = 0;
+    }
 
     if (event.shiftKey && focusIndex === 0) {
       focusableEls[focusableEls.length - 1].focus();
