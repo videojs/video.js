@@ -155,6 +155,7 @@ class LiveTracker extends Component {
       this.one(this.player_, 'timeupdate', this.handleFirstTimeupdate);
     } else {
       this.on(this.player_, 'seeked', this.handleSeeked);
+      this.seekToLiveEdge();
     }
   }
 
@@ -174,8 +175,7 @@ class LiveTracker extends Component {
   handleSeeked() {
     const timeDiff = Math.abs(this.liveCurrentTime() - this.player_.currentTime());
 
-    this.seekedBehindLive_ = this.skipNextSeeked_ ? false : timeDiff > 2;
-    this.skipNextSeeked_ = false;
+    this.seekedBehindLive_ = timeDiff > 2;
     this.trackLive_();
   }
 
@@ -198,13 +198,18 @@ class LiveTracker extends Component {
     this.behindLiveEdge_ = true;
     this.timeupdateSeen_ = false;
     this.seekedBehindLive_ = false;
-    this.skipNextSeeked_ = false;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
 
     this.off(this.player_, ['play', 'pause'], this.trackLive_);
     this.off(this.player_, 'seeked', this.handleSeeked);
+    if (this.trackSeeking_) {
+      this.off(this.player_, 'seeking', this.trackSeeking_);
+    }
+    if (this.seekingToLiveEdge_) {
+      this.off(this.player_, 'seeked', this.seekingToLiveEdge_);
+    }
     this.off(this.player_, 'play', this.handlePlay);
     this.off(this.player_, 'timeupdate', this.handleFirstTimeupdate);
     this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
@@ -353,14 +358,34 @@ class LiveTracker extends Component {
    * Seek to the live edge if we are behind the live edge
    */
   seekToLiveEdge() {
-    this.seekedBehindLive_ = false;
+    this.trackLive_();
     if (this.atLiveEdge()) {
       return;
     }
-    // skipNextSeeked_
-    this.skipNextSeeked_ = true;
-    this.player_.currentTime(this.liveCurrentTime());
 
+    let seekings = 0;
+
+    this.trackSeeking_ = function() {
+      seekings++;
+    };
+
+    // seeks can cause seekable end to change drastically
+    // prevent us from seeking behind live by trying to seek again.
+    this.seekingToLiveEdge_ = () => {
+      this.off(this.player_, 'seeking', this.trackSeeking_);
+      this.trackSeeking_ = null;
+      this.seekingToLiveEdge_ = null;
+      // if there was a user seek, respect it and don't try to seek again
+      if (seekings > 1) {
+        return;
+      }
+      this.seekToLiveEdge();
+    };
+
+    this.on(this.player_, 'seeking', this.trackSeeking_);
+    this.one(this.player_, 'seeked', this.seekToLiveEdge);
+
+    this.player_.currentTime(this.liveCurrentTime());
   }
 
   /**
