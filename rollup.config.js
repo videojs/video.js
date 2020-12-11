@@ -94,8 +94,7 @@ const moduleExternals = [
   '@babel/runtime'
 ];
 const externals = {
-  browser: Object.keys(globals.browser).concat([
-  ]),
+  browser: [],
   module(id) {
     const result = moduleExternals.some((ext) => id.indexOf(ext) !== -1);
 
