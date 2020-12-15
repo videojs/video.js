@@ -1,11 +1,10 @@
 {
     "name": "videojs/video.js",
-    "description": "An HTML5 and Flash video player with a common API and skin for both.",
+    "description": "An HTML5 video player.",
     "type": "library",
     "keywords": [
         "videojs",
         "html5",
-        "flash",
         "video",
         "player"
     ],

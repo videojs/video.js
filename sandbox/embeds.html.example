@@ -8,17 +8,7 @@
 
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
-
-  <script src='../node_modules/videojs-flash/dist/videojs-flash.js'></script>
-  <script src="https://unpkg.com/videojs-contrib-hls@latest/dist/videojs-contrib-hls.js"></script>
-
-  <script src="../dist/lang/es.js"></script>
-
-  <!-- Set the location of the flash SWF -->
-  <script>
-    // videojs.options.flash.swf = 'https://vjs.zencdn.net/swf/5.3/video-js.swf';
-    videojs.options.flash.swf = 'http://localhost:8000/video-js-swf/dist/video-js.swf';
-  </script>
+  
   <style>
     .source-el { background: #FF6961; }
     .source-js { background: #77DD77; }

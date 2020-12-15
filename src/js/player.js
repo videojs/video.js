@@ -1303,6 +1303,7 @@ class Player extends Component {
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
+    // TODO: Is this needed for any techs other than Flash?
     // Any touch events are set to block the mousedown event from happening
     this.on(this.tech_, 'mouseup', this.handleTechClick_);
     this.on(this.tech_, 'dblclick', this.handleTechDoubleClick_);
@@ -2266,6 +2267,7 @@ class Player extends Component {
 
     // Flash likes to die and reload when you hide or reposition it.
     // In these cases the object methods go away and we get errors.
+    // TODO: Is this needed for techs other than Flash?
     // When that happens we'll catch the errors and inform tech that it's not ready any more.
     try {
       return this.tech_[method]();
@@ -2503,7 +2505,7 @@ class Player extends Component {
    * in all but the rarest use cases an argument will NOT be passed to the method
    *
    * > **NOTE**: The video must have started loading before the duration can be
-   * known, and in the case of Flash, may not be known until the video starts
+   * known, and depending on preload behaviour may not be known until the video starts
    * playing.
    *
    * @fires Player#durationchange
@@ -2529,6 +2531,7 @@ class Player extends Component {
 
     if (seconds !== this.cache_.duration) {
       // Cache the last set value for optimized scrubbing (esp. Flash)
+      // TODO: Required for techs other than Flash?
       this.cache_.duration = seconds;
 
       if (seconds === Infinity) {
@@ -2734,7 +2737,7 @@ class Player extends Component {
 
   /**
    * Check if current tech can support native fullscreen
-   * (e.g. with built in controls like iOS, so not our flash swf)
+   * (e.g. with built in controls like iOS)
    *
    * @return {boolean}
    *         if native fullscreen is supported
@@ -3799,7 +3802,7 @@ class Player extends Component {
 
   /**
    * Toggle native controls on/off. Native controls are the controls built into
-   * devices (e.g. default iPhone controls), Flash, or other techs
+   * devices (e.g. default iPhone controls) or other techs
    * (e.g. Vimeo Controls)
    * **This should only be set by the current tech, because only the tech knows
    * if it can support native controls**
@@ -4893,7 +4896,6 @@ Player.prototype.options_ = {
   techOrder: Tech.defaultTechOrder_,
 
   html5: {},
-  flash: {},
 
   // default inactivity timeout
   inactivityTimeout: 2000,

@@ -7,12 +7,7 @@
   <!-- Load the source files -->
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
-  <script src="../node_modules/videojs-flash/dist/videojs-flash.js"></script>
 
-  <!-- Set the location of the flash SWF -->
-  <script>
-    videojs.options.flash.swf = '../node_modules/videojs-flash/node_modules/videojs-swf/dist/video-js.swf';
-  </script>
 </head>
 <body>
   <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">

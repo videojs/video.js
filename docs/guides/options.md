@@ -51,8 +51,6 @@
   * [${componentName}](#componentname)
 * [Tech Options](#tech-options)
   * [${techName}](#techname)
-  * [flash](#flash)
-    * [swf](#swf)
   * [html5](#html5)
     * [nativeControlsForTouch](#nativecontrolsfortouch-1)
     * [nativeAudioTracks](#nativeaudiotracks)
@@ -560,27 +558,7 @@ videojs('my-player', {
 
 > Type: `Object`
 
-Video.js playback technologies (i.e. "techs") can be given custom options as part of the options passed to the `videojs` function. They should be passed under the _lower-case variant of the tech name_ (e.g. `"flash"` or `"html5"`).
-
-### `flash`
-
-#### `swf`
-
-Specifies where the Video.js SWF file is located for the `Flash` tech:
-
-```js
-videojs('my-player', {
-  flash: {
-    swf: '//path/to/videojs.swf'
-  }
-});
-```
-
-However, changing the global defaults is generally more appropriate:
-
-```js
-videojs.options.flash.swf = '//path/to/videojs.swf'
-```
+Video.js playback technologies (i.e. "techs") can be given custom options as part of the options passed to the `videojs` function. They should be passed under the _lower-case variant of the tech name_ (e.g. `"html5"`).
 
 ### `html5`
 
