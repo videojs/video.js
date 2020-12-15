@@ -161,7 +161,7 @@ on using that option.
 
 ## Q: How can I play RTMP video in Video.js?
 
-It is no longer possible to play RTMP as it requires Flash, and [fash-eol][Flash has reached end of life]. No browser supports it.
+It is no longer possible to play RTMP as it requires Flash, and [Flash has reached end of life][flash-eol]. No browser supports it.
 
 ## Q: How can I hide the links to my video/subtitles/audio/tracks?
 

@@ -50,7 +50,7 @@ For older Video.js versions, [http-streaming][http-streaming] or its predecessor
 
 ### If you are using Flash videos:
 
-* [flash-eol][Flash has reached end of life] and is no longer supported in browsers.
+* [Flash has reached end of life][flash-eol] and is no longer supported in browsers.
 
 ## Problems when hosting media
 

@@ -1,6 +1,6 @@
 # Playback Technology ("Tech")
 
-Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using the [videojs-youtube][youtube] tech, the playback technology is the You Tube player. The tech also includes an API wrapper to translate between the Video.js controls and API to the specific playback technology used.
+Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using the [videojs-youtube][youtube] tech, the playback technology is the YouTube player. The tech also includes an API wrapper to translate between the Video.js controls and API to the specific playback technology used.
 
 Essentially we're using html5 and plugins only as video decoders, and using HTML and JavaScript to create a consistent API and skinning experience across all of them.
 
@@ -75,7 +75,7 @@ Techs can check if they have this capability by checking the `canOverridePoster`
 
 When Video.js is given an array of sources, which to use is determined by finding the first supported source / tech combination. Each tech will be queried in the order specified in `techOrder` whether it can play the first source. The first match wins. If no tech can play the first source, then the next will be tested. It's important to set the `type` of each source correctly for this test to be accurate.
 
-> These example use the obsolete [flash-eol][Flash tech], for illustration of tech ordering with techs which have a greater degree of overlap in sources they can play
+> These example use the obsolete [Flash tech][flash-eol], for illustration of tech ordering with techs which have a greater degree of overlap in sources they can play
 
 For example, given the following video element, assuming the [videojs-flash][flash] tech and [videojs-contrib-hls][hls] source handler are available:
 
