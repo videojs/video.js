@@ -32,7 +32,7 @@ You can supply an array of alternate sources. [webm][can-webm] and/or [ogv][can-
 Video.js 7+ supports HLS and MPEG-DASH as standard as it includes [http-streaming][http-streaming], which uses [Media Source Extensions][can-mse] to play these formats in modern browsers.
 If choosing a single format, HLS is more convenient as iOS and some Android browsers which do not support MSE do have native HLS support.
 
-HLS is not possible with Flash on IE 11 on Windows 7, which does not support MSE.
+HLS is not possible on IE 11 on Windows 7, which does not support MSE. It was possible to play HLS on this browser with Flash.
 
 For older Video.js versions, [http-streaming][http-streaming] or its predecessors [videojs-contrib-hls][hls] and [videojs-contrib-dash][dash] add similar support, but for best results use the latest Video.js.
 
