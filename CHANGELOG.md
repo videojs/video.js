@@ -1,3 +1,28 @@
+<a name="7.11.1"></a>
+## [7.11.1](https://github.com/videojs/video.js/compare/v7.11.0...v7.11.1) (2020-12-22)
+
+### Features
+
+* **lang:** add Slovene language translation ([#6959](https://github.com/videojs/video.js/issues/6959)) ([8476abd](https://github.com/videojs/video.js/commit/8476abd))
+
+### Bug Fixes
+
+* **MapSham:** fix set method to use map property ([#7000](https://github.com/videojs/video.js/issues/7000)) ([a35a121](https://github.com/videojs/video.js/commit/a35a121))
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).4.1 ([#7010](https://github.com/videojs/video.js/issues/7010)) ([ead775b](https://github.com/videojs/video.js/commit/ead775b))
+* clear readyQueue with dispose ([#6967](https://github.com/videojs/video.js/issues/6967)) ([11d37e2](https://github.com/videojs/video.js/commit/11d37e2))
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).4.0 ([#6986](https://github.com/videojs/video.js/issues/6986)) ([0631f03](https://github.com/videojs/video.js/commit/0631f03))
+* **time-display:** add a null check for text node ([#6977](https://github.com/videojs/video.js/issues/6977)) ([3e30f83](https://github.com/videojs/video.js/commit/3e30f83)), closes [#6699](https://github.com/videojs/video.js/issues/6699) [#6700](https://github.com/videojs/video.js/issues/6700)
+* play progress time tooltip from jittering during live ([#6968](https://github.com/videojs/video.js/issues/6968)) ([799616d](https://github.com/videojs/video.js/commit/799616d))
+* **rollup:** browser globals shouldn't be external ([#6954](https://github.com/videojs/video.js/issues/6954)) ([63752f3](https://github.com/videojs/video.js/commit/63752f3)), closes [#6443](https://github.com/videojs/video.js/issues/6443) [#6272](https://github.com/videojs/video.js/issues/6272) [#6212](https://github.com/videojs/video.js/issues/6212) [#5680](https://github.com/videojs/video.js/issues/5680)
+
+### Chores
+
+* move unit test build right below main for faster watch ([#6953](https://github.com/videojs/video.js/issues/6953)) ([5a13e90](https://github.com/videojs/video.js/commit/5a13e90))
+
+### Documentation
+
+* Remove Flash ([#6994](https://github.com/videojs/video.js/issues/6994)) ([503141c](https://github.com/videojs/video.js/commit/503141c))
+
 <a name="7.11.0"></a>
 # [7.11.0](https://github.com/videojs/video.js/compare/v7.10.2...v7.11.0) (2020-11-16)
 
