@@ -1,6 +1,7 @@
 .video-js {
   // display:inline-block would be closer to the video el's display:inline
   // but it results in flash reloading when going into fullscreen [#2205]
+  // TODO: Still needed?
   display: block;
   // Make video.js videos align top when next to video elements
   vertical-align: top;

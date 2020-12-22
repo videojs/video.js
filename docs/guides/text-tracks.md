@@ -163,7 +163,7 @@ metadataTrack.addEventListener('cuechange', function() {
 
 ## Emulated Text Tracks
 
-By default, Video.js will use native text tracks and fall back to emulated text tracks if the native functionality is broken, incomplete, or non-existent. The Flash tech will always use the emulated text track functionality.
+By default, Video.js will use native text tracks and fall back to emulated text tracks if the native functionality is broken, incomplete, or non-existent.
 
 The Video.js API and TextTrack objects were modeled after the W3C specification. Video.js uses [Mozilla's vtt.js](https://github.com/mozilla/vtt.js) library to parse and display emulated text tracks.
 

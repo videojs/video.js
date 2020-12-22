@@ -9,11 +9,6 @@
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
 
-  <!-- Set the location of the flash SWF -->
-  <script>
-    videojs.options.flash.swf = '../node_modules/videojs-flash/node_modules/videojs-swf/dist/video-js.swf';
-  </script>
-
   <!-- Add support for Spanish 'es' -->
   <script>
     videojs.addLanguage('es', {

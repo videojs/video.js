@@ -76,7 +76,7 @@ function createTrackHelper(self, kind, label, language, options = {}) {
 
 /**
  * This is the base class for media playback technology controllers, such as
- * {@link Flash} and {@link HTML5}
+ * {@link HTML5}
  *
  * @extends Component
  */
@@ -115,12 +115,12 @@ class Tech extends Component {
       }
     });
 
-    // Manually track progress in cases where the browser/flash player doesn't report it.
+    // Manually track progress in cases where the browser/tech doesn't report it.
     if (!this.featuresProgressEvents) {
       this.manualProgressOn();
     }
 
-    // Manually track timeupdates in cases where the browser/flash player doesn't report it.
+    // Manually track timeupdates in cases where the browser/tech doesn't report it.
     if (!this.featuresTimeupdateEvents) {
       this.manualTimeUpdatesOn();
     }

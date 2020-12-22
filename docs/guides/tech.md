@@ -1,10 +1,10 @@
 # Playback Technology ("Tech")
 
-Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using Flash from [videojs-flash][flash], the playback technology is the video-js.swf Flash object. When using the [videojs-youtube][youtube] tech, the playback technology is the You Tube player. The tech also includes an API wrapper to translate between the Video.js controls and API to the specific playback technology used.
+Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using the [videojs-youtube][youtube] tech, the playback technology is the YouTube player. The tech also includes an API wrapper to translate between the Video.js controls and API to the specific playback technology used.
 
 Essentially we're using html5 and plugins only as video decoders, and using HTML and JavaScript to create a consistent API and skinning experience across all of them.
 
-In addition to techs there are source handlers. Source handlers add the capability to play additional source types to techs. For example, the [videojs-contrib-hls][hls] source handler enables the HTML5 and Flash techs to play HLS.
+In addition to techs there are source handlers. Source handlers add the capability to play additional source types to techs. For example, the [http-streaming][http-streaming] source handler (included with Video.js 7+ by default) enables the HTML5 tech to play HLS and DASH.
 
 ## Building an API Wrapper
 
@@ -46,14 +46,14 @@ When additional techs are added they are automatically added to the `techOrder`.
 ### Tag Method:
 
 ```html
-<video data-setup='{"techOrder": ["html5", "flash", "other supported tech"]}'>
+<video data-setup='{"techOrder": ["html5", "other supported tech"]}'>
 ```
 
 ### Object Method:
 
 ```js
 videojs("videoID", {
-  techOrder: ["html5", "flash", "other supported tech"]
+  techOrder: ["html5", "other supported tech"]
 });
 ```
 
@@ -74,6 +74,8 @@ Techs can check if they have this capability by checking the `canOverridePoster`
 ## Technology Ordering
 
 When Video.js is given an array of sources, which to use is determined by finding the first supported source / tech combination. Each tech will be queried in the order specified in `techOrder` whether it can play the first source. The first match wins. If no tech can play the first source, then the next will be tested. It's important to set the `type` of each source correctly for this test to be accurate.
+
+> These example use the obsolete [Flash tech][flash-eol], for illustration of tech ordering with techs which have a greater degree of overlap in sources they can play
 
 For example, given the following video element, assuming the [videojs-flash][flash] tech and [videojs-contrib-hls][hls] source handler are available:
 
@@ -121,37 +123,13 @@ This time, we have videojs-flash but not videojs-contrib-hls:
 
 ## Flash Technology
 
-The Flash playback tech was previously included in Video.js core and was included in the default `techOrder`. As of version 6, the Flash tech was moved to a separate [videojs-flash plugin][flash] which you would need to include if you still need to use Flash.
+Flash is no longer supported as it has reached [flash-eol][end of life]
 
-It's increasingly likely that end users don't have Flash or their browser has either disabled it or puts a click-to-play or other barrier to using it, so it's strongly recommended to use an alternative such as HLS.
-
-### Enabling RTMP Streaming Playback
-
-In order to force the Flash tech to choose streaming playback, you need to provide a valid streaming source **before other valid Flash video sources**. This is necessary because of the source selection algorithm, where playback tech chooses the first possible source object with a valid type. Valid streaming `type` values include `rtmp/mp4` and `rtmp/flv`. The streaming `src` value requires valid connection and stream strings, separated by an `&`. An example of supplying a streaming source through your HTML markup might look like:
-
-```html
-<source src="rtmp://your.streaming.provider.net/cfx/st/&mp4:path/to/video.mp4" type="rtmp/mp4">
-<source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
-<source src="http://your.static.provider.net/path/to/video.webm" type="video/webm">
-```
-
-You may optionally use the last `/` as the separator between connection and stream strings, for example:
-
-```html
-<source src="rtmp://your.streaming.provider.net/cfx/st/mp4:video.mp4" type="rtmp/mp4">
-```
-
-All four RTMP protocols are valid in the `src` (RTMP, RTMPT, RTMPE, and RTMPS).
-
-#### A note on sandboxing and security
-
-In some environments, such as Electron and NW.js apps, stricter policies are enforced, and `.swf` files won’t be able to communicate with the outside world out of the box. To stream media, you have to add them to a special manifest of trusted files. [nw-flash-trust](https://github.com/szwacz/nw-flash-trust) makes this job easy.
-
-Browsers also prevent the Flash tech from working when you load a page from the filesystem (with the `file:` protocol) and also in sandboxed iframes.
-
-[flash]: https://github.com/videojs/videojs-flash
+[flash-eol]: https://www.adobe.com/products/flashplayer/end-of-life.html
 
 [hls]: https://github.com/videojs/videojs-contrib-hls
+
+[http-streaming]: https://github.com/videojs/http-streaming
 
 [mse]: https://en.wikipedia.org/wiki/Media_Source_Extensions
 

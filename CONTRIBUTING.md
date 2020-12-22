@@ -35,7 +35,6 @@ So you want to help out? Great! There's a number of ways you can get involved.
 There's also other Video.js projects where you can help. (check the [video.js org](https://github.com/videojs) for an up-to-date list of projects)
 
 * [Videojs.com](https://github.com/videojs/videojs.com)
-* [Video.js flash player](https://github.com/videojs/videojs-flash)
 * [HLS](https://github.com/videojs/videojs-contrib-hls)
 * [DASH](https://github.com/videojs/videojs-contrib-dash)
 * [Youtube Tech](https://github.com/videojs/videojs-youtube)
@@ -183,7 +182,6 @@ See [the following section](#running-a-local-web-server) for how to open the pag
 
 This ties in nicely with the sandbox directory. You can always open the `sandbox/index.html` file directly but in some cases it may not work properly.
 
-> Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you must use a local web server.
 
 To run the local webserver:
