@@ -473,7 +473,7 @@ class Player extends Component {
     }
 
     if (this.fluid_) {
-      this.on('playerreset', this.updateStyleEl_);
+      this.on(['playerreset', 'resize'], this.updateStyleEl_);
     }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
@@ -912,13 +912,13 @@ class Player extends Component {
     this.fluid_ = !!bool;
 
     if (isEvented(this)) {
-      this.off('playerreset', this.updateStyleEl_);
+      this.off(['playerreset', 'resize'], this.updateStyleEl_);
     }
     if (bool) {
       this.addClass('vjs-fluid');
       this.fill(false);
-      addEventedCallback(function() {
-        this.on('playerreset', this.updateStyleEl_);
+      addEventedCallback(this, () => {
+        this.on(['playerreset', 'resize'], this.updateStyleEl_);
       });
     } else {
       this.removeClass('vjs-fluid');
