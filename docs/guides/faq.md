@@ -144,7 +144,7 @@ on the `video` element. It's still supported by Video.js but, many browsers, inc
 Instead we recommend using the `autoplay` option rather than the `autoplay` attribute, for more information on using that.
 see the [autoplay option][autoplay-option] in the Video.js options guide.
 
-For more information on the autoplay changes see our blog post: <https://videojs.com/blog/autoplay-best-practices-with-video-js/>
+For more information on the autoplay changes see our [blog post](https://videojs.com/blog/autoplay-best-practices-with-video-js/).
 
 ### Q: How can I autoplay a video on a mobile device?
 
@@ -276,6 +276,8 @@ Yes! See [ReactJS integration example][react-guide].
 [ads]: https://github.com/videojs/videojs-contrib-ads
 
 [audio-tracks]: /docs/guides/audio-tracks.md
+
+[autoplay-option]: /docs/guides/options.md#autoplay
 
 [contributing-issues]: https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#filing-issues
 
