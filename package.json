@@ -112,7 +112,7 @@
     "humanize-duration": "^3.18.0",
     "husky": "^1.2.0",
     "is-ci": "^2.0.0",
-    "jsdoc": "^3.6.2",
+    "jsdoc": "^3.6.6",
     "karma": "^5.2.3",
     "lint-staged": "^8.2.0",
     "markdown-table": "^1.1.3",
