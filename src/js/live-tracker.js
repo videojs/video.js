@@ -103,7 +103,7 @@ class LiveTracker extends Component {
 
     // we cannot be behind if
     // 1. until we have not seen a timeupdate yet
-    // 2. liveCurrentTime is Infinity, which happens on Android
+    // 2. liveCurrentTime is Infinity, which happens on Android and Native Safari
     if (!this.timeupdateSeen_ || liveCurrentTime === Infinity) {
       isBehind = false;
     }
@@ -275,8 +275,9 @@ class LiveTracker extends Component {
   liveWindow() {
     const liveCurrentTime = this.liveCurrentTime();
 
+    // if liveCurrenTime is Infinity then we don't have a liveWindow at all
     if (liveCurrentTime === Infinity) {
-      return Infinity;
+      return 0;
     }
 
     return liveCurrentTime - this.seekableStart();
