@@ -349,6 +349,89 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   log.error.restore();
 });
 
+QUnit.test('should retry setting source if error occurs and retryOnError: true', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techOrder: ['html5'],
+    retryOnError: true,
+    sources: [
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' }
+    ]
+  });
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+    'first source set'
+  );
+
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+    'second source set'
+  );
+
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' },
+    'last source set'
+  );
+
+  // No more sources to try so the previous source should remain
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' },
+    'last source remains'
+  );
+
+  player.dispose();
+});
+
+QUnit.test('should not retry setting source if retryOnError: true and error occurs during playback', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techOrder: ['html5'],
+    retryOnError: true,
+    sources: [
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' }
+    ]
+  });
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+    'first source set'
+  );
+
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+    'second source set'
+  );
+
+  // Playback starts then error occurs
+  player.trigger('playing');
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' },
+    'second source remains'
+  );
+
+  player.dispose();
+});
+
 QUnit.test('should suppress source error messages', function(assert) {
   sinon.stub(log, 'error');
   const clock = sinon.useFakeTimers();

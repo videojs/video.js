@@ -429,6 +429,7 @@ class Player extends Component {
     tag.removeAttribute('controls');
 
     this.changingSrc_ = false;
+    this.retrying_ = false;
     this.playCallbacks_ = [];
     this.playTerminatedQueue_ = [];
 
@@ -3377,6 +3378,26 @@ class Player extends Component {
 
       middleware.setTech(mws, this.tech_);
     });
+
+    // Try another available source if this one fails before playback.
+    if (this.options_.retryOnError && sources.length > 1) {
+      const retry = () => {
+        // Remove the error modal
+        this.error(null);
+        this.retrying_ = true;
+        this.src(sources.slice(1));
+      };
+      const removeRetryHandler = () => {
+        this.off('error', retry);
+        this.retrying_ = false;
+      };
+
+      this.one('error', retry);
+      // If we've already initiated a retry, we don't need to add this again
+      if (!this.retrying_) {
+        this.one('playing', removeRetryHandler);
+      }
+    }
   }
 
   /**
