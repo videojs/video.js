@@ -391,6 +391,16 @@ QUnit.test('should retry setting source if error occurs and retryOnError: true',
     'last source remains'
   );
 
+  assert.deepEqual(
+    player.currentSources(),
+    [
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' }
+    ],
+    'currentSources() correctly returns the full source list'
+  );
+
   player.dispose();
 });
 
@@ -427,6 +437,16 @@ QUnit.test('should not retry setting source if retryOnError: true and error occu
     player.currentSource(),
     { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' },
     'second source remains'
+  );
+
+  assert.deepEqual(
+    player.currentSources(),
+    [
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' }
+    ],
+    'currentSources() correctly returns the full source list'
   );
 
   player.dispose();

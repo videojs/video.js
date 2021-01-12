@@ -3343,7 +3343,12 @@ class Player extends Component {
     // initial sources
     this.changingSrc_ = true;
 
-    this.cache_.sources = sources;
+    // Only update the cached source list if we haven't initiated a retry on error,
+    // since in that case we want to include the failed source(s) in the cache
+    if (!this.retrying_) {
+      this.cache_.sources = sources;
+    }
+
     this.updateSourceCaches_(sources[0]);
 
     // middlewareSource is the source after it has been changed by middleware
@@ -3352,7 +3357,10 @@ class Player extends Component {
 
       // since sourceSet is async we have to update the cache again after we select a source since
       // the source that is selected could be out of order from the cache update above this callback.
-      this.cache_.sources = sources;
+      if (!this.retrying_) {
+        this.cache_.sources = sources;
+      }
+
       this.updateSourceCaches_(middlewareSource);
 
       const err = this.src_(middlewareSource);
