@@ -1,3 +1,24 @@
+<a name="7.11.2"></a>
+## [7.11.2](https://github.com/videojs/video.js/compare/v7.11.1...v7.11.2) (2021-01-14)
+
+### Bug Fixes
+
+* set liveWindow to 0 liveCurrentTime is Infinity ([#7034](https://github.com/videojs/video.js/issues/7034)) ([330c82c](https://github.com/videojs/video.js/commit/330c82c))
+* **player:** Ensure fluid works when dimensions not initially known ([#7023](https://github.com/videojs/video.js/issues/7023)) ([661962c](https://github.com/videojs/video.js/commit/661962c)), closes [#6939](https://github.com/videojs/video.js/issues/6939)
+
+### Chores
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).4.2 ([#7042](https://github.com/videojs/video.js/issues/7042)) ([f672af8](https://github.com/videojs/video.js/commit/f672af8))
+
+### Documentation
+
+* Add note to legacy notes  ([#7022](https://github.com/videojs/video.js/issues/7022)) ([f87297b](https://github.com/videojs/video.js/commit/f87297b))
+* **faq:** fixup autoplay blogpost url ([#7027](https://github.com/videojs/video.js/issues/7027)) ([a000fed](https://github.com/videojs/video.js/commit/a000fed)), closes [#6905](https://github.com/videojs/video.js/issues/6905)
+
+### Tests
+
+* update ci workflow to prevent install failures ([#7041](https://github.com/videojs/video.js/issues/7041)) ([5904ec2](https://github.com/videojs/video.js/commit/5904ec2))
+
 <a name="7.11.1"></a>
 ## [7.11.1](https://github.com/videojs/video.js/compare/v7.11.0...v7.11.1) (2020-12-22)
 
