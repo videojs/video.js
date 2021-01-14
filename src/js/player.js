@@ -3410,7 +3410,7 @@ class Player extends Component {
         this.one('playing', stopListeningForErrors);
       }
 
-      this.resetRetryOnError = () => {
+      this.resetRetryOnError_ = () => {
         this.off('error', retry);
         this.off('playing', stopListeningForErrors);
       };
