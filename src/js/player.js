@@ -3307,7 +3307,7 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the video source.
+   * Executes source setting and getting logic
    *
    * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
    *        A SourceObject, an array of SourceObjects, or a string referencing
@@ -3316,12 +3316,14 @@ class Player extends Component {
    *        algorithms can take the `type` into account.
    *
    *        If not provided, this method acts as a getter.
+   * @param {boolean} duringRetry
+   *        Indicates whether this is being called internally as a result of a retry
    *
    * @return {string|undefined}
    *         If the `source` argument is missing, returns the current source
    *         URL. Otherwise, returns nothing/undefined.
    */
-  src(source) {
+  handleSrc_(source, duringRetry) {
     // getter usage
     if (typeof source === 'undefined') {
       return this.cache_.src || '';
@@ -3345,7 +3347,7 @@ class Player extends Component {
 
     // Only update the cached source list if we haven't initiated a retry on error,
     // since in that case we want to include the failed source(s) in the cache
-    if (!this.retrying_) {
+    if (!duringRetry) {
       this.cache_.sources = sources;
     }
 
@@ -3357,7 +3359,7 @@ class Player extends Component {
 
       // since sourceSet is async we have to update the cache again after we select a source since
       // the source that is selected could be out of order from the cache update above this callback.
-      if (!this.retrying_) {
+      if (!duringRetry) {
         this.cache_.sources = sources;
       }
 
@@ -3367,7 +3369,7 @@ class Player extends Component {
 
       if (err) {
         if (sources.length > 1) {
-          return this.src(sources.slice(1));
+          return this.handleSrc_(sources.slice(1));
         }
 
         this.changingSrc_ = false;
@@ -3392,20 +3394,37 @@ class Player extends Component {
       const retry = () => {
         // Remove the error modal
         this.error(null);
-        this.retrying_ = true;
-        this.src(sources.slice(1));
+        this.handleSrc_(sources.slice(1), true);
       };
       const removeRetryHandler = () => {
         this.off('error', retry);
-        this.retrying_ = false;
       };
 
       this.one('error', retry);
       // If we've already initiated a retry, we don't need to add this again
-      if (!this.retrying_) {
+      if (!duringRetry) {
         this.one('playing', removeRetryHandler);
       }
     }
+  }
+
+  /**
+   * Get or set the video source.
+   *
+   * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
+   *        A SourceObject, an array of SourceObjects, or a string referencing
+   *        a URL to a media source. It is _highly recommended_ that an object
+   *        or array of objects is used here, so that source selection
+   *        algorithms can take the `type` into account.
+   *
+   *        If not provided, this method acts as a getter.
+   *
+   * @return {string|undefined}
+   *         If the `source` argument is missing, returns the current source
+   *         URL. Otherwise, returns nothing/undefined.
+   */
+  src(source) {
+    return this.handleSrc_(source);
   }
 
   /**
