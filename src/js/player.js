@@ -3433,7 +3433,7 @@ class Player extends Component {
    *         URL. Otherwise, returns nothing/undefined.
    */
   src(source) {
-    return this.handleSrc_(source);
+    return this.handleSrc_(source, false);
   }
 
   /**
