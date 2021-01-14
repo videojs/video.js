@@ -3350,8 +3350,8 @@ class Player extends Component {
       this.cache_.sources = sources;
 
       // If a retry was previously started, reset it
-      if (this.resetRetryOnError) {
-        this.resetRetryOnError();
+      if (this.resetRetryOnError_) {
+        this.resetRetryOnError_();
       }
     }
 
