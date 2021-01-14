@@ -452,6 +452,73 @@ QUnit.test('should not retry setting source if retryOnError: true and error occu
   player.dispose();
 });
 
+QUnit.test('aborts and resets retryOnError behavior if new src() call made during a retry', function(assert) {
+  const player = TestHelpers.makePlayer({
+    techOrder: ['html5'],
+    retryOnError: true,
+    sources: [
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' }
+    ]
+  });
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
+    'first source set'
+  );
+
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
+    'second source set'
+  );
+
+  // Setting a new source list should reset retry behavior and enable it for the new sources
+  player.src([
+    { src: 'http://vjs.zencdn.net/v/newSource.mp4', type: 'video/mp4' },
+    { src: 'http://vjs.zencdn.net/v/newSource2.mp4', type: 'video/mp4' },
+    { src: 'http://vjs.zencdn.net/v/newSource3.mp4', type: 'video/mp4' }
+  ]);
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/newSource.mp4', type: 'video/mp4' },
+    'first new source set'
+  );
+
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/newSource2.mp4', type: 'video/mp4' },
+    'second new source set'
+  );
+
+  player.trigger('error');
+
+  assert.deepEqual(
+    player.currentSource(),
+    { src: 'http://vjs.zencdn.net/v/newSource3.mp4', type: 'video/mp4' },
+    'third new source set'
+  );
+
+  assert.deepEqual(
+    player.currentSources(),
+    [
+      { src: 'http://vjs.zencdn.net/v/newSource.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/newSource2.mp4', type: 'video/mp4' },
+      { src: 'http://vjs.zencdn.net/v/newSource3.mp4', type: 'video/mp4' }
+    ],
+    'currentSources() correctly returns the full new source list'
+  );
+
+  player.dispose();
+});
+
 QUnit.test('should suppress source error messages', function(assert) {
   sinon.stub(log, 'error');
   const clock = sinon.useFakeTimers();

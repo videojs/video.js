@@ -3316,14 +3316,14 @@ class Player extends Component {
    *        algorithms can take the `type` into account.
    *
    *        If not provided, this method acts as a getter.
-   * @param {boolean} duringRetry
+   * @param {boolean} isRetry
    *        Indicates whether this is being called internally as a result of a retry
    *
    * @return {string|undefined}
    *         If the `source` argument is missing, returns the current source
    *         URL. Otherwise, returns nothing/undefined.
    */
-  handleSrc_(source, duringRetry) {
+  handleSrc_(source, isRetry) {
     // getter usage
     if (typeof source === 'undefined') {
       return this.cache_.src || '';
@@ -3345,10 +3345,15 @@ class Player extends Component {
     // initial sources
     this.changingSrc_ = true;
 
-    // Only update the cached source list if we haven't initiated a retry on error,
-    // since in that case we want to include the failed source(s) in the cache
-    if (!duringRetry) {
+    if (!isRetry) {
+      // Only update the cached source list if we are not retrying a new source after error,
+      // since in that case we want to include the failed source(s) in the cache
       this.cache_.sources = sources;
+
+      // If a retry was previously started, reset it
+      if (this.resetRetryOnError) {
+        this.resetRetryOnError();
+      }
     }
 
     this.updateSourceCaches_(sources[0]);
@@ -3359,7 +3364,7 @@ class Player extends Component {
 
       // since sourceSet is async we have to update the cache again after we select a source since
       // the source that is selected could be out of order from the cache update above this callback.
-      if (!duringRetry) {
+      if (!isRetry) {
         this.cache_.sources = sources;
       }
 
@@ -3396,15 +3401,20 @@ class Player extends Component {
         this.error(null);
         this.handleSrc_(sources.slice(1), true);
       };
-      const removeRetryHandler = () => {
+      const stopListeningForErrors = () => {
         this.off('error', retry);
       };
 
       this.one('error', retry);
       // If we've already initiated a retry, we don't need to add this again
-      if (!duringRetry) {
-        this.one('playing', removeRetryHandler);
+      if (!isRetry) {
+        this.one('playing', stopListeningForErrors);
       }
+
+      this.resetRetryOnError = () => {
+        this.off('error', retry);
+        this.off('playing', stopListeningForErrors);
+      };
     }
   }
 
