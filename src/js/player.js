@@ -429,7 +429,6 @@ class Player extends Component {
     tag.removeAttribute('controls');
 
     this.changingSrc_ = false;
-    this.retrying_ = false;
     this.playCallbacks_ = [];
     this.playTerminatedQueue_ = [];
 
