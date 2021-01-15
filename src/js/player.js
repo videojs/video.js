@@ -3327,6 +3327,12 @@ class Player extends Component {
     if (typeof source === 'undefined') {
       return this.cache_.src || '';
     }
+
+    // Reset retry behavior for new source
+    if (this.resetRetryOnError_) {
+      this.resetRetryOnError_();
+    }
+
     // filter out invalid sources and turn our source into
     // an array of source objects
     const sources = filterSource(source);
@@ -3344,15 +3350,10 @@ class Player extends Component {
     // initial sources
     this.changingSrc_ = true;
 
+    // Only update the cached source list if we are not retrying a new source after error,
+    // since in that case we want to include the failed source(s) in the cache
     if (!isRetry) {
-      // Only update the cached source list if we are not retrying a new source after error,
-      // since in that case we want to include the failed source(s) in the cache
       this.cache_.sources = sources;
-
-      // If a retry was previously started, reset it
-      if (this.resetRetryOnError_) {
-        this.resetRetryOnError_();
-      }
     }
 
     this.updateSourceCaches_(sources[0]);
@@ -3400,15 +3401,13 @@ class Player extends Component {
         this.error(null);
         this.handleSrc_(sources.slice(1), true);
       };
+
       const stopListeningForErrors = () => {
         this.off('error', retry);
       };
 
       this.one('error', retry);
-      // If we've already initiated a retry, we don't need to add this again
-      if (!isRetry) {
-        this.one('playing', stopListeningForErrors);
-      }
+      this.one('playing', stopListeningForErrors);
 
       this.resetRetryOnError_ = () => {
         this.off('error', retry);

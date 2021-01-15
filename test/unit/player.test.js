@@ -435,7 +435,7 @@ QUnit.test('should not retry setting source if retryOnError: true and error occu
 
   assert.deepEqual(
     player.currentSource(),
-    { src: 'http://vjs.zencdn.net/v/oceans3.mp4', type: 'video/mp4' },
+    { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
     'second source remains'
   );
 
