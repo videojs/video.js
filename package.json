@@ -71,6 +71,7 @@
     "docs:fix": "remark --output -- './{,!(node_modules)/**/}!(CHANGELOG)*.md'",
     "docs:lang": "node build/translations.js",
     "netlify": "node ./build/netlify.js",
+    "netlify-docs": "node ./build/netlify-docs.js",
     "prepublishOnly": "run-p build",
     "publish": "node build/gh-release.js",
     "version": "is-prerelease || npm run changelog && git add CHANGELOG.md",
