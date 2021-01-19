@@ -139,7 +139,7 @@ the different languages available as alternate audio tracks.
 The valid [BCP 47](https://tools.ietf.org/html/bcp47) code for the language of the audio
 track, e.g. `"en"` for English or `"es"` for Spanish.
 
-For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/master/lang)
+For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/main/lang)
 located in the Video.js root and refer to the [languages guide][languages-guide] for more
 information on languages in Video.js.
 

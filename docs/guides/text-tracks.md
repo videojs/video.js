@@ -91,7 +91,7 @@ The boolean `default` attribute can be used to indicate that a track's mode shou
 
 The valid [BCP 47](https://tools.ietf.org/html/bcp47) code for the language of the text track, e.g. `"en"` for English or `"es"` for Spanish.
 
-For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the Video.js root and refer to the [languages guide](/docs/guides/languages.md) for more information on languages in Video.js.
+For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/main/lang) folder located in the Video.js root and refer to the [languages guide](/docs/guides/languages.md) for more information on languages in Video.js.
 
 ### Text Tracks from Another Domain
 

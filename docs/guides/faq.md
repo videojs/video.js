@@ -279,9 +279,9 @@ Yes! See [ReactJS integration example][react-guide].
 
 [autoplay-option]: /docs/guides/options.md#autoplay
 
-[contributing-issues]: https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#filing-issues
+[contributing-issues]: https://github.com/videojs/video.js/blob/main/CONTRIBUTING.md#filing-issues
 
-[contributing-prs]: https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md#contributing-code
+[contributing-prs]: https://github.com/videojs/video.js/blob/main/CONTRIBUTING.md#contributing-code
 
 [components-guide]: /docs/guides/components.md
 
@@ -303,7 +303,7 @@ Yes! See [ReactJS integration example][react-guide].
 
 [install-guide]: https://videojs.com/getting-started/
 
-[issue-template]: https://github.com/videojs/video.js/blob/master/.github/ISSUE_TEMPLATE.md
+[issue-template]: https://github.com/videojs/video.js/blob/main/.github/ISSUE_TEMPLATE.md
 
 [node]: https://www.npmjs.com/package/video.js
 
@@ -315,7 +315,7 @@ Yes! See [ReactJS integration example][react-guide].
 
 [pr-issue-question]: #q-i-think-i-found-a-bug-with-videojs-or-i-want-to-add-a-feature-what-should-i-do
 
-[pr-template]: https://github.com/videojs/video.js/blob/master/.github/PULL_REQUEST_TEMPLATE.md
+[pr-template]: https://github.com/videojs/video.js/blob/main/.github/PULL_REQUEST_TEMPLATE.md
 
 [react-guide]: /docs/guides/react.md
 

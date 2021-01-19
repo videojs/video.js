@@ -8,7 +8,7 @@ In addition to techs there are source handlers. Source handlers add the capabili
 
 ## Building an API Wrapper
 
-We'll write a more complete guide on writing a wrapper soon, but for now the best resource is the [Video.js](https://github.com/videojs/video.js/tree/master/src/js/tech) source where you can see how the HTML5 API wrapper is created.
+We'll write a more complete guide on writing a wrapper soon, but for now the best resource is the [Video.js](https://github.com/videojs/video.js/tree/main/src/js/tech) source where you can see how the HTML5 API wrapper is created.
 
 ## Required Methods
 
@@ -59,11 +59,11 @@ videojs("videoID", {
 
 ### Posters
 
-By default, techs will have to handle their own posters and are somewhat locked out of the player's poster lifecycle. 
-However, when the player is initialized with the `techCanOverridePoster` option 
+By default, techs will have to handle their own posters and are somewhat locked out of the player's poster lifecycle.
+However, when the player is initialized with the `techCanOverridePoster` option
 it will be possible for techs to integrate into that lifecycle  and the player's `PosterImage` component to be used.
 
-Techs can check if they have this capability by checking the `canOverridePoster` boolean in their options. 
+Techs can check if they have this capability by checking the `canOverridePoster` boolean in their options.
 
 **`techCanOverridePoster` requirements**
 

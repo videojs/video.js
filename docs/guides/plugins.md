@@ -374,6 +374,6 @@ These events work for both basic and advanced plugins. They are triggered on the
 
 [spellbook]: https://github.com/videojs/spellbook
 
-[standards]: https://github.com/videojs/generator-videojs-plugin/blob/master/docs/standards.md
+[standards]: https://github.com/videojs/generator-videojs-plugin/blob/main/docs/standards.md
 
 [yeoman]: http://yeoman.io
