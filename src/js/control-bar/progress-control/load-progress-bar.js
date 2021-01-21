@@ -28,7 +28,7 @@ class LoadProgressBar extends Component {
   constructor(player, options) {
     super(player, options);
     this.partEls_ = [];
-    this.on(player, 'progress', this.update);
+    this.on(player, 'progress', (e) => this.update(e));
   }
 
   /**
