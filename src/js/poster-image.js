@@ -3,7 +3,6 @@
  */
 import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
-import * as Fn from './utils/fn.js';
 import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
 import * as browser from './utils/browser.js';
@@ -28,14 +27,16 @@ class PosterImage extends ClickableComponent {
     super(player, options);
 
     this.update();
-    player.on('posterchange', Fn.bind(this, this.update));
+
+    this.update_ = (e) => this.update(e);
+    player.on('posterchange', this.update_);
   }
 
   /**
    * Clean up and dispose of the `PosterImage`.
    */
   dispose() {
-    this.player().off('posterchange', this.update);
+    this.player().off('posterchange', this.update_);
     super.dispose();
   }
 
