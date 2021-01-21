@@ -49,7 +49,8 @@ if (Html5.supportsNativeTextTracks()) {
         crossOrigin() {
           return null;
         },
-        on() {}
+        on() {},
+        one() {}
       }
     });
 
@@ -111,7 +112,8 @@ if (Html5.supportsNativeTextTracks()) {
         crossOrigin() {
           return null;
         },
-        on() {}
+        on() {},
+        one() {}
       }
     });
 
@@ -174,7 +176,8 @@ QUnit.test('trackToJson_ produces correct representation for emulated track obje
       crossOrigin() {
         return null;
       },
-      on() {}
+      on() {},
+      one() {}
     }
   });
 
@@ -197,7 +200,8 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
       crossOrigin() {
         return null;
       },
-      on() {}
+      on() {},
+      one() {}
     }
   });
 
@@ -210,7 +214,8 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
       crossOrigin() {
         return null;
       },
-      on() {}
+      on() {},
+      one() {}
     }
   });
 
@@ -235,6 +240,7 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
       return null;
     },
     on() {},
+    one() {},
     textTracks() {
       return tt;
     }
@@ -268,7 +274,8 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
       crossOrigin() {
         return null;
       },
-      on() {}
+      on() {},
+      one() {}
     }
   });
 
@@ -281,7 +288,8 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
       crossOrigin() {
         return null;
       },
-      on() {}
+      on() {},
+      one() {}
     }
   });
 
@@ -307,6 +315,7 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
       return null;
     },
     on() {},
+    one() {},
     textTracks() {
       return tt;
     },
