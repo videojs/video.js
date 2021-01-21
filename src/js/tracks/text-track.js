@@ -201,10 +201,9 @@ class TextTrack extends Track {
 
     const disposeHandler = () => {
       this.tech_.off('timeupdate', timeupdateHandler);
-      this.tech_.off('dispose', disposeHandler);
     };
 
-    this.tech_.on('dispose', disposeHandler);
+    this.tech_.one('dispose', disposeHandler);
     if (mode !== 'disabled') {
       this.tech_.on('timeupdate', timeupdateHandler);
     }
@@ -243,6 +242,10 @@ class TextTrack extends Track {
           if (!TextTrackMode[newMode]) {
             return;
           }
+          if (mode === newMode) {
+            return;
+          }
+
           mode = newMode;
           if (!this.preload_ && mode !== 'disabled' && this.cues.length === 0) {
             // On-demand load.
