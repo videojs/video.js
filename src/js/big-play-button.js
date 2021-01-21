@@ -18,7 +18,7 @@ class BigPlayButton extends Button {
 
     this.mouseused_ = false;
 
-    this.on('mousedown', this.handleMouseDown);
+    this.on('mousedown', (e) => this.handleMouseDown(e));
   }
 
   /**
