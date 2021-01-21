@@ -26,7 +26,7 @@ class LiveDisplay extends Component {
     super(player, options);
 
     this.updateShowing();
-    this.on(this.player(), 'durationchange', this.updateShowing);
+    this.on(this.player(), 'durationchange', (e) => this.updateShowing(e));
   }
 
   /**
