@@ -87,6 +87,12 @@ const isValidEventType = (type) =>
  *
  * @param  {Object} target
  *         The object to test.
+ *
+ * @param  {Object} obj
+ *         The evented object we are validating for
+ *
+ * @param  {string} fnName
+ *         The name of the evented mixin function that called this.
  */
 const validateTarget = (target, obj, fnName) => {
   if (!target || (!target.nodeName && !isEvented(target))) {
@@ -103,6 +109,12 @@ const validateTarget = (target, obj, fnName) => {
  *
  * @param  {string|Array} type
  *         The type to test.
+ *
+ * @param  {Object} obj
+*         The evented object we are validating for
+ *
+ * @param  {string} fnName
+ *         The name of the evented mixin function that called this.
  */
 const validateEventType = (type, obj, fnName) => {
   if (!isValidEventType(type)) {
@@ -119,6 +131,12 @@ const validateEventType = (type, obj, fnName) => {
  *
  * @param  {Function} listener
  *         The listener to test.
+ *
+ * @param  {Object} obj
+ *         The evented object we are validating for
+ *
+ * @param  {string} fnName
+ *         The name of the evented mixin function that called this.
  */
 const validateListener = (listener, obj, fnName) => {
   if (typeof listener !== 'function') {
@@ -137,6 +155,9 @@ const validateListener = (listener, obj, fnName) => {
  *
  * @param  {Array} args
  *         An array of arguments passed to `on()` or `one()`.
+ *
+ * @param  {string} fnName
+ *         The name of the evented mixin function that called this.
  *
  * @return {Object}
  *         An object containing useful values for `on()` or `one()` calls.
