@@ -35,7 +35,7 @@ class PlaybackRateMenuItem extends MenuItem {
     this.label = label;
     this.rate = rate;
 
-    this.on(player, 'ratechange', this.update);
+    this.on(player, 'ratechange', (e) => this.update(e));
   }
 
   /**
