@@ -184,7 +184,10 @@ class TextTrack extends Track {
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
     const timeupdateHandler = Fn.bind(this, function() {
+      if (!this.tech_.isReady_ || this.tech_.isDisposed()) {
+        return;
 
+      }
       // Accessing this.activeCues for the side-effects of updating itself
       // due to its nature as a getter function. Do not remove or cues will
       // stop updating!
@@ -196,10 +199,13 @@ class TextTrack extends Track {
       }
     });
 
+    const disposeHandler = () => {
+      this.tech_.off('timeupdate', timeupdateHandler);
+    };
+
+    this.tech_.one('dispose', disposeHandler);
     if (mode !== 'disabled') {
-      this.tech_.ready(() => {
-        this.tech_.on('timeupdate', timeupdateHandler);
-      }, true);
+      this.tech_.on('timeupdate', timeupdateHandler);
     }
 
     Object.defineProperties(this, {
@@ -236,17 +242,19 @@ class TextTrack extends Track {
           if (!TextTrackMode[newMode]) {
             return;
           }
+          if (mode === newMode) {
+            return;
+          }
+
           mode = newMode;
           if (!this.preload_ && mode !== 'disabled' && this.cues.length === 0) {
             // On-demand load.
             loadTrack(this.src, this);
           }
+          this.tech_.off('timeupdate', timeupdateHandler);
+
           if (mode !== 'disabled') {
-            this.tech_.ready(() => {
-              this.tech_.on('timeupdate', timeupdateHandler);
-            }, true);
-          } else {
-            this.tech_.off('timeupdate', timeupdateHandler);
+            this.tech_.on('timeupdate', timeupdateHandler);
           }
           /**
            * An event that fires when mode changes on this track. This allows

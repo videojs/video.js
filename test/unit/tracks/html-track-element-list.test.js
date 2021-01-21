@@ -6,6 +6,7 @@ const defaultTech = {
   textTracks() {},
   on() {},
   off() {},
+  one() {},
   currentTime() {}
 };
 

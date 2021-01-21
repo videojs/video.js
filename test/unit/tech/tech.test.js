@@ -142,8 +142,9 @@ QUnit.test('dispose() should stop time tracking', function(assert) {
 QUnit.test('dispose() should clear all tracks that are passed when its created', function(assert) {
   const audioTracks = new AudioTrackList([new AudioTrack(), new AudioTrack()]);
   const videoTracks = new VideoTrackList([new VideoTrack(), new VideoTrack()]);
-  const textTracks = new TextTrackList([new TextTrack({tech: {}}),
-    new TextTrack({tech: {}})]);
+  const pretech = new Tech();
+  const textTracks = new TextTrackList([new TextTrack({tech: pretech}),
+    new TextTrack({tech: pretech})]);
 
   assert.equal(audioTracks.length, 2, 'should have two audio tracks at the start');
   assert.equal(videoTracks.length, 2, 'should have two video tracks at the start');
@@ -167,6 +168,7 @@ QUnit.test('dispose() should clear all tracks that are passed when its created',
     'should hold text tracks that we passed'
   );
 
+  pretech.dispose();
   tech.dispose();
 
   assert.equal(audioTracks.length, 0, 'should have zero audio tracks after dispose');

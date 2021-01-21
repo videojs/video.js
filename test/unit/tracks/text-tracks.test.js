@@ -343,7 +343,7 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
     numTextTrackChanges++;
   });
 
-  tt.mode = 'showing';
+  tt.mode = 'disabled';
   this.clock.tick(1);
   assert.equal(
     numTextTrackChanges, 1,
