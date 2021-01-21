@@ -26,7 +26,7 @@ class TimeDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
-    this.on(player, ['timeupdate', 'ended'], this.updateContent);
+    this.on(player, ['timeupdate', 'ended'], (e) => this.updateContent(e));
     this.updateTextNode_();
   }
 
