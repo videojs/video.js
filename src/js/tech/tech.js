@@ -97,6 +97,12 @@ class Tech extends Component {
     options.reportTouchActivity = false;
     super(null, options, ready);
 
+    this.onDurationChange_ = (e) => this.onDurationChange(e);
+    this.trackProgress_ = (e) => this.trackProgress(e);
+    this.trackCurrentTime_ = (e) => this.trackCurrentTime(e);
+    this.stopTrackingCurrentTime_ = (e) => this.stopTrackingCurrentTime(e);
+    this.disposeSourceHandler_ = (e) => this.disposeSourceHandler(e);
+
     // keep track of whether the current source has played at all to
     // implement a very limited played()
     this.hasStarted_ = false;
@@ -194,12 +200,12 @@ class Tech extends Component {
    * @see {@link Tech#trackProgress}
    */
   manualProgressOn() {
-    this.on('durationchange', this.onDurationChange);
+    this.on('durationchange', this.onDurationChange_);
 
     this.manualProgress = true;
 
     // Trigger progress watching when a source begins loading
-    this.one('ready', this.trackProgress);
+    this.one('ready', this.trackProgress_);
   }
 
   /**
@@ -210,7 +216,7 @@ class Tech extends Component {
     this.manualProgress = false;
     this.stopTrackingProgress();
 
-    this.off('durationchange', this.onDurationChange);
+    this.off('durationchange', this.onDurationChange_);
   }
 
   /**
@@ -304,8 +310,8 @@ class Tech extends Component {
   manualTimeUpdatesOn() {
     this.manualTimeUpdates = true;
 
-    this.on('play', this.trackCurrentTime);
-    this.on('pause', this.stopTrackingCurrentTime);
+    this.on('play', this.trackCurrentTime_);
+    this.on('pause', this.stopTrackingCurrentTime_);
   }
 
   /**
@@ -315,8 +321,8 @@ class Tech extends Component {
   manualTimeUpdatesOff() {
     this.manualTimeUpdates = false;
     this.stopTrackingCurrentTime();
-    this.off('play', this.trackCurrentTime);
-    this.off('pause', this.stopTrackingCurrentTime);
+    this.off('play', this.trackCurrentTime_);
+    this.off('pause', this.stopTrackingCurrentTime_);
   }
 
   /**
@@ -1342,14 +1348,14 @@ Tech.withSourceHandlers = function(_Tech) {
 
     // Dispose any existing source handler
     this.disposeSourceHandler();
-    this.off('dispose', this.disposeSourceHandler);
+    this.off('dispose', this.disposeSourceHandler_);
 
     if (sh !== _Tech.nativeSourceHandler) {
       this.currentSource_ = source;
     }
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
-    this.one('dispose', this.disposeSourceHandler);
+    this.one('dispose', this.disposeSourceHandler_);
   };
 
   /**
