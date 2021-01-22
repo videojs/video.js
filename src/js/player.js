@@ -351,8 +351,8 @@ class Player extends Component {
     super(null, options, ready);
 
     // Create bound methods for document listeners.
-    this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
-    this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
+    this.boundDocumentFullscreenChange_ = (e) => this.documentFullscreenChange_(e);
+    this.boundFullWindowOnEscKey_ = (e) => this.fullWindowOnEscKey(e);
 
     // default isFullscreen_ to false
     this.isFullscreen_ = false;
