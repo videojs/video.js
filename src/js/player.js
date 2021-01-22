@@ -354,6 +354,17 @@ class Player extends Component {
     this.boundDocumentFullscreenChange_ = (e) => this.documentFullscreenChange_(e);
     this.boundFullWindowOnEscKey_ = (e) => this.fullWindowOnEscKey(e);
 
+    this.boundUpdateStyleEl_ = (e) => this.updateStyleEl_(e);
+    this.boundApplyInitTime_ = (e) => this.applyInitTime_(e);
+    this.boundUpdateCurrentBreakpoint_ = (e) => this.updateCurrentBreakpoint_(e);
+
+    this.boundHandleTechClick_ = (e) => this.handleTechClick_(e);
+    this.boundHandleTechDoubleClick_ = (e) => this.handleTechDoubleClick_(e);
+    this.boundHandleTechTouchStart_ = (e) => this.handleTechTouchStart_(e);
+    this.boundHandleTechTouchMove_ = (e) => this.handleTechTouchMove_(e);
+    this.boundHandleTechTouchEnd_ = (e) => this.handleTechTouchEnd_(e);
+    this.boundHandleTechTap_ = (e) => this.handleTechTap_(e);
+
     // default isFullscreen_ to false
     this.isFullscreen_ = false;
 
@@ -473,7 +484,7 @@ class Player extends Component {
     }
 
     if (this.fluid_) {
-      this.on(['playerreset', 'resize'], this.updateStyleEl_);
+      this.on(['playerreset', 'resize'], this.boundUpdateStyleEl_);
     }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
@@ -552,10 +563,10 @@ class Player extends Component {
     this.userActive(true);
     this.reportUserActivity();
 
-    this.one('play', this.listenForUserActivity_);
-    this.on('stageclick', this.handleStageClick_);
-    this.on('keydown', this.handleKeyDown);
-    this.on('languagechange', this.handleLanguagechange);
+    this.one('play', (e) => this.listenForUserActivity_(e));
+    this.on('stageclick', (e) => this.handleStageClick_(e));
+    this.on('keydown', (e) => this.handleKeyDown(e));
+    this.on('languagechange', (e) => this.handleLanguagechange(e));
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -912,13 +923,13 @@ class Player extends Component {
     this.fluid_ = !!bool;
 
     if (isEvented(this)) {
-      this.off(['playerreset', 'resize'], this.updateStyleEl_);
+      this.off(['playerreset', 'resize'], this.boundUpdateStyleEl_);
     }
     if (bool) {
       this.addClass('vjs-fluid');
       this.fill(false);
       addEventedCallback(this, () => {
-        this.on(['playerreset', 'resize'], this.updateStyleEl_);
+        this.on(['playerreset', 'resize'], this.boundUpdateStyleEl_);
       });
     } else {
       this.removeClass('vjs-fluid');
@@ -1173,7 +1184,7 @@ class Player extends Component {
 
     // Listen to all HTML5-defined events and trigger them on the player
     TECH_EVENTS_RETRIGGER.forEach((event) => {
-      this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
+      this.on(this.tech_, event, (e) => this[`handleTech${toTitleCase(event)}_`](e));
     });
 
     Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
@@ -1189,24 +1200,24 @@ class Player extends Component {
       });
     });
 
-    this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
-    this.on(this.tech_, 'sourceset', this.handleTechSourceset_);
-    this.on(this.tech_, 'waiting', this.handleTechWaiting_);
-    this.on(this.tech_, 'ended', this.handleTechEnded_);
-    this.on(this.tech_, 'seeking', this.handleTechSeeking_);
-    this.on(this.tech_, 'play', this.handleTechPlay_);
-    this.on(this.tech_, 'firstplay', this.handleTechFirstPlay_);
-    this.on(this.tech_, 'pause', this.handleTechPause_);
-    this.on(this.tech_, 'durationchange', this.handleTechDurationChange_);
-    this.on(this.tech_, 'fullscreenchange', this.handleTechFullscreenChange_);
-    this.on(this.tech_, 'fullscreenerror', this.handleTechFullscreenError_);
-    this.on(this.tech_, 'enterpictureinpicture', this.handleTechEnterPictureInPicture_);
-    this.on(this.tech_, 'leavepictureinpicture', this.handleTechLeavePictureInPicture_);
-    this.on(this.tech_, 'error', this.handleTechError_);
-    this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
-    this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
-    this.on(this.tech_, 'textdata', this.handleTechTextData_);
-    this.on(this.tech_, 'ratechange', this.handleTechRateChange_);
+    this.on(this.tech_, 'loadstart', (e) => this.handleTechLoadStart_(e));
+    this.on(this.tech_, 'sourceset', (e) => this.handleTechSourceset_(e));
+    this.on(this.tech_, 'waiting', (e) => this.handleTechWaiting_(e));
+    this.on(this.tech_, 'ended', (e) => this.handleTechEnded_(e));
+    this.on(this.tech_, 'seeking', (e) => this.handleTechSeeking_(e));
+    this.on(this.tech_, 'play', (e) => this.handleTechPlay_(e));
+    this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
+    this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
+    this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
+    this.on(this.tech_, 'fullscreenchange', (e) => this.handleTechFullscreenChange_(e));
+    this.on(this.tech_, 'fullscreenerror', (e) => this.handleTechFullscreenError_(e));
+    this.on(this.tech_, 'enterpictureinpicture', (e) => this.handleTechEnterPictureInPicture_(e));
+    this.on(this.tech_, 'leavepictureinpicture', (e) => this.handleTechLeavePictureInPicture_(e));
+    this.on(this.tech_, 'error', (e) => this.handleTechError_(e));
+    this.on(this.tech_, 'posterchange', (e) => this.handleTechPosterChange_(e));
+    this.on(this.tech_, 'textdata', (e) => this.handleTechTextData_(e));
+    this.on(this.tech_, 'ratechange', (e) => this.handleTechRateChange_(e));
+    this.on(this.tech_, 'loadedmetadata', this.boundUpdateStyleEl_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -1305,19 +1316,19 @@ class Player extends Component {
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // TODO: Is this needed for any techs other than Flash?
     // Any touch events are set to block the mousedown event from happening
-    this.on(this.tech_, 'mouseup', this.handleTechClick_);
-    this.on(this.tech_, 'dblclick', this.handleTechDoubleClick_);
+    this.on(this.tech_, 'mouseup', this.boundHandleTechClick_);
+    this.on(this.tech_, 'dblclick', this.boundHandleTechDoubleClick_);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
     // activity
-    this.on(this.tech_, 'touchstart', this.handleTechTouchStart_);
-    this.on(this.tech_, 'touchmove', this.handleTechTouchMove_);
-    this.on(this.tech_, 'touchend', this.handleTechTouchEnd_);
+    this.on(this.tech_, 'touchstart', this.boundHandleTechTouchStart_);
+    this.on(this.tech_, 'touchmove', this.boundHandleTechTouchMove_);
+    this.on(this.tech_, 'touchend', this.boundHandleTechTouchEnd_);
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on(this.tech_, 'tap', this.handleTechTap_);
+    this.on(this.tech_, 'tap', this.boundHandleTechTap_);
   }
 
   /**
@@ -1329,12 +1340,12 @@ class Player extends Component {
   removeTechControlsListeners_() {
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
-    this.off(this.tech_, 'tap', this.handleTechTap_);
-    this.off(this.tech_, 'touchstart', this.handleTechTouchStart_);
-    this.off(this.tech_, 'touchmove', this.handleTechTouchMove_);
-    this.off(this.tech_, 'touchend', this.handleTechTouchEnd_);
-    this.off(this.tech_, 'mouseup', this.handleTechClick_);
-    this.off(this.tech_, 'dblclick', this.handleTechDoubleClick_);
+    this.off(this.tech_, 'tap', this.boundHandleTechTap_);
+    this.off(this.tech_, 'touchstart', this.boundHandleTechTouchStart_);
+    this.off(this.tech_, 'touchmove', this.boundHandleTechTouchMove_);
+    this.off(this.tech_, 'touchend', this.boundHandleTechTouchEnd_);
+    this.off(this.tech_, 'mouseup', this.boundHandleTechClick_);
+    this.off(this.tech_, 'dblclick', this.boundhandleTechDoubleClick_);
   }
 
   /**
@@ -2472,8 +2483,8 @@ class Player extends Component {
       }
       if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_) {
         this.cache_.initTime = seconds;
-        this.off('canplay', this.applyInitTime_);
-        this.one('canplay', this.applyInitTime_);
+        this.off('canplay', this.boundApplyInitTime_);
+        this.one('canplay', this.boundApplyInitTime_);
         return;
       }
       this.techCall_('setCurrentTime', seconds);
@@ -4526,12 +4537,12 @@ class Player extends Component {
     // Start listening for breakpoints and set the initial breakpoint if the
     // player is now responsive.
     if (value) {
-      this.on('playerresize', this.updateCurrentBreakpoint_);
+      this.on('playerresize', this.boundUpdateCurrentBreakpoint_);
       this.updateCurrentBreakpoint_();
 
     // Stop listening for breakpoints if the player is no longer responsive.
     } else {
-      this.off('playerresize', this.updateCurrentBreakpoint_);
+      this.off('playerresize', this.boundUpdateCurrentBreakpoint_);
       this.removeCurrentBreakpoint_();
     }
 
