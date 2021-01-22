@@ -216,7 +216,7 @@ class Plugin {
 
     // Auto-bind the dispose method so we can use it as a listener and unbind
     // it later easily.
-    this.dispose = (e) => this.dispose(e);
+    this.dispose = this.dispose.bind(this);
 
     // If the player is disposed, dispose the plugin.
     player.on('dispose', this.dispose);
