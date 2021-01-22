@@ -1345,7 +1345,7 @@ class Player extends Component {
     this.off(this.tech_, 'touchmove', this.boundHandleTechTouchMove_);
     this.off(this.tech_, 'touchend', this.boundHandleTechTouchEnd_);
     this.off(this.tech_, 'mouseup', this.boundHandleTechClick_);
-    this.off(this.tech_, 'dblclick', this.boundhandleTechDoubleClick_);
+    this.off(this.tech_, 'dblclick', this.boundHandleTechDoubleClick_);
   }
 
   /**
