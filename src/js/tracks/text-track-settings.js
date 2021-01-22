@@ -253,7 +253,7 @@ class TextTrackSettings extends ModalDialog {
     options.temporary = false;
 
     super(player, options);
-    this.updateDisplay = (e) => this.updateDisplay(e);
+    this.updateDisplay = this.updateDisplay.bind(this);
 
     // fill the modal and pretend we have opened it
     this.fill();
