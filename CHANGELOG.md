@@ -1,3 +1,23 @@
+<a name="7.11.3"></a>
+## [7.11.3](https://github.com/videojs/video.js/compare/v7.11.2...v7.11.3) (2021-01-25)
+
+### Bug Fixes
+
+* **lang:** Update nn.json ([#7054](https://github.com/videojs/video.js/issues/7054)) ([4a9e1ab](https://github.com/videojs/video.js/commit/4a9e1ab))
+* only preventDefault if event is cancelable ([#7063](https://github.com/videojs/video.js/issues/7063)) ([b13cb07](https://github.com/videojs/video.js/commit/b13cb07))
+* **fs:** make sure handlers are unique per player ([#7035](https://github.com/videojs/video.js/issues/7035)) ([dceedb6](https://github.com/videojs/video.js/commit/dceedb6)), closes [#7013](https://github.com/videojs/video.js/issues/7013)
+* **time-display:** fix IE11 appending times instead of replacing ([#7059](https://github.com/videojs/video.js/issues/7059)) ([ed3c54d](https://github.com/videojs/video.js/commit/ed3c54d))
+* better evented validation and error messages ([#6982](https://github.com/videojs/video.js/issues/6982)) ([ffb690a](https://github.com/videojs/video.js/commit/ffb690a))
+* prevent dispose error and text track duplicate listeners ([#6984](https://github.com/videojs/video.js/issues/6984)) ([db46578](https://github.com/videojs/video.js/commit/db46578))
+
+### Chores
+
+* netlify ci demo and docs ([#7045](https://github.com/videojs/video.js/issues/7045)) ([9574bb4](https://github.com/videojs/video.js/commit/9574bb4))
+
+### Documentation
+
+* change master to main ([#7050](https://github.com/videojs/video.js/issues/7050)) ([e240396](https://github.com/videojs/video.js/commit/e240396))
+
 <a name="7.11.2"></a>
 ## [7.11.2](https://github.com/videojs/video.js/compare/v7.11.1...v7.11.2) (2021-01-14)
 
