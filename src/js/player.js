@@ -2023,7 +2023,9 @@ class Player extends Component {
    */
   handleTechTouchEnd_(event) {
     // Stop the mouse events from also happening
-    event.preventDefault();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
   }
 
   /**
