@@ -1,3 +1,10 @@
+<a name="7.11.4"></a>
+## [7.11.4](https://github.com/videojs/video.js/compare/v7.11.3...v7.11.4) (2021-01-26)
+
+### Bug Fixes
+
+* **evented:** log an error on invalid type ([#7067](https://github.com/videojs/video.js/issues/7067)) ([85575db](https://github.com/videojs/video.js/commit/85575db)), closes [#6982](https://github.com/videojs/video.js/issues/6982)
+
 <a name="7.11.3"></a>
 ## [7.11.3](https://github.com/videojs/video.js/compare/v7.11.2...v7.11.3) (2021-01-25)
 
