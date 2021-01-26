@@ -102,6 +102,9 @@ QUnit.test('trigger() errors', function(assert) {
 
   createTest(targeta.log)(targeta);
   [targetb, targetc, targetd].forEach(createTest(log));
+
+  targeta.log.error.restore();
+  log.error.restore();
 });
 
 QUnit.test('on(), one(), and any() errors', function(assert) {
