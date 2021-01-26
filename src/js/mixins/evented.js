@@ -8,6 +8,7 @@ import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
 import EventTarget from '../event-target';
+import log from '../utils/log';
 
 const objName = (obj) => {
   if (typeof obj.name === 'function') {
@@ -444,7 +445,7 @@ const EventedMixin = {
     const type = event && typeof event !== 'string' ? event.type : event;
 
     if (!isValidEventType(type)) {
-      throw new Error(`Invalid event type for ${objName(this)}#trigger; ` +
+      (this.log || log).error(`Invalid event type for ${objName(this)}#trigger; ` +
         'must be a non-empty string or object with a type key that has a non-empty value.');
     }
     return Events.trigger(this.eventBusEl_, event, hash);
