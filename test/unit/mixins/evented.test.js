@@ -70,6 +70,7 @@ QUnit.test('trigger() errors', function(assert) {
   const targeta = evented(tester);
   const targetb = evented(new Test());
   const targetc = evented(new Test());
+  const targetd = evented({});
 
   tester.log = log.createLogger('tester');
 
@@ -100,7 +101,7 @@ QUnit.test('trigger() errors', function(assert) {
   };
 
   createTest(targeta.log)(targeta);
-  [targetb, targetc].forEach(createTest(log));
+  [targetb, targetc, targetd].forEach(createTest(log));
 });
 
 QUnit.test('on(), one(), and any() errors', function(assert) {
