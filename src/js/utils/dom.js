@@ -4,6 +4,7 @@
  */
 import document from 'global/document';
 import window from 'global/window';
+import fs from '../fullscreen-api';
 import log from './log.js';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
@@ -564,12 +565,12 @@ export function findPosition(el) {
   let left = 0;
   let top = 0;
 
-  do {
+  while (el.offsetParent && el !== document[fs.fullscreenElement]) {
     left += el.offsetLeft;
     top += el.offsetTop;
 
     el = el.offsetParent;
-  } while (el);
+  }
 
   return {
     left,
