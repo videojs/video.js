@@ -8,6 +8,7 @@ import fs from '../fullscreen-api';
 import log from './log.js';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
+import * as browser from './browser.js';
 
 /**
  * Detect if a value is a string with any non-whitespace characters.
@@ -565,12 +566,15 @@ export function findPosition(el) {
   let left = 0;
   let top = 0;
 
+  // console.log('!!!!!!!');
   while (el.offsetParent && el !== document[fs.fullscreenElement]) {
+    // console.log(el.className);
     left += el.offsetLeft;
     top += el.offsetTop;
 
     el = el.offsetParent;
   }
+  // console.log('######', left);
 
   return {
     left,
@@ -579,6 +583,41 @@ export function findPosition(el) {
     height
   };
 }
+
+export function findPosition2(el) {
+  let box;
+
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
+
+  if (!box) {
+    return {
+      left: 0,
+      top: 0
+    };
+  }
+
+  const docEl = document.documentElement;
+  const body = document.body;
+
+  const clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  const scrollLeft = window.pageXOffset || body.scrollLeft;
+  const left = box.left + scrollLeft - clientLeft;
+
+  const clientTop = docEl.clientTop || body.clientTop || 0;
+  const scrollTop = window.pageYOffset || body.scrollTop;
+  const top = box.top + scrollTop - clientTop;
+
+  // Android sometimes returns slightly off decimal values, so need to round
+  return {
+    left: Math.round(left),
+    top: Math.round(top),
+    width: box.width,
+    height: box.height
+  };
+}
+
 
 /**
  * Represents x and y coordinates for a DOM element or mouse pointer.
@@ -608,21 +647,56 @@ export function findPosition(el) {
  *
  */
 export function getPointerPosition(el, event) {
+  let translated = {
+    x: 0,
+    y: 0,
+    sx: 1,
+    sy: 1
+  };
+
+  // if (browser.IS_IOS) {
+    let item = el;
+    while(item && item.nodeName.toLowerCase() !== 'html') {
+      const transform = computedStyle(item, 'transform');
+      if (/^matrix/.test(transform)) {
+        const values = transform.slice(7, -1).split(/,\s/).map(Number)
+        translated.sx *= values[0];
+        translated.sy *= values[3];
+        translated.x += values[4];
+        translated.y += values[5];
+      } else if (/^matrix3d/.test(transform)) {
+        const values = transform.slice(9, -1).split(/,\s/).map(Number)
+        translated.sx *= values[0];
+        translated.sy *= values[5];
+        translated.x += values[12];
+        translated.y += values[13];
+      }
+
+      item = item.parentNode;
+    }
+  // }
+
   const position = {};
-  const boxTarget = findPosition(event.target);
-  const box = findPosition(el);
+  const boxTarget = findPosition2(event.target);
+  const box = findPosition2(el);
   const boxW = box.width;
   const boxH = box.height;
-  let offsetY = event.offsetY - (box.top - boxTarget.top);
-  let offsetX = event.offsetX - (box.left - boxTarget.left);
+  let offsetY = event.pageY - (box.top - boxTarget.top);
+  let offsetX = event.pageX - (box.left - boxTarget.left) + translated.x*translated.sx;
+
+  const box2 = findPosition2(el);
+  const boxTarget2 = findPosition2(event.target);
 
   if (event.changedTouches) {
     offsetX = event.changedTouches[0].pageX - box.left;
     offsetY = event.changedTouches[0].pageY + box.top;
   }
 
-  position.y = (1 - Math.max(0, Math.min(1, offsetY / boxH)));
-  position.x = Math.max(0, Math.min(1, offsetX / boxW));
+  position.y = (1 - Math.max(0, Math.min(1, (offsetY / boxH)/translated.sy)));
+  position.x = Math.max(0, Math.min(1, ((offsetX - box.left) / boxW)/translated.sx));
+  console.log({boxW, offsetX, sx:translated.sx, x:position.x,
+    left: el.getBoundingClientRect().left,
+    boxW2: box2.width})
   return position;
 }
 
