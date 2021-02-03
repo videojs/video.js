@@ -8,6 +8,7 @@ import fs from '../fullscreen-api';
 import log from './log.js';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
+import * as browser from './browser';
 
 /**
  * Detect if a value is a string with any non-whitespace characters.
@@ -580,6 +581,40 @@ export function findPosition(el) {
   };
 }
 
+export function findPosition2(el) {
+  let box;
+
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
+
+  if (!box) {
+    return {
+      left: 0,
+      top: 0
+    };
+  }
+
+  const docEl = document.documentElement;
+  const body = document.body;
+
+  const clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  const scrollLeft = window.pageXOffset || body.scrollLeft;
+  const left = box.left + scrollLeft - clientLeft;
+
+  const clientTop = docEl.clientTop || body.clientTop || 0;
+  const scrollTop = window.pageYOffset || body.scrollTop;
+  const top = box.top + scrollTop - clientTop;
+
+  // Android sometimes returns slightly off decimal values, so need to round
+  return {
+    left: Math.round(left),
+    top: Math.round(top),
+    width: box.width,
+    height: box.height
+  };
+}
+
 /**
  * Represents x and y coordinates for a DOM element or mouse pointer.
  *
@@ -608,6 +643,39 @@ export function findPosition(el) {
  *
  */
 export function getPointerPosition(el, event) {
+  const translated = {
+    x: 0,
+    y: 0,
+    sx: 1,
+    sy: 1
+  };
+
+  if (browser.IS_IOS) {
+    let item = el;
+
+    while (item && item.nodeName.toLowerCase() !== 'html') {
+      const transform = computedStyle(item, 'transform');
+
+      if (/^matrix/.test(transform)) {
+        const values = transform.slice(7, -1).split(/,\s/).map(Number);
+
+        translated.sx *= values[0];
+        translated.sy *= values[3];
+        translated.x += values[4];
+        translated.y += values[5];
+      } else if (/^matrix3d/.test(transform)) {
+        const values = transform.slice(9, -1).split(/,\s/).map(Number);
+
+        translated.sx *= values[0];
+        translated.sy *= values[5];
+        translated.x += values[12];
+        translated.y += values[13];
+      }
+
+      item = item.parentNode;
+    }
+  }
+
   const position = {};
   const boxTarget = findPosition(event.target);
   const box = findPosition(el);
@@ -619,6 +687,10 @@ export function getPointerPosition(el, event) {
   if (event.changedTouches) {
     offsetX = event.changedTouches[0].pageX - box.left;
     offsetY = event.changedTouches[0].pageY + box.top;
+    if (browser.IS_IOS) {
+      offsetX -= translated.x;
+      offsetY -= translated.y;
+    }
   }
 
   position.y = (1 - Math.max(0, Math.min(1, offsetY / boxH)));
