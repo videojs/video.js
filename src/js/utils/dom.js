@@ -645,9 +645,7 @@ export function findPosition2(el) {
 export function getPointerPosition(el, event) {
   const translated = {
     x: 0,
-    y: 0,
-    sx: 1,
-    sy: 1
+    y: 0
   };
 
   if (browser.IS_IOS) {
@@ -659,15 +657,11 @@ export function getPointerPosition(el, event) {
       if (/^matrix/.test(transform)) {
         const values = transform.slice(7, -1).split(/,\s/).map(Number);
 
-        translated.sx *= values[0];
-        translated.sy *= values[3];
         translated.x += values[4];
         translated.y += values[5];
       } else if (/^matrix3d/.test(transform)) {
         const values = transform.slice(9, -1).split(/,\s/).map(Number);
 
-        translated.sx *= values[0];
-        translated.sy *= values[5];
         translated.x += values[12];
         translated.y += values[13];
       }
