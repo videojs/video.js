@@ -8,6 +8,7 @@ import fs from '../fullscreen-api';
 import log from './log.js';
 import {isObject} from './obj';
 import computedStyle from './computed-style';
+import * as browser from './browser';
 
 /**
  * Detect if a value is a string with any non-whitespace characters.
@@ -608,6 +609,33 @@ export function findPosition(el) {
  *
  */
 export function getPointerPosition(el, event) {
+  const translated = {
+    x: 0,
+    y: 0
+  };
+
+  if (browser.IS_IOS) {
+    let item = el;
+
+    while (item && item.nodeName.toLowerCase() !== 'html') {
+      const transform = computedStyle(item, 'transform');
+
+      if (/^matrix/.test(transform)) {
+        const values = transform.slice(7, -1).split(/,\s/).map(Number);
+
+        translated.x += values[4];
+        translated.y += values[5];
+      } else if (/^matrix3d/.test(transform)) {
+        const values = transform.slice(9, -1).split(/,\s/).map(Number);
+
+        translated.x += values[12];
+        translated.y += values[13];
+      }
+
+      item = item.parentNode;
+    }
+  }
+
   const position = {};
   const boxTarget = findPosition(event.target);
   const box = findPosition(el);
@@ -619,6 +647,10 @@ export function getPointerPosition(el, event) {
   if (event.changedTouches) {
     offsetX = event.changedTouches[0].pageX - box.left;
     offsetY = event.changedTouches[0].pageY + box.top;
+    if (browser.IS_IOS) {
+      offsetX -= translated.x;
+      offsetY -= translated.y;
+    }
   }
 
   position.y = (1 - Math.max(0, Math.min(1, offsetY / boxH)));
