@@ -1,3 +1,11 @@
+<a name="7.11.5"></a>
+## [7.11.5](https://github.com/videojs/video.js/compare/v7.11.4...v7.11.5) (2021-02-04)
+
+### Bug Fixes
+
+* **dom:** account for translated parent in pointer position on iOS ([#7079](https://github.com/videojs/video.js/issues/7079)) ([542cead](https://github.com/videojs/video.js/commit/542cead))
+* **dom:** stop findPosition at a fullscreenElement ([#7074](https://github.com/videojs/video.js/issues/7074)) ([541f2e5](https://github.com/videojs/video.js/commit/541f2e5))
+
 <a name="7.11.4"></a>
 ## [7.11.4](https://github.com/videojs/video.js/compare/v7.11.3...v7.11.4) (2021-01-26)
 
