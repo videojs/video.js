@@ -129,6 +129,30 @@ export default cliargs => [
     onwarn,
     watch
   },
+  // debug umd file
+  {
+    input: 'src/js/debug.js',
+    output: {
+      format: 'umd',
+      file: 'dist/alt/video.debug.js',
+      name: 'videojs',
+      banner,
+      globals: globals.browser
+    },
+    external: externals.browser,
+    plugins: [
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
+  },
   {
     input: 'test/unit/**/*.test.js',
     output: {
