@@ -3,6 +3,7 @@
   @include flex(none);
 
   & .vjs-icon-placeholder {
+    display: block;
     @extend .vjs-icon-volume-high;
   }
 }
