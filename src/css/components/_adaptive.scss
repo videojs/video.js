@@ -18,7 +18,7 @@
 // - Volume Mute button
 // - Fullscreen Button
 //
-.video-js:not(.vjs-fullscreen) {
+.video-js {
 
   &.vjs-layout-small,
   &.vjs-layout-x-small,
@@ -34,7 +34,7 @@
     .vjs-subtitles-button,
     .vjs-audio-button,
     .vjs-volume-control {
-      display: none;
+      display: none !important;
     }
 
     // Reset the size of the volume panel to the default so we don't see a big
