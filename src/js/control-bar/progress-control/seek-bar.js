@@ -74,6 +74,8 @@ class SeekBar extends Slider {
 
   toggleVisibility_(e) {
     if (document.visibilityState === 'hidden') {
+      this.cancelNamedAnimationFrame('SeekBar#update');
+      this.cancelNamedAnimationFrame('Slider#update');
       this.disableInterval_(e);
     } else {
       if (!this.player_.ended() && !this.player_.paused()) {
