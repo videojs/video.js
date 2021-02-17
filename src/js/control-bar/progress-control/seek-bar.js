@@ -135,6 +135,11 @@ class SeekBar extends Slider {
    *          The current percent at a number from 0-1
    */
   update(event) {
+    // ignore updates while the tab is hidden
+    if (document.visibilityState === 'hidden') {
+      return;
+    }
+
     const percent = super.update();
 
     this.requestNamedAnimationFrame('SeekBar#update', () => {
