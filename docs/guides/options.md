@@ -269,6 +269,22 @@ Allows the player to use the new live ui that includes:
 Without this option the progress bar will be hidden and in its place will be text that indicates `LIVE` playback. There will be no progress control
 and you will not be able click the text to seek to the live edge. `liveui` will default to `true` in a future version!
 
+### `liveTracker.trackingThreshold`
+
+> Type: `number`
+> Default: `30`
+
+An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 30s on the seekBar then we do not show the new liveui even with the liveui option set.
+
+
+### `liveTracker.liveTolerance`
+
+> Type: `number`
+> Default: `15`
+
+An option for the liveTracker component of the player that controls how far from the seekable end should be considered live playback. By default anything further than 15s from the live seekable edge is considered behind live and everything else is considered live. Any user interaction to seek backwards will ignore this value as a user would expect.
+
+
 ### `nativeControlsForTouch`
 
 > Type: `boolean`
