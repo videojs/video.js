@@ -73,10 +73,12 @@ class SeekBar extends Slider {
   }
 
   toggleVisibility_(e) {
-    if (document.hidden) {
+    if (document.visibilityState === 'hidden') {
       this.disableInterval_(e);
     } else {
-      this.enableInterval_();
+      if (!this.player_.ended() && !this.player_.paused()) {
+        this.enableInterval_();
+      }
 
       // we just switched back to the page and someone may be looking, so, update ASAP
       this.update();
