@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/alt/video.debug.js"></script>
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
+    <pre>npm start</pre>
+    <pre>open http://localhost:9999/sandbox/debug.html</pre>
+  </div>
+
+  <video-js
+    id="vid1"
+    controls
+    preload="auto"
+    width="640"
+    height="264">
+    <source src="https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8" type="application/x-mpegURL">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+
+  <script>
+    var vid = document.getElementById('vid1');
+    var player = videojs(vid);
+  </script>
+
+</body>
+</html>
