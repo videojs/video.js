@@ -60,8 +60,8 @@
   background: none;
 }
 
-.video-js *:focus:not(:focus-visible),
-.video-js .vjs-menu *:focus:not(:focus-visible) {
+.video-js *:focus:not(:focus-visible):not([tabindex="-1"]),
+.video-js .vjs-menu *:focus:not(:focus-visible):not([tabindex="-1"]) {
   outline: none;
   background: none;
 }
