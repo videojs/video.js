@@ -196,15 +196,15 @@ export default cliargs => [
     ],
     external: externals.module,
     plugins: [
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js'),
+        '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
+      }),
       replace({
         // single quote replace
         "require('@videojs/vhs-utils/es": "require('@videojs/vhs-utils/cjs",
         // double quote replace
         'require("@videojs/vhs-utils/es': 'require("@videojs/vhs-utils/cjs'
-      }),
-      alias({
-        'video.js': path.resolve(__dirname, './src/js/video.js'),
-        '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
       json(),
       primedBabel,
