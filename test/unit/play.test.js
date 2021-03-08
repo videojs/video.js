@@ -429,9 +429,9 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
         playerReady: true,
         playCalls: 1
       });
-    });
 
-    this.finish(assert);
+      this.finish(assert);
+    });
   });
 };
 
