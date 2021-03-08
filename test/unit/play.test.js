@@ -409,6 +409,8 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
       });
     }
 
+    this.clock.tick(1000);
+
     this.finish(assert);
   });
 
