@@ -3,6 +3,7 @@ import videojs from '../../src/js/video.js';
 import document from 'global/document';
 import window from 'global/window';
 import log from '../../src/js/utils/log.js';
+import * as browser from '../../src/js/utils/browser.js';
 import sinon from 'sinon';
 import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
@@ -21,7 +22,7 @@ const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
 const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
 const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
 
-if (!Html5.canOverrideAttributes()) {
+if (!Html5.canOverrideAttributes() || browser.IE_VERSION) {
   qunitFn = 'skip';
 }
 
