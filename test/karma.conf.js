@@ -44,6 +44,8 @@ module.exports = function(config) {
   config.browserStack.project = 'Video.js';
   config.browserStack.video = true;
 
+  config.browsers = ['bsIE11Win10'];
+
   // pin Browserstack Firefox version to 64
   /* eslint-disable camelcase */
   config.customLaunchers.bsFirefox.browser_version = '64.0';
@@ -60,7 +62,7 @@ module.exports = function(config) {
   */
 
   /* eslint-disable no-console */
-  // console.log(JSON.stringify(config, null, 2));
+  console.log(JSON.stringify(config, null, 2));
   /* eslint-enable no-console */
 
 };
