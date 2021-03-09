@@ -409,6 +409,8 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
       });
     }
 
+    this.clock.tick(1000);
+
     this.finish(assert);
   });
 
@@ -429,9 +431,9 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
         playerReady: true,
         playCalls: 1
       });
-    });
 
-    this.finish(assert);
+      this.finish(assert);
+    });
   });
 };
 
