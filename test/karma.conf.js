@@ -15,6 +15,8 @@ module.exports = function(config) {
     serverBrowsers(defaults) {
       return [];
     },
+    showQUnitUI: true,
+    reporters: ['progress'],
     coverage: reportCoverage
   };
 
