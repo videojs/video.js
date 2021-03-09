@@ -40,6 +40,7 @@ module.exports = function(config) {
   ];
 
   config.browserStack.project = 'Video.js';
+  config.browserStack.video = true;
 
   // pin Browserstack Firefox version to 64
   /* eslint-disable camelcase */
