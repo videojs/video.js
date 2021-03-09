@@ -349,7 +349,7 @@ class TextTrack extends Track {
         // Act like we're loaded for other purposes.
         this.loaded_ = true;
       }
-      if (this.preload_ || default_ || (settings.kind !== 'subtitles' && settings.kind !== 'captions')) {
+      if (this.preload_ || (settings.kind !== 'subtitles' && settings.kind !== 'captions')) {
         loadTrack(this.src, this);
       }
     } else {
