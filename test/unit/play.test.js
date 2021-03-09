@@ -348,9 +348,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
     this.finish(assert);
   });
 
-  const testOrSkip = browser.IE_VERSION ? 'skip' : 'test';
-
-  QUnit[testOrSkip]('Player#play() resolves correctly', function(assert) {
+  QUnit.test('Player#play() resolves correctly', function(assert) {
     this.player = TestHelpers.makePlayer();
 
     this.playTest('player/tech start out ready', {
@@ -418,7 +416,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
   });
 
   // without enableSourceset this test will fail.
-  QUnit[testOrSkip]('Player#play() resolves correctly on tech el src', function(assert) {
+  QUnit.test('Player#play() resolves correctly on tech el src', function(assert) {
     this.player = TestHelpers.makePlayer({techOrder: ['html5'], enableSourceset: true});
 
     this.playTest('player/tech start out ready', {
@@ -441,6 +439,10 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
 };
 
 QUnit.module('Player#play()', (hooks) => {
+  if (browser.IE_VERSION) {
+    return;
+  }
+
   playReturnValues.forEach((playReturnValue) => {
     middleWareTerminations.forEach((middlewareTermination) => {
       QUnit.module(`tech#play() => ${playReturnValue}, middleware ${middlewareTermination}`, (subhooks) => {
