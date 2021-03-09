@@ -438,7 +438,9 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
   });
 };
 
-QUnit.module('Player#play()', (hooks) => {
+const moduleOrSkip = browser.IE_VERSION ? QUnit.module.skip : QUnit.module;
+
+moduleOrSkip('Player#play()', (hooks) => {
   if (browser.IE_VERSION) {
     return;
   }

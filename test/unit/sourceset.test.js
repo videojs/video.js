@@ -9,7 +9,7 @@ import {getAbsoluteURL} from '../../src/js/utils/url.js';
 
 const Html5 = videojs.getTech('Html5');
 const wait = 1;
-let qunitFn = 'module';
+let moduleOrSkip = QUnit.module;
 const blobSrc = {
   src: 'blob:something',
   type: 'video/mp4'
@@ -23,7 +23,7 @@ const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
 const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
 
 if (!Html5.canOverrideAttributes() || browser.IE_VERSION) {
-  qunitFn = 'skip';
+  moduleOrSkip = QUnit.module.skip;
 }
 
 const oldMovingMedia = Html5.prototype.movingMediaElementInDOM;
@@ -113,7 +113,7 @@ const setupAfterEach = function(totalSourcesets) {
 
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el', 'video-js', 'change video-js el'];
 
-QUnit[qunitFn]('sourceset', function(hooks) {
+moduleOrSkip('sourceset', function(hooks) {
   QUnit.module('source before player', (subhooks) => testTypes.forEach((testName) => {
     QUnit.module(testName, {
       beforeEach() {
