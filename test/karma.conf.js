@@ -40,7 +40,6 @@ module.exports = function(config) {
   ];
 
   config.browserStack.project = 'Video.js';
-  config.browserStack.video = true;
 
   config.browsers = ['bsIE11Win10'];
 
@@ -51,16 +50,16 @@ module.exports = function(config) {
 
   // uncomment the section below to re-enable all browserstack video recording
   // it is off by default because it slows the build
-  /*
+  // /*
   Object.keys(config.customLaunchers).forEach(function(cl) {
     if ('browserstack.video' in config.customLaunchers[cl]) {
-      config.customLaunchers[cl]['browserstack.video'] = "true";
+      config.customLaunchers[cl]['browserstack.video'] = 'true';
     }
   });
-  */
+  // */
 
   /* eslint-disable no-console */
-  console.log(JSON.stringify(config, null, 2));
+  // console.log(JSON.stringify(config, null, 2));
   /* eslint-enable no-console */
 
 };
