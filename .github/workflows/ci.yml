@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   should-skip:
     continue-on-error: true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     # Map a step output to a job output
     outputs:
       should-skip-job: ${{steps.skip-check.outputs.should_skip}}
