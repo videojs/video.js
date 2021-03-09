@@ -1,3 +1,29 @@
+<a name="7.11.6"></a>
+## [7.11.6](https://github.com/videojs/video.js/compare/v7.11.5...v7.11.6) (2021-03-09)
+
+### Bug Fixes
+
+* add display block to all buttons icon placeholder ([#7094](https://github.com/videojs/video.js/issues/7094)) ([45eef66](https://github.com/videojs/video.js/commit/45eef66)), closes [#6989](https://github.com/videojs/video.js/issues/6989)
+* clear progress control related rAFs when tab is hidden ([#7099](https://github.com/videojs/video.js/issues/7099)) ([134f039](https://github.com/videojs/video.js/commit/134f039)), closes [#7086](https://github.com/videojs/video.js/issues/7086)
+* do not preload default text track if preloadTextTracks is false ([#7021](https://github.com/videojs/video.js/issues/7021)) ([b76e816](https://github.com/videojs/video.js/commit/b76e816)), closes [#7019](https://github.com/videojs/video.js/issues/7019)
+* focus-visible shouldn't change background styles ([#7113](https://github.com/videojs/video.js/issues/7113)) ([1b52e7b](https://github.com/videojs/video.js/commit/1b52e7b))
+* **package:** update to videojs/http-streaming 2.6.3 ([#7129](https://github.com/videojs/video.js/issues/7129)) ([8d0c601](https://github.com/videojs/video.js/commit/8d0c601))
+* try enabling liveui on canplay ([#7114](https://github.com/videojs/video.js/issues/7114)) ([3d676d6](https://github.com/videojs/video.js/commit/3d676d6)), closes [#7034](https://github.com/videojs/video.js/issues/7034)
+
+### Chores
+
+* update rollup for upcoming vhs changes ([#7075](https://github.com/videojs/video.js/issues/7075)) ([0b46704](https://github.com/videojs/video.js/commit/0b46704))
+* video.js debug build ([#7082](https://github.com/videojs/video.js/issues/7082)) ([ba47953](https://github.com/videojs/video.js/commit/ba47953))
+
+### Documentation
+
+* Add liveTracker options to options guide ([#7097](https://github.com/videojs/video.js/issues/7097)) ([6336e57](https://github.com/videojs/video.js/commit/6336e57))
+* fix broken blogpost urls ([#7106](https://github.com/videojs/video.js/issues/7106)) ([dd0c675](https://github.com/videojs/video.js/commit/dd0c675))
+
+### Tests
+
+* a couple of minor fixes, tweak CI config, swap rollup replace plugin ([#7128](https://github.com/videojs/video.js/issues/7128)) ([fbf34e3](https://github.com/videojs/video.js/commit/fbf34e3))
+
 <a name="7.11.5"></a>
 ## [7.11.5](https://github.com/videojs/video.js/compare/v7.11.4...v7.11.5) (2021-02-04)
 
