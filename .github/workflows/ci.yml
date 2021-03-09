@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   should-skip:
     continue-on-error: true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     # Map a step output to a job output
     outputs:
       should-skip-job: ${{steps.skip-check.outputs.should_skip}}
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-18.04]
     env:
       BROWSER_STACK_USERNAME: ${{secrets.BROWSER_STACK_USERNAME}}
       BROWSER_STACK_ACCESS_KEY: ${{secrets.BROWSER_STACK_ACCESS_KEY}}
