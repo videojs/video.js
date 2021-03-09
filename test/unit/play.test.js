@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
 import videojs from '../../src/js/video.js';
+import * as browser from '../../src/js/utils/browser.js';
 
 const middleWareTerminations = ['terminates', 'does not-terminate'];
 const playReturnValues = ['non-promise', 'promise'];
@@ -347,7 +348,9 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
     this.finish(assert);
   });
 
-  QUnit.test('Player#play() resolves correctly', function(assert) {
+  const testOrSkip = browser.IE_VERSION ? 'skip' : 'test';
+
+  QUnit[testOrSkip]('Player#play() resolves correctly', function(assert) {
     this.player = TestHelpers.makePlayer();
 
     this.playTest('player/tech start out ready', {
@@ -415,7 +418,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
   });
 
   // without enableSourceset this test will fail.
-  QUnit.test('Player#play() resolves correctly on tech el src', function(assert) {
+  QUnit[testOrSkip]('Player#play() resolves correctly on tech el src', function(assert) {
     this.player = TestHelpers.makePlayer({techOrder: ['html5'], enableSourceset: true});
 
     this.playTest('player/tech start out ready', {
