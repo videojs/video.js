@@ -16,7 +16,7 @@ module.exports = function(config) {
       return [];
     },
     showQUnitUI: true,
-    reporters: ['progress'],
+    reporters: ['spec'],
     coverage: reportCoverage
   };
 
