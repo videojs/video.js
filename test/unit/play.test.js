@@ -441,10 +441,6 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
 const moduleOrSkip = browser.IE_VERSION ? QUnit.module.skip : QUnit.module;
 
 moduleOrSkip('Player#play()', (hooks) => {
-  if (browser.IE_VERSION) {
-    return;
-  }
-
   playReturnValues.forEach((playReturnValue) => {
     middleWareTerminations.forEach((middlewareTermination) => {
       QUnit.module(`tech#play() => ${playReturnValue}, middleware ${middlewareTermination}`, (subhooks) => {
