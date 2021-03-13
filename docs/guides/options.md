@@ -32,6 +32,7 @@
   * [liveTracker.liveTolerance](#livetrackerlivetolerance)
   * [nativeControlsForTouch](#nativecontrolsfortouch)
   * [notSupportedMessage](#notsupportedmessage)
+  * [noUITitleAttributes](#nouititleattributes)
   * [fullscreen](#fullscreen)
     * [options](#options)
   * [playbackRates](#playbackrates)
@@ -297,6 +298,13 @@ Explicitly set a default value for [the associated tech option](#nativecontrolsf
 
 Allows overriding the default message that is displayed when Video.js cannot play back a media source.
 
+### `noUITitleAttributes`
+
+> Type: `boolean`
+> Default: `false`
+
+Control whether UI elements have a `title` attribute. A `title` attribute is shown on mouse hover, which can be helpful for usability, but has drawbacks for accessibility. Setting `noUITitleAttributes` to `true` prevents the `title` attribute from being added to UI elements, allowing for more accessible tooltips to be added to controls by a plugin or external framework.
+
 ### `fullscreen`
 
 > Type: `Object`
@@ -421,9 +429,7 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 
 > Type: `boolean|function`
 
-Controls how double-clicking on the player/tech operates. If set to `false`, double-clicking is disabled. If undefined or set to
-`true`, double-clicking is enabled and toggles fullscreen mode. To override the default double-click handling, set `userActions.doubleClick`
-to a function which accepts a `dblclick` event:
+Controls how double-clicking on the player/tech operates. If set to `false`, double-clicking is disabled. If undefined or set to `true`, double-clicking is enabled and toggles fullscreen mode. To override the default double-click handling, set `userActions.doubleClick` to a function which accepts a `dblclick` event:
 
 ```js
 function myDoubleClickHandler(event) = {
