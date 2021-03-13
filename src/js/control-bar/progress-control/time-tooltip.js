@@ -96,6 +96,12 @@ class TimeTooltip extends Component {
       pullTooltipBy = tooltipRect.width;
     }
 
+    // prevent small width fluctuations within 0.4px from
+    // changing the value below.
+    // This really helps for live to prevent the play
+    // progress time tooltip from jittering
+    pullTooltipBy = Math.round(pullTooltipBy);
+
     this.el_.style.right = `-${pullTooltipBy}px`;
     this.write(content);
   }

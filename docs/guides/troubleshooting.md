@@ -32,7 +32,7 @@ You can supply an array of alternate sources. [webm][can-webm] and/or [ogv][can-
 Video.js 7+ supports HLS and MPEG-DASH as standard as it includes [http-streaming][http-streaming], which uses [Media Source Extensions][can-mse] to play these formats in modern browsers.
 If choosing a single format, HLS is more convenient as iOS and some Android browsers which do not support MSE do have native HLS support.
 
-HLS is also possible with Flash on IE 11 on Windows 7, which does not support MSE, if you add the [flashls source handler][flashls].
+HLS is not possible on IE 11 on Windows 7, which does not support MSE. It was possible to play HLS on this browser with Flash.
 
 For older Video.js versions, [http-streaming][http-streaming] or its predecessors [videojs-contrib-hls][hls] and [videojs-contrib-dash][dash] add similar support, but for best results use the latest Video.js.
 
@@ -50,10 +50,7 @@ For older Video.js versions, [http-streaming][http-streaming] or its predecessor
 
 ### If you are using Flash videos:
 
-* Consider using a different format. Some browsers do not support Flash and some users won't install it. Where it is installed, browsers make it increasingly difficult to use, e.g. requiring users to opt-in to run FLash on each site.
-* Make sure to add the [Flash tech][flash]. It was included by default in Video.js 5 and earlier.
-* Flash media formats include RTMP streams and FLV format media.
-* SWF is not a media format.
+* [Flash has reached end of life][flash-eol] and is no longer supported in browsers.
 
 ## Problems when hosting media
 
@@ -104,10 +101,6 @@ To fix this issue please make sure that all event listeners are cleaned up on di
 
 [youtube]: https://github.com/videojs/videojs-youtube
 
-[flash]: https://github.com/videojs/videojs-flash
-
-[flashls]: https://github.com/brightcove/videojs-flashls-source-handler
-
 [media-types]: https://www.iana.org/assignments/media-types/media-types.xhtml#video
 
 [cors]: https://enable-cors.org/
@@ -119,3 +112,5 @@ To fix this issue please make sure that all event listeners are cleaned up on di
 [can-ogv]: https://caniuse.com/#feat=ogv
 
 [can-mse]: https://caniuse.com/#feat=mediasource
+
+[flash-eol]: https://www.adobe.com/products/flashplayer/end-of-life.html

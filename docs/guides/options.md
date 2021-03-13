@@ -28,6 +28,8 @@
   * [language](#language)
   * [languages](#languages)
   * [liveui](#liveui)
+  * [liveTracker.trackingThreshold](#livetrackertrackingthreshold)
+  * [liveTracker.liveTolerance](#livetrackerlivetolerance)
   * [nativeControlsForTouch](#nativecontrolsfortouch)
   * [notSupportedMessage](#notsupportedmessage)
   * [fullscreen](#fullscreen)
@@ -51,8 +53,6 @@
   * [${componentName}](#componentname)
 * [Tech Options](#tech-options)
   * [${techName}](#techname)
-  * [flash](#flash)
-    * [swf](#swf)
   * [html5](#html5)
     * [nativeControlsForTouch](#nativecontrolsfortouch-1)
     * [nativeAudioTracks](#nativeaudiotracks)
@@ -94,7 +94,7 @@ player.autoplay('muted');
 
 #### More info on autoplay support and changes:
 
-* See our blog post: <https://videojs.com/blog/autoplay-best-practices-with-video-js/>
+* See our blog post: [Autoplay Best Practices with Video.js](https://videojs.com/blog/autoplay-best-practices-with-video-js/)
 
 ### `controls`
 
@@ -270,6 +270,20 @@ Allows the player to use the new live ui that includes:
 
 Without this option the progress bar will be hidden and in its place will be text that indicates `LIVE` playback. There will be no progress control
 and you will not be able click the text to seek to the live edge. `liveui` will default to `true` in a future version!
+
+### `liveTracker.trackingThreshold`
+
+> Type: `number`
+> Default: `30`
+
+An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 30s on the seekBar then we do not show the new liveui even with the liveui option set.
+
+### `liveTracker.liveTolerance`
+
+> Type: `number`
+> Default: `15`
+
+An option for the liveTracker component of the player that controls how far from the seekable end should be considered live playback. By default anything further than 15s from the live seekable edge is considered behind live and everything else is considered live. Any user interaction to seek backwards will ignore this value as a user would expect.
 
 ### `nativeControlsForTouch`
 
@@ -560,27 +574,7 @@ videojs('my-player', {
 
 > Type: `Object`
 
-Video.js playback technologies (i.e. "techs") can be given custom options as part of the options passed to the `videojs` function. They should be passed under the _lower-case variant of the tech name_ (e.g. `"flash"` or `"html5"`).
-
-### `flash`
-
-#### `swf`
-
-Specifies where the Video.js SWF file is located for the `Flash` tech:
-
-```js
-videojs('my-player', {
-  flash: {
-    swf: '//path/to/videojs.swf'
-  }
-});
-```
-
-However, changing the global defaults is generally more appropriate:
-
-```js
-videojs.options.flash.swf = '//path/to/videojs.swf'
-```
+Video.js playback technologies (i.e. "techs") can be given custom options as part of the options passed to the `videojs` function. They should be passed under the _lower-case variant of the tech name_ (e.g. `"html5"`).
 
 ### `html5`
 

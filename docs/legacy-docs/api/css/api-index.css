@@ -51,3 +51,18 @@ div.indexColumn {
 div, .section {
     border: none;
 }
+
+.legacydocsnote {
+    background-color: #ffdddd;
+    border: 2px solid #ff0000;
+    text-align: center;
+    margin: 1em auto;
+    padding: 1em;
+    width: 80%;
+}
+
+.legacydocsnote::before {
+    content: "⚠️";
+    font-size: 200%;
+    vertical-align: middle;
+}

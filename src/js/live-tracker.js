@@ -47,6 +47,9 @@ class LiveTracker extends Component {
     this.reset_();
 
     this.on(this.player_, 'durationchange', this.handleDurationchange);
+    // we should try to toggle tracking on canplay as native playback engines, like Safari
+    // may not have the proper values for things like seekableEnd until then
+    this.one(this.player_, 'canplay', () => this.toggleTracking());
 
     // we don't need to track live playback if the document is hidden,
     // also, tracking when the document is hidden can
@@ -103,7 +106,7 @@ class LiveTracker extends Component {
 
     // we cannot be behind if
     // 1. until we have not seen a timeupdate yet
-    // 2. liveCurrentTime is Infinity, which happens on Android
+    // 2. liveCurrentTime is Infinity, which happens on Android and Native Safari
     if (!this.timeupdateSeen_ || liveCurrentTime === Infinity) {
       isBehind = false;
     }
@@ -119,6 +122,13 @@ class LiveTracker extends Component {
    * and start/stop tracking accordingly.
    */
   handleDurationchange() {
+    this.toggleTracking();
+  }
+
+  /**
+   * start/stop tracking
+   */
+  toggleTracking() {
     if (this.player_.duration() === Infinity && this.liveWindow() >= this.options_.trackingThreshold) {
       if (this.player_.options_.liveui) {
         this.player_.addClass('vjs-liveui');
@@ -275,8 +285,9 @@ class LiveTracker extends Component {
   liveWindow() {
     const liveCurrentTime = this.liveCurrentTime();
 
+    // if liveCurrenTime is Infinity then we don't have a liveWindow at all
     if (liveCurrentTime === Infinity) {
-      return Infinity;
+      return 0;
     }
 
     return liveCurrentTime - this.seekableStart();

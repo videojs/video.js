@@ -73,10 +73,14 @@ class SeekBar extends Slider {
   }
 
   toggleVisibility_(e) {
-    if (document.hidden) {
+    if (document.visibilityState === 'hidden') {
+      this.cancelNamedAnimationFrame('SeekBar#update');
+      this.cancelNamedAnimationFrame('Slider#update');
       this.disableInterval_(e);
     } else {
-      this.enableInterval_();
+      if (!this.player_.ended() && !this.player_.paused()) {
+        this.enableInterval_();
+      }
 
       // we just switched back to the page and someone may be looking, so, update ASAP
       this.update();
@@ -131,6 +135,11 @@ class SeekBar extends Slider {
    *          The current percent at a number from 0-1
    */
   update(event) {
+    // ignore updates while the tab is hidden
+    if (document.visibilityState === 'hidden') {
+      return;
+    }
+
     const percent = super.update();
 
     this.requestNamedAnimationFrame('SeekBar#update', () => {

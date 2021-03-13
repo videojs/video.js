@@ -71,7 +71,7 @@ Video.js is built around a collection of components. These are the building bloc
 
 #### [Tech](/docs/guides/tech.md)
 
-A "tech" is the shorthand we're using to describe any video playback technology - be it HTML5 video, Flash, . Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
+A "tech" is the shorthand we're using to describe any video playback technology - be it HTML5 video or a YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
 #### [Languages](/docs/guides/languages.md)
 

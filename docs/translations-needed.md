@@ -848,6 +848,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
+| sl.json (missing 6)     | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
 | sr.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |

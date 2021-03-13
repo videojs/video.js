@@ -138,6 +138,10 @@ class Component {
       return;
     }
 
+    if (this.readyQueue_) {
+      this.readyQueue_.length = 0;
+    }
+
     /**
      * Triggered when a `Component` is disposed.
      *

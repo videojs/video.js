@@ -77,7 +77,7 @@ Suggests that a player or component was removed from the DOM without using `disp
 
 ## Showing and Hiding a Player
 
-It is not recommended that you attempt to toggle the visibility or display of a Video.js player. Doing so can be particularly problematic when it comes to the Flash tech. Instead, players should be created and [disposed](#removing-players) as needed.
+It is not recommended that you attempt to toggle the visibility or display of a Video.js player. Instead, players should be created and [disposed](#removing-players) as needed.
 
 This is relevant to use cases such as displaying a player in a modal/overlay. Rather than keeping a hidden Video.js player in a DOM element, it's recommended that you create the player when the modal opens and dispose it when the modal closes.
 

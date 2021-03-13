@@ -36,7 +36,7 @@ When `VIDEOJS_NO_DYNAMIC_STYLE` is set, `Player#width()` and `Player#height()` w
 
 Video.js ships with a number of icons built into the skin via an icon font.
 
-You can view all of the icons available in the default skin by renaming [`sandbox/icons.html.example`](https://github.com/videojs/video.js/blob/master/sandbox/icons.html.example) to `sandbox/icons.html`, building Video.js with `npm run build`, and opening `sandbox/icons.html` in your browser of choice.
+You can view all of the icons available in the default skin by renaming [`sandbox/icons.html.example`](https://github.com/videojs/video.js/blob/main/sandbox/icons.html.example) to `sandbox/icons.html`, building Video.js with `npm run build`, and opening `sandbox/icons.html` in your browser of choice.
 
 ## Creating a Skin
 

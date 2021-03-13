@@ -10,9 +10,9 @@
   * [Landing a PR manually](#landing-a-pr-manually)
     * [Landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
     * [I just made a mistake](#i-just-made-a-mistake)
-      * [I accidentally pushed a broken commit or incorrect commit to master](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-master)
+      * [I accidentally pushed a broken commit or incorrect commit to main](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-main)
       * [I lost changes](#i-lost-changes)
-      * [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
+      * [I accidentally committed a broken change to main](#i-accidentally-committed-a-broken-change-to-main)
 * [video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
     * [npm access](#npm-access)
@@ -113,12 +113,12 @@ git am --abort
 git rebase --abort
 ```
 
-Checkout and update the master branch:
+Checkout and update the main branch:
 
 ```sh
-git checkout master
+git checkout main
 git remote update
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 Check out the PR:
@@ -135,16 +135,16 @@ git checkout -t {{name of branch}}
 > git checkout -t gkatsev-html5-fix
 > ```
 
-_Optional:_ If necessary, rebase against master. If you have multiple features in the PR, [landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
+_Optional:_ If necessary, rebase against main. If you have multiple features in the PR, [landing a PR manually with several changes](#landing-a-pr-manually-with-several-changes)
 
 ```sh
-git rebase master
+git rebase main
 ```
 
-Fix up any issues that arise from the rebase, change back to the master branch and squash merge:
+Fix up any issues that arise from the rebase, change back to the main branch and squash merge:
 
 ```sh
-git checkout master
+git checkout main
 git merge --squash --no-commit gkatsev-html5-fix
 ```
 
@@ -175,20 +175,20 @@ Now you can commit the change the change with the author, following our commit g
 git commit --author "Gary Katsevman <git@gkatsev.com>"
 ```
 
-Now that it's committed, push to master
+Now that it's committed, push to main
 
 ```sh
-git push upstream master
+git push upstream main
 ```
 
-Congratulate yourself for a job well done and the contributor for having his change landed in master.
+Congratulate yourself for a job well done and the contributor for having his change landed in main.
 
 #### Landing a PR manually with several changes
 
-Follow the same steps as before but when you rebase against master, you want to do an interactive rebase and then squash the changes into just a few commits.
+Follow the same steps as before but when you rebase against main, you want to do an interactive rebase and then squash the changes into just a few commits.
 
 ```sh
-git rebase -i master
+git rebase -i main
 ```
 
 This will give you an output like the following:
@@ -242,13 +242,13 @@ When you get to the edit commits, git will give more information, but you'd want
 git commit --amend
 ```
 
-After going through and making the commits you want, you want to change back to master and then rebase the branch onto master so we get a clean history
+After going through and making the commits you want, you want to change back to main and then rebase the branch onto main so we get a clean history
 
 ```sh
 git rebase gkatsev-html5-fix
 ```
 
-This will put our two commits into master:
+This will put our two commits into main:
 
 ```txt
 b4dc15d chore(contributing.md): Update CONTRIBUTING.md with latest info <Gary Katsevman>
@@ -256,28 +256,28 @@ b4dc15d chore(contributing.md): Update CONTRIBUTING.md with latest info <Gary Ka
 9e20386 v5.12.6 <Gary Katsevman>
 ```
 
-Now you're ready to push to master as in the normal instructions.
+Now you're ready to push to main as in the normal instructions.
 
 #### I just made a mistake
 
 While `git` allows you to update the remote branch with a force push (`git push -f`). This is generally frowned upon since you're rewriting public history. However, if you just pushed the change and it's been less than 10 minutes since you've done with, you may force push to update the commit, assuming no one else has already pushed after you.
 
-##### I accidentally pushed a broken commit or incorrect commit to master
+##### I accidentally pushed a broken commit or incorrect commit to main
 
-Assuming no more than 10 minutes have passed, you may force-push to update or remove the commit. If someone else has already pushed to master or 10 minutes have passed, you should instead use the revert command (`git revert`) to revert the commit and then commit the proper change, or just fix it forward with a followup commit that fixes things.
+Assuming no more than 10 minutes have passed, you may force-push to update or remove the commit. If someone else has already pushed to main or 10 minutes have passed, you should instead use the revert command (`git revert`) to revert the commit and then commit the proper change, or just fix it forward with a followup commit that fixes things.
 
 ##### I lost changes
 
 Assuming that the changes were committed, even if you lost the commit in your current history does not mean that it is lost. In a lot of cases you can still recover it from the PR branch or if all else fails look at [git's reflog](https://git-scm.com/docs/git-reflog).
 
-##### I accidentally committed a broken change to master
+##### I accidentally committed a broken change to main
 
 This is a great time to discover that something is broken. Because it hasn't been pushed to GitHub yet, it's very easy to reset the change as if nothing has happened and try again.
 
-To do so, just reset the branch against master.
+To do so, just reset the branch against main.
 
 ```sh
-git reset --hard upstream/master
+git reset --hard upstream/main
 ```
 
 ## video.js releases
@@ -321,7 +321,7 @@ Most common releases will be either `patch` or `minor`.
 ### Doing a release
 
 It is also recommended you have a clean clone of Video.js for each release line you want to release.
-That means having a folder for master/v6 and one for 5.x.
+That means having a folder for main/v6 and one for 5.x.
 This is because 5.x and 6.x have different versions expecations for release process and have different dependencies.
 Plus, during development you could end up with a dirty repo, so, it just usually easier if you have a clean release repo.
 
@@ -334,11 +334,11 @@ git clone git@github.com:videojs/video.js.git videojs-5-release
 
 #### Current Video.js
 
-Make sure go to the master branch and grab the latest updates.
+Make sure go to the main branch and grab the latest updates.
 
 ```sh
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 ```
 
 At this point, you should run `npm install` because dependencies may have changed.
@@ -359,7 +359,7 @@ It's necessary to do this before running `npm publish` because our GitHub releas
 relies on the commit being available on GitHub.
 
 ```sh
-git push --tags origin master
+git push --tags origin main
 ```
 
 Finally, run `npm publish` with an appropriate tag. Don't forget to supply your token.
@@ -461,7 +461,7 @@ This collaborator guide was heavily inspired by [node.js's guide](https://github
 
 [pr template]: /.github/PULL_REQUEST_TEMPLATE.md
 
-[conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md
+[conventions]: https://github.com/videojs/conventional-changelog-videojs/blob/main/convention.md
 
 [vjs npm]: https://www.npmjs.com/org/videojs
 

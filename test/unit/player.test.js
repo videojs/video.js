@@ -480,6 +480,45 @@ QUnit.test('should default to 16:9 when fluid', function(assert) {
   player.dispose();
 });
 
+QUnit.test('should resize fluid player on resize', function(assert) {
+  const player = TestHelpers.makePlayer({fluid: true});
+  let ratio = player.currentHeight() / player.currentWidth();
+
+  // account for some rounding of 0.5625 up to 0.563
+  assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
+
+  player.tech_.videoWidth = () => 100;
+  player.tech_.videoHeight = () => 50;
+
+  player.trigger('resize');
+
+  this.clock.tick(1);
+
+  ratio = player.currentHeight() / player.currentWidth();
+
+  assert.ok(ratio === 0.5, 'player aspect ratio changed on resize event');
+
+  player.dispose();
+});
+
+QUnit.test('should resize fluid player on resize if fluid enabled post initialisation', function(assert) {
+  const player = TestHelpers.makePlayer({fluid: false});
+
+  player.tech_.videoWidth = () => 100;
+  player.tech_.videoHeight = () => 30;
+
+  player.fluid(true);
+  player.trigger('resize');
+
+  this.clock.tick(1);
+
+  const ratio = player.currentHeight() / player.currentWidth();
+
+  assert.ok(ratio === 0.3, 'player aspect ratio changed on resize event');
+
+  player.dispose();
+});
+
 QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
   const tag = TestHelpers.makeTag();
 

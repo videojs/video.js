@@ -419,6 +419,52 @@ QUnit.test('enabled and disabled cuechange handler when changing mode to showing
   player.dispose();
 });
 
+QUnit.test('if preloadTextTracks is false, default tracks are not parsed until mode is showing', function(assert) {
+  this.tech.preloadTextTracks = false;
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+  const reqs = [];
+
+  this.xhr.onCreate = function(req) {
+    reqs.push(req);
+  };
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {};
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  const tt = new TextTrack({
+    tech: this.tech,
+    src: 'http://example.com',
+    default: true
+  });
+
+  assert.notOk(reqs.length, 'Default track is not requested');
+  assert.notOk(parserCreated, 'Parser is not created');
+
+  tt.mode = 'showing';
+
+  const req = reqs.pop();
+
+  req.respond(200, null, 'WEBVTT\n');
+
+  assert.ok(parserCreated, 'Parser is created after track is showing');
+
+  clock.restore();
+  tt.off();
+  window.WebVTT = oldVTT;
+});
+
 QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;

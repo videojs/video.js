@@ -194,7 +194,7 @@ var myMiddleware = function(player) {
 videojs.use('*', myMiddleware);
 ```
 
-This middleware allows the call to `play()` to go through to the `Tech`, and checks in `play` whether the play succeeded or not. A more detailed example can be found in our [sandbox](https://github.com/videojs/video.js/blob/master/sandbox/middleware-play.html.example).
+This middleware allows the call to `play()` to go through to the `Tech`, and checks in `play` whether the play succeeded or not. A more detailed example can be found in our [sandbox](https://github.com/videojs/video.js/blob/main/sandbox/middleware-play.html.example).
 
 ### Terminating Mediator Methods
 
