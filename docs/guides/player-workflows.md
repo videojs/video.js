@@ -353,7 +353,7 @@ console.log(myPlayer.poster());
 
 ## Accessing the Tech on the player
 
-The tech on the player can only be accesed by pasing `{IWillNotUseThisInPlugins: true}` into the `tech()`
+The tech on the player can be accessed by passing any argument into the `tech()`
 function on the player.
 
 ```js
@@ -361,14 +361,12 @@ var myPlayer = videojs('some-player-id');
 
 myPlayer.src({type: 'video/mp4', src: 'http://www.example.com/path/to/video.mp4'});
 myPlayer.ready(function() {
-   // tech() will error with no argument
-   var tech = myPlayer.tech({IWillNotUseThisInPlugins: true});
+   // tech() will log warning without any argument
+   var tech = myPlayer.tech(false);
 });
 ```
 
 ## Using Video.js with...
-
-Coming soon...
 
 ### jQuery
 
