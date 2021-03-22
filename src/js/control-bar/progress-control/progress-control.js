@@ -137,7 +137,8 @@ class ProgressControl extends Component {
 
     this.off(['mousedown', 'touchstart'], this.handleMouseDown);
     this.off(this.el_, 'mousemove', this.handleMouseMove);
-    this.handleMouseUp();
+
+    this.removeListenersAddedOnMousedownAndTouchstart();
 
     this.addClass('disabled');
 
@@ -159,6 +160,18 @@ class ProgressControl extends Component {
     this.removeClass('disabled');
 
     this.enabled_ = true;
+  }
+
+  /**
+   * Cleanup listeners after the user finishes interacting with the progress controls
+   */
+  removeListenersAddedOnMousedownAndTouchstart() {
+    const doc = this.el_.ownerDocument;
+
+    this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
+    this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
+    this.off(doc, 'mouseup', this.handleMouseUp);
+    this.off(doc, 'touchend', this.handleMouseUp);
   }
 
   /**
@@ -194,17 +207,13 @@ class ProgressControl extends Component {
    * @listens mouseup
    */
   handleMouseUp(event) {
-    const doc = this.el_.ownerDocument;
     const seekBar = this.getChild('seekBar');
 
     if (seekBar) {
       seekBar.handleMouseUp(event);
     }
 
-    this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
-    this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
-    this.off(doc, 'mouseup', this.handleMouseUp);
-    this.off(doc, 'touchend', this.handleMouseUp);
+    this.removeListenersAddedOnMousedownAndTouchstart();
   }
 }
 
