@@ -129,7 +129,7 @@ class ClickableComponent extends Component {
 
     this.controlText_ = text;
     Dom.textContent(this.controlTextEl_, localizedText);
-    if (!this.nonIconControl) {
+    if (!this.nonIconControl && !this.player_.options_.noUITitleAttributes) {
       // Set title attribute if only an icon is shown
       el.setAttribute('title', localizedText);
     }
