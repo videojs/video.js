@@ -1,3 +1,14 @@
+<a name="7.11.8"></a>
+## [7.11.8](https://github.com/videojs/video.js/compare/v7.11.7...v7.11.8) (2021-03-23)
+
+### Bug Fixes
+
+* remove extra timeupdate event when progress controls is disabled ([#7142](https://github.com/videojs/video.js/issues/7142)) ([b2336aa](https://github.com/videojs/video.js/commit/b2336aa))
+
+### Documentation
+
+* update note about accessing tech ([#7141](https://github.com/videojs/video.js/issues/7141)) ([7d46f44](https://github.com/videojs/video.js/commit/7d46f44))
+
 <a name="7.11.7"></a>
 ## [7.11.7](https://github.com/videojs/video.js/compare/v7.11.6...v7.11.7) (2021-03-12)
 
