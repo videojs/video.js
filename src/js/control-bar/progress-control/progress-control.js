@@ -5,6 +5,7 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import clamp from '../../utils/clamp.js';
 import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
+import {silencePromise} from '../../utils/promise';
 
 import './seek-bar.js';
 
@@ -143,6 +144,17 @@ class ProgressControl extends Component {
     this.addClass('disabled');
 
     this.enabled_ = false;
+
+    // Restore normal playback state if controls are disabled while scrubbing
+    if (this.player_.scrubbing()) {
+      const seekBar = this.getChild('seekBar');
+
+      this.player_.scrubbing(false);
+
+      if (seekBar.videoWasPlaying) {
+        silencePromise(this.player_.play());
+      }
+    }
   }
 
   /**
