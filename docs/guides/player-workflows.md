@@ -353,7 +353,7 @@ console.log(myPlayer.poster());
 
 ## Accessing the Tech on the player
 
-The tech on the player can be accessed by passing any argument into the `tech()`
+The tech on the player can be via `tech()`. Passing any argument will silence the warning that is logged.
 function on the player.
 
 ```js
