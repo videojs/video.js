@@ -138,6 +138,7 @@
   &:before {
     position: absolute;
     font-size: 0.9em; // Doing this to match the handle on play progress.
+    z-index: 1;
   }
 }
 
@@ -148,6 +149,7 @@
   &:before {
     top: -0.5em;
     left: -0.3em;
+    z-index: 1;
   }
 }
 .vjs-slider-horizontal .vjs-volume-level {
@@ -183,4 +185,84 @@
 
 .video-js .vjs-volume-horizontal .vjs-menu {
   left: -2em;
+}
+
+// .vjs-volume-tooltip
+//
+// These elements are displayed above the volume bar.
+//
+// By default, they are hidden and only shown when hovering over the volume
+// control.
+.video-js .vjs-volume-tooltip {
+  @include background-color-with-alpha(#fff, 0.8);
+  @include border-radius(0.3em);
+  color: #000;
+  float: right;
+  font-family: $text-font-family;
+  font-size: 1em;
+  padding: 6px 8px 8px 8px;
+  pointer-events: none;
+  position: absolute;
+  top: -3.4em;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.video-js .vjs-volume-control:hover .vjs-volume-tooltip,
+.video-js .vjs-volume-control:hover .vjs-progress-holder:focus .vjs-volume-tooltip {
+  display: block;
+  font-size: 1em;
+  visibility: visible;
+}
+
+.video-js .vjs-volume-vertical:hover .vjs-volume-tooltip,
+.video-js .vjs-volume-vertical:hover .vjs-progress-holder:focus .vjs-volume-tooltip {
+  left: 1em;
+  top: -12px;
+}
+
+.video-js .vjs-volume-control.disabled:hover .vjs-volume-tooltip {
+  font-size: 1em;
+}
+
+// .vjs-mouse-display / MouseVolumeLevelDisplay
+//
+// This element tracks the mouse position along the volume control and
+// includes a tooltip, which displays the volume level.
+.video-js .vjs-volume-control .vjs-mouse-display {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: #000;
+  z-index: 1;
+}
+
+.video-js .vjs-volume-horizontal .vjs-mouse-display {
+  width: 1px;
+  height: 100%;
+}
+
+.vjs-no-flex .vjs-volume-control .vjs-mouse-display {
+  z-index: 0;
+}
+
+.video-js .vjs-volume-control:hover .vjs-mouse-display {
+  display: block;
+}
+
+.video-js.vjs-user-inactive .vjs-volume-control .vjs-mouse-display {
+  visibility: hidden;
+  opacity: 0;
+  $trans: visibility 1.0s, opacity 1.0s;
+  @include transition($trans);
+}
+
+.video-js.vjs-user-inactive.vjs-no-flex .vjs-volume-control .vjs-mouse-display {
+  display: none;
+}
+
+.vjs-mouse-display .vjs-volume-tooltip {
+  color: #fff;
+  @include background-color-with-alpha(#000, 0.8);
 }

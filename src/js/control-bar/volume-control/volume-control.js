@@ -44,6 +44,7 @@ class VolumeControl extends Component {
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
+    this.on('mousemove', this.handleMouseMove);
 
     // while the slider is active (the mouse has been pressed down and
     // is dragging) or in focus we do not want to hide the VolumeBar
