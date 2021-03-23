@@ -68,7 +68,7 @@ see the [setup guide][install-guide].
 ## Q: Is Video.js on bower?
 
 Versions prior to Video.js 6 support bower, however, as of Video.js 6, bower is no
-longer officially supported. Please see <https://github.com/videojs/video.js/issues/4012>
+longer officially supported. Please see [issue #4012][issue-4012]
 for more information.
 
 ## Q: What do Video.js version numbers mean?
@@ -302,6 +302,8 @@ Yes! See [ReactJS integration example][react-guide].
 [hls]: https://github.com/videojs/http-streaming
 
 [install-guide]: https://videojs.com/getting-started/
+
+[issue-4012]: https://github.com/videojs/video.js/issues/4012
 
 [issue-template]: https://github.com/videojs/video.js/blob/main/.github/ISSUE_TEMPLATE.md
 
