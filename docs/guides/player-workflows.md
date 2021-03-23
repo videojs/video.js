@@ -354,7 +354,6 @@ console.log(myPlayer.poster());
 ## Accessing the Tech on the player
 
 The tech on the player can be accessed via `tech()`. Passing any argument will silence the warning that is logged.
-function on the player.
 
 ```js
 var myPlayer = videojs('some-player-id');
