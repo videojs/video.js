@@ -27,7 +27,7 @@ This document outlines many considerations for using Video.js for advanced playe
 After an instance has been created it can be accessed globally in two ways:
 
 1. By calling `videojs('example_video_id');`
-1. By using it directly via  `videojs.players.example_video_id;`
+1. By using it directly via `videojs.players.example_video_id;`
 
 ## Removing Players
 
@@ -353,7 +353,7 @@ console.log(myPlayer.poster());
 
 ## Accessing the Tech on the player
 
-The tech on the player can be via `tech()`. Passing any argument will silence the warning that is logged.
+The tech on the player can be accessed via `tech()`. Passing any argument will silence the warning that is logged.
 function on the player.
 
 ```js
