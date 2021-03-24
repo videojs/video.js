@@ -29,8 +29,8 @@ class VolumeBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
-    this.on('slideractive', this.updateLastVolume_);
-    this.on(player, 'volumechange', this.updateARIAAttributes);
+    this.on('slideractive', (e) => this.updateLastVolume_(e));
+    this.on(player, 'volumechange', (e) => this.updateARIAAttributes(e));
     player.ready(() => this.updateARIAAttributes());
   }
 

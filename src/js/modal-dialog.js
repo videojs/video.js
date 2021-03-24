@@ -58,6 +58,9 @@ class ModalDialog extends Component {
    */
   constructor(player, options) {
     super(player, options);
+
+    this.handleKeyDown_ = (e) => this.handleKeyDown(e);
+    this.close_ = (e) => this.close(e);
     this.opened_ = this.hasBeenOpened_ = this.hasBeenFilled_ = false;
 
     this.closeable(!this.options_.uncloseable);
@@ -179,7 +182,7 @@ class ModalDialog extends Component {
         player.pause();
       }
 
-      this.on('keydown', this.handleKeyDown);
+      this.on('keydown', this.handleKeyDown_);
 
       // Hide controls and note if they were enabled.
       this.hadControls_ = player.controls();
@@ -242,7 +245,7 @@ class ModalDialog extends Component {
       player.play();
     }
 
-    this.off('keydown', this.handleKeyDown);
+    this.off('keydown', this.handleKeyDown_);
 
     if (this.hadControls_) {
       player.controls(true);
@@ -289,12 +292,12 @@ class ModalDialog extends Component {
         this.contentEl_ = this.el_;
         close = this.addChild('closeButton', {controlText: 'Close Modal Dialog'});
         this.contentEl_ = temp;
-        this.on(close, 'close', this.close);
+        this.on(close, 'close', this.close_);
       }
 
       // If this is being made uncloseable and has a close button, remove it.
       if (!closeable && close) {
-        this.off(close, 'close', this.close);
+        this.off(close, 'close', this.close_);
         this.removeChild(close);
         close.dispose();
       }

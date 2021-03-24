@@ -5,7 +5,6 @@ import Button from '../button.js';
 import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
-import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
 import {toTitleCase} from '../utils/string-cases.js';
 import { IS_IOS } from '../utils/browser.js';
@@ -48,16 +47,20 @@ class MenuButton extends Component {
 
     this.enabled_ = true;
 
-    this.on(this.menuButton_, 'tap', this.handleClick);
-    this.on(this.menuButton_, 'click', this.handleClick);
-    this.on(this.menuButton_, 'keydown', this.handleKeyDown);
+    const handleClick = (e) => this.handleClick(e);
+
+    this.handleMenuKeyUp_ = (e) => this.handleMenuKeyUp(e);
+
+    this.on(this.menuButton_, 'tap', handleClick);
+    this.on(this.menuButton_, 'click', handleClick);
+    this.on(this.menuButton_, 'keydown', (e) => this.handleKeyDown(e));
     this.on(this.menuButton_, 'mouseenter', () => {
       this.addClass('vjs-hover');
       this.menu.show();
-      Events.on(document, 'keyup', Fn.bind(this, this.handleMenuKeyUp));
+      Events.on(document, 'keyup', this.handleMenuKeyUp_);
     });
-    this.on('mouseleave', this.handleMouseLeave);
-    this.on('keydown', this.handleSubmenuKeyDown);
+    this.on('mouseleave', (e) => this.handleMouseLeave(e));
+    this.on('keydown', (e) => this.handleSubmenuKeyDown(e));
   }
 
   /**
@@ -252,7 +255,7 @@ class MenuButton extends Component {
    */
   handleMouseLeave(event) {
     this.removeClass('vjs-hover');
-    Events.off(document, 'keyup', Fn.bind(this, this.handleMenuKeyUp));
+    Events.off(document, 'keyup', this.handleMenuKeyUp_);
   }
 
   /**

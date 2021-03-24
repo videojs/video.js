@@ -30,6 +30,11 @@ class ClickableComponent extends Component {
   constructor(player, options) {
     super(player, options);
 
+    this.handleMouseOver_ = (e) => this.handleMouseOver(e);
+    this.handleMouseOut_ = (e) => this.handleMouseOut(e);
+    this.handleClick_ = (e) => this.handleClick(e);
+    this.handleKeyDown_ = (e) => this.handleKeyDown(e);
+
     this.emitTapEvents();
 
     this.enable();
@@ -156,8 +161,8 @@ class ClickableComponent extends Component {
       if (typeof this.tabIndex_ !== 'undefined') {
         this.el_.setAttribute('tabIndex', this.tabIndex_);
       }
-      this.on(['tap', 'click'], this.handleClick);
-      this.on('keydown', this.handleKeyDown);
+      this.on(['tap', 'click'], this.handleClick_);
+      this.on('keydown', this.handleKeyDown_);
     }
   }
 
@@ -171,10 +176,10 @@ class ClickableComponent extends Component {
     if (typeof this.tabIndex_ !== 'undefined') {
       this.el_.removeAttribute('tabIndex');
     }
-    this.off('mouseover', this.handleMouseOver);
-    this.off('mouseout', this.handleMouseOut);
-    this.off(['tap', 'click'], this.handleClick);
-    this.off('keydown', this.handleKeyDown);
+    this.off('mouseover', this.handleMouseOver_);
+    this.off('mouseout', this.handleMouseOut_);
+    this.off(['tap', 'click'], this.handleClick_);
+    this.off('keydown', this.handleKeyDown_);
   }
 
   /**

@@ -61,9 +61,12 @@ class SeekBar extends Slider {
     // via an interval
     this.updateInterval = null;
 
-    this.on(this.player_, ['playing'], this.enableInterval_);
+    this.enableIntervalHandler_ = (e) => this.enableInterval_(e);
+    this.disableIntervalHandler_ = (e) => this.disableInterval_(e);
 
-    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
+    this.on(this.player_, ['playing'], this.enableIntervalHandler_);
+
+    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableIntervalHandler_);
 
     // we don't need to update the play progress if the document is hidden,
     // also, this causes the CPU to spike and eventually crash the page on IE11.
@@ -446,8 +449,8 @@ class SeekBar extends Slider {
       this.on(this.player_.liveTracker, 'liveedgechange', this.update);
     }
 
-    this.off(this.player_, ['playing'], this.enableInterval_);
-    this.off(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
+    this.off(this.player_, ['playing'], this.enableIntervalHandler_);
+    this.off(this.player_, ['ended', 'pause', 'waiting'], this.disableIntervalHandler_);
 
     // we don't need to update the play progress if the document is hidden,
     // also, this causes the CPU to spike and eventually crash the page on IE11.

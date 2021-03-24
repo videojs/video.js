@@ -29,8 +29,8 @@ class PlaybackRateMenuButton extends MenuButton {
     this.updateVisibility();
     this.updateLabel();
 
-    this.on(player, 'loadstart', this.updateVisibility);
-    this.on(player, 'ratechange', this.updateLabel);
+    this.on(player, 'loadstart', (e) => this.updateVisibility(e));
+    this.on(player, 'ratechange', (e) => this.updateLabel(e));
   }
 
   /**

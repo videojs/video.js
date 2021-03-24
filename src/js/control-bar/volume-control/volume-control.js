@@ -41,10 +41,11 @@ class VolumeControl extends Component {
     checkVolumeSupport(this, player);
 
     this.throttledHandleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
+    this.handleMouseUpHandler_ = (e) => this.handleMouseUp(e);
 
-    this.on('mousedown', this.handleMouseDown);
-    this.on('touchstart', this.handleMouseDown);
-    this.on('mousemove', this.handleMouseMove);
+    this.on('mousedown', (e) => this.handleMouseDown(e));
+    this.on('touchstart', (e) => this.handleMouseDown(e));
+    this.on('mousemove', (e) => this.handleMouseMove(e));
 
     // while the slider is active (the mouse has been pressed down and
     // is dragging) or in focus we do not want to hide the VolumeBar
@@ -93,8 +94,8 @@ class VolumeControl extends Component {
 
     this.on(doc, 'mousemove', this.throttledHandleMouseMove);
     this.on(doc, 'touchmove', this.throttledHandleMouseMove);
-    this.on(doc, 'mouseup', this.handleMouseUp);
-    this.on(doc, 'touchend', this.handleMouseUp);
+    this.on(doc, 'mouseup', this.handleMouseUpHandler_);
+    this.on(doc, 'touchend', this.handleMouseUpHandler_);
   }
 
   /**
@@ -111,8 +112,8 @@ class VolumeControl extends Component {
 
     this.off(doc, 'mousemove', this.throttledHandleMouseMove);
     this.off(doc, 'touchmove', this.throttledHandleMouseMove);
-    this.off(doc, 'mouseup', this.handleMouseUp);
-    this.off(doc, 'touchend', this.handleMouseUp);
+    this.off(doc, 'mouseup', this.handleMouseUpHandler_);
+    this.off(doc, 'touchend', this.handleMouseUpHandler_);
   }
 
   /**

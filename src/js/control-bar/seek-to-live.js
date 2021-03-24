@@ -27,7 +27,8 @@ class SeekToLive extends Button {
     this.updateLiveEdgeStatus();
 
     if (this.player_.liveTracker) {
-      this.on(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+      this.updateLiveEdgeStatusHandler_ = (e) => this.updateLiveEdgeStatus(e);
+      this.on(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatusHandler_);
     }
   }
 
@@ -84,7 +85,7 @@ class SeekToLive extends Button {
    */
   dispose() {
     if (this.player_.liveTracker) {
-      this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+      this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatusHandler_);
     }
     this.textEl_ = null;
 

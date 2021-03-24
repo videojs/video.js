@@ -30,6 +30,8 @@ class ProgressControl extends Component {
     super(player, options);
     this.handleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), UPDATE_REFRESH_INTERVAL);
+    this.handleMouseUpHandler_ = (e) => this.handleMouseUp(e);
+    this.handleMouseDownHandler_ = (e) => this.handleMouseDown(e);
 
     this.enable();
   }
@@ -136,7 +138,7 @@ class ProgressControl extends Component {
       return;
     }
 
-    this.off(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.off(['mousedown', 'touchstart'], this.handleMouseDownHandler_);
     this.off(this.el_, 'mousemove', this.handleMouseMove);
 
     this.removeListenersAddedOnMousedownAndTouchstart();
@@ -167,7 +169,7 @@ class ProgressControl extends Component {
       return;
     }
 
-    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.on(['mousedown', 'touchstart'], this.handleMouseDownHandler_);
     this.on(this.el_, 'mousemove', this.handleMouseMove);
     this.removeClass('disabled');
 
@@ -182,8 +184,8 @@ class ProgressControl extends Component {
 
     this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
-    this.off(doc, 'mouseup', this.handleMouseUp);
-    this.off(doc, 'touchend', this.handleMouseUp);
+    this.off(doc, 'mouseup', this.handleMouseUpHandler_);
+    this.off(doc, 'touchend', this.handleMouseUpHandler_);
   }
 
   /**
@@ -205,8 +207,8 @@ class ProgressControl extends Component {
 
     this.on(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.on(doc, 'touchmove', this.throttledHandleMouseSeek);
-    this.on(doc, 'mouseup', this.handleMouseUp);
-    this.on(doc, 'touchend', this.handleMouseUp);
+    this.on(doc, 'mouseup', this.handleMouseUpHandler_);
+    this.on(doc, 'touchend', this.handleMouseUpHandler_);
   }
 
   /**

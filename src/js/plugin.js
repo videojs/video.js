@@ -4,7 +4,6 @@
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Events from './utils/events';
-import * as Fn from './utils/fn';
 import log from './utils/log';
 import Player from './player';
 
@@ -217,7 +216,7 @@ class Plugin {
 
     // Auto-bind the dispose method so we can use it as a listener and unbind
     // it later easily.
-    this.dispose = Fn.bind(this, this.dispose);
+    this.dispose = this.dispose.bind(this);
 
     // If the player is disposed, dispose the plugin.
     player.on('dispose', this.dispose);

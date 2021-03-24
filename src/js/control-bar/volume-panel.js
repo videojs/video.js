@@ -4,7 +4,6 @@
 import Component from '../component.js';
 import {isPlain} from '../utils/obj';
 import * as Events from '../utils/events.js';
-import * as Fn from '../utils/fn.js';
 import keycode from 'keycode';
 import document from 'global/document';
 
@@ -45,12 +44,15 @@ class VolumePanel extends Component {
 
     super(player, options);
 
-    this.on(player, ['loadstart'], this.volumePanelState_);
-    this.on(this.muteToggle, 'keyup', this.handleKeyPress);
-    this.on(this.volumeControl, 'keyup', this.handleVolumeControlKeyUp);
-    this.on('keydown', this.handleKeyPress);
-    this.on('mouseover', this.handleMouseOver);
-    this.on('mouseout', this.handleMouseOut);
+    // this handler is used by mouse handler methods below
+    this.handleKeyPressHandler_ = (e) => this.handleKeyPress(e);
+
+    this.on(player, ['loadstart'], (e) => this.volumePanelState_(e));
+    this.on(this.muteToggle, 'keyup', (e) => this.handleKeyPress(e));
+    this.on(this.volumeControl, 'keyup', (e) => this.handleVolumeControlKeyUp(e));
+    this.on('keydown', (e) => this.handleKeyPress(e));
+    this.on('mouseover', (e) => this.handleMouseOver(e));
+    this.on('mouseout', (e) => this.handleMouseOut(e));
 
     // while the slider is active (the mouse has been pressed down and
     // is dragging) we do not want to hide the VolumeBar
@@ -153,7 +155,7 @@ class VolumePanel extends Component {
    */
   handleMouseOver(event) {
     this.addClass('vjs-hover');
-    Events.on(document, 'keyup', Fn.bind(this, this.handleKeyPress));
+    Events.on(document, 'keyup', this.handleKeyPressHandler_);
   }
 
   /**
@@ -168,7 +170,7 @@ class VolumePanel extends Component {
    */
   handleMouseOut(event) {
     this.removeClass('vjs-hover');
-    Events.off(document, 'keyup', Fn.bind(this, this.handleKeyPress));
+    Events.off(document, 'keyup', this.handleKeyPressHandler_);
   }
 
   /**
