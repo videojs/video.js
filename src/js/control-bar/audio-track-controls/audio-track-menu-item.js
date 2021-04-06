@@ -83,7 +83,9 @@ class AudioTrackMenuItem extends MenuItem {
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i];
 
-      track.enabled = track === this.track;
+      if (track === this.track) {
+        track.enabled = true;
+      }
     }
   }
 
