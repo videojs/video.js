@@ -1,3 +1,26 @@
+<a name="7.12.0"></a>
+# [7.12.0](https://github.com/videojs/video.js/compare/v7.11.8...v7.12.0) (2021-04-07)
+
+### Features
+
+* **package:** update VHS to 2.7.0 ([#7164](https://github.com/videojs/video.js/issues/7164)) ([0d47306](https://github.com/videojs/video.js/commit/0d47306))
+* Add a mouse volume tooltip ([#6824](https://github.com/videojs/video.js/issues/6824)) ([b2edfd2](https://github.com/videojs/video.js/commit/b2edfd2))
+* Add a player option `noUITitleAttributes` to prevent title attributes in the UI ([#7134](https://github.com/videojs/video.js/issues/7134)) ([5f59391](https://github.com/videojs/video.js/commit/5f59391)), closes [#6767](https://github.com/videojs/video.js/issues/6767)
+* enable responsive controls on fullscreen  ([#7098](https://github.com/videojs/video.js/issues/7098)) ([239c9a1](https://github.com/videojs/video.js/commit/239c9a1))
+* retry on error ([#7038](https://github.com/videojs/video.js/issues/7038)) ([22e9843](https://github.com/videojs/video.js/commit/22e9843)), closes [#1805](https://github.com/videojs/video.js/issues/1805)
+
+### Bug Fixes
+
+* always have an enabled audio track when switching ([#7163](https://github.com/videojs/video.js/issues/7163)) ([4707ce8](https://github.com/videojs/video.js/commit/4707ce8))
+
+### Chores
+
+* never skip github actions workflows in main ([#7169](https://github.com/videojs/video.js/issues/7169)) ([b6412a3](https://github.com/videojs/video.js/commit/b6412a3))
+
+### Performance Improvements
+
+* wrap prototype methods in handlers in an arrow function ([#7060](https://github.com/videojs/video.js/issues/7060)) ([17a6147](https://github.com/videojs/video.js/commit/17a6147))
+
 <a name="7.11.8"></a>
 ## [7.11.8](https://github.com/videojs/video.js/compare/v7.11.7...v7.11.8) (2021-03-23)
 
