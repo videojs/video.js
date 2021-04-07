@@ -35,7 +35,6 @@ So you want to help out? Great! There's a number of ways you can get involved.
 There's also other Video.js projects where you can help. (check the [video.js org](https://github.com/videojs) for an up-to-date list of projects)
 
 * [Videojs.com](https://github.com/videojs/videojs.com)
-* [Video.js flash player](https://github.com/videojs/videojs-flash)
 * [HLS](https://github.com/videojs/videojs-contrib-hls)
 * [DASH](https://github.com/videojs/videojs-contrib-dash)
 * [Youtube Tech](https://github.com/videojs/videojs-youtube)
@@ -58,7 +57,7 @@ Guidelines for bug reports:
 
 1. If your issue is with a particular video.js plugin or subproject, please open an issue against that project. See [list of some potential other projects above](#other-repositories-where-issues-could-be-filed)
 1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) — check if the issue has already been reported.
-1. Check if the issue has already been fixed — try to reproduce it using the latest `master` branch in the repository.
+1. Check if the issue has already been fixed — try to reproduce it using the latest `main` branch in the repository.
 1. Isolate the problem — **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this codepen template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) as a starting point -- don't forget to update it to the videojs version you use.
 1. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
 
@@ -125,8 +124,8 @@ git remote add upstream https://github.com/videojs/video.js.git
 >
 > ```sh
 > git remote update
-> git checkout master
-> git pull upstream master
+> git checkout main
+> git pull upstream main
 > ```
 
 #### Installing local dependencies
@@ -183,7 +182,6 @@ See [the following section](#running-a-local-web-server) for how to open the pag
 
 This ties in nicely with the sandbox directory. You can always open the `sandbox/index.html` file directly but in some cases it may not work properly.
 
-> Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you must use a local web server.
 
 To run the local webserver:
@@ -218,8 +216,8 @@ Before starting work, you want to update your local repository to have all the l
 
 ```sh
 git remote update
-git checkout master
-git rebase upstream/master
+git checkout main
+git rebase upstream/main
 ```
 
 #### Step 3: Branch
@@ -233,7 +231,7 @@ git checkout -b my-branch
 #### Step 4: Commit
 
 Commit changes as you go. Write thorough descriptions of your changes in your commit messages.
-For more information see our [conventional changelog guidelines for video.js](https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md)
+For more information see our [conventional changelog guidelines for video.js](https://github.com/videojs/conventional-changelog-videojs/blob/main/convention.md)
 Follow these guidelines:
 
 1. The first line should be less than 50 characters and contain a short description of the commit.
@@ -290,7 +288,7 @@ Then go to the [repo page](https://github.com/videojs/video.js) and click the "P
 
 Our javascript is linted using [videojs-standard][linter].
 
-## [Developer's Certificate of Origin 1.1](https://github.com/nodejs/node/blob/master/CONTRIBUTING.md#developers-certificate-of-origin-11)
+## [Developer's Certificate of Origin 1.1](https://github.com/nodejs/node/blob/main/CONTRIBUTING.md#developers-certificate-of-origin-11)
 
 By making a contribution to this project, I certify that:
 

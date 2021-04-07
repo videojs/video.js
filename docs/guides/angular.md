@@ -21,7 +21,7 @@ import videojs from 'video.js';
 })
 export class VjsPlayerComponent implements OnInit, OnDestroy {
   @ViewChild('target', {static: true}) target: ElementRef;
-  // see options: https://github.com/videojs/video.js/blob/master/docs/guides/options.md
+  // see options: https://github.com/videojs/video.js/blob/main/docs/guides/options.md
   @Input() options: {
       fluid: boolean,
       aspectRatio: string,

@@ -76,15 +76,11 @@ class AudioTrackMenuItem extends MenuItem {
    * @listens click
    */
   handleClick(event) {
-    const tracks = this.player_.audioTracks();
-
     super.handleClick(event);
 
-    for (let i = 0; i < tracks.length; i++) {
-      const track = tracks[i];
-
-      track.enabled = track === this.track;
-    }
+    // the audio track list will automatically toggle other tracks
+    // off for us.
+    this.track.enabled = true;
   }
 
   /**

@@ -18,6 +18,10 @@
   @extend %icon-default;
 }
 
+.vjs-button > .vjs-icon-placeholder {
+    display: block;
+}
+
 // Replacement for focus outline
 .video-js .vjs-control:focus:before,
 .video-js .vjs-control:hover:before,

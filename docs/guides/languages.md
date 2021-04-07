@@ -153,4 +153,4 @@ For all existing/supported languages, please see the [languages folder (`lang/`)
 
 [lang-codes]: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
-[translations-needed]: https://github.com/videojs/video.js/blob/master/docs/translations-needed.md
+[translations-needed]: https://github.com/videojs/video.js/blob/main/docs/translations-needed.md

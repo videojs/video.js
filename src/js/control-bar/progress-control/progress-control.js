@@ -5,6 +5,7 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import clamp from '../../utils/clamp.js';
 import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
+import {silencePromise} from '../../utils/promise';
 
 import './seek-bar.js';
 
@@ -29,6 +30,8 @@ class ProgressControl extends Component {
     super(player, options);
     this.handleMouseMove = throttle(bind(this, this.handleMouseMove), UPDATE_REFRESH_INTERVAL);
     this.throttledHandleMouseSeek = throttle(bind(this, this.handleMouseSeek), UPDATE_REFRESH_INTERVAL);
+    this.handleMouseUpHandler_ = (e) => this.handleMouseUp(e);
+    this.handleMouseDownHandler_ = (e) => this.handleMouseDown(e);
 
     this.enable();
   }
@@ -135,13 +138,25 @@ class ProgressControl extends Component {
       return;
     }
 
-    this.off(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.off(['mousedown', 'touchstart'], this.handleMouseDownHandler_);
     this.off(this.el_, 'mousemove', this.handleMouseMove);
-    this.handleMouseUp();
+
+    this.removeListenersAddedOnMousedownAndTouchstart();
 
     this.addClass('disabled');
 
     this.enabled_ = false;
+
+    // Restore normal playback state if controls are disabled while scrubbing
+    if (this.player_.scrubbing()) {
+      const seekBar = this.getChild('seekBar');
+
+      this.player_.scrubbing(false);
+
+      if (seekBar.videoWasPlaying) {
+        silencePromise(this.player_.play());
+      }
+    }
   }
 
   /**
@@ -154,11 +169,23 @@ class ProgressControl extends Component {
       return;
     }
 
-    this.on(['mousedown', 'touchstart'], this.handleMouseDown);
+    this.on(['mousedown', 'touchstart'], this.handleMouseDownHandler_);
     this.on(this.el_, 'mousemove', this.handleMouseMove);
     this.removeClass('disabled');
 
     this.enabled_ = true;
+  }
+
+  /**
+   * Cleanup listeners after the user finishes interacting with the progress controls
+   */
+  removeListenersAddedOnMousedownAndTouchstart() {
+    const doc = this.el_.ownerDocument;
+
+    this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
+    this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
+    this.off(doc, 'mouseup', this.handleMouseUpHandler_);
+    this.off(doc, 'touchend', this.handleMouseUpHandler_);
   }
 
   /**
@@ -180,8 +207,8 @@ class ProgressControl extends Component {
 
     this.on(doc, 'mousemove', this.throttledHandleMouseSeek);
     this.on(doc, 'touchmove', this.throttledHandleMouseSeek);
-    this.on(doc, 'mouseup', this.handleMouseUp);
-    this.on(doc, 'touchend', this.handleMouseUp);
+    this.on(doc, 'mouseup', this.handleMouseUpHandler_);
+    this.on(doc, 'touchend', this.handleMouseUpHandler_);
   }
 
   /**
@@ -194,17 +221,13 @@ class ProgressControl extends Component {
    * @listens mouseup
    */
   handleMouseUp(event) {
-    const doc = this.el_.ownerDocument;
     const seekBar = this.getChild('seekBar');
 
     if (seekBar) {
       seekBar.handleMouseUp(event);
     }
 
-    this.off(doc, 'mousemove', this.throttledHandleMouseSeek);
-    this.off(doc, 'touchmove', this.throttledHandleMouseSeek);
-    this.off(doc, 'mouseup', this.handleMouseUp);
-    this.off(doc, 'touchend', this.handleMouseUp);
+    this.removeListenersAddedOnMousedownAndTouchstart();
   }
 }
 

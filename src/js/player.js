@@ -355,8 +355,19 @@ class Player extends Component {
     super(null, options, ready);
 
     // Create bound methods for document listeners.
-    this.boundDocumentFullscreenChange_ = Fn.bind(this, this.documentFullscreenChange_);
-    this.boundFullWindowOnEscKey_ = Fn.bind(this, this.fullWindowOnEscKey);
+    this.boundDocumentFullscreenChange_ = (e) => this.documentFullscreenChange_(e);
+    this.boundFullWindowOnEscKey_ = (e) => this.fullWindowOnEscKey(e);
+
+    this.boundUpdateStyleEl_ = (e) => this.updateStyleEl_(e);
+    this.boundApplyInitTime_ = (e) => this.applyInitTime_(e);
+    this.boundUpdateCurrentBreakpoint_ = (e) => this.updateCurrentBreakpoint_(e);
+
+    this.boundHandleTechClick_ = (e) => this.handleTechClick_(e);
+    this.boundHandleTechDoubleClick_ = (e) => this.handleTechDoubleClick_(e);
+    this.boundHandleTechTouchStart_ = (e) => this.handleTechTouchStart_(e);
+    this.boundHandleTechTouchMove_ = (e) => this.handleTechTouchMove_(e);
+    this.boundHandleTechTouchEnd_ = (e) => this.handleTechTouchEnd_(e);
+    this.boundHandleTechTap_ = (e) => this.handleTechTap_(e);
 
     // default isFullscreen_ to false
     this.isFullscreen_ = false;
@@ -478,7 +489,7 @@ class Player extends Component {
     }
 
     if (this.fluid_) {
-      this.on('playerreset', this.updateStyleEl_);
+      this.on(['playerreset', 'resize'], this.boundUpdateStyleEl_);
     }
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.
@@ -557,10 +568,10 @@ class Player extends Component {
     this.userActive(true);
     this.reportUserActivity();
 
-    this.one('play', this.listenForUserActivity_);
-    this.on('stageclick', this.handleStageClick_);
-    this.on('keydown', this.handleKeyDown);
-    this.on('languagechange', this.handleLanguagechange);
+    this.one('play', (e) => this.listenForUserActivity_(e));
+    this.on('stageclick', (e) => this.handleStageClick_(e));
+    this.on('keydown', (e) => this.handleKeyDown(e));
+    this.on('languagechange', (e) => this.handleLanguagechange(e));
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
@@ -917,13 +928,13 @@ class Player extends Component {
     this.fluid_ = !!bool;
 
     if (isEvented(this)) {
-      this.off('playerreset', this.updateStyleEl_);
+      this.off(['playerreset', 'resize'], this.boundUpdateStyleEl_);
     }
     if (bool) {
       this.addClass('vjs-fluid');
       this.fill(false);
-      addEventedCallback(function() {
-        this.on('playerreset', this.updateStyleEl_);
+      addEventedCallback(this, () => {
+        this.on(['playerreset', 'resize'], this.boundUpdateStyleEl_);
       });
     } else {
       this.removeClass('vjs-fluid');
@@ -1178,7 +1189,7 @@ class Player extends Component {
 
     // Listen to all HTML5-defined events and trigger them on the player
     TECH_EVENTS_RETRIGGER.forEach((event) => {
-      this.on(this.tech_, event, this[`handleTech${toTitleCase(event)}_`]);
+      this.on(this.tech_, event, (e) => this[`handleTech${toTitleCase(event)}_`](e));
     });
 
     Object.keys(TECH_EVENTS_QUEUE).forEach((event) => {
@@ -1194,24 +1205,24 @@ class Player extends Component {
       });
     });
 
-    this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
-    this.on(this.tech_, 'sourceset', this.handleTechSourceset_);
-    this.on(this.tech_, 'waiting', this.handleTechWaiting_);
-    this.on(this.tech_, 'ended', this.handleTechEnded_);
-    this.on(this.tech_, 'seeking', this.handleTechSeeking_);
-    this.on(this.tech_, 'play', this.handleTechPlay_);
-    this.on(this.tech_, 'firstplay', this.handleTechFirstPlay_);
-    this.on(this.tech_, 'pause', this.handleTechPause_);
-    this.on(this.tech_, 'durationchange', this.handleTechDurationChange_);
-    this.on(this.tech_, 'fullscreenchange', this.handleTechFullscreenChange_);
-    this.on(this.tech_, 'fullscreenerror', this.handleTechFullscreenError_);
-    this.on(this.tech_, 'enterpictureinpicture', this.handleTechEnterPictureInPicture_);
-    this.on(this.tech_, 'leavepictureinpicture', this.handleTechLeavePictureInPicture_);
-    this.on(this.tech_, 'error', this.handleTechError_);
-    this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
-    this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
-    this.on(this.tech_, 'textdata', this.handleTechTextData_);
-    this.on(this.tech_, 'ratechange', this.handleTechRateChange_);
+    this.on(this.tech_, 'loadstart', (e) => this.handleTechLoadStart_(e));
+    this.on(this.tech_, 'sourceset', (e) => this.handleTechSourceset_(e));
+    this.on(this.tech_, 'waiting', (e) => this.handleTechWaiting_(e));
+    this.on(this.tech_, 'ended', (e) => this.handleTechEnded_(e));
+    this.on(this.tech_, 'seeking', (e) => this.handleTechSeeking_(e));
+    this.on(this.tech_, 'play', (e) => this.handleTechPlay_(e));
+    this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
+    this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
+    this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
+    this.on(this.tech_, 'fullscreenchange', (e) => this.handleTechFullscreenChange_(e));
+    this.on(this.tech_, 'fullscreenerror', (e) => this.handleTechFullscreenError_(e));
+    this.on(this.tech_, 'enterpictureinpicture', (e) => this.handleTechEnterPictureInPicture_(e));
+    this.on(this.tech_, 'leavepictureinpicture', (e) => this.handleTechLeavePictureInPicture_(e));
+    this.on(this.tech_, 'error', (e) => this.handleTechError_(e));
+    this.on(this.tech_, 'posterchange', (e) => this.handleTechPosterChange_(e));
+    this.on(this.tech_, 'textdata', (e) => this.handleTechTextData_(e));
+    this.on(this.tech_, 'ratechange', (e) => this.handleTechRateChange_(e));
+    this.on(this.tech_, 'loadedmetadata', this.boundUpdateStyleEl_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -1308,20 +1319,21 @@ class Player extends Component {
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
+    // TODO: Is this needed for any techs other than Flash?
     // Any touch events are set to block the mousedown event from happening
-    this.on(this.tech_, 'mouseup', this.handleTechClick_);
-    this.on(this.tech_, 'dblclick', this.handleTechDoubleClick_);
+    this.on(this.tech_, 'mouseup', this.boundHandleTechClick_);
+    this.on(this.tech_, 'dblclick', this.boundHandleTechDoubleClick_);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
     // activity
-    this.on(this.tech_, 'touchstart', this.handleTechTouchStart_);
-    this.on(this.tech_, 'touchmove', this.handleTechTouchMove_);
-    this.on(this.tech_, 'touchend', this.handleTechTouchEnd_);
+    this.on(this.tech_, 'touchstart', this.boundHandleTechTouchStart_);
+    this.on(this.tech_, 'touchmove', this.boundHandleTechTouchMove_);
+    this.on(this.tech_, 'touchend', this.boundHandleTechTouchEnd_);
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on(this.tech_, 'tap', this.handleTechTap_);
+    this.on(this.tech_, 'tap', this.boundHandleTechTap_);
   }
 
   /**
@@ -1333,12 +1345,12 @@ class Player extends Component {
   removeTechControlsListeners_() {
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
-    this.off(this.tech_, 'tap', this.handleTechTap_);
-    this.off(this.tech_, 'touchstart', this.handleTechTouchStart_);
-    this.off(this.tech_, 'touchmove', this.handleTechTouchMove_);
-    this.off(this.tech_, 'touchend', this.handleTechTouchEnd_);
-    this.off(this.tech_, 'mouseup', this.handleTechClick_);
-    this.off(this.tech_, 'dblclick', this.handleTechDoubleClick_);
+    this.off(this.tech_, 'tap', this.boundHandleTechTap_);
+    this.off(this.tech_, 'touchstart', this.boundHandleTechTouchStart_);
+    this.off(this.tech_, 'touchmove', this.boundHandleTechTouchMove_);
+    this.off(this.tech_, 'touchend', this.boundHandleTechTouchEnd_);
+    this.off(this.tech_, 'mouseup', this.boundHandleTechClick_);
+    this.off(this.tech_, 'dblclick', this.boundHandleTechDoubleClick_);
   }
 
   /**
@@ -2027,7 +2039,9 @@ class Player extends Component {
    */
   handleTechTouchEnd_(event) {
     // Stop the mouse events from also happening
-    event.preventDefault();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
   }
 
   /**
@@ -2271,6 +2285,7 @@ class Player extends Component {
 
     // Flash likes to die and reload when you hide or reposition it.
     // In these cases the object methods go away and we get errors.
+    // TODO: Is this needed for techs other than Flash?
     // When that happens we'll catch the errors and inform tech that it's not ready any more.
     try {
       return this.tech_[method]();
@@ -2475,8 +2490,8 @@ class Player extends Component {
       }
       if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_) {
         this.cache_.initTime = seconds;
-        this.off('canplay', this.applyInitTime_);
-        this.one('canplay', this.applyInitTime_);
+        this.off('canplay', this.boundApplyInitTime_);
+        this.one('canplay', this.boundApplyInitTime_);
         return;
       }
       this.techCall_('setCurrentTime', seconds);
@@ -2508,7 +2523,7 @@ class Player extends Component {
    * in all but the rarest use cases an argument will NOT be passed to the method
    *
    * > **NOTE**: The video must have started loading before the duration can be
-   * known, and in the case of Flash, may not be known until the video starts
+   * known, and depending on preload behaviour may not be known until the video starts
    * playing.
    *
    * @fires Player#durationchange
@@ -2534,6 +2549,7 @@ class Player extends Component {
 
     if (seconds !== this.cache_.duration) {
       // Cache the last set value for optimized scrubbing (esp. Flash)
+      // TODO: Required for techs other than Flash?
       this.cache_.duration = seconds;
 
       if (seconds === Infinity) {
@@ -2739,7 +2755,7 @@ class Player extends Component {
 
   /**
    * Check if current tech can support native fullscreen
-   * (e.g. with built in controls like iOS, so not our flash swf)
+   * (e.g. with built in controls like iOS)
    *
    * @return {boolean}
    *         if native fullscreen is supported
@@ -3308,7 +3324,7 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the video source.
+   * Executes source setting and getting logic
    *
    * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
    *        A SourceObject, an array of SourceObjects, or a string referencing
@@ -3317,16 +3333,24 @@ class Player extends Component {
    *        algorithms can take the `type` into account.
    *
    *        If not provided, this method acts as a getter.
+   * @param {boolean} isRetry
+   *        Indicates whether this is being called internally as a result of a retry
    *
    * @return {string|undefined}
    *         If the `source` argument is missing, returns the current source
    *         URL. Otherwise, returns nothing/undefined.
    */
-  src(source) {
+  handleSrc_(source, isRetry) {
     // getter usage
     if (typeof source === 'undefined') {
       return this.cache_.src || '';
     }
+
+    // Reset retry behavior for new source
+    if (this.resetRetryOnError_) {
+      this.resetRetryOnError_();
+    }
+
     // filter out invalid sources and turn our source into
     // an array of source objects
     const sources = filterSource(source);
@@ -3344,7 +3368,12 @@ class Player extends Component {
     // initial sources
     this.changingSrc_ = true;
 
-    this.cache_.sources = sources;
+    // Only update the cached source list if we are not retrying a new source after error,
+    // since in that case we want to include the failed source(s) in the cache
+    if (!isRetry) {
+      this.cache_.sources = sources;
+    }
+
     this.updateSourceCaches_(sources[0]);
 
     // middlewareSource is the source after it has been changed by middleware
@@ -3353,14 +3382,17 @@ class Player extends Component {
 
       // since sourceSet is async we have to update the cache again after we select a source since
       // the source that is selected could be out of order from the cache update above this callback.
-      this.cache_.sources = sources;
+      if (!isRetry) {
+        this.cache_.sources = sources;
+      }
+
       this.updateSourceCaches_(middlewareSource);
 
       const err = this.src_(middlewareSource);
 
       if (err) {
         if (sources.length > 1) {
-          return this.src(sources.slice(1));
+          return this.handleSrc_(sources.slice(1));
         }
 
         this.changingSrc_ = false;
@@ -3379,6 +3411,46 @@ class Player extends Component {
 
       middleware.setTech(mws, this.tech_);
     });
+
+    // Try another available source if this one fails before playback.
+    if (this.options_.retryOnError && sources.length > 1) {
+      const retry = () => {
+        // Remove the error modal
+        this.error(null);
+        this.handleSrc_(sources.slice(1), true);
+      };
+
+      const stopListeningForErrors = () => {
+        this.off('error', retry);
+      };
+
+      this.one('error', retry);
+      this.one('playing', stopListeningForErrors);
+
+      this.resetRetryOnError_ = () => {
+        this.off('error', retry);
+        this.off('playing', stopListeningForErrors);
+      };
+    }
+  }
+
+  /**
+   * Get or set the video source.
+   *
+   * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
+   *        A SourceObject, an array of SourceObjects, or a string referencing
+   *        a URL to a media source. It is _highly recommended_ that an object
+   *        or array of objects is used here, so that source selection
+   *        algorithms can take the `type` into account.
+   *
+   *        If not provided, this method acts as a getter.
+   *
+   * @return {string|undefined}
+   *         If the `source` argument is missing, returns the current source
+   *         URL. Otherwise, returns nothing/undefined.
+   */
+  src(source) {
+    return this.handleSrc_(source, false);
   }
 
   /**
@@ -3804,7 +3876,7 @@ class Player extends Component {
 
   /**
    * Toggle native controls on/off. Native controls are the controls built into
-   * devices (e.g. default iPhone controls), Flash, or other techs
+   * devices (e.g. default iPhone controls) or other techs
    * (e.g. Vimeo Controls)
    * **This should only be set by the current tech, because only the tech knows
    * if it can support native controls**
@@ -4528,12 +4600,12 @@ class Player extends Component {
     // Start listening for breakpoints and set the initial breakpoint if the
     // player is now responsive.
     if (value) {
-      this.on('playerresize', this.updateCurrentBreakpoint_);
+      this.on('playerresize', this.boundUpdateCurrentBreakpoint_);
       this.updateCurrentBreakpoint_();
 
     // Stop listening for breakpoints if the player is no longer responsive.
     } else {
-      this.off('playerresize', this.updateCurrentBreakpoint_);
+      this.off('playerresize', this.boundUpdateCurrentBreakpoint_);
       this.removeCurrentBreakpoint_();
     }
 
@@ -4898,7 +4970,6 @@ Player.prototype.options_ = {
   techOrder: Tech.defaultTechOrder_,
 
   html5: {},
-  flash: {},
 
   // default inactivity timeout
   inactivityTimeout: 2000,

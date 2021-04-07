@@ -23,7 +23,7 @@ class RemainingTimeDisplay extends TimeDisplay {
    */
   constructor(player, options) {
     super(player, options);
-    this.on(player, 'durationchange', this.updateContent);
+    this.on(player, 'durationchange', (e) => this.updateContent(e));
   }
 
   /**

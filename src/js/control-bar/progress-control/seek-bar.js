@@ -61,9 +61,12 @@ class SeekBar extends Slider {
     // via an interval
     this.updateInterval = null;
 
-    this.on(this.player_, ['playing'], this.enableInterval_);
+    this.enableIntervalHandler_ = (e) => this.enableInterval_(e);
+    this.disableIntervalHandler_ = (e) => this.disableInterval_(e);
 
-    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
+    this.on(this.player_, ['playing'], this.enableIntervalHandler_);
+
+    this.on(this.player_, ['ended', 'pause', 'waiting'], this.disableIntervalHandler_);
 
     // we don't need to update the play progress if the document is hidden,
     // also, this causes the CPU to spike and eventually crash the page on IE11.
@@ -73,10 +76,14 @@ class SeekBar extends Slider {
   }
 
   toggleVisibility_(e) {
-    if (document.hidden) {
+    if (document.visibilityState === 'hidden') {
+      this.cancelNamedAnimationFrame('SeekBar#update');
+      this.cancelNamedAnimationFrame('Slider#update');
       this.disableInterval_(e);
     } else {
-      this.enableInterval_();
+      if (!this.player_.ended() && !this.player_.paused()) {
+        this.enableInterval_();
+      }
 
       // we just switched back to the page and someone may be looking, so, update ASAP
       this.update();
@@ -131,6 +138,11 @@ class SeekBar extends Slider {
    *          The current percent at a number from 0-1
    */
   update(event) {
+    // ignore updates while the tab is hidden
+    if (document.visibilityState === 'hidden') {
+      return;
+    }
+
     const percent = super.update();
 
     this.requestNamedAnimationFrame('SeekBar#update', () => {
@@ -437,8 +449,8 @@ class SeekBar extends Slider {
       this.on(this.player_.liveTracker, 'liveedgechange', this.update);
     }
 
-    this.off(this.player_, ['playing'], this.enableInterval_);
-    this.off(this.player_, ['ended', 'pause', 'waiting'], this.disableInterval_);
+    this.off(this.player_, ['playing'], this.enableIntervalHandler_);
+    this.off(this.player_, ['ended', 'pause', 'waiting'], this.disableIntervalHandler_);
 
     // we don't need to update the play progress if the document is hidden,
     // also, this causes the CPU to spike and eventually crash the page on IE11.

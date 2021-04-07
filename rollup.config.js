@@ -12,6 +12,7 @@ import pkg from './package.json';
 import multiEntry from 'rollup-plugin-multi-entry';
 import stub from 'rollup-plugin-stub';
 import isCI from 'is-ci';
+import replace from '@rollup/plugin-replace';
 
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
@@ -94,8 +95,7 @@ const moduleExternals = [
   '@babel/runtime'
 ];
 const externals = {
-  browser: Object.keys(globals.browser).concat([
-  ]),
+  browser: [],
   module(id) {
     const result = moduleExternals.some((ext) => id.indexOf(ext) !== -1);
 
@@ -130,6 +130,54 @@ export default cliargs => [
     onwarn,
     watch
   },
+  // debug umd file
+  {
+    input: 'src/js/debug.js',
+    output: {
+      format: 'umd',
+      file: 'dist/alt/video.debug.js',
+      name: 'videojs',
+      banner,
+      globals: globals.browser
+    },
+    external: externals.browser,
+    plugins: [
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
+  },
+  {
+    input: 'test/unit/**/*.test.js',
+    output: {
+      format: 'iife',
+      name: 'videojsTests',
+      file: 'test/dist/bundle.js',
+      globals: globals.test
+    },
+    external: externals.test,
+    plugins: [
+      multiEntry({exports: false}),
+      alias({
+        'video.js': path.resolve(__dirname, './src/js/video.js')
+      }),
+      primedResolve,
+      json(),
+      stub(),
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
+  },
   // es, cjs
   {
     input: 'src/js/index.js',
@@ -151,6 +199,12 @@ export default cliargs => [
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js'),
         '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
+      }),
+      replace({
+        // single quote replace
+        "require('@videojs/vhs-utils/es": "require('@videojs/vhs-utils/cjs",
+        // double quote replace
+        'require("@videojs/vhs-utils/es': 'require("@videojs/vhs-utils/cjs'
       }),
       json(),
       primedBabel,
@@ -251,30 +305,5 @@ export default cliargs => [
     ],
     onwarn,
     watch
-  },
-  {
-    input: 'test/unit/**/*.test.js',
-    output: {
-      format: 'iife',
-      name: 'videojsTests',
-      file: 'test/dist/bundle.js',
-      globals: globals.test
-    },
-    external: externals.test,
-    plugins: [
-      multiEntry({exports: false}),
-      alias({
-        'video.js': path.resolve(__dirname, './src/js/video.js')
-      }),
-      primedResolve,
-      json(),
-      stub(),
-      primedCjs,
-      primedBabel,
-      cliargs.progress !== false ? progress() : {}
-    ],
-    onwarn,
-    watch
   }
-
 ];

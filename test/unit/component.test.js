@@ -1390,3 +1390,29 @@ QUnit.test('getDescendant should work as expected', function(assert) {
 
   comp.dispose();
 });
+
+QUnit.test('ready queue should not run after dispose', function(assert) {
+  let option = false;
+  let callback = false;
+
+  const comp = new Component(this.player, {name: 'component'}, () => {
+    option = true;
+  });
+
+  comp.ready(() => {
+    callback = true;
+  });
+
+  comp.dispose();
+  comp.triggerReady();
+  // TODO: improve this error. It is a variant of:
+  // "Cannot read property 'parentNode' of null"
+  //
+  // but on some browsers such as IE 11 and safari 9 other errors are thrown,
+  // I think any error at all works for our purposes here.
+  assert.throws(() => this.clock.tick(1), /.*/, 'throws trigger error');
+
+  assert.notOk(option, 'ready option not run');
+  assert.notOk(callback, 'ready callback not run');
+
+});

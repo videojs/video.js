@@ -44,15 +44,25 @@ class LiveTracker extends Component {
 
     super(player, options_);
 
+    this.handleVisibilityChange_ = (e) => this.handleVisibilityChange(e);
+    this.trackLiveHandler_ = () => this.trackLive_();
+    this.handlePlay_ = (e) => this.handlePlay(e);
+    this.handleFirstTimeupdate_ = (e) => this.handleFirstTimeupdate(e);
+    this.handleSeeked_ = (e) => this.handleSeeked(e);
+    this.seekToLiveEdge_ = (e) => this.seekToLiveEdge(e);
+
     this.reset_();
 
-    this.on(this.player_, 'durationchange', this.handleDurationchange);
+    this.on(this.player_, 'durationchange', (e) => this.handleDurationchange(e));
+    // we should try to toggle tracking on canplay as native playback engines, like Safari
+    // may not have the proper values for things like seekableEnd until then
+    this.one(this.player_, 'canplay', () => this.toggleTracking());
 
     // we don't need to track live playback if the document is hidden,
     // also, tracking when the document is hidden can
     // cause the CPU to spike and eventually crash the page on IE11.
     if (browser.IE_VERSION && 'hidden' in document && 'visibilityState' in document) {
-      this.on(document, 'visibilitychange', this.handleVisibilityChange);
+      this.on(document, 'visibilitychange', this.handleVisibilityChange_);
     }
   }
 
@@ -103,7 +113,7 @@ class LiveTracker extends Component {
 
     // we cannot be behind if
     // 1. until we have not seen a timeupdate yet
-    // 2. liveCurrentTime is Infinity, which happens on Android
+    // 2. liveCurrentTime is Infinity, which happens on Android and Native Safari
     if (!this.timeupdateSeen_ || liveCurrentTime === Infinity) {
       isBehind = false;
     }
@@ -119,6 +129,13 @@ class LiveTracker extends Component {
    * and start/stop tracking accordingly.
    */
   handleDurationchange() {
+    this.toggleTracking();
+  }
+
+  /**
+   * start/stop tracking
+   */
+  toggleTracking() {
     if (this.player_.duration() === Infinity && this.liveWindow() >= this.options_.trackingThreshold) {
       if (this.player_.options_.liveui) {
         this.player_.addClass('vjs-liveui');
@@ -145,16 +162,16 @@ class LiveTracker extends Component {
       this.timeupdateSeen_ = this.player_.hasStarted();
     }
 
-    this.trackingInterval_ = this.setInterval(this.trackLive_, Fn.UPDATE_REFRESH_INTERVAL);
+    this.trackingInterval_ = this.setInterval(this.trackLiveHandler_, Fn.UPDATE_REFRESH_INTERVAL);
     this.trackLive_();
 
-    this.on(this.player_, ['play', 'pause'], this.trackLive_);
+    this.on(this.player_, ['play', 'pause'], this.trackLiveHandler_);
 
     if (!this.timeupdateSeen_) {
-      this.one(this.player_, 'play', this.handlePlay);
-      this.one(this.player_, 'timeupdate', this.handleFirstTimeupdate);
+      this.one(this.player_, 'play', this.handlePlay_);
+      this.one(this.player_, 'timeupdate', this.handleFirstTimeupdate_);
     } else {
-      this.on(this.player_, 'seeked', this.handleSeeked);
+      this.on(this.player_, 'seeked', this.handleSeeked_);
     }
   }
 
@@ -164,7 +181,7 @@ class LiveTracker extends Component {
    */
   handleFirstTimeupdate() {
     this.timeupdateSeen_ = true;
-    this.on(this.player_, 'seeked', this.handleSeeked);
+    this.on(this.player_, 'seeked', this.handleSeeked_);
   }
 
   /**
@@ -184,7 +201,7 @@ class LiveTracker extends Component {
    * right to the live edge.
    */
   handlePlay() {
-    this.one(this.player_, 'timeupdate', this.seekToLiveEdge);
+    this.one(this.player_, 'timeupdate', this.seekToLiveEdge_);
   }
 
   /**
@@ -203,11 +220,11 @@ class LiveTracker extends Component {
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
 
-    this.off(this.player_, ['play', 'pause'], this.trackLive_);
-    this.off(this.player_, 'seeked', this.handleSeeked);
-    this.off(this.player_, 'play', this.handlePlay);
-    this.off(this.player_, 'timeupdate', this.handleFirstTimeupdate);
-    this.off(this.player_, 'timeupdate', this.seekToLiveEdge);
+    this.off(this.player_, ['play', 'pause'], this.trackLiveHandler_);
+    this.off(this.player_, 'seeked', this.handleSeeked_);
+    this.off(this.player_, 'play', this.handlePlay_);
+    this.off(this.player_, 'timeupdate', this.handleFirstTimeupdate_);
+    this.off(this.player_, 'timeupdate', this.seekToLiveEdge_);
   }
 
   /**
@@ -275,8 +292,9 @@ class LiveTracker extends Component {
   liveWindow() {
     const liveCurrentTime = this.liveCurrentTime();
 
+    // if liveCurrenTime is Infinity then we don't have a liveWindow at all
     if (liveCurrentTime === Infinity) {
-      return Infinity;
+      return 0;
     }
 
     return liveCurrentTime - this.seekableStart();
@@ -367,7 +385,7 @@ class LiveTracker extends Component {
    * Dispose of liveTracker
    */
   dispose() {
-    this.off(document, 'visibilitychange', this.handleVisibilityChange);
+    this.off(document, 'visibilitychange', this.handleVisibilityChange_);
     this.stopTracking();
     super.dispose();
   }

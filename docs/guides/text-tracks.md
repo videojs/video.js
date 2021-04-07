@@ -91,7 +91,7 @@ The boolean `default` attribute can be used to indicate that a track's mode shou
 
 The valid [BCP 47](https://tools.ietf.org/html/bcp47) code for the language of the text track, e.g. `"en"` for English or `"es"` for Spanish.
 
-For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the Video.js root and refer to the [languages guide](/docs/guides/languages.md) for more information on languages in Video.js.
+For supported language translations, please see the [languages folder (/lang)](https://github.com/videojs/video.js/tree/main/lang) folder located in the Video.js root and refer to the [languages guide](/docs/guides/languages.md) for more information on languages in Video.js.
 
 ### Text Tracks from Another Domain
 
@@ -163,7 +163,7 @@ metadataTrack.addEventListener('cuechange', function() {
 
 ## Emulated Text Tracks
 
-By default, Video.js will use native text tracks and fall back to emulated text tracks if the native functionality is broken, incomplete, or non-existent. The Flash tech will always use the emulated text track functionality.
+By default, Video.js will use native text tracks and fall back to emulated text tracks if the native functionality is broken, incomplete, or non-existent.
 
 The Video.js API and TextTrack objects were modeled after the W3C specification. Video.js uses [Mozilla's vtt.js](https://github.com/mozilla/vtt.js) library to parse and display emulated text tracks.
 

@@ -15,7 +15,7 @@ class MapSham {
     return has;
   }
   set(key, value) {
-    this.set_[key] = value;
+    this.map_[key] = value;
     return this;
   }
   forEach(callback, thisArg) {
