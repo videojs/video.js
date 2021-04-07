@@ -17,7 +17,7 @@ jobs:
 
   ci:
     needs: should-skip
-    if: ${{needs.should-skip.outputs.should-skip-job != 'true'}}
+    if: ${{needs.should-skip.outputs.should-skip-job != 'true' || github.ref == 'refs/heads/main'}}
     strategy:
       fail-fast: false
       matrix:
