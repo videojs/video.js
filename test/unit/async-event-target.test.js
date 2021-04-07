@@ -3,8 +3,21 @@ import window from 'global/window';
 import EventTarget from '../../src/js/event-target.js';
 import AsyncEventTarget from '../../src/js/async-event-target.js';
 import {isEvented} from '../../src/js/mixins/evented';
-import {hasAsyncTimers} from '../../src/js/mixins/async-timers.js';
+import {AsyncTimersMixin} from '../../src/js/mixins/async-timers.js';
 import sinon from 'sinon';
+
+// a function that is mostly for unit tests.
+export const hasAsyncTimers = function(target) {
+  const fns = Object.keys(AsyncTimersMixin);
+
+  for (let i = 0; i < fns.length; i++) {
+    if (typeof target[fns[i]] !== 'function') {
+      return false;
+    }
+  }
+
+  return true;
+};
 
 QUnit.module('AsyncEventTarget', {
   beforeEach() {

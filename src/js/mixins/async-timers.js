@@ -15,7 +15,7 @@ import Set from '../utils/set.js';
  *
  * @mixin AsyncTimers
  */
-const AsyncTimersMixin = {
+export const AsyncTimersMixin = {
   /**
    * A callback that has no parameters and is bound into `Component`s context.
    *
@@ -336,18 +336,6 @@ const asyncTimers = function(target, options) {
   Obj.assign(target, AsyncTimersMixin);
 
   return target;
-};
-
-export const hasAsyncTimers = function(target) {
-  const fns = Object.keys(AsyncTimersMixin);
-
-  for (let i = 0; i < fns.length; i++) {
-    if (typeof target[fns[i]] !== 'function') {
-      return false;
-    }
-  }
-
-  return true;
 };
 
 export default asyncTimers;
