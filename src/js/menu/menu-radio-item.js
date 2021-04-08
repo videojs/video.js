@@ -11,12 +11,14 @@ import Component from '../../component.js';
  * @extends MenuItem
  */
 class MenuRadioItem extends MenuItem {
-  constructor(player, options) {
-    // only one item should be selectable in menu
+  constructor(player, options, clickHandler) {
+    // one and only one item should be selectable in menu at a time
+    options.selectable = true;
     options.selectable = true;
     options.multiSelectable = false;
     super(player, options);
 
+    this.clickHandler = clickHandler;
     this.selected(options.defaultSelection);
   }
 
@@ -32,8 +34,15 @@ class MenuRadioItem extends MenuItem {
    * @listens click
    */
   handleClick(event) {
+    // loop through the menu items, selecting this one and unselecting others
     for (const item of this.parentComponent_.parentComponent_.items) {
       item.selected(item.id_ === this.id_);
+    }
+
+    // allow clickHandler so MenuRadioItems can be created directly
+    // (see ClickableComponent.handleClick(). For some reason MenuItem overrides it. Here we restore it)
+    if (typeof this.clickHandler === 'function') {
+      this.clickHandler(event, this.options_);
     }
   }
 }
