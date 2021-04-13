@@ -1,3 +1,12 @@
+<a name="7.12.1"></a>
+## [7.12.1](https://github.com/videojs/video.js/compare/v7.12.0...v7.12.1) (2021-04-13)
+
+### Bug Fixes
+
+* **package:** remove remove ([#7177](https://github.com/videojs/video.js/issues/7177)) ([9abba58](https://github.com/videojs/video.js/commit/9abba58)), closes [#7176](https://github.com/videojs/video.js/issues/7176)
+* **package:** update vtt.js to allow server-side-rendering ([#7178](https://github.com/videojs/video.js/issues/7178)) ([a3bfeb7](https://github.com/videojs/video.js/commit/a3bfeb7))
+* **package:** upgrade VHS to 2.7.1 ([#7174](https://github.com/videojs/video.js/issues/7174)) ([f0d69cd](https://github.com/videojs/video.js/commit/f0d69cd))
+
 <a name="7.12.0"></a>
 # [7.12.0](https://github.com/videojs/video.js/compare/v7.11.8...v7.12.0) (2021-04-07)
 
