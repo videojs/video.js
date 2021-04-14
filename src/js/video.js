@@ -569,5 +569,9 @@ videojs.url = Url;
 
 videojs.defineLazyProperty = defineLazyProperty;
 
+// Adding less ambiguous text for fullscreen button.
+// In a major update this could become the default text and key.
+videojs.addLanguage('en', {'Non-Fullscreen': 'Exit Fullscreen'});
+
 export default videojs;
 

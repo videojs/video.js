@@ -16,7 +16,7 @@
   "Progress Bar": "Progress Bar",
   "progress bar timing: currentTime={1} duration={2}": "{1} of {2}",
   "Fullscreen": "Fullscreen",
-  "Non-Fullscreen": "Non-Fullscreen",
+  "Non-Fullscreen": "Exit Fullscreen",
   "Mute": "Mute",
   "Unmute": "Unmute",
   "Playback Rate": "Playback Rate",
