@@ -14,7 +14,6 @@ class MenuRadioItem extends MenuItem {
   constructor(player, options, clickHandler) {
     // one and only one item should be selectable in menu at a time
     options.selectable = true;
-    options.selectable = true;
     options.multiSelectable = false;
     super(player, options);
 
