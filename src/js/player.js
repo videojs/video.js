@@ -1125,9 +1125,13 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
-    // if autoplay is a string we pass false to the tech
+    let autoplay = this.autoplay();
+
+    // if autoplay is a string (or `true` with normalizeAutoplay: true) we pass false to the tech
     // because the player is going to handle autoplay on `loadstart`
-    const autoplay = typeof this.autoplay() === 'string' ? false : this.autoplay();
+    if (typeof this.autoplay() === 'string' || this.autoplay() === true && this.options_.normalizeAutoplay) {
+      autoplay = false;
+    }
 
     // Grab tech-specific options from player options and add source and parent element to use.
     const techOptions = {
@@ -1410,7 +1414,7 @@ class Player extends Component {
 
     // autoplay happens after loadstart for the browser,
     // so we mimic that behavior
-    this.manualAutoplay_(this.autoplay());
+    this.manualAutoplay_(this.autoplay() === true && this.options_.normalizeAutoplay ? 'play' : this.autoplay());
   }
 
   /**
@@ -3684,6 +3688,14 @@ class Player extends Component {
     } else if (!value) {
       this.options_.autoplay = false;
 
+    // normalize `true` as 'play' if need be
+    } else if (value === true && this.options_.normalizeAutoplay) {
+      // we still want player.autoplay() to return the provided setting,
+      // even though it will be treated as a 'play' behind the scenes
+      this.options_.autoplay = value;
+      this.manualAutoplay_('play');
+      techAutoplay = false;
+
     // any other value (ie truthy) sets autoplay to true
     } else {
       this.options_.autoplay = true;
@@ -4996,6 +5008,8 @@ Player.prototype.options_ = {
 
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.',
+
+  normalizeAutoplay: false,
 
   fullscreen: {
     options: {
