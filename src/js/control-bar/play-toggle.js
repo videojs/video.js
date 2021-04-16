@@ -3,6 +3,7 @@
  */
 import Button from '../button.js';
 import Component from '../component.js';
+import {silencePromise} from '../utils/promise';
 
 /**
  * Button to toggle between play and pause.
@@ -57,7 +58,7 @@ class PlayToggle extends Button {
    */
   handleClick(event) {
     if (this.player_.paused()) {
-      this.player_.play();
+      silencePromise(this.player_.play());
     } else {
       this.player_.pause();
     }
