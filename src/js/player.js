@@ -3677,24 +3677,16 @@ class Player extends Component {
 
     let techAutoplay;
 
-    // if the value is a valid string set it to that
-    if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
+    // if the value is a valid string set it to that, or normalize `true` to 'play if need be'
+    if (typeof value === 'string' && (/(any|play|muted)/).test(value) || value === true && this.options_.normalizeAutoplay) {
       this.options_.autoplay = value;
-      this.manualAutoplay_(value);
+      this.manualAutoplay_(typeof value === 'string' ? value : 'play');
       techAutoplay = false;
 
     // any falsy value sets autoplay to false in the browser,
     // lets do the same
     } else if (!value) {
       this.options_.autoplay = false;
-
-    // normalize `true` as 'play' if need be
-    } else if (value === true && this.options_.normalizeAutoplay) {
-      // we still want player.autoplay() to return the provided setting,
-      // even though it will be treated as a 'play' behind the scenes
-      this.options_.autoplay = value;
-      this.manualAutoplay_('play');
-      techAutoplay = false;
 
     // any other value (ie truthy) sets autoplay to true
     } else {
