@@ -31,6 +31,7 @@
   * [liveTracker.trackingThreshold](#livetrackertrackingthreshold)
   * [liveTracker.liveTolerance](#livetrackerlivetolerance)
   * [nativeControlsForTouch](#nativecontrolsfortouch)
+  * [normalizeAutoplay](#normalizeautoplay)
   * [notSupportedMessage](#notsupportedmessage)
   * [noUITitleAttributes](#nouititleattributes)
   * [fullscreen](#fullscreen)
@@ -291,6 +292,12 @@ An option for the liveTracker component of the player that controls how far from
 > Type: `boolean`
 
 Explicitly set a default value for [the associated tech option](#nativecontrolsfortouch).
+
+### `normalizeAutoplay`
+
+> Type: `boolean`
+
+Specify whether setting `autoplay: true` should be treated the same as `autoplay: 'play'` 
 
 ### `notSupportedMessage`
 
