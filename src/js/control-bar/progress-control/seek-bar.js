@@ -186,6 +186,13 @@ class SeekBar extends Slider {
     return percent;
   }
 
+  /**
+   * Prevent liveThreshold from causing seeks to seem like they
+   * are not happening from a user perspective.
+   *
+   * @param {number} ct
+   *        current time to seek to
+   */
   userSeek_(ct) {
     if (this.player_.liveTracker && this.player_.liveTracker.isLive()) {
       this.player_.liveTracker.nextSeekedFromUser();
