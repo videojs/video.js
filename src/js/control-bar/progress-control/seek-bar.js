@@ -302,6 +302,12 @@ class SeekBar extends Slider {
       }
     }
 
+    // tell live tracker that the current seek can be
+    // behind live.
+    if (liveTracker) {
+      liveTracker.userSeek_(true);
+    }
+
     // Set new time (tell player to seek to new time)
     this.player_.currentTime(newTime);
   }
