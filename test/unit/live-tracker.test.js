@@ -148,7 +148,7 @@ QUnit.module('LiveTracker', () => {
     assert.ok(this.liveTracker.behindLiveEdge(), 'behindLiveEdge live edge');
   });
 
-  QUnit.test('is behindLiveEdge when seeking backwards', function(assert) {
+  QUnit.test('is behindLiveEdge when seeking behind liveTolerance with API', function(assert) {
     this.liveTracker.options_.liveTolerance = 6;
     this.player.seekable = () => createTimeRanges(0, 20);
     this.player.trigger('timeupdate');
@@ -157,6 +157,23 @@ QUnit.module('LiveTracker', () => {
 
     assert.ok(this.liveTracker.atLiveEdge(), 'at live edge');
 
+    this.player.currentTime = () => 14;
+    this.player.trigger('seeked');
+
+    assert.equal(this.liveEdgeChanges, 1, 'should have one live edge change');
+    assert.ok(this.liveTracker.behindLiveEdge(), 'behindLiveEdge live edge');
+  });
+
+  QUnit.test('is behindLiveEdge when seeking >2s behind with ui', function(assert) {
+    this.liveTracker.options_.liveTolerance = 6;
+    this.player.seekable = () => createTimeRanges(0, 20);
+    this.player.trigger('timeupdate');
+    this.player.currentTime = () => 20;
+    this.clock.tick(1000);
+
+    assert.ok(this.liveTracker.atLiveEdge(), 'at live edge');
+
+    this.liveTracker.nextSeekedFromUser();
     this.player.currentTime = () => 17;
     this.player.trigger('seeked');
 
