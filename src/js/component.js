@@ -15,6 +15,7 @@ import mergeOptions from './utils/merge-options.js';
 import computedStyle from './utils/computed-style';
 import Map from './utils/map.js';
 import Set from './utils/set.js';
+import keycode from 'keycode';
 
 /**
  * Base class for all UI Components.
@@ -1161,8 +1162,10 @@ class Component {
     if (this.player_) {
 
       // We only stop propagation here because we want unhandled events to fall
-      // back to the browser.
-      event.stopPropagation();
+      // back to the browser. Exclude Tab for focus trapping.
+      if (!keycode.isEventKey(event, 'Tab')) {
+        event.stopPropagation();
+      }
       this.player_.handleKeyDown(event);
     }
   }
