@@ -120,8 +120,6 @@ class MenuButton extends Component {
         tabIndex: -1
       });
 
-      this.hideThreshold_ += 1;
-
       const titleComponent = new Component(this.player_, {el: titleEl});
 
       menu.addItem(titleComponent);

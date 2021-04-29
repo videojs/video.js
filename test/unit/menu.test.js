@@ -43,6 +43,24 @@ QUnit.test('should place title list item into ul', function(assert) {
   player.dispose();
 });
 
+QUnit.test('should not include menu title in hide threshold', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const menuButton = new MenuButton(player, {
+    title: 'testTitle'
+  });
+
+  assert.strictEqual(menuButton.hideThreshold_, 0, 'title should not increment hideThreshold_');
+
+  menuButton.createItems = () => [new MenuItem(player, { label: 'menu-item1' })];
+  menuButton.update();
+
+  assert.strictEqual(menuButton.hasClass('vjs-hidden'), false, 'menu button with single (non-title) item is not hidden');
+
+  menuButton.dispose();
+  player.dispose();
+});
+
 QUnit.test('clicking should display the menu', function(assert) {
   assert.expect(6);
 
