@@ -2873,7 +2873,7 @@ class Player extends Component {
       }
 
       return promise;
-    } else if (this.tech_.supportsFullScreen()) {
+    } else if (this.tech_.supportsFullScreen() && !this.options_.preferFullWindow === true) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
       // with native controls
       this.techCall_('enterFullScreen');
@@ -2933,7 +2933,7 @@ class Player extends Component {
       }
 
       return promise;
-    } else if (this.tech_.supportsFullScreen()) {
+    } else if (this.tech_.supportsFullScreen() && !this.options_.preferFullWindow === true) {
       this.techCall_('exitFullScreen');
     } else {
       this.exitFullWindow();
