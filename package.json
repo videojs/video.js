@@ -85,7 +85,7 @@
     "@babel/runtime": "^7.9.2",
     "@videojs/http-streaming": "2.7.1",
     "@videojs/xhr": "2.5.1",
-    "global": "4.3.2",
+    "global": "^4.4.0",
     "keycode": "^2.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "safe-json-parse": "4.0.0",
