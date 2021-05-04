@@ -98,7 +98,7 @@
     "@babel/preset-env": "^7.9.0",
     "@rollup/plugin-replace": "^2.4.1",
     "access-sniff": "^3.2.0",
-    "autoprefixer": "^9.6.0",
+    "autoprefixer": "^10.2.5",
     "bestzip": "^2.2.0",
     "browserify": "^16.2.3",
     "chokidar-cli": "^2.1.0",
