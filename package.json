@@ -116,7 +116,7 @@
     "is-ci": "^3.0.0",
     "jsdoc": "^3.6.6",
     "karma": "^6.3.2",
-    "lint-staged": "^8.2.0",
+    "lint-staged": "^10.5.4",
     "markdown-table": "^1.1.3",
     "maxmin": "^2.1.0",
     "not-prerelease": "^1.0.1",
@@ -173,16 +173,13 @@
   },
   "lint-staged": {
     "*.js": [
-      "vjsstandard --fix",
-      "git add"
+      "vjsstandard --fix"
     ],
     "!(CHANGELOG)*.md": [
-      "remark --output --",
-      "git add"
+      "remark --output --"
     ],
     "lang/**/!(zh-Hans|zh-Hant)*.json": [
-      "node build/translations.js",
-      "git add docs/translations-needed.md"
+      "node build/translations.js"
     ]
   }
 }
