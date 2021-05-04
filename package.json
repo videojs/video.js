@@ -111,7 +111,7 @@
     "es6-shim": "^0.35.6",
     "filesize": "^4.1.2",
     "gh-release": "^5.0.0",
-    "humanize-duration": "^3.18.0",
+    "humanize-duration": "^3.26.0",
     "husky": "^1.2.0",
     "is-ci": "^2.0.0",
     "jsdoc": "^3.6.6",
