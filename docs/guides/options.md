@@ -297,7 +297,7 @@ Explicitly set a default value for [the associated tech option](#nativecontrolsf
 
 > Type: `boolean`
 
-Specify whether setting `autoplay: true` should be treated the same as `autoplay: 'play'`, i.e. the `autoplay` attribute should be removed and the `play()` should be initiated manually by video.js rather than the browser.
+Specify whether setting `autoplay: true` and `<video autoplay>` should be treated the same as `autoplay: 'play'`, i.e. the `autoplay` attribute should be removed from (or not added to) the video element and `play()` be initiated manually by Video.js rather than the browser.
 
 ### `notSupportedMessage`
 
