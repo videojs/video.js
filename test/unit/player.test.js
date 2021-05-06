@@ -339,7 +339,7 @@ QUnit.test('should remove autoplay attribute when normalizeAutoplay: true', func
 
   player.loadTech_('Html5');
 
-  assert.equal(player.options_.autoplay, true, 'autoplay option is set to true');
+  assert.equal(player.autoplay(), true, 'autoplay option is set to true');
   assert.equal(tag.getAttribute('autoplay'), null, 'autoplay attribute removed');
 });
 
