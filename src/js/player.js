@@ -3677,7 +3677,7 @@ class Player extends Component {
 
     let techAutoplay;
 
-    // if the value is a valid string set it to that, or normalize `true` to 'play if need be'
+    // if the value is a valid string set it to that, or normalize `true` to 'play', if need be
     if (typeof value === 'string' && (/(any|play|muted)/).test(value) || value === true && this.options_.normalizeAutoplay) {
       this.options_.autoplay = value;
       this.manualAutoplay_(typeof value === 'string' ? value : 'play');
