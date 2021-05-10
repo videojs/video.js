@@ -187,6 +187,21 @@ class SeekBar extends Slider {
   }
 
   /**
+   * Prevent liveThreshold from causing seeks to seem like they
+   * are not happening from a user perspective.
+   *
+   * @param {number} ct
+   *        current time to seek to
+   */
+  userSeek_(ct) {
+    if (this.player_.liveTracker && this.player_.liveTracker.isLive()) {
+      this.player_.liveTracker.nextSeekedFromUser();
+    }
+
+    this.player_.currentTime(ct);
+  }
+
+  /**
    * Get the value of current time but allows for smooth scrubbing,
    * when player can't keep up.
    *
@@ -303,7 +318,7 @@ class SeekBar extends Slider {
     }
 
     // Set new time (tell player to seek to new time)
-    this.player_.currentTime(newTime);
+    this.userSeek_(newTime);
   }
 
   enable() {
@@ -366,14 +381,14 @@ class SeekBar extends Slider {
    * Move more quickly fast forward for keyboard-only users
    */
   stepForward() {
-    this.player_.currentTime(this.player_.currentTime() + STEP_SECONDS);
+    this.userSeek_(this.player_.currentTime() + STEP_SECONDS);
   }
 
   /**
    * Move more quickly rewind for keyboard-only users
    */
   stepBack() {
-    this.player_.currentTime(this.player_.currentTime() - STEP_SECONDS);
+    this.userSeek_(this.player_.currentTime() - STEP_SECONDS);
   }
 
   /**
@@ -409,6 +424,8 @@ class SeekBar extends Slider {
    * @listens keydown
    */
   handleKeyDown(event) {
+    const liveTracker = this.player_.liveTracker;
+
     if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
       event.preventDefault();
       event.stopPropagation();
@@ -416,25 +433,33 @@ class SeekBar extends Slider {
     } else if (keycode.isEventKey(event, 'Home')) {
       event.preventDefault();
       event.stopPropagation();
-      this.player_.currentTime(0);
+      this.userSeek_(0);
     } else if (keycode.isEventKey(event, 'End')) {
       event.preventDefault();
       event.stopPropagation();
-      this.player_.currentTime(this.player_.duration());
+      if (liveTracker && liveTracker.isLive()) {
+        this.userSeek_(liveTracker.liveCurrentTime());
+      } else {
+        this.userSeek_(this.player_.duration());
+      }
     } else if (/^[0-9]$/.test(keycode(event))) {
       event.preventDefault();
       event.stopPropagation();
       const gotoFraction = (keycode.codes[keycode(event)] - keycode.codes['0']) * 10.0 / 100.0;
 
-      this.player_.currentTime(this.player_.duration() * gotoFraction);
+      if (liveTracker && liveTracker.isLive()) {
+        this.userSeek_(liveTracker.seekableStart() + (liveTracker.liveWindow() * gotoFraction));
+      } else {
+        this.userSeek_(this.player_.duration() * gotoFraction);
+      }
     } else if (keycode.isEventKey(event, 'PgDn')) {
       event.preventDefault();
       event.stopPropagation();
-      this.player_.currentTime(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+      this.userSeek_(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else if (keycode.isEventKey(event, 'PgUp')) {
       event.preventDefault();
       event.stopPropagation();
-      this.player_.currentTime(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+      this.userSeek_(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
     } else {
       // Pass keydown handling up for unsupported keys
       super.handleKeyDown(event);

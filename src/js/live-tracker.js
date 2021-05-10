@@ -191,8 +191,8 @@ class LiveTracker extends Component {
   handleSeeked() {
     const timeDiff = Math.abs(this.liveCurrentTime() - this.player_.currentTime());
 
-    this.seekedBehindLive_ = this.skipNextSeeked_ ? false : timeDiff > 2;
-    this.skipNextSeeked_ = false;
+    this.seekedBehindLive_ = this.nextSeekedFromUser_ && timeDiff > 2;
+    this.nextSeekedFromUser_ = false;
     this.trackLive_();
   }
 
@@ -215,7 +215,7 @@ class LiveTracker extends Component {
     this.behindLiveEdge_ = true;
     this.timeupdateSeen_ = false;
     this.seekedBehindLive_ = false;
-    this.skipNextSeeked_ = false;
+    this.nextSeekedFromUser_ = false;
 
     this.clearInterval(this.trackingInterval_);
     this.trackingInterval_ = null;
@@ -225,6 +225,15 @@ class LiveTracker extends Component {
     this.off(this.player_, 'play', this.handlePlay_);
     this.off(this.player_, 'timeupdate', this.handleFirstTimeupdate_);
     this.off(this.player_, 'timeupdate', this.seekToLiveEdge_);
+  }
+
+  /**
+   * The next seeked event is from the user. Meaning that any seek
+   * > 2s behind live will be considered behind live for real and
+   * liveTolerance will be ignored.
+   */
+  nextSeekedFromUser() {
+    this.nextSeekedFromUser_ = true;
   }
 
   /**
@@ -375,8 +384,7 @@ class LiveTracker extends Component {
     if (this.atLiveEdge()) {
       return;
     }
-    // skipNextSeeked_
-    this.skipNextSeeked_ = true;
+    this.nextSeekedFromUser_ = false;
     this.player_.currentTime(this.liveCurrentTime());
 
   }
