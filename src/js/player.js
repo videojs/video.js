@@ -508,6 +508,8 @@ class Player extends Component {
 
     this.middleware_ = [];
 
+    this.playbackRates(options.playbackRates);
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -4856,6 +4858,40 @@ class Player extends Component {
       this.previousLogLevel_ = undefined;
       this.debugEnabled_ = false;
     }
+
+  }
+
+  /**
+   * Set or get current playback rates.
+   * Takes an array and updates the playback rates menu with the new items.
+   * Pass in an empty array to hide the menu.
+   * Values other than arrays are ignored.
+   *
+   * @fires Player#rateschange
+   * @param {number[]} newRates
+   *                   The new rates that the playback rates menu should update to.
+   *                   An empty array will hide the menu
+   * @return {number[]} When used as a getter will return the current playback rates
+   */
+  playbackRates(newRates) {
+    if (newRates === undefined) {
+      return this.cache_.playbackRates;
+    }
+
+    // ignore any value that isn't an array
+    if (!Array.isArray(newRates)) {
+      return;
+    }
+
+    this.cache_.playbackRates = newRates;
+
+    /**
+    * fires when the player language change
+    *
+    * @event Player#rateschange
+    * @type {EventTarget~Event}
+    */
+    this.trigger('rateschange');
   }
 }
 
