@@ -2220,6 +2220,7 @@ class Player extends Component {
       src: '',
       source: {},
       sources: [],
+      playbackRates: [],
       volume: 1
     };
   }
