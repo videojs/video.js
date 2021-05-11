@@ -26,7 +26,13 @@ function computedStyle(el, prop) {
   }
 
   if (typeof window.getComputedStyle === 'function') {
-    const computedStyleValue = window.getComputedStyle(el);
+    let computedStyleValue;
+
+    try {
+      computedStyleValue = window.getComputedStyle(el);
+    } catch (e) {
+      return '';
+    }
 
     return computedStyleValue ? computedStyleValue.getPropertyValue(prop) || computedStyleValue[prop] : '';
   }
