@@ -207,3 +207,20 @@ QUnit.test('fullscreenOptions from function args should override player options'
 
   player.dispose();
 });
+
+QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
+  const player = FullscreenTestHelpers.makePlayer(true);
+
+  player.enterFullWindow();
+  assert.ok(player.isFullWindow, 'enterFullWindow should be called');
+
+  const evt = TestHelpers.createEvent('keydown');
+
+  evt.keyCode = 27;
+  evt.which = 27;
+  player.boundFullWindowOnEscKey_(evt);
+  // player.fullWindowOnEscKey(evt);
+  assert.equal(player.isFullWindow, false, 'exitFullWindow should be called');
+
+  player.dispose();
+});
