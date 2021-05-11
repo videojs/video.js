@@ -30,7 +30,7 @@ function computedStyle(el, prop) {
 
     try {
       computedStyleValue = window.getComputedStyle(el);
-    } catch (_) {
+    } catch (e) {
       return '';
     }
 
