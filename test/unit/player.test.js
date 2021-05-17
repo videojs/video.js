@@ -1809,6 +1809,7 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   player.src(sources);
   player.duration(10);
   player.playbackRate(0.5);
+  player.playbackRates([1, 2, 3]);
   player.volume(0.2);
 
   assert.strictEqual(player.currentSrc(), sources[0].src, 'currentSrc is correct');
@@ -1816,6 +1817,7 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   assert.deepEqual(player.currentSources(), sources, 'currentSources is correct');
   assert.strictEqual(player.duration(), 10, 'duration is correct');
   assert.strictEqual(player.playbackRate(), 0.5, 'playbackRate is correct');
+  assert.deepEqual(player.playbackRates(), [1, 2, 3], 'playbackRates is correct');
   assert.strictEqual(player.volume(), 0.2, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 0.2, 'lastVolume_ is correct');
 
@@ -1832,6 +1834,7 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   assert.strictEqual(player.getCache().currentTime, 0, 'currentTime is correct');
   assert.ok(isNaN(player.duration()), 'duration is correct');
   assert.strictEqual(player.playbackRate(), 1, 'playbackRate is correct');
+  assert.deepEqual(player.playbackRates(), [], 'playbackRates is correct');
   assert.strictEqual(player.volume(), 1, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 1, 'lastVolume_ is correct');
 });
