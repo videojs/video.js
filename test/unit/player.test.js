@@ -2602,3 +2602,51 @@ QUnit[testOrSkip]('Should only allow requestPictureInPicture if the tech support
   player.requestPictureInPicture();
   assert.equal(count, 1, 'requestPictureInPicture not passed through when tech does not support');
 });
+
+QUnit.test('playbackRates should trigger a rateschange event', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const rates = [];
+  let rateschangeCount = 0;
+
+  player.on('rateschange', function() {
+    rates.push(player.playbackRates());
+    rateschangeCount++;
+  });
+
+  player.playbackRates([1, 2, 3]);
+  player.playbackRates([]);
+  player.playbackRates([1, 4]);
+
+  assert.equal(rateschangeCount, 3, 'we got 3 rateschange events');
+  assert.deepEqual(rates[0], [1, 2, 3], 'first rates is 1,2,3');
+  assert.deepEqual(rates[1], [], 'second rates is empty');
+  assert.deepEqual(rates[2], [1, 4], 'third rates is 1,4');
+
+  player.dispose();
+});
+
+QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let rateschangeCount = 0;
+
+  player.on('rateschange', function() {
+    rateschangeCount++;
+  });
+
+  player.playbackRates([1, 2, 3]);
+  assert.equal(rateschangeCount, 1, 'we got a rateschange event');
+
+  player.playbackRates('hello');
+  assert.equal(rateschangeCount, 1, 'we did not get a rateschange event');
+
+  player.playbackRates([1, 4]);
+  assert.equal(rateschangeCount, 2, 'we got a rateschange event');
+
+  player.playbackRates(5);
+  assert.equal(rateschangeCount, 2, 'we did not get a rateschange event');
+
+  player.playbackRates(['hello', '2', 'why?']);
+  assert.equal(rateschangeCount, 2, 'we did not get a rateschange event');
+
+  player.dispose();
+});
