@@ -167,6 +167,28 @@ QUnit.test('playback rate button is not hidden if playback rates are set', funct
   playbackRate.dispose();
 });
 
+QUnit.test('should show or hide playback rate menu button on playback rates change', function(assert) {
+  const rates = [1, 2, 3];
+  const norates = [];
+  let playbackRatesReturnValue = rates;
+  const player = TestHelpers.makePlayer();
+
+  player.playbackRates = () => playbackRatesReturnValue;
+
+  const playbackRate = new PlaybackRateMenuButton(player);
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') === -1, 'playbackRate is not hidden');
+
+  playbackRatesReturnValue = norates;
+
+  player.trigger('rateschange');
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is hidden');
+
+  player.dispose();
+  playbackRate.dispose();
+});
+
 QUnit.test('Picture-in-Picture control text should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
   const player = TestHelpers.makePlayer();
   const pictureInPictureToggle = new PictureInPictureToggle(player);
