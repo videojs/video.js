@@ -4884,6 +4884,11 @@ class Player extends Component {
       return;
     }
 
+    // ignore any arrays that don't only contain numbers
+    if (!newRates.every((rate) => typeof rate === 'number')) {
+      return;
+    }
+
     this.cache_.playbackRates = newRates;
 
     /**
