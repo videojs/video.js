@@ -1,3 +1,23 @@
+<a name="7.12.2"></a>
+## [7.12.2](https://github.com/videojs/video.js/compare/v7.12.1...v7.12.2) (2021-05-19)
+
+### Bug Fixes
+
+* update to VHS 2.8.1 ([#7238](https://github.com/videojs/video.js/issues/7238)) ([c4cfa55](https://github.com/videojs/video.js/commit/c4cfa55))
+* **utils:** add try and catch for computedStyle ([#7214](https://github.com/videojs/video.js/issues/7214)) ([90ce2d7](https://github.com/videojs/video.js/commit/90ce2d7))
+* Better text for exit fullscreen ([#7183](https://github.com/videojs/video.js/issues/7183)) ([0e46624](https://github.com/videojs/video.js/commit/0e46624))
+* Don't hide menus with one item and a title ([#7215](https://github.com/videojs/video.js/issues/7215)) ([d4a08de](https://github.com/videojs/video.js/commit/d4a08de))
+* exit full window mode with Esc key ([#7224](https://github.com/videojs/video.js/issues/7224)) ([e9953e5](https://github.com/videojs/video.js/commit/e9953e5))
+* incorrect focus styles on selected MenuItem ([#7202](https://github.com/videojs/video.js/issues/7202)) ([06cdb6f](https://github.com/videojs/video.js/commit/06cdb6f)), closes [#7200](https://github.com/videojs/video.js/issues/7200)
+* make Playback Rate control work better with screen readers ([#7193](https://github.com/videojs/video.js/issues/7193)) ([17919ce](https://github.com/videojs/video.js/commit/17919ce)), closes [#7121](https://github.com/videojs/video.js/issues/7121)
+* silence play promise in the play toggle. ([#7189](https://github.com/videojs/video.js/issues/7189)) ([2c6e439](https://github.com/videojs/video.js/commit/2c6e439)), closes [#6998](https://github.com/videojs/video.js/issues/6998)
+* user and programmatic seeks with live streams ([#7210](https://github.com/videojs/video.js/issues/7210)) ([39485fc](https://github.com/videojs/video.js/commit/39485fc))
+
+### Chores
+
+* update 'global' package in dependencies ([#7213](https://github.com/videojs/video.js/issues/7213)) ([cb1d29b](https://github.com/videojs/video.js/commit/cb1d29b))
+* update node/nvmrc and various dependencies ([#7221](https://github.com/videojs/video.js/issues/7221)) ([90f3e39](https://github.com/videojs/video.js/commit/90f3e39)), closes [#7216](https://github.com/videojs/video.js/issues/7216) [#6933](https://github.com/videojs/video.js/issues/6933) [#6924](https://github.com/videojs/video.js/issues/6924) [#7179](https://github.com/videojs/video.js/issues/7179)
+
 <a name="7.12.1"></a>
 ## [7.12.1](https://github.com/videojs/video.js/compare/v7.12.0...v7.12.1) (2021-04-13)
 
