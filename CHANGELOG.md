@@ -1,3 +1,14 @@
+<a name="7.12.3"></a>
+## [7.12.3](https://github.com/videojs/video.js/compare/v7.12.2...v7.12.3) (2021-05-20)
+
+### Bug Fixes
+
+* update to VHS 2.8.2 ([#7242](https://github.com/videojs/video.js/issues/7242)) ([f528767](https://github.com/videojs/video.js/commit/f528767)), closes [#7240](https://github.com/videojs/video.js/issues/7240)
+
+### Chores
+
+* revert back to gh-release[@3](https://github.com/3).5.0 for now ([#7241](https://github.com/videojs/video.js/issues/7241)) ([a4c9b12](https://github.com/videojs/video.js/commit/a4c9b12))
+
 <a name="7.12.2"></a>
 ## [7.12.2](https://github.com/videojs/video.js/compare/v7.12.1...v7.12.2) (2021-05-19)
 
