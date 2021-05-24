@@ -4892,7 +4892,7 @@ class Player extends Component {
     this.cache_.playbackRates = newRates;
 
     /**
-    * fires when the player language change
+    * fires when the playback rates in a player are changed
     *
     * @event Player#rateschange
     * @type {EventTarget~Event}
