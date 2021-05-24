@@ -181,7 +181,7 @@ QUnit.test('should show or hide playback rate menu button on playback rates chan
 
   playbackRatesReturnValue = norates;
 
-  player.trigger('rateschange');
+  player.trigger('playbackrateschange');
 
   assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is hidden');
 

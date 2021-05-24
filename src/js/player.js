@@ -4868,7 +4868,7 @@ class Player extends Component {
    * Pass in an empty array to hide the menu.
    * Values other than arrays are ignored.
    *
-   * @fires Player#rateschange
+   * @fires Player#playbackrateschange
    * @param {number[]} newRates
    *                   The new rates that the playback rates menu should update to.
    *                   An empty array will hide the menu
@@ -4894,10 +4894,10 @@ class Player extends Component {
     /**
     * fires when the playback rates in a player are changed
     *
-    * @event Player#rateschange
+    * @event Player#playbackrateschange
     * @type {EventTarget~Event}
     */
-    this.trigger('rateschange');
+    this.trigger('playbackrateschange');
   }
 }
 

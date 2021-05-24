@@ -32,7 +32,7 @@ class PlaybackRateMenuButton extends MenuButton {
 
     this.on(player, 'loadstart', (e) => this.updateVisibility(e));
     this.on(player, 'ratechange', (e) => this.updateLabel(e));
-    this.on(player, 'rateschange', (e) => this.handleRateschange(e));
+    this.on(player, 'playbackrateschange', (e) => this.handlePlaybackRateschange(e));
   }
 
   /**
@@ -129,11 +129,11 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * On rateschange, update the menu to account for the new items.
+   * On playbackrateschange, update the menu to account for the new items.
    *
-   * @listens Player#rateschange
+   * @listens Player#playbackrateschange
    */
-  handleRateschange(event) {
+  handlePlaybackRateschange(event) {
     this.update();
   }
 
