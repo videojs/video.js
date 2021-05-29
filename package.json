@@ -142,7 +142,7 @@
     "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-progress": "^1.1.2",
     "rollup-plugin-stub": "^1.2.0",
-    "sass": "^1.21.0",
+    "sass": "^1.34.0",
     "semver": "^5.7.0",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2",
