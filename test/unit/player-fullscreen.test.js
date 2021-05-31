@@ -224,3 +224,39 @@ QUnit.test('fullwindow mode should exit when ESC event triggered', function(asse
 
   player.dispose();
 });
+
+QUnit.test('fullscreenchange event from Html5 should change player.isFullscreen_', function(assert) {
+  const player = FullscreenTestHelpers.makePlayer(false);
+  const html5 = player.tech(true);
+
+  // simulate html5.proxyWebkitFullscreen_
+  html5.trigger('fullscreenchange', {
+    isFullscreen: true,
+    nativeIOSFullscreen: true
+  });
+
+  assert.ok(player.isFullscreen(), 'player.isFullscreen_ should be true');
+
+  html5.trigger('fullscreenchange', { isFullscreen: false });
+
+  assert.ok(!player.isFullscreen(), 'player.isFullscreen_ should be false');
+
+  player.dispose();
+});
+
+QUnit.test('fullscreenerror event from Html5 should pass through player', function(assert) {
+  const player = FullscreenTestHelpers.makePlayer(false);
+  const html5 = player.tech(true);
+  const err = new Error('This is test');
+  let fullscreenerror;
+
+  player.on('fullscreenerror', function(evt, error) {
+    fullscreenerror = error;
+  });
+
+  html5.trigger('fullscreenerror', err);
+
+  assert.strictEqual(fullscreenerror, err);
+
+  player.dispose();
+});

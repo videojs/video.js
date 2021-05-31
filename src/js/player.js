@@ -1209,8 +1209,8 @@ class Player extends Component {
     this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
     this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
     this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
-    this.on(this.tech_, 'fullscreenchange', (e) => this.handleTechFullscreenChange_(e));
-    this.on(this.tech_, 'fullscreenerror', (e) => this.handleTechFullscreenError_(e));
+    this.on(this.tech_, 'fullscreenchange', (e, data) => this.handleTechFullscreenChange_(e, data));
+    this.on(this.tech_, 'fullscreenerror', (e, err) => this.handleTechFullscreenError_(e, err));
     this.on(this.tech_, 'enterpictureinpicture', (e) => this.handleTechEnterPictureInPicture_(e));
     this.on(this.tech_, 'leavepictureinpicture', (e) => this.handleTechLeavePictureInPicture_(e));
     this.on(this.tech_, 'error', (e) => this.handleTechError_(e));
