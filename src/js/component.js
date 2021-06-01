@@ -120,7 +120,6 @@ class Component {
     // finished for all children that run this constructor
     this.ready(ready);
 
-
     if (options.reportTouchActivity !== false) {
       this.enableTouchActivity();
     }
