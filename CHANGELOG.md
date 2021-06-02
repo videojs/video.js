@@ -1,3 +1,17 @@
+<a name="7.12.4"></a>
+## [7.12.4](https://github.com/videojs/video.js/compare/v7.12.3...v7.12.4) (2021-06-02)
+
+### Bug Fixes
+
+* allow Video.js to be required in an env without setTimeout ([#7247](https://github.com/videojs/video.js/issues/7247)) ([8082c5a](https://github.com/videojs/video.js/commit/8082c5a))
+* **player:** accept data for fullscreenchange and error events from the tech ([#7254](https://github.com/videojs/video.js/issues/7254)) ([41d5eb3](https://github.com/videojs/video.js/commit/41d5eb3))
+* **seek-bar:** remove event listener on dispose ([#7258](https://github.com/videojs/video.js/issues/7258)) ([c70c298](https://github.com/videojs/video.js/commit/c70c298))
+
+### Chores
+
+* **component:** update comment around triggering ready in component ([#7256](https://github.com/videojs/video.js/issues/7256)) ([11ac0b9](https://github.com/videojs/video.js/commit/11ac0b9))
+* Update sass and remove now deprecated / for division. ([#7253](https://github.com/videojs/video.js/issues/7253)) ([b3503c9](https://github.com/videojs/video.js/commit/b3503c9)), closes [#7244](https://github.com/videojs/video.js/issues/7244)
+
 <a name="7.12.3"></a>
 ## [7.12.3](https://github.com/videojs/video.js/compare/v7.12.2...v7.12.3) (2021-05-20)
 
