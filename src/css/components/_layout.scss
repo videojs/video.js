@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .video-js {
   // display:inline-block would be closer to the video el's display:inline
   // but it results in flash reloading when going into fullscreen [#2205]
@@ -63,7 +65,7 @@
 // Fill the width of the containing element and use padding to create the
 // desired aspect ratio. Default to 16x9 unless another ratio is given.
 @mixin apply-aspect-ratio($width, $height) {
-  padding-top: 100% * ($height/$width);
+  padding-top: 100% * math.div($height, $width);
 }
 
 // Not including a default AR in vjs-fluid because it would override
