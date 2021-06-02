@@ -471,7 +471,7 @@ class SeekBar extends Slider {
 
     this.off(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
     if (this.player_.liveTracker) {
-      this.on(this.player_.liveTracker, 'liveedgechange', this.update);
+      this.off(this.player_.liveTracker, 'liveedgechange', this.update);
     }
 
     this.off(this.player_, ['playing'], this.enableIntervalHandler_);
