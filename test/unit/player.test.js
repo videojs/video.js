@@ -322,6 +322,27 @@ QUnit.test('should get current sources from src set', function(assert) {
   player.dispose();
 });
 
+QUnit.test('should remove autoplay attribute when normalizeAutoplay: true', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  let html = '<video id="example_1" class="video-js" autoplay preload="none">';
+
+  html += '<source src="http://google.com" type="video/mp4">';
+  html += '<source src="http://google.com" type="video/webm">';
+  html += '<track kind="captions" attrtest>';
+  html += '</video>';
+
+  fixture.innerHTML += html;
+
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({normalizeAutoplay: true}, tag);
+
+  player.loadTech_('Html5');
+
+  assert.equal(player.autoplay(), true, 'autoplay option is set to true');
+  assert.equal(tag.getAttribute('autoplay'), null, 'autoplay attribute removed');
+});
+
 QUnit.test('should asynchronously fire error events during source selection', function(assert) {
   assert.expect(2);
 

@@ -1127,9 +1127,13 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
-    // if autoplay is a string we pass false to the tech
+    let autoplay = this.autoplay();
+
+    // if autoplay is a string (or `true` with normalizeAutoplay: true) we pass false to the tech
     // because the player is going to handle autoplay on `loadstart`
-    const autoplay = typeof this.autoplay() === 'string' ? false : this.autoplay();
+    if (typeof this.autoplay() === 'string' || this.autoplay() === true && this.options_.normalizeAutoplay) {
+      autoplay = false;
+    }
 
     // Grab tech-specific options from player options and add source and parent element to use.
     const techOptions = {
@@ -1412,7 +1416,7 @@ class Player extends Component {
 
     // autoplay happens after loadstart for the browser,
     // so we mimic that behavior
-    this.manualAutoplay_(this.autoplay());
+    this.manualAutoplay_(this.autoplay() === true && this.options_.normalizeAutoplay ? 'play' : this.autoplay());
   }
 
   /**
@@ -3678,10 +3682,10 @@ class Player extends Component {
 
     let techAutoplay;
 
-    // if the value is a valid string set it to that
-    if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
+    // if the value is a valid string set it to that, or normalize `true` to 'play', if need be
+    if (typeof value === 'string' && (/(any|play|muted)/).test(value) || value === true && this.options_.normalizeAutoplay) {
       this.options_.autoplay = value;
-      this.manualAutoplay_(value);
+      this.manualAutoplay_(typeof value === 'string' ? value : 'play');
       techAutoplay = false;
 
     // any falsy value sets autoplay to false in the browser,
@@ -5040,6 +5044,8 @@ Player.prototype.options_ = {
 
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.',
+
+  normalizeAutoplay: false,
 
   fullscreen: {
     options: {
