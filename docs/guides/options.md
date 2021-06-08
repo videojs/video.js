@@ -169,6 +169,8 @@ Each option is `undefined` by default unless otherwise specified.
 
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
 
+Alternatively, the classes `vjs-16-9`, `vjs-9-16`, `vjs-4-3` or `vjs-1-1` can be added to the player.
+
 ### `autoSetup`
 
 > Type: `boolean`
@@ -229,7 +231,7 @@ This option is inherited from the [`Component` base class](#component-options).
 
 > Type: `boolean`
 
-When `true`, the Video.js player will have a fluid size. In other words, it will scale to fit its container.
+When `true`, the Video.js player will have a fluid size. In other words, it will scale to fit its container at the video's intrinsic aspect ratio, or at a specified [`aspectRatio`](#aspectRatio).
 
 Also, if the `<video>` element has the `"vjs-fluid"`, this option is automatically set to `true`.
 
@@ -372,6 +374,8 @@ See [the plugins guide][plugins] for more information on Video.js plugins.
 Setting this option to `true` will cause the player to customize itself based on responsive breakpoints (see: [`breakpoints` option](#breakpoints)).
 
 When this option is `false` (the default), responsive breakpoints will be ignored.
+
+> Note this is about the responsiveness of the controls within the player, not responsive sizing of the pplayer itself. For that, see [fluid](#fluid).
 
 ### `sources`
 
