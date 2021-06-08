@@ -224,8 +224,8 @@ QUnit.test('full window can be preferred to fullscreen tech', function(assert) {
 
   player.exitFullscreen();
   assert.strictEqual(player.isFullWindow, false, 'full window is exited');
-  
-    player.dispose();
+
+  player.dispose();
 });
 
 QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
