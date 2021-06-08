@@ -1809,6 +1809,7 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   player.src(sources);
   player.duration(10);
   player.playbackRate(0.5);
+  player.playbackRates([1, 2, 3]);
   player.volume(0.2);
 
   assert.strictEqual(player.currentSrc(), sources[0].src, 'currentSrc is correct');
@@ -1816,6 +1817,7 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   assert.deepEqual(player.currentSources(), sources, 'currentSources is correct');
   assert.strictEqual(player.duration(), 10, 'duration is correct');
   assert.strictEqual(player.playbackRate(), 0.5, 'playbackRate is correct');
+  assert.deepEqual(player.playbackRates(), [1, 2, 3], 'playbackRates is correct');
   assert.strictEqual(player.volume(), 0.2, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 0.2, 'lastVolume_ is correct');
 
@@ -1832,6 +1834,7 @@ QUnit.test('player#reset clears the player cache', function(assert) {
   assert.strictEqual(player.getCache().currentTime, 0, 'currentTime is correct');
   assert.ok(isNaN(player.duration()), 'duration is correct');
   assert.strictEqual(player.playbackRate(), 1, 'playbackRate is correct');
+  assert.deepEqual(player.playbackRates(), [], 'playbackRates is correct');
   assert.strictEqual(player.volume(), 1, 'volume is correct');
   assert.strictEqual(player.lastVolume_(), 1, 'lastVolume_ is correct');
 });
@@ -2598,4 +2601,52 @@ QUnit[testOrSkip]('Should only allow requestPictureInPicture if the tech support
   delete player.tech_.el_.disablePictureInPicture;
   player.requestPictureInPicture();
   assert.equal(count, 1, 'requestPictureInPicture not passed through when tech does not support');
+});
+
+QUnit.test('playbackRates should trigger a playbackrateschange event', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const rates = [];
+  let rateschangeCount = 0;
+
+  player.on('playbackrateschange', function() {
+    rates.push(player.playbackRates());
+    rateschangeCount++;
+  });
+
+  player.playbackRates([1, 2, 3]);
+  player.playbackRates([]);
+  player.playbackRates([1, 4]);
+
+  assert.equal(rateschangeCount, 3, 'we got 3 playbackrateschange events');
+  assert.deepEqual(rates[0], [1, 2, 3], 'first rates is 1,2,3');
+  assert.deepEqual(rates[1], [], 'second rates is empty');
+  assert.deepEqual(rates[2], [1, 4], 'third rates is 1,4');
+
+  player.dispose();
+});
+
+QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
+  const player = TestHelpers.makePlayer();
+  let rateschangeCount = 0;
+
+  player.on('playbackrateschange', function() {
+    rateschangeCount++;
+  });
+
+  player.playbackRates([1, 2, 3]);
+  assert.equal(rateschangeCount, 1, 'we got a playbackrateschange event');
+
+  player.playbackRates('hello');
+  assert.equal(rateschangeCount, 1, 'we did not get a playbackrateschange event');
+
+  player.playbackRates([1, 4]);
+  assert.equal(rateschangeCount, 2, 'we got a playbackrateschange event');
+
+  player.playbackRates(5);
+  assert.equal(rateschangeCount, 2, 'we did not get a playbackrateschange event');
+
+  player.playbackRates(['hello', '2', 'why?']);
+  assert.equal(rateschangeCount, 2, 'we did not get a playbackrateschange event');
+
+  player.dispose();
 });

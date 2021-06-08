@@ -141,13 +141,49 @@ QUnit.test('calculateDistance should use changedTouches, if available', function
   slider.dispose();
 });
 
-QUnit.test('should hide playback rate control if it\'s not supported', function(assert) {
+QUnit.test('playback rate button is hidden by default', function(assert) {
   assert.expect(1);
 
   const player = TestHelpers.makePlayer();
   const playbackRate = new PlaybackRateMenuButton(player);
 
-  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is hidden');
+
+  player.dispose();
+  playbackRate.dispose();
+});
+
+QUnit.test('playback rate button is not hidden if playback rates are set', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({
+    playbackRates: [1, 2, 3]
+  });
+  const playbackRate = new PlaybackRateMenuButton(player);
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') === -1, 'playbackRate is not hidden');
+
+  player.dispose();
+  playbackRate.dispose();
+});
+
+QUnit.test('should show or hide playback rate menu button on playback rates change', function(assert) {
+  const rates = [1, 2, 3];
+  const norates = [];
+  let playbackRatesReturnValue = rates;
+  const player = TestHelpers.makePlayer();
+
+  player.playbackRates = () => playbackRatesReturnValue;
+
+  const playbackRate = new PlaybackRateMenuButton(player);
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') === -1, 'playbackRate is not hidden');
+
+  playbackRatesReturnValue = norates;
+
+  player.trigger('playbackrateschange');
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is hidden');
 
   player.dispose();
   playbackRate.dispose();
