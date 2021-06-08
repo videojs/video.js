@@ -38,6 +38,7 @@
     * [options](#options)
   * [playbackRates](#playbackrates)
   * [plugins](#plugins)
+  * [preferFullWindow](#preferfullwindow)
   * [responsive](#responsive)
   * [sources](#sources)
   * [suppressNotSupportedError](#suppressnotsupportederror)
@@ -373,6 +374,12 @@ player.boo({baz: false});
 Although, since the `plugins` option is an object, the order of initialization is not guaranteed!
 
 See [the plugins guide][plugins] for more information on Video.js plugins.
+
+### `preferFullWindow`
+
+> Type: `boolean`, Defaut: `false`
+
+Setting this to `true` will change fullscreen behaviour on devices which do not support the HTML5 fullscreen API but do support fullscreen on the video element, i.e. iPhone. Instead of making the video fullscreen, the player will be stretched to fill the browser window.  
 
 ### `responsive`
 

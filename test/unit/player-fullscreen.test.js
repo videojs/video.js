@@ -208,6 +208,26 @@ QUnit.test('fullscreenOptions from function args should override player options'
   player.dispose();
 });
 
+QUnit.test('full window can be preferred to fullscreen tech', function(assert) {
+
+  const player = FullscreenTestHelpers.makePlayer(false, {
+    preferFullWindow: true
+  });
+
+  player.fsApi_ = {};
+  player.tech_.supportsFullScreen = () => true;
+
+  player.requestFullscreen();
+
+  assert.strictEqual(player.isFullscreen(), true, 'player considered fullscreen');
+  assert.strictEqual(player.isFullWindow, true, 'player is full window');
+
+  player.exitFullscreen();
+  assert.strictEqual(player.isFullWindow, false, 'full window is exited');
+
+  player.dispose();
+});
+
 QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
   const player = FullscreenTestHelpers.makePlayer(true);
 
