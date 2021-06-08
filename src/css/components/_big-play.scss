@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .video-js .vjs-big-play-button {
   font-size: 3em;
   line-height: $big-play-button--line-height;
@@ -30,8 +32,8 @@
 .vjs-big-play-centered .vjs-big-play-button {
   top: 50%;
   left: 50%;
-  margin-top: -($big-play-button--height / 2);
-  margin-left: -($big-play-button--width / 2);
+  margin-top: -(math.div($big-play-button--height, 2));
+  margin-left: -(math.div($big-play-button--width, 2));
 }
 
 .video-js:hover .vjs-big-play-button,

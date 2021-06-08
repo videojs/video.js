@@ -20,11 +20,11 @@ You can enable fluid in a few ways:
 
 ### Classes
 
-There are three classes associated with fluid mode, `vjs-fluid`, `vjs-16-9`, and `vjs-4-3`.
+There are five classes associated with fluid mode, `vjs-fluid`, `vjs-16-9`, `vjs-4-3`, `vjs-9-16` and `vjs-1-1`.
 
 `vjs-fluid` turns on the general fluid mode which will wait for the video to load to calculate the aspect ratio of the video.
 
-Alternatively, because 16:9 and 4:3 aspect ratios are so common, we provided them as classes by default for you to use if you know that your videos are 16:9 or 4:3.
+Alternatively, because 16:9, 4:3, 9:16 and 1:1  aspect ratios are so common, we provided them as classes by default for you to use if you know that your videos are 16:9 or , 4:3, 9:16 or 1:1.
 
 ### Enabling Fluid Mode
 

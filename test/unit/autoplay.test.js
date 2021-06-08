@@ -189,6 +189,28 @@ QUnit.test('option = "play" play, no muted', function(assert) {
   assert.equal(this.counts.failure, 0, 'failure count');
 });
 
+QUnit.test('option = true w/ normalizeAutoplay = true play, no muted', function(assert) {
+  this.createPlayer({
+    autoplay: true,
+    normalizeAutoplay: true
+  }, {}, this.resolvePromise);
+
+  assert.equal(this.player.autoplay(), true, 'player.autoplay getter');
+  assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 1, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+  assert.equal(this.counts.success, 1, 'success count');
+  assert.equal(this.counts.failure, 0, 'failure count');
+
+  this.player.tech_.trigger('loadstart');
+  assert.equal(this.counts.play, 2, 'play count');
+  assert.equal(this.counts.muted, 0, 'muted count');
+  assert.equal(this.counts.success, 2, 'success count');
+  assert.equal(this.counts.failure, 0, 'failure count');
+});
+
 QUnit.test('option = "any" play, no muted', function(assert) {
   this.createPlayer({autoplay: 'any'}, {}, this.resolvePromise);
 

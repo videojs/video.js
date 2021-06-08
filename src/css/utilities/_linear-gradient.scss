@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // These functions and mixins taken from:
 //
 // "Building a linear-gradient Mixin in Sass" by Hugo Giraudel
@@ -12,10 +14,9 @@
 /// @return {Number} Converted angle
 @function convert-angle($value, $unit) {
   $convertable-units: deg grad turn rad;
-  $conversion-factors: 1 (10grad/9deg) (1turn/360deg) (3.1415926rad/180deg);
+  $conversion-factors: 1 math.div(10grad, 9deg) math.div(1turn, 360deg) math.div(3.1415926rad, 180deg);
   @if index($convertable-units, unit($value)) and index($convertable-units, $unit) {
-    @return $value
-             / nth($conversion-factors, index($convertable-units, unit($value)))
+    @return math.div($value, nth($conversion-factors, index($convertable-units, unit($value))))
              * nth($conversion-factors, index($convertable-units, $unit));
   }
 

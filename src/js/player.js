@@ -508,6 +508,8 @@ class Player extends Component {
 
     this.middleware_ = [];
 
+    this.playbackRates(options.playbackRates);
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -1125,9 +1127,13 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
-    // if autoplay is a string we pass false to the tech
+    let autoplay = this.autoplay();
+
+    // if autoplay is a string (or `true` with normalizeAutoplay: true) we pass false to the tech
     // because the player is going to handle autoplay on `loadstart`
-    const autoplay = typeof this.autoplay() === 'string' ? false : this.autoplay();
+    if (typeof this.autoplay() === 'string' || this.autoplay() === true && this.options_.normalizeAutoplay) {
+      autoplay = false;
+    }
 
     // Grab tech-specific options from player options and add source and parent element to use.
     const techOptions = {
@@ -1209,8 +1215,8 @@ class Player extends Component {
     this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
     this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
     this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
-    this.on(this.tech_, 'fullscreenchange', (e) => this.handleTechFullscreenChange_(e));
-    this.on(this.tech_, 'fullscreenerror', (e) => this.handleTechFullscreenError_(e));
+    this.on(this.tech_, 'fullscreenchange', (e, data) => this.handleTechFullscreenChange_(e, data));
+    this.on(this.tech_, 'fullscreenerror', (e, err) => this.handleTechFullscreenError_(e, err));
     this.on(this.tech_, 'enterpictureinpicture', (e) => this.handleTechEnterPictureInPicture_(e));
     this.on(this.tech_, 'leavepictureinpicture', (e) => this.handleTechLeavePictureInPicture_(e));
     this.on(this.tech_, 'error', (e) => this.handleTechError_(e));
@@ -1410,7 +1416,7 @@ class Player extends Component {
 
     // autoplay happens after loadstart for the browser,
     // so we mimic that behavior
-    this.manualAutoplay_(this.autoplay());
+    this.manualAutoplay_(this.autoplay() === true && this.options_.normalizeAutoplay ? 'play' : this.autoplay());
   }
 
   /**
@@ -2218,6 +2224,7 @@ class Player extends Component {
       src: '',
       source: {},
       sources: [],
+      playbackRates: [],
       volume: 1
     };
   }
@@ -2979,9 +2986,11 @@ class Player extends Component {
   fullWindowOnEscKey(event) {
     if (keycode.isEventKey(event, 'Esc')) {
       if (this.isFullscreen() === true) {
-        this.exitFullscreen();
-      } else {
-        this.exitFullWindow();
+        if (!this.isFullWindow) {
+          this.exitFullscreen();
+        } else {
+          this.exitFullWindow();
+        }
       }
     }
   }
@@ -3673,10 +3682,10 @@ class Player extends Component {
 
     let techAutoplay;
 
-    // if the value is a valid string set it to that
-    if (typeof value === 'string' && (/(any|play|muted)/).test(value)) {
+    // if the value is a valid string set it to that, or normalize `true` to 'play', if need be
+    if (typeof value === 'string' && (/(any|play|muted)/).test(value) || value === true && this.options_.normalizeAutoplay) {
       this.options_.autoplay = value;
-      this.manualAutoplay_(value);
+      this.manualAutoplay_(typeof value === 'string' ? value : 'play');
       techAutoplay = false;
 
     // any falsy value sets autoplay to false in the browser,
@@ -4856,6 +4865,45 @@ class Player extends Component {
       this.previousLogLevel_ = undefined;
       this.debugEnabled_ = false;
     }
+
+  }
+
+  /**
+   * Set or get current playback rates.
+   * Takes an array and updates the playback rates menu with the new items.
+   * Pass in an empty array to hide the menu.
+   * Values other than arrays are ignored.
+   *
+   * @fires Player#playbackrateschange
+   * @param {number[]} newRates
+   *                   The new rates that the playback rates menu should update to.
+   *                   An empty array will hide the menu
+   * @return {number[]} When used as a getter will return the current playback rates
+   */
+  playbackRates(newRates) {
+    if (newRates === undefined) {
+      return this.cache_.playbackRates;
+    }
+
+    // ignore any value that isn't an array
+    if (!Array.isArray(newRates)) {
+      return;
+    }
+
+    // ignore any arrays that don't only contain numbers
+    if (!newRates.every((rate) => typeof rate === 'number')) {
+      return;
+    }
+
+    this.cache_.playbackRates = newRates;
+
+    /**
+    * fires when the playback rates in a player are changed
+    *
+    * @event Player#playbackrateschange
+    * @type {EventTarget~Event}
+    */
+    this.trigger('playbackrateschange');
   }
 }
 
@@ -4996,6 +5044,8 @@ Player.prototype.options_ = {
 
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.',
+
+  normalizeAutoplay: false,
 
   fullscreen: {
     options: {

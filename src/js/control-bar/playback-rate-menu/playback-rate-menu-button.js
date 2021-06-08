@@ -2,7 +2,6 @@
  * @file playback-rate-menu-button.js
  */
 import MenuButton from '../../menu/menu-button.js';
-import Menu from '../../menu/menu.js';
 import PlaybackRateMenuItem from './playback-rate-menu-item.js';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
@@ -33,6 +32,7 @@ class PlaybackRateMenuButton extends MenuButton {
 
     this.on(player, 'loadstart', (e) => this.updateVisibility(e));
     this.on(player, 'ratechange', (e) => this.updateLabel(e));
+    this.on(player, 'playbackrateschange', (e) => this.handlePlaybackRateschange(e));
   }
 
   /**
@@ -78,22 +78,18 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * Create the playback rate menu
+   * Create the list of menu items. Specific to each subclass.
    *
-   * @return {Menu}
-   *         Menu object populated with {@link PlaybackRateMenuItem}s
    */
-  createMenu() {
-    const menu = new Menu(this.player());
+  createItems() {
     const rates = this.playbackRates();
+    const items = [];
 
-    if (rates) {
-      for (let i = rates.length - 1; i >= 0; i--) {
-        menu.addChild(new PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'}));
-      }
+    for (let i = rates.length - 1; i >= 0; i--) {
+      items.push(new PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'}));
     }
 
-    return menu;
+    return items;
   }
 
   /**
@@ -133,13 +129,22 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
+   * On playbackrateschange, update the menu to account for the new items.
+   *
+   * @listens Player#playbackrateschange
+   */
+  handlePlaybackRateschange(event) {
+    this.update();
+  }
+
+  /**
    * Get possible playback rates
    *
    * @return {Array}
    *         All possible playback rates
    */
   playbackRates() {
-    return this.options_.playbackRates || (this.options_.playerOptions && this.options_.playerOptions.playbackRates);
+    return this.player().playbackRates() || [];
   }
 
   /**

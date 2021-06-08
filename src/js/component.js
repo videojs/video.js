@@ -116,9 +116,9 @@ class Component {
       this.initChildren();
     }
 
-    this.ready(ready);
-    // Don't want to trigger ready here or it will before init is actually
+    // Don't want to trigger ready here or it will go before init is actually
     // finished for all children that run this constructor
+    this.ready(ready);
 
     if (options.reportTouchActivity !== false) {
       this.enableTouchActivity();
