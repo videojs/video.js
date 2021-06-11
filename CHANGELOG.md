@@ -1,3 +1,19 @@
+<a name="7.13.0"></a>
+# [7.13.0](https://github.com/videojs/video.js/compare/v7.12.4...v7.13.0) (2021-06-11)
+
+### Features
+
+* Add helper classes for 9:16 and 1:1 ([#7219](https://github.com/videojs/video.js/issues/7219)) ([35ad17a](https://github.com/videojs/video.js/commit/35ad17a))
+* Add normalizeAutoplay option to treat autoplay: true as autoplay: "play" ([#7190](https://github.com/videojs/video.js/issues/7190)) ([b4ad93a](https://github.com/videojs/video.js/commit/b4ad93a))
+* Add option to use full window mode instead of using tech's fullscreen ([#7218](https://github.com/videojs/video.js/issues/7218)) ([b86f083](https://github.com/videojs/video.js/commit/b86f083))
+* update to VHS[@2](https://github.com/2).9.0 and mpd-parser[@0](https://github.com/0).17.0 ([#7269](https://github.com/videojs/video.js/issues/7269)) ([2ea05b4](https://github.com/videojs/video.js/commit/2ea05b4))
+* **package:** add VHS deps as Video.js deps ([#7263](https://github.com/videojs/video.js/issues/7263)) ([39de502](https://github.com/videojs/video.js/commit/39de502)), closes [#7091](https://github.com/videojs/video.js/issues/7091) [#7209](https://github.com/videojs/video.js/issues/7209) [#7144](https://github.com/videojs/video.js/issues/7144) [#7109](https://github.com/videojs/video.js/issues/7109)
+* **player:** Add playbackRates() method ([#7228](https://github.com/videojs/video.js/issues/7228)) ([6259ef7](https://github.com/videojs/video.js/commit/6259ef7)), closes [#7198](https://github.com/videojs/video.js/issues/7198)
+
+### Documentation
+
+* Fix typo in CONTRIBUTING.md ([#7260](https://github.com/videojs/video.js/issues/7260)) ([380a9b5](https://github.com/videojs/video.js/commit/380a9b5))
+
 <a name="7.12.4"></a>
 ## [7.12.4](https://github.com/videojs/video.js/compare/v7.12.3...v7.12.4) (2021-06-02)
 
