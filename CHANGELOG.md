@@ -1,3 +1,10 @@
+<a name="7.13.1"></a>
+## [7.13.1](https://github.com/videojs/video.js/compare/v7.13.0...v7.13.1) (2021-06-14)
+
+### Bug Fixes
+
+* do a null check on playbackRates player method ([#7273](https://github.com/videojs/video.js/issues/7273)) ([6888798](https://github.com/videojs/video.js/commit/6888798))
+
 <a name="7.13.0"></a>
 # [7.13.0](https://github.com/videojs/video.js/compare/v7.12.4...v7.13.0) (2021-06-11)
 
