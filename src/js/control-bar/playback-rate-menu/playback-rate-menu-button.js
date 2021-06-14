@@ -144,7 +144,9 @@ class PlaybackRateMenuButton extends MenuButton {
    *         All possible playback rates
    */
   playbackRates() {
-    return this.player().playbackRates() || [];
+    const player = this.player();
+
+    return (player.playbackRates && player.playbackRates()) || [];
   }
 
   /**
