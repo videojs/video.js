@@ -1,3 +1,10 @@
+<a name="7.13.2"></a>
+## [7.13.2](https://github.com/videojs/video.js/compare/v7.13.1...v7.13.2) (2021-06-22)
+
+### Bug Fixes
+
+* **package:** update to VHS 2.9.1 ([#7284](https://github.com/videojs/video.js/issues/7284)) ([cee5fa3](https://github.com/videojs/video.js/commit/cee5fa3)), closes [#7230](https://github.com/videojs/video.js/issues/7230)
+
 <a name="7.13.1"></a>
 ## [7.13.1](https://github.com/videojs/video.js/compare/v7.13.0...v7.13.1) (2021-06-14)
 
