@@ -5,6 +5,12 @@ module.exports = function(config) {
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
+    browsers(aboutToRun) {
+      // never run on Chromium
+      return aboutToRun.filter(function(launcherName) {
+        return !(/^(Chromium)/).test(launcherName);
+      });
+    },
     serverBrowsers(defaults) {
       return [];
     },
