@@ -1,10 +1,7 @@
 const generate = require('videojs-generate-karma-config');
+const CI_TEST_TYPE = process.env.CI_TEST_TYPE || '';
 
 module.exports = function(config) {
-  // const coverageFlag = process.env.npm_config_coverage;
-  // process.env.TRAVIS || coverageFlag || false;
-  const reportCoverage = false;
-
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
@@ -15,7 +12,15 @@ module.exports = function(config) {
     serverBrowsers(defaults) {
       return [];
     },
-    coverage: reportCoverage
+    browserstackLaunchers(defaults) {
+      // do not use browserstack for coverage testing
+      if (CI_TEST_TYPE === 'coverage') {
+        return {};
+      }
+
+      return defaults;
+    },
+    coverage: CI_TEST_TYPE === 'coverage' ? true : false
   };
 
   config = generate(config, options);
