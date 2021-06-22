@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        test-type: [unit coverage]
+        test-type: [unit, coverage]
     env:
       BROWSER_STACK_USERNAME: ${{secrets.BROWSER_STACK_USERNAME}}
       BROWSER_STACK_ACCESS_KEY: ${{secrets.BROWSER_STACK_ACCESS_KEY}}
