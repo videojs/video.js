@@ -83,7 +83,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@videojs/http-streaming": "2.9.0",
+    "@videojs/http-streaming": "2.9.1",
     "@videojs/vhs-utils": "^3.0.2",
     "@videojs/xhr": "2.5.1",
     "aes-decrypter": "3.1.2",
@@ -91,7 +91,7 @@
     "keycode": "^2.2.0",
     "m3u8-parser": "4.7.0",
     "mpd-parser": "0.17.0",
-    "mux.js": "5.11.0",
+    "mux.js": "5.11.1",
     "safe-json-parse": "4.0.0",
     "videojs-font": "3.2.0",
     "videojs-vtt.js": "^0.15.3"
