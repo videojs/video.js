@@ -5,10 +5,6 @@ module.exports = function(config) {
   // see https://github.com/videojs/videojs-generate-karma-config
   // for options
   const options = {
-    travisLaunchers(defaults) {
-      delete defaults.travisFirefox;
-      return defaults;
-    },
     serverBrowsers(defaults) {
       return [];
     },
@@ -48,7 +44,9 @@ module.exports = function(config) {
 
   // pin Browserstack Firefox version to 64
   /* eslint-disable camelcase */
-  config.customLaunchers.bsFirefox.browser_version = '64.0';
+  if (config.customLaunchers && config.customLaunchers.bsFirefox) {
+    config.customLaunchers.bsFirefox.browser_version = '64.0';
+  }
   /* eslint-enable camelcase */
 
   // uncomment the section below to re-enable all browserstack video recording
