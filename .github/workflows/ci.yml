@@ -50,15 +50,12 @@ jobs:
 
     - name: update apt cache on linux w/o browserstack
       run: sudo apt-get update
-      if: ${{startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME}}
 
     - name: install ffmpeg/pulseaudio for firefox on linux w/o browserstack
       run: sudo apt-get install ffmpeg pulseaudio
-      if: ${{startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME}}
 
     - name: start pulseaudio for firefox on linux w/o browserstack
       run: pulseaudio -D
-      if: ${{startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME}}
 
     - name: setup node
       uses: actions/setup-node@v1
