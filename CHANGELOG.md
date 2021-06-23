@@ -1,3 +1,10 @@
+<a name="7.13.3"></a>
+## [7.13.3](https://github.com/videojs/video.js/compare/v7.13.2...v7.13.3) (2021-06-23)
+
+### Chores
+
+* republish with VHS 2.9.1 ([4b50f82](https://github.com/videojs/video.js/commit/4b50f82))
+
 <a name="7.13.2"></a>
 ## [7.13.2](https://github.com/videojs/video.js/compare/v7.13.1...v7.13.2) (2021-06-22)
 
