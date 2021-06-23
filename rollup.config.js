@@ -13,7 +13,16 @@ import multiEntry from 'rollup-plugin-multi-entry';
 import stub from 'rollup-plugin-stub';
 import isCI from 'is-ci';
 import replace from '@rollup/plugin-replace';
+import istanbul from 'rollup-plugin-istanbul';
 
+const excludeCoverage = [
+  'test/**',
+  'node_modules/**',
+  'package.json',
+  /^data-files!/
+];
+
+const CI_TEST_TYPE = process.env.CI_TEST_TYPE || '';
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
 const banner = compiledLicense(Object.assign({includesVtt: true}, bannerData));
@@ -172,8 +181,10 @@ export default cliargs => [
       json(),
       stub(),
       primedCjs,
+      CI_TEST_TYPE === 'coverage' ? istanbul({exclude: excludeCoverage}) : {},
       primedBabel,
       cliargs.progress !== false ? progress() : {}
+
     ],
     onwarn,
     watch

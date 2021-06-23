@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   should-skip:
     continue-on-error: true
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     # Map a step output to a job output
     outputs:
       should-skip-job: ${{steps.skip-check.outputs.should_skip}}
@@ -21,10 +21,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-latest]
+        test-type: [unit, coverage]
     env:
       BROWSER_STACK_USERNAME: ${{secrets.BROWSER_STACK_USERNAME}}
       BROWSER_STACK_ACCESS_KEY: ${{secrets.BROWSER_STACK_ACCESS_KEY}}
+      CI_TEST_TYPE: ${{matrix.test-type}}
     runs-on: ${{matrix.os}}
     steps:
     - name: checkout code
@@ -48,15 +50,12 @@ jobs:
 
     - name: update apt cache on linux w/o browserstack
       run: sudo apt-get update
-      if: ${{startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME}}
 
     - name: install ffmpeg/pulseaudio for firefox on linux w/o browserstack
       run: sudo apt-get install ffmpeg pulseaudio
-      if: ${{startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME}}
 
     - name: start pulseaudio for firefox on linux w/o browserstack
       run: pulseaudio -D
-      if: ${{startsWith(matrix.os, 'ubuntu') && !env.BROWSER_STACK_USERNAME}}
 
     - name: setup node
       uses: actions/setup-node@v1
@@ -75,3 +74,11 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: npm run test
+
+    - name: coverage
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        files: './test/dist/coverage/coverage-final.json'
+        fail_ci_if_error: true
+      if: ${{startsWith(env.CI_TEST_TYPE, 'coverage')}}
