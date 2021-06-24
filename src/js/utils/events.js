@@ -104,7 +104,7 @@ export function fixEvent(event) {
   // But native events return true for stopPropagation, but don't have
   // other expected methods like isPropagationStopped. Seems to be a problem
   // with the Javascript Ninja code. So we're just overriding all events now.
-  if (!event || !event.isPropagationStopped) {
+  if (!event || !event.isPropagationStopped || !event.isImmediatePropagationStopped) {
     const old = event || window.event;
 
     event = {};
