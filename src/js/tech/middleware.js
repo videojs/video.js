@@ -188,7 +188,8 @@ export const allowedGetters = {
   played: 1,
   paused: 1,
   seekable: 1,
-  volume: 1
+  volume: 1,
+  ended: 1
 };
 
 /**
