@@ -1430,7 +1430,9 @@ class Player extends Component {
       return;
     }
 
-    const muted = () => {
+    // Save original muted() value, set muted to true, and attempt to play().
+    // On promise rejection, restore muted from saved value
+    const resolveMuted = () => {
       const previouslyMuted = this.muted();
 
       this.muted(true);
@@ -1448,21 +1450,24 @@ class Player extends Component {
         return;
       }
 
-      return mutedPromise.catch(restoreMuted);
+      return mutedPromise.catch(err => {
+        restoreMuted();
+        throw new Error(`Rejection at manualAutoplay. Restoring muted value. ${err ? err : ''}`);
+      });
     };
 
     let promise;
 
     // if muted defaults to true
     // the only thing we can do is call play
-    if (type === 'any' && this.muted() !== true) {
+    if (type === 'any' && !this.muted()) {
       promise = this.play();
 
       if (isPromise(promise)) {
-        promise = promise.catch(muted);
+        promise = promise.catch(resolveMuted);
       }
-    } else if (type === 'muted' && this.muted() !== true) {
-      promise = muted();
+    } else if (type === 'muted' && !this.muted()) {
+      promise = resolveMuted();
     } else {
       promise = this.play();
     }
@@ -1473,7 +1478,7 @@ class Player extends Component {
 
     return promise.then(() => {
       this.trigger({type: 'autoplay-success', autoplay: type});
-    }).catch((e) => {
+    }).catch(() => {
       this.trigger({type: 'autoplay-failure', autoplay: type});
     });
   }
