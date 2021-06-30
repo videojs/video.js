@@ -74,11 +74,6 @@ const App = () => {
 
 ```
 
-
---------
-
-
-
 ## React Class Component Example
 
 It just instantiates the Video.js player on `componentDidMount` and destroys it on `componentWillUnmount`.
