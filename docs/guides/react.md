@@ -1,6 +1,6 @@
 # Video.js and ReactJS integration
 
-Here's a basic ReactJS player implementation.
+Here are a couple ReactJS player implementations.
 
 ## React Functional Component and useEffect Example
 
