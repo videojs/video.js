@@ -43,7 +43,7 @@ export default VideoJS;
 
 ```
 
-__Implementation Example:__
+You can then use it like this: (see [options guide][options] for option information)
 ```jsx
 import React from "react";
 import VideoJS from './VideoJS' // point to where the functional component is stored
