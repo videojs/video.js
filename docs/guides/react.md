@@ -2,7 +2,7 @@
 
 Here's a basic ReactJS player implementation.
 
-## React Functional Component Example
+## React Functional Component and useEffect Example
 
 ```jsx
 import React from "react";
