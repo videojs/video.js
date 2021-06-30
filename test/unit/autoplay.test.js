@@ -29,18 +29,25 @@ QUnit.module('autoplay', {
 
     fixture.appendChild(videoTag);
 
-    // this promise fake will act right away
-    // it will also only act on catch calls
+    // These mock promises immediately execute,
+    // effectively synchronising promise chains for testing
+
+    // This will only act on catch calls
     this.rejectPromise = {
       then(fn) {
         return this;
       },
       catch(fn) {
-        fn();
+        try {
+          fn();
+        } catch (err) {
+          return this;
+        }
         return this;
       }
     };
 
+    // This will only act on then calls
     this.resolvePromise = {
       then(fn) {
         fn();
@@ -274,7 +281,10 @@ QUnit.test('option = "any" play, no muted, rejection leads to muted then play', 
   assert.equal(this.player.autoplay(), 'any', 'player.autoplay getter');
   assert.equal(this.player.tech_.autoplay(), false, 'tech.autoplay getter');
 
-  // muted called twice here, as muted is value is restored on failure.
+  // The workflow described here:
+  // Call play() -> on rejection, attempt to set mute to true ->
+  // call play() again -> on rejection, set original mute value ->
+  // catch failure at the end of promise chain
   this.player.tech_.trigger('loadstart');
   assert.equal(this.counts.play, 2, 'play count');
   assert.equal(this.counts.muted, 2, 'muted count');
