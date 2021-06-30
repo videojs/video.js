@@ -1,3 +1,17 @@
+<a name="7.13.4"></a>
+## [7.13.4](https://github.com/videojs/video.js/compare/v7.13.3...v7.13.4) (2021-06-30)
+
+### Bug Fixes
+
+* **lang:** add some translations to es.json ([#6822](https://github.com/videojs/video.js/issues/6822)) ([fbcfb7b](https://github.com/videojs/video.js/commit/fbcfb7b))
+* throw error on muted resolution rejection during autoplay ([#7293](https://github.com/videojs/video.js/issues/7293)) ([f9fb1d3](https://github.com/videojs/video.js/commit/f9fb1d3))
+* **event:** event polyfill detection compatibility with react-native-web ([#7286](https://github.com/videojs/video.js/issues/7286)) ([a221be1](https://github.com/videojs/video.js/commit/a221be1)), closes [#7259](https://github.com/videojs/video.js/issues/7259)
+* **lang:** improve Hungarian translation ([#7289](https://github.com/videojs/video.js/issues/7289)) ([0f70787](https://github.com/videojs/video.js/commit/0f70787))
+
+### Chores
+
+* add a code coverage ci workflow ([#7282](https://github.com/videojs/video.js/issues/7282)) ([4cecbda](https://github.com/videojs/video.js/commit/4cecbda))
+
 <a name="7.13.3"></a>
 ## [7.13.3](https://github.com/videojs/video.js/compare/v7.13.2...v7.13.3) (2021-06-23)
 
