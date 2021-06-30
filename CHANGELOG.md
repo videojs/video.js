@@ -1,3 +1,10 @@
+<a name="7.14.0"></a>
+# [7.14.0](https://github.com/videojs/video.js/compare/v7.13.4...v7.14.0) (2021-06-30)
+
+### Features
+
+* add ended getter middleware ([#7287](https://github.com/videojs/video.js/issues/7287)) ([c74c27d](https://github.com/videojs/video.js/commit/c74c27d))
+
 <a name="7.13.4"></a>
 ## [7.13.4](https://github.com/videojs/video.js/compare/v7.13.3...v7.13.4) (2021-06-30)
 
