@@ -282,6 +282,39 @@ QUnit.test('fullscreenerror event from Html5 should pass through player', functi
   player.dispose();
 });
 
+QUnit.test('requestFullscreen returns a rejected promise if unable to go fullscreen', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const techEl = player.el();
+  const stub = sinon.stub(techEl, 'requestFullscreen');
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  promise.reject(new Error('Cannot go fullscreen'));
+
+  assert.rejects(
+    player.requestFullscreen(),
+    new Error('Cannot go fullscreen'),
+    'our promise was rejected'
+  );
+
+  stub.restore();
+});
+
+QUnit.test('requestFullscreen returns a resovled promise if we were fullscreen', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const playerEl = player.el();
+  const stub = sinon.stub(playerEl, 'requestFullscreen');
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  // pretend we successfully went fullscreen.
+  promise.resolve();
+
+  player.requestFullscreen().then(() => assert.ok(true, 'our promise resolved'));
+
+  stub.restore();
+});
+
 QUnit.test('exitFullscreen returns a rejected promise if document is not active', function(assert) {
   const stub = sinon.stub(document, 'exitFullscreen');
   const player = TestHelpers.makePlayer();
