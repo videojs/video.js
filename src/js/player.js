@@ -2944,7 +2944,7 @@ class Player extends Component {
       if (promise) {
         // we're splitting the promise here, so, we want to catch the
         // potential error so that this chain doesn't have unhandled errors
-        promise.then(() => this.isFullscreen(false), () => {});
+        silencePromise(promise.then(() => this.isFullscreen(false)));
       }
 
       return promise;
