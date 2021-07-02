@@ -230,7 +230,7 @@ QUnit.test('full window can be preferred to fullscreen tech', function(assert) {
 });
 
 QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
-  const player = FullscreenTestHelpers.makePlayer(true);
+  const player = TestHelpers.makePlayer();
 
   player.enterFullWindow();
   assert.ok(player.isFullWindow, 'enterFullWindow should be called');
