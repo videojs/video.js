@@ -39,7 +39,9 @@ module.exports = function(config) {
   config.files = [
     'node_modules/es5-shim/es5-shim.js',
     'node_modules/es6-shim/es6-shim.js',
-    'node_modules/sinon/pkg/sinon.js',
+    // make sinon be available via karma's server but don't include it directly
+    { pattern: 'node_modules/sinon/pkg/sinon.js', included: false, served: true },
+    'test/sinon.js',
     'dist/video-js.css',
     'test/dist/bundle.js',
     'test/dist/browserify.js',

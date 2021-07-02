@@ -282,7 +282,10 @@ QUnit.test('fullscreenerror event from Html5 should pass through player', functi
   player.dispose();
 });
 
-QUnit.test('requestFullscreen returns a rejected promise if unable to go fullscreen', function(assert) {
+// only run where we have sinon.promise
+const skipOrTest = sinon.promise ? 'test' : 'skip';
+
+QUnit[skipOrTest]('requestFullscreen returns a rejected promise if unable to go fullscreen', function(assert) {
   const player = TestHelpers.makePlayer();
   const playerEl = player.el();
   const stub = sinon.stub(playerEl, player.fsApi_.requestFullscreen);
@@ -300,7 +303,7 @@ QUnit.test('requestFullscreen returns a rejected promise if unable to go fullscr
   stub.restore();
 });
 
-QUnit.test('requestFullscreen returns a resovled promise if we were fullscreen', function(assert) {
+QUnit[skipOrTest]('requestFullscreen returns a resovled promise if we were fullscreen', function(assert) {
   const player = TestHelpers.makePlayer();
   const playerEl = player.el();
   const stub = sinon.stub(playerEl, player.fsApi_.requestFullscreen);
@@ -315,7 +318,7 @@ QUnit.test('requestFullscreen returns a resovled promise if we were fullscreen',
   stub.restore();
 });
 
-QUnit.test('exitFullscreen returns a rejected promise if document is not active', function(assert) {
+QUnit[skipOrTest]('exitFullscreen returns a rejected promise if document is not active', function(assert) {
   const player = TestHelpers.makePlayer();
   const stub = sinon.stub(document, player.fsApi_.exitFullscreen);
   const promise = sinon.promise();
@@ -332,7 +335,7 @@ QUnit.test('exitFullscreen returns a rejected promise if document is not active'
   stub.restore();
 });
 
-QUnit.test('exitFullscreen returns a resovled promise if we were fullscreen', function(assert) {
+QUnit[skipOrTest]('exitFullscreen returns a resovled promise if we were fullscreen', function(assert) {
   const player = TestHelpers.makePlayer();
   const stub = sinon.stub(document, player.fsApi_.exitFullscreen);
   const promise = sinon.promise();
