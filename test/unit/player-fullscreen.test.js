@@ -3,6 +3,7 @@ import Player from '../../src/js/player.js';
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import window from 'global/window';
+import document from 'global/document';
 
 const FullscreenTestHelpers = {
   makePlayer(prefixed, playerOptions, videoTag) {
@@ -279,4 +280,21 @@ QUnit.test('fullscreenerror event from Html5 should pass through player', functi
   assert.strictEqual(fullscreenerror, err);
 
   player.dispose();
+});
+
+QUnit.test('exitFullscreen returns a rejected promise if document is not active', function(assert) {
+  const stub = sinon.stub(document, 'exitFullscreen');
+  const player = TestHelpers.makePlayer();
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  promise.reject(new Error('Document not active'));
+
+  assert.rejects(
+    player.exitFullscreen(),
+    new Error('Document not active'),
+    'our promise was rejected'
+  );
+
+  stub.restore();
 });
