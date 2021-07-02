@@ -2850,7 +2850,7 @@ class Player extends Component {
 
         if (promise) {
           promise.then(offHandler, offHandler);
-          return promise;
+          promise.then(resolve, reject);
         }
       });
     }
