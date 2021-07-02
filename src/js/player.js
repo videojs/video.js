@@ -2850,8 +2850,7 @@ class Player extends Component {
 
         if (promise) {
           promise.then(offHandler, offHandler);
-          // promise.then(resolve, reject);
-          return promise;
+          promise.then(resolve, reject);
         }
       });
     }
@@ -2930,8 +2929,7 @@ class Player extends Component {
         if (promise) {
           promise.then(offHandler, offHandler);
           // map the promise to our resolve/reject methods
-          // promise.then(resolve, reject);
-          return promise;
+          promise.then(resolve, reject);
         }
       });
     }
@@ -2946,7 +2944,7 @@ class Player extends Component {
       if (promise) {
         // we're splitting the promise here, so, we want to catch the
         // potential error so that this chain doesn't have unhandled errors
-        (promise.then(() => this.isFullscreen(false)));
+        silencePromise(promise.then(() => this.isFullscreen(false)));
       }
 
       return promise;
