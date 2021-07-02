@@ -298,3 +298,17 @@ QUnit.test('exitFullscreen returns a rejected promise if document is not active'
 
   stub.restore();
 });
+
+QUnit.test('exitFullscreen returns a resovled promise if we were fullscreen', function(assert) {
+  const stub = sinon.stub(document, 'exitFullscreen');
+  const player = TestHelpers.makePlayer();
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  // pretend we successfully exited.
+  promise.resolve();
+
+  player.exitFullscreen().then(() => assert.ok(true, 'our promise resolved'));
+
+  stub.restore();
+});
