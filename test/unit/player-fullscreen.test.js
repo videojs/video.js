@@ -335,7 +335,7 @@ QUnit[skipOrTest]('exitFullscreen returns a rejected promise if document is not 
   stub.restore();
 });
 
-QUnit[skipOrTest]('exitFullscreen returns a resovled promise if we were fullscreen', function(assert) {
+QUnit[skipOrTest]('exitFullscreen returns a resolved promise if we were fullscreen', function(assert) {
   const player = TestHelpers.makePlayer();
   const stub = sinon.stub(document, player.fsApi_.exitFullscreen);
   const promise = sinon.promise();
