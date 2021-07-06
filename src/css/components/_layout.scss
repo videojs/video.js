@@ -157,8 +157,8 @@ body.vjs-full-window {
 
 .vjs-lock-showing {
   display: block !important;
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 // This optional paragraph inside the video tag can provide a message to users
