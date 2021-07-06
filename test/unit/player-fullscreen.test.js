@@ -3,6 +3,7 @@ import Player from '../../src/js/player.js';
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import window from 'global/window';
+import document from 'global/document';
 
 const FullscreenTestHelpers = {
   makePlayer(prefixed, playerOptions, videoTag) {
@@ -229,7 +230,7 @@ QUnit.test('full window can be preferred to fullscreen tech', function(assert) {
 });
 
 QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
-  const player = FullscreenTestHelpers.makePlayer(true);
+  const player = TestHelpers.makePlayer();
 
   player.enterFullWindow();
   assert.ok(player.isFullWindow, 'enterFullWindow should be called');
@@ -279,4 +280,71 @@ QUnit.test('fullscreenerror event from Html5 should pass through player', functi
   assert.strictEqual(fullscreenerror, err);
 
   player.dispose();
+});
+
+// only run where we have sinon.promise
+const skipOrTest = sinon.promise ? 'test' : 'skip';
+
+QUnit[skipOrTest]('requestFullscreen returns a rejected promise if unable to go fullscreen', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const playerEl = player.el();
+  const stub = sinon.stub(playerEl, player.fsApi_.requestFullscreen);
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  promise.reject(new Error('Cannot go fullscreen'));
+
+  assert.rejects(
+    player.requestFullscreen(),
+    new Error('Cannot go fullscreen'),
+    'our promise was rejected'
+  );
+
+  stub.restore();
+});
+
+QUnit[skipOrTest]('requestFullscreen returns a resolved promise if we were fullscreen', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const playerEl = player.el();
+  const stub = sinon.stub(playerEl, player.fsApi_.requestFullscreen);
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  // pretend we successfully went fullscreen.
+  promise.resolve();
+
+  player.requestFullscreen().then(() => assert.ok(true, 'our promise resolved'));
+
+  stub.restore();
+});
+
+QUnit[skipOrTest]('exitFullscreen returns a rejected promise if document is not active', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const stub = sinon.stub(document, player.fsApi_.exitFullscreen);
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  promise.reject(new Error('Document not active'));
+
+  assert.rejects(
+    player.exitFullscreen(),
+    new Error('Document not active'),
+    'our promise was rejected'
+  );
+
+  stub.restore();
+});
+
+QUnit[skipOrTest]('exitFullscreen returns a resolved promise if we were fullscreen', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const stub = sinon.stub(document, player.fsApi_.exitFullscreen);
+  const promise = sinon.promise();
+
+  stub.returns(promise);
+  // pretend we successfully exited.
+  promise.resolve();
+
+  player.exitFullscreen().then(() => assert.ok(true, 'our promise resolved'));
+
+  stub.restore();
 });
