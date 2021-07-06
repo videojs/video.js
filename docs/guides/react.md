@@ -1,12 +1,87 @@
 # Video.js and ReactJS integration
 
-Here's a basic ReactJS player implementation.
+Here are a couple ReactJS player implementations.
+
+## React Functional Component and useEffect Example
+
+```jsx
+import React from "react";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
+
+export const VideoJS = ( props ) => {
+
+  const videoRef = React.useRef(null);
+  const { options } = props;
+
+  // This seperate functional component fixes the removal of the videoelement 
+  // from the DOM when calling the dispose() method on a player
+  const VideoHtml = ( props ) => (
+    <div data-vjs-player>
+      <video ref={videoRef} className="video-js vjs-big-play-centered" />
+    </div>
+  );
+
+  React.useEffect( () => {
+    const videoElement = videoRef.current;
+    let player;
+    if( videoElement ) {
+      player = videojs( videoElement, options, () => {
+        console.log("player is ready");
+      });
+    }
+    return () => {
+      if( player ) {
+        player.dispose();
+      }
+    }
+  }, [options]);
+
+  return (<VideoHtml />);
+}
+export default VideoJS;
+
+```
+
+You can then use it like this: (see [options guide][options] for option information)
+```jsx
+import React from "react";
+import VideoJS from './VideoJS' // point to where the functional component is stored
+
+const App = () => {
+
+  const videoJsOptions = { // lookup the options in the docs for more options
+    autoplay: true,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [{
+      src: '/path/to/video.mp4',
+      type: 'video/mp4'
+    }]
+  }
+  
+  return (
+    <>
+      <div>Rest of app here</div>
+      
+      <VideoJS options={videoJsOptions}/>
+      
+      <div>Rest of app here</div>
+    </>
+  );
+}
+
+```
+
+## React Class Component Example
 
 It just instantiates the Video.js player on `componentDidMount` and destroys it on `componentWillUnmount`.
 
 ```jsx
 import React from 'react';
 import videojs from 'video.js'
+import video.js/dist/video-js.css
 
 export default class VideoPlayer extends React.Component {
   componentDidMount() {
@@ -52,10 +127,9 @@ const videoJsOptions = {
 
 return <VideoPlayer { ...videoJsOptions } />
 ```
-
-Don't forget to include the Video.js CSS, located at `video.js/dist/video-js.css`.
-
 [options]: /docs/guides/options.md
+
+
 
 ## Using a React Component as a Video JS Component
 
