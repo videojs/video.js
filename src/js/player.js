@@ -1894,6 +1894,7 @@ class Player extends Component {
    */
   handleTechEnded_() {
     this.addClass('vjs-ended');
+    this.removeClass('vjs-waiting');
     if (this.options_.loop) {
       this.currentTime(0);
       this.play();
