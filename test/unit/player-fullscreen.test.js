@@ -303,7 +303,7 @@ QUnit[skipOrTest]('requestFullscreen returns a rejected promise if unable to go 
   stub.restore();
 });
 
-QUnit[skipOrTest]('requestFullscreen returns a resovled promise if we were fullscreen', function(assert) {
+QUnit[skipOrTest]('requestFullscreen returns a resolved promise if we were fullscreen', function(assert) {
   const player = TestHelpers.makePlayer();
   const playerEl = player.el();
   const stub = sinon.stub(playerEl, player.fsApi_.requestFullscreen);
