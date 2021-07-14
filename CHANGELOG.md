@@ -1,3 +1,21 @@
+<a name="7.14.1"></a>
+## [7.14.1](https://github.com/videojs/video.js/compare/v7.14.0...v7.14.1) (2021-07-14)
+
+### Bug Fixes
+
+* **package:** update to VHS 2.9.2 ([#7320](https://github.com/videojs/video.js/issues/7320)) ([fff0611](https://github.com/videojs/video.js/commit/fff0611))
+* all !important properties of vjs-lock-showing ([#7312](https://github.com/videojs/video.js/issues/7312)) ([508a424](https://github.com/videojs/video.js/commit/508a424))
+* properly return promise from requestFullscreen and exitFullscreen ([#7299](https://github.com/videojs/video.js/issues/7299)) ([3921b7f](https://github.com/videojs/video.js/commit/3921b7f)), closes [#7298](https://github.com/videojs/video.js/issues/7298)
+* remove loading spinner on ended ([#7311](https://github.com/videojs/video.js/issues/7311)) ([14da28d](https://github.com/videojs/video.js/commit/14da28d)), closes [videojs/http-streaming#1156](https://github.com/videojs/http-streaming/issues/1156)
+
+### Chores
+
+* use setup-node cache and remove individual cache step ([#7310](https://github.com/videojs/video.js/issues/7310)) ([fab6e87](https://github.com/videojs/video.js/commit/fab6e87))
+
+### Documentation
+
+* **react:** Added a functional React component using React.useEffect ([#7203](https://github.com/videojs/video.js/issues/7203)) ([2360236](https://github.com/videojs/video.js/commit/2360236))
+
 <a name="7.14.0"></a>
 # [7.14.0](https://github.com/videojs/video.js/compare/v7.13.4...v7.14.0) (2021-06-30)
 
