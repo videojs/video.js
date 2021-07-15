@@ -282,6 +282,7 @@ export function addClass(element, classToAdd) {
 export function removeClass(element, classToRemove) {
   // Protect in case the player gets disposed
   if (!element) {
+    log.warn("removeClass was called with an element that doesn't exist");
     return null;
   }
   if (element.classList) {
