@@ -2,6 +2,7 @@
  * @file time-ranges.js
  * @module time-ranges
  */
+import window from 'global/window';
 
 /**
  * Returns the time for the specified index at the start or end
@@ -94,8 +95,10 @@ function getRange(fnName, valueIndex, ranges, rangeIndex) {
  *          An array of time ranges.
  */
 function createTimeRangesObj(ranges) {
+  let timeRangesObj;
+
   if (ranges === undefined || ranges.length === 0) {
-    return {
+    timeRangesObj = {
       length: 0,
       start() {
         throw new Error('This TimeRanges object is empty');
@@ -104,12 +107,19 @@ function createTimeRangesObj(ranges) {
         throw new Error('This TimeRanges object is empty');
       }
     };
+  } else {
+    timeRangesObj = {
+      length: ranges.length,
+      start: getRange.bind(null, 'start', 0, ranges),
+      end: getRange.bind(null, 'end', 1, ranges)
+    };
   }
-  return {
-    length: ranges.length,
-    start: getRange.bind(null, 'start', 0, ranges),
-    end: getRange.bind(null, 'end', 1, ranges)
-  };
+
+  if (window.Symbol && window.Symbol.iterator) {
+    timeRangesObj[window.Symbol.iterator] = () => (ranges || []).values();
+  }
+
+  return timeRangesObj;
 }
 
 /**
