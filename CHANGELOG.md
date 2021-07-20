@@ -1,3 +1,10 @@
+<a name="7.14.2"></a>
+## [7.14.2](https://github.com/videojs/video.js/compare/v7.14.1...v7.14.2) (2021-07-19)
+
+### Bug Fixes
+
+* **dom:** in removeClass, check element for null in case of a disposed player ([#6701](https://github.com/videojs/video.js/issues/6701)) ([2990cc7](https://github.com/videojs/video.js/commit/2990cc7))
+
 <a name="7.14.1"></a>
 ## [7.14.1](https://github.com/videojs/video.js/compare/v7.14.0...v7.14.1) (2021-07-14)
 
