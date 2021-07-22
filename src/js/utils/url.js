@@ -73,6 +73,7 @@ export const parseUrl = function(url) {
     details.protocol = window.location.protocol;
   }
 
+  /* istanbul ignore if */
   if (!details.host) {
     details.host = window.location.host;
   }
