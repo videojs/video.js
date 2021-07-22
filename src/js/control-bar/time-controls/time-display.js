@@ -39,9 +39,15 @@ class TimeDisplay extends Component {
   createEl() {
     const className = this.buildCSSClass();
     const el = super.createEl('div', {
-      className: `${className} vjs-time-control vjs-control`,
-      innerHTML: `<span class="vjs-control-text" role="presentation">${this.localize(this.labelText_)}\u00a0</span>`
+      className: `${className} vjs-time-control vjs-control`
     });
+    const span = Dom.createEl('span', {
+      className: 'vjs-control-text',
+      role: 'presentation',
+      textContent: `${this.localize(this.labelText_)}\u00a0`
+    });
+
+    el.appendChild(span);
 
     this.contentEl_ = Dom.createEl('span', {
       className: `${className}-display`

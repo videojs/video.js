@@ -63,11 +63,19 @@ class MenuItem extends ClickableComponent {
     // The control is textual, not just an icon
     this.nonIconControl = true;
 
-    return super.createEl('li', assign({
+    const el = super.createEl('li', assign({
       className: 'vjs-menu-item',
-      innerHTML: `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}</span>`,
       tabIndex: -1
     }, props), attrs);
+
+    const span = super.createEl('span', {
+      className: 'vjs-menu-item-text',
+      textContent: this.localize(this.options_.label)
+    });
+
+    el.appendChild(span);
+
+    return el;
   }
 
   /**

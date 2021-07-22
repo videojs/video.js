@@ -45,7 +45,7 @@ class SeekToLive extends Button {
 
     this.textEl_ = Dom.createEl('span', {
       className: 'vjs-seek-to-live-text',
-      innerHTML: this.localize('LIVE')
+      textContent: this.localize('LIVE')
     }, {
       'aria-hidden': 'true'
     });

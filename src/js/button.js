@@ -34,7 +34,6 @@ class Button extends ClickableComponent {
     tag = 'button';
 
     props = assign({
-      innerHTML: '<span aria-hidden="true" class="vjs-icon-placeholder"></span>',
       className: this.buildCSSClass()
     }, props);
 
@@ -46,6 +45,9 @@ class Button extends ClickableComponent {
     }, attributes);
 
     const el = Component.prototype.createEl.call(this, tag, props, attributes);
+    const span = Component.prototype.createEl.call(this, 'span', {className: 'vjs-icon-placeholder'});
+
+    el.appendChild(span);
 
     this.createControlTextEl(el);
 

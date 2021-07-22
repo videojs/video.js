@@ -116,7 +116,7 @@ class MenuButton extends Component {
     if (this.options_.title) {
       const titleEl = Dom.createEl('li', {
         className: 'vjs-menu-title',
-        innerHTML: toTitleCase(this.options_.title),
+        textContent: toTitleCase(this.options_.title),
         tabIndex: -1
       });
 

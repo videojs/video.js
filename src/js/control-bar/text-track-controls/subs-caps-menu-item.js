@@ -3,7 +3,6 @@
  */
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
-import {assign} from '../../utils/obj';
 
 /**
  * SubsCapsMenuItem has an [cc] icon to distinguish captions from subtitles
@@ -14,20 +13,28 @@ import {assign} from '../../utils/obj';
 class SubsCapsMenuItem extends TextTrackMenuItem {
 
   createEl(type, props, attrs) {
-    let innerHTML = `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}`;
+    const el = super.createEl(type, props, attrs);
+    const parentSpan = super.createEl('span', {
+      className: 'vjs-menu-item-text',
+      textContent: this.localize(this.options_.label)
+    });
 
-    if (this.options_.track.kind === 'captions') {
-      innerHTML += `
-        <span aria-hidden="true" class="vjs-icon-placeholder"></span>
-        <span class="vjs-control-text"> ${this.localize('Captions')}</span>
-      `;
+    if (this.options_.track.kind === 'main-desc') {
+      const icon = super.createEl('span', {
+        className: 'vjs-icon-placeholder'
+      }, {
+        'aria-hidden': true
+      });
+      const controlText = super.createEl('span', {
+        className: 'vjs-control-text',
+        textContent: this.localize('captions')
+      });
+
+      parentSpan.appendChild(icon);
+      parentSpan.appendChild(controlText);
     }
 
-    innerHTML += '</span>';
-
-    const el = super.createEl(type, assign({
-      innerHTML
-    }, props), attrs);
+    el.appendChild(parentSpan);
 
     return el;
   }
