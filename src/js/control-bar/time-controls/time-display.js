@@ -43,8 +43,9 @@ class TimeDisplay extends Component {
     });
     const span = Dom.createEl('span', {
       className: 'vjs-control-text',
-      role: 'presentation',
       textContent: `${this.localize(this.labelText_)}\u00a0`
+    }, {
+      role: 'presentation'
     });
 
     el.appendChild(span);
