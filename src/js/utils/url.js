@@ -97,10 +97,12 @@ export const getAbsoluteURL = function(url) {
   // Check if absolute URL
   if (!url.match(/^https?:\/\//)) {
     // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
-    const div = document.createElement('div');
+    // add the url to an anchor and let the browser parse the URL
+    const a = document.createElement('a');
 
-    div.innerHTML = `<a href="${url}">x</a>`;
-    url = div.firstChild.href;
+    a.href = url;
+
+    url = a.href;
   }
 
   return url;
