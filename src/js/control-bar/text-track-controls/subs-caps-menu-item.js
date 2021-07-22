@@ -3,6 +3,7 @@
  */
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
+import document from 'global/document';
 
 /**
  * SubsCapsMenuItem has an [cc] icon to distinguish captions from subtitles
@@ -15,23 +16,21 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
   createEl(type, props, attrs) {
     const el = super.createEl(type, props, attrs);
     const parentSpan = super.createEl('span', {
-      className: 'vjs-menu-item-text',
-      textContent: this.localize(this.options_.label)
+      className: 'vjs-menu-item-text'
     });
 
-    if (this.options_.track.kind === 'main-desc') {
-      const icon = super.createEl('span', {
+    parentSpan.appendChild(document.createTextNode(this.localize(this.options_.label)));
+
+    if (this.options_.track.kind === 'captions') {
+      parentSpan.appendChild(super.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {
         'aria-hidden': true
-      });
-      const controlText = super.createEl('span', {
+      }));
+      parentSpan.appendChild(super.createEl('span', {
         className: 'vjs-control-text',
-        textContent: this.localize('captions')
-      });
-
-      parentSpan.appendChild(icon);
-      parentSpan.appendChild(controlText);
+        textContent: this.localize('Captions')
+      }));
     }
 
     el.appendChild(parentSpan);

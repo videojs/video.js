@@ -3,6 +3,7 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
+import document from 'global/document';
 
 /**
  * An {@link AudioTrack} {@link MenuItem}
@@ -47,23 +48,21 @@ class AudioTrackMenuItem extends MenuItem {
   createEl(type, props, attrs) {
     const el = super.createEl(type, props, attrs);
     const parentSpan = super.createEl('span', {
-      className: 'vjs-menu-item-text',
-      textContent: this.localize(this.options_.label)
+      className: 'vjs-menu-item-text'
     });
 
+    parentSpan.appendChild(document.createTextNode(this.localize(this.options_.label)));
+
     if (this.options_.track.kind === 'main-desc') {
-      const icon = super.createEl('span', {
+      parentSpan.appendChild(super.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {
         'aria-hidden': true
-      });
-      const controlText = super.createEl('span', {
+      }));
+      parentSpan.appendChild(super.createEl('span', {
         className: 'vjs-control-text',
         textContent: this.localize('Descriptions')
-      });
-
-      parentSpan.appendChild(icon);
-      parentSpan.appendChild(controlText);
+      }));
     }
 
     el.appendChild(parentSpan);

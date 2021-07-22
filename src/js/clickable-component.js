@@ -72,12 +72,13 @@ class ClickableComponent extends Component {
 
     this.tabIndex_ = props.tabIndex;
 
-    const el = super.createEl(tag, props, attributes);
-    const span = super.createEl('span', {
-      className: 'vjs-icon-placeholder'
-    });
+    const el = Dom.createEl(tag, props, attributes);
 
-    el.appendChild(span);
+    el.appendChild(Dom.createEl('span', {
+      className: 'vjs-icon-placeholder'
+    }, {
+      'aria-hidden': true
+    }));
 
     this.createControlTextEl(el);
 

@@ -68,12 +68,10 @@ class MenuItem extends ClickableComponent {
       tabIndex: -1
     }, props), attrs);
 
-    const span = super.createEl('span', {
+    el.appendChild(super.createEl('span', {
       className: 'vjs-menu-item-text',
       textContent: this.localize(this.options_.label)
-    });
-
-    el.appendChild(span);
+    }));
 
     return el;
   }

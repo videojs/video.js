@@ -41,8 +41,6 @@ class LiveDisplay extends Component {
       className: 'vjs-live-control vjs-control'
     });
 
-    const textNode = document.createTextNode(this.localize('LIVE'));
-
     this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-live-display',
       textContent: `${this.localize('Stream Type')}\u00a0`
@@ -50,12 +48,11 @@ class LiveDisplay extends Component {
       'aria-live': 'off'
     });
 
-    const span = Dom.createEl('span', {
+    this.contentEl_.appendChild(Dom.createEl('span', {
       className: 'vjs-control-text'
-    });
+    }));
+    this.contentEl_.appendChild(document.createTextNode(this.localize('LIVE')));
 
-    this.contentEl_.appendChild(span);
-    this.contentEl_.appendChild(textNode);
     el.appendChild(this.contentEl_);
     return el;
   }
