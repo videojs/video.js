@@ -5,12 +5,9 @@ import * as Url from '../../../src/js/utils/url.js';
 
 QUnit.module('url');
 QUnit.test('should parse the details of a url correctly', function(assert) {
-  assert.equal(
-    Url.parseUrl('#').protocol,
-    window.location.protocol,
-    'parsed relative url protocol'
-  );
+  assert.equal(Url.parseUrl('#').protocol, window.location.protocol, 'parsed relative url protocol');
   assert.equal(Url.parseUrl('#').host, window.location.host, 'parsed relative url host');
+  assert.equal(Url.parseUrl('#foo').hash, '#foo', 'parsed relative url hash');
 
   assert.equal(Url.parseUrl('http://example.com').protocol, 'http:', 'parsed example url protocol');
   assert.equal(Url.parseUrl('http://example.com').hostname, 'example.com', 'parsed example url hostname');
