@@ -41,30 +41,17 @@ import window from 'global/window';
  *           An object of url details
  */
 export const parseUrl = function(url) {
+  // This entire method can be replace with URL once we are able to drop IE11
+
   const props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
 
   // add the url to an anchor and let the browser parse the URL
-  let a = document.createElement('a');
+  const a = document.createElement('a');
 
   a.href = url;
 
-  // IE8 (and 9?) Fix
-  // ie8 doesn't parse the URL correctly until the anchor is actually
-  // added to the body, and an innerHTML is needed to trigger the parsing
-  const addToBody = (a.host === '' && a.protocol !== 'file:');
-  let div;
-
-  if (addToBody) {
-    div = document.createElement('div');
-    div.innerHTML = `<a href="${url}"></a>`;
-    a = div.firstChild;
-    // prevent the div from affecting layout
-    div.setAttribute('style', 'display:none; position:absolute;');
-    document.body.appendChild(div);
-  }
-
   // Copy the specific URL properties to a new object
-  // This is also needed for IE8 because the anchor loses its
+  // This is also needed for IE because the anchor loses its
   // properties when it's removed from the dom
   const details = {};
 
@@ -72,7 +59,7 @@ export const parseUrl = function(url) {
     details[props[i]] = a[props[i]];
   }
 
-  // IE9 adds the port to the host property unlike everyone else. If
+  // IE adds the port to the host property unlike everyone else. If
   // a port identifier is added for standard ports, strip it.
   if (details.protocol === 'http:') {
     details.host = details.host.replace(/:80$/, '');
@@ -86,8 +73,9 @@ export const parseUrl = function(url) {
     details.protocol = window.location.protocol;
   }
 
-  if (addToBody) {
-    document.body.removeChild(div);
+  /* istanbul ignore if */
+  if (!details.host) {
+    details.host = window.location.host;
   }
 
   return details;
