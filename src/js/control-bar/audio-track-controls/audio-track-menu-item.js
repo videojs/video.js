@@ -47,6 +47,11 @@ class AudioTrackMenuItem extends MenuItem {
 
   createEl(type, props, attrs) {
     const el = super.createEl(type, props, attrs);
+
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+
     const parentSpan = super.createEl('span', {
       className: 'vjs-menu-item-text'
     });

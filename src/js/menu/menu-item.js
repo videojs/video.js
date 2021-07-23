@@ -6,6 +6,7 @@ import Component from '../component.js';
 import {assign} from '../utils/obj';
 import {MenuKeys} from './menu-keys.js';
 import keycode from 'keycode';
+import {createEl} from '../utils/dom.js';
 
 /**
  * The component for a menu item. `<li>`
@@ -68,7 +69,11 @@ class MenuItem extends ClickableComponent {
       tabIndex: -1
     }, props), attrs);
 
-    el.appendChild(super.createEl('span', {
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+
+    el.appendChild(createEl('span', {
       className: 'vjs-menu-item-text',
       textContent: this.localize(this.options_.label)
     }));
