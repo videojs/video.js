@@ -28,7 +28,9 @@ class TimeDivider extends Component {
     });
 
     const div = super.createEl('div');
-    const span = super.createEl('span');
+    const span = super.createEl('span', {
+      textContent: '/'
+    });
 
     div.appendChild(span);
     el.appendChild(div);

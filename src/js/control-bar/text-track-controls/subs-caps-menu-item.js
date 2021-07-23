@@ -29,7 +29,9 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
       }));
       parentSpan.appendChild(super.createEl('span', {
         className: 'vjs-control-text',
-        textContent: this.localize('Captions')
+        // space added as the text will visually flow with the
+        // label
+        textContent: ` ${this.localize('Captions')}`
       }));
     }
 
