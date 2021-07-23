@@ -32,7 +32,7 @@ class CustomControlSpacer extends Spacer {
       className: this.buildCSSClass(),
       // No-flex/table-cell mode requires there be some content
       // in the cell to fill the remaining space of the table.
-      textContent: '&nbsp'
+      textContent: '&nbsp;'
     });
   }
 }
