@@ -27,10 +27,12 @@ class Spacer extends Component {
    * @return {Element}
    *         The element that was created.
    */
-  createEl() {
-    return super.createEl('div', {
-      className: this.buildCSSClass()
-    });
+  createEl(tag = 'div', props = {}, attributes = {}) {
+    if (!props.className) {
+      props.className = this.buildCSSClass();
+    }
+
+    return super.createEl(tag, props, attributes);
   }
 }
 
