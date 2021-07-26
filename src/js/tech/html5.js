@@ -1351,8 +1351,7 @@ Html5.resetMediaElement = function(el) {
     el.removeChild(sources[i]);
   }
 
-  // remove any src reference.
-  // not setting `src=''` because that throws an error
+  el.src = '';
   el.removeAttribute('src');
 
   if (typeof el.load === 'function') {
