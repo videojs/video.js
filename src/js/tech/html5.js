@@ -1322,8 +1322,7 @@ Html5.disposeMediaElement = function(el) {
     el.removeChild(el.firstChild);
   }
 
-  // remove any src reference. not setting `src=''` because that causes a warning
-  // in firefox
+  el.src = '';
   el.removeAttribute('src');
 
   // force the media element to update its loading state by calling load()
