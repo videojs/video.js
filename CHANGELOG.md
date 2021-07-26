@@ -1,3 +1,11 @@
+<a name="7.14.3"></a>
+## [7.14.3](https://github.com/videojs/video.js/compare/v7.14.2...v7.14.3) (2021-07-26)
+
+### Bug Fixes
+
+* don't add anchor to DOM for getAbsoluteURL ([#7336](https://github.com/videojs/video.js/issues/7336)) ([b483a76](https://github.com/videojs/video.js/commit/b483a76))
+* remove IE8 url parsing workaround ([#7334](https://github.com/videojs/video.js/issues/7334)) ([b3acf66](https://github.com/videojs/video.js/commit/b3acf66))
+
 <a name="7.14.2"></a>
 ## [7.14.2](https://github.com/videojs/video.js/compare/v7.14.1...v7.14.2) (2021-07-19)
 
