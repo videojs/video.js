@@ -86,7 +86,7 @@
     "@babel/runtime": "^7.12.5",
     "@videojs/http-streaming": "2.9.2",
     "@videojs/vhs-utils": "^3.0.2",
-    "@videojs/xhr": "2.5.1",
+    "@videojs/xhr": "2.6.0",
     "aes-decrypter": "3.1.2",
     "global": "^4.4.0",
     "keycode": "^2.2.0",
