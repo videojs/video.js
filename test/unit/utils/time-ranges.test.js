@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import { createTimeRanges, createTimeRange } from '../../../src/js/utils/time-ranges.js';
+import window from 'global/window';
 
 QUnit.module('time-ranges');
 
@@ -75,4 +76,22 @@ QUnit.test('should throw without being given an index', function(assert) {
     /Failed to execute 'end'/,
     'end throws if no index is given'
   );
+});
+
+let testOrSkip = 'skip';
+
+if (window.Symbol && window.Symbol.iterator) {
+  testOrSkip = 'test';
+}
+QUnit[testOrSkip]('Array.from works on our time ranges object', function(assert) {
+  const trRepresentation = [
+    [0, 10],
+    [20, 30]
+  ];
+  let tr = createTimeRanges(trRepresentation);
+
+  assert.deepEqual(Array.from(tr), trRepresentation, 'we got back what we put in');
+
+  tr = createTimeRanges(0, 10);
+  assert.deepEqual(Array.from(tr), [[0, 10]], 'we got back a ranges representation');
 });
