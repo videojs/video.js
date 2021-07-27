@@ -106,7 +106,7 @@ videojs('some-id', {autoplay: true, controls: true});
 ### beforeerror
 
 `beforeerror` occurs just as we get an error on the player. This allows plugins or other custom code to intercept the error and modify it to be something else.
-`error` is can be an object such as `{code: 4}` or something with a message. It potentially includes a `cause` property too. Alternatively, it could be `null` which means that the current error will be getting cleared.
+`error` is an object such with a `code` property, an optional `message` property, and potentially a `cause` property too. Alternatively, it could be `null` which means that the current error should be cleared.
 
 `beforeerror` hook functions:
 
