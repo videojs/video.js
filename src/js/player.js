@@ -1317,12 +1317,7 @@ class Player extends Component {
     // Make sure to remove all the previous listeners in case we are called multiple times.
     this.removeTechControlsListeners_();
 
-    // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
-    // trigger mousedown/up.
-    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
-    // TODO: Is this needed for any techs other than Flash?
-    // Any touch events are set to block the mousedown event from happening
-    this.on(this.tech_, 'mouseup', this.boundHandleTechClick_);
+    this.on(this.tech_, 'click', this.boundHandleTechClick_);
     this.on(this.tech_, 'dblclick', this.boundHandleTechDoubleClick_);
 
     // If the controls were hidden we don't want that to change without a tap event
@@ -1350,7 +1345,7 @@ class Player extends Component {
     this.off(this.tech_, 'touchstart', this.boundHandleTechTouchStart_);
     this.off(this.tech_, 'touchmove', this.boundHandleTechTouchMove_);
     this.off(this.tech_, 'touchend', this.boundHandleTechTouchEnd_);
-    this.off(this.tech_, 'mouseup', this.boundHandleTechClick_);
+    this.off(this.tech_, 'click', this.boundHandleTechClick_);
     this.off(this.tech_, 'dblclick', this.boundHandleTechDoubleClick_);
   }
 
@@ -1927,14 +1922,10 @@ class Player extends Component {
    * @param {EventTarget~Event} event
    *        the event that caused this function to trigger
    *
-   * @listens Tech#mouseup
+   * @listens Tech#click
    * @private
    */
   handleTechClick_(event) {
-    if (!Dom.isSingleLeftClick(event)) {
-      return;
-    }
-
     // When controls are disabled a click should not toggle playback because
     // the click is considered a control
     if (!this.controls_) {
