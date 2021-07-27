@@ -1181,6 +1181,50 @@ QUnit.test('player should handle different error types', function(assert) {
   player.dispose();
 });
 
+QUnit.test('beforeerror hook allows us to modify errors', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const beforeerrorHook = function(p, err) {
+    assert.equal(player, p, 'the players match');
+    assert.equal(err.code, 4, 'we got code 4 in beforeerror hook');
+    return { code: 1 };
+  };
+  const errorHook = function(p, err) {
+    assert.equal(player, p, 'the players match');
+    assert.equal(err.code, 1, 'we got code 1 in error hook');
+  };
+
+  videojs.hook('beforeerror', beforeerrorHook);
+  videojs.hook('error', errorHook);
+
+  player.error({code: 4});
+
+  player.dispose();
+  videojs.removeHook('beforeerror', beforeerrorHook);
+  videojs.removeHook('error', errorHook);
+});
+
+QUnit.test('player should trigger error related hooks', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const beforeerrorHook = function(p, err) {
+    assert.equal(player, p, 'the players match');
+    assert.equal(err.code, 4, 'we got code 4 in beforeerror hook');
+    return err;
+  };
+  const errorHook = function(p, err) {
+    assert.equal(player, p, 'the players match');
+    assert.equal(err.code, 4, 'we got code 4 in error hook');
+  };
+
+  videojs.hook('beforeerror', beforeerrorHook);
+  videojs.hook('error', errorHook);
+
+  player.error({code: 4});
+
+  player.dispose();
+  videojs.removeHook('beforeerror', beforeerrorHook);
+  videojs.removeHook('error', errorHook);
+});
+
 QUnit.test('Data attributes on the video element should persist in the new wrapper element', function(assert) {
   const dataId = 123;
 
