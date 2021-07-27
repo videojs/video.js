@@ -25,6 +25,9 @@
   // Remain visible for screen reader and keyboard users
   visibility: visible;
   opacity: 0;
+  // prevent a click/tap from interacting with vjs-lock-showing menu's
+  // or other controls while we are inactive/hidden
+  pointer-events: none;
 
   $trans: visibility 1.0s, opacity 1.0s;
   @include transition($trans);
