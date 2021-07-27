@@ -3955,8 +3955,13 @@ class Player extends Component {
     hooks('beforeerror').forEach((hookFunction) => {
       const newErr = hookFunction(this, err);
 
-      if (!isObject(newErr) && newErr !== null) {
-        log.error('please return an object or null in beforeerror hooks');
+      if (!(
+        (isObject(newErr) && !Array.isArray(newErr)) ||
+        typeof newErr === 'string' ||
+        typeof newErr === 'number' ||
+        newErr === null
+      )) {
+        this.log.error('please return a value that MediaError expects in beforeerror hooks');
         return;
       }
 

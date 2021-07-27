@@ -1203,6 +1203,61 @@ QUnit.test('beforeerror hook allows us to modify errors', function(assert) {
   videojs.removeHook('error', errorHook);
 });
 
+QUnit.test('beforeerror hook logs a warning if the incorrect type is returned', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const stub = sinon.stub(player.log, 'error');
+  let errorReturnValue;
+
+  const beforeerrorHook = function(p, err) {
+    return errorReturnValue;
+  };
+
+  videojs.hook('beforeerror', beforeerrorHook);
+
+  stub.reset();
+  errorReturnValue = {code: 4};
+  player.error({code: 4});
+  assert.ok(stub.notCalled, '{code: 4} is supported');
+
+  stub.reset();
+  errorReturnValue = 1;
+  player.error({code: 4});
+  assert.ok(stub.notCalled, 'number is supported');
+
+  stub.reset();
+  errorReturnValue = null;
+  player.error({code: 4});
+  assert.ok(stub.notCalled, 'null is supported');
+
+  stub.reset();
+  errorReturnValue = 'hello';
+  player.error({code: 4});
+  assert.ok(stub.notCalled, 'string is supported');
+
+  stub.reset();
+  errorReturnValue = new Error('hello');
+  player.error({code: 4});
+  assert.ok(stub.notCalled, 'Error object is supported');
+
+  stub.reset();
+  errorReturnValue = [1, 2, 3];
+  player.error({code: 4});
+  assert.ok(stub.called, 'array is not supported');
+
+  stub.reset();
+  errorReturnValue = undefined;
+  player.error({code: 4});
+  assert.ok(stub.called, 'undefined is not supported');
+
+  stub.reset();
+  errorReturnValue = true;
+  player.error({code: 4});
+  assert.ok(stub.called, 'booleans are not supported');
+
+  videojs.removeHook('beforeerror', beforeerrorHook);
+  player.dispose();
+});
+
 QUnit.test('player should trigger error related hooks', function(assert) {
   const player = TestHelpers.makePlayer({});
   const beforeerrorHook = function(p, err) {
