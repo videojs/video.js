@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import document from 'global/document';
 
 /**
  * An {@link AudioTrack} {@link MenuItem}
@@ -47,16 +46,7 @@ class AudioTrackMenuItem extends MenuItem {
 
   createEl(type, props, attrs) {
     const el = super.createEl(type, props, attrs);
-
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
-
-    const parentSpan = super.createEl('span', {
-      className: 'vjs-menu-item-text'
-    });
-
-    parentSpan.appendChild(document.createTextNode(this.localize(this.options_.label)));
+    const parentSpan = el.querySelector('.vjs-menu-item-text');
 
     if (this.options_.track.kind === 'main-desc') {
       parentSpan.appendChild(super.createEl('span', {
@@ -69,8 +59,6 @@ class AudioTrackMenuItem extends MenuItem {
         textContent: this.localize('Descriptions')
       }));
     }
-
-    el.appendChild(parentSpan);
 
     return el;
   }

@@ -69,14 +69,11 @@ class MenuItem extends ClickableComponent {
       tabIndex: -1
     }, props), attrs);
 
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
-
-    el.appendChild(createEl('span', {
+    // swap icon with menu item text.
+    el.replaceChild(createEl('span', {
       className: 'vjs-menu-item-text',
       textContent: this.localize(this.options_.label)
-    }));
+    }), el.querySelector('.vjs-icon-placeholder'));
 
     return el;
   }

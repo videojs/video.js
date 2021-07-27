@@ -3,7 +3,6 @@
  */
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
-import document from 'global/document';
 import {createEl} from '../../utils/dom.js';
 
 /**
@@ -16,16 +15,7 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
 
   createEl(type, props, attrs) {
     const el = super.createEl(type, props, attrs);
-
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
-
-    const parentSpan = createEl('span', {
-      className: 'vjs-menu-item-text'
-    });
-
-    parentSpan.appendChild(document.createTextNode(this.localize(this.options_.label)));
+    const parentSpan = el.querySelector('.vjs-menu-item-text');
 
     if (this.options_.track.kind === 'captions') {
       parentSpan.appendChild(createEl('span', {
@@ -40,8 +30,6 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
         textContent: ` ${this.localize('Captions')}`
       }));
     }
-
-    el.appendChild(parentSpan);
 
     return el;
   }
