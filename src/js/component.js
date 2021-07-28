@@ -8,6 +8,7 @@ import evented from './mixins/evented.js';
 import asyncTimers from './mixins/async-timers.js';
 import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
+import DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/string-cases.js';
@@ -174,6 +175,9 @@ class Component {
         this.el_.parentNode.removeChild(this.el_);
       }
 
+      if (DomData.has(this.el_)) {
+        DomData.delete(this.el_);
+      }
       this.el_ = null;
     }
 
