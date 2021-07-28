@@ -9,15 +9,19 @@ Hooks exist so that users can globally hook into certain Video.js lifecycle mome
     * [Example](#example)
   * [setup](#setup)
     * [Example](#example-1)
+  * [beforeerror](#beforeerror)
+    * [Example](#example-2)
+  * [error](#error)
+    * [Example](#example-3)
 * [Usage](#usage)
   * [Adding](#adding)
-    * [Example](#example-2)
-  * [Adding Once](#adding-once)
-    * [Example](#example-3)
-  * [Getting](#getting)
     * [Example](#example-4)
-  * [Removing](#removing)
+  * [Adding Once](#adding-once)
     * [Example](#example-5)
+  * [Getting](#getting)
+    * [Example](#example-6)
+  * [Removing](#removing)
+    * [Example](#example-7)
 
 ## Current Hooks
 
@@ -97,6 +101,53 @@ videojs.hook('setup', function(player) {
 
 // Create a new player.
 videojs('some-id', {autoplay: true, controls: true});
+```
+
+### beforeerror
+
+`beforeerror` occurs just as we get an error on the player. This allows plugins or other custom code to intercept the error and modify it to be something else.
+`error` can be [one of multiple things](https://docs.videojs.com/mediaerror#MediaError), most commonly an object with a `code` property or `null` which means that the current error should be cleared.
+
+`beforeerror` hook functions:
+
+* Take two arguments:
+  1. The `player` that the error is happening on.
+  1. The `error` object that was passed in.
+* Return an error object that should replace the error
+
+#### Example
+
+```js
+videojs.hook('beforeerror', function(player, err) {
+  const error = player.error();
+
+  // prevent current error from being cleared out
+  if (err === null) {
+    return error;
+  }
+
+  // but allow changing to a new error
+  return err;
+});
+```
+
+### error
+
+`error` occurs after the player has errored out, after `beforeerror` has allowed updating the error, and after an `error` event has been triggered on the player in question. It is purely an informative event which allows you to get all errors from all players.
+
+`error` hook functions:
+
+* Take two arguments:
+  1. `player`: the player that the error occurred on
+  1. `error`: the Error object that was resolved with the `beforeerror` hooks
+* Don't have to return anything
+
+#### Example
+
+```js
+videojs.hook('error', function(player, err) {
+  console.log(`player ${player.id()} has errored out with code ${err.code} ${err.message}`);
+});
 ```
 
 ## Usage

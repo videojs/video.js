@@ -4,12 +4,14 @@ import document from 'global/document';
 import sinon from 'sinon';
 import log from '../../src/js/utils/log.js';
 
+const clearObj = (obj) => Object.keys(obj).forEach((key) => delete obj[key]);
+
 QUnit.module('video.js:hooks ', {
   beforeEach() {
-    videojs.hooks_ = {};
+    clearObj(videojs.hooks_);
   },
   afterEach() {
-    videojs.hooks_ = {};
+    clearObj(videojs.hooks_);
   }
 });
 

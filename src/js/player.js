@@ -33,6 +33,8 @@ import * as middleware from './tech/middleware.js';
 import {ALL as TRACK_TYPES} from './tracks/track-types';
 import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
+import {hooks} from './utils/hooks';
+import {isObject} from './utils/obj';
 import keycode from 'keycode';
 
 // The following imports are used only to ensure that the corresponding modules
@@ -3949,6 +3951,23 @@ class Player extends Component {
       return this.error_ || null;
     }
 
+    // allow hooks to modify error object
+    hooks('beforeerror').forEach((hookFunction) => {
+      const newErr = hookFunction(this, err);
+
+      if (!(
+        (isObject(newErr) && !Array.isArray(newErr)) ||
+        typeof newErr === 'string' ||
+        typeof newErr === 'number' ||
+        newErr === null
+      )) {
+        this.log.error('please return a value that MediaError expects in beforeerror hooks');
+        return;
+      }
+
+      err = newErr;
+    });
+
     // Suppress the first error message for no compatible source until
     // user interaction
     if (this.options_.suppressNotSupportedError &&
@@ -3990,6 +4009,9 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('error');
+
+    // notify hooks of the per player error
+    hooks('error').forEach((hookFunction) => hookFunction(this, this.error_));
 
     return;
   }
