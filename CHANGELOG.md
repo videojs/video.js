@@ -1,3 +1,25 @@
+<a name="7.15.0"></a>
+# [7.15.0](https://github.com/videojs/video.js/compare/v7.14.3...v7.15.0) (2021-07-28)
+
+### Features
+
+* **hooks:** Error hooks ([#7349](https://github.com/videojs/video.js/issues/7349)) ([774f9e7](https://github.com/videojs/video.js/commit/774f9e7))
+* **lang:** add Hindi Language translation ([#7327](https://github.com/videojs/video.js/issues/7327)) ([e90ae32](https://github.com/videojs/video.js/commit/e90ae32))
+* **lang:** add Romanian language and update translations doc. ([#7300](https://github.com/videojs/video.js/issues/7300)) ([5c2a45b](https://github.com/videojs/video.js/commit/5c2a45b))
+* **package:** update to [@videojs](https://github.com/videojs)/xhr[@2](https://github.com/2).6 to add httpHandler helper ([#7348](https://github.com/videojs/video.js/issues/7348)) ([c699140](https://github.com/videojs/video.js/commit/c699140))
+* **time-ranges:** make TimeRanges iteratable if Symbol.iterator exists ([#7330](https://github.com/videojs/video.js/issues/7330)) ([ad9546c](https://github.com/videojs/video.js/commit/ad9546c))
+
+### Bug Fixes
+
+* **package:** update to VHS 2.10.0 ([#7351](https://github.com/videojs/video.js/issues/7351)) ([8afde12](https://github.com/videojs/video.js/commit/8afde12))
+* evented should cleanup dom data ([#7350](https://github.com/videojs/video.js/issues/7350)) ([ada25c4](https://github.com/videojs/video.js/commit/ada25c4))
+* prevent control bar clicks/taps with while user inactive ([#7329](https://github.com/videojs/video.js/issues/7329)) ([2ad4d60](https://github.com/videojs/video.js/commit/2ad4d60))
+* use click event for tech click event ([#7302](https://github.com/videojs/video.js/issues/7302)) ([956379c](https://github.com/videojs/video.js/commit/956379c))
+
+### Code Refactoring
+
+* remove most usage of innerHTML ([#7337](https://github.com/videojs/video.js/issues/7337)) ([eb8f802](https://github.com/videojs/video.js/commit/eb8f802))
+
 <a name="7.14.3"></a>
 ## [7.14.3](https://github.com/videojs/video.js/compare/v7.14.2...v7.14.3) (2021-07-26)
 
