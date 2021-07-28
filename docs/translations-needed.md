@@ -329,8 +329,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| es.json (missing 2)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
+| es.json (Complete)      |                                                                                     |
 | fa.json (Complete)      |                                                                                     |
 | fi.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -778,6 +777,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
+| ro.json (Complete)      |                                                                                     |
 | ru.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
