@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import {assign} from '../../utils/obj';
 
 /**
  * An {@link AudioTrack} {@link MenuItem}
@@ -46,20 +45,20 @@ class AudioTrackMenuItem extends MenuItem {
   }
 
   createEl(type, props, attrs) {
-    let innerHTML = `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}`;
+    const el = super.createEl(type, props, attrs);
+    const parentSpan = el.querySelector('.vjs-menu-item-text');
 
     if (this.options_.track.kind === 'main-desc') {
-      innerHTML += `
-        <span aria-hidden="true" class="vjs-icon-placeholder"></span>
-        <span class="vjs-control-text"> ${this.localize('Descriptions')}</span>
-      `;
+      parentSpan.appendChild(super.createEl('span', {
+        className: 'vjs-icon-placeholder'
+      }, {
+        'aria-hidden': true
+      }));
+      parentSpan.appendChild(super.createEl('span', {
+        className: 'vjs-control-text',
+        textContent: this.localize('Descriptions')
+      }));
     }
-
-    innerHTML += '</span>';
-
-    const el = super.createEl(type, assign({
-      innerHTML
-    }, props), attrs);
 
     return el;
   }

@@ -28,14 +28,12 @@ class CustomControlSpacer extends Spacer {
    *         The element that was created.
    */
   createEl() {
-    const el = super.createEl({
-      className: this.buildCSSClass()
+    return super.createEl('div', {
+      className: this.buildCSSClass(),
+      // No-flex/table-cell mode requires there be some content
+      // in the cell to fill the remaining space of the table.
+      textContent: '\u00a0'
     });
-
-    // No-flex/table-cell mode requires there be some content
-    // in the cell to fill the remaining space of the table.
-    el.innerHTML = '\u00a0';
-    return el;
   }
 }
 

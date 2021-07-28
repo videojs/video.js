@@ -49,7 +49,7 @@ class PlaybackRateMenuButton extends MenuButton {
     this.labelEl_ = Dom.createEl('div', {
       className: 'vjs-playback-rate-value',
       id: this.labelElId_,
-      innerHTML: '1x'
+      textContent: '1x'
     });
 
     el.appendChild(this.labelEl_);
@@ -190,7 +190,7 @@ class PlaybackRateMenuButton extends MenuButton {
    */
   updateLabel(event) {
     if (this.playbackRateSupported()) {
-      this.labelEl_.innerHTML = this.player().playbackRate() + 'x';
+      this.labelEl_.textContent = this.player().playbackRate() + 'x';
     }
   }
 

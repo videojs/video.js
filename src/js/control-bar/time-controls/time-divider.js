@@ -18,15 +18,24 @@ class TimeDivider extends Component {
    *         The element that was created.
    */
   createEl() {
-    return super.createEl('div', {
-      className: 'vjs-time-control vjs-time-divider',
-      innerHTML: '<div><span>/</span></div>'
+    const el = super.createEl('div', {
+      className: 'vjs-time-control vjs-time-divider'
     }, {
       // this element and its contents can be hidden from assistive techs since
       // it is made extraneous by the announcement of the control text
       // for the current time and duration displays
       'aria-hidden': true
     });
+
+    const div = super.createEl('div');
+    const span = super.createEl('span', {
+      textContent: '/'
+    });
+
+    div.appendChild(span);
+    el.appendChild(div);
+
+    return el;
   }
 
 }

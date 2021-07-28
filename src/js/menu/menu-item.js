@@ -6,6 +6,7 @@ import Component from '../component.js';
 import {assign} from '../utils/obj';
 import {MenuKeys} from './menu-keys.js';
 import keycode from 'keycode';
+import {createEl} from '../utils/dom.js';
 
 /**
  * The component for a menu item. `<li>`
@@ -63,11 +64,18 @@ class MenuItem extends ClickableComponent {
     // The control is textual, not just an icon
     this.nonIconControl = true;
 
-    return super.createEl('li', assign({
+    const el = super.createEl('li', assign({
       className: 'vjs-menu-item',
-      innerHTML: `<span class="vjs-menu-item-text">${this.localize(this.options_.label)}</span>`,
       tabIndex: -1
     }, props), attrs);
+
+    // swap icon with menu item text.
+    el.replaceChild(createEl('span', {
+      className: 'vjs-menu-item-text',
+      textContent: this.localize(this.options_.label)
+    }), el.querySelector('.vjs-icon-placeholder'));
+
+    return el;
   }
 
   /**

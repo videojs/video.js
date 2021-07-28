@@ -6,6 +6,7 @@ import Component from './component';
 import log from './utils/log.js';
 import {assign} from './utils/obj';
 import keycode from 'keycode';
+import {createEl} from './utils/dom.js';
 
 /**
  * Base class for all buttons.
@@ -34,7 +35,6 @@ class Button extends ClickableComponent {
     tag = 'button';
 
     props = assign({
-      innerHTML: '<span aria-hidden="true" class="vjs-icon-placeholder"></span>',
       className: this.buildCSSClass()
     }, props);
 
@@ -45,7 +45,13 @@ class Button extends ClickableComponent {
       type: 'button'
     }, attributes);
 
-    const el = Component.prototype.createEl.call(this, tag, props, attributes);
+    const el = createEl(tag, props, attributes);
+
+    el.appendChild(createEl('span', {
+      className: 'vjs-icon-placeholder'
+    }, {
+      'aria-hidden': true
+    }));
 
     this.createControlTextEl(el);
 
