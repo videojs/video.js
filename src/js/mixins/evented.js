@@ -8,6 +8,7 @@ import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
 import EventTarget from '../event-target';
+import DomData from '../utils/dom-data';
 import log from '../utils/log';
 
 const objName = (obj) => {
@@ -499,6 +500,11 @@ function evented(target, options = {}) {
   // When any evented object is disposed, it removes all its listeners.
   target.on('dispose', () => {
     target.off();
+    [target, target.el_, target.eventBusEl_].forEach(function(val) {
+      if (val && DomData.has(val)) {
+        DomData.delete(val);
+      }
+    });
     window.setTimeout(() => {
       target.eventBusEl_ = null;
     }, 0);
