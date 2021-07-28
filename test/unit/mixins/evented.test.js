@@ -2,8 +2,10 @@
 import sinon from 'sinon';
 import evented from '../../../src/js/mixins/evented';
 import log from '../../../src/js/utils/log';
+import DomData from '../../../src/js/utils/dom-data';
 import * as Dom from '../../../src/js/utils/dom';
 import * as Obj from '../../../src/js/utils/obj';
+import * as Events from '../../../src/js/utils/events.js';
 
 // Common errors thrown by evented objects.
 const errors = {
@@ -568,4 +570,32 @@ QUnit.test('off() can remove a listener from an array of events on a different t
     type: 'y',
     target: b.eventBusEl_
   });
+});
+
+QUnit.test('Removes DomData on dispose', function(assert) {
+  const el_ = Dom.createEl('div');
+  const eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
+  const target = evented({el_, eventBusEl_}, {eventBusKey: 'eventBusEl_'});
+
+  assert.equal(DomData.get(eventBusEl_).handlers.dispose.length, 1, 'event bus has dispose handler');
+  assert.notOk(DomData.get(target), 'evented obj has no handlers');
+  assert.notOk(DomData.get(el_), 'evented el_ has handlers');
+
+  target.on('foo', () => {});
+
+  assert.equal(DomData.get(eventBusEl_).handlers.foo.length, 1, 'foo handler added to bus');
+
+  Events.on(eventBusEl_, 'bar', () => {});
+  assert.equal(DomData.get(eventBusEl_).handlers.bar.length, 1, 'bar handler added to bus');
+
+  Events.on(el_, 'foo', () => {});
+  assert.equal(DomData.get(el_).handlers.foo.length, 1, 'foo handler added to el_');
+
+  Events.on(target, 'foo', () => {});
+  assert.equal(DomData.get(target).handlers.foo.length, 1, 'foo handler added to evented object');
+
+  target.trigger('dispose');
+  assert.notOk(DomData.get(eventBusEl_), 'eventBusEl_ DomData deleted');
+  assert.notOk(DomData.get(target), 'evented object DomData deleted');
+  assert.notOk(DomData.get(el_), 'el_ DomData deleted');
 });
