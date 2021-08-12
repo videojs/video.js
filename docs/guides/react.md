@@ -14,7 +14,7 @@ export const VideoJS = ( props ) => {
   const videoRef = React.useRef(null);
   const { options } = props;
 
-  // This seperate functional component fixes the removal of the videoelement 
+  // This separate functional component fixes the removal of the videoelement 
   // from the DOM when calling the dispose() method on a player
   const VideoHtml = ( props ) => (
     <div data-vjs-player>
