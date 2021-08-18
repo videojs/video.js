@@ -4141,7 +4141,9 @@ class Player extends Component {
     if (controlBar && !browser.IS_IOS && !browser.IS_ANDROID) {
 
       controlBar.on('mouseenter', function(event) {
-        this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
+        if (this.player().options_.inactivityTimeout !== 0) {
+          this.player().cache_.inactivityTimeout = this.player().options_.inactivityTimeout;
+        }
         this.player().options_.inactivityTimeout = 0;
       });
 
