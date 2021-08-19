@@ -9,7 +9,7 @@ on:
 jobs:
   release:
     env:
-      NETLIFY_BASE: 'videojs-preview.netlify.app/sandbox/'
+      NETLIFY_BASE: 'videojs-preview.netlify.app'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,6 +29,7 @@ jobs:
         with:
           node-version: '${{steps.nvm.outputs.NVMRC}}'
           cache: npm
+          # this line is required for the setup-node action to be able to run the npm publish below.
           registry-url: 'https://registry.npmjs.org'
 
       - name: npm install
