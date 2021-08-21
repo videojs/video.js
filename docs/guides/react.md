@@ -16,7 +16,7 @@ export const VideoJS = ( props ) => {
   const { options, onReady } = props;
 
   React.useEffect(() => {
-    // make sure VjsPlayer only initial once
+    // make sure Video.js player is only initialized once
     if (!playerRef.current) {
       const videoElement = videoRef.current;
       if (!videoElement) return;
@@ -33,7 +33,7 @@ export const VideoJS = ( props ) => {
     }
   }, [options]);
 
-  // Dispose VjsPlayer when functional component actually unmount
+  // Dispose the Video.js player when the functional component unmounts
   React.useEffect(() => {
     return () => {
       if (playerRef.current) {
@@ -76,7 +76,7 @@ const App = () => {
   const handlePlayerReady = (player) => {
     playerRef.current = player;
 
-    // you can handle player's events here
+    // you can handle player events here
     player.on('waiting', () => {
       console.log('player is waiting');
     });
@@ -87,7 +87,7 @@ const App = () => {
   };
 
   // const changePlayerOptions = () => {
-  //   // you can update player through VjsPlayer instance
+  //   // you can update the player through the Video.js player instance
   //   if (!playerRef.current) {
   //     return;
   //   }
