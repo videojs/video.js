@@ -1,3 +1,10 @@
+<a name="7.15.2"></a>
+## [7.15.2](https://github.com/videojs/video.js/compare/v7.15.1...v7.15.2) (2021-08-23)
+
+### Chores
+
+* specify bucket for CDN push ([#7393](https://github.com/videojs/video.js/issues/7393)) ([af484ec](https://github.com/videojs/video.js/commit/af484ec))
+
 <a name="7.15.1"></a>
 ## [7.15.1](https://github.com/videojs/video.js/compare/v7.15.0...v7.15.1) (2021-08-23)
 
