@@ -1,3 +1,20 @@
+<a name="7.15.1"></a>
+## [7.15.1](https://github.com/videojs/video.js/compare/v7.15.0...v7.15.1) (2021-08-23)
+
+### Bug Fixes
+
+* prevent cached inactivityTimeout from being overwritten with 0 ([#7383](https://github.com/videojs/video.js/issues/7383)) ([1f4d95b](https://github.com/videojs/video.js/commit/1f4d95b)), closes [#7313](https://github.com/videojs/video.js/issues/7313)
+* **lang:** fix typo in de locale for progress bar ([#7380](https://github.com/videojs/video.js/issues/7380)) ([9e82035](https://github.com/videojs/video.js/commit/9e82035))
+
+### Chores
+
+* add a release and deploy Github Action ([#7385](https://github.com/videojs/video.js/issues/7385)) ([957c6fa](https://github.com/videojs/video.js/commit/957c6fa))
+
+### Documentation
+
+* **react:** Fix typo ([#7375](https://github.com/videojs/video.js/issues/7375)) ([05083bb](https://github.com/videojs/video.js/commit/05083bb))
+* **react:** update react functional component tutorial ([#7377](https://github.com/videojs/video.js/issues/7377)) ([d07a9de](https://github.com/videojs/video.js/commit/d07a9de))
+
 <a name="7.15.0"></a>
 # [7.15.0](https://github.com/videojs/video.js/compare/v7.14.3...v7.15.0) (2021-07-28)
 
