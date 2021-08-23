@@ -1,0 +1,93 @@
+name: release
+on:
+  push:
+    tags:
+    # match semver versions
+    - "v[0-9]+.[0-9]+.[0-9]+"
+    # match semver pre-releases
+    - "v[0-9]+.[0-9]+.[0-9]+-*"
+jobs:
+  release:
+    env:
+      NETLIFY_BASE: 'videojs-preview.netlify.app'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        # We neeed to fetch the entire history as conventional-changelog needs
+        # access to any number of git commits to build the changelog.
+        with:
+          fetch-depth: 0
+
+      - name: read node version from .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        shell: bash
+        id: nvm
+
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '${{steps.nvm.outputs.NVMRC}}'
+          cache: npm
+          # this line is required for the setup-node action to be able to run the npm publish below.
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: npm install
+        run: npm i --prefer-offline --no-audit
+
+      # publish runs build for us via a prepublishOnly script
+      - name: npm release
+        run: npm publish --tag next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: get current changelog
+        run: node -e "console.log(require('./build/current-changelog.js')())" > CHANGELOG-LATEST.md
+
+      - name: get dashed package version for netlify
+        run: echo ::set-output name=VERSION::$(node -e "process.stdout.write(require('./package.json').version.split('.').join('-'))")
+        id: get-version
+        shell: bash
+        if: env.NETLIFY_BASE != ''
+
+      - name: add netlify preview to release notes
+        run: |
+          echo "" >> CHANGELOG-LATEST.md
+          echo "[netlify preview for this version](https://v${{steps.get-version.outputs.VERSION}}--${{env.NETLIFY_BASE}})" >> CHANGELOG-LATEST.md
+        if: env.NETLIFY_BASE != ''
+
+      - name: Create Github release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG-LATEST.md
+          token: ${{github.token}}
+          prerelease: true
+          files: dist/*.zip
+          discussion_category_name: Releases
+
+  deploy:
+    needs: release
+    runs-on: ubuntu-latest
+    environment: Deploy
+    env:
+      VJS_VERSION: ${{ github.event.head_commit.message }}
+      S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+      S3_ACCESS: ${{ secrets.AWS_S3_ACCESS }}
+      S3_KEY: ${{ secrets.AWS_S3_KEY }}
+    steps:
+      - name: setup node
+        uses: actions/setup-node@v2
+
+      - name: npm install video.js
+        run: npm install "video.js@$VJS_VERSION"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_SECRET }}
+          aws-region: us-east-1
+
+      - name: Copy files to the CDN with the AWS CLI
+        run: |
+          aws s3 sync node_modules/video.js/dist/ s3://${S3_KEY}/${VJS_VERSION}/ --acl ${S3_ACCESS}
