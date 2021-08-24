@@ -1,3 +1,10 @@
+<a name="7.15.3"></a>
+## [7.15.3](https://github.com/videojs/video.js/compare/v7.15.2...v7.15.3) (2021-08-24)
+
+### Bug Fixes
+
+* update VHS to fix xmldom warning ([#7395](https://github.com/videojs/video.js/issues/7395)) ([1ddcfde](https://github.com/videojs/video.js/commit/1ddcfde)), closes [#7389](https://github.com/videojs/video.js/issues/7389)
+
 <a name="7.15.2"></a>
 ## [7.15.2](https://github.com/videojs/video.js/compare/v7.15.1...v7.15.2) (2021-08-23)
 
