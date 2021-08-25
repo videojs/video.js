@@ -1,3 +1,10 @@
+<a name="7.15.4"></a>
+## [7.15.4](https://github.com/videojs/video.js/compare/v7.15.3...v7.15.4) (2021-08-25)
+
+### Chores
+
+* use aws s3 cp rather than sync ([#7400](https://github.com/videojs/video.js/issues/7400)) ([dae1266](https://github.com/videojs/video.js/commit/dae1266))
+
 <a name="7.15.3"></a>
 ## [7.15.3](https://github.com/videojs/video.js/compare/v7.15.2...v7.15.3) (2021-08-24)
 
