@@ -90,4 +90,4 @@ jobs:
 
       - name: Copy files to the CDN with the AWS CLI
         run: |
-          aws s3 sync node_modules/video.js/dist/ s3://${S3_BUCKET}/${S3_KEY}/${VJS_VERSION}/ --acl ${S3_ACCESS}
+          aws s3 cp node_modules/video.js/dist s3://${S3_BUCKET}/${S3_KEY}/${VJS_VERSION}/ --acl ${S3_ACCESS} --recursive
