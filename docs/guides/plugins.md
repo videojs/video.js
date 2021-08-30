@@ -351,7 +351,7 @@ For any given plugin initialization, there are four events to be aware of:
 * `beforepluginsetup`: Triggered immediately before any plugin is initialized.
 * `beforepluginsetup:examplePlugin` Triggered immediately before the `examplePlugin` is initialized.
 * `pluginsetup`: Triggered after any plugin is initialized.
-* `pluginsetup:examplePlugin`: Triggered after he `examplePlugin` is initialized.
+* `pluginsetup:examplePlugin`: Triggered after the `examplePlugin` is initialized.
 
 These events work for both basic and advanced plugins. They are triggered on the player and each includes an object of [extra event data](#extra-event-data) as a second argument to its listeners.
 
