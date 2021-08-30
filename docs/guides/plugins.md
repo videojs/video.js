@@ -20,11 +20,12 @@ A basic plugin is a plain JavaScript function:
 
 ```js
 function examplePlugin(options) {
+
   if (options.customClass) {
     this.addClass(options.customClass);
   }
 
-  this.on('playing', function () {
+  this.on('playing', function() {
     videojs.log('playback began!');
   });
 }
@@ -62,6 +63,7 @@ If you're using ES6 already, you can use that syntax with your transpiler/langua
 const Plugin = videojs.getPlugin('plugin');
 
 class ExamplePlugin extends Plugin {
+
   constructor(player, options) {
     super(player, options);
 
@@ -69,7 +71,7 @@ class ExamplePlugin extends Plugin {
       player.addClass(options.customClass);
     }
 
-    player.on('playing', function () {
+    player.on('playing', function() {
       videojs.log('playback began!');
     });
   }
@@ -82,17 +84,18 @@ Or with ES5:
 var Plugin = videojs.getPlugin('plugin');
 
 var ExamplePlugin = videojs.extend(Plugin, {
-  constructor: function (player, options) {
+
+  constructor: function(player, options) {
     Plugin.call(this, player, options);
 
     if (options.customClass) {
       player.addClass(options.customClass);
     }
 
-    player.on('playing', function () {
+    player.on('playing', function() {
       videojs.log('playback began!');
     });
-  },
+  }
 });
 ```
 
@@ -146,7 +149,7 @@ Like components, advanced plugins offer an implementation of events. This includ
 * The ability to listen for events on the plugin instance using `on` or `one`:
 
   ```js
-  player.examplePlugin().on('example-event', function () {
+  player.examplePlugin().on('example-event', function() {
     videojs.log('example plugin received an example-event');
   });
   ```
@@ -183,14 +186,14 @@ A default `state` can be provided by adding a static property to a plugin constr
 
 ```js
 ExamplePlugin.defaultState = {
-  customClass: 'default-custom-class',
+  customClass: 'default-custom-class'
 };
 ```
 
 When the `state` is updated via the `setState` method, the plugin instance fires a `"statechanged"` event, but _only if something changed!_ This event can be used as a signal to update the DOM or perform some other action. The event object passed to listeners for this event includes, an object describing the changes that occurred on the `state` property:
 
 ```js
-player.examplePlugin().on('statechanged', function (e) {
+player.examplePlugin().on('statechanged', function(e) {
   if (e.changes && e.changes.customClass) {
     this.player
       .removeClass(e.changes.customClass.from)
@@ -198,7 +201,7 @@ player.examplePlugin().on('statechanged', function (e) {
   }
 });
 
-player.examplePlugin().setState({ customClass: 'another-custom-class' });
+player.examplePlugin().setState({customClass: 'another-custom-class'});
 ```
 
 #### Lifecycle
@@ -236,7 +239,7 @@ Retrieve it using `videojs.getPluginVersion`:
 
 ```js
 var version = videojs.getPluginVersion('examplePlugin');
-console.log(version); // 1.0.1
+console.log(version);  // 1.0.1
 ```
 
 Note that the [plugin generator](https://github.com/videojs/generator-videojs-plugin) already takes care of adding a version number for you.
@@ -267,6 +270,7 @@ import videojs from 'video.js';
 const Plugin = videojs.getPlugin('plugin');
 
 class Advanced extends Plugin {
+
   constructor(player, options) {
     super(player, options);
 
@@ -282,13 +286,11 @@ class Advanced extends Plugin {
   }
 
   updateState() {
-    this.setState({ playing: !this.player.paused() });
+    this.setState({playing: !this.player.paused()});
   }
 
   logState(changed) {
-    videojs.log(
-      `the player is now ${this.state.playing ? 'playing' : 'paused'}`
-    );
+    videojs.log(`the player is now ${this.state.playing ? 'playing' : 'paused'}`);
   }
 }
 
@@ -325,9 +327,9 @@ The first way is during creation of the player. Using the `plugins` option, a pl
 videojs('example-player', {
   plugins: {
     examplePlugin: {
-      customClass: 'example-class',
-    },
-  },
+      customClass: 'example-class'
+    }
+  }
 });
 ```
 
@@ -335,7 +337,7 @@ Otherwise, a plugin can be manually set up:
 
 ```js
 var player = videojs('example-player');
-player.examplePlugin({ customClass: 'example-class' });
+player.examplePlugin({customClass: 'example-class'});
 ```
 
 These two methods are functionally identical - use whichever you prefer!
