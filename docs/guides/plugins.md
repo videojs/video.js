@@ -20,13 +20,12 @@ A basic plugin is a plain JavaScript function:
 
 ```js
 function examplePlugin(options) {
-
   if (options.customClass) {
     this.addClass(options.customClass);
   }
 
-  this.on('playing', function() {
-    videojs.log('playback began!');
+  this.on("playing", function () {
+    videojs.log("playback began!");
   });
 }
 ```
@@ -40,7 +39,7 @@ By convention, plugins are passed an `options` object; however, you can realisti
 Now that we have a function that does something with a player, all that's left is to register the plugin with Video.js:
 
 ```js
-videojs.registerPlugin('examplePlugin', examplePlugin);
+videojs.registerPlugin("examplePlugin", examplePlugin);
 ```
 
 After that, any player will automatically have an `examplePlugin` method on its prototype!
@@ -60,10 +59,9 @@ If you're familiar with creating [components][components], this process is simil
 If you're using ES6 already, you can use that syntax with your transpiler/language of choice (Babel, TypeScript, etc):
 
 ```js
-const Plugin = videojs.getPlugin('plugin');
+const Plugin = videojs.getPlugin("plugin");
 
 class ExamplePlugin extends Plugin {
-
   constructor(player, options) {
     super(player, options);
 
@@ -71,8 +69,8 @@ class ExamplePlugin extends Plugin {
       player.addClass(options.customClass);
     }
 
-    player.on('playing', function() {
-      videojs.log('playback began!');
+    player.on("playing", function () {
+      videojs.log("playback began!");
     });
   }
 }
@@ -81,21 +79,20 @@ class ExamplePlugin extends Plugin {
 Or with ES5:
 
 ```js
-var Plugin = videojs.getPlugin('plugin');
+var Plugin = videojs.getPlugin("plugin");
 
 var ExamplePlugin = videojs.extend(Plugin, {
-
-  constructor: function(player, options) {
+  constructor: function (player, options) {
     Plugin.call(this, player, options);
 
     if (options.customClass) {
       player.addClass(options.customClass);
     }
 
-    player.on('playing', function() {
-      videojs.log('playback began!');
+    player.on("playing", function () {
+      videojs.log("playback began!");
     });
-  }
+  },
 });
 ```
 
@@ -106,7 +103,7 @@ For now, this example advanced plugin does the exact same thing as the basic plu
 The registration process for advanced plugins is identical to [the process for basic plugins](#register-a-basic-plugin).
 
 ```js
-videojs.registerPlugin('examplePlugin', ExamplePlugin);
+videojs.registerPlugin("examplePlugin", ExamplePlugin);
 ```
 
 > **Note:** Because ES6 classes are syntactic sugar on top of existing constructor function and prototype architecture in JavaScript, in all cases `registerPlugin`'s second argument is a function.
@@ -149,21 +146,21 @@ Like components, advanced plugins offer an implementation of events. This includ
 * The ability to listen for events on the plugin instance using `on` or `one`:
 
   ```js
-  player.examplePlugin().on('example-event', function() {
-    videojs.log('example plugin received an example-event');
+  player.examplePlugin().on("example-event", function () {
+    videojs.log("example plugin received an example-event");
   });
   ```
 
 * The ability to `trigger` custom events on a plugin instance:
 
   ```js
-  player.examplePlugin().trigger('example-event');
+  player.examplePlugin().trigger("example-event");
   ```
 
 * The ability to stop listening to custom events on a plugin instance using `off`:
 
   ```js
-  player.examplePlugin().off('example-event');
+  player.examplePlugin().off("example-event");
   ```
 
 By offering a built-in events system, advanced plugins offer a wider range of options for code structure with a pattern familiar to most web developers.
@@ -186,14 +183,14 @@ A default `state` can be provided by adding a static property to a plugin constr
 
 ```js
 ExamplePlugin.defaultState = {
-  customClass: 'default-custom-class'
+  customClass: "default-custom-class",
 };
 ```
 
 When the `state` is updated via the `setState` method, the plugin instance fires a `"statechanged"` event, but _only if something changed!_ This event can be used as a signal to update the DOM or perform some other action. The event object passed to listeners for this event includes, an object describing the changes that occurred on the `state` property:
 
 ```js
-player.examplePlugin().on('statechanged', function(e) {
+player.examplePlugin().on("statechanged", function (e) {
   if (e.changes && e.changes.customClass) {
     this.player
       .removeClass(e.changes.customClass.from)
@@ -201,7 +198,7 @@ player.examplePlugin().on('statechanged', function(e) {
   }
 });
 
-player.examplePlugin().setState({customClass: 'another-custom-class'});
+player.examplePlugin().setState({ customClass: "another-custom-class" });
 ```
 
 #### Lifecycle
@@ -230,16 +227,16 @@ In addition, if the player is disposed, the disposal of all its advanced plugin 
 Adding a version number to a plugin is done by defining a `VERSION` property on the plugin before registering it:
 
 ```js
-ExamplePlugin.VERSION = '1.0.1';
+ExamplePlugin.VERSION = "1.0.1";
 
-videojs.registerPlugin('examplePlugin', ExamplePlugin);
+videojs.registerPlugin("examplePlugin", ExamplePlugin);
 ```
 
 Retrieve it using `videojs.getPluginVersion`:
 
 ```js
-var version = videojs.getPluginVersion('examplePlugin');
-console.log(version);  // 1.0.1
+var version = videojs.getPluginVersion("examplePlugin");
+console.log(version); // 1.0.1
 ```
 
 Note that the [plugin generator](https://github.com/videojs/generator-videojs-plugin) already takes care of adding a version number for you.
@@ -249,7 +246,7 @@ Note that the [plugin generator](https://github.com/videojs/generator-videojs-pl
 By default, each advanced plugin instance has its own `log` property much like `videojs` and `Player` instances do. The log messages will be prefixed with the player's ID and the plugin's name:
 
 ```js
-player.examplePlugin().log('hello world!');
+player.examplePlugin().log("hello world!");
 ```
 
 The above will log the following:
@@ -265,38 +262,39 @@ The `log` function will also have all the methods/properties of the default `vid
 What follows is a complete ES6 advanced plugin that logs a custom message when the player's state changes between playing and pause. It uses all the described advanced features:
 
 ```js
-import videojs from 'video.js';
+import videojs from "video.js";
 
-const Plugin = videojs.getPlugin('plugin');
+const Plugin = videojs.getPlugin("plugin");
 
 class Advanced extends Plugin {
-
   constructor(player, options) {
     super(player, options);
 
     // Whenever the player emits a playing or pause event, we update the
     // state if necessary.
-    this.on(player, ['playing', 'pause'], this.updateState);
-    this.on('statechanged', this.logState);
+    this.on(player, ["playing", "pause"], this.updateState);
+    this.on("statechanged", this.logState);
   }
 
   dispose() {
     super.dispose();
-    videojs.log('the advanced plugin is being disposed');
+    videojs.log("the advanced plugin is being disposed");
   }
 
   updateState() {
-    this.setState({playing: !this.player.paused()});
+    this.setState({ playing: !this.player.paused() });
   }
 
   logState(changed) {
-    videojs.log(`the player is now ${this.state.playing ? 'playing' : 'paused'}`);
+    videojs.log(
+      `the player is now ${this.state.playing ? "playing" : "paused"}`
+    );
   }
 }
 
-videojs.registerPlugin('advanced', Advanced);
+videojs.registerPlugin("advanced", Advanced);
 
-const player = videojs('example-player');
+const player = videojs("example-player");
 
 player.advanced();
 
@@ -324,20 +322,20 @@ There are two ways to set up (or initialize) a plugin on a player. Both ways wor
 The first way is during creation of the player. Using the `plugins` option, a plugin can be automatically set up on a player:
 
 ```js
-videojs('example-player', {
+videojs("example-player", {
   plugins: {
     examplePlugin: {
-      customClass: 'example-class'
-    }
-  }
+      customClass: "example-class",
+    },
+  },
 });
 ```
 
 Otherwise, a plugin can be manually set up:
 
 ```js
-var player = videojs('example-player');
-player.examplePlugin({customClass: 'example-class'});
+var player = videojs("example-player");
+player.examplePlugin({ customClass: "example-class" });
 ```
 
 These two methods are functionally identical - use whichever you prefer!
@@ -351,7 +349,7 @@ For any given plugin initialization, there are four events to be aware of:
 * `beforepluginsetup`: Triggered immediately before any plugin is initialized.
 * `beforepluginsetup:examplePlugin` Triggered immediately before the `examplePlugin` is initialized.
 * `pluginsetup`: Triggered after any plugin is initialized.
-* `pluginsetup:examplePlugin`: Triggered after he `examplePlugin` is initialized.
+* `pluginsetup:examplePlugin`: Triggered after the `examplePlugin` is initialized.
 
 These events work for both basic and advanced plugins. They are triggered on the player and each includes an object of [extra event data](#extra-event-data) as a second argument to its listeners.
 
