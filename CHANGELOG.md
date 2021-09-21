@@ -1,3 +1,15 @@
+<a name="7.15.5"></a>
+## [7.15.5](https://github.com/videojs/video.js/compare/v7.15.4...v7.15.5) (2021-09-21)
+
+### Bug Fixes
+
+* **package:** update VHS to 2.10.3 to fix seeking into a gap ([#7436](https://github.com/videojs/video.js/issues/7436)) ([6c68f95](https://github.com/videojs/video.js/commit/6c68f95))
+* remove deprecation of getComponent feature ([#7410](https://github.com/videojs/video.js/issues/7410)) ([6d39ee2](https://github.com/videojs/video.js/commit/6d39ee2))
+
+### Documentation
+
+* **plugins:** fix typo in the plugins guide ([#7405](https://github.com/videojs/video.js/issues/7405)) ([3ea078d](https://github.com/videojs/video.js/commit/3ea078d))
+
 <a name="7.15.4"></a>
 ## [7.15.4](https://github.com/videojs/video.js/compare/v7.15.3...v7.15.4) (2021-08-25)
 
