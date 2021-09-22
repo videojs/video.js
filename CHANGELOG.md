@@ -1,3 +1,10 @@
+<a name="7.15.6"></a>
+## [7.15.6](https://github.com/videojs/video.js/compare/v7.15.5...v7.15.6) (2021-09-22)
+
+### Bug Fixes
+
+* mark global/window/document as external globals ([#7438](https://github.com/videojs/video.js/issues/7438)) ([029e92a](https://github.com/videojs/video.js/commit/029e92a))
+
 <a name="7.15.5"></a>
 ## [7.15.5](https://github.com/videojs/video.js/compare/v7.15.4...v7.15.5) (2021-09-21)
 
