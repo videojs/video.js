@@ -104,9 +104,6 @@ class ClickableComponent extends Component {
   createControlTextEl(el) {
     this.controlTextEl_ = Dom.createEl('span', {
       className: 'vjs-control-text'
-    }, {
-      // let the screen reader user know that the text of the element may change
-      'aria-live': 'polite'
     });
 
     if (el) {
