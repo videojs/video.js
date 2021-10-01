@@ -1,3 +1,11 @@
+<a name="7.16.0"></a>
+# [7.16.0](https://github.com/videojs/video.js/compare/v7.15.7...v7.16.0) (2021-10-01)
+
+### Features
+
+* **lang:** add telugu language translations ([#7391](https://github.com/videojs/video.js/issues/7391)) ([0558096](https://github.com/videojs/video.js/commit/0558096))
+* **package:** update to VHS 2.11.0 ([#7459](https://github.com/videojs/video.js/issues/7459)) ([b05ee91](https://github.com/videojs/video.js/commit/b05ee91))
+
 <a name="7.15.7"></a>
 ## [7.15.7](https://github.com/videojs/video.js/compare/v7.15.6...v7.15.7) (2021-10-01)
 
