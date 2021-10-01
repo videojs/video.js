@@ -1,3 +1,10 @@
+<a name="7.15.7"></a>
+## [7.15.7](https://github.com/videojs/video.js/compare/v7.15.6...v7.15.7) (2021-10-01)
+
+### Bug Fixes
+
+* remove rule on small layout ([#7449](https://github.com/videojs/video.js/issues/7449)) ([1d91831](https://github.com/videojs/video.js/commit/1d91831))
+
 <a name="7.15.6"></a>
 ## [7.15.6](https://github.com/videojs/video.js/compare/v7.15.5...v7.15.6) (2021-09-22)
 
