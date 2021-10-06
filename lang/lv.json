@@ -81,8 +81,8 @@
     "restore all settings to the default values": "atiestatīt iestatījumu uz noklusējumu",
     "Done": "Gatavs",
     "Caption Settings Dialog": "Parakstu iestatījumi",
-    "Beginning of dialog window. Escape will cancel and close the window.": "Lai aizvērtu, spiediet ESC taustiņu.",
-    "End of dialog window.": " ",
+    "Beginning of dialog window. Escape will cancel and close the window.": "Paraksta iestatījumu sākums. Lai aizvērtu, spiediet ESC taustiņu.",
+    "End of dialog window.": "Parakstu iestatījumu loga beigas",
     "{1} is loading.": "{1} ielādē.",
     "Exit Picture-in-Picture": "Iziet no Attēls attēlā",
     "Picture-in-Picture": "Attēls attēlā"
