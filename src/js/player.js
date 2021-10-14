@@ -803,6 +803,8 @@ class Player extends Component {
     // if it's been set to something different to the doc
     this.el_.setAttribute('lang', this.language_);
 
+    this.el_.setAttribute('translate', 'no');
+
     this.el_ = el;
 
     return el;

@@ -218,6 +218,7 @@ class TextTrackDisplay extends Component {
     return super.createEl('div', {
       className: 'vjs-text-track-display'
     }, {
+      'translate': 'yes',
       'aria-live': 'off',
       'aria-atomic': 'true'
     });
