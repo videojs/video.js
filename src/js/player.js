@@ -1934,10 +1934,26 @@ class Player extends Component {
       return;
     }
 
-    if (this.paused()) {
-      silencePromise(this.play());
-    } else {
-      this.pause();
+    if (
+      this.options_ === undefined ||
+        this.options_.userActions === undefined ||
+        this.options_.userActions.Click === undefined ||
+        this.options_.userActions.Click !== false
+    ) {
+
+      if (
+        this.options_ !== undefined &&
+          this.options_.userActions !== undefined &&
+          typeof this.options_.userActions.Click === 'function'
+      ) {
+
+        this.options_.userActions.Click.call(this, event);
+
+      } else if (this.paused()) {
+        silencePromise(this.play());
+      } else {
+        this.pause();
+      }
     }
   }
 
