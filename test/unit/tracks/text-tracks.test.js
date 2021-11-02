@@ -323,6 +323,51 @@ QUnit.test('should check for text track changes when emulating text tracks', fun
   tech.dispose();
 });
 
+QUnit.test('no lang attribute on cue elements if one is provided', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'showing'
+  });
+
+  tt.addCue({
+    id: '1',
+    startTime: 2,
+    endTime: 5
+  });
+  player.tech_.textTracks().addTrack(tt);
+
+  player.currentTime(2);
+  player.trigger('timeupdate');
+
+  assert.notOk(tt.activeCues[0].displayState.hasAttribute('lang'), 'no lang attribute should be set');
+
+  player.dispose();
+});
+
+QUnit.test('set lang attribute on cue elements if one is provided', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const tt = new TextTrack({
+    srclang: 'en',
+    tech: player.tech_,
+    mode: 'showing'
+  });
+
+  tt.addCue({
+    id: '1',
+    startTime: 2,
+    endTime: 5
+  });
+  player.tech_.textTracks().addTrack(tt);
+
+  player.currentTime(2);
+  player.trigger('timeupdate');
+
+  assert.equal(tt.activeCues[0].displayState.getAttribute('lang'), 'en', 'the lang should be set to en');
+
+  player.dispose();
+});
+
 QUnit.test('removes cuechange event when text track is hidden for emulated tracks', function(assert) {
   const player = TestHelpers.makePlayer();
   const tt = new TextTrack({
