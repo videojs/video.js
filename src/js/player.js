@@ -1937,17 +1937,17 @@ class Player extends Component {
     if (
       this.options_ === undefined ||
         this.options_.userActions === undefined ||
-        this.options_.userActions.Click === undefined ||
-        this.options_.userActions.Click !== false
+        this.options_.userActions.click === undefined ||
+        this.options_.userActions.click !== false
     ) {
 
       if (
         this.options_ !== undefined &&
           this.options_.userActions !== undefined &&
-          typeof this.options_.userActions.Click === 'function'
+          typeof this.options_.userActions.click === 'function'
       ) {
 
-        this.options_.userActions.Click.call(this, event);
+        this.options_.userActions.click.call(this, event);
 
       } else if (this.paused()) {
         silencePromise(this.play());
