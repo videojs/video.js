@@ -1936,15 +1936,15 @@ class Player extends Component {
 
     if (
       this.options_ === undefined ||
-        this.options_.userActions === undefined ||
-        this.options_.userActions.click === undefined ||
-        this.options_.userActions.click !== false
+      this.options_.userActions === undefined ||
+      this.options_.userActions.click === undefined ||
+      this.options_.userActions.click !== false
     ) {
 
       if (
         this.options_ !== undefined &&
-          this.options_.userActions !== undefined &&
-          typeof this.options_.userActions.click === 'function'
+        this.options_.userActions !== undefined &&
+        typeof this.options_.userActions.click === 'function'
       ) {
 
         this.options_.userActions.click.call(this, event);
