@@ -28,7 +28,7 @@ class LiveTracker extends Component {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {number} [options.trackingThreshold=30]
+   * @param {number} [options.trackingThreshold=20]
    *        Number of seconds of live window (seekableEnd - seekableStart) that
    *        media needs to have before the liveui will be shown.
    *

@@ -279,9 +279,9 @@ and you will not be able click the text to seek to the live edge. `liveui` will 
 ### `liveTracker.trackingThreshold`
 
 > Type: `number`
-> Default: `30`
+> Default: `20`
 
-An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 30s on the seekBar then we do not show the new liveui even with the liveui option set.
+An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 20s on the seekBar then we do not show the new liveui even with the liveui option set.
 
 ### `liveTracker.liveTolerance`
 
