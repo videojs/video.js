@@ -6,7 +6,7 @@ import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
 const defaults = {
-  trackingThreshold: 30,
+  trackingThreshold: 20,
   liveTolerance: 15
 };
 
