@@ -84,7 +84,7 @@ QUnit.test('liveui disabled live window is never shown', function(assert) {
 
   // liveui false
   this.player.options_.liveui = false;
-  this.player.seekable = () => createTimeRange(0, 29);
+  this.player.seekable = () => createTimeRange(0, 19);
   this.player.duration(Infinity);
 
   assert.equal(this.getComputedDisplay(), 'none', 'is hidden');
