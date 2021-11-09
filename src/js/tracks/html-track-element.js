@@ -49,7 +49,7 @@ class HTMLTrackElement extends EventTarget {
    *
    * @param {string} [options.srclang='']
    *        A valid two character language code. An alternative, but deprioritized
-   *        vesion of `options.language`
+   *        version of `options.language`
    *
    * @param {string} [options.src]
    *        A url to TextTrack cues.
