@@ -144,7 +144,7 @@ const TECH_EVENTS_RETRIGGER = [
    * @type {EventTarget~Event}
    */
   /**
-   * Retrigger the `stalled` event that was triggered by the {@link Tech}.
+   * Retrigger the `loadedmetadata` event that was triggered by the {@link Tech}.
    *
    * @private
    * @method Player#handleTechLoadedmetadata_
