@@ -5,6 +5,121 @@ import sinon from 'sinon';
 import TestHelpers from './test-helpers';
 import FullscreenApi from '../../src/js/fullscreen-api.js';
 
+QUnit.module('Player: User Actions: Click', {
+
+  beforeEach() {
+    this.clock = sinon.useFakeTimers();
+    this.player = TestHelpers.makePlayer({controls: true});
+  },
+
+  afterEach() {
+    this.player.dispose();
+    this.clock.restore();
+  }
+});
+
+QUnit.test('by default, click toggles play', function(assert) {
+  let paused = true;
+
+  this.player.paused = () => paused;
+  this.player.play = sinon.spy();
+  this.player.pause = sinon.spy();
+
+  this.player.handleTechClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.play.callCount, 1, 'has called play');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+
+  paused = false;
+  this.player.handleTechClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.play.callCount, 1, 'has called play, previously');
+  assert.strictEqual(this.player.pause.callCount, 1, 'has called pause');
+});
+
+QUnit.test('when controls are disabled, click does nothing', function(assert) {
+  let paused = true;
+
+  this.player.controls(false);
+
+  this.player.paused = () => paused;
+  this.player.play = sinon.spy();
+  this.player.pause = sinon.spy();
+
+  this.player.handleTechClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.play.callCount, 0, 'has not called play');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+
+  paused = false;
+  this.player.handleTechClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.play.callCount, 0, 'has not called play, previously');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+});
+
+QUnit.test('when userActions.click is false, click does nothing', function(assert) {
+  let paused = true;
+
+  this.player.dispose();
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    userActions: {
+      click: false
+    }
+  });
+
+  this.player.paused = () => paused;
+  this.player.play = sinon.spy();
+  this.player.pause = sinon.spy();
+
+  this.player.handleTechClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.play.callCount, 0, 'has not called play');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+
+  paused = false;
+  this.player.handleTechClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.play.callCount, 0, 'has not called play, previously');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+});
+
+QUnit.test('when userActions.click is a function, that function is called instead of toggling play', function(assert) {
+  let paused = true;
+  const clickSpy = sinon.spy();
+
+  this.player.dispose();
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    userActions: {
+      click: clickSpy
+    }
+  });
+
+  this.player.paused = () => paused;
+  this.player.play = sinon.spy();
+  this.player.pause = sinon.spy();
+
+  let event = {target: this.player.tech_.el_};
+
+  this.player.handleTechClick_(event);
+
+  assert.strictEqual(this.player.play.callCount, 0, 'has not called play');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+  assert.strictEqual(clickSpy.callCount, 1, 'has called the click handler');
+  assert.strictEqual(clickSpy.getCall(0).args[0], event, 'has passed the event to the handler');
+
+  paused = false;
+  event = {target: this.player.tech_.el_};
+  this.player.handleTechClick_(event);
+
+  assert.strictEqual(this.player.play.callCount, 0, 'has not called play, previously');
+  assert.strictEqual(this.player.pause.callCount, 0, 'has not called pause');
+  assert.strictEqual(clickSpy.callCount, 2, 'has called the click handler');
+  assert.strictEqual(clickSpy.getCall(1).args[0], event, 'has passed the event to the handler');
+});
+
 QUnit.module('Player: User Actions: Double Click', {
 
   beforeEach() {
