@@ -56,7 +56,7 @@ class LiveTracker extends Component {
     this.on(this.player_, 'durationchange', (e) => this.handleDurationchange(e));
     // we should try to toggle tracking on canplay as native playback engines, like Safari
     // may not have the proper values for things like seekableEnd until then
-    this.one(this.player_, 'canplay', () => this.toggleTracking());
+    this.on(this.player_, 'canplay', () => this.toggleTracking());
 
     // we don't need to track live playback if the document is hidden,
     // also, tracking when the document is hidden can
