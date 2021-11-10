@@ -1,3 +1,33 @@
+<a name="7.17.0"></a>
+# [7.17.0](https://github.com/videojs/video.js/compare/v7.16.0...v7.17.0) (2021-11-10)
+
+### Features
+
+* Add userAction.click to prevent pause/play when player is clicked ([#7495](https://github.com/videojs/video.js/issues/7495)) ([749105d](https://github.com/videojs/video.js/commit/749105d)), closes [#7123](https://github.com/videojs/video.js/issues/7123)
+* **lang:** Add Latvian (lv) language support ([#7468](https://github.com/videojs/video.js/issues/7468)) ([b97be4d](https://github.com/videojs/video.js/commit/b97be4d))
+* update to VHS 2.12.0 ([#7503](https://github.com/videojs/video.js/issues/7503)) ([b1760c5](https://github.com/videojs/video.js/commit/b1760c5))
+
+### Bug Fixes
+
+* **lang:** Update zh-TW.json ([#7483](https://github.com/videojs/video.js/issues/7483)) ([11228cf](https://github.com/videojs/video.js/commit/11228cf))
+* don't let the player be translated except captions ([#7474](https://github.com/videojs/video.js/issues/7474)) ([bcd80f9](https://github.com/videojs/video.js/commit/bcd80f9)), closes [#6699](https://github.com/videojs/video.js/issues/6699) [#6977](https://github.com/videojs/video.js/issues/6977)
+* enable liveui on more livestreams ([#7502](https://github.com/videojs/video.js/issues/7502)) ([e9e894f](https://github.com/videojs/video.js/commit/e9e894f))
+* volume button empty space ([#7466](https://github.com/videojs/video.js/issues/7466)) ([78cf834](https://github.com/videojs/video.js/commit/78cf834)), closes [#7465](https://github.com/videojs/video.js/issues/7465)
+* **lang:** Update Polish translation ([#7499](https://github.com/videojs/video.js/issues/7499)) ([b061491](https://github.com/videojs/video.js/commit/b061491))
+* set the 'lang' attribute on text track display elements, if the language of the track is known ([#7493](https://github.com/videojs/video.js/issues/7493)) ([f326cf3](https://github.com/videojs/video.js/commit/f326cf3)), closes [#7487](https://github.com/videojs/video.js/issues/7487)
+* **package:** update to VHS 2.11.2 ([#7484](https://github.com/videojs/video.js/issues/7484)) ([6faad26](https://github.com/videojs/video.js/commit/6faad26))
+
+### Documentation
+
+* fix a comment of the player's loadedmetadata event ([#7506](https://github.com/videojs/video.js/issues/7506)) ([ca2f5a3](https://github.com/videojs/video.js/commit/ca2f5a3))
+* **react:** fix clear when unmount component ([#7433](https://github.com/videojs/video.js/issues/7433)) ([fdb87d8](https://github.com/videojs/video.js/commit/fdb87d8)), closes [#7361](https://github.com/videojs/video.js/issues/7361)
+* fix typo in html-track-element.js ([#7504](https://github.com/videojs/video.js/issues/7504)) ([8e8b7be](https://github.com/videojs/video.js/commit/8e8b7be))
+* **component.md:** fix spelling error ([#7498](https://github.com/videojs/video.js/issues/7498)) ([e60f2ca](https://github.com/videojs/video.js/commit/e60f2ca))
+
+### Tests
+
+* add tests for the click user action ([#7507](https://github.com/videojs/video.js/issues/7507)) ([8abe438](https://github.com/videojs/video.js/commit/8abe438)), closes [#7495](https://github.com/videojs/video.js/issues/7495)
+
 <a name="7.16.0"></a>
 # [7.16.0](https://github.com/videojs/video.js/compare/v7.15.7...v7.16.0) (2021-10-01)
 
