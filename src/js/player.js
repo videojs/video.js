@@ -1936,10 +1936,26 @@ class Player extends Component {
       return;
     }
 
-    if (this.paused()) {
-      silencePromise(this.play());
-    } else {
-      this.pause();
+    if (
+      this.options_ === undefined ||
+      this.options_.userActions === undefined ||
+      this.options_.userActions.click === undefined ||
+      this.options_.userActions.click !== false
+    ) {
+
+      if (
+        this.options_ !== undefined &&
+        this.options_.userActions !== undefined &&
+        typeof this.options_.userActions.click === 'function'
+      ) {
+
+        this.options_.userActions.click.call(this, event);
+
+      } else if (this.paused()) {
+        silencePromise(this.play());
+      } else {
+        this.pause();
+      }
     }
   }
 

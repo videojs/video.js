@@ -45,6 +45,7 @@
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
+  * [userActions.click](#useractionsclick)
   * [userActions.doubleClick](#useractionsdoubleclick)
   * [userActions.hotkeys](#useractionshotkeys)
   * [userActions.hotkeys.fullscreenKey](#useractionshotkeysfullscreenkey)
@@ -442,6 +443,40 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 ### `userActions`
 
 > Type: `Object`
+
+### `userActions.click`
+
+> Type: `boolean|function`
+
+Controls how clicking on the player/tech operates. If set to `false`, clicking is disabled and will no longer cause the player to toggle between paused and playing.
+
+```js
+videojs('my-player', {
+  userActions: {
+    click: false
+  }
+});
+```
+
+If undefined or set to `true`, clicking is enabled and toggles the player between paused and play. To override the default click handling, set `userActions.click` to a function which accepts a `click` event (in this example it will request Full Screen, the same as a `userAction.doubleClick`):
+
+```js
+function myClickHandler(event) = {
+  // `this` is the player in this context
+
+  if (this.isFullscreen()) {
+      this.exitFullscreen();
+    } else {
+      this.requestFullscreen();
+    }
+};
+
+videojs('my-player', {
+  userActions: {
+    click: myClickHandler
+  }
+});
+```
 
 ### `userActions.doubleClick`
 
