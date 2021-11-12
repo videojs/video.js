@@ -80,6 +80,22 @@ class AudioTrackMenuItem extends MenuItem {
     // the audio track list will automatically toggle other tracks
     // off for us.
     this.track.enabled = true;
+
+    // when native audio tracks are used, we want to make sure that other tracks are turned off
+    if (this.player_.tech_.featuresNativeAudioTracks) {
+      const tracks = this.player_.audioTracks();
+
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+
+        // skip the current track since we enabled it above
+        if (track === this.track) {
+          continue;
+        }
+
+        track.enabled = track === this.track;
+      }
+    }
   }
 
   /**
