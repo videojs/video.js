@@ -180,7 +180,7 @@ class Slider extends Component {
     this.on(doc, 'touchmove', this.handleMouseMove_);
     this.on(doc, 'touchend', this.handleMouseUp_);
 
-    this.handleMouseMove(event);
+    this.handleMouseMove(event, true);
   }
 
   /**
@@ -192,6 +192,7 @@ class Slider extends Component {
    * @param {EventTarget~Event} event
    *        `mousedown`, `mousemove`, `touchstart`, or `touchmove` event that triggered
    *        this function
+   * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler.
    *
    * @listens mousemove
    * @listens touchmove
