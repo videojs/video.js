@@ -1040,7 +1040,7 @@ Html5.canControlVolume = function() {
     // Since features doesn't currently work asynchronously,
     // we then have to manually set the new value.
     if (canControl && browser.IS_IOS) {
-      setTimeout(() => {
+      window.setTimeout(() => {
         Html5.prototype.featuresVolumeControl = volume !== Html5.TEST_VID.volume;
       });
     }
