@@ -1035,10 +1035,11 @@ Html5.canControlVolume = function() {
 
     const canControl = volume !== Html5.TEST_VID.volume;
 
-    // on latest iOS, there are cases where we read the volume as changed.
-    // In those cases, we should add a timeout and check again later.
-    // Since features doesn't currently work asynchronously,
-    // we then have to manually set the new value.
+    // With the introduction of iOS 15, there are cases where the volume is read as
+    // changed but reverts back to its original state at the start of the next tick.
+    // To determine whether volume can be controlled on iOS,
+    // a timeout is set and the volume is checked asynchronously.
+    // Since `features` doesn't currently work asynchronously, the value is manually set.
     if (canControl && browser.IS_IOS) {
       window.setTimeout(() => {
         Html5.prototype.featuresVolumeControl = volume !== Html5.TEST_VID.volume;
