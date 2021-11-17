@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import EventTarget from '../../src/js/event-target.js';
 import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
 import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
 import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
@@ -8,6 +9,7 @@ import Slider from '../../src/js/slider/slider.js';
 import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-toggle.js';
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
+import SeekBar from '../../src/js/control-bar/progress-control/seek-bar.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
@@ -139,6 +141,35 @@ QUnit.test('calculateDistance should use changedTouches, if available', function
 
   player.dispose();
   slider.dispose();
+});
+
+QUnit.test("SeekBar doesn't set scrubbing on mouse down, only on mouse move", function(assert) {
+  const player = TestHelpers.makePlayer();
+  const scrubbingSpy = sinon.spy(player, 'scrubbing');
+  const seekBar = new SeekBar(player);
+  const doc = new EventTarget();
+
+  // mousemove is listened to on the document.
+  // Specifically, we check the ownerDocument of the seekBar's bar.
+  // Therefore, we want to mock it out to be able to trigger mousemove
+  seekBar.bar.dispose();
+  seekBar.bar.el_ = new EventTarget();
+  seekBar.bar.el_.ownerDocument = doc;
+
+  seekBar.trigger('mousedown');
+  assert.ok(scrubbingSpy.calledWith(), 'called scrubbing as a getter');
+  assert.notOk(scrubbingSpy.calledWith(true), 'did not set scrubbing true');
+
+  player.scrubbing(false);
+
+  scrubbingSpy.resetHistory();
+
+  doc.trigger('mousemove');
+  assert.ok(scrubbingSpy.calledWith(), 'called scrubbing as a getter');
+  assert.ok(scrubbingSpy.calledWith(true), 'did set scrubbing true');
+
+  seekBar.dispose();
+  player.dispose();
 });
 
 QUnit.test('playback rate button is hidden by default', function(assert) {
