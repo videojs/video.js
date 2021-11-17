@@ -151,7 +151,7 @@ QUnit.test("SeekBar doesn't set scrubbing on mouse down, only on mouse move", fu
 
   // mousemove is listened to on the document.
   // Specifically, we check the ownerDocument of the seekBar's bar.
-  // Therefore, we want to mock it out to be able to trigger mosuemove
+  // Therefore, we want to mock it out to be able to trigger mousemove
   seekBar.bar.dispose();
   seekBar.bar.el_ = new EventTarget();
   seekBar.bar.el_.ownerDocument = doc;

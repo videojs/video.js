@@ -192,7 +192,7 @@ class Slider extends Component {
    * @param {EventTarget~Event} event
    *        `mousedown`, `mousemove`, `touchstart`, or `touchmove` event that triggered
    *        this function
-   * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler.
+   * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler. Defaults to false.
    *
    * @listens mousemove
    * @listens touchmove
