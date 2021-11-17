@@ -268,11 +268,11 @@ class SeekBar extends Slider {
    *
    * @param {EventTarget~Event} event
    *        The `mousemove` event that caused this to run.
-   * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler.
+   * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler. Defaults to false
    *
    * @listens mousemove
    */
-  handleMouseMove(event, mouseDown) {
+  handleMouseMove(event, mouseDown = false) {
     if (!Dom.isSingleLeftClick(event)) {
       return;
     }
