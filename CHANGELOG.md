@@ -1,3 +1,17 @@
+<a name="7.17.1"></a>
+## [7.17.1](https://github.com/videojs/video.js/compare/v7.17.0...v7.17.1) (2021-11-17)
+
+### Bug Fixes
+
+* don't always use fastSeek when available. ([#7527](https://github.com/videojs/video.js/issues/7527)) ([df927de](https://github.com/videojs/video.js/commit/df927de))
+* improve enabling liveui when switching sources ([#7510](https://github.com/videojs/video.js/issues/7510)) ([6c67c30](https://github.com/videojs/video.js/commit/6c67c30)), closes [#7114](https://github.com/videojs/video.js/issues/7114)
+* try again on volume feature detection on iOS ([#7514](https://github.com/videojs/video.js/issues/7514)) ([1d96d1c](https://github.com/videojs/video.js/commit/1d96d1c)), closes [#7040](https://github.com/videojs/video.js/issues/7040)
+* turn off other tracks with native audio track ([#7519](https://github.com/videojs/video.js/issues/7519)) ([115a047](https://github.com/videojs/video.js/commit/115a047)), closes [#7163](https://github.com/videojs/video.js/issues/7163) [#7163](https://github.com/videojs/video.js/issues/7163) [#7494](https://github.com/videojs/video.js/issues/7494)
+
+### Chores
+
+* **sandbox:** update embeds media to use public url ([#7530](https://github.com/videojs/video.js/issues/7530)) ([8f580cc](https://github.com/videojs/video.js/commit/8f580cc))
+
 <a name="7.17.0"></a>
 # [7.17.0](https://github.com/videojs/video.js/compare/v7.16.0...v7.17.0) (2021-11-10)
 
