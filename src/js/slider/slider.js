@@ -180,7 +180,7 @@ class Slider extends Component {
     this.on(doc, 'touchmove', this.handleMouseMove_);
     this.on(doc, 'touchend', this.handleMouseUp_);
 
-    this.handleMouseMove(event);
+    this.handleMouseMove(event, true);
   }
 
   /**
