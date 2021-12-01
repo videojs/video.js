@@ -1042,8 +1042,13 @@ Html5.canControlVolume = function() {
     // Since `features` doesn't currently work asynchronously, the value is manually set.
     if (canControl && browser.IS_IOS) {
       window.setTimeout(() => {
-        Html5.prototype.featuresVolumeControl = volume !== Html5.TEST_VID.volume;
+        if (Html5 && Html5.prototype) {
+          Html5.prototype.featuresVolumeControl = volume !== Html5.TEST_VID.volume;
+        }
       });
+
+      // default iOS to false, which will be updated in the timeout above.
+      return false;
     }
 
     return canControl;
@@ -1241,7 +1246,6 @@ Html5.Events = [
  * @default {@link Html5.supportsNativeAudioTracks}
  */
 [
-  ['featuresVolumeControl', 'canControlVolume'],
   ['featuresMuteControl', 'canMuteVolume'],
   ['featuresPlaybackRate', 'canControlPlaybackRate'],
   ['featuresSourceset', 'canOverrideAttributes'],
@@ -1251,6 +1255,8 @@ Html5.Events = [
 ].forEach(function([key, fn]) {
   defineLazyProperty(Html5.prototype, key, () => Html5[fn](), true);
 });
+
+Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the media element
