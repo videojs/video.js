@@ -3,6 +3,7 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
+import * as Dom from '../../utils/dom.js';
 
 /**
  * An {@link AudioTrack} {@link MenuItem}
@@ -49,14 +50,14 @@ class AudioTrackMenuItem extends MenuItem {
     const parentSpan = el.querySelector('.vjs-menu-item-text');
 
     if (this.options_.track.kind === 'main-desc') {
-      parentSpan.appendChild(super.createEl('span', {
+      parentSpan.appendChild(Dom.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {
         'aria-hidden': true
       }));
-      parentSpan.appendChild(super.createEl('span', {
+      parentSpan.appendChild(Dom.createEl('span', {
         className: 'vjs-control-text',
-        textContent: this.localize('Descriptions')
+        textContent: ' ' + this.localize('Descriptions')
       }));
     }
 
