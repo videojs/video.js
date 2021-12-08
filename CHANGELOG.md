@@ -1,3 +1,15 @@
+<a name="7.17.2"></a>
+## [7.17.2](https://github.com/videojs/video.js/compare/v7.17.1...v7.17.2) (2021-12-08)
+
+### Bug Fixes
+
+* regression with AD audio track menu items ([#7559](https://github.com/videojs/video.js/issues/7559)) ([1d4bad8](https://github.com/videojs/video.js/commit/1d4bad8)), closes [#7337](https://github.com/videojs/video.js/issues/7337) [#7556](https://github.com/videojs/video.js/issues/7556)
+* volume control showing up on iOS ([#7550](https://github.com/videojs/video.js/issues/7550)) ([3c21345](https://github.com/videojs/video.js/commit/3c21345)), closes [#7514](https://github.com/videojs/video.js/issues/7514)
+
+### Chores
+
+* fix typo in COLLABORATOR_GUIDE ([#7537](https://github.com/videojs/video.js/issues/7537)) ([d38806d](https://github.com/videojs/video.js/commit/d38806d))
+
 <a name="7.17.1"></a>
 ## [7.17.1](https://github.com/videojs/video.js/compare/v7.17.0...v7.17.1) (2021-11-17)
 
