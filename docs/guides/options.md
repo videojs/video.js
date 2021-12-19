@@ -7,6 +7,7 @@
 * [Standard &lt;video> Element Options](#standard-video-element-options)
   * [autoplay](#autoplay)
     * [More info on autoplay support and changes:](#more-info-on-autoplay-support-and-changes)
+  * [controlBar.remainingTimeDisplay.displayNegative](#controlbarremainingtimedisplaydisplaynegative)
   * [controls](#controls)
   * [height](#height)
   * [loop](#loop)
@@ -99,6 +100,12 @@ player.autoplay('muted');
 #### More info on autoplay support and changes:
 
 * See our blog post: [Autoplay Best Practices with Video.js](https://videojs.com/blog/autoplay-best-practices-with-video-js/)
+
+### `controlBar.remainingTimeDisplay.displayNegative`
+
+> Type: `boolean`
+
+Bu default the remaining time display shows as negative time. To not show the negative sign set `controlBar.remainingTimeDisplay.displayNegative` to `false`.
 
 ### `controls`
 

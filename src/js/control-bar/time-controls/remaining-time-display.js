@@ -45,7 +45,9 @@ class RemainingTimeDisplay extends TimeDisplay {
   createEl() {
     const el = super.createEl();
 
-    el.insertBefore(Dom.createEl('span', {}, {'aria-hidden': true}, '-'), this.contentEl_);
+    if (this.options_.displayNegative !== false) {
+      el.insertBefore(Dom.createEl('span', {}, {'aria-hidden': true}, '-'), this.contentEl_);
+    }
     return el;
   }
 

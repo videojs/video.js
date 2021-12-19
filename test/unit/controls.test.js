@@ -10,6 +10,7 @@ import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-
 import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
 import ControlBar from '../../src/js/control-bar/control-bar.js';
 import SeekBar from '../../src/js/control-bar/progress-control/seek-bar.js';
+import RemainingTimeDisplay from '../../src/js/control-bar/time-controls/remaining-time-display.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import sinon from 'sinon';
@@ -439,4 +440,20 @@ QUnit.test('all controlbar children to false, does not cause an assertion', func
   player.triggerReady();
   player.dispose();
   assert.ok(true, 'did not cause an assertion');
+});
+
+QUnit.test('Remaing time negative sign can be optional', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+
+  const rtd1 = new RemainingTimeDisplay(player);
+  const rtd2 = new RemainingTimeDisplay(player, {displayNegative: false});
+
+  this.clock.tick(1);
+
+  assert.ok(rtd1.el().textContent.indexOf('-') > 0, 'Value is negative by default');
+  assert.equal(rtd2.el().textContent.indexOf('-'), -1, 'Value is positive with option');
+
+  rtd1.dispose();
+  rtd2.dispose();
+  player.dispose();
 });
