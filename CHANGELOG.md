@@ -1,3 +1,11 @@
+<a name="7.18.0"></a>
+# [7.18.0](https://github.com/videojs/video.js/compare/v7.17.3...v7.18.0) (2021-12-20)
+
+### Features
+
+* make negative sign on remaining time optional ([#7571](https://github.com/videojs/video.js/issues/7571)) ([67e6ed6](https://github.com/videojs/video.js/commit/67e6ed6)), closes [#7565](https://github.com/videojs/video.js/issues/7565)
+* udpate to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).13.1 ([#7573](https://github.com/videojs/video.js/issues/7573)) ([9aaf67a](https://github.com/videojs/video.js/commit/9aaf67a))
+
 <a name="7.17.3"></a>
 ## [7.17.3](https://github.com/videojs/video.js/compare/v7.17.2...v7.17.3) (2021-12-10)
 
