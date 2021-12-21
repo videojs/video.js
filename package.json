@@ -158,6 +158,7 @@
     "tui-jsdoc-template": "^1.2.2",
     "uglify-js": "^3.6.0",
     "unified": "^7.0.2",
+    "video.js": "^7.17.0",
     "videojs-generate-karma-config": "^7.1.0",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^8.0.3",
