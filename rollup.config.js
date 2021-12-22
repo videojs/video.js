@@ -324,5 +324,30 @@ export default cliargs => [
     ],
     onwarn,
     watch
+  },
+  // core ra
+  {
+    input: 'src/js/raVideoManager.js',
+    output: {
+      format: 'umd',
+      file: 'dist/ra-video-manager.js',
+      name: 'raVideoManager',
+      banner,
+      globals: globals.browser
+    },
+    external: externals.browser,
+    plugins: [
+      alias({
+        'ra.js': path.resolve(__dirname, './src/js/ra.js')
+      }),
+      primedResolve,
+      json(),
+      primedExternalGlobals,
+      primedCjs,
+      primedBabel,
+      cliargs.progress !== false ? progress() : {}
+    ],
+    onwarn,
+    watch
   }
 ];

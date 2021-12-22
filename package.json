@@ -46,6 +46,7 @@
     "postbuild:lang": "shx cp -R lang/* dist/lang/",
     "minify": "npm-run-all minify:*",
     "minify:js": "node build/minify.js",
+    "minify-ra-video-manager:js": "node build/minify-ra-video-manager.js",
     "minify:css": "npm-run-all minify:css:*",
     "minify:css:cdn": "cleancss dist/alt/video-js-cdn.css -o dist/alt/video-js-cdn.min.css",
     "minify:css:default": "cleancss dist/video-js.css -o dist/video-js.min.css",
