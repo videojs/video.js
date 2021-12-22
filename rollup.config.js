@@ -327,7 +327,7 @@ export default cliargs => [
   },
   // core ra
   {
-    input: 'src/js/raVideoManager.js',
+    input: 'src/js/ra-video-manager.js',
     output: {
       format: 'umd',
       file: 'dist/ra-video-manager.js',
