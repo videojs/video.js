@@ -193,6 +193,30 @@ QUnit.test('arbitrary events', function(assert) {
   }, 'the event hash object is correct');
 });
 
+QUnit.test('arbitrary events do not include additional fields when `includeExtraPluginEventData` option is false', function(assert) {
+  const fooSpy = sinon.spy();
+
+  this.player = TestHelpers.makePlayer({
+    includeExtraPluginEventData: false
+  });
+
+  const instance = this.player.mock();
+
+  instance.on('foo', fooSpy);
+  instance.trigger('foo', { customProperty: 'custom-value' });
+
+  const event = fooSpy.firstCall.args[0];
+  const hash = fooSpy.firstCall.args[1];
+
+  assert.strictEqual(fooSpy.callCount, 1, 'the "foo" event was triggered');
+  assert.strictEqual(event.type, 'foo', 'the event has the correct type');
+  assert.strictEqual(event.target, instance.eventBusEl_, 'the event has the correct target');
+
+  assert.deepEqual(hash, {
+    customProperty: 'custom-value'
+  }, 'the event hash includes user-provided properties but not additional videojs-provided data about the plugin');
+});
+
 QUnit.test('handleStateChanged() method is automatically bound to the "statechanged" event', function(assert) {
   const spy = sinon.spy();
 

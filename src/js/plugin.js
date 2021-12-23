@@ -242,9 +242,14 @@ class Plugin {
    *          An event hash object with provided properties mixed-in.
    */
   getEventHash(hash = {}) {
-    hash.name = this.name;
-    hash.plugin = this.constructor;
-    hash.instance = this;
+    const { includeExtraPluginEventData } = this.player.options();
+
+    if (includeExtraPluginEventData) {
+      hash.name = this.name;
+      hash.plugin = this.constructor;
+      hash.instance = this;
+    }
+
     return hash;
   }
 

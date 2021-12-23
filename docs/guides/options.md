@@ -45,6 +45,7 @@
   * [suppressNotSupportedError](#suppressnotsupportederror)
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
+  * [includeExtraPluginEventData](#includeextraplugineventdata)
   * [userActions](#useractions)
   * [userActions.click](#useractionsclick)
   * [userActions.doubleClick](#useractionsdoubleclick)
@@ -446,6 +447,18 @@ This can be useful when multiple techs are used and each has to set their own po
 > Type: `Array`, Default: `['html5']`
 
 Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred. Other registered techs will be added after this tech in the order in which they are registered.
+
+### `includeExtraPluginEventData`
+
+> Type: `boolean`, Default: `true`
+
+When enabled, custom events emitted by _advanced_ plugins, via calls to `Plugin.trigger`, will include an additional data object as a second argument. The object has three properties:
+
+* `name`: The name of the plugin (e.g `"examplePlugin"`) as a string.
+* `plugin`: The plugin constructor (e.g `ExamplePlugin`).
+* `instance`: The plugin constructor instance
+
+If custom event data is provided to `Plugin.trigger`, the above fields will be merged with that data.
 
 ### `userActions`
 
