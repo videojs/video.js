@@ -877,12 +877,12 @@ class Html5 extends Tech {
    *
    * @param {Object} options The object should contain values for
    * kind, language, label, and src (location of the WebVTT file)
-   * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
-   * automatically removed from the video element whenever the source changes
+   * @param {boolean} [manualCleanup=false] if set to true, the TextTrack
+   * will not be removed from the TextTrackList and HtmlTrackElementList
+   * after a source change
    * @return {HTMLTrackElement} An Html Track Element.
    * This can be an emulated {@link HTMLTrackElement} or a native one.
-   * @deprecated The default value of the "manualCleanup" parameter will default
-   * to "false" in upcoming versions of Video.js
+   *
    */
   addRemoteTextTrack(options, manualCleanup) {
     const htmlTrackElement = super.addRemoteTextTrack(options, manualCleanup);
