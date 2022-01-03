@@ -395,10 +395,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 | fr.json (missing 5)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
+|                         | Seek to live, currently playing live												|
 | gd.json (missing 2)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 | gl.json (missing 2)     | Exit Picture-in-Picture                                                             |
