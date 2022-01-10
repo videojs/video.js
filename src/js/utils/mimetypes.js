@@ -22,6 +22,7 @@ export const MimetypesKind = {
   oga: 'audio/ogg',
   wav: 'audio/wav',
   m3u8: 'application/x-mpegURL',
+  mpd: 'application/dash+xml',
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   gif: 'image/gif',
