@@ -3,7 +3,7 @@ import * as Url from '../utils/url.js';
 /**
  * Mimetypes
  *
- * @see http://hul.harvard.edu/ois/////systems/wax/wax-public-help/mimetypes.htm
+ * @see https://www.iana.org/assignments/media-types/media-types.xhtml
  * @typedef Mimetypes~Kind
  * @enum
  */
