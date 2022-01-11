@@ -29,6 +29,12 @@ class ChaptersButton extends TextTrackButton {
    */
   constructor(player, options, ready) {
     super(player, options, ready);
+
+    this.selectCurrentChild_ = () => {
+      this.items.forEach(item => {
+        item.selected(this.track_.activeCues[0] === item.cue);
+      });
+    };
   }
 
   /**
@@ -56,10 +62,20 @@ class ChaptersButton extends TextTrackButton {
    * @listens TextTrackList#change
    */
   update(event) {
-    if (!this.track_ || (event && (event.type === 'addtrack' || event.type === 'removetrack'))) {
-      this.setTrack(this.findChaptersTrack());
+    if (event && event.track && event.track.kind !== 'chapters') {
+      return;
     }
-    super.update();
+
+    const track = this.findChaptersTrack();
+
+    if (track !== this.track_) {
+      // Set new track
+      this.setTrack(track);
+      super.update();
+    } else if (!this.items || (track && track.cues && track.cues.length !== this.items.length)) {
+      // Update the menu initially and if the number of cues has changed
+      super.update();
+    }
   }
 
   /**
@@ -86,6 +102,8 @@ class ChaptersButton extends TextTrackButton {
         remoteTextTrackEl.removeEventListener('load', this.updateHandler_);
       }
 
+      this.track_.removeEventListener('cuechange', this.selectCurrentChild_);
+
       this.track_ = null;
     }
 
@@ -100,6 +118,8 @@ class ChaptersButton extends TextTrackButton {
       if (remoteTextTrackEl) {
         remoteTextTrackEl.addEventListener('load', this.updateHandler_);
       }
+
+      this.track_.addEventListener('cuechange', this.selectCurrentChild_);
     }
   }
 
@@ -175,6 +195,7 @@ class ChaptersButton extends TextTrackButton {
 
     return items;
   }
+
 }
 
 /**

@@ -3,7 +3,6 @@
  */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 
 /**
  * The chapter track menu item
@@ -35,7 +34,6 @@ class ChaptersTrackMenuItem extends MenuItem {
 
     this.track = track;
     this.cue = cue;
-    track.addEventListener('cuechange', Fn.bind(this, this.update));
   }
 
   /**
@@ -52,23 +50,6 @@ class ChaptersTrackMenuItem extends MenuItem {
   handleClick(event) {
     super.handleClick();
     this.player_.currentTime(this.cue.startTime);
-    this.update(this.cue.startTime);
-  }
-
-  /**
-   * Update chapter menu item
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `cuechange` event that caused this function to run.
-   *
-   * @listens TextTrack#cuechange
-   */
-  update(event) {
-    const cue = this.cue;
-    const currentTime = this.player_.currentTime();
-
-    // vjs.log(currentTime, cue.startTime);
-    this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
   }
 
 }
