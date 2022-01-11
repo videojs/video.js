@@ -30,7 +30,7 @@ class ChaptersButton extends TextTrackButton {
   constructor(player, options, ready) {
     super(player, options, ready);
 
-    this.selectCurrentChild_ = () => {
+    this.selectCurrentItem_ = () => {
       this.items.forEach(item => {
         item.selected(this.track_.activeCues[0] === item.cue);
       });
@@ -69,11 +69,10 @@ class ChaptersButton extends TextTrackButton {
     const track = this.findChaptersTrack();
 
     if (track !== this.track_) {
-      // Set new track
       this.setTrack(track);
       super.update();
     } else if (!this.items || (track && track.cues && track.cues.length !== this.items.length)) {
-      // Update the menu initially and if the number of cues has changed
+      // Update the menu initially or if the number of cues has changed since set
       super.update();
     }
   }
@@ -102,7 +101,7 @@ class ChaptersButton extends TextTrackButton {
         remoteTextTrackEl.removeEventListener('load', this.updateHandler_);
       }
 
-      this.track_.removeEventListener('cuechange', this.selectCurrentChild_);
+      this.track_.removeEventListener('cuechange', this.selectCurrentItem_);
 
       this.track_ = null;
     }
@@ -119,7 +118,7 @@ class ChaptersButton extends TextTrackButton {
         remoteTextTrackEl.addEventListener('load', this.updateHandler_);
       }
 
-      this.track_.addEventListener('cuechange', this.selectCurrentChild_);
+      this.track_.addEventListener('cuechange', this.selectCurrentItem_);
     }
   }
 
