@@ -4521,23 +4521,20 @@ class Player extends Component {
 
   /**
    * Create a remote {@link TextTrack} and an {@link HTMLTrackElement}.
-   * When manualCleanup is set to false, the track will be automatically removed
-   * on source changes.
    *
    * @param {Object} options
    *        Options to pass to {@link HTMLTrackElement} during creation. See
    *        {@link HTMLTrackElement} for object properties that you should use.
    *
-   * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
-   *                                       removed on a source change
+   * @param {boolean} [manualCleanup=false] if set to true, the TextTrack will not be removed
+   *                                        from the TextTrackList and HtmlTrackElementList
+   *                                        after a source change
    *
    * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
    *         to the HtmlTrackElementList and the remote
    *         TextTrackList
    *
-   * @deprecated The default value of the "manualCleanup" parameter will default
-   *             to "false" in upcoming versions of Video.js
    */
   addRemoteTextTrack(options, manualCleanup) {
     if (this.tech_) {

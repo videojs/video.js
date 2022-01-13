@@ -219,14 +219,8 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
   assert.equal(tech.textTracks().length, 0, 'should have zero video tracks after dispose');
 });
 
-QUnit.test('switching sources should clear all remote tracks that are added with manualCleanup = false', function(assert) {
-
+QUnit.test('switching sources should clear all remote tracks that are added with the default manualCleanup = false', function(assert) {
   const oldLogWarn = log.warn;
-  let warning;
-
-  log.warn = function(wrning) {
-    warning = wrning;
-  };
 
   // Define a new tech class
   const MyTech = extend(Tech);
@@ -254,18 +248,10 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   // set the initial source
   tech.setSource({src: 'foo.mp4', type: 'mp4'});
 
-  // default value for manualCleanup is true
-  tech.addRemoteTextTrack({});
-  this.clock.tick(1);
-
-  assert.equal(
-    warning,
-    'Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js',
-    'we log a warning when `addRemoteTextTrack` is called without a manualCleanup argument'
-  );
-
+  // should not be automatically cleaned up when source changes
+  tech.addRemoteTextTrack({}, true);
   // should be automatically cleaned up when source changes
-  tech.addRemoteTextTrack({}, false);
+  tech.addRemoteTextTrack({});
   this.clock.tick(1);
 
   assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
