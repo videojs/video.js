@@ -755,7 +755,7 @@ class Tech extends Component {
    * @param {Object} options
    *        See {@link Tech#createRemoteTextTrack} for more detailed properties.
    *
-   * @param {boolean} [manualCleanup=true]
+   * @param {boolean} [manualCleanup=false]
    *        - When false: the TextTrack will be automatically removed from the video
    *          element whenever the source changes
    *        - When True: The TextTrack will have to be cleaned up manually
@@ -763,24 +763,19 @@ class Tech extends Component {
    * @return {HTMLTrackElement}
    *         An Html Track Element.
    *
-   * @deprecated The default functionality for this function will be equivalent
-   *             to "manualCleanup=false" in the future. The manualCleanup parameter will
-   *             also be removed.
    */
   addRemoteTextTrack(options = {}, manualCleanup) {
     const htmlTrackElement = this.createRemoteTextTrack(options);
 
-    if (manualCleanup !== true && manualCleanup !== false) {
-      // deprecation warning
-      log.warn('Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js');
-      manualCleanup = true;
+    if (typeof manualCleanup !== 'boolean') {
+      manualCleanup = false;
     }
 
     // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
     this.remoteTextTracks().addTrack(htmlTrackElement.track);
 
-    if (manualCleanup !== true) {
+    if (manualCleanup === false) {
       // create the TextTrackList if it doesn't exist
       this.ready(() => this.autoRemoteTextTracks_.addTrack(htmlTrackElement.track));
     }
