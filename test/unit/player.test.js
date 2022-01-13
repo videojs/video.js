@@ -2047,7 +2047,6 @@ QUnit.test('player#reset removes the poster', function(assert) {
 });
 
 QUnit.test('player#reset removes remote text tracks', function(assert) {
-  sinon.stub(log, 'warn');
   const player = TestHelpers.makePlayer();
 
   this.clock.tick(1);
@@ -2062,8 +2061,6 @@ QUnit.test('player#reset removes remote text tracks', function(assert) {
   assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
   player.reset();
   assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
-  assert.strictEqual(log.warn.callCount, 1, 'one warning about for manualCleanup');
-  log.warn.restore();
 });
 
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
