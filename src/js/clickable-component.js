@@ -22,13 +22,25 @@ class ClickableComponent extends Component {
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]
-   *         The key/value store of player options.
+   *         The key/value store of component options.
    *
    * @param  {function} [options.clickHandler]
    *         The function to call when the button is clicked / activated
+   *
+   * @param  {string} [options.controlText]
+   *         The text to set on the button
+   *
+   * @param  {string} [options.className]
+   *         A class or space separated list of classes to add the component
+   *
    */
   constructor(player, options) {
+
     super(player, options);
+
+    if (this.options_.controlText) {
+      this.controlText(this.options_.controlText);
+    }
 
     this.handleMouseOver_ = (e) => this.handleMouseOver(e);
     this.handleMouseOut_ = (e) => this.handleMouseOut(e);

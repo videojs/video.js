@@ -677,6 +677,21 @@ QUnit.test('should add and remove a CSS class', function(assert) {
   comp.dispose();
 });
 
+QUnit.test('should add CSS class passed in options', function(assert) {
+  const comp = new Component(this.player, {className: 'class1 class2'});
+
+  assert.ok(comp.el().className.indexOf('class1') !== -1, 'first of multiple classes added');
+  assert.ok(comp.el().className.indexOf('class2') !== -1, 'second of multiple classes added');
+
+  comp.dispose();
+
+  const comp2 = new Component(this.player, {className: 'class1'});
+
+  assert.ok(comp2.el().className.indexOf('class1') !== -1, 'singe class added');
+
+  comp2.dispose();
+});
+
 QUnit.test('should show and hide an element', function(assert) {
   const comp = new Component(this.player, {});
 
