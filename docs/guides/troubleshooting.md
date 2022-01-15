@@ -106,7 +106,7 @@ Here you might expect the player to be intitialised with the `autoplay` option s
 
 This can be more confusing if `videojs('my_video')` is used in an async script as different behaviour will occur def=pending on when the script is executed.
 
-It's better to not use `data-setup` and use the `videojs()` constructor once to set up the player, and/or only use the explicit getter `videojs.getPlayer('my_video')` to get a plyer reference.
+It's better to not use `data-setup` and use the `videojs()` constructor once to set up the player, and/or only use the explicit getter `videojs.getPlayer('my_video')` to get a player reference.
 
 [hosting-media]: #problems-when-hosting-media
 
