@@ -95,7 +95,7 @@ myButton.controlText('def');
 The control text of a button is normally not visible (but present for screen readers) as the default buttons all display only an icon. The text can be displayed by adding a `vjs-text-visible` class to the button. This or any other class may be set as a setup option, or later by API.
 
 ```js
-const myButton = player.addChild('button', {class: 'vjs-text-visible'});
+const myButton = player.addChild('button', {className: 'vjs-text-visible'});
 ```
 
 or set later:
