@@ -115,17 +115,11 @@ class PlaybackRateMenuButton extends MenuButton {
     // select next rate option
     const currentRate = this.player().playbackRate();
     const rates = this.playbackRates();
+    const currentIndex = rates.indexOf(currentRate);
+    // this get the next rate and it will select first one if the last one currently selected
+    const newIndex = (currentIndex + 1) % rates.length;
 
-    // this will select first one if the last one currently selected
-    let newRate = rates[0];
-
-    for (let i = 0; i < rates.length; i++) {
-      if (rates[i] > currentRate) {
-        newRate = rates[i];
-        break;
-      }
-    }
-    this.player().playbackRate(newRate);
+    this.player().playbackRate(rates[newIndex]);
   }
 
   /**
