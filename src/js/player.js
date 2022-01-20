@@ -2345,7 +2345,7 @@ class Player extends Component {
     if (PromiseClass) {
       return new PromiseClass((resolve) => {
         this.play_(resolve);
-      });
+      }).catch();
     }
 
     return this.play_();
