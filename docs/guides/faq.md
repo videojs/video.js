@@ -41,7 +41,7 @@
 * [Q: Can Video.js be required in node.js?](#q-can-videojs-be-required-in-nodejs)
 * [Q: Does Video.js work with webpack?](#q-does-videojs-work-with-webpack)
 * [Q: Does Video.js work with react?](#q-does-videojs-work-with-react)
-* [Q: Can the big play button be centred?](#q-can-the-big-play-button-be-centred)
+* [Q: Can the big play button be centered?](#q-can-the-big-play-button-be-centered)
 * [Q: Can the big play button be shown when paused?](#q-can-the-big-play-button-be-shown-when-paused)
 * [Q: Why is the picture-in-picture button different in Firefox?](#q-why-is-the-picture-in-picture-button-different-in-firefox)
 
@@ -276,7 +276,7 @@ Yes! See the [Webpack and Video.js configuration guide][webpack-guide].
 
 Yes! See [ReactJS integration example][react-guide].
 
-## Q: Can the big play button be centred?
+## Q: Can the big play button be centered?
 
 The default skin offsets the button to not obscure the poster image, but just add a `vjs-big-play-centered` class to the player to have it centred.
 

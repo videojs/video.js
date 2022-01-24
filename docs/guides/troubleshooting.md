@@ -92,7 +92,7 @@ To fix this issue please make sure that all event listeners are cleaned up on di
 
 ## Problems with setup options
 
-If a player is inititalised without the expected setup options, it's usually because of using both the `data-setup` attriubte and the `videojs()` constructor. Take this example:
+If a player is inititalized without the expected setup options, it's usually because of using both the `data-setup` attribute and the `videojs()` constructor. Take this example:
 
 ```html
 <video-js id="my_video" data-setup='{"autoplay": "any"}'></video-js>
@@ -102,9 +102,9 @@ If a player is inititalised without the expected setup options, it's usually bec
 </script>
 ```
 
-Here you might expect the player to be intitialised with the `autoplay` option set, but it will not be. While Video.js sets up player embeds that have a `data-setup` attribute automatically when the page is loaded, in this case the player will have _already been setup_ in the script tag. The `data-setup` option will never be applied.
+Here you might expect the player to be initialized with the `autoplay` option set, but it will not be. While Video.js sets up player embeds that have a `data-setup` attribute automatically when the page is loaded, in this case the player will have _already been setup_ in the script tag. The `data-setup` option will never be applied.
 
-This can be more confusing if `videojs('my_video')` is used in an async script as different behaviour will occur def=pending on when the script is executed.
+This can be more confusing if `videojs('my_video')` is used in an async script as different behavior will occur depending on when the script is executed.
 
 It's better to not use `data-setup` and use the `videojs()` constructor once to set up the player, and/or only use the explicit getter `videojs.getPlayer('my_video')` to get a player reference.
 
