@@ -183,11 +183,18 @@ class TextTrack extends Track {
     const cues = new TextTrackCueList(this.cues_);
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
-    const timeupdateHandler = Fn.bind(this, function() {
-      if (!this.tech_.isReady_ || this.tech_.isDisposed()) {
-        return;
 
+    this.timeupdateHandler = Fn.bind(this, function() {
+      if (this.tech_.isDisposed()) {
+        return;
       }
+
+      if (!this.tech_.isReady_) {
+        this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+
+        return;
+      }
+
       // Accessing this.activeCues for the side-effects of updating itself
       // due to its nature as a getter function. Do not remove or cues will
       // stop updating!
@@ -197,15 +204,18 @@ class TextTrack extends Track {
         this.trigger('cuechange');
         changed = false;
       }
+
+      this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+
     });
 
     const disposeHandler = () => {
-      this.tech_.off('timeupdate', timeupdateHandler);
+      this.stopTracking();
     };
 
     this.tech_.one('dispose', disposeHandler);
     if (mode !== 'disabled') {
-      this.tech_.on('timeupdate', timeupdateHandler);
+      this.startTracking();
     }
 
     Object.defineProperties(this, {
@@ -251,10 +261,10 @@ class TextTrack extends Track {
             // On-demand load.
             loadTrack(this.src, this);
           }
-          this.tech_.off('timeupdate', timeupdateHandler);
+          this.stopTracking();
 
           if (mode !== 'disabled') {
-            this.tech_.on('timeupdate', timeupdateHandler);
+            this.startTracking();
           }
           /**
            * An event that fires when mode changes on this track. This allows
@@ -354,6 +364,17 @@ class TextTrack extends Track {
       }
     } else {
       this.loaded_ = true;
+    }
+  }
+
+  startTracking() {
+    this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+  }
+
+  stopTracking() {
+    if (this.rvf_) {
+      this.tech_.cancelVideoFrameCallback(this.rvf_);
+      this.rvf_ = undefined;
     }
   }
 

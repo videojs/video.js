@@ -739,6 +739,32 @@ class Html5 extends Tech {
   }
 
   /**
+   * Native requestVideoFrameCallback if supported by browser/tech, or fallback
+   *
+   * @param {function} cb function to call
+   * @return {number} id of request
+   */
+  requestVideoFrameCallback(cb) {
+    if (this.featuresVideoFrameCallback) {
+      return this.el_.requestVideoFrameCallback(cb);
+    }
+    return super.requestVideoFrameCallback(cb);
+  }
+
+  /**
+   * Native or fallback requestVideoFrameCallback
+   *
+   * @param {number} id request id to cancel
+   */
+  cancelVideoFrameCallback(id) {
+    if (this.featuresVideoFrameCallback) {
+      this.el_.cancelVideoFrameCallback(id);
+    } else {
+      super.cancelVideoFrameCallback(id);
+    }
+  }
+
+  /**
    * A getter/setter for the `Html5` Tech's source object.
    * > Note: Please use {@link Html5#setSource}
    *
@@ -1295,6 +1321,13 @@ Html5.prototype.featuresProgressEvents = true;
  * @default
  */
 Html5.prototype.featuresTimeupdateEvents = true;
+
+/**
+ * Whether the HTML5 el supports `requestVideoFrameCallback`
+ *
+ * @type {boolean}
+ */
+Html5.prototype.featuresVideoFrameCallback = window.HTMLVideoElement && 'requestVideoFrameCallback' in window.HTMLVideoElement.prototype;
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;
