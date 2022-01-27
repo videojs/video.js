@@ -1327,7 +1327,7 @@ Html5.prototype.featuresTimeupdateEvents = true;
  *
  * @type {boolean}
  */
-Html5.prototype.featuresVideoFrameCallback = window.HTMLVideoElement && 'requestVideoFrameCallback' in window.HTMLVideoElement.prototype;
+Html5.prototype.featuresVideoFrameCallback = !!(Html5.TEST_VID && Html5.TEST_VID.requestVideoFrameCallback);
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;
