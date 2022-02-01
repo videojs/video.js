@@ -1570,6 +1570,21 @@ QUnit.test('should add an audio player region if an audio el is used', function(
   player.dispose();
 });
 
+QUnit.test('should turn on/off audioPosterMode when audioPosterMode is called with true/false', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.options_.audioPosterMode === false, 'audioPosterMode is initially false');
+  player.options_.audioOnlyMode = true;
+  player.audioPosterMode(true);
+  assert.ok(player.options_.audioPosterMode === false, 'audioPosterMode is cannot be set to true if audioOnlyMode is true');
+  player.options_.audioOnlyMode = false;
+  player.audioPosterMode(true);
+  assert.ok(player.options_.audioPosterMode === true, 'audioPosterMode is set to true');
+  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') !== -1, 'vjs-audio-poster-mode class is added');
+  player.audioPosterMode(false);
+  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') === -1, 'vjs-audio-poster-mode class is removed');
+});
+
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
   const player = TestHelpers.makePlayer();
   let isScrubbing;

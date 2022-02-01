@@ -30,3 +30,8 @@
 .vjs-using-native-controls .vjs-poster {
   display: none;
 }
+
+// Don't hide the poster when audio-poster-mode is true
+.vjs-has-started.vjs-audio-poster-mode .vjs-poster {
+  display: block;
+}

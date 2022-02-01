@@ -349,6 +349,8 @@ class Player extends Component {
       }
     }
 
+    options.audioPosterMode = false;
+
     // Run base component initializing with new options
     super(null, options, ready);
 
@@ -4288,6 +4290,32 @@ class Player extends Component {
     }
 
     return !!this.isAudio_;
+  }
+
+  /**
+   * Get the current audioPosterMode state or set audioPosterMode to true or false
+   *
+   * @param {boolean} [value]
+   *         The value to set audioPosterMode to.
+   *
+   * @return {boolean}
+   *         True if audioPosterMode is on, false otherwise.
+   */
+  audioPosterMode(value) {
+
+    if (value === undefined) {
+      return this.options_.audioPosterMode;
+    }
+    this.options_.audioPosterMode = !!value && !this.options_.audioOnlyMode;
+
+    if (this.options_.audioPosterMode) {
+      this.tech_.hide();
+      this.addClass('vjs-audio-poster-mode');
+      return;
+    }
+    // Show the video element and hide the poster image if audioPosterMode is set to false
+    this.tech_.show();
+    this.removeClass('vjs-audio-poster-mode');
   }
 
   /**
