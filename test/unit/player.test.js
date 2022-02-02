@@ -1570,19 +1570,37 @@ QUnit.test('should add an audio player region if an audio el is used', function(
   player.dispose();
 });
 
-QUnit.test('should turn on/off audioPosterMode when audioPosterMode is called with true/false', function(assert) {
+QUnit.test('default audioPosterMode value at player creation', function(assert) {
   const player = TestHelpers.makePlayer({});
 
-  assert.ok(player.options_.audioPosterMode === false, 'audioPosterMode is initially false');
-  player.options_.audioOnlyMode = true;
+  assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false by default');
+
+  const player2 = TestHelpers.makePlayer({
+    audioPosterMode: true
+  });
+
+  assert.ok(player2.audioPosterMode() === true, 'audioPosterMode can be set to true when the player is created');
+  player.dispose();
+  player2.dispose();
+});
+
+QUnit.test('get and set audioPosterMode value', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
   player.audioPosterMode(true);
-  assert.ok(player.options_.audioPosterMode === false, 'audioPosterMode is cannot be set to true if audioOnlyMode is true');
-  player.options_.audioOnlyMode = false;
+  assert.ok(player.audioPosterMode() === true, 'audioPosterMode is set to true');
+});
+
+QUnit.test('vjs-audio-poster-mode class and video element visibility when audioPosterMode is true', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
   player.audioPosterMode(true);
-  assert.ok(player.options_.audioPosterMode === true, 'audioPosterMode is set to true');
-  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') !== -1, 'vjs-audio-poster-mode class is added');
+  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') !== -1, 'vjs-audio-poster-mode class is present');
+  assert.ok(player.tech_.el().className.indexOf('vjs-hidden') !== -1, 'video element is hidden');
+
   player.audioPosterMode(false);
   assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') === -1, 'vjs-audio-poster-mode class is removed');
+  assert.ok(player.tech_.el().className.indexOf('vjs-hidden') === -1, 'video element is visible');
 });
 
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {

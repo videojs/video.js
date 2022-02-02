@@ -349,8 +349,6 @@ class Player extends Component {
       }
     }
 
-    options.audioPosterMode = false;
-
     // Run base component initializing with new options
     super(null, options, ready);
 
@@ -4303,10 +4301,13 @@ class Player extends Component {
    */
   audioPosterMode(value) {
 
-    if (value === undefined) {
+    value = value && Boolean(value);
+
+    if (value === undefined || value === this.options_.audioPosterMode) {
       return this.options_.audioPosterMode;
     }
-    this.options_.audioPosterMode = !!value && !this.options_.audioOnlyMode;
+
+    this.options_.audioPosterMode = value;
 
     if (this.options_.audioPosterMode) {
       this.tech_.hide();
@@ -5124,7 +5125,8 @@ Player.prototype.options_ = {
   },
 
   breakpoints: {},
-  responsive: false
+  responsive: false,
+  audioPosterMode: false
 };
 
 [
