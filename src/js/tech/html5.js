@@ -641,11 +641,14 @@ class Html5 extends Tech {
 
     const endFn = function() {
       this.trigger('fullscreenchange', { isFullscreen: false });
+      // Safari will sometimes set contols on the videoelement when existing fullscreen.
+      if (this.el_.controls && !this.options_.nativeControlsForTouch && this.controls()) {
+        this.el_.controls = false;
+      }
     };
 
     const beginFn = function() {
-      if ('webkitPresentationMode' in this.el_ &&
-        this.el_.webkitPresentationMode !== 'picture-in-picture') {
+      if ('webkitPresentationMode' in this.el_ && this.el_.webkitPresentationMode !== 'picture-in-picture') {
         this.one('webkitendfullscreen', endFn);
 
         this.trigger('fullscreenchange', {
