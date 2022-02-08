@@ -380,6 +380,8 @@ See [ReactJS integration example](/docs/guides/react.md)
 
 ### Angular
 
+See [Angular integration example](/docs/guides/angular.md)
+
 ### Vue
 
 See [Vue integration example](/docs/guides/vue.md)
