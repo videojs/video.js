@@ -223,7 +223,7 @@ class SeekBar extends Slider {
    * @listens mousedown
    */
   handleMouseDown(event) {
-    if (!Dom.isSingleLeftClick(event)) {
+    if (!Dom.isLeftMouseButtonPressed(event)) {
       return;
     }
 
@@ -246,9 +246,10 @@ class SeekBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
-    if (!Dom.isSingleLeftClick(event)) {
+    if (!this.player_.scrubbing()) {
       return;
     }
+
     let newTime;
     const distance = this.calculateDistance(event);
     const liveTracker = this.player_.liveTracker;

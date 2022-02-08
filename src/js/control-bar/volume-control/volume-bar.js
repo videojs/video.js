@@ -55,10 +55,11 @@ class VolumeBar extends Slider {
    * @listens mousedown
    */
   handleMouseDown(event) {
-    if (!Dom.isSingleLeftClick(event)) {
+    if (!Dom.isLeftMouseButtonPressed(event)) {
       return;
     }
 
+    this.scrubbing = true;
     super.handleMouseDown(event);
   }
 
@@ -71,12 +72,25 @@ class VolumeBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event) {
-    if (!Dom.isSingleLeftClick(event)) {
+    if (!this.scrubbing) {
       return;
     }
 
     this.checkMuted();
     this.player_.volume(this.calculateDistance(event));
+  }
+
+  /**
+   * Handles mouse up event on volume bar
+   *
+   * @param {EventTarget~Event} event
+   *        The `mouseup` event that caused this to run.
+   *
+   * @listens mouseup
+   */
+  handleMouseUp(event) {
+    this.scrubbing = false;
+    super.handleMouseUp(event);
   }
 
   /**

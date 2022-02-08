@@ -760,6 +760,24 @@ export function insertContent(el, content) {
 }
 
 /**
+ * Check if an event was triggered by a left mouse button pressed.
+ *
+ * @param  {EventTarget~Event} event
+ *         Event object.
+ *
+ * @return {boolean}
+ *         will be `true` if event is triggered by left mouse pressed,
+ *         `false` otherwise.
+ */
+export function isLeftMouseButtonPressed(event) {
+  if (event.type !== 'mousedown') {
+    return false;
+  }
+
+  return event.button === 0 || event.buttons === 1;
+}
+
+/**
  * Check if an event was a single left click.
  *
  * @param  {EventTarget~Event} event

@@ -621,6 +621,34 @@ QUnit.test('isSingleLeftClick() returns true for mouseup event', function(assert
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a mouseup event is a single left click');
 });
 
+QUnit.test('isLeftMouseButtonPressed() checks return values for mousedown event', function(assert) {
+  const mouseEvent = TestHelpers.createEvent('mousedown');
+
+  // Left mouse click
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.ok(Dom.isLeftMouseButtonPressed(mouseEvent), 'a left mouse click on an older browser (Safari) is a single left click');
+
+  // Left mouse click
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 1;
+
+  assert.ok(Dom.isLeftMouseButtonPressed(mouseEvent), 'a left mouse click on browsers that supporting buttons property is a single left click');
+
+  // Right mouse click
+  mouseEvent.button = 2;
+  mouseEvent.buttons = 2;
+
+  assert.notOk(Dom.isLeftMouseButtonPressed(mouseEvent), 'a right mouse click is not a single left click');
+
+  // Touch event on some mobiles
+  mouseEvent.button = 0;
+  mouseEvent.buttons = undefined;
+
+  assert.ok(Dom.isLeftMouseButtonPressed(mouseEvent), 'a touch event on mobiles is a single left click');
+});
+
 QUnit.test('isSingleLeftClick() checks return values for mousedown event', function(assert) {
   const mouseEvent = TestHelpers.createEvent('mousedown');
 
