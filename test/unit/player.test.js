@@ -2770,3 +2770,41 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
 
   player.dispose();
 });
+
+// QUnit.test('audioOnlyMode(true) hides player components except control bar', function(assert) {
+//   const player = TestHelpers.makePlayer({});
+//   const components = ['PosterImage', 'TextTrackDisplay'];
+
+//   components.forEach(component => {
+//     const el = player.getChild(component).el();
+
+//     assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'block');
+//   });
+
+//   player.audioOnlyMode(true);
+
+//   components.forEach(component => {
+//     const el = player.getChild(component).el();
+
+//     assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none');
+//   });
+// });
+
+// QUnit.test('audioOnlyMode(false) shows player components previously hidden', function(assert) {
+//   // TestHelpers.getComputedStyle(el, 'width');
+
+// });
+
+// QUnit.test('audioOnlyMode(true) hides video-specific control bar components', function(assert) {
+//   // TestHelpers.getComputedStyle(el, 'width');
+
+// });
+
+// QUnit.test('audioOnlyMode(false) shows video-specific control bar components previously hidden', function(assert) {
+//   // TestHelpers.getComputedStyle(el, 'width');
+
+// });
+
+// QUnit.test('audioOnlyMode() gets the current audioOnlyMode_ state', function(assert) {
+
+// });

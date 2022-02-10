@@ -111,6 +111,10 @@
   height: 100%;
 }
 
+.video-js.vjs-audio-only-mode .vjs-tech {
+  display: none;
+}
+
 // Fullscreen Styles
 body.vjs-full-window {
   padding: 0;

@@ -25,3 +25,7 @@
   font-size: 1.5em;
   line-height: inherit;
 }
+
+.video-js.vjs-audio-only-mode .vjs-subs-caps-button {
+  display: none;
+}

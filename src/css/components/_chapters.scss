@@ -2,6 +2,10 @@
   @extend .vjs-icon-chapters;
 }
 
+.video-js.vjs-audio-only-mode .vjs-chapters-button {
+  display: none;
+}
+
 .vjs-chapters-button .vjs-menu ul {
   width: 24em;
 }

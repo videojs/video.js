@@ -1,3 +1,7 @@
 .video-js .vjs-captions-button .vjs-icon-placeholder {
   @extend .vjs-icon-captions;
 }
+
+.video-js.vjs-audio-only-mode .vjs-captions-button {
+  display: none;
+}

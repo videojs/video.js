@@ -54,6 +54,7 @@ import './live-tracker.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
+import videojs from './video.js';
 
 // The following tech events are simply re-triggered
 // on the player when they happen
@@ -395,6 +396,12 @@ class Player extends Component {
     // Init debugEnabled_
     this.debugEnabled_ = false;
 
+    // Init state audioOnlyMode_
+    this.audioOnlyMode_ = false;
+
+    // Init state hiddenPlayerChildren_
+    this.hiddenPlayerChildren_ = [];
+
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -574,6 +581,7 @@ class Player extends Component {
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
+    this.audioOnlyMode(this.options_.audioOnlyMode);
   }
 
   /**
@@ -4291,6 +4299,96 @@ class Player extends Component {
   }
 
   /**
+   * Get the current audioOnlyMode state or set audioOnlyMode to true or false.
+   *
+   * Setting this to `true` will hide all player components except the control bar,
+   * as well as control bar components needed only for video.
+   *
+   * @param {boolean} [value]
+   *         The value to set audioOnlyMode to.
+   *
+   * @return {boolean}
+   *         True if audioOnlyMode is on, false otherwise.
+   */
+  audioOnlyMode(value) {
+    if (value === undefined) {
+      return this.audioOnlyMode_;
+    }
+
+    if (value === this.audioOnlyMode_) {
+      return;
+    }
+
+    if (typeof value !== 'boolean') {
+      videojs.log.warn('audioOnlyMode can only be enabled or disabled using a boolean value');
+      return;
+    }
+
+    if (value === true) {
+      // Update styling immediately so we can get the control bar's height
+      this.addClass('vjs-audio-only-mode');
+
+      const playerChildren = this.children();
+      const controlBar = this.getChild('ControlBar');
+      const controlBarHeight = controlBar && controlBar.height();
+
+      // Hide all player components except the control bar
+      playerChildren.forEach(child => {
+        if (child.name_ === 'ControlBar') {
+          return;
+        }
+
+        if (child.el_ && child.hide && !child.hasClass('vjs-hidden')) {
+          child.hide();
+
+          this.hiddenPlayerChildren_.push(child);
+        }
+      });
+
+      // Set the player height the same as the control bar
+      this.height(controlBarHeight);
+
+      // Show control bar
+      this.userActive(true);
+
+      // Fullscreen is not supported in audioOnlyMode, so exit if we need to
+      if (this.isFullscreen()) {
+        this.exitFullscreen();
+      }
+
+      this.audioOnlyMode_ = true;
+
+      this.trigger('audioonlymodechange');
+
+      videojs.log(this.hiddenPlayerChildren_);
+    } else {
+      this.removeClass('vjs-audio-only-mode');
+
+      // Show player components that were previously hidden
+      if (this.hiddenPlayerChildren_.length > 0) {
+        this.hiddenPlayerChildren_.forEach(child => {
+          if (child.name_ === 'ControlBar') {
+            return;
+          }
+
+          if (child.el_ && child.show) {
+            child.show();
+          }
+        });
+      }
+
+      this.height(this.options_.height);
+
+      // Show control bar
+      this.userActive(true);
+
+      this.audioOnlyMode_ = false;
+
+      this.trigger('audioonlymodechange');
+    }
+  }
+
+  /**
    * A helper method for adding a {@link TextTrack} to our
    * {@link TextTrackList}.
    *
@@ -5096,7 +5194,8 @@ Player.prototype.options_ = {
   },
 
   breakpoints: {},
-  responsive: false
+  responsive: false,
+  audioOnlyMode: false
 };
 
 [

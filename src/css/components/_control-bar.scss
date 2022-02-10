@@ -10,8 +10,9 @@
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }
 
-// Video has started playing
-.vjs-has-started .vjs-control-bar {
+// Video has started playing or we are in audioOnlyMode
+.vjs-has-started .vjs-control-bar,
+.vjs-audio-only-mode .vjs-control-bar {
   @include display-flex;
   visibility: visible;
   opacity: 1;
@@ -41,8 +42,9 @@
   display: none !important;
 }
 
-// Don't hide the control bar if it's audio
-.vjs-audio.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+// Don't hide the control bar if it's audio or in audioOnlyMode
+.vjs-audio.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar,
+.vjs-audio-only-mode.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
   opacity: 1;
   visibility: visible;
 }
