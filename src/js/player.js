@@ -4301,15 +4301,19 @@ class Player extends Component {
    */
   audioPosterMode(value) {
 
-    value = value && Boolean(value);
-
-    if (value === undefined || value === this.options_.audioPosterMode) {
-      return this.options_.audioPosterMode;
+    if (this.audioPosterMode_ === undefined) {
+      this.audioPosterMode_ = this.options_.audioPosterMode;
     }
 
-    this.options_.audioPosterMode = value;
+    value = value && Boolean(value);
 
-    if (this.options_.audioPosterMode) {
+    if (value === undefined || typeof value !== 'boolean' || value === this.audioPosterMode_) {
+      return this.audioPosterMode_;
+    }
+
+    this.audioPosterMode_ = value;
+
+    if (this.audioPosterMode_) {
       this.tech_.hide();
       this.addClass('vjs-audio-poster-mode');
       return;
