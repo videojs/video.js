@@ -4305,9 +4305,7 @@ class Player extends Component {
       this.audioPosterMode_ = this.options_.audioPosterMode;
     }
 
-    value = value && Boolean(value);
-
-    if (value === undefined || typeof value !== 'boolean' || value === this.audioPosterMode_) {
+    if (typeof value !== 'boolean' || value === this.audioPosterMode_) {
       return this.audioPosterMode_;
     }
 
