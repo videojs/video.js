@@ -54,7 +54,6 @@ import './live-tracker.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
-import videojs from './video.js';
 
 // The following tech events are simply re-triggered
 // on the player when they happen
@@ -4320,7 +4319,7 @@ class Player extends Component {
     }
 
     if (typeof value !== 'boolean') {
-      videojs.log.warn('audioOnlyMode can only be enabled or disabled using a boolean value');
+      log.warn('audioOnlyMode can only be enabled or disabled using a boolean value');
       return;
     }
 
@@ -4332,7 +4331,8 @@ class Player extends Component {
       const controlBar = this.getChild('ControlBar');
       const controlBarHeight = controlBar && controlBar.height();
 
-      // Hide all player components except the control bar
+      // Hide all player components except the control bar. Control bar components
+      // needed only for video are hidden with CSS
       playerChildren.forEach(child => {
         if (child.name_ === 'ControlBar') {
           return;
@@ -4359,8 +4359,6 @@ class Player extends Component {
       this.audioOnlyMode_ = true;
 
       this.trigger('audioonlymodechange');
-
-      videojs.log(this.hiddenPlayerChildren_);
     } else {
       this.removeClass('vjs-audio-only-mode');
 

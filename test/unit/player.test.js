@@ -2771,7 +2771,7 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
   player.dispose();
 });
 
-// QUnit.test('audioOnlyMode(true) hides player components except control bar', function(assert) {
+// QUnit.only('audioOnlyMode(true) hides player components except control bar', function(assert) {
 //   const player = TestHelpers.makePlayer({});
 //   const components = ['PosterImage', 'TextTrackDisplay'];
 
