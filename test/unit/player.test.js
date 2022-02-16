@@ -2802,6 +2802,25 @@ QUnit.test('audioOnlyMode(true/false) adds or removes vjs-audio-only-mode class 
   assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'class was removed');
 });
 
+QUnit.test('setting audioOnlyMode() triggers audioonlymodechange event', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  let audioOnlyModeState = false;
+  let audioOnlyModeChangeEvents = 0;
+
+  player.on('audioonlymodechange', () => {
+    audioOnlyModeChangeEvents++;
+    audioOnlyModeState = player.audioOnlyMode();
+  });
+
+  player.audioOnlyMode(true);
+  assert.equal(audioOnlyModeState, true, 'state is correct');
+  assert.equal(audioOnlyModeChangeEvents, 1, 'event fired once');
+
+  player.audioOnlyMode(false);
+  assert.equal(audioOnlyModeState, false, 'state is correct');
+  assert.equal(audioOnlyModeChangeEvents, 2, 'event fired again');
+});
+
 QUnit.test('audioOnlyMode(true) makes player height equal to control bar height', function(assert) {
   const player = TestHelpers.makePlayer({controls: true, height: 600});
 

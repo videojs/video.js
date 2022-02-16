@@ -4338,7 +4338,7 @@ class Player extends Component {
           return;
         }
 
-        if (child.el_ && child.hide && !child.hasClass('vjs-hidden')) {
+        if (child.el_ && !child.hasClass('vjs-hidden')) {
           child.hide();
 
           this.hiddenPlayerChildren_.push(child);
@@ -4364,17 +4364,10 @@ class Player extends Component {
 
       // Show player components that were previously hidden
       if (this.hiddenPlayerChildren_.length > 0) {
-        this.hiddenPlayerChildren_.forEach(child => {
-          if (child.name_ === 'ControlBar') {
-            return;
-          }
-
-          if (child.el_ && child.show) {
-            child.show();
-          }
-        });
+        this.hiddenPlayerChildren_.forEach(child => child.show());
       }
 
+      // Reset player height
       this.height(this.options_.height);
 
       // Show control bar
