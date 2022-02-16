@@ -2771,40 +2771,169 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
   player.dispose();
 });
 
-// QUnit.only('audioOnlyMode(true) hides player components except control bar', function(assert) {
-//   const player = TestHelpers.makePlayer({});
-//   const components = ['PosterImage', 'TextTrackDisplay'];
+QUnit.test('audioOnlyMode can be set by option', function(assert) {
+  const player = TestHelpers.makePlayer({ audioOnlyMode: true });
 
-//   components.forEach(component => {
-//     const el = player.getChild(component).el();
+  assert.equal(player.audioOnlyMode(), true, 'defaults to false');
+  assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'defaults to false');
+});
 
-//     assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'block');
-//   });
+QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(assert) {
+  const player = TestHelpers.makePlayer({});
 
-//   player.audioOnlyMode(true);
+  assert.equal(player.audioOnlyMode(), false, 'defaults to false');
 
-//   components.forEach(component => {
-//     const el = player.getChild(component).el();
+  player.audioOnlyMode(true);
+  assert.equal(player.audioOnlyMode(), true, 'returns updated state after enabled');
 
-//     assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none');
-//   });
-// });
+  player.audioOnlyMode(false);
+  assert.equal(player.audioOnlyMode(), false, 'returns updated state after disabled');
+});
 
-// QUnit.test('audioOnlyMode(false) shows player components previously hidden', function(assert) {
-//   // TestHelpers.getComputedStyle(el, 'width');
+QUnit.test('audioOnlyMode(true/false) adds or removes vjs-audio-only-mode class to player', function(assert) {
+  const player = TestHelpers.makePlayer({});
 
-// });
+  assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'class not initially present');
 
-// QUnit.test('audioOnlyMode(true) hides video-specific control bar components', function(assert) {
-//   // TestHelpers.getComputedStyle(el, 'width');
+  player.audioOnlyMode(true);
+  assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class was added');
 
-// });
+  player.audioOnlyMode(false);
+  assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'class was removed');
+});
 
-// QUnit.test('audioOnlyMode(false) shows video-specific control bar components previously hidden', function(assert) {
-//   // TestHelpers.getComputedStyle(el, 'width');
+QUnit.test('audioOnlyMode(true) makes player height equal to control bar height', function(assert) {
+  const player = TestHelpers.makePlayer({controls: true, height: 600});
 
-// });
+  player.hasStarted(true);
 
-// QUnit.test('audioOnlyMode() gets the current audioOnlyMode_ state', function(assert) {
+  const controlBarHeight = player.getChild('ControlBar').height();
+  const playerHeight = player.height();
 
-// });
+  assert.notEqual(playerHeight, controlBarHeight, 'heights are not the same');
+
+  player.audioOnlyMode(true);
+  assert.equal(player.height(), controlBarHeight, 'player height set to height of control bar in audioOnlyMode');
+
+});
+
+QUnit.test('audioOnlyMode(true/false) hides/shows player components except control bar', function(assert) {
+  const player = TestHelpers.makePlayer({controls: true});
+
+  player.hasStarted(true);
+
+  assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'block', 'TextTrackDisplay is initially visible');
+  assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'block', 'Tech is initially visible');
+  assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is initially visible');
+
+  player.audioOnlyMode(true);
+
+  assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'none', 'TextTrackDisplay is hidden');
+  assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'none', 'Tech is hidden');
+  assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is still visible');
+
+  // Sanity check that all non-ControlBar player children are hidden
+  player.children().forEach(child => {
+    const el = child.el_;
+
+    if (el) {
+      if (child.name_ !== 'ControlBar') {
+        assert.equal(TestHelpers.getComputedStyle(child.el_, 'display') === 'none', true, 'non-controlBar component is hidden');
+      }
+    }
+  });
+
+  player.audioOnlyMode(false);
+
+  assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'block', 'TextTrackDisplay is visible again');
+  assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'block', 'Tech is visible again');
+  assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is still visible');
+});
+
+QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar components', function(assert) {
+  const tracks = ['captions', 'subtitles', 'descriptions', 'chapters'].map(kind => {
+    return {
+      kind,
+      label: 'English'
+    };
+  });
+  const player = TestHelpers.makePlayer({controls: true, tracks, playbackRates: [1, 2]});
+
+  this.clock.tick(1000);
+
+  const controlBar = player.getChild('ControlBar');
+  const childrenShownInAudioOnlyMode = [
+    'PlayToggle',
+    'VolumePanel',
+    'ProgressControl',
+    'PlaybackRateMenuButton',
+    'ChaptersButton',
+    'RemainingTimeDisplay'
+  ];
+  const childrenHiddenInAudioOnlyMode = [
+    'CaptionsButton',
+    'DescriptionsButton',
+    'FullscreenToggle',
+    'PictureInPictureToggle',
+    'SubsCapsButton'
+  ];
+
+  const allChildren = childrenShownInAudioOnlyMode.concat(childrenHiddenInAudioOnlyMode);
+
+  const chapters = player.textTracks()[3];
+
+  chapters.addCue({
+    startTime: 0,
+    endTime: 2,
+    text: 'Chapter 1'
+  });
+  chapters.addCue({
+    startTime: 2,
+    endTime: 4,
+    text: 'Chapter 2'
+  });
+
+  // ChaptersButton only shows once cues added and update() called
+  controlBar.getChild('ChaptersButton').update();
+
+  player.hasStarted(true);
+
+  // Show all control bar children
+  allChildren.forEach(child => {
+    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
+
+    if (el) {
+      // Sanity check that component is showing
+      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+    }
+  });
+
+  player.audioOnlyMode(true);
+
+  childrenHiddenInAudioOnlyMode.forEach(child => {
+    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
+
+    if (el) {
+      assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is hidden`);
+    }
+  });
+
+  childrenShownInAudioOnlyMode.forEach(child => {
+    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
+
+    if (el) {
+      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is still shown`);
+    }
+  });
+
+  player.audioOnlyMode(false);
+
+  // Check that all are showing again
+  allChildren.concat(childrenHiddenInAudioOnlyMode).forEach(child => {
+    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
+
+    if (el) {
+      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+    }
+  });
+});
