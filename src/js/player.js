@@ -45,6 +45,7 @@ import './poster-image.js';
 import './tracks/text-track-display.js';
 import './loading-spinner.js';
 import './big-play-button.js';
+import './big-pause-button.js';
 import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
@@ -5072,6 +5073,7 @@ Player.prototype.options_ = {
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',
+    'bigPauseButton',
     'liveTracker',
     'controlBar',
     'errorDisplay',
