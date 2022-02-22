@@ -1,0 +1,96 @@
+@use "sass:math";
+
+.video-js .vjs-big-play-button,
+.video-js .vjs-big-pause-button {
+  font-size: 3em;
+  line-height: $big-play-pause-button--line-height;
+  height: $big-play-pause-button--height;
+  width: $big-play-pause-button--width; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
+  display: block;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 0;
+  cursor: pointer;
+  opacity: 1;
+  border: $big-play-pause-button--border-size solid $primary-foreground-color;
+
+  // Need a slightly gray bg so it can be seen on black backgrounds
+  @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
+  @include border-radius(0.3em);
+  @include transition(all 0.4s);
+
+  // Since the big play and pause button doesn't inherit from vjs-control, we need to specify a bit more than
+  // other buttons for the icon.
+  & .vjs-icon-placeholder:before {
+    @extend %icon-default;
+  }
+}
+
+.video-js .vjs-big-play-button .vjs-icon-placeholder:before {
+  @extend .vjs-icon-play;
+}
+
+.video-js .vjs-big-pause-button .vjs-icon-placeholder:before {
+  @extend .vjs-icon-pause;
+}
+
+// Allow people that hate their poster image to center the big play and pause button.
+.vjs-big-play-centered .vjs-big-play-button,
+.vjs-big-pause-centered .vjs-big-pause-button {
+  top: 50%;
+  left: 50%;
+  margin-top: -(math.div($big-play-pause-button--height, 2));
+  margin-left: -(math.div($big-play-pause-button--width, 2));
+}
+
+.video-js:hover .vjs-big-play-button,
+.video-js .vjs-big-play-button:focus,
+.video-js:hover .vjs-big-pause-button,
+.video-js .vjs-big-pause-button:focus {
+  border-color: $primary-foreground-color;
+
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
+  @include transition(all 0s);
+}
+
+// Hide big play button if controls are disabled, the video is playing, or native controls are used.
+// Hide big pause button if controls are disabled, the video is paused, or native controls are used.
+.vjs-controls-disabled .vjs-big-play-button,
+.vjs-has-started .vjs-big-play-button,
+.vjs-using-native-controls .vjs-big-play-button,
+.vjs-error .vjs-big-play-button,
+.vjs-controls-disabled .vjs-big-pause-button,
+.vjs-paused .vjs-big-pause-button,
+.vjs-using-native-controls .vjs-big-pause-button,
+.vjs-error .vjs-big-pause-button {
+  display: none;
+}
+
+// Show big play button if video is paused and .vjs-show-big-play-button-on-pause is set on video element
+.vjs-has-started.vjs-paused.vjs-show-big-play-button-on-pause .vjs-big-play-button {
+  display: block;
+}
+
+// Show big pause button if video has started playing
+.vjs-has-started .vjs-big-pause-button {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+
+  $trans: visibility 0.1s, opacity 0.1s; // Var needed because of comma
+  @include transition($trans);
+}
+
+// Hide big pause button if video has started playing AND user is inactive
+.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-big-pause-button {
+  // Remain visible for screen reader and keyboard users
+  visibility: visible;
+  opacity: 0;
+  // prevent a click/tap from interacting with vjs-lock-showing menu's
+  // or other controls while we are inactive/hidden
+  pointer-events: none;
+
+  $trans: visibility 1.0s, opacity 1.0s;
+  @include transition($trans);
+}
