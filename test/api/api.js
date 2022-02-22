@@ -169,6 +169,7 @@ QUnit.test('should export useful components to the public', function(assert) {
   assert.ok(videojs.getComponent('PictureInPictureToggle'), 'PictureInPictureToggle should be public');
   assert.ok(videojs.getComponent('FullscreenToggle'), 'FullscreenToggle should be public');
   assert.ok(videojs.getComponent('BigPlayButton'), 'BigPlayButton should be public');
+  assert.ok(videojs.getComponent('BigPauseButton'), 'BigPauseButton should be public');
   assert.ok(videojs.getComponent('LoadingSpinner'), 'LoadingSpinner should be public');
   assert.ok(videojs.getComponent('CurrentTimeDisplay'),
            'CurrentTimeDisplay should be public');
