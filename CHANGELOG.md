@@ -1,3 +1,20 @@
+<a name="7.18.1"></a>
+## [7.18.1](https://github.com/videojs/video.js/compare/v7.18.0...v7.18.1) (2022-02-23)
+
+### Bug Fixes
+
+* **lang:** remove trailing comma from fr.json ([#7657](https://github.com/videojs/video.js/issues/7657)) ([26209b0](https://github.com/videojs/video.js/commit/26209b0))
+* Fix playback rate iteration if rates are not in the ascending order ([#7618](https://github.com/videojs/video.js/issues/7618)) ([50fe5f6](https://github.com/videojs/video.js/commit/50fe5f6))
+* Guard against Safari adding native controls after fullscreen ([#7634](https://github.com/videojs/video.js/issues/7634)) ([f16d73b](https://github.com/videojs/video.js/commit/f16d73b))
+* **accessibility:** By default, show track selection buttons at all responsive breakpoints ([#7603](https://github.com/videojs/video.js/issues/7603)) ([c44057d](https://github.com/videojs/video.js/commit/c44057d))
+* **lang:** Add missing translations for French, Italian, Japanese, and Korean ([#7589](https://github.com/videojs/video.js/issues/7589)) ([b5f775e](https://github.com/videojs/video.js/commit/b5f775e))
+* keep focus trapping contained to modal ([#6983](https://github.com/videojs/video.js/issues/6983)) ([950deae](https://github.com/videojs/video.js/commit/950deae))
+
+### Documentation
+
+* Add some FAQ entries ([#7609](https://github.com/videojs/video.js/issues/7609)) ([53cbfc6](https://github.com/videojs/video.js/commit/53cbfc6))
+* Link to Angular guide in Player Workflows guide ([#7635](https://github.com/videojs/video.js/issues/7635)) ([481e809](https://github.com/videojs/video.js/commit/481e809))
+
 <a name="7.18.0"></a>
 # [7.18.0](https://github.com/videojs/video.js/compare/v7.17.3...v7.18.0) (2021-12-20)
 
