@@ -4310,17 +4310,8 @@ class Player extends Component {
    *         True if audioOnlyMode is on, false otherwise.
    */
   audioOnlyMode(value) {
-    if (value === undefined) {
+    if (typeof value !== 'boolean' || value === this.audioOnlyMode_) {
       return this.audioOnlyMode_;
-    }
-
-    if (value === this.audioOnlyMode_) {
-      return;
-    }
-
-    if (typeof value !== 'boolean') {
-      log.warn('audioOnlyMode can only be enabled or disabled using a boolean value');
-      return;
     }
 
     if (value === true) {
