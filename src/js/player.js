@@ -4325,7 +4325,7 @@ class Player extends Component {
       // Hide all player components except the control bar. Control bar components
       // needed only for video are hidden with CSS
       playerChildren.forEach(child => {
-        if (child.name_ === 'ControlBar') {
+        if (child === controlBar) {
           return;
         }
 
