@@ -2821,7 +2821,7 @@ QUnit.test('setting audioOnlyMode() triggers audioonlymodechange event', functio
   assert.equal(audioOnlyModeChangeEvents, 2, 'event fired again');
 });
 
-QUnit.test('audioOnlyMode(true) makes player height equal to control bar height', function(assert) {
+QUnit.test('audioOnlyMode(true/false) changes player height', function(assert) {
   const player = TestHelpers.makePlayer({controls: true, height: 600});
 
   player.hasStarted(true);
@@ -2830,10 +2830,13 @@ QUnit.test('audioOnlyMode(true) makes player height equal to control bar height'
   const playerHeight = player.height();
 
   assert.notEqual(playerHeight, controlBarHeight, 'heights are not the same');
+  assert.equal(player.height(), playerHeight, 'player initial height is correct');
 
   player.audioOnlyMode(true);
   assert.equal(player.height(), controlBarHeight, 'player height set to height of control bar in audioOnlyMode');
 
+  player.audioOnlyMode(false);
+  assert.equal(player.height(), playerHeight, 'player reset to original height when disabling audioOnlyMode');
 });
 
 QUnit.test('audioOnlyMode(true/false) hides/shows player components except control bar', function(assert) {

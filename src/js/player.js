@@ -398,8 +398,11 @@ class Player extends Component {
     // Init state audioOnlyMode_
     this.audioOnlyMode_ = false;
 
-    // Init state hiddenPlayerChildren_
-    this.hiddenPlayerChildren_ = [];
+    // Init state audioOnlyCache_
+    this.audioOnlyCache_ = {
+      playerHeight: null,
+      hiddenChildren: []
+    };
 
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
@@ -4332,42 +4335,32 @@ class Player extends Component {
         if (child.el_ && !child.hasClass('vjs-hidden')) {
           child.hide();
 
-          this.hiddenPlayerChildren_.push(child);
+          this.audioOnlyCache_.hiddenChildren.push(child);
         }
       });
 
+      this.audioOnlyCache_.playerHeight = this.height();
+
       // Set the player height the same as the control bar
       this.height(controlBarHeight);
-
-      // Show control bar
-      this.userActive(true);
 
       // Fullscreen is not supported in audioOnlyMode, so exit if we need to
       if (this.isFullscreen()) {
         this.exitFullscreen();
       }
-
-      this.audioOnlyMode_ = true;
-
-      this.trigger('audioonlymodechange');
     } else {
       this.removeClass('vjs-audio-only-mode');
 
       // Show player components that were previously hidden
-      if (this.hiddenPlayerChildren_.length > 0) {
-        this.hiddenPlayerChildren_.forEach(child => child.show());
-      }
+      this.audioOnlyCache_.hiddenChildren.forEach(child => child.show());
 
       // Reset player height
-      this.height(this.options_.height);
-
-      // Show control bar
-      this.userActive(true);
-
-      this.audioOnlyMode_ = false;
-
-      this.trigger('audioonlymodechange');
+      this.height(this.audioOnlyCache_.playerHeight);
     }
+
+    this.audioOnlyMode_ = value;
+
+    this.trigger('audioonlymodechange');
   }
 
   /**
