@@ -21,6 +21,7 @@
   * [width](#width)
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
+  * [audioPosterMode](#audiopostermode)
   * [autoSetup](#autosetup)
   * [breakpoints](#breakpoints)
   * [children](#children)
@@ -180,6 +181,13 @@ Each option is `undefined` by default unless otherwise specified.
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
 
 Alternatively, the classes `vjs-16-9`, `vjs-9-16`, `vjs-4-3` or `vjs-1-1` can be added to the player.
+
+### `audioPosterMode`
+
+> Type: `boolean`
+> Default: `false`
+
+If set to true, it enables the poster viewer experience by hiding the video element and displaying the poster image persistently. This option can be set to `true` or `false` by calling `audioPosterMode([true|false])` at runtime.
 
 ### `autoSetup`
 
