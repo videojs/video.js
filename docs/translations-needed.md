@@ -330,6 +330,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 | es.json (Complete)      |                                                                                     |
+| eu.json (Complete)      |                                                                                     |
 | fa.json (Complete)      |                                                                                     |
 | fi.json (missing 63)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
