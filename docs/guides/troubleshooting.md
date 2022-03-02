@@ -14,6 +14,7 @@
 * [Problems with playback](#problems-with-playback)
 * [Video.js Errors](#videojs-errors)
   * [vdata123456 errors](#vdata123456-errors)
+* [Problems with setup options](#problems-with-setup-options)
 
 ## Problems with media formats
 
@@ -88,6 +89,24 @@ is almost always due to event listeners not being disposed when dispose is calle
 a component.
 
 To fix this issue please make sure that all event listeners are cleaned up on dispose.
+
+## Problems with setup options
+
+If a player is inititalized without the expected setup options, it's usually because of using both the `data-setup` attribute and the `videojs()` constructor. Take this example:
+
+```html
+<video-js id="my_video" data-setup='{"autoplay": "any"}'></video-js>
+
+<script>
+  const myPlayer = videojs('my_video');
+</script>
+```
+
+Here you might expect the player to be initialized with the `autoplay` option set, but it will not be. While Video.js sets up player embeds that have a `data-setup` attribute automatically when the page is loaded, in this case the player will have _already been setup_ in the script tag. The `data-setup` option will never be applied.
+
+This can be more confusing if `videojs('my_video')` is used in an async script as different behavior will occur depending on when the script is executed.
+
+It's better to not use `data-setup` and use the `videojs()` constructor once to set up the player, and/or only use the explicit getter `videojs.getPlayer('my_video')` to get a player reference.
 
 [hosting-media]: #problems-when-hosting-media
 

@@ -41,6 +41,9 @@
 * [Q: Can Video.js be required in node.js?](#q-can-videojs-be-required-in-nodejs)
 * [Q: Does Video.js work with webpack?](#q-does-videojs-work-with-webpack)
 * [Q: Does Video.js work with react?](#q-does-videojs-work-with-react)
+* [Q: Can the big play button be centered?](#q-can-the-big-play-button-be-centered)
+* [Q: Can the big play button be shown when paused?](#q-can-the-big-play-button-be-shown-when-paused)
+* [Q: Why is the picture-in-picture button different in Firefox?](#q-why-is-the-picture-in-picture-button-different-in-firefox)
 
 ## Q: What is Video.js?
 
@@ -273,6 +276,18 @@ Yes! See the [Webpack and Video.js configuration guide][webpack-guide].
 
 Yes! See [ReactJS integration example][react-guide].
 
+## Q: Can the big play button be centered?
+
+The default skin offsets the button to not obscure the poster image, but just add a `vjs-big-play-centered` class to the player to have it centred.
+
+## Q: Can the big play button be shown when paused?
+
+Add a `vjs-show-big-play-button-on-pause` class to the player to display the button when paused.
+
+## Q: Why is the picture-in-picture button different in Firefox?
+
+Firefox does not support the HTML video Picture-in-Picture (PIP) API, so it is not possible to have a custom button in the Video.js controls. Firefox has its own overlay PIP button, and its [own logic for whether to display it][firefox-pip].
+
 [ads]: https://github.com/videojs/videojs-contrib-ads
 
 [audio-tracks]: /docs/guides/audio-tracks.md
@@ -292,6 +307,8 @@ Yes! See [ReactJS integration example][react-guide].
 [debug-guide]: /docs/guides/debugging.md
 
 [eme]: https://github.com/videojs/videojs-contrib-eme
+
+[firefox-pip]: https://firefox-source-docs.mozilla.org/toolkit/components/pictureinpicture/pictureinpicture/index.html#the-picture-in-picture-toggle
 
 [flash-eol]: https://www.adobe.com/products/flashplayer/end-of-life.html
 

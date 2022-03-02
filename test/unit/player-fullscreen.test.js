@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import Player from '../../src/js/player.js';
+import Html5 from '../../src/js/tech/html5.js'; // eslint-disable-line no-unused-vars
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import window from 'global/window';
@@ -21,6 +22,19 @@ const FullscreenTestHelpers = {
     };
 
     return player;
+  },
+  fakeSafariVideoEl() {
+    const testEl = document.createElement('video');
+
+    if (!('webkitPresentationMode' in testEl)) {
+      testEl.webkitPresentationMode = 'test';
+    }
+
+    if (!('webkitDisplayingFullscreen' in testEl)) {
+      testEl.webkitDisplayingFullscreen = false;
+    }
+
+    return testEl;
   }
 };
 
@@ -261,6 +275,40 @@ QUnit.test('fullscreenchange event from Html5 should change player.isFullscreen_
   html5.trigger('fullscreenchange', { isFullscreen: false });
 
   assert.ok(!player.isFullscreen(), 'player.isFullscreen_ should be false');
+
+  player.dispose();
+});
+
+QUnit.test('fullscreenchange event from Html5 should guard against Safari showing double controls', function(assert) {
+  const player = FullscreenTestHelpers.makePlayer(undefined, {techOrder: ['html5']}, FullscreenTestHelpers.fakeSafariVideoEl());
+  const html5 = player.tech(true);
+
+  html5.trigger('webkitbeginfullscreen');
+
+  assert.ok(player.isFullscreen(), 'player.isFullscreen_ should be true');
+
+  player.tech_.el_.controls = true;
+
+  html5.trigger('webkitendfullscreen');
+
+  assert.ok(!player.tech_.el_.controls, 'el controls should be false');
+
+  player.dispose();
+});
+
+QUnit.test('Safari leaving fullscreen should retain controls with nativeControlsForTouch', function(assert) {
+  const player = FullscreenTestHelpers.makePlayer(undefined, {techOrder: ['html5'], nativeControlsForTouch: true}, FullscreenTestHelpers.fakeSafariVideoEl());
+  const html5 = player.tech(true);
+
+  html5.trigger('webkitbeginfullscreen');
+
+  assert.ok(player.isFullscreen(), 'player.isFullscreen_ should be true');
+
+  player.tech_.el_.controls = true;
+
+  html5.trigger('webkitendfullscreen');
+
+  assert.ok(player.tech_.el_.controls, 'el controls should be true');
 
   player.dispose();
 });

@@ -2124,7 +2124,10 @@ class Player extends Component {
   handleTechFullscreenChange_(event, data) {
     if (data) {
       if (data.nativeIOSFullscreen) {
-        this.toggleClass('vjs-ios-native-fs');
+        this.addClass('vjs-ios-native-fs');
+        this.tech_.one('webkitendfullscreen', () => {
+          this.removeClass('vjs-ios-native-fs');
+        });
       }
       this.isFullscreen(data.isFullscreen);
     }
@@ -4291,6 +4294,37 @@ class Player extends Component {
   }
 
   /**
+   * Get the current audioPosterMode state or set audioPosterMode to true or false
+   *
+   * @param {boolean} [value]
+   *         The value to set audioPosterMode to.
+   *
+   * @return {boolean}
+   *         True if audioPosterMode is on, false otherwise.
+   */
+  audioPosterMode(value) {
+
+    if (this.audioPosterMode_ === undefined) {
+      this.audioPosterMode_ = this.options_.audioPosterMode;
+    }
+
+    if (typeof value !== 'boolean' || value === this.audioPosterMode_) {
+      return this.audioPosterMode_;
+    }
+
+    this.audioPosterMode_ = value;
+
+    if (this.audioPosterMode_) {
+      this.tech_.hide();
+      this.addClass('vjs-audio-poster-mode');
+      return;
+    }
+    // Show the video element and hide the poster image if audioPosterMode is set to false
+    this.tech_.show();
+    this.removeClass('vjs-audio-poster-mode');
+  }
+
+  /**
    * A helper method for adding a {@link TextTrack} to our
    * {@link TextTrackList}.
    *
@@ -5096,7 +5130,8 @@ Player.prototype.options_ = {
   },
 
   breakpoints: {},
-  responsive: false
+  responsive: false,
+  audioPosterMode: false
 };
 
 [
