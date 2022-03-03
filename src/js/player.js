@@ -4323,7 +4323,7 @@ class Player extends Component {
 
       const playerChildren = this.children();
       const controlBar = this.getChild('ControlBar');
-      const controlBarHeight = controlBar && controlBar.height();
+      const controlBarHeight = controlBar && controlBar.currentHeight();
 
       // Hide all player components except the control bar. Control bar components
       // needed only for video are hidden with CSS
