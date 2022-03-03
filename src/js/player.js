@@ -4317,7 +4317,7 @@ class Player extends Component {
       return this.audioOnlyMode_;
     }
 
-    if (value === true) {
+    if (value) {
       // Update styling immediately so we can get the control bar's height
       this.addClass('vjs-audio-only-mode');
 
