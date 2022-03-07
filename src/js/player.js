@@ -4300,6 +4300,51 @@ class Player extends Component {
     return !!this.isAudio_;
   }
 
+  updateAudioOnlyModeState_(value) {
+    this.audioOnlyMode_ = value;
+    this.trigger('audioonlymodechange');
+  }
+
+  enableAudioOnlyUI_() {
+    // Update styling immediately to show the control bar so we can get its height
+    this.addClass('vjs-audio-only-mode');
+
+    const playerChildren = this.children();
+    const controlBar = this.getChild('ControlBar');
+    const controlBarHeight = controlBar && controlBar.currentHeight();
+
+    // Hide all player components except the control bar. Control bar components
+    // needed only for video are hidden with CSS
+    playerChildren.forEach(child => {
+      if (child === controlBar) {
+        return;
+      }
+
+      if (child.el_ && !child.hasClass('vjs-hidden')) {
+        child.hide();
+
+        this.audioOnlyCache_.hiddenChildren.push(child);
+      }
+    });
+
+    this.audioOnlyCache_.playerHeight = this.currentHeight();
+
+    // Set the player height the same as the control bar
+    this.height(controlBarHeight);
+    this.updateAudioOnlyModeState_(true);
+  }
+
+  disableAudioOnlyUI_() {
+    this.removeClass('vjs-audio-only-mode');
+
+    // Show player components that were previously hidden
+    this.audioOnlyCache_.hiddenChildren.forEach(child => child.show());
+
+    // Reset player height
+    this.height(this.audioOnlyCache_.playerHeight);
+    this.updateAudioOnlyModeState_(false);
+  }
+
   /**
    * Get the current audioOnlyMode state or set audioOnlyMode to true or false.
    *
@@ -4309,58 +4354,51 @@ class Player extends Component {
    * @param {boolean} [value]
    *         The value to set audioOnlyMode to.
    *
-   * @return {boolean}
-   *         True if audioOnlyMode is on, false otherwise.
+   * @return {Promise|boolean}
+   *        A Promise is returned when setting the state, and a boolean when getting
+   *        the present state
    */
   audioOnlyMode(value) {
     if (typeof value !== 'boolean' || value === this.audioOnlyMode_) {
       return this.audioOnlyMode_;
     }
 
+    const PromiseClass = this.options_.Promise || window.Promise;
+
+    if (PromiseClass) {
+      // Enable Audio Only Mode
+      if (value) {
+        const exitPromises = [];
+
+        // Fullscreen and PiP are not supported in audioOnlyMode, so exit if we need to.
+        if (this.isInPictureInPicture()) {
+          exitPromises.push(this.exitPictureInPicture());
+        }
+
+        if (this.isFullscreen()) {
+          exitPromises.push(this.exitFullscreen());
+        }
+
+        return PromiseClass.all(exitPromises).then(() => this.enableAudioOnlyUI_());
+      }
+
+      // Disable Audio Only Mode
+      return PromiseClass.resolve().then(() => this.disableAudioOnlyUI_());
+    }
+
     if (value) {
-      // Update styling immediately so we can get the control bar's height
-      this.addClass('vjs-audio-only-mode');
+      if (this.isInPictureInPicture()) {
+        this.exitPictureInPicture();
+      }
 
-      const playerChildren = this.children();
-      const controlBar = this.getChild('ControlBar');
-      const controlBarHeight = controlBar && controlBar.currentHeight();
-
-      // Hide all player components except the control bar. Control bar components
-      // needed only for video are hidden with CSS
-      playerChildren.forEach(child => {
-        if (child === controlBar) {
-          return;
-        }
-
-        if (child.el_ && !child.hasClass('vjs-hidden')) {
-          child.hide();
-
-          this.audioOnlyCache_.hiddenChildren.push(child);
-        }
-      });
-
-      this.audioOnlyCache_.playerHeight = this.height();
-
-      // Set the player height the same as the control bar
-      this.height(controlBarHeight);
-
-      // Fullscreen is not supported in audioOnlyMode, so exit if we need to
       if (this.isFullscreen()) {
         this.exitFullscreen();
       }
+
+      this.enableAudioOnlyUI_();
     } else {
-      this.removeClass('vjs-audio-only-mode');
-
-      // Show player components that were previously hidden
-      this.audioOnlyCache_.hiddenChildren.forEach(child => child.show());
-
-      // Reset player height
-      this.height(this.audioOnlyCache_.playerHeight);
+      this.disableAudioOnlyUI_();
     }
-
-    this.audioOnlyMode_ = value;
-
-    this.trigger('audioonlymodechange');
   }
 
   /**
