@@ -641,11 +641,14 @@ class Html5 extends Tech {
 
     const endFn = function() {
       this.trigger('fullscreenchange', { isFullscreen: false });
+      // Safari will sometimes set contols on the videoelement when existing fullscreen.
+      if (this.el_.controls && !this.options_.nativeControlsForTouch && this.controls()) {
+        this.el_.controls = false;
+      }
     };
 
     const beginFn = function() {
-      if ('webkitPresentationMode' in this.el_ &&
-        this.el_.webkitPresentationMode !== 'picture-in-picture') {
+      if ('webkitPresentationMode' in this.el_ && this.el_.webkitPresentationMode !== 'picture-in-picture') {
         this.one('webkitendfullscreen', endFn);
 
         this.trigger('fullscreenchange', {
@@ -736,6 +739,32 @@ class Html5 extends Tech {
    */
   requestPictureInPicture() {
     return this.el_.requestPictureInPicture();
+  }
+
+  /**
+   * Native requestVideoFrameCallback if supported by browser/tech, or fallback
+   *
+   * @param {function} cb function to call
+   * @return {number} id of request
+   */
+  requestVideoFrameCallback(cb) {
+    if (this.featuresVideoFrameCallback) {
+      return this.el_.requestVideoFrameCallback(cb);
+    }
+    return super.requestVideoFrameCallback(cb);
+  }
+
+  /**
+   * Native or fallback requestVideoFrameCallback
+   *
+   * @param {number} id request id to cancel
+   */
+  cancelVideoFrameCallback(id) {
+    if (this.featuresVideoFrameCallback) {
+      this.el_.cancelVideoFrameCallback(id);
+    } else {
+      super.cancelVideoFrameCallback(id);
+    }
   }
 
   /**
@@ -1295,6 +1324,13 @@ Html5.prototype.featuresProgressEvents = true;
  * @default
  */
 Html5.prototype.featuresTimeupdateEvents = true;
+
+/**
+ * Whether the HTML5 el supports `requestVideoFrameCallback`
+ *
+ * @type {boolean}
+ */
+Html5.prototype.featuresVideoFrameCallback = !!(Html5.TEST_VID && Html5.TEST_VID.requestVideoFrameCallback);
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;

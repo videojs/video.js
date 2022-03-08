@@ -16,17 +16,14 @@
   height: 100%;
 }
 
-// Hide the poster after the video has started playing
-.vjs-has-started .vjs-poster {
-  display: none;
-}
-
-// Don't hide the poster if we're playing audio
-.vjs-audio.vjs-has-started .vjs-poster {
-  display: block;
-}
-
-// Hide the poster when native controls are used otherwise it covers them
+// Hide the poster after the video has started playing and when native controls are used
+.vjs-has-started .vjs-poster,
 .vjs-using-native-controls .vjs-poster {
   display: none;
+}
+
+// Don't hide the poster if we're playing audio or when audio-poster-mode is true
+.vjs-audio.vjs-has-started .vjs-poster, 
+.vjs-has-started.vjs-audio-poster-mode  .vjs-poster {
+  display: block;
 }

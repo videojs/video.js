@@ -15,6 +15,7 @@ import {isPlain} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
 import {toTitleCase, toLowerCase} from '../utils/string-cases.js';
 import vtt from 'videojs-vtt.js';
+import * as Guid from '../utils/guid.js';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -102,6 +103,8 @@ class Tech extends Component {
     this.trackCurrentTime_ = (e) => this.trackCurrentTime(e);
     this.stopTrackingCurrentTime_ = (e) => this.stopTrackingCurrentTime(e);
     this.disposeSourceHandler_ = (e) => this.disposeSourceHandler(e);
+
+    this.queuedHanders_ = new Set();
 
     // keep track of whether the current source has played at all to
     // implement a very limited played()
@@ -858,6 +861,43 @@ class Tech extends Component {
   setDisablePictureInPicture() {}
 
   /**
+   * A fallback implementation of requestVideoFrameCallback using requestAnimationFrame
+   *
+   * @param {function} cb
+   * @return {number} request id
+   */
+  requestVideoFrameCallback(cb) {
+    const id = Guid.newGUID();
+
+    if (this.paused()) {
+      this.queuedHanders_.add(id);
+      this.one('playing', () => {
+        if (this.queuedHanders_.has(id)) {
+          this.queuedHanders_.delete(id);
+          cb();
+        }
+      });
+    } else {
+      this.requestNamedAnimationFrame(id, cb);
+    }
+
+    return id;
+  }
+
+  /**
+   * A fallback implementation of cancelVideoFrameCallback
+   *
+   * @param {number} id id of callback to be cancelled
+   */
+  cancelVideoFrameCallback(id) {
+    if (this.queuedHanders_.has(id)) {
+      this.queuedHanders_.delete(id);
+    } else {
+      this.cancelNamedAnimationFrame(id);
+    }
+  }
+
+  /**
    * A method to set a poster from a `Tech`.
    *
    * @abstract
@@ -1170,6 +1210,14 @@ Tech.prototype.featuresTimeupdateEvents = false;
  * @default
  */
 Tech.prototype.featuresNativeTextTracks = false;
+
+/**
+ * Boolean indicating whether the `Tech` supports `requestVideoFrameCallback`.
+ *
+ * @type {boolean}
+ * @default
+ */
+Tech.prototype.featuresVideoFrameCallback = false;
 
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.

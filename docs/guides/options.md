@@ -22,6 +22,7 @@
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
   * [audioOnlyMode](#audioonlymode)
+  * [audioPosterMode](#audiopostermode)
   * [autoSetup](#autosetup)
   * [breakpoints](#breakpoints)
   * [children](#children)
@@ -188,6 +189,13 @@ Alternatively, the classes `vjs-16-9`, `vjs-9-16`, `vjs-4-3` or `vjs-1-1` can be
 > Default: `false`
 
 If set to true, it hides all player components except the control bar, as well as any specific controls that are needed only for video. This option can be set to `true` or `false` by calling `audioOnlyMode([true|false])` at runtime.
+
+### `audioPosterMode`
+
+> Type: `boolean`
+> Default: `false`
+
+If set to true, it enables the poster viewer experience by hiding the video element and displaying the poster image persistently. This option can be set to `true` or `false` by calling `audioPosterMode([true|false])` at runtime.
 
 ### `autoSetup`
 
