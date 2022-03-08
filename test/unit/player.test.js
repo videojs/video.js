@@ -2132,9 +2132,9 @@ QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE 
 
 QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the tech el', function(assert) {
   // clear the HEAD before running this test
+  const originalVjsNoDynamicStyling = window.VIDEOJS_NO_DYNAMIC_STYLE;
   const styles = document.querySelectorAll('style');
   let i = styles.length;
-  const originalVjsNoDynamicStyling = window.VIDEOJS_NO_DYNAMIC_STYLE;
 
   while (i--) {
     const style = styles[i];

@@ -188,7 +188,7 @@ Alternatively, the classes `vjs-16-9`, `vjs-9-16`, `vjs-4-3` or `vjs-1-1` can be
 > Type: `boolean`
 > Default: `false`
 
-If set to true, it hides all player components except the control bar, as well as any specific controls that are needed only for video. This option can be set to `true` or `false` by calling `audioOnlyMode([true|false])` at runtime.
+If set to true, it asynchronously hides all player components except the control bar, as well as any specific controls that are needed only for video. This option can be set to `true` or `false` by calling `audioOnlyMode([true|false])` at runtime. When used as a setter, it returns a Promise. When used as a getter, it returns a Boolean.
 
 ### `audioPosterMode`
 
