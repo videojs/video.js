@@ -2826,8 +2826,6 @@ QUnit.test('audioOnlyMode(true) returns Promise when promises are supported', fu
 
   if (window.Promise) {
     assert.ok(returnValTrue instanceof window.Promise, 'audioOnlyMode(true) returns Promise when supported');
-  } else {
-    assert.equal(returnValTrue, undefined, 'audioOnlyMode(true) returns undefined when promises unsupported');
   }
 
   return returnValTrue;
@@ -2841,8 +2839,6 @@ QUnit.test('audioOnlyMode(false) returns Promise when promises are supported', f
 
     if (window.Promise) {
       assert.ok(returnValFalse instanceof window.Promise, 'audioOnlyMode(false) returns Promise when supported');
-    } else {
-      assert.equal(returnValFalse, undefined, 'audioOnlyMode(false) returns undefined when promises unsupported');
     }
 
     return returnValFalse;
@@ -2853,6 +2849,25 @@ QUnit.test('audioOnlyMode() getter returns Boolean', function(assert) {
   const player = TestHelpers.makePlayer({});
 
   assert.ok(typeof player.audioOnlyMode() === 'boolean', 'getter correctly returns boolean');
+});
+
+QUnit.test('audioOnlyMode(true/false) is synchronous and returns undefined when promises are unsupported', function(assert) {
+  const originalPromise = window.Promise;
+  const player = TestHelpers.makePlayer({});
+
+  window.Promise = undefined;
+
+  const returnValTrue = player.audioOnlyMode(true);
+
+  assert.equal(returnValTrue, undefined, 'return value is undefined');
+  assert.ok(player.audioOnlyMode(), 'state synchronously set to true');
+
+  const returnValFalse = player.audioOnlyMode(false);
+
+  assert.equal(returnValFalse, undefined, 'return value is undefined');
+  assert.notOk(player.audioOnlyMode(), 'state synchronously set to false');
+
+  window.Promise = originalPromise;
 });
 
 QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(assert) {
