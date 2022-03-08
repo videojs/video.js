@@ -2101,6 +2101,7 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   // clear the HEAD before running this test
   const styles = document.querySelectorAll('style');
   let i = styles.length;
+  const originalVjsNoDynamicStyling = window.VIDEOJS_NO_DYNAMIC_STYLE;
 
   while (i--) {
     const style = styles[i];
@@ -2128,6 +2129,7 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   assert.equal(player.tech_.el().width, 600, 'the width is equal to 600');
   assert.equal(player.tech_.el().height, 300, 'the height is equal 300');
   player.dispose();
+  window.VIDEOJS_NO_DYNAMIC_STYLE = originalVjsNoDynamicStyling;
 });
 
 QUnit.test('should allow to register custom player when any player has not been created', function(assert) {
@@ -2772,10 +2774,52 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
 });
 
 QUnit.test('audioOnlyMode can be set by option', function(assert) {
-  const player = TestHelpers.makePlayer({ audioOnlyMode: true });
+  assert.expect(4);
 
-  assert.equal(player.audioOnlyMode(), true, 'defaults to false');
-  assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'defaults to false');
+  const player = TestHelpers.makePlayer({audioOnlyMode: true});
+
+  player.one('audioonlymodechange', () => {
+    assert.equal(player.audioOnlyMode(), true, 'asynchronously set via option');
+    assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class added asynchronously');
+  });
+
+  assert.equal(player.audioOnlyMode(), false, 'defaults to false');
+  assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'initially does not have class');
+});
+
+QUnit.test('audioOnlyMode(true) returns Promise when promises are supported', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const returnValTrue = player.audioOnlyMode(true);
+
+  if (window.Promise) {
+    assert.ok(returnValTrue instanceof window.Promise, 'audioOnlyMode(true) returns Promise when supported');
+  } else {
+    assert.equal(returnValTrue, undefined, 'audioOnlyMode(true) returns undefined when promises unsupported');
+  }
+
+  return returnValTrue;
+});
+
+QUnit.test('audioOnlyMode(false) returns Promise when promises are supported', function(assert) {
+  const player = TestHelpers.makePlayer({audioOnlyMode: true});
+
+  player.one('audioonlymodechange', () => {
+    const returnValFalse = player.audioOnlyMode(false);
+
+    if (window.Promise) {
+      assert.ok(returnValFalse instanceof window.Promise, 'audioOnlyMode(false) returns Promise when supported');
+    } else {
+      assert.equal(returnValFalse, undefined, 'audioOnlyMode(false) returns undefined when promises unsupported');
+    }
+
+    return returnValFalse;
+  });
+});
+
+QUnit.test('audioOnlyMode() getter returns Boolean', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(typeof player.audioOnlyMode() === 'boolean', 'getter correctly returns boolean');
 });
 
 QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(assert) {
@@ -2783,11 +2827,11 @@ QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(asse
 
   assert.equal(player.audioOnlyMode(), false, 'defaults to false');
 
-  player.audioOnlyMode(true);
-  assert.equal(player.audioOnlyMode(), true, 'returns updated state after enabled');
-
-  player.audioOnlyMode(false);
-  assert.equal(player.audioOnlyMode(), false, 'returns updated state after disabled');
+  return player.audioOnlyMode(true)
+    .then(() => assert.equal(player.audioOnlyMode(), true, 'returns updated state after enabled'))
+    .then(() => player.audioOnlyMode(false))
+    .then(() => assert.equal(player.audioOnlyMode(), false, 'returns updated state after disabled'))
+    .catch(() => assert.ok(false, 'test error'));
 });
 
 QUnit.test('audioOnlyMode(true/false) adds or removes vjs-audio-only-mode class to player', function(assert) {
@@ -2795,11 +2839,11 @@ QUnit.test('audioOnlyMode(true/false) adds or removes vjs-audio-only-mode class 
 
   assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'class not initially present');
 
-  player.audioOnlyMode(true);
-  assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class was added');
-
-  player.audioOnlyMode(false);
-  assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'class was removed');
+  return player.audioOnlyMode(true)
+    .then(() => assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class was added'))
+    .then(() => player.audioOnlyMode(false))
+    .then(() => assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'class was removed'))
+    .catch(() => assert.ok(false, 'test error'));
 });
 
 QUnit.test('setting audioOnlyMode() triggers audioonlymodechange event', function(assert) {
@@ -2812,13 +2856,17 @@ QUnit.test('setting audioOnlyMode() triggers audioonlymodechange event', functio
     audioOnlyModeState = player.audioOnlyMode();
   });
 
-  player.audioOnlyMode(true);
-  assert.equal(audioOnlyModeState, true, 'state is correct');
-  assert.equal(audioOnlyModeChangeEvents, 1, 'event fired once');
-
-  player.audioOnlyMode(false);
-  assert.equal(audioOnlyModeState, false, 'state is correct');
-  assert.equal(audioOnlyModeChangeEvents, 2, 'event fired again');
+  return player.audioOnlyMode(true)
+    .then(() => {
+      assert.equal(audioOnlyModeState, true, 'state is correct');
+      assert.equal(audioOnlyModeChangeEvents, 1, 'event fired once');
+    })
+    .then(() => player.audioOnlyMode(false))
+    .then(() => {
+      assert.equal(audioOnlyModeState, false, 'state is correct');
+      assert.equal(audioOnlyModeChangeEvents, 2, 'event fired again');
+    })
+    .catch(() => assert.ok(false, 'test error'));
 });
 
 QUnit.test('audioOnlyMode(true/false) changes player height', function(assert) {
@@ -2826,17 +2874,17 @@ QUnit.test('audioOnlyMode(true/false) changes player height', function(assert) {
 
   player.hasStarted(true);
 
-  const controlBarHeight = player.getChild('ControlBar').height();
-  const playerHeight = player.height();
+  const controlBarHeight = player.getChild('ControlBar').currentHeight();
+  const playerHeight = player.currentHeight();
 
   assert.notEqual(playerHeight, controlBarHeight, 'heights are not the same');
-  assert.equal(player.height(), playerHeight, 'player initial height is correct');
+  assert.equal(player.currentHeight(), playerHeight, 'player initial height is correct');
 
-  player.audioOnlyMode(true);
-  assert.equal(player.height(), controlBarHeight, 'player height set to height of control bar in audioOnlyMode');
-
-  player.audioOnlyMode(false);
-  assert.equal(player.height(), playerHeight, 'player reset to original height when disabling audioOnlyMode');
+  return player.audioOnlyMode(true)
+    .then(() => assert.equal(player.currentHeight(), controlBarHeight, 'player height set to height of control bar in audioOnlyMode'))
+    .then(() => player.audioOnlyMode(false))
+    .then(() => assert.equal(player.currentHeight(), playerHeight, 'player reset to original height when disabling audioOnlyMode'))
+    .catch(() => assert.ok(false, 'test error'));
 });
 
 QUnit.test('audioOnlyMode(true/false) hides/shows player components except control bar', function(assert) {
@@ -2848,28 +2896,30 @@ QUnit.test('audioOnlyMode(true/false) hides/shows player components except contr
   assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'block', 'Tech is initially visible');
   assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is initially visible');
 
-  player.audioOnlyMode(true);
+  return player.audioOnlyMode(true)
+    .then(() => {
+      assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'none', 'TextTrackDisplay is hidden');
+      assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'none', 'Tech is hidden');
+      assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is still visible');
 
-  assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'none', 'TextTrackDisplay is hidden');
-  assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'none', 'Tech is hidden');
-  assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is still visible');
+      // Sanity check that all non-ControlBar player children are hidden
+      player.children().forEach(child => {
+        const el = child.el_;
 
-  // Sanity check that all non-ControlBar player children are hidden
-  player.children().forEach(child => {
-    const el = child.el_;
-
-    if (el) {
-      if (child.name_ !== 'ControlBar') {
-        assert.equal(TestHelpers.getComputedStyle(child.el_, 'display') === 'none', true, 'non-controlBar component is hidden');
-      }
-    }
-  });
-
-  player.audioOnlyMode(false);
-
-  assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'block', 'TextTrackDisplay is visible again');
-  assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'block', 'Tech is visible again');
-  assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is still visible');
+        if (el) {
+          if (child.name_ !== 'ControlBar') {
+            assert.equal(TestHelpers.getComputedStyle(child.el_, 'display') === 'none', true, 'non-controlBar component is hidden');
+          }
+        }
+      });
+    })
+    .then(() => player.audioOnlyMode(false))
+    .then(() => {
+      assert.equal(TestHelpers.getComputedStyle(player.getChild('TextTrackDisplay').el_, 'display'), 'block', 'TextTrackDisplay is visible again');
+      assert.equal(TestHelpers.getComputedStyle(player.tech(true).el_, 'display'), 'block', 'Tech is visible again');
+      assert.equal(TestHelpers.getComputedStyle(player.getChild('ControlBar').el_, 'display'), 'flex', 'ControlBar is still visible');
+    })
+    .catch(() => assert.ok(false, 'test error'));
 });
 
 QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar components', function(assert) {
@@ -2930,32 +2980,34 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
     }
   });
 
-  player.audioOnlyMode(true);
+  return player.audioOnlyMode(true)
+    .then(() => {
+      childrenHiddenInAudioOnlyMode.forEach(child => {
+        const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
-  childrenHiddenInAudioOnlyMode.forEach(child => {
-    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
+        if (el) {
+          assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is hidden`);
+        }
+      });
 
-    if (el) {
-      assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is hidden`);
-    }
-  });
+      childrenShownInAudioOnlyMode.forEach(child => {
+        const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
-  childrenShownInAudioOnlyMode.forEach(child => {
-    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
+        if (el) {
+          assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is still shown`);
+        }
+      });
+    })
+    .then(() => player.audioOnlyMode(false))
+    .then(() => {
+      // Check that all are showing again
+      allChildren.concat(childrenHiddenInAudioOnlyMode).forEach(child => {
+        const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
-    if (el) {
-      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is still shown`);
-    }
-  });
-
-  player.audioOnlyMode(false);
-
-  // Check that all are showing again
-  allChildren.concat(childrenHiddenInAudioOnlyMode).forEach(child => {
-    const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
-
-    if (el) {
-      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
-    }
-  });
+        if (el) {
+          assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+        }
+      });
+    })
+    .catch(() => assert.ok(false, 'test error'));
 });
