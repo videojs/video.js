@@ -6,6 +6,11 @@
     @extend .vjs-icon-picture-in-picture-enter;
   }
 }
+
+.video-js.vjs-audio-only-mode .vjs-picture-in-picture-control {
+  display: none;
+}
+
 // Switch to the exit icon when the player is in Picture-in-Picture
 .video-js.vjs-picture-in-picture .vjs-picture-in-picture-control .vjs-icon-placeholder {
   @extend .vjs-icon-picture-in-picture-exit;

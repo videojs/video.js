@@ -21,6 +21,7 @@
   * [width](#width)
 * [Video.js-specific Options](#videojs-specific-options)
   * [aspectRatio](#aspectratio)
+  * [audioOnlyMode](#audioonlymode)
   * [audioPosterMode](#audiopostermode)
   * [autoSetup](#autosetup)
   * [breakpoints](#breakpoints)
@@ -181,6 +182,13 @@ Each option is `undefined` by default unless otherwise specified.
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
 
 Alternatively, the classes `vjs-16-9`, `vjs-9-16`, `vjs-4-3` or `vjs-1-1` can be added to the player.
+
+### `audioOnlyMode`
+
+> Type: `boolean`
+> Default: `false`
+
+If set to true, it asynchronously hides all player components except the control bar, as well as any specific controls that are needed only for video. This option can be set to `true` or `false` by calling `audioOnlyMode([true|false])` at runtime. When used as a setter, it returns a Promise. When used as a getter, it returns a Boolean.
 
 ### `audioPosterMode`
 

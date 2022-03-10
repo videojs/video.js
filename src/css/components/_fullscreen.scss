@@ -6,6 +6,11 @@
     @extend .vjs-icon-fullscreen-enter;
   }
 }
+
+.video-js.vjs-audio-only-mode .vjs-fullscreen-control {
+  display: none;
+}
+
 // Switch to the exit icon when the player is in fullscreen
 .video-js.vjs-fullscreen .vjs-fullscreen-control .vjs-icon-placeholder {
   @extend .vjs-icon-fullscreen-exit;
