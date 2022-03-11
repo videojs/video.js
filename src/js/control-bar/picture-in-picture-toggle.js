@@ -29,6 +29,20 @@ class PictureInPictureToggle extends Button {
     this.on(player, ['enterpictureinpicture', 'leavepictureinpicture'], (e) => this.handlePictureInPictureChange(e));
     this.on(player, ['disablepictureinpicturechanged', 'loadedmetadata'], (e) => this.handlePictureInPictureEnabledChange(e));
 
+    this.on(player, ['loadedmetadata', 'audioonlymodechange', 'audiopostermodechange'], () => {
+      const isSourceAudio = player.currentSource().type.includes('audio');
+
+      if (isSourceAudio || player.audioPosterMode() || player.audioOnlyMode()) {
+        if (player.isInPictureInPicture()) {
+          player.exitPictureInPicture();
+        }
+        this.hide();
+      } else {
+        this.show();
+      }
+
+    });
+
     // TODO: Deactivate button on player emptied event.
     this.disable();
   }

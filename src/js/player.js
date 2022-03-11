@@ -398,6 +398,9 @@ class Player extends Component {
     // Init state audioOnlyMode_
     this.audioOnlyMode_ = false;
 
+    // Init state audioPosterMode_
+    this.audioPosterMode_ = false;
+
     // Init state audioOnlyCache_
     this.audioOnlyCache_ = {
       playerHeight: null,
@@ -583,7 +586,12 @@ class Player extends Component {
 
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
-    this.audioOnlyMode(this.options_.audioOnlyMode);
+
+    this.on('ready', () => {
+      this.audioPosterMode(this.options_.audioPosterMode);
+      this.audioOnlyMode(this.options_.audioOnlyMode);
+
+    });
   }
 
   /**
@@ -4305,6 +4313,10 @@ class Player extends Component {
 
   updateAudioOnlyModeState_(value) {
     this.audioOnlyMode_ = value;
+
+    if (value && this.audioPosterMode()) {
+      this.audioPosterMode(false);
+    }
     this.trigger('audioonlymodechange');
   }
 
@@ -4415,23 +4427,27 @@ class Player extends Component {
    */
   audioPosterMode(value) {
 
-    if (this.audioPosterMode_ === undefined) {
-      this.audioPosterMode_ = this.options_.audioPosterMode;
-    }
-
     if (typeof value !== 'boolean' || value === this.audioPosterMode_) {
       return this.audioPosterMode_;
     }
 
     this.audioPosterMode_ = value;
+    // eslint-disable-next-line
+    console.log('triggering');
+    this.trigger('audiopostermodechange');
+
+    const techEl = this.tech_ && this.tech_;
 
     if (this.audioPosterMode_) {
-      this.tech_.hide();
+      if (this.audioOnlyMode()) {
+        this.audioOnlyMode(false);
+      }
+      techEl.hide();
       this.addClass('vjs-audio-poster-mode');
       return;
     }
     // Show the video element and hide the poster image if audioPosterMode is set to false
-    this.tech_.show();
+    techEl.show();
     this.removeClass('vjs-audio-poster-mode');
   }
 
