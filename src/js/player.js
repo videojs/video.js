@@ -590,7 +590,6 @@ class Player extends Component {
     this.on('ready', () => {
       this.audioPosterMode(this.options_.audioPosterMode);
       this.audioOnlyMode(this.options_.audioOnlyMode);
-
     });
   }
 
@@ -4432,8 +4431,6 @@ class Player extends Component {
     }
 
     this.audioPosterMode_ = value;
-    // eslint-disable-next-line
-    console.log('triggering');
     this.trigger('audiopostermodechange');
 
     const techEl = this.tech_ && this.tech_;
