@@ -2809,11 +2809,13 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
 QUnit.test('audioOnlyMode can be set by option', function(assert) {
   assert.expect(4);
 
+  const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true});
 
   player.one('audioonlymodechange', () => {
     assert.equal(player.audioOnlyMode(), true, 'asynchronously set via option');
     assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class added asynchronously');
+    done();
   });
 
   assert.equal(player.audioOnlyMode(), false, 'defaults to false');
@@ -2827,11 +2829,10 @@ QUnit.test('audioOnlyMode(true) returns Promise when promises are supported', fu
   if (window.Promise) {
     assert.ok(returnValTrue instanceof window.Promise, 'audioOnlyMode(true) returns Promise when supported');
   }
-
-  return returnValTrue;
 });
 
 QUnit.test('audioOnlyMode(false) returns Promise when promises are supported', function(assert) {
+  const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true});
 
   player.one('audioonlymodechange', () => {
@@ -2839,9 +2840,8 @@ QUnit.test('audioOnlyMode(false) returns Promise when promises are supported', f
 
     if (window.Promise) {
       assert.ok(returnValFalse instanceof window.Promise, 'audioOnlyMode(false) returns Promise when supported');
+      done();
     }
-
-    return returnValFalse;
   });
 });
 
