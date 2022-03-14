@@ -1579,23 +1579,19 @@ QUnit.test('default audioPosterMode value at player creation', function(assert) 
   const player2 = TestHelpers.makePlayer({
     audioPosterMode: true
   });
-  const done = assert.async();
 
   player2.trigger('ready');
   player2.one('audiopostermodechange', () => {
     assert.ok(player2.audioPosterMode() === true, 'audioPosterMode can be set to true when the player is created');
-    done();
   });
 });
 
 QUnit.test('get and set audioPosterMode value', function(assert) {
   const player = TestHelpers.makePlayer({});
-  const done = assert.async();
 
   return player.audioPosterMode(true)
     .then(() => {
       assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
-      done();
     });
 });
 
@@ -1619,7 +1615,6 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
   const player = TestHelpers.makePlayer({
     audioPosterMode: true
   });
-  const done = assert.async();
   let triggered = false;
 
   player.trigger('ready');
@@ -1627,8 +1622,27 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
     triggered = true;
     assert.equal(triggered, true, 'audiopostermodechange event was triggered');
     assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
-    done();
   });
+});
+
+QUnit.test('audioPosterMode is synchronous and returns undefined when promises are unsupported', function(assert) {
+  const originalPromise = window.Promise;
+  const player = TestHelpers.makePlayer({});
+
+  player.trigger('ready');
+  window.Promise = undefined;
+
+  const returnValTrue = player.audioPosterMode(true);
+
+  assert.equal(returnValTrue, undefined, 'return value is undefined');
+  assert.ok(player.audioPosterMode(), 'state synchronously set to true');
+
+  const returnValFalse = player.audioPosterMode(false);
+
+  assert.equal(returnValFalse, undefined, 'return value is undefined');
+  assert.notOk(player.audioPosterMode(), 'state synchronously set to false');
+
+  window.Promise = originalPromise;
 });
 
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
@@ -2835,7 +2849,7 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
 });
 
 QUnit.test('audioOnlyMode can be set by option', function(assert) {
-  assert.expect(2);
+  assert.expect(3);
 
   const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true});
@@ -2846,6 +2860,7 @@ QUnit.test('audioOnlyMode can be set by option', function(assert) {
     assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class added asynchronously');
     done();
   });
+  assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'initially does not have class');
 });
 
 QUnit.test('audioOnlyMode(true) returns Promise when promises are supported', function(assert) {
@@ -3098,7 +3113,6 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
 });
 
 QUnit.test('setting both audioOnlyMode and audioPosterMode options to true will only turn audioOnlyMode', function(assert) {
-  const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true, audioPosterMode: true});
 
   player.trigger('ready');
@@ -3106,12 +3120,10 @@ QUnit.test('setting both audioOnlyMode and audioPosterMode options to true will 
   player.one('audioonlymodechange', () => {
     assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
     assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false');
-    done();
   });
 });
 
 QUnit.test('turning on audioOnlyMode when audioPosterMode is already on will turn off audioPosterMode', function(assert) {
-  const done = assert.async();
   const player = TestHelpers.makePlayer({audioPosterMode: true});
 
   player.trigger('ready');
@@ -3120,7 +3132,6 @@ QUnit.test('turning on audioOnlyMode when audioPosterMode is already on will tur
     .then(() => {
       assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false');
       assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
-      done();
     });
 });
 

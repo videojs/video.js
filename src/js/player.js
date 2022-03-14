@@ -4453,18 +4453,18 @@ class Player extends Component {
     if (PromiseClass) {
 
       if (value) {
-        const exitPromises = [];
 
         if (this.audioOnlyMode()) {
-          exitPromises.push(this.audioOnlyMode(false));
+          const audioOnlyModePromise = this.audioOnlyMode(false);
 
-          return PromiseClass.all(exitPromises).then(() => {
+          return audioOnlyModePromise.then(() => {
             // enable audio poster mode after audio only mode is disabled
             this.enablePosterModeUI_();
           });
         }
 
         return PromiseClass.resolve().then(() => {
+          // enable audio poster mode
           this.enablePosterModeUI_();
         });
       }
