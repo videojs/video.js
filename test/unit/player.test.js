@@ -1579,31 +1579,39 @@ QUnit.test('default audioPosterMode value at player creation', function(assert) 
   const player2 = TestHelpers.makePlayer({
     audioPosterMode: true
   });
+  const done = assert.async();
 
   player2.trigger('ready');
-  assert.ok(player2.audioPosterMode() === true, 'audioPosterMode can be set to true when the player is created');
-  player.dispose();
-  player2.dispose();
+  player2.one('audiopostermodechange', () => {
+    assert.ok(player2.audioPosterMode() === true, 'audioPosterMode can be set to true when the player is created');
+    done();
+  });
 });
 
 QUnit.test('get and set audioPosterMode value', function(assert) {
   const player = TestHelpers.makePlayer({});
+  const done = assert.async();
 
-  player.trigger('ready');
-  player.audioPosterMode(true);
-  assert.ok(player.audioPosterMode() === true, 'audioPosterMode is set to true');
+  return player.audioPosterMode(true)
+    .then(() => {
+      assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
+      done();
+    });
 });
 
 QUnit.test('vjs-audio-poster-mode class and video element visibility when audioPosterMode is true', function(assert) {
   const player = TestHelpers.makePlayer({});
+  const done = assert.async();
 
   player.trigger('ready');
-  player.audioPosterMode(true);
-  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') !== -1, 'vjs-audio-poster-mode class is present');
-  assert.ok(player.tech_.el().className.indexOf('vjs-hidden') !== -1, 'video element is hidden');
+  player.audioPosterMode(true)
+    .then(() => {
+      assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') !== -1, 'vjs-audio-poster-mode class is present');
+      assert.ok(player.tech_.el().className.indexOf('vjs-hidden') !== -1, 'video element is hidden');
+      done();
+    });
 
-  player.audioPosterMode(false);
-  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') === -1, 'vjs-audio-poster-mode class is removed');
+  assert.ok(player.el().className.indexOf('vjs-audio-poster-mode') === -1, 'vjs-audio-poster-mode class is not present initially');
   assert.ok(player.tech_.el().className.indexOf('vjs-hidden') === -1, 'video element is visible');
 });
 
@@ -1611,15 +1619,16 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
   const player = TestHelpers.makePlayer({
     audioPosterMode: true
   });
+  const done = assert.async();
   let triggered = false;
 
-  player.on('audiopostermodechange', () => {
-    triggered = true;
-  });
   player.trigger('ready');
-
-  assert.equal(triggered, true, 'audiopostermodechange event was triggered');
-  assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
+  player.one('audiopostermodechange', () => {
+    triggered = true;
+    assert.equal(triggered, true, 'audiopostermodechange event was triggered');
+    assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
+    done();
+  });
 });
 
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
@@ -2826,7 +2835,7 @@ QUnit.test('playbackRates only accepts arrays of numbers', function(assert) {
 });
 
 QUnit.test('audioOnlyMode can be set by option', function(assert) {
-  assert.expect(4);
+  assert.expect(2);
 
   const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true});
@@ -2837,9 +2846,6 @@ QUnit.test('audioOnlyMode can be set by option', function(assert) {
     assert.equal(player.hasClass('vjs-audio-only-mode'), true, 'class added asynchronously');
     done();
   });
-
-  assert.equal(player.audioOnlyMode(), false, 'defaults to false');
-  assert.equal(player.hasClass('vjs-audio-only-mode'), false, 'initially does not have class');
 });
 
 QUnit.test('audioOnlyMode(true) returns Promise when promises are supported', function(assert) {
@@ -3091,7 +3097,7 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
     .catch(() => assert.ok(false, 'test error'));
 });
 
-QUnit.test('setting both audioOnlyMode and audioPosterMode options to true will only turn on audioOnlyMode', function(assert) {
+QUnit.test('setting both audioOnlyMode and audioPosterMode options to true will only turn audioOnlyMode', function(assert) {
   const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true, audioPosterMode: true});
 
@@ -3099,12 +3105,13 @@ QUnit.test('setting both audioOnlyMode and audioPosterMode options to true will 
 
   player.one('audioonlymodechange', () => {
     assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
-    done();
     assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false');
+    done();
   });
 });
 
 QUnit.test('turning on audioOnlyMode when audioPosterMode is already on will turn off audioPosterMode', function(assert) {
+  const done = assert.async();
   const player = TestHelpers.makePlayer({audioPosterMode: true});
 
   player.trigger('ready');
@@ -3113,21 +3120,19 @@ QUnit.test('turning on audioOnlyMode when audioPosterMode is already on will tur
     .then(() => {
       assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false');
       assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
+      done();
     });
 });
 
 QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will turn off audioOnlyMode', function(assert) {
-  const done = assert.async();
   const player = TestHelpers.makePlayer({audioOnlyMode: true});
 
   player.trigger('ready');
-
-  player.one('audioonlymodechange', () => {
-    assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
-    done();
-  });
-  player.audioPosterMode(true);
-  assert.ok(player.audioPosterMode() === true, 'audioPosterMode is true');
-  assert.ok(player.audioOnlyMode() === false, 'audioOnlyMode is false');
+  assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
+  return player.audioPosterMode(true)
+    .then(() => {
+      assert.equal(player.audioPosterMode(), true, 'audioPosterMode is true');
+      assert.equal(player.audioOnlyMode(), false, 'audioOnlyMode is false');
+    });
 });
 
