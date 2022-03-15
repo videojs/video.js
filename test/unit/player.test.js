@@ -1583,7 +1583,7 @@ QUnit.test('default audioPosterMode value at player creation', function(assert) 
 
   player2.trigger('ready');
   player2.one('audiopostermodechange', () => {
-    assert.ok(player2.audioPosterMode() === true, 'audioPosterMode can be set to true when the player is created');
+    assert.ok(player2.audioPosterMode(), 'audioPosterMode can be set to true when the player is created');
     done();
   });
 });
@@ -1593,7 +1593,7 @@ QUnit.test('get and set audioPosterMode value', function(assert) {
 
   return player.audioPosterMode(true)
     .then(() => {
-      assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
+      assert.ok(player.audioPosterMode(), 'audioPosterMode is set to true');
     });
 });
 
@@ -1621,7 +1621,7 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
   player.trigger('ready');
   player.one('audiopostermodechange', () => {
     assert.ok(true, 'audiopostermodechange event was triggered');
-    assert.equal(player.audioPosterMode(), true, 'audioPosterMode is set to true');
+    assert.ok(player.audioPosterMode(), 'audioPosterMode is set to true');
     done();
   });
 });
@@ -3120,8 +3120,8 @@ QUnit.test('setting both audioOnlyMode and audioPosterMode options to true will 
   player.trigger('ready');
 
   player.one('audioonlymodechange', () => {
-    assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
-    assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false');
+    assert.ok(player.audioOnlyMode(), 'audioOnlyMode is true');
+    assert.notOk(player.audioPosterMode(), 'audioPosterMode is false');
     done();
   });
 });
@@ -3130,11 +3130,11 @@ QUnit.test('turning on audioOnlyMode when audioPosterMode is already on will tur
   const player = TestHelpers.makePlayer({audioPosterMode: true});
 
   player.trigger('ready');
-  assert.ok(player.audioPosterMode() === true, 'audioPosterMode is true');
+  assert.ok(player.audioPosterMode(), 'audioPosterMode is true');
   return player.audioOnlyMode(true)
     .then(() => {
-      assert.ok(player.audioPosterMode() === false, 'audioPosterMode is false');
-      assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
+      assert.notOk(player.audioPosterMode(), 'audioPosterMode is false');
+      assert.ok(player.audioOnlyMode(), 'audioOnlyMode is true');
     });
 });
 
@@ -3142,11 +3142,11 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
   const player = TestHelpers.makePlayer({audioOnlyMode: true});
 
   player.trigger('ready');
-  assert.ok(player.audioOnlyMode() === true, 'audioOnlyMode is true');
+  assert.ok(player.audioOnlyMode(), 'audioOnlyMode is true');
   return player.audioPosterMode(true)
     .then(() => {
-      assert.equal(player.audioPosterMode(), true, 'audioPosterMode is true');
-      assert.equal(player.audioOnlyMode(), false, 'audioOnlyMode is false');
+      assert.ok(player.audioPosterMode(), 'audioPosterMode is true');
+      assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
 });
 
