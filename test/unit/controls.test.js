@@ -287,10 +287,14 @@ QUnit.test('Picture-in-Picture control is hidden when the source is audio', func
   const player = TestHelpers.makePlayer({});
   const pictureInPictureToggle = new PictureInPictureToggle(player);
 
-  player.src({src: 'example.mp3', type: 'audio/mp3'});
-
+  player.src({src: 'example.mp4', type: 'video/mp4'});
   player.trigger('loadedmetadata');
-  assert.equal(pictureInPictureToggle.hasClass('vjs-hidden'), true, 'pictureInPictureToggle button hidden');
+
+  assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+
+  player.src({src: 'example1.mp3', type: 'audio/mp3'});
+  player.trigger('loadedmetadata');
+  assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden whenh the source is audio');
 
   player.dispose();
   pictureInPictureToggle.dispose();

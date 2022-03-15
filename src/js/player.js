@@ -587,7 +587,11 @@ class Player extends Component {
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
 
+    // Calling both the audio mode mothods after the player is fully
+    // setup to be able to listen to the events triggered by them
     this.on('ready', () => {
+      // Calling the audioPosterMode method first so that
+      // the audioOnlyMode can take precedence when both options are set to true
       this.audioPosterMode(this.options_.audioPosterMode);
       this.audioOnlyMode(this.options_.audioOnlyMode);
     });
