@@ -30,6 +30,7 @@ class PictureInPictureToggle extends Button {
     this.on(player, ['disablepictureinpicturechanged', 'loadedmetadata'], (e) => this.handlePictureInPictureEnabledChange(e));
 
     this.on(player, ['loadedmetadata', 'audioonlymodechange', 'audiopostermodechange'], () => {
+      // This audio detection will not detect HLS or DASH audio-only streams because there was no reliable way to detect them at the time
       const isSourceAudio = player.currentType().substring(0, 5) === 'audio';
 
       if (isSourceAudio || player.audioPosterMode() || player.audioOnlyMode()) {
