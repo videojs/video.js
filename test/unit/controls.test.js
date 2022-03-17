@@ -283,6 +283,23 @@ QUnit.test('Picture-in-Picture control enabled property value should be correct 
   pictureInPictureToggle.dispose();
 });
 
+QUnit.test('Picture-in-Picture control is hidden when the source is audio', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.src({src: 'example.mp4', type: 'video/mp4'});
+  player.trigger('loadedmetadata');
+
+  assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+
+  player.src({src: 'example1.mp3', type: 'audio/mp3'});
+  player.trigger('loadedmetadata');
+  assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden whenh the source is audio');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
   const player = TestHelpers.makePlayer({controlBar: false});
   const fullscreentoggle = new FullscreenToggle(player);
