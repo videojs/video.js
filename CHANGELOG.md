@@ -1,3 +1,33 @@
+<a name="7.19.0"></a>
+# [7.19.0](https://github.com/videojs/video.js/compare/v7.18.1...v7.19.0) (2022-03-21)
+
+### Features
+
+* Add audioPosterMode option ([#7629](https://github.com/videojs/video.js/issues/7629)) ([64e55f5](https://github.com/videojs/video.js/commit/64e55f5))
+* Add Basque (eu) translations ([#7625](https://github.com/videojs/video.js/issues/7625)) ([a80307f](https://github.com/videojs/video.js/commit/a80307f))
+* Assume DASH MIME type when an MPD source URL is given ([#7602](https://github.com/videojs/video.js/issues/7602)) ([a0bb526](https://github.com/videojs/video.js/commit/a0bb526))
+* Audio Only Mode ([#7647](https://github.com/videojs/video.js/issues/7647)) ([762e7bc](https://github.com/videojs/video.js/commit/762e7bc))
+* easier configuration of buttons and components via options ([#7611](https://github.com/videojs/video.js/issues/7611)) ([28bdc7d](https://github.com/videojs/video.js/commit/28bdc7d))
+* Greater text track precision using requestVideoFrameCallback ([#7633](https://github.com/videojs/video.js/issues/7633)) ([1179826](https://github.com/videojs/video.js/commit/1179826))
+
+### Bug Fixes
+
+* async audio only tests ([#7673](https://github.com/videojs/video.js/issues/7673)) ([ebb2d09](https://github.com/videojs/video.js/commit/ebb2d09))
+* generate chapters menu only when needed and don't create orphaned event listeners ([#7604](https://github.com/videojs/video.js/issues/7604)) ([5af81ca](https://github.com/videojs/video.js/commit/5af81ca))
+* text-track-display position with no ui ([#7682](https://github.com/videojs/video.js/issues/7682)) ([337ff2f](https://github.com/videojs/video.js/commit/337ff2f)), closes [#7681](https://github.com/videojs/video.js/issues/7681)
+
+### Chores
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).14.0 ([#7676](https://github.com/videojs/video.js/issues/7676)) ([b275a15](https://github.com/videojs/video.js/commit/b275a15))
+
+### Code Refactoring
+
+* Unify audioOnly mode and audioPoster mode ([#7678](https://github.com/videojs/video.js/issues/7678)) ([eeff79c](https://github.com/videojs/video.js/commit/eeff79c))
+
+### Tests
+
+* **text-track-controls:** fix failing test caused by incompatibility between PRs ([#7686](https://github.com/videojs/video.js/issues/7686)) ([58a8bd0](https://github.com/videojs/video.js/commit/58a8bd0))
+
 <a name="7.18.1"></a>
 ## [7.18.1](https://github.com/videojs/video.js/compare/v7.18.0...v7.18.1) (2022-02-23)
 
