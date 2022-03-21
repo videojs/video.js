@@ -527,3 +527,46 @@ QUnit.test('chapters should be displayed when remote track added and load event 
 
   player.dispose();
 });
+
+QUnit.test('chapters button should update selected menu item', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1000);
+
+  const chaptersEl = player.addRemoteTextTrack(chaptersTrack, true);
+
+  chaptersEl.track.addCue({
+    startTime: 0,
+    endTime: 2,
+    text: 'Chapter 1'
+  });
+  chaptersEl.track.addCue({
+    startTime: 2,
+    endTime: 4,
+    text: 'Chapter 2'
+  });
+
+  assert.equal(chaptersEl.track.cues.length, 2);
+
+  if (player.tech_.featuresNativeTextTracks) {
+    TestHelpers.triggerDomEvent(chaptersEl, 'load');
+  } else {
+    chaptersEl.trigger('load');
+  }
+
+  const menuItems = player.controlBar.chaptersButton.items;
+
+  assert.ok(menuItems.find(i => i.isSelected_) === menuItems[0], 'item with startTime 0 selected on init');
+
+  player.currentTime(4);
+  player.trigger('timeupdate');
+
+  assert.ok(menuItems.find(i => i.isSelected_) === menuItems[1], 'second item selected on cuechange');
+
+  player.currentTime(1);
+  player.trigger('timeupdate');
+
+  assert.ok(menuItems.find(i => i.isSelected_) === menuItems[0], 'first item selected on cuechange');
+
+  player.dispose();
+});
