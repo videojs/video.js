@@ -140,3 +140,17 @@ QUnit.test('language change should localize its text', function(assert) {
   testClickableComponent.dispose();
   player.dispose();
 });
+
+QUnit.test('class and text should be settable from options', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const testClickableComponent = new ClickableComponent(player, {
+    className: 'class1',
+    controlText: 'some text'
+  });
+
+  assert.equal(testClickableComponent.controlText(), 'some text', 'text was set');
+  assert.ok(testClickableComponent.hasClass('class1'), 'class was set');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});

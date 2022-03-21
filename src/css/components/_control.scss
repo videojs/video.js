@@ -9,8 +9,14 @@
   height: 100%;
   width: 4em;
   @include flex(none);
-
 }
+
+.video-js .vjs-control.vjs-visible-text {
+  width: auto;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
 .vjs-button > .vjs-icon-placeholder:before {
   font-size: 1.8em;
   line-height: 1.67;
@@ -30,7 +36,7 @@
 }
 
 // Hide control text visually, but have it available for screenreaders
-.video-js .vjs-control-text {
+.video-js *:not(.vjs-visible-text) > .vjs-control-text {
   @include hide-visually;
 }
 

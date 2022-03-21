@@ -63,9 +63,10 @@ console.log(button.el());
 The above code will output
 
 ```html
-<div class="video-js">
-  <div class="vjs-button">Button</div>
-</div>
+<button class="vjs-control vjs-button" type="button" aria-disabled="false">
+  <span class="vjs-icon-placeholder" aria-hidden="true"></span>
+  <span class="vjs-control-text" aria-live="polite"></span>
+</button>
 ```
 
 Adding the new button to the player
@@ -77,6 +78,30 @@ var button = player.addChild('button');
 
 console.log(button.el());
 // will have the same html result as the previous example
+```
+
+The text of the button can be set as an option:
+
+```js
+const myButton = player.addChild('button', {controlText: 'abc'});
+```
+
+or set later:
+
+```js
+myButton.controlText('def');
+```
+
+The control text of a button is normally not visible (but present for screen readers) as the default buttons all display only an icon. The text can be displayed by adding a `vjs-text-visible` class to the button. This or any other class may be set as a setup option, or later by API.
+
+```js
+const myButton = player.addChild('button', {className: 'vjs-text-visible'});
+```
+
+or set later:
+
+```js
+myButton.addClass('vjs-text-visible');
 ```
 
 ## Component Children
