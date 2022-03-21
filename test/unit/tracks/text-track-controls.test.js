@@ -559,12 +559,12 @@ QUnit.test('chapters button should update selected menu item', function(assert) 
   assert.ok(menuItems.find(i => i.isSelected_) === menuItems[0], 'item with startTime 0 selected on init');
 
   player.currentTime(4);
-  player.trigger('timeupdate');
+  chaptersEl.track.timeupdateHandler();
 
   assert.ok(menuItems.find(i => i.isSelected_) === menuItems[1], 'second item selected on cuechange');
 
   player.currentTime(1);
-  player.trigger('timeupdate');
+  chaptersEl.track.timeupdateHandler();
 
   assert.ok(menuItems.find(i => i.isSelected_) === menuItems[0], 'first item selected on cuechange');
 
