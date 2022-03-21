@@ -9,6 +9,7 @@
 }
 
 // Move captions down when controls aren't being shown
+.video-js.vjs-controls-disabled .vjs-text-track-display,
 .video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
   bottom: 1em;
 }
@@ -30,6 +31,7 @@ video::-webkit-media-text-track-display {
 }
 
 // Move captions down when controls aren't being shown
+.video-js.vjs-controls-disabled video::-webkit-media-text-track-display,
 .video-js.vjs-user-inactive.vjs-playing video::-webkit-media-text-track-display {
   @include transform(translateY(-1.5em));
 }
