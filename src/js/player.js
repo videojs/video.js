@@ -3471,7 +3471,7 @@ class Player extends Component {
   resetProgressBar_() {
     this.currentTime(0);
 
-    const { durationDisplay, remainingTimeDisplay } = this.controlBar;
+    const { durationDisplay, remainingTimeDisplay } = this.controlBar || {};
 
     if (durationDisplay) {
       durationDisplay.updateContent();
