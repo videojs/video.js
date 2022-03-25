@@ -2066,6 +2066,23 @@ QUnit.test('player#reset removes remote text tracks', function(assert) {
   log.warn.restore();
 });
 
+QUnit.test('player#reset progress bar', function(assert) {
+
+  let error;
+
+  const player = TestHelpers.makePlayer();
+
+  player.removeChild('controlBar');
+
+  try {
+    player.resetProgressBar_();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on resetProgressBar');
+});
+
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
   const player = TestHelpers.makePlayer();
 
