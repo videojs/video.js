@@ -2073,6 +2073,7 @@ QUnit.test('player#reset progress bar', function(assert) {
   const player = TestHelpers.makePlayer();
 
   player.removeChild('controlBar');
+  player.controlBar = null;
 
   try {
     player.resetProgressBar_();
