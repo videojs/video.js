@@ -207,7 +207,7 @@ if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
         height: 150px;
       }
 
-      .vjs-fluid {
+      .vjs-fluid:not(.vjs-audio-only-mode) {
         padding-top: 56.25%
       }
     `);
