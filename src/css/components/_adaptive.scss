@@ -34,16 +34,19 @@
     .vjs-subtitles-button,
     .vjs-audio-button,
     .vjs-volume-control {
-      display: none !important;
+      display: none;
     }
 
     // Reset the size of the volume panel to the default so we don't see a big
     // empty space to the right of the mute button.
-    .vjs-volume-panel.vjs-volume-panel-horizontal:hover,
-    .vjs-volume-panel.vjs-volume-panel-horizontal:active,
-    .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
-      width: auto;
-      width: initial;
+    .vjs-volume-panel.vjs-volume-panel-horizontal {
+      &:hover,
+      &:active,
+      &.vjs-slider-active,
+      &.vjs-hover {
+        width: auto;
+        width: initial;
+      }
     }
   }
 

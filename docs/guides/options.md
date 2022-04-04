@@ -7,6 +7,7 @@
 * [Standard &lt;video> Element Options](#standard-video-element-options)
   * [autoplay](#autoplay)
     * [More info on autoplay support and changes:](#more-info-on-autoplay-support-and-changes)
+  * [controlBar.remainingTimeDisplay.displayNegative](#controlbarremainingtimedisplaydisplaynegative)
   * [controls](#controls)
   * [height](#height)
   * [loop](#loop)
@@ -45,6 +46,7 @@
   * [techCanOverridePoster](#techcanoverrideposter)
   * [techOrder](#techorder)
   * [userActions](#useractions)
+  * [userActions.click](#useractionsclick)
   * [userActions.doubleClick](#useractionsdoubleclick)
   * [userActions.hotkeys](#useractionshotkeys)
   * [userActions.hotkeys.fullscreenKey](#useractionshotkeysfullscreenkey)
@@ -98,6 +100,12 @@ player.autoplay('muted');
 #### More info on autoplay support and changes:
 
 * See our blog post: [Autoplay Best Practices with Video.js](https://videojs.com/blog/autoplay-best-practices-with-video-js/)
+
+### `controlBar.remainingTimeDisplay.displayNegative`
+
+> Type: `boolean`
+
+Bu default the remaining time display shows as negative time. To not show the negative sign set `controlBar.remainingTimeDisplay.displayNegative` to `false`.
 
 ### `controls`
 
@@ -279,9 +287,9 @@ and you will not be able click the text to seek to the live edge. `liveui` will 
 ### `liveTracker.trackingThreshold`
 
 > Type: `number`
-> Default: `30`
+> Default: `20`
 
-An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 30s on the seekBar then we do not show the new liveui even with the liveui option set.
+An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 20s on the seekBar then we do not show the new liveui even with the liveui option set.
 
 ### `liveTracker.liveTolerance`
 
@@ -442,6 +450,40 @@ Defines the order in which Video.js techs are preferred. By default, this means 
 ### `userActions`
 
 > Type: `Object`
+
+### `userActions.click`
+
+> Type: `boolean|function`
+
+Controls how clicking on the player/tech operates. If set to `false`, clicking is disabled and will no longer cause the player to toggle between paused and playing.
+
+```js
+videojs('my-player', {
+  userActions: {
+    click: false
+  }
+});
+```
+
+If undefined or set to `true`, clicking is enabled and toggles the player between paused and play. To override the default click handling, set `userActions.click` to a function which accepts a `click` event (in this example it will request Full Screen, the same as a `userAction.doubleClick`):
+
+```js
+function myClickHandler(event) = {
+  // `this` is the player in this context
+
+  if (this.isFullscreen()) {
+      this.exitFullscreen();
+    } else {
+      this.requestFullscreen();
+    }
+};
+
+videojs('my-player', {
+  userActions: {
+    click: myClickHandler
+  }
+});
+```
 
 ### `userActions.doubleClick`
 

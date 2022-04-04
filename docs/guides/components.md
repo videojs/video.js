@@ -219,7 +219,7 @@ myComponent.on(otherComponent, 'eventName', myFunc);
 
 otherComponent.trigger('eventName');
 // logs 'myFunc called' twice
-myComponent.off(ootherComponent.el(), 'eventName', myFunc);
+myComponent.off(otherComponent.el(), 'eventName', myFunc);
 myComponent.off(otherComponent, 'eventName', myFunc);
 otherComponent.trigger('eventName');
 // does nothing

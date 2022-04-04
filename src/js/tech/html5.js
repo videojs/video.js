@@ -877,12 +877,12 @@ class Html5 extends Tech {
    *
    * @param {Object} options The object should contain values for
    * kind, language, label, and src (location of the WebVTT file)
-   * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
-   * automatically removed from the video element whenever the source changes
+   * @param {boolean} [manualCleanup=false] if set to true, the TextTrack
+   * will not be removed from the TextTrackList and HtmlTrackElementList
+   * after a source change
    * @return {HTMLTrackElement} An Html Track Element.
    * This can be an emulated {@link HTMLTrackElement} or a native one.
-   * @deprecated The default value of the "manualCleanup" parameter will default
-   * to "false" in upcoming versions of Video.js
+   *
    */
   addRemoteTextTrack(options, manualCleanup) {
     const htmlTrackElement = super.addRemoteTextTrack(options, manualCleanup);
@@ -1032,7 +1032,26 @@ Html5.canControlVolume = function() {
     const volume = Html5.TEST_VID.volume;
 
     Html5.TEST_VID.volume = (volume / 2) + 0.1;
-    return volume !== Html5.TEST_VID.volume;
+
+    const canControl = volume !== Html5.TEST_VID.volume;
+
+    // With the introduction of iOS 15, there are cases where the volume is read as
+    // changed but reverts back to its original state at the start of the next tick.
+    // To determine whether volume can be controlled on iOS,
+    // a timeout is set and the volume is checked asynchronously.
+    // Since `features` doesn't currently work asynchronously, the value is manually set.
+    if (canControl && browser.IS_IOS) {
+      window.setTimeout(() => {
+        if (Html5 && Html5.prototype) {
+          Html5.prototype.featuresVolumeControl = volume !== Html5.TEST_VID.volume;
+        }
+      });
+
+      // default iOS to false, which will be updated in the timeout above.
+      return false;
+    }
+
+    return canControl;
   } catch (e) {
     return false;
   }
@@ -1227,7 +1246,6 @@ Html5.Events = [
  * @default {@link Html5.supportsNativeAudioTracks}
  */
 [
-  ['featuresVolumeControl', 'canControlVolume'],
   ['featuresMuteControl', 'canMuteVolume'],
   ['featuresPlaybackRate', 'canControlPlaybackRate'],
   ['featuresSourceset', 'canOverrideAttributes'],
@@ -1237,6 +1255,8 @@ Html5.Events = [
 ].forEach(function([key, fn]) {
   defineLazyProperty(Html5.prototype, key, () => Html5[fn](), true);
 });
+
+Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 
 /**
  * Boolean indicating whether the `HTML5` tech currently supports the media element

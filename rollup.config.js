@@ -14,6 +14,7 @@ import stub from 'rollup-plugin-stub';
 import isCI from 'is-ci';
 import replace from '@rollup/plugin-replace';
 import istanbul from 'rollup-plugin-istanbul';
+import externalGlobals from 'rollup-plugin-external-globals';
 
 const excludeCoverage = [
   'test/**',
@@ -78,6 +79,11 @@ const primedBabel = babel({
     ['@babel/plugin-transform-runtime', {regenerator: false}]
   ]
 });
+const primedExternalGlobals = externalGlobals({
+  'global': 'window',
+  'global/window': 'window',
+  'global/document': 'document'
+});
 
 const progress = () => {
   if (isCI) {
@@ -89,9 +95,6 @@ const progress = () => {
 
 const globals = {
   browser: {
-    'global': 'window',
-    'global/window': 'window',
-    'global/document': 'document'
   },
   module: {
   },
@@ -144,6 +147,7 @@ export default cliargs => [
       }),
       primedResolve,
       json(),
+      primedExternalGlobals,
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -168,6 +172,7 @@ export default cliargs => [
       }),
       primedResolve,
       json(),
+      primedExternalGlobals,
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -254,6 +259,7 @@ export default cliargs => [
       }),
       primedResolve,
       json(),
+      primedExternalGlobals,
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -300,6 +306,7 @@ export default cliargs => [
     plugins: [
       primedResolve,
       json(),
+      primedExternalGlobals,
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}
@@ -322,6 +329,7 @@ export default cliargs => [
       primedIgnore,
       primedResolve,
       json(),
+      primedExternalGlobals,
       primedCjs,
       primedBabel,
       cliargs.progress !== false ? progress() : {}

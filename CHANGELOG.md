@@ -1,3 +1,108 @@
+<a name="7.18.0"></a>
+# [7.18.0](https://github.com/videojs/video.js/compare/v7.17.3...v7.18.0) (2021-12-20)
+
+### Features
+
+* make negative sign on remaining time optional ([#7571](https://github.com/videojs/video.js/issues/7571)) ([67e6ed6](https://github.com/videojs/video.js/commit/67e6ed6)), closes [#7565](https://github.com/videojs/video.js/issues/7565)
+* udpate to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).13.1 ([#7573](https://github.com/videojs/video.js/issues/7573)) ([9aaf67a](https://github.com/videojs/video.js/commit/9aaf67a))
+
+<a name="7.17.3"></a>
+## [7.17.3](https://github.com/videojs/video.js/compare/v7.17.2...v7.17.3) (2021-12-10)
+
+### Bug Fixes
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming[@2](https://github.com/2).12.1 ([#7563](https://github.com/videojs/video.js/issues/7563)) ([01893ab](https://github.com/videojs/video.js/commit/01893ab))
+
+<a name="7.17.2"></a>
+## [7.17.2](https://github.com/videojs/video.js/compare/v7.17.1...v7.17.2) (2021-12-08)
+
+### Bug Fixes
+
+* regression with AD audio track menu items ([#7559](https://github.com/videojs/video.js/issues/7559)) ([1d4bad8](https://github.com/videojs/video.js/commit/1d4bad8)), closes [#7337](https://github.com/videojs/video.js/issues/7337) [#7556](https://github.com/videojs/video.js/issues/7556)
+* volume control showing up on iOS ([#7550](https://github.com/videojs/video.js/issues/7550)) ([3c21345](https://github.com/videojs/video.js/commit/3c21345)), closes [#7514](https://github.com/videojs/video.js/issues/7514)
+
+### Chores
+
+* fix typo in COLLABORATOR_GUIDE ([#7537](https://github.com/videojs/video.js/issues/7537)) ([d38806d](https://github.com/videojs/video.js/commit/d38806d))
+
+<a name="7.17.1"></a>
+## [7.17.1](https://github.com/videojs/video.js/compare/v7.17.0...v7.17.1) (2021-11-17)
+
+### Bug Fixes
+
+* don't always use fastSeek when available. ([#7527](https://github.com/videojs/video.js/issues/7527)) ([df927de](https://github.com/videojs/video.js/commit/df927de))
+* improve enabling liveui when switching sources ([#7510](https://github.com/videojs/video.js/issues/7510)) ([6c67c30](https://github.com/videojs/video.js/commit/6c67c30)), closes [#7114](https://github.com/videojs/video.js/issues/7114)
+* try again on volume feature detection on iOS ([#7514](https://github.com/videojs/video.js/issues/7514)) ([1d96d1c](https://github.com/videojs/video.js/commit/1d96d1c)), closes [#7040](https://github.com/videojs/video.js/issues/7040)
+* turn off other tracks with native audio track ([#7519](https://github.com/videojs/video.js/issues/7519)) ([115a047](https://github.com/videojs/video.js/commit/115a047)), closes [#7163](https://github.com/videojs/video.js/issues/7163) [#7163](https://github.com/videojs/video.js/issues/7163) [#7494](https://github.com/videojs/video.js/issues/7494)
+
+### Chores
+
+* **sandbox:** update embeds media to use public url ([#7530](https://github.com/videojs/video.js/issues/7530)) ([8f580cc](https://github.com/videojs/video.js/commit/8f580cc))
+
+<a name="7.17.0"></a>
+# [7.17.0](https://github.com/videojs/video.js/compare/v7.16.0...v7.17.0) (2021-11-10)
+
+### Features
+
+* Add userAction.click to prevent pause/play when player is clicked ([#7495](https://github.com/videojs/video.js/issues/7495)) ([749105d](https://github.com/videojs/video.js/commit/749105d)), closes [#7123](https://github.com/videojs/video.js/issues/7123)
+* **lang:** Add Latvian (lv) language support ([#7468](https://github.com/videojs/video.js/issues/7468)) ([b97be4d](https://github.com/videojs/video.js/commit/b97be4d))
+* update to VHS 2.12.0 ([#7503](https://github.com/videojs/video.js/issues/7503)) ([b1760c5](https://github.com/videojs/video.js/commit/b1760c5))
+
+### Bug Fixes
+
+* **lang:** Update zh-TW.json ([#7483](https://github.com/videojs/video.js/issues/7483)) ([11228cf](https://github.com/videojs/video.js/commit/11228cf))
+* don't let the player be translated except captions ([#7474](https://github.com/videojs/video.js/issues/7474)) ([bcd80f9](https://github.com/videojs/video.js/commit/bcd80f9)), closes [#6699](https://github.com/videojs/video.js/issues/6699) [#6977](https://github.com/videojs/video.js/issues/6977)
+* enable liveui on more livestreams ([#7502](https://github.com/videojs/video.js/issues/7502)) ([e9e894f](https://github.com/videojs/video.js/commit/e9e894f))
+* volume button empty space ([#7466](https://github.com/videojs/video.js/issues/7466)) ([78cf834](https://github.com/videojs/video.js/commit/78cf834)), closes [#7465](https://github.com/videojs/video.js/issues/7465)
+* **lang:** Update Polish translation ([#7499](https://github.com/videojs/video.js/issues/7499)) ([b061491](https://github.com/videojs/video.js/commit/b061491))
+* set the 'lang' attribute on text track display elements, if the language of the track is known ([#7493](https://github.com/videojs/video.js/issues/7493)) ([f326cf3](https://github.com/videojs/video.js/commit/f326cf3)), closes [#7487](https://github.com/videojs/video.js/issues/7487)
+* **package:** update to VHS 2.11.2 ([#7484](https://github.com/videojs/video.js/issues/7484)) ([6faad26](https://github.com/videojs/video.js/commit/6faad26))
+
+### Documentation
+
+* fix a comment of the player's loadedmetadata event ([#7506](https://github.com/videojs/video.js/issues/7506)) ([ca2f5a3](https://github.com/videojs/video.js/commit/ca2f5a3))
+* **react:** fix clear when unmount component ([#7433](https://github.com/videojs/video.js/issues/7433)) ([fdb87d8](https://github.com/videojs/video.js/commit/fdb87d8)), closes [#7361](https://github.com/videojs/video.js/issues/7361)
+* fix typo in html-track-element.js ([#7504](https://github.com/videojs/video.js/issues/7504)) ([8e8b7be](https://github.com/videojs/video.js/commit/8e8b7be))
+* **component.md:** fix spelling error ([#7498](https://github.com/videojs/video.js/issues/7498)) ([e60f2ca](https://github.com/videojs/video.js/commit/e60f2ca))
+
+### Tests
+
+* add tests for the click user action ([#7507](https://github.com/videojs/video.js/issues/7507)) ([8abe438](https://github.com/videojs/video.js/commit/8abe438)), closes [#7495](https://github.com/videojs/video.js/issues/7495)
+
+<a name="7.16.0"></a>
+# [7.16.0](https://github.com/videojs/video.js/compare/v7.15.7...v7.16.0) (2021-10-01)
+
+### Features
+
+* **lang:** add telugu language translations ([#7391](https://github.com/videojs/video.js/issues/7391)) ([0558096](https://github.com/videojs/video.js/commit/0558096))
+* **package:** update to VHS 2.11.0 ([#7459](https://github.com/videojs/video.js/issues/7459)) ([b05ee91](https://github.com/videojs/video.js/commit/b05ee91))
+
+<a name="7.15.7"></a>
+## [7.15.7](https://github.com/videojs/video.js/compare/v7.15.6...v7.15.7) (2021-10-01)
+
+### Bug Fixes
+
+* remove rule on small layout ([#7449](https://github.com/videojs/video.js/issues/7449)) ([1d91831](https://github.com/videojs/video.js/commit/1d91831))
+
+<a name="7.15.6"></a>
+## [7.15.6](https://github.com/videojs/video.js/compare/v7.15.5...v7.15.6) (2021-09-22)
+
+### Bug Fixes
+
+* mark global/window/document as external globals ([#7438](https://github.com/videojs/video.js/issues/7438)) ([029e92a](https://github.com/videojs/video.js/commit/029e92a))
+
+<a name="7.15.5"></a>
+## [7.15.5](https://github.com/videojs/video.js/compare/v7.15.4...v7.15.5) (2021-09-21)
+
+### Bug Fixes
+
+* **package:** update VHS to 2.10.3 to fix seeking into a gap ([#7436](https://github.com/videojs/video.js/issues/7436)) ([6c68f95](https://github.com/videojs/video.js/commit/6c68f95))
+* remove deprecation of getComponent feature ([#7410](https://github.com/videojs/video.js/issues/7410)) ([6d39ee2](https://github.com/videojs/video.js/commit/6d39ee2))
+
+### Documentation
+
+* **plugins:** fix typo in the plugins guide ([#7405](https://github.com/videojs/video.js/issues/7405)) ([3ea078d](https://github.com/videojs/video.js/commit/3ea078d))
+
 <a name="7.15.4"></a>
 ## [7.15.4](https://github.com/videojs/video.js/compare/v7.15.3...v7.15.4) (2021-08-25)
 

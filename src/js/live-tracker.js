@@ -6,7 +6,7 @@ import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
 const defaults = {
-  trackingThreshold: 30,
+  trackingThreshold: 20,
   liveTolerance: 15
 };
 
@@ -28,7 +28,7 @@ class LiveTracker extends Component {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {number} [options.trackingThreshold=30]
+   * @param {number} [options.trackingThreshold=20]
    *        Number of seconds of live window (seekableEnd - seekableStart) that
    *        media needs to have before the liveui will be shown.
    *
@@ -56,7 +56,7 @@ class LiveTracker extends Component {
     this.on(this.player_, 'durationchange', (e) => this.handleDurationchange(e));
     // we should try to toggle tracking on canplay as native playback engines, like Safari
     // may not have the proper values for things like seekableEnd until then
-    this.one(this.player_, 'canplay', () => this.toggleTracking());
+    this.on(this.player_, 'canplay', () => this.toggleTracking());
 
     // we don't need to track live playback if the document is hidden,
     // also, tracking when the document is hidden can

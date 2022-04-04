@@ -144,7 +144,7 @@ const TECH_EVENTS_RETRIGGER = [
    * @type {EventTarget~Event}
    */
   /**
-   * Retrigger the `stalled` event that was triggered by the {@link Tech}.
+   * Retrigger the `loadedmetadata` event that was triggered by the {@link Tech}.
    *
    * @private
    * @method Player#handleTechLoadedmetadata_
@@ -802,6 +802,8 @@ class Player extends Component {
     // Set lang attr on player to ensure CSS :lang() in consistent with player
     // if it's been set to something different to the doc
     this.el_.setAttribute('lang', this.language_);
+
+    this.el_.setAttribute('translate', 'no');
 
     this.el_ = el;
 
@@ -1934,10 +1936,26 @@ class Player extends Component {
       return;
     }
 
-    if (this.paused()) {
-      silencePromise(this.play());
-    } else {
-      this.pause();
+    if (
+      this.options_ === undefined ||
+      this.options_.userActions === undefined ||
+      this.options_.userActions.click === undefined ||
+      this.options_.userActions.click !== false
+    ) {
+
+      if (
+        this.options_ !== undefined &&
+        this.options_.userActions !== undefined &&
+        typeof this.options_.userActions.click === 'function'
+      ) {
+
+        this.options_.userActions.click.call(this, event);
+
+      } else if (this.paused()) {
+        silencePromise(this.play());
+      } else {
+        this.pause();
+      }
     }
   }
 
@@ -4301,23 +4319,20 @@ class Player extends Component {
 
   /**
    * Create a remote {@link TextTrack} and an {@link HTMLTrackElement}.
-   * When manualCleanup is set to false, the track will be automatically removed
-   * on source changes.
    *
    * @param {Object} options
    *        Options to pass to {@link HTMLTrackElement} during creation. See
    *        {@link HTMLTrackElement} for object properties that you should use.
    *
-   * @param {boolean} [manualCleanup=true] if set to false, the TextTrack will be
-   *                                       removed on a source change
+   * @param {boolean} [manualCleanup=false] if set to true, the TextTrack will not be removed
+   *                                        from the TextTrackList and HtmlTrackElementList
+   *                                        after a source change
    *
    * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
    *         to the HtmlTrackElementList and the remote
    *         TextTrackList
    *
-   * @deprecated The default value of the "manualCleanup" parameter will default
-   *             to "false" in upcoming versions of Video.js
    */
   addRemoteTextTrack(options, manualCleanup) {
     if (this.tech_) {

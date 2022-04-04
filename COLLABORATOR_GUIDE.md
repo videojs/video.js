@@ -65,7 +65,7 @@ If you are unsure about the modification and cannot take responsibility for it, 
 
 Before merging the change, it should be left open for other core committers to comment on. At least 24 hours during a weekday, and the 48 hours on a weekend. Trivial changes or bug fixes that have been reviewed by multiple committers may be merged without delay.
 
-For non-breaking changes, if there is no disagreeming between the collaborators, the PR may be landed assuming it was reviewed. If there is still disagreement, it may need to be [escalated to the TSC](#involving-the-tsc).
+For non-breaking changes, if there is no disagreement between the collaborators, the PR may be landed assuming it was reviewed. If there is still disagreement, it may need to be [escalated to the TSC](#involving-the-tsc).
 
 Bug fixes require a test case that fails beforehand and succeeds after. All code changes should contain tests and pass on the CI.
 
