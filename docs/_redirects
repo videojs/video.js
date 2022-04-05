@@ -1,0 +1,3 @@
+# Netlify redirects to redirect old tutorial pages to new guide pages
+/tutorial-*.html                   https://videojs.com/guides/:splat
+/tutorial-angular.html             https://videojs.com/guides/angular

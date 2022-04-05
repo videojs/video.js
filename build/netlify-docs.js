@@ -19,5 +19,5 @@ if (process.env.BRANCH === 'main' && semver.valid(output.trim()) === null) {
   // in version control.
   const docsPath = path.join(__dirname, '..', 'docs');
 
-  sh.mv(path.join(docsPath, '_redirects'), path.join(docsPath, 'api', '_redirects'));
+  sh.cp(path.join(docsPath, '_redirects'), path.join(docsPath, 'api', '_redirects'));
 }
