@@ -3,8 +3,6 @@
  * @module extend
  */
 
-import _inherits from '@babel/runtime/helpers/inherits';
-
 /**
  * Used to subclass an existing class by emulating ES subclassing using the
  * `extends` keyword.
@@ -27,9 +25,17 @@ import _inherits from '@babel/runtime/helpers/inherits';
  *           The new class with subClassMethods that inherited superClass.
  */
 const extend = function(superClass, subClassMethods = {}) {
-  let subClass = function() {
-    superClass.apply(this, arguments);
-  };
+  let subClass;
+
+  // If the provided super class is a native ES6 class,
+  // make the sub class one as well.
+  if (/^class/.test(superClass.toString())) {
+    subClass = class SubClass extends superClass {};
+  } else {
+    subClass = function() {
+      superClass.apply(this, arguments);
+    };
+  }
 
   let methods = {};
 
@@ -41,8 +47,6 @@ const extend = function(superClass, subClassMethods = {}) {
   } else if (typeof subClassMethods === 'function') {
     subClass = subClassMethods;
   }
-
-  _inherits(subClass, superClass);
 
   // this is needed for backward-compatibility and node compatibility.
   if (superClass) {
