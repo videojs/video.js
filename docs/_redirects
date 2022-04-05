@@ -1,3 +1,5 @@
 # Netlify redirects to redirect old tutorial pages to new guide pages
 https://docs.videojs.com/tutorial-*.html                   https://videojs.com/guides/:splat                301!
 https://docs.videojs.com/tutorial-angular.html             https://videojs.com/guides/angular               301!
+https://deploy-preview-7706--videojs-docs.netlify.app/tutorial-*.html                   https://videojs.com/guides/:splat                301!
+https://deploy-preview-7706--videojs-docs.netlify.app/tutorial-angular.html             https://videojs.com/guides/angular               301!
