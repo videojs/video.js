@@ -1,5 +1,6 @@
 const replace = require('replace');
 const path = require('path');
+const sh = require('shelljs');
 const apiPath = path.join(__dirname, '..', 'docs', 'api');
 
 const replacements = [
@@ -41,3 +42,9 @@ replacements.forEach(function(obj) {
     silent: true
   });
 });
+
+// move docs/_redirects into the root of the docs site
+//
+// this is needed because the root of the docs site is docs/api, which is not
+// in version control.
+sh.mv(path.join(apiPath, '..', '_redirects'), path.join(apiPath, '_redirects'));
