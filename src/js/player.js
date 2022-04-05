@@ -1237,7 +1237,6 @@ class Player extends Component {
     this.on(this.tech_, 'ended', (e) => this.handleTechEnded_(e));
     this.on(this.tech_, 'seeking', (e) => this.handleTechSeeking_(e));
     this.on(this.tech_, 'play', (e) => this.handleTechPlay_(e));
-    this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
     this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
     this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
     this.on(this.tech_, 'fullscreenchange', (e, data) => this.handleTechFullscreenChange_(e, data));
@@ -1427,7 +1426,7 @@ class Player extends Component {
        * @type {EventTarget~Event}
        */
       this.trigger('loadstart');
-      this.trigger('firstplay');
+      this.trigger('play');
     } else {
       // reset the hasStarted state
       this.hasStarted(false);
@@ -1676,7 +1675,7 @@ class Player extends Component {
 
     if (this.hasStarted_) {
       this.addClass('vjs-has-started');
-      this.trigger('firstplay');
+      this.trigger('play');
     } else {
       this.removeClass('vjs-has-started');
     }
@@ -1883,7 +1882,7 @@ class Player extends Component {
      * @deprecated As of 6.0 firstplay event is deprecated.
      * @type {EventTarget~Event}
      */
-    this.trigger('firstplay');
+    this.trigger('play');
   }
 
   /**

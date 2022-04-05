@@ -1046,7 +1046,7 @@ QUnit.test('should not add multiple first play events despite subsequent loads',
 
   const player = TestHelpers.makePlayer({});
 
-  player.on('firstplay', function() {
+  player.on('play', function() {
     assert.ok(true, 'First play should fire once.');
   });
 
@@ -1062,7 +1062,7 @@ QUnit.test('should fire firstplay after resetting the player', function(assert) 
 
   let fpFired = false;
 
-  player.on('firstplay', function() {
+  player.on('play', function() {
     fpFired = true;
   });
 
