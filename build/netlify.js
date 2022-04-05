@@ -32,4 +32,10 @@ files
   .concat('dist', 'index.html', 'sandbox', 'docs')
   .forEach((file) => sh.cp('-r', file, path.join(deployDir, file)));
 
+// move docs/_redirects into the root of the docs site
+//
+// this is needed because the root of the docs site is docs/api, which is not
+// in version control.
+sh.mv(path.join(deployDir, 'docs', '_redirects'), path.join(deployDir, 'docs', 'api', '_redirects'));
+
 sh.rm(path.join(deployDir, 'dist', `video-js-${pkg.version}.zip`));
