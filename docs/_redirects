@@ -1,5 +1,4 @@
 # Netlify redirects to redirect old tutorial pages to new guide pages
-# These will not work on netlify preview pages
 /tutorial-angular.html            https://videojs.com/guides/angular            301!
 /tutorial-audio-tracks.html       https://videojs.com/guides/audio-tracks       301!
 /tutorial-components.html         https://videojs.com/guides/components         301!
