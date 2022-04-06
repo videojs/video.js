@@ -6649,24 +6649,6 @@ var docData =
         "scope": "global"
     },
     {
-        "comment": "/**\n* Fired the first time a video is played\n* Not part of the HLS spec, and we're not sure if this is the best\n* implementation yet, so use sparingly. If you don't have a reason to\n* prevent playback, use `myPlayer.one('play');` instead.\n*\n* @event firstplay\n*/",
-        "meta": {
-            "range": [
-                5964,
-                6226
-            ],
-            "filename": "player.js",
-            "lineno": 786,
-            "path": "/Users/mboles/git/BCL-LearningSamples/grunt-shell/videojs-src",
-            "code": {}
-        },
-        "description": "<p>Fired the first time a video is played\nNot part of the HLS spec, and we're not sure if this is the best\nimplementation yet, so use sparingly. If you don't have a reason to\nprevent playback, use <code>myPlayer.one('play');</code> instead.</p>",
-        "kind": "event",
-        "name": "firstplay",
-        "longname": "event:firstplay",
-        "scope": "global"
-    },
-    {
         "comment": "/**\n* Fired whenever the media has been paused\n*\n* @event pause\n*/",
         "meta": {
             "range": [
