@@ -3,6 +3,8 @@
  * @module extend
  */
 
+import log from './utils/log';
+
 /**
  * Used to subclass an existing class by emulating ES subclassing using the
  * `extends` keyword.
@@ -25,16 +27,16 @@
  *           The new class with subClassMethods that inherited superClass.
  */
 const extend = function(superClass, subClassMethods = {}) {
-  let subClass;
+  log.warn('The extend() method is deprecated. Please use native ES6 classes instead.');
+
+  let subClass = function() {
+    superClass.apply(this, arguments);
+  };
 
   // If the provided super class is a native ES6 class,
   // make the sub class one as well.
-  if (/^class/.test(superClass.toString())) {
+  if (superClass && /^class/.test(superClass.toString())) {
     subClass = class SubClass extends superClass {};
-  } else {
-    subClass = function() {
-      superClass.apply(this, arguments);
-    };
   }
 
   let methods = {};
