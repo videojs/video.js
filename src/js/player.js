@@ -1846,24 +1846,6 @@ class Player extends Component {
     this.trigger('seeked');
   }
 
-  handleTechFirstPlay_() {
-    // If the first starttime attribute is specified
-    // then we will start at the given offset in seconds
-    if (this.options_.starttime) {
-      log.warn('Passing the `starttime` option to the player will be deprecated in 6.0');
-      this.currentTime(this.options_.starttime);
-    }
-
-    this.addClass('vjs-has-started');
-    /**
-     * Fired the first time a video is played. Not part of the HLS spec, and this is
-     * probably not the best implementation yet, so use sparingly. If you don't have a
-     * reason to prevent playback, use `myPlayer.one('play');` instead.
-     *
-     * @type {EventTarget~Event}
-     */
-  }
-
   /**
    * Retrigger the `pause` event that was triggered by the {@link Tech}.
    *
