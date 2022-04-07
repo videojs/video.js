@@ -3,6 +3,7 @@
  * @module extend
  */
 
+import _inherits from '@babel/runtime/helpers/inherits';
 import log from './utils/log';
 
 /**
@@ -29,13 +30,15 @@ import log from './utils/log';
 const extend = function(superClass, subClassMethods = {}) {
   log.warn('The extend() method is deprecated. Please use native ES6 classes instead.');
 
+  const isNativeClass = superClass && /^class/.test(superClass.toString());
+
   let subClass = function() {
     superClass.apply(this, arguments);
   };
 
   // If the provided super class is a native ES6 class,
   // make the sub class one as well.
-  if (superClass && /^class/.test(superClass.toString())) {
+  if (isNativeClass) {
     subClass = class SubClass extends superClass {};
   }
 
@@ -48,6 +51,10 @@ const extend = function(superClass, subClassMethods = {}) {
     methods = subClassMethods;
   } else if (typeof subClassMethods === 'function') {
     subClass = subClassMethods;
+  }
+
+  if (!isNativeClass) {
+    _inherits(subClass, superClass);
   }
 
   // this is needed for backward-compatibility and node compatibility.
