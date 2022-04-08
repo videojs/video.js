@@ -32,9 +32,7 @@ import * as Url from './utils/url.js';
 import * as Obj from './utils/obj';
 import * as Buffer from './utils/buffer';
 import clamp from './utils/clamp';
-import DomData from './utils/dom-data';
 import filterSource from './utils/filter-source';
-import * as Guid from './utils/guid';
 import map from './utils/map';
 import * as Promise from './utils/promise';
 import * as MimeTypes from './utils/mimetypes';
@@ -516,13 +514,11 @@ const helpers = {
   computedStyle,
   createLogger,
   defineLazyProperty,
-  domData: DomData,
   dom: Dom,
   events: Events,
   filterSource,
   fn: Fn,
   formatTime: { formatTime, resetFormatTime, setFormatTime },
-  guid: Guid,
   hooksHelpers: { hooks_, hooks, hook, hookOnce, removeHook },
   log,
   map,
