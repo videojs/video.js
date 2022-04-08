@@ -23,14 +23,23 @@ import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
-
-import { createTimeRanges } from './utils/time-ranges.js';
+import * as TimeRanges from './utils/time-ranges.js';
 import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
 import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
-import {isObject} from './utils/obj';
+import * as Obj from './utils/obj';
+import * as Buffer from './utils/buffer';
+import clamp from './utils/clamp';
+import DomData from './utils/dom-data';
+import filterSource from './utils/filter-source';
+import * as Guid from './utils/guid';
+import map from './utils/map';
+import * as Promise from './utils/promise';
+import * as MimeTypes from './utils/mimetypes';
+import set from './utils/set';
+import * as StringCases from './utils/string-cases';
 import computedStyle from './utils/computed-style.js';
 import extend from './extend.js';
 import xhr from '@videojs/xhr';
@@ -165,7 +174,7 @@ function videojs(id, options, ready) {
   hooks('beforesetup').forEach((hookFunction) => {
     const opts = hookFunction(el, mergeOptions(options));
 
-    if (!isObject(opts) || Array.isArray(opts)) {
+    if (!Obj.isObject(opts) || Array.isArray(opts)) {
       log.error('please return an object in beforesetup hooks');
       return;
     }
@@ -426,7 +435,7 @@ videojs.addLanguage = function(code, data) {
 videojs.log = log;
 videojs.createLogger = createLogger;
 
-videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
+videojs.createTimeRange = videojs.createTimeRanges = TimeRanges.createTimeRanges;
 videojs.formatTime = formatTime;
 videojs.setFormatTime = setFormatTime;
 videojs.resetFormatTime = resetFormatTime;
@@ -499,6 +508,37 @@ videojs.defineLazyProperty = defineLazyProperty;
 // Adding less ambiguous text for fullscreen button.
 // In a major update this could become the default text and key.
 videojs.addLanguage('en', {'Non-Fullscreen': 'Exit Fullscreen'});
+
+const helpers = {
+  browser,
+  buffer: Buffer,
+  clamp,
+  computedStyle,
+  createLogger,
+  defineLazyProperty,
+  domData: DomData,
+  dom: Dom,
+  events: Events,
+  filterSource,
+  fn: Fn,
+  formatTime: { formatTime, resetFormatTime, setFormatTime },
+  guid: Guid,
+  hooksHelpers: { hooks_, hooks, hook, hookOnce, removeHook },
+  log,
+  map,
+  mergeOptions,
+  mimeTypes: MimeTypes,
+  obj: Obj,
+  promise: Promise,
+  set,
+  stringCases: StringCases,
+  stylesheet,
+  timeRanges: TimeRanges,
+  url: Url
+};
+
+// Export all utils Helpers
+videojs.helpers = helpers;
 
 export default videojs;
 
