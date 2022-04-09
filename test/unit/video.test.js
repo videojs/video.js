@@ -579,3 +579,18 @@ QUnit.test('adds video-js class name with the video-js embed', function(assert) 
   assert.ok(player.hasClass('video-js'), 'video-js class was added to the first embed');
   assert.ok(player2.hasClass('video-js'), 'video-js class was preserved to the second embed');
 });
+
+QUnit.test(
+  'should merge any data-setup options',
+  function(assert) {
+    const fixture = document.getElementById('qunit-fixture');
+
+    fixture.innerHTML += '<video id="test_vid_id" data-setup=\'{"opt1": "a", "opt2": "b"}\'></video>';
+
+    const player = videojs('test_vid_id', { opt2: 'c' });
+
+    assert.ok(player, 'created player from tag');
+    assert.equal(player.options_.opt1, 'a', 'data-setup options were merged');
+    assert.equal(player.options_.opt2, 'c', 'constructor options take precedence');
+  }
+);

@@ -136,7 +136,7 @@ function videojs(id, options, ready) {
 
   if (player) {
     if (options) {
-      log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
+      log.warn(`Player "${id}" is already initialised. New options were not applied.`);
     }
     if (ready) {
       player.ready(ready);
@@ -161,6 +161,10 @@ function videojs(id, options, ready) {
   }
 
   options = options || {};
+
+  if (el.hasAttribute('data-setup')) {
+    options = videojs.mergeOptions(JSON.parse(el.getAttribute('data-setup')), options);
+  }
 
   hooks('beforesetup').forEach((hookFunction) => {
     const opts = hookFunction(el, mergeOptions(options));
