@@ -163,6 +163,7 @@ function videojs(id, options, ready) {
   options = options || {};
 
   if (el.hasAttribute('data-setup')) {
+    log.warn('Using videojs() as a constructor and data-setup options together is not recommended.');
     options = videojs.mergeOptions(JSON.parse(el.getAttribute('data-setup')), options);
   }
 
