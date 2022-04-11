@@ -26,6 +26,8 @@ import log from './utils/log';
  *
  * @return   {Function}
  *           The new class with subClassMethods that inherited superClass.
+ *
+ * @deprecated videojs.extend() is deprecated as of v8; use native ES6 classes instead
  */
 const extend = function(superClass, subClassMethods = {}) {
   log.warn('The extend() method is deprecated. Please use native ES6 classes instead.');
