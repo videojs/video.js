@@ -88,7 +88,7 @@ class MenuButton extends Component {
 
     if (this.items && this.items.length <= this.hideThreshold_) {
       this.hide();
-      this.menu.contentEl_.removeAttribute('role', 'menu');
+      this.menu.contentEl_.removeAttribute('role');
 
     } else {
       this.show();
