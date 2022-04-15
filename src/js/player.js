@@ -1112,7 +1112,7 @@ class Player extends Component {
         height: ${height}px;
       }
 
-      .${idClass}.vjs-fluid {
+      .${idClass}.vjs-fluid:not(.vjs-audio-only-mode) {
         padding-top: ${ratioMultiplier * 100}%;
       }
     `);
