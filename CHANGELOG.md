@@ -1,3 +1,15 @@
+<a name="7.19.1"></a>
+## [7.19.1](https://github.com/videojs/video.js/compare/v7.19.0...v7.19.1) (2022-04-15)
+
+### Bug Fixes
+
+* **accessibility:** fix broken aria menu ([#7699](https://github.com/videojs/video.js/issues/7699)) ([b7cb9d0](https://github.com/videojs/video.js/commit/b7cb9d0))
+* Audio only mode styling conflicts with fluid mode ([#7724](https://github.com/videojs/video.js/issues/7724)) ([145aba6](https://github.com/videojs/video.js/commit/145aba6))
+
+### Documentation
+
+* Redirect guides to videojs.com ([#7706](https://github.com/videojs/video.js/issues/7706)) ([9cec1de](https://github.com/videojs/video.js/commit/9cec1de))
+
 <a name="7.19.0"></a>
 # [7.19.0](https://github.com/videojs/video.js/compare/v7.18.1...v7.19.0) (2022-03-21)
 
