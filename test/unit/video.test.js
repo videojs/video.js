@@ -579,3 +579,45 @@ QUnit.test('adds video-js class name with the video-js embed', function(assert) 
   assert.ok(player.hasClass('video-js'), 'video-js class was added to the first embed');
   assert.ok(player2.hasClass('video-js'), 'video-js class was preserved to the second embed');
 });
+
+QUnit.test('stores placeholder el and restores on dispose', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const embeds = [
+    {
+      type: 'video el',
+      src: '<video id="test1"><source src="http://example.com/video.mp4" type="video/mp4"></source></video>',
+      initSelector: 'test1',
+      testSelector: '#test1'
+    },
+    {
+      type: 'video-js el',
+      src: '<video-js id="test2"><source src="http://example.com/video.mp4" type="video/mp4"></source></video-js>',
+      initSelector: 'test2',
+      testSelector: '#test2'
+    },
+    {
+      type: 'div ingest',
+      src: '<div data-vjs-player><video id="test3"><source src="http://example.com/video.mp4" type="video/mp4"></source></video></div>',
+      initSelector: 'test3',
+      testSelector: 'div[data-vjs-player]'
+    }
+  ];
+
+  embeds.forEach(embed => {
+    const comparisonEl = document.createRange().createContextualFragment(embed.src).children[0];
+
+    fixture.innerHTML += embed.src;
+
+    const player = videojs(embed.initSelector, {restoreEl: true});
+
+    assert.ok(comparisonEl.isEqualNode(player.options_.restoreEl), `${embed.type}: restoreEl option replaced by element`);
+
+    player.dispose();
+
+    const el = document.querySelector(embed.testSelector);
+
+    assert.ok(comparisonEl.isEqualNode(el), `${embed.type}: element was restored`);
+
+  });
+});
