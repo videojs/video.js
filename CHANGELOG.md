@@ -1,3 +1,10 @@
+<a name="7.19.2"></a>
+## [7.19.2](https://github.com/videojs/video.js/compare/v7.19.1...v7.19.2) (2022-04-20)
+
+### Bug Fixes
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming 2.14.2 ([#7728](https://github.com/videojs/video.js/issues/7728)) ([1912764](https://github.com/videojs/video.js/commit/1912764))
+
 <a name="7.19.1"></a>
 ## [7.19.1](https://github.com/videojs/video.js/compare/v7.19.0...v7.19.1) (2022-04-15)
 
