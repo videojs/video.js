@@ -612,13 +612,14 @@ QUnit.test('stores placeholder el and restores on dispose', function(assert) {
     const player = videojs(embed.initSelector, {restoreEl: true});
 
     assert.ok(comparisonEl.isEqualNode(player.options_.restoreEl), `${embed.type}: restoreEl option replaced by an element`);
-    assert.notOk(comparisonEl.isSameNode(player.options_.restoreEl), `${embed.type}: restoreEl is a copy of the original element`);
+    assert.notOk(document.querySelector(embed.testSelector).isSameNode(player.options_.restoreEl), `${embed.type}: restoreEl is not the original element`);
+    assert.notOk(comparisonEl.isSameNode(player.options_.restoreEl), `${embed.type}: restoreEl is not the control element`);
 
     player.dispose();
 
-    const el = document.querySelector(embed.testSelector);
+    const expectedEl = document.querySelector(embed.testSelector);
 
-    assert.ok(comparisonEl.isEqualNode(el), `${embed.type}: element was restored`);
+    assert.ok(comparisonEl.isEqualNode(expectedEl), `${embed.type}: element was restored`);
 
   });
 });
