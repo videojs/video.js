@@ -611,7 +611,8 @@ QUnit.test('stores placeholder el and restores on dispose', function(assert) {
 
     const player = videojs(embed.initSelector, {restoreEl: true});
 
-    assert.ok(comparisonEl.isEqualNode(player.options_.restoreEl), `${embed.type}: restoreEl option replaced by element`);
+    assert.ok(comparisonEl.isEqualNode(player.options_.restoreEl), `${embed.type}: restoreEl option replaced by an element`);
+    assert.notOk(comparisonEl.isSameNode(player.options_.restoreEl), `${embed.type}: restoreEl is a copy of the original element`);
 
     player.dispose();
 
