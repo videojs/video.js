@@ -4,6 +4,7 @@
  */
 
 import _inherits from '@babel/runtime/helpers/inherits';
+import log from './utils/log';
 
 /**
  * Used to subclass an existing class by emulating ES subclassing using the
@@ -25,11 +26,23 @@ import _inherits from '@babel/runtime/helpers/inherits';
  *
  * @return   {Function}
  *           The new class with subClassMethods that inherited superClass.
+ *
+ * @deprecated videojs.extend() is deprecated as of v8; use native ES6 classes instead
  */
 const extend = function(superClass, subClassMethods = {}) {
+  log.warn('The extend() method is deprecated. Please use native ES6 classes instead.');
+
+  const isNativeClass = superClass && /^class/.test(superClass.toString());
+
   let subClass = function() {
     superClass.apply(this, arguments);
   };
+
+  // If the provided super class is a native ES6 class,
+  // make the sub class one as well.
+  if (isNativeClass) {
+    subClass = class SubClass extends superClass {};
+  }
 
   let methods = {};
 
@@ -42,7 +55,9 @@ const extend = function(superClass, subClassMethods = {}) {
     subClass = subClassMethods;
   }
 
-  _inherits(subClass, superClass);
+  if (!isNativeClass) {
+    _inherits(subClass, superClass);
+  }
 
   // this is needed for backward-compatibility and node compatibility.
   if (superClass) {
