@@ -23,14 +23,16 @@ import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
-
 import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
 import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
-import {isObject} from './utils/obj';
+import * as Obj from './utils/obj';
+import clamp from './utils/clamp';
+import { isPromise, silencePromise } from './utils/promise';
+import * as StringCases from './utils/string-cases';
 import computedStyle from './utils/computed-style.js';
 import extend from './extend.js';
 import xhr from '@videojs/xhr';
@@ -165,7 +167,7 @@ function videojs(id, options, ready) {
   hooks('beforesetup').forEach((hookFunction) => {
     const opts = hookFunction(el, mergeOptions(options));
 
-    if (!isObject(opts) || Array.isArray(opts)) {
+    if (!Obj.isObject(opts) || Array.isArray(opts)) {
       log.error('please return an object in beforesetup hooks');
       return;
     }
@@ -499,6 +501,13 @@ videojs.defineLazyProperty = defineLazyProperty;
 // Adding less ambiguous text for fullscreen button.
 // In a major update this could become the default text and key.
 videojs.addLanguage('en', {'Non-Fullscreen': 'Exit Fullscreen'});
+
+videojs.clamp = clamp;
+videojs.fn = Fn;
+videojs.obj = Obj;
+videojs.isPromise = isPromise;
+videojs.silencePromise = silencePromise;
+videojs.strings = StringCases;
 
 export default videojs;
 
