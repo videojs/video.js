@@ -12,10 +12,8 @@
  * @return {number}
  *         the clamped number
  */
-const clamp = function(number, min, max) {
+export const clamp = function(number, min, max) {
   number = Number(number);
 
   return Math.min(max, Math.max(min, isNaN(number) ? min : number));
 };
-
-export default clamp;

@@ -2,7 +2,7 @@
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import computedStyle from '../../src/js/utils/computed-style.js';
-import { createTimeRange } from '../../src/js/utils/time-ranges.js';
+import { createTimeRanges } from '../../src/js/utils/time';
 
 QUnit.module('SeekToLive', {
   beforeEach() {
@@ -17,7 +17,7 @@ QUnit.module('SeekToLive', {
       this.player.paused = () => false;
       this.player.hasStarted = () => true;
       this.player.options_.liveui = true;
-      this.player.seekable = () => createTimeRange(0, 45);
+      this.player.seekable = () => createTimeRanges(0, 45);
       this.player.currentTime = () => this.player.liveTracker.liveCurrentTime();
       this.player.duration(Infinity);
     };
@@ -35,7 +35,7 @@ QUnit.test('liveui enabled, can switch between at and behind live edge ', functi
   assert.ok(this.seekToLive.hasClass('vjs-at-live-edge'), 'has at live edge class');
 
   this.player.currentTime = () => 0;
-  this.player.seekable = () => createTimeRange(0, 38);
+  this.player.seekable = () => createTimeRanges(0, 38);
   this.clock.tick(30);
 
   assert.notOk(this.seekToLive.hasClass('vjs-at-live-edge'), 'does not have at live edge class');
@@ -84,7 +84,7 @@ QUnit.test('liveui disabled live window is never shown', function(assert) {
 
   // liveui false
   this.player.options_.liveui = false;
-  this.player.seekable = () => createTimeRange(0, 19);
+  this.player.seekable = () => createTimeRanges(0, 19);
   this.player.duration(Infinity);
 
   assert.equal(this.getComputedDisplay(), 'none', 'is hidden');

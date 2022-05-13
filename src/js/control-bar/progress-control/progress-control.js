@@ -3,7 +3,7 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import clamp from '../../utils/clamp.js';
+import {clamp} from '../../utils/num';
 import {bind, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import {silencePromise} from '../../utils/promise';
 

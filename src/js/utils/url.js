@@ -82,7 +82,7 @@ export const parseUrl = function(url) {
 };
 
 /**
- * Get absolute version of relative URL. Used to tell Flash the correct URL.
+ * Get absolute version of relative URL.
  *
  * @function
  * @param    {string} url
