@@ -3,7 +3,7 @@
  * @module middleware
  */
 import { assign } from '../utils/obj.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 
 const middlewares = {};
 const middlewareInstances = {};

@@ -10,7 +10,7 @@ import document from 'global/document';
 import window from 'global/window';
 import {assign} from '../utils/obj';
 import mergeOptions from '../utils/merge-options.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 import {NORMAL as TRACK_TYPES, REMOTE} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
 import defineLazyProperty from '../utils/define-lazy-property.js';

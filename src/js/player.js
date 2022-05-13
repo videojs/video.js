@@ -16,7 +16,7 @@ import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
 import {IE_VERSION, IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
-import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
+import {toTitleCase, titleCaseEquals} from './utils/str.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';

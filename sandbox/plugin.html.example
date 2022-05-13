@@ -33,7 +33,7 @@
       };
 
       // register the plugin
-      videojs.plugin('progressed', progressed);
+      videojs.registerPlugin('progressed', progressed);
 
       // initialize it
       vid1 = videojs('vid1');

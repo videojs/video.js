@@ -4,6 +4,31 @@
  */
 import {version} from '../../package.json';
 import window from 'global/window';
+
+// Include core functions and classes
+import extend from './extend';
+import * as setup from './setup';
+import * as stylesheet from './utils/stylesheet';
+import Component from './component';
+import EventTarget from './event-target';
+import Player from './player';
+import Plugin from './plugin';
+import TextTrack from './tracks/text-track';
+import AudioTrack from './tracks/audio-track';
+import VideoTrack from './tracks/video-track';
+
+// Include utilities
+import { createTimeRange } from './utils/time-ranges';
+import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time';
+import log, { createLogger } from './utils/log';
+import deprecate from './utils/deprecate';
+import * as browser from './utils/browser';
+import clamp from './utils/clamp';
+import computedStyle from './utils/computed-style';
+import * as dom from './utils/dom';
+import * as events from './utils/events';
+import * as fn from './utils/fn';
+
 import {
   hooks_,
   hooks,
@@ -11,36 +36,18 @@ import {
   hookOnce,
   removeHook
 } from './utils/hooks';
-import * as setup from './setup';
-import * as stylesheet from './utils/stylesheet.js';
-import Component from './component';
-import EventTarget from './event-target';
-import * as Events from './utils/events.js';
-import Player from './player';
-import Plugin from './plugin';
-import mergeOptions from './utils/merge-options.js';
-import * as Fn from './utils/fn.js';
-import TextTrack from './tracks/text-track.js';
-import AudioTrack from './tracks/audio-track.js';
-import VideoTrack from './tracks/video-track.js';
-import { createTimeRanges } from './utils/time-ranges.js';
-import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
-import log, { createLogger } from './utils/log.js';
-import * as Dom from './utils/dom.js';
-import * as browser from './utils/browser.js';
-import * as Url from './utils/url.js';
-import * as Obj from './utils/obj';
-import clamp from './utils/clamp';
-import { isPromise, silencePromise } from './utils/promise';
-import * as StringCases from './utils/string-cases';
-import computedStyle from './utils/computed-style.js';
-import extend from './extend.js';
+
+import * as obj from './utils/obj';
+import * as promise from './utils/promise';
+import * as str from './utils/str';
+import * as url from './utils/url';
+
 import xhr from '@videojs/xhr';
 
 // Include the built-in techs
-import Tech from './tech/tech.js';
-import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
-import defineLazyProperty from './utils/define-lazy-property.js';
+import Tech from './tech/tech';
+import { use as middlewareUse, TERMINATOR } from './tech/middleware';
+import defineLazyProperty from './utils/define-lazy-property';
 
 /**
  * Normalize an `id` value by trimming off a leading `#`
@@ -146,9 +153,9 @@ function videojs(id, options, ready) {
     return player;
   }
 
-  const el = (typeof id === 'string') ? Dom.$('#' + normalizeId(id)) : id;
+  const el = (typeof id === 'string') ? dom.$('#' + normalizeId(id)) : id;
 
-  if (!Dom.isEl(el)) {
+  if (!dom.isEl(el)) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
@@ -165,14 +172,14 @@ function videojs(id, options, ready) {
   options = options || {};
 
   hooks('beforesetup').forEach((hookFunction) => {
-    const opts = hookFunction(el, mergeOptions(options));
+    const opts = hookFunction(el, obj.merge(options));
 
-    if (!Obj.isObject(opts) || Array.isArray(opts)) {
+    if (!obj.isObject(opts) || Array.isArray(opts)) {
       log.error('please return an object in beforesetup hooks');
       return;
     }
 
-    options = mergeOptions(options, opts);
+    options = obj.merge(options, opts);
   });
 
   // We get the current "Player" component here in case an integration has
@@ -193,12 +200,12 @@ videojs.hookOnce = hookOnce;
 videojs.removeHook = removeHook;
 
 // Add default styles
-if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && Dom.isReal()) {
-  let style = Dom.$('.vjs-styles-defaults');
+if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true && dom.isReal()) {
+  let style = dom.$('.vjs-styles-defaults');
 
   if (!style) {
     style = stylesheet.createStyleElement('vjs-styles-defaults');
-    const head = Dom.$('head');
+    const head = dom.$('head');
 
     if (head) {
       head.insertBefore(style, head.firstChild);
@@ -270,12 +277,12 @@ videojs.getPlayer = (id) => {
       return player;
     }
 
-    tag = Dom.$('#' + nId);
+    tag = dom.$('#' + nId);
   } else {
     tag = id;
   }
 
-  if (Dom.isEl(tag)) {
+  if (dom.isEl(tag)) {
     const {player, playerId} = tag;
 
     // Element may have a `player` property referring to an already created
@@ -353,49 +360,6 @@ Object.defineProperty(videojs.middleware, 'TERMINATOR', {
 });
 
 /**
- * A reference to the {@link module:browser|browser utility module} as an object.
- *
- * @type {Object}
- * @see  {@link module:browser|browser}
- */
-videojs.browser = browser;
-
-/**
- * Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead; only
- * included for backward-compatibility with 4.x.
- *
- * @deprecated Since version 5.0, use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED instead.
- * @type {boolean}
- */
-videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
-
-videojs.extend = extend;
-videojs.mergeOptions = mergeOptions;
-videojs.bind = Fn.bind;
-videojs.registerPlugin = Plugin.registerPlugin;
-videojs.deregisterPlugin = Plugin.deregisterPlugin;
-
-/**
- * Deprecated method to register a plugin with Video.js
- *
- * @deprecated videojs.plugin() is deprecated; use videojs.registerPlugin() instead
- *
- * @param {string} name
- *        The plugin name
- *
- * @param {Plugin|Function} plugin
- *         The plugin sub-class or function
- */
-videojs.plugin = (name, plugin) => {
-  log.warn('videojs.plugin() is deprecated; use videojs.registerPlugin() instead');
-  return Plugin.registerPlugin(name, plugin);
-};
-
-videojs.getPlugins = Plugin.getPlugins;
-videojs.getPlugin = Plugin.getPlugin;
-videojs.getPluginVersion = Plugin.getPluginVersion;
-
-/**
  * Adding languages so that they're available to all players.
  * Example: `videojs.addLanguage('es', { 'Hello': 'Hola' });`
  *
@@ -411,7 +375,7 @@ videojs.getPluginVersion = Plugin.getPluginVersion;
 videojs.addLanguage = function(code, data) {
   code = ('' + code).toLowerCase();
 
-  videojs.options.languages = mergeOptions(
+  videojs.options.languages = obj.merge(
     videojs.options.languages,
     {[code]: data}
   );
@@ -428,17 +392,124 @@ videojs.addLanguage = function(code, data) {
 videojs.log = log;
 videojs.createLogger = createLogger;
 
-videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
-videojs.formatTime = formatTime;
-videojs.setFormatTime = setFormatTime;
-videojs.resetFormatTime = resetFormatTime;
-videojs.parseUrl = Url.parseUrl;
-videojs.isCrossOrigin = Url.isCrossOrigin;
+videojs.registerPlugin = Plugin.registerPlugin;
+videojs.deregisterPlugin = Plugin.deregisterPlugin;
+videojs.getPlugins = Plugin.getPlugins;
+videojs.getPlugin = Plugin.getPlugin;
+videojs.getPluginVersion = Plugin.getPluginVersion;
+
+/**
+ * A reference to the {@link module:browser|browser utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:browser|browser}
+ */
+videojs.browser = browser;
+
+/**
+ * A reference to the {@link module:dom|DOM utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:dom|dom}
+ */
+videojs.dom = dom;
+
+/**
+ * A reference to the {@link module:fn|function utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:fn|fn}
+ */
+videojs.fn = fn;
+
+/**
+ * An object containing number-related functions.
+ *
+ * @type {Object}
+ */
+videojs.num = {
+  clamp
+};
+
+/**
+ * A reference to the {@link module:obj|object utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:obj|obj}
+ */
+videojs.obj = obj;
+
+/**
+ * A reference to the {@link module:promise|promise utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:promise|promise}
+ */
+videojs.promise = promise;
+
+/**
+ * A reference to the {@link module:str|string utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:str|str}
+ */
+videojs.str = str;
+
+/**
+ * An object containing time-related functions.
+ *
+ * @type {Object}
+ */
+videojs.time = {
+  createTimeRange,
+  format: formatTime,
+  setFormat: setFormatTime,
+  resetFormat: resetFormatTime
+};
+
+/**
+ * A reference to the {@link module:url|URL utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:url|url}
+ */
+videojs.url = url;
+
+/**
+ * Namespace for general utility functions.
+ *
+ * @type {Object}
+ */
+videojs.utils = {
+  computedStyle,
+  defineLazyProperty
+};
+
+// Deprecated global namespace functions
+videojs.extend = deprecate('videojs.extend is deprecated as of 8.0. Please use native ES6 classes instead.', extend);
+videojs.mergeOptions = deprecate('videojs.mergeOptions is deprecated as of 8.0. Please use videojs.obj.merge instead.', obj.merge);
+videojs.bind = deprecate('videojs.bind is deprecated as of 8.0. Please use native Function.prototype.bind instead.', fn.bind);
+videojs.createTimeRange = deprecate('videojs.createTimeRange is deprecated as of 8.0. Please use videojs.time.createTimeRange instead.', createTimeRange);
+videojs.createTimeRanges = deprecate('videojs.createTimeRanges is deprecated as of 8.0. Please use videojs.time.createTimeRange instead.', createTimeRange);
+videojs.formatTime = deprecate('videojs.formatTime is deprecated as of 8.0. Please use videojs.time.format instead.', formatTime);
+videojs.setFormatTime = deprecate('videojs.setFormatTime is deprecated as of 8.0. Please use videojs.time.setFormat instead.', setFormatTime);
+videojs.resetFormatTime = deprecate('videojs.resetFormatTime is deprecated as of 8.0. Please use videojs.time.resetFormat instead.', resetFormatTime);
+videojs.computedStyle = deprecate('videojs.computedStyle is deprecated as of 8.0. Please use videojs.utils.computedStyle instead.', computedStyle);
+videojs.defineLazyProperty = deprecate('videojs.defineLazyProperty is deprecated as of 8.0. Please use videojs.utils.defineLazyProperty instead.', defineLazyProperty);
+videojs.isPromise = deprecate('videojs.isPromise is deprecated as of 8.0. Please use videojs.promise.isPromise instead.', promise.isPromise);
+videojs.silencePromise = deprecate('videojs.silencePromise is deprecated as of 8.0. Please use videojs.promise.silencePromise instead.', promise.silencePromise);
+videojs.parseUrl = deprecate('videojs.parseUrl is deprecated as of 8.0. Please use videojs.url.parseUrl instead.', url.parseUrl);
+videojs.isCrossOrigin = deprecate('videojs.isCrossOrigin is deprecated as of 8.0. Please use videojs.url.isCrossOrigin instead.', url.isCrossOrigin);
+
+videojs.on = events.on;
+videojs.one = events.one;
+videojs.off = events.off;
+videojs.trigger = events.trigger;
+
 videojs.EventTarget = EventTarget;
-videojs.on = Events.on;
-videojs.one = Events.one;
-videojs.off = Events.off;
-videojs.trigger = Events.trigger;
+videojs.TextTrack = TextTrack;
+videojs.AudioTrack = AudioTrack;
+videojs.VideoTrack = VideoTrack;
 
 /**
  * A cross-browser XMLHttpRequest wrapper.
@@ -453,61 +524,6 @@ videojs.trigger = Events.trigger;
  * @see      https://github.com/Raynos/xhr
  */
 videojs.xhr = xhr;
-
-videojs.TextTrack = TextTrack;
-videojs.AudioTrack = AudioTrack;
-videojs.VideoTrack = VideoTrack;
-
-[
-  'isEl',
-  'isTextNode',
-  'createEl',
-  'hasClass',
-  'addClass',
-  'removeClass',
-  'toggleClass',
-  'setAttributes',
-  'getAttributes',
-  'emptyEl',
-  'appendContent',
-  'insertContent'
-].forEach(k => {
-  videojs[k] = function() {
-    log.warn(`videojs.${k}() is deprecated; use videojs.dom.${k}() instead`);
-    return Dom[k].apply(null, arguments);
-  };
-});
-
-videojs.computedStyle = computedStyle;
-
-/**
- * A reference to the {@link module:dom|DOM utility module} as an object.
- *
- * @type {Object}
- * @see  {@link module:dom|dom}
- */
-videojs.dom = Dom;
-
-/**
- * A reference to the {@link module:url|URL utility module} as an object.
- *
- * @type {Object}
- * @see  {@link module:url|url}
- */
-videojs.url = Url;
-
-videojs.defineLazyProperty = defineLazyProperty;
-
-// Adding less ambiguous text for fullscreen button.
-// In a major update this could become the default text and key.
-videojs.addLanguage('en', {'Non-Fullscreen': 'Exit Fullscreen'});
-
-videojs.clamp = clamp;
-videojs.fn = Fn;
-videojs.obj = Obj;
-videojs.isPromise = isPromise;
-videojs.silencePromise = silencePromise;
-videojs.strings = StringCases;
 
 export default videojs;
 

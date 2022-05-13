@@ -212,7 +212,6 @@ QUnit.test('should add the value to the languages object with lower case lang co
 QUnit.test('should expose plugin functions', function(assert) {
   [
     'registerPlugin',
-    'plugin',
     'getPlugins',
     'getPlugin',
     'getPluginVersion'
@@ -243,7 +242,7 @@ QUnit.test('should expose DOM functions', function(assert) {
   ];
 
   methods.forEach(name => {
-    assert.strictEqual(typeof videojs[name], 'function', `function videojs.${name}`);
+    assert.strictEqual(typeof videojs.dom[name], 'function', `function videojs.${name}`);
     assert.strictEqual(typeof Dom[name], 'function', `Dom.${name} function exists`);
   });
 });

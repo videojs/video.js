@@ -1,6 +1,6 @@
 /**
- * @file string-cases.js
- * @module to-lower-case
+ * @file str.js
+ * @module str
  */
 
 /**
