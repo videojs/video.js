@@ -109,7 +109,6 @@ const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
  * @borrows module:format-time.formatTime as formatTime
  * @borrows module:format-time.resetFormatTime as resetFormatTime
  * @borrows module:format-time.setFormatTime as setFormatTime
- * @borrows module:merge-options.mergeOptions as mergeOptions
  * @borrows module:middleware.use as use
  * @borrows Player.players as players
  * @borrows Plugin.registerPlugin as registerPlugin

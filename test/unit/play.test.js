@@ -51,7 +51,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
     };
 
     this.checkState = (assertName, options = {}) => {
-      const expectedState = videojs.mergeOptions({
+      const expectedState = videojs.obj.merge({
         playCalls: 0,
         techLoaded: false,
         techReady: false,

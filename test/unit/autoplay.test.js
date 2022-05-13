@@ -63,7 +63,7 @@ QUnit.module('autoplay', {
         videoTag.setAttribute(a, attributes[a]);
       });
 
-      this.player = videojs(videoTag.id, videojs.mergeOptions({techOrder: ['techFaker']}, options));
+      this.player = videojs(videoTag.id, videojs.obj.merge({techOrder: ['techFaker']}, options));
       const oldMuted = this.player.muted;
 
       this.player.play = () => {

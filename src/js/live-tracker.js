@@ -1,5 +1,5 @@
 import Component from './component.js';
-import mergeOptions from './utils/merge-options.js';
+import {merge} from './utils/obj.js';
 import document from 'global/document';
 import * as browser from './utils/browser.js';
 import window from 'global/window';
@@ -40,7 +40,7 @@ class LiveTracker extends Component {
    */
   constructor(player, options) {
     // LiveTracker does not need an element
-    const options_ = mergeOptions(defaults, options, {createEl: false});
+    const options_ = merge(defaults, options, {createEl: false});
 
     super(player, options_);
 

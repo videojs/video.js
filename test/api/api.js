@@ -208,8 +208,6 @@ QUnit.test('should export useful components to the public', function(assert) {
   assert.ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
   assert.ok(videojs.getComponent('ChaptersTrackMenuItem'),
            'ChaptersTrackMenuItem should be public');
-
-  assert.ok(videojs.mergeOptions, 'mergeOptions should be public');
 });
 
 QUnit.test('should be able to initialize player twice on the same tag using string reference', function(assert) {
