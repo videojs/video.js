@@ -93,7 +93,7 @@ class ResizeManager extends Component {
     return super.createEl('iframe', {
       className: 'vjs-resize-manager',
       tabIndex: -1,
-      title: 'No content'
+      title: this.localize('No content')
     }, {
       'aria-hidden': 'true'
     });
