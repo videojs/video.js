@@ -1237,7 +1237,6 @@ class Player extends Component {
     this.on(this.tech_, 'ended', (e) => this.handleTechEnded_(e));
     this.on(this.tech_, 'seeking', (e) => this.handleTechSeeking_(e));
     this.on(this.tech_, 'play', (e) => this.handleTechPlay_(e));
-    this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
     this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
     this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
     this.on(this.tech_, 'fullscreenchange', (e, data) => this.handleTechFullscreenChange_(e, data));
@@ -1395,12 +1394,9 @@ class Player extends Component {
   }
 
   /**
-   * Retrigger the `loadstart` event that was triggered by the {@link Tech}. This
-   * function will also trigger {@link Player#firstplay} if it is the first loadstart
-   * for a video.
+   * Retrigger the `loadstart` event that was triggered by the {@link Tech}.
    *
    * @fires Player#loadstart
-   * @fires Player#firstplay
    * @listens Tech#loadstart
    * @private
    */
@@ -1416,9 +1412,6 @@ class Player extends Component {
     // Update the duration
     this.handleTechDurationChange_();
 
-    // If it's already playing we want to trigger a firstplay event now.
-    // The firstplay event relies on both the play and loadstart events
-    // which can happen in any order for a new source
     if (!this.paused()) {
       /**
        * Fired when the user agent begins looking for media data
@@ -1427,7 +1420,6 @@ class Player extends Component {
        * @type {EventTarget~Event}
        */
       this.trigger('loadstart');
-      this.trigger('firstplay');
     } else {
       // reset the hasStarted state
       this.hasStarted(false);
@@ -1653,7 +1645,6 @@ class Player extends Component {
   /**
    * Add/remove the vjs-has-started class
    *
-   * @fires Player#firstplay
    *
    * @param {boolean} request
    *        - true: adds the class
@@ -1676,7 +1667,6 @@ class Player extends Component {
 
     if (this.hasStarted_) {
       this.addClass('vjs-has-started');
-      this.trigger('firstplay');
     } else {
       this.removeClass('vjs-has-started');
     }
@@ -1854,36 +1844,6 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('seeked');
-  }
-
-  /**
-   * Retrigger the `firstplay` event that was triggered by the {@link Tech}.
-   *
-   * @fires Player#firstplay
-   * @listens Tech#firstplay
-   * @deprecated As of 6.0 firstplay event is deprecated.
-   *             As of 6.0 passing the `starttime` option to the player and the firstplay event are deprecated.
-   * @private
-   */
-  handleTechFirstPlay_() {
-    // If the first starttime attribute is specified
-    // then we will start at the given offset in seconds
-    if (this.options_.starttime) {
-      log.warn('Passing the `starttime` option to the player will be deprecated in 6.0');
-      this.currentTime(this.options_.starttime);
-    }
-
-    this.addClass('vjs-has-started');
-    /**
-     * Fired the first time a video is played. Not part of the HLS spec, and this is
-     * probably not the best implementation yet, so use sparingly. If you don't have a
-     * reason to prevent playback, use `myPlayer.one('play');` instead.
-     *
-     * @event Player#firstplay
-     * @deprecated As of 6.0 firstplay event is deprecated.
-     * @type {EventTarget~Event}
-     */
-    this.trigger('firstplay');
   }
 
   /**
