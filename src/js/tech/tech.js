@@ -831,11 +831,7 @@ class Tech extends Component {
    * @abstract
    */
   requestPictureInPicture() {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (PromiseClass) {
-      return PromiseClass.reject();
-    }
+    return Promise.reject();
   }
 
   /**

@@ -1177,8 +1177,7 @@ class Player extends Component {
       'playerElIngest': this.playerElIngest_ || false,
       'vtt.js': this.options_['vtt.js'],
       'canOverridePoster': !!this.options_.techCanOverridePoster,
-      'enableSourceset': this.options_.enableSourceset,
-      'Promise': this.options_.Promise
+      'enableSourceset': this.options_.enableSourceset
     };
 
     TRACK_TYPES.names.forEach((name) => {
@@ -2324,15 +2323,9 @@ class Player extends Component {
    *         the promise from play is fulfilled.
    */
   play() {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (PromiseClass) {
-      return new PromiseClass((resolve) => {
-        this.play_(resolve);
-      });
-    }
-
-    return this.play_();
+    return new Promise((resolve) => {
+      this.play_(resolve);
+    });
   }
 
   /**
@@ -2820,38 +2813,32 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   requestFullscreen(fullscreenOptions) {
-    const PromiseClass = this.options_.Promise || window.Promise;
+    const self = this;
 
-    if (PromiseClass) {
-      const self = this;
+    return new Promise((resolve, reject) => {
+      function offHandler() {
+        self.off('fullscreenerror', errorHandler);
+        self.off('fullscreenchange', changeHandler);
+      }
+      function changeHandler() {
+        offHandler();
+        resolve();
+      }
+      function errorHandler(e, err) {
+        offHandler();
+        reject(err);
+      }
 
-      return new PromiseClass((resolve, reject) => {
-        function offHandler() {
-          self.off('fullscreenerror', errorHandler);
-          self.off('fullscreenchange', changeHandler);
-        }
-        function changeHandler() {
-          offHandler();
-          resolve();
-        }
-        function errorHandler(e, err) {
-          offHandler();
-          reject(err);
-        }
+      self.one('fullscreenchange', changeHandler);
+      self.one('fullscreenerror', errorHandler);
 
-        self.one('fullscreenchange', changeHandler);
-        self.one('fullscreenerror', errorHandler);
+      const promise = self.requestFullscreenHelper_(fullscreenOptions);
 
-        const promise = self.requestFullscreenHelper_(fullscreenOptions);
-
-        if (promise) {
-          promise.then(offHandler, offHandler);
-          promise.then(resolve, reject);
-        }
-      });
-    }
-
-    return this.requestFullscreenHelper_();
+      if (promise) {
+        promise.then(offHandler, offHandler);
+        promise.then(resolve, reject);
+      }
+    });
   }
 
   requestFullscreenHelper_(fullscreenOptions) {
@@ -2876,6 +2863,7 @@ class Player extends Component {
     if (this.fsApi_.requestFullscreen) {
       const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
+      // Even on browsers with promise support this may not return a promise
       if (promise) {
         promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
       }
@@ -2898,45 +2886,40 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    const PromiseClass = this.options_.Promise || window.Promise;
+    const self = this;
 
-    if (PromiseClass) {
-      const self = this;
+    return new Promise((resolve, reject) => {
+      function offHandler() {
+        self.off('fullscreenerror', errorHandler);
+        self.off('fullscreenchange', changeHandler);
+      }
+      function changeHandler() {
+        offHandler();
+        resolve();
+      }
+      function errorHandler(e, err) {
+        offHandler();
+        reject(err);
+      }
 
-      return new PromiseClass((resolve, reject) => {
-        function offHandler() {
-          self.off('fullscreenerror', errorHandler);
-          self.off('fullscreenchange', changeHandler);
-        }
-        function changeHandler() {
-          offHandler();
-          resolve();
-        }
-        function errorHandler(e, err) {
-          offHandler();
-          reject(err);
-        }
+      self.one('fullscreenchange', changeHandler);
+      self.one('fullscreenerror', errorHandler);
 
-        self.one('fullscreenchange', changeHandler);
-        self.one('fullscreenerror', errorHandler);
+      const promise = self.exitFullscreenHelper_();
 
-        const promise = self.exitFullscreenHelper_();
-
-        if (promise) {
-          promise.then(offHandler, offHandler);
-          // map the promise to our resolve/reject methods
-          promise.then(resolve, reject);
-        }
-      });
-    }
-
-    return this.exitFullscreenHelper_();
+      if (promise) {
+        promise.then(offHandler, offHandler);
+        // map the promise to our resolve/reject methods
+        promise.then(resolve, reject);
+      }
+    });
   }
 
   exitFullscreenHelper_() {
     if (this.fsApi_.requestFullscreen) {
       const promise = document[this.fsApi_.exitFullscreen]();
 
+      // Even on browsers with promise support this may not return a promise
       if (promise) {
         // we're splitting the promise here, so, we want to catch the
         // potential error so that this chain doesn't have unhandled errors
@@ -3524,9 +3507,7 @@ class Player extends Component {
    * and calls `reset` on the `tech`.
    */
   reset() {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (this.paused() || !PromiseClass) {
+    if (this.paused()) {
       this.doReset_();
     } else {
       const playPromise = this.play();
