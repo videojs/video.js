@@ -23,6 +23,7 @@ import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
+import { deprecateFor8 } from './utils/deprecate';
 import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime, { setFormatTime, resetFormatTime } from './utils/format-time.js';
 import log, { createLogger } from './utils/log.js';
@@ -375,9 +376,9 @@ videojs.browser = browser;
  */
 videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
-videojs.extend = extend;
-videojs.mergeOptions = mergeOptions;
-videojs.bind = Fn.bind;
+videojs.extend = deprecateFor8('videojs.extend', 'native ES6 classes', extend);
+videojs.mergeOptions = deprecateFor8('videojs.mergeOptions', 'videojs.obj.merge', mergeOptions);
+videojs.bind = deprecateFor8('videojs.bind', 'native Function.prototype.bind', Fn.bind);
 videojs.registerPlugin = Plugin.registerPlugin;
 videojs.deregisterPlugin = Plugin.deregisterPlugin;
 
@@ -434,12 +435,13 @@ videojs.addLanguage = function(code, data) {
 videojs.log = log;
 videojs.createLogger = createLogger;
 
-videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
-videojs.formatTime = formatTime;
-videojs.setFormatTime = setFormatTime;
-videojs.resetFormatTime = resetFormatTime;
-videojs.parseUrl = Url.parseUrl;
-videojs.isCrossOrigin = Url.isCrossOrigin;
+videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', createTimeRanges);
+videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', createTimeRanges);
+videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.format', formatTime);
+videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.setFormat', setFormatTime);
+videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time.resetFormat', resetFormatTime);
+videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parse', Url.parseUrl);
+videojs.isCrossOrigin = deprecateFor8('videojs.isCrossOrigin', 'videojs.url.isCrossOrigin', Url.isCrossOrigin);
 videojs.EventTarget = EventTarget;
 videojs.on = Events.on;
 videojs.one = Events.one;
@@ -484,7 +486,7 @@ videojs.VideoTrack = VideoTrack;
   };
 });
 
-videojs.computedStyle = computedStyle;
+videojs.computedStyle = deprecateFor8('videojs.computedStyle', 'videojs.dom.computedStyle', computedStyle);
 
 /**
  * A reference to the {@link module:dom|DOM utility module} as an object.
@@ -502,7 +504,7 @@ videojs.dom = Dom;
  */
 videojs.url = Url;
 
-videojs.defineLazyProperty = defineLazyProperty;
+videojs.defineLazyProperty = deprecateFor8('videojs.defineLazyProperty', 'videojs.obj.defineLazyProperty', defineLazyProperty);
 
 // Adding less ambiguous text for fullscreen button.
 // In a major update this could become the default text and key.
