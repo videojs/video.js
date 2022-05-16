@@ -1,5 +1,4 @@
 /* eslint-env qunit */
-import {IE_VERSION} from '../../../src/js/utils/browser';
 import log from '../../../src/js/utils/log.js';
 import window from 'global/window';
 import sinon from 'sinon';
@@ -38,9 +37,6 @@ QUnit.module('utils/log', {
   }
 });
 
-const getConsoleArgs = (...arr) =>
-  IE_VERSION && IE_VERSION < 11 ? [arr.join(' ')] : arr;
-
 QUnit.test('logging functions should work', function(assert) {
 
   // Need to reset history here because there are extra messages logged
@@ -55,7 +51,7 @@ QUnit.test('logging functions should work', function(assert) {
   assert.ok(window.console.log.called, 'log was called');
   assert.deepEqual(
     window.console.log.firstCall.args,
-    getConsoleArgs('VIDEOJS:', 'log1', 'log2')
+    ['VIDEOJS:', 'log1', 'log2']
   );
 
   // debug isn't enabled by default
@@ -64,13 +60,13 @@ QUnit.test('logging functions should work', function(assert) {
   assert.ok(window.console.warn.called, 'warn was called');
   assert.deepEqual(
     window.console.warn.firstCall.args,
-    getConsoleArgs('VIDEOJS:', 'WARN:', 'warn1', 'warn2')
+    ['VIDEOJS:', 'WARN:', 'warn1', 'warn2']
   );
 
   assert.ok(window.console.error.called, 'error was called');
   assert.deepEqual(
     window.console.error.firstCall.args,
-    getConsoleArgs('VIDEOJS:', 'ERROR:', 'error1', 'error2')
+    ['VIDEOJS:', 'ERROR:', 'error1', 'error2']
   );
 
   const history = log.history();
@@ -205,7 +201,7 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   assert.notOk(window.console.error.called, 'error was not called');
   assert.deepEqual(
     window.console.info.firstCall.args,
-    getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'),
+    ['VIDEOJS:', 'DEBUG:', 'debug1', 'debug2'],
     'logged the right message'
   );
 
@@ -217,7 +213,7 @@ QUnit.test('falls back to info and log when debug is not supported', function(as
   assert.notOk(window.console.error.called, 'error was not called');
   assert.deepEqual(
     window.console.log.firstCall.args,
-    getConsoleArgs('VIDEOJS:', 'DEBUG:', 'debug3', 'debug4'),
+    ['VIDEOJS:', 'DEBUG:', 'debug3', 'debug4'],
     'logged the right message'
   );
 

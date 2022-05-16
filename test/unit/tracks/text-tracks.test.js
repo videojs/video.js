@@ -517,10 +517,10 @@ QUnit.test('should uniformly create html track element when adding text track', 
   player.dispose();
 });
 
-// disable in Firefox and IE because while the code works in practice,
-// during the tests, somehow the text track object isn't ready and thus it won't
-// allow us to change the mode of the track rendering the test non-functional.
-if (!browser.IS_FIREFOX && !browser.IE_VERSION === 11) {
+// disable in Firefox because while the code works in practice, during the
+// tests, somehow the text track object isn't ready and thus it won't allow
+// us to change the mode of the track rendering the test non-functional.
+if (!browser.IS_FIREFOX) {
   QUnit.test('remote text tracks change event should fire when using native text tracks', function(assert) {
     const done = assert.async();
 

@@ -1,7 +1,5 @@
 import Component from './component.js';
 import mergeOptions from './utils/merge-options.js';
-import document from 'global/document';
-import * as browser from './utils/browser.js';
 import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
@@ -44,7 +42,6 @@ class LiveTracker extends Component {
 
     super(player, options_);
 
-    this.handleVisibilityChange_ = (e) => this.handleVisibilityChange(e);
     this.trackLiveHandler_ = () => this.trackLive_();
     this.handlePlay_ = (e) => this.handlePlay(e);
     this.handleFirstTimeupdate_ = (e) => this.handleFirstTimeupdate(e);
@@ -57,28 +54,6 @@ class LiveTracker extends Component {
     // we should try to toggle tracking on canplay as native playback engines, like Safari
     // may not have the proper values for things like seekableEnd until then
     this.on(this.player_, 'canplay', () => this.toggleTracking());
-
-    // we don't need to track live playback if the document is hidden,
-    // also, tracking when the document is hidden can
-    // cause the CPU to spike and eventually crash the page on IE11.
-    if (browser.IE_VERSION && 'hidden' in document && 'visibilityState' in document) {
-      this.on(document, 'visibilitychange', this.handleVisibilityChange_);
-    }
-  }
-
-  /**
-   * toggle tracking based on document visiblility
-   */
-  handleVisibilityChange() {
-    if (this.player_.duration() !== Infinity) {
-      return;
-    }
-
-    if (document.hidden) {
-      this.stopTracking();
-    } else {
-      this.startTracking();
-    }
   }
 
   /**
@@ -393,7 +368,6 @@ class LiveTracker extends Component {
    * Dispose of liveTracker
    */
   dispose() {
-    this.off(document, 'visibilitychange', this.handleVisibilityChange_);
     this.stopTracking();
     super.dispose();
   }
