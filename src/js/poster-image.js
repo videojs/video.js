@@ -5,7 +5,6 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
 import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
-import * as browser from './utils/browser.js';
 
 /**
  * A `ClickableComponent` that handles showing the poster image for the player.
@@ -114,15 +113,7 @@ class PosterImage extends ClickableComponent {
       return;
     }
 
-    const sourceIsEncrypted = this.player_.usingPlugin('eme') &&
-                                this.player_.eme.sessions &&
-                                this.player_.eme.sessions.length > 0;
-
-    if (this.player_.tech(true) &&
-    // We've observed a bug in IE and Edge when playing back DRM content where
-    // calling .focus() on the video element causes the video to go black,
-    // so we avoid it in that specific case
-    !((browser.IE_VERSION || browser.IS_EDGE) && sourceIsEncrypted)) {
+    if (this.player_.tech(true)) {
       this.player_.tech(true).focus();
     }
 
