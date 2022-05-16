@@ -435,7 +435,7 @@ videojs.addLanguage = function(code, data) {
 videojs.log = log;
 videojs.createLogger = createLogger;
 
-videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', createTimeRanges);
+videojs.createTimeRange = deprecateFor8('videojs.createTimeRange', 'videojs.time.createTimeRanges', createTimeRanges);
 videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', createTimeRanges);
 videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.format', formatTime);
 videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.setFormat', setFormatTime);
