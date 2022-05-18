@@ -354,7 +354,7 @@ videojs.browser = browser;
  * Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead; only
  * included for backward-compatibility with 4.x.
  *
- * @deprecated Since version 5.0, use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED instead.
+ * @deprecated Deprecated since version 5.0, will be removed in 8.0. Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead.
  * @type {boolean}
  */
 videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
@@ -364,7 +364,7 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
  *
  * @type {Function}
  * @see {@link module:extend~extend|extend}
- * @deprecated Please use native ES6 classes instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use native ES6 classes instead.
  */
 videojs.extend = deprecateFor8('videojs.extend', 'native ES6 classes', extend);
 
@@ -373,7 +373,7 @@ videojs.extend = deprecateFor8('videojs.extend', 'native ES6 classes', extend);
  *
  * @type {Function}
  * @see {@link module:obj.merge|merge}
- * @deprecated Please use videojs.obj.merge instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.obj.merge instead.
  */
 videojs.mergeOptions = deprecateFor8('videojs.mergeOptions', 'videojs.obj.merge', Obj.merge);
 
@@ -382,7 +382,7 @@ videojs.mergeOptions = deprecateFor8('videojs.mergeOptions', 'videojs.obj.merge'
  *
  * @type {Function}
  * @see {@link module:obj.defineLazyProperty|defineLazyProperty}
- * @deprecated Please use videojs.obj.defineLazyProperty instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.obj.defineLazyProperty instead.
  */
 videojs.defineLazyProperty = deprecateFor8('videojs.defineLazyProperty', 'videojs.obj.defineLazyProperty', Obj.defineLazyProperty);
 
@@ -391,7 +391,7 @@ videojs.defineLazyProperty = deprecateFor8('videojs.defineLazyProperty', 'videoj
  *
  * @type {Function}
  * @see {@link module:fn.bind|fn.bind}
- * @deprecated Please use native Function.prototype.bind instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use native Function.prototype.bind instead.
  */
 videojs.bind = deprecateFor8('videojs.bind', 'native Function.prototype.bind', Fn.bind);
 
@@ -401,7 +401,7 @@ videojs.deregisterPlugin = Plugin.deregisterPlugin;
 /**
  * Deprecated method to register a plugin with Video.js
  *
- * @deprecated videojs.plugin() is deprecated; use videojs.registerPlugin() instead
+ * @deprecated Deprecated and will be removed in 8.0. Use videojs.registerPlugin() instead.
  *
  * @param {string} name
  *        The plugin name
@@ -472,7 +472,7 @@ videojs.time = {
  *
  * @type {Function}
  * @see {@link module:time-ranges.createTimeRanges|createTimeRanges}
- * @deprecated Please use videojs.time.createTimeRanges instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.createTimeRanges instead.
  */
 videojs.createTimeRange = deprecateFor8('videojs.createTimeRange', 'videojs.time.createTimeRanges', createTimeRanges);
 
@@ -481,7 +481,7 @@ videojs.createTimeRange = deprecateFor8('videojs.createTimeRange', 'videojs.time
  *
  * @type {Function}
  * @see {@link module:time-ranges.createTimeRanges|createTimeRanges}
- * @deprecated Please use videojs.time.createTimeRanges instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.createTimeRanges instead.
  */
 videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', createTimeRanges);
 
@@ -490,7 +490,7 @@ videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.ti
  *
  * @type {Function}
  * @see {@link module:format-time.formatTime|formatTime}
- * @deprecated Please use videojs.time.format instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.format instead.
  */
 videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.format', formatTime);
 
@@ -499,7 +499,7 @@ videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.format', 
  *
  * @type {Function}
  * @see {@link module:format-time.setFormatTime|setFormatTime}
- * @deprecated Please use videojs.time.setFormat instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.setFormat instead.
  */
 videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.setFormat', setFormatTime);
 
@@ -508,7 +508,7 @@ videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.set
  *
  * @type {Function}
  * @see {@link module:format-time.resetFormatTime|resetFormatTime}
- * @deprecated Please use videojs.time.resetFormat instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.resetFormat instead.
  */
 videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time.resetFormat', resetFormatTime);
 
@@ -517,7 +517,7 @@ videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time
  *
  * @type {Function}
  * @see {@link module:url.parseUrl|parseUrl}
- * @deprecated Please use videojs.url.parseUrl instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.url.parseUrl instead.
  */
 videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parse', Url.parseUrl);
 
@@ -526,7 +526,7 @@ videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parse', Url.pa
  *
  * @type {Function}
  * @see {@link module:url.isCrossOrigin|isCrossOrigin}
- * @deprecated Please use videojs.url.isCrossOrigin instead.
+ * @deprecated Deprecated and will be removed in 8.0. Please use videojs.url.isCrossOrigin instead.
  */
 videojs.isCrossOrigin = deprecateFor8('videojs.isCrossOrigin', 'videojs.url.isCrossOrigin', Url.isCrossOrigin);
 

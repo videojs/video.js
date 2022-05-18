@@ -37,6 +37,7 @@ export function deprecate(message, fn) {
  * Internal function used to mark a function as deprecated in 8.0, used to
  * avoid too much boilerplate.
  *
+ * @deprecated This function will be removed in 8.0.
  * @param  {string}   oldName The old function name
  * @param  {string}   newName The new function name
  * @param  {Function} fn      The function to deprecate
