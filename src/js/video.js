@@ -356,7 +356,12 @@ videojs.browser = browser;
  * @type {Object}
  * @see  {@link module:obj|obj}
  */
-videojs.obj = Obj;
+videojs.obj = Obj.assign({}, Obj);
+
+// Obj is not exposed yet and we do not want `assign` to be used as it will be
+// removed in Video.js 8.0. The other option here would be exposing it as a
+// deprecated function.
+delete videojs.obj.assign;
 
 /**
  * Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead; only

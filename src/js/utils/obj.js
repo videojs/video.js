@@ -83,6 +83,7 @@ export function reduce(object, fn, initial = 0) {
 /**
  * Object.assign-style object shallow merge/extend.
  *
+ * @deprecated Deprecated and will be removed in 8.0. Please use native Object.assign instead.
  * @param  {Object} target
  * @param  {Object} ...sources
  * @return {Object}
