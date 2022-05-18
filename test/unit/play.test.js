@@ -3,7 +3,7 @@ import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import window from 'global/window';
 import * as middleware from '../../src/js/tech/middleware.js';
-import videojs from '../../src/js/video.js';
+import {merge} from '../../src/js/utils/obj';
 
 const middleWareTerminations = ['terminates', 'does not-terminate'];
 const playReturnValues = ['non-promise', 'promise'];
@@ -51,7 +51,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
     };
 
     this.checkState = (assertName, options = {}) => {
-      const expectedState = videojs.mergeOptions({
+      const expectedState = merge({
         playCalls: 0,
         techLoaded: false,
         techReady: false,

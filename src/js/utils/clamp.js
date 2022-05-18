@@ -1,4 +1,9 @@
 /**
+ * @file clamp.js
+ * @module clamp
+ */
+
+/**
  * Keep a number between a min and a max value
  *
  * @param {number} number

@@ -7,7 +7,6 @@ import window from 'global/window';
 import fs from '../fullscreen-api';
 import log from './log.js';
 import {isObject} from './obj';
-import computedStyle from './computed-style';
 import * as browser from './browser';
 
 /**
@@ -879,3 +878,38 @@ export const $ = createQuerier('querySelector');
  *
  */
 export const $$ = createQuerier('querySelectorAll');
+
+/**
+ * A safe getComputedStyle.
+ *
+ * This is needed because in Firefox, if the player is loaded in an iframe with
+ * `display:none`, then `getComputedStyle` returns `null`, so, we do a
+ * null-check to make sure that the player doesn't break in these cases.
+ *
+ * @param    {Element} el
+ *           The element you want the computed style of
+ *
+ * @param    {string} prop
+ *           The property name you want
+ *
+ * @see      https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+ */
+export function computedStyle(el, prop) {
+  if (!el || !prop) {
+    return '';
+  }
+
+  if (typeof window.getComputedStyle === 'function') {
+    let computedStyleValue;
+
+    try {
+      computedStyleValue = window.getComputedStyle(el);
+    } catch (e) {
+      return '';
+    }
+
+    return computedStyleValue ? computedStyleValue.getPropertyValue(prop) || computedStyleValue[prop] : '';
+  }
+
+  return '';
+}

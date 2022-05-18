@@ -76,7 +76,6 @@ export function resetFormatTime() {
  * guide (in seconds) will force a number of leading zeros to cover the
  * length of the guide.
  *
- * @static
  * @example  formatTime(125, 600) === "02:05"
  * @param    {number} seconds
  *           Number of seconds to be turned into a string
@@ -87,8 +86,6 @@ export function resetFormatTime() {
  * @return   {string}
  *           Time formatted as H:MM:SS or M:SS
  */
-function formatTime(seconds, guide = seconds) {
+export function formatTime(seconds, guide = seconds) {
   return implementation(seconds, guide);
 }
-
-export default formatTime;

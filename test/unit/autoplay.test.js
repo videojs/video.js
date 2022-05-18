@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
+import {merge} from '../../src/js/utils/obj';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 import window from 'global/window';
@@ -63,7 +64,7 @@ QUnit.module('autoplay', {
         videoTag.setAttribute(a, attributes[a]);
       });
 
-      this.player = videojs(videoTag.id, videojs.mergeOptions({techOrder: ['techFaker']}, options));
+      this.player = videojs(videoTag.id, merge({techOrder: ['techFaker']}, options));
       const oldMuted = this.player.muted;
 
       this.player.play = () => {

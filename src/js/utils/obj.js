@@ -131,3 +131,76 @@ export function isPlain(value) {
     toString.call(value) === '[object Object]' &&
     value.constructor === Object;
 }
+
+/**
+ * Merge two objects recursively.
+ *
+ * Performs a deep merge like
+ * {@link https://lodash.com/docs/4.17.10#merge|lodash.merge}, but only merges
+ * plain objects (not arrays, elements, or anything else).
+ *
+ * Non-plain object values will be copied directly from the right-most
+ * argument.
+ *
+ * @param   {Object[]} sources
+ *          One or more objects to merge into a new object.
+ *
+ * @return {Object}
+ *          A new object that is the merged result of all sources.
+ */
+export function merge(...sources) {
+  const result = {};
+
+  sources.forEach(source => {
+    if (!source) {
+      return;
+    }
+
+    each(source, (value, key) => {
+      if (!isPlain(value)) {
+        result[key] = value;
+        return;
+      }
+
+      if (!isPlain(result[key])) {
+        result[key] = {};
+      }
+
+      result[key] = merge(result[key], value);
+    });
+  });
+
+  return result;
+}
+
+/**
+ * Object.defineProperty but "lazy", which means that the value is only set after
+ * it retrieved the first time, rather than being set right away.
+ *
+ * @param {Object} obj the object to set the property on
+ * @param {string} key the key for the property to set
+ * @param {Function} getValue the function used to get the value when it is needed.
+ * @param {boolean} setter wether a setter shoould be allowed or not
+ */
+export function defineLazyProperty(obj, key, getValue, setter = true) {
+  const set = (value) =>
+    Object.defineProperty(obj, key, {value, enumerable: true, writable: true});
+
+  const options = {
+    configurable: true,
+    enumerable: true,
+    get() {
+      const value = getValue();
+
+      set(value);
+
+      return value;
+    }
+  };
+
+  if (setter) {
+    options.set = set;
+  }
+
+  return Object.defineProperty(obj, key, options);
+}

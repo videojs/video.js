@@ -23,8 +23,7 @@ import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign} from './utils/obj';
-import mergeOptions from './utils/merge-options.js';
+import {assign, merge} from './utils/obj';
 import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
@@ -504,7 +503,7 @@ class Player extends Component {
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
     // an infinite loop.
-    const playerOptionsCopy = mergeOptions(this.options_);
+    const playerOptionsCopy = merge(this.options_);
 
     // Load plugins
     if (options.plugins) {
@@ -1525,7 +1524,7 @@ class Player extends Component {
     }
 
     // update `currentSource` cache always
-    this.cache_.source = mergeOptions({}, srcObj, {src, type});
+    this.cache_.source = merge({}, srcObj, {src, type});
 
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
     const sourceElSources = [];
@@ -4588,7 +4587,7 @@ class Player extends Component {
    *         An array of of supported languages
    */
   languages() {
-    return mergeOptions(Player.prototype.options_.languages, this.languages_);
+    return merge(Player.prototype.options_.languages, this.languages_);
   }
 
   /**
@@ -4599,7 +4598,7 @@ class Player extends Component {
    *         Object representing the current of track info
    */
   toJSON() {
-    const options = mergeOptions(this.options_);
+    const options = merge(this.options_);
     const tracks = options.tracks;
 
     options.tracks = [];
@@ -4608,7 +4607,7 @@ class Player extends Component {
       let track = tracks[i];
 
       // deep merge tracks and null out player so no circular references
-      track = mergeOptions(track);
+      track = merge(track);
       track.player = undefined;
       options.tracks[i] = track;
     }
@@ -4882,7 +4881,7 @@ class Player extends Component {
     this.reset();
 
     // Clone the media object so it cannot be mutated from outside.
-    this.cache_.media = mergeOptions(media);
+    this.cache_.media = merge(media);
 
     const {artwork, poster, src, textTracks} = this.cache_.media;
 
@@ -4941,7 +4940,7 @@ class Player extends Component {
       return media;
     }
 
-    return mergeOptions(this.cache_.media);
+    return merge(this.cache_.media);
   }
 
   /**

@@ -9,7 +9,7 @@ import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from '@videojs/xhr';
-import merge from '../utils/merge-options';
+import {merge} from '../utils/obj';
 
 /**
  * Takes a webvtt file contents and parses it into cues

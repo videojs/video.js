@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import formatTime, { setFormatTime, resetFormatTime } from '../../../src/js/utils/format-time.js';
+import { formatTime, setFormatTime, resetFormatTime } from '../../../src/js/utils/format-time.js';
 
 QUnit.module('format-time standard implementation', {
   afterEach: resetFormatTime()
