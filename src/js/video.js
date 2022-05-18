@@ -23,8 +23,7 @@ import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
 import { deprecateFor8 } from './utils/deprecate';
-import { createTimeRanges } from './utils/time-ranges.js';
-import { formatTime, setFormatTime, resetFormatTime } from './utils/format-time.js';
+import * as Time from './utils/time.js';
 import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
@@ -351,6 +350,14 @@ Object.defineProperty(videojs.middleware, 'TERMINATOR', {
 videojs.browser = browser;
 
 /**
+ * A reference to the {@link module:obj|obj utility module} as an object.
+ *
+ * @type {Object}
+ * @see  {@link module:obj|obj}
+ */
+videojs.obj = Obj;
+
+/**
  * Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead; only
  * included for backward-compatibility with 4.x.
  *
@@ -452,65 +459,57 @@ videojs.log = log;
 videojs.createLogger = createLogger;
 
 /**
- * General utility functions for working with time.
+ * A reference to the {@link module:time|time utility module} as an object.
  *
- * @namespace
- * @borrows module:format-time.formatTime as format
- * @borrows module:format-time.resetFormatTime as resetFormat
- * @borrows module:format-time.setFormatTime as setFormat
- * @borrows module:time-ranges.createTimeRanges as createTimeRanges
+ * @type {Object}
+ * @see {@link module:time|time}
  */
-videojs.time = {
-  createTimeRanges,
-  format: formatTime,
-  setFormat: setFormatTime,
-  resetFormat: resetFormatTime
-};
+videojs.time = Time;
 
 /**
- * Deprecated reference to the {@link module:time-ranges.createTimeRanges|createTimeRanges function}
+ * Deprecated reference to the {@link module:time.createTimeRanges|createTimeRanges function}
  *
  * @type {Function}
- * @see {@link module:time-ranges.createTimeRanges|createTimeRanges}
+ * @see {@link module:time.createTimeRanges|createTimeRanges}
  * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.createTimeRanges instead.
  */
-videojs.createTimeRange = deprecateFor8('videojs.createTimeRange', 'videojs.time.createTimeRanges', createTimeRanges);
+videojs.createTimeRange = deprecateFor8('videojs.createTimeRange', 'videojs.time.createTimeRanges', Time.createTimeRanges);
 
 /**
- * Deprecated reference to the {@link module:time-ranges.createTimeRanges|createTimeRanges function}
+ * Deprecated reference to the {@link module:time.createTimeRanges|createTimeRanges function}
  *
  * @type {Function}
- * @see {@link module:time-ranges.createTimeRanges|createTimeRanges}
+ * @see {@link module:time.createTimeRanges|createTimeRanges}
  * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.createTimeRanges instead.
  */
-videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', createTimeRanges);
+videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', Time.createTimeRanges);
 
 /**
- * Deprecated reference to the {@link module:format-time.formatTime|formatTime function}
+ * Deprecated reference to the {@link module:time.formatTime|formatTime function}
  *
  * @type {Function}
- * @see {@link module:format-time.formatTime|formatTime}
+ * @see {@link module:time.formatTime|formatTime}
  * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.format instead.
  */
-videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.format', formatTime);
+videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.formatTime', Time.formatTime);
 
 /**
- * Deprecated reference to the {@link module:format-time.setFormatTime|setFormatTime function}
+ * Deprecated reference to the {@link module:time.setFormatTime|setFormatTime function}
  *
  * @type {Function}
- * @see {@link module:format-time.setFormatTime|setFormatTime}
+ * @see {@link module:time.setFormatTime|setFormatTime}
  * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.setFormat instead.
  */
-videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.setFormat', setFormatTime);
+videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.setFormatTime', Time.setFormatTime);
 
 /**
- * Deprecated reference to the {@link module:format-time.resetFormatTime|resetFormatTime function}
+ * Deprecated reference to the {@link module:time.resetFormatTime|resetFormatTime function}
  *
  * @type {Function}
- * @see {@link module:format-time.resetFormatTime|resetFormatTime}
+ * @see {@link module:time.resetFormatTime|resetFormatTime}
  * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.resetFormat instead.
  */
-videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time.resetFormat', resetFormatTime);
+videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time.resetFormatTime', Time.resetFormatTime);
 
 /**
  * Deprecated reference to the {@link module:url.parseUrl|Url.parseUrl function}
@@ -519,7 +518,7 @@ videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time
  * @see {@link module:url.parseUrl|parseUrl}
  * @deprecated Deprecated and will be removed in 8.0. Please use videojs.url.parseUrl instead.
  */
-videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parse', Url.parseUrl);
+videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parseUrl', Url.parseUrl);
 
 /**
  * Deprecated reference to the {@link module:url.isCrossOrigin|Url.isCrossOrigin function}
@@ -554,13 +553,6 @@ videojs.TextTrack = TextTrack;
 videojs.AudioTrack = AudioTrack;
 videojs.VideoTrack = VideoTrack;
 
-/**
- * A reference to the {@link module:obj|obj utility module} as an object.
- *
- * @namespace
- */
-videojs.obj = Obj;
-
 [
   'isEl',
   'isTextNode',
@@ -586,7 +578,7 @@ videojs.computedStyle = deprecateFor8('videojs.computedStyle', 'videojs.dom.comp
 /**
  * A reference to the {@link module:dom|DOM utility module} as an object.
  *
- * @namespace
+ * @type {Object}
  * @see {@link module:dom|dom}
  */
 videojs.dom = Dom;
@@ -594,7 +586,7 @@ videojs.dom = Dom;
 /**
  * A reference to the {@link module:url|URL utility module} as an object.
  *
- * @namespace
+ * @type {Object}
  * @see {@link module:url|url}
  */
 videojs.url = Url;

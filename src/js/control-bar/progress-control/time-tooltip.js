@@ -3,7 +3,7 @@
  */
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
-import {formatTime} from '../../utils/format-time.js';
+import {formatTime} from '../../utils/time.js';
 import * as Fn from '../../utils/fn.js';
 
 /**

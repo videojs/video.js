@@ -17,7 +17,7 @@ import * as browser from './utils/browser.js';
 import {IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
 import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
-import { createTimeRange } from './utils/time-ranges.js';
+import { createTimeRange } from './utils/time.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';

@@ -5,7 +5,7 @@
 import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
-import { createTimeRange } from '../utils/time-ranges.js';
+import { createTimeRange } from '../utils/time.js';
 import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
