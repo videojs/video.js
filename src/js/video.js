@@ -162,6 +162,12 @@ function videojs(id, options, ready) {
 
   options = options || {};
 
+  // Store a copy of the el before modification, if it is to be restored in destroy()
+  // If div ingest, store the parent div
+  if (options.restoreEl === true) {
+    options.restoreEl = (el.parentNode && el.parentNode.hasAttribute('data-vjs-player') ? el.parentNode : el).cloneNode(true);
+  }
+
   hooks('beforesetup').forEach((hookFunction) => {
     const opts = hookFunction(el, mergeOptions(options));
 

@@ -666,8 +666,8 @@ class Player extends Component {
       }
     });
 
-    // the actual .el_ is removed here
-    super.dispose();
+    // the actual .el_ is removed here, or replaced if
+    super.dispose({restoreEl: this.options_.restoreEl});
   }
 
   /**

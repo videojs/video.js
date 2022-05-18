@@ -137,8 +137,11 @@ class Component {
    * Dispose of the `Component` and all child components.
    *
    * @fires Component#dispose
+   *
+   * @param {Object} options
+   * @param {Element} options.originalEl element with which to replace player element
    */
-  dispose() {
+  dispose(options = {}) {
 
     // Bail out if the component has already been disposed.
     if (this.isDisposed_) {
@@ -182,7 +185,11 @@ class Component {
     if (this.el_) {
       // Remove element from DOM
       if (this.el_.parentNode) {
-        this.el_.parentNode.removeChild(this.el_);
+        if (options.restoreEl) {
+          this.el_.parentNode.replaceChild(options.restoreEl, this.el_);
+        } else {
+          this.el_.parentNode.removeChild(this.el_);
+        }
       }
 
       this.el_ = null;

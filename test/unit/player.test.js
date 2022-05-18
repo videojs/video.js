@@ -105,6 +105,20 @@ QUnit.test('dispose should not throw if playerEl is missing', function(assert) {
   assert.notOk(error, 'Function did not throw an error on dispose');
 });
 
+QUnit.test('dispose should replace playerEl with restoreEl', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+  const replacement = document.createElement('div');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag, {restoreEl: replacement});
+
+  player.dispose();
+
+  assert.ok(replacement.parentNode, fixture, 'Replacement node present after dispose');
+});
+
 // technically, all uses of videojs.options should be replaced with
 // Player.prototype.options_ in this file and a equivalent test using
 // videojs.options should be made in video.test.js. Keeping this here

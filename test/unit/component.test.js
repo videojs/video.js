@@ -1431,3 +1431,15 @@ QUnit.test('ready queue should not run after dispose', function(assert) {
   assert.notOk(callback, 'ready callback not run');
 
 });
+
+QUnit.test('a component\'s el can be replaced on dispose', function(assert) {
+  const comp = this.player.addChild('Component', {}, {}, 2);
+  const prevIndex = Array.from(this.player.el_.childNodes).indexOf(comp.el_);
+  const replacementEl = document.createElement('div');
+
+  comp.dispose({restoreEl: replacementEl});
+
+  assert.strictEqual(replacementEl.parentNode, this.player.el_, 'replacement was inserted');
+  assert.strictEqual(Array.from(this.player.el_.childNodes).indexOf(replacementEl), prevIndex, 'replacement was inserted at same position');
+
+});
