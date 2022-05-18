@@ -19,6 +19,7 @@ import * as Events from './utils/events.js';
 import Player from './player';
 import Plugin from './plugin';
 import * as Fn from './utils/fn.js';
+import * as Num from './utils/num.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
@@ -582,6 +583,22 @@ videojs.computedStyle = deprecateFor8('videojs.computedStyle', 'videojs.dom.comp
  * @see {@link module:dom|dom}
  */
 videojs.dom = Dom;
+
+/**
+ * A reference to the {@link module:fn|fn utility module} as an object.
+ *
+ * @type {Object}
+ * @see {@link module:fn|fn}
+ */
+videojs.fn = Fn;
+
+/**
+ * A reference to the {@link module:num|num utility module} as an object.
+ *
+ * @type {Object}
+ * @see {@link module:num|num}
+ */
+videojs.num = Num;
 
 /**
  * A reference to the {@link module:url|URL utility module} as an object.

@@ -5,7 +5,7 @@ import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {assign} from '../utils/obj';
 import {IS_CHROME} from '../utils/browser.js';
-import clamp from '../utils/clamp.js';
+import {clamp} from '../utils/num.js';
 import keycode from 'keycode';
 
 /**

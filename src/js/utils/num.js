@@ -1,6 +1,6 @@
 /**
- * @file clamp.js
- * @module clamp
+ * @file num.js
+ * @module num
  */
 
 /**
@@ -17,10 +17,8 @@
  * @return {number}
  *         the clamped number
  */
-const clamp = function(number, min, max) {
+export function clamp(number, min, max) {
   number = Number(number);
 
   return Math.min(max, Math.max(min, isNaN(number) ? min : number));
-};
-
-export default clamp;
+}
