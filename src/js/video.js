@@ -20,6 +20,7 @@ import Player from './player';
 import Plugin from './plugin';
 import * as Fn from './utils/fn.js';
 import * as Num from './utils/num.js';
+import * as Str from './utils/str.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
@@ -536,6 +537,8 @@ videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parseUrl', Url
 videojs.isCrossOrigin = deprecateFor8('videojs.isCrossOrigin', 'videojs.url.isCrossOrigin', Url.isCrossOrigin);
 
 videojs.EventTarget = EventTarget;
+
+videojs.any = Events.any;
 videojs.on = Events.on;
 videojs.one = Events.one;
 videojs.off = Events.off;
@@ -604,6 +607,14 @@ videojs.fn = Fn;
  * @see {@link module:num|num}
  */
 videojs.num = Num;
+
+/**
+ * A reference to the {@link module:str|str utility module} as an object.
+ *
+ * @type {Object}
+ * @see {@link module:str|str}
+ */
+videojs.str = Str;
 
 /**
  * A reference to the {@link module:url|URL utility module} as an object.

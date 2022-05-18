@@ -1,7 +1,7 @@
 /* eslint-env qunit */
-import {toLowerCase, toTitleCase, titleCaseEquals} from '../../../src/js/utils/string-cases.js';
+import {toLowerCase, toTitleCase, titleCaseEquals} from '../../../src/js/utils/str.js';
 
-QUnit.module('string-cases');
+QUnit.module('str');
 
 QUnit.test('toTitleCase should make a string start with an uppercase letter', function(assert) {
   const foo = toTitleCase('bar');

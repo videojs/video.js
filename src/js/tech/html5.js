@@ -9,7 +9,7 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
 import {assign, defineLazyProperty, merge} from '../utils/obj';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 import {NORMAL as TRACK_TYPES, REMOTE} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
 import {silencePromise} from '../utils/promise';
