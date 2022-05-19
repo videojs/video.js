@@ -77,7 +77,6 @@ const primedBabel = babel({
     }]
   ],
   plugins: [
-    '@babel/plugin-transform-object-assign',
     ['@babel/plugin-transform-runtime', {regenerator: false}]
   ]
 });

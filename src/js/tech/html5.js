@@ -8,7 +8,7 @@ import log from '../utils/log.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
-import {assign, defineLazyProperty, merge} from '../utils/obj';
+import {defineLazyProperty, merge} from '../utils/obj';
 import {toTitleCase} from '../utils/str.js';
 import {NORMAL as TRACK_TYPES, REMOTE} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
@@ -391,7 +391,7 @@ class Html5 extends Tech {
 
         Dom.setAttributes(
           el,
-          assign(attributes, {
+          Object.assign(attributes, {
             id: this.options_.techId,
             class: 'vjs-tech'
           })

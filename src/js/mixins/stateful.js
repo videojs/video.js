@@ -103,11 +103,11 @@ const StatefulMixin = {
  *          Returns the `target`.
  */
 function stateful(target, defaultState) {
-  Obj.assign(target, StatefulMixin);
+  Object.assign(target, StatefulMixin);
 
   // This happens after the mixing-in because we need to replace the `state`
   // added in that step.
-  target.state = Obj.assign({}, target.state, defaultState);
+  target.state = Object.assign({}, target.state, defaultState);
 
   // Auto-bind the `handleStateChanged` method of the target object if it exists.
   if (typeof target.handleStateChanged === 'function' && isEvented(target)) {

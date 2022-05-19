@@ -23,7 +23,7 @@ import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign, merge} from './utils/obj';
+import {merge} from './utils/obj';
 import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
@@ -311,7 +311,7 @@ class Player extends Component {
     // which overrides globally set options.
     // This latter part coincides with the load order
     // (tag must exist before Player)
-    options = assign(Player.getTagSettings(tag), options);
+    options = Object.assign(Player.getTagSettings(tag), options);
 
     // Delay the initialization of children because we need to set up
     // player properties first, and can't use `this` before `super()`
@@ -1184,9 +1184,9 @@ class Player extends Component {
       techOptions[props.getterName] = this[props.privateName];
     });
 
-    assign(techOptions, this.options_[titleTechName]);
-    assign(techOptions, this.options_[camelTechName]);
-    assign(techOptions, this.options_[techName.toLowerCase()]);
+    Object.assign(techOptions, this.options_[titleTechName]);
+    Object.assign(techOptions, this.options_[camelTechName]);
+    Object.assign(techOptions, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
       techOptions.tag = this.tag;
@@ -4737,18 +4737,18 @@ class Player extends Component {
 
     // Used as a getter.
     if (breakpoints === undefined) {
-      return assign(this.breakpoints_);
+      return Object.assign(this.breakpoints_);
     }
 
     this.breakpoint_ = '';
-    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+    this.breakpoints_ = Object.assign({}, DEFAULT_BREAKPOINTS, breakpoints);
 
     // When breakpoint definitions change, we need to update the currently
     // selected breakpoint.
     this.updateCurrentBreakpoint_();
 
     // Clone the breakpoints before returning.
-    return assign(this.breakpoints_);
+    return Object.assign(this.breakpoints_);
   }
 
   /**
@@ -4978,10 +4978,10 @@ class Player extends Component {
       if (err) {
         log.error(err);
       }
-      assign(tagOptions, data);
+      Object.assign(tagOptions, data);
     }
 
-    assign(baseOptions, tagOptions);
+    Object.assign(baseOptions, tagOptions);
 
     // Get tag children settings
     if (tag.hasChildNodes()) {
