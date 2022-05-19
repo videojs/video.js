@@ -34,15 +34,15 @@ export function deprecate(message, fn) {
 }
 
 /**
- * Internal function used to mark a function as deprecated in 8.0, used to
- * avoid too much boilerplate.
+ * Internal function used to mark a function as deprecated in the next major
+ * version with consistent messaging.
  *
- * @deprecated This function will be removed in 8.0.
+ * @param  {number}   major   The major version where it will be removed
  * @param  {string}   oldName The old function name
  * @param  {string}   newName The new function name
  * @param  {Function} fn      The function to deprecate
  * @return {Function}         The decorated function
  */
-export function deprecateFor8(oldName, newName, fn) {
-  return deprecate(`${oldName} is deprecated and will be removed in 8.0. Please use ${newName} instead.`, fn);
+export function deprecateForMajor(major, oldName, newName, fn) {
+  return deprecate(`${oldName} is deprecated and will be removed in ${major}.0; please use ${newName} instead.`, fn);
 }

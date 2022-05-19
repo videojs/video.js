@@ -24,7 +24,7 @@ import * as Str from './utils/str.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
-import { deprecateFor8 } from './utils/deprecate';
+import { deprecateForMajor } from './utils/deprecate';
 import * as Time from './utils/time.js';
 import log, { createLogger } from './utils/log.js';
 import * as Dom from './utils/dom.js';
@@ -357,57 +357,43 @@ videojs.browser = browser;
  * @type {Object}
  * @see  {@link module:obj|obj}
  */
-videojs.obj = Obj.assign({}, Obj);
-
-// Obj is not exposed yet and we do not want `assign` to be used as it will be
-// removed in Video.js 8.0. The other option here would be exposing it as a
-// deprecated function.
-delete videojs.obj.assign;
-
-/**
- * Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead; only
- * included for backward-compatibility with 4.x.
- *
- * @deprecated Deprecated since version 5.0, will be removed in 8.0. Use {@link module:browser.TOUCH_ENABLED|browser.TOUCH_ENABLED} instead.
- * @type {boolean}
- */
-videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
+videojs.obj = Obj;
 
 /**
  * Deprecated reference to the {@link module:extend~extend|extend function}
  *
  * @type {Function}
  * @see {@link module:extend~extend|extend}
- * @deprecated Deprecated and will be removed in 8.0. Please use native ES6 classes instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use native ES6 classes instead.
  */
-videojs.extend = deprecateFor8('videojs.extend', 'native ES6 classes', extend);
+videojs.extend = deprecateForMajor(9, 'videojs.extend', 'native ES6 classes', extend);
 
 /**
  * Deprecated reference to the {@link module:obj.merge|merge function}
  *
  * @type {Function}
  * @see {@link module:obj.merge|merge}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.obj.merge instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.obj.merge instead.
  */
-videojs.mergeOptions = deprecateFor8('videojs.mergeOptions', 'videojs.obj.merge', Obj.merge);
+videojs.mergeOptions = deprecateForMajor(9, 'videojs.mergeOptions', 'videojs.obj.merge', Obj.merge);
 
 /**
  * Deprecated reference to the {@link module:obj.defineLazyProperty|defineLazyProperty function}
  *
  * @type {Function}
  * @see {@link module:obj.defineLazyProperty|defineLazyProperty}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.obj.defineLazyProperty instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.obj.defineLazyProperty instead.
  */
-videojs.defineLazyProperty = deprecateFor8('videojs.defineLazyProperty', 'videojs.obj.defineLazyProperty', Obj.defineLazyProperty);
+videojs.defineLazyProperty = deprecateForMajor(9, 'videojs.defineLazyProperty', 'videojs.obj.defineLazyProperty', Obj.defineLazyProperty);
 
 /**
  * Deprecated reference to the {@link module:fn.bind|fn.bind function}
  *
  * @type {Function}
  * @see {@link module:fn.bind|fn.bind}
- * @deprecated Deprecated and will be removed in 8.0. Please use native Function.prototype.bind instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use native Function.prototype.bind instead.
  */
-videojs.bind = deprecateFor8('videojs.bind', 'native Function.prototype.bind', Fn.bind);
+videojs.bind = deprecateForMajor(9, 'videojs.bind', 'native Function.prototype.bind', Fn.bind);
 
 videojs.registerPlugin = Plugin.registerPlugin;
 videojs.deregisterPlugin = Plugin.deregisterPlugin;
@@ -415,7 +401,7 @@ videojs.deregisterPlugin = Plugin.deregisterPlugin;
 /**
  * Deprecated method to register a plugin with Video.js
  *
- * @deprecated Deprecated and will be removed in 8.0. Use videojs.registerPlugin() instead.
+ * @deprecated Deprecated and will be removed in 9.0. Use videojs.registerPlugin() instead.
  *
  * @param {string} name
  *        The plugin name
@@ -478,63 +464,63 @@ videojs.time = Time;
  *
  * @type {Function}
  * @see {@link module:time.createTimeRanges|createTimeRanges}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.createTimeRanges instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.time.createTimeRanges instead.
  */
-videojs.createTimeRange = deprecateFor8('videojs.createTimeRange', 'videojs.time.createTimeRanges', Time.createTimeRanges);
+videojs.createTimeRange = deprecateForMajor(9, 'videojs.createTimeRange', 'videojs.time.createTimeRanges', Time.createTimeRanges);
 
 /**
  * Deprecated reference to the {@link module:time.createTimeRanges|createTimeRanges function}
  *
  * @type {Function}
  * @see {@link module:time.createTimeRanges|createTimeRanges}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.createTimeRanges instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.time.createTimeRanges instead.
  */
-videojs.createTimeRanges = deprecateFor8('videojs.createTimeRanges', 'videojs.time.createTimeRanges', Time.createTimeRanges);
+videojs.createTimeRanges = deprecateForMajor(9, 'videojs.createTimeRanges', 'videojs.time.createTimeRanges', Time.createTimeRanges);
 
 /**
  * Deprecated reference to the {@link module:time.formatTime|formatTime function}
  *
  * @type {Function}
  * @see {@link module:time.formatTime|formatTime}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.format instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.time.format instead.
  */
-videojs.formatTime = deprecateFor8('videojs.formatTime', 'videojs.time.formatTime', Time.formatTime);
+videojs.formatTime = deprecateForMajor(9, 'videojs.formatTime', 'videojs.time.formatTime', Time.formatTime);
 
 /**
  * Deprecated reference to the {@link module:time.setFormatTime|setFormatTime function}
  *
  * @type {Function}
  * @see {@link module:time.setFormatTime|setFormatTime}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.setFormat instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.time.setFormat instead.
  */
-videojs.setFormatTime = deprecateFor8('videojs.setFormatTime', 'videojs.time.setFormatTime', Time.setFormatTime);
+videojs.setFormatTime = deprecateForMajor(9, 'videojs.setFormatTime', 'videojs.time.setFormatTime', Time.setFormatTime);
 
 /**
  * Deprecated reference to the {@link module:time.resetFormatTime|resetFormatTime function}
  *
  * @type {Function}
  * @see {@link module:time.resetFormatTime|resetFormatTime}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.time.resetFormat instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.time.resetFormat instead.
  */
-videojs.resetFormatTime = deprecateFor8('videojs.resetFormatTime', 'videojs.time.resetFormatTime', Time.resetFormatTime);
+videojs.resetFormatTime = deprecateForMajor(9, 'videojs.resetFormatTime', 'videojs.time.resetFormatTime', Time.resetFormatTime);
 
 /**
  * Deprecated reference to the {@link module:url.parseUrl|Url.parseUrl function}
  *
  * @type {Function}
  * @see {@link module:url.parseUrl|parseUrl}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.url.parseUrl instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.url.parseUrl instead.
  */
-videojs.parseUrl = deprecateFor8('videojs.parseUrl', 'videojs.url.parseUrl', Url.parseUrl);
+videojs.parseUrl = deprecateForMajor(9, 'videojs.parseUrl', 'videojs.url.parseUrl', Url.parseUrl);
 
 /**
  * Deprecated reference to the {@link module:url.isCrossOrigin|Url.isCrossOrigin function}
  *
  * @type {Function}
  * @see {@link module:url.isCrossOrigin|isCrossOrigin}
- * @deprecated Deprecated and will be removed in 8.0. Please use videojs.url.isCrossOrigin instead.
+ * @deprecated Deprecated and will be removed in 9.0. Please use videojs.url.isCrossOrigin instead.
  */
-videojs.isCrossOrigin = deprecateFor8('videojs.isCrossOrigin', 'videojs.url.isCrossOrigin', Url.isCrossOrigin);
+videojs.isCrossOrigin = deprecateForMajor(9, 'videojs.isCrossOrigin', 'videojs.url.isCrossOrigin', Url.isCrossOrigin);
 
 videojs.EventTarget = EventTarget;
 
@@ -582,7 +568,7 @@ videojs.VideoTrack = VideoTrack;
   };
 });
 
-videojs.computedStyle = deprecateFor8('videojs.computedStyle', 'videojs.dom.computedStyle', Dom.computedStyle);
+videojs.computedStyle = deprecateForMajor(9, 'videojs.computedStyle', 'videojs.dom.computedStyle', Dom.computedStyle);
 
 /**
  * A reference to the {@link module:dom|DOM utility module} as an object.
@@ -628,12 +614,4 @@ videojs.url = Url;
 // In a major update this could become the default text and key.
 videojs.addLanguage('en', {'Non-Fullscreen': 'Exit Fullscreen'});
 
-videojs.clamp = clamp;
-videojs.fn = Fn;
-videojs.obj = Obj;
-videojs.isPromise = isPromise;
-videojs.silencePromise = silencePromise;
-videojs.strings = StringCases;
-
 export default videojs;
-

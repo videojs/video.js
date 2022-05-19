@@ -1,7 +1,5 @@
 import Component from './component.js';
 import {merge} from './utils/obj.js';
-import document from 'global/document';
-import * as browser from './utils/browser.js';
 import window from 'global/window';
 import * as Fn from './utils/fn.js';
 

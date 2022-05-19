@@ -81,32 +81,6 @@ export function reduce(object, fn, initial = 0) {
 }
 
 /**
- * Object.assign-style object shallow merge/extend.
- *
- * @deprecated Deprecated and will be removed in 8.0. Please use native Object.assign instead.
- * @param  {Object} target
- * @param  {Object} ...sources
- * @return {Object}
- */
-export function assign(target, ...sources) {
-  if (Object.assign) {
-    return Object.assign(target, ...sources);
-  }
-
-  sources.forEach(source => {
-    if (!source) {
-      return;
-    }
-
-    each(source, (value, key) => {
-      target[key] = value;
-    });
-  });
-
-  return target;
-}
-
-/**
  * Returns whether a value is an object of any kind - including DOM nodes,
  * arrays, regular expressions, etc. Not functions, though.
  *
