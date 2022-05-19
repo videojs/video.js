@@ -150,12 +150,12 @@ export function merge(...sources) {
 
 /**
  * Object.defineProperty but "lazy", which means that the value is only set after
- * it retrieved the first time, rather than being set right away.
+ * it is retrieved the first time, rather than being set right away.
  *
  * @param {Object} obj the object to set the property on
  * @param {string} key the key for the property to set
  * @param {Function} getValue the function used to get the value when it is needed.
- * @param {boolean} setter wether a setter shoould be allowed or not
+ * @param {boolean} setter whether a setter should be allowed or not
  */
 export function defineLazyProperty(obj, key, getValue, setter = true) {
   const set = (value) =>
