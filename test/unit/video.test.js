@@ -580,7 +580,15 @@ QUnit.test('adds video-js class name with the video-js embed', function(assert) 
   assert.ok(player2.hasClass('video-js'), 'video-js class was preserved to the second embed');
 });
 
-QUnit.test('stores placeholder el and restores on dispose', function(assert) {
+let testOrSkip = 'test';
+
+// The following test uses some DocumentFragment properties that are not
+// available in IE or older Safaris, so we skip it.
+if (videojs.browser.IE_VERSION || videojs.browser.IS_ANY_SAFARI) {
+  testOrSkip = 'skip';
+}
+
+QUnit[testOrSkip]('stores placeholder el and restores on dispose', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
   const embeds = [
