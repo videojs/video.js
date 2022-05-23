@@ -4313,46 +4313,28 @@ class Player extends Component {
 
     this.audioOnlyMode_ = value;
 
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (PromiseClass) {
-      // Enable Audio Only Mode
-      if (value) {
-        const exitPromises = [];
-
-        // Fullscreen and PiP are not supported in audioOnlyMode, so exit if we need to.
-        if (this.isInPictureInPicture()) {
-          exitPromises.push(this.exitPictureInPicture());
-        }
-
-        if (this.isFullscreen()) {
-          exitPromises.push(this.exitFullscreen());
-        }
-
-        if (this.audioPosterMode()) {
-          exitPromises.push(this.audioPosterMode(false));
-        }
-
-        return PromiseClass.all(exitPromises).then(() => this.enableAudioOnlyUI_());
-      }
-
-      // Disable Audio Only Mode
-      return PromiseClass.resolve().then(() => this.disableAudioOnlyUI_());
-    }
-
+    // Enable Audio Only Mode
     if (value) {
+      const exitPromises = [];
+
+      // Fullscreen and PiP are not supported in audioOnlyMode, so exit if we need to.
       if (this.isInPictureInPicture()) {
-        this.exitPictureInPicture();
+        exitPromises.push(this.exitPictureInPicture());
       }
 
       if (this.isFullscreen()) {
-        this.exitFullscreen();
+        exitPromises.push(this.exitFullscreen());
       }
 
-      this.enableAudioOnlyUI_();
-    } else {
-      this.disableAudioOnlyUI_();
+      if (this.audioPosterMode()) {
+        exitPromises.push(this.audioPosterMode(false));
+      }
+
+      return Promise.all(exitPromises).then(() => this.enableAudioOnlyUI_());
     }
+
+    // Disable Audio Only Mode
+    return Promise.resolve().then(() => this.disableAudioOnlyUI_());
   }
 
   enablePosterModeUI_() {
@@ -4391,44 +4373,27 @@ class Player extends Component {
 
     this.audioPosterMode_ = value;
 
-    const PromiseClass = this.options_.Promise || window.Promise;
+    if (value) {
 
-    if (PromiseClass) {
+      if (this.audioOnlyMode()) {
+        const audioOnlyModePromise = this.audioOnlyMode(false);
 
-      if (value) {
-
-        if (this.audioOnlyMode()) {
-          const audioOnlyModePromise = this.audioOnlyMode(false);
-
-          return audioOnlyModePromise.then(() => {
-            // enable audio poster mode after audio only mode is disabled
-            this.enablePosterModeUI_();
-          });
-        }
-
-        return PromiseClass.resolve().then(() => {
-          // enable audio poster mode
+        return audioOnlyModePromise.then(() => {
+          // enable audio poster mode after audio only mode is disabled
           this.enablePosterModeUI_();
         });
       }
 
-      return PromiseClass.resolve().then(() => {
-        // disable audio poster mode
-        this.disablePosterModeUI_();
+      return Promise.resolve().then(() => {
+        // enable audio poster mode
+        this.enablePosterModeUI_();
       });
     }
 
-    if (value) {
-
-      if (this.audioOnlyMode()) {
-        this.audioOnlyMode(false);
-      }
-
-      this.enablePosterModeUI_();
-      return;
-    }
-
-    this.disablePosterModeUI_();
+    return Promise.resolve().then(() => {
+      // disable audio poster mode
+      this.disablePosterModeUI_();
+    });
   }
 
   /**
