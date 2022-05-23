@@ -11,8 +11,6 @@ import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/str.js';
 import {merge} from './utils/obj.js';
-import Map from './utils/map.js';
-import Set from './utils/set.js';
 import keycode from 'keycode';
 
 /**
@@ -1508,11 +1506,6 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.setTimeout(fn, 1000 / 60);
-    }
-
     this.clearTimersOnDispose_();
 
     // declare as variables so they are properly available in rAF function
@@ -1595,11 +1588,6 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
    */
   cancelAnimationFrame(id) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.clearTimeout(id);
-    }
-
     if (this.rafIds_.has(id)) {
       this.rafIds_.delete(id);
       window.cancelAnimationFrame(id);
@@ -1731,17 +1719,6 @@ class Component {
     return Component.components_[name];
   }
 }
-
-/**
- * Whether or not this component supports `requestAnimationFrame`.
- *
- * This is exposed primarily for testing purposes.
- *
- * @private
- * @type {Boolean}
- */
-Component.prototype.supportsRaf_ = typeof window.requestAnimationFrame === 'function' &&
-  typeof window.cancelAnimationFrame === 'function';
 
 Component.registerComponent('Component', Component);
 
