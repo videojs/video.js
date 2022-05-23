@@ -1,9 +1,8 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
 import TestHelpers from './test-helpers';
-import {assign} from '../../src/js/utils/obj';
 
-const getExpectedBreakpoints = (o) => assign({}, {
+const getExpectedBreakpoints = (o) => Object.assign({}, {
   tiny: 210,
   xsmall: 320,
   small: 425,

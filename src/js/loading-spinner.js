@@ -2,7 +2,7 @@
  * @file loading-spinner.js
  */
 import Component from './component';
-import * as dom from './utils/dom';
+import * as Dom from './utils/dom';
 
 /**
  * A loading spinner for use during waiting/loading events.
@@ -20,7 +20,7 @@ class LoadingSpinner extends Component {
   createEl() {
     const isAudio = this.player_.isAudio();
     const playerType = this.localize(isAudio ? 'Audio Player' : 'Video Player');
-    const controlText = dom.createEl('span', {
+    const controlText = Dom.createEl('span', {
       className: 'vjs-control-text',
       textContent: this.localize('{1} is loading.', [playerType])
     });

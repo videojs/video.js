@@ -2,7 +2,7 @@
 import Tech from '../../../src/js/tech/tech.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Button from '../../../src/js/button.js';
-import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
+import { createTimeRange } from '../../../src/js/utils/time.js';
 import extend from '../../../src/js/extend.js';
 import MediaError from '../../../src/js/media-error.js';
 import AudioTrack from '../../../src/js/tracks/audio-track';

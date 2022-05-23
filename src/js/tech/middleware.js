@@ -2,8 +2,7 @@
  * @file middleware.js
  * @module middleware
  */
-import { assign } from '../utils/obj.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 
 const middlewares = {};
 const middlewareInstances = {};
@@ -301,7 +300,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
       return setSourceHelper(src, mwrest, next, player, acc, lastRun);
     }
 
-    mw.setSource(assign({}, src), function(err, _src) {
+    mw.setSource(Object.assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
       // make sure to use the old src

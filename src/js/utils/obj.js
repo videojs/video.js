@@ -81,31 +81,6 @@ export function reduce(object, fn, initial = 0) {
 }
 
 /**
- * Object.assign-style object shallow merge/extend.
- *
- * @param  {Object} target
- * @param  {Object} ...sources
- * @return {Object}
- */
-export function assign(target, ...sources) {
-  if (Object.assign) {
-    return Object.assign(target, ...sources);
-  }
-
-  sources.forEach(source => {
-    if (!source) {
-      return;
-    }
-
-    each(source, (value, key) => {
-      target[key] = value;
-    });
-  });
-
-  return target;
-}
-
-/**
  * Returns whether a value is an object of any kind - including DOM nodes,
  * arrays, regular expressions, etc. Not functions, though.
  *
@@ -130,4 +105,77 @@ export function isPlain(value) {
   return isObject(value) &&
     toString.call(value) === '[object Object]' &&
     value.constructor === Object;
+}
+
+/**
+ * Merge two objects recursively.
+ *
+ * Performs a deep merge like
+ * {@link https://lodash.com/docs/4.17.10#merge|lodash.merge}, but only merges
+ * plain objects (not arrays, elements, or anything else).
+ *
+ * Non-plain object values will be copied directly from the right-most
+ * argument.
+ *
+ * @param   {Object[]} sources
+ *          One or more objects to merge into a new object.
+ *
+ * @return {Object}
+ *          A new object that is the merged result of all sources.
+ */
+export function merge(...sources) {
+  const result = {};
+
+  sources.forEach(source => {
+    if (!source) {
+      return;
+    }
+
+    each(source, (value, key) => {
+      if (!isPlain(value)) {
+        result[key] = value;
+        return;
+      }
+
+      if (!isPlain(result[key])) {
+        result[key] = {};
+      }
+
+      result[key] = merge(result[key], value);
+    });
+  });
+
+  return result;
+}
+
+/**
+ * Object.defineProperty but "lazy", which means that the value is only set after
+ * it is retrieved the first time, rather than being set right away.
+ *
+ * @param {Object} obj the object to set the property on
+ * @param {string} key the key for the property to set
+ * @param {Function} getValue the function used to get the value when it is needed.
+ * @param {boolean} setter whether a setter should be allowed or not
+ */
+export function defineLazyProperty(obj, key, getValue, setter = true) {
+  const set = (value) =>
+    Object.defineProperty(obj, key, {value, enumerable: true, writable: true});
+
+  const options = {
+    configurable: true,
+    enumerable: true,
+    get() {
+      const value = getValue();
+
+      set(value);
+
+      return value;
+    }
+  };
+
+  if (setter) {
+    options.set = set;
+  }
+
+  return Object.defineProperty(obj, key, options);
 }

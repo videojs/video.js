@@ -6,7 +6,6 @@ import window from 'global/window';
 import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
-import * as Obj from '../utils/obj';
 import EventTarget from '../event-target';
 import DomData from '../utils/dom-data';
 
@@ -482,7 +481,7 @@ function evented(target, options = {}) {
     target.eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
   }
 
-  Obj.assign(target, EventedMixin);
+  Object.assign(target, EventedMixin);
 
   if (target.eventedCallbacks) {
     target.eventedCallbacks.forEach((callback) => {

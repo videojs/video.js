@@ -3,7 +3,7 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import clamp from '../../utils/clamp';
+import {clamp} from '../../utils/num';
 import document from 'global/document';
 
 // get the percent width of a time compared to the total end

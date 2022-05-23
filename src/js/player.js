@@ -16,15 +16,14 @@ import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
 import {IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
-import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
-import { createTimeRange } from './utils/time-ranges.js';
+import {toTitleCase, titleCaseEquals} from './utils/str.js';
+import { createTimeRange } from './utils/time.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign} from './utils/obj';
-import mergeOptions from './utils/merge-options.js';
+import {merge} from './utils/obj';
 import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
@@ -312,7 +311,7 @@ class Player extends Component {
     // which overrides globally set options.
     // This latter part coincides with the load order
     // (tag must exist before Player)
-    options = assign(Player.getTagSettings(tag), options);
+    options = Object.assign(Player.getTagSettings(tag), options);
 
     // Delay the initialization of children because we need to set up
     // player properties first, and can't use `this` before `super()`
@@ -504,7 +503,7 @@ class Player extends Component {
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
     // an infinite loop.
-    const playerOptionsCopy = mergeOptions(this.options_);
+    const playerOptionsCopy = merge(this.options_);
 
     // Load plugins
     if (options.plugins) {
@@ -1185,9 +1184,9 @@ class Player extends Component {
       techOptions[props.getterName] = this[props.privateName];
     });
 
-    assign(techOptions, this.options_[titleTechName]);
-    assign(techOptions, this.options_[camelTechName]);
-    assign(techOptions, this.options_[techName.toLowerCase()]);
+    Object.assign(techOptions, this.options_[titleTechName]);
+    Object.assign(techOptions, this.options_[camelTechName]);
+    Object.assign(techOptions, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
       techOptions.tag = this.tag;
@@ -1525,7 +1524,7 @@ class Player extends Component {
     }
 
     // update `currentSource` cache always
-    this.cache_.source = mergeOptions({}, srcObj, {src, type});
+    this.cache_.source = merge({}, srcObj, {src, type});
 
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
     const sourceElSources = [];
@@ -4588,7 +4587,7 @@ class Player extends Component {
    *         An array of of supported languages
    */
   languages() {
-    return mergeOptions(Player.prototype.options_.languages, this.languages_);
+    return merge(Player.prototype.options_.languages, this.languages_);
   }
 
   /**
@@ -4599,7 +4598,7 @@ class Player extends Component {
    *         Object representing the current of track info
    */
   toJSON() {
-    const options = mergeOptions(this.options_);
+    const options = merge(this.options_);
     const tracks = options.tracks;
 
     options.tracks = [];
@@ -4608,7 +4607,7 @@ class Player extends Component {
       let track = tracks[i];
 
       // deep merge tracks and null out player so no circular references
-      track = mergeOptions(track);
+      track = merge(track);
       track.player = undefined;
       options.tracks[i] = track;
     }
@@ -4738,18 +4737,18 @@ class Player extends Component {
 
     // Used as a getter.
     if (breakpoints === undefined) {
-      return assign(this.breakpoints_);
+      return Object.assign(this.breakpoints_);
     }
 
     this.breakpoint_ = '';
-    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+    this.breakpoints_ = Object.assign({}, DEFAULT_BREAKPOINTS, breakpoints);
 
     // When breakpoint definitions change, we need to update the currently
     // selected breakpoint.
     this.updateCurrentBreakpoint_();
 
     // Clone the breakpoints before returning.
-    return assign(this.breakpoints_);
+    return Object.assign(this.breakpoints_);
   }
 
   /**
@@ -4882,7 +4881,7 @@ class Player extends Component {
     this.reset();
 
     // Clone the media object so it cannot be mutated from outside.
-    this.cache_.media = mergeOptions(media);
+    this.cache_.media = merge(media);
 
     const {artwork, poster, src, textTracks} = this.cache_.media;
 
@@ -4941,7 +4940,7 @@ class Player extends Component {
       return media;
     }
 
-    return mergeOptions(this.cache_.media);
+    return merge(this.cache_.media);
   }
 
   /**
@@ -4979,10 +4978,10 @@ class Player extends Component {
       if (err) {
         log.error(err);
       }
-      assign(tagOptions, data);
+      Object.assign(tagOptions, data);
     }
 
-    assign(baseOptions, tagOptions);
+    Object.assign(baseOptions, tagOptions);
 
     // Get tag children settings
     if (tag.hasChildNodes()) {
