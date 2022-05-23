@@ -1591,26 +1591,6 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
   });
 });
 
-QUnit.test('audioPosterMode is synchronous and returns undefined when promises are unsupported', function(assert) {
-  const originalPromise = window.Promise;
-  const player = TestHelpers.makePlayer({});
-
-  player.trigger('ready');
-  window.Promise = undefined;
-
-  const returnValTrue = player.audioPosterMode(true);
-
-  assert.equal(returnValTrue, undefined, 'return value is undefined');
-  assert.ok(player.audioPosterMode(), 'state synchronously set to true');
-
-  const returnValFalse = player.audioPosterMode(false);
-
-  assert.equal(returnValFalse, undefined, 'return value is undefined');
-  assert.notOk(player.audioPosterMode(), 'state synchronously set to false');
-
-  window.Promise = originalPromise;
-});
-
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
   const player = TestHelpers.makePlayer();
   let isScrubbing;
@@ -2875,26 +2855,6 @@ QUnit.test('audioOnlyMode() getter returns Boolean', function(assert) {
 
   player.trigger('ready');
   assert.ok(typeof player.audioOnlyMode() === 'boolean', 'getter correctly returns boolean');
-});
-
-QUnit.test('audioOnlyMode(true/false) is synchronous and returns undefined when promises are unsupported', function(assert) {
-  const originalPromise = window.Promise;
-  const player = TestHelpers.makePlayer({});
-
-  player.trigger('ready');
-  window.Promise = undefined;
-
-  const returnValTrue = player.audioOnlyMode(true);
-
-  assert.equal(returnValTrue, undefined, 'return value is undefined');
-  assert.ok(player.audioOnlyMode(), 'state synchronously set to true');
-
-  const returnValFalse = player.audioOnlyMode(false);
-
-  assert.equal(returnValFalse, undefined, 'return value is undefined');
-  assert.notOk(player.audioOnlyMode(), 'state synchronously set to false');
-
-  window.Promise = originalPromise;
 });
 
 QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(assert) {
