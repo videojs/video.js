@@ -4,7 +4,6 @@
 import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
-import {assign} from './utils/obj';
 import keycode from 'keycode';
 import {createEl} from './utils/dom.js';
 
@@ -34,12 +33,12 @@ class Button extends ClickableComponent {
   createEl(tag, props = {}, attributes = {}) {
     tag = 'button';
 
-    props = assign({
+    props = Object.assign({
       className: this.buildCSSClass()
     }, props);
 
     // Add attributes for button element
-    attributes = assign({
+    attributes = Object.assign({
 
       // Necessary since the default button type is "submit"
       type: 'button'

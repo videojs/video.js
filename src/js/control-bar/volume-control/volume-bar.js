@@ -4,7 +4,7 @@
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import clamp from '../../utils/clamp.js';
+import {clamp} from '../../utils/num.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 
 // Required children

@@ -2,8 +2,6 @@
 import sinon from 'sinon';
 import * as Obj from '../../../src/js/utils/obj';
 
-QUnit.module('utils/obj');
-
 class Foo {
   constructor() {}
   toString() {
@@ -21,201 +19,161 @@ const passFail = (assert, fn, descriptor, passes, failures) => {
   });
 };
 
-QUnit.test('each', function(assert) {
-  const spy = sinon.spy();
+QUnit.module('utils/obj', function() {
 
-  Obj.each({
-    a: 1,
-    b: 'foo',
-    c: null
-  }, spy);
+  QUnit.test('each', function(assert) {
+    const spy = sinon.spy();
 
-  assert.strictEqual(spy.callCount, 3);
-  assert.ok(spy.calledWith(1, 'a'));
-  assert.ok(spy.calledWith('foo', 'b'));
-  assert.ok(spy.calledWith(null, 'c'));
+    Obj.each({
+      a: 1,
+      b: 'foo',
+      c: null
+    }, spy);
 
-  Obj.each({}, spy);
-  assert.strictEqual(spy.callCount, 3, 'an empty object was not iterated over');
-});
+    assert.strictEqual(spy.callCount, 3);
+    assert.ok(spy.calledWith(1, 'a'));
+    assert.ok(spy.calledWith('foo', 'b'));
+    assert.ok(spy.calledWith(null, 'c'));
 
-QUnit.test('reduce', function(assert) {
-  const first = Obj.reduce({
-    a: 1,
-    b: 2,
-    c: 3,
-    d: 4
-  }, (accum, value) => accum + value);
-
-  assert.strictEqual(first, 10);
-
-  const second = Obj.reduce({
-    a: 1,
-    b: 2,
-    c: 3,
-    d: 4
-  }, (accum, value) => accum + value, 10);
-
-  assert.strictEqual(second, 20);
-
-  const third = Obj.reduce({
-    a: 1,
-    b: 2,
-    c: 3,
-    d: 4
-  }, (accum, value, key) => {
-    accum[key] = 0 - value;
-    return accum;
-  }, {});
-
-  assert.strictEqual(third.a, -1);
-  assert.strictEqual(third.b, -2);
-  assert.strictEqual(third.c, -3);
-  assert.strictEqual(third.d, -4);
-});
-
-QUnit.test('isObject', function(assert) {
-  passFail(assert, Obj.isObject, 'an object', {
-    'plain object': {},
-    'constructed object': new Foo(),
-    'array': [],
-    'regex': new RegExp('.'),
-    'date': new Date()
-  }, {
-    null: null,
-    function() {},
-    boolean: true,
-    number: 1,
-    string: 'xyz'
+    Obj.each({}, spy);
+    assert.strictEqual(spy.callCount, 3, 'an empty object was not iterated over');
   });
-});
 
-QUnit.test('isPlain', function(assert) {
-  passFail(assert, Obj.isPlain, 'a plain object', {
-    'plain object': {}
-  }, {
-    'constructed object': new Foo(),
-    'null': null,
-    'array': [],
-    'function'() {},
-    'regex': new RegExp('.'),
-    'date': new Date(),
-    'boolean': true,
-    'number': 1,
-    'string': 'xyz'
+  QUnit.test('reduce', function(assert) {
+    const first = Obj.reduce({
+      a: 1,
+      b: 2,
+      c: 3,
+      d: 4
+    }, (accum, value) => accum + value);
+
+    assert.strictEqual(first, 10);
+
+    const second = Obj.reduce({
+      a: 1,
+      b: 2,
+      c: 3,
+      d: 4
+    }, (accum, value) => accum + value, 10);
+
+    assert.strictEqual(second, 20);
+
+    const third = Obj.reduce({
+      a: 1,
+      b: 2,
+      c: 3,
+      d: 4
+    }, (accum, value, key) => {
+      accum[key] = 0 - value;
+      return accum;
+    }, {});
+
+    assert.strictEqual(third.a, -1);
+    assert.strictEqual(third.b, -2);
+    assert.strictEqual(third.c, -3);
+    assert.strictEqual(third.d, -4);
   });
-});
 
-QUnit.module('utils/obj.assign', function() {
-  const assignTests = ['mocked'];
-
-  // we only run "normal" tests where Object.assign is used when
-  // Object.assign is supported
-  if (Object.assign) {
-    assignTests.push('unmocked');
-  }
-
-  assignTests.forEach(function(k) {
-    QUnit.module(`with ${k} Object.assign`, {
-      before() {
-        if (k === 'mocked') {
-          this.oldObjectAssign = Object.assign;
-          Object.assign = null;
-        }
-      },
-      after() {
-        if (this.oldObjectAssign) {
-          Object.assign = this.oldObjectAssign;
-        }
-        this.oldObjectAssign = null;
-      }
-    });
-
-    QUnit.test('override object', function(assert) {
-      const foo = {foo: 'yellow'};
-
-      assert.deepEqual(Obj.assign(foo, {foo: 'blue'}), {foo: 'blue'}, 'Obj.assign should return overriden result');
-      assert.deepEqual(foo, {foo: 'blue'}, 'foo should be modified directly');
-    });
-
-    QUnit.test('new object', function(assert) {
-      const foo = {foo: 'yellow'};
-
-      assert.deepEqual(Obj.assign({}, foo, {foo: 'blue'}), {foo: 'blue'}, 'Obj.assign should return result');
-      assert.deepEqual(foo, {foo: 'yellow'}, 'foo should not be modified');
-    });
-
-    QUnit.test('empty override', function(assert) {
-      const foo = {foo: 'yellow'};
-
-      assert.deepEqual(Obj.assign(foo, {}), {foo: 'yellow'}, 'Obj.assign should return result');
-      assert.deepEqual(foo, {foo: 'yellow'}, 'foo should not be modified');
-    });
-
-    QUnit.test('multiple override object', function(assert) {
-      const foo = {foo: 'foo'};
-      const bar = {foo: 'bar'};
-      const baz = {foo: 'baz'};
-
-      assert.deepEqual(Obj.assign(foo, bar, baz), baz, 'Obj.assign should return result');
-      assert.deepEqual(foo, baz, 'foo should be overridden');
-    });
-
-    QUnit.test('additive properties', function(assert) {
-      const foo = {};
-      const expected = {one: 1, two: 2, three: 3};
-
-      assert.deepEqual(Obj.assign(foo, {one: 1}, {two: 2}, {three: 3}), expected, 'Obj.assign should return result');
-      assert.deepEqual(foo, expected, 'foo should be equal to result');
-    });
-
-    QUnit.test('deep override', function(assert) {
-      const foo = {
-        foo: {
-          bar: {
-            baz: 'buzz'
-          }
-        },
-        blue: [55, 56],
-        red: 'nope'
-      };
-
-      const baz = {
-        foo: {
-          bar: {
-            baz: 'red'
-          }
-        },
-        blue: [57]
-      };
-
-      const expected = {
-        foo: {
-          bar: {
-            baz: 'red'
-          }
-        },
-        blue: [57],
-        red: 'nope'
-      };
-
-      assert.deepEqual(Obj.assign(foo, baz), expected, 'Obj.assign should return result');
-      assert.deepEqual(foo, expected, 'foo is overridden');
-    });
-
-    QUnit.test('negative tests', function(assert) {
-      const expected = {foo: 11};
-
-      assert.deepEqual(Obj.assign({}, expected, undefined), expected, 'assign should undefined');
-      assert.deepEqual(Obj.assign({}, expected, null), expected, 'assign should ignore null');
-      assert.deepEqual(Obj.assign({}, expected, []), expected, 'assign should ignore Array');
-      assert.deepEqual(Obj.assign({}, expected, ''), expected, 'assign should ignore string');
-      assert.deepEqual(Obj.assign({}, expected, 11), expected, 'assign should ignore number');
-      assert.deepEqual(Obj.assign({}, expected, new RegExp()), expected, 'assign should ignore RegExp');
-      assert.deepEqual(Obj.assign({}, expected, new Date()), expected, 'assign should ignore Date');
-      assert.deepEqual(Obj.assign({}, expected, true), expected, 'assign should ignore boolean');
-      assert.deepEqual(Obj.assign({}, expected, () => {}), expected, 'assign should ignore function');
+  QUnit.test('isObject', function(assert) {
+    passFail(assert, Obj.isObject, 'an object', {
+      'plain object': {},
+      'constructed object': new Foo(),
+      'array': [],
+      'regex': new RegExp('.'),
+      'date': new Date()
+    }, {
+      null: null,
+      function() {},
+      boolean: true,
+      number: 1,
+      string: 'xyz'
     });
   });
-});
 
+  QUnit.test('isPlain', function(assert) {
+    passFail(assert, Obj.isPlain, 'a plain object', {
+      'plain object': {}
+    }, {
+      'constructed object': new Foo(),
+      'null': null,
+      'array': [],
+      'function'() {},
+      'regex': new RegExp('.'),
+      'date': new Date(),
+      'boolean': true,
+      'number': 1,
+      'string': 'xyz'
+    });
+  });
+
+  QUnit.module('merge');
+
+  QUnit.test('should merge objects', function(assert) {
+    const ob1 = {
+      a: true,
+      b: { b1: true, b2: true, b3: true },
+      c: true
+    };
+
+    const ob2 = {
+      // override value
+      a: false,
+      // merge sub-option values
+      b: { b1: true, b2: false, b4: true },
+      // add new option
+      d: true
+    };
+
+    const ob3 = Obj.merge(ob1, ob2);
+
+    assert.deepEqual(ob3, {
+      a: false,
+      b: { b1: true, b2: false, b3: true, b4: true },
+      c: true,
+      d: true
+    }, 'options objects merged correctly');
+  });
+
+  QUnit.test('should ignore non-objects', function(assert) {
+    const obj = { a: 1 };
+
+    assert.deepEqual(Obj.merge(obj, true), obj, 'ignored non-object input');
+  });
+
+  QUnit.module('defineLazyProperty');
+
+  QUnit.test('should define a "lazy" property', function(assert) {
+    assert.expect(12);
+
+    const obj = {a: 1};
+    const getValue = sinon.spy(() => {
+      return 2;
+    });
+
+    Obj.defineLazyProperty(obj, 'b', getValue);
+
+    let descriptor = Object.getOwnPropertyDescriptor(obj, 'b');
+
+    assert.ok(getValue.notCalled, 'getValue function was not called');
+    assert.strictEqual(typeof descriptor.get, 'function', 'descriptor has a getter');
+    assert.strictEqual(typeof descriptor.set, 'function', 'descriptor has a setter');
+    assert.strictEqual(typeof descriptor.value, 'undefined', 'descriptor has no value');
+
+    let b = obj.b;
+
+    descriptor = Object.getOwnPropertyDescriptor(obj, 'b');
+
+    assert.ok(getValue.calledOnce, 'getValue function was not called');
+    assert.strictEqual(b, 2, 'the value was retrieved correctly');
+    assert.strictEqual(typeof descriptor.get, 'undefined', 'descriptor has no getter');
+    assert.strictEqual(typeof descriptor.set, 'undefined', 'descriptor has no setter');
+    assert.strictEqual(descriptor.value, 2, 'descriptor has a value');
+
+    b = obj.b;
+    descriptor = Object.getOwnPropertyDescriptor(obj, 'b');
+
+    assert.ok(getValue.calledOnce, 'getValue function was still only called once');
+    assert.strictEqual(b, 2, 'the value was retrieved correctly');
+    assert.strictEqual(descriptor.value, 2, 'descriptor has a value');
+  });
+});
