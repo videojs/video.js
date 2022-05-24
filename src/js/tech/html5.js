@@ -114,6 +114,8 @@ class Html5 extends Tech {
     // into a `fullscreenchange` event
     this.proxyWebkitFullscreen_();
 
+    this.featuresVideoFrameCallback = this.featuresVideoFrameCallback && this.el_.tagName === 'VIDEO';
+
     this.triggerReady();
   }
 
