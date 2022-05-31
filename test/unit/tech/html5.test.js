@@ -1032,3 +1032,12 @@ QUnit.test('supports getting available media playback quality metrics', function
   window.performance = origPerformance;
   window.Date = origDate;
 });
+
+QUnit.test('featuresVideoFrameCallback is false for audio elements', function(assert) {
+  const el = document.createElement('audio');
+  const audioTech = new Html5({el});
+
+  assert.strictEqual(audioTech.featuresVideoFrameCallback, false, 'Html5 with audio element should not support rvf');
+
+  audioTech.dispose();
+});
