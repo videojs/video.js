@@ -1,3 +1,20 @@
+<a name="7.20.1"></a>
+## [7.20.1](https://github.com/videojs/video.js/compare/v7.20.0...v7.20.1) (2022-05-31)
+
+### Bug Fixes
+
+* Don't copy deprecated Event.path ([#7782](https://github.com/videojs/video.js/issues/7782)) ([27f22ef](https://github.com/videojs/video.js/commit/27f22ef))
+* error message should not be localized in the player class ([#7776](https://github.com/videojs/video.js/issues/7776)) ([75ea699](https://github.com/videojs/video.js/commit/75ea699))
+* HTML5 tech with audio tag shouldn't use requestVideoFrameCallback ([#7778](https://github.com/videojs/video.js/issues/7778)) ([a14ace2](https://github.com/videojs/video.js/commit/a14ace2))
+
+### Chores
+
+* Lock old closed issues ([#7777](https://github.com/videojs/video.js/issues/7777)) ([18bad57](https://github.com/videojs/video.js/commit/18bad57))
+
+### Tests
+
+* stop running placeholder el test in IE and Safari to prevent errors ([#7769](https://github.com/videojs/video.js/issues/7769)) ([50ffd57](https://github.com/videojs/video.js/commit/50ffd57))
+
 <a name="7.20.0"></a>
 # [7.20.0](https://github.com/videojs/video.js/compare/v7.19.2...v7.20.0) (2022-05-20)
 
