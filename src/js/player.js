@@ -50,6 +50,7 @@ import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
 import './live-tracker.js';
+import './title-bar.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -5155,7 +5156,8 @@ Player.prototype.options_ = {
     'controlBar',
     'errorDisplay',
     'textTrackSettings',
-    'resizeManager'
+    'resizeManager',
+    'titleBar'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
