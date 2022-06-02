@@ -943,7 +943,6 @@ QUnit.test('When Android Chrome reports Infinity duration with currentTime 0, re
 
 QUnit.test('supports getting available media playback quality metrics', function(assert) {
   const origPerformance = window.performance;
-  const origDate = window.Date;
   const oldEl = tech.el_;
   const videoPlaybackQuality = {
     creationTime: 1,
@@ -960,7 +959,6 @@ QUnit.test('supports getting available media playback quality metrics', function
     videoPlaybackQuality,
     'uses native implementation when supported'
   );
-
   tech.el_ = {
     webkitDroppedFrameCount: 1,
     webkitDecodedFrameCount: 2
@@ -974,42 +972,12 @@ QUnit.test('supports getting available media playback quality metrics', function
     'uses webkit prefixed metrics and performance.now when supported'
   );
 
-  tech.el_ = {
-    webkitDroppedFrameCount: 1,
-    webkitDecodedFrameCount: 2
-  };
-  window.Date = {
-    now: () => 10
-  };
-  window.performance = {
-    timing: {
-      navigationStart: 3
-    }
-  };
-  assert.deepEqual(
-    tech.getVideoPlaybackQuality(),
-    { droppedVideoFrames: 1, totalVideoFrames: 2, creationTime: 7 },
-    'uses webkit prefixed metrics and Date.now() - navigationStart when ' +
-                   'supported'
-  );
-
   tech.el_ = {};
   window.performance = void 0;
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'empty object when not supported');
 
   window.performance = {
-    now: () => 5
-  };
-  assert.deepEqual(
-    tech.getVideoPlaybackQuality(),
-    { creationTime: 5 },
-    'only creation time when it\'s the only piece available'
-  );
-
-  window.performance = {
-    timing: {
-      navigationStart: 3
-    }
+    now: () => 7
   };
   assert.deepEqual(
     tech.getVideoPlaybackQuality(),
@@ -1030,5 +998,4 @@ QUnit.test('supports getting available media playback quality metrics', function
 
   tech.el_ = oldEl;
   window.performance = origPerformance;
-  window.Date = origDate;
 });

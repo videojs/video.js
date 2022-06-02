@@ -3,7 +3,6 @@ import Tech from '../../../src/js/tech/tech.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Button from '../../../src/js/button.js';
 import { createTimeRange } from '../../../src/js/utils/time.js';
-import extend from '../../../src/js/extend.js';
 import MediaError from '../../../src/js/media-error.js';
 import AudioTrack from '../../../src/js/tracks/audio-track';
 import VideoTrack from '../../../src/js/tracks/video-track';
@@ -43,7 +42,7 @@ QUnit.module('Media Tech', {
 });
 
 QUnit.test('Tech.registerTech and Tech.getTech', function(assert) {
-  const MyTech = extend(Tech);
+  class MyTech extends Tech {}
   const oldTechs = Tech.techs_;
   const oldDefaultTechOrder = Tech.defaultTechOrder_;
 
@@ -223,7 +222,7 @@ QUnit.test('switching sources should clear all remote tracks that are added with
   const oldLogWarn = log.warn;
 
   // Define a new tech class
-  const MyTech = extend(Tech);
+  class MyTech extends Tech {}
 
   // Create source handler
   const handler = {
@@ -301,7 +300,7 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   const sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  const MyTech = extend(Tech);
+  class MyTech extends Tech {}
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -501,7 +500,7 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
 
 QUnit.test('should handle unsupported sources with the source handler API', function(assert) {
   // Define a new tech class
-  const MyTech = extend(Tech);
+  class MyTech extends Tech {}
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -553,17 +552,17 @@ QUnit.test('should track whether a video has played', function(assert) {
 });
 
 QUnit.test('delegates deferrables to the source handler', function(assert) {
-  const MyTech = extend(Tech, {
+  class MyTech extends Tech {
     seekable() {
       throw new Error('You should not be calling me!');
-    },
+    }
     seeking() {
       throw new Error('You should not be calling me!');
-    },
+    }
     duration() {
       throw new Error('You should not be calling me!');
     }
-  });
+  }
 
   Tech.withSourceHandlers(MyTech);
 
@@ -604,18 +603,19 @@ QUnit.test('delegates deferrables to the source handler', function(assert) {
 
 QUnit.test('delegates only deferred deferrables to the source handler', function(assert) {
   let seekingCount = 0;
-  const MyTech = extend(Tech, {
+
+  class MyTech extends Tech {
     seekable() {
       throw new Error('You should not be calling me!');
-    },
+    }
     seeking() {
       seekingCount++;
       return false;
-    },
+    }
     duration() {
       throw new Error('You should not be calling me!');
     }
-  });
+  }
 
   Tech.withSourceHandlers(MyTech);
 
@@ -668,7 +668,7 @@ QUnit.test('Tech.isTech returns correct answers for techs and components', funct
 });
 
 QUnit.test('setSource after tech dispose should dispose source handler once', function(assert) {
-  const MyTech = extend(Tech);
+  class MyTech extends Tech {}
 
   Tech.withSourceHandlers(MyTech);
 
@@ -713,7 +713,7 @@ QUnit.test('setSource after tech dispose should dispose source handler once', fu
 });
 
 QUnit.test('setSource after previous setSource should dispose source handler once', function(assert) {
-  const MyTech = extend(Tech);
+  class MyTech extends Tech {}
 
   Tech.withSourceHandlers(MyTech);
 
