@@ -44,7 +44,7 @@ QUnit.test('setting title and description from options', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.strictEqual(techEl.getAttribute('aria-labelledby'), titleBar.titleEl.id, 'tech aria-labelledby matches TitleBar title element');
-  assert.strictEqual(techEl.getAttribute('aria-descriptionribedby'), titleBar.descriptionEl.id, 'tech aria-descriptionribedby matches TitleBar description element');
+  assert.strictEqual(techEl.getAttribute('aria-describedby'), titleBar.descriptionEl.id, 'tech aria-describedby matches TitleBar description element');
 });
 
 QUnit.test('setting title only from options', function(assert) {
@@ -59,7 +59,7 @@ QUnit.test('setting title only from options', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.strictEqual(techEl.getAttribute('aria-labelledby'), titleBar.titleEl.id, 'tech aria-labelledby matches TitleBar title element');
-  assert.notOk(techEl.hasAttribute('aria-descriptionribedby'), 'tech aria-descriptionribedby is not set');
+  assert.notOk(techEl.hasAttribute('aria-describedby'), 'tech aria-describedby is not set');
 });
 
 QUnit.test('setting description only from options', function(assert) {
@@ -74,7 +74,7 @@ QUnit.test('setting description only from options', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.notOk(techEl.hasAttribute('aria-labelledby'), 'tech aria-labelledby is not set');
-  assert.strictEqual(techEl.getAttribute('aria-descriptionribedby'), titleBar.descriptionEl.id, 'tech aria-descriptionribedby matches TitleBar description element');
+  assert.strictEqual(techEl.getAttribute('aria-describedby'), titleBar.descriptionEl.id, 'tech aria-describedby matches TitleBar description element');
 });
 QUnit.test('setting no title or description', function(assert) {
   const titleBar = new TitleBar(this.player);
@@ -86,7 +86,7 @@ QUnit.test('setting no title or description', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.notOk(techEl.hasAttribute('aria-labelledby'), 'tech aria-labelledby is not set');
-  assert.notOk(techEl.hasAttribute('aria-descriptionribedby'), 'tech aria-descriptionribedby is not set');
+  assert.notOk(techEl.hasAttribute('aria-describedby'), 'tech aria-describedby is not set');
 });
 
 QUnit.test('updating title and description', function(assert) {
@@ -107,7 +107,7 @@ QUnit.test('updating title and description', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.strictEqual(techEl.getAttribute('aria-labelledby'), titleBar.titleEl.id, 'tech aria-labelledby matches TitleBar title element');
-  assert.strictEqual(techEl.getAttribute('aria-descriptionribedby'), titleBar.descriptionEl.id, 'tech aria-descriptionribedby matches TitleBar description element');
+  assert.strictEqual(techEl.getAttribute('aria-describedby'), titleBar.descriptionEl.id, 'tech aria-describedby matches TitleBar description element');
 });
 
 QUnit.test('updating title only', function(assert) {
@@ -127,7 +127,7 @@ QUnit.test('updating title only', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.strictEqual(techEl.getAttribute('aria-labelledby'), titleBar.titleEl.id, 'tech aria-labelledby matches TitleBar title element');
-  assert.notOk(techEl.hasAttribute('aria-descriptionribedby'), 'tech aria-descriptionribedby is not set');
+  assert.notOk(techEl.hasAttribute('aria-describedby'), 'tech aria-describedby is not set');
 });
 
 QUnit.test('updating description only from options', function(assert) {
@@ -147,7 +147,7 @@ QUnit.test('updating description only from options', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.notOk(techEl.hasAttribute('aria-labelledby'), 'tech aria-labelledby is not set');
-  assert.strictEqual(techEl.getAttribute('aria-descriptionribedby'), titleBar.descriptionEl.id, 'tech aria-descriptionribedby matches TitleBar description element');
+  assert.strictEqual(techEl.getAttribute('aria-describedby'), titleBar.descriptionEl.id, 'tech aria-describedby matches TitleBar description element');
 });
 
 QUnit.test('updating no title or description', function(assert) {
@@ -165,5 +165,25 @@ QUnit.test('updating no title or description', function(assert) {
   const techEl = this.player.tech_.el_;
 
   assert.notOk(techEl.hasAttribute('aria-labelledby'), 'tech aria-labelledby is not set');
-  assert.notOk(techEl.hasAttribute('aria-descriptionribedby'), 'tech aria-descriptionribedby is not set');
+  assert.notOk(techEl.hasAttribute('aria-describedby'), 'tech aria-describedby is not set');
+});
+
+QUnit.test('disposing removes aria attributes on the tech and removes child DOM refs', function(assert) {
+  const titleBar = new TitleBar(this.player, {
+    title: 'test title',
+    description: 'test description'
+  });
+
+  const techEl = this.player.tech_.el_;
+
+  assert.ok(techEl.hasAttribute('aria-labelledby'), 'tech aria-labelledby is set');
+  assert.ok(techEl.hasAttribute('aria-describedby'), 'tech aria-describedby is set');
+
+  titleBar.dispose();
+
+  assert.notOk(techEl.hasAttribute('aria-labelledby'), 'tech aria-labelledby is not set');
+  assert.notOk(techEl.hasAttribute('aria-describedby'), 'tech aria-describedby is not set');
+  assert.notOk(titleBar.titleEl, 'titleEl is nulled');
+  assert.notOk(titleBar.descriptionEl, 'descriptionEl is nulled');
+
 });

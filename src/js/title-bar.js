@@ -73,13 +73,13 @@ class TitleBar extends Component {
     // according to whether a title and/or description have been provided.
     if (techEl) {
       techEl.removeAttribute('aria-labelledby');
-      techEl.removeAttribute('aria-descriptionribedby');
+      techEl.removeAttribute('aria-describedby');
 
       if (title) {
         techEl.setAttribute('aria-labelledby', titleEl.id);
       }
       if (description) {
-        techEl.setAttribute('aria-descriptionribedby', descriptionEl.id);
+        techEl.setAttribute('aria-describedby', descriptionEl.id);
       }
     }
 
@@ -99,7 +99,7 @@ class TitleBar extends Component {
 
     if (techEl) {
       techEl.removeAttribute('aria-labelledby');
-      techEl.removeAttribute('aria-descriptionribedby');
+      techEl.removeAttribute('aria-describedby');
     }
 
     super.dispose();
