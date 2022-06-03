@@ -4845,7 +4845,7 @@ class Player extends Component {
     // Clone the media object so it cannot be mutated from outside.
     this.cache_.media = merge(media);
 
-    const {artwork, poster, src, textTracks} = this.cache_.media;
+    const {artwork, description, poster, src, textTracks, title} = this.cache_.media;
 
     // If `artwork` is not given, create it using `poster`.
     if (!artwork && poster) {
@@ -4865,6 +4865,10 @@ class Player extends Component {
 
     if (Array.isArray(textTracks)) {
       textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
+    }
+
+    if (this.titleBar) {
+      this.titleBar.update({title, description});
     }
 
     this.ready(ready);
@@ -5149,6 +5153,7 @@ Player.prototype.options_ = {
   children: [
     'mediaLoader',
     'posterImage',
+    'titleBar',
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',
@@ -5156,8 +5161,7 @@ Player.prototype.options_ = {
     'controlBar',
     'errorDisplay',
     'textTrackSettings',
-    'resizeManager',
-    'titleBar'
+    'resizeManager'
   ],
 
   language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',

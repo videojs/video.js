@@ -32,52 +32,61 @@ class TitleBar extends Component {
       id: `vjs-title-bar-title-${Guid.newGUID()}`
     });
 
-    this.descEl = Dom.createEl('div', {
-      className: 'vjs-title-bar-desc',
-      id: `vjs-title-bar-desc-${Guid.newGUID()}`
+    this.descriptionEl = Dom.createEl('div', {
+      className: 'vjs-title-bar-description',
+      id: `vjs-title-bar-description-${Guid.newGUID()}`
     });
 
     return Dom.createEl('div', {
       className: 'vjs-title-bar'
     }, {}, [
       this.titleEl,
-      this.descEl
+      this.descriptionEl
     ]);
   }
 
   /**
    * Update the contents of the title bar with new title and description text.
    *
-   * @param  {Object} [options]
+   * If both title and description are missing, the title bar will be hidden.
+   *
+   * If either title or description are present, the title bar will be visible.
+   *
+   * @param  {Object} [options={}]
+   *         An options object. When empty, the title bar will be hidden.
+   *
    * @param  {string} [options.title]
-   * @param  {string} [options.desc]
+   *         A title to display in the title bar.
+   *
+   * @param  {string} [options.description]
+   *         A description to display in the title bar.
    */
-  update({title = '', desc = ''} = {}) {
-    const {titleEl, descEl} = this;
+  update({title = '', description = ''} = {}) {
+    const {titleEl, descriptionEl} = this;
     const tech = this.player_.tech_;
     const techEl = tech && tech.el_;
 
     Dom.emptyEl(titleEl);
-    Dom.emptyEl(descEl);
+    Dom.emptyEl(descriptionEl);
 
     // If there is a tech element available, update its ARIA attributes
     // according to whether a title and/or description have been provided.
     if (techEl) {
       techEl.removeAttribute('aria-labelledby');
-      techEl.removeAttribute('aria-describedby');
+      techEl.removeAttribute('aria-descriptionribedby');
 
       if (title) {
         techEl.setAttribute('aria-labelledby', titleEl.id);
       }
-      if (desc) {
-        techEl.setAttribute('aria-describedby', descEl.id);
+      if (description) {
+        techEl.setAttribute('aria-descriptionribedby', descriptionEl.id);
       }
     }
 
     Dom.textContent(titleEl, title);
-    Dom.textContent(descEl, desc);
+    Dom.textContent(descriptionEl, description);
 
-    if (title || desc) {
+    if (title || description) {
       this.show();
     } else {
       this.hide();
@@ -90,12 +99,12 @@ class TitleBar extends Component {
 
     if (techEl) {
       techEl.removeAttribute('aria-labelledby');
-      techEl.removeAttribute('aria-describedby');
+      techEl.removeAttribute('aria-descriptionribedby');
     }
 
     super.dispose();
     this.titleEl = null;
-    this.descEl = null;
+    this.descriptionEl = null;
   }
 }
 

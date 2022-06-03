@@ -23,7 +23,7 @@
 }
 
 .vjs-title-bar-title,
-.vjs-title-bar-desc {
+.vjs-title-bar-description {
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -33,4 +33,9 @@
 .vjs-title-bar-title {
   font-weight: bold;
   margin-bottom: 0.333em; // 4px
+}
+
+.vjs-playing.vjs-user-inactive .vjs-title-bar {
+  opacity: 0;
+  @include transition(opacity 1s);
 }
