@@ -5,12 +5,6 @@ import * as promise from '../../../src/js/utils/promise';
 QUnit.module('utils/promise');
 
 QUnit.test('can correctly identify a native Promise (if supported)', function(assert) {
-
-  // If Promises aren't supported, skip this.
-  if (!window.Promise) {
-    return assert.expect(0);
-  }
-
   assert.ok(promise.isPromise(new window.Promise((resolve) => resolve())), 'a native Promise was recognized');
 });
 

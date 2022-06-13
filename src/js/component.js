@@ -9,11 +9,8 @@ import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
-import {toTitleCase, toLowerCase} from './utils/string-cases.js';
-import mergeOptions from './utils/merge-options.js';
-import computedStyle from './utils/computed-style';
-import Map from './utils/map.js';
-import Set from './utils/set.js';
+import {toTitleCase, toLowerCase} from './utils/str.js';
+import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
 /**
@@ -69,10 +66,10 @@ class Component {
     this.parentComponent_ = null;
 
     // Make a copy of prototype.options_ to protect against overriding defaults
-    this.options_ = mergeOptions({}, this.options_);
+    this.options_ = merge({}, this.options_);
 
     // Updated options with supplied options
-    options = this.options_ = mergeOptions(this.options_, options);
+    options = this.options_ = merge(this.options_, options);
 
     // Get ID from options or options element if one is supplied
     this.id_ = options.id || (options.el && options.el.id);
@@ -137,8 +134,11 @@ class Component {
    * Dispose of the `Component` and all child components.
    *
    * @fires Component#dispose
+   *
+   * @param {Object} options
+   * @param {Element} options.originalEl element with which to replace player element
    */
-  dispose() {
+  dispose(options = {}) {
 
     // Bail out if the component has already been disposed.
     if (this.isDisposed_) {
@@ -182,7 +182,11 @@ class Component {
     if (this.el_) {
       // Remove element from DOM
       if (this.el_.parentNode) {
-        this.el_.parentNode.removeChild(this.el_);
+        if (options.restoreEl) {
+          this.el_.parentNode.replaceChild(options.restoreEl, this.el_);
+        } else {
+          this.el_.parentNode.removeChild(this.el_);
+        }
       }
 
       this.el_ = null;
@@ -215,7 +219,7 @@ class Component {
   /**
    * Deep merge of options objects with new options.
    * > Note: When both `obj` and `options` contain properties whose values are objects.
-   *         The two properties get merged using {@link module:mergeOptions}
+   *         The two properties get merged using {@link module:obj.merge}
    *
    * @param {Object} obj
    *        The object that contains new options.
@@ -228,7 +232,7 @@ class Component {
       return this.options_;
     }
 
-    this.options_ = mergeOptions(this.options_, obj);
+    this.options_ = merge(this.options_, obj);
     return this.options_;
   }
 
@@ -1074,7 +1078,7 @@ class Component {
       throw new Error('currentDimension only accepts width or height value');
     }
 
-    computedWidthOrHeight = computedStyle(this.el_, widthOrHeight);
+    computedWidthOrHeight = Dom.computedStyle(this.el_, widthOrHeight);
 
     // remove 'px' from variable and parse as integer
     computedWidthOrHeight = parseFloat(computedWidthOrHeight);
@@ -1502,11 +1506,6 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.setTimeout(fn, 1000 / 60);
-    }
-
     this.clearTimersOnDispose_();
 
     // declare as variables so they are properly available in rAF function
@@ -1589,11 +1588,6 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
    */
   cancelAnimationFrame(id) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.clearTimeout(id);
-    }
-
     if (this.rafIds_.has(id)) {
       this.rafIds_.delete(id);
       window.cancelAnimationFrame(id);
@@ -1725,17 +1719,6 @@ class Component {
     return Component.components_[name];
   }
 }
-
-/**
- * Whether or not this component supports `requestAnimationFrame`.
- *
- * This is exposed primarily for testing purposes.
- *
- * @private
- * @type {Boolean}
- */
-Component.prototype.supportsRaf_ = typeof window.requestAnimationFrame === 'function' &&
-  typeof window.cancelAnimationFrame === 'function';
 
 Component.registerComponent('Component', Component);
 

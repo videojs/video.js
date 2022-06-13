@@ -3,7 +3,6 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import {assign} from '../utils/obj';
 import {MenuKeys} from './menu-keys.js';
 import keycode from 'keycode';
 import {createEl} from '../utils/dom.js';
@@ -64,7 +63,7 @@ class MenuItem extends ClickableComponent {
     // The control is textual, not just an icon
     this.nonIconControl = true;
 
-    const el = super.createEl('li', assign({
+    const el = super.createEl('li', Object.assign({
       className: 'vjs-menu-item',
       tabIndex: -1
     }, props), attrs);

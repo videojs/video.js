@@ -8,12 +8,10 @@ import log from '../utils/log.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
-import {assign} from '../utils/obj';
-import mergeOptions from '../utils/merge-options.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {defineLazyProperty, merge} from '../utils/obj';
+import {toTitleCase} from '../utils/str.js';
 import {NORMAL as TRACK_TYPES, REMOTE} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
-import defineLazyProperty from '../utils/define-lazy-property.js';
 import {silencePromise} from '../utils/promise';
 
 /**
@@ -385,7 +383,7 @@ class Html5 extends Tech {
 
         // determine if native controls should be used
         const tagAttributes = this.options_.tag && Dom.getAttributes(this.options_.tag);
-        const attributes = mergeOptions({}, tagAttributes);
+        const attributes = merge({}, tagAttributes);
 
         if (!browser.TOUCH_ENABLED || this.options_.nativeControlsForTouch !== true) {
           delete attributes.controls;
@@ -393,7 +391,7 @@ class Html5 extends Tech {
 
         Dom.setAttributes(
           el,
-          assign(attributes, {
+          Object.assign(attributes, {
             id: this.options_.techId,
             class: 'vjs-tech'
           })
@@ -967,13 +965,8 @@ class Html5 extends Tech {
       videoPlaybackQuality.totalVideoFrames = this.el().webkitDecodedFrameCount;
     }
 
-    if (window.performance && typeof window.performance.now === 'function') {
+    if (window.performance) {
       videoPlaybackQuality.creationTime = window.performance.now();
-    } else if (window.performance &&
-               window.performance.timing &&
-               typeof window.performance.timing.navigationStart === 'number') {
-      videoPlaybackQuality.creationTime =
-        window.Date.now() - window.performance.timing.navigationStart;
     }
 
     return videoPlaybackQuality;

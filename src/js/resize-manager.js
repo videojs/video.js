@@ -4,7 +4,7 @@
 import window from 'global/window';
 import { debounce } from './utils/fn.js';
 import * as Events from './utils/events.js';
-import mergeOptions from './utils/merge-options.js';
+import { merge } from './utils/obj.js';
 import Component from './component.js';
 
 /**
@@ -47,7 +47,7 @@ class ResizeManager extends Component {
     }
 
     // Only create an element when ResizeObserver isn't available
-    const options_ = mergeOptions({
+    const options_ = merge({
       createEl: !RESIZE_OBSERVER_AVAILABLE,
       reportTouchActivity: false
     }, options);
@@ -92,7 +92,8 @@ class ResizeManager extends Component {
   createEl() {
     return super.createEl('iframe', {
       className: 'vjs-resize-manager',
-      tabIndex: -1
+      tabIndex: -1,
+      title: this.localize('No content')
     }, {
       'aria-hidden': 'true'
     });

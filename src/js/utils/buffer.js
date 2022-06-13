@@ -2,7 +2,7 @@
  * @file buffer.js
  * @module buffer
  */
-import { createTimeRange } from './time-ranges.js';
+import { createTimeRange } from './time.js';
 
 /**
  * Compute the percentage of the media that has been buffered.

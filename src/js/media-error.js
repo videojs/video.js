@@ -1,7 +1,7 @@
 /**
  * @file media-error.js
  */
-import {assign, isObject} from './utils/obj';
+import {isObject} from './utils/obj';
 
 /**
  * A Custom `MediaError` class which mimics the standard HTML5 `MediaError` class.
@@ -41,7 +41,7 @@ function MediaError(value) {
       this.code = value.code;
     }
 
-    assign(this, value);
+    Object.assign(this, value);
   }
 
   if (!this.message) {

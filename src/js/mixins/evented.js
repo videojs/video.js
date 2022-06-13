@@ -6,10 +6,8 @@ import window from 'global/window';
 import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 import * as Fn from '../utils/fn';
-import * as Obj from '../utils/obj';
 import EventTarget from '../event-target';
 import DomData from '../utils/dom-data';
-import log from '../utils/log';
 
 const objName = (obj) => {
   if (typeof obj.name === 'function') {
@@ -446,14 +444,8 @@ const EventedMixin = {
     const type = event && typeof event !== 'string' ? event.type : event;
 
     if (!isValidEventType(type)) {
-      const error = `Invalid event type for ${objName(this)}#trigger; ` +
-        'must be a non-empty string or object with a type key that has a non-empty value.';
-
-      if (event) {
-        (this.log || log).error(error);
-      } else {
-        throw new Error(error);
-      }
+      throw new Error(`Invalid event type for ${objName(this)}#trigger; ` +
+        'must be a non-empty string or object with a type key that has a non-empty value.');
     }
     return Events.trigger(this.eventBusEl_, event, hash);
   }
@@ -489,7 +481,7 @@ function evented(target, options = {}) {
     target.eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
   }
 
-  Obj.assign(target, EventedMixin);
+  Object.assign(target, EventedMixin);
 
   if (target.eventedCallbacks) {
     target.eventedCallbacks.forEach((callback) => {

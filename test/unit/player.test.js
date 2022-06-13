@@ -105,6 +105,20 @@ QUnit.test('dispose should not throw if playerEl is missing', function(assert) {
   assert.notOk(error, 'Function did not throw an error on dispose');
 });
 
+QUnit.test('dispose should replace playerEl with restoreEl', function(assert) {
+  const videoTag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+  const replacement = document.createElement('div');
+
+  fixture.appendChild(videoTag);
+
+  const player = new Player(videoTag, {restoreEl: replacement});
+
+  player.dispose();
+
+  assert.ok(replacement.parentNode, fixture, 'Replacement node present after dispose');
+});
+
 // technically, all uses of videojs.options should be replaced with
 // Player.prototype.options_ in this file and a equivalent test using
 // videojs.options should be made in video.test.js. Keeping this here
@@ -1041,55 +1055,6 @@ QUnit.test('should register players with generated ids', function(assert) {
   player.dispose();
 });
 
-QUnit.test('should not add multiple first play events despite subsequent loads', function(assert) {
-  assert.expect(1);
-
-  const player = TestHelpers.makePlayer({});
-
-  player.on('firstplay', function() {
-    assert.ok(true, 'First play should fire once.');
-  });
-
-  // Checking to make sure onLoadStart removes first play listener before adding a new one.
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  player.dispose();
-});
-
-QUnit.test('should fire firstplay after resetting the player', function(assert) {
-  const player = TestHelpers.makePlayer({});
-
-  let fpFired = false;
-
-  player.on('firstplay', function() {
-    fpFired = true;
-  });
-
-  // init firstplay listeners
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  assert.ok(fpFired, 'First firstplay fired');
-
-  // reset the player
-  player.tech_.trigger('loadstart');
-  fpFired = false;
-  player.tech_.trigger('play');
-  assert.ok(fpFired, 'Second firstplay fired');
-
-  // the play event can fire before the loadstart event.
-  // in that case we still want the firstplay even to fire.
-  player.tech_.paused = function() {
-    return false;
-  };
-  fpFired = false;
-  // reset the player
-  player.tech_.trigger('loadstart');
-  // player.tech_.trigger('play');
-  assert.ok(fpFired, 'Third firstplay fired');
-  player.dispose();
-});
-
 QUnit.test('should remove vjs-has-started class', function(assert) {
   assert.expect(3);
 
@@ -1626,26 +1591,6 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
   });
 });
 
-QUnit.test('audioPosterMode is synchronous and returns undefined when promises are unsupported', function(assert) {
-  const originalPromise = window.Promise;
-  const player = TestHelpers.makePlayer({});
-
-  player.trigger('ready');
-  window.Promise = undefined;
-
-  const returnValTrue = player.audioPosterMode(true);
-
-  assert.equal(returnValTrue, undefined, 'return value is undefined');
-  assert.ok(player.audioPosterMode(), 'state synchronously set to true');
-
-  const returnValFalse = player.audioPosterMode(false);
-
-  assert.equal(returnValFalse, undefined, 'return value is undefined');
-  assert.notOk(player.audioPosterMode(), 'state synchronously set to false');
-
-  window.Promise = originalPromise;
-});
-
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
   const player = TestHelpers.makePlayer();
   let isScrubbing;
@@ -2061,6 +2006,24 @@ QUnit.test('player#reset removes remote text tracks', function(assert) {
   assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
   player.reset();
   assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
+});
+
+QUnit.test('player#reset progress bar', function(assert) {
+
+  let error;
+
+  const player = TestHelpers.makePlayer();
+
+  player.removeChild('controlBar');
+  player.controlBar = null;
+
+  try {
+    player.resetProgressBar_();
+  } catch (e) {
+    error = e;
+  }
+
+  assert.notOk(error, 'Function did not throw an error on resetProgressBar');
 });
 
 QUnit.test('Remove waiting class after tech waiting when timeupdate shows a time change', function(assert) {
@@ -2892,26 +2855,6 @@ QUnit.test('audioOnlyMode() getter returns Boolean', function(assert) {
 
   player.trigger('ready');
   assert.ok(typeof player.audioOnlyMode() === 'boolean', 'getter correctly returns boolean');
-});
-
-QUnit.test('audioOnlyMode(true/false) is synchronous and returns undefined when promises are unsupported', function(assert) {
-  const originalPromise = window.Promise;
-  const player = TestHelpers.makePlayer({});
-
-  player.trigger('ready');
-  window.Promise = undefined;
-
-  const returnValTrue = player.audioOnlyMode(true);
-
-  assert.equal(returnValTrue, undefined, 'return value is undefined');
-  assert.ok(player.audioOnlyMode(), 'state synchronously set to true');
-
-  const returnValFalse = player.audioOnlyMode(false);
-
-  assert.equal(returnValFalse, undefined, 'return value is undefined');
-  assert.notOk(player.audioOnlyMode(), 'state synchronously set to false');
-
-  window.Promise = originalPromise;
 });
 
 QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(assert) {

@@ -77,26 +77,33 @@
 .video-js.vjs-1-1 {
   width: 100%;
   max-width: 100%;
+}
+
+.video-js.vjs-fluid:not(.vjs-audio-only-mode),
+.video-js.vjs-16-9:not(.vjs-audio-only-mode),
+.video-js.vjs-4-3:not(.vjs-audio-only-mode),
+.video-js.vjs-9-16:not(.vjs-audio-only-mode),
+.video-js.vjs-1-1:not(.vjs-audio-only-mode) {
   height: 0;
 }
 
-.video-js.vjs-16-9 {
+.video-js.vjs-16-9:not(.vjs-audio-only-mode) {
   @include apply-aspect-ratio(16, 9);
 }
 
-.video-js.vjs-4-3 {
+.video-js.vjs-4-3:not(.vjs-audio-only-mode) {
   @include apply-aspect-ratio(4, 3);
 }
 
-.video-js.vjs-9-16 {
+.video-js.vjs-9-16:not(.vjs-audio-only-mode) {
   @include apply-aspect-ratio(9, 16);
 }
 
-.video-js.vjs-1-1 {
+.video-js.vjs-1-1:not(.vjs-audio-only-mode) {
   @include apply-aspect-ratio(1, 1);
 }
 
-.video-js.vjs-fill {
+.video-js.vjs-fill:not(.vjs-audio-only-mode) {
   width: 100%;
   height: 100%;
 }

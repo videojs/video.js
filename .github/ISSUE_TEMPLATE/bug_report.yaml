@@ -1,0 +1,75 @@
+name: General issue
+description: Report a general issue with Video.js
+labels: "needs: triage, bug"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for using Video.js and contributing by opening an issue. Before you start, please check this list:
+        * If you are not reporting a bug, but want to ask a general question, use [discussions](https://github.com/videojs/video.js/discussions) instead.
+        * Check the [FAQ](https://videojs.com/guides/faqs) and [troubleshooting guides](https://videojs.com/guides/troubleshooting).
+        * If there is an existing open issue for exactly the same problem, comment there instead.
+          * However, be careful not to comment on old, closed issues, the new comment is unlikely to be noticed.
+          * Take care to make sure it is really the exact same issue. If in doubt, open as a new issue.
+        * If the issue is with a specific plugin, it's often better to open an issue on the plugin repository instead.
+        * Please do take the time to give detailed information, and include a test case. A detailed issue with actionable information will get a better response than a vague anecdote.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        Please give a detailed description of the issue.
+        What did you expect to happen, and what happened?
+    validations:
+      required: true
+  - type: input
+    id: testcase
+    attributes:
+      label: Reduced test case
+      description: |
+        Please add a URL to a [reduced test case](https://stackoverflow.com/help/minimal-reproducible-example) where the issue can be observed. We have a [starter template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) on Codepen.
+        Providing a test case will improve the chances of someone being able to identify the issue quickly.
+        For a playback problem, including the stream URL is essential.
+      placeholder: https://
+  - type: textarea
+    id: str
+    attributes:
+      label: Steps to reproduce
+      description: Detailed steps to reproduce the issue.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: errors
+    attributes:
+      label: Errors
+      description: If there is an error displayed in the player or in the console, please include them here.
+  - type: input
+    id: version
+    attributes:
+      label: What version of Video.js are you using?
+      description: Please include all relevant versions. If not using the latest version, explain why not in the description above.
+      placeholder: e.g. vX.Y.Z
+    validations:
+      required: true
+  - type: input
+    id: plugins
+    attributes:
+      label: Video.js plugins used.
+  - type: input
+    id: browser
+    attributes:
+      label: What browser(s) including version(s) does this occur with?
+      placeholder: e.g. Chrome 100
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: What OS(es) and version(s) does this occur with?
+      placeholder: e.g. Windows 11
+    validations:
+      required: true

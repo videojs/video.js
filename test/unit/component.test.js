@@ -969,9 +969,6 @@ QUnit.test('should provide a requestAnimationFrame method that is cleared on dis
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   const spyRAF = sinon.spy();
 
   comp.requestNamedAnimationFrame('testing', spyRAF);
@@ -1005,9 +1002,6 @@ QUnit.test('should provide a requestNamedAnimationFrame method that is cleared o
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   const spyRAF = sinon.spy();
 
   comp.requestNamedAnimationFrame('testing', spyRAF);
@@ -1027,34 +1021,6 @@ QUnit.test('should provide a requestNamedAnimationFrame method that is cleared o
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
 
-  window.requestAnimationFrame = oldRAF;
-  window.cancelAnimationFrame = oldCAF;
-});
-
-QUnit.test('requestAnimationFrame falls back to timers if rAF not supported', function(assert) {
-  const comp = new Component(this.player);
-  const oldRAF = window.requestAnimationFrame;
-  const oldCAF = window.cancelAnimationFrame;
-
-  // Stub the window.*AnimationFrame methods with window.setTimeout methods
-  // so we can control when the callbacks are called via sinon's timer stubs.
-  const rAF = window.requestAnimationFrame = sinon.spy();
-  const cAF = window.cancelAnimationFrame = sinon.spy();
-
-  // Make sure the component thinks it does not support rAF.
-  comp.supportsRaf_ = false;
-
-  sinon.spy(comp, 'setTimeout');
-  sinon.spy(comp, 'clearTimeout');
-
-  comp.cancelAnimationFrame(comp.requestAnimationFrame(() => {}));
-
-  assert.strictEqual(rAF.callCount, 0, 'window.requestAnimationFrame was not called');
-  assert.strictEqual(cAF.callCount, 0, 'window.cancelAnimationFrame was not called');
-  assert.strictEqual(comp.setTimeout.callCount, 1, 'Component#setTimeout was called');
-  assert.strictEqual(comp.clearTimeout.callCount, 1, 'Component#clearTimeout was called');
-
-  comp.dispose();
   window.requestAnimationFrame = oldRAF;
   window.cancelAnimationFrame = oldCAF;
 });
@@ -1083,9 +1049,6 @@ QUnit.test('requestNamedAnimationFrame should remove dispose handler on trigger'
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   const spyRAF = sinon.spy();
 
   comp.requestNamedAnimationFrame('testFrame', spyRAF);
@@ -1113,9 +1076,6 @@ QUnit.test('requestAnimationFrame should remove dispose handler on trigger', fun
   // so we can control when the callbacks are called via sinon's timer stubs.
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
-
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
 
   const spyRAF = sinon.spy();
 
@@ -1272,9 +1232,6 @@ QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific n
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   // Stub the window.*AnimationFrame methods with window.setTimeout methods
   // so we can control when the callbacks are called via sinon's timer stubs.
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
@@ -1429,5 +1386,17 @@ QUnit.test('ready queue should not run after dispose', function(assert) {
 
   assert.notOk(option, 'ready option not run');
   assert.notOk(callback, 'ready callback not run');
+
+});
+
+QUnit.test('a component\'s el can be replaced on dispose', function(assert) {
+  const comp = this.player.addChild('Component', {}, {}, 2);
+  const prevIndex = Array.from(this.player.el_.childNodes).indexOf(comp.el_);
+  const replacementEl = document.createElement('div');
+
+  comp.dispose({restoreEl: replacementEl});
+
+  assert.strictEqual(replacementEl.parentNode, this.player.el_, 'replacement was inserted');
+  assert.strictEqual(Array.from(this.player.el_.childNodes).indexOf(replacementEl), prevIndex, 'replacement was inserted at same position');
 
 });

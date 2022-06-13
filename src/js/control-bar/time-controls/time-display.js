@@ -4,7 +4,7 @@
 import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import formatTime from '../../utils/format-time.js';
+import {formatTime} from '../../utils/time.js';
 import log from '../../utils/log.js';
 
 /**

@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
 import TestHelpers from '../test-helpers.js';
 
-QUnit.module('dom');
+QUnit.module('utils/dom');
 
 QUnit.test('should create an element', function(assert) {
   const div = Dom.createEl();

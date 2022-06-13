@@ -14,17 +14,16 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
-import {IE_VERSION, IS_CHROME, IS_WINDOWS} from './utils/browser.js';
+import {IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
-import {toTitleCase, titleCaseEquals} from './utils/string-cases.js';
-import { createTimeRange } from './utils/time-ranges.js';
+import {toTitleCase, titleCaseEquals} from './utils/str.js';
+import { createTimeRange } from './utils/time.js';
 import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import {assign} from './utils/obj';
-import mergeOptions from './utils/merge-options.js';
+import {merge} from './utils/obj';
 import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
@@ -312,7 +311,7 @@ class Player extends Component {
     // which overrides globally set options.
     // This latter part coincides with the load order
     // (tag must exist before Player)
-    options = assign(Player.getTagSettings(tag), options);
+    options = Object.assign(Player.getTagSettings(tag), options);
 
     // Delay the initialization of children because we need to set up
     // player properties first, and can't use `this` before `super()`
@@ -504,7 +503,7 @@ class Player extends Component {
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
     // an infinite loop.
-    const playerOptionsCopy = mergeOptions(this.options_);
+    const playerOptionsCopy = merge(this.options_);
 
     // Load plugins
     if (options.plugins) {
@@ -666,8 +665,8 @@ class Player extends Component {
       }
     });
 
-    // the actual .el_ is removed here
-    super.dispose();
+    // the actual .el_ is removed here, or replaced if
+    super.dispose({restoreEl: this.options_.restoreEl});
   }
 
   /**
@@ -723,12 +722,11 @@ class Player extends Component {
     tag.setAttribute('tabindex', '-1');
     attrs.tabindex = '-1';
 
-    // Workaround for #4583 (JAWS+IE doesn't announce BPB or play button), and
-    // for the same issue with Chrome (on Windows) with JAWS.
+    // Workaround for #4583 on Chrome (on Windows) with JAWS.
     // See https://github.com/FreedomScientific/VFO-standards-support/issues/78
     // Note that we can't detect if JAWS is being used, but this ARIA attribute
-    //  doesn't change behavior of IE11 or Chrome if JAWS is not being used
-    if (IE_VERSION || (IS_CHROME && IS_WINDOWS)) {
+    // doesn't change behavior of Chrome if JAWS is not being used
+    if (IS_CHROME && IS_WINDOWS) {
       tag.setAttribute('role', 'application');
       attrs.role = 'application';
     }
@@ -1112,7 +1110,7 @@ class Player extends Component {
         height: ${height}px;
       }
 
-      .${idClass}.vjs-fluid {
+      .${idClass}.vjs-fluid:not(.vjs-audio-only-mode) {
         padding-top: ${ratioMultiplier * 100}%;
       }
     `);
@@ -1177,8 +1175,7 @@ class Player extends Component {
       'playerElIngest': this.playerElIngest_ || false,
       'vtt.js': this.options_['vtt.js'],
       'canOverridePoster': !!this.options_.techCanOverridePoster,
-      'enableSourceset': this.options_.enableSourceset,
-      'Promise': this.options_.Promise
+      'enableSourceset': this.options_.enableSourceset
     };
 
     TRACK_TYPES.names.forEach((name) => {
@@ -1187,9 +1184,9 @@ class Player extends Component {
       techOptions[props.getterName] = this[props.privateName];
     });
 
-    assign(techOptions, this.options_[titleTechName]);
-    assign(techOptions, this.options_[camelTechName]);
-    assign(techOptions, this.options_[techName.toLowerCase()]);
+    Object.assign(techOptions, this.options_[titleTechName]);
+    Object.assign(techOptions, this.options_[camelTechName]);
+    Object.assign(techOptions, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
       techOptions.tag = this.tag;
@@ -1237,7 +1234,6 @@ class Player extends Component {
     this.on(this.tech_, 'ended', (e) => this.handleTechEnded_(e));
     this.on(this.tech_, 'seeking', (e) => this.handleTechSeeking_(e));
     this.on(this.tech_, 'play', (e) => this.handleTechPlay_(e));
-    this.on(this.tech_, 'firstplay', (e) => this.handleTechFirstPlay_(e));
     this.on(this.tech_, 'pause', (e) => this.handleTechPause_(e));
     this.on(this.tech_, 'durationchange', (e) => this.handleTechDurationChange_(e));
     this.on(this.tech_, 'fullscreenchange', (e, data) => this.handleTechFullscreenChange_(e, data));
@@ -1395,12 +1391,9 @@ class Player extends Component {
   }
 
   /**
-   * Retrigger the `loadstart` event that was triggered by the {@link Tech}. This
-   * function will also trigger {@link Player#firstplay} if it is the first loadstart
-   * for a video.
+   * Retrigger the `loadstart` event that was triggered by the {@link Tech}.
    *
    * @fires Player#loadstart
-   * @fires Player#firstplay
    * @listens Tech#loadstart
    * @private
    */
@@ -1416,9 +1409,6 @@ class Player extends Component {
     // Update the duration
     this.handleTechDurationChange_();
 
-    // If it's already playing we want to trigger a firstplay event now.
-    // The firstplay event relies on both the play and loadstart events
-    // which can happen in any order for a new source
     if (!this.paused()) {
       /**
        * Fired when the user agent begins looking for media data
@@ -1427,7 +1417,6 @@ class Player extends Component {
        * @type {EventTarget~Event}
        */
       this.trigger('loadstart');
-      this.trigger('firstplay');
     } else {
       // reset the hasStarted state
       this.hasStarted(false);
@@ -1535,7 +1524,7 @@ class Player extends Component {
     }
 
     // update `currentSource` cache always
-    this.cache_.source = mergeOptions({}, srcObj, {src, type});
+    this.cache_.source = merge({}, srcObj, {src, type});
 
     const matchingSources = this.cache_.sources.filter((s) => s.src && s.src === src);
     const sourceElSources = [];
@@ -1653,7 +1642,6 @@ class Player extends Component {
   /**
    * Add/remove the vjs-has-started class
    *
-   * @fires Player#firstplay
    *
    * @param {boolean} request
    *        - true: adds the class
@@ -1676,7 +1664,6 @@ class Player extends Component {
 
     if (this.hasStarted_) {
       this.addClass('vjs-has-started');
-      this.trigger('firstplay');
     } else {
       this.removeClass('vjs-has-started');
     }
@@ -1854,36 +1841,6 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('seeked');
-  }
-
-  /**
-   * Retrigger the `firstplay` event that was triggered by the {@link Tech}.
-   *
-   * @fires Player#firstplay
-   * @listens Tech#firstplay
-   * @deprecated As of 6.0 firstplay event is deprecated.
-   *             As of 6.0 passing the `starttime` option to the player and the firstplay event are deprecated.
-   * @private
-   */
-  handleTechFirstPlay_() {
-    // If the first starttime attribute is specified
-    // then we will start at the given offset in seconds
-    if (this.options_.starttime) {
-      log.warn('Passing the `starttime` option to the player will be deprecated in 6.0');
-      this.currentTime(this.options_.starttime);
-    }
-
-    this.addClass('vjs-has-started');
-    /**
-     * Fired the first time a video is played. Not part of the HLS spec, and this is
-     * probably not the best implementation yet, so use sparingly. If you don't have a
-     * reason to prevent playback, use `myPlayer.one('play');` instead.
-     *
-     * @event Player#firstplay
-     * @deprecated As of 6.0 firstplay event is deprecated.
-     * @type {EventTarget~Event}
-     */
-    this.trigger('firstplay');
   }
 
   /**
@@ -2364,15 +2321,9 @@ class Player extends Component {
    *         the promise from play is fulfilled.
    */
   play() {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (PromiseClass) {
-      return new PromiseClass((resolve) => {
-        this.play_(resolve);
-      });
-    }
-
-    return this.play_();
+    return new Promise((resolve) => {
+      this.play_(resolve);
+    });
   }
 
   /**
@@ -2860,38 +2811,32 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   requestFullscreen(fullscreenOptions) {
-    const PromiseClass = this.options_.Promise || window.Promise;
+    const self = this;
 
-    if (PromiseClass) {
-      const self = this;
+    return new Promise((resolve, reject) => {
+      function offHandler() {
+        self.off('fullscreenerror', errorHandler);
+        self.off('fullscreenchange', changeHandler);
+      }
+      function changeHandler() {
+        offHandler();
+        resolve();
+      }
+      function errorHandler(e, err) {
+        offHandler();
+        reject(err);
+      }
 
-      return new PromiseClass((resolve, reject) => {
-        function offHandler() {
-          self.off('fullscreenerror', errorHandler);
-          self.off('fullscreenchange', changeHandler);
-        }
-        function changeHandler() {
-          offHandler();
-          resolve();
-        }
-        function errorHandler(e, err) {
-          offHandler();
-          reject(err);
-        }
+      self.one('fullscreenchange', changeHandler);
+      self.one('fullscreenerror', errorHandler);
 
-        self.one('fullscreenchange', changeHandler);
-        self.one('fullscreenerror', errorHandler);
+      const promise = self.requestFullscreenHelper_(fullscreenOptions);
 
-        const promise = self.requestFullscreenHelper_(fullscreenOptions);
-
-        if (promise) {
-          promise.then(offHandler, offHandler);
-          promise.then(resolve, reject);
-        }
-      });
-    }
-
-    return this.requestFullscreenHelper_();
+      if (promise) {
+        promise.then(offHandler, offHandler);
+        promise.then(resolve, reject);
+      }
+    });
   }
 
   requestFullscreenHelper_(fullscreenOptions) {
@@ -2916,6 +2861,7 @@ class Player extends Component {
     if (this.fsApi_.requestFullscreen) {
       const promise = this.el_[this.fsApi_.requestFullscreen](fsOptions);
 
+      // Even on browsers with promise support this may not return a promise
       if (promise) {
         promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
       }
@@ -2938,45 +2884,40 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   exitFullscreen() {
-    const PromiseClass = this.options_.Promise || window.Promise;
+    const self = this;
 
-    if (PromiseClass) {
-      const self = this;
+    return new Promise((resolve, reject) => {
+      function offHandler() {
+        self.off('fullscreenerror', errorHandler);
+        self.off('fullscreenchange', changeHandler);
+      }
+      function changeHandler() {
+        offHandler();
+        resolve();
+      }
+      function errorHandler(e, err) {
+        offHandler();
+        reject(err);
+      }
 
-      return new PromiseClass((resolve, reject) => {
-        function offHandler() {
-          self.off('fullscreenerror', errorHandler);
-          self.off('fullscreenchange', changeHandler);
-        }
-        function changeHandler() {
-          offHandler();
-          resolve();
-        }
-        function errorHandler(e, err) {
-          offHandler();
-          reject(err);
-        }
+      self.one('fullscreenchange', changeHandler);
+      self.one('fullscreenerror', errorHandler);
 
-        self.one('fullscreenchange', changeHandler);
-        self.one('fullscreenerror', errorHandler);
+      const promise = self.exitFullscreenHelper_();
 
-        const promise = self.exitFullscreenHelper_();
-
-        if (promise) {
-          promise.then(offHandler, offHandler);
-          // map the promise to our resolve/reject methods
-          promise.then(resolve, reject);
-        }
-      });
-    }
-
-    return this.exitFullscreenHelper_();
+      if (promise) {
+        promise.then(offHandler, offHandler);
+        // map the promise to our resolve/reject methods
+        promise.then(resolve, reject);
+      }
+    });
   }
 
   exitFullscreenHelper_() {
     if (this.fsApi_.requestFullscreen) {
       const promise = document[this.fsApi_.exitFullscreen]();
 
+      // Even on browsers with promise support this may not return a promise
       if (promise) {
         // we're splitting the promise here, so, we want to catch the
         // potential error so that this chain doesn't have unhandled errors
@@ -3564,9 +3505,7 @@ class Player extends Component {
    * and calls `reset` on the `tech`.
    */
   reset() {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (this.paused() || !PromiseClass) {
+    if (this.paused()) {
       this.doReset_();
     } else {
       const playPromise = this.play();
@@ -3605,7 +3544,7 @@ class Player extends Component {
   resetProgressBar_() {
     this.currentTime(0);
 
-    const { durationDisplay, remainingTimeDisplay } = this.controlBar;
+    const { durationDisplay, remainingTimeDisplay } = this.controlBar || {};
 
     if (durationDisplay) {
       durationDisplay.updateContent();
@@ -4374,46 +4313,28 @@ class Player extends Component {
 
     this.audioOnlyMode_ = value;
 
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (PromiseClass) {
-      // Enable Audio Only Mode
-      if (value) {
-        const exitPromises = [];
-
-        // Fullscreen and PiP are not supported in audioOnlyMode, so exit if we need to.
-        if (this.isInPictureInPicture()) {
-          exitPromises.push(this.exitPictureInPicture());
-        }
-
-        if (this.isFullscreen()) {
-          exitPromises.push(this.exitFullscreen());
-        }
-
-        if (this.audioPosterMode()) {
-          exitPromises.push(this.audioPosterMode(false));
-        }
-
-        return PromiseClass.all(exitPromises).then(() => this.enableAudioOnlyUI_());
-      }
-
-      // Disable Audio Only Mode
-      return PromiseClass.resolve().then(() => this.disableAudioOnlyUI_());
-    }
-
+    // Enable Audio Only Mode
     if (value) {
+      const exitPromises = [];
+
+      // Fullscreen and PiP are not supported in audioOnlyMode, so exit if we need to.
       if (this.isInPictureInPicture()) {
-        this.exitPictureInPicture();
+        exitPromises.push(this.exitPictureInPicture());
       }
 
       if (this.isFullscreen()) {
-        this.exitFullscreen();
+        exitPromises.push(this.exitFullscreen());
       }
 
-      this.enableAudioOnlyUI_();
-    } else {
-      this.disableAudioOnlyUI_();
+      if (this.audioPosterMode()) {
+        exitPromises.push(this.audioPosterMode(false));
+      }
+
+      return Promise.all(exitPromises).then(() => this.enableAudioOnlyUI_());
     }
+
+    // Disable Audio Only Mode
+    return Promise.resolve().then(() => this.disableAudioOnlyUI_());
   }
 
   enablePosterModeUI_() {
@@ -4452,44 +4373,27 @@ class Player extends Component {
 
     this.audioPosterMode_ = value;
 
-    const PromiseClass = this.options_.Promise || window.Promise;
+    if (value) {
 
-    if (PromiseClass) {
+      if (this.audioOnlyMode()) {
+        const audioOnlyModePromise = this.audioOnlyMode(false);
 
-      if (value) {
-
-        if (this.audioOnlyMode()) {
-          const audioOnlyModePromise = this.audioOnlyMode(false);
-
-          return audioOnlyModePromise.then(() => {
-            // enable audio poster mode after audio only mode is disabled
-            this.enablePosterModeUI_();
-          });
-        }
-
-        return PromiseClass.resolve().then(() => {
-          // enable audio poster mode
+        return audioOnlyModePromise.then(() => {
+          // enable audio poster mode after audio only mode is disabled
           this.enablePosterModeUI_();
         });
       }
 
-      return PromiseClass.resolve().then(() => {
-        // disable audio poster mode
-        this.disablePosterModeUI_();
+      return Promise.resolve().then(() => {
+        // enable audio poster mode
+        this.enablePosterModeUI_();
       });
     }
 
-    if (value) {
-
-      if (this.audioOnlyMode()) {
-        this.audioOnlyMode(false);
-      }
-
-      this.enablePosterModeUI_();
-      return;
-    }
-
-    this.disablePosterModeUI_();
+    return Promise.resolve().then(() => {
+      // disable audio poster mode
+      this.disablePosterModeUI_();
+    });
   }
 
   /**
@@ -4648,7 +4552,7 @@ class Player extends Component {
    *         An array of of supported languages
    */
   languages() {
-    return mergeOptions(Player.prototype.options_.languages, this.languages_);
+    return merge(Player.prototype.options_.languages, this.languages_);
   }
 
   /**
@@ -4659,7 +4563,7 @@ class Player extends Component {
    *         Object representing the current of track info
    */
   toJSON() {
-    const options = mergeOptions(this.options_);
+    const options = merge(this.options_);
     const tracks = options.tracks;
 
     options.tracks = [];
@@ -4668,7 +4572,7 @@ class Player extends Component {
       let track = tracks[i];
 
       // deep merge tracks and null out player so no circular references
-      track = mergeOptions(track);
+      track = merge(track);
       track.player = undefined;
       options.tracks[i] = track;
     }
@@ -4798,18 +4702,18 @@ class Player extends Component {
 
     // Used as a getter.
     if (breakpoints === undefined) {
-      return assign(this.breakpoints_);
+      return Object.assign(this.breakpoints_);
     }
 
     this.breakpoint_ = '';
-    this.breakpoints_ = assign({}, DEFAULT_BREAKPOINTS, breakpoints);
+    this.breakpoints_ = Object.assign({}, DEFAULT_BREAKPOINTS, breakpoints);
 
     // When breakpoint definitions change, we need to update the currently
     // selected breakpoint.
     this.updateCurrentBreakpoint_();
 
     // Clone the breakpoints before returning.
-    return assign(this.breakpoints_);
+    return Object.assign(this.breakpoints_);
   }
 
   /**
@@ -4942,7 +4846,7 @@ class Player extends Component {
     this.reset();
 
     // Clone the media object so it cannot be mutated from outside.
-    this.cache_.media = mergeOptions(media);
+    this.cache_.media = merge(media);
 
     const {artwork, poster, src, textTracks} = this.cache_.media;
 
@@ -5001,7 +4905,7 @@ class Player extends Component {
       return media;
     }
 
-    return mergeOptions(this.cache_.media);
+    return merge(this.cache_.media);
   }
 
   /**
@@ -5039,10 +4943,10 @@ class Player extends Component {
       if (err) {
         log.error(err);
       }
-      assign(tagOptions, data);
+      Object.assign(tagOptions, data);
     }
 
-    assign(baseOptions, tagOptions);
+    Object.assign(baseOptions, tagOptions);
 
     // Get tag children settings
     if (tag.hasChildNodes()) {

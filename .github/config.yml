@@ -30,3 +30,5 @@ newPRWelcomeComment: |
 firstPRMergeComment: >
   Congrats on merging your first pull request! 🎉🎉🎉
 
+# Prevent issues being created without using the template
+blank_issues_enabled: false
