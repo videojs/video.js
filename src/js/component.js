@@ -815,21 +815,21 @@ class Component {
   /**
    * Add a CSS class name to the `Component`s element.
    *
-   * @param {string} classToAdd
-   *        CSS class name to add
+   * @param {string[]} classesToRemove
+   *        One or more CSS class name to add.
    */
-  addClass(classToAdd) {
-    Dom.addClass(this.el_, classToAdd);
+  addClass(...classesToRemove) {
+    Dom.addClass(this.el_, ...classesToRemove);
   }
 
   /**
    * Remove a CSS class name from the `Component`s element.
    *
-   * @param {string} classToRemove
-   *        CSS class name to remove
+   * @param {string[]} classesToRemove
+   *        One or one CSS class name to remove.
    */
-  removeClass(classToRemove) {
-    Dom.removeClass(this.el_, classToRemove);
+  removeClass(...classesToRemove) {
+    Dom.removeClass(this.el_, ...classesToRemove);
   }
 
   /**

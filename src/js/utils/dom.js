@@ -48,21 +48,6 @@ function throwIfWhitespace(str) {
 }
 
 /**
- * Produce a regular expression for matching a className within an elements className.
- *
- * @private
- * @param  {string} className
- *         The className to generate the RegExp for.
- *
- * @return {RegExp}
- *         The RegExp that will check for a specific `className` in an elements
- *         className.
- */
-function classRegExp(className) {
-  return new RegExp('(^|\\s)' + className + '($|\\s)');
-}
-
-/**
  * Whether the current DOM interface appears to be real (i.e. not simulated).
  *
  * @return {boolean}
@@ -237,10 +222,8 @@ export function prependTo(child, parent) {
  */
 export function hasClass(element, classToCheck) {
   throwIfWhitespace(classToCheck);
-  if (element.classList) {
-    return element.classList.contains(classToCheck);
-  }
-  return classRegExp(classToCheck).test(element.className);
+
+  return element.classList.contains(classToCheck);
 }
 
 /**
@@ -249,21 +232,14 @@ export function hasClass(element, classToCheck) {
  * @param  {Element} element
  *         Element to add class name to.
  *
- * @param  {string} classToAdd
- *         Class name to add.
+ * @param  {string} classesToRemove
+ *         One or more class name to add.
  *
  * @return {Element}
  *         The DOM element with the added class name.
  */
-export function addClass(element, classToAdd) {
-  if (element.classList) {
-    element.classList.add(classToAdd);
-
-  // Don't need to `throwIfWhitespace` here because `hasElClass` will do it
-  // in the case of classList not being supported.
-  } else if (!hasClass(element, classToAdd)) {
-    element.className = (element.className + ' ' + classToAdd).trim();
-  }
+export function addClass(element, ...classesToRemove) {
+  element.classList.add(...classesToRemove);
 
   return element;
 }
@@ -274,26 +250,19 @@ export function addClass(element, classToAdd) {
  * @param  {Element} element
  *         Element to remove a class name from.
  *
- * @param  {string} classToRemove
- *         Class name to remove
+ * @param  {string} classesToRemove
+ *         One or more class name to remove.
  *
  * @return {Element}
  *         The DOM element with class name removed.
  */
-export function removeClass(element, classToRemove) {
+export function removeClass(element, ...classesToRemove) {
   // Protect in case the player gets disposed
   if (!element) {
     log.warn("removeClass was called with an element that doesn't exist");
     return null;
   }
-  if (element.classList) {
-    element.classList.remove(classToRemove);
-  } else {
-    throwIfWhitespace(classToRemove);
-    element.className = element.className.split(/\s+/).filter(function(c) {
-      return c !== classToRemove;
-    }).join(' ');
-  }
+  element.classList.remove(...classesToRemove);
 
   return element;
 }

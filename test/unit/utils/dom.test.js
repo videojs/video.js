@@ -52,7 +52,7 @@ QUnit.test('should insert an element first in another', function(assert) {
 QUnit.test('addClass()', function(assert) {
   const el = document.createElement('div');
 
-  assert.expect(5);
+  assert.expect(6);
 
   Dom.addClass(el, 'test-class');
   assert.strictEqual(el.className, 'test-class', 'adds a single class');
@@ -69,6 +69,9 @@ QUnit.test('addClass()', function(assert) {
 
   Dom.addClass(el, 'FOO');
   assert.strictEqual(el.className, 'test-class test2_className FOO', 'adds third class');
+
+  Dom.addClass(el, 'left-class', 'right-class');
+  assert.strictEqual(el.className, 'test-class test2_className FOO left-class right-class', 'adds two classes');
 });
 
 QUnit.test('removeClass()', function(assert) {
@@ -76,7 +79,7 @@ QUnit.test('removeClass()', function(assert) {
 
   el.className = 'test-class test2_className FOO bar';
 
-  assert.expect(4);
+  assert.expect(5);
 
   Dom.removeClass(el, 'test-class');
   assert.strictEqual(el.className, 'test2_className FOO bar', 'removes one class');
@@ -90,6 +93,11 @@ QUnit.test('removeClass()', function(assert) {
 
   Dom.removeClass(el, 'FOO');
   assert.strictEqual(el.className, 'bar', 'removes another class');
+
+  el.className = 'bar left-class right-class';
+
+  Dom.removeClass(el, 'left-class', 'right-class');
+  assert.strictEqual(el.className, 'bar', 'removes two classes');
 });
 
 QUnit.test('hasClass()', function(assert) {
