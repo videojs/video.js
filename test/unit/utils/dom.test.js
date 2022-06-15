@@ -60,10 +60,6 @@ QUnit.test('addClass()', function(assert) {
   Dom.addClass(el, 'test-class');
   assert.strictEqual(el.className, 'test-class', 'does not duplicate classes');
 
-  assert.throws(function() {
-    Dom.addClass(el, 'foo foo-bar');
-  }, 'throws when attempting to add a class with whitespace');
-
   Dom.addClass(el, 'test2_className');
   assert.strictEqual(el.className, 'test-class test2_className', 'adds second class');
 
@@ -72,6 +68,13 @@ QUnit.test('addClass()', function(assert) {
 
   Dom.addClass(el, 'left-class', 'right-class');
   assert.strictEqual(el.className, 'test-class test2_className FOO left-class right-class', 'adds two classes');
+
+  Dom.addClass(el, 'l-class r-class');
+  assert.strictEqual(
+    el.className,
+    'test-class test2_className FOO left-class right-class l-class r-class',
+    'adds two classes via one string'
+  );
 });
 
 QUnit.test('removeClass()', function(assert) {
@@ -84,10 +87,6 @@ QUnit.test('removeClass()', function(assert) {
   Dom.removeClass(el, 'test-class');
   assert.strictEqual(el.className, 'test2_className FOO bar', 'removes one class');
 
-  assert.throws(function() {
-    Dom.removeClass(el, 'test2_className bar');
-  }, 'throws when attempting to remove a class with whitespace');
-
   Dom.removeClass(el, 'test2_className');
   assert.strictEqual(el.className, 'FOO bar', 'removes another class');
 
@@ -98,6 +97,11 @@ QUnit.test('removeClass()', function(assert) {
 
   Dom.removeClass(el, 'left-class', 'right-class');
   assert.strictEqual(el.className, 'bar', 'removes two classes');
+
+  el.className = 'bar l-class r-class';
+
+  Dom.removeClass(el, 'l-class r-class');
+  assert.strictEqual(el.className, 'bar', 'removes two classes via one string');
 });
 
 QUnit.test('hasClass()', function(assert) {

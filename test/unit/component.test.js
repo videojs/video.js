@@ -687,6 +687,13 @@ QUnit.test('should add and remove CSS classes', function(assert) {
   assert.ok(comp.el().className.indexOf('first-class') === -1);
   assert.ok(comp.el().className.indexOf('second-class') === -1);
 
+  comp.addClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class') !== -1);
+  assert.ok(comp.el().className.indexOf('second-class') !== -1);
+  comp.removeClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class') === -1);
+  assert.ok(comp.el().className.indexOf('second-class') === -1);
+
   comp.dispose();
 });
 

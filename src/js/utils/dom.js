@@ -232,14 +232,14 @@ export function hasClass(element, classToCheck) {
  * @param  {Element} element
  *         Element to add class name to.
  *
- * @param  {string} classesToRemove
+ * @param  {...string} classesToAdd
  *         One or more class name to add.
  *
  * @return {Element}
  *         The DOM element with the added class name.
  */
-export function addClass(element, ...classesToRemove) {
-  element.classList.add(...classesToRemove);
+export function addClass(element, ...classesToAdd) {
+  element.classList.add(...classesToAdd.reduce((prev, current) => prev.concat(current.split(/\s+/)), []));
 
   return element;
 }
@@ -250,7 +250,7 @@ export function addClass(element, ...classesToRemove) {
  * @param  {Element} element
  *         Element to remove a class name from.
  *
- * @param  {string} classesToRemove
+ * @param  {...string} classesToRemove
  *         One or more class name to remove.
  *
  * @return {Element}
@@ -262,7 +262,7 @@ export function removeClass(element, ...classesToRemove) {
     log.warn("removeClass was called with an element that doesn't exist");
     return null;
   }
-  element.classList.remove(...classesToRemove);
+  element.classList.remove(...classesToRemove.reduce((prev, current) => prev.concat(current.split(/\s+/)), []));
 
   return element;
 }
