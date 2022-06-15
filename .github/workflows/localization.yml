@@ -23,6 +23,7 @@ jobs:
           upload_sources: true
           # Upload translations to Crowdin, only use true at initial run
           upload_translations: true
+          upload_translations_args: '--import-eq-suggestions'
           # Make pull request of Crowdin translations
           download_translations: true
           # To download translations to the specified version branch
