@@ -1,0 +1,60 @@
+"project_id_env": "CROWDIN_PROJECT_ID"
+"api_token_env": "CROWDIN_PERSONAL_TOKEN"
+"base_path": "."
+
+"preserve_hierarchy": true
+
+"files": [
+  {
+    "source": "/lang/en.json",
+    "translation": "/lang/%locale%.json",
+    "languages_mapping": {
+      "locale": {
+        "ar": "ar",
+        "ba": "ba",
+        "bg": "bg",
+        "ca": "ca",
+        "cs": "cs",
+        "cy": "cy",
+        "da": "da",
+        "de": "de",
+        "el": "el",
+        "es-ES": "es",
+        "et": "et",
+        "eu": "eu",
+        "fa": "fa",
+        "fi": "fi",
+        "fr": "fr",
+        "gd": "gd",
+        "gl": "gl",
+        "he": "he",
+        "hi": "hi",
+        "hr": "hr",
+        "hu": "hu",
+        "it": "it",
+        "ja": "ja",
+        "ko": "ko",
+        "lv": "lv",
+        "nb": "nb",
+        "nl": "nl",
+        "oc": "oc",
+        "pl": "pl",
+        "ro": "ro",
+        "ru": "ru",
+        "sk": "sk",
+        "sl": "sl",
+        "sr": "sr",
+        "sv-SE": "sv",
+        "te": "te",
+        "th": "th",
+        "tr": "tr",
+        "uk": "uk",
+        "vi": "vi",
+        "pt-BR": "pt-BR",
+        "pt-PT": "pt-PT",
+        "zh-CN": "zh-CN",
+        "zh-TW": "zh-TW"
+      }
+    }
+  }
+]
