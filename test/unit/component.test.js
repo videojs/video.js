@@ -704,6 +704,11 @@ QUnit.test('should add and remove CSS classes', function(assert) {
   comp.removeClass('multiple         spaces       between   words');
   assert.ok(comp.el().className.indexOf('multiple spaces between words') === -1);
 
+  comp.toggleClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class second-class') !== -1);
+  comp.toggleClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class second-class') === -1);
+
   comp.dispose();
 });
 

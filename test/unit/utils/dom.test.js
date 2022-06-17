@@ -216,7 +216,7 @@ QUnit.test('toggleClass()', function(assert) {
     }
   ];
 
-  assert.expect(3 + predicateToggles.length);
+  assert.expect(4 + predicateToggles.length);
 
   Dom.toggleClass(el, 'bar');
   assert.strictEqual(el.className, 'foo', 'toggles a class off, if present');
@@ -224,9 +224,11 @@ QUnit.test('toggleClass()', function(assert) {
   Dom.toggleClass(el, 'bar');
   assert.strictEqual(el.className, 'foo bar', 'toggles a class on, if absent');
 
-  assert.throws(function() {
-    Dom.toggleClass(el, 'foo bar');
-  }, 'throws when attempting to toggle a class with whitespace');
+  Dom.toggleClass(el, 'bla ok');
+  assert.strictEqual(el.className, 'foo bar bla ok', 'toggles a classes on, if absent');
+
+  Dom.toggleClass(el, 'bla ok');
+  assert.strictEqual(el.className, 'foo bar', 'toggles a classes off, if present');
 
   predicateToggles.forEach(x => {
     Dom.toggleClass(el, x.toggle, x.predicate);

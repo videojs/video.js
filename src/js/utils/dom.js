@@ -300,31 +300,13 @@ export function removeClass(element, ...classesToRemove) {
  *         The element with a class that has been toggled.
  */
 export function toggleClass(element, classToToggle, predicate) {
-
-  // This CANNOT use `classList` internally because IE11 does not support the
-  // second parameter to the `classList.toggle()` method! Which is fine because
-  // `classList` will be used by the add/remove functions.
-  const has = hasClass(element, classToToggle);
-
   if (typeof predicate === 'function') {
     predicate = predicate(element, classToToggle);
   }
-
   if (typeof predicate !== 'boolean') {
-    predicate = !has;
+    predicate = undefined;
   }
-
-  // If the necessary class operation matches the current state of the
-  // element, no action is required.
-  if (predicate === has) {
-    return;
-  }
-
-  if (predicate) {
-    addClass(element, classToToggle);
-  } else {
-    removeClass(element, classToToggle);
-  }
+  classToToggle.split(/\s+/).forEach(className => element.classList.toggle(className, predicate));
 
   return element;
 }
