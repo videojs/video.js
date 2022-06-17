@@ -4607,7 +4607,7 @@ class Player extends Component {
   /**
    * The player's language code.
    *
-   * Changing the langauge will trigger
+   * Changing the language will trigger
    * [languagechange]{@link Player#event:languagechange}
    * which Components can use to update control text.
    * ClickableComponent will update its control text by default on
