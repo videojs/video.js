@@ -826,7 +826,7 @@ class Component {
    * Remove a CSS class name from the `Component`s element.
    *
    * @param {...string} classesToRemove
-   *        One or one CSS class name to remove.
+   *        One or more CSS class name to remove.
    */
   removeClass(...classesToRemove) {
     Dom.removeClass(this.el_, ...classesToRemove);
