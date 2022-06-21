@@ -150,17 +150,17 @@ function videojs(id, options, ready) {
     throw new TypeError('The element or ID supplied is not valid. (videojs)');
   }
 
+  options = options || {};
+
   // document.body.contains(el) will only check if el is contained within that one document.
   // This causes problems for elements in iframes.
   // Instead, use the element's ownerDocument instead of the global document.
   // This will make sure that the element is indeed in the dom of that document.
   // Additionally, check that the document in question has a default view.
   // If the document is no longer attached to the dom, the defaultView of the document will be null.
-  if (!el.ownerDocument.defaultView || !el.ownerDocument.body.contains(el)) {
+  if ((!el.ownerDocument.defaultView || !el.ownerDocument.body.contains(el)) && !options.noWarnOutOfDom) {
     log.warn('The element supplied is not included in the DOM');
   }
-
-  options = options || {};
 
   // Store a copy of the el before modification, if it is to be restored in destroy()
   // If div ingest, store the parent div
