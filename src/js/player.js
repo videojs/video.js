@@ -549,10 +549,6 @@ class Player extends Component {
       this.addClass('vjs-audio');
     }
 
-    if (this.flexNotSupported_()) {
-      this.addClass('vjs-no-flex');
-    }
-
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
     // TODO: Make this check be performed again when the window switches between monitors
@@ -5065,26 +5061,6 @@ class Player extends Component {
     }
 
     return baseOptions;
-  }
-
-  /**
-   * Determine whether or not flexbox is supported
-   *
-   * @return {boolean}
-   *         - true if flexbox is supported
-   *         - false if flexbox is not supported
-   */
-  flexNotSupported_() {
-    const elem = document.createElement('i');
-
-    // Note: We don't actually use flexBasis (or flexOrder), but it's one of the more
-    // common flex features that we can rely on when checking for flex support.
-    return !('flexBasis' in elem.style ||
-            'webkitFlexBasis' in elem.style ||
-            'mozFlexBasis' in elem.style ||
-            'msFlexBasis' in elem.style ||
-            // IE10-specific (2012 flex spec), available for completeness
-            'msFlexOrder' in elem.style);
   }
 
   /**
