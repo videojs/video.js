@@ -39,6 +39,8 @@ class Html5 extends Tech {
     const source = options.source;
     let crossoriginTracks = false;
 
+    this.featuresVideoFrameCallback = this.featuresVideoFrameCallback && this.el_.tagName === 'VIDEO';
+
     // Set the source if one is provided
     // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
     // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
@@ -113,8 +115,6 @@ class Html5 extends Tech {
     // on iOS, we want to proxy `webkitbeginfullscreen` and `webkitendfullscreen`
     // into a `fullscreenchange` event
     this.proxyWebkitFullscreen_();
-
-    this.featuresVideoFrameCallback = this.featuresVideoFrameCallback && this.el_.tagName === 'VIDEO';
 
     this.triggerReady();
   }
