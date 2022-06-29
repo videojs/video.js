@@ -66,14 +66,6 @@
 }
 
 @mixin flex($value) {
-  // @include context('.video-js', '.video-js.vjs-no-flex') {
-  //   display: table-cell;
-  //   vertical-align: middle;
-  //   @if ($value == 'auto') {
-  //     width: auto;
-  //   }
-  // }
-
   -webkit-box-flex: $value;
   -moz-box-flex: $value;
   -webkit-flex: $value;
