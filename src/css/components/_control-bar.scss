@@ -47,6 +47,7 @@
 .vjs-audio-only-mode.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 // no flex support
