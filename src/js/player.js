@@ -4845,7 +4845,7 @@ class Player extends Component {
     // Clone the media object so it cannot be mutated from outside.
     this.cache_.media = merge(media);
 
-    const {artwork, description, poster, src, textTracks, title} = this.cache_.media;
+    const {artist, artwork, description, poster, src, textTracks, title} = this.cache_.media;
 
     // If `artwork` is not given, create it using `poster`.
     if (!artwork && poster) {
@@ -4868,7 +4868,10 @@ class Player extends Component {
     }
 
     if (this.titleBar) {
-      this.titleBar.update({title, description});
+      this.titleBar.update({
+        title,
+        description: description || artist || ''
+      });
     }
 
     this.ready(ready);

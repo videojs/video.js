@@ -15,9 +15,8 @@ class TitleBar extends Component {
 
   constructor(player, options) {
     super(player, options);
-
-    this.update = this.update.bind(this);
-    this.update(options);
+    this.on('statechanged', (e) => this.updateDom_());
+    this.updateDom_();
   }
 
   /**
@@ -27,26 +26,65 @@ class TitleBar extends Component {
    *         The element that was created.
    */
   createEl() {
-    this.titleEl = Dom.createEl('div', {
-      className: 'vjs-title-bar-title',
-      id: `vjs-title-bar-title-${Guid.newGUID()}`
-    });
-
-    this.descriptionEl = Dom.createEl('div', {
-      className: 'vjs-title-bar-description',
-      id: `vjs-title-bar-description-${Guid.newGUID()}`
-    });
+    this.els = {
+      title: Dom.createEl('div', {
+        className: 'vjs-title-bar-title',
+        id: `vjs-title-bar-title-${Guid.newGUID()}`
+      }),
+      description: Dom.createEl('div', {
+        className: 'vjs-title-bar-description',
+        id: `vjs-title-bar-description-${Guid.newGUID()}`
+      })
+    };
 
     return Dom.createEl('div', {
       className: 'vjs-title-bar'
-    }, {}, [
-      this.titleEl,
-      this.descriptionEl
-    ]);
+    }, {}, Object.values(this.els));
   }
 
   /**
-   * Update the contents of the title bar with new title and description text.
+   * Updates the DOM based on the component's state object.
+   */
+  updateDom_() {
+    const tech = this.player_.tech_;
+    const techEl = tech && tech.el_;
+    const techAriaAttrs = {
+      title: 'aria-labelledby',
+      description: 'aria-describedby'
+    };
+
+    ['title', 'description'].forEach(k => {
+      const value = this.state[k];
+      const el = this.els[k];
+      const techAriaAttr = techAriaAttrs[k];
+
+      Dom.emptyEl(el);
+
+      if (value) {
+        Dom.textContent(el, value);
+      }
+
+      // If there is a tech element available, update its ARIA attributes
+      // according to whether a title and/or description have been provided.
+      if (techEl) {
+        techEl.removeAttribute(techAriaAttr);
+
+        if (value) {
+          techEl.setAttribute(techAriaAttr, el.id);
+        }
+      }
+    });
+
+    if (this.state.title || this.state.description) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  }
+
+  /**
+   * Update the contents of the title bar component with new title and
+   * description text.
    *
    * If both title and description are missing, the title bar will be hidden.
    *
@@ -61,38 +99,13 @@ class TitleBar extends Component {
    * @param  {string} [options.description]
    *         A description to display in the title bar.
    */
-  update({title = '', description = ''} = {}) {
-    const {titleEl, descriptionEl} = this;
-    const tech = this.player_.tech_;
-    const techEl = tech && tech.el_;
-
-    Dom.emptyEl(titleEl);
-    Dom.emptyEl(descriptionEl);
-
-    // If there is a tech element available, update its ARIA attributes
-    // according to whether a title and/or description have been provided.
-    if (techEl) {
-      techEl.removeAttribute('aria-labelledby');
-      techEl.removeAttribute('aria-describedby');
-
-      if (title) {
-        techEl.setAttribute('aria-labelledby', titleEl.id);
-      }
-      if (description) {
-        techEl.setAttribute('aria-describedby', descriptionEl.id);
-      }
-    }
-
-    Dom.textContent(titleEl, title);
-    Dom.textContent(descriptionEl, description);
-
-    if (title || description) {
-      this.show();
-    } else {
-      this.hide();
-    }
+  update(options) {
+    this.setState(options);
   }
 
+  /**
+   * Dispose the component.
+   */
   dispose() {
     const tech = this.player_.tech_;
     const techEl = tech && tech.el_;
@@ -103,8 +116,7 @@ class TitleBar extends Component {
     }
 
     super.dispose();
-    this.titleEl = null;
-    this.descriptionEl = null;
+    this.els = null;
   }
 }
 
