@@ -1044,3 +1044,20 @@ QUnit.test('featuresVideoFrameCallback is false for audio elements', function(as
 
   audioTech.dispose();
 });
+
+QUnit.test('featuresVideoFrameCallback is false for Safari DRM', function(assert) {
+  // Looking for `super.requestVideoFrameCallback()` being called
+  const spy = sinon.spy(Object.getPrototypeOf(Object.getPrototypeOf(tech)), 'requestVideoFrameCallback');
+
+  tech.featuresVideoFrameCallback = true;
+
+  try {
+    tech.el_.webkitKeys = {};
+    tech.requestVideoFrameCallback(function() {});
+
+    assert.ok(spy.calledOnce, false, 'rvf fallback used');
+  } catch (e) {
+    // video.webkitKeys isn't writable on Safari, so relying on the mocked property on other browsers
+    assert.ok(true, 'skipped because webkitKeys not writable');
+  }
+});
