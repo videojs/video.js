@@ -90,6 +90,18 @@ class TitleBar extends Component {
    *
    * If either title or description are present, the title bar will be visible.
    *
+   * NOTE: Any previously set value will be preserved. To unset a previously
+   * set value, you must pass an empty string or null.
+   *
+   * For example:
+   *
+   * ```
+   * update({title: 'foo', description: 'bar'}) // title: 'foo', description: 'bar'
+   * update({description: 'bar2'}) // title: 'foo', description: 'bar2'
+   * update({title: ''}) // title: '', description: 'bar2'
+   * update({title: 'foo', description: null}) // title: 'foo', description: null
+   * ```
+   *
    * @param  {Object} [options={}]
    *         An options object. When empty, the title bar will be hidden.
    *
