@@ -1,0 +1,41 @@
+.vjs-title-bar {
+
+  // At a base inherited font-size of 10px, the title bar overall height should
+  // be 96px with the area of text occupying the first 48px and the rest being
+  // padding. This leaves plenty of room for the gradient to fade to
+  // transparent while maintaining an WCAG AA-compliant contrast ratio (tested
+  // using the TPGi Color Contrast Analyzer application) even on top of a solid
+  // white background.
+  @include linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 60%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  font-size: 1.2em; // 12px
+  line-height: 1.5; // 18px
+  @include transition(opacity 0.1s);
+  padding: 0.666em 1.333em 4em; // 8px 16px 48px
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.vjs-title-bar-title,
+.vjs-title-bar-description {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vjs-title-bar-title {
+  font-weight: bold;
+  margin-bottom: 0.333em; // 4px
+}
+
+.vjs-playing.vjs-user-inactive .vjs-title-bar {
+  opacity: 0;
+  @include transition(opacity 1s);
+}

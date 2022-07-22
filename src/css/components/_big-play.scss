@@ -7,9 +7,11 @@
   width: $big-play-button--width; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
   display: block;
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 50%;
+  left: 50%;
   padding: 0;
+  margin-top: -(math.div($big-play-button--height, 2));
+  margin-left: -(math.div($big-play-button--width, 2));
   cursor: pointer;
   opacity: 1;
   border: $big-play-button--border-size solid $primary-foreground-color;
@@ -26,14 +28,6 @@
 
     @extend %icon-default;
   }
-}
-
-// Allow people that hate their poster image to center the big play button.
-.vjs-big-play-centered .vjs-big-play-button {
-  top: 50%;
-  left: 50%;
-  margin-top: -(math.div($big-play-button--height, 2));
-  margin-left: -(math.div($big-play-button--width, 2));
 }
 
 .video-js:hover .vjs-big-play-button,
