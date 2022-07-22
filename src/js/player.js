@@ -50,6 +50,7 @@ import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
 import './live-tracker.js';
+import './title-bar.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -4844,7 +4845,7 @@ class Player extends Component {
     // Clone the media object so it cannot be mutated from outside.
     this.cache_.media = merge(media);
 
-    const {artwork, poster, src, textTracks} = this.cache_.media;
+    const {artist, artwork, description, poster, src, textTracks, title} = this.cache_.media;
 
     // If `artwork` is not given, create it using `poster`.
     if (!artwork && poster) {
@@ -4864,6 +4865,13 @@ class Player extends Component {
 
     if (Array.isArray(textTracks)) {
       textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
+    }
+
+    if (this.titleBar) {
+      this.titleBar.update({
+        title,
+        description: description || artist || ''
+      });
     }
 
     this.ready(ready);
@@ -5148,6 +5156,7 @@ Player.prototype.options_ = {
   children: [
     'mediaLoader',
     'posterImage',
+    'titleBar',
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',
