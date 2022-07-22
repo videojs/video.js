@@ -575,7 +575,6 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', (e) => this.listenForUserActivity_(e));
-    this.on('stageclick', (e) => this.handleStageClick_(e));
     this.on('keydown', (e) => this.handleKeyDown(e));
     this.on('languagechange', (e) => this.handleLanguagechange(e));
 
@@ -2037,17 +2036,6 @@ class Player extends Component {
   }
 
   /**
-   * native click events on the SWF aren't triggered on IE11, Win8.1RT
-   * use stageclick events triggered from inside the SWF instead
-   *
-   * @private
-   * @listens stageclick
-   */
-  handleStageClick_() {
-    this.reportUserActivity();
-  }
-
-  /**
    * @private
    */
   toggleFullscreenClass_() {
@@ -2257,14 +2245,14 @@ class Player extends Component {
   }
 
   /**
-   * Mediate attempt to call playback tech method 
+   * Mediate attempt to call playback tech method
    * and return the value of the method called.
    *
    * @param {string} method
    *        Tech method
    *
    * @return {*}
-   *         Value returned by the tech method called, undefined if tech 
+   *         Value returned by the tech method called, undefined if tech
    *         is not ready or tech method is not present
    *
    * @private
@@ -2540,7 +2528,7 @@ class Player extends Component {
     if (seconds !== this.cache_.duration) {
       // Cache the last set value for optimized scrubbing
       this.cache_.duration = seconds;
-      
+
       if (seconds === Infinity) {
         this.addClass('vjs-live');
       } else {
