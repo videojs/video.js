@@ -153,18 +153,9 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
   Object.getOwnPropertyNames(properties).forEach(function(propName) {
     const val = properties[propName];
 
-    // See #2176
-    // We originally were accepting both properties and attributes in the
-    // same object, but that doesn't work so well.
-    if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
-      log.warn('Setting attributes in the second argument of createEl()\n' +
-               'has been deprecated. Use the third argument instead.\n' +
-               `createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
-      el.setAttribute(propName, val);
-
     // Handle textContent since it's not supported everywhere and we have a
     // method for it.
-    } else if (propName === 'textContent') {
+    if (propName === 'textContent') {
       textContent(el, val);
     } else if (el[propName] !== val || propName === 'tabIndex') {
       el[propName] = val;
