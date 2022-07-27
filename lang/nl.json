@@ -14,7 +14,7 @@
   "Progress Bar": "Voortgangsbalk",
   "progress bar timing: currentTime={1} duration={2}": "{1} van {2}",
   "Fullscreen": "Volledig scherm",
-  "Non-Fullscreen": "Geen volledig scherm",
+  "Exit Fullscreen": "Geen volledig scherm",
   "Mute": "Dempen",
   "Unmute": "Niet dempen",
   "Playback Rate": "Afspeelsnelheid",

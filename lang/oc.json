@@ -16,7 +16,7 @@
   "Progress Bar": "Barra de progression",
   "progress bar timing: currentTime={1} duration={2}": "{1} sus {2}",
   "Fullscreen": "Ecran complèt",
-  "Non-Fullscreen": "Pas en ecran complèt",
+  "Exit Fullscreen": "Pas en ecran complèt",
   "Mute": "Copar lo son",
   "Unmute": "Restablir lo son",
   "Playback Rate": "Velocitat de lectura",

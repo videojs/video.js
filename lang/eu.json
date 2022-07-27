@@ -16,7 +16,7 @@
   "Progress Bar": "Aurrerapen barra",
   "progress bar timing: currentTime={1} duration={2}": "{1} / {2}",
   "Fullscreen": "Pantaila osoa",
-  "Non-Fullscreen": "Irten pantaila osotik",
+  "Exit Fullscreen": "Irten pantaila osotik",
   "Mute": "Ixildu",
   "Unmute": "Soinua jarri",
   "Playback Rate": "Abiadura",

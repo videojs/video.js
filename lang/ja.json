@@ -14,7 +14,7 @@
   "Progress Bar": "シークバー",
   "progress bar timing: currentTime={1} duration={2}": "{2}の{1}",
   "Fullscreen": "フルスクリーン",
-  "Non-Fullscreen": "フルスクリーン以外",
+  "Exit Fullscreen": "フルスクリーン以外",
   "Mute": "ミュート",
   "Unmute": "ミュート解除",
   "Playback Rate": "再生レート",

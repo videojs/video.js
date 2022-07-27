@@ -16,7 +16,7 @@
   "Progress Bar": "Bară de progres",
   "progress bar timing: currentTime={1} duration={2}": "{1} din {2}",
   "Fullscreen": "Ecran complet",
-  "Non-Fullscreen": "Ecran parțial",
+  "Exit Fullscreen": "Ecran parțial",
   "Mute": "Suprimare sunet",
   "Unmute": "Activare sunet",
   "Playback Rate": "Rată de redare",
