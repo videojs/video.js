@@ -1161,9 +1161,8 @@ Tech.prototype.featuresFullscreenResize = false;
 Tech.prototype.featuresPlaybackRate = false;
 
 /**
- * Boolean indicating whether the `Tech` supports the `progress` event. This is currently
- * not triggered by video-js-swf. This will be used to determine if
- * {@link Tech#manualProgressOn} should be called.
+ * Boolean indicating whether the `Tech` supports the `progress` event.
+ * This will be used to determine if {@link Tech#manualProgressOn} should be called.
  *
  * @type {boolean}
  * @default
@@ -1183,9 +1182,8 @@ Tech.prototype.featuresProgressEvents = false;
 Tech.prototype.featuresSourceset = false;
 
 /**
- * Boolean indicating whether the `Tech` supports the `timeupdate` event. This is currently
- * not triggered by video-js-swf. This will be used to determine if
- * {@link Tech#manualTimeUpdates} should be called.
+ * Boolean indicating whether the `Tech` supports the `timeupdate` event.
+ * This will be used to determine if {@link Tech#manualTimeUpdates} should be called.
  *
  * @type {boolean}
  * @default

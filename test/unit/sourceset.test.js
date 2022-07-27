@@ -1097,33 +1097,33 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     const fixture = document.querySelector('#qunit-fixture');
     const vid = document.createElement('video');
     const Tech = videojs.getTech('Tech');
-    const flashSrc = {
-      src: 'http://example.com/oceans.flv',
-      type: 'video/flv'
+    const youtubeSrc = {
+      src: 'https://www.youtube.com/watch?v=C0DPdy98e4c',
+      type: 'video/youtube'
     };
     const sourcesets = [];
 
-    class FakeFlash extends Html5 {
+    class FakeYoutube extends Html5 {
       static isSupported() {
         return true;
       }
 
       static canPlayType(type) {
-        return type === 'video/flv' ? 'maybe' : '';
+        return type === 'video/youtube' ? 'maybe' : '';
       }
 
       static canPlaySource(srcObj) {
-        return srcObj.type === 'video/flv';
+        return srcObj.type === 'video/youtube';
       }
     }
 
-    videojs.registerTech('FakeFlash', FakeFlash);
+    videojs.registerTech('FakeYoutube', FakeYoutube);
 
     fixture.appendChild(vid);
 
     const player = videojs(vid, {
       enableSourceset: true,
-      techOrder: ['fakeFlash', 'html5']
+      techOrder: ['fakeYoutube', 'html5']
     });
 
     player.ready(function() {
@@ -1134,10 +1134,10 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         sourcesets.push(e.src);
 
         if (sourcesets.length === 3) {
-          assert.deepEqual([flashSrc.src, sourceTwo.src, sourceOne.src], sourcesets, 'sourceset as expected');
+          assert.deepEqual([youtubeSrc.src, sourceTwo.src, sourceOne.src], sourcesets, 'sourceset as expected');
 
           player.dispose();
-          delete Tech.techs_.FakeFlash;
+          delete Tech.techs_.FakeYoutube;
           done();
         }
       });
@@ -1146,7 +1146,7 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       player.src(sourceTwo);
     });
 
-    player.src(flashSrc);
+    player.src(youtubeSrc);
 
   });
 });
