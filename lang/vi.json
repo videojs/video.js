@@ -14,7 +14,7 @@
   "Progress Bar": "Thanh tiến trình",
   "progress bar timing: currentTime={1} duration={2}": "{1} của {2}",
   "Fullscreen": "Toàn màn hình",
-  "Non-Fullscreen": "Thoát toàn màn hình",
+  "Exit Fullscreen": "Thoát toàn màn hình",
   "Mute": "Tắt tiếng",
   "Unmute": "Bật âm thanh",
   "Playback Rate": "Tỉ lệ phát lại",

@@ -14,7 +14,7 @@
   "Progress Bar": "Barra di avanzamento",
   "progress bar timing: currentTime={1} duration={2}": "{1} di {2}",
   "Fullscreen": "Schermo intero",
-  "Non-Fullscreen": "Chiudi Schermo intero",
+  "Exit Fullscreen": "Chiudi Schermo intero",
   "Mute": "Muto",
   "Unmute": "Audio",
   "Playback Rate": "Tasso di riproduzione",

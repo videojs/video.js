@@ -14,7 +14,7 @@
   "Progress Bar": "Індикатор завантаження",
   "progress bar timing: currentTime={1} duration={2}": "{1} з {2}",  
   "Fullscreen": "Повноекранний режим",
-  "Non-Fullscreen": "Неповноекранний режим",
+  "Exit Fullscreen": "Неповноекранний режим",
   "Mute": "Без звуку",
   "Unmute": "Зі звуком",
   "Playback Rate": "Швидкість відтворення",
