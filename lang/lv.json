@@ -16,7 +16,7 @@
     "Progress Bar": "Progresa josla",
     "progress bar timing: currentTime={1} duration={2}": "{1} no {2}",
     "Fullscreen": "Pilnekrāna režīms",
-    "Non-Fullscreen": "Iziet no pilnekrāna režīma",
+    "Exit Fullscreen": "Iziet no pilnekrāna režīma",
     "Mute": "Izslēgt skaņu",
     "Unmute": "Ieslēgt skaņu",
     "Playback Rate": "Atskaņošanas ātrums",

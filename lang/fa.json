@@ -16,7 +16,7 @@
   "Progress Bar": "نوار پیشرفت",
   "progress bar timing: currentTime={1} duration={2}": "{1} از {2}",
   "Fullscreen": "تمام‌صفحه",
-  "Non-Fullscreen": "غیر تمام‌صفحه",
+  "Exit Fullscreen": "غیر تمام‌صفحه",
   "Mute": "بی صدا",
   "Unmute": "صدادار",
   "Playback Rate": "سرعت پخش",
