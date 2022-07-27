@@ -576,7 +576,6 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', (e) => this.listenForUserActivity_(e));
-    this.on('stageclick', (e) => this.handleStageClick_(e));
     this.on('keydown', (e) => this.handleKeyDown(e));
     this.on('languagechange', (e) => this.handleLanguagechange(e));
 
@@ -2038,17 +2037,6 @@ class Player extends Component {
   }
 
   /**
-   * native click events on the SWF aren't triggered on IE11, Win8.1RT
-   * use stageclick events triggered from inside the SWF instead
-   *
-   * @private
-   * @listens stageclick
-   */
-  handleStageClick_() {
-    this.reportUserActivity();
-  }
-
-  /**
    * @private
    */
   toggleFullscreenClass_() {
@@ -2258,13 +2246,15 @@ class Player extends Component {
   }
 
   /**
-   * Get calls can't wait for the tech, and sometimes don't need to.
+   * Mediate attempt to call playback tech method
+   * and return the value of the method called.
    *
    * @param {string} method
    *        Tech method
    *
-   * @return {Function|undefined}
-   *         the method or undefined
+   * @return {*}
+   *         Value returned by the tech method called, undefined if tech
+   *         is not ready or tech method is not present
    *
    * @private
    */
@@ -2280,10 +2270,8 @@ class Player extends Component {
       return middleware.mediate(this.middleware_, this.tech_, method);
     }
 
-    // Flash likes to die and reload when you hide or reposition it.
-    // In these cases the object methods go away and we get errors.
-    // TODO: Is this needed for techs other than Flash?
-    // When that happens we'll catch the errors and inform tech that it's not ready any more.
+    // Log error when playback tech object is present but method
+    // is undefined or unavailable
     try {
       return this.tech_[method]();
     } catch (e) {
@@ -2539,8 +2527,7 @@ class Player extends Component {
     }
 
     if (seconds !== this.cache_.duration) {
-      // Cache the last set value for optimized scrubbing (esp. Flash)
-      // TODO: Required for techs other than Flash?
+      // Cache the last set value for optimized scrubbing
       this.cache_.duration = seconds;
 
       if (seconds === Infinity) {
