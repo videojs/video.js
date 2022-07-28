@@ -30,11 +30,24 @@ QUnit.test('should create an element, supporting textContent', function(assert) 
   }
 });
 
+QUnit.test('should create an element with tabIndex prop', function(assert) {
+  const span = Dom.createEl('span', {tabIndex: '5'});
+
+  assert.strictEqual(span.tabIndex, 5);
+});
+
 QUnit.test('should create an element with content', function(assert) {
   const span = Dom.createEl('span');
   const div = Dom.createEl('div', undefined, undefined, span);
 
   assert.strictEqual(div.firstChild, span);
+});
+
+QUnit.test('should be able to set standard props as attributes, and vice versa, on a created element', function(assert) {
+  const span = Dom.createEl('span', {className: 'bar'}, {id: 'foo'});
+
+  assert.strictEqual(span.getAttribute('class'), 'bar');
+  assert.strictEqual(span.id, 'foo');
 });
 
 QUnit.test('should insert an element first in another', function(assert) {
