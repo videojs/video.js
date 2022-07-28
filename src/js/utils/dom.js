@@ -150,7 +150,11 @@ function createQuerier(method) {
 export function createEl(tagName = 'div', properties = {}, attributes = {}, content) {
   const el = document.createElement(tagName);
 
-  Object.entries(properties).forEach(([propName, val]) => {
+  Object.getOwnPropertyNames(properties).forEach(function(propName) {
+    const val = properties[propName];
+
+    // Handle textContent since it's not supported everywhere and we have a
+    // method for it.
     if (propName === 'textContent') {
       textContent(el, val);
     } else if (el[propName] !== val || propName === 'tabIndex') {
@@ -158,8 +162,8 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
     }
   });
 
-  Object.entries(attributes).forEach(([attrName, val]) => {
-    el.setAttribute(attrName, val);
+  Object.getOwnPropertyNames(attributes).forEach(function(attrName) {
+    el.setAttribute(attrName, attributes[attrName]);
   });
 
   if (content) {
