@@ -745,12 +745,15 @@ class Html5 extends Tech {
 
   /**
    * Native requestVideoFrameCallback if supported by browser/tech, or fallback
+   * Don't use rVCF on Safari when DRM is playing, as it doesn't fire
+   * Needs to be checked later than the constructor
+   * This will be a false positive for clear sources loaded after a Fairplay source
    *
    * @param {function} cb function to call
    * @return {number} id of request
    */
   requestVideoFrameCallback(cb) {
-    if (this.featuresVideoFrameCallback) {
+    if (this.featuresVideoFrameCallback && !this.el_.webkitKeys) {
       return this.el_.requestVideoFrameCallback(cb);
     }
     return super.requestVideoFrameCallback(cb);
@@ -762,7 +765,7 @@ class Html5 extends Tech {
    * @param {number} id request id to cancel
    */
   cancelVideoFrameCallback(id) {
-    if (this.featuresVideoFrameCallback) {
+    if (this.featuresVideoFrameCallback && !this.el_.webkitKeys) {
       this.el_.cancelVideoFrameCallback(id);
     } else {
       super.cancelVideoFrameCallback(id);
