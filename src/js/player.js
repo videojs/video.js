@@ -330,22 +330,10 @@ class Player extends Component {
 
     // If language is not set, get the closest lang attribute
     if (!options.language) {
-      if (typeof tag.closest === 'function') {
-        const closest = tag.closest('[lang]');
+      const closest = tag.closest('[lang]');
 
-        if (closest && closest.getAttribute) {
-          options.language = closest.getAttribute('lang');
-        }
-      } else {
-        let element = tag;
-
-        while (element && element.nodeType === 1) {
-          if (Dom.getAttributes(element).hasOwnProperty('lang')) {
-            options.language = element.getAttribute('lang');
-            break;
-          }
-          element = element.parentNode;
-        }
+      if (closest) {
+        options.language = closest.getAttribute('lang');
       }
     }
 
