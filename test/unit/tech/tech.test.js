@@ -770,3 +770,21 @@ QUnit.test('returns an empty object for getVideoPlaybackQuality', function(asser
   assert.deepEqual(tech.getVideoPlaybackQuality(), {}, 'returns an empty object');
   tech.dispose();
 });
+
+QUnit.test('requestVideoFrameCallback waits if tech not ready', function(assert) {
+  const tech = new Tech();
+  const cbSpy = sinon.spy();
+
+  tech.paused = sinon.spy();
+  tech.isReady_ = false;
+
+  tech.requestVideoFrameCallback(cbSpy);
+
+  assert.notOk(tech.paused.called, 'paused not called on tech that is not ready');
+
+  tech.trigger('playing');
+
+  assert.ok(cbSpy.called, 'callback was called on tech playing');
+
+  tech.dispose();
+});
