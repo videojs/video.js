@@ -46,12 +46,16 @@ class PosterImage extends ClickableComponent {
    *         The element that gets created.
    */
   createEl() {
-    const el = Dom.createEl('div', {
+    const crossOrigin = this.player_.options_.crossOrigin || this.player_.options_.crossorigin || null;
+    const el = Dom.createEl('picture', {
       className: 'vjs-poster',
 
       // Don't want poster to be tabbable.
       tabIndex: -1
-    });
+    }, {}, Dom.createEl('img', {
+      loading: 'lazy',
+      crossOrigin
+    }));
 
     return el;
   }
@@ -85,15 +89,7 @@ class PosterImage extends ClickableComponent {
    *        The URL to the source for the `PosterImage`.
    */
   setSrc(url) {
-    let backgroundImage = '';
-
-    // Any falsy value should stay as an empty string, otherwise
-    // this will throw an extra error
-    if (url) {
-      backgroundImage = `url("${url}")`;
-    }
-
-    this.el_.style.backgroundImage = backgroundImage;
+    this.el_.querySelector('img').src = url;
   }
 
   /**

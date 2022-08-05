@@ -839,6 +839,9 @@ class Player extends Component {
     }
 
     this.techCall_('setCrossOrigin', value);
+    if (this.posterImage) {
+      this.posterImage.$('img').crossOrigin = value;
+    }
 
     return;
   }
