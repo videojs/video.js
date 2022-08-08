@@ -418,8 +418,7 @@ class TextTrackDisplay extends Component {
       for (let j = 0; j < track.activeCues.length; ++j) {
         const cueEl = track.activeCues[j].displayState;
 
-        Dom.addClass(cueEl, 'vjs-text-track-cue');
-        Dom.addClass(cueEl, 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
+        Dom.addClass(cueEl, 'vjs-text-track-cue', 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
         if (track.language) {
           Dom.setAttribute(cueEl, 'lang', track.language);
         }
