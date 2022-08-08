@@ -3371,7 +3371,7 @@ class Player extends Component {
     });
 
     // Try another available source if this one fails before playback.
-    if (this.options_.retryOnError && sources.length > 1) {
+    if (sources.length > 1) {
       const retry = () => {
         // Remove the error modal
         this.error(null);
