@@ -677,6 +677,41 @@ QUnit.test('should add and remove a CSS class', function(assert) {
   comp.dispose();
 });
 
+QUnit.test('should add and remove CSS classes', function(assert) {
+  const comp = new Component(this.player, {});
+
+  comp.addClass('first-class', 'second-class');
+  assert.ok(comp.el().className.indexOf('first-class') !== -1);
+  assert.ok(comp.el().className.indexOf('second-class') !== -1);
+  comp.removeClass('first-class', 'second-class');
+  assert.ok(comp.el().className.indexOf('first-class') === -1);
+  assert.ok(comp.el().className.indexOf('second-class') === -1);
+
+  comp.addClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class') !== -1);
+  assert.ok(comp.el().className.indexOf('second-class') !== -1);
+  comp.removeClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class') === -1);
+  assert.ok(comp.el().className.indexOf('second-class') === -1);
+
+  comp.addClass('be cool', 'scooby', 'doo');
+  assert.ok(comp.el().className.indexOf('be cool scooby doo') !== -1);
+  comp.removeClass('be cool', 'scooby', 'doo');
+  assert.ok(comp.el().className.indexOf('be cool scooby doo') === -1);
+
+  comp.addClass('multiple         spaces       between   words');
+  assert.ok(comp.el().className.indexOf('multiple spaces between words') !== -1);
+  comp.removeClass('multiple         spaces       between   words');
+  assert.ok(comp.el().className.indexOf('multiple spaces between words') === -1);
+
+  comp.toggleClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class second-class') !== -1);
+  comp.toggleClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class second-class') === -1);
+
+  comp.dispose();
+});
+
 QUnit.test('should add CSS class passed in options', function(assert) {
   const comp = new Component(this.player, {className: 'class1 class2'});
 

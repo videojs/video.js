@@ -1384,8 +1384,7 @@ class Player extends Component {
   handleTechLoadStart_() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
-    this.removeClass('vjs-ended');
-    this.removeClass('vjs-seeking');
+    this.removeClass('vjs-ended', 'vjs-seeking');
 
     // reset the error state
     this.error(null);
@@ -1662,8 +1661,7 @@ class Player extends Component {
    * @private
    */
   handleTechPlay_() {
-    this.removeClass('vjs-ended');
-    this.removeClass('vjs-paused');
+    this.removeClass('vjs-ended', 'vjs-paused');
     this.addClass('vjs-playing');
 
     // hide the poster when the user hits play
@@ -1816,8 +1814,7 @@ class Player extends Component {
    * @private
    */
   handleTechSeeked_() {
-    this.removeClass('vjs-seeking');
-    this.removeClass('vjs-ended');
+    this.removeClass('vjs-seeking', 'vjs-ended');
     /**
      * Fired when the player has finished jumping to a new time
      *
