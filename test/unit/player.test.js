@@ -384,10 +384,9 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   log.error.restore();
 });
 
-QUnit.test('should retry setting source if error occurs and retryOnError: true', function(assert) {
+QUnit.test('should retry setting source if error occurs', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -439,10 +438,9 @@ QUnit.test('should retry setting source if error occurs and retryOnError: true',
   player.dispose();
 });
 
-QUnit.test('should not retry setting source if retryOnError: true and error occurs during playback', function(assert) {
+QUnit.test('should not retry setting source if error occurs during playback', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -490,7 +488,6 @@ QUnit.test('should not retry setting source if retryOnError: true and error occu
 QUnit.test('aborts and resets retryOnError behavior if new src() call made during a retry', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
