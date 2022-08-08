@@ -17,9 +17,11 @@ const testSrc = {
   src: 'http://example.com/testSrc.mp4',
   type: 'video/mp4'
 };
-const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
-const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
-const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
+// Using a real URL here makes the tests work with retryOnError by default
+// however, this means that it may fail offline
+const sourceOne = {src: 'https://vjs.zencdn.net/v/oceans.mp4?one', type: 'video/mp4'};
+const sourceTwo = {src: 'https://vjs.zencdn.net/v/oceans.mp4?two', type: 'video/mp4'};
+const sourceThree = {src: 'https://vjs.zencdn.net/v/oceans.mp4?three', type: 'video/mp4'};
 
 if (!Html5.canOverrideAttributes()) {
   qunitFn = 'skip';
