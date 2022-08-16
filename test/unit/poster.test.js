@@ -33,18 +33,12 @@ QUnit.test('should create and update a poster image', function(assert) {
 
 QUnit.test('should mirror crossOrigin', function(assert) {
   assert.strictEqual(this.mockPlayer.posterImage.$('img').crossOrigin, null, 'crossOrigin not set when not present in options');
+  assert.strictEqual(this.mockPlayer.posterImage.crossOrigin(), null, 'crossOrigin not set from getter when not present in options');
 
   this.mockPlayer.crossOrigin('anonymous');
 
   assert.strictEqual(this.mockPlayer.posterImage.$('img').crossOrigin, 'anonymous', 'crossOrigin updated');
-
-  this.mockPlayer.options_.crossOrigin = 'anonymous';
-
-  const newPosterImage = new PosterImage(this.mockPlayer);
-
-  assert.strictEqual(newPosterImage.$('img').crossOrigin, 'anonymous', 'crossOrigin is set from player options');
-
-  newPosterImage.dispose();
+  assert.strictEqual(this.mockPlayer.posterImage.crossOrigin(), 'anonymous', 'crossOrigin getter returns updated value');
 
 });
 

@@ -820,27 +820,28 @@ class Player extends Component {
    *
    * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
    *
-   * @param {string} [value]
+   * @param {string|null} [value]
    *        The value to set the `Player`'s crossOrigin to. If an argument is
-   *        given, must be one of `anonymous` or `use-credentials`.
+   *        given, must be one of `'anonymous'` or `'use-credentials'`, or 'null'.
    *
-   * @return {string|undefined}
+   * @return {string|null|undefined}
    *         - The current crossOrigin value of the `Player` when getting.
    *         - undefined when setting
    */
   crossOrigin(value) {
-    if (!value) {
+    // `null` can be set to unset a value
+    if (typeof value === 'undefined') {
       return this.techGet_('crossOrigin');
     }
 
-    if (value !== 'anonymous' && value !== 'use-credentials') {
-      log.warn(`crossOrigin must be "anonymous" or "use-credentials", given "${value}"`);
+    if (value !== null && value !== 'anonymous' && value !== 'use-credentials') {
+      log.warn(`crossOrigin must be null,  "anonymous" or "use-credentials", given "${value}"`);
       return;
     }
 
     this.techCall_('setCrossOrigin', value);
     if (this.posterImage) {
-      this.posterImage.$('img').crossOrigin = value;
+      this.posterImage.crossOrigin(value);
     }
 
     return;
