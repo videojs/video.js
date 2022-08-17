@@ -5115,6 +5115,9 @@ Player.prototype.options_ = {
 
   html5: {},
 
+  // enable sourceset by default
+  enableSourceset: true,
+
   // default inactivity timeout
   inactivityTimeout: 2000,
 
