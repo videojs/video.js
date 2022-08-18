@@ -115,6 +115,49 @@ const setupAfterEach = function(totalSourcesets) {
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el', 'video-js', 'change video-js el'];
 
 QUnit[qunitFn]('sourceset', function(hooks) {
+  QUnit.module('sourceset option', (subhooks) => testTypes.forEach((testName) => {
+    QUnit.module(testName, {
+      beforeEach() {
+
+        setupEnv(this, testName);
+      },
+      afterEach: setupAfterEach(1)
+    });
+
+    QUnit.test('sourceset enabled by default', function(assert) {
+      const done = assert.async();
+
+      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
+      this.player = videojs(this.mediaEl, {});
+
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, [testSrc], e);
+        done();
+      });
+    });
+
+    QUnit.test('sourceset not triggered if turned off', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl, {
+        enableSourceset: false
+      });
+
+      this.totalSourcesets = 0;
+
+      this.player.one('sourceset', (e) => {
+        this.totalSourcesets = 1;
+      });
+
+      this.player.on('loadstart', () => {
+        done();
+      });
+
+      this.player.src(testSrc);
+
+    });
+  }));
+
   QUnit.module('source before player', (subhooks) => testTypes.forEach((testName) => {
     QUnit.module(testName, {
       beforeEach() {
