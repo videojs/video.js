@@ -160,7 +160,7 @@
     "videojs-generate-karma-config": "^8.0.1",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^9.0.1",
-    "webpack": "^5.74.0"
+    "webpack": "^1.15.0"
   },
   "vjsstandard": {
     "ignore": [
