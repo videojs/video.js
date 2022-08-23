@@ -15,7 +15,7 @@ import document from 'global/document';
  */
 export const createStyleElement = function(className) {
   const style = document.createElement('style');
-
+  style.nonce =  window.cspNonce; // adding CSP nounce for dynamically added styles.
   style.className = className;
 
   return style;
