@@ -133,8 +133,7 @@ class Slider extends Component {
       'role': 'slider',
       'aria-valuenow': 0,
       'aria-valuemin': 0,
-      'aria-valuemax': 100,
-      'tabIndex': 0
+      'aria-valuemax': 100
     }, attributes);
 
     return super.createEl(type, props, attributes);

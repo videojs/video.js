@@ -14,7 +14,7 @@
   "Progress Bar": "Ukazovateľ priebehu",
   "progress bar timing: currentTime={1} duration={2}": "časovanie ukazovateľa priebehu: currentTime={1} duration={2}",
   "Fullscreen": "Režim celej obrazovky",
-  "Non-Fullscreen": "Režim normálnej obrazovky",
+  "Exit Fullscreen": "Režim normálnej obrazovky",
   "Mute": "Stlmiť",
   "Unmute": "Zrušiť stlmenie",
   "Playback Rate": "Rýchlosť prehrávania",

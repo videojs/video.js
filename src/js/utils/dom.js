@@ -48,21 +48,6 @@ function throwIfWhitespace(str) {
 }
 
 /**
- * Produce a regular expression for matching a className within an elements className.
- *
- * @private
- * @param  {string} className
- *         The className to generate the RegExp for.
- *
- * @return {RegExp}
- *         The RegExp that will check for a specific `className` in an elements
- *         className.
- */
-function classRegExp(className) {
-  return new RegExp('(^|\\s)' + className + '($|\\s)');
-}
-
-/**
  * Whether the current DOM interface appears to be real (i.e. not simulated).
  *
  * @return {boolean}
@@ -153,18 +138,9 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
   Object.getOwnPropertyNames(properties).forEach(function(propName) {
     const val = properties[propName];
 
-    // See #2176
-    // We originally were accepting both properties and attributes in the
-    // same object, but that doesn't work so well.
-    if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
-      log.warn('Setting attributes in the second argument of createEl()\n' +
-               'has been deprecated. Use the third argument instead.\n' +
-               `createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
-      el.setAttribute(propName, val);
-
     // Handle textContent since it's not supported everywhere and we have a
     // method for it.
-    } else if (propName === 'textContent') {
+    if (propName === 'textContent') {
       textContent(el, val);
     } else if (el[propName] !== val || propName === 'tabIndex') {
       el[propName] = val;
@@ -237,10 +213,8 @@ export function prependTo(child, parent) {
  */
 export function hasClass(element, classToCheck) {
   throwIfWhitespace(classToCheck);
-  if (element.classList) {
-    return element.classList.contains(classToCheck);
-  }
-  return classRegExp(classToCheck).test(element.className);
+
+  return element.classList.contains(classToCheck);
 }
 
 /**
@@ -249,21 +223,14 @@ export function hasClass(element, classToCheck) {
  * @param  {Element} element
  *         Element to add class name to.
  *
- * @param  {string} classToAdd
- *         Class name to add.
+ * @param  {...string} classesToAdd
+ *         One or more class name to add.
  *
  * @return {Element}
  *         The DOM element with the added class name.
  */
-export function addClass(element, classToAdd) {
-  if (element.classList) {
-    element.classList.add(classToAdd);
-
-  // Don't need to `throwIfWhitespace` here because `hasElClass` will do it
-  // in the case of classList not being supported.
-  } else if (!hasClass(element, classToAdd)) {
-    element.className = (element.className + ' ' + classToAdd).trim();
-  }
+export function addClass(element, ...classesToAdd) {
+  element.classList.add(...classesToAdd.reduce((prev, current) => prev.concat(current.split(/\s+/)), []));
 
   return element;
 }
@@ -274,26 +241,19 @@ export function addClass(element, classToAdd) {
  * @param  {Element} element
  *         Element to remove a class name from.
  *
- * @param  {string} classToRemove
- *         Class name to remove
+ * @param  {...string} classesToRemove
+ *         One or more class name to remove.
  *
  * @return {Element}
  *         The DOM element with class name removed.
  */
-export function removeClass(element, classToRemove) {
+export function removeClass(element, ...classesToRemove) {
   // Protect in case the player gets disposed
   if (!element) {
     log.warn("removeClass was called with an element that doesn't exist");
     return null;
   }
-  if (element.classList) {
-    element.classList.remove(classToRemove);
-  } else {
-    throwIfWhitespace(classToRemove);
-    element.className = element.className.split(/\s+/).filter(function(c) {
-      return c !== classToRemove;
-    }).join(' ');
-  }
+  element.classList.remove(...classesToRemove.reduce((prev, current) => prev.concat(current.split(/\s+/)), []));
 
   return element;
 }
@@ -331,31 +291,13 @@ export function removeClass(element, classToRemove) {
  *         The element with a class that has been toggled.
  */
 export function toggleClass(element, classToToggle, predicate) {
-
-  // This CANNOT use `classList` internally because IE11 does not support the
-  // second parameter to the `classList.toggle()` method! Which is fine because
-  // `classList` will be used by the add/remove functions.
-  const has = hasClass(element, classToToggle);
-
   if (typeof predicate === 'function') {
     predicate = predicate(element, classToToggle);
   }
-
   if (typeof predicate !== 'boolean') {
-    predicate = !has;
+    predicate = undefined;
   }
-
-  // If the necessary class operation matches the current state of the
-  // element, no action is required.
-  if (predicate === has) {
-    return;
-  }
-
-  if (predicate) {
-    addClass(element, classToToggle);
-  } else {
-    removeClass(element, classToToggle);
-  }
+  classToToggle.split(/\s+/).forEach(className => element.classList.toggle(className, predicate));
 
   return element;
 }

@@ -202,7 +202,7 @@ const firstSourceWatch = function(tech) {
 
 /**
  * our implementation of a `src` descriptor for browsers
- * that do not have one.
+ * that do not have one
  */
 const srcDescriptorPolyfill = Object.defineProperty({}, 'src', {
   get() {

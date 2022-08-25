@@ -50,6 +50,7 @@ import './error-display.js';
 import './tracks/text-track-settings.js';
 import './resize-manager.js';
 import './live-tracker.js';
+import './title-bar.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
@@ -329,22 +330,10 @@ class Player extends Component {
 
     // If language is not set, get the closest lang attribute
     if (!options.language) {
-      if (typeof tag.closest === 'function') {
-        const closest = tag.closest('[lang]');
+      const closest = tag.closest('[lang]');
 
-        if (closest && closest.getAttribute) {
-          options.language = closest.getAttribute('lang');
-        }
-      } else {
-        let element = tag;
-
-        while (element && element.nodeType === 1) {
-          if (Dom.getAttributes(element).hasOwnProperty('lang')) {
-            options.language = element.getAttribute('lang');
-            break;
-          }
-          element = element.parentNode;
-        }
+      if (closest) {
+        options.language = closest.getAttribute('lang');
       }
     }
 
@@ -548,10 +537,6 @@ class Player extends Component {
       this.addClass('vjs-audio');
     }
 
-    if (this.flexNotSupported_()) {
-      this.addClass('vjs-no-flex');
-    }
-
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
     // TODO: Make this check be performed again when the window switches between monitors
@@ -579,7 +564,6 @@ class Player extends Component {
     this.reportUserActivity();
 
     this.one('play', (e) => this.listenForUserActivity_(e));
-    this.on('stageclick', (e) => this.handleStageClick_(e));
     this.on('keydown', (e) => this.handleKeyDown(e));
     this.on('languagechange', (e) => this.handleLanguagechange(e));
 
@@ -836,25 +820,29 @@ class Player extends Component {
    *
    * @see [Video Element Attributes]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-crossorigin}
    *
-   * @param {string} [value]
+   * @param {string|null} [value]
    *        The value to set the `Player`'s crossOrigin to. If an argument is
-   *        given, must be one of `anonymous` or `use-credentials`.
+   *        given, must be one of `'anonymous'` or `'use-credentials'`, or 'null'.
    *
-   * @return {string|undefined}
+   * @return {string|null|undefined}
    *         - The current crossOrigin value of the `Player` when getting.
    *         - undefined when setting
    */
   crossOrigin(value) {
-    if (!value) {
+    // `null` can be set to unset a value
+    if (typeof value === 'undefined') {
       return this.techGet_('crossOrigin');
     }
 
-    if (value !== 'anonymous' && value !== 'use-credentials') {
-      log.warn(`crossOrigin must be "anonymous" or "use-credentials", given "${value}"`);
+    if (value !== null && value !== 'anonymous' && value !== 'use-credentials') {
+      log.warn(`crossOrigin must be null,  "anonymous" or "use-credentials", given "${value}"`);
       return;
     }
 
     this.techCall_('setCrossOrigin', value);
+    if (this.posterImage) {
+      this.posterImage.crossOrigin(value);
+    }
 
     return;
   }
@@ -1400,8 +1388,7 @@ class Player extends Component {
   handleTechLoadStart_() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
-    this.removeClass('vjs-ended');
-    this.removeClass('vjs-seeking');
+    this.removeClass('vjs-ended', 'vjs-seeking');
 
     // reset the error state
     this.error(null);
@@ -1678,8 +1665,7 @@ class Player extends Component {
    * @private
    */
   handleTechPlay_() {
-    this.removeClass('vjs-ended');
-    this.removeClass('vjs-paused');
+    this.removeClass('vjs-ended', 'vjs-paused');
     this.addClass('vjs-playing');
 
     // hide the poster when the user hits play
@@ -1832,8 +1818,7 @@ class Player extends Component {
    * @private
    */
   handleTechSeeked_() {
-    this.removeClass('vjs-seeking');
-    this.removeClass('vjs-ended');
+    this.removeClass('vjs-seeking', 'vjs-ended');
     /**
      * Fired when the player has finished jumping to a new time
      *
@@ -2038,17 +2023,6 @@ class Player extends Component {
     if (event.cancelable) {
       event.preventDefault();
     }
-  }
-
-  /**
-   * native click events on the SWF aren't triggered on IE11, Win8.1RT
-   * use stageclick events triggered from inside the SWF instead
-   *
-   * @private
-   * @listens stageclick
-   */
-  handleStageClick_() {
-    this.reportUserActivity();
   }
 
   /**
@@ -2261,13 +2235,15 @@ class Player extends Component {
   }
 
   /**
-   * Get calls can't wait for the tech, and sometimes don't need to.
+   * Mediate attempt to call playback tech method
+   * and return the value of the method called.
    *
    * @param {string} method
    *        Tech method
    *
-   * @return {Function|undefined}
-   *         the method or undefined
+   * @return {*}
+   *         Value returned by the tech method called, undefined if tech
+   *         is not ready or tech method is not present
    *
    * @private
    */
@@ -2283,10 +2259,8 @@ class Player extends Component {
       return middleware.mediate(this.middleware_, this.tech_, method);
     }
 
-    // Flash likes to die and reload when you hide or reposition it.
-    // In these cases the object methods go away and we get errors.
-    // TODO: Is this needed for techs other than Flash?
-    // When that happens we'll catch the errors and inform tech that it's not ready any more.
+    // Log error when playback tech object is present but method
+    // is undefined or unavailable
     try {
       return this.tech_[method]();
     } catch (e) {
@@ -2542,8 +2516,7 @@ class Player extends Component {
     }
 
     if (seconds !== this.cache_.duration) {
-      // Cache the last set value for optimized scrubbing (esp. Flash)
-      // TODO: Required for techs other than Flash?
+      // Cache the last set value for optimized scrubbing
       this.cache_.duration = seconds;
 
       if (seconds === Infinity) {
@@ -3402,7 +3375,7 @@ class Player extends Component {
     });
 
     // Try another available source if this one fails before playback.
-    if (this.options_.retryOnError && sources.length > 1) {
+    if (sources.length > 1) {
       const retry = () => {
         // Remove the error modal
         this.error(null);
@@ -4848,7 +4821,7 @@ class Player extends Component {
     // Clone the media object so it cannot be mutated from outside.
     this.cache_.media = merge(media);
 
-    const {artwork, poster, src, textTracks} = this.cache_.media;
+    const {artist, artwork, description, poster, src, textTracks, title} = this.cache_.media;
 
     // If `artwork` is not given, create it using `poster`.
     if (!artwork && poster) {
@@ -4868,6 +4841,13 @@ class Player extends Component {
 
     if (Array.isArray(textTracks)) {
       textTracks.forEach(tt => this.addRemoteTextTrack(tt, false));
+    }
+
+    if (this.titleBar) {
+      this.titleBar.update({
+        title,
+        description: description || artist || ''
+      });
     }
 
     this.ready(ready);
@@ -4966,26 +4946,6 @@ class Player extends Component {
     }
 
     return baseOptions;
-  }
-
-  /**
-   * Determine whether or not flexbox is supported
-   *
-   * @return {boolean}
-   *         - true if flexbox is supported
-   *         - false if flexbox is not supported
-   */
-  flexNotSupported_() {
-    const elem = document.createElement('i');
-
-    // Note: We don't actually use flexBasis (or flexOrder), but it's one of the more
-    // common flex features that we can rely on when checking for flex support.
-    return !('flexBasis' in elem.style ||
-            'webkitFlexBasis' in elem.style ||
-            'mozFlexBasis' in elem.style ||
-            'msFlexBasis' in elem.style ||
-            // IE10-specific (2012 flex spec), available for completeness
-            'msFlexOrder' in elem.style);
   }
 
   /**
@@ -5159,6 +5119,9 @@ Player.prototype.options_ = {
 
   html5: {},
 
+  // enable sourceset by default
+  enableSourceset: true,
+
   // default inactivity timeout
   inactivityTimeout: 2000,
 
@@ -5172,6 +5135,7 @@ Player.prototype.options_ = {
   children: [
     'mediaLoader',
     'posterImage',
+    'titleBar',
     'textTrackDisplay',
     'loadingSpinner',
     'bigPlayButton',

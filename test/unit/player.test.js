@@ -384,10 +384,9 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   log.error.restore();
 });
 
-QUnit.test('should retry setting source if error occurs and retryOnError: true', function(assert) {
+QUnit.test('should retry setting source if error occurs', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -439,10 +438,9 @@ QUnit.test('should retry setting source if error occurs and retryOnError: true',
   player.dispose();
 });
 
-QUnit.test('should not retry setting source if retryOnError: true and error occurs during playback', function(assert) {
+QUnit.test('should not retry setting source if error occurs during playback', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -490,7 +488,6 @@ QUnit.test('should not retry setting source if retryOnError: true and error occu
 QUnit.test('aborts and resets retryOnError behavior if new src() call made during a retry', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -1878,7 +1875,7 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
 
   const testPlayer = {
     options_: {
-      techOrder: ['html5', 'flash']
+      techOrder: ['html5', 'youtube']
     },
     resetCache_() {},
     loadTech_(tech, source) {
@@ -1910,7 +1907,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 
   const testPlayer = {
     options_: {
-      techOrder: ['flash', 'html5']
+      techOrder: ['youtube', 'html5']
     },
     resetCache_() {},
     loadTech_(tech, source) {
@@ -1930,7 +1927,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 
   Player.prototype.reset.call(testPlayer);
 
-  assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
+  assert.equal(loadedTech, 'youtube', 'we loaded the Youtube tech');
   assert.equal(loadedSource, null, 'with a null source');
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
@@ -2324,7 +2321,7 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   FooTech.canPlaySource = (src) => FooTech.canPlayType(src.type);
 
   BarTech.isSupported = () => true;
-  BarTech.canPlayType = (type) => type === 'video/flv';
+  BarTech.canPlayType = (type) => type === 'video/youtube';
   BarTech.canPlaySource = (src) => BarTech.canPlayType(src.type);
 
   videojs.registerTech('FooTech', FooTech);
@@ -2342,8 +2339,8 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   videojs.use('video/bar', () => ({
     setSource(src, next) {
       next(null, {
-        src: 'http://example.com/video.flv',
-        type: 'video/flv'
+        src: 'https://www.youtube.com/watch?v=C0DPdy98e4c',
+        type: 'video/youtube'
       });
     }
   }));
@@ -2373,7 +2370,7 @@ QUnit.test('src selects tech based on middleware', function(assert) {
 
   this.clock.tick(1);
 
-  assert.equal(player.techName_, 'BarTech', 'the BarTech (Flash) tech is chosen');
+  assert.equal(player.techName_, 'BarTech', 'the BarTech (Youtube) tech is chosen');
 
   middleware.getMiddleware('video/foo').pop();
   middleware.getMiddleware('video/bar').pop();

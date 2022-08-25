@@ -13,8 +13,7 @@
 // Hover state
 .video-js .vjs-menu-button-inline:hover,
 .video-js .vjs-menu-button-inline:focus,
-.video-js .vjs-menu-button-inline.vjs-slider-active,
-.video-js.vjs-no-flex .vjs-menu-button-inline {
+.video-js .vjs-menu-button-inline.vjs-slider-active {
   // This width is currently specific to the inline volume bar.
   width: 12em;
 }
@@ -39,19 +38,6 @@
 .vjs-menu-button-inline.vjs-slider-active .vjs-menu {
   display: block;
   opacity: 1;
-}
-
-.vjs-no-flex .vjs-menu-button-inline .vjs-menu {
-  display: block;
-  opacity: 1;
-  position: relative;
-  width: auto;
-}
-
-.vjs-no-flex .vjs-menu-button-inline:hover .vjs-menu,
-.vjs-no-flex .vjs-menu-button-inline:focus .vjs-menu,
-.vjs-no-flex .vjs-menu-button-inline.vjs-slider-active .vjs-menu {
-  width: auto;
 }
 
 .vjs-menu-button-inline .vjs-menu-content {

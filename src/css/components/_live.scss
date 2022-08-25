@@ -6,12 +6,6 @@
   line-height: 3em;
 }
 
-.vjs-no-flex .vjs-live-control {
-  display: table-cell;
-  width: auto;
-  text-align: left;
-}
-
 // hide the LiveDisplay when not live or when
 // the new liveui is in use
 .video-js:not(.vjs-live) .vjs-live-control,
@@ -32,12 +26,6 @@
   line-height: 3em;
   width: auto;
   min-width: 4em;
-}
-
-.vjs-no-flex .vjs-seek-to-live-control {
-  display: table-cell;
-  width: auto;
-  text-align: left;
 }
 
 // hide the SeekToLive button when not live and
