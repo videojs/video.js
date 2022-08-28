@@ -60,4 +60,5 @@ class QualityLevel {
     return level;
   }
 }
+
 export default QualityLevel;
