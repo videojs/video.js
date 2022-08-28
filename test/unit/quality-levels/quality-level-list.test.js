@@ -161,12 +161,8 @@ QUnit.module('QualityLevelList', () => {
   });
 
   QUnit.module('player', {
-    beforeEach() {
-      // this.clock = sinon.useFakeTimers();
-    },
     afterEach() {
       this.player.dispose();
-      // this.clock.restore();
     }
   });
 
