@@ -54,7 +54,6 @@ import './title-bar.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
-import QualityLevelList from './quality-levels/quality-level-list.js';
 
 // The following tech events are simply re-triggered
 // on the player when they happen
@@ -464,11 +463,6 @@ class Player extends Component {
       });
     }
 
-    if (options.qualityLevels) {
-      this.qualityLevels_ = new QualityLevelList();
-      this.qualityLevels = () => this.qualityLevels_;
-    }
-
     /*
      * Store the internal state of scrubbing
      *
@@ -640,10 +634,6 @@ class Player extends Component {
     }
 
     middleware.clearCacheForPlayer(this);
-
-    if (this.qualityLevels_) {
-      this.qualityLevels_.dispose();
-    }
 
     // remove all event handlers for track lists
     // all tracks and track listeners are removed on
