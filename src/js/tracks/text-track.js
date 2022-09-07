@@ -184,13 +184,15 @@ class TextTrack extends Track {
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
 
-    this.timeupdateHandler = Fn.bind(this, function() {
+    this.timeupdateHandler = Fn.bind(this, function(event = {}) {
       if (this.tech_.isDisposed()) {
         return;
       }
 
       if (!this.tech_.isReady_) {
-        this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+        if (event.type !== 'timeupdate') {
+          this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+        }
 
         return;
       }
@@ -205,7 +207,9 @@ class TextTrack extends Track {
         changed = false;
       }
 
-      this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+      if (event.type !== 'timeupdate') {
+        this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+      }
 
     });
 
@@ -368,7 +372,10 @@ class TextTrack extends Track {
   }
 
   startTracking() {
+    // More precise cues based on requestVideoFrameCallback with a requestAnimationFram fallback
     this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+    // Also listen to timeupdate in case rVFC/rAF stops (window in background, audio in video el)
+    this.tech_.on('timeupdate', this.timeupdateHandler);
   }
 
   stopTracking() {
@@ -376,6 +383,7 @@ class TextTrack extends Track {
       this.tech_.cancelVideoFrameCallback(this.rvf_);
       this.rvf_ = undefined;
     }
+    this.tech_.off('timeupdate', this.timeupdateHandler);
   }
 
   /**
