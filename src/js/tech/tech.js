@@ -869,7 +869,7 @@ class Tech extends Component {
   requestVideoFrameCallback(cb) {
     const id = Guid.newGUID();
 
-    if (this.paused()) {
+    if (!this.isReady_ || this.paused()) {
       this.queuedHanders_.add(id);
       this.one('playing', () => {
         if (this.queuedHanders_.has(id)) {
