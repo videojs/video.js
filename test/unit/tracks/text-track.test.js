@@ -279,7 +279,9 @@ QUnit.test('does not fire cuechange before Tech is ready', function(assert) {
     return 0;
   };
 
+  // `playing` would trigger rvfc or raf, `timeupdate` for fallback
   player.tech_.trigger('playing');
+  player.tech_.trigger('timeupdate');
   assert.equal(changes, 0, 'a cuechange event is not triggered');
 
   player.tech_.on('ready', function() {
@@ -291,6 +293,11 @@ QUnit.test('does not fire cuechange before Tech is ready', function(assert) {
     clock.tick(1);
 
     assert.equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
+
+    player.tech_.trigger('timeupdate');
+    clock.tick(1);
+
+    assert.equal(changes, 2, 'a cuechange event trigger not duplicated by timeupdate');
 
     tt.off();
     player.dispose();
@@ -311,31 +318,45 @@ QUnit.test('fires cuechange when cues become active and inactive', function(asse
   const cuechangeHandler = function() {
     changes++;
   };
+  let fakeCurrentTime = 0;
+
+  player.tech_.currentTime = function() {
+    return fakeCurrentTime;
+  };
 
   tt.addCue({
     id: '1',
     startTime: 1,
     endTime: 5
   });
+  tt.addCue({
+    id: '2',
+    startTime: 11,
+    endTime: 14
+  });
 
   tt.oncuechange = cuechangeHandler;
   tt.addEventListener('cuechange', cuechangeHandler);
 
-  player.tech_.currentTime = function() {
-    return 2;
-  };
-
+  fakeCurrentTime = 2;
   player.tech_.trigger('playing');
 
-  assert.equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
+  assert.equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange (rvfc/raf)');
 
-  player.tech_.currentTime = function() {
-    return 7;
-  };
-
+  fakeCurrentTime = 7;
   player.tech_.trigger('playing');
 
-  assert.equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
+  assert.equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange (rvfc/raf)');
+
+  fakeCurrentTime = 12;
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 6, 'a cuechange event trigger addEventListener and oncuechange (timeupdate)');
+
+  fakeCurrentTime = 17;
+  player.tech_.trigger('timeupdate');
+
+  assert.equal(changes, 8, 'a cuechange event trigger addEventListener and oncuechange (timeupdate)');
 
   tt.off();
   player.dispose();
@@ -365,6 +386,7 @@ QUnit.test('enabled and disabled cuechange handler when changing mode to hidden'
     return 2;
   };
   player.tech_.trigger('playing');
+  player.tech_.trigger('timeupdate');
 
   assert.equal(changes, 1, 'a cuechange event trigger');
 
@@ -376,6 +398,7 @@ QUnit.test('enabled and disabled cuechange handler when changing mode to hidden'
     return 7;
   };
   player.tech_.trigger('playing');
+  player.tech_.trigger('timeupdate');
 
   assert.equal(changes, 0, 'NO cuechange event trigger');
 

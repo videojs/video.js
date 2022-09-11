@@ -1,3 +1,25 @@
+<a name="7.20.3"></a>
+## [7.20.3](https://github.com/videojs/video.js/compare/v7.20.2...v7.20.3) (2022-09-09)
+
+### Bug Fixes
+
+* allow for techs that init slowly in rvfc ([#7864](https://github.com/videojs/video.js/issues/7864)) ([d736541](https://github.com/videojs/video.js/commit/d736541))
+* Use timeupdate as well as rvfc/raf for cues ([#7918](https://github.com/videojs/video.js/issues/7918)) ([9b81afe](https://github.com/videojs/video.js/commit/9b81afe)), closes [#7910](https://github.com/videojs/video.js/issues/7910) [#7902](https://github.com/videojs/video.js/issues/7902)
+* **package:** Update to [@videojs](https://github.com/videojs)/http-streaming 2.14.3 and videojs-vtt.js 0.15.4 ([#7907](https://github.com/videojs/video.js/issues/7907)) ([2810507](https://github.com/videojs/video.js/commit/2810507))
+
+### Chores
+
+* update FAQ redirect ([#7892](https://github.com/videojs/video.js/issues/7892)) ([3c70573](https://github.com/videojs/video.js/commit/3c70573)), closes [videojs/videojs.com#159](https://github.com/videojs/videojs.com/issues/159)
+* **docs:** use https URLs in noUITitleAtttributes example ([#7809](https://github.com/videojs/video.js/issues/7809)) ([0211d73](https://github.com/videojs/video.js/commit/0211d73))
+
+### Code Refactoring
+
+* fix typo in player.js ([#7805](https://github.com/videojs/video.js/issues/7805)) ([9ca2e87](https://github.com/videojs/video.js/commit/9ca2e87))
+
+### Documentation
+
+* update FAQ.md to match change in [#7892](https://github.com/videojs/video.js/issues/7892) ([#7893](https://github.com/videojs/video.js/issues/7893)) ([ed4524e](https://github.com/videojs/video.js/commit/ed4524e))
+
 <a name="7.20.2"></a>
 ## [7.20.2](https://github.com/videojs/video.js/compare/v7.20.1...v7.20.2) (2022-07-28)
 
