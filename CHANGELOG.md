@@ -1,3 +1,15 @@
+<a name="7.21.0"></a>
+# [7.21.0](https://github.com/videojs/video.js/compare/v7.20.3...v7.21.0) (2022-09-15)
+
+### Features
+
+* **lang:** Add Bengali (bn) translations ([#7823](https://github.com/videojs/video.js/issues/7823)) ([12b9e8d](https://github.com/videojs/video.js/commit/12b9e8d))
+* update VHS to 2.15.0 ([#7929](https://github.com/videojs/video.js/issues/7929)) ([9e38ca4](https://github.com/videojs/video.js/commit/9e38ca4))
+
+### Bug Fixes
+
+* **lang:** Update Occitan translation ([#7888](https://github.com/videojs/video.js/issues/7888)) ([e47f48c](https://github.com/videojs/video.js/commit/e47f48c))
+
 <a name="7.20.3"></a>
 ## [7.20.3](https://github.com/videojs/video.js/compare/v7.20.2...v7.20.3) (2022-09-09)
 
