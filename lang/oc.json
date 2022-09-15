@@ -83,5 +83,8 @@
   "Caption Settings Dialog": "Fenèstra de paramètres de legenda",
   "Beginning of dialog window. Escape will cancel and close the window.": "Debuta de la fenèstra. Escapar anullarà e tamparà la fenèstra",
   "End of dialog window.": "Fin de la fenèstra.",
-  "{1} is loading.": "{1} es a cargar."
+  "{1} is loading.": "{1} es a cargar.",
+  "Exit Picture-in-Picture": "Sortir de la vidèo incrustada",
+  "Picture-in-Picture": "Vidèo incrustada",
+  "No content": "Cap de contengut"  
 }
