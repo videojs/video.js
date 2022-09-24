@@ -2862,6 +2862,11 @@ class Player extends Component {
   requestFullscreen(fullscreenOptions) {
     const PromiseClass = this.options_.Promise || window.Promise;
 
+    // In case of requestFullscreen is happend when player is in fullWindow mode
+    if (this.isFullWindow) {
+      this.exitFullWindow();
+    }
+
     if (PromiseClass) {
       const self = this;
 
