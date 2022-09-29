@@ -387,13 +387,13 @@ videojs.mergeOptions = deprecateForMajor(9, 'videojs.mergeOptions', 'videojs.obj
 videojs.defineLazyProperty = deprecateForMajor(9, 'videojs.defineLazyProperty', 'videojs.obj.defineLazyProperty', Obj.defineLazyProperty);
 
 /**
- * Deprecated reference to the {@link module:fn.bind|fn.bind function}
+ * Deprecated reference to the {@link module:fn.bind_|fn.bind_ function}
  *
  * @type {Function}
- * @see {@link module:fn.bind|fn.bind}
+ * @see {@link module:fn.bind_|fn.bind_}
  * @deprecated Deprecated and will be removed in 9.0. Please use native Function.prototype.bind instead.
  */
-videojs.bind = deprecateForMajor(9, 'videojs.bind', 'native Function.prototype.bind', Fn.bind);
+videojs.bind = deprecateForMajor(9, 'videojs.bind', 'native Function.prototype.bind', Fn.bind_);
 
 videojs.registerPlugin = Plugin.registerPlugin;
 videojs.deregisterPlugin = Plugin.deregisterPlugin;
