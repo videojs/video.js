@@ -28,7 +28,7 @@ class DescriptionsButton extends TextTrackButton {
     super(player, options, ready);
 
     const tracks = player.textTracks();
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
+    const changeHandler = Fn.bind_(this, this.handleTracksChange);
 
     tracks.addEventListener('change', changeHandler);
     this.on('dispose', function() {
