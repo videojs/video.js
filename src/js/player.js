@@ -2918,6 +2918,11 @@ class Player extends Component {
 
       if (promise) {
         promise.then(() => this.isFullscreen(true), () => this.isFullscreen(false));
+        // When entering fullscreen disable picture in picture
+        // This is done with promises when supported
+        if (this.isInPictureInPicture()) {
+          promise.then(this.exitPictureInPicture());
+        }
       }
 
       return promise;
@@ -2929,6 +2934,10 @@ class Player extends Component {
       // fullscreen isn't supported so we'll just stretch the video element to
       // fill the viewport
       this.enterFullWindow();
+    }
+    // When entering fullscreen disable picture in picture
+    if (this.isInPictureInPicture()) {
+      this.exitPictureInPicture();
     }
   }
 
