@@ -90,7 +90,7 @@
     "aes-decrypter": "4.0.1",
     "global": "^4.4.0",
     "keycode": "^2.2.0",
-    "m3u8-parser": "5.0.0",
+    "m3u8-parser": "^6.0.0",
     "mpd-parser": "1.0.0",
     "mux.js": "6.2.0",
     "safe-json-parse": "4.0.0",
