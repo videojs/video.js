@@ -27,6 +27,8 @@ import _inherits from '@babel/runtime/helpers/inherits';
  *
  * @return   {Function}
  *           The new class with subClassMethods that inherited superClass.
+ *
+ * * @deprecated videojs.extend() is deprecated; use native ES6 classes instead
  */
 const extend = function(superClass, subClassMethods = {}) {
   log.warn('The extend() method is deprecated and will be removed in Video.js 8. Please use native ES6 classes instead.');
