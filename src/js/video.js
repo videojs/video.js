@@ -31,7 +31,6 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import * as Obj from './utils/obj';
-import extend from './extend.js';
 import xhr from '@videojs/xhr';
 
 // Include the built-in techs
@@ -358,15 +357,6 @@ videojs.browser = browser;
  * @see  {@link module:obj|obj}
  */
 videojs.obj = Obj;
-
-/**
- * Deprecated reference to the {@link module:extend~extend|extend function}
- *
- * @type {Function}
- * @see {@link module:extend~extend|extend}
- * @deprecated Deprecated and will be removed in 9.0. Please use native ES6 classes instead.
- */
-videojs.extend = deprecateForMajor(9, 'videojs.extend', 'native ES6 classes', extend);
 
 /**
  * Deprecated reference to the {@link module:obj.merge|merge function}
