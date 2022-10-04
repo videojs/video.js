@@ -3,29 +3,106 @@
 <head>
   <meta charset="utf-8" />
   <title>Video.js Sandbox</title>
+  <style type="text/css">
+    #intro {
+      width: 938px;
+      background-color: #eee;
+      border: 1px solid #777;
+      padding: 0 10px;
+      margin-bottom: 20px;
+      line-height: 1.5em;
+    }
+
+    #source-form {
+      width: 938px;
+      padding: 10px 10px 0;
+      border: 1px solid #777;
+      margin: 0 0 20px;
+    }
+
+    #source-form > div {
+      margin: 0 0 12px;
+      overflow: hidden;
+    }
+
+    #source-form label {
+      float: left;
+      width: 200px;
+    }
+
+    #source-form input[type="text"],
+    #source-form select {
+      float: left;
+    }
+
+    #source-form input[type="text"] {
+      width: 700px;
+    }
+  </style>
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/alt/video.debug.js"></script>
 </head>
 <body>
-  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+  <div id="intro">
     <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
     <pre>npm start</pre>
     <pre>open http://localhost:9999/sandbox/debug.html</pre>
   </div>
 
+  <form id="source-form">
+    <div>
+      <label for="source">Set Media Source URL</label>
+      <input type="text" id="source" value="https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8">
+    </div>
+    <div>
+      <label for="source-type">Set Media Source Type</label>
+      <select id="source-type">
+        <option value="">None</option>
+        <option value="video/mp4">MP4 (video/mp4)</option>
+        <option selected value="application/x-mpegurl">HLS (application/x-mpegurl)</option>
+        <option value="application/dash+xml">DASH (application/dash+xml)</option>
+      </select>
+    </div>
+    <div>
+      <button type="submit">Set</button>
+    </div>
+  </form>
+
   <video-js
-    id="vid1"
+    id="debug"
     controls
     preload="auto"
-    width="640"
-    height="264">
-    <source src="https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8" type="application/x-mpegURL">
-    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    width="960"
+    height="396">
   </video-js>
 
   <script>
-    var vid = document.getElementById('vid1');
-    var player = videojs(vid);
+    const vid = document.getElementById('debug');
+    const player = videojs(vid);
+    const form = document.getElementById('source-form');
+    const sourceField = document.getElementById('source');
+    const sourceTypeField = document.getElementById('source-type');
+
+    const setSource = () => {
+      const source = {
+        src: sourceField.value,
+        type: sourceTypeField.value
+      };
+
+      if (!source.type) {
+        delete source.type;
+      }
+
+      player.log('setting source', source);
+      player.src(source);
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      setSource();
+    });
+
+    setSource();
   </script>
 
 </body>
