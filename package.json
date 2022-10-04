@@ -94,7 +94,7 @@
     "mpd-parser": "1.0.0",
     "mux.js": "6.2.0",
     "safe-json-parse": "4.0.0",
-    "videojs-contrib-quality-levels": "^2.1.0",
+    "videojs-contrib-quality-levels": "^2.2.0",
     "videojs-font": "3.2.0",
     "videojs-vtt.js": "^0.15.3"
   },
