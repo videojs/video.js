@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <style>
+    .btn {
+      background-color: #5cb85c;
+      border-radius: 0.5em;
+      border: 1px solid #18ab29;
+      display: inline-block;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 1em;
+      padding: 0.5em;
+      margin: 0.25em 0.25em 0.25em 0;
+    }
+
+    .btn-success {
+      font-weight: bold;
+      background-color: #337ab7;
+    }
+  </style>
+  <script src="../dist/video.js"></script>
+</head>
+<body>
+  <div
+    style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo,
+      except files that end in .example (so don't edit or add those files). To get started make a copy of
+      index.html.example and rename it to index.html.</p>
+    <pre>cp sandbox/index.html.example sandbox/index.html</pre>
+    <pre>npm run start</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+  <div style="width: 65%;">
+    <video-js id="vid1" controls preload="auto" class="vjs-fluid">
+      <source src="https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8"
+        type="application/x-mpegURL">
+      <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a
+          href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    </video-js>
+  </div>
+  <div id="currentLevelControl" style="width: 100%;">
+    <button id="autoBtn" type="button" class="btn btn-success">Auto</button>
+  </div>
+  <script>
+    const vid = document.getElementById('vid1');
+    const player = videojs(vid, {
+      qualityLevels: true
+    });
+    player.one('loadedmetadata', () => {
+      const container = document.getElementById('currentLevelControl');
+      const autoBtn = document.getElementById('autoBtn');
+      const btnList = [];
+      // create a button for every video quality level 
+      for (let i = 0; i < player.qualityLevels().length; i++) {
+        let level = player.qualityLevels()[i];
+        if (level.width === undefined) {
+          continue;
+        }
+        let levelElm = document.createElement('button');
+        levelElm.classList.add('btn');
+        if (player.qualityLevels().selectedIndex === i) {
+          levelElm.classList.add('btn-success');
+        }
+        levelElm.setAttribute('title', level.label);
+        levelElm.setAttribute('type', 'button');
+        levelElm.setAttribute('data-level', i);
+        levelElm.innerText = `${i} ('${level.width}': ${level.height}p, ${(level.bitrate / 1024).toFixed(0)}kb)`;
+        btnList.push(levelElm);
+        container.append(levelElm);
+      }
+      // attach a click handler to buttons
+      for (const btn of btnList) {
+        btn.addEventListener('click', (event) => {
+          const selectedIndex = player.qualityLevels().selectedIndex;
+          const btnIndex = event.target.dataset.level;
+          autoBtn.classList.remove('btn-success');
+          if (selectedIndex == btnIndex) {
+            return;
+          }
+          btnList.forEach((elm) => {
+            player.qualityLevels()[elm.dataset.level].enabled = elm.dataset.level === btnIndex;
+          });
+        });
+      }
+      // update buttons on video quality changes
+      player.qualityLevels().on('change', (event) => {
+        for (let btn of btnList) {
+          if (btn.dataset.level == event.selectedIndex) {
+            btn.classList.add('btn-success');
+          } else {
+            btn.classList.remove('btn-success');
+          }
+        }
+      });
+      // add a click handler to reset previously selected video quality by the user
+      autoBtn.addEventListener('click', (event) => {
+        btnList.forEach((elm) => {
+          player.qualityLevels()[elm.dataset.level].enabled = true;
+        });
+        autoBtn.classList.toggle('btn-success', true);
+      });
+    });
+  </script>
+</body>
+</html>

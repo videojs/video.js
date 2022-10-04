@@ -227,6 +227,7 @@ export default cliargs => [
     plugins: [
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js'),
+        'videojs-contrib-quality-levels': path.resolve(__dirname, './node_modules/videojs-contrib-quality-levels/dist/videojs-contrib-quality-levels.es.js'),
         '@videojs/http-streaming': path.resolve(__dirname, './node_modules/@videojs/http-streaming/dist/videojs-http-streaming.es.js')
       }),
       replace({
