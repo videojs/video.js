@@ -5014,6 +5014,7 @@ class Player extends Component {
 
 /**
  * Get the {@link VideoTrackList}
+ *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
  *
  * @return {VideoTrackList}
@@ -5024,6 +5025,7 @@ class Player extends Component {
 
 /**
  * Get the {@link AudioTrackList}
+ *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
  *
  * @return {AudioTrackList}
