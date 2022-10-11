@@ -253,6 +253,43 @@ QUnit.test('can only remove one cue at a time', function(assert) {
   assert.equal(tt.cues.length, 0, 'we have removed the other instance of cue1');
 });
 
+QUnit.test('does not include past cues in activeCues', function(assert) {
+  // Testing for the absense of a previous behaviour, which considered cues with equal
+  // start and end times as active 0.5s after ending
+  const player = TestHelpers.makePlayer();
+  const tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'showing'
+  });
+  const expectedCue = {
+    id: '2',
+    startTime: 2.555,
+    endTime: 3
+  };
+
+  player.tech_.currentTime = function() {
+    return 2.556;
+  };
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 2.555
+  });
+  tt.addCue({
+    id: '2',
+    startTime: 2.555,
+    endTime: 2.555
+  });
+  // start 2.55
+  tt.addCue(expectedCue);
+
+  player.tech_.trigger('playing');
+
+  assert.equal(tt.activeCues_.length, 1, 'only one cue is present');
+  assert.equal(tt.activeCues_[0].originalCue_, expectedCue, 'correct active cue is present');
+});
+
 QUnit.test('does not fire cuechange before Tech is ready', function(assert) {
   const done = assert.async();
   const clock = sinon.useFakeTimers();
