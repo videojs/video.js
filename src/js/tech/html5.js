@@ -28,7 +28,7 @@ class Html5 extends Tech {
   * @param {Object} [options]
   *        The key/value store of player options.
   *
-  * @param {Component~ReadyCallback} ready
+  * @param {Component~ReadyCallback} [ready]
   *        Callback function to call when the `HTML5` Tech is ready.
   */
   constructor(options, ready) {

@@ -25,7 +25,7 @@ class Component {
 
   /**
    * A callback that is called when a component is ready. Does not have any
-   * paramters and any callback value will be ignored.
+   * parameters and any callback value will be ignored.
    *
    * @callback Component~ReadyCallback
    * @this Component
@@ -699,6 +699,9 @@ class Component {
    * Bind a listener to the component's ready state.
    * Different from event listeners in that if the ready event has already happened
    * it will trigger the function immediately.
+   *
+   * @param {Component~ReadyCallback} fn
+   *        Function that gets called when the `Component` is ready.
    *
    * @return {Component}
    *         Returns itself; method can be chained.

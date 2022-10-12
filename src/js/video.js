@@ -50,6 +50,13 @@ import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
 const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
 
 /**
+ * A callback that is called when a component is ready. Does not have any
+ * parameters and any callback value will be ignored. See: {@link Component~ReadyCallback}
+ *
+ * @callback ReadyCallback
+ */
+
+/**
  * The `videojs()` function doubles as the main function for users to create a
  * {@link Player} instance as well as the main library namespace.
  *
@@ -110,7 +117,7 @@ const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
  *         Options object for providing settings.
  *         See: [Options Guide](https://docs.videojs.com/tutorial-options.html).
  *
- * @param  {Component~ReadyCallback} [ready]
+ * @param  {ReadyCallback} [ready]
  *         A function to be called when the {@link Player} and {@link Tech} are
  *         ready.
  *
