@@ -133,6 +133,7 @@ class EventTarget {
     window.clearTimeout(oldTimeout);
 
     const timeout = window.setTimeout(() => {
+      map.delete(type);
       // if we cleared out all timeouts for the current target, delete its map
       if (map.size === 0) {
         map = null;
