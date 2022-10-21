@@ -15,7 +15,6 @@ let EVENT_MAP;
  * @class EventTarget
  */
 class EventTarget {
-  constructor() { }
   /**
    * Adds an `event listener` to an instance of an `EventTarget`. An `event listener` is a
    * function that will get called when an event with a certain name gets triggered.
