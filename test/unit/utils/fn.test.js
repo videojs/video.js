@@ -18,7 +18,7 @@ QUnit.test('should add context to a function', function(assert) {
   const asdf = function() {
     assert.ok(this === newContext);
   };
-  const fdsa = Fn.bind(newContext, asdf);
+  const fdsa = Fn.bind_(newContext, asdf);
 
   fdsa();
 });

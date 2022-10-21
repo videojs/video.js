@@ -86,7 +86,7 @@ const loadTrack = function(src, track) {
     opts.withCredentials = withCredentials;
   }
 
-  XHR(opts, Fn.bind(this, function(err, response, responseBody) {
+  XHR(opts, Fn.bind_(this, function(err, response, responseBody) {
     if (err) {
       return log.error(err, response);
     }
@@ -184,7 +184,7 @@ class TextTrack extends Track {
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
 
-    this.timeupdateHandler = Fn.bind(this, function(event = {}) {
+    this.timeupdateHandler = Fn.bind_(this, function(event = {}) {
       if (this.tech_.isDisposed()) {
         return;
       }

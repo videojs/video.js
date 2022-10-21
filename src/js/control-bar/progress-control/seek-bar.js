@@ -49,7 +49,7 @@ class SeekBar extends Slider {
    * @private
    */
   setEventHandlers_() {
-    this.update_ = Fn.bind(this, this.update);
+    this.update_ = Fn.bind_(this, this.update);
     this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
 
     this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);

@@ -8,12 +8,12 @@ import window from 'global/window';
 export const UPDATE_REFRESH_INTERVAL = 30;
 
 /**
- * Bind (a.k.a proxy or context). A simple method for changing the context of
- * a function.
+ * A private, internal-only function for changing the context of a function.
  *
  * It also stores a unique id on the function so it can be easily removed from
  * events.
  *
+ * @private
  * @function
  * @param    {Mixed} context
  *           The object to bind as scope.
@@ -27,7 +27,7 @@ export const UPDATE_REFRESH_INTERVAL = 30;
  * @return   {Function}
  *           The new function that will be bound into the context given
  */
-export const bind = function(context, fn, uid) {
+export const bind_ = function(context, fn, uid) {
   // Make sure the function has a unique ID
   if (!fn.guid) {
     fn.guid = newGUID();

@@ -34,7 +34,7 @@ class TrackButton extends MenuButton {
       return;
     }
 
-    const updateHandler = Fn.bind(this, this.update);
+    const updateHandler = Fn.bind_(this, this.update);
 
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);

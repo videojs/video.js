@@ -189,7 +189,7 @@ const normalizeListenArgs = (self, args, fnName) => {
   validateEventType(type, self, fnName);
   validateListener(listener, self, fnName);
 
-  listener = Fn.bind(self, listener);
+  listener = Fn.bind_(self, listener);
 
   return {isTargetingSelf, target, type, listener};
 };
@@ -410,7 +410,7 @@ const EventedMixin = {
       validateListener(listener, this, 'off');
 
       // Ensure there's at least a guid, even if the function hasn't been used
-      listener = Fn.bind(this, listener);
+      listener = Fn.bind_(this, listener);
 
       // Remove the dispose listener on this evented object, which was given
       // the same guid as the event listener in on().
