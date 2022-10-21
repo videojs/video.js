@@ -1321,7 +1321,7 @@ class Component {
     }
 
     // listener for reporting that the user is active
-    const report = Fn.bind(this.player(), this.player().reportUserActivity);
+    const report = Fn.bind_(this.player(), this.player().reportUserActivity);
 
     let touchHolding;
 
@@ -1384,7 +1384,7 @@ class Component {
     // eslint-disable-next-line
     var timeoutId, disposeFn;
 
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     this.clearTimersOnDispose_();
 
@@ -1445,7 +1445,7 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval}
    */
   setInterval(fn, interval) {
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     this.clearTimersOnDispose_();
 
@@ -1511,7 +1511,7 @@ class Component {
     // declare as variables so they are properly available in rAF function
     // eslint-disable-next-line
     var id;
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     id = window.requestAnimationFrame(() => {
       if (this.rafIds_.has(id)) {
@@ -1542,7 +1542,7 @@ class Component {
     }
     this.clearTimersOnDispose_();
 
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     const id = this.requestAnimationFrame(() => {
       fn();

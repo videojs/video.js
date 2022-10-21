@@ -1194,7 +1194,7 @@ class Player extends Component {
     this.tech_ = new TechClass(techOptions);
 
     // player.triggerReady is always async, so don't need this to be async
-    this.tech_.ready(Fn.bind(this, this.handleTechReady_), true);
+    this.tech_.ready(Fn.bind_(this, this.handleTechReady_), true);
 
     textTrackConverter.jsonToTextTracks(this.textTracksJson_ || [], this.tech_);
 
@@ -4052,7 +4052,7 @@ class Player extends Component {
     let mouseInProgress;
     let lastMoveX;
     let lastMoveY;
-    const handleActivity = Fn.bind(this, this.reportUserActivity);
+    const handleActivity = Fn.bind_(this, this.reportUserActivity);
 
     const handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
@@ -5014,6 +5014,7 @@ class Player extends Component {
 
 /**
  * Get the {@link VideoTrackList}
+ *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
  *
  * @return {VideoTrackList}
@@ -5024,6 +5025,7 @@ class Player extends Component {
 
 /**
  * Get the {@link AudioTrackList}
+ *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
  *
  * @return {AudioTrackList}

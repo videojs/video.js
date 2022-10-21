@@ -236,7 +236,7 @@ class Tech extends Component {
    */
   trackProgress(event) {
     this.stopTrackingProgress();
-    this.progressInterval = this.setInterval(Fn.bind(this, function() {
+    this.progressInterval = this.setInterval(Fn.bind_(this, function() {
       // Don't trigger unless buffered amount is greater than last time
 
       const numBufferedPercent = this.bufferedPercent();

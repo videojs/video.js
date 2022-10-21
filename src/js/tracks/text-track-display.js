@@ -109,7 +109,7 @@ class TextTrackDisplay extends Component {
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(Fn.bind(this, function() {
+    player.ready(Fn.bind_(this, function() {
       if (player.tech_ && player.tech_.featuresNativeTextTracks) {
         this.hide();
         return;
