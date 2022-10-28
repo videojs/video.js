@@ -222,13 +222,13 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   // the patch runs automatically so we need to first unpatch
   Html5.unpatchCanPlayType();
 
-  const oldAV = browser.ANDROID_VERSION;
+  const oldIsAndroid = browser.IS_ANDROID;
   const oldIsFirefox = browser.IS_FIREFOX;
   const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_ANDROID(true);
   browser.stub_IS_FIREFOX(false);
   browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
@@ -253,7 +253,7 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
     'patched canPlayType and function returned from unpatch are equal'
   );
 
-  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_ANDROID(oldIsAndroid);
   browser.stub_IS_FIREFOX(oldIsFirefox);
   browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
@@ -263,13 +263,13 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
   // the patch runs automatically so we need to first unpatch
   Html5.unpatchCanPlayType();
 
-  const oldAV = browser.ANDROID_VERSION;
+  const oldIsAndroid = browser.ANDROID_VERSION;
   const oldIsChrome = browser.IS_CHROME;
   const oldIsFirefox = browser.IS_FIREFOX;
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_ANDROID(true);
   browser.stub_IS_CHROME(true);
   browser.stub_IS_FIREFOX(false);
   Html5.patchCanPlayType();
@@ -280,7 +280,7 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Chr
     'original canPlayType and patched canPlayType should be equal'
   );
 
-  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_ANDROID(oldIsAndroid);
   browser.stub_IS_CHROME(oldIsChrome);
   browser.stub_IS_FIREFOX(oldIsFirefox);
   Html5.unpatchCanPlayType();
@@ -290,13 +290,13 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
   // the patch runs automatically so we need to first unpatch
   Html5.unpatchCanPlayType();
 
-  const oldAV = browser.ANDROID_VERSION;
+  const oldIsAndroid = browser.ANDROID_VERSION;
   const oldIsFirefox = browser.IS_FIREFOX;
   const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
-  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_ANDROID(true);
   browser.stub_IS_FIREFOX(true);
   browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
@@ -307,19 +307,19 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
     'original canPlayType and patched canPlayType should be equal'
   );
 
-  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_ANDROID(oldIsAndroid);
   browser.stub_IS_FIREFOX(oldIsFirefox);
   browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
 });
 
-QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Chrome or Firefox', function(assert) {
-  const oldAV = browser.ANDROID_VERSION;
+QUnit.test('should return maybe for HLS urls on Android when not Chrome or Firefox', function(assert) {
+  const oldIsAndroid = browser.ANDROID_VERSION;
   const oldIsFirefox = browser.IS_FIREFOX;
   const oldIsChrome = browser.IS_CHROME;
   const video = document.createElement('video');
 
-  browser.stub_ANDROID_VERSION(4.0);
+  browser.stub_IS_ANDROID(true);
   browser.stub_IS_FIREFOX(false);
   browser.stub_IS_CHROME(false);
   Html5.patchCanPlayType();
@@ -327,27 +327,25 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above when not Ch
   assert.strictEqual(
     video.canPlayType('application/x-mpegurl'),
     'maybe',
-    'android version 4.0 or above should be a maybe for x-mpegurl'
+    'android should be a maybe for x-mpegurl'
   );
   assert.strictEqual(
     video.canPlayType('application/x-mpegURL'),
     'maybe',
-    'android version 4.0 or above should be a maybe for x-mpegURL'
+    'android should be a maybe for x-mpegURL'
   );
   assert.strictEqual(
     video.canPlayType('application/vnd.apple.mpegurl'),
     'maybe',
-    'android version 4.0 or above should be a ' +
-                    'maybe for vnd.apple.mpegurl'
+    'android should be a maybe for vnd.apple.mpegurl'
   );
   assert.strictEqual(
     video.canPlayType('application/vnd.apple.mpegURL'),
     'maybe',
-    'android version 4.0 or above should be a ' +
-                    'maybe for vnd.apple.mpegurl'
+    'android should be a maybe for vnd.apple.mpegurl'
   );
 
-  browser.stub_ANDROID_VERSION(oldAV);
+  browser.stub_IS_ANDROID(oldIsAndroid);
   browser.stub_IS_FIREFOX(oldIsFirefox);
   browser.stub_IS_CHROME(oldIsChrome);
   Html5.unpatchCanPlayType();
