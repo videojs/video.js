@@ -148,6 +148,7 @@ class ClickableComponent extends Component {
 
     const localizedText = this.localize(text);
 
+    /** @protected */
     this.controlText_ = text;
     Dom.textContent(this.controlTextEl_, localizedText);
     if (!this.nonIconControl && !this.player_.options_.noUITitleAttributes) {

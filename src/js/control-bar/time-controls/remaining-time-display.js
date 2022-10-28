@@ -93,7 +93,7 @@ RemainingTimeDisplay.prototype.labelText_ = 'Remaining Time';
  * The text that should display over the `RemainingTimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
- * @private
+ * @protected
  *
  * @deprecated in v7; controlText_ is not used in non-active display Components
  */
