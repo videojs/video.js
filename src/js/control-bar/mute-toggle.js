@@ -139,7 +139,7 @@ class MuteToggle extends Button {
  * The text that should display over the `MuteToggle`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 MuteToggle.prototype.controlText_ = 'Mute';
 

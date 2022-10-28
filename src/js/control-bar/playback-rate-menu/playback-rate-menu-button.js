@@ -166,7 +166,7 @@ class PlaybackRateMenuButton extends MenuButton {
  * Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 PlaybackRateMenuButton.prototype.controlText_ = 'Playback Rate';
 

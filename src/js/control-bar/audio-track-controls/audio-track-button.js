@@ -76,7 +76,7 @@ class AudioTrackButton extends TrackButton {
  * The text that should display over the `AudioTrackButton`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 AudioTrackButton.prototype.controlText_ = 'Audio Track';
 Component.registerComponent('AudioTrackButton', AudioTrackButton);

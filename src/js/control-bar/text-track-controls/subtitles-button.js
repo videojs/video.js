@@ -54,7 +54,7 @@ SubtitlesButton.prototype.kind_ = 'subtitles';
  * The text that should display over the `SubtitlesButton`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 SubtitlesButton.prototype.controlText_ = 'Subtitles';
 

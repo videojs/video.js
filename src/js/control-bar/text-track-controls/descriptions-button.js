@@ -93,7 +93,7 @@ DescriptionsButton.prototype.kind_ = 'descriptions';
  * The text that should display over the `DescriptionsButton`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 DescriptionsButton.prototype.controlText_ = 'Descriptions';
 
