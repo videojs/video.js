@@ -103,8 +103,7 @@ class Html5 extends Tech {
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if ((browser.TOUCH_ENABLED || browser.IS_IPHONE ||
-        browser.IS_NATIVE_ANDROID) && options.nativeControlsForTouch === true) {
+    if ((browser.TOUCH_ENABLED || browser.IS_IPHONE) && options.nativeControlsForTouch === true) {
       this.setControls(true);
     }
 
@@ -673,10 +672,8 @@ class Html5 extends Tech {
    */
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
-      const userAgent = window.navigator && window.navigator.userAgent || '';
-
-      // Seems to be broken in Chromium/Chrome && Safari in Leopard
-      if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {
+      // Still needed?
+      if (browser.IS_ANDROID) {
         return true;
       }
     }
