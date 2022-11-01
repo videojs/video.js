@@ -1322,38 +1322,6 @@ Html5.prototype.featuresTimeupdateEvents = true;
  */
 Html5.prototype.featuresVideoFrameCallback = !!(Html5.TEST_VID && Html5.TEST_VID.requestVideoFrameCallback);
 
-// HTML5 Feature detection and Device Fixes --------------------------------- //
-let canPlayType;
-
-Html5.patchCanPlayType = function() {
-
-  // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
-  // Firefox and Chrome report correctly
-  if (browser.IS_ANDROID && !browser.IS_FIREFOX && !browser.IS_CHROME) {
-    canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
-    Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
-      const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
-
-      if (type && mpegurlRE.test(type)) {
-        return 'maybe';
-      }
-      return canPlayType.call(this, type);
-    };
-  }
-};
-
-Html5.unpatchCanPlayType = function() {
-  const r = Html5.TEST_VID.constructor.prototype.canPlayType;
-
-  if (canPlayType) {
-    Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
-  }
-  return r;
-};
-
-// by default, patch the media element
-Html5.patchCanPlayType();
-
 Html5.disposeMediaElement = function(el) {
   if (!el) {
     return;
