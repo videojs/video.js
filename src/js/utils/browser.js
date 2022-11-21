@@ -76,6 +76,15 @@ export let IS_CHROME = false;
 export let CHROME_VERSION = null;
 
 /**
+ * The detected Internet Explorer version - or `null`.
+ *
+ * @static
+ * @deprecated
+ * @type {number|null}
+ */
+export let IE_VERSION = null;
+
+/**
  * Whether or not this is desktop Safari.
  *
  * @static
@@ -186,6 +195,18 @@ if (!CHROME_VERSION) {
       return parseFloat(match[2]);
     }
     return null;
+  }());
+
+  IE_VERSION = (function() {
+    const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT);
+    let version = result && parseFloat(result[1]);
+
+    if (!version && (/Trident\/7.0/i).test(USER_AGENT) && (/rv:11.0/).test(USER_AGENT)) {
+      // IE 11 has a different user agent string than other IE versions
+      version = 11.0;
+    }
+
+    return version;
   }());
 
   IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE;
