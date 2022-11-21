@@ -1,7 +1,6 @@
 /**
  * @file fullscreen-api.js
  * @module fullscreen-api
- * @private
  */
 import document from 'global/document';
 
