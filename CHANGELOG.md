@@ -1,3 +1,16 @@
+<a name="7.21.1"></a>
+## [7.21.1](https://github.com/videojs/video.js/compare/v7.21.0...v7.21.1) (2022-11-21)
+
+### Bug Fixes
+
+* deprecate the extend() function ([#7944](https://github.com/videojs/video.js/issues/7944)) ([b58a220](https://github.com/videojs/video.js/commit/b58a220))
+* last timeout in queueTrigger() never clears  map ([#7964](https://github.com/videojs/video.js/issues/7964)) ([e49286a](https://github.com/videojs/video.js/commit/e49286a))
+* update [@videojs](https://github.com/videojs)/http-streaming to 2.15.1 ([#8010](https://github.com/videojs/video.js/issues/8010)) ([1c2be96](https://github.com/videojs/video.js/commit/1c2be96)), closes [#7998](https://github.com/videojs/video.js/issues/7998) [#7958](https://github.com/videojs/video.js/issues/7958)
+
+### Chores
+
+* fix mixed content warnings from netlify ([#7946](https://github.com/videojs/video.js/issues/7946)) ([ce1baba](https://github.com/videojs/video.js/commit/ce1baba))
+
 <a name="7.21.0"></a>
 # [7.21.0](https://github.com/videojs/video.js/compare/v7.20.3...v7.21.0) (2022-09-15)
 
