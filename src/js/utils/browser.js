@@ -54,14 +54,25 @@ export let IS_FIREFOX = false;
 export let IS_EDGE = false;
 
 /**
- * Whether or not this is Google Chrome.
+ * Whether or not this is any Chromium Browser
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_CHROMIUM = false;
+
+/**
+ * Whether or not this is any Chromium browser that is not Edge.
  *
  * This will also be `true` for Chrome on iOS, which will have different support
  * as it is actually Safari under the hood.
  *
- * This will be true for any Chromium browser that is not Edge.
+ * Depreacted, as the behaviour to not match Edge was to prevent Legacy Edge's UA matching.
+ * IS_CHROMIUM should be used instead.
+ * "Chromium but not Edge" could be explicitly tested with IS_CHROMIUM && !IS_EDGE
  *
  * @static
+ * @deprecated
  * @type {Boolean}
  */
 export let IS_CHROME = false;
@@ -139,8 +150,9 @@ if (UAD) {
   // userAgentData does not expose Android version, so ANDROID_VERSION remains `null`
 
   IS_ANDROID = UAD.platform === 'Android';
-  IS_CHROME = Boolean(UAD.brands.find(b => b.brand === 'Google Chrome'));
   IS_EDGE = Boolean(UAD.brands.find(b => b.brand === 'Microsoft Edge'));
+  IS_CHROMIUM = Boolean(UAD.brands.find(b => b.brand === 'Chromium'));
+  IS_CHROME = !IS_EDGE && IS_CHROMIUM;
   CHROME_VERSION = (UAD.brands.find(b => b.brand === 'Chromium') || {}).version || null;
   IS_WINDOWS = UAD.platform === 'Windows';
 }
@@ -186,7 +198,9 @@ if (!CHROME_VERSION) {
 
   IS_EDGE = (/Edg/i).test(USER_AGENT);
 
-  IS_CHROME = !IS_EDGE && ((/Chrome/i).test(USER_AGENT) || (/CriOS/i).test(USER_AGENT));
+  IS_CHROMIUM = ((/Chrome/i).test(USER_AGENT) || (/CriOS/i).test(USER_AGENT));
+
+  IS_CHROME = !IS_EDGE && IS_CHROMIUM;
 
   CHROME_VERSION = (function() {
     const match = USER_AGENT.match(/(Chrome|CriOS)\/(\d+)/);
