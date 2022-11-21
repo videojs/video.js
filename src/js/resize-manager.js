@@ -14,6 +14,7 @@ import Component from './component.js';
  *
  * If the ResizeObserver is available natively, it will be used. A polyfill can be passed in as an option.
  * If a `playerresize` event is not needed, the ResizeManager component can be removed from the player, see the example below.
+ *
  * @example <caption>How to disable the resize manager</caption>
  * const player = videojs('#vid', {
  *   resizeManager: false
