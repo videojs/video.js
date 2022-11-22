@@ -105,8 +105,7 @@ class Html5 extends Tech {
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if ((browser.TOUCH_ENABLED || browser.IS_IPHONE ||
-        browser.IS_NATIVE_ANDROID) && options.nativeControlsForTouch === true) {
+    if ((browser.TOUCH_ENABLED || browser.IS_IPHONE) && options.nativeControlsForTouch === true) {
       this.setControls(true);
     }
 
@@ -675,10 +674,8 @@ class Html5 extends Tech {
    */
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
-      const userAgent = window.navigator && window.navigator.userAgent || '';
-
-      // Seems to be broken in Chromium/Chrome && Safari in Leopard
-      if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {
+      // Still needed?
+      if (browser.IS_ANDROID) {
         return true;
       }
     }
@@ -1329,38 +1326,6 @@ Html5.prototype.featuresTimeupdateEvents = true;
  * @type {boolean}
  */
 Html5.prototype.featuresVideoFrameCallback = !!(Html5.TEST_VID && Html5.TEST_VID.requestVideoFrameCallback);
-
-// HTML5 Feature detection and Device Fixes --------------------------------- //
-let canPlayType;
-
-Html5.patchCanPlayType = function() {
-
-  // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
-  // Firefox and Chrome report correctly
-  if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX && !browser.IS_CHROME) {
-    canPlayType = Html5.TEST_VID && Html5.TEST_VID.constructor.prototype.canPlayType;
-    Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
-      const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
-
-      if (type && mpegurlRE.test(type)) {
-        return 'maybe';
-      }
-      return canPlayType.call(this, type);
-    };
-  }
-};
-
-Html5.unpatchCanPlayType = function() {
-  const r = Html5.TEST_VID.constructor.prototype.canPlayType;
-
-  if (canPlayType) {
-    Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
-  }
-  return r;
-};
-
-// by default, patch the media element
-Html5.patchCanPlayType();
 
 Html5.disposeMediaElement = function(el) {
   if (!el) {
