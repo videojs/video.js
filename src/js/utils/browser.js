@@ -78,10 +78,20 @@ export let IS_CHROMIUM = false;
 export let IS_CHROME = false;
 
 /**
- * The detected Google Chrome version - or `null`.
- * This has always been the _Chromium_ version, i.e. would return on Chromium Edge
+ * The detected Chromium version - or `null`.
  *
  * @static
+ * @type {number|null}
+ */
+export let CHROMIUM_VERSION = null;
+
+/**
+ * The detected Google Chrome version - or `null`.
+ * This has always been the _Chromium_ version, i.e. would return on Chromium Edge.
+ * Depreacted, use CHROMIUM_VERSION instead.
+ *
+ * @static
+ * @deprecated
  * @type {number|null}
  */
 export let CHROME_VERSION = null;
@@ -153,12 +163,14 @@ if (UAD) {
   IS_EDGE = Boolean(UAD.brands.find(b => b.brand === 'Microsoft Edge'));
   IS_CHROMIUM = Boolean(UAD.brands.find(b => b.brand === 'Chromium'));
   IS_CHROME = !IS_EDGE && IS_CHROMIUM;
-  CHROME_VERSION = (UAD.brands.find(b => b.brand === 'Chromium') || {}).version || null;
+  CHROMIUM_VERSION = CHROME_VERSION = (UAD.brands.find(b => b.brand === 'Chromium') || {}).version || null;
   IS_WINDOWS = UAD.platform === 'Windows';
 }
 
-if (!CHROME_VERSION) {
-  // no userAgentData, or a browser that has added userAgentData since this was added
+// If the broser is not Chromium, either userAgentData is not present which could be an old Chromium browser,
+//  or it's a browser that has added userAgentData since that we don't have tests for yet. In either case,
+// the checks need to be made agiainst the regular userAgent string.
+if (!IS_CHROMIUM) {
   const USER_AGENT = window.navigator && window.navigator.userAgent || '';
 
   IS_IPOD = (/iPod/i).test(USER_AGENT);
@@ -202,7 +214,7 @@ if (!CHROME_VERSION) {
 
   IS_CHROME = !IS_EDGE && IS_CHROMIUM;
 
-  CHROME_VERSION = (function() {
+  CHROMIUM_VERSION = CHROME_VERSION = (function() {
     const match = USER_AGENT.match(/(Chrome|CriOS)\/(\d+)/);
 
     if (match && match[2]) {
