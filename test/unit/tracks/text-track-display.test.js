@@ -420,19 +420,15 @@ if (!Html5.supportsNativeTextTracks()) {
     const textTrackDisplay = player.getChild('TextTrackDisplay');
     const textTrackDisplayStyle = textTrackDisplay.el().style;
 
-    assert.ok(textTrackDisplayStyle.top === '', 'text track display style top defaults to empty string');
-    assert.ok(textTrackDisplayStyle.bottom === '', 'text track display style bottom defaults to empty string');
-    assert.ok(textTrackDisplayStyle.left === '', 'text track display style left defaults to empty string');
-    assert.ok(textTrackDisplayStyle.right === '', 'text track display style right defaults to empty string');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     // video aspect ratio equal to NaN
     player.tech_.videoWidth = () => 0;
     player.tech_.videoHeight = () => 0;
 
-    assert.ok(textTrackDisplayStyle.top === '', 'text track display style top defaults to empty string');
-    assert.ok(textTrackDisplayStyle.bottom === '', 'text track display style bottom defaults to empty string');
-    assert.ok(textTrackDisplayStyle.left === '', 'text track display style left defaults to empty string');
-    assert.ok(textTrackDisplayStyle.right === '', 'text track display style right defaults to empty string');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     // video aspect ratio 2:1
     player.tech_.videoWidth = () => 100;
@@ -440,10 +436,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     textTrackDisplay.updateDisplayOverlay();
 
-    assert.ok(textTrackDisplayStyle.top === '10px', 'text track display style top equal to10px');
-    assert.ok(textTrackDisplayStyle.bottom === '10px', 'text track display style bottom equal to 10px');
-    assert.ok(textTrackDisplayStyle.left === '', 'text track display style left defaults to empty string');
-    assert.ok(textTrackDisplayStyle.right === '', 'text track display style right defaults to empty string');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '10px', 'text track display style insetBlock equal to 10px');
 
     // video aspect ratio 4:3
     player.tech_.videoWidth = () => 100;
@@ -451,10 +445,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     textTrackDisplay.updateDisplayOverlay();
 
-    assert.ok(textTrackDisplayStyle.top === '', 'text track display style top defaults to empty string');
-    assert.ok(textTrackDisplayStyle.bottom === '', 'text track display style bottom defaults to empty string');
-    assert.ok(textTrackDisplayStyle.left === '40px', 'text track display style left equal to 40px');
-    assert.ok(textTrackDisplayStyle.right === '40px', 'text track display style right equal to 40px');
+    assert.ok(textTrackDisplayStyle.insetInline === '40px', 'text track display style insetInline equal to 40px');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     // video aspect ratio 16:9
     player.tech_.videoWidth = () => 320;
@@ -462,10 +454,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     textTrackDisplay.updateDisplayOverlay();
 
-    assert.ok(textTrackDisplayStyle.top === '', 'text track display style top defaults to empty string');
-    assert.ok(textTrackDisplayStyle.bottom === '', 'text track display style bottom defaults to empty string');
-    assert.ok(textTrackDisplayStyle.left === '', 'text track display style left defaults to empty string');
-    assert.ok(textTrackDisplayStyle.right === '', 'text track display style right defaults to empty string');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     player.dispose();
   });

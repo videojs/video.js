@@ -329,21 +329,19 @@ class TextTrackDisplay extends Component {
     const playerHeight = this.player_.currentHeight();
     const playerAspectRatio = playerWidth / playerHeight;
     const videoAspectRatio = this.player_.videoWidth() / this.player_.videoHeight();
-    let leftRight = 0;
-    let topBottom = 0;
+    let insetInlineMatch = 0;
+    let insetBlockMatch = 0;
 
-    if (Math.abs(playerAspectRatio - videoAspectRatio) > 0.01) {
+    if (Math.abs(playerAspectRatio - videoAspectRatio) > 0.1) {
       if (playerAspectRatio > videoAspectRatio) {
-        leftRight = Math.round((playerWidth - playerHeight * videoAspectRatio) / 2);
+        insetInlineMatch = Math.round((playerWidth - playerHeight * videoAspectRatio) / 2);
       } else {
-        topBottom = Math.round((playerHeight - playerWidth / videoAspectRatio) / 2);
+        insetBlockMatch = Math.round((playerHeight - playerWidth / videoAspectRatio) / 2);
       }
     }
 
-    tryUpdateStyle(this.el_, 'top', getCSSPositionValue(topBottom));
-    tryUpdateStyle(this.el_, 'bottom', getCSSPositionValue(topBottom));
-    tryUpdateStyle(this.el_, 'left', getCSSPositionValue(leftRight));
-    tryUpdateStyle(this.el_, 'right', getCSSPositionValue(leftRight));
+    tryUpdateStyle(this.el_, 'insetInline', getCSSPositionValue(insetInlineMatch));
+    tryUpdateStyle(this.el_, 'insetBlock', getCSSPositionValue(insetBlockMatch));
   }
 
   /**
