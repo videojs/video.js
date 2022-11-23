@@ -1,3 +1,11 @@
+<a name="8.0.1"></a>
+## [8.0.1](https://github.com/videojs/video.js/compare/v8.0.0...v8.0.1) (2022-11-23)
+
+### Chores
+
+* gh-release build script no longer needed ([#8020](https://github.com/videojs/video.js/issues/8020)) ([b5d487c](https://github.com/videojs/video.js/commit/b5d487c))
+* **package:** update videojs-contrib-quality-levels to 2.2.1 ([#8019](https://github.com/videojs/video.js/issues/8019)) ([adaeeca](https://github.com/videojs/video.js/commit/adaeeca))
+
 <a name="8.0.0"></a>
 # [8.0.0](https://github.com/videojs/video.js/compare/v7.21.1...v8.0.0) (2022-11-23)
 
