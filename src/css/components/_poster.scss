@@ -23,3 +23,9 @@
 .vjs-has-started.vjs-audio-poster-mode  .vjs-poster {
   display: block;
 }
+
+.vjs-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
