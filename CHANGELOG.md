@@ -1,3 +1,10 @@
+<a name="8.0.2"></a>
+## [8.0.2](https://github.com/videojs/video.js/compare/v8.0.1...v8.0.2) (2022-11-24)
+
+### Bug Fixes
+
+* Add poster size styles ([#8022](https://github.com/videojs/video.js/issues/8022)) ([dff3dd4](https://github.com/videojs/video.js/commit/dff3dd4))
+
 <a name="8.0.1"></a>
 ## [8.0.1](https://github.com/videojs/video.js/compare/v8.0.0...v8.0.1) (2022-11-23)
 
