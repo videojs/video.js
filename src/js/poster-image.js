@@ -6,6 +6,8 @@ import Component from './component.js';
 import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
 
+const POSTER_ALT_TEXT = 'Poster image for the player';
+
 /**
  * A `ClickableComponent` that handles showing the poster image for the player.
  *
@@ -51,9 +53,13 @@ class PosterImage extends ClickableComponent {
 
       // Don't want poster to be tabbable.
       tabIndex: -1
-    }, {}, Dom.createEl('img', {
+    }, {
+      alt: 'some alt text'
+    }, Dom.createEl('img', {
       loading: 'lazy',
       crossOrigin: this.crossOrigin()
+    }, {
+      alt: this.localize(POSTER_ALT_TEXT)
     }));
 
     return el;

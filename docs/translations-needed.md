@@ -16,11 +16,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 4)     | progress bar timing: currentTime={1} duration={2}                                   |
+| ar.json (missing 5)     | progress bar timing: currentTime={1} duration={2}                                   |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| ba.json (missing 64)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| ba.json (missing 65)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -84,7 +85,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| bg.json (missing 64)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| bg.json (missing 65)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -148,7 +150,10 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| ca.json (missing 64)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| bn.json (missing 2)     | Exit Fullscreen                                                                     |
+|                         | Poster image for the player                                                         |
+| ca.json (missing 65)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -212,17 +217,20 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| cs.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Poster image for the player                                                         |
+| cs.json (missing 6)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| cy.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Poster image for the player                                                         |
+| cy.json (missing 6)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| da.json (missing 64)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| da.json (missing 65)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -286,8 +294,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
 | de.json (missing 1)     | No content                                                                          |
-| el.json (missing 50)    | Audio Player                                                                        |
+| el.json (missing 51)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -337,93 +346,16 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| es.json (missing 1)     | No content                                                                          |
-| et.json (missing 1)     | No content                                                                          |
-| eu.json (missing 1)     | No content                                                                          |
-| fa.json (missing 1)     | No content                                                                          |
-| fi.json (missing 64)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| fr.json (missing 5)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| gd.json (missing 3)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| gl.json (missing 3)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| he.json (missing 6)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| hi.json (missing 1)     | No content                                                                          |
-| hr.json (missing 64)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| es.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| et.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| eu.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| fa.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| fi.json (missing 65)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -487,124 +419,29 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| hu.json (missing 1)     | No content                                                                          |
-| it.json (missing 7)     | Seek to live, currently behind live                                                 |
+|                         | Poster image for the player                                                         |
+| fr.json (missing 4)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
 |                         | No content                                                                          |
-| ja.json (missing 7)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | No content                                                                          |
-| ko.json (missing 8)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Dropshadow                                                                          |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | No content                                                                          |
-| lv.json (missing 1)     | No content                                                                          |
-| nb.json (missing 3)     | Exit Picture-in-Picture                                                             |
+|                         | Poster image for the player                                                         |
+| gd.json (missing 4)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| nl.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | Poster image for the player                                                         |
+| gl.json (missing 4)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| he.json (missing 7)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| nn.json (missing 3)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| oc.json (missing 3)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| pl.json (missing 12)    | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | {1} is loading.                                                                     |
-|                         | No content                                                                          |
-| pt-BR.json (missing 3)  | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | No content                                                                          |
-| pt-PT.json (missing 49) | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Volume Level                                                                        |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| ro.json (missing 1)     | No content                                                                          |
-| ru.json (missing 1)     | No content                                                                          |
-| sk.json (missing 5)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-| sl.json (missing 7)     | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | No content                                                                          |
-| sr.json (missing 64)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| hi.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| hr.json (missing 65)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -668,12 +505,199 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| sv.json (missing 3)     | Exit Picture-in-Picture                                                             |
+|                         | Poster image for the player                                                         |
+| hu.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| it.json (missing 8)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| ja.json (missing 8)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| ko.json (missing 9)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Dropshadow                                                                          |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| lv.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| nb.json (missing 4)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| te.json (missing 1)     | No content                                                                          |
-| th.json (missing 1)     | No content                                                                          |
-| tr.json (missing 14)    | Audio Player                                                                        |
+|                         | Poster image for the player                                                         |
+| nl.json (missing 7)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | {1} is loading.                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| nn.json (missing 4)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| oc.json (missing 1)     | Poster image for the player                                                         |
+| pl.json (missing 1)     | Poster image for the player                                                         |
+| pt-BR.json (missing 4)  | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| pt-PT.json (missing 50) | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | Progress Bar                                                                        |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Volume Level                                                                        |
+|                         | captions settings                                                                   |
+|                         | subtitles settings                                                                  |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Reset                                                                               |
+|                         | restore all settings to the default values                                          |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+|                         | End of dialog window.                                                               |
+|                         | {1} is loading.                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| ro.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| ru.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| sk.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| sl.json (missing 8)     | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| sr.json (missing 65)    | Audio Player                                                                        |
+|                         | Video Player                                                                        |
+|                         | Replay                                                                              |
+|                         | Seek to live, currently behind live                                                 |
+|                         | Seek to live, currently playing live                                                |
+|                         | Progress Bar                                                                        |
+|                         | progress bar timing: currentTime={1} duration={2}                                   |
+|                         | Descriptions                                                                        |
+|                         | descriptions off                                                                    |
+|                         | Audio Track                                                                         |
+|                         | Volume Level                                                                        |
+|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
+|                         | Play Video                                                                          |
+|                         | Close                                                                               |
+|                         | Close Modal Dialog                                                                  |
+|                         | Modal Window                                                                        |
+|                         | This is a modal window                                                              |
+|                         | This modal can be closed by pressing the Escape key or activating the close button. |
+|                         | , opens captions settings dialog                                                    |
+|                         | , opens subtitles settings dialog                                                   |
+|                         | , opens descriptions settings dialog                                                |
+|                         | , selected                                                                          |
+|                         | captions settings                                                                   |
+|                         | subtitles settings                                                                  |
+|                         | descriptions settings                                                               |
+|                         | Text                                                                                |
+|                         | White                                                                               |
+|                         | Black                                                                               |
+|                         | Red                                                                                 |
+|                         | Green                                                                               |
+|                         | Blue                                                                                |
+|                         | Yellow                                                                              |
+|                         | Magenta                                                                             |
+|                         | Cyan                                                                                |
+|                         | Background                                                                          |
+|                         | Window                                                                              |
+|                         | Transparent                                                                         |
+|                         | Semi-Transparent                                                                    |
+|                         | Opaque                                                                              |
+|                         | Font Size                                                                           |
+|                         | Text Edge Style                                                                     |
+|                         | None                                                                                |
+|                         | Raised                                                                              |
+|                         | Depressed                                                                           |
+|                         | Uniform                                                                             |
+|                         | Dropshadow                                                                          |
+|                         | Font Family                                                                         |
+|                         | Proportional Sans-Serif                                                             |
+|                         | Monospace Sans-Serif                                                                |
+|                         | Proportional Serif                                                                  |
+|                         | Monospace Serif                                                                     |
+|                         | Casual                                                                              |
+|                         | Script                                                                              |
+|                         | Small Caps                                                                          |
+|                         | Reset                                                                               |
+|                         | restore all settings to the default values                                          |
+|                         | Done                                                                                |
+|                         | Caption Settings Dialog                                                             |
+|                         | Beginning of dialog window. Escape will cancel and close the window.                |
+|                         | End of dialog window.                                                               |
+|                         | {1} is loading.                                                                     |
+|                         | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| sv.json (missing 4)     | Exit Picture-in-Picture                                                             |
+|                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| te.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| th.json (missing 2)     | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| tr.json (missing 15)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -687,20 +711,25 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| uk.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Poster image for the player                                                         |
+| uk.json (missing 6)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| vi.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | Poster image for the player                                                         |
+| vi.json (missing 7)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| zh-CN.json (missing 1)  | No content                                                                          |
-| zh-TW.json (missing 3)  | Exit Picture-in-Picture                                                             |
+|                         | Poster image for the player                                                         |
+| zh-CN.json (missing 2)  | No content                                                                          |
+|                         | Poster image for the player                                                         |
+| zh-TW.json (missing 4)  | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
+|                         | Poster image for the player                                                         |
 
 <!-- END langtable -->
