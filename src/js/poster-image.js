@@ -6,8 +6,6 @@ import Component from './component.js';
 import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
 
-const POSTER_ALT_TEXT = 'Poster image for the player';
-
 /**
  * A `ClickableComponent` that handles showing the poster image for the player.
  *
@@ -59,7 +57,7 @@ class PosterImage extends ClickableComponent {
       loading: 'lazy',
       crossOrigin: this.crossOrigin()
     }, {
-      alt: this.localize(POSTER_ALT_TEXT)
+      alt: ''
     }));
 
     return el;
