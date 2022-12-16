@@ -17,7 +17,8 @@
         "link": "https://videojs.com"
       }],
       "favicon": "https://videojs.com/favicon.ico",
-      "footer": "<span class='copyright'><a href='https://videojs.com'>Video.js</a> is a free and open source HTML5 video player. © <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>. <a href='https://github.com/videojs/video.js/blob/master/LICENSE' class='button blue' target='_blank'>View license</a></span> <ul class='other-links'><li><a href='https://videojs.com' class='button white'><i class='fa fa-external-link'></i> Video.js</a></li> <li><a href='https://twitter.com/videojs' class='button white' target='_blank'><i class='fa fa-twitter'></i> @videojs</a></li> <li><a href='https://github.com/videojs/video.js' class='button white' target='_blank'><i class='fa fa-github-alt'></i> Source</a></li> </ul>"
+      "footer": "<span class='copyright'><a href='https://videojs.com'>Video.js</a> is a free and open source HTML5 video player. © <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>. <a href='https://github.com/videojs/video.js/blob/master/LICENSE' class='button blue' target='_blank'>View license</a></span> <ul class='other-links'><li><a href='https://videojs.com' class='button white'><i class='fa fa-external-link'></i> Video.js</a></li> <li><a href='https://twitter.com/videojs' class='button white' target='_blank'><i class='fa fa-twitter'></i> @videojs</a></li> <li><a href='https://github.com/videojs/video.js' class='button white' target='_blank'><i class='fa fa-github-alt'></i> Source</a></li> </ul>",
+      "include_css": ["./docs/apistyles/videojs.css"]
     }
   },
   "templates": {
@@ -25,16 +26,7 @@
       "staticFiles": {
         "include": ["build/docs/"]
       }
-    },
-    "logo": {
-      "url": "https://videojs.com/logo-white.png",
-      "height": "30px",
-      "width": "214px"
-    },
-    "name": "Video.js Documentation",
-    "css": [
-      "styles/videojs.css"
-    ]
+    }
   },
   "plugins": ["plugins/markdown"],
   "markdown": {

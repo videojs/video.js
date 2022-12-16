@@ -1,8 +1,8 @@
 # [Video.js][vjs-website] API Documentation
 
-There are two categories of docs: These these [API docs][api] and the [Guides](vjs-guides) on the main [Video.js website](vjs-website).
+These [API docs][api] are automatically generated from the code. You'll find specific details about functions, properties, and events.
 
-Guides explain general topics and use cases (e.g. setup). API docs are automatically generated from the codebase and give specific details about functions, properties, and events.
+More in-depth [Guides](vjs-guides) are found on the main [Video.js website](vjs-website). The guides explain general topics and use cases (e.g. setup).
 
 ## [API Docs][api]
 

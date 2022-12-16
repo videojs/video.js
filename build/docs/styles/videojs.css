@@ -27,3 +27,13 @@ footer .other-links li {
 footer .logo {
   display: none;
 }
+
+.sidebar-title {
+  background: center / contain no-repeat url(https://videojs.com/logo-white.png);
+  text-indent: -999em;
+}
+
+.light .sidebar-title {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
