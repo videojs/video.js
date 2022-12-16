@@ -34,6 +34,6 @@ footer .logo {
 }
 
 .light .sidebar-title {
-  -webkit-filter: invert(100%);
-  filter: invert(100%);
+  -webkit-filter: invert(80%);
+  filter: invert(80%);
 }
