@@ -431,6 +431,9 @@ class Player extends Component {
 
     // Set poster
     this.poster_ = options.poster || '';
+    if (options.posterOptions) {
+      this.posterOpts_ = this.sanitisePosterOpts_(options.posterOptions);
+    }
 
     // Set controls
     this.controls_ = !!options.controls;
@@ -3714,32 +3717,45 @@ class Player extends Component {
    *
    * @fires Player#posterchange
    *
-   * @param {string} [src]
+   * @param {string | object} [opts]
+   *        Poster image source URL, or object of settings
+   * @param {string} [opts.img]
    *        Poster image source URL
+   * @param {string} [opts.alt]
+   *        Poster image alt text. Set to null by default, but add text if there is content
+   *        in the poster image that should be read by a screen reader
+   * @param {Array}  [opts.sources]
+   *        Array of objects repreesenting <source> element attributes
    *
    * @return {string}
    *         The current value of poster when getting
    */
-  poster(src) {
-    if (src === undefined) {
-      return this.poster_;
+  poster(opts) {
+    // To be non-breaking, the getter returns a string. However the string will be
+    // the actual source chosen by the browser. In the case only a string is set, there
+    // is no change in behaviour.
+    if (opts === undefined) {
+      return this.posterImage.$('img').currentSrc || this.poster_;
     }
 
-    // The correct way to remove a poster is to set as an empty string
-    // other falsey values will throw errors
-    if (!src) {
-      src = '';
-    }
+    opts = this.sanitisePosterOpts_(opts);
 
-    if (src === this.poster_) {
+    // No change
+    if (opts === this.posterOpts_) {
       return;
     }
 
-    // update the internal poster variable
-    this.poster_ = src;
+    // update the internal poster variables
+    this.poster_ = opts.img;
+    this.posterOpts_ = opts;
 
     // update the tech's poster
-    this.techCall_('setPoster', src);
+    // Don't set a poster if desirable to not have mis-matching posters on the tech and PosterImage
+    if (this.options_.noTechPoster || (opts && opts.sources && opts.sources.length > 0)) {
+      this.techCall_('setPoster', '');
+    } else {
+      this.techCall_('setPoster', opts.img);
+    }
 
     this.isPosterFromTech_ = false;
 
@@ -3751,6 +3767,45 @@ class Player extends Component {
      * @type {EventTarget~Event}
      */
     this.trigger('posterchange');
+  }
+
+  /**
+   * Get poster options. Unlike similar methods this is not also a setter, as
+   * options should be set with `poster()`
+   *
+   * @return {Object}
+   */
+  posterOpts() {
+    if (arguments) {
+      this.log.warn('`posterOpts()` is not a setter');
+    }
+    return this.posterOpts_;
+  }
+
+  /**
+   * Ensures poster options include a img
+   *
+   * @param {Object} opts
+   * @return {Object} opts
+   */
+  sanitisePosterOpts_(opts) {
+    if (!opts || typeof opts !== 'object') {
+      opts = {
+        img: opts
+      };
+    }
+
+    // If img is missing but have sources, use a source as the img
+    // If no img and no sources, make img an empty string so `poster(null)` works as before
+    if (!opts.img) {
+      if (opts.sources && opts.sources.length) {
+        opts.img = opts.sources[opts.sources.length - 1].srcset.split(',')[0];
+      } else {
+        opts.img = '';
+      }
+    }
+
+    return opts;
   }
 
   /**

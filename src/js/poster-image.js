@@ -62,6 +62,7 @@ class PosterImage extends ClickableComponent {
   /**
    * Get or set the `PosterImage`'s crossOrigin option.
    *
+   *
    * @param {string|null} [value]
    *        The value to set the crossOrigin to. If an argument is
    *        given, must be one of `'anonymous'` or `'use-credentials'`, or 'null'.
@@ -105,13 +106,14 @@ class PosterImage extends ClickableComponent {
    *        The `Player#posterchange` event that triggered this function.
    */
   update(event) {
-    const url = this.player().poster();
+    const opts = this.player().posterOpts_;
 
-    this.setSrc(url);
+    this.setSrc(opts);
 
     // If there's no poster source we should display:none on this component
     // so it's not still clickable or right-clickable
-    if (url) {
+    // TODO: is this catching all unset scenarios
+    if (opts.img) {
       this.show();
     } else {
       this.hide();
@@ -123,9 +125,28 @@ class PosterImage extends ClickableComponent {
    *
    * @param {string} url
    *        The URL to the source for the `PosterImage`.
+   * @param {Object} [opts]
+   *        Image options
+   * @param {Object} [opts.sources]
+   *        An array of attributes to construct <picture> <source>s.
+   * @param {string} [opts.alt]
+   *        Alt text to set on the <picture>'s <img>..
    */
-  setSrc(url) {
-    this.el_.querySelector('img').src = url;
+  setSrc(opts) {
+    const imgEl = this.$('img');
+
+    imgEl.src = opts.img;
+    imgEl.setAttribute('alt', opts.alt || '');
+
+    this.$$('source').forEach(s => {
+      this.el_.removeChild(s);
+    });
+
+    if (opts.sources) {
+      opts.sources.forEach(s => {
+        this.el_.insertBefore(Dom.createEl('source', {}, s), imgEl);
+      });
+    }
   }
 
   /**
