@@ -112,7 +112,7 @@
     "browserify": "^16.2.3",
     "chokidar-cli": "^2.1.0",
     "clean-css-cli": "^4.3.0",
-    "clean-jsdoc-theme": "^4.1.10",
+    "clean-jsdoc-theme": "^4.2.1",
     "cli-table": "^0.3.1",
     "conventional-changelog-cli": "^2.0.21",
     "conventional-changelog-videojs": "^3.0.1",
