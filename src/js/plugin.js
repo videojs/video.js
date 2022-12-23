@@ -336,7 +336,7 @@ class Plugin {
    *          must not match an existing plugin or a method on the `Player`
    *          prototype.
    *
-   * @param   {Function} plugin
+   * @param   {typeof Plugin|Function} plugin
    *          A sub-class of `Plugin` or a function for basic plugins.
    *
    * @return {typeof Plugin|Function}
