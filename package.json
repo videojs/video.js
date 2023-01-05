@@ -69,7 +69,7 @@
     "test:a11y": "node build/test-a11y.js",
     "test:unit": "karma start test/karma.conf.js",
     "docs": "npm-run-all clean docs:lint docs:api",
-    "docs:api": "jsdoc -c .jsdoc.json",
+    "docs:api": "node ./build/doc-version.js && jsdoc -c .jsdoc.json",
     "postdocs:api": "node ./build/fix-api-docs.js",
     "docs:lint": "remark -- './{,!(node_modules)/**/}!(CHANGELOG)*.md'",
     "docs:fix": "remark --output -- './{,!(node_modules)/**/}!(CHANGELOG)*.md'",
