@@ -3569,7 +3569,9 @@ class Player extends Component {
    *         The current source object
    */
   currentSource() {
-    return this.cache_.source || {};
+    const mw = this.middleware_;
+
+    return middleware.currentSource(this.cache_.source, mw) || this.cache_.source || {};
   }
 
   /**

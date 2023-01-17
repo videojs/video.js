@@ -82,6 +82,10 @@ export function setSource(player, src, next) {
   player.setTimeout(() => setSourceHelper(src, middlewares[src.type], next, player), 1);
 }
 
+export function currentSource(src, middleware) {
+  return middleware.reduceRight(middlewareIterator('currentSource'), src);
+}
+
 /**
  * When the tech is set, passes the tech to each middleware's `setTech` method.
  *

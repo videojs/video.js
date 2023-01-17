@@ -536,3 +536,17 @@ QUnit.test('a middleware without a setSource gets chosen implicitly', function(a
 
   middleware.getMiddleware('video/foo').pop();
 });
+
+QUnit.test('middleware can override currentSource', function(assert) {
+  const middlewares = [
+    {
+      currentSource: (src) => {
+        return `foo${src}`;
+      }
+    }
+  ];
+
+  const result = middleware.currentSource('bar', middlewares);
+
+  assert.equal(result, 'foobar', 'value of currentSource() is overriden');
+});
