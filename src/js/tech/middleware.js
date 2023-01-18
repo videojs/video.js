@@ -82,6 +82,16 @@ export function setSource(player, src, next) {
   player.setTimeout(() => setSourceHelper(src, middlewares[src.type], next, player), 1);
 }
 
+/**
+ * Allows user to override the returned value of player.currentSource() using middleware.
+ *
+ * @param {Tech~SourceObject} src
+ *         A source object.
+ * @param {Object[]} middleware
+ *        An array of middleware instances.
+ * @return {Tech~SourceObject}
+ *         A source object.
+ */
 export function currentSource(src, middleware) {
   return middleware.reduceRight(middlewareIterator('currentSource'), src);
 }
