@@ -2784,6 +2784,10 @@ class Player extends Component {
    * @fires Player#fullscreenchange
    */
   requestFullscreen(fullscreenOptions) {
+    if (this.isInPictureInPicture()) {
+      this.exitPictureInPicture();
+    }
+
     const self = this;
 
     return new Promise((resolve, reject) => {
