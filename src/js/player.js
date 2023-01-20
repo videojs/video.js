@@ -3305,7 +3305,7 @@ class Player extends Component {
   handleSrc_(source, isRetry) {
     // getter usage
     if (typeof source === 'undefined') {
-      return this.cache_.src || '';
+      return this.currentSrc();
     }
 
     // Reset retry behavior for new source
