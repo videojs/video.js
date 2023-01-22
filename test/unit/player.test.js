@@ -3224,3 +3224,48 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
       assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
 });
+
+QUnit.test('crossOrigin value should be maintained after loadMedia is called', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const example1 = '<video id="example_1" class="video-js" preload="none"></video>';
+  const example2 = '<video id="example_2" class="video-js" preload="none"></video>';
+  const example3 = '<video id="example_3" class="video-js" crossorigin="anonymous" preload="none"></video>';
+
+  fixture.innerHTML += example1;
+  fixture.innerHTML += example2;
+  fixture.innerHTML += example3;
+
+  const tagExample1 = document.getElementById('example_1');
+  const tagExample2 = document.getElementById('example_2');
+  const tagExample3 = document.getElementById('example_3');
+  const playerExample1 = TestHelpers.makePlayer({techOrder: ['Html5']}, tagExample1);
+  const playerExample2 = TestHelpers.makePlayer({techOrder: ['Html5'], crossOrigin: 'use-credentials'}, tagExample2);
+  const playerExample3 = TestHelpers.makePlayer({techOrder: ['Html5']}, tagExample3);
+
+  this.clock.tick(1000);
+
+  playerExample1.crossOrigin('anonymous');
+  playerExample1.loadMedia({
+    src: 'foo.mp4'
+  });
+  playerExample2.loadMedia({
+    src: 'foo.mp4'
+  });
+  playerExample3.loadMedia({
+    src: 'foo.mp4'
+  });
+
+  assert.strictEqual(playerExample1.crossOrigin(), 'anonymous', 'crossOrigin value remains correct when assigned by the crossOrigin method and loadMedia is called');
+  assert.ok(tagExample1.crossOrigin === 'anonymous');
+
+  assert.strictEqual(playerExample2.crossOrigin(), 'use-credentials', 'crossOrigin value remains correct when passed through the options and loadMedia is called');
+  assert.ok(tagExample2.crossOrigin === 'use-credentials');
+
+  assert.strictEqual(playerExample3.crossOrigin(), 'anonymous', 'crossOrigin value remains correct when passed via the html property and loadMedia is called');
+  assert.ok(tagExample3.crossOrigin === 'anonymous');
+
+  playerExample1.dispose();
+  playerExample2.dispose();
+  playerExample3.dispose();
+});
