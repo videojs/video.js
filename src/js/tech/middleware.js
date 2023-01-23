@@ -92,7 +92,7 @@ export function setSource(player, src, next) {
  * @return {Tech~SourceObject}
  *         A source object.
  */
-export function currentSource(src, middleware) {
+export function currentSource(middleware, src) {
   return middleware.reduceRight(middlewareIterator('currentSource'), src);
 }
 
