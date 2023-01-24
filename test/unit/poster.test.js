@@ -42,6 +42,12 @@ QUnit.test('should mirror crossOrigin', function(assert) {
 
 });
 
+QUnit.test('should populate an alt attribute', function(assert) {
+  const posterImage = new PosterImage(this.mockPlayer);
+
+  assert.ok(posterImage.$('img').hasAttribute('alt'), 'img has alt atttribute');
+});
+
 QUnit.test('should remove itself from the document flow when there is no poster', function(assert) {
   const posterImage = new PosterImage(this.mockPlayer);
 
