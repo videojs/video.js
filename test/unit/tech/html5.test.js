@@ -893,3 +893,15 @@ QUnit.test('featuresVideoFrameCallback is false for Safari DRM', function(assert
     assert.ok(true, 'skipped because webkitKeys not writable');
   }
 });
+
+QUnit.test('supportsFullScreen is always with `webkitEnterFullScreen`', function(assert) {
+  const oldEl = tech.el_;
+
+  tech.el_ = {
+    webkitEnterFullScreen: () => {}
+  };
+
+  assert.ok(tech.supportsFullScreen(), 'supportsFullScreen() true with webkitEnterFullScreen');
+
+  tech.el_ = oldEl;
+});

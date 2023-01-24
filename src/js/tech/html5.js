@@ -666,20 +666,14 @@ class Html5 extends Tech {
   }
 
   /**
-   * Check if fullscreen is supported on the current playback device.
+   * Check if fullscreen is supported on the video el.
    *
    * @return {boolean}
    *         - True if fullscreen is supported.
    *         - False if fullscreen is not supported.
    */
   supportsFullScreen() {
-    if (typeof this.el_.webkitEnterFullScreen === 'function') {
-      // Still needed?
-      if (browser.IS_ANDROID) {
-        return true;
-      }
-    }
-    return false;
+    return typeof this.el_.webkitEnterFullScreen === 'function';
   }
 
   /**
