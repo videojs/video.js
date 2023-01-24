@@ -33,7 +33,7 @@
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
     ]
   },
-  "plugins": ["plugins/markdown"],
+  "plugins": ["plugins/markdown", "build/jsdoc-typeof-plugin"],
   "markdown": {
     "tags": ["example"],
     "idInHeadings": true
