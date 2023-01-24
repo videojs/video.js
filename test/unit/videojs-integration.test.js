@@ -18,10 +18,10 @@ QUnit.test('create a real player and dispose', function(assert) {
 
   // TODO: remove this code when we have a videojs debug build
   // see https://github.com/videojs/video.js/issues/5858
-  old.bind = Fn.bind;
+  old.bind_ = Fn.bind_;
 
-  Fn.stub_bind(function(context, fn, uid) {
-    const retval = old.bind(context, fn, uid);
+  Fn.stub_bind_(function(context, fn, uid) {
+    const retval = old.bind_(context, fn, uid);
 
     retval.og_ = fn.og_ || fn;
     retval.cx_ = fn.cx_ || context;

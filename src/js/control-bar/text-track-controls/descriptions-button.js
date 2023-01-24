@@ -28,7 +28,7 @@ class DescriptionsButton extends TextTrackButton {
     super(player, options, ready);
 
     const tracks = player.textTracks();
-    const changeHandler = Fn.bind(this, this.handleTracksChange);
+    const changeHandler = Fn.bind_(this, this.handleTracksChange);
 
     tracks.addEventListener('change', changeHandler);
     this.on('dispose', function() {
@@ -93,7 +93,7 @@ DescriptionsButton.prototype.kind_ = 'descriptions';
  * The text that should display over the `DescriptionsButton`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 DescriptionsButton.prototype.controlText_ = 'Descriptions';
 

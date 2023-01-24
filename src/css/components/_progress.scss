@@ -21,10 +21,6 @@
   @include display-flex(center);
 }
 
-.vjs-no-flex .vjs-progress-control {
-  width: auto;
-}
-
 // .vjs-progress-holder / SeekBar
 //
 // Box containing play and load progress bars. It also acts as seek scrubber.
@@ -79,7 +75,7 @@
     font-size: 0.9em;
     position: absolute;
     right: -0.5em;
-    top: -0.333333333333333em;
+    line-height: .35em;
     z-index: 1;
   }
 }
@@ -154,10 +150,6 @@
   z-index: 1;
 }
 
-.vjs-no-flex .vjs-progress-control .vjs-mouse-display {
-  z-index: 0;
-}
-
 .video-js .vjs-progress-control:hover .vjs-mouse-display {
   display: block;
 }
@@ -167,10 +159,6 @@
   opacity: 0;
   $trans: visibility 1.0s, opacity 1.0s;
   @include transition($trans);
-}
-
-.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display {
-  display: none;
 }
 
 .vjs-mouse-display .vjs-time-tooltip {

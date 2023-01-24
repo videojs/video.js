@@ -463,7 +463,9 @@ QUnit.test('if preloadTextTracks is false, default tracks are not parsed until m
 
   window.WebVTT = () => {};
   window.WebVTT.StringDecoder = () => {};
-  window.WebVTT.Parser = () => {
+
+  // This needs to be function expression rather than arrow function so it is constructable
+  window.WebVTT.Parser = function() {
     parserCreated = true;
     return {
       oncue() {},
@@ -508,7 +510,9 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
 
   window.WebVTT = () => {};
   window.WebVTT.StringDecoder = () => {};
-  window.WebVTT.Parser = () => {
+
+  // This needs to be function expression rather than arrow function so it is constructable
+  window.WebVTT.Parser = function() {
     parserCreated = true;
     return {
       oncue() {},
@@ -547,7 +551,9 @@ QUnit.test('tracks are loaded withCredentials is crossorigin is set to use-crede
 
   window.WebVTT = () => {};
   window.WebVTT.StringDecoder = () => {};
-  window.WebVTT.Parser = () => {
+
+  // This needs to be function expression rather than arrow function so it is constructable
+  window.WebVTT.Parser = function() {
     return {
       oncue() {},
       onparsingerror() {},
@@ -619,7 +625,9 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
 
   window.WebVTT = () => {};
   window.WebVTT.StringDecoder = () => {};
-  window.WebVTT.Parser = () => {
+
+  // This needs to be function expression rather than arrow function so it is constructable
+  window.WebVTT.Parser = function() {
     parserCreated = true;
     return {
       oncue() {},

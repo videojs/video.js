@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js loadMedia Demo</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+</head>
+<body>
+  <h1>Video.js <code>loadMedia</code> Demo</h1>
+  <p>This shows how the <code>loadMedia</code> method is used and the effect it has on the player.</p>
+
+  <video-js
+    id="vid1"
+    controls
+    width="640"
+    height="264">
+  </video-js>
+
+  <script>
+    var vid = document.getElementById('vid1');
+    var player = videojs(vid);
+
+    player.log('window.player created', player);
+
+    player.loadMedia({
+      artist: 'Disney',
+      album: 'Oceans',
+      title: 'Oceans',
+      description: 'Journey in to the depths of a wonderland filled with mystery, beauty and power. Oceans is a spectacular story, narrated by Pierce Brosnan, about remarkable creatures under the sea. It\'s an unprecedented look at the lives of these elusive deepwater creatures through their own eyes. Incredible state-of-the-art-underwater filmmaking will take your breath away as you migrate with whales, swim alongside a great white shark and race with dolphins at play.',
+      poster: 'https://vjs.zencdn.net/v/oceans.png',
+      src: [{
+        src: 'https://vjs.zencdn.net/v/oceans.mp4',
+        type: 'video/mp4'
+      }, {
+        src: 'https://vjs.zencdn.net/v/oceans.webm',
+        type: 'video/webm'
+      }, {
+        src: 'https://vjs.zencdn.net/v/oceans.ogv',
+        type: 'video/ogv'
+      }],
+      textTracks: [{
+        kind: 'captions',
+        label: 'English',
+        src: '../docs/examples/shared/example-captions.vtt',
+        srclang: 'en'
+      }]
+    })
+  </script>
+
+</body>
+</html>

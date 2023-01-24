@@ -1,6 +1,6 @@
 import window from 'global/window';
 import document from 'global/document';
-import mergeOptions from '../utils/merge-options';
+import {merge} from '../utils/obj';
 import {getAbsoluteURL} from '../utils/url';
 
 /**
@@ -183,7 +183,7 @@ const firstSourceWatch = function(tech) {
     el[k] = appendWrapper(old[k]);
   });
 
-  Object.defineProperty(el, 'innerHTML', mergeOptions(innerDescriptor, {
+  Object.defineProperty(el, 'innerHTML', merge(innerDescriptor, {
     set: appendWrapper(innerDescriptor.set)
   }));
 
@@ -202,7 +202,7 @@ const firstSourceWatch = function(tech) {
 
 /**
  * our implementation of a `src` descriptor for browsers
- * that do not have one.
+ * that do not have one
  */
 const srcDescriptorPolyfill = Object.defineProperty({}, 'src', {
   get() {
@@ -252,7 +252,7 @@ const setupSourceset = function(tech) {
   const oldSetAttribute = el.setAttribute;
   const oldLoad = el.load;
 
-  Object.defineProperty(el, 'src', mergeOptions(srcDescriptor, {
+  Object.defineProperty(el, 'src', merge(srcDescriptor, {
     set: (v) => {
       const retval = srcDescriptor.set.call(el, v);
 

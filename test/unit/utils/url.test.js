@@ -3,7 +3,8 @@ import document from 'global/document';
 import window from 'global/window';
 import * as Url from '../../../src/js/utils/url.js';
 
-QUnit.module('url');
+QUnit.module('utils/url');
+
 QUnit.test('should parse the details of a url correctly', function(assert) {
   assert.equal(Url.parseUrl('#').protocol, window.location.protocol, 'parsed relative url protocol');
   assert.equal(Url.parseUrl('#').host, window.location.host, 'parsed relative url host');

@@ -82,7 +82,7 @@ export const parseUrl = function(url) {
 };
 
 /**
- * Get absolute version of relative URL. Used to tell Flash the correct URL.
+ * Get absolute version of relative URL.
  *
  * @function
  * @param    {string} url
@@ -96,8 +96,7 @@ export const parseUrl = function(url) {
 export const getAbsoluteURL = function(url) {
   // Check if absolute URL
   if (!url.match(/^https?:\/\//)) {
-    // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
-    // add the url to an anchor and let the browser parse the URL
+    // Add the url to an anchor and let the browser parse it to convert to an absolute url
     const a = document.createElement('a');
 
     a.href = url;

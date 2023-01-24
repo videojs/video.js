@@ -6,16 +6,6 @@ import EventTarget from '../event-target';
 import TextTrack from '../tracks/text-track';
 
 /**
- * @memberof HTMLTrackElement
- * @typedef {HTMLTrackElement~ReadyState}
- * @enum {number}
- */
-const NONE = 0;
-const LOADING = 1;
-const LOADED = 2;
-const ERROR = 3;
-
-/**
  * A single track represented in the DOM.
  *
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement}
@@ -98,14 +88,14 @@ class HTMLTrackElement extends EventTarget {
       }
     });
 
-    readyState = NONE;
+    readyState = HTMLTrackElement.NONE;
 
     /**
      * @listens TextTrack#loadeddata
      * @fires HTMLTrackElement#load
      */
     track.addEventListener('loadeddata', () => {
-      readyState = LOADED;
+      readyState = HTMLTrackElement.LOADED;
 
       this.trigger({
         type: 'load',
@@ -119,9 +109,36 @@ HTMLTrackElement.prototype.allowedEvents_ = {
   load: 'load'
 };
 
-HTMLTrackElement.NONE = NONE;
-HTMLTrackElement.LOADING = LOADING;
-HTMLTrackElement.LOADED = LOADED;
-HTMLTrackElement.ERROR = ERROR;
+/**
+ * The text track not loaded state.
+ *
+ * @type {number}
+ * @static
+ */
+HTMLTrackElement.NONE = 0;
+
+/**
+ * The text track loading state.
+ *
+ * @type {number}
+ * @static
+ */
+HTMLTrackElement.LOADING = 1;
+
+/**
+ * The text track loaded state.
+ *
+ * @type {number}
+ * @static
+ */
+HTMLTrackElement.LOADED = 2;
+
+/**
+ * The text track failed to load state.
+ *
+ * @type {number}
+ * @static
+ */
+HTMLTrackElement.ERROR = 3;
 
 export default HTMLTrackElement;

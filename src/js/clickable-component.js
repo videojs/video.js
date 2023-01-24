@@ -4,7 +4,6 @@
 import Component from './component';
 import * as Dom from './utils/dom.js';
 import log from './utils/log.js';
-import {assign} from './utils/obj';
 import keycode from 'keycode';
 
 /**
@@ -68,7 +67,7 @@ class ClickableComponent extends Component {
    *         The element that gets created.
    */
   createEl(tag = 'div', props = {}, attributes = {}) {
-    props = assign({
+    props = Object.assign({
       className: this.buildCSSClass(),
       tabIndex: 0
     }, props);
@@ -78,7 +77,7 @@ class ClickableComponent extends Component {
     }
 
     // Add ARIA attributes for clickable element which is not a native HTML button
-    attributes = assign({
+    attributes = Object.assign({
       role: 'button'
     }, attributes);
 
@@ -149,6 +148,7 @@ class ClickableComponent extends Component {
 
     const localizedText = this.localize(text);
 
+    /** @protected */
     this.controlText_ = text;
     Dom.textContent(this.controlTextEl_, localizedText);
     if (!this.nonIconControl && !this.player_.options_.noUITitleAttributes) {

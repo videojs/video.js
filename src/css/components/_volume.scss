@@ -88,24 +88,6 @@
   @include transition($transition-property)
 }
 
-.video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
-  width: 5em;
-  height: 3em;
-
-  visibility: visible;
-  opacity: 1;
-  position: relative;
-
-  @include transition(none);
-}
-
-.video-js.vjs-no-flex .vjs-volume-control.vjs-volume-vertical,
-.video-js.vjs-no-flex .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
-  position: absolute;
-  bottom: 3em;
-  left: 0.5em;
-}
-
 .video-js .vjs-volume-panel {
   @include display-flex;
 }
@@ -157,7 +139,7 @@
 
   // Volume handle
   &:before {
-    top: -0.3em;
+    line-height: .35em;
     right: -0.5em;
   }
 }
@@ -243,10 +225,6 @@
   height: 100%;
 }
 
-.vjs-no-flex .vjs-volume-control .vjs-mouse-display {
-  z-index: 0;
-}
-
 .video-js .vjs-volume-control:hover .vjs-mouse-display {
   display: block;
 }
@@ -256,10 +234,6 @@
   opacity: 0;
   $trans: visibility 1.0s, opacity 1.0s;
   @include transition($trans);
-}
-
-.video-js.vjs-user-inactive.vjs-no-flex .vjs-volume-control .vjs-mouse-display {
-  display: none;
 }
 
 .vjs-mouse-display .vjs-volume-tooltip {

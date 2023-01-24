@@ -16,10 +16,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 3)     | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-| ba.json (missing 63)    | Audio Player                                                                        |
+| ar.json (Complete)      |                                                                                     |
+| ba.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -82,7 +80,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| bg.json (missing 63)    | Audio Player                                                                        |
+|                         | No content                                                                          |
+| bg.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -145,7 +144,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| ca.json (missing 63)    | Audio Player                                                                        |
+|                         | No content                                                                          |
+| bn.json (missing 1)     | Exit Fullscreen                                                                     |
+| ca.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -208,15 +209,18 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| cs.json (missing 4)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| cs.json (missing 5)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| cy.json (missing 4)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| cy.json (missing 5)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| da.json (missing 63)    | Audio Player                                                                        |
+|                         | No content                                                                          |
+| da.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -279,8 +283,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
 | de.json (Complete)      |                                                                                     |
-| el.json (missing 49)    | Audio Player                                                                        |
+| el.json (missing 50)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -329,10 +334,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
 | es.json (Complete)      |                                                                                     |
-| eu.json (Complete)      |                                                                                     |
-| fa.json (Complete)      |                                                                                     |
-| fi.json (missing 63)    | Audio Player                                                                        |
+| et.json (missing 1)     | No content                                                                          |
+| eu.json (missing 1)     | No content                                                                          |
+| fa.json (missing 1)     | No content                                                                          |
+| fi.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -395,21 +402,22 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| fr.json (missing 4)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Exit Picture-in-Picture                                                             |
+|                         | No content                                                                          |
+| fr.json (Complete)      |                                                                                     |
+| gd.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| gd.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | No content                                                                          |
+| gl.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| gl.json (missing 2)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-| he.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| he.json (missing 6)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| hi.json (Complete)      |                                                                                     |
-| hr.json (missing 63)    | Audio Player                                                                        |
+|                         | No content                                                                          |
+| hi.json (missing 1)     | No content                                                                          |
+| hr.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -472,52 +480,36 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| hu.json (Complete)      |                                                                                     |
-| it.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| hu.json (missing 1)     | No content                                                                          |
+| it.json (missing 7)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
-| ja.json (missing 6)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-| ko.json (missing 7)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Dropshadow                                                                          |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-| lv.json (Complete)      |                                                                                     |
-| nb.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | No content                                                                          |
+| ja.json (Complete)      |                                                                                     |
+| ko.json (Complete)      |                                                                                     |
+| lv.json (missing 1)     | No content                                                                          |
+| nb.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| nl.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| nl.json (missing 6)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| nn.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | No content                                                                          |
+| nn.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| oc.json (missing 2)     | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-| pl.json (missing 11)    | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| oc.json (Complete)      |                                                                                     |
+| pl.json (Complete)      |                                                                                     |
+| pt-BR.json (missing 3)  | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | {1} is loading.                                                                     |
-| pt-BR.json (missing 2)  | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-| pt-PT.json (missing 48) | Audio Player                                                                        |
+|                         | No content                                                                          |
+| pt-PT.json (missing 49) | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -565,19 +557,22 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| ro.json (Complete)      |                                                                                     |
-| ru.json (Complete)      |                                                                                     |
-| sk.json (missing 4)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| ro.json (missing 1)     | No content                                                                          |
+| ru.json (missing 1)     | No content                                                                          |
+| sk.json (missing 5)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| sl.json (missing 6)     | Proportional Sans-Serif                                                             |
+|                         | No content                                                                          |
+| sl.json (missing 7)     | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
 |                         | Proportional Serif                                                                  |
 |                         | Monospace Serif                                                                     |
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
-| sr.json (missing 63)    | Audio Player                                                                        |
+|                         | No content                                                                          |
+| sr.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -640,11 +635,13 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| sv.json (missing 2)     | Exit Picture-in-Picture                                                             |
+|                         | No content                                                                          |
+| sv.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| te.json (Complete)      |                                                                                     |
-| th.json (Complete)      |                                                                                     |
-| tr.json (missing 13)    | Audio Player                                                                        |
+|                         | No content                                                                          |
+| te.json (missing 1)     | No content                                                                          |
+| th.json (missing 1)     | No content                                                                          |
+| tr.json (missing 14)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -657,17 +654,19 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| uk.json (missing 4)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| uk.json (missing 5)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-| vi.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | No content                                                                          |
+| vi.json (missing 6)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
 | zh-CN.json (Complete)   |                                                                                     |
-| zh-TW.json (missing 2)  | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
+| zh-TW.json (Complete)   |                                                                                     |
 
 <!-- END langtable -->

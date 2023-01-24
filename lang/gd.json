@@ -16,7 +16,7 @@
   "Progress Bar": "Bàr adhartais",
   "progress bar timing: currentTime={1} duration={2}": "{1} à {2}",
   "Fullscreen": "Làn-sgrìn",
-  "Non-Fullscreen": "Fàg modh làn-sgrìn",
+  "Exit Fullscreen": "Fàg modh làn-sgrìn",
   "Mute": "Mùch",
   "Unmute": "Dì-mhùch",
   "Playback Rate": "Reat na cluiche",

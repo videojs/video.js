@@ -9,11 +9,8 @@ import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
-import {toTitleCase, toLowerCase} from './utils/string-cases.js';
-import mergeOptions from './utils/merge-options.js';
-import computedStyle from './utils/computed-style';
-import Map from './utils/map.js';
-import Set from './utils/set.js';
+import {toTitleCase, toLowerCase} from './utils/str.js';
+import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
 /**
@@ -28,7 +25,7 @@ class Component {
 
   /**
    * A callback that is called when a component is ready. Does not have any
-   * paramters and any callback value will be ignored.
+   * parameters and any callback value will be ignored.
    *
    * @callback Component~ReadyCallback
    * @this Component
@@ -69,10 +66,10 @@ class Component {
     this.parentComponent_ = null;
 
     // Make a copy of prototype.options_ to protect against overriding defaults
-    this.options_ = mergeOptions({}, this.options_);
+    this.options_ = merge({}, this.options_);
 
     // Updated options with supplied options
-    options = this.options_ = mergeOptions(this.options_, options);
+    options = this.options_ = merge(this.options_, options);
 
     // Get ID from options or options element if one is supplied
     this.id_ = options.id || (options.el && options.el.id);
@@ -222,7 +219,7 @@ class Component {
   /**
    * Deep merge of options objects with new options.
    * > Note: When both `obj` and `options` contain properties whose values are objects.
-   *         The two properties get merged using {@link module:mergeOptions}
+   *         The two properties get merged using {@link module:obj.merge}
    *
    * @param {Object} obj
    *        The object that contains new options.
@@ -235,7 +232,7 @@ class Component {
       return this.options_;
     }
 
-    this.options_ = mergeOptions(this.options_, obj);
+    this.options_ = merge(this.options_, obj);
     return this.options_;
   }
 
@@ -703,6 +700,9 @@ class Component {
    * Different from event listeners in that if the ready event has already happened
    * it will trigger the function immediately.
    *
+   * @param {Component~ReadyCallback} fn
+   *        Function that gets called when the `Component` is ready.
+   *
    * @return {Component}
    *         Returns itself; method can be chained.
    */
@@ -818,21 +818,21 @@ class Component {
   /**
    * Add a CSS class name to the `Component`s element.
    *
-   * @param {string} classToAdd
-   *        CSS class name to add
+   * @param {...string} classesToAdd
+   *        One or more CSS class name to add.
    */
-  addClass(classToAdd) {
-    Dom.addClass(this.el_, classToAdd);
+  addClass(...classesToAdd) {
+    Dom.addClass(this.el_, ...classesToAdd);
   }
 
   /**
    * Remove a CSS class name from the `Component`s element.
    *
-   * @param {string} classToRemove
-   *        CSS class name to remove
+   * @param {...string} classesToRemove
+   *        One or more CSS class name to remove.
    */
-  removeClass(classToRemove) {
-    Dom.removeClass(this.el_, classToRemove);
+  removeClass(...classesToRemove) {
+    Dom.removeClass(this.el_, ...classesToRemove);
   }
 
   /**
@@ -1081,7 +1081,7 @@ class Component {
       throw new Error('currentDimension only accepts width or height value');
     }
 
-    computedWidthOrHeight = computedStyle(this.el_, widthOrHeight);
+    computedWidthOrHeight = Dom.computedStyle(this.el_, widthOrHeight);
 
     // remove 'px' from variable and parse as integer
     computedWidthOrHeight = parseFloat(computedWidthOrHeight);
@@ -1324,7 +1324,7 @@ class Component {
     }
 
     // listener for reporting that the user is active
-    const report = Fn.bind(this.player(), this.player().reportUserActivity);
+    const report = Fn.bind_(this.player(), this.player().reportUserActivity);
 
     let touchHolding;
 
@@ -1387,7 +1387,7 @@ class Component {
     // eslint-disable-next-line
     var timeoutId, disposeFn;
 
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     this.clearTimersOnDispose_();
 
@@ -1448,7 +1448,7 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval}
    */
   setInterval(fn, interval) {
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     this.clearTimersOnDispose_();
 
@@ -1509,17 +1509,12 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.setTimeout(fn, 1000 / 60);
-    }
-
     this.clearTimersOnDispose_();
 
     // declare as variables so they are properly available in rAF function
     // eslint-disable-next-line
     var id;
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     id = window.requestAnimationFrame(() => {
       if (this.rafIds_.has(id)) {
@@ -1550,7 +1545,7 @@ class Component {
     }
     this.clearTimersOnDispose_();
 
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     const id = this.requestAnimationFrame(() => {
       fn();
@@ -1596,11 +1591,6 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
    */
   cancelAnimationFrame(id) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.clearTimeout(id);
-    }
-
     if (this.rafIds_.has(id)) {
       this.rafIds_.delete(id);
       window.cancelAnimationFrame(id);
@@ -1732,17 +1722,6 @@ class Component {
     return Component.components_[name];
   }
 }
-
-/**
- * Whether or not this component supports `requestAnimationFrame`.
- *
- * This is exposed primarily for testing purposes.
- *
- * @private
- * @type {Boolean}
- */
-Component.prototype.supportsRaf_ = typeof window.requestAnimationFrame === 'function' &&
-  typeof window.cancelAnimationFrame === 'function';
 
 Component.registerComponent('Component', Component);
 

@@ -1,8 +1,8 @@
 /* eslint-env qunit */
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
-import computedStyle from '../../src/js/utils/computed-style.js';
-import { createTimeRange } from '../../src/js/utils/time-ranges.js';
+import { computedStyle } from '../../src/js/utils/dom.js';
+import { createTimeRange } from '../../src/js/utils/time.js';
 
 QUnit.module('SeekToLive', {
   beforeEach() {

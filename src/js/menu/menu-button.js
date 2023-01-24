@@ -6,7 +6,7 @@ import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Events from '../utils/events.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
 import keycode from 'keycode';

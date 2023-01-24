@@ -113,10 +113,7 @@ class MuteToggle extends Button {
       level = 2;
     }
 
-    // TODO improve muted icon classes
-    for (let i = 0; i < 4; i++) {
-      Dom.removeClass(this.el_, `vjs-vol-${i}`);
-    }
+    Dom.removeClass(this.el_, [0, 1, 2, 3].reduce((str, i) => str + `${i ? ' ' : ''}vjs-vol-${i}`, ''));
     Dom.addClass(this.el_, `vjs-vol-${level}`);
   }
 
@@ -142,7 +139,7 @@ class MuteToggle extends Button {
  * The text that should display over the `MuteToggle`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 MuteToggle.prototype.controlText_ = 'Mute';
 
