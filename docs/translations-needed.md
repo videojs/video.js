@@ -16,10 +16,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 4)     | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
+| ar.json (Complete)      |                                                                                     |
 | ba.json (missing 64)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -287,7 +284,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| de.json (missing 1)     | No content                                                                          |
+| de.json (Complete)      |                                                                                     |
 | el.json (missing 50)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -338,7 +335,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| es.json (missing 1)     | No content                                                                          |
+| es.json (Complete)      |                                                                                     |
 | et.json (missing 1)     | No content                                                                          |
 | eu.json (missing 1)     | No content                                                                          |
 | fa.json (missing 1)     | No content                                                                          |
@@ -406,9 +403,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| fr.json (missing 3)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | No content                                                                          |
+| fr.json (Complete)      |                                                                                     |
 | gd.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
@@ -494,21 +489,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | No content                                                                          |
-| ja.json (missing 7)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | No content                                                                          |
-| ko.json (missing 8)     | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Dropshadow                                                                          |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | No content                                                                          |
+| ja.json (Complete)      |                                                                                     |
+| ko.json (Complete)      |                                                                                     |
 | lv.json (missing 1)     | No content                                                                          |
 | nb.json (missing 3)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
@@ -684,9 +666,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| zh-CN.json (missing 1)  | No content                                                                          |
-| zh-TW.json (missing 3)  | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
+| zh-CN.json (Complete)   |                                                                                     |
+| zh-TW.json (Complete)   |                                                                                     |
 
 <!-- END langtable -->
