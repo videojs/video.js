@@ -52,7 +52,7 @@ const pluginExists = (name) => pluginStorage.hasOwnProperty(name);
  * @param   {string} name
  *          The name of a plugin.
  *
- * @return {Function|undefined}
+ * @return {typeof Plugin|Function|undefined}
  *          The plugin (or undefined).
  */
 const getPlugin = (name) => pluginExists(name) ? pluginStorage[name] : undefined;
@@ -336,10 +336,10 @@ class Plugin {
    *          must not match an existing plugin or a method on the `Player`
    *          prototype.
    *
-   * @param   {Function} plugin
+   * @param   {typeof Plugin|Function} plugin
    *          A sub-class of `Plugin` or a function for basic plugins.
    *
-   * @return {Function}
+   * @return {typeof Plugin|Function}
    *          For advanced plugins, a factory function for that plugin. For
    *          basic plugins, a wrapper function that initializes the plugin.
    */
@@ -444,7 +444,7 @@ class Plugin {
  * @param    {string} name
  *           The name of a plugin.
  *
- * @returns  {Function|undefined}
+ * @returns  {typeof Plugin|Function|undefined}
  *           The plugin (or `undefined`).
  */
 Plugin.getPlugin = getPlugin;

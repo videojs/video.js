@@ -59,7 +59,8 @@
     }
   },
   "plugins": [
-    "plugins/markdown"
+    "plugins/markdown",
+    "build/jsdoc-typeof-plugin"
   ],
   "markdown": {
     "tags": [

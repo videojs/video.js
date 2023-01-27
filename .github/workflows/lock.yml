@@ -2,7 +2,7 @@ name: 'Lock Threads'
 
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 1 * * 1,4'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,7 @@ jobs:
     if: ${{ github.repository_owner == 'videojs' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: dessant/lock-threads@v3
+      - uses: dessant/lock-threads@v4
         with:
           issue-inactive-days: '60'
           process-only: 'issues'

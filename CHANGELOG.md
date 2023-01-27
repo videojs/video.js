@@ -1,3 +1,14 @@
+<a name="8.0.3"></a>
+## [8.0.3](https://github.com/videojs/video.js/compare/v8.0.2...v8.0.3) (2023-01-05)
+
+### Bug Fixes
+
+* **package:** Upgrade to videojs-contrib-quality-levels 3.0.0 ([#8055](https://github.com/videojs/video.js/issues/8055)) ([40e1d47](https://github.com/videojs/video.js/commit/40e1d47))
+
+### Chores
+
+* Update lock thrads dependency ([#8044](https://github.com/videojs/video.js/issues/8044)) ([e59222a](https://github.com/videojs/video.js/commit/e59222a))
+
 <a name="8.0.2"></a>
 ## [8.0.2](https://github.com/videojs/video.js/compare/v8.0.1...v8.0.2) (2022-11-24)
 

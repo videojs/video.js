@@ -46,15 +46,21 @@ class PosterImage extends ClickableComponent {
    *         The element that gets created.
    */
   createEl() {
-    const el = Dom.createEl('picture', {
-      className: 'vjs-poster',
+    const el = Dom.createEl(
+      'picture', {
+        className: 'vjs-poster',
 
-      // Don't want poster to be tabbable.
-      tabIndex: -1
-    }, {}, Dom.createEl('img', {
-      loading: 'lazy',
-      crossOrigin: this.crossOrigin()
-    }));
+        // Don't want poster to be tabbable.
+        tabIndex: -1
+      },
+      {},
+      Dom.createEl('img', {
+        loading: 'lazy',
+        crossOrigin: this.crossOrigin()
+      }, {
+        alt: ''
+      })
+    );
 
     return el;
   }
