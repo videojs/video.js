@@ -78,18 +78,15 @@
   margin: 0 0 5px 0;
 }
 
-// Hide labels, so they are only for screen reader users
 .vjs-text-track-settings .vjs-label {
-  position: absolute;
   clip: rect(1px 1px 1px 1px); // for Internet Explorer
   clip: rect(1px, 1px, 1px, 1px);
-  display: block;
-  margin: 0 0 5px 0;
-  padding: 0;
+  margin: 0 5px 5px 0;
   border: 0;
   height: 1px;
   width: 1px;
   overflow: hidden;
+  padding-inline-start: 2px;
 }
 
 .vjs-track-settings-controls button:focus,

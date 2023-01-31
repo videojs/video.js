@@ -54,7 +54,7 @@ const selectConfigs = {
   backgroundOpacity: {
     selector: '.vjs-bg-opacity > select',
     id: 'captions-background-opacity-%s',
-    label: 'Transparency',
+    label: 'Opacity',
     options: [
       OPACITY_OPAQUE,
       OPACITY_SEMI,
@@ -128,7 +128,7 @@ const selectConfigs = {
   textOpacity: {
     selector: '.vjs-text-opacity > select',
     id: 'captions-foreground-opacity-%s',
-    label: 'Transparency',
+    label: 'Opacity',
     options: [
       OPACITY_OPAQUE,
       OPACITY_SEMI
@@ -146,7 +146,7 @@ const selectConfigs = {
   windowOpacity: {
     selector: '.vjs-window-opacity > select',
     id: 'captions-window-opacity-%s',
-    label: 'Transparency',
+    label: 'Opacity',
     options: [
       OPACITY_TRANS,
       OPACITY_SEMI,
@@ -370,7 +370,7 @@ class TextTrackSettings extends ModalDialog {
     return [
       '<fieldset class="vjs-bg-color vjs-track-setting">',
       `<legend id="${legendId}">`,
-      this.localize('Background'),
+      this.localize('Text Background'),
       '</legend>',
       this.createElSelect_('backgroundColor', legendId),
       '<span class="vjs-bg-opacity vjs-opacity">',
@@ -394,7 +394,7 @@ class TextTrackSettings extends ModalDialog {
     return [
       '<fieldset class="vjs-window-color vjs-track-setting">',
       `<legend id="${legendId}">`,
-      this.localize('Window'),
+      this.localize('Caption Area Background'),
       '</legend>',
       this.createElSelect_('windowColor', legendId),
       '<span class="vjs-window-opacity vjs-opacity">',

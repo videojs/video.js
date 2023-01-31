@@ -86,5 +86,9 @@
   "{1} is loading.": "{1}이(가) 로딩 중입니다.",
   "Exit Picture-in-Picture": "Picture-in-Picture 종료",
   "Picture-in-Picture": "Picture-in-Picture",
-  "No content": "콘텐츠 없음"
+  "No content": "콘텐츠 없음",
+  "Color": "색상",
+  "Opacity": "투명도",
+  "Text Background": "텍스트 배경",
+  "Caption Area Background": "자막 배경"
 }
