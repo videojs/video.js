@@ -1,3 +1,11 @@
+<a name="7.21.2"></a>
+## [7.21.2](https://github.com/videojs/video.js/compare/v7.21.1...v7.21.2) (2023-01-31)
+
+### Chores
+
+* Add missing translations ([#8099](https://github.com/videojs/video.js/issues/8099)) ([2fe3aba](https://github.com/videojs/video.js/commit/2fe3aba)), closes [#8083](https://github.com/videojs/video.js/issues/8083) [#8091](https://github.com/videojs/video.js/issues/8091)
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming 2.16.0 ([#8098](https://github.com/videojs/video.js/issues/8098)) ([cb77739](https://github.com/videojs/video.js/commit/cb77739))
+
 <a name="7.21.1"></a>
 ## [7.21.1](https://github.com/videojs/video.js/compare/v7.21.0...v7.21.1) (2022-11-21)
 
