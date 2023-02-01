@@ -16,7 +16,7 @@
   "Progress Bar": "प्रोगेस बार",
   "progress bar timing: currentTime={1} duration={2}": "{2} में से {1}",
   "Fullscreen": "फ़ुल स्क्रीन",
-  "Non-Fullscreen": "फ़ुल स्क्रीन से बाहर निकलें",
+  "Exit Fullscreen": "फ़ुल स्क्रीन से बाहर निकलें",
   "Mute": "म्यूट करें",
   "Unmute": "अनम्यूट करें",
   "Playback Rate": "चलाने की दर",

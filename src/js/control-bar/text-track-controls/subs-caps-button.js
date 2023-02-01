@@ -5,7 +5,7 @@ import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 import SubsCapsMenuItem from './subs-caps-menu-item.js';
-import {toTitleCase} from '../../utils/string-cases.js';
+import {toTitleCase} from '../../utils/str.js';
 /**
  * The button component for toggling and selecting captions and/or subtitles
  *
@@ -74,7 +74,7 @@ SubsCapsButton.prototype.kinds_ = ['captions', 'subtitles'];
  *
  *
  * @type {string}
- * @private
+ * @protected
  */
 SubsCapsButton.prototype.controlText_ = 'Subtitles';
 

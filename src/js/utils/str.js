@@ -1,5 +1,5 @@
 /**
- * @file string-cases.js
+ * @file str.js
  * @module to-lower-case
  */
 

@@ -4,7 +4,7 @@
 import window from 'global/window';
 import { debounce } from './utils/fn.js';
 import * as Events from './utils/events.js';
-import mergeOptions from './utils/merge-options.js';
+import { merge } from './utils/obj.js';
 import Component from './component.js';
 
 /**
@@ -14,6 +14,7 @@ import Component from './component.js';
  *
  * If the ResizeObserver is available natively, it will be used. A polyfill can be passed in as an option.
  * If a `playerresize` event is not needed, the ResizeManager component can be removed from the player, see the example below.
+ *
  * @example <caption>How to disable the resize manager</caption>
  * const player = videojs('#vid', {
  *   resizeManager: false
@@ -47,7 +48,7 @@ class ResizeManager extends Component {
     }
 
     // Only create an element when ResizeObserver isn't available
-    const options_ = mergeOptions({
+    const options_ = merge({
       createEl: !RESIZE_OBSERVER_AVAILABLE,
       reportTouchActivity: false
     }, options);

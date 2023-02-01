@@ -1,4 +1,9 @@
 /**
+ * @file num.js
+ * @module num
+ */
+
+/**
  * Keep a number between a min and a max value
  *
  * @param {number} number
@@ -12,10 +17,8 @@
  * @return {number}
  *         the clamped number
  */
-const clamp = function(number, min, max) {
+export function clamp(number, min, max) {
   number = Number(number);
 
   return Math.min(max, Math.max(min, isNaN(number) ? min : number));
-};
-
-export default clamp;
+}

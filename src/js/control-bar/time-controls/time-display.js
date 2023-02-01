@@ -4,7 +4,7 @@
 import document from 'global/document';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import formatTime from '../../utils/format-time.js';
+import {formatTime} from '../../utils/time.js';
 import log from '../../utils/log.js';
 
 /**
@@ -140,7 +140,7 @@ TimeDisplay.prototype.labelText_ = 'Time';
  * The text that should display over the `TimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
- * @private
+ * @protected
  *
  * @deprecated in v7; controlText_ is not used in non-active display Components
  */

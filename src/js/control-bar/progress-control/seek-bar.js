@@ -6,7 +6,7 @@ import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
-import formatTime from '../../utils/format-time.js';
+import {formatTime} from '../../utils/time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
 import document from 'global/document';
@@ -49,7 +49,7 @@ class SeekBar extends Slider {
    * @private
    */
   setEventHandlers_() {
-    this.update_ = Fn.bind(this, this.update);
+    this.update_ = Fn.bind_(this, this.update);
     this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
 
     this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);

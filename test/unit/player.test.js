@@ -384,10 +384,9 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   log.error.restore();
 });
 
-QUnit.test('should retry setting source if error occurs and retryOnError: true', function(assert) {
+QUnit.test('should retry setting source if error occurs', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -439,10 +438,9 @@ QUnit.test('should retry setting source if error occurs and retryOnError: true',
   player.dispose();
 });
 
-QUnit.test('should not retry setting source if retryOnError: true and error occurs during playback', function(assert) {
+QUnit.test('should not retry setting source if error occurs during playback', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -490,7 +488,6 @@ QUnit.test('should not retry setting source if retryOnError: true and error occu
 QUnit.test('aborts and resets retryOnError behavior if new src() call made during a retry', function(assert) {
   const player = TestHelpers.makePlayer({
     techOrder: ['html5'],
-    retryOnError: true,
     sources: [
       { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' },
       { src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' },
@@ -1055,55 +1052,6 @@ QUnit.test('should register players with generated ids', function(assert) {
   player.dispose();
 });
 
-QUnit.test('should not add multiple first play events despite subsequent loads', function(assert) {
-  assert.expect(1);
-
-  const player = TestHelpers.makePlayer({});
-
-  player.on('firstplay', function() {
-    assert.ok(true, 'First play should fire once.');
-  });
-
-  // Checking to make sure onLoadStart removes first play listener before adding a new one.
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  player.dispose();
-});
-
-QUnit.test('should fire firstplay after resetting the player', function(assert) {
-  const player = TestHelpers.makePlayer({});
-
-  let fpFired = false;
-
-  player.on('firstplay', function() {
-    fpFired = true;
-  });
-
-  // init firstplay listeners
-  player.tech_.trigger('loadstart');
-  player.tech_.trigger('play');
-  assert.ok(fpFired, 'First firstplay fired');
-
-  // reset the player
-  player.tech_.trigger('loadstart');
-  fpFired = false;
-  player.tech_.trigger('play');
-  assert.ok(fpFired, 'Second firstplay fired');
-
-  // the play event can fire before the loadstart event.
-  // in that case we still want the firstplay even to fire.
-  player.tech_.paused = function() {
-    return false;
-  };
-  fpFired = false;
-  // reset the player
-  player.tech_.trigger('loadstart');
-  // player.tech_.trigger('play');
-  assert.ok(fpFired, 'Third firstplay fired');
-  player.dispose();
-});
-
 QUnit.test('should remove vjs-has-started class', function(assert) {
   assert.expect(3);
 
@@ -1640,26 +1588,6 @@ QUnit.test('setting audioPosterMode() should trigger audiopostermodechange event
   });
 });
 
-QUnit.test('audioPosterMode is synchronous and returns undefined when promises are unsupported', function(assert) {
-  const originalPromise = window.Promise;
-  const player = TestHelpers.makePlayer({});
-
-  player.trigger('ready');
-  window.Promise = undefined;
-
-  const returnValTrue = player.audioPosterMode(true);
-
-  assert.equal(returnValTrue, undefined, 'return value is undefined');
-  assert.ok(player.audioPosterMode(), 'state synchronously set to true');
-
-  const returnValFalse = player.audioPosterMode(false);
-
-  assert.equal(returnValFalse, undefined, 'return value is undefined');
-  assert.notOk(player.audioPosterMode(), 'state synchronously set to false');
-
-  window.Promise = originalPromise;
-});
-
 QUnit.test('should setScrubbing when seeking or not seeking', function(assert) {
   const player = TestHelpers.makePlayer();
   let isScrubbing;
@@ -1947,7 +1875,7 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
 
   const testPlayer = {
     options_: {
-      techOrder: ['html5', 'flash']
+      techOrder: ['html5', 'youtube']
     },
     resetCache_() {},
     loadTech_(tech, source) {
@@ -1979,7 +1907,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 
   const testPlayer = {
     options_: {
-      techOrder: ['flash', 'html5']
+      techOrder: ['youtube', 'html5']
     },
     resetCache_() {},
     loadTech_(tech, source) {
@@ -1999,7 +1927,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
 
   Player.prototype.reset.call(testPlayer);
 
-  assert.equal(loadedTech, 'flash', 'we loaded the Flash tech');
+  assert.equal(loadedTech, 'youtube', 'we loaded the Youtube tech');
   assert.equal(loadedSource, null, 'with a null source');
   assert.equal(techCallMethod, 'reset', 'we then reset the tech');
 });
@@ -2061,7 +1989,6 @@ QUnit.test('player#reset removes the poster', function(assert) {
 });
 
 QUnit.test('player#reset removes remote text tracks', function(assert) {
-  sinon.stub(log, 'warn');
   const player = TestHelpers.makePlayer();
 
   this.clock.tick(1);
@@ -2076,8 +2003,6 @@ QUnit.test('player#reset removes remote text tracks', function(assert) {
   assert.strictEqual(player.remoteTextTracks().length, 1, 'there is one RTT');
   player.reset();
   assert.strictEqual(player.remoteTextTracks().length, 0, 'there are zero RTTs');
-  assert.strictEqual(log.warn.callCount, 1, 'one warning about for manualCleanup');
-  log.warn.restore();
 });
 
 QUnit.test('player#reset progress bar', function(assert) {
@@ -2396,7 +2321,7 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   FooTech.canPlaySource = (src) => FooTech.canPlayType(src.type);
 
   BarTech.isSupported = () => true;
-  BarTech.canPlayType = (type) => type === 'video/flv';
+  BarTech.canPlayType = (type) => type === 'video/youtube';
   BarTech.canPlaySource = (src) => BarTech.canPlayType(src.type);
 
   videojs.registerTech('FooTech', FooTech);
@@ -2414,8 +2339,8 @@ QUnit.test('src selects tech based on middleware', function(assert) {
   videojs.use('video/bar', () => ({
     setSource(src, next) {
       next(null, {
-        src: 'http://example.com/video.flv',
-        type: 'video/flv'
+        src: 'https://www.youtube.com/watch?v=C0DPdy98e4c',
+        type: 'video/youtube'
       });
     }
   }));
@@ -2445,7 +2370,7 @@ QUnit.test('src selects tech based on middleware', function(assert) {
 
   this.clock.tick(1);
 
-  assert.equal(player.techName_, 'BarTech', 'the BarTech (Flash) tech is chosen');
+  assert.equal(player.techName_, 'BarTech', 'the BarTech (Youtube) tech is chosen');
 
   middleware.getMiddleware('video/foo').pop();
   middleware.getMiddleware('video/bar').pop();
@@ -2927,26 +2852,6 @@ QUnit.test('audioOnlyMode() getter returns Boolean', function(assert) {
 
   player.trigger('ready');
   assert.ok(typeof player.audioOnlyMode() === 'boolean', 'getter correctly returns boolean');
-});
-
-QUnit.test('audioOnlyMode(true/false) is synchronous and returns undefined when promises are unsupported', function(assert) {
-  const originalPromise = window.Promise;
-  const player = TestHelpers.makePlayer({});
-
-  player.trigger('ready');
-  window.Promise = undefined;
-
-  const returnValTrue = player.audioOnlyMode(true);
-
-  assert.equal(returnValTrue, undefined, 'return value is undefined');
-  assert.ok(player.audioOnlyMode(), 'state synchronously set to true');
-
-  const returnValFalse = player.audioOnlyMode(false);
-
-  assert.equal(returnValFalse, undefined, 'return value is undefined');
-  assert.notOk(player.audioOnlyMode(), 'state synchronously set to false');
-
-  window.Promise = originalPromise;
 });
 
 QUnit.test('audioOnlyMode() gets the correct audioOnlyMode state', function(assert) {

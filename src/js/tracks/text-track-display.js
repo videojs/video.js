@@ -109,7 +109,7 @@ class TextTrackDisplay extends Component {
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(Fn.bind(this, function() {
+    player.ready(Fn.bind_(this, function() {
       if (player.tech_ && player.tech_.featuresNativeTextTracks) {
         this.hide();
         return;
@@ -118,8 +118,11 @@ class TextTrackDisplay extends Component {
       player.on('fullscreenchange', updateDisplayHandler);
       player.on('playerresize', updateDisplayHandler);
 
-      window.addEventListener('orientationchange', updateDisplayHandler);
-      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
+      const screenOrientation = window.screen.orientation || window;
+      const changeOrientationEvent = window.screen.orientation ? 'change' : 'orientationchange';
+
+      screenOrientation.addEventListener(changeOrientationEvent, updateDisplayHandler);
+      player.on('dispose', () => screenOrientation.removeEventListener(changeOrientationEvent, updateDisplayHandler));
 
       const tracks = this.options_.playerOptions.tracks || [];
 
@@ -418,8 +421,7 @@ class TextTrackDisplay extends Component {
       for (let j = 0; j < track.activeCues.length; ++j) {
         const cueEl = track.activeCues[j].displayState;
 
-        Dom.addClass(cueEl, 'vjs-text-track-cue');
-        Dom.addClass(cueEl, 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
+        Dom.addClass(cueEl, 'vjs-text-track-cue', 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
         if (track.language) {
           Dom.setAttribute(cueEl, 'lang', track.language);
         }

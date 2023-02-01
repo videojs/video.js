@@ -9,7 +9,7 @@ import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from '@videojs/xhr';
-import merge from '../utils/merge-options';
+import {merge} from '../utils/obj';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -86,7 +86,7 @@ const loadTrack = function(src, track) {
     opts.withCredentials = withCredentials;
   }
 
-  XHR(opts, Fn.bind(this, function(err, response, responseBody) {
+  XHR(opts, Fn.bind_(this, function(err, response, responseBody) {
     if (err) {
       return log.error(err, response);
     }
@@ -184,7 +184,7 @@ class TextTrack extends Track {
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
 
-    this.timeupdateHandler = Fn.bind(this, function(event = {}) {
+    this.timeupdateHandler = Fn.bind_(this, function(event = {}) {
       if (this.tech_.isDisposed()) {
         return;
       }
@@ -325,10 +325,6 @@ class TextTrack extends Track {
             const cue = this.cues[i];
 
             if (cue.startTime <= ct && cue.endTime >= ct) {
-              active.push(cue);
-            } else if (cue.startTime === cue.endTime &&
-                       cue.startTime <= ct &&
-                       cue.startTime + 0.5 >= ct) {
               active.push(cue);
             }
           }

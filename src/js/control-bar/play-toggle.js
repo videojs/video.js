@@ -92,8 +92,7 @@ class PlayToggle extends Button {
    * @listens Player#play
    */
   handlePlay(event) {
-    this.removeClass('vjs-ended');
-    this.removeClass('vjs-paused');
+    this.removeClass('vjs-ended', 'vjs-paused');
     this.addClass('vjs-playing');
     // change the button text to "Pause"
     this.controlText('Pause');
@@ -137,7 +136,7 @@ class PlayToggle extends Button {
  * The text that should display over the `PlayToggle`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 PlayToggle.prototype.controlText_ = 'Play';
 

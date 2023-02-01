@@ -3,17 +3,16 @@
  */
 
 import Component from '../component';
-import mergeOptions from '../utils/merge-options.js';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
-import { createTimeRange } from '../utils/time-ranges.js';
+import { createTimeRange } from '../utils/time.js';
 import { bufferedPercent } from '../utils/buffer.js';
 import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
-import {isPlain} from '../utils/obj';
+import {isPlain, merge} from '../utils/obj';
 import * as TRACK_TYPES from '../tracks/track-types';
-import {toTitleCase, toLowerCase} from '../utils/string-cases.js';
+import {toTitleCase, toLowerCase} from '../utils/str.js';
 import vtt from 'videojs-vtt.js';
 import * as Guid from '../utils/guid.js';
 
@@ -89,7 +88,7 @@ class Tech extends Component {
   * @param {Object} [options]
   *        The key/value store of player options.
   *
-  * @param {Component~ReadyCallback} ready
+  * @param {Component~ReadyCallback} [ready]
   *        Callback function to call when the `HTML5` Tech is ready.
   */
   constructor(options = {}, ready = function() {}) {
@@ -237,7 +236,7 @@ class Tech extends Component {
    */
   trackProgress(event) {
     this.stopTrackingProgress();
-    this.progressInterval = this.setInterval(Fn.bind(this, function() {
+    this.progressInterval = this.setInterval(Fn.bind_(this, function() {
       // Don't trigger unless buffered amount is greater than last time
 
       const numBufferedPercent = this.bufferedPercent();
@@ -743,7 +742,7 @@ class Tech extends Component {
    *         The track element that gets created.
    */
   createRemoteTextTrack(options) {
-    const track = mergeOptions(options, {
+    const track = merge(options, {
       tech: this
     });
 
@@ -758,7 +757,7 @@ class Tech extends Component {
    * @param {Object} options
    *        See {@link Tech#createRemoteTextTrack} for more detailed properties.
    *
-   * @param {boolean} [manualCleanup=true]
+   * @param {boolean} [manualCleanup=false]
    *        - When false: the TextTrack will be automatically removed from the video
    *          element whenever the source changes
    *        - When True: The TextTrack will have to be cleaned up manually
@@ -766,24 +765,19 @@ class Tech extends Component {
    * @return {HTMLTrackElement}
    *         An Html Track Element.
    *
-   * @deprecated The default functionality for this function will be equivalent
-   *             to "manualCleanup=false" in the future. The manualCleanup parameter will
-   *             also be removed.
    */
   addRemoteTextTrack(options = {}, manualCleanup) {
     const htmlTrackElement = this.createRemoteTextTrack(options);
 
-    if (manualCleanup !== true && manualCleanup !== false) {
-      // deprecation warning
-      log.warn('Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js');
-      manualCleanup = true;
+    if (typeof manualCleanup !== 'boolean') {
+      manualCleanup = false;
     }
 
     // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
     this.remoteTextTracks().addTrack(htmlTrackElement.track);
 
-    if (manualCleanup !== true) {
+    if (manualCleanup === false) {
       // create the TextTrackList if it doesn't exist
       this.ready(() => this.autoRemoteTextTracks_.addTrack(htmlTrackElement.track));
     }
@@ -836,11 +830,7 @@ class Tech extends Component {
    * @abstract
    */
   requestPictureInPicture() {
-    const PromiseClass = this.options_.Promise || window.Promise;
-
-    if (PromiseClass) {
-      return PromiseClass.reject();
-    }
+    return Promise.reject();
   }
 
   /**
@@ -1171,9 +1161,8 @@ Tech.prototype.featuresFullscreenResize = false;
 Tech.prototype.featuresPlaybackRate = false;
 
 /**
- * Boolean indicating whether the `Tech` supports the `progress` event. This is currently
- * not triggered by video-js-swf. This will be used to determine if
- * {@link Tech#manualProgressOn} should be called.
+ * Boolean indicating whether the `Tech` supports the `progress` event.
+ * This will be used to determine if {@link Tech#manualProgressOn} should be called.
  *
  * @type {boolean}
  * @default
@@ -1193,9 +1182,8 @@ Tech.prototype.featuresProgressEvents = false;
 Tech.prototype.featuresSourceset = false;
 
 /**
- * Boolean indicating whether the `Tech` supports the `timeupdate` event. This is currently
- * not triggered by video-js-swf. This will be used to determine if
- * {@link Tech#manualTimeUpdates} should be called.
+ * Boolean indicating whether the `Tech` supports the `timeupdate` event.
+ * This will be used to determine if {@link Tech#manualTimeUpdates} should be called.
  *
  * @type {boolean}
  * @default

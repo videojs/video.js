@@ -9,7 +9,9 @@
   "Loaded": "載入完畢",
   "Progress": "進度",
   "Fullscreen": "全螢幕",
-  "Non-Fullscreen": "退出全螢幕",
+  "Exit Fullscreen": "退出全螢幕",
+  "Picture-in-Picture": "子母畫面",
+  "Exit Picture-in-Picture": "退出子母畫面",
   "Mute": "靜音",
   "Unmute": "取消靜音",
   "Playback Rate": " 播放速率",
@@ -83,5 +85,6 @@
   "Seek to live, currently behind live": "快轉至直播，目前為稍早畫面",
   "Seek to live, currently playing live": "快轉至直播，目前為現場畫面",
   "progress bar timing: currentTime={1} duration={2}": "{1}/{2}",
-  "{1} is loading.": "{1} 正在載入。"
+  "{1} is loading.": "{1} 正在載入。",
+  "No content": "無內容"
 }

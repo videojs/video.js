@@ -9,12 +9,14 @@
   "Remaining Time": "Temps restant",
   "Stream Type": "Type de flux",
   "LIVE": "EN DIRECT",
+  "Seek to live, currently behind live": "Rechercher le direct, actuellement après le direct",
+  "Seek to live, currently playing live": "Rechercher le direct, le direct actuellement en cours de lecture",
   "Loaded": "Chargé",
   "Progress": "Progression",
   "Progress Bar": "Barre de progression",
   "progress bar timing: currentTime={1} duration={2}": "{1} de {2}",
   "Fullscreen": "Plein écran",
-  "Non-Fullscreen": "Fenêtré",
+  "Exit Fullscreen": "Fenêtré",
   "Mute": "Sourdine",
   "Unmute": "Son activé",
   "Playback Rate": "Vitesse de lecture",
@@ -83,5 +85,6 @@
   "End of dialog window.": "Fin de la fenêtre de dialogue.",
   "Exit Picture-in-Picture": "Quitter le mode image dans l'image",
   "Picture-in-Picture": "Image dans l'image",
-  "{1} is loading.": "{1} en cours de chargement."
+  "{1} is loading.": "{1} en cours de chargement.",
+  "No content": "Aucun contenu"
 }

@@ -10,7 +10,7 @@
   "Loaded": "Geladen",
   "Progress": "Status",
   "Fullscreen": "Vollbild",
-  "Non-Fullscreen": "Vollbildmodus beenden",
+  "Exit Fullscreen": "Vollbildmodus beenden",
   "Mute": "Ton aus",
   "Unmute": "Ton ein",
   "Playback Rate": "Wiedergabegeschwindigkeit",
@@ -85,6 +85,7 @@
   "Seek to live, currently behind live": "Zur Live-Übertragung wechseln. Aktuell wird es nicht live abgespielt.",
   "Seek to live, currently playing live": "Zur Live-Übertragung wechseln. Es wird aktuell live abgespielt.",
   "Exit Picture-in-Picture": "Bild-im-Bild-Modus beenden",
-  "Picture-in-Picture": "Bild-im-Bild-Modus"
+  "Picture-in-Picture": "Bild-im-Bild-Modus",
+  "No content": "Kein Inhalt"
 }
 

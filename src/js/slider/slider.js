@@ -3,9 +3,8 @@
  */
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
-import {assign} from '../utils/obj';
 import {IS_CHROME} from '../utils/browser.js';
-import clamp from '../utils/clamp.js';
+import {clamp} from '../utils/num.js';
 import keycode from 'keycode';
 
 /**
@@ -126,16 +125,15 @@ class Slider extends Component {
   createEl(type, props = {}, attributes = {}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
-    props = assign({
+    props = Object.assign({
       tabIndex: 0
     }, props);
 
-    attributes = assign({
+    attributes = Object.assign({
       'role': 'slider',
       'aria-valuenow': 0,
       'aria-valuemin': 0,
-      'aria-valuemax': 100,
-      'tabIndex': 0
+      'aria-valuemax': 100
     }, attributes);
 
     return super.createEl(type, props, attributes);

@@ -49,8 +49,3 @@
   visibility: visible;
   pointer-events: auto;
 }
-
-// no flex support
-.vjs-has-started.vjs-no-flex .vjs-control-bar {
-  display: table;
-}

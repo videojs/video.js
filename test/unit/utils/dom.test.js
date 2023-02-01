@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
 import TestHelpers from '../test-helpers.js';
 
-QUnit.module('dom');
+QUnit.module('utils/dom');
 
 QUnit.test('should create an element', function(assert) {
   const div = Dom.createEl();
@@ -30,11 +30,24 @@ QUnit.test('should create an element, supporting textContent', function(assert) 
   }
 });
 
+QUnit.test('should create an element with tabIndex prop', function(assert) {
+  const span = Dom.createEl('span', {tabIndex: '5'});
+
+  assert.strictEqual(span.tabIndex, 5);
+});
+
 QUnit.test('should create an element with content', function(assert) {
   const span = Dom.createEl('span');
   const div = Dom.createEl('div', undefined, undefined, span);
 
   assert.strictEqual(div.firstChild, span);
+});
+
+QUnit.test('should be able to set standard props as attributes, and vice versa, on a created element', function(assert) {
+  const span = Dom.createEl('span', {className: 'bar'}, {id: 'foo'});
+
+  assert.strictEqual(span.getAttribute('class'), 'bar');
+  assert.strictEqual(span.id, 'foo');
 });
 
 QUnit.test('should insert an element first in another', function(assert) {
@@ -52,7 +65,7 @@ QUnit.test('should insert an element first in another', function(assert) {
 QUnit.test('addClass()', function(assert) {
   const el = document.createElement('div');
 
-  assert.expect(5);
+  assert.expect(6);
 
   Dom.addClass(el, 'test-class');
   assert.strictEqual(el.className, 'test-class', 'adds a single class');
@@ -60,15 +73,21 @@ QUnit.test('addClass()', function(assert) {
   Dom.addClass(el, 'test-class');
   assert.strictEqual(el.className, 'test-class', 'does not duplicate classes');
 
-  assert.throws(function() {
-    Dom.addClass(el, 'foo foo-bar');
-  }, 'throws when attempting to add a class with whitespace');
-
   Dom.addClass(el, 'test2_className');
   assert.strictEqual(el.className, 'test-class test2_className', 'adds second class');
 
   Dom.addClass(el, 'FOO');
   assert.strictEqual(el.className, 'test-class test2_className FOO', 'adds third class');
+
+  Dom.addClass(el, 'left-class', 'right-class');
+  assert.strictEqual(el.className, 'test-class test2_className FOO left-class right-class', 'adds two classes');
+
+  Dom.addClass(el, 'l-class r-class');
+  assert.strictEqual(
+    el.className,
+    'test-class test2_className FOO left-class right-class l-class r-class',
+    'adds two classes via one string'
+  );
 });
 
 QUnit.test('removeClass()', function(assert) {
@@ -76,20 +95,26 @@ QUnit.test('removeClass()', function(assert) {
 
   el.className = 'test-class test2_className FOO bar';
 
-  assert.expect(4);
+  assert.expect(5);
 
   Dom.removeClass(el, 'test-class');
   assert.strictEqual(el.className, 'test2_className FOO bar', 'removes one class');
-
-  assert.throws(function() {
-    Dom.removeClass(el, 'test2_className bar');
-  }, 'throws when attempting to remove a class with whitespace');
 
   Dom.removeClass(el, 'test2_className');
   assert.strictEqual(el.className, 'FOO bar', 'removes another class');
 
   Dom.removeClass(el, 'FOO');
   assert.strictEqual(el.className, 'bar', 'removes another class');
+
+  el.className = 'bar left-class right-class';
+
+  Dom.removeClass(el, 'left-class', 'right-class');
+  assert.strictEqual(el.className, 'bar', 'removes two classes');
+
+  el.className = 'bar l-class r-class';
+
+  Dom.removeClass(el, 'l-class r-class');
+  assert.strictEqual(el.className, 'bar', 'removes two classes via one string');
 });
 
 QUnit.test('hasClass()', function(assert) {
@@ -204,7 +229,7 @@ QUnit.test('toggleClass()', function(assert) {
     }
   ];
 
-  assert.expect(3 + predicateToggles.length);
+  assert.expect(4 + predicateToggles.length);
 
   Dom.toggleClass(el, 'bar');
   assert.strictEqual(el.className, 'foo', 'toggles a class off, if present');
@@ -212,9 +237,11 @@ QUnit.test('toggleClass()', function(assert) {
   Dom.toggleClass(el, 'bar');
   assert.strictEqual(el.className, 'foo bar', 'toggles a class on, if absent');
 
-  assert.throws(function() {
-    Dom.toggleClass(el, 'foo bar');
-  }, 'throws when attempting to toggle a class with whitespace');
+  Dom.toggleClass(el, 'bla ok');
+  assert.strictEqual(el.className, 'foo bar bla ok', 'toggles a classes on, if absent');
+
+  Dom.toggleClass(el, 'bla ok');
+  assert.strictEqual(el.className, 'foo bar', 'toggles a classes off, if present');
 
   predicateToggles.forEach(x => {
     Dom.toggleClass(el, x.toggle, x.predicate);

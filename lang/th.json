@@ -16,7 +16,7 @@
   "Progress Bar": "แถบแสดงความคืบหน้า",
   "progress bar timing: currentTime={1} duration={2}": "{1} ของ {2}",
   "Fullscreen": "แบบเต็มหน้าจอ",
-  "Non-Fullscreen": "ไม่ใช่แบบเต็มหน้าจอ",
+  "Exit Fullscreen": "ไม่ใช่แบบเต็มหน้าจอ",
   "Mute": "ปิดเสียง",
   "Unmute": "ยกเลิกการปิดเสียง",
   "Playback Rate": "อัตราการเล่น",

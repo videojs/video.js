@@ -93,36 +93,6 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * Updates ARIA accessibility attributes
-   */
-  updateARIAAttributes() {
-    // Current playback rate
-    this.el().setAttribute('aria-valuenow', this.player().playbackRate());
-  }
-
-  /**
-   * This gets called when an `PlaybackRateMenuButton` is "clicked". See
-   * {@link ClickableComponent} for more detailed information on what a click can be.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `keydown`, `tap`, or `click` event that caused this function to be
-   *        called.
-   *
-   * @listens tap
-   * @listens click
-   */
-  handleClick(event) {
-    // select next rate option
-    const currentRate = this.player().playbackRate();
-    const rates = this.playbackRates();
-    const currentIndex = rates.indexOf(currentRate);
-    // this get the next rate and it will select first one if the last one currently selected
-    const newIndex = (currentIndex + 1) % rates.length;
-
-    this.player().playbackRate(rates[newIndex]);
-  }
-
-  /**
    * On playbackrateschange, update the menu to account for the new items.
    *
    * @listens Player#playbackrateschange
@@ -191,10 +161,12 @@ class PlaybackRateMenuButton extends MenuButton {
 }
 
 /**
- * The text that should display over the `FullscreenToggle`s controls. Added for localization.
+ * The text that should display over the `PlaybackRateMenuButton`s controls.
+ *
+ * Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 PlaybackRateMenuButton.prototype.controlText_ = 'Playback Rate';
 

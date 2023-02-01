@@ -1,6 +1,6 @@
 /* eslint-env qunit */
 import TestHelpers from './test-helpers.js';
-import {createTimeRanges} from '../../src/js/utils/time-ranges.js';
+import {createTimeRanges} from '../../src/js/utils/time.js';
 import sinon from 'sinon';
 
 QUnit.module('LiveTracker', () => {

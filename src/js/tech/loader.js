@@ -3,8 +3,8 @@
  */
 import Component from '../component.js';
 import Tech from './tech.js';
-import {toTitleCase} from '../utils/string-cases.js';
-import mergeOptions from '../utils/merge-options.js';
+import {toTitleCase} from '../utils/str.js';
+import {merge} from '../utils/obj.js';
 
 /**
  * The `MediaLoader` is the `Component` that decides which playback technology to load
@@ -28,7 +28,7 @@ class MediaLoader extends Component {
    */
   constructor(player, options, ready) {
     // MediaLoader has no element
-    const options_ = mergeOptions({createEl: false}, options);
+    const options_ = merge({createEl: false}, options);
 
     super(player, options_, ready);
 
