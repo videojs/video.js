@@ -326,10 +326,6 @@ class TextTrack extends Track {
 
             if (cue.startTime <= ct && cue.endTime >= ct) {
               active.push(cue);
-            } else if (cue.startTime === cue.endTime &&
-                       cue.startTime <= ct &&
-                       cue.startTime + 0.5 >= ct) {
-              active.push(cue);
             }
           }
 
