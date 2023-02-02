@@ -63,7 +63,7 @@ const selectConfigs = {
   },
 
   color: {
-    selector: '.vjs-fg-color > select',
+    selector: '.vjs-text-color > select',
     id: 'captions-foreground-color-%s',
     label: 'Color',
     options: [
@@ -344,11 +344,13 @@ class TextTrackSettings extends ModalDialog {
     const legendId = `captions-text-legend-${this.id_}`;
 
     return [
-      '<fieldset class="vjs-fg-color vjs-track-setting">',
+      '<fieldset class="vjs-fg vjs-track-setting">',
       `<legend id="${legendId}">`,
       this.localize('Text'),
       '</legend>',
+      '<span class="vjs-text-color">',
       this.createElSelect_('color', legendId),
+      '</span>',
       '<span class="vjs-text-opacity vjs-opacity">',
       this.createElSelect_('textOpacity', legendId),
       '</span>',
@@ -368,11 +370,13 @@ class TextTrackSettings extends ModalDialog {
     const legendId = `captions-background-${this.id_}`;
 
     return [
-      '<fieldset class="vjs-bg-color vjs-track-setting">',
+      '<fieldset class="vjs-bg vjs-track-setting">',
       `<legend id="${legendId}">`,
       this.localize('Text Background'),
       '</legend>',
+      '<span class="vjs-bg-color">',
       this.createElSelect_('backgroundColor', legendId),
+      '</span>',
       '<span class="vjs-bg-opacity vjs-opacity">',
       this.createElSelect_('backgroundOpacity', legendId),
       '</span>',
@@ -392,11 +396,13 @@ class TextTrackSettings extends ModalDialog {
     const legendId = `captions-window-${this.id_}`;
 
     return [
-      '<fieldset class="vjs-window-color vjs-track-setting">',
+      '<fieldset class="vjs-window vjs-track-setting">',
       `<legend id="${legendId}">`,
       this.localize('Caption Area Background'),
       '</legend>',
+      '<span class="vjs-window-color">',
       this.createElSelect_('windowColor', legendId),
+      '</span>',
       '<span class="vjs-window-opacity vjs-opacity">',
       this.createElSelect_('windowOpacity', legendId),
       '</span>',

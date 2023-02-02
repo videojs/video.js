@@ -65,6 +65,7 @@
 
 .vjs-text-track-settings fieldset span {
   display: inline-block;
+  padding-inline-start: 8px;
 }
 
 // style the second select for text colors
@@ -86,7 +87,6 @@
   height: 1px;
   width: 1px;
   overflow: hidden;
-  padding-inline-start: 2px;
 }
 
 .vjs-track-settings-controls button:focus,
