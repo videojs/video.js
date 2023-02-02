@@ -1,3 +1,23 @@
+<a name="8.0.4"></a>
+## [8.0.4](https://github.com/videojs/video.js/compare/v8.0.3...v8.0.4) (2023-02-02)
+
+### Bug Fixes
+
+*  use Screen Orientation API where supported ([#8031](https://github.com/videojs/video.js/issues/8031)) ([33b476d](https://github.com/videojs/video.js/commit/33b476d))
+* Ensures iOS can use native fullscreen ([#8071](https://github.com/videojs/video.js/issues/8071)) ([509b3d0](https://github.com/videojs/video.js/commit/509b3d0))
+* Exit PIP if entering fullscreen ([#8082](https://github.com/videojs/video.js/issues/8082)) ([267b5c6](https://github.com/videojs/video.js/commit/267b5c6))
+* Improves types for registerPlugin and getPlugin ([#8058](https://github.com/videojs/video.js/issues/8058)) ([2e96253](https://github.com/videojs/video.js/commit/2e96253))
+* **lang:** Add missing comma in turkish ([#8102](https://github.com/videojs/video.js/issues/8102)) ([7776d18](https://github.com/videojs/video.js/commit/7776d18))
+* **lang:** Remove dupelicate entry in en.json ([#8093](https://github.com/videojs/video.js/issues/8093)) ([68fec76](https://github.com/videojs/video.js/commit/68fec76))
+* remove unnecessary handling of invalid cues ([#7956](https://github.com/videojs/video.js/issues/7956)) ([db882cd](https://github.com/videojs/video.js/commit/db882cd))
+* Set alt attr on poster img ([#8043](https://github.com/videojs/video.js/issues/8043)) ([3accbc7](https://github.com/videojs/video.js/commit/3accbc7))
+
+### Chores
+
+* add missing translations ([#8083](https://github.com/videojs/video.js/issues/8083)) ([e21d295](https://github.com/videojs/video.js/commit/e21d295))
+* roll back remark dev dependencies to address failing release automation ([#8021](https://github.com/videojs/video.js/issues/8021)) ([9bda6be](https://github.com/videojs/video.js/commit/9bda6be))
+* Update codecov action ([#8103](https://github.com/videojs/video.js/issues/8103)) ([0cfc485](https://github.com/videojs/video.js/commit/0cfc485))
+
 <a name="8.0.3"></a>
 ## [8.0.3](https://github.com/videojs/video.js/compare/v8.0.2...v8.0.3) (2023-01-05)
 
