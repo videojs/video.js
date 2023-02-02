@@ -59,8 +59,7 @@
 }
 
 .vjs-text-track-settings fieldset {
-  margin: 8px 10px;
-  padding: 3px;
+  margin: 10px;
   border: none;
 }
 
@@ -75,6 +74,8 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .vjs-text-track-settings .vjs-label {
