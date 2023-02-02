@@ -554,17 +554,13 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
-| it.json (missing 11)    | Seek to live, currently behind live                                                 |
+| it.json (missing 7)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
 | ja.json (Complete)      |                                                                                     |
 | ko.json (Complete)      |                                                                                     |
 | lv.json (missing 5)     | No content                                                                          |
