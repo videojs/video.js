@@ -124,7 +124,7 @@ const mainModule = function(playReturnValue, middlewareTermination, subhooks) {
   QUnit.test('Player#play() resolves correctly with dom sources and async tech ready', function(assert) {
     // turn of mediaLoader to prevent setting a tech right away
     // similar to settings sources in the DOM
-    // turn off autoReady to prevent syncronous ready from the tech
+    // turn off autoReady to prevent synchronous ready from the tech
     this.player = TestHelpers.makePlayer({mediaLoader: false, techFaker: {autoReady: false}});
 
     this.playTest('before anything is ready');

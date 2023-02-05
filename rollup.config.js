@@ -33,7 +33,7 @@ const watch = {
 };
 
 const onwarn = (warning) => {
-  // ignore unknow option for --no-progress
+  // ignore unknown option for --no-progress
   if (warning.code === 'UNKNOWN_OPTION' && warning.message.indexOf('progress') !== -1) {
     return;
   }

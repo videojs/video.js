@@ -72,7 +72,7 @@ QUnit.test('middleware get iterates through the middleware array in the right or
   const foo = middleware.get(mws, tech, 'foo');
 
   const assertion = (actual, expected, actualArr, expectedArr, type) => {
-    assert.equal(actual, expected, `our middleware chain return currectly for ${type}`);
+    assert.equal(actual, expected, `our middleware chain return correctly for ${type}`);
     assert.deepEqual(actualArr, expectedArr, `we got called in the correct order for ${type}`);
   };
 
@@ -135,7 +135,7 @@ QUnit.test('middleware set iterates through the middleware array in the right or
   const foo = middleware.set(mws, tech, 'foo', 10);
 
   const assertion = (actual, expected, actualArr, expectedArr, type) => {
-    assert.equal(actual, expected, `our middleware chain return currectly for ${type}`);
+    assert.equal(actual, expected, `our middleware chain return correctly for ${type}`);
     assert.deepEqual(actualArr, expectedArr, `we got called in the correct order for ${type}`);
   };
 

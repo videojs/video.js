@@ -254,7 +254,7 @@ QUnit.test('can only remove one cue at a time', function(assert) {
 });
 
 QUnit.test('does not include past cues in activeCues', function(assert) {
-  // Testing for the absense of a previous behaviour, which considered cues with equal
+  // Testing for the absence of a previous behaviour, which considered cues with equal
   // start and end times as active 0.5s after ending
   const player = TestHelpers.makePlayer();
   const tt = new TextTrack({

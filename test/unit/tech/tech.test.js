@@ -488,7 +488,7 @@ QUnit.test('should add the source handler interface to a tech', function(assert)
   );
   assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
-  // Check that the handler dipose method works
+  // Check that the handler dispose method works
   assert.ok(disposeCalled, 'dispose has been called for the handler yet');
   disposeCalled = false;
   tech.dispose();

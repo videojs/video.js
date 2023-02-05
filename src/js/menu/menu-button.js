@@ -357,7 +357,7 @@ class MenuButton extends Component {
     } else {
       // NOTE: This is a special case where we don't pass unhandled
       //  keydown events up to the Component handler, because it is
-      //  just entending the keydown handling of the `MenuItem`
+      //  just intending the keydown handling of the `MenuItem`
       //  in the `Menu` which already passes unused keys up.
     }
   }

@@ -333,7 +333,7 @@ QUnit.test('one() can add a listener to one event type on a different target obj
 });
 
 // TODO: This test is incorrect! this listener should be called twice,
-//       but instead all listners are removed on the first trigger!
+//       but instead all listeners are removed on the first trigger!
 //       see https://github.com/videojs/video.js/issues/5962
 QUnit.test('one() can add a listener to an array of event types on a different target object', function(assert) {
   const a = this.targets.a = evented({});

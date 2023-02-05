@@ -10,7 +10,7 @@ const hooks_ = {};
  * Get a list of hooks for a specific lifecycle
  *
  * @param  {string} type
- *         the lifecyle to get hooks from
+ *         the lifecycle to get hooks from
  *
  * @param  {Function|Function[]} [fn]
  *         Optionally add a hook (or hooks) to the lifecycle that your are getting.

@@ -1135,7 +1135,7 @@ Tech.prototype.featuresVolumeControl = true;
 /**
  * Boolean indicating whether the `Tech` supports muting volume.
  *
- * @type {bolean}
+ * @type {boolean}
  * @default
  */
 Tech.prototype.featuresMuteControl = true;
@@ -1373,7 +1373,7 @@ Tech.withSourceHandlers = function(_Tech) {
     let sh = _Tech.selectSourceHandler(source, this.options_);
 
     if (!sh) {
-      // Fall back to a native source hander when unsupported sources are
+      // Fall back to a native source handler when unsupported sources are
       // deliberately set
       if (_Tech.nativeSourceHandler) {
         sh = _Tech.nativeSourceHandler;
