@@ -17,7 +17,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
 | ar.json (Complete)      |                                                                                     |
-| ba.json (missing 64)    | Audio Player                                                                        |
+| ba.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -81,7 +81,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| bg.json (missing 64)    | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| bg.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -145,8 +149,16 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| bn.json (missing 1)     | Exit Fullscreen                                                                     |
-| ca.json (missing 64)    | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| bn.json (missing 5)     | Exit Fullscreen                                                                     |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| ca.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -210,17 +222,29 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| cs.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| cs.json (missing 9)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| cy.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| cy.json (missing 9)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| da.json (missing 64)    | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| da.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -284,8 +308,12 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
 | de.json (Complete)      |                                                                                     |
-| el.json (missing 50)    | Audio Player                                                                        |
+| el.json (missing 54)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -335,11 +363,27 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
 | es.json (Complete)      |                                                                                     |
-| et.json (missing 1)     | No content                                                                          |
-| eu.json (missing 1)     | No content                                                                          |
-| fa.json (missing 1)     | No content                                                                          |
-| fi.json (missing 64)    | Audio Player                                                                        |
+| et.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| eu.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| fa.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| fi.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -403,21 +447,41 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
 | fr.json (Complete)      |                                                                                     |
-| gd.json (missing 3)     | Exit Picture-in-Picture                                                             |
+| gd.json (missing 7)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| gl.json (missing 3)     | Exit Picture-in-Picture                                                             |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| gl.json (missing 7)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| he.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| he.json (missing 10)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| hi.json (missing 1)     | No content                                                                          |
-| hr.json (missing 64)    | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| hi.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| hr.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -481,7 +545,15 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| hu.json (missing 1)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| hu.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
 | it.json (missing 7)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Raised                                                                              |
@@ -491,25 +563,51 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | No content                                                                          |
 | ja.json (Complete)      |                                                                                     |
 | ko.json (Complete)      |                                                                                     |
-| lv.json (missing 1)     | No content                                                                          |
-| nb.json (missing 3)     | Exit Picture-in-Picture                                                             |
+| lv.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| nb.json (missing 7)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| nl.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| nl.json (missing 10)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| nn.json (missing 3)     | Exit Picture-in-Picture                                                             |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| nn.json (missing 7)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| oc.json (Complete)      |                                                                                     |
-| pl.json (Complete)      |                                                                                     |
-| pt-BR.json (missing 3)  | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| oc.json (missing 4)     | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| pl.json (missing 4)     | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| pt-BR.json (missing 7)  | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | No content                                                                          |
-| pt-PT.json (missing 49) | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| pt-PT.json (missing 53) | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -558,21 +656,41 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| ro.json (missing 1)     | No content                                                                          |
-| ru.json (missing 1)     | No content                                                                          |
-| sk.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| ro.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| ru.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| sk.json (missing 9)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| sl.json (missing 7)     | Proportional Sans-Serif                                                             |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| sl.json (missing 11)    | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
 |                         | Proportional Serif                                                                  |
 |                         | Monospace Serif                                                                     |
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | No content                                                                          |
-| sr.json (missing 64)    | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| sr.json (missing 68)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
 |                         | Seek to live, currently behind live                                                 |
@@ -636,12 +754,28 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| sv.json (missing 3)     | Exit Picture-in-Picture                                                             |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| sv.json (missing 7)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| te.json (missing 1)     | No content                                                                          |
-| th.json (missing 1)     | No content                                                                          |
-| tr.json (missing 14)    | Audio Player                                                                        |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| te.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| th.json (missing 5)     | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| tr.json (missing 18)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -655,17 +789,29 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| uk.json (missing 5)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| uk.json (missing 9)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
-| vi.json (missing 6)     | Seek to live, currently behind live                                                 |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+| vi.json (missing 10)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
 | zh-CN.json (Complete)   |                                                                                     |
 | zh-TW.json (Complete)   |                                                                                     |
 

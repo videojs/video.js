@@ -86,5 +86,9 @@
   "Exit Picture-in-Picture": "Quitter le mode image dans l'image",
   "Picture-in-Picture": "Image dans l'image",
   "{1} is loading.": "{1} en cours de chargement.",
-  "No content": "Aucun contenu"
+  "No content": "Aucun contenu",
+  "Color": "Couleur",
+  "Opacity": "Opacité",
+  "Text Background": "Arrière-plan du texte",
+  "Caption Area Background": "Arrière-plan de la zone de sous-titre"
 }

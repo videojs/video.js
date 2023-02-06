@@ -86,5 +86,9 @@
   "{1} is loading.": "{1} قيد التحميل.",
   "Exit Picture-in-Picture": "خرج من وضع صورة داخل صورة",
   "Picture-in-Picture": "صورة داخل صورة",
-  "No content": "لا يوجد محتوى"
+  "No content": "لا يوجد محتوى",
+  "Color": "اللون",
+  "Opacity": "معدل الشفافية",
+  "Text Background": "خلفية النص",
+  "Caption Area Background": "خلفية منطقة التسمية التوضيحية"
 }

@@ -86,5 +86,9 @@
   "Seek to live, currently playing live": "尝试直播，当前为实时播放",
   "progress bar timing: currentTime={1} duration={2}": "{1}/{2}",
   "{1} is loading.": "正在加载 {1}。",
-  "No content": "无内容"
+  "No content": "无内容",
+  "Color": "颜色",
+  "Opacity": "不透明度",
+  "Text Background": "文本背景",
+  "Caption Area Background": "字幕区域背景"
 }
