@@ -86,5 +86,9 @@
   "{1} is loading.": "{1} se está cargando.",
   "Exit Picture-in-Picture": "Salir de imagen sobre imagen",
   "Picture-in-Picture": "Imagen sobre imagen",
-  "No content": "Sin contenido"
+  "No content": "Sin contenido",
+  "Color": "Color",
+  "Opacity": "Opacidad",
+  "Text Background": "Fondo del texto",
+  "Caption Area Background": "Fondo del área de subtítulos"
 }

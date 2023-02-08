@@ -243,6 +243,29 @@ QUnit.test('full window can be preferred to fullscreen tech', function(assert) {
   player.dispose();
 });
 
+QUnit.test('fullscreen mode should exit picture-in-picture if it was enabled', function(assert) {
+  const player = FullscreenTestHelpers.makePlayer(false, {
+    preferFullWindow: true
+  });
+
+  const fakeExitPictureInPicture = sinon.replace(player, 'exitPictureInPicture', sinon.fake(() => {}));
+
+  player.fsApi_ = {};
+  player.tech_.supportsFullScreen = () => true;
+
+  assert.strictEqual(player.isFullscreen(), false, 'player should not be fullscreen initially');
+  player.isInPictureInPicture(true);
+  player.trigger('enterpictureinpicture');
+  assert.strictEqual(player.isInPictureInPicture(), true, 'player is in picture-in-picture');
+
+  assert.strictEqual(fakeExitPictureInPicture.called, false, 'should not have called exitPictureInPicture yet');
+  player.requestFullscreen();
+  assert.strictEqual(player.isFullscreen(), true, 'player should be fullscreen');
+  assert.strictEqual(fakeExitPictureInPicture.called, true, 'should have called exitPictureInPicture');
+
+  player.dispose();
+});
+
 QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
   const player = TestHelpers.makePlayer();
 

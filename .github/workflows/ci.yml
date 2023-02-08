@@ -66,7 +66,7 @@ jobs:
         run: npm run test
 
     - name: coverage
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         files: './test/dist/coverage/coverage-final.json'

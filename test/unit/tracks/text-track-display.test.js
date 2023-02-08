@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import window from 'global/window';
 import Html5 from '../../../src/js/tech/html5.js';
 import { constructColor } from '../../../src/js/tracks/text-track-display.js';
 import Component from '../../../src/js/component.js';
@@ -105,6 +106,44 @@ QUnit.test('shows the default caption track first', function(assert) {
 });
 
 if (!Html5.supportsNativeTextTracks()) {
+  QUnit.test('text track display should attach screen orientation change event handler', function(assert) {
+    const oldScreen = window.screen;
+    const removeHandlerSpy = sinon.spy();
+    let changeHandlerSpy;
+    let changeHandlerAttached;
+
+    window.screen = {
+      orientation: {
+        addEventListener: (type, func) => {
+          changeHandlerAttached = true;
+          changeHandlerSpy = sinon.spy();
+        },
+        dispatchEvent: (type) => changeHandlerSpy(),
+        removeEventListener: removeHandlerSpy
+      }
+    };
+
+    const player = TestHelpers.makePlayer();
+
+    this.clock.tick(1);
+
+    assert.true(changeHandlerAttached, 'screen orientation change event handler was not attached');
+    assert.strictEqual(changeHandlerSpy.callCount, 0, 'screen orientation change event handler should not be called');
+
+    window.screen.orientation.dispatchEvent('change');
+
+    assert.strictEqual(changeHandlerSpy.callCount, 1, 'screen orientation change event handler was not called');
+
+    player.dispose();
+
+    assert.strictEqual(
+      removeHandlerSpy.callCount,
+      1,
+      'screen orientation change event handler was not removed during player dispose'
+    );
+    window.screen = oldScreen;
+  });
+
   QUnit.test('selectedlanguagechange is triggered by a track mode change', function(assert) {
     const player = TestHelpers.makePlayer();
     const track1 = {
