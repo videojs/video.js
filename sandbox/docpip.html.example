@@ -5,6 +5,7 @@
   <title>Video.js Sandbox</title>
   <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
   <script src="../dist/video.js"></script>
+  <meta http-equiv="origin-trial" content="AruMDfzKHqbkAi4xRXZRAmpUv/hnpKsuR0VB+B6S7TGJOZBQv6ZQ0jaH6+EDW1tHjwYBlBAObmYinZ/aGtaLGwQAAACYeyJvcmlnaW4iOiJodHRwczovL2RlcGxveS1wcmV2aWV3LTgxMTMtLXZpZGVvanMtcHJldmlldy5uZXRsaWZ5LmFwcDo0NDMiLCJmZWF0dXJlIjoiRG9jdW1lbnRQaWN0dXJlSW5QaWN0dXJlQVBJIiwiZXhwaXJ5IjoxNjk0MTMxMTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=" />
 </head>
 <body>
   <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
@@ -12,6 +13,8 @@
     <pre>npm start</pre>
     <pre>open http://localhost:9999/sandbox/index.html</pre>
   </div>
+
+  <p>Docuemnt Picture-in-Picture is available in Chrome version 111 onwards.</p>
 
   <video-js
     id="vid1"
