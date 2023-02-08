@@ -24,10 +24,17 @@
 
 .vjs-title-bar-title,
 .vjs-title-bar-description {
+  // The width of the 'shelf' component that existed in the deprecated 'videojs-dock' plugin.
+  // Adding this amount of padding to the right of the title bar title/descriptions allows for
+  // icons to be placed in the top right of the title bar without overlapping on the title/description
+  // text.
+  $shelf-width: 25%;
+
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding-right: $shelf-width;
 }
 
 .vjs-title-bar-title {
