@@ -86,5 +86,9 @@
   "{1} is loading.": "{1}は読み込み中です。",
   "Exit Picture-in-Picture": "ピクチャーインピクチャー機能の終了",
   "Picture-in-Picture": "ピクチャーインピクチャー",
-  "No content": "コンテンツなし"
+  "No content": "コンテンツなし",
+  "Color": "色",
+  "Opacity": "不透明度",
+  "Text Background": "テキスト背景",
+  "Caption Area Background": "キャプション領域背景"
 }
