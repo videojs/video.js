@@ -4,6 +4,7 @@
 import Button from '../button.js';
 import Component from '../component.js';
 import document from 'global/document';
+import window from 'global/window';
 
 /**
  * Toggle Picture-in-Picture mode
@@ -63,7 +64,10 @@ class PictureInPictureToggle extends Button {
    * or on value returned by player.disablePictureInPicture() method.
    */
   handlePictureInPictureEnabledChange() {
-    if (document.pictureInPictureEnabled && this.player_.disablePictureInPicture() === false) {
+    if (
+      (document.pictureInPictureEnabled && this.player_.disablePictureInPicture() === false) ||
+      (this.player_.options_.preferDocumentPictureInPicture && 'documentPictureInPicture' in window)
+    ) {
       this.enable();
     } else {
       this.disable();

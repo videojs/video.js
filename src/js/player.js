@@ -3031,6 +3031,42 @@ class Player extends Component {
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
+    if (this.options_.preferDocumentPictureInPicture && 'documentPictureInPicture' in window) {
+      const pipContainer = document.createElement(this.el().tagName);
+
+      pipContainer.classList = this.el().classList;
+      pipContainer.classList.add('vjs-pip-container');
+      if (this.posterImage) {
+        pipContainer.appendChild(this.posterImage.el().cloneNode(true));
+      }
+      if (this.titleBar) {
+        pipContainer.appendChild(this.titleBar.el().cloneNode(true));
+      }
+      pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in picture-in-picture')));
+
+      window.documentPictureInPicture.requestWindow({
+        // This aspect ratio doesn't seem to be respected
+        initialAspectRatio: this.videoWidth() / this.videoHeight(),
+        copyStyleSheets: true
+      }).then(pipWindow => {
+        this.el_.parentNode.insertBefore(pipContainer, this.el_);
+
+        pipWindow.document.title = 'Video.js';
+        pipWindow.document.body.append(this.el_);
+        pipWindow.document.body.classList.add('vjs-pip-window');
+
+        this.player_.isInPictureInPicture(true);
+
+        // Listen for the PiP closing event to move the video back.
+        pipWindow.addEventListener('unload', (event) => {
+          const pipVideo = event.target.querySelector('.video-js');
+
+          pipContainer.replaceWith(pipVideo);
+          this.player_.isInPictureInPicture(false);
+        });
+      });
+      return;
+    }
     if ('pictureInPictureEnabled' in document && this.disablePictureInPicture() === false) {
       /**
        * This event fires when the player enters picture in picture mode
@@ -3053,7 +3089,10 @@ class Player extends Component {
    *         A promise.
    */
   exitPictureInPicture() {
-    if ('pictureInPictureEnabled' in document) {
+    if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
+      window.documentPictureInPicture.window.close();
+      return;
+    } else if ('pictureInPictureEnabled' in document) {
       /**
        * This event fires when the player leaves picture in picture mode
        *
