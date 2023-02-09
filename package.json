@@ -97,7 +97,7 @@
     "mux.js": "^6.2.0",
     "safe-json-parse": "4.0.0",
     "videojs-contrib-quality-levels": "3.0.0",
-    "videojs-font": "3.2.0",
+    "videojs-font": "4.0.0",
     "videojs-vtt.js": "0.15.4"
   },
   "devDependencies": {
