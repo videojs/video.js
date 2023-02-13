@@ -46,23 +46,9 @@ class PosterImage extends ClickableComponent {
    *         The element that gets created.
    */
   createEl() {
-    const el = Dom.createEl(
-      'picture', {
-        className: 'vjs-poster',
-
-        // Don't want poster to be tabbable.
-        tabIndex: -1
-      },
-      {},
-      Dom.createEl('img', {
-        loading: 'lazy',
-        crossOrigin: this.crossOrigin()
-      }, {
-        alt: ''
-      })
-    );
-
-    return el;
+    // The el is an empty div to keep position in the DOM
+    // A picture and img el will be inserted when a source is set
+    return Dom.createEl('div', { className: 'vjs-poster'});
   }
 
   /**
@@ -79,9 +65,9 @@ class PosterImage extends ClickableComponent {
   crossOrigin(value) {
     // `null` can be set to unset a value
     if (typeof value === 'undefined') {
-      if (this.el_) {
+      if (this.$('img')) {
         // If the poster's element exists, give its value
-        return this.el_.querySelector('img').crossOrigin;
+        return this.$('img').crossOrigin;
       } else if (this.player_.tech_ && this.player_.tech_.isReady_) {
         // If not but the tech is ready, query the tech
         return this.player_.crossOrigin();
@@ -97,7 +83,9 @@ class PosterImage extends ClickableComponent {
       return;
     }
 
-    this.el_.querySelector('img').crossOrigin = value;
+    if (this.$('img')) {
+      this.$('img').crossOrigin = value;
+    }
 
     return;
   }
@@ -113,13 +101,32 @@ class PosterImage extends ClickableComponent {
   update(event) {
     const url = this.player().poster();
 
-    this.setSrc(url);
-
-    // If there's no poster source we should display:none on this component
-    // so it's not still clickable or right-clickable
     if (url) {
+      // As there's a poster source, add a picture/img if not already present
+
+      if (!this.$('img')) {
+        this.el_.appendChild(Dom.createEl(
+          'picture', {
+            className: 'vjs-poster',
+
+            // Don't want poster to be tabbable.
+            tabIndex: -1
+          },
+          {},
+          Dom.createEl('img', {
+            loading: 'lazy',
+            crossOrigin: this.crossOrigin()
+          }, {
+            alt: ''
+          })
+        ));
+      }
+      this.setSrc(url);
       this.show();
     } else {
+      // With no source, remove child elements to not end up with an invalid img
+
+      this.el_.textContent = '';
       this.hide();
     }
   }
@@ -131,7 +138,7 @@ class PosterImage extends ClickableComponent {
    *        The URL to the source for the `PosterImage`.
    */
   setSrc(url) {
-    this.el_.querySelector('img').src = url;
+    this.$('img').src = url;
   }
 
   /**
