@@ -1,0 +1,13 @@
+.video-js .vjs-forward-button {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+  @extend .vjs-icon-forward-5;
+  }
+}
+
+.video-js .vjs-back-button {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-replay-5;
+  }
+}
