@@ -101,43 +101,49 @@ class PosterImage extends ClickableComponent {
   update(event) {
     const url = this.player().poster();
 
+    this.setSrc(url);
+
+    // If there's no poster source we should display:none on this component
+    // so it's not still clickable or right-clickable
     if (url) {
-      // As there's a poster source, add a picture/img if not already present
-
-      if (!this.$('img')) {
-        this.el_.appendChild(Dom.createEl(
-          'picture', {
-            className: 'vjs-poster',
-
-            // Don't want poster to be tabbable.
-            tabIndex: -1
-          },
-          {},
-          Dom.createEl('img', {
-            loading: 'lazy',
-            crossOrigin: this.crossOrigin()
-          }, {
-            alt: ''
-          })
-        ));
-      }
-      this.setSrc(url);
       this.show();
     } else {
-      // With no source, remove child elements to not end up with an invalid img
-
-      this.el_.textContent = '';
       this.hide();
     }
   }
 
   /**
-   * Set the source of the `PosterImage` depending on the display method.
+   * Set the source of the `PosterImage` depending on the display method. (Re)creates
+   * the inner picture and img elementss when needed.
    *
-   * @param {string} url
-   *        The URL to the source for the `PosterImage`.
+   * @param {string} [url]
+   *        The URL to the source for the `PosterImage`. If not specified or falsy,
+   *        any source and ant inner picture/img are removed.
    */
   setSrc(url) {
+    if (!url) {
+      this.el_.textContent = '';
+      return;
+    }
+
+    if (!this.$('img')) {
+      this.el_.appendChild(Dom.createEl(
+        'picture', {
+          className: 'vjs-poster',
+
+          // Don't want poster to be tabbable.
+          tabIndex: -1
+        },
+        {},
+        Dom.createEl('img', {
+          loading: 'lazy',
+          crossOrigin: this.crossOrigin()
+        }, {
+          alt: ''
+        })
+      ));
+    }
+
     this.$('img').src = url;
   }
 
