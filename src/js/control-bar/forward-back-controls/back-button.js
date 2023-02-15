@@ -9,8 +9,6 @@ class BackButton extends SkipButton {
 
   constructor(player, options) {
     super(player, options);
-
-    this.options = options;
   }
 
 
@@ -21,7 +19,8 @@ class BackButton extends SkipButton {
    *         The DOM `className` for this object
    */
   buildCSSClass() {
-    return `vjs-back-button ${super.buildCSSClass()}`;
+    const iconType = this.options_.playerOptions.skip_timer;
+    return `vjs-back-button-${iconType} ${super.buildCSSClass()}`;
   }
 
   /**
@@ -29,8 +28,9 @@ class BackButton extends SkipButton {
    * @param {*} event 
    */
   handleClick(event) {
+    console.log(this.options_);
     const currentVideoTime = this.player_.currentTime();
-    const replayTime = this.options.playerOptions.skip_timer;
+    const replayTime = this.options_.playerOptions.skip_timer;
 
     var newTime;
     if(currentVideoTime >= replayTime) {

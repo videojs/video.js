@@ -1,13 +1,40 @@
-.video-js .vjs-forward-button {
+.video-js .vjs-forward-button-5 {
   cursor: pointer;
   & .vjs-icon-placeholder {
   @extend .vjs-icon-forward-5;
   }
 }
 
-.video-js .vjs-back-button {
+.video-js .vjs-forward-button-10 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+  @extend .vjs-icon-forward-10;
+  }
+}
+.video-js .vjs-forward-button-30 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+  @extend .vjs-icon-forward-30;
+  }
+}
+
+.video-js .vjs-back-button-5 {
   cursor: pointer;
   & .vjs-icon-placeholder {
     @extend .vjs-icon-replay-5;
+  }
+}
+
+.video-js .vjs-back-button-10 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-replay-10;
+  }
+}
+
+.video-js .vjs-back-button-30 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-replay-30;
   }
 }

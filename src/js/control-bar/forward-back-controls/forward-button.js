@@ -10,8 +10,6 @@ class ForwardButton extends SkipButton {
 
   constructor(player, options) {
     super(player, options);
-
-    this.options = options;
   }
 
   /**
@@ -21,7 +19,10 @@ class ForwardButton extends SkipButton {
    *         The DOM `className` for this object
    */
   buildCSSClass() {
-    return `vjs-forward-button ${super.buildCSSClass()}`;
+    console.log(this.options_)
+    // depending on which option is chosen, the icon used is different.
+    const iconType = this.options_.playerOptions.skip_timer;
+    return `vjs-forward-button-${iconType} ${super.buildCSSClass()}`;
   }
 
   /**
@@ -34,7 +35,7 @@ class ForwardButton extends SkipButton {
     // if the duration left of the vid is < than the skip timer we skip to end
     const currentTime = this.player_.currentTime();
     const duration = this.player_.duration();
-    const skipTime = this.options.playerOptions.skip_timer;
+    const skipTime = this.options_.playerOptions.skip_timer;
 
     var newTime;
     if (currentTime + skipTime <= duration) {

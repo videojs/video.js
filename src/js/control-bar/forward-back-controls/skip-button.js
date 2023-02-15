@@ -9,8 +9,6 @@ class SkipButton extends Button {
     super(player, options);
     this.validSkipTimes = [5, 10, 30];
     this.handleShowing(options.playerOptions);
-    // here we have the handle showing fn -> same for both back and forward
-    // the handleClick will be different for both so that is separate
   }
 
   /**
