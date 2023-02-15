@@ -11,6 +11,7 @@ class ForwardButton extends SkipButton {
   constructor(player, options) {
     super(player, options);
 
+    this.options = options;
   }
 
   /**
@@ -20,17 +21,32 @@ class ForwardButton extends SkipButton {
    *         The DOM `className` for this object
    */
   buildCSSClass() {
-    console.log("css built")
-    console.log('vjs-jump-forward');
     return `vjs-forward-button ${super.buildCSSClass()}`;
   }
 
+  /**
+   * 
+   * @param {*} event 
+   */
   handleClick(event) {
-    console.log("Hello");
+    // skip forward logic
+    // if we are end of video we do not skip
+    // if the duration left of the vid is < than the skip timer we skip to end
+    const currentTime = this.player_.currentTime();
+    const duration = this.player_.duration();
+    const skipTime = this.options.playerOptions.skip_timer;
+
+    var newTime;
+    if (currentTime + skipTime <= duration) {
+      newTime = currentTime + skipTime;
+    } else {
+      newTime = duration;
+    }
+    this.player_.currentTime(newTime);
   }
 } 
 
-ForwardButton.prototype.controlText_ = 'Skip Forward';
+ForwardButton.prototype.controlText_ = 'Forward';
 
 Component.registerComponent('ForwardButton', ForwardButton);
 export default ForwardButton;
