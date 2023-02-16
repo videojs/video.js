@@ -14,7 +14,7 @@
     <pre>open http://localhost:9999/sandbox/index.html</pre>
   </div>
 
-  <p>Docuemnt Picture-in-Picture is available in Chrome version 111 onwards.</p>
+  <p>Document Picture-in-Picture is available in Chrome version 111 onwards.</p>
 
   <video-js
     id="vid1"
