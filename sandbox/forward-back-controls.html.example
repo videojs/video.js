@@ -24,7 +24,7 @@
   <script>
     var vid = document.getElementById('vid1');
 
-    var options = {"dock": true, "skip_timer": 5}
+    var options = {"dock": true, "jumpForwardAndBack": 5}
     var player = videojs(vid, options);
   </script>
 

@@ -27,6 +27,7 @@ class ForwardBackControls extends Component {
       this.hide();
     }
   }
+
   /**
    * Populates the forward and back buttons with the relevant
    * class names, control text and onClick functionality.
@@ -95,6 +96,12 @@ class ForwardBackControls extends Component {
     this.player_.currentTime(newTime);
   }
 
+  /**
+   * Buils the default DOM `className`.
+   *
+   * @return {string}
+   *          The DOM `className` for this object
+   */
   buildCSSClass() {
     return `vjs-forward-back-controls ${super.buildCSSClass()}`;
   }
