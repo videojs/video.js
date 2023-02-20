@@ -53,8 +53,6 @@ class TimeDisplay extends Component {
     this.contentEl_ = Dom.createEl('span', {
       className: `${className}-display`
     }, {
-      // tell screen readers not to automatically read the time as it changes
-      'aria-live': 'off',
       // span elements have no implicit role, but some screen readers (notably VoiceOver)
       // treat them as a break between items in the DOM when using arrow keys
       // (or left-to-right swipes on iOS) to read contents of a page. Using
