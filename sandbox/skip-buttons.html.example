@@ -24,8 +24,8 @@
   <script>
     var vid = document.getElementById('vid1');
 
-    var options = {"dock": true, "jumpForwardAndBack": 5}
-    var player = videojs(vid, options);
+    var options = {"muted": true, "controlBar": {"skipButtons": {"forward": 5, "backward": 10}}}
+    var player = videojs(vid, options)
   </script>
 
 </body>
