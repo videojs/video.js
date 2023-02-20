@@ -132,9 +132,7 @@ class PlayToggle extends Button {
     this.addClass('vjs-ended');
     // change the button text to "Replay"
     this.controlText('Replay');
-    // console.dir(event);
-    // console.dir(this.player_.tech_);
-    // is not getting fired in Safari
+
     // on the next seek remove the replay button
     this.one(this.player_, 'seeked', (e) => this.handleSeeked(e));
   }
