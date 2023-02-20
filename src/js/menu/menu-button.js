@@ -12,6 +12,10 @@ import document from 'global/document';
 import keycode from 'keycode';
 
 /**
+ * @typedef { import('../player').default } Player
+ */
+
+/**
  * A `MenuButton` class for any popup {@link Menu}.
  *
  * @extends Component
@@ -231,7 +235,7 @@ class MenuButton extends Component {
    * Handle a click on a `MenuButton`.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -249,7 +253,7 @@ class MenuButton extends Component {
   /**
    * Handle `mouseleave` for `MenuButton`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mouseleave` event that caused this function to be called.
    *
    * @listens mouseleave
@@ -277,7 +281,7 @@ class MenuButton extends Component {
    * Handle tab, escape, down arrow, and up arrow keys for `MenuButton`. See
    * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
@@ -309,7 +313,7 @@ class MenuButton extends Component {
    * Handle a `keyup` event on a `MenuButton`. The listener for this is added in
    * the constructor.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        Key press event
    *
    * @listens keyup
@@ -326,7 +330,7 @@ class MenuButton extends Component {
    * anyone calling `handleSubmenuKeyPress` will not see their method calls
    * stop working.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to be called.
    */
   handleSubmenuKeyPress(event) {
@@ -337,7 +341,7 @@ class MenuButton extends Component {
    * Handle a `keydown` event on a sub-menu. The listener for this is added in
    * the constructor.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        Key press event
    *
    * @listens keydown

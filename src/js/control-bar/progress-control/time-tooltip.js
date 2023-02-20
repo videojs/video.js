@@ -7,6 +7,10 @@ import {formatTime} from '../../utils/time.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * Time tooltips display a time above the progress bar.
  *
  * @extends Component

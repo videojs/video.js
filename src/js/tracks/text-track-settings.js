@@ -8,6 +8,10 @@ import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
 
+/**
+ * @typedef { import('../player').default } Player
+ */
+
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
 const COLOR_BLACK = ['#000', 'Black'];
@@ -166,7 +170,7 @@ selectConfigs.windowColor.options = selectConfigs.backgroundColor.options;
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
  *
- * @return {Mixed}
+ * @return {*}
  *         - Will be `undefined` if no value exists
  *         - Will be `undefined` if the given value is "none".
  *         - Will be the actual value otherwise.
@@ -192,7 +196,7 @@ function parseOptionValue(value, parser) {
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
  *
- * @return {Mixed}
+ * @return {*}
  *         - Will be `undefined` if no value exists
  *         - Will be `undefined` if the given value is "none".
  *         - Will be the actual value otherwise.

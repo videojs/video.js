@@ -15,7 +15,7 @@ export const UPDATE_REFRESH_INTERVAL = 30;
  *
  * @private
  * @function
- * @param    {Mixed} context
+ * @param    {*} context
  *           The object to bind as scope.
  *
  * @param    {Function} fn

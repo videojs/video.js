@@ -6,6 +6,10 @@ import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The button component for toggling and selecting descriptions
  *
  * @extends TextTrackButton
@@ -21,7 +25,7 @@ class DescriptionsButton extends TextTrackButton {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when this component is ready.
    */
   constructor(player, options, ready) {
@@ -39,7 +43,7 @@ class DescriptionsButton extends TextTrackButton {
   /**
    * Handle text track change
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to run
    *
    * @listens TextTrackList#change

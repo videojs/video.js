@@ -7,6 +7,10 @@ import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * A `ClickableComponent` that handles showing the poster image for the player.
  *
  * @extends ClickableComponent
@@ -95,7 +99,7 @@ class PosterImage extends ClickableComponent {
    *
    * @listens Player#posterchange
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `Player#posterchange` event that triggered this function.
    */
   update(event) {
@@ -155,7 +159,7 @@ class PosterImage extends ClickableComponent {
    * @listens click
    * @listens keydown
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    +        The `click`, `tap` or `keydown` event that caused this function to be called.
    */
   handleClick(event) {

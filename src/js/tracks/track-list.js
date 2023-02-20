@@ -5,6 +5,10 @@ import EventTarget from '../event-target';
 import {isEvented} from '../mixins/evented';
 
 /**
+ * @typedef { import('./track').default } Track
+ */
+
+/**
  * Common functionaliy between {@link TextTrackList}, {@link AudioTrackList}, and
  * {@link VideoTrackList}
  *
@@ -67,7 +71,7 @@ class TrackList extends EventTarget {
        * Triggered when a track is added to a track list.
        *
        * @event TrackList#addtrack
-       * @type {EventTarget~Event}
+       * @type {Event}
        * @property {Track} track
        *           A reference to track that was added.
        */
@@ -82,7 +86,7 @@ class TrackList extends EventTarget {
      * Triggered when a track label is changed.
      *
      * @event TrackList#addtrack
-     * @type {EventTarget~Event}
+     * @type {Event}
      * @property {Track} track
      *           A reference to track that was added.
      */
@@ -131,7 +135,7 @@ class TrackList extends EventTarget {
      * Triggered when a track is removed from track list.
      *
      * @event TrackList#removetrack
-     * @type {EventTarget~Event}
+     * @type {Event}
      * @property {Track} track
      *           A reference to track that was removed.
      */
@@ -170,7 +174,7 @@ class TrackList extends EventTarget {
  * Triggered when a different track is selected/enabled.
  *
  * @event TrackList#change
- * @type {EventTarget~Event}
+ * @type {Event}
  */
 
 /**

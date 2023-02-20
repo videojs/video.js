@@ -3,6 +3,10 @@ import {merge} from './utils/obj.js';
 import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
+/**
+ * @typedef { import('./player').default } Player
+ */
+
 const defaults = {
   trackingThreshold: 20,
   liveTolerance: 15

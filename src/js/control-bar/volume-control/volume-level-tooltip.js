@@ -6,6 +6,10 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * Volume level tooltips display a volume above or side by side the volume bar.
  *
  * @extends Component

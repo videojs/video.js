@@ -6,6 +6,10 @@ import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The button component for toggling and selecting captions
  *
  * @extends TextTrackButton
@@ -21,7 +25,7 @@ class CaptionsButton extends TextTrackButton {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when this component is ready.
    */
   constructor(player, options, ready) {

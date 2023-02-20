@@ -67,7 +67,7 @@ function _cleanUpEvents(elem, type) {
  * @param {string} type
  *        Type of event to bind to.
  *
- * @param {EventTarget~EventListener} callback
+ * @param {Function} callback
  *        Event listener.
  */
 function _handleMultipleEvents(fn, elem, types, callback) {
@@ -256,7 +256,7 @@ const passiveEvents = [
  * @param {string|string[]} type
  *        Type of event to bind to.
  *
- * @param {EventTarget~EventListener} fn
+ * @param {Function} fn
  *        Event listener.
  */
 export function on(elem, type, fn) {
@@ -341,7 +341,7 @@ export function on(elem, type, fn) {
  * @param {string|string[]} [type]
  *        Type of listener to remove. Don't include to remove all events from element.
  *
- * @param {EventTarget~EventListener} [fn]
+ * @param {Function} [fn]
  *        Specific listener to remove. Don't include to remove listeners for an event
  *        type.
  */

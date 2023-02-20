@@ -61,7 +61,7 @@ export function isReal() {
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
- * @param  {Mixed} value
+ * @param  {*} value
  *         The value to check.
  *
  * @return {boolean}
@@ -126,7 +126,7 @@ function createQuerier(method) {
  * @param  {Object} [attributes={}]
  *         Element attributes to be applied.
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} [content]
  *        A content descriptor object.
  *
  * @return {Element}
@@ -547,7 +547,7 @@ export function findPosition(el) {
  * @param  {Element} el
  *         Element on which to get the pointer position on.
  *
- * @param  {EventTarget~Event} event
+ * @param  {Event} event
  *         Event object.
  *
  * @return {module:dom~Coordinates}
@@ -607,7 +607,7 @@ export function getPointerPosition(el, event) {
 /**
  * Determines, via duck typing, whether or not a value is a text node.
  *
- * @param  {Mixed} value
+ * @param  {*} value
  *         Check if this value is a text node.
  *
  * @return {boolean}
@@ -641,11 +641,11 @@ export function emptyEl(el) {
  * -----------|-------------
  * `string`   | The value will be normalized into a text node.
  * `Element`  | The value will be accepted as-is.
- * `TextNode` | The value will be accepted as-is.
+ * `Text`     | A TextNode. The value will be accepted as-is.
  * `Array`    | A one-dimensional array of strings, elements, text nodes, or functions. These functions should return a string, element, or text node (any other return value, like an array, will be ignored).
  * `Function` | A function, which is expected to return a string, element, text node, or array - any of the other possible values described above. This means that a content descriptor could be a function that returns an array of functions, but those second-level functions must return strings, elements, or text nodes.
  *
- * @typedef {string|Element|TextNode|Array|Function} module:dom~ContentDescriptor
+ * @typedef {string|Element|Text|Array|Function} ContentDescriptor
  */
 
 /**
@@ -658,7 +658,7 @@ export function emptyEl(el) {
  * The content for an element can be passed in multiple types and
  * combinations, whose behavior is as follows:
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} content
  *        A content descriptor value.
  *
  * @return {Array}
@@ -699,7 +699,7 @@ export function normalizeContent(content) {
  * @param  {Element} el
  *         Element to append normalized content to.
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} content
  *        A content descriptor value.
  *
  * @return {Element}
@@ -717,7 +717,7 @@ export function appendContent(el, content) {
  * @param {Element} el
  *        Element to insert normalized content into.
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} content
  *        A content descriptor value.
  *
  * @return {Element}
@@ -730,7 +730,7 @@ export function insertContent(el, content) {
 /**
  * Check if an event was a single left click.
  *
- * @param  {EventTarget~Event} event
+ * @param  {Event} event
  *         Event object.
  *
  * @return {boolean}
