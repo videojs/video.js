@@ -61,6 +61,7 @@ QUnit.test('should remove itself from the document flow when there is no poster'
     true,
     'Poster image hides with an empty source'
   );
+  assert.equal(posterImage.$('img'), null, 'Poster image with no source has no img el');
 
   // Updated with a valid source
   this.mockPlayer.poster_ = this.poster2;
@@ -70,6 +71,7 @@ QUnit.test('should remove itself from the document flow when there is no poster'
     false,
     'Poster image shows again when there is a source'
   );
+  assert.ok(posterImage.$('img'), 'Poster image with source restores img el');
 
   posterImage.dispose();
 });
