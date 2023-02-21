@@ -1,6 +1,14 @@
 import Button from '../../button';
 import Component from '../../component';
 
+/**
+ * Button to skip backward a configurable amount of time
+ * through a video. Renders in the control bar.
+ *
+ *  * e.g. options: {controlBar: {skipButtons: backward: 5}}
+ *
+ * @extends Button
+ */
 class SkipBackward extends Button {
   constructor(player, options) {
     super(player, options);
@@ -26,7 +34,9 @@ class SkipBackward extends Button {
   }
 
   /**
-   * TBC
+   * On click, skips backward in the video by a configurable amount of seconds.
+   * If the current time in the video is less than the configured 'skip backward' time,
+   * skips to beginning of video.
    *
    * Handle a click on a `SkipBackward` button
    *

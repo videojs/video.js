@@ -1,6 +1,14 @@
 import Button from '../../button';
 import Component from '../../component';
 
+/**
+ * Button to skip forward a configurable amount of time
+ * through a video. Renders in the control bar.
+ *
+ * e.g. options: {controlBar: {skipButtons: forward: 5}}
+ *
+ * @extends Button
+ */
 class SkipForward extends Button {
   constructor(player, options) {
     super(player, options);
@@ -26,7 +34,9 @@ class SkipForward extends Button {
   }
 
   /**
-   * TBC
+   * On click, skips forward in the video by a configurable amount of seconds.
+   * If the time left in the video is less than the configured 'skip forward' time,
+   * skips to end of video.
    *
    * Handle a click on a `SkipForward` button
    *
