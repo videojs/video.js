@@ -21,6 +21,15 @@ filepaths.forEach((filepath) => {
   }
 
   const target = require(filepath);
+
+  // Special case for English, the assumption being that since the keys are English only
+  // a  few strings need to be altered for regional differences, e.g. en-GB.
+  if (filename.startsWith('en-')) {
+    console.log(`${filename} English - should be manually checked.`);
+    tableData.push([`${filename} (has ${Object.keys(target).length})`, 'Needs manual checking. Can safely use most default strings.']);
+    return;
+  }
+
   const missing = [];
 
   for (const string in source) {

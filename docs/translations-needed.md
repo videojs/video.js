@@ -367,6 +367,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
+| en-GB.json (has 1)      | Needs manual checking. Can safely use most default strings. 
 | es.json (Complete)      |                                                                                     |
 | et.json (missing 5)     | No content                                                                          |
 |                         | Color                                                                               |
@@ -775,21 +776,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
-| tr.json (missing 18)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Volume Level                                                                        |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-|                         | Color                                                                               |
+| tr.json (missing 4)     | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
