@@ -58,12 +58,6 @@ class PlayToggle extends Button {
    */
   handleClick(event) {
     if (this.player_.paused()) {
-      // Safari will not restart playback on a play click when playing back natively, so we seek to 0, then play.
-      const endedNativePlayback = this.hasClass('vjs-ended') && !this.player_.lastSource_.tech.startsWith('blob');
-
-      if (endedNativePlayback) {
-        this.player_.currentTime(0);
-      }
       silencePromise(this.player_.play());
     } else {
       this.player_.pause();

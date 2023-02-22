@@ -2313,6 +2313,7 @@ class Player extends Component {
     this.playCallbacks_.push(callback);
 
     const isSrcReady = Boolean(!this.changingSrc_ && (this.src() || this.currentSrc()));
+    const isSafariOrIOS = Boolean(browser.IS_ANY_SAFARI || browser.IS_IOS);
 
     // treat calls to play_ somewhat like the `one` event function
     if (this.waitToPlay_) {
@@ -2330,7 +2331,7 @@ class Player extends Component {
 
       // if we are in Safari, there is a high chance that loadstart will trigger after the gesture timeperiod
       // in that case, we need to prime the video element by calling load so it'll be ready in time
-      if (!isSrcReady && (browser.IS_ANY_SAFARI || browser.IS_IOS)) {
+      if (!isSrcReady && isSafariOrIOS) {
         this.load();
       }
       return;
@@ -2339,6 +2340,12 @@ class Player extends Component {
     // If the player/tech is ready and we have a source, we can attempt playback.
     const val = this.techGet_('play');
 
+    // Reset the progress bar
+    const isNativeReplay = isSafariOrIOS && this.hasClass('vjs-ended');
+
+    if (isNativeReplay) {
+      this.resetProgressBar_();
+    }
     // play was terminated if the returned value is null
     if (val === null) {
       this.runPlayTerminatedQueue_();
