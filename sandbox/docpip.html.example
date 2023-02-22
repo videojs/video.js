@@ -27,7 +27,7 @@
   <script>
     var vid = document.getElementById('vid1');
     var player = videojs(vid, {
-      preferDocumentPictureInPicture: true
+      enableDocumentPictureInPicture: true
     });
     player.loadMedia({
       artist: 'Disney',

@@ -60,13 +60,18 @@ class PictureInPictureToggle extends Button {
   }
 
   /**
-   * Enables or disables button based on document.pictureInPictureEnabled property value
-   * or on value returned by player.disablePictureInPicture() method.
+   * Enables or disables button based on availablity of a Picture-In-Picture mode.
+   *
+   * Enabled if
+   * - `player.options().enableDocumentPictureInPicture` is true and
+   *   window.documentPictureInPicture is available; or
+   * - `player.disablePictureInPicture()` is not `true and
+   *   element.requestPictureInPicture is available
    */
   handlePictureInPictureEnabledChange() {
     if (
       (document.pictureInPictureEnabled && this.player_.disablePictureInPicture() === false) ||
-      (this.player_.options_.preferDocumentPictureInPicture && 'documentPictureInPicture' in window)
+      (this.player_.options_.enableDocumentPictureInPicture && 'documentPictureInPicture' in window)
     ) {
       this.enable();
     } else {

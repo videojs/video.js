@@ -3023,7 +3023,14 @@ class Player extends Component {
    * continue consuming media while they interact with other content sites, or
    * applications on their device.
    *
+   * This can use document picture-in-picture or element picture in picture
+   *
+   * Set `enableDocumentPictureInPicture` to `true` to use docPiP on a supported browser
+   * Else set `disablePictureInPicture` to `false` to disable elPiP on a supported browser
+   *
+   *
    * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   * @see [Spec]{@link https://wicg.github.io/document-picture-in-picture/}
    *
    * @fires Player#enterpictureinpicture
    *
@@ -3031,7 +3038,7 @@ class Player extends Component {
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
-    if (this.options_.preferDocumentPictureInPicture && 'documentPictureInPicture' in window) {
+    if (this.options_.enableDocumentPictureInPicture && 'documentPictureInPicture' in window) {
       const pipContainer = document.createElement(this.el().tagName);
 
       pipContainer.classList = this.el().classList;
@@ -3044,28 +3051,33 @@ class Player extends Component {
       }
       pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in picture-in-picture')));
 
-      window.documentPictureInPicture.requestWindow({
-        // This aspect ratio doesn't seem to be respected
-        initialAspectRatio: this.videoWidth() / this.videoHeight(),
-        copyStyleSheets: true
-      }).then(pipWindow => {
-        this.el_.parentNode.insertBefore(pipContainer, this.el_);
+      return new Promise((resolve, reject) => {
+        window.documentPictureInPicture.requestWindow({
+          // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
+          initialAspectRatio: this.videoWidth() / this.videoHeight(),
+          copyStyleSheets: true
+        }).then(pipWindow => {
+          this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
-        pipWindow.document.title = 'Video.js';
-        pipWindow.document.body.append(this.el_);
-        pipWindow.document.body.classList.add('vjs-pip-window');
+          pipWindow.document.title = 'Video.js';
+          pipWindow.document.body.append(this.el_);
+          pipWindow.document.body.classList.add('vjs-pip-window');
 
-        this.player_.isInPictureInPicture(true);
+          this.player_.isInPictureInPicture(true);
+          this.player_.trigger('enterpictureinpicture');
 
-        // Listen for the PiP closing event to move the video back.
-        pipWindow.addEventListener('unload', (event) => {
-          const pipVideo = event.target.querySelector('.video-js');
+          // Listen for the PiP closing event to move the video back.
+          pipWindow.addEventListener('unload', (event) => {
+            const pipVideo = event.target.querySelector('.video-js');
 
-          pipContainer.replaceWith(pipVideo);
-          this.player_.isInPictureInPicture(false);
-        });
+            pipContainer.replaceWith(pipVideo);
+            this.player_.isInPictureInPicture(false);
+            this.player_.trigger('leavepictureinpicture');
+          });
+
+          resolve(pipWindow);
+        }).catch(reject);
       });
-      return;
     }
     if ('pictureInPictureEnabled' in document && this.disablePictureInPicture() === false) {
       /**
@@ -3090,8 +3102,10 @@ class Player extends Component {
    */
   exitPictureInPicture() {
     if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
-      window.documentPictureInPicture.window.close();
-      return;
+      return new Promise((resolve) => {
+        window.documentPictureInPicture.window.close();
+        resolve();
+      });
     } else if ('pictureInPictureEnabled' in document) {
       /**
        * This event fires when the player leaves picture in picture mode
