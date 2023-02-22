@@ -2340,7 +2340,7 @@ class Player extends Component {
     // If the player/tech is ready and we have a source, we can attempt playback.
     const val = this.techGet_('play');
 
-    // Reset the progress bar
+    // For native playback, reset the progress bar if we get a play call from a replay.
     const isNativeReplay = isSafariOrIOS && this.hasClass('vjs-ended');
 
     if (isNativeReplay) {
