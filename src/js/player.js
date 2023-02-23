@@ -3100,11 +3100,11 @@ class Player extends Component {
    */
   exitPictureInPicture() {
     if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
-      return new Promise((resolve) => {
-        window.documentPictureInPicture.window.close();
-        resolve();
-      });
-    } else if ('pictureInPictureEnabled' in document) {
+      window.documentPictureInPicture.window.close();
+      return Promise.resolve();
+    } 
+    if ('pictureInPictureEnabled' in document) {
+
       /**
        * This event fires when the player leaves picture in picture mode
        *
