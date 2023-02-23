@@ -2,6 +2,7 @@
 import sinon from 'sinon';
 import {silencePromise} from '../../src/js/utils/promise';
 import TestHelpers from './test-helpers';
+import * as browser from '../../src/js/utils/browser.js';
 
 QUnit.module('Player#play', {
 
@@ -106,6 +107,8 @@ QUnit.test('tech ready + has source + changing source = wait for loadstart', fun
 });
 
 QUnit.test('play call from native replay', function(assert) {
+  browser.stub_IS_ANY_SAFARI(true);
+  browser.stub_IS_IOS(true);
 
   // Mock the player having a source.
   this.player.src('xyz.mp4');
