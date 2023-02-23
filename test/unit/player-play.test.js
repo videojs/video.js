@@ -106,9 +106,11 @@ QUnit.test('tech ready + has source + changing source = wait for loadstart', fun
   assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
 
-QUnit.test('play call from native replay', function(assert) {
+QUnit.test('play call from native replay calls resetProgressBar_', function(assert) {
+  const origSafari = browser.IS_ANY_SAFARI;
+  const origIOS = browser.IS_IOS;
+
   browser.stub_IS_ANY_SAFARI(true);
-  browser.stub_IS_IOS(true);
 
   // Mock the player having a source.
   this.player.src('xyz.mp4');
@@ -123,4 +125,15 @@ QUnit.test('play call from native replay', function(assert) {
 
   silencePromise(this.player.play());
   assert.strictEqual(this.techPlayCallCount, 2, 'tech_.play was called');
+  assert.strictEqual(this.techCurrentTimeCallCount, 1, 'tech_.currentTime was called');
+
+  // Reset safari stub and try replay in iOS.
+  browser.stub_IS_ANY_SAFARI(origSafari);
+  browser.stub_IS_IOS(true);
+
+  silencePromise(this.player.play());
+  assert.strictEqual(this.techPlayCallCount, 3, 'tech_.play was called');
+  assert.strictEqual(this.techCurrentTimeCallCount, 2, 'tech_.currentTime was called');
+
+  browser.stub_IS_IOS(origIOS);
 });
