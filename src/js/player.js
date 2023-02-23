@@ -3051,32 +3051,30 @@ class Player extends Component {
       }
       pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in picture-in-picture')));
 
-      return new Promise((resolve, reject) => {
-        window.documentPictureInPicture.requestWindow({
-          // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
-          initialAspectRatio: this.videoWidth() / this.videoHeight(),
-          copyStyleSheets: true
-        }).then(pipWindow => {
-          this.el_.parentNode.insertBefore(pipContainer, this.el_);
+      return window.documentPictureInPicture.requestWindow({
+        // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
+        initialAspectRatio: this.videoWidth() / this.videoHeight(),
+        copyStyleSheets: true
+      }).then(pipWindow => {
+        this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
-          pipWindow.document.title = 'Video.js';
-          pipWindow.document.body.append(this.el_);
-          pipWindow.document.body.classList.add('vjs-pip-window');
+        pipWindow.document.title = 'Video.js';
+        pipWindow.document.body.append(this.el_);
+        pipWindow.document.body.classList.add('vjs-pip-window');
 
-          this.player_.isInPictureInPicture(true);
-          this.player_.trigger('enterpictureinpicture');
+        this.player_.isInPictureInPicture(true);
+        this.player_.trigger('enterpictureinpicture');
 
-          // Listen for the PiP closing event to move the video back.
-          pipWindow.addEventListener('unload', (event) => {
-            const pipVideo = event.target.querySelector('.video-js');
+        // Listen for the PiP closing event to move the video back.
+        pipWindow.addEventListener('unload', (event) => {
+          const pipVideo = event.target.querySelector('.video-js');
 
-            pipContainer.replaceWith(pipVideo);
-            this.player_.isInPictureInPicture(false);
-            this.player_.trigger('leavepictureinpicture');
-          });
+          pipContainer.replaceWith(pipVideo);
+          this.player_.isInPictureInPicture(false);
+          this.player_.trigger('leavepictureinpicture');
+        });
 
-          resolve(pipWindow);
-        }).catch(reject);
+        return pipWindow;
       });
     }
     if ('pictureInPictureEnabled' in document && this.disablePictureInPicture() === false) {
