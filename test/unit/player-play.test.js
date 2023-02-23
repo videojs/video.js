@@ -104,3 +104,20 @@ QUnit.test('tech ready + has source + changing source = wait for loadstart', fun
   this.player.trigger('loadstart');
   assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
 });
+
+QUnit.test('play call from native replay', function(assert) {
+
+  // Mock the player having a source.
+  this.player.src('xyz.mp4');
+  this.clock.tick(100);
+
+  // Attempt to play, but silence the promise that might be returned.
+  silencePromise(this.player.play());
+  assert.strictEqual(this.techPlayCallCount, 1, 'tech_.play was called');
+
+  // add vjs-ended for replay logic and play again.
+  this.player.addClass('vjs-ended');
+
+  silencePromise(this.player.play());
+  assert.strictEqual(this.techPlayCallCount, 2, 'tech_.play was called');
+});
