@@ -17,6 +17,7 @@ class SkipBackward extends Button {
     this.skipTime = this.getSkipBackwardTime();
 
     if (this.skipTime && this.validOptions.includes(this.skipTime)) {
+      this.controlText(`Skip backward ${this.skipTime} seconds`);
       this.show();
     } else {
       this.hide();
@@ -36,7 +37,7 @@ class SkipBackward extends Button {
   /**
    * On click, skips backward in the video by a configurable amount of seconds.
    * If the current time in the video is less than the configured 'skip backward' time,
-   * skips to beginning of video.
+   * skips to beginning of video or seekable range.
    *
    * Handle a click on a `SkipBackward` button
    *
@@ -46,10 +47,13 @@ class SkipBackward extends Button {
    */
   handleClick(event) {
     const currentVideoTime = this.player_.currentTime();
-
+    const liveTracker = this.player_.liveTracker;
+    const seekableStart = liveTracker && liveTracker.isLive() && liveTracker.seekableStart();
     let newTime;
 
-    if (currentVideoTime >= this.skipTime) {
+    if (seekableStart && (currentVideoTime - this.skipTime <= seekableStart)) {
+      newTime = seekableStart;
+    } else if (currentVideoTime >= this.skipTime) {
       newTime = currentVideoTime - this.skipTime;
     } else {
       newTime = 0;

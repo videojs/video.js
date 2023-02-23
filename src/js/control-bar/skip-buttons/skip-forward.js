@@ -15,6 +15,7 @@ class SkipForward extends Button {
 
     this.validOptions = [5, 10, 30];
     this.skipTime = this.getSkipForwardTime();
+    this.controlText(`Skip forward ${this.skipTime} seconds`);
 
     if (this.skipTime && this.validOptions.includes(this.skipTime)) {
       this.show();
@@ -34,9 +35,9 @@ class SkipForward extends Button {
   }
 
   /**
-   * On click, skips forward in the video by a configurable amount of seconds.
-   * If the time left in the video is less than the configured 'skip forward' time,
-   * skips to end of video.
+   * On click, skips forward in the duration/seekable range by a configurable amount of seconds.
+   * If the time left in the duration/seekable range is less than the configured 'skip forward' time,
+   * skips to end of duration/seekable range.
    *
    * Handle a click on a `SkipForward` button
    *
@@ -46,8 +47,8 @@ class SkipForward extends Button {
    */
   handleClick(event) {
     const currentVideoTime = this.player_.currentTime();
-    const duration = this.player_.duration();
-
+    const liveTracker = this.player_.liveTracker;
+    const duration = (liveTracker && liveTracker.isLive()) ? liveTracker.seekableEnd() : this.player_.duration();
     let newTime;
 
     if (currentVideoTime + this.skipTime <= duration) {
@@ -59,8 +60,6 @@ class SkipForward extends Button {
     this.player_.currentTime(newTime);
   }
 }
-
-SkipForward.prototype.controlText_ = 'Skip Forward';
 
 Component.registerComponent('SkipForward', SkipForward);
 
