@@ -3102,7 +3102,7 @@ class Player extends Component {
     if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
       window.documentPictureInPicture.window.close();
       return Promise.resolve();
-    } 
+    }
     if ('pictureInPictureEnabled' in document) {
 
       /**
