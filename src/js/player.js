@@ -3543,6 +3543,10 @@ class Player extends Component {
 
     if (seekBar) {
       seekBar.update();
+
+      if (seekBar.loadProgressBar) {
+        seekBar.loadProgressBar.update();
+      }
     }
   }
 
