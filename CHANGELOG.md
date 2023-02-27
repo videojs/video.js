@@ -1,3 +1,10 @@
+<a name="7.21.3"></a>
+## [7.21.3](https://github.com/videojs/video.js/compare/v7.21.2...v7.21.3) (2023-02-27)
+
+### Chores
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming 2.16.2 ([#8161](https://github.com/videojs/video.js/issues/8161)) ([2b06194](https://github.com/videojs/video.js/commit/2b06194))
+
 <a name="7.21.2"></a>
 ## [7.21.2](https://github.com/videojs/video.js/compare/v7.21.1...v7.21.2) (2023-01-31)
 
