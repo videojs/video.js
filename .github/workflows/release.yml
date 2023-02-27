@@ -37,7 +37,7 @@ jobs:
 
       # publish runs build for us via a prepublishOnly script
       - name: npm release
-        run: npm publish --tag next
+        run: npm publish --tag next-7
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
