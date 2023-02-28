@@ -282,14 +282,14 @@ git reset --hard upstream/main
 ## video.js releases
 
 Releasing video.js is partially automated through various scripts.
-To do a release, you need npm access.
+To do a release, all you need is just write access to the repo!
 
 Releases in video.js are done on npm and GitHub and eventually posted on the CDN.
 These are the instructions for the npm/GitHub releases.
 
 When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
 
-you can promote it using `npm dist-tag add video.js@<version> <tag>`
+You can promote it using `npm dist-tag add video.js@<version> <tag>`.
 
 ### Getting dependencies
 
@@ -360,6 +360,7 @@ After the tag was pushed, GitHub actions will trigger the `release` workflow, wh
 
 * Publish to npm with `next` or `next-{n}` depending on your current major version.
 * Create GitHub pre-release with changelog and Netlify preview.
+* Create a GitHub `releases` discussion linked to the GitHub release.
 * Copy files to the CDN with the AWS CLI (this step requires approval, make sure to ping collaborators chat!)
 
 And that's it. Congratulations - you've just released a new version of video.js.
