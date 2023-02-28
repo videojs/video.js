@@ -16,7 +16,6 @@
 * [video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
     * [npm access](#npm-access)
-    * [GitHub personal access token](#github-personal-access-token)
   * [Deciding what type of version release](#deciding-what-type-of-version-release)
   * [Doing a release](#doing-a-release)
     * [Current Video.js](#current-videojs)
@@ -283,12 +282,14 @@ git reset --hard upstream/main
 ## video.js releases
 
 Releasing video.js is partially automated through various scripts.
-To do a release, you need a couple of things: npm access, GitHub personal access token.
+To do a release, you need npm access.
 
 Releases in video.js are done on npm and GitHub and eventually posted on the CDN.
 These are the instructions for the npm/GitHub releases.
 
 When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
+
+you can promote it using `npm dist-tag add video.js@<version> <tag>`
 
 ### Getting dependencies
 
@@ -303,12 +304,6 @@ npm owner ls video.js
 If you are a core committer, you can request access to npm from one of the current owners.
 Access is managed via an [npm organization][npm org] for [Video.js][vjs npm].
 
-#### GitHub personal access token
-
-This is used to make a GitHub release on videojs. You can get a token from the [personal access tokens](https://github.com/settings/tokens) page.
-
-After generating one, make sure to keep it safe because GitHub will not show the token for you again. A good place to save it is Lastpass Secure Notes.
-
 ### Deciding what type of version release
 
 Since we follow the [conventional changelog conventions][conventions],
@@ -321,15 +316,14 @@ Most common releases will be either `patch` or `minor`.
 ### Doing a release
 
 It is also recommended you have a clean clone of Video.js for each release line you want to release.
-That means having a folder for main/v6 and one for 5.x.
-This is because 5.x and 6.x have different versions expecations for release process and have different dependencies.
+This is because different versions have different expectations for release process and have different dependencies.
 Plus, during development you could end up with a dirty repo, so, it just usually easier if you have a clean release repo.
 
 ```sh
-# for v6
-git clone git@github.com:videojs/video.js.git videojs-6-release
-# for v5
-git clone git@github.com:videojs/video.js.git videojs-5-release
+# for v8
+git clone git@github.com:videojs/video.js.git videojs-8-release
+# for v7
+git clone git@github.com:videojs/video.js.git videojs-7-release
 ```
 
 #### Current Video.js
@@ -362,21 +356,13 @@ relies on the commit being available on GitHub.
 git push --tags origin main
 ```
 
-Finally, run `npm publish` with an appropriate tag. Don't forget to supply your token.
+After the tag was pushed, GitHub actions will trigger the `release` workflow, which will do the following:
 
-```sh
-VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token npm publish --tag next
-```
+* Publish to npm with `next` or `next-{n}` depending on your current major version.
+* Create GitHub pre-release with changelog and Netlify preview.
+* Copy files to the CDN with the AWS CLI (this step requires approval, make sure to ping collaborators chat!)
 
-After it's done, verify that the GitHub release has the correct changelog output.
-This is to make sure that the CHANGELOG didn't get garbled and isn't missing pieces.
-
-If the GitHub release did not work correctly, such as if the GitHub token was not provided,
-you can run it manually:
-
-```sh
-VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=123 node build/gh-release.js --prelease
-```
+And that's it. Congratulations - you've just released a new version of video.js.
 
 #### Legacy Video.js (5)
 
