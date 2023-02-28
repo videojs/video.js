@@ -1,3 +1,14 @@
+<a name="8.1.1"></a>
+## [8.1.1](https://github.com/videojs/video.js/compare/v8.1.0...v8.1.1) (2023-02-28)
+
+### Chores
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming 3.0.2 ([#8162](https://github.com/videojs/video.js/issues/8162)) ([48a4ffc](https://github.com/videojs/video.js/commit/48a4ffc))
+
+### Documentation
+
+* Remove redundant 8.0.4 changes from 8.1.0 changelog ([#8155](https://github.com/videojs/video.js/issues/8155)) ([54830cd](https://github.com/videojs/video.js/commit/54830cd))
+
 <a name="8.1.0"></a>
 # [8.1.0](https://github.com/videojs/video.js/compare/v8.0.4...v8.1.0) (2023-02-23)
 
