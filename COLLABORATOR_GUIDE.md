@@ -13,7 +13,7 @@
       * [I accidentally pushed a broken commit or incorrect commit to main](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-main)
       * [I lost changes](#i-lost-changes)
       * [I accidentally committed a broken change to main](#i-accidentally-committed-a-broken-change-to-main)
-* [video.js releases](#videojs-releases)
+* [Video.js releases](#videojs-releases)
   * [Getting dependencies](#getting-dependencies)
     * [npm access](#npm-access)
   * [Deciding what type of version release](#deciding-what-type-of-version-release)
@@ -28,7 +28,7 @@
 
 ## Issues and Pull Requests
 
-Full courtesy should always be shown in video.js projects.
+Full courtesy should always be shown in Video.js projects.
 
 Collaborators may manage issues they feel qualified to handle, being mindful of our guidelines.
 
@@ -54,7 +54,7 @@ There are labels that are useful to include on issues and PRs. A few of them are
 
 ## Accepting changes
 
-Any code change in video.js should be happening through Pull Requests on GitHub. This includes core committers.
+Any code change in Video.js should be happening through Pull Requests on GitHub. This includes core committers.
 
 Before a PR is merged, it must be reviewed by at least two core committers, at least one if it comes from a core committer.
 
@@ -279,12 +279,12 @@ To do so, just reset the branch against main.
 git reset --hard upstream/main
 ```
 
-## video.js releases
+## Video.js releases
 
-Releasing video.js is partially automated through various scripts.
+Releasing Video.js is partially automated through various scripts.
 To do a release, all you need is just write access to the repo!
 
-Releases in video.js are done on npm and GitHub and eventually posted on the CDN.
+Releases in Video.js are done on npm and GitHub and eventually posted on the CDN.
 These are the instructions for the npm/GitHub releases.
 
 When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
@@ -363,7 +363,7 @@ After the tag was pushed, GitHub actions will trigger the `release` workflow, wh
 * Create a GitHub `releases` discussion linked to the GitHub release.
 * Copy files to the CDN with the AWS CLI (this step requires approval, make sure to ping collaborators chat!)
 
-And that's it. Congratulations - you've just released a new version of video.js.
+And that's it. Congratulations - you've just released a new version of Video.js.
 
 #### Legacy Video.js (5)
 
