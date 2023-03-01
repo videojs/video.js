@@ -385,6 +385,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
+| en-GB.json (has 1)      | Needs manual checking. Can safely use most default strings.                         |
 | es.json (missing 2)     | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
 | et.json (missing 7)     | No content                                                                          |

@@ -1,3 +1,30 @@
+<a name="8.1.1"></a>
+## [8.1.1](https://github.com/videojs/video.js/compare/v8.1.0...v8.1.1) (2023-02-28)
+
+### Chores
+
+* **package:** update to [@videojs](https://github.com/videojs)/http-streaming 3.0.2 ([#8162](https://github.com/videojs/video.js/issues/8162)) ([48a4ffc](https://github.com/videojs/video.js/commit/48a4ffc))
+
+### Documentation
+
+* Remove redundant 8.0.4 changes from 8.1.0 changelog ([#8155](https://github.com/videojs/video.js/issues/8155)) ([54830cd](https://github.com/videojs/video.js/commit/54830cd))
+
+<a name="8.1.0"></a>
+# [8.1.0](https://github.com/videojs/video.js/compare/v8.0.4...v8.1.0) (2023-02-23)
+
+### Features
+
+* improved text tracks settings labels ([#8101](https://github.com/videojs/video.js/issues/8101)) ([b306ce6](https://github.com/videojs/video.js/commit/b306ce6))
+
+### Bug Fixes
+
+* Remove img el when there's no poster source ([#8130](https://github.com/videojs/video.js/issues/8130)) ([a27ee05](https://github.com/videojs/video.js/commit/a27ee05))
+
+### Chores
+
+* Update translations script to special case en-GB ([#8106](https://github.com/videojs/video.js/issues/8106)) ([55cd188](https://github.com/videojs/video.js/commit/55cd188))
+* upgrade videojs-font to 4.0.0 ([#8117](https://github.com/videojs/video.js/issues/8117)) ([2c7eea8](https://github.com/videojs/video.js/commit/2c7eea8))
+
 <a name="8.0.4"></a>
 ## [8.0.4](https://github.com/videojs/video.js/compare/v8.0.3...v8.0.4) (2023-02-02)
 
