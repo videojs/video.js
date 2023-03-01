@@ -17,7 +17,7 @@ class SkipForward extends Button {
     this.skipTime = this.getSkipForwardTime();
 
     if (this.skipTime && this.validOptions.includes(this.skipTime)) {
-      this.controlText(`Skip forward ${this.skipTime} seconds`);
+      this.controlText(this.localize('Skip forward {1} seconds', [this.skipTime]));
       this.show();
     } else {
       this.hide();
