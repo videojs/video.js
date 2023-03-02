@@ -7,6 +7,11 @@ import window from 'global/window';
 import document from 'global/document';
 import keycode from 'keycode';
 
+/**
+ * @typedef { import('./player').default } Player
+ * @typedef { import('./utils/dom').ContentDescriptor} ContentDescriptor
+ */
+
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 
 /**
@@ -29,7 +34,7 @@ class ModalDialog extends Component {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Mixed} [options.content=undefined]
+   * @param {ContentDescriptor} [options.content=undefined]
    *        Provide customized content for this modal.
    *
    * @param {string} [options.description]
@@ -163,7 +168,7 @@ class ModalDialog extends Component {
         * Fired just before a `ModalDialog` is opened.
         *
         * @event ModalDialog#beforemodalopen
-        * @type {EventTarget~Event}
+        * @type {Event}
         */
       this.trigger('beforemodalopen');
       this.opened_ = true;
@@ -196,7 +201,7 @@ class ModalDialog extends Component {
         * Fired just after a `ModalDialog` is opened.
         *
         * @event ModalDialog#modalopen
-        * @type {EventTarget~Event}
+        * @type {Event}
         */
       this.trigger('modalopen');
       this.hasBeenOpened_ = true;
@@ -236,7 +241,7 @@ class ModalDialog extends Component {
       * Fired just before a `ModalDialog` is closed.
       *
       * @event ModalDialog#beforemodalclose
-      * @type {EventTarget~Event}
+      * @type {Event}
       */
     this.trigger('beforemodalclose');
     this.opened_ = false;
@@ -258,7 +263,7 @@ class ModalDialog extends Component {
       * Fired just after a `ModalDialog` is closed.
       *
       * @event ModalDialog#modalclose
-      * @type {EventTarget~Event}
+      * @type {Event}
       */
     this.trigger('modalclose');
     this.conditionalBlur_();
@@ -320,7 +325,7 @@ class ModalDialog extends Component {
    * @fires ModalDialog#beforemodalfill
    * @fires ModalDialog#modalfill
    *
-   * @param {Mixed} [content]
+   * @param {ContentDescriptor} [content]
    *        The same rules apply to this as apply to the `content` option.
    */
   fillWith(content) {
@@ -332,7 +337,7 @@ class ModalDialog extends Component {
       * Fired just before a `ModalDialog` is filled with content.
       *
       * @event ModalDialog#beforemodalfill
-      * @type {EventTarget~Event}
+      * @type {Event}
       */
     this.trigger('beforemodalfill');
     this.hasBeenFilled_ = true;
@@ -346,7 +351,7 @@ class ModalDialog extends Component {
      * Fired just after a `ModalDialog` is filled with content.
      *
      * @event ModalDialog#modalfill
-     * @type {EventTarget~Event}
+     * @type {Event}
      */
     this.trigger('modalfill');
 
@@ -376,7 +381,7 @@ class ModalDialog extends Component {
     * Fired just before a `ModalDialog` is emptied.
     *
     * @event ModalDialog#beforemodalempty
-    * @type {EventTarget~Event}
+    * @type {Event}
     */
     this.trigger('beforemodalempty');
     Dom.emptyEl(this.contentEl());
@@ -385,7 +390,7 @@ class ModalDialog extends Component {
     * Fired just after a `ModalDialog` is emptied.
     *
     * @event ModalDialog#modalempty
-    * @type {EventTarget~Event}
+    * @type {Event}
     */
     this.trigger('modalempty');
   }
@@ -397,12 +402,12 @@ class ModalDialog extends Component {
    * This does not update the DOM or fill the modal, but it is called during
    * that process.
    *
-   * @param  {Mixed} [value]
+   * @param  {ContentDescriptor} [value]
    *         If defined, sets the internal content value to be used on the
    *         next call(s) to `fill`. This value is normalized before being
    *         inserted. To "clear" the internal content value, pass `null`.
    *
-   * @return {Mixed}
+   * @return {ContentDescriptor}
    *         The current content of the modal dialog
    */
   content(value) {

@@ -6,6 +6,10 @@ import EventTarget from '../event-target';
 import TextTrack from '../tracks/text-track';
 
 /**
+ * @typedef { import('../tech/tech').default } Tech
+ */
+
+/**
  * A single track represented in the DOM.
  *
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement}

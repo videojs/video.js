@@ -8,6 +8,10 @@ import checkMuteSupport from './volume-control/check-mute-support';
 import * as browser from '../utils/browser.js';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * A button component for muting the audio.
  *
  * @extends Button
@@ -46,7 +50,7 @@ class MuteToggle extends Button {
    * This gets called when an `MuteToggle` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -71,7 +75,7 @@ class MuteToggle extends Button {
    * Update the `MuteToggle` button based on the state of `volume` and `muted`
    * on the player.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link Player#loadstart} event if this function was called
    *        through an event.
    *

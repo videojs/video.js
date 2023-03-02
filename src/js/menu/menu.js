@@ -8,6 +8,10 @@ import * as Events from '../utils/events.js';
 import keycode from 'keycode';
 
 /**
+ * @typedef { import('../player').default } Player
+ */
+
+/**
  * The Menu component is used to build popup menus, including subtitle and
  * captions selection menus.
  *
@@ -149,7 +153,7 @@ class Menu extends Component {
   /**
    * Called when a `MenuItem` loses focus.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `blur` event that caused this function to be called.
    *
    * @listens blur
@@ -172,7 +176,7 @@ class Menu extends Component {
   /**
    * Called when a `MenuItem` gets clicked or tapped.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `click` or `tap` event that caused this function to be called.
    *
    * @listens click,tap
@@ -205,7 +209,7 @@ class Menu extends Component {
   /**
    * Handle a `keydown` event on this menu. This listener is added in the constructor.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        A `keydown` event that happened on the menu.
    *
    * @listens keydown

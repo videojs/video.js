@@ -7,6 +7,12 @@ import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
 import {toTitleCase} from '../../utils/str.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ * @typedef { import('../../menu/menu').default } Menu
+ * @typedef { import('../text-track-menu-item/menu/').default } TextTrackMenuItem
+ */
+
+/**
  * The button component for toggling and selecting chapters
  * Chapters act much differently than other text tracks
  * Cues are navigation vs. other tracks of alternative languages
@@ -24,7 +30,7 @@ class ChaptersButton extends TextTrackButton {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when this function is ready.
    */
   constructor(player, options, ready) {
@@ -54,7 +60,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Update the menu based on the current state of its items.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        An event that triggered this function to run.
    *
    * @listens TextTrackList#addtrack

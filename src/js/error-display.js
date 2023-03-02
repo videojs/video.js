@@ -5,6 +5,10 @@ import Component from './component';
 import ModalDialog from './modal-dialog';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * A display that indicates an error has occurred. This means that the video
  * is unplayable.
  *

@@ -7,6 +7,10 @@ import * as Fn from '../../utils/fn.js';
 import './time-tooltip';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The {@link MouseTimeDisplay} component tracks mouse movement over the
  * {@link ProgressControl}. It displays an indicator and a {@link TimeTooltip}
  * indicating the time which is represented by a given point in the

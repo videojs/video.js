@@ -70,7 +70,7 @@ class AudioTrack extends Track {
          *         this internally without an event.
          *
          * @event AudioTrack#enabledchange
-         * @type {EventTarget~Event}
+         * @type {Event}
          */
         this.trigger('enabledchange');
       }

@@ -110,7 +110,7 @@ class ResizeManager extends Component {
      * Called when the player size has changed
      *
      * @event Player#playerresize
-     * @type {EventTarget~Event}
+     * @type {Event}
      */
     // make sure player is still around to trigger
     // prevents this from causing an error after dispose

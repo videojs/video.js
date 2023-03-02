@@ -5,6 +5,10 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The menu item for caption track settings menu
  *
  * @extends TextTrackMenuItem
@@ -44,7 +48,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
    * This gets called when an `CaptionSettingsMenuItem` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

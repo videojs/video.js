@@ -24,7 +24,7 @@ class CurrentTimeDisplay extends TimeDisplay {
   /**
    * Update current time display
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `timeupdate` event that caused this function to run.
    *
    * @listens Player#timeupdate

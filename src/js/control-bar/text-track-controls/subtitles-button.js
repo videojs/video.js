@@ -5,6 +5,10 @@ import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The button component for toggling and selecting subtitles
  *
  * @extends TextTrackButton
@@ -20,7 +24,7 @@ class SubtitlesButton extends TextTrackButton {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when this component is ready.
    */
   constructor(player, options, ready) {
