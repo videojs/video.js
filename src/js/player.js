@@ -3086,6 +3086,7 @@ class Player extends Component {
        */
       return this.techGet_('requestPictureInPicture');
     }
+    return Promise.reject('No PiP mode is available');
   }
 
   /**
