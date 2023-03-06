@@ -90,5 +90,7 @@
   "Color": "色",
   "Opacity": "不透明度",
   "Text Background": "テキスト背景",
-  "Caption Area Background": "キャプション領域背景"
+  "Caption Area Background": "キャプション領域背景",
+  "Skip forward {1} seconds": "{1}秒進む",
+  "Skip backward {1} seconds": "{1}秒戻る"
 }
