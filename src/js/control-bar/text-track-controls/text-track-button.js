@@ -7,6 +7,10 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
  * @extends MenuButton

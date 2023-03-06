@@ -4,6 +4,10 @@
 import TrackList from './track-list';
 
 /**
+ * @typedef { import('./text-track').default } TextTrack
+ */
+
+/**
  * The current list of {@link TextTrack} for a media file.
  *
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist}

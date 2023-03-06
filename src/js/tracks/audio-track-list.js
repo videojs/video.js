@@ -4,6 +4,10 @@
 import TrackList from './track-list';
 
 /**
+ * @typedef { import('./audio-track').default } AudioTrack
+ */
+
+/**
  * Anywhere we call this function we diverge from the spec
  * as we only support one enabled audiotrack at a time
  *

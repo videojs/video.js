@@ -12,6 +12,11 @@ import './volume-level.js';
 import './mouse-volume-level-display.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ * @typedef {import('../../event-target').Event} Event
+ */
+
+/**
  * The bar that contains the volume level and can be clicked on to adjust the level
  *
  * @extends Slider
@@ -52,7 +57,7 @@ class VolumeBar extends Slider {
   /**
    * Handle mouse down on volume bar
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mousedown` event that caused this to run.
    *
    * @listens mousedown
@@ -68,7 +73,7 @@ class VolumeBar extends Slider {
   /**
    * Handle movement events on the {@link VolumeMenuButton}.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to run.
    *
    * @listens mousemove
@@ -140,7 +145,7 @@ class VolumeBar extends Slider {
   /**
    * Update ARIA accessibility attributes
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `volumechange` event that caused this function to run.
    *
    * @listens Player#volumechange

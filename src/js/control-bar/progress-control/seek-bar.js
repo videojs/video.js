@@ -15,6 +15,11 @@ import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './mouse-time-display.js';
 
+/**
+ * @typedef { import('../../player').default } Player
+ * @typedef {import('../event-target').Event} Event
+ */
+
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
@@ -129,7 +134,7 @@ class SeekBar extends Slider {
    * This function updates the play progress bar and accessibility
    * attributes to whatever is passed in.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `timeupdate` or `ended` event that caused this to run.
    *
    * @listens Player#timeupdate
@@ -244,7 +249,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse down on seek bar
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mousedown` event that caused this to run.
    *
    * @listens mousedown
@@ -266,7 +271,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse move on seek bar
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mousemove` event that caused this to run.
    * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler. Defaults to false
    *
@@ -351,7 +356,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse up on seek bar
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mouseup` event that caused this to run.
    *
    * @listens mouseup
@@ -370,7 +375,7 @@ class SeekBar extends Slider {
      * This is particularly useful for if the player is paused to time the time displays.
      *
      * @event Tech#timeupdate
-     * @type {EventTarget~Event}
+     * @type {Event}
      */
     this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     if (this.videoWasPlaying) {
@@ -400,7 +405,7 @@ class SeekBar extends Slider {
    * Toggles the playback state of the player
    * This gets called when enter or space is used on the seekbar
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called
    *
    */
@@ -423,7 +428,7 @@ class SeekBar extends Slider {
    *   PageDown key moves back a larger step than ArrowDown
    *   PageUp key moves forward a large step
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

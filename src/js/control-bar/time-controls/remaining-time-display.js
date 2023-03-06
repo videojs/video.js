@@ -6,6 +6,10 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * Displays the time left in the video
  *
  * @extends Component
@@ -54,7 +58,7 @@ class RemainingTimeDisplay extends TimeDisplay {
   /**
    * Update remaining time display.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `timeupdate` or `durationchange` event that caused this to run.
    *
    * @listens Player#timeupdate

@@ -6,6 +6,10 @@
  */
 
 /**
+ * @typedef { import('../tech/tech').default } Tech
+ */
+
+/**
  * Examine a single {@link TextTrack} and return a JSON-compatible javascript object that
  * represents the {@link TextTrack}'s state.
  *

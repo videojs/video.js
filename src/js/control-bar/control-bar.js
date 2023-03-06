@@ -16,6 +16,8 @@ import './progress-control/progress-control.js';
 import './picture-in-picture-toggle.js';
 import './fullscreen-toggle.js';
 import './volume-panel.js';
+import './skip-buttons/skip-forward.js';
+import './skip-buttons/skip-backward.js';
 import './text-track-controls/chapters-button.js';
 import './text-track-controls/descriptions-button.js';
 import './text-track-controls/subtitles-button.js';
@@ -55,6 +57,8 @@ class ControlBar extends Component {
 ControlBar.prototype.options_ = {
   children: [
     'playToggle',
+    'skipBackward',
+    'skipForward',
     'volumePanel',
     'currentTimeDisplay',
     'timeDivider',

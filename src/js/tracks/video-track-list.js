@@ -4,6 +4,10 @@
 import TrackList from './track-list';
 
 /**
+ * @typedef { import('./video-track').default } VideoTrack
+ */
+
+/**
  * Un-select all other {@link VideoTrack}s that are selected.
  *
  * @param {VideoTrackList} list

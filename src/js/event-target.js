@@ -22,7 +22,7 @@ class EventTarget {
    * @param {string|string[]} type
    *        An event name or an array of event names.
    *
-   * @param {EventTarget~EventListener} fn
+   * @param {Function} fn
    *        The function to call with `EventTarget`s
    */
   on(type, fn) {
@@ -42,7 +42,7 @@ class EventTarget {
    * @param {string|string[]} type
    *        An event name or an array of event names.
    *
-   * @param {EventTarget~EventListener} fn
+   * @param {Function} fn
    *        The function to remove.
    */
   off(type, fn) {
@@ -56,7 +56,7 @@ class EventTarget {
    * @param {string|string[]} type
    *        An event name or an array of event names.
    *
-   * @param {EventTarget~EventListener} fn
+   * @param {Function} fn
    *        The function to be called once for each event name.
    */
   one(type, fn) {
@@ -68,6 +68,18 @@ class EventTarget {
     Events.one(this, type, fn);
     this.addEventListener = ael;
   }
+  /**
+   * This function will add an `event listener` that gets triggered only once and is
+   * removed from all events. This is like adding an array of `event listener`s
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on all events the
+   * first time it is triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
   any(type, fn) {
     // Remove the addEventListener aliasing Events.on
     // so we don't get into an infinite type loop
@@ -149,7 +161,7 @@ class EventTarget {
 /**
  * A Custom DOM event.
  *
- * @typedef {EventTarget} Event
+ * @typedef {CustomEvent} Event
  * @see [Properties]{@link https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent}
  */
 
@@ -159,7 +171,7 @@ class EventTarget {
  * @callback EventTarget~EventListener
  * @this {EventTarget}
  *
- * @param {EventTarget~Event} event
+ * @param {Event} event
  *        the event that triggered this function
  *
  * @param {Object} [hash]

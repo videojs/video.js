@@ -7,6 +7,10 @@ import document from 'global/document';
 import window from 'global/window';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * Toggle Picture-in-Picture mode
  *
  * @extends Button
@@ -82,7 +86,7 @@ class PictureInPictureToggle extends Button {
   /**
    * Handles enterpictureinpicture and leavepictureinpicture on the player and change control text accordingly.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link Player#enterpictureinpicture} or {@link Player#leavepictureinpicture} event that caused this function to be
    *        called.
    *
@@ -102,7 +106,7 @@ class PictureInPictureToggle extends Button {
    * This gets called when an `PictureInPictureToggle` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

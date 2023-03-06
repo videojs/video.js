@@ -5,6 +5,10 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * A special menu item for turning of a specific type of text track
  *
  * @extends TextTrackMenuItem
@@ -55,7 +59,7 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
   /**
    * Handle text track change
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to run
    */
   handleTracksChange(event) {
