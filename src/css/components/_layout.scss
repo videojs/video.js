@@ -151,11 +151,18 @@ body.vjs-pip-window .video-js {
 .vjs-pip-container .vjs-pip-text {
   position: absolute;
   bottom: 10%;
-  font-size: 2em; /* Needs sizes for responsive classes */
+  font-size: 2em;
   background-color: rgba(0, 0, 0, .7);
   padding: .5em;
   text-align: center;
   width: 100%
+}
+
+.vjs-layout-tiny.vjs-pip-container .vjs-pip-text,
+.vjs-layout-x-small.vjs-pip-container .vjs-pip-text,
+.vjs-layout-small.vjs-pip-container .vjs-pip-text {
+  bottom: 0;
+  font-size: 1.4em;
 }
 
 
