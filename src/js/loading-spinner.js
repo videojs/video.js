@@ -36,9 +36,7 @@ class LoadingSpinner extends Component {
   }
 
   /**
-   * Handles language change in ClickableComponent for the player in components
-   *
-   *
+   * Update control text on languagechange
    */
   handleLanguagechange() {
     this.$('.vjs-control-text').textContent = this.localize('{1} is loading.', [

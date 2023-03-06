@@ -611,7 +611,7 @@ class TextTrackSettings extends ModalDialog {
   }
 
   /**
-   * Repopulate dialog with new localizations
+   * Repopulate dialog with new localizations on languagechange
    */
   handleLanguagechange() {
     this.fill();

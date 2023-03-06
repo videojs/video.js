@@ -1,6 +1,9 @@
 /* eslint-env qunit */
 import TextTrackMenuItem from '../../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
+import OffTextTrackMenuItem from '../../../../src/js/control-bar/text-track-controls/off-text-track-menu-item.js';
+import CaptionSettingsMenuItem from '../../../../src/js/control-bar/text-track-controls/caption-settings-menu-item.js';
 import TestHelpers from '../../test-helpers.js';
+import videojs from '../../../../src/js/video.js';
 
 QUnit.module('TextTrackMenuItem', {
   beforeEach(assert) {
@@ -83,4 +86,19 @@ QUnit.test('clicking should disable non-selected tracks of the relevant kind(s)'
   fooItem.dispose();
   barItem.dispose();
   bipItem.dispose();
+});
+
+QUnit.test('should localize meu items on languagechage', function(assert) {
+  const OffItem = new OffTextTrackMenuItem(this.player, {kind: 'subtitles'});
+  const SettingsItem = new CaptionSettingsMenuItem(this.player, {kind: 'subtitles'});
+
+  videojs.addLanguage('test', {
+    'subtitles off': 'SUBSOFF',
+    'subtitles settings': 'SUBSSETTINGS'
+  });
+
+  this.player.language('test');
+
+  assert.equal(OffItem.$('.vjs-menu-item-text').textContent, 'SUBSOFF', 'subtitles settings text updates');
+  assert.equal(SettingsItem.$('.vjs-menu-item-text').textContent, 'SUBSSETTINGS', 'subtitles settings text updates');
 });

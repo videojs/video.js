@@ -102,6 +102,9 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     }
   }
 
+  /**
+   * Update control text and label on languagechange
+   */
   handleLanguagechange() {
     this.$('.vjs-menu-item-text').textContent = this.player_.localize(this.options_.label);
 
