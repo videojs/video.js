@@ -60,6 +60,10 @@ class SkipBackward extends Button {
     }
     this.player_.currentTime(newTime);
   }
+
+  handleLanguagechange() {
+    this.controlText(this.localize('Skip backward {1} seconds', [this.skipTime]));
+  }
 }
 
 SkipBackward.prototype.controlText_ = 'Skip Backward';

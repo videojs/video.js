@@ -58,6 +58,12 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
   }
+
+  handleLanguagechange() {
+    this.$('.vjs-menu-item-text').textContent = this.player_.localize(this.options_.kind + ' settings');
+
+    super.handleLanguagechange();
+  }
 }
 
 Component.registerComponent('CaptionSettingsMenuItem', CaptionSettingsMenuItem);

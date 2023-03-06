@@ -59,6 +59,10 @@ class SkipForward extends Button {
 
     this.player_.currentTime(newTime);
   }
+
+  handleLanguagechange() {
+    this.controlText(this.localize('Skip forward {1} seconds', [this.skipTime]));
+  }
 }
 
 Component.registerComponent('SkipForward', SkipForward);

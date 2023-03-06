@@ -34,6 +34,17 @@ class LoadingSpinner extends Component {
 
     return el;
   }
+
+  /**
+   * Handles language change in ClickableComponent for the player in components
+   *
+   *
+   */
+  handleLanguagechange() {
+    this.$('.vjs-control-text').textContent = this.localize('{1} is loading.', [
+      this.player_.isAudio() ? 'Audio Player' : 'Video Player'
+    ]);
+  }
 }
 
 Component.registerComponent('LoadingSpinner', LoadingSpinner);

@@ -102,6 +102,12 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     }
   }
 
+  handleLanguagechange() {
+    this.$('.vjs-menu-item-text').textContent = this.player_.localize(this.options_.label);
+
+    super.handleLanguagechange();
+  }
+
 }
 
 Component.registerComponent('OffTextTrackMenuItem', OffTextTrackMenuItem);
