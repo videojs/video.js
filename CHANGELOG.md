@@ -1,3 +1,18 @@
+<a name="8.2.0"></a>
+# [8.2.0](https://github.com/videojs/video.js/compare/v8.1.1...v8.2.0) (2023-03-06)
+
+### Features
+
+* add skip forward/backward buttons ([#8147](https://github.com/videojs/video.js/issues/8147)) ([8f3f32c](https://github.com/videojs/video.js/commit/8f3f32c))
+
+### Bug Fixes
+
+* **types:** Improve Typescript coverage ([#8148](https://github.com/videojs/video.js/issues/8148)) ([0022867](https://github.com/videojs/video.js/commit/0022867))
+
+### Chores
+
+* **documentation:** Update release flow in collaborator guide md ([#8167](https://github.com/videojs/video.js/issues/8167)) ([0a47175](https://github.com/videojs/video.js/commit/0a47175))
+
 <a name="8.1.1"></a>
 ## [8.1.1](https://github.com/videojs/video.js/compare/v8.1.0...v8.1.1) (2023-02-28)
 
