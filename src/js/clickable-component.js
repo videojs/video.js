@@ -7,6 +7,10 @@ import log from './utils/log.js';
 import keycode from 'keycode';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * Component which is clickable or keyboard actionable, but is not a
  * native HTML button.
  *
@@ -212,7 +216,7 @@ class ClickableComponent extends Component {
    * Event handler that is called when a `ClickableComponent` receives a
    * `click` or `tap` event.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `tap` or `click` event that caused this function to be called.
    *
    * @listens tap
@@ -231,7 +235,7 @@ class ClickableComponent extends Component {
    *
    * By default, if the key is Space or Enter, it will trigger a `click` event.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

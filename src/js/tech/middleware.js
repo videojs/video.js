@@ -4,6 +4,11 @@
  */
 import {toTitleCase} from '../utils/str.js';
 
+/**
+ * @typedef { import('../player').default } Player
+ * @typedef { import('../tech/tech').default } Tech
+ */
+
 const middlewares = {};
 const middlewareInstances = {};
 
@@ -108,7 +113,7 @@ export function setTech(middleware, tech) {
  * @param  {string} method
  *         A method name.
  *
- * @return {Mixed}
+ * @return {*}
  *         The final value from the tech after middleware has intercepted it.
  */
 export function get(middleware, tech, method) {
@@ -128,10 +133,10 @@ export function get(middleware, tech, method) {
  * @param  {string} method
  *         A method name.
  *
- * @param  {Mixed} arg
+ * @param  {*} arg
  *         The value to set on the tech.
  *
- * @return {Mixed}
+ * @return {*}
  *         The return value of the `method` of the `tech`.
  */
 export function set(middleware, tech, method, arg) {
@@ -154,10 +159,10 @@ export function set(middleware, tech, method, arg) {
  * @param  {string} method
  *         A method name.
  *
- * @param  {Mixed} arg
+ * @param  {*} arg
  *         The value to set on the tech.
  *
- * @return {Mixed}
+ * @return {*}
  *         The return value of the `method` of the `tech`, regardless of the
  *         return values of middlewares.
  */

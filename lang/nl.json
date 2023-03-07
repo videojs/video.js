@@ -90,5 +90,7 @@
   "Color": "Kleur",
   "Opacity": "Transparantie",
   "Text Background": "Tekst Achtergrond",
-  "Caption Area Background": "Achtergrond voor Ondertiteling"
+  "Caption Area Background": "Achtergrond voor Ondertiteling",
+  "Skip forward {1} seconds": "{1} seconden vooruit",
+  "Skip backward {1} seconds": "{1} seconden terug"
 }

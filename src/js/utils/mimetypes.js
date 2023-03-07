@@ -1,6 +1,10 @@
 import * as Url from '../utils/url.js';
 
 /**
+ * @typedef { import('../player').default } Player
+ */
+
+/**
  * Mimetypes
  *
  * @see https://www.iana.org/assignments/media-types/media-types.xhtml

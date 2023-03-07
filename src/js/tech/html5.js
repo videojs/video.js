@@ -28,7 +28,7 @@ class Html5 extends Tech {
   * @param {Object} [options]
   *        The key/value store of player options.
   *
-  * @param {Component~ReadyCallback} [ready]
+  * @param {Function} [ready]
   *        Callback function to call when the `HTML5` Tech is ready.
   */
   constructor(options, ready) {
@@ -1080,7 +1080,7 @@ Html5.canControlVolume = function() {
  * Some devices, e.g. iOS, don't allow changing volume
  * but permits muting/unmuting.
  *
- * @return {bolean}
+ * @return {boolean}
  *      - True if volume can be muted
  *      - False otherwise
  */
@@ -1225,7 +1225,7 @@ Html5.Events = [
 /**
  * Boolean indicating whether the `Tech` supports muting volume.
  *
- * @type {bolean}
+ * @type {boolean}
  * @default {@link Html5.canMuteVolume}
  */
 

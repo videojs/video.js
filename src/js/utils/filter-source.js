@@ -5,6 +5,10 @@ import {isObject} from './obj';
 import {getMimetype} from './mimetypes';
 
 /**
+ * @typedef { import('../tech/tech').default } Tech
+ */
+
+/**
  * Filter out single bad source objects or multiple source objects in an
  * array. Also flattens nested source object arrays into a 1 dimensional
  * array of source objects.

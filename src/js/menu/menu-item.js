@@ -8,6 +8,10 @@ import keycode from 'keycode';
 import {createEl} from '../utils/dom.js';
 
 /**
+ * @typedef { import('../player').default } Player
+ */
+
+/**
  * The component for a menu item. `<li>`
  *
  * @extends ClickableComponent
@@ -81,7 +85,7 @@ class MenuItem extends ClickableComponent {
    * Ignore keys which are used by the menu, but pass any other ones up. See
    * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
@@ -97,7 +101,7 @@ class MenuItem extends ClickableComponent {
    * Any click on a `MenuItem` puts it into the selected state.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

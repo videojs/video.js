@@ -6,6 +6,10 @@ import Component from '../component.js';
 import * as Fn from '../utils/fn.js';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * The base class for buttons that toggle specific  track types (e.g. subtitles).
  *
  * @extends MenuButton

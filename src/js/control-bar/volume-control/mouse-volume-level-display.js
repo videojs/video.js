@@ -1,4 +1,8 @@
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * @file mouse-volume-level-display.js
  */
 import Component from '../../component.js';
