@@ -2758,10 +2758,9 @@ QUnit[testOrSkip]('Should only allow requestPictureInPicture if the tech support
   assert.equal(count, 1, 'requestPictureInPicture not passed through when tech does not support');
 });
 
-QUnit.test('document pictureinpictrue is opt-in', function(assert) {
+QUnit.test('document pictureinpicture is opt-in', function(assert) {
   const done = assert.async();
   const player = TestHelpers.makePlayer({
-    enablePictureInPicture: false,
     disablePictureInPicture: true
   });
 
@@ -2787,7 +2786,7 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
 
   const done = assert.async();
   const player = TestHelpers.makePlayer({
-    enablePictureInPicture: true
+    enableDocumentPictureInPicture: true
   });
   let count = 0;
 
@@ -2820,7 +2819,60 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
     }
     done();
   });
+});
 
+QUnit.test('docPiP moves player', function(assert) {
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    enableDocumentPictureInPicture: false
+  });
+  const playerParent = player.el().parentElement;
+  const fakePiPWindow = document.createElement('div');
+
+  fakePiPWindow.document = {
+    body: document.createElement('div')
+  };
+  fakePiPWindow.querySelector = function(sel) {
+    return fakePiPWindow.document.body.querySelector(sel);
+  };
+  fakePiPWindow.close = function() {
+    fakePiPWindow.dispatchEvent(new Event('unload'));
+    delete window.documentPictureInPicture.window;
+  };
+
+  const testPiPObj = {
+    requestWindow() {
+      window.documentPictureInPicture.window = fakePiPWindow;
+      return Promise.resolve(fakePiPWindow);
+    }
+  };
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.requestPictureInPicture().then(win => {
+    assert.ok(player.el().parentElement === win.document.body, 'player el was moved');
+    assert.ok(playerParent.querySelector('.vjs-pip-container'), 'placeholder el was added');
+    assert.ok(player.isInPictureInPicture(), 'player is in pip state');
+
+    player.exitPictureInPicture().then(_ => {
+      assert.ok(player.el().parentElement === playerParent, 'player el was restored');
+      assert.notOk(playerParent.querySelector('.vjs-pip-container'), 'placeholder el was removed');
+
+      if (window.documentPictureInPicture === testPiPObj) {
+        delete window.documentPictureInPicture;
+      }
+      done();
+    });
+  }).catch(e => {
+    // Any other error is a failure in the then()s above
+    assert.equal(e, 'No PiP mode is available', 'skipped as pip not used');
+    if (window.documentPictureInPicture === testPiPObj) {
+      delete window.documentPictureInPicture;
+    }
+    done();
+  });
 });
 
 QUnit.test('playbackRates should trigger a playbackrateschange event', function(assert) {
