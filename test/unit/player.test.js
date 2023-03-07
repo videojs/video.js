@@ -2821,12 +2821,25 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
   });
 });
 
-QUnit.test('docPiP moves player', function(assert) {
+QUnit.test('docPiP moves player and triggers events', function(assert) {
   const done = assert.async();
   const player = TestHelpers.makePlayer({
-    enableDocumentPictureInPicture: false
+    enableDocumentPictureInPicture: true
   });
   const playerParent = player.el().parentElement;
+
+  player.videoHeight = () => 9;
+  player.videoWidth = () => 16;
+
+  const counts = {
+    enterpictureinpicture: 0,
+    leavepictureinpicture: 0
+  };
+
+  player.on(Object.keys(counts), function(e) {
+    counts[e.type]++;
+  });
+
   const fakePiPWindow = document.createElement('div');
 
   fakePiPWindow.document = {
@@ -2855,10 +2868,13 @@ QUnit.test('docPiP moves player', function(assert) {
     assert.ok(player.el().parentElement === win.document.body, 'player el was moved');
     assert.ok(playerParent.querySelector('.vjs-pip-container'), 'placeholder el was added');
     assert.ok(player.isInPictureInPicture(), 'player is in pip state');
+    assert.equal(counts.enterpictureinpicture, 1, '`enterpictureinpicture` triggered');
 
     player.exitPictureInPicture().then(_ => {
       assert.ok(player.el().parentElement === playerParent, 'player el was restored');
       assert.notOk(playerParent.querySelector('.vjs-pip-container'), 'placeholder el was removed');
+      assert.notOk(player.isInPictureInPicture(), 'player is not in pip state');
+      assert.equal(counts.leavepictureinpicture, 1, '`leavepictureinpicture` triggered');
 
       if (window.documentPictureInPicture === testPiPObj) {
         delete window.documentPictureInPicture;
@@ -2866,8 +2882,13 @@ QUnit.test('docPiP moves player', function(assert) {
       done();
     });
   }).catch(e => {
-    // Any other error is a failure in the then()s above
-    assert.equal(e, 'No PiP mode is available', 'skipped as pip not used');
+    if (e === 'No PiP mode is available') {
+      assert.ok(true, 'Test skipped because PiP not available');
+    } else if (e.name && e.name === 'NotAllowedError') {
+      assert.ok(true, 'Test skipped because PiP not allowed');
+    } else {
+      assert.notOk(true, 'An unexpected error occurred');
+    }
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
     }
