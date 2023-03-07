@@ -90,5 +90,7 @@
   "Color": "顏色",
   "Opacity": "不透明度",
   "Text Background": "文字背景",
-  "Caption Area Background": "字幕區域背景"
+  "Caption Area Background": "字幕區域背景",
+  "Skip forward {1} seconds": "快轉 {1} 秒",
+  "Skip backward {1} seconds": "倒轉 {1} 秒"
 }
