@@ -3065,7 +3065,6 @@ class Player extends Component {
       }).then(pipWindow => {
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
-        pipWindow.document.title = 'Video.js';
         pipWindow.document.body.append(this.el_);
         pipWindow.document.body.classList.add('vjs-pip-window');
 

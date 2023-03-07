@@ -2750,12 +2750,77 @@ QUnit[testOrSkip]('Should only allow requestPictureInPicture if the tech support
   assert.equal(count, 1, 'requestPictureInPicture passed through to supporting tech');
 
   player.tech_.el_.disablePictureInPicture = true;
-  player.requestPictureInPicture();
+  player.requestPictureInPicture().catch(_ => {});
   assert.equal(count, 1, 'requestPictureInPicture not passed through when disabled on tech');
 
   delete player.tech_.el_.disablePictureInPicture;
-  player.requestPictureInPicture();
+  player.requestPictureInPicture().catch(_ => {});
   assert.equal(count, 1, 'requestPictureInPicture not passed through when tech does not support');
+});
+
+QUnit.test('document pictureinpictrue is opt-in', function(assert) {
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    enablePictureInPicture: false,
+    disablePictureInPicture: true
+  });
+
+  const testPiPObj = {};
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.requestPictureInPicture().catch(e => {
+    assert.equal(e, 'No PiP mode is available', 'docPiP not used when not enabled');
+  }).finally(_ => {
+    if (window.documentPictureInPicture === testPiPObj) {
+      delete window.documentPictureInPicture;
+    }
+    done();
+  });
+
+});
+
+QUnit.test('docPiP is used in preference to winPiP', function(assert) {
+  assert.expect(2);
+
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    enablePictureInPicture: true
+  });
+  let count = 0;
+
+  player.tech_.el_ = {
+    disablePictureInPicture: false,
+    requestPictureInPicture() {
+      count++;
+    }
+  };
+
+  const testPiPObj = {
+    requestWindow() {
+      return Promise.resolve({});
+    }
+  };
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  // Test isn't concerned with whether the browser allows the request,
+  player.requestPictureInPicture().then(_ => {
+    assert.ok(true, 'docPiP was called');
+  }).catch(_ => {
+    assert.ok(true, 'docPiP was called');
+  }).finally(_ => {
+    assert.equal(0, count, 'requestPictureInPicture not passed to tech');
+    if (window.documentPictureInPicture === testPiPObj) {
+      delete window.documentPictureInPicture;
+    }
+    done();
+  });
+
 });
 
 QUnit.test('playbackRates should trigger a playbackrateschange event', function(assert) {

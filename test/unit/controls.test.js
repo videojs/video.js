@@ -307,9 +307,12 @@ QUnit.test('Picture-in-Picture control is displayed if docPiP is enabled', funct
     enableDocumentPictureInPicture: true
   });
   const pictureInPictureToggle = new PictureInPictureToggle(player);
-  const tempObj = {};
+  const testPiPObj = {};
 
-  window.documentPictureInPicture = window.documentPictureInPicture || tempObj;
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
   player.src({src: 'example.mp4', type: 'video/mp4'});
   player.trigger('loadedmetadata');
 
@@ -317,7 +320,7 @@ QUnit.test('Picture-in-Picture control is displayed if docPiP is enabled', funct
 
   player.dispose();
   pictureInPictureToggle.dispose();
-  if (window.documentPictureInPicture === tempObj) {
+  if (window.documentPictureInPicture === testPiPObj) {
     delete window.documentPictureInPicture;
   }
 });
