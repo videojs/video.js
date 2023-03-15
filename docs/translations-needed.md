@@ -327,8 +327,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| de.json (missing 2)     | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| de.json (Complete)      |                                                                                     |
 | el.json (missing 56)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -402,13 +401,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| fa.json (missing 7)     | No content                                                                          |
+| fa.json (missing 5)     | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
 | fi.json (missing 70)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -595,26 +592,21 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| it.json (missing 9)     | Seek to live, currently behind live                                                 |
+| it.json (missing 7)     | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | No content                                                                          |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
-| ja.json (missing 2)     | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| ja.json (Complete)      |                                                                                     |
 | ko.json (missing 2)     | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| lv.json (missing 7)     | No content                                                                          |
+| lv.json (missing 5)     | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
 | nb.json (missing 9)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
@@ -624,7 +616,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| nl.json (missing 12)    | Seek to live, currently behind live                                                 |
+| nl.json (missing 10)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
@@ -634,8 +626,6 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
 | nn.json (missing 9)     | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
@@ -728,13 +718,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| ru.json (missing 7)     | No content                                                                          |
+| ru.json (missing 5)     | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
 | sk.json (missing 11)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
@@ -881,9 +869,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Caption Area Background                                                             |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| zh-CN.json (missing 2)  | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
-| zh-TW.json (missing 2)  | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| zh-CN.json (Complete)   |                                                                                     |
+| zh-TW.json (Complete)   |                                                                                     |
 
 <!-- END langtable -->
