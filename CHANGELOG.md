@@ -1,3 +1,12 @@
+<a name="8.2.1"></a>
+## [8.2.1](https://github.com/videojs/video.js/compare/v8.2.0...v8.2.1) (2023-03-15)
+
+### Bug Fixes
+
+* **lang:** Add strings for skip buttons ([#8174](https://github.com/videojs/video.js/issues/8174)) ([35c539d](https://github.com/videojs/video.js/commit/35c539d))
+* **lang:** update Japanese translations ([#8190](https://github.com/videojs/video.js/issues/8190)) ([7e8bd5c](https://github.com/videojs/video.js/commit/7e8bd5c))
+* replay button broken for native playback ([#8142](https://github.com/videojs/video.js/issues/8142)) ([b7116be](https://github.com/videojs/video.js/commit/b7116be))
+
 <a name="8.2.0"></a>
 # [8.2.0](https://github.com/videojs/video.js/compare/v8.1.1...v8.2.0) (2023-03-06)
 
