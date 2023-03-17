@@ -6,6 +6,10 @@ import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
+ * @typedef { import('./player').default } Player
+ */
+
+/**
  * Displays the live indicator when duration is Infinity.
  *
  * @extends Component

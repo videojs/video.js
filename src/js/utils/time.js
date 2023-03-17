@@ -21,7 +21,7 @@ import window from 'global/window';
  */
 
 /**
- * An object that contains ranges of time.
+ * An object that contains ranges of time, which mimics {@link TimeRanges}.
  *
  * @typedef  {Object} TimeRange
  *
@@ -93,6 +93,8 @@ function getRange(fnName, valueIndex, ranges, rangeIndex) {
  * @private
  * @param   {Array} [ranges]
  *          An array of time ranges.
+ *
+ * @return  {TimeRange}
  */
 function createTimeRangesObj(ranges) {
   let timeRangesObj;
@@ -133,6 +135,8 @@ function createTimeRangesObj(ranges) {
  * @param {number} end
  *        The end of a single range. Cannot be used with the array form of
  *        the `start` argument.
+ *
+ * @return {TimeRange}
  */
 export function createTimeRanges(start, end) {
   if (Array.isArray(start)) {

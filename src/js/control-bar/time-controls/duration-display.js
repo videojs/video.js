@@ -5,6 +5,10 @@ import TimeDisplay from './time-display';
 import Component from '../../component.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * Displays the duration
  *
  * @extends Component
@@ -54,7 +58,7 @@ class DurationDisplay extends TimeDisplay {
   /**
    * Update duration time display.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `durationchange`, `timeupdate`, or `loadedmetadata` event that caused
    *        this function to be called.
    *

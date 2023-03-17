@@ -6,6 +6,10 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * An {@link AudioTrack} {@link MenuItem}
  *
  * @extends MenuItem
@@ -68,7 +72,7 @@ class AudioTrackMenuItem extends MenuItem {
    * This gets called when an `AudioTrackMenuItem is "clicked". See {@link ClickableComponent}
    * for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -102,7 +106,7 @@ class AudioTrackMenuItem extends MenuItem {
   /**
    * Handle any {@link AudioTrack} change.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link AudioTrackList#change} event that caused this to run.
    *
    * @listens AudioTrackList#change

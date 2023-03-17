@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
-  "version": "8.0.3",
+  "version": "8.2.1",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@videojs/http-streaming": "3.0.0",
+    "@videojs/http-streaming": "3.0.2",
     "@videojs/vhs-utils": "^4.0.0",
     "@videojs/xhr": "2.6.0",
     "aes-decrypter": "^4.0.1",
@@ -97,7 +97,7 @@
     "mux.js": "^6.2.0",
     "safe-json-parse": "4.0.0",
     "videojs-contrib-quality-levels": "3.0.0",
-    "videojs-font": "3.2.0",
+    "videojs-font": "4.1.0",
     "videojs-vtt.js": "0.15.4"
   },
   "devDependencies": {

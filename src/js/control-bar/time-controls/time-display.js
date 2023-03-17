@@ -8,6 +8,10 @@ import {formatTime} from '../../utils/time.js';
 import log from '../../utils/log.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * Displays time information about the video
  *
  * @extends Component
@@ -120,7 +124,7 @@ class TimeDisplay extends Component {
    * To be filled out in the child class, should update the displayed time
    * in accordance with the fact that the current time has changed.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `timeupdate`  event that caused this to run.
    *
    * @listens Player#timeupdate

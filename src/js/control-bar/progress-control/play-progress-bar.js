@@ -8,6 +8,10 @@ import * as Fn from '../../utils/fn.js';
 import './time-tooltip';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * Used by {@link SeekBar} to display media playback progress as part of the
  * {@link ProgressControl}.
  *

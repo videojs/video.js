@@ -8,6 +8,10 @@ import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
 
+/**
+ * @typedef { import('../player').default } Player
+ */
+
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
 const COLOR_BLACK = ['#000', 'Black'];
@@ -54,7 +58,7 @@ const selectConfigs = {
   backgroundOpacity: {
     selector: '.vjs-bg-opacity > select',
     id: 'captions-background-opacity-%s',
-    label: 'Transparency',
+    label: 'Opacity',
     options: [
       OPACITY_OPAQUE,
       OPACITY_SEMI,
@@ -63,7 +67,7 @@ const selectConfigs = {
   },
 
   color: {
-    selector: '.vjs-fg-color > select',
+    selector: '.vjs-text-color > select',
     id: 'captions-foreground-color-%s',
     label: 'Color',
     options: [
@@ -128,7 +132,7 @@ const selectConfigs = {
   textOpacity: {
     selector: '.vjs-text-opacity > select',
     id: 'captions-foreground-opacity-%s',
-    label: 'Transparency',
+    label: 'Opacity',
     options: [
       OPACITY_OPAQUE,
       OPACITY_SEMI
@@ -146,7 +150,7 @@ const selectConfigs = {
   windowOpacity: {
     selector: '.vjs-window-opacity > select',
     id: 'captions-window-opacity-%s',
-    label: 'Transparency',
+    label: 'Opacity',
     options: [
       OPACITY_TRANS,
       OPACITY_SEMI,
@@ -166,7 +170,7 @@ selectConfigs.windowColor.options = selectConfigs.backgroundColor.options;
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
  *
- * @return {Mixed}
+ * @return {*}
  *         - Will be `undefined` if no value exists
  *         - Will be `undefined` if the given value is "none".
  *         - Will be the actual value otherwise.
@@ -192,7 +196,7 @@ function parseOptionValue(value, parser) {
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
  *
- * @return {Mixed}
+ * @return {*}
  *         - Will be `undefined` if no value exists
  *         - Will be `undefined` if the given value is "none".
  *         - Will be the actual value otherwise.
@@ -344,11 +348,13 @@ class TextTrackSettings extends ModalDialog {
     const legendId = `captions-text-legend-${this.id_}`;
 
     return [
-      '<fieldset class="vjs-fg-color vjs-track-setting">',
+      '<fieldset class="vjs-fg vjs-track-setting">',
       `<legend id="${legendId}">`,
       this.localize('Text'),
       '</legend>',
+      '<span class="vjs-text-color">',
       this.createElSelect_('color', legendId),
+      '</span>',
       '<span class="vjs-text-opacity vjs-opacity">',
       this.createElSelect_('textOpacity', legendId),
       '</span>',
@@ -368,11 +374,13 @@ class TextTrackSettings extends ModalDialog {
     const legendId = `captions-background-${this.id_}`;
 
     return [
-      '<fieldset class="vjs-bg-color vjs-track-setting">',
+      '<fieldset class="vjs-bg vjs-track-setting">',
       `<legend id="${legendId}">`,
-      this.localize('Background'),
+      this.localize('Text Background'),
       '</legend>',
+      '<span class="vjs-bg-color">',
       this.createElSelect_('backgroundColor', legendId),
+      '</span>',
       '<span class="vjs-bg-opacity vjs-opacity">',
       this.createElSelect_('backgroundOpacity', legendId),
       '</span>',
@@ -392,11 +400,13 @@ class TextTrackSettings extends ModalDialog {
     const legendId = `captions-window-${this.id_}`;
 
     return [
-      '<fieldset class="vjs-window-color vjs-track-setting">',
+      '<fieldset class="vjs-window vjs-track-setting">',
       `<legend id="${legendId}">`,
-      this.localize('Window'),
+      this.localize('Caption Area Background'),
       '</legend>',
+      '<span class="vjs-window-color">',
       this.createElSelect_('windowColor', legendId),
+      '</span>',
       '<span class="vjs-window-opacity vjs-opacity">',
       this.createElSelect_('windowOpacity', legendId),
       '</span>',

@@ -86,5 +86,11 @@
   "Seek to live, currently playing live": "快轉至直播，目前為現場畫面",
   "progress bar timing: currentTime={1} duration={2}": "{1}/{2}",
   "{1} is loading.": "{1} 正在載入。",
-  "No content": "無內容"
+  "No content": "無內容",
+  "Color": "顏色",
+  "Opacity": "不透明度",
+  "Text Background": "文字背景",
+  "Caption Area Background": "字幕區域背景",
+  "Skip forward {1} seconds": "快轉 {1} 秒",
+  "Skip backward {1} seconds": "倒轉 {1} 秒"
 }

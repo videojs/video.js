@@ -1,4 +1,9 @@
 /**
+ * @typedef { import('../../player').default } Player
+ * @typedef { import('../../component').default } Component
+ */
+
+/**
  * Check if muting volume is supported and if it isn't hide the mute toggle
  * button.
  *

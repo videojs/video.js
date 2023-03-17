@@ -4,6 +4,10 @@ import {merge} from '../utils/obj';
 import {getAbsoluteURL} from '../utils/url';
 
 /**
+ * @typedef { import('./html5').default } Html5
+ */
+
+/**
  * This function is used to fire a sourceset when there is something
  * similar to `mediaEl.load()` being called. It will try to find the source via
  * the `src` attribute and then the `<source>` elements. It will then fire `sourceset`

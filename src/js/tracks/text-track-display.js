@@ -6,6 +6,11 @@ import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
+/**
+ * @typedef { import('./player').default } Player
+ * @typedef { import('./tech/tech').default } Tech
+ */
+
 const darkGray = '#222';
 const lightGray = '#ccc';
 const fontMap = {
@@ -93,7 +98,7 @@ class TextTrackDisplay extends Component {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when `TextTrackDisplay` is ready.
    */
   constructor(player, options, ready) {

@@ -295,7 +295,7 @@ class Plugin {
      * Signals that a advanced plugin is about to be disposed.
      *
      * @event Plugin#dispose
-     * @type  {EventTarget~Event}
+     * @type  {Event}
      */
     this.trigger('dispose');
     this.off();

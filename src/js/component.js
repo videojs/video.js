@@ -14,6 +14,11 @@ import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
 /**
+ * @typedef { import('./player').default } Player
+ * @typedef { import('./event-target').Event} Event
+*/
+
+/**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
  * in the DOM. They can be children of other components, and can have
@@ -27,7 +32,7 @@ class Component {
    * A callback that is called when a component is ready. Does not have any
    * parameters and any callback value will be ignored.
    *
-   * @callback Component~ReadyCallback
+   * @callback ReadyCallback
    * @this Component
    */
 
@@ -48,7 +53,7 @@ class Component {
    * @param  {string} [options.className]
    *         A class or space separated list of classes to add the component
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {ReadyCallback} [ready]
    *        Function that gets called when the `Component` is ready.
    */
   constructor(player, options, ready) {
@@ -95,6 +100,12 @@ class Component {
       options.className.split(' ').forEach(c => this.addClass(c));
     }
 
+    // Remove the placeholder event methods. If the component is evented, the
+    // real methods are added next
+    ['on', 'off', 'one', 'any', 'trigger'].forEach(fn => {
+      this[fn] = undefined;
+    });
+
     // if evented is anything except false, we want to mixin in evented
     if (options.evented !== false) {
       // Make this an evented object and use `el_`, if available, as its event bus
@@ -130,6 +141,79 @@ class Component {
 
   }
 
+  // `on`, `off`, `one`, `any` and `trigger` are here so tsc includes them in definitions.
+  // They are replaced or removed in the constructor
+
+  /**
+   * Adds an `event listener` to an instance of an `EventTarget`. An `event listener` is a
+   * function that will get called when an event with a certain name gets triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to call with `EventTarget`s
+   */
+  on(type, fn) {}
+
+  /**
+   * Removes an `event listener` for a specific event from an instance of `EventTarget`.
+   * This makes it so that the `event listener` will no longer get called when the
+   * named event happens.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to remove.
+   */
+  off(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once. After the
+   * first trigger it will get removed. This is like adding an `event listener`
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on itself.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  one(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once and is
+   * removed from all events. This is like adding an array of `event listener`s
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on all events the
+   * first time it is triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  any(type, fn) {}
+
+  /**
+   * This function causes an event to happen. This will then cause any `event listeners`
+   * that are waiting for that event, to get called. If there are no `event listeners`
+   * for an event then nothing will happen.
+   *
+   * If the name of the `Event` that is being triggered is in `EventTarget.allowedEvents_`.
+   * Trigger will also call the `on` + `uppercaseEventName` function.
+   *
+   * Example:
+   * 'click' is in `EventTarget.allowedEvents_`, so, trigger will attempt to call
+   * `onClick` if it exists.
+   *
+   * @param {string|Event|Object} event
+   *        The name of the event, an `Event`, or an object with a key of type set to
+   *        an event name.
+   */
+  trigger(event) {}
+
   /**
    * Dispose of the `Component` and all child components.
    *
@@ -153,7 +237,7 @@ class Component {
      * Triggered when a `Component` is disposed.
      *
      * @event Component#dispose
-     * @type {EventTarget~Event}
+     * @type {Event}
      *
      * @property {boolean} [bubbles=false]
      *           set to false so that the dispose event does not
@@ -700,7 +784,7 @@ class Component {
    * Different from event listeners in that if the ready event has already happened
    * it will trigger the function immediately.
    *
-   * @param {Component~ReadyCallback} fn
+   * @param {ReadyCallback} fn
    *        Function that gets called when the `Component` is ready.
    *
    * @return {Component}
@@ -751,7 +835,7 @@ class Component {
        * Triggered when a `Component` is ready.
        *
        * @event Component#ready
-       * @type {EventTarget~Event}
+       * @type {Event}
        */
       this.trigger('ready');
     }, 1);
@@ -1033,7 +1117,7 @@ class Component {
          * Triggered when a component is resized.
          *
          * @event Component#componentresize
-         * @type {EventTarget~Event}
+         * @type {Event}
          */
         this.trigger('componentresize');
       }
@@ -1169,7 +1253,7 @@ class Component {
    * When this Component receives a `keydown` event which it does not process,
    *  it passes the event to the Player for handling.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    */
   handleKeyDown(event) {
@@ -1190,7 +1274,7 @@ class Component {
    * delegates to `handleKeyDown`. This means anyone calling `handleKeyPress`
    * will not see their method calls stop working.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to be called.
    */
   handleKeyPress(event) {
@@ -1283,7 +1367,7 @@ class Component {
            * Triggered when a `Component` is tapped.
            *
            * @event Component#tap
-           * @type {EventTarget~Event}
+           * @type {Event}
            */
           this.trigger('tap');
           // It may be good to copy the touchend event object and change the

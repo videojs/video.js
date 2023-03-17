@@ -79,5 +79,11 @@
   "End of dialog window.": "Fine della finestra di dialogo.",
   "{1} is loading.": "{1} in fase di caricamento.",
   "Exit Picture-in-Picture": "Uscire dalla modalità Picture-in-Picture",
-  "Picture-in-Picture": "Picture-in-Picture"
+  "Picture-in-Picture": "Picture-in-Picture",
+  "Color": "Colore",
+  "Opacity": "Opacità",
+  "Text Background": "Sfondo del testo",
+  "Caption Area Background": "Sfondo dell'area dei sottotitoli",
+  "Skip forward {1} seconds": "Avanti di {1} secondi",
+  "Skip backward {1} seconds": "Indietro di {1} secondi"
 }

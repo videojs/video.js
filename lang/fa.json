@@ -85,5 +85,7 @@
   "End of dialog window.": "پایان پنجرهٔ محاوره‌ای.",
   "{1} is loading.": "{1} در حال بارگیری است.",
   "Exit Picture-in-Picture": "خروج از حالت تصویر در تصویر",
-  "Picture-in-Picture": "تصویر در تصویر"
+  "Picture-in-Picture": "تصویر در تصویر",
+  "Skip forward {1} seconds": "{1} ثانیه بعد",
+  "Skip backward {1} seconds": "{1} ثانیه قبل"
 }

@@ -80,5 +80,7 @@
   "Done": "Klaar",
   "Caption Settings Dialog": "Venster voor bijschriften-instellingen",
   "Beginning of dialog window. Escape will cancel and close the window.": "Begin van dialoogvenster. Escape zal annuleren en het venster sluiten.",
-  "End of dialog window.": "Einde van dialoogvenster."
+  "End of dialog window.": "Einde van dialoogvenster.",
+  "Skip forward {1} seconds": "{1} seconden vooruit",
+  "Skip backward {1} seconds": "{1} seconden terug"
 }

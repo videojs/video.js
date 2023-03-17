@@ -10,6 +10,10 @@ import {throttle, bind_, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import './volume-bar.js';
 
 /**
+ * @typedef { import('../../player').default } Player
+ */
+
+/**
  * The component for controlling the volume level
  *
  * @extends Component
@@ -83,7 +87,7 @@ class VolumeControl extends Component {
   /**
    * Handle `mousedown` or `touchstart` events on the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousedown
@@ -101,7 +105,7 @@ class VolumeControl extends Component {
   /**
    * Handle `mouseup` or `touchend` events on the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mouseup` or `touchend` event that triggered this function.
    *
    * @listens touchend
@@ -119,7 +123,7 @@ class VolumeControl extends Component {
   /**
    * Handle `mousedown` or `touchstart` events on the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousedown

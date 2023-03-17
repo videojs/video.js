@@ -12,6 +12,10 @@ import XHR from '@videojs/xhr';
 import {merge} from '../utils/obj';
 
 /**
+ * @typedef { import('../tech/tech').default } Tech
+ */
+
+/**
  * Takes a webvtt file contents and parses it into cues
  *
  * @param {string} srcContent
@@ -277,7 +281,7 @@ class TextTrack extends Track {
            * > Note: This is not part of the spec!
            *
            * @event TextTrack#modechange
-           * @type {EventTarget~Event}
+           * @type {Event}
            */
           this.trigger('modechange');
 

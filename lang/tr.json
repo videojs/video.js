@@ -81,7 +81,7 @@
   "restore all settings to the default values": "tüm ayarları varsayılan değerlere geri yükler",
   "Done": "Tamam",
   "Caption Settings Dialog": "Altyazı Ayarları Menüsü",
-  "Beginning of dialog window. Escape will cancel and close the window.": "Etkileşim penceresinin başlangıcı. ESC tuşu işlemi iptal edip pencereyi kapatacaktır."
+  "Beginning of dialog window. Escape will cancel and close the window.": "Etkileşim penceresinin başlangıcı. ESC tuşu işlemi iptal edip pencereyi kapatacaktır.",
   "End of dialog window.": "Etkileşim penceresinin sonu.",
   "{1} is loading.": "{1} yükleniyor.",
   "Exit Picture-in-Picture": "Mini oynatıcıdan çık",

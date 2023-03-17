@@ -7,6 +7,10 @@ import * as Events from '../utils/events.js';
 import keycode from 'keycode';
 import document from 'global/document';
 
+/**
+ * @typedef { import('./player').default } Player
+ */
+
 // Required children
 import './volume-control/volume-control.js';
 import './mute-toggle.js';
@@ -132,7 +136,7 @@ class VolumePanel extends Component {
    * Handles `keyup` events on the `VolumeControl`, looking for ESC, which closes
    * the volume panel and sets focus on `MuteToggle`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keyup` event that caused this function to be called.
    *
    * @listens keyup
@@ -148,7 +152,7 @@ class VolumePanel extends Component {
    * Turns on listening for `mouseover` event. When they happen it
    * calls `this.handleMouseOver`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mouseover` event that caused this function to be called.
    *
    * @listens mouseover
@@ -163,7 +167,7 @@ class VolumePanel extends Component {
    * Turns on listening for `mouseout` event. When they happen it
    * calls `this.handleMouseOut`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mouseout` event that caused this function to be called.
    *
    * @listens mouseout
@@ -177,7 +181,7 @@ class VolumePanel extends Component {
    * Handles `keyup` event on the document or `keydown` event on the `VolumePanel`,
    * looking for ESC, which hides the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The keypress that triggered this event.
    *
    * @listens keydown | keyup

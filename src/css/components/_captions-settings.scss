@@ -59,13 +59,13 @@
 }
 
 .vjs-text-track-settings fieldset {
-  margin: 5px;
-  padding: 3px;
+  margin: 10px;
   border: none;
 }
 
 .vjs-text-track-settings fieldset span {
   display: inline-block;
+  padding: 0 6px 8px;
 }
 
 // style the second select for text colors
@@ -75,17 +75,14 @@
 
 .vjs-text-track-settings legend {
   color: $primary-foreground-color;
-  margin: 0 0 5px 0;
+  font-weight: bold;
+  font-size: 14px;
 }
 
-// Hide labels, so they are only for screen reader users
 .vjs-text-track-settings .vjs-label {
-  position: absolute;
   clip: rect(1px 1px 1px 1px); // for Internet Explorer
   clip: rect(1px, 1px, 1px, 1px);
-  display: block;
-  margin: 0 0 5px 0;
-  padding: 0;
+  margin: 0 5px 5px 0;
   border: 0;
   height: 1px;
   width: 1px;
