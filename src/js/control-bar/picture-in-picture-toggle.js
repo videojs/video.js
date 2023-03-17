@@ -64,12 +64,12 @@ class PictureInPictureToggle extends Button {
   }
 
   /**
-   * Enables or disables button based on availablity of a Picture-In-Picture mode.
+   * Enables or disables button based on availability of a Picture-In-Picture mode.
    *
    * Enabled if
    * - `player.options().enableDocumentPictureInPicture` is true and
    *   window.documentPictureInPicture is available; or
-   * - `player.disablePictureInPicture()` is not `true and
+   * - `player.disablePictureInPicture()` is false and
    *   element.requestPictureInPicture is available
    */
   handlePictureInPictureEnabledChange() {

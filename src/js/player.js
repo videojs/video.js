@@ -3043,7 +3043,7 @@ class Player extends Component {
    * Else set `disablePictureInPicture` to `false` to disable elPiP on a supported browser
    *
    *
-   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   * @see [Spec]{@link https://w3c.github.io/picture-in-picture/}
    * @see [Spec]{@link https://wicg.github.io/document-picture-in-picture/}
    *
    * @fires Player#enterpictureinpicture
