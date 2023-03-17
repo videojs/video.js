@@ -3052,7 +3052,7 @@ class Player extends Component {
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
-    if (this.options_.enableDocumentPictureInPicture && 'documentPictureInPicture' in window) {
+    if (this.options_.enableDocumentPictureInPicture && window.documentPictureInPicture) {
       const pipContainer = document.createElement(this.el().tagName);
 
       pipContainer.classList = this.el().classList;
@@ -3114,6 +3114,7 @@ class Player extends Component {
    */
   exitPictureInPicture() {
     if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
+      // With documentPictureInPicture, Player#leavepictureinpicture is fired in the unload handler
       window.documentPictureInPicture.window.close();
       return Promise.resolve();
     }
