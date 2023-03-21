@@ -58,11 +58,7 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'tap', handleClick);
     this.on(this.menuButton_, 'click', handleClick);
     this.on(this.menuButton_, 'keydown', (e) => this.handleKeyDown(e));
-    this.on(this.menuButton_, 'mouseenter', () => {
-      this.addClass('vjs-hover');
-      this.menu.show();
-      Events.on(document, 'keyup', this.handleMenuKeyUp_);
-    });
+    this.on('mouseenter', (e) => this.handleMouseEnter(e));
     this.on('mouseleave', (e) => this.handleMouseLeave(e));
     this.on('keydown', (e) => this.handleSubmenuKeyDown(e));
   }
@@ -261,6 +257,20 @@ class MenuButton extends Component {
   handleMouseLeave(event) {
     this.removeClass('vjs-hover');
     Events.off(document, 'keyup', this.handleMenuKeyUp_);
+  }
+
+  /**
+   *
+   * @param {Event} event
+   *        The `mouseenter` event that caused this function to be called.
+   *
+   * @listens mouseenter
+   */
+  handleMouseEnter(event) {
+    this.addClass('vjs-hover');
+    this.buttonPressed_ = true;
+    this.menu.show();
+    Events.on(document, 'keyup', this.handleMenuKeyUp_);
   }
 
   /**
