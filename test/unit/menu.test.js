@@ -100,6 +100,39 @@ QUnit.test('clicking should display the menu', function(assert) {
   player.dispose();
 });
 
+QUnit.test('hovering should display the menu', function(assert) {
+  assert.expect(5);
+
+  const player = TestHelpers.makePlayer();
+
+  // Make sure there's some content in the menu, even if it's just a title!
+  const menuButton = new MenuButton(player, {
+    title: 'testTitle'
+  });
+  const el = menuButton.el();
+
+  assert.ok(menuButton.menu !== undefined, 'menu is created');
+
+  Events.trigger(el, 'mouseenter');
+
+  assert.ok(menuButton.hasClass('vjs-hover'), 'menu button is in hover state');
+
+  Events.trigger(el, 'mouseleave');
+
+  assert.ok(!menuButton.hasClass('vjs-hover'), 'menu button is no longer in hover state');
+
+  Events.trigger(el, 'mouseenter');
+
+  assert.ok(menuButton.hasClass('vjs-hover'), 'menu button is in hover state');
+
+  Events.trigger(menuButton.menuButton_.el(), 'click');
+
+  assert.ok(menuButton.menu.hasClass('vjs-hidden'), 'menu is hidden when clicked after mouseenter');
+
+  menuButton.dispose();
+  player.dispose();
+});
+
 QUnit.test('should keep all the added menu items', function(assert) {
   const player = TestHelpers.makePlayer();
 

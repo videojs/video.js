@@ -256,6 +256,7 @@ class MenuButton extends Component {
    */
   handleMouseLeave(event) {
     this.removeClass('vjs-hover');
+    this.buttonPressed_ = false;
     Events.off(document, 'keyup', this.handleMenuKeyUp_);
   }
 
