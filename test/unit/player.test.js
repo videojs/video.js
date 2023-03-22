@@ -2450,7 +2450,7 @@ QUnit.test('player.duration() returns NaN if player.cache_.duration is undefined
   const player = TestHelpers.makePlayer();
 
   player.cache_.duration = undefined;
-  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unkown duration');
+  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unknown duration');
 });
 
 QUnit.test('player.duration() returns player.cache_.duration if it is defined', function(assert) {
@@ -3086,4 +3086,3 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
       assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
 });
-

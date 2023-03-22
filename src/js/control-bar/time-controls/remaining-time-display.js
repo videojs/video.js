@@ -41,7 +41,7 @@ class RemainingTimeDisplay extends TimeDisplay {
   }
 
   /**
-   * Create the `Component`'s DOM element with the "minus" characted prepend to the time
+   * Create the `Component`'s DOM element with the "minus" character prepend to the time
    *
    * @return {Element}
    *         The element that was created.

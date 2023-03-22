@@ -759,7 +759,7 @@ class Player extends Component {
     this.addClass('vjs-paused');
 
     // Add a style element in the player that we'll use to set the width/height
-    // of the player in a way that's still overrideable by CSS, just like the
+    // of the player in a way that's still overridable by CSS, just like the
     // video element
     if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
       this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
@@ -873,7 +873,7 @@ class Player extends Component {
    * To get the current height use `currentheight()`.
    *
    * @param {number} [value]
-   *        The value to set the `Player`'s heigth to.
+   *        The value to set the `Player`'s height to.
    *
    * @return {number}
    *         The current height of the `Player` when getting.
@@ -1074,7 +1074,7 @@ class Player extends Component {
       // Use any width that's been specifically set
       width = this.width_;
     } else if (this.height_ !== undefined) {
-      // Or calulate the width from the aspect ratio if a height has been set
+      // Or calculate the width from the aspect ratio if a height has been set
       width = this.height_ / ratioMultiplier;
     } else {
       // Or use the video's metadata, or use the video el's default of 300
@@ -2364,7 +2364,7 @@ class Player extends Component {
   /**
    * These functions will be run when if play is terminated. If play
    * runPlayCallbacks_ is run these function will not be run. This allows us
-   * to differenciate between a terminated play and an actual call to play.
+   * to differentiate between a terminated play and an actual call to play.
    */
   runPlayTerminatedQueue_() {
     const queue = this.playTerminatedQueue_.slice(0);
@@ -2484,7 +2484,7 @@ class Player extends Component {
     // cache last currentTime and return. default to 0 seconds
     //
     // Caching the currentTime is meant to prevent a massive amount of reads on the tech's
-    // currentTime when scrubbing, but may not provide much performance benefit afterall.
+    // currentTime when scrubbing, but may not provide much performance benefit after all.
     // Should be tested. Also something has to read the actual current time or the cache will
     // never get updated.
     this.cache_.currentTime = (this.techGet_('currentTime') || 0);
@@ -2563,7 +2563,7 @@ class Player extends Component {
   }
 
   /**
-   * A remaining time function that is intented to be used when
+   * A remaining time function that is intended to be used when
    * the time is to be displayed directly to the user.
    *
    * @return {number}
@@ -4547,7 +4547,7 @@ class Player extends Component {
   }
 
   /**
-   * returns a JavaScript object reperesenting the current track
+   * returns a JavaScript object representing the current track
    * information. **DOES not return it as JSON**
    *
    * @return {Object}

@@ -13,7 +13,7 @@ TrackBaseline(AudioTrack, {
   kind: 'main'
 });
 
-QUnit.test('can create an enabled propert on an AudioTrack', function(assert) {
+QUnit.test('can create an enabled property on an AudioTrack', function(assert) {
   const enabled = true;
   const track = new AudioTrack({
     enabled

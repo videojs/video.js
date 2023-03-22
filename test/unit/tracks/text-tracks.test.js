@@ -164,7 +164,7 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function(asser
         }
         events[type].push(handler);
       },
-      // Requrired in player.dispose()
+      // Required in player.dispose()
       removeEventListener() {}
     };
   };

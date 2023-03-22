@@ -223,7 +223,7 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 
-  QUnit.test("don't select user langauge if it is an empty string", function(assert) {
+  QUnit.test("don't select user language if it is an empty string", function(assert) {
     const player = TestHelpers.makePlayer();
     const track1 = {
       kind: 'captions',
@@ -396,7 +396,7 @@ if (!Html5.supportsNativeTextTracks()) {
     const englishTrack = player.addRemoteTextTrack(track1, true).track;
     // Keep track of menu items
     const enCaptionMenuItem = getMenuItemByLanguage(captionsButton.items, 'en');
-    // we know the postition of the OffTextTrackMenuItem
+    // we know the position of the OffTextTrackMenuItem
     const offMenuItem = captionsButton.items[1];
 
     // Select English initially
