@@ -31,7 +31,7 @@ body:
       label: Reduced test case
       description: |
         Please add a URL to a [reduced test case](https://stackoverflow.com/help/minimal-reproducible-example) where the issue can be observed. We have a [starter template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) on Codepen.
-        *Without a test case* it's unlikely your issue can be actioned.
+        **Without a test case** it's unlikely your issue can be actioned.
         For a playback problem, including the stream URL is _essential._
       placeholder: https://
   - type: textarea
