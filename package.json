@@ -5,7 +5,6 @@
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
-  "types": "./dist/types/video.d.ts",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
   "license": "Apache-2.0",
   "keywords": [
