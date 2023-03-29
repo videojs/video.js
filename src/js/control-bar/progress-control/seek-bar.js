@@ -17,7 +17,7 @@ import './mouse-time-display.js';
 
 /**
  * @typedef { import('../../player').default } Player
- * @typedef {import('../event-target').Event} Event
+ * @typedef { import('../../event-target').Event } Event
  */
 
 // The number of seconds the `step*` functions move the timeline.
@@ -428,7 +428,7 @@ class SeekBar extends Slider {
    *   PageDown key moves back a larger step than ArrowDown
    *   PageUp key moves forward a large step
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

@@ -142,7 +142,7 @@ TimeDisplay.prototype.labelText_ = 'Time';
  * The text that should display over the `TimeDisplay`s controls. Added to for localization.
  *
  * @type {string}
- * @protected
+ * @public
  *
  * @deprecated in v7; controlText_ is not used in non-active display Components
  */

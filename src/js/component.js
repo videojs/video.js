@@ -1253,7 +1253,7 @@ class Component {
    * When this Component receives a `keydown` event which it does not process,
    *  it passes the event to the Player for handling.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    */
   handleKeyDown(event) {
@@ -1274,7 +1274,7 @@ class Component {
    * delegates to `handleKeyDown`. This means anyone calling `handleKeyPress`
    * will not see their method calls stop working.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The event that caused this function to be called.
    */
   handleKeyPress(event) {
@@ -1286,7 +1286,7 @@ class Component {
    * support toggling the controls through a tap on the video. They get enabled
    * because every sub-component would have extra overhead otherwise.
    *
-   * @private
+   * @protected
    * @fires Component#tap
    * @listens Component#touchstart
    * @listens Component#touchmove

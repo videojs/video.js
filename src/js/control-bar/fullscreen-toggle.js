@@ -86,7 +86,7 @@ class FullscreenToggle extends Button {
  * The text that should display over the `FullscreenToggle`s controls. Added for localization.
  *
  * @type {string}
- * @protected
+ * @public
  */
 FullscreenToggle.prototype.controlText_ = 'Fullscreen';
 

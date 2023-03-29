@@ -3084,7 +3084,7 @@ class Player extends Component {
    * This allows player-wide hotkeys (either as defined below, or optionally
    * by an external function).
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

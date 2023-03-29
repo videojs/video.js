@@ -307,7 +307,7 @@ class Slider extends Component {
    * arrow keys. This function will only be called when the slider has focus. See
    * {@link Slider#handleFocus} and {@link Slider#handleBlur}.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        the `keydown` event that caused this function to run.
    *
    * @listens keydown

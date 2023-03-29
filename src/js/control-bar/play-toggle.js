@@ -140,7 +140,7 @@ class PlayToggle extends Button {
  * The text that should display over the `PlayToggle`s controls. Added for localization.
  *
  * @type {string}
- * @protected
+ * @public
  */
 PlayToggle.prototype.controlText_ = 'Play';
 

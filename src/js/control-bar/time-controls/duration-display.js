@@ -85,7 +85,7 @@ DurationDisplay.prototype.labelText_ = 'Duration';
  * The text that should display over the `DurationDisplay`s controls. Added to for localization.
  *
  * @type {string}
- * @protected
+ * @public
  *
  * @deprecated in v7; controlText_ is not used in non-active display Components
  */

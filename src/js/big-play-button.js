@@ -6,10 +6,6 @@ import Component from './component.js';
 import {isPromise, silencePromise} from './utils/promise';
 
 /**
- *  @typedef {import('../event-target').Event} Event
- */
-
-/**
  * The initial play button that shows before the video has played. The hiding of the
  * `BigPlayButton` get done via CSS and `Player` states.
  *
@@ -38,8 +34,8 @@ class BigPlayButton extends Button {
    * This gets called when a `BigPlayButton` "clicked". See {@link ClickableComponent}
    * for more detailed information on what a click can be.
    *
-   * @param {Event} event
-   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   * @param {MouseEvent|TouchEvent} event
+   *        The `tap` or `click` event that caused this function to be
    *        called.
    *
    * @listens tap
@@ -49,7 +45,7 @@ class BigPlayButton extends Button {
     const playPromise = this.player_.play();
 
     // exit early if clicked via the mouse
-    if (this.mouseused_ && event.clientX && event.clientY) {
+    if (this.mouseused_ && 'clientX' in event && 'clientY' in event) {
       silencePromise(playPromise);
 
       if (this.player_.tech(true)) {
@@ -76,12 +72,29 @@ class BigPlayButton extends Button {
     }
   }
 
+  /**
+   * Event handler that is called when a `BigPlayButton` receives a
+   * `keydown` event.
+   *
+   * @param {KeyboardEvent} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens keydown
+   */
   handleKeyDown(event) {
     this.mouseused_ = false;
 
     super.handleKeyDown(event);
   }
 
+  /**
+   * Handle `mousedown` events on the `BigPlayButton`.
+   *
+   * @param {MouseEvent} event
+   *        `mousedown` or `touchstart` event that triggered this function
+   *
+   * @listens mousedown
+   */
   handleMouseDown(event) {
     this.mouseused_ = true;
   }
@@ -91,7 +104,7 @@ class BigPlayButton extends Button {
  * The text that should display over the `BigPlayButton`s controls. Added to for localization.
  *
  * @type {string}
- * @protected
+ * @public
  */
 BigPlayButton.prototype.controlText_ = 'Play Video';
 

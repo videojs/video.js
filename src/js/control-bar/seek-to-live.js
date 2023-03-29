@@ -100,7 +100,7 @@ class SeekToLive extends Button {
  * The text that should display over the `SeekToLive`s control. Added for localization.
  *
  * @type {string}
- * @protected
+ * @public
  */
 SeekToLive.prototype.controlText_ = 'Seek to live, currently playing live';
 

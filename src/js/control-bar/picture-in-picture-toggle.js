@@ -118,7 +118,7 @@ class PictureInPictureToggle extends Button {
  * The text that should display over the `PictureInPictureToggle`s controls. Added for localization.
  *
  * @type {string}
- * @protected
+ * @public
  */
 PictureInPictureToggle.prototype.controlText_ = 'Picture-in-Picture';
 
