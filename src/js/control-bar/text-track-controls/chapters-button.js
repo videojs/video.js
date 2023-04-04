@@ -9,7 +9,7 @@ import {toTitleCase} from '../../utils/str.js';
 /**
  * @typedef { import('../../player').default } Player
  * @typedef { import('../../menu/menu').default } Menu
- * @typedef { import('../text-track-menu-item/menu/').default } TextTrackMenuItem
+ * @typedef { import('./text-track-menu-item').default } TextTrackMenuItem
  */
 
 /**

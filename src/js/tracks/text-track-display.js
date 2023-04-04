@@ -7,8 +7,8 @@ import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
 /**
- * @typedef { import('./player').default } Player
- * @typedef { import('./tech/tech').default } Tech
+ * @typedef { import('../player').default } Player
+ * @typedef { import('../tech/tech').default } Tech
  */
 
 const darkGray = '#222';

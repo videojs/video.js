@@ -21,7 +21,7 @@
           "class": "link-vjs"
         },
         {
-          "title": "v8.0.2 source",
+          "title": "v8.2.1 source",
           "link": "https://github.com/videojs/video.js",
           "class": "link-gh"
         },
@@ -59,6 +59,7 @@
     }
   },
   "plugins": [
+    "node_modules/jsdoc-tsimport-plugin/index.js",
     "plugins/markdown",
     "build/jsdoc-typeof-plugin"
   ],
