@@ -1,6 +1,6 @@
 name: General issue
 description: Report a general issue with Video.js
-labels: "needs: triage, bug"
+labels: "needs: triage"
 body:
   - type: markdown
     attributes:
@@ -9,9 +9,10 @@ body:
         * If you are not reporting a bug, but want to ask a general question, use [discussions](https://github.com/videojs/video.js/discussions) instead.
         * Check the [FAQ](https://videojs.com/guides/faqs) and [troubleshooting guides](https://videojs.com/guides/troubleshooting).
         * If there is an existing open issue for exactly the same problem, comment there instead.
-          * However, be careful not to comment on old, closed issues, the new comment is unlikely to be noticed.
-          * Take care to make sure it is really the exact same issue. If in doubt, open as a new issue.
-        * If the issue is with a specific plugin, it's often better to open an issue on the plugin repository instead.
+          * However, be careful not to comment on old and closed issues. Your new comment is unlikely to be noticed.
+          * Take care to make sure it is really the exact same issue. Conflating tangentially related issues is counterproductive. If in doubt, open as a new issue.
+          * Add useful new information, such as a new reproducible case to help narrow down the issue.
+        * If the issue is with a specific plugin, it's generally better to open an issue on the plugin repository instead.
         * Please do take the time to give detailed information, and include a test case. A detailed issue with actionable information will get a better response than a vague anecdote.
   - type: textarea
     id: description
@@ -24,12 +25,14 @@ body:
       required: true
   - type: input
     id: testcase
+    validations:
+      required: true
     attributes:
       label: Reduced test case
       description: |
         Please add a URL to a [reduced test case](https://stackoverflow.com/help/minimal-reproducible-example) where the issue can be observed. We have a [starter template](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0) on Codepen.
-        Providing a test case will improve the chances of someone being able to identify the issue quickly.
-        For a playback problem, including the stream URL is essential.
+        **Without a test case** it's unlikely your issue can be actioned.
+        For a playback problem, including the stream URL is _essential._
       placeholder: https://
   - type: textarea
     id: str
