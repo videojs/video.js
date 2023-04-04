@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <meta http-equiv="origin-trial" content="AruMDfzKHqbkAi4xRXZRAmpUv/hnpKsuR0VB+B6S7TGJOZBQv6ZQ0jaH6+EDW1tHjwYBlBAObmYinZ/aGtaLGwQAAACYeyJvcmlnaW4iOiJodHRwczovL2RlcGxveS1wcmV2aWV3LTgxMTMtLXZpZGVvanMtcHJldmlldy5uZXRsaWZ5LmFwcDo0NDMiLCJmZWF0dXJlIjoiRG9jdW1lbnRQaWN0dXJlSW5QaWN0dXJlQVBJIiwiZXhwaXJ5IjoxNjk0MTMxMTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=" />
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
+    <pre>npm start</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+
+  <p>Document Picture-in-Picture is available in Chrome version 111 onwards.</p>
+
+  <video-js
+    id="vid1"
+    controls
+    preload="auto"
+    width="640"
+    height="264"></video-js>
+  </video-js>
+
+  <script>
+    var vid = document.getElementById('vid1');
+    var player = videojs(vid, {
+      enableDocumentPictureInPicture: true
+    });
+    player.loadMedia({
+      artist: 'Disney',
+      album: 'Oceans',
+      title: 'Oceans',
+      description: 'Journey in to the depths of a wonderland filled with mystery, beauty and power. Oceans is a spectacular story, narrated by Pierce Brosnan, about remarkable creatures under the sea. It\'s an unprecedented look at the lives of these elusive deepwater creatures through their own eyes. Incredible state-of-the-art-underwater filmmaking will take your breath away as you migrate with whales, swim alongside a great white shark and race with dolphins at play.',
+      poster: 'https://vjs.zencdn.net/v/oceans.png',
+      src: [{
+        src: 'https://vjs.zencdn.net/v/oceans.mp4',
+        type: 'video/mp4',
+      }]
+    })
+
+    player.on(['enterpictureinpicture', 'leavepictureinpicture', 'disablepictureinpicturechanged'], e => {
+      console.log(e.type);
+    });
+    player.disablePictureInPicture(true);
+    player.log('window.player created', player);
+  </script>
+
+</body>
+</html>

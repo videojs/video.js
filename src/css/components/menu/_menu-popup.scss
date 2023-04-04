@@ -9,6 +9,11 @@
   border-top-color: rgba($primary-background-color, $primary-background-transparency); // Same as ul background
 }
 
+.vjs-pip-window .vjs-menu-button-popup .vjs-menu {
+  left: unset;
+  right: 1em; // Extra offset for last menu button in pip window, as fullscreen button not present
+}
+
 // Button Pop-up Menu
 .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
