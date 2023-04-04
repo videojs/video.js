@@ -3587,7 +3587,17 @@ class Player extends Component {
   resetProgressBar_() {
     this.currentTime(0);
 
-    const { durationDisplay, remainingTimeDisplay } = this.controlBar || {};
+    const {
+      currentTimeDisplay,
+      durationDisplay,
+      progressControl,
+      remainingTimeDisplay
+    } = this.controlBar || {};
+    const { seekBar } = progressControl || {};
+
+    if (currentTimeDisplay) {
+      currentTimeDisplay.updateContent();
+    }
 
     if (durationDisplay) {
       durationDisplay.updateContent();
@@ -3595,6 +3605,14 @@ class Player extends Component {
 
     if (remainingTimeDisplay) {
       remainingTimeDisplay.updateContent();
+    }
+
+    if (seekBar) {
+      seekBar.update();
+
+      if (seekBar.loadProgressBar) {
+        seekBar.loadProgressBar.update();
+      }
     }
   }
 
