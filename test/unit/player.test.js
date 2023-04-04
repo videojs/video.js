@@ -2450,7 +2450,7 @@ QUnit.test('player.duration() returns NaN if player.cache_.duration is undefined
   const player = TestHelpers.makePlayer();
 
   player.cache_.duration = undefined;
-  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unkown duration');
+  assert.ok(Number.isNaN(player.duration()), 'returned NaN for unknown duration');
 });
 
 QUnit.test('player.duration() returns player.cache_.duration if it is defined', function(assert) {
@@ -2750,12 +2750,150 @@ QUnit[testOrSkip]('Should only allow requestPictureInPicture if the tech support
   assert.equal(count, 1, 'requestPictureInPicture passed through to supporting tech');
 
   player.tech_.el_.disablePictureInPicture = true;
-  player.requestPictureInPicture();
+  player.requestPictureInPicture().catch(_ => {});
   assert.equal(count, 1, 'requestPictureInPicture not passed through when disabled on tech');
 
   delete player.tech_.el_.disablePictureInPicture;
-  player.requestPictureInPicture();
+  player.requestPictureInPicture().catch(_ => {});
   assert.equal(count, 1, 'requestPictureInPicture not passed through when tech does not support');
+});
+
+QUnit.test('document pictureinpicture is opt-in', function(assert) {
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    disablePictureInPicture: true
+  });
+
+  const testPiPObj = {};
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.requestPictureInPicture().catch(e => {
+    assert.equal(e, 'No PiP mode is available', 'docPiP not used when not enabled');
+  }).finally(_ => {
+    if (window.documentPictureInPicture === testPiPObj) {
+      delete window.documentPictureInPicture;
+    }
+    done();
+  });
+
+});
+
+QUnit.test('docPiP is used in preference to winPiP', function(assert) {
+  assert.expect(2);
+
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    enableDocumentPictureInPicture: true
+  });
+  let count = 0;
+
+  player.tech_.el_ = {
+    disablePictureInPicture: false,
+    requestPictureInPicture() {
+      count++;
+    }
+  };
+
+  const testPiPObj = {
+    requestWindow() {
+      return Promise.resolve({});
+    }
+  };
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  // Test isn't concerned with whether the browser allows the request,
+  player.requestPictureInPicture().then(_ => {
+    assert.ok(true, 'docPiP was called');
+  }).catch(_ => {
+    assert.ok(true, 'docPiP was called');
+  }).finally(_ => {
+    assert.equal(0, count, 'requestPictureInPicture not passed to tech');
+    if (window.documentPictureInPicture === testPiPObj) {
+      delete window.documentPictureInPicture;
+    }
+    done();
+  });
+});
+
+QUnit.test('docPiP moves player and triggers events', function(assert) {
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    enableDocumentPictureInPicture: true
+  });
+  const playerParent = player.el().parentElement;
+
+  player.videoHeight = () => 9;
+  player.videoWidth = () => 16;
+
+  const counts = {
+    enterpictureinpicture: 0,
+    leavepictureinpicture: 0
+  };
+
+  player.on(Object.keys(counts), function(e) {
+    counts[e.type]++;
+  });
+
+  const fakePiPWindow = document.createElement('div');
+
+  fakePiPWindow.document = {
+    body: document.createElement('div')
+  };
+  fakePiPWindow.querySelector = function(sel) {
+    return fakePiPWindow.document.body.querySelector(sel);
+  };
+  fakePiPWindow.close = function() {
+    fakePiPWindow.dispatchEvent(new Event('unload'));
+    delete window.documentPictureInPicture.window;
+  };
+
+  const testPiPObj = {
+    requestWindow() {
+      window.documentPictureInPicture.window = fakePiPWindow;
+      return Promise.resolve(fakePiPWindow);
+    }
+  };
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.requestPictureInPicture().then(win => {
+    assert.ok(player.el().parentElement === win.document.body, 'player el was moved');
+    assert.ok(playerParent.querySelector('.vjs-pip-container'), 'placeholder el was added');
+    assert.ok(player.isInPictureInPicture(), 'player is in pip state');
+    assert.equal(counts.enterpictureinpicture, 1, '`enterpictureinpicture` triggered');
+
+    player.exitPictureInPicture().then(_ => {
+      assert.ok(player.el().parentElement === playerParent, 'player el was restored');
+      assert.notOk(playerParent.querySelector('.vjs-pip-container'), 'placeholder el was removed');
+      assert.notOk(player.isInPictureInPicture(), 'player is not in pip state');
+      assert.equal(counts.leavepictureinpicture, 1, '`leavepictureinpicture` triggered');
+
+      if (window.documentPictureInPicture === testPiPObj) {
+        delete window.documentPictureInPicture;
+      }
+      done();
+    });
+  }).catch(e => {
+    if (e === 'No PiP mode is available') {
+      assert.ok(true, 'Test skipped because PiP not available');
+    } else if (e.name && e.name === 'NotAllowedError') {
+      assert.ok(true, 'Test skipped because PiP not allowed');
+    } else {
+      assert.notOk(true, 'An unexpected error occurred');
+    }
+    if (window.documentPictureInPicture === testPiPObj) {
+      delete window.documentPictureInPicture;
+    }
+    done();
+  });
 });
 
 QUnit.test('playbackRates should trigger a playbackrateschange event', function(assert) {
@@ -3086,4 +3224,3 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
       assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
 });
-

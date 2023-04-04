@@ -759,7 +759,7 @@ class Player extends Component {
     this.addClass('vjs-paused');
 
     // Add a style element in the player that we'll use to set the width/height
-    // of the player in a way that's still overrideable by CSS, just like the
+    // of the player in a way that's still overridable by CSS, just like the
     // video element
     if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
       this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
@@ -873,7 +873,7 @@ class Player extends Component {
    * To get the current height use `currentheight()`.
    *
    * @param {number} [value]
-   *        The value to set the `Player`'s heigth to.
+   *        The value to set the `Player`'s height to.
    *
    * @return {number}
    *         The current height of the `Player` when getting.
@@ -1074,7 +1074,7 @@ class Player extends Component {
       // Use any width that's been specifically set
       width = this.width_;
     } else if (this.height_ !== undefined) {
-      // Or calulate the width from the aspect ratio if a height has been set
+      // Or calculate the width from the aspect ratio if a height has been set
       width = this.height_ / ratioMultiplier;
     } else {
       // Or use the video's metadata, or use the video el's default of 300
@@ -2364,7 +2364,7 @@ class Player extends Component {
   /**
    * These functions will be run when if play is terminated. If play
    * runPlayCallbacks_ is run these function will not be run. This allows us
-   * to differenciate between a terminated play and an actual call to play.
+   * to differentiate between a terminated play and an actual call to play.
    */
   runPlayTerminatedQueue_() {
     const queue = this.playTerminatedQueue_.slice(0);
@@ -2484,7 +2484,7 @@ class Player extends Component {
     // cache last currentTime and return. default to 0 seconds
     //
     // Caching the currentTime is meant to prevent a massive amount of reads on the tech's
-    // currentTime when scrubbing, but may not provide much performance benefit afterall.
+    // currentTime when scrubbing, but may not provide much performance benefit after all.
     // Should be tested. Also something has to read the actual current time or the cache will
     // never get updated.
     this.cache_.currentTime = (this.techGet_('currentTime') || 0);
@@ -2563,7 +2563,7 @@ class Player extends Component {
   }
 
   /**
-   * A remaining time function that is intented to be used when
+   * A remaining time function that is intended to be used when
    * the time is to be displayed directly to the user.
    *
    * @return {number}
@@ -3037,7 +3037,14 @@ class Player extends Component {
    * continue consuming media while they interact with other content sites, or
    * applications on their device.
    *
-   * @see [Spec]{@link https://wicg.github.io/picture-in-picture}
+   * This can use document picture-in-picture or element picture in picture
+   *
+   * Set `enableDocumentPictureInPicture` to `true` to use docPiP on a supported browser
+   * Else set `disablePictureInPicture` to `false` to disable elPiP on a supported browser
+   *
+   *
+   * @see [Spec]{@link https://w3c.github.io/picture-in-picture/}
+   * @see [Spec]{@link https://wicg.github.io/document-picture-in-picture/}
    *
    * @fires Player#enterpictureinpicture
    *
@@ -3045,6 +3052,44 @@ class Player extends Component {
    *         A promise with a Picture-in-Picture window.
    */
   requestPictureInPicture() {
+    if (this.options_.enableDocumentPictureInPicture && window.documentPictureInPicture) {
+      const pipContainer = document.createElement(this.el().tagName);
+
+      pipContainer.classList = this.el().classList;
+      pipContainer.classList.add('vjs-pip-container');
+      if (this.posterImage) {
+        pipContainer.appendChild(this.posterImage.el().cloneNode(true));
+      }
+      if (this.titleBar) {
+        pipContainer.appendChild(this.titleBar.el().cloneNode(true));
+      }
+      pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in picture-in-picture')));
+
+      return window.documentPictureInPicture.requestWindow({
+        // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
+        initialAspectRatio: this.videoWidth() / this.videoHeight(),
+        copyStyleSheets: true
+      }).then(pipWindow => {
+        this.el_.parentNode.insertBefore(pipContainer, this.el_);
+
+        pipWindow.document.body.append(this.el_);
+        pipWindow.document.body.classList.add('vjs-pip-window');
+
+        this.player_.isInPictureInPicture(true);
+        this.player_.trigger('enterpictureinpicture');
+
+        // Listen for the PiP closing event to move the video back.
+        pipWindow.addEventListener('unload', (event) => {
+          const pipVideo = event.target.querySelector('.video-js');
+
+          pipContainer.replaceWith(pipVideo);
+          this.player_.isInPictureInPicture(false);
+          this.player_.trigger('leavepictureinpicture');
+        });
+
+        return pipWindow;
+      });
+    }
     if ('pictureInPictureEnabled' in document && this.disablePictureInPicture() === false) {
       /**
        * This event fires when the player enters picture in picture mode
@@ -3054,6 +3099,7 @@ class Player extends Component {
        */
       return this.techGet_('requestPictureInPicture');
     }
+    return Promise.reject('No PiP mode is available');
   }
 
   /**
@@ -3067,7 +3113,13 @@ class Player extends Component {
    *         A promise.
    */
   exitPictureInPicture() {
+    if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
+      // With documentPictureInPicture, Player#leavepictureinpicture is fired in the unload handler
+      window.documentPictureInPicture.window.close();
+      return Promise.resolve();
+    }
     if ('pictureInPictureEnabled' in document) {
+
       /**
        * This event fires when the player leaves picture in picture mode
        *
@@ -4547,7 +4599,7 @@ class Player extends Component {
   }
 
   /**
-   * returns a JavaScript object reperesenting the current track
+   * returns a JavaScript object representing the current track
    * information. **DOES not return it as JSON**
    *
    * @return {Object}

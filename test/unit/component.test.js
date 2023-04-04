@@ -900,7 +900,7 @@ QUnit.test('should emit a tap event', function(assert) {
   ]});
   comp.trigger('touchend');
 
-  // A touchmove with a lot of movement by modifying the exisiting touch object
+  // A touchmove with a lot of movement by modifying the existing touch object
   // should not trigger a tap
   singleTouch = { pageX: 0, pageY: 0 };
   Events.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
@@ -909,7 +909,7 @@ QUnit.test('should emit a tap event', function(assert) {
   Events.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
-  // A touchmove with not much movement by modifying the exisiting touch object
+  // A touchmove with not much movement by modifying the existing touch object
   // should still allow a tap
   singleTouch = { pageX: 0, pageY: 0 };
   Events.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
@@ -918,7 +918,7 @@ QUnit.test('should emit a tap event', function(assert) {
   Events.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
-  // Reset to orignial value
+  // Reset to original value
   browser.stub_TOUCH_ENABLED(origTouch);
   comp.dispose();
 });

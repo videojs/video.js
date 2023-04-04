@@ -67,7 +67,7 @@ export let IS_CHROMIUM = false;
  * This will also be `true` for Chrome on iOS, which will have different support
  * as it is actually Safari under the hood.
  *
- * Depreacted, as the behaviour to not match Edge was to prevent Legacy Edge's UA matching.
+ * Deprecated, as the behaviour to not match Edge was to prevent Legacy Edge's UA matching.
  * IS_CHROMIUM should be used instead.
  * "Chromium but not Edge" could be explicitly tested with IS_CHROMIUM && !IS_EDGE
  *
@@ -88,7 +88,7 @@ export let CHROMIUM_VERSION = null;
 /**
  * The detected Google Chrome version - or `null`.
  * This has always been the _Chromium_ version, i.e. would return on Chromium Edge.
- * Depreacted, use CHROMIUM_VERSION instead.
+ * Deprecated, use CHROMIUM_VERSION instead.
  *
  * @static
  * @deprecated
@@ -167,7 +167,7 @@ if (UAD) {
   IS_WINDOWS = UAD.platform === 'Windows';
 }
 
-// If the broser is not Chromium, either userAgentData is not present which could be an old Chromium browser,
+// If the browser is not Chromium, either userAgentData is not present which could be an old Chromium browser,
 //  or it's a browser that has added userAgentData since that we don't have tests for yet. In either case,
 // the checks need to be made agiainst the regular userAgent string.
 if (!IS_CHROMIUM) {

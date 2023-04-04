@@ -119,13 +119,15 @@
   display: none;
 }
 
-// Fullscreen Styles
-body.vjs-full-window {
+// Fullscreen and Document Picture-in-Picture Styles
+body.vjs-full-window,
+body.vjs-pip-window {
   padding: 0;
   margin: 0;
   height: 100%;
 }
-.vjs-full-window .video-js.vjs-fullscreen {
+.vjs-full-window .video-js.vjs-fullscreen,
+body.vjs-pip-window .video-js {
   position: fixed;
   overflow: hidden;
   z-index: 1000;
@@ -134,7 +136,8 @@ body.vjs-full-window {
   bottom: 0;
   right: 0;
 }
-.video-js.vjs-fullscreen:not(.vjs-ios-native-fs) {
+.video-js.vjs-fullscreen:not(.vjs-ios-native-fs),
+body.vjs-pip-window .video-js {
   width: 100% !important;
   height: 100% !important;
   // Undo any aspect ratio padding for fluid layouts
@@ -143,6 +146,23 @@ body.vjs-full-window {
 
 .video-js.vjs-fullscreen.vjs-user-inactive {
   cursor: none;
+}
+
+.vjs-pip-container .vjs-pip-text {
+  position: absolute;
+  bottom: 10%;
+  font-size: 2em;
+  background-color: rgba(0, 0, 0, .7);
+  padding: .5em;
+  text-align: center;
+  width: 100%
+}
+
+.vjs-layout-tiny.vjs-pip-container .vjs-pip-text,
+.vjs-layout-x-small.vjs-pip-container .vjs-pip-text,
+.vjs-layout-small.vjs-pip-container .vjs-pip-text {
+  bottom: 0;
+  font-size: 1.4em;
 }
 
 

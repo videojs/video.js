@@ -315,7 +315,7 @@ const EventedMixin = {
     } else {
       // TODO: This wrapper is incorrect! It should only
       //       remove the wrapper for the event type that called it.
-      //       Instead all listners are removed on the first trigger!
+      //       Instead all listeners are removed on the first trigger!
       //       see https://github.com/videojs/video.js/issues/5962
       const wrapper = (...largs) => {
         this.off(target, type, wrapper);

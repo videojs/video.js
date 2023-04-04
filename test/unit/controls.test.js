@@ -13,6 +13,7 @@ import SeekBar from '../../src/js/control-bar/progress-control/seek-bar.js';
 import RemainingTimeDisplay from '../../src/js/control-bar/time-controls/remaining-time-display.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
 import sinon from 'sinon';
 
 QUnit.module('Controls', {
@@ -298,6 +299,30 @@ QUnit.test('Picture-in-Picture control is hidden when the source is audio', func
 
   player.dispose();
   pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control is displayed if docPiP is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({
+    disablePictureInPicture: true,
+    enableDocumentPictureInPicture: true
+  });
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+  const testPiPObj = {};
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.src({src: 'example.mp4', type: 'video/mp4'});
+  player.trigger('loadedmetadata');
+
+  assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+  if (window.documentPictureInPicture === testPiPObj) {
+    delete window.documentPictureInPicture;
+  }
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {

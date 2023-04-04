@@ -70,7 +70,7 @@ Bug fixes require a test case that fails beforehand and succeeds after. All code
 
 ### Involving the TSC
 
-A change or issue can be elevated to the TSC by assing the `tsc-agent` label. This should be done in the following scenarios:
+A change or issue can be elevated to the TSC by assigning the `tsc-agent` label. This should be done in the following scenarios:
 
 * There will be a major impact on the codebase or project
 * The change is inherently controversial
@@ -235,7 +235,7 @@ fixup 433c582 Update TOC
 edit 259dee6 Add grunt and doctoc npm scripts
 ```
 
-When you get to the edit commits, git will give more information, but you'd want to run ammend the current commit while following our commit guidelines
+When you get to the edit commits, git will give more information, but you'd want to run amend the current commit while following our commit guidelines
 
 ```sh
 git commit --amend

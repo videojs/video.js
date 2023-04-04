@@ -162,7 +162,7 @@ class Slider extends Component {
     }
     // Do not call preventDefault() on touchstart in Chrome
     // to avoid console warnings. Use a 'touch-action: none' style
-    // instead to prevent unintented scrolling.
+    // instead to prevent unintended scrolling.
     // https://developers.google.com/web/updates/2017/01/scrolling-intervention
     if (event.type === 'touchstart' && !IS_CHROME) {
       event.preventDefault();
@@ -303,7 +303,7 @@ class Slider extends Component {
   }
 
   /**
-   * Handle a `keydown` event on the `Slider`. Watches for left, rigth, up, and down
+   * Handle a `keydown` event on the `Slider`. Watches for left, right, up, and down
    * arrow keys. This function will only be called when the slider has focus. See
    * {@link Slider#handleFocus} and {@link Slider#handleBlur}.
    *

@@ -46,7 +46,7 @@ class Component {
    *        The key/value store of component options.
    *
    * @param {Object[]} [options.children]
-   *        An array of children objects to intialize this component with. Children objects have
+   *        An array of children objects to initialize this component with. Children objects have
    *        a name property that will be used if more than one component of the same type needs to be
    *        added.
    *
@@ -420,7 +420,7 @@ class Component {
   }
 
   /**
-   * Handles language change for the player in components. Should be overriden by sub-components.
+   * Handles language change for the player in components. Should be overridden by sub-components.
    *
    * @abstract
    */
@@ -754,7 +754,7 @@ class Component {
         })
         .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
-        // techs are registerd as Components but can't aren't compatible
+        // techs are registered as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
           const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
@@ -766,7 +766,7 @@ class Component {
   }
 
   /**
-   * Builds the default DOM class name. Should be overriden by sub-components.
+   * Builds the default DOM class name. Should be overridden by sub-components.
    *
    * @return {string}
    *         The DOM class name for this object.
@@ -980,7 +980,7 @@ class Component {
    *         - The value of the attribute that was asked for.
    *         - Can be an empty string on some browsers if the attribute does not exist
    *           or has no value
-   *         - Most browsers will return null if the attibute does not exist or has
+   *         - Most browsers will return null if the attribute does not exist or has
    *           no value.
    *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute}
@@ -1545,7 +1545,7 @@ class Component {
 
   /**
    * Clears an interval that gets created via `window.setInterval` or
-   * {@link Component#setInterval}. If you set an inteval via {@link Component#setInterval}
+   * {@link Component#setInterval}. If you set an interval via {@link Component#setInterval}
    * use this function instead of `window.clearInterval`. If you don't your dispose
    * listener will not get cleaned up until {@link Component#dispose}!
    *
