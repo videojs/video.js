@@ -5,10 +5,6 @@ import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * The chapter track menu item
  *
  * @extends MenuItem
@@ -18,7 +14,7 @@ class ChaptersTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

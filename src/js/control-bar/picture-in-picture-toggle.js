@@ -6,10 +6,6 @@ import Component from '../component.js';
 import document from 'global/document';
 
 /**
- * @typedef { import('./player').default } Player
- */
-
-/**
  * Toggle Picture-in-Picture mode
  *
  * @extends Button
@@ -19,7 +15,7 @@ class PictureInPictureToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

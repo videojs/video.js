@@ -12,10 +12,6 @@ import XHR from '@videojs/xhr';
 import {merge} from '../utils/obj';
 
 /**
- * @typedef { import('../tech/tech').default } Tech
- */
-
-/**
  * Takes a webvtt file contents and parses it into cues
  *
  * @param {string} srcContent
@@ -132,7 +128,7 @@ class TextTrack extends Track {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param {Tech} options.tech
+   * @param { import('../tech/tech').default } options.tech
    *        A reference to the tech that owns this TextTrack.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']

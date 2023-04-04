@@ -6,10 +6,6 @@ import * as Dom from '../../utils/dom.js';
 import {clamp} from '../../utils/num';
 import document from 'global/document';
 
-/**
- * @typedef { import('../../player').default } Player
- */
-
 // get the percent width of a time compared to the total end
 const percentify = (time, end) => clamp((time / end) * 100, 0, 100).toFixed(2) + '%';
 
@@ -23,7 +19,7 @@ class LoadProgressBar extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

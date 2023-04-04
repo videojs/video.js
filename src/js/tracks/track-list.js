@@ -5,10 +5,6 @@ import EventTarget from '../event-target';
 import {isEvented} from '../mixins/evented';
 
 /**
- * @typedef { import('./track').default } Track
- */
-
-/**
  * Common functionaliy between {@link TextTrackList}, {@link AudioTrackList}, and
  * {@link VideoTrackList}
  *
@@ -18,7 +14,7 @@ class TrackList extends EventTarget {
   /**
    * Create an instance of this class
    *
-   * @param {Track[]} tracks
+   * @param { import('./track').default[] } tracks
    *        A list of tracks to initialize the list with.
    *
    * @abstract
@@ -48,7 +44,7 @@ class TrackList extends EventTarget {
   /**
    * Add a {@link Track} to the `TrackList`
    *
-   * @param {Track} track
+   * @param { import('./track').default } track
    *        The audio, video, or text track to add to the list.
    *
    * @fires TrackList#addtrack
@@ -106,7 +102,7 @@ class TrackList extends EventTarget {
   /**
    * Remove a {@link Track} from the `TrackList`
    *
-   * @param {Track} rtrack
+   * @param { import('./track').default } rtrack
    *        The audio, video, or text track to remove from the list.
    *
    * @fires TrackList#removetrack
@@ -151,7 +147,7 @@ class TrackList extends EventTarget {
    *
    * @param {string} id - the id of the track to get
    * @method getTrackById
-   * @return {Track}
+   * @return { import('./track').default }
    * @private
    */
   getTrackById(id) {

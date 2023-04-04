@@ -5,10 +5,6 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * The menu item for caption track settings menu
  *
  * @extends TextTrackMenuItem
@@ -18,7 +14,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

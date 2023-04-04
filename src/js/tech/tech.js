@@ -17,10 +17,6 @@ import vtt from 'videojs-vtt.js';
 import * as Guid from '../utils/guid.js';
 
 /**
- * @typedef { import('../utils/time').TimeRange } TimeRange
- */
-
-/**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
  * that just contains the src url alone.
  * * `var SourceObject = {src: 'http://ex.com/video.mp4', type: 'video/mp4'};`
@@ -279,7 +275,7 @@ class Tech extends Component {
   /**
    * Get and create a `TimeRange` object for buffering.
    *
-   * @return {TimeRange}
+   * @return { import('../utils/time').TimeRange }
    *         The time range object that was created.
    */
   buffered() {

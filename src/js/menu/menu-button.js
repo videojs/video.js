@@ -12,10 +12,6 @@ import document from 'global/document';
 import keycode from 'keycode';
 
 /**
- * @typedef { import('../player').default } Player
- */
-
-/**
  * A `MenuButton` class for any popup {@link Menu}.
  *
  * @extends Component
@@ -25,7 +21,7 @@ class MenuButton extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

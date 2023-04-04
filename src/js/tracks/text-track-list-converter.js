@@ -6,10 +6,6 @@
  */
 
 /**
- * @typedef { import('../tech/tech').default } Tech
- */
-
-/**
  * Examine a single {@link TextTrack} and return a JSON-compatible javascript object that
  * represents the {@link TextTrack}'s state.
  *
@@ -50,7 +46,7 @@ const trackToJson_ = function(track) {
  * state of all {@link TextTrack}s currently configured. The return array is compatible with
  * {@link text-track-list-converter:jsonToTextTracks}.
  *
- * @param {Tech} tech
+ * @param { import('../tech/tech').default } tech
  *        The tech object to query
  *
  * @return {Array}

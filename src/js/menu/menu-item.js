@@ -8,10 +8,6 @@ import keycode from 'keycode';
 import {createEl} from '../utils/dom.js';
 
 /**
- * @typedef { import('../player').default } Player
- */
-
-/**
  * The component for a menu item. `<li>`
  *
  * @extends ClickableComponent
@@ -21,7 +17,7 @@ class MenuItem extends ClickableComponent {
   /**
    * Creates an instance of the this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

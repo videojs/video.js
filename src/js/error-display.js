@@ -5,10 +5,6 @@ import Component from './component';
 import ModalDialog from './modal-dialog';
 
 /**
- * @typedef { import('./player').default } Player
- */
-
-/**
  * A display that indicates an error has occurred. This means that the video
  * is unplayable.
  *
@@ -19,7 +15,7 @@ class ErrorDisplay extends ModalDialog {
   /**
    * Creates an instance of this class.
    *
-   * @param  {Player} player
+   * @param  { import('./player').default } player
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]

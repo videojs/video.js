@@ -6,10 +6,6 @@ import Component from './component.js';
 import {isPromise, silencePromise} from './utils/promise';
 
 /**
- *  @typedef {import('../event-target').Event} Event
- */
-
-/**
  * The initial play button that shows before the video has played. The hiding of the
  * `BigPlayButton` get done via CSS and `Player` states.
  *
@@ -38,7 +34,7 @@ class BigPlayButton extends Button {
    * This gets called when a `BigPlayButton` "clicked". See {@link ClickableComponent}
    * for more detailed information on what a click can be.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
