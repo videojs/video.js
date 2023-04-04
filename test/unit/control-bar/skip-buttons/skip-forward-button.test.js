@@ -2,6 +2,7 @@
 import TestHelpers from '../../test-helpers';
 import sinon from 'sinon';
 import { createTimeRange } from '../../../../src/js/utils/time';
+import videojs from '../../../../src/js/video.js';
 
 QUnit.module('SkipForwardButton');
 
@@ -112,6 +113,18 @@ QUnit.test('skips forward in video by configured skip forward time amount', func
 
   assert.expect(1);
   assert.equal(curTimeSpy.getCall(1).args[0], 30, 'player current time set 30 seconds forward after button click');
+
+  player.dispose();
+});
+
+QUnit.test('localizes on languagechange', function(assert) {
+  const player = TestHelpers.makePlayer({controlBar: {skipButtons: {forward: 30}}});
+  const button = player.controlBar.skipForward;
+
+  videojs.addLanguage('test', {'Skip forward {1} seconds': '{1} FORWARD'});
+  player.language('test');
+
+  assert.equal(button.$('.vjs-control-text').textContent, '30 FORWARD', 'control text updates on languagechange');
 
   player.dispose();
 });
