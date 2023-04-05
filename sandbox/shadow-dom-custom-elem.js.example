@@ -18,7 +18,6 @@ export class TestCustomElement extends HTMLElement {
 
     const videoElem = document.createElement('video');
 
-    videoElem.setAttribute('autoplay', 'true');
     videoElem.setAttribute('preload', 'auto');
     videoElem.setAttribute('width', 640);
     videoElem.setAttribute('height', 260);
@@ -31,6 +30,15 @@ export class TestCustomElement extends HTMLElement {
     videoElem.appendChild(sourceElem);
 
     this.innerPlayer = videojs(videoElem);
+
+    containerElem.addEventListener('click', () => {
+      if (this.innerPlayer.paused()) {
+        this.innerPlayer.play();
+      }
+      else {
+        this.innerPlayer.pause();
+      }
+    });
   }
 }
 
