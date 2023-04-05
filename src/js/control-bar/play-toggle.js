@@ -6,10 +6,6 @@ import Component from '../component.js';
 import {silencePromise} from '../utils/promise';
 
 /**
- * @typedef { import('./player').default } Player
- */
-
-/**
  * Button to toggle between play and pause.
  *
  * @extends Button
@@ -19,7 +15,7 @@ class PlayToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

@@ -1,10 +1,6 @@
 import * as Url from '../utils/url.js';
 
 /**
- * @typedef { import('../player').default } Player
- */
-
-/**
  * Mimetypes
  *
  * @see https://www.iana.org/assignments/media-types/media-types.xhtml
@@ -55,7 +51,7 @@ export const getMimetype = function(src = '') {
  * Find the mime type of a given source string if possible. Uses the player
  * source cache.
  *
- * @param {Player} player
+ * @param { import('../player').default } player
  *        The player object
  *
  * @param {string} src

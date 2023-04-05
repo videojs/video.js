@@ -5,10 +5,6 @@ import Component from '../component';
 import * as Dom from '../utils/dom.js';
 import document from 'global/document';
 
-/**
- * @typedef { import('./player').default } Player
- */
-
 // TODO - Future make it click to snap to live
 
 /**
@@ -21,7 +17,7 @@ class LiveDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

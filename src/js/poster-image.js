@@ -7,10 +7,6 @@ import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
 
 /**
- * @typedef { import('./player').default } Player
- */
-
-/**
  * A `ClickableComponent` that handles showing the poster image for the player.
  *
  * @extends ClickableComponent
@@ -20,7 +16,7 @@ class PosterImage extends ClickableComponent {
   /**
    * Create an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]

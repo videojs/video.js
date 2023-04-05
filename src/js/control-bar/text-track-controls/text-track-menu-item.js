@@ -7,10 +7,6 @@ import window from 'global/window';
 import document from 'global/document';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * The specific menu item type for selecting a language within a text track kind
  *
  * @extends MenuItem
@@ -20,7 +16,7 @@ class TextTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

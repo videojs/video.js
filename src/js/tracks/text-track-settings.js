@@ -8,10 +8,6 @@ import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
 
-/**
- * @typedef { import('../player').default } Player
- */
-
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
 const COLOR_BLACK = ['#000', 'Black'];
@@ -247,7 +243,7 @@ class TextTrackSettings extends ModalDialog {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *         The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

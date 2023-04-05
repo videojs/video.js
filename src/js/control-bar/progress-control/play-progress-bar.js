@@ -8,10 +8,6 @@ import * as Fn from '../../utils/fn.js';
 import './time-tooltip';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * Used by {@link SeekBar} to display media playback progress as part of the
  * {@link ProgressControl}.
  *
@@ -22,7 +18,7 @@ class PlayProgressBar extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]
