@@ -4,10 +4,7 @@
 import Button from '../button.js';
 import Component from '../component.js';
 import document from 'global/document';
-
-/**
- * @typedef { import('./player').default } Player
- */
+import window from 'global/window';
 
 /**
  * Toggle Picture-in-Picture mode
@@ -19,7 +16,7 @@ class PictureInPictureToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -63,11 +60,19 @@ class PictureInPictureToggle extends Button {
   }
 
   /**
-   * Enables or disables button based on document.pictureInPictureEnabled property value
-   * or on value returned by player.disablePictureInPicture() method.
+   * Enables or disables button based on availability of a Picture-In-Picture mode.
+   *
+   * Enabled if
+   * - `player.options().enableDocumentPictureInPicture` is true and
+   *   window.documentPictureInPicture is available; or
+   * - `player.disablePictureInPicture()` is false and
+   *   element.requestPictureInPicture is available
    */
   handlePictureInPictureEnabledChange() {
-    if (document.pictureInPictureEnabled && this.player_.disablePictureInPicture() === false) {
+    if (
+      (document.pictureInPictureEnabled && this.player_.disablePictureInPicture() === false) ||
+      (this.player_.options_.enableDocumentPictureInPicture && 'documentPictureInPicture' in window)
+    ) {
       this.enable();
     } else {
       this.disable();

@@ -34,6 +34,15 @@ class LoadingSpinner extends Component {
 
     return el;
   }
+
+  /**
+   * Update control text on languagechange
+   */
+  handleLanguagechange() {
+    this.$('.vjs-control-text').textContent = this.localize('{1} is loading.', [
+      this.player_.isAudio() ? 'Audio Player' : 'Video Player'
+    ]);
+  }
 }
 
 Component.registerComponent('LoadingSpinner', LoadingSpinner);

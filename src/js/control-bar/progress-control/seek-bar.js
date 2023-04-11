@@ -15,11 +15,6 @@ import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './mouse-time-display.js';
 
-/**
- * @typedef { import('../../player').default } Player
- * @typedef { import('../../event-target').Event } Event
- */
-
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
@@ -37,7 +32,7 @@ class SeekBar extends Slider {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -249,7 +244,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse down on seek bar
    *
-   * @param {Event} event
+   * @param {MouseEvent} event
    *        The `mousedown` event that caused this to run.
    *
    * @listens mousedown
@@ -271,7 +266,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse move on seek bar
    *
-   * @param {Event} event
+   * @param {MouseEvent} event
    *        The `mousemove` event that caused this to run.
    * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler. Defaults to false
    *
@@ -356,7 +351,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse up on seek bar
    *
-   * @param {Event} event
+   * @param {MouseEvent} event
    *        The `mouseup` event that caused this to run.
    *
    * @listens mouseup
@@ -405,7 +400,7 @@ class SeekBar extends Slider {
    * Toggles the playback state of the player
    * This gets called when enter or space is used on the seekbar
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called
    *
    */

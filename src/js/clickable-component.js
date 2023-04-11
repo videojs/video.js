@@ -7,10 +7,6 @@ import log from './utils/log.js';
 import keycode from 'keycode';
 
 /**
- * @typedef { import('./player').default } Player
- */
-
-/**
  * Component which is clickable or keyboard actionable, but is not a
  * native HTML button.
  *
@@ -21,7 +17,7 @@ class ClickableComponent extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param  {Player} player
+   * @param  { import('./player').default } player
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]

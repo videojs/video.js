@@ -20,7 +20,8 @@
 
 // Don't hide the poster if we're playing audio or when audio-poster-mode is true
 .vjs-audio.vjs-has-started .vjs-poster, 
-.vjs-has-started.vjs-audio-poster-mode  .vjs-poster {
+.vjs-has-started.vjs-audio-poster-mode  .vjs-poster,
+.vjs-pip-container.vjs-has-started .vjs-poster {
   display: block;
 }
 

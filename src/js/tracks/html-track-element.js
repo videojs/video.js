@@ -6,10 +6,6 @@ import EventTarget from '../event-target';
 import TextTrack from '../tracks/text-track';
 
 /**
- * @typedef { import('../tech/tech').default } Tech
- */
-
-/**
  * A single track represented in the DOM.
  *
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement}
@@ -23,7 +19,7 @@ class HTMLTrackElement extends EventTarget {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param {Tech} options.tech
+   * @param { import('../tech/tech').default } options.tech
    *        A reference to the tech that owns this HTMLTrackElement.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']

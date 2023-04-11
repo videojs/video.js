@@ -2,6 +2,7 @@
 import TestHelpers from '../../test-helpers';
 import sinon from 'sinon';
 import { createTimeRange } from '../../../../src/js/utils/time';
+import videojs from '../../../../src/js/video.js';
 
 QUnit.module('SkipBackwardButton');
 
@@ -93,6 +94,18 @@ QUnit.test('skip backward in video by configured skip backward time amount', fun
 
   assert.expect(1);
   assert.equal(curTimeSpy.getCall(1).args[0], 1, 'player current time set 30 seconds back on button click');
+
+  player.dispose();
+});
+
+QUnit.test('localizes on languagechange', function(assert) {
+  const player = TestHelpers.makePlayer({controlBar: {skipButtons: {backward: 30}}});
+  const button = player.controlBar.skipBackward;
+
+  videojs.addLanguage('test', {'Skip backward {1} seconds': '{1} BACKWARD'});
+  player.language('test');
+
+  assert.equal(button.$('.vjs-control-text').textContent, '30 BACKWARD', 'control text updates on languagechange');
 
   player.dispose();
 });

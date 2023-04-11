@@ -8,10 +8,6 @@ import {formatTime} from '../../utils/time.js';
 import log from '../../utils/log.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * Displays time information about the video
  *
  * @extends Component
@@ -21,7 +17,7 @@ class TimeDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

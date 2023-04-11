@@ -3,10 +3,6 @@ import {merge} from './utils/obj.js';
 import window from 'global/window';
 import * as Fn from './utils/fn.js';
 
-/**
- * @typedef { import('./player').default } Player
- */
-
 const defaults = {
   trackingThreshold: 20,
   liveTolerance: 15
@@ -24,7 +20,7 @@ class LiveTracker extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

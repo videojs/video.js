@@ -10,10 +10,6 @@ import {silencePromise} from '../../utils/promise';
 import './seek-bar.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * The Progress Control component contains the seek bar, load progress,
  * and play progress.
  *
@@ -24,7 +20,7 @@ class ProgressControl extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

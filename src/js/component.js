@@ -14,11 +14,6 @@ import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
 /**
- * @typedef { import('./player').default } Player
- * @typedef { import('./event-target').Event} Event
-*/
-
-/**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
  * in the DOM. They can be children of other components, and can have
@@ -39,7 +34,7 @@ class Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -293,7 +288,7 @@ class Component {
   /**
    * Return the {@link Player} that the `Component` has attached to.
    *
-   * @return {Player}
+   * @return { import('./player').default }
    *         The player that this `Component` has attached to.
    */
   player() {
@@ -1367,7 +1362,7 @@ class Component {
            * Triggered when a `Component` is tapped.
            *
            * @event Component#tap
-           * @type {Event}
+           * @type {MouseEvent}
            */
           this.trigger('tap');
           // It may be good to copy the touchend event object and change the

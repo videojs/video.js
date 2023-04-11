@@ -4,16 +4,12 @@
 import TrackList from './track-list';
 
 /**
- * @typedef { import('./video-track').default } VideoTrack
- */
-
-/**
  * Un-select all other {@link VideoTrack}s that are selected.
  *
  * @param {VideoTrackList} list
  *        list to work on
  *
- * @param {VideoTrack} track
+ * @param { import('./video-track').default } track
  *        The track to skip
  *
  * @private
@@ -75,7 +71,7 @@ class VideoTrackList extends TrackList {
   /**
    * Add a {@link VideoTrack} to the `VideoTrackList`.
    *
-   * @param {VideoTrack} track
+   * @param { import('./video-track').default } track
    *        The VideoTrack to add to the list
    *
    * @fires TrackList#addtrack

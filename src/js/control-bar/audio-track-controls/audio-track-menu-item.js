@@ -6,10 +6,6 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * An {@link AudioTrack} {@link MenuItem}
  *
  * @extends MenuItem
@@ -19,7 +15,7 @@ class AudioTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

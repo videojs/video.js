@@ -6,11 +6,6 @@ import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
-/**
- * @typedef { import('./player').default } Player
- * @typedef { import('./tech/tech').default } Tech
- */
-
 const darkGray = '#222';
 const lightGray = '#ccc';
 const fontMap = {
@@ -83,6 +78,21 @@ function tryUpdateStyle(el, style, rule) {
 }
 
 /**
+ * Converts the CSS top/right/bottom/left property numeric value to string in pixels.
+ *
+ * @param {number} position
+ *        The CSS top/right/bottom/left property value.
+ *
+ * @return {string}
+ *          The CSS property value that was created, like '10px'.
+ *
+ * @private
+ */
+function getCSSPositionValue(position) {
+  return position ? `${position}px` : '';
+}
+
+/**
  * The component for displaying text track cues.
  *
  * @extends Component
@@ -92,7 +102,7 @@ class TextTrackDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -104,11 +114,18 @@ class TextTrackDisplay extends Component {
   constructor(player, options, ready) {
     super(player, options, ready);
 
-    const updateDisplayHandler = (e) => this.updateDisplay(e);
+    const updateDisplayTextHandler = (e) => this.updateDisplay(e);
+    const updateDisplayHandler = (e) => {
+      this.updateDisplayOverlay();
+      this.updateDisplay(e);
+    };
 
     player.on('loadstart', (e) => this.toggleDisplay(e));
-    player.on('texttrackchange', updateDisplayHandler);
-    player.on('loadedmetadata', (e) => this.preselectTrack(e));
+    player.on('texttrackchange', updateDisplayTextHandler);
+    player.on('loadedmetadata', (e) => {
+      this.updateDisplayOverlay();
+      this.preselectTrack(e);
+    });
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
@@ -300,6 +317,34 @@ class TextTrackDisplay extends Component {
       }
       this.updateForTrack(descriptionsTrack);
     }
+  }
+
+  /**
+   * Updates the displayed TextTrack to be sure it overlays the video when a either
+   * a {@link Player#texttrackchange} or a {@link Player#fullscreenchange} is fired.
+   */
+  updateDisplayOverlay() {
+    if (!this.player_.videoHeight()) {
+      return;
+    }
+
+    const playerWidth = this.player_.currentWidth();
+    const playerHeight = this.player_.currentHeight();
+    const playerAspectRatio = playerWidth / playerHeight;
+    const videoAspectRatio = this.player_.videoWidth() / this.player_.videoHeight();
+    let insetInlineMatch = 0;
+    let insetBlockMatch = 0;
+
+    if (Math.abs(playerAspectRatio - videoAspectRatio) > 0.1) {
+      if (playerAspectRatio > videoAspectRatio) {
+        insetInlineMatch = Math.round((playerWidth - playerHeight * videoAspectRatio) / 2);
+      } else {
+        insetBlockMatch = Math.round((playerHeight - playerWidth / videoAspectRatio) / 2);
+      }
+    }
+
+    tryUpdateStyle(this.el_, 'insetInline', getCSSPositionValue(insetInlineMatch));
+    tryUpdateStyle(this.el_, 'insetBlock', getCSSPositionValue(insetBlockMatch));
   }
 
   /**

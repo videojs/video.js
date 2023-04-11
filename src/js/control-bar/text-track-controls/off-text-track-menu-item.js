@@ -5,10 +5,6 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * A special menu item for turning of a specific type of text track
  *
  * @extends TextTrackMenuItem
@@ -18,7 +14,7 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -100,6 +96,15 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
         enabled: false
       };
     }
+  }
+
+  /**
+   * Update control text and label on languagechange
+   */
+  handleLanguagechange() {
+    this.$('.vjs-menu-item-text').textContent = this.player_.localize(this.options_.label);
+
+    super.handleLanguagechange();
   }
 
 }

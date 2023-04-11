@@ -5,10 +5,6 @@ import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * The specific menu item type for selecting a playback rate.
  *
  * @extends MenuItem
@@ -18,7 +14,7 @@ class PlaybackRateMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

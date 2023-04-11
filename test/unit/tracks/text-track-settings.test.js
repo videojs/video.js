@@ -6,6 +6,7 @@ import safeParseTuple from 'safe-json-parse/tuple';
 import sinon from 'sinon';
 import window from 'global/window';
 import Component from '../../../src/js/component.js';
+import videojs from '../../../src/js/video.js';
 
 const tracks = [{
   kind: 'captions',
@@ -366,6 +367,19 @@ QUnit.test('should not restore saved settings', function(assert) {
   });
 
   assert.deepEqual(player.textTrackSettings.getValues(), defaultSettings);
+
+  player.dispose();
+});
+
+QUnit.test('should update on languagechange', function(assert) {
+  const player = TestHelpers.makePlayer({
+    tracks
+  });
+
+  videojs.addLanguage('test', {'Font Size': 'FONTSIZE'});
+  player.language('test');
+
+  assert.equal(player.$('.vjs-font-percent legend').textContent, 'FONTSIZE', 'settings dialog updates on languagechange');
 
   player.dispose();
 });

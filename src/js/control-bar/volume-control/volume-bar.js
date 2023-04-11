@@ -12,11 +12,6 @@ import './volume-level.js';
 import './mouse-volume-level-display.js';
 
 /**
- * @typedef { import('../../player').default } Player
- * @typedef {import('../../event-target').Event} Event
- */
-
-/**
  * The bar that contains the volume level and can be clicked on to adjust the level
  *
  * @extends Slider
@@ -26,7 +21,7 @@ class VolumeBar extends Slider {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

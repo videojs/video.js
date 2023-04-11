@@ -6,10 +6,6 @@ import Component from './component';
 import keycode from 'keycode';
 
 /**
- * @typedef { import('./player').default } Player
- */
-
-/**
  * The `CloseButton` is a `{@link Button}` that fires a `close` event when
  * it gets clicked.
  *
@@ -20,7 +16,7 @@ class CloseButton extends Button {
   /**
   * Creates an instance of the this class.
   *
-  * @param  {Player} player
+  * @param  { import('./player').default } player
   *         The `Player` that this class should be attached to.
   *
   * @param  {Object} [options]

@@ -10,10 +10,6 @@ import {throttle, bind_, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import './volume-bar.js';
 
 /**
- * @typedef { import('../../player').default } Player
- */
-
-/**
  * The component for controlling the volume level
  *
  * @extends Component
@@ -23,7 +19,7 @@ class VolumeControl extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

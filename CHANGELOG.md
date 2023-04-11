@@ -1,3 +1,31 @@
+<a name="8.3.0"></a>
+# [8.3.0](https://github.com/videojs/video.js/compare/v8.2.1...v8.3.0) (2023-04-05)
+
+### Features
+
+* Add document picture-in-picture support ([#8113](https://github.com/videojs/video.js/issues/8113)) ([0c72805](https://github.com/videojs/video.js/commit/0c72805))
+
+### Bug Fixes
+
+* Ensure additional components update on languagechange ([#8175](https://github.com/videojs/video.js/issues/8175)) ([b489bc5](https://github.com/videojs/video.js/commit/b489bc5))
+* improved accessibility for time display ([#8182](https://github.com/videojs/video.js/issues/8182)) ([c35c45b](https://github.com/videojs/video.js/commit/c35c45b)), closes [#8143](https://github.com/videojs/video.js/issues/8143)
+* **lang:** improve Italian labels ([#8193](https://github.com/videojs/video.js/issues/8193)) ([fefd525](https://github.com/videojs/video.js/commit/fefd525))
+* **lang:** Improve Persian translation ([#7991](https://github.com/videojs/video.js/issues/7991)) ([af33e39](https://github.com/videojs/video.js/commit/af33e39))
+* **lang:** Improve translations for mute and unmute ([#8227](https://github.com/videojs/video.js/issues/8227)) ([629000b](https://github.com/videojs/video.js/commit/629000b))
+* **lang:** Update nl.json ([#8135](https://github.com/videojs/video.js/issues/8135)) ([b60d34b](https://github.com/videojs/video.js/commit/b60d34b))
+* reset progress bar fully when player is reset ([#8160](https://github.com/videojs/video.js/issues/8160)) ([71343d1](https://github.com/videojs/video.js/commit/71343d1))
+* **types:** Add jsdoc plugin to handle ts-style imports ([#8225](https://github.com/videojs/video.js/issues/8225)) ([61bd74d](https://github.com/videojs/video.js/commit/61bd74d))
+
+### Chores
+
+* **package:** fix out of sync package-lock.json ([#8228](https://github.com/videojs/video.js/issues/8228)) ([fe94c5d](https://github.com/videojs/video.js/commit/fe94c5d))
+* Update CI and release workflows ([#8214](https://github.com/videojs/video.js/issues/8214)) ([882f3af](https://github.com/videojs/video.js/commit/882f3af))
+* update issue template ([#8212](https://github.com/videojs/video.js/issues/8212)) ([e42b859](https://github.com/videojs/video.js/commit/e42b859))
+
+### Documentation
+
+* Update jsdoc template for better usability on mobile ([#8048](https://github.com/videojs/video.js/issues/8048)) ([c1a1f9c](https://github.com/videojs/video.js/commit/c1a1f9c))
+
 <a name="8.2.1"></a>
 ## [8.2.1](https://github.com/videojs/video.js/compare/v8.2.0...v8.2.1) (2023-03-15)
 
