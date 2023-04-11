@@ -91,7 +91,7 @@ SubsCapsButton.prototype.kinds_ = ['captions', 'subtitles'];
  *
  *
  * @type {string}
- * @public
+ * @protected
  */
 SubsCapsButton.prototype.controlText_ = 'Subtitles';
 

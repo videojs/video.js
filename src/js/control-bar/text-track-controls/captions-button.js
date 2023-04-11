@@ -79,7 +79,7 @@ CaptionsButton.prototype.kind_ = 'captions';
  * The text that should display over the `CaptionsButton`s controls. Added for localization.
  *
  * @type {string}
- * @public
+ * @protected
  */
 CaptionsButton.prototype.controlText_ = 'Captions';
 

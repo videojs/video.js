@@ -215,7 +215,7 @@ ChaptersButton.prototype.kind_ = 'chapters';
  * The text that should display over the `ChaptersButton`s controls. Added for localization.
  *
  * @type {string}
- * @public
+ * @protected
  */
 ChaptersButton.prototype.controlText_ = 'Chapters';
 
