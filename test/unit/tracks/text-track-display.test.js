@@ -449,4 +449,53 @@ if (!Html5.supportsNativeTextTracks()) {
       'colors must be valid hex codes.'
     );
   });
+
+  QUnit.test('text track display should overlay a video', function(assert) {
+    const tag = document.createElement('video');
+
+    tag.width = 320;
+    tag.height = 180;
+    const player = TestHelpers.makePlayer({}, tag);
+    const textTrackDisplay = player.getChild('TextTrackDisplay');
+    const textTrackDisplayStyle = textTrackDisplay.el().style;
+
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
+
+    // video aspect ratio equal to NaN
+    player.tech_.videoWidth = () => 0;
+    player.tech_.videoHeight = () => 0;
+
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
+
+    // video aspect ratio 2:1
+    player.tech_.videoWidth = () => 100;
+    player.tech_.videoHeight = () => 50;
+
+    textTrackDisplay.updateDisplayOverlay();
+
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '10px', 'text track display style insetBlock equal to 10px');
+
+    // video aspect ratio 4:3
+    player.tech_.videoWidth = () => 100;
+    player.tech_.videoHeight = () => 75;
+
+    textTrackDisplay.updateDisplayOverlay();
+
+    assert.ok(textTrackDisplayStyle.insetInline === '40px', 'text track display style insetInline equal to 40px');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
+
+    // video aspect ratio 16:9
+    player.tech_.videoWidth = () => 320;
+    player.tech_.videoHeight = () => 180;
+
+    textTrackDisplay.updateDisplayOverlay();
+
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
+
+    player.dispose();
+  });
 }
