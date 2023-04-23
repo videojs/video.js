@@ -2165,6 +2165,12 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   window.VIDEOJS_NO_DYNAMIC_STYLE = originalVjsNoDynamicStyling;
 });
 
+QUnit.test('should return the registered component', function(assert) {
+  class CustomPlayer extends Player {}
+
+  assert.strictEqual(videojs.registerComponent('CustomPlayer', CustomPlayer), CustomPlayer, 'the component is returned');
+});
+
 QUnit.test('should allow to register custom player when any player has not been created', function(assert) {
   class CustomPlayer extends Player {}
   videojs.registerComponent('Player', CustomPlayer);
