@@ -135,7 +135,7 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.13",
     "postcss-cli": "^8.3.1",
-    "qunit": "2.13.0",
+    "qunit": "^2.19.4",
     "remark-cli": "^6.0.1",
     "remark-lint": "^6.0.6",
     "remark-parse": "^6.0.3",
