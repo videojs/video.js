@@ -273,7 +273,7 @@ class SeekBar extends Slider {
    * @listens mousemove
    */
   handleMouseMove(event, mouseDown = false) {
-    if (!Dom.isSingleLeftClick(event)) {
+    if (!Dom.isSingleLeftClick(event) || isNaN(this.player_.duration())) {
       return;
     }
 
