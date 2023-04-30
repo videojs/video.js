@@ -1613,7 +1613,7 @@ class Player extends Component {
             return;
           }
 
-          const techSrc = this.techGet('currentSrc');
+          const techSrc = this.techGet_('currentSrc');
 
           this.lastSource_.tech = techSrc;
           this.updateSourceCaches_(techSrc);

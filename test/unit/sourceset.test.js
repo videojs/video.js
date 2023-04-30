@@ -1194,4 +1194,41 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     player.src(youtubeSrc);
 
   });
+
+  QUnit.test('tech sourceset update sources cache when changingSrc_ is false', function(assert) {
+    const clock = sinon.useFakeTimers();
+    const fixture = document.querySelector('#qunit-fixture');
+    const vid = document.createElement('video');
+
+    fixture.appendChild(vid);
+
+    const player = videojs(vid);
+
+    player.src(sourceOne);
+
+    clock.tick(1);
+
+    // Declaring the spies here avoids listening to the changes that took place when loading the source.
+    const handleTechSourceset_ = sinon.spy(player, 'handleTechSourceset_');
+    const techGet_ = sinon.spy(player, 'techGet_');
+    const updateSourceCaches_ = sinon.spy(player, 'updateSourceCaches_');
+
+    player.tech_.trigger('sourceset');
+
+    assert.ok(handleTechSourceset_.calledOnce, 'handleTechSourceset_ was called');
+    assert.ok(!techGet_.called, 'techGet_ was not called');
+    assert.ok(updateSourceCaches_.calledOnce, 'updateSourceCaches_ was called');
+    assert.equal(player.cache_.src, '', 'player.cache_.src was reset');
+
+    player.tech_.trigger('loadstart');
+
+    assert.ok(techGet_.called, 'techGet_ was called');
+    assert.equal(updateSourceCaches_.callCount, 2, 'updateSourceCaches_ was called twice');
+
+    handleTechSourceset_.restore();
+    techGet_.restore();
+    updateSourceCaches_.restore();
+    player.dispose();
+    clock.restore();
+  });
 });
