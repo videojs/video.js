@@ -16,3 +16,10 @@
 .video-js.vjs-fullscreen .vjs-fullscreen-control .vjs-icon-placeholder {
   @extend .vjs-icon-fullscreen-exit;
 }
+
+.vjs-svg-icons-enabled .vjs-fullscreen-control .vjs-icon-placeholder {
+  @extend .vjs-icon-fullscreen-enter-svg;
+}
+.vjs-svg-icons-enabled.vjs-fullscreen .vjs-fullscreen-control .vjs-icon-placeholder {
+  @extend .vjs-icon-fullscreen-exit-svg;
+}

@@ -1,8 +1,10 @@
 // Text, icons, hover states
 $primary-foreground-color: #fff !default;
+$primary-foreground-color-svg: invert(100%) sepia(100%) saturate(0%) hue-rotate(139deg) brightness(107%) contrast(104%);
 
 // Control backgrounds (control bar, big play, menus)
 $primary-background-color: #2B333F !default;
+$primary-background-color-svg: invert(14%) sepia(7%) saturate(2512%) hue-rotate(177deg) brightness(93%) contrast(82%);
 $primary-background-transparency: 0.7 !default;
 
 // Hover states, slider backgrounds

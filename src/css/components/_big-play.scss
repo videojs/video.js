@@ -30,6 +30,12 @@
   }
 }
 
+.vjs-svg-icons-enabled .vjs-big-play-button {
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-play-svg;
+  }
+}
+
 .video-js:hover .vjs-big-play-button,
 .video-js .vjs-big-play-button:focus {
   border-color: $primary-foreground-color;

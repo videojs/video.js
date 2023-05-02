@@ -547,6 +547,10 @@ class Player extends Component {
       this.addClass('vjs-touch-enabled');
     }
 
+    if (options.useSVGIcons) {
+      this.addClass('vjs-svg-icons-enabled');
+    }
+
     // iOS Safari has broken hover handling
     if (!browser.IS_IOS) {
       this.addClass('vjs-workinghover');

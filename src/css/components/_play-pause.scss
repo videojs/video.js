@@ -11,3 +11,13 @@
 .video-js .vjs-play-control.vjs-ended .vjs-icon-placeholder {
   @extend .vjs-icon-replay;
 }
+
+.vjs-svg-icons-enabled .vjs-play-control .vjs-icon-placeholder {
+  @extend .vjs-icon-play-svg;
+}
+.vjs-svg-icons-enabled .vjs-play-control.vjs-playing .vjs-icon-placeholder {
+  @extend .vjs-icon-pause-svg;
+}
+.vjs-svg-icons-enabled .vjs-play-control.vjs-ended .vjs-icon-placeholder {
+  @extend .vjs-icon-replay-svg;
+}

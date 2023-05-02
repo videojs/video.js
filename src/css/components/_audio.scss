@@ -2,6 +2,10 @@
   @extend .vjs-icon-audio;
 }
 
+.vjs-svg-icons-enabled .vjs-audio-button .vjs-icon-placeholder {
+  @extend .vjs-icon-audio-svg;
+}
+
 .video-js .vjs-audio-button + .vjs-menu .vjs-main-desc-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
   vertical-align: middle;
   display: inline-block;

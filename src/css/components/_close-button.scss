@@ -10,3 +10,9 @@
   top: 0.5em;
   z-index: 2;
 }
+
+.vjs-svg-icons-enabled .vjs-control.vjs-close-button {
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-cancel-svg;
+  }
+}

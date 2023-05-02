@@ -2,6 +2,10 @@
   @extend .vjs-icon-chapters;
 }
 
+.vjs-svg-icons-enabled .vjs-chapters-button .vjs-icon-placeholder {
+  @extend .vjs-icon-chapters-svg;
+}
+
 .vjs-chapters-button .vjs-menu ul {
   width: 24em;
 }

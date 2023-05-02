@@ -80,6 +80,18 @@
   }
 }
 
+// Since the progress circle does not use an icon-placeholder,
+// the `content` attribute will be overwritten
+.vjs-svg-icons-enabled .vjs-play-progress {
+  &:before {
+    top: -0.2em;
+    color: $primary-foreground-color;
+    width: 6px;
+    height: 6px;
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23FFFFFF'%3E%3C!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --%3E%3Cpath d='M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z'/%3E%3C/svg%3E");
+  }
+}
+
 .video-js .vjs-load-progress {
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
@@ -118,6 +130,20 @@
   top: -3.4em;
   visibility: hidden;
   z-index: 1;
+}
+
+// Update the size of the progress circle when using SVG icons
+.vjs-svg-icons-enabled .vjs-progress-control:hover .vjs-progress-holder .vjs-play-progress {
+  &:before {
+    width: 12px;
+    height: 12px;
+  }
+}
+.vjs-svg-icons-enabled .vjs-progress-control:hover .vjs-progress-holder.disabled .vjs-play-progress {
+  &:before {
+    width: 8px;
+    height: 8px;
+  }
 }
 
 .video-js .vjs-progress-holder:focus .vjs-time-tooltip {

@@ -56,6 +56,16 @@
   color: $primary-background-color;
 }
 
+// Change the SVG color when an item is selected
+.vjs-svg-icons-enabled .vjs-menu li.vjs-selected,
+.vjs-svg-icons-enabled .vjs-menu li.vjs-selected:focus,
+.vjs-svg-icons-enabled .vjs-menu li.vjs-selected:hover,
+.vjs-svg-icons-enabled .js-focus-visible .vjs-menu li.vjs-selected:hover {
+  .vjs-icon-placeholder {
+    filter: $primary-background-color-svg;
+  }
+}
+
 .video-js .vjs-menu *:not(.vjs-selected):focus:not(:focus-visible),
 .js-focus-visible .vjs-menu *:not(.vjs-selected):focus:not(.focus-visible) {
   background: none;

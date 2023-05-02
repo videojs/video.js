@@ -17,6 +17,19 @@
   @extend .vjs-icon-volume-mid;
 }
 
+.vjs-svg-icons-enabled .vjs-mute-control .vjs-icon-placeholder {
+  @extend .vjs-icon-volume-high-svg;
+}
+.vjs-svg-icons-enabled .vjs-mute-control.vjs-vol-0 .vjs-icon-placeholder {
+  @extend .vjs-icon-volume-mute-svg;
+}
+.vjs-svg-icons-enabled .vjs-mute-control.vjs-vol-1 .vjs-icon-placeholder {
+  @extend .vjs-icon-volume-low-svg;
+}
+.vjs-svg-icons-enabled .vjs-mute-control.vjs-vol-2 .vjs-icon-placeholder {
+  @extend .vjs-icon-volume-medium-svg;
+}
+
 .video-js .vjs-volume-control {
   cursor: pointer;
   margin-right: 1em;
@@ -134,6 +147,17 @@
     z-index: 1;
   }
 }
+// Since the volume circle does not use an icon-placeholder,
+// the `content` attribute will be overwritten
+.vjs-svg-icons-enabled .vjs-volume-level {
+  &:before {
+    color: $primary-foreground-color;
+    width: 8px;
+    height: 8px;
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23FFFFFF'%3E%3C!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --%3E%3Cpath d='M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z'/%3E%3C/svg%3E");
+  }
+}
+
 .vjs-slider-horizontal .vjs-volume-level {
   height: 0.3em;
 
@@ -141,6 +165,18 @@
   &:before {
     line-height: .35em;
     right: -0.5em;
+  }
+}
+
+// Update placement of circle icon when using SVG icons
+.vjs-svg-icons-enabled .vjs-slider-horizontal .vjs-volume-level {
+  &:before {
+    top: -0.3em;
+  }
+}
+.vjs-svg-icons-enabled .vjs-slider-vertical .vjs-volume-level {
+  &:before {
+    left: -0.3em;
   }
 }
 

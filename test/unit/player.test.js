@@ -967,6 +967,16 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({useSVGIcons: true});
+
+  assert.notEqual(player.el().className.indexOf('vjs-svg-icons-enabled'), -1, 'svg-icons-enabled classname added');
+
+  player.dispose();
+});
+
 QUnit.test('should not add a touch-enabled classname when touch is not supported', function(assert) {
   assert.expect(1);
 
