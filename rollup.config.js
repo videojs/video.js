@@ -73,7 +73,9 @@ const primedBabel = babel({
       ],
       bugfixes: true,
       loose: true,
-      modules: false
+      modules: false,
+      useBuiltIns: 'usage',
+      corejs: '2'
     }]
   ],
   plugins: [
