@@ -149,6 +149,26 @@ export function merge(...sources) {
 }
 
 /**
+ * Returns an array of values for a given object
+ *
+ * @param  {Object} source - target object
+ * @return {Array<unknown>} - object values
+ */
+export function values(source = {}) {
+  const result = [];
+
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      const value = source[key];
+
+      result.push(value);
+    }
+  }
+
+  return result;
+}
+
+/**
  * Object.defineProperty but "lazy", which means that the value is only set after
  * it is retrieved the first time, rather than being set right away.
  *
