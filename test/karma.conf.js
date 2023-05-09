@@ -50,10 +50,16 @@ module.exports = function(config) {
 
   config.browserStack.project = 'Video.js';
 
-  // pin Browserstack Firefox version to 64
+  // pin Browserstack Firefox version to 64 and Chrome version to 53
   /* eslint-disable camelcase */
-  if (config.customLaunchers && config.customLaunchers.bsFirefox) {
-    config.customLaunchers.bsFirefox.browser_version = '64.0';
+  if (config.customLaunchers) {
+    if (config.customLaunchers.bsFirefox) {
+      config.customLaunchers.bsFirefox.browser_version = '64.0';
+    }
+
+    if (config.customLaunchers.bsChrome) {
+      config.customLaunchers.bsChrome.browser_version = '53.0';
+    }
   }
   /* eslint-enable camelcase */
 
