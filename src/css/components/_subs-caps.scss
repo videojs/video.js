@@ -4,11 +4,6 @@
   @extend .vjs-icon-captions;
 }
 
-.vjs-svg-icons-enabled:lang(en) .vjs-subs-caps-button .vjs-icon-placeholder,
-.vjs-svg-icons-enabled:lang(fr-CA) .vjs-subs-caps-button .vjs-icon-placeholder {
-  @extend .vjs-icon-captions-svg;
-}
-
 // ROW uses 'subtitles'
 // Double selector because @extend puts these rules above the captions icon
 .video-js .vjs-subs-caps-button .vjs-icon-placeholder,
@@ -19,16 +14,7 @@
   @extend .vjs-icon-subtitles;
 }
 
-// ROW uses 'subtitles' SVG icon
-.vjs-svg-icons-enabled .vjs-subs-caps-button .vjs-icon-placeholder,
-.vjs-svg-icons-enabled:lang(en-GB) .vjs-subs-caps-button .vjs-icon-placeholder,
-.vjs-svg-icons-enabled:lang(en-IE) .vjs-subs-caps-button .vjs-icon-placeholder,
-.vjs-svg-icons-enabled:lang(en-AU) .vjs-subs-caps-button .vjs-icon-placeholder,
-.vjs-svg-icons-enabled:lang(en-NZ) .vjs-subs-caps-button .vjs-icon-placeholder {
-  @extend .vjs-icon-subtitles-svg;
-}
-
-.vjs-svg-icons-enabled .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
+.vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-svg-icon {
   margin-left: 0.3em;
 }
 

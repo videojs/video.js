@@ -24,6 +24,7 @@ class CloseButton extends Button {
   */
   constructor(player, options) {
     super(player, options);
+    this.setIcon('vjs-icon-cancel');
     this.controlText(options && options.controlText || this.localize('Close'));
   }
 

@@ -30,10 +30,9 @@
   }
 }
 
-.vjs-svg-icons-enabled .vjs-big-play-button {
-  & .vjs-icon-placeholder {
-    @extend .vjs-icon-play-svg;
-  }
+.vjs-big-play-button .vjs-svg-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .video-js:hover .vjs-big-play-button,

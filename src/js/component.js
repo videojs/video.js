@@ -3,6 +3,7 @@
  *
  * @file component.js
  */
+import document from 'global/document';
 import window from 'global/window';
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
@@ -522,6 +523,52 @@ class Component {
     }
 
     return currentChild;
+  }
+
+  /**
+   * Adds an SVG icon element to another element or component.
+   *
+   * @param {string} iconName
+   *        The name of icon. A list of all the icon names can be found...
+   *
+   * @param {Component|Element} [el=this.el()]
+   *        Component or element to set the title on. Defaults
+   *
+   * @return {Element}
+   *        The newly created icon element.
+   */
+  setIcon(iconName, el = this.el()) {
+    if (!this.player_.options_.useSVGIcons) {
+      return;
+    }
+
+    const xmlnsURL = 'http://www.w3.org/2000/svg';
+
+    // The below creates an element in thw format of:
+    // <span><svg><use>....</span></svg></use>
+    const iconContainer = Dom.createEl('span', {
+      className: 'vjs-icon-placeholder vjs-svg-icon'
+    }, {'aria-hidden': 'true'});
+
+    const svgEl = document.createElementNS(xmlnsURL, 'svg');
+
+    svgEl.setAttributeNS(null, 'viewBox', '0 0 512 512');
+    const useEl = document.createElementNS(xmlnsURL, 'use');
+
+    svgEl.appendChild(useEl);
+    useEl.setAttributeNS(null, 'href', `../images/icons.svg#${iconName}`);
+    iconContainer.appendChild(svgEl);
+
+    // Replace a pre-existing icon if one exists.
+    if (this.iconIsSet_) {
+      el.replaceChild(iconContainer, el.querySelector('.vjs-icon-placeholder'));
+    } else {
+      el.appendChild(iconContainer);
+    }
+
+    this.iconIsSet_ = true;
+
+    return iconContainer;
   }
 
   /**

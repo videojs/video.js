@@ -46,12 +46,16 @@
   color: #888;
 }
 
-.vjs-svg-icons-enabled .vjs-seek-to-live-control .vjs-icon-placeholder {
-  @extend .vjs-icon-circle-svg;
+.vjs-svg-icons-enabled .vjs-seek-to-live-control {
+  display: inline;
+}
+
+.vjs-seek-to-live-control .vjs-svg-icon {
   width: 8px;
   height: 8px;
+  pointer-events: none;
   // add svg filter for #888888 hex value.
-  filter: invert(59%) sepia(4%) saturate(9%) hue-rotate(355deg) brightness(89%) contrast(93%);
+  fill: #888888;
 }
 
 // make the live circle red when at the live edge
@@ -60,6 +64,6 @@
 }
 
 // make the live circle red when at the live edge when using SVG icons
-.vjs-svg-icons-enabled .vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-icon-placeholder {
-  filter: invert(14%) sepia(100%) saturate(7271%) hue-rotate(6deg) brightness(95%) contrast(121%);
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-svg-icon {
+  fill: red;
 }

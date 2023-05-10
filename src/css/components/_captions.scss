@@ -2,10 +2,6 @@
   @extend .vjs-icon-captions;
 }
 
-.vjs-svg-icons-enabled .vjs-captions-button .vjs-icon-placeholder {
-  @extend .vjs-icon-captions-svg;
-}
-
 .video-js.vjs-audio-only-mode .vjs-captions-button {
   display: none;
 }
