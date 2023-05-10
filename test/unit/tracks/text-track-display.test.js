@@ -451,10 +451,6 @@ if (!Html5.supportsNativeTextTracks()) {
   });
 
   QUnit.test('text track display should overlay a video', function(assert) {
-    // Note:
-    // In Firefox 64 textTrackDisplayStyle.insetInline and textTrackDisplayStyle.insetBlock
-    // Both values are undefined, so instead of checking for empty string we check that it is unset.
-
     const tag = document.createElement('video');
 
     tag.width = 320;
@@ -463,15 +459,15 @@ if (!Html5.supportsNativeTextTracks()) {
     const textTrackDisplay = player.getChild('TextTrackDisplay');
     const textTrackDisplayStyle = textTrackDisplay.el().style;
 
-    assert.ok(!textTrackDisplayStyle.insetInline, 'text track display style insetInline is unset');
-    assert.ok(!textTrackDisplayStyle.insetBlock, 'text track display style insetBlock is unset');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     // video aspect ratio equal to NaN
     player.tech_.videoWidth = () => 0;
     player.tech_.videoHeight = () => 0;
 
-    assert.ok(!textTrackDisplayStyle.insetInline, 'text track display style insetInline is unset');
-    assert.ok(!textTrackDisplayStyle.insetBlock, 'text track display style insetBlock is unset');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     // video aspect ratio 2:1
     player.tech_.videoWidth = () => 100;
@@ -479,7 +475,7 @@ if (!Html5.supportsNativeTextTracks()) {
 
     textTrackDisplay.updateDisplayOverlay();
 
-    assert.ok(!textTrackDisplayStyle.insetInline, 'text track display style insetInline is unset');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
     assert.ok(textTrackDisplayStyle.insetBlock === '10px', 'text track display style insetBlock equal to 10px');
 
     // video aspect ratio 4:3
@@ -489,7 +485,7 @@ if (!Html5.supportsNativeTextTracks()) {
     textTrackDisplay.updateDisplayOverlay();
 
     assert.ok(textTrackDisplayStyle.insetInline === '40px', 'text track display style insetInline equal to 40px');
-    assert.ok(!textTrackDisplayStyle.insetBlock, 'text track display style insetBlock is unset');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     // video aspect ratio 16:9
     player.tech_.videoWidth = () => 320;
@@ -497,8 +493,8 @@ if (!Html5.supportsNativeTextTracks()) {
 
     textTrackDisplay.updateDisplayOverlay();
 
-    assert.ok(!textTrackDisplayStyle.insetInline, 'text track display style insetInline is unset');
-    assert.ok(!textTrackDisplayStyle.insetBlock, 'text track display style insetBlock is unset');
+    assert.ok(textTrackDisplayStyle.insetInline === '', 'text track display style insetInline equal to empty string');
+    assert.ok(textTrackDisplayStyle.insetBlock === '', 'text track display style insetBlock equal to empty string');
 
     player.dispose();
   });
