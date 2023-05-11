@@ -550,7 +550,7 @@ class Component {
     const xmlnsURL = 'http://www.w3.org/2000/svg';
 
     // The below creates an element in the format of:
-    // <span><svg><use>....</span></svg></use>
+    // <span><svg><use>....</use></svg></span>
     const iconContainer = Dom.createEl('span', {
       className: 'vjs-icon-placeholder vjs-svg-icon'
     }, {'aria-hidden': 'true'});
