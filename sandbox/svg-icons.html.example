@@ -39,7 +39,8 @@
 <body>
   <img src="../images/icons.svg" hidden/>
   <h1>VideoJS SVG Icons</h1>
-  <p>All icons prefixed by <code>vjs-icon-</code></p>
+  <p>In order to use SVG icons, the <code>useSVGIcons</code> option must be enabled on the player. See: <a href="https://videojs.com/guides/options/#usesvgicons">UseSVGIcons</a></p>
+  <p>SVG Icons are expected to be added to the player through components. Example: <code>myButton.setIcon('play');</code></p>
   <div class="container-class vjs-svg-icons-enabled">
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">

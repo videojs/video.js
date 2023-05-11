@@ -529,10 +529,10 @@ class Component {
    * Adds an SVG icon element to another element or component.
    *
    * @param {string} iconName
-   *        The name of icon. A list of all the icon names can be found...
+   *        The name of icon. A list of all the icon names can be found at 'sandbox/svg-icons.html'
    *
-   * @param {Component|Element} [el=this.el()]
-   *        Component or element to set the title on. Defaults
+   * @param {Element} [el=this.el()]
+   *        Component or element to set the title on. Defaults to the current Component's element.
    *
    * @return {Element}
    *        The newly created icon element.
