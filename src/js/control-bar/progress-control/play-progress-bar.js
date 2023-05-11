@@ -26,7 +26,7 @@ class PlayProgressBar extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.setIcon('vjs-icon-circle');
+    this.setIcon('circle');
     this.update = Fn.throttle(Fn.bind_(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
   }
 

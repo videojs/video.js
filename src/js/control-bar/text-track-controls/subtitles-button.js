@@ -26,7 +26,7 @@ class SubtitlesButton extends TextTrackButton {
   constructor(player, options, ready) {
     super(player, options, ready);
 
-    this.setIcon('vjs-icon-subtitles');
+    this.setIcon('subtitles');
   }
 
   /**

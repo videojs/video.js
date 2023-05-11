@@ -98,7 +98,7 @@ class MuteToggle extends Button {
     const vol = this.player_.volume();
     let level = 3;
 
-    this.setIcon('vjs-icon-volume-high');
+    this.setIcon('volume-high');
 
     // in iOS when a player is loaded with muted attribute
     // and volume is changed with a native mute button
@@ -108,13 +108,13 @@ class MuteToggle extends Button {
     }
 
     if (vol === 0 || this.player_.muted()) {
-      this.setIcon('vjs-icon-volume-mute');
+      this.setIcon('volume-mute');
       level = 0;
     } else if (vol < 0.33) {
-      this.setIcon('vjs-icon-volume-low');
+      this.setIcon('volume-low');
       level = 1;
     } else if (vol < 0.67) {
-      this.setIcon('vjs-icon-volume-medium');
+      this.setIcon('volume-medium');
       level = 2;
     }
 

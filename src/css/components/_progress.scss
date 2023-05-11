@@ -80,8 +80,7 @@
   }
 }
 
-// Since the progress circle does not use an icon-placeholder,
-// the `content` attribute will be overwritten
+// Remove content from play-progress when using SVGs.
 .vjs-svg-icons-enabled .vjs-play-progress {
   &:before {
     content: none !important;

@@ -54,7 +54,6 @@
   width: 8px;
   height: 8px;
   pointer-events: none;
-  // add svg filter for #888888 hex value.
   fill: #888888;
 }
 
@@ -62,8 +61,6 @@
 .vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-icon-placeholder {
   color: red;
 }
-
-// make the live circle red when at the live edge when using SVG icons
 .vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-svg-icon {
   fill: red;
 }

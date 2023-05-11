@@ -26,7 +26,7 @@ class AudioTrackButton extends TrackButton {
 
     super(player, options);
 
-    this.setIcon('vjs-icon-audio');
+    this.setIcon('audio');
   }
 
   /**

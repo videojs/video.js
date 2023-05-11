@@ -176,6 +176,89 @@ QUnit.test('should allow for children that are elements', function(assert) {
   /* eslint-enable no-unused-vars */
 });
 
+QUnit.test('setIcon should not do anything when useSVGIcons is not set', function(assert) {
+  const comp = new Component(this.player);
+  const iconName = 'test';
+
+  assert.equal(comp.setIcon(iconName), null, 'we should not return anything');
+
+  comp.dispose();
+});
+
+QUnit.test('setIcon should return the correct SVG', function(assert) {
+  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const comp = new Component(player);
+
+  const iconName = 'test';
+
+  // Elements and children of the icon.
+  const spanEl = comp.setIcon(iconName);
+  const svgEl = spanEl.childNodes[0];
+  const useEl = svgEl.childNodes[0];
+
+  // Ensure all elements are of the correct type.
+  assert.equal(spanEl.nodeName.toLowerCase(), 'span', 'parent element should be a <span>');
+  assert.equal(svgEl.nodeName.toLowerCase(), 'svg', 'first child element should be a <svg>');
+  assert.equal(useEl.nodeName.toLowerCase(), 'use', 'second child element should be a <use>');
+
+  // Ensure the classname and attributes are set correctly on the elements.
+  assert.equal(spanEl.className, 'vjs-icon-placeholder vjs-svg-icon', 'span should have icon class');
+  assert.equal(svgEl.getAttribute('viewBox'), '0 0 512 512', 'svg should have viewBox set');
+  assert.equal(useEl.getAttribute('href'), '../images/icons.svg#vjs-icon-test', 'use should have an href set with the correct icon url');
+
+  assert.equal(comp.iconIsSet_, true, 'the component iconIsSet_ property is set to true');
+
+  player.dispose();
+  comp.dispose();
+});
+
+QUnit.test('setIcon should call replaceChild if an icon already exists', function(assert) {
+  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const comp = new Component(player);
+
+  const appendSpy = sinon.spy(comp.el(), 'appendChild');
+  const replaceSpy = sinon.spy(comp.el(), 'replaceChild');
+
+  // Elements and children of the icon.
+  let spanEl = comp.setIcon('test-1');
+  let svgEl = spanEl.childNodes[0];
+  let useEl = svgEl.childNodes[0];
+
+  // ensure first setIcon call works correctly
+  assert.equal(useEl.getAttribute('href'), '../images/icons.svg#vjs-icon-test-1', 'use should have an href set with the correct icon url');
+  assert.ok(appendSpy.calledOnce, '`appendChild` has been called');
+
+  spanEl = comp.setIcon('test-2');
+  svgEl = spanEl.childNodes[0];
+  useEl = svgEl.childNodes[0];
+
+  assert.equal(useEl.getAttribute('href'), '../images/icons.svg#vjs-icon-test-2', 'use should have an href set with the correct icon url');
+  assert.ok(replaceSpy.calledOnce, '`replaceChild` has been called');
+
+  appendSpy.restore();
+  replaceSpy.restore();
+
+  player.dispose();
+  comp.dispose();
+});
+
+QUnit.test('setIcon should append a child to the element passed into the method', function(assert) {
+  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const comp = new Component(player);
+
+  const el = document.createElement('div');
+
+  comp.setIcon('test', el);
+  const spanEl = el.childNodes[0];
+  const svgEl = spanEl.childNodes[0];
+  const useEl = svgEl.childNodes[0];
+
+  assert.equal(useEl.getAttribute('href'), '../images/icons.svg#vjs-icon-test', 'href set on the element passed in');
+
+  player.dispose();
+  comp.dispose();
+});
+
 QUnit.test('addChild should throw if the child does not exist', function(assert) {
   const comp = new Component(this.player);
 

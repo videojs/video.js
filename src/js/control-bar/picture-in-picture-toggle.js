@@ -40,7 +40,7 @@ class PictureInPictureToggle extends Button {
         }
         this.hide();
       } else {
-        this.setIcon('vjs-icon-picture-in-picture-enter');
+        this.setIcon('picture-in-picture-enter');
         this.show();
       }
 
@@ -92,10 +92,10 @@ class PictureInPictureToggle extends Button {
    */
   handlePictureInPictureChange(event) {
     if (this.player_.isInPictureInPicture()) {
-      this.setIcon('vjs-icon-picture-in-picture-exit');
+      this.setIcon('picture-in-picture-exit');
       this.controlText('Exit Picture-in-Picture');
     } else {
-      this.setIcon('vjs-icon-picture-in-picture-enter');
+      this.setIcon('picture-in-picture-enter');
       this.controlText('Picture-in-Picture');
     }
     this.handlePictureInPictureEnabledChange();

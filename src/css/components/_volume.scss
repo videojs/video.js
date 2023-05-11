@@ -134,8 +134,7 @@
     z-index: 1;
   }
 }
-// Since the volume circle does not use an icon-placeholder,
-// the `content` attribute will be overwritten
+// Remove content from volume-level when using SVGs.
 .vjs-svg-icons-enabled .vjs-volume-level {
   &:before {
     content: none;
@@ -146,6 +145,7 @@
   position: absolute;
   width: 6px;
   height: 6px;
+  top: -0.55em;
   pointer-events: none;
 }
 
@@ -161,11 +161,9 @@
 
 // Update placement of circle icon when using SVG icons
 .vjs-slider-horizontal .vjs-volume-level .vjs-svg-icon {
-  top: -0.55em;
   right: -0.45em;
 }
 .vjs-slider-vertical .vjs-volume-level .vjs-svg-icon {
-  top: -0.55em;
   right: -0.15em;
 }
 

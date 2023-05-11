@@ -19,7 +19,7 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
 
     if (this.options_.track.kind === 'captions') {
       if (this.player_.options_.useSVGIcons) {
-        this.setIcon('vjs-icon-captions', el);
+        this.setIcon('captions', el);
       } else {
         parentSpan.appendChild(createEl('span', {
           className: 'vjs-icon-placeholder'

@@ -30,7 +30,7 @@ class ChaptersButton extends TextTrackButton {
   constructor(player, options, ready) {
     super(player, options, ready);
 
-    this.setIcon('vjs-icon-chapters');
+    this.setIcon('chapters');
 
     this.selectCurrentItem_ = () => {
       this.items.forEach(item => {

@@ -27,7 +27,7 @@ class DescriptionsButton extends TextTrackButton {
   constructor(player, options, ready) {
     super(player, options, ready);
 
-    this.setIcon('vjs-icon-audio-description');
+    this.setIcon('audio-description');
 
     const tracks = player.textTracks();
     const changeHandler = Fn.bind_(this, this.handleTracksChange);

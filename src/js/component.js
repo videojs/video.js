@@ -538,13 +538,18 @@ class Component {
    *        The newly created icon element.
    */
   setIcon(iconName, el = this.el()) {
+    // TODO: In v9 of video.js, we will want to remove font icons entirely.
+    // This means this check, as well as the others throughout the code, and
+    // the unecessary CSS for font icons, will need to be removed.
+    // See https://github.com/videojs/video.js/pull/8260 as to which components
+    // need updating.
     if (!this.player_.options_.useSVGIcons) {
       return;
     }
 
     const xmlnsURL = 'http://www.w3.org/2000/svg';
 
-    // The below creates an element in thw format of:
+    // The below creates an element in the format of:
     // <span><svg><use>....</span></svg></use>
     const iconContainer = Dom.createEl('span', {
       className: 'vjs-icon-placeholder vjs-svg-icon'
@@ -556,7 +561,7 @@ class Component {
     const useEl = document.createElementNS(xmlnsURL, 'use');
 
     svgEl.appendChild(useEl);
-    useEl.setAttributeNS(null, 'href', `../images/icons.svg#${iconName}`);
+    useEl.setAttributeNS(null, 'href', `../images/icons.svg#vjs-icon-${iconName}`);
     iconContainer.appendChild(svgEl);
 
     // Replace a pre-existing icon if one exists.
