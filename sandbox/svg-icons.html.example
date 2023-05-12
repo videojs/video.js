@@ -45,7 +45,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/icons.svg#vjs-icon-play" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../images/icons.svg#vjs-icon-play" />
         </svg>
       </span>
       <span>play</span>
