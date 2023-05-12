@@ -972,7 +972,7 @@ QUnit.test('should add a svg-icons-enabled classname when svg icons are supporte
 
   const player = TestHelpers.makePlayer({useSVGIcons: true});
 
-  assert.notEqual(player.el().className.indexOf('vjs-svg-icons-enabled'), -1, 'svg-icons-enabled classname added');
+  assert.ok(player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname added');
 
   player.dispose();
 });

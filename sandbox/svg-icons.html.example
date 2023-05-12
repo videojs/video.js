@@ -37,7 +37,7 @@
   </style>
 </head>
 <body>
-  <img src="../images/icons.svg" hidden/>
+  <img src="../../dist/images/icons.svg" hidden/>
   <h1>VideoJS SVG Icons</h1>
   <p>In order to use SVG icons, the <code>useSVGIcons</code> option must be enabled on the player. See: <a href="https://videojs.com/guides/options/#usesvgicons">UseSVGIcons</a></p>
   <p>SVG Icons are expected to be added to the player through components. Example: <code>myButton.setIcon('play');</code></p>
@@ -45,7 +45,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../images/icons.svg#vjs-icon-play" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/icons.svg#vjs-icon-play" />
         </svg>
       </span>
       <span>play</span>
