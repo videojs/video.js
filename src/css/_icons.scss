@@ -1,14 +1,11 @@
-@import "private-variables";
-
-// A CSS implementation of the icons used by video.js.
+// CSS styles for SVG icons used throughout video.js.
 //
 // The goal is to replace all icons from the font family pulled from videojs/font entirely.
-// This project currently uses fonts. We want to replace this with SVG data
-// URLs. This will ensure consitency between versions, as well as simplified
+// This project currently uses fonts. We want to replace this with SVGs from
+// images/icons.svg. This will ensure consitency between versions, as well as simplified
 // and straight-forward customization.
 
 // Default styling for all SVG icons
-
 .vjs-svg-icon {
   display: inline-block !important;
   background-repeat: no-repeat;
