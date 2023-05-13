@@ -3230,3 +3230,31 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
       assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
 });
+
+QUnit.test('player#load resets the media element to its initial state', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.src({ src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' });
+
+  // Declaring spies here avoids spying on previous calls
+  const techGet_ = sinon.spy(player, 'techCall_');
+  const src = sinon.spy(player, 'src');
+
+  player.load();
+
+  // Case when the VHS tech is not used
+  assert.ok(techGet_.calledOnce, 'techCall_ was called once');
+  assert.ok(src.notCalled, 'src was not called');
+
+  // Simulate the VHS tech
+  player.tech_.vhs = true;
+  player.load();
+
+  // Case when the VHS tech is used
+  assert.ok(techGet_.calledOnce, 'techCall_ remains the same');
+  assert.ok(src.calledOnce, 'src was called');
+
+  techGet_.restore();
+  src.restore();
+  player.dispose();
+});
