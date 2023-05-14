@@ -853,11 +853,12 @@ class Player extends Component {
    * A getter/setter for the `Player`'s width. Returns the player's configured value.
    * To get the current width use `currentWidth()`.
    *
-   * @param {number} [value]
-   *        The value to set the `Player`'s width to.
+   * @param {number|string} [value]
+   *        CSS value to set the `Player`'s width to.
    *
-   * @return {number}
+   * @return {number|void}
    *         The current width of the `Player` when getting.
+   *         Void when setting
    */
   width(value) {
     return this.dimension('width', value);
@@ -867,11 +868,12 @@ class Player extends Component {
    * A getter/setter for the `Player`'s height. Returns the player's configured value.
    * To get the current height use `currentheight()`.
    *
-   * @param {number} [value]
-   *        The value to set the `Player`'s height to.
+   * @param {number|string} [value]
+   *        CSS value to set the `Player`'s height to.
    *
-   * @return {number}
+   * @return {number|void}
    *         The current height of the `Player` when getting.
+   *         Void when setting
    */
   height(value) {
     return this.dimension('height', value);
@@ -885,7 +887,7 @@ class Player extends Component {
    *        - 'width'
    *        - 'height'
    *
-   * @param {number} [value]
+   * @param {number|string} [value]
    *        Value for dimension specified in the first argument.
    *
    * @return {number}
@@ -2394,9 +2396,6 @@ class Player extends Component {
 
   /**
    * Pause the video playback
-   *
-   * @return {Player}
-   *         A reference to the player object this function was called on
    */
   pause() {
     this.techCall_('pause');
@@ -2427,15 +2426,16 @@ class Player extends Component {
   }
 
   /**
-   * Returns whether or not the user is "scrubbing". Scrubbing is
+   * Sets or returns whether or not the user is "scrubbing". Scrubbing is
    * when the user has clicked the progress bar handle and is
    * dragging it along the progress bar.
    *
    * @param {boolean} [isScrubbing]
    *        whether the user is or is not scrubbing
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         The value of scrubbing when getting
+   *         Void when setting
    */
   scrubbing(isScrubbing) {
     if (typeof isScrubbing === 'undefined') {
@@ -2457,8 +2457,9 @@ class Player extends Component {
    * @param {number|string} [seconds]
    *        The time to seek to in seconds
    *
-   * @return {number}
+   * @return {number|void}
    *         - the current time in seconds when getting
+   *         - void when setting
    */
   currentTime(seconds) {
     if (typeof seconds !== 'undefined') {
@@ -2508,8 +2509,9 @@ class Player extends Component {
    * @param {number} [seconds]
    *        The duration of the video to set in seconds
    *
-   * @return {number}
+   * @return {number|void}
    *         - The duration of the video in seconds when getting
+   *         - Void when setting
    */
   duration(seconds) {
     if (seconds === undefined) {
@@ -2631,7 +2633,7 @@ class Player extends Component {
    *         - 1.0 is 100%/full
    *         - 0.5 is half volume or 50%
    *
-   * @return {number}
+   * @return {number|void}
    *         The current volume as a percent when getting
    */
   volume(percentAsDecimal) {
@@ -2639,7 +2641,7 @@ class Player extends Component {
 
     if (percentAsDecimal !== undefined) {
       // Force value to between 0 and 1
-      vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal)));
+      vol = Math.max(0, Math.min(1, percentAsDecimal));
       this.cache_.volume = vol;
       this.techCall_('setVolume', vol);
 
@@ -2662,9 +2664,10 @@ class Player extends Component {
    *        - true to mute
    *        - false to unmute
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         - true if mute is on and getting
    *         - false if mute is off and getting
+   *         - void if setting
    */
   muted(muted) {
     if (muted !== undefined) {
@@ -2695,10 +2698,10 @@ class Player extends Component {
    *        - true to mute
    *        - false to unmute
    *
-   * @return {boolean|Player}
+   * @return {boolean|void}
    *         - true if defaultMuted is on and getting
    *         - false if defaultMuted is off and getting
-   *         - A reference to the current player when setting
+   *         - void when setting
    */
   defaultMuted(defaultMuted) {
     if (defaultMuted !== undefined) {
@@ -2716,8 +2719,9 @@ class Player extends Component {
    *         - 1.0 is 100%/full
    *         - 0.5 is half volume or 50%
    *
-   * @return {number}
+   * @return {number|void}
    *         the current value of lastVolume as a percent when getting
+   *         void when setting
    *
    * @private
    */
@@ -2751,9 +2755,10 @@ class Player extends Component {
    * @param  {boolean} [isFS]
    *         Set the players current fullscreen state
    *
-   * @return {boolean}
+   * @return {boolean|vid}
    *         - true if fullscreen is on and getting
    *         - false if fullscreen is off and getting
+   *         - void when setting
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
@@ -3014,9 +3019,10 @@ class Player extends Component {
    * @param  {boolean} [isPiP]
    *         Set the players current Picture-in-Picture state
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         - true if Picture-in-Picture is on and getting
    *         - false if Picture-in-Picture is off and getting
+   *         - void if setting
    */
   isInPictureInPicture(isPiP) {
     if (isPiP !== undefined) {
@@ -3685,8 +3691,9 @@ class Player extends Component {
    *        - true means that we should preload
    *        - false means that we should not preload
    *
-   * @return {string}
+   * @return {string|void}
    *         The preload attribute value when getting
+   *         Void when setting
    */
   preload(value) {
     if (value !== undefined) {
@@ -3710,8 +3717,9 @@ class Player extends Component {
    *        - 'any': call play() on every loadstart. if that fails call muted() then play().
    *        - *: values other than those listed here will be set `autoplay` to true
    *
-   * @return {boolean|string}
+   * @return {boolean|string|void}
    *         The current value of autoplay when getting
+   *         Vid when setting
    */
   autoplay(value) {
     // getter usage
@@ -3758,9 +3766,9 @@ class Player extends Component {
    *          which in most cases is inline. iOS Safari is a notable exception
    *          and plays fullscreen by default.
    *
-   * @return {string|Player}
+   * @return {string|void}
    *         - the current value of playsinline
-   *         - the player when setting
+   *         - void when setting
    *
    * @see [Spec]{@link https://html.spec.whatwg.org/#attr-video-playsinline}
    */
@@ -3780,8 +3788,9 @@ class Player extends Component {
    *        - true means that we should loop the video
    *        - false means that we should not loop the video
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         The current value of loop when getting
+   *         Void when setting
    */
   loop(value) {
     if (value !== undefined) {
@@ -3800,8 +3809,9 @@ class Player extends Component {
    * @param {string} [src]
    *        Poster image source URL
    *
-   * @return {string}
+   * @return {string|void}
    *         The current value of poster when getting
+   *         Void when setting
    */
   poster(src) {
     if (src === undefined) {
@@ -3871,8 +3881,9 @@ class Player extends Component {
    *        - true to turn controls on
    *        - false to turn controls off
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         The current value of controls when getting
+   *         Void when setting
    */
   controls(bool) {
     if (bool === undefined) {
@@ -3931,8 +3942,9 @@ class Player extends Component {
    *        - true to turn native controls on
    *        - false to turn native controls off
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         The current value of native controls when getting
+   *         Void when setting
    */
   usingNativeControls(bool) {
     if (bool === undefined) {
@@ -3980,8 +3992,9 @@ class Player extends Component {
    *         A MediaError or a string/number to be turned
    *         into a MediaError
    *
-   * @return {MediaError|null}
+   * @return {MediaError|null|void}
    *         The current MediaError when getting (or null)
+   *         Void when setting
    */
   error(err) {
     if (err === undefined) {
@@ -4073,8 +4086,9 @@ class Player extends Component {
    *        - true if the user is active
    *        - false if the user is inactive
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         The current value of userActive when getting
+   *         Void when setting
    */
   userActive(bool) {
     if (bool === undefined) {
@@ -4247,8 +4261,9 @@ class Player extends Component {
    * @param {number} [rate]
    *       New playback rate to set.
    *
-   * @return {number}
+   * @return {number|void}
    *         The current playback rate when getting or 1.0
+   *         Void when setting
    */
   playbackRate(rate) {
     if (rate !== undefined) {
@@ -4275,9 +4290,9 @@ class Player extends Component {
    * @param {number} [rate]
    *       New default playback rate to set.
    *
-   * @return {number|Player}
+   * @return {number|void}
    *         - The default playback rate when getting or 1.0
-   *         - the player when setting
+   *         - void when setting
    */
   defaultPlaybackRate(rate) {
     if (rate !== undefined) {
@@ -4297,8 +4312,9 @@ class Player extends Component {
    *        - true signals that this is an audio player
    *        - false signals that this is not an audio player
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         The current value of isAudio when getting
+   *         Void when setting
    */
   isAudio(bool) {
     if (bool !== undefined) {
@@ -4562,7 +4578,7 @@ class Player extends Component {
   }
 
   /**
-   * The player's language code.
+   * Set or get the player's language code.
    *
    * Changing the language will trigger
    * [languagechange]{@link Player#event:languagechange}
@@ -4575,8 +4591,9 @@ class Player extends Component {
    * @param {string} [code]
    *        the language code to set the player to
    *
-   * @return {string}
+   * @return {string|void}
    *         The current language code when getting
+   *         Void when setting
    */
   language(code) {
     if (code === undefined) {
@@ -4776,13 +4793,14 @@ class Player extends Component {
    * Get or set a flag indicating whether or not this player should adjust
    * its UI based on its dimensions.
    *
-   * @param  {boolean} value
+   * @param  {boolean} [value]
    *         Should be `true` if the player should adjust its UI based on its
    *         dimensions; otherwise, should be `false`.
    *
-   * @return {boolean}
+   * @return {boolean|void}
    *         Will be `true` if this player should adjust its UI based on its
    *         dimensions; otherwise, will be `false`.
+   *         Void if setting
    */
   responsive(value) {
 
@@ -5037,6 +5055,7 @@ class Player extends Component {
    * @param {boolean} enabled
    * @fires Player#debugon
    * @fires Player#debugoff
+   * @return {boolean|void}
    */
   debug(enabled) {
     if (enabled === undefined) {
