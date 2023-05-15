@@ -33,7 +33,7 @@
     "build:test:webpack": "webpack --hide-modules test/require/webpack.js test/dist/webpack.js",
     "copy": "npm-run-all copy:*",
     "copy:fonts": "shx cp -R node_modules/videojs-font/fonts dist/font",
-    "copy:images": "shx cp -R images dist/",
+    "copy:images": "shx cp -R src/images dist/",
     "copy:examples": "shx cp -R docs/examples dist/",
     "build:js": "rollup -c",
     "build:css": "npm-run-all build:css:*",
