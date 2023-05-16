@@ -35,6 +35,7 @@ import {getMimetype, findMimetype} from './utils/mimetypes';
 import {hooks} from './utils/hooks';
 import {isObject} from './utils/obj';
 import keycode from 'keycode';
+import icons from '../images/icons.svg';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -378,6 +379,9 @@ class Player extends Component {
 
     // Init state hasStarted_
     this.hasStarted_ = false;
+
+    // Add the SVG icon sprite to the player in the form of a data URI.
+    this.icons = icons;
 
     // Init state userActive_
     this.userActive_ = false;

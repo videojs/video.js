@@ -13,6 +13,7 @@ import multiEntry from 'rollup-plugin-multi-entry';
 import stub from 'rollup-plugin-stub';
 import isCI from 'is-ci';
 import replace from '@rollup/plugin-replace';
+import image from '@rollup/plugin-image';
 import istanbul from 'rollup-plugin-istanbul';
 import externalGlobals from 'rollup-plugin-external-globals';
 
@@ -151,6 +152,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -176,6 +178,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -201,13 +204,14 @@ export default cliargs => [
       primedCjs,
       CI_TEST_TYPE === 'coverage' ? istanbul({exclude: excludeCoverage}) : {},
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
 
     ],
     onwarn,
     watch
   },
-  // es, cjs
+  // es, cjs, probably here
   {
     input: 'src/js/index.js',
     output: [
@@ -238,6 +242,7 @@ export default cliargs => [
       }),
       json(),
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -264,6 +269,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -289,6 +295,7 @@ export default cliargs => [
     plugins: [
       json(),
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -311,6 +318,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -334,6 +342,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,

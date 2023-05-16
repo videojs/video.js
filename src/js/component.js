@@ -561,7 +561,7 @@ class Component {
     const useEl = document.createElementNS(xmlnsURL, 'use');
 
     svgEl.appendChild(useEl);
-    useEl.setAttributeNS(null, 'href', `../images/icons.svg#vjs-icon-${iconName}`);
+    useEl.setAttributeNS(null, 'href', `${this.player_.icons}#vjs-icon-${iconName}`);
     iconContainer.appendChild(svgEl);
 
     // Replace a pre-existing icon if one exists.

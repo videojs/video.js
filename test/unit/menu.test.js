@@ -158,6 +158,9 @@ QUnit.test('should add or remove role menu for accessibility purpose', function(
 
 QUnit.test('setIcon should apply a child to the Button component', function(assert) {
   const player = TestHelpers.makePlayer({useSVGIcons: true});
+
+  player.icons = 'testPath';
+
   const menuButton = new MenuButton(player);
 
   menuButton.createItems = () => [];
@@ -170,7 +173,7 @@ QUnit.test('setIcon should apply a child to the Button component', function(asse
   const svgEl = spanEl.childNodes[0];
   const useEl = svgEl.childNodes[0];
 
-  assert.equal(useEl.getAttribute('href'), '../images/icons.svg#vjs-icon-test', 'use should have an href set with the correct icon url');
+  assert.equal(useEl.getAttribute('href'), 'testPath#vjs-icon-test', 'use should have an href set with the correct icon url');
 
   menuButton.dispose();
   player.dispose();
