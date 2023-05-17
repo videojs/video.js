@@ -22,6 +22,9 @@ sh.rm('-rf', deployDir);
 // make sure the directory exists
 sh.mkdir('-p', deployDir);
 
+// create sub-directory for images
+sh.mkdir('-p', `${deployDir}/src`);
+
 // create nested directories
 files
   .map((file) => path.dirname(file))
