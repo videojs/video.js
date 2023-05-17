@@ -211,7 +211,7 @@ export default cliargs => [
     onwarn,
     watch
   },
-  // es, cjs, probably here
+  // es, cjs
   {
     input: 'src/js/index.js',
     output: [

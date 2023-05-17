@@ -37,7 +37,6 @@
   </style>
 </head>
 <body>
-  <img src="../../dist/images/icons.svg" hidden/>
   <h1>VideoJS SVG Icons</h1>
   <p>In order to use SVG icons, the <code>useSVGIcons</code> option must be enabled on the player. See: <a href="https://videojs.com/guides/options/#usesvgicons">UseSVGIcons</a></p>
   <p>SVG Icons are expected to be added to the player through components. Example: <code>myButton.setIcon('play');</code></p>
@@ -45,7 +44,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-play" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-play" />
         </svg>
       </span>
       <span>play</span>
@@ -53,7 +52,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-play-circle" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-play-circle" />
         </svg>
       </span>
       <span>play-circle</span>
@@ -61,7 +60,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-pause" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-pause" />
         </svg>
       </span>
       <span>pause</span>
@@ -69,7 +68,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-volume-mute" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-mute" />
         </svg>
       </span>
       <span>volume-mute</span>
@@ -77,7 +76,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-volume-low" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-low" />
         </svg>
       </span>
       <span>volume-low</span>
@@ -85,7 +84,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-volume-medium" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-medium" />
         </svg>
       </span>
       <span>volume-medium</span>
@@ -93,7 +92,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-volume-high" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-high" />
         </svg>
       </span>
       <span>volume-high</span>
@@ -101,7 +100,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-fullscreen-enter" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-fullscreen-enter" />
         </svg>
       </span>
       <span>fullscreen-enter</span>
@@ -109,7 +108,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-fullscreen-exit" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-fullscreen-exit" />
         </svg>
       </span>
       <span>fullscreen-exit</span>
@@ -117,7 +116,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-spinner" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-spinner" />
         </svg>
       </span>
       <span>spinner</span>
@@ -125,7 +124,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-subtitles" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-subtitles" />
         </svg>
       </span>
       <span>subtitles</span>
@@ -133,7 +132,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-captions" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-captions" />
         </svg>
       </span>
       <span>captions</span>
@@ -141,7 +140,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-hd" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-hd" />
         </svg>
       </span>
       <span>hd</span>
@@ -149,7 +148,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-chapters" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-chapters" />
         </svg>
       </span>
       <span>chapters</span>
@@ -157,7 +156,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-downloading" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-downloading" />
         </svg>
       </span>
       <span>downloading</span>
@@ -165,7 +164,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-file-download" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-file-download" />
         </svg>
       </span>
       <span>file-download</span>
@@ -173,7 +172,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-file-download-done" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-file-download-done" />
         </svg>
       </span>
       <span>file-download-done</span>
@@ -181,7 +180,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-file-download-off" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-file-download-off" />
         </svg>
       </span>
       <span>file-download-off</span>
@@ -189,7 +188,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-share" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-share" />
         </svg>
       </span>
       <span>share</span>
@@ -197,7 +196,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-cog" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-cog" />
         </svg>
       </span>
       <span>cog</span>
@@ -205,7 +204,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-square" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-square" />
         </svg>
       </span>
       <span>square</span>
@@ -213,7 +212,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-circle" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-circle" />
         </svg>
       </span>
       <span>circle</span>
@@ -221,7 +220,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-circle-outline" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-circle-outline" />
         </svg>
       </span>
       <span>circle-outline</span>
@@ -229,7 +228,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-circle-inner-circle" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-circle-inner-circle" />
         </svg>
       </span>
       <span>circle-inner-circle</span>
@@ -237,7 +236,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-cancel" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-cancel" />
         </svg>
       </span>
       <span>cancel</span>
@@ -245,7 +244,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-repeat" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-repeat" />
         </svg>
       </span>
       <span>repeat</span>
@@ -253,7 +252,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-replay" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay" />
         </svg>
       </span>
       <span>replay</span>
@@ -261,7 +260,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-replay-5" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay-5" />
         </svg>
       </span>
       <span>replay-5</span>
@@ -269,7 +268,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-replay-10" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay-10" />
         </svg>
       </span>
       <span>replay-10</span>
@@ -277,7 +276,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-replay-30" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay-30" />
         </svg>
       </span>
       <span>replay-30</span>
@@ -285,7 +284,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-forward-5" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-forward-5" />
         </svg>
       </span>
       <span>forward-5</span>
@@ -293,7 +292,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-forward-10" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-forward-10" />
         </svg>
       </span>
       <span>forward-10</span>
@@ -301,7 +300,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-forward-30" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-forward-30" />
         </svg>
       </span>
       <span>forward-30</span>
@@ -309,7 +308,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-audio" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-audio" />
         </svg>
       </span>
       <span>audio</span>
@@ -317,7 +316,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-next-item" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-next-item" />
         </svg>
       </span>
       <span>next-item</span>
@@ -325,7 +324,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-previous-item" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-previous-item" />
         </svg>
       </span>
       <span>previous-item</span>
@@ -333,7 +332,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-shuffle" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-shuffle" />
         </svg>
       </span>
       <span>shuffle</span>
@@ -341,7 +340,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-cast" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-cast" />
         </svg>
       </span>
       <span>cast</span>
@@ -349,7 +348,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-picture-in-picture-enter" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-picture-in-picture-enter" />
         </svg>
       </span>
       <span>picture-in-picture-enter</span>
@@ -357,7 +356,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-picture-in-picture-exit" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-picture-in-picture-exit" />
         </svg>
       </span>
       <span>picture-in-picture-exit</span>
@@ -365,7 +364,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-facebook" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-facebook" />
         </svg>
       </span>
       <span>facebook</span>
@@ -373,7 +372,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-linkedin" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-linkedin" />
         </svg>
       </span>
       <span>linkedin</span>
@@ -381,7 +380,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-twitter" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-twitter" />
         </svg>
       </span>
       <span>twitter</span>
@@ -389,7 +388,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-tumblr" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-tumblr" />
         </svg>
       </span>
       <span>tumblr</span>
@@ -397,7 +396,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-pinterest" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-pinterest" />
         </svg>
       </span>
       <span>pinterest</span>
@@ -405,7 +404,7 @@
     <div>
       <span class="vjs-icon-placeholder vjs-svg-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <use xmlns="http://www.w3.org/2000/svg" href="../../dist/images/icons.svg#vjs-icon-audio-description" />
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-audio-description" />
         </svg>
       </span>
       <span>audio-description</span>
