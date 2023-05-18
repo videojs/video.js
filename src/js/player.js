@@ -857,8 +857,8 @@ class Player extends Component {
    *        CSS value to set the `Player`'s width to.
    *
    * @return {number|void}
-   *         The current width of the `Player` when getting.
-   *         Void when setting
+   *         - The current width of the `Player` when getting.
+   *         - Void when setting
    */
   width(value) {
     return this.dimension('width', value);
@@ -872,8 +872,8 @@ class Player extends Component {
    *        CSS value to set the `Player`'s height to.
    *
    * @return {number|void}
-   *         The current height of the `Player` when getting.
-   *         Void when setting
+   *         - The current height of the `Player` when getting.
+   *         - Void when setting
    */
   height(value) {
     return this.dimension('height', value);
@@ -2434,8 +2434,8 @@ class Player extends Component {
    *        whether the user is or is not scrubbing
    *
    * @return {boolean|void}
-   *         The value of scrubbing when getting
-   *         Void when setting
+   *         - The value of scrubbing when getting
+   *         - Void when setting
    */
   scrubbing(isScrubbing) {
     if (typeof isScrubbing === 'undefined') {
@@ -2720,8 +2720,8 @@ class Player extends Component {
    *         - 0.5 is half volume or 50%
    *
    * @return {number|void}
-   *         the current value of lastVolume as a percent when getting
-   *         void when setting
+   *         - The current value of lastVolume as a percent when getting
+   *         - Void when setting
    *
    * @private
    */
@@ -2997,9 +2997,9 @@ class Player extends Component {
   }
 
   /**
-   * Disable Picture-in-Picture mode.
+   * Get or set disable Picture-in-Picture mode.
    *
-   * @param {boolean} value
+   * @param {boolean} [value]
    *                  - true will disable Picture-in-Picture mode
    *                  - false will enable Picture-in-Picture mode
    */
@@ -3687,13 +3687,12 @@ class Player extends Component {
   /**
    * Get or set the preload attribute
    *
-   * @param {boolean} [value]
-   *        - true means that we should preload
-   *        - false means that we should not preload
+   * @param {'none'|'auto'|'metadata'} [value]
+   *        Preload mode to pass to tech
    *
    * @return {string|void}
-   *         The preload attribute value when getting
-   *         Void when setting
+   *         - The preload attribute value when getting
+   *         - Void when setting
    */
   preload(value) {
     if (value !== undefined) {
@@ -3709,7 +3708,7 @@ class Player extends Component {
    * modify the attribute on the tech. When this is a string the attribute on
    * the tech will be removed and `Player` will handle autoplay on loadstarts.
    *
-   * @param {boolean|string} [value]
+   * @param {boolean|'play'|'muted'|'any'} [value]
    *        - true: autoplay using the browser behavior
    *        - false: do not autoplay
    *        - 'play': call play() on every loadstart
@@ -3717,9 +3716,9 @@ class Player extends Component {
    *        - 'any': call play() on every loadstart. if that fails call muted() then play().
    *        - *: values other than those listed here will be set `autoplay` to true
    *
-   * @return {boolean|string|void}
-   *         The current value of autoplay when getting
-   *         Vid when setting
+   * @return {boolean|string|undefined}
+   *         - The current value of autoplay when getting
+   *         - Void when setting
    */
   autoplay(value) {
     // getter usage
@@ -3776,7 +3775,6 @@ class Player extends Component {
     if (value !== undefined) {
       this.techCall_('setPlaysinline', value);
       this.options_.playsinline = value;
-      return this;
     }
     return this.techGet_('playsinline');
   }
@@ -3789,8 +3787,8 @@ class Player extends Component {
    *        - false means that we should not loop the video
    *
    * @return {boolean|void}
-   *         The current value of loop when getting
-   *         Void when setting
+   *         - The current value of loop when getting
+   *         - Void when setting
    */
   loop(value) {
     if (value !== undefined) {
@@ -3810,8 +3808,8 @@ class Player extends Component {
    *        Poster image source URL
    *
    * @return {string|void}
-   *         The current value of poster when getting
-   *         Void when setting
+   *         - The current value of poster when getting
+   *         - Void when setting
    */
   poster(src) {
     if (src === undefined) {
@@ -3882,8 +3880,8 @@ class Player extends Component {
    *        - false to turn controls off
    *
    * @return {boolean|void}
-   *         The current value of controls when getting
-   *         Void when setting
+   *         - The current value of controls when getting
+   *         - Void when setting
    */
   controls(bool) {
     if (bool === undefined) {
@@ -3943,8 +3941,8 @@ class Player extends Component {
    *        - false to turn native controls off
    *
    * @return {boolean|void}
-   *         The current value of native controls when getting
-   *         Void when setting
+   *         - The current value of native controls when getting
+   *         - Void when setting
    */
   usingNativeControls(bool) {
     if (bool === undefined) {
@@ -3993,8 +3991,8 @@ class Player extends Component {
    *         into a MediaError
    *
    * @return {MediaError|null|void}
-   *         The current MediaError when getting (or null)
-   *         Void when setting
+   *         - The current MediaError when getting (or null)
+   *         - Void when setting
    */
   error(err) {
     if (err === undefined) {
@@ -4087,8 +4085,8 @@ class Player extends Component {
    *        - false if the user is inactive
    *
    * @return {boolean|void}
-   *         The current value of userActive when getting
-   *         Void when setting
+   *         - The current value of userActive when getting
+   *         - Void when setting
    */
   userActive(bool) {
     if (bool === undefined) {
@@ -4262,8 +4260,8 @@ class Player extends Component {
    *       New playback rate to set.
    *
    * @return {number|void}
-   *         The current playback rate when getting or 1.0
-   *         Void when setting
+   *         - The current playback rate when getting or 1.0
+   *         - Void when setting
    */
   playbackRate(rate) {
     if (rate !== undefined) {
@@ -4308,13 +4306,13 @@ class Player extends Component {
   /**
    * Gets or sets the audio flag
    *
-   * @param {boolean} bool
+   * @param {boolean} [bool]
    *        - true signals that this is an audio player
    *        - false signals that this is not an audio player
    *
    * @return {boolean|void}
-   *         The current value of isAudio when getting
-   *         Void when setting
+   *         - The current value of isAudio when getting
+   *         - Void when setting
    */
   isAudio(bool) {
     if (bool !== undefined) {
@@ -4592,8 +4590,8 @@ class Player extends Component {
    *        the language code to set the player to
    *
    * @return {string|void}
-   *         The current language code when getting
-   *         Void when setting
+   *         - The current language code when getting
+   *         - Void when setting
    */
   language(code) {
     if (code === undefined) {
