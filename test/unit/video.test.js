@@ -80,6 +80,13 @@ QUnit.test(
     videojs('test_vid_id2');
     assert.equal(warnLogs.length, 1, 'did not log another warning');
 
+    const vid3 = document.createElement('video');
+
+    videojs(vid3, {
+      noWarnOutOfDom: true
+    });
+    assert.equal(warnLogs.length, 1, 'did not log another warning');
+
     log.warn = origWarnLog;
   }
 );
