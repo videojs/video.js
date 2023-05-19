@@ -46,7 +46,7 @@ const isEvented = (object) =>
 /**
  * Adds a callback to run after the evented mixin applied.
  *
- * @param  {Object} object
+ * @param  {Object} target
  *         An object to Add
  * @param  {Function} callback
  *         The callback to run.
