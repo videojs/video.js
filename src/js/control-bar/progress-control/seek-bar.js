@@ -324,6 +324,10 @@ class SeekBar extends Slider {
 
     // Set new time (tell player to seek to new time)
     this.userSeek_(newTime);
+
+    if (this.player_.options_.enableSmoothSeeking) {
+      this.update();
+    }
   }
 
   enable() {

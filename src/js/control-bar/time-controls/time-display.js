@@ -26,7 +26,7 @@ class TimeDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
-    this.on(player, ['timeupdate', 'ended'], (e) => this.updateContent(e));
+    this.on(player, ['timeupdate', 'ended', 'seeking'], (e) => this.update(e));
     this.updateTextNode_();
   }
 
@@ -69,6 +69,20 @@ class TimeDisplay extends Component {
     this.textNode_ = null;
 
     super.dispose();
+  }
+
+  /**
+   * Updates the displayed time according to the `updateContent` function which is defined in the child class.
+   *
+   * @param {Event} [event]
+   *          The `timeupdate`, `ended` or `seeking` (if enableSmoothSeeking is true) event that caused this function to be called.
+   */
+  update(event) {
+    if (!this.player_.options_.enableSmoothSeeking && event.type === 'seeking') {
+      return;
+    }
+
+    this.updateContent(event);
   }
 
   /**

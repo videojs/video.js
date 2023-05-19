@@ -5316,7 +5316,9 @@ Player.prototype.options_ = {
   breakpoints: {},
   responsive: false,
   audioOnlyMode: false,
-  audioPosterMode: false
+  audioPosterMode: false,
+  // Default smooth seeking to false
+  enableSmoothSeeking: false
 };
 
 [
