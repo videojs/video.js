@@ -2461,29 +2461,30 @@ class Player extends Component {
    *         - the current time in seconds when getting
    */
   currentTime(seconds) {
-    if (typeof seconds !== 'undefined') {
-      if (seconds < 0) {
-        seconds = 0;
-      }
-      if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_) {
-        this.cache_.initTime = seconds;
-        this.off('canplay', this.boundApplyInitTime_);
-        this.one('canplay', this.boundApplyInitTime_);
-        return;
-      }
-      this.techCall_('setCurrentTime', seconds);
-      this.cache_.initTime = 0;
+    if (seconds === undefined) {
+      // cache last currentTime and return. default to 0 seconds
+      //
+      // Caching the currentTime is meant to prevent a massive amount of reads on the tech's
+      // currentTime when scrubbing, but may not provide much performance benefit after all.
+      // Should be tested. Also something has to read the actual current time or the cache will
+      // never get updated.
+      this.cache_.currentTime = (this.techGet_('currentTime') || 0);
+      return this.cache_.currentTime;
+    }
+
+    if (seconds < 0) {
+      seconds = 0;
+    }
+
+    if (!this.isReady_ || this.changingSrc_ || !this.tech_ || !this.tech_.isReady_) {
+      this.cache_.initTime = seconds;
+      this.off('canplay', this.boundApplyInitTime_);
+      this.one('canplay', this.boundApplyInitTime_);
       return;
     }
 
-    // cache last currentTime and return. default to 0 seconds
-    //
-    // Caching the currentTime is meant to prevent a massive amount of reads on the tech's
-    // currentTime when scrubbing, but may not provide much performance benefit after all.
-    // Should be tested. Also something has to read the actual current time or the cache will
-    // never get updated.
-    this.cache_.currentTime = (this.techGet_('currentTime') || 0);
-    return this.cache_.currentTime;
+    this.techCall_('setCurrentTime', seconds);
+    this.cache_.initTime = 0;
   }
 
   /**
