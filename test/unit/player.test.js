@@ -2676,6 +2676,20 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
 
+QUnit.test('Should be able to set the cache currentTime after player initialization as soon the canplay event is fired', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.src('xyz.mp4');
+  player.currentTime(500);
+
+  assert.strictEqual(player.getCache().currentTime, 0, 'cache currentTime value was not changed');
+
+  this.clock.tick(100);
+  player.trigger('canplay');
+
+  assert.strictEqual(player.getCache().currentTime, 500, 'cache currentTime value is the one passed after initialization');
+});
+
 QUnit.test('Should fire debugon event when debug mode is enabled', function(assert) {
   const player = TestHelpers.makePlayer({});
   const debugOnSpy = sinon.spy();

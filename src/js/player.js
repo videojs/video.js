@@ -2485,6 +2485,10 @@ class Player extends Component {
 
     this.techCall_('setCurrentTime', seconds);
     this.cache_.initTime = 0;
+
+    if (isFinite(seconds)) {
+      this.cache_.currentTime = Number(seconds);
+    }
   }
 
   /**
