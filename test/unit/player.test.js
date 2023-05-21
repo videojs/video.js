@@ -3150,6 +3150,7 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
   controlBar.getChild('ChaptersButton').update();
 
   player.trigger('ready');
+  player.trigger('loadedmetadata');
   player.hasStarted(true);
 
   // Show all control bar children
@@ -3157,8 +3158,12 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
     const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
     if (el) {
-      // Sanity check that component is showing
-      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+      if (!document.exitPictureInPicture && child === 'PictureInPictureToggle') {
+        assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is not visible if PiP is not supported`);
+      } else {
+        // Sanity check that component is showing
+        assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+      }
     }
   });
 
@@ -3187,7 +3192,11 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
         const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
         if (el) {
-          assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+          if (!document.exitPictureInPicture && child === 'PictureInPictureToggle') {
+            assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is not visible if PiP is not supported`);
+          } else {
+            assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+          }
         }
       });
     })
