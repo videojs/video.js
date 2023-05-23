@@ -16,6 +16,7 @@ import replace from '@rollup/plugin-replace';
 import image from '@rollup/plugin-image';
 import istanbul from 'rollup-plugin-istanbul';
 import externalGlobals from 'rollup-plugin-external-globals';
+import svg from 'rollup-plugin-svg';
 
 const excludeCoverage = [
   'test/**',
@@ -152,7 +153,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -178,7 +179,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -204,6 +205,7 @@ export default cliargs => [
       primedCjs,
       CI_TEST_TYPE === 'coverage' ? istanbul({exclude: excludeCoverage}) : {},
       primedBabel,
+      primedExternalGlobals,
       image(),
       cliargs.progress !== false ? progress() : {}
 
@@ -242,7 +244,7 @@ export default cliargs => [
       }),
       json(),
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -269,7 +271,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -295,7 +297,7 @@ export default cliargs => [
     plugins: [
       json(),
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -318,7 +320,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -342,7 +344,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
-      image(),
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,

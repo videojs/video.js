@@ -380,9 +380,6 @@ class Player extends Component {
     // Init state hasStarted_
     this.hasStarted_ = false;
 
-    // Add the SVG icon sprite to the player in the form of a data URI.
-    this.icons = icons;
-
     // Init state userActive_
     this.userActive_ = false;
 
@@ -552,6 +549,21 @@ class Player extends Component {
     }
 
     if (options.useSVGIcons) {
+      // Add SVG Sprite to the DOM
+      const parser = new window.DOMParser();
+      const parsedSVG = parser.parseFromString(icons, 'image/svg+xml');
+      const errorNode = parsedSVG.querySelector('parsererror');
+
+      if (errorNode) {
+        log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
+        return;
+      }
+
+      const sprite = parsedSVG.documentElement;
+
+      sprite.style.display = 'none';
+      this.el_.appendChild(sprite);
+
       this.addClass('vjs-svg-icons-enabled');
     }
 
