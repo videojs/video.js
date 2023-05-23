@@ -60,8 +60,8 @@ QUnit.test('should be possible to pass data when you trigger an event', function
 
   const listener = function(evt, hash) {
     assert.ok(true, 'Callback triggered');
-    assert.deepEqual(fakeData1, hash.d1, 'Shoulbe be passed to the handler');
-    assert.deepEqual(fakeData2, hash.d2, 'Shoulbe be passed to the handler');
+    assert.deepEqual(fakeData1, hash.d1, 'Should be be passed to the handler');
+    assert.deepEqual(fakeData2, hash.d2, 'Should be be passed to the handler');
   };
 
   Events.on(el, ['event1', 'event2'], listener);
