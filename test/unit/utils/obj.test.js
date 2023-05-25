@@ -176,4 +176,30 @@ QUnit.module('utils/obj', function() {
     assert.strictEqual(b, 2, 'the value was retrieved correctly');
     assert.strictEqual(descriptor.value, 2, 'descriptor has a value');
   });
+
+  QUnit.module('values', () => {
+    QUnit.test('returns an array of values for a given object', (assert) => {
+      const source = { a: 1, b: 2, c: 3 };
+      const expectedResult = [1, 2, 3];
+
+      assert.deepEqual(Obj.values(source), expectedResult, 'All values are extracted correctly');
+    });
+
+    QUnit.test('returns an empty array for an empty object', (assert) => {
+      const source = {};
+      const expectedResult = [];
+
+      assert.deepEqual(Obj.values(source), expectedResult, 'Empty array is returned for an empty object');
+    });
+
+    QUnit.test('ignores prototype properties', (assert) => {
+      const source = Object.create({ a: 1 });
+
+      source.b = 2;
+
+      const expectedResult = [2];
+
+      assert.deepEqual(Obj.values(source), expectedResult, 'Only own properties are included in the result');
+    });
+  });
 });
