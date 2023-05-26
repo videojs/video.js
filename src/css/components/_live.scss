@@ -47,12 +47,12 @@
 }
 
 .vjs-svg-icons-enabled .vjs-seek-to-live-control {
-  display: inline;
+  line-height: 0;
 }
 
 .vjs-seek-to-live-control .vjs-svg-icon {
-  width: 8px;
-  height: 8px;
+  width: 1em;
+  height: 1em;
   pointer-events: none;
   fill: #888888;
 }
