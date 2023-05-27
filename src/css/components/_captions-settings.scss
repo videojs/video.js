@@ -80,13 +80,7 @@
 }
 
 .vjs-text-track-settings .vjs-label {
-  clip: rect(1px 1px 1px 1px); // for Internet Explorer
-  clip: rect(1px, 1px, 1px, 1px);
   margin: 0 5px 5px 0;
-  border: 0;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
 }
 
 .vjs-track-settings-controls button:focus,
