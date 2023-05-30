@@ -532,7 +532,7 @@ class Component {
    *        The name of icon. A list of all the icon names can be found at 'sandbox/svg-icons.html'
    *
    * @param {Element} [el=this.el()]
-   *        Component or element to set the title on. Defaults to the current Component's element.
+   *        Element to set the title on. Defaults to the current Component's element.
    *
    * @return {Element}
    *        The newly created icon element.
