@@ -205,7 +205,6 @@ export default cliargs => [
       primedCjs,
       CI_TEST_TYPE === 'coverage' ? istanbul({exclude: excludeCoverage}) : {},
       primedBabel,
-      primedExternalGlobals,
       image(),
       cliargs.progress !== false ? progress() : {}
 
