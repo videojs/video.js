@@ -128,3 +128,21 @@ QUnit.test('localizes on languagechange', function(assert) {
 
   player.dispose();
 });
+
+QUnit.test('skips forward only if the duration is valid', function(assert) {
+  const player = TestHelpers.makePlayer({controlBar: {skipButtons: {forward: 5}}});
+  const currentTimeSpy = sinon.spy(player, 'currentTime');
+  const button = player.controlBar.skipForward;
+
+  button.trigger('click');
+
+  assert.ok(currentTimeSpy.notCalled, 'currentTime was not called');
+
+  player.duration(0);
+  button.trigger('click');
+
+  assert.ok(currentTimeSpy.called, 'currentTime was called');
+
+  currentTimeSpy.restore();
+  player.dispose();
+});
