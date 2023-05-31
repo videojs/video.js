@@ -2209,6 +2209,29 @@ QUnit.test('should not allow to register custom player when any player has been 
   videojs.registerComponent('Player', Player);
 });
 
+QUnit.test('setters getters passed to tech', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
+
+  const setSpy = sinon.spy(player.tech_, 'setDefaultMuted');
+  const getSpy = sinon.spy(player.tech_, 'defaultMuted');
+
+  player.defaultMuted(true);
+  player.defaultMuted();
+
+  assert.ok(setSpy.calledWith(true), 'setSpy called');
+  assert.ok(getSpy.called);
+
+  setSpy.restore();
+  getSpy.restore();
+});
+
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
   let muts = 0;
