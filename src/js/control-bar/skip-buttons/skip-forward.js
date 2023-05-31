@@ -46,6 +46,10 @@ class SkipForward extends Button {
    *        to be called
    */
   handleClick(event) {
+    if (isNaN(this.player_.duration())) {
+      return;
+    }
+
     const currentVideoTime = this.player_.currentTime();
     const liveTracker = this.player_.liveTracker;
     const duration = (liveTracker && liveTracker.isLive()) ? liveTracker.seekableEnd() : this.player_.duration();

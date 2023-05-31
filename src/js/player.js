@@ -1613,7 +1613,7 @@ class Player extends Component {
             return;
           }
 
-          const techSrc = this.techGet('currentSrc');
+          const techSrc = this.techGet_('currentSrc');
 
           this.lastSource_.tech = techSrc;
           this.updateSourceCaches_(techSrc);
@@ -3062,7 +3062,8 @@ class Player extends Component {
 
       return window.documentPictureInPicture.requestWindow({
         // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
-        initialAspectRatio: this.videoWidth() / this.videoHeight(),
+        width: this.videoWidth(),
+        height: this.videoHeight(),
         copyStyleSheets: true
       }).then(pipWindow => {
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
@@ -4907,6 +4908,8 @@ class Player extends Component {
       return;
     }
 
+    const crossOrigin = this.crossOrigin();
+
     this.reset();
 
     // Clone the media object so it cannot be mutated from outside.
@@ -4920,6 +4923,10 @@ class Player extends Component {
         src: poster,
         type: getMimetype(poster)
       }];
+    }
+
+    if (crossOrigin) {
+      this.crossOrigin(crossOrigin);
     }
 
     if (src) {
