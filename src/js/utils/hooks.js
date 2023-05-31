@@ -35,7 +35,7 @@ const hooks = function(type, fn) {
  * @param {Function|Function[]}
  *        The function or array of functions to attach.
  */
-const hook = function(type, fn) {
+const hook = (type, fn) => {
   hooks(type, fn);
 };
 

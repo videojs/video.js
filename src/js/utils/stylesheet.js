@@ -30,7 +30,7 @@ export const createStyleElement = function(className) {
  * @param {string} content
  *        The text to add to the element.
  */
-export const setTextContent = function(el, content) {
+export const setTextContent = (el, content) => {
   if (el.styleSheet) {
     el.styleSheet.cssText = content;
   } else {
