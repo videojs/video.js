@@ -2,8 +2,7 @@
  * @file middleware.js
  * @module middleware
  */
-import { assign } from '../utils/obj.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 
 const middlewares = {};
 const middlewareInstances = {};
@@ -28,7 +27,7 @@ export const TERMINATOR = {};
  * passed in as an argument.
  *
  * @callback MiddlewareFactory
- * @param {Player} player
+ * @param { import('../player').default } player
  *        A Video.js player.
  */
 
@@ -70,7 +69,7 @@ export function getMiddleware(type) {
  * matching middlewares and calling `setSource` on each, passing along the
  * previous returned value each time.
  *
- * @param  {Player} player
+ * @param  { import('../player').default } player
  *         A {@link Player} instance.
  *
  * @param  {Tech~SourceObject} src
@@ -89,7 +88,7 @@ export function setSource(player, src, next) {
  * @param {Object[]} middleware
  *        An array of middleware instances.
  *
- * @param {Tech} tech
+ * @param { import('../tech/tech').default } tech
  *        A Video.js tech.
  */
 export function setTech(middleware, tech) {
@@ -103,13 +102,13 @@ export function setTech(middleware, tech) {
  * @param  {Object[]} middleware
  *         An array of middleware instances.
  *
- * @param  {Tech} tech
+ * @param  { import('../tech/tech').default } tech
  *         The current tech.
  *
  * @param  {string} method
  *         A method name.
  *
- * @return {Mixed}
+ * @return {*}
  *         The final value from the tech after middleware has intercepted it.
  */
 export function get(middleware, tech, method) {
@@ -123,16 +122,16 @@ export function get(middleware, tech, method) {
  * @param  {Object[]} middleware
  *         An array of middleware instances.
  *
- * @param  {Tech} tech
+ * @param  { import('../tech/tech').default } tech
  *         The current tech.
  *
  * @param  {string} method
  *         A method name.
  *
- * @param  {Mixed} arg
+ * @param  {*} arg
  *         The value to set on the tech.
  *
- * @return {Mixed}
+ * @return {*}
  *         The return value of the `method` of the `tech`.
  */
 export function set(middleware, tech, method, arg) {
@@ -149,16 +148,16 @@ export function set(middleware, tech, method, arg) {
  * @param  {Object[]} middleware
  *         An array of middleware instances.
  *
- * @param  {Tech} tech
+ * @param  { import('../tech/tech').default } tech
  *         The current tech.
  *
  * @param  {string} method
  *         A method name.
  *
- * @param  {Mixed} arg
+ * @param  {*} arg
  *         The value to set on the tech.
  *
- * @return {Mixed}
+ * @return {*}
  *         The return value of the `method` of the `tech`, regardless of the
  *         return values of middlewares.
  */
@@ -241,7 +240,7 @@ function executeRight(mws, method, value, terminated) {
 /**
  * Clear the middleware cache for a player.
  *
- * @param  {Player} player
+ * @param  { import('../player').default } player
  *         A {@link Player} instance.
  */
 export function clearCacheForPlayer(player) {
@@ -301,7 +300,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
       return setSourceHelper(src, mwrest, next, player, acc, lastRun);
     }
 
-    mw.setSource(assign({}, src), function(err, _src) {
+    mw.setSource(Object.assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
       // make sure to use the old src

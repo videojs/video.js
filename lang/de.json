@@ -10,9 +10,9 @@
   "Loaded": "Geladen",
   "Progress": "Status",
   "Fullscreen": "Vollbild",
-  "Non-Fullscreen": "Vollbildmodus beenden",
-  "Mute": "Ton aus",
-  "Unmute": "Ton ein",
+  "Exit Fullscreen": "Vollbildmodus beenden",
+  "Mute": "Stumm schalten",
+  "Unmute": "Ton einschalten",
   "Playback Rate": "Wiedergabegeschwindigkeit",
   "Subtitles": "Untertitel",
   "subtitles off": "Untertitel aus",
@@ -85,6 +85,14 @@
   "Seek to live, currently behind live": "Zur Live-Übertragung wechseln. Aktuell wird es nicht live abgespielt.",
   "Seek to live, currently playing live": "Zur Live-Übertragung wechseln. Es wird aktuell live abgespielt.",
   "Exit Picture-in-Picture": "Bild-im-Bild-Modus beenden",
-  "Picture-in-Picture": "Bild-im-Bild-Modus"
+  "Picture-in-Picture": "Bild-im-Bild-Modus",
+  "No content": "Kein Inhalt",
+  "Color": "Farbe",
+  "Opacity": "Deckkraft",
+  "Text Background": "Texthintergrund",
+  "Caption Area Background": "Hintergrund des Untertitelbereichs",
+  "Playing in Picture-in-Picture": "Wird im Bild-im-Bild-Modus wiedergegeben",
+  "Skip forward {1} seconds": "{1} Sekunden vorwärts",
+  "Skip backward {1} seconds": "{1} Sekunden zurück"
 }
 

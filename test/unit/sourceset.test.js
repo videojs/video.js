@@ -17,9 +17,11 @@ const testSrc = {
   src: 'http://example.com/testSrc.mp4',
   type: 'video/mp4'
 };
-const sourceOne = {src: 'http://example.com/one.mp4', type: 'video/mp4'};
-const sourceTwo = {src: 'http://example.com/two.mp4', type: 'video/mp4'};
-const sourceThree = {src: 'http://example.com/three.mp4', type: 'video/mp4'};
+// Using a real URL here makes the tests work with retryOnError by default
+// however, this means that it may fail offline
+const sourceOne = {src: 'https://vjs.zencdn.net/v/oceans.mp4?one', type: 'video/mp4'};
+const sourceTwo = {src: 'https://vjs.zencdn.net/v/oceans.mp4?two', type: 'video/mp4'};
+const sourceThree = {src: 'https://vjs.zencdn.net/v/oceans.mp4?three', type: 'video/mp4'};
 
 if (!Html5.canOverrideAttributes()) {
   qunitFn = 'skip';
@@ -113,6 +115,49 @@ const setupAfterEach = function(totalSourcesets) {
 const testTypes = ['video el', 'change video el', 'audio el', 'change audio el', 'video-js', 'change video-js el'];
 
 QUnit[qunitFn]('sourceset', function(hooks) {
+  QUnit.module('sourceset option', (subhooks) => testTypes.forEach((testName) => {
+    QUnit.module(testName, {
+      beforeEach() {
+
+        setupEnv(this, testName);
+      },
+      afterEach: setupAfterEach(1)
+    });
+
+    QUnit.test('sourceset enabled by default', function(assert) {
+      const done = assert.async();
+
+      this.mediaEl.setAttribute('data-setup', JSON.stringify({sources: [testSrc]}));
+      this.player = videojs(this.mediaEl, {});
+
+      this.player.one('sourceset', (e) => {
+        validateSource(this.player, [testSrc], e);
+        done();
+      });
+    });
+
+    QUnit.test('sourceset not triggered if turned off', function(assert) {
+      const done = assert.async();
+
+      this.player = videojs(this.mediaEl, {
+        enableSourceset: false
+      });
+
+      this.totalSourcesets = 0;
+
+      this.player.one('sourceset', (e) => {
+        this.totalSourcesets = 1;
+      });
+
+      this.player.on('loadstart', () => {
+        done();
+      });
+
+      this.player.src(testSrc);
+
+    });
+  }));
+
   QUnit.module('source before player', (subhooks) => testTypes.forEach((testName) => {
     QUnit.module(testName, {
       beforeEach() {
@@ -1097,33 +1142,33 @@ QUnit[qunitFn]('sourceset', function(hooks) {
     const fixture = document.querySelector('#qunit-fixture');
     const vid = document.createElement('video');
     const Tech = videojs.getTech('Tech');
-    const flashSrc = {
-      src: 'http://example.com/oceans.flv',
-      type: 'video/flv'
+    const youtubeSrc = {
+      src: 'https://www.youtube.com/watch?v=C0DPdy98e4c',
+      type: 'video/youtube'
     };
     const sourcesets = [];
 
-    class FakeFlash extends Html5 {
+    class FakeYoutube extends Html5 {
       static isSupported() {
         return true;
       }
 
       static canPlayType(type) {
-        return type === 'video/flv' ? 'maybe' : '';
+        return type === 'video/youtube' ? 'maybe' : '';
       }
 
       static canPlaySource(srcObj) {
-        return srcObj.type === 'video/flv';
+        return srcObj.type === 'video/youtube';
       }
     }
 
-    videojs.registerTech('FakeFlash', FakeFlash);
+    videojs.registerTech('FakeYoutube', FakeYoutube);
 
     fixture.appendChild(vid);
 
     const player = videojs(vid, {
       enableSourceset: true,
-      techOrder: ['fakeFlash', 'html5']
+      techOrder: ['fakeYoutube', 'html5']
     });
 
     player.ready(function() {
@@ -1134,10 +1179,10 @@ QUnit[qunitFn]('sourceset', function(hooks) {
         sourcesets.push(e.src);
 
         if (sourcesets.length === 3) {
-          assert.deepEqual([flashSrc.src, sourceTwo.src, sourceOne.src], sourcesets, 'sourceset as expected');
+          assert.deepEqual([youtubeSrc.src, sourceTwo.src, sourceOne.src], sourcesets, 'sourceset as expected');
 
           player.dispose();
-          delete Tech.techs_.FakeFlash;
+          delete Tech.techs_.FakeYoutube;
           done();
         }
       });
@@ -1146,7 +1191,44 @@ QUnit[qunitFn]('sourceset', function(hooks) {
       player.src(sourceTwo);
     });
 
-    player.src(flashSrc);
+    player.src(youtubeSrc);
 
+  });
+
+  QUnit.test('tech sourceset update sources cache when changingSrc_ is false', function(assert) {
+    const clock = sinon.useFakeTimers();
+    const fixture = document.querySelector('#qunit-fixture');
+    const vid = document.createElement('video');
+
+    fixture.appendChild(vid);
+
+    const player = videojs(vid);
+
+    player.src(sourceOne);
+
+    clock.tick(1);
+
+    // Declaring the spies here avoids listening to the changes that took place when loading the source.
+    const handleTechSourceset_ = sinon.spy(player, 'handleTechSourceset_');
+    const techGet_ = sinon.spy(player, 'techGet_');
+    const updateSourceCaches_ = sinon.spy(player, 'updateSourceCaches_');
+
+    player.tech_.trigger('sourceset');
+
+    assert.ok(handleTechSourceset_.calledOnce, 'handleTechSourceset_ was called');
+    assert.ok(!techGet_.called, 'techGet_ was not called');
+    assert.ok(updateSourceCaches_.calledOnce, 'updateSourceCaches_ was called');
+    assert.equal(player.cache_.src, '', 'player.cache_.src was reset');
+
+    player.tech_.trigger('loadstart');
+
+    assert.ok(techGet_.called, 'techGet_ was called');
+    assert.equal(updateSourceCaches_.callCount, 2, 'updateSourceCaches_ was called twice');
+
+    handleTechSourceset_.restore();
+    techGet_.restore();
+    updateSourceCaches_.restore();
+    player.dispose();
+    clock.restore();
   });
 });

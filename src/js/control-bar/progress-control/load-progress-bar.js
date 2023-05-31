@@ -3,7 +3,7 @@
  */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
-import clamp from '../../utils/clamp';
+import {clamp} from '../../utils/num';
 import document from 'global/document';
 
 // get the percent width of a time compared to the total end
@@ -19,7 +19,7 @@ class LoadProgressBar extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -66,7 +66,7 @@ class LoadProgressBar extends Component {
   /**
    * Update progress bar
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `progress` event that caused this function to run.
    *
    * @listens Player#progress

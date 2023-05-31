@@ -15,7 +15,7 @@ class AudioTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -49,7 +49,7 @@ class AudioTrackMenuItem extends MenuItem {
     const el = super.createEl(type, props, attrs);
     const parentSpan = el.querySelector('.vjs-menu-item-text');
 
-    if (this.options_.track.kind === 'main-desc') {
+    if (['main-desc', 'description'].indexOf(this.options_.track.kind) >= 0) {
       parentSpan.appendChild(Dom.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {
@@ -68,7 +68,7 @@ class AudioTrackMenuItem extends MenuItem {
    * This gets called when an `AudioTrackMenuItem is "clicked". See {@link ClickableComponent}
    * for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -102,7 +102,7 @@ class AudioTrackMenuItem extends MenuItem {
   /**
    * Handle any {@link AudioTrack} change.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link AudioTrackList#change} event that caused this to run.
    *
    * @listens AudioTrackList#change

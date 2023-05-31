@@ -14,7 +14,7 @@ class DurationDisplay extends TimeDisplay {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -54,7 +54,7 @@ class DurationDisplay extends TimeDisplay {
   /**
    * Update duration time display.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `durationchange`, `timeupdate`, or `loadedmetadata` event that caused
    *        this function to be called.
    *
@@ -81,7 +81,7 @@ DurationDisplay.prototype.labelText_ = 'Duration';
  * The text that should display over the `DurationDisplay`s controls. Added to for localization.
  *
  * @type {string}
- * @private
+ * @protected
  *
  * @deprecated in v7; controlText_ is not used in non-active display Components
  */

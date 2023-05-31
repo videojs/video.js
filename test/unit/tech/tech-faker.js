@@ -1,7 +1,7 @@
 // Fake a media playback tech controller so that player tests
 // can run without HTML5 which PhantomJS does not support.
 import Tech from '../../../src/js/tech/tech.js';
-import {createTimeRanges} from '../../../src/js/utils/time-ranges.js';
+import {createTimeRanges} from '../../../src/js/utils/time.js';
 /**
  * @class
  */

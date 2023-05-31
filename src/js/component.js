@@ -9,11 +9,8 @@ import stateful from './mixins/stateful';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
-import {toTitleCase, toLowerCase} from './utils/string-cases.js';
-import mergeOptions from './utils/merge-options.js';
-import computedStyle from './utils/computed-style';
-import Map from './utils/map.js';
-import Set from './utils/set.js';
+import {toTitleCase, toLowerCase} from './utils/str.js';
+import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
 /**
@@ -28,30 +25,30 @@ class Component {
 
   /**
    * A callback that is called when a component is ready. Does not have any
-   * paramters and any callback value will be ignored.
+   * parameters and any callback value will be ignored.
    *
-   * @callback Component~ReadyCallback
+   * @callback ReadyCallback
    * @this Component
    */
 
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of component options.
    *
    * @param {Object[]} [options.children]
-   *        An array of children objects to intialize this component with. Children objects have
+   *        An array of children objects to initialize this component with. Children objects have
    *        a name property that will be used if more than one component of the same type needs to be
    *        added.
    *
    * @param  {string} [options.className]
    *         A class or space separated list of classes to add the component
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {ReadyCallback} [ready]
    *        Function that gets called when the `Component` is ready.
    */
   constructor(player, options, ready) {
@@ -69,10 +66,10 @@ class Component {
     this.parentComponent_ = null;
 
     // Make a copy of prototype.options_ to protect against overriding defaults
-    this.options_ = mergeOptions({}, this.options_);
+    this.options_ = merge({}, this.options_);
 
     // Updated options with supplied options
-    options = this.options_ = mergeOptions(this.options_, options);
+    options = this.options_ = merge(this.options_, options);
 
     // Get ID from options or options element if one is supplied
     this.id_ = options.id || (options.el && options.el.id);
@@ -97,6 +94,12 @@ class Component {
     if (options.className && this.el_) {
       options.className.split(' ').forEach(c => this.addClass(c));
     }
+
+    // Remove the placeholder event methods. If the component is evented, the
+    // real methods are added next
+    ['on', 'off', 'one', 'any', 'trigger'].forEach(fn => {
+      this[fn] = undefined;
+    });
 
     // if evented is anything except false, we want to mixin in evented
     if (options.evented !== false) {
@@ -133,6 +136,79 @@ class Component {
 
   }
 
+  // `on`, `off`, `one`, `any` and `trigger` are here so tsc includes them in definitions.
+  // They are replaced or removed in the constructor
+
+  /**
+   * Adds an `event listener` to an instance of an `EventTarget`. An `event listener` is a
+   * function that will get called when an event with a certain name gets triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to call with `EventTarget`s
+   */
+  on(type, fn) {}
+
+  /**
+   * Removes an `event listener` for a specific event from an instance of `EventTarget`.
+   * This makes it so that the `event listener` will no longer get called when the
+   * named event happens.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to remove.
+   */
+  off(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once. After the
+   * first trigger it will get removed. This is like adding an `event listener`
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on itself.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  one(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once and is
+   * removed from all events. This is like adding an array of `event listener`s
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on all events the
+   * first time it is triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  any(type, fn) {}
+
+  /**
+   * This function causes an event to happen. This will then cause any `event listeners`
+   * that are waiting for that event, to get called. If there are no `event listeners`
+   * for an event then nothing will happen.
+   *
+   * If the name of the `Event` that is being triggered is in `EventTarget.allowedEvents_`.
+   * Trigger will also call the `on` + `uppercaseEventName` function.
+   *
+   * Example:
+   * 'click' is in `EventTarget.allowedEvents_`, so, trigger will attempt to call
+   * `onClick` if it exists.
+   *
+   * @param {string|Event|Object} event
+   *        The name of the event, an `Event`, or an object with a key of type set to
+   *        an event name.
+   */
+  trigger(event) {}
+
   /**
    * Dispose of the `Component` and all child components.
    *
@@ -156,7 +232,7 @@ class Component {
      * Triggered when a `Component` is disposed.
      *
      * @event Component#dispose
-     * @type {EventTarget~Event}
+     * @type {Event}
      *
      * @property {boolean} [bubbles=false]
      *           set to false so that the dispose event does not
@@ -212,7 +288,7 @@ class Component {
   /**
    * Return the {@link Player} that the `Component` has attached to.
    *
-   * @return {Player}
+   * @return { import('./player').default }
    *         The player that this `Component` has attached to.
    */
   player() {
@@ -222,7 +298,7 @@ class Component {
   /**
    * Deep merge of options objects with new options.
    * > Note: When both `obj` and `options` contain properties whose values are objects.
-   *         The two properties get merged using {@link module:mergeOptions}
+   *         The two properties get merged using {@link module:obj.merge}
    *
    * @param {Object} obj
    *        The object that contains new options.
@@ -235,7 +311,7 @@ class Component {
       return this.options_;
     }
 
-    this.options_ = mergeOptions(this.options_, obj);
+    this.options_ = merge(this.options_, obj);
     return this.options_;
   }
 
@@ -339,7 +415,7 @@ class Component {
   }
 
   /**
-   * Handles language change for the player in components. Should be overriden by sub-components.
+   * Handles language change for the player in components. Should be overridden by sub-components.
    *
    * @abstract
    */
@@ -673,7 +749,7 @@ class Component {
         })
         .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
-        // techs are registerd as Components but can't aren't compatible
+        // techs are registered as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
           const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
@@ -685,7 +761,7 @@ class Component {
   }
 
   /**
-   * Builds the default DOM class name. Should be overriden by sub-components.
+   * Builds the default DOM class name. Should be overridden by sub-components.
    *
    * @return {string}
    *         The DOM class name for this object.
@@ -702,6 +778,9 @@ class Component {
    * Bind a listener to the component's ready state.
    * Different from event listeners in that if the ready event has already happened
    * it will trigger the function immediately.
+   *
+   * @param {ReadyCallback} fn
+   *        Function that gets called when the `Component` is ready.
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -751,7 +830,7 @@ class Component {
        * Triggered when a `Component` is ready.
        *
        * @event Component#ready
-       * @type {EventTarget~Event}
+       * @type {Event}
        */
       this.trigger('ready');
     }, 1);
@@ -818,21 +897,21 @@ class Component {
   /**
    * Add a CSS class name to the `Component`s element.
    *
-   * @param {string} classToAdd
-   *        CSS class name to add
+   * @param {...string} classesToAdd
+   *        One or more CSS class name to add.
    */
-  addClass(classToAdd) {
-    Dom.addClass(this.el_, classToAdd);
+  addClass(...classesToAdd) {
+    Dom.addClass(this.el_, ...classesToAdd);
   }
 
   /**
    * Remove a CSS class name from the `Component`s element.
    *
-   * @param {string} classToRemove
-   *        CSS class name to remove
+   * @param {...string} classesToRemove
+   *        One or more CSS class name to remove.
    */
-  removeClass(classToRemove) {
-    Dom.removeClass(this.el_, classToRemove);
+  removeClass(...classesToRemove) {
+    Dom.removeClass(this.el_, ...classesToRemove);
   }
 
   /**
@@ -896,7 +975,7 @@ class Component {
    *         - The value of the attribute that was asked for.
    *         - Can be an empty string on some browsers if the attribute does not exist
    *           or has no value
-   *         - Most browsers will return null if the attibute does not exist or has
+   *         - Most browsers will return null if the attribute does not exist or has
    *           no value.
    *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute}
@@ -1033,7 +1112,7 @@ class Component {
          * Triggered when a component is resized.
          *
          * @event Component#componentresize
-         * @type {EventTarget~Event}
+         * @type {Event}
          */
         this.trigger('componentresize');
       }
@@ -1081,7 +1160,7 @@ class Component {
       throw new Error('currentDimension only accepts width or height value');
     }
 
-    computedWidthOrHeight = computedStyle(this.el_, widthOrHeight);
+    computedWidthOrHeight = Dom.computedStyle(this.el_, widthOrHeight);
 
     // remove 'px' from variable and parse as integer
     computedWidthOrHeight = parseFloat(computedWidthOrHeight);
@@ -1169,7 +1248,7 @@ class Component {
    * When this Component receives a `keydown` event which it does not process,
    *  it passes the event to the Player for handling.
    *
-   * @param {EventTarget~Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    */
   handleKeyDown(event) {
@@ -1190,7 +1269,7 @@ class Component {
    * delegates to `handleKeyDown`. This means anyone calling `handleKeyPress`
    * will not see their method calls stop working.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to be called.
    */
   handleKeyPress(event) {
@@ -1283,7 +1362,7 @@ class Component {
            * Triggered when a `Component` is tapped.
            *
            * @event Component#tap
-           * @type {EventTarget~Event}
+           * @type {MouseEvent}
            */
           this.trigger('tap');
           // It may be good to copy the touchend event object and change the
@@ -1324,7 +1403,7 @@ class Component {
     }
 
     // listener for reporting that the user is active
-    const report = Fn.bind(this.player(), this.player().reportUserActivity);
+    const report = Fn.bind_(this.player(), this.player().reportUserActivity);
 
     let touchHolding;
 
@@ -1387,7 +1466,7 @@ class Component {
     // eslint-disable-next-line
     var timeoutId, disposeFn;
 
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     this.clearTimersOnDispose_();
 
@@ -1448,7 +1527,7 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval}
    */
   setInterval(fn, interval) {
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     this.clearTimersOnDispose_();
 
@@ -1461,7 +1540,7 @@ class Component {
 
   /**
    * Clears an interval that gets created via `window.setInterval` or
-   * {@link Component#setInterval}. If you set an inteval via {@link Component#setInterval}
+   * {@link Component#setInterval}. If you set an interval via {@link Component#setInterval}
    * use this function instead of `window.clearInterval`. If you don't your dispose
    * listener will not get cleaned up until {@link Component#dispose}!
    *
@@ -1509,17 +1588,12 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame}
    */
   requestAnimationFrame(fn) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.setTimeout(fn, 1000 / 60);
-    }
-
     this.clearTimersOnDispose_();
 
     // declare as variables so they are properly available in rAF function
     // eslint-disable-next-line
     var id;
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     id = window.requestAnimationFrame(() => {
       if (this.rafIds_.has(id)) {
@@ -1550,7 +1624,7 @@ class Component {
     }
     this.clearTimersOnDispose_();
 
-    fn = Fn.bind(this, fn);
+    fn = Fn.bind_(this, fn);
 
     const id = this.requestAnimationFrame(() => {
       fn();
@@ -1596,11 +1670,6 @@ class Component {
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/window/cancelAnimationFrame}
    */
   cancelAnimationFrame(id) {
-    // Fall back to using a timer.
-    if (!this.supportsRaf_) {
-      return this.clearTimeout(id);
-    }
-
     if (this.rafIds_.has(id)) {
       this.rafIds_.delete(id);
       window.cancelAnimationFrame(id);
@@ -1732,17 +1801,6 @@ class Component {
     return Component.components_[name];
   }
 }
-
-/**
- * Whether or not this component supports `requestAnimationFrame`.
- *
- * This is exposed primarily for testing purposes.
- *
- * @private
- * @type {Boolean}
- */
-Component.prototype.supportsRaf_ = typeof window.requestAnimationFrame === 'function' &&
-  typeof window.cancelAnimationFrame === 'function';
 
 Component.registerComponent('Component', Component);
 

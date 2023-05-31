@@ -16,7 +16,7 @@ class TextTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -89,7 +89,7 @@ class TextTrackMenuItem extends MenuItem {
    * This gets called when an `TextTrackMenuItem` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -133,7 +133,7 @@ class TextTrackMenuItem extends MenuItem {
   /**
    * Handle text track list change
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `change` event that caused this function to be called.
    *
    * @listens TextTrackList#change

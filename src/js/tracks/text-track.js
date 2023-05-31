@@ -9,7 +9,7 @@ import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from '@videojs/xhr';
-import merge from '../utils/merge-options';
+import {merge} from '../utils/obj';
 
 /**
  * Takes a webvtt file contents and parses it into cues
@@ -86,7 +86,7 @@ const loadTrack = function(src, track) {
     opts.withCredentials = withCredentials;
   }
 
-  XHR(opts, Fn.bind(this, function(err, response, responseBody) {
+  XHR(opts, Fn.bind_(this, function(err, response, responseBody) {
     if (err) {
       return log.error(err, response);
     }
@@ -128,7 +128,7 @@ class TextTrack extends Track {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param {Tech} options.tech
+   * @param { import('../tech/tech').default } options.tech
    *        A reference to the tech that owns this TextTrack.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']
@@ -184,13 +184,15 @@ class TextTrack extends Track {
     const activeCues = new TextTrackCueList(this.activeCues_);
     let changed = false;
 
-    this.timeupdateHandler = Fn.bind(this, function() {
+    this.timeupdateHandler = Fn.bind_(this, function(event = {}) {
       if (this.tech_.isDisposed()) {
         return;
       }
 
       if (!this.tech_.isReady_) {
-        this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+        if (event.type !== 'timeupdate') {
+          this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+        }
 
         return;
       }
@@ -205,7 +207,9 @@ class TextTrack extends Track {
         changed = false;
       }
 
-      this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+      if (event.type !== 'timeupdate') {
+        this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+      }
 
     });
 
@@ -273,7 +277,7 @@ class TextTrack extends Track {
            * > Note: This is not part of the spec!
            *
            * @event TextTrack#modechange
-           * @type {EventTarget~Event}
+           * @type {Event}
            */
           this.trigger('modechange');
 
@@ -322,10 +326,6 @@ class TextTrack extends Track {
 
             if (cue.startTime <= ct && cue.endTime >= ct) {
               active.push(cue);
-            } else if (cue.startTime === cue.endTime &&
-                       cue.startTime <= ct &&
-                       cue.startTime + 0.5 >= ct) {
-              active.push(cue);
             }
           }
 
@@ -368,7 +368,10 @@ class TextTrack extends Track {
   }
 
   startTracking() {
+    // More precise cues based on requestVideoFrameCallback with a requestAnimationFram fallback
     this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+    // Also listen to timeupdate in case rVFC/rAF stops (window in background, audio in video el)
+    this.tech_.on('timeupdate', this.timeupdateHandler);
   }
 
   stopTracking() {
@@ -376,6 +379,7 @@ class TextTrack extends Track {
       this.tech_.cancelVideoFrameCallback(this.rvf_);
       this.rvf_ = undefined;
     }
+    this.tech_.off('timeupdate', this.timeupdateHandler);
   }
 
   /**

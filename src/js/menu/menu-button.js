@@ -6,7 +6,7 @@ import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Events from '../utils/events.js';
-import {toTitleCase} from '../utils/string-cases.js';
+import {toTitleCase} from '../utils/str.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
 import keycode from 'keycode';
@@ -21,7 +21,7 @@ class MenuButton extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -231,7 +231,7 @@ class MenuButton extends Component {
    * Handle a click on a `MenuButton`.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -249,7 +249,7 @@ class MenuButton extends Component {
   /**
    * Handle `mouseleave` for `MenuButton`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mouseleave` event that caused this function to be called.
    *
    * @listens mouseleave
@@ -277,7 +277,7 @@ class MenuButton extends Component {
    * Handle tab, escape, down arrow, and up arrow keys for `MenuButton`. See
    * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
@@ -309,7 +309,7 @@ class MenuButton extends Component {
    * Handle a `keyup` event on a `MenuButton`. The listener for this is added in
    * the constructor.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        Key press event
    *
    * @listens keyup
@@ -326,7 +326,7 @@ class MenuButton extends Component {
    * anyone calling `handleSubmenuKeyPress` will not see their method calls
    * stop working.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to be called.
    */
   handleSubmenuKeyPress(event) {
@@ -337,7 +337,7 @@ class MenuButton extends Component {
    * Handle a `keydown` event on a sub-menu. The listener for this is added in
    * the constructor.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        Key press event
    *
    * @listens keydown
@@ -357,7 +357,7 @@ class MenuButton extends Component {
     } else {
       // NOTE: This is a special case where we don't pass unhandled
       //  keydown events up to the Component handler, because it is
-      //  just entending the keydown handling of the `MenuItem`
+      //  just intending the keydown handling of the `MenuItem`
       //  in the `Menu` which already passes unused keys up.
     }
   }

@@ -4,7 +4,6 @@
 import Component from './component';
 import * as Dom from './utils/dom.js';
 import log from './utils/log.js';
-import {assign} from './utils/obj';
 import keycode from 'keycode';
 
 /**
@@ -18,7 +17,7 @@ class ClickableComponent extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param  {Player} player
+   * @param  { import('./player').default } player
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]
@@ -68,7 +67,7 @@ class ClickableComponent extends Component {
    *         The element that gets created.
    */
   createEl(tag = 'div', props = {}, attributes = {}) {
-    props = assign({
+    props = Object.assign({
       className: this.buildCSSClass(),
       tabIndex: 0
     }, props);
@@ -78,7 +77,7 @@ class ClickableComponent extends Component {
     }
 
     // Add ARIA attributes for clickable element which is not a native HTML button
-    attributes = assign({
+    attributes = Object.assign({
       role: 'button'
     }, attributes);
 
@@ -149,6 +148,7 @@ class ClickableComponent extends Component {
 
     const localizedText = this.localize(text);
 
+    /** @protected */
     this.controlText_ = text;
     Dom.textContent(this.controlTextEl_, localizedText);
     if (!this.nonIconControl && !this.player_.options_.noUITitleAttributes) {
@@ -212,7 +212,7 @@ class ClickableComponent extends Component {
    * Event handler that is called when a `ClickableComponent` receives a
    * `click` or `tap` event.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `tap` or `click` event that caused this function to be called.
    *
    * @listens tap
@@ -231,7 +231,7 @@ class ClickableComponent extends Component {
    *
    * By default, if the key is Space or Enter, it will trigger a `click` event.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

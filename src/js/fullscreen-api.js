@@ -1,7 +1,6 @@
 /**
  * @file fullscreen-api.js
  * @module fullscreen-api
- * @private
  */
 import document from 'global/document';
 
@@ -36,26 +35,6 @@ const apiMap = [
     'webkitfullscreenchange',
     'webkitfullscreenerror',
     '-webkit-full-screen'
-  ],
-  // Mozilla
-  [
-    'mozRequestFullScreen',
-    'mozCancelFullScreen',
-    'mozFullScreenElement',
-    'mozFullScreenEnabled',
-    'mozfullscreenchange',
-    'mozfullscreenerror',
-    '-moz-full-screen'
-  ],
-  // Microsoft
-  [
-    'msRequestFullscreen',
-    'msExitFullscreen',
-    'msFullscreenElement',
-    'msFullscreenEnabled',
-    'MSFullscreenChange',
-    'MSFullscreenError',
-    '-ms-fullscreen'
   ]
 ];
 

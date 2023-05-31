@@ -1,6 +1,6 @@
 import {VideoTrackKind} from './track-enums';
 import Track from './track';
-import merge from '../utils/merge-options';
+import {merge} from '../utils/obj';
 
 /**
  * A representation of a single `VideoTrack`.
@@ -68,7 +68,7 @@ class VideoTrack extends Track {
          *         this internally without an event.
          *
          * @event VideoTrack#selectedchange
-         * @type {EventTarget~Event}
+         * @type {Event}
          */
         this.trigger('selectedchange');
       }

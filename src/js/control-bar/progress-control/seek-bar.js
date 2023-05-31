@@ -6,7 +6,7 @@ import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
-import formatTime from '../../utils/format-time.js';
+import {formatTime} from '../../utils/time.js';
 import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
 import document from 'global/document';
@@ -32,7 +32,7 @@ class SeekBar extends Slider {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -49,7 +49,7 @@ class SeekBar extends Slider {
    * @private
    */
   setEventHandlers_() {
-    this.update_ = Fn.bind(this, this.update);
+    this.update_ = Fn.bind_(this, this.update);
     this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
 
     this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
@@ -129,7 +129,7 @@ class SeekBar extends Slider {
    * This function updates the play progress bar and accessibility
    * attributes to whatever is passed in.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `timeupdate` or `ended` event that caused this to run.
    *
    * @listens Player#timeupdate
@@ -244,7 +244,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse down on seek bar
    *
-   * @param {EventTarget~Event} event
+   * @param {MouseEvent} event
    *        The `mousedown` event that caused this to run.
    *
    * @listens mousedown
@@ -266,14 +266,14 @@ class SeekBar extends Slider {
   /**
    * Handle mouse move on seek bar
    *
-   * @param {EventTarget~Event} event
+   * @param {MouseEvent} event
    *        The `mousemove` event that caused this to run.
    * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler. Defaults to false
    *
    * @listens mousemove
    */
   handleMouseMove(event, mouseDown = false) {
-    if (!Dom.isSingleLeftClick(event)) {
+    if (!Dom.isSingleLeftClick(event) || isNaN(this.player_.duration())) {
       return;
     }
 
@@ -351,7 +351,7 @@ class SeekBar extends Slider {
   /**
    * Handle mouse up on seek bar
    *
-   * @param {EventTarget~Event} event
+   * @param {MouseEvent} event
    *        The `mouseup` event that caused this to run.
    *
    * @listens mouseup
@@ -370,7 +370,7 @@ class SeekBar extends Slider {
      * This is particularly useful for if the player is paused to time the time displays.
      *
      * @event Tech#timeupdate
-     * @type {EventTarget~Event}
+     * @type {Event}
      */
     this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     if (this.videoWasPlaying) {
@@ -400,7 +400,7 @@ class SeekBar extends Slider {
    * Toggles the playback state of the player
    * This gets called when enter or space is used on the seekbar
    *
-   * @param {EventTarget~Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called
    *
    */
@@ -423,7 +423,7 @@ class SeekBar extends Slider {
    *   PageDown key moves back a larger step than ArrowDown
    *   PageUp key moves forward a large step
    *
-   * @param {EventTarget~Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

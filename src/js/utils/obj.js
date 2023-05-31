@@ -6,7 +6,7 @@
 /**
  * @callback obj:EachCallback
  *
- * @param {Mixed} value
+ * @param {*} value
  *        The current key for the object that is being iterated over.
  *
  * @param {string} key
@@ -16,16 +16,16 @@
 /**
  * @callback obj:ReduceCallback
  *
- * @param {Mixed} accum
+ * @param {*} accum
  *        The value that is accumulating over the reduce loop.
  *
- * @param {Mixed} value
+ * @param {*} value
  *        The current key for the object that is being iterated over.
  *
  * @param {string} key
  *        The current key-value for object that is being iterated over
  *
- * @return {Mixed}
+ * @return {*}
  *         The new accumulated value.
  */
 const toString = Object.prototype.toString;
@@ -70,39 +70,14 @@ export function each(object, fn) {
  *         receives the accumulated value and the per-iteration value and key
  *         as arguments.
  *
- * @param {Mixed} [initial = 0]
+ * @param {*} [initial = 0]
  *        Starting value
  *
- * @return {Mixed}
+ * @return {*}
  *         The final accumulated value.
  */
 export function reduce(object, fn, initial = 0) {
   return keys(object).reduce((accum, key) => fn(accum, object[key], key), initial);
-}
-
-/**
- * Object.assign-style object shallow merge/extend.
- *
- * @param  {Object} target
- * @param  {Object} ...sources
- * @return {Object}
- */
-export function assign(target, ...sources) {
-  if (Object.assign) {
-    return Object.assign(target, ...sources);
-  }
-
-  sources.forEach(source => {
-    if (!source) {
-      return;
-    }
-
-    each(source, (value, key) => {
-      target[key] = value;
-    });
-  });
-
-  return target;
 }
 
 /**
@@ -130,4 +105,97 @@ export function isPlain(value) {
   return isObject(value) &&
     toString.call(value) === '[object Object]' &&
     value.constructor === Object;
+}
+
+/**
+ * Merge two objects recursively.
+ *
+ * Performs a deep merge like
+ * {@link https://lodash.com/docs/4.17.10#merge|lodash.merge}, but only merges
+ * plain objects (not arrays, elements, or anything else).
+ *
+ * Non-plain object values will be copied directly from the right-most
+ * argument.
+ *
+ * @param   {Object[]} sources
+ *          One or more objects to merge into a new object.
+ *
+ * @return {Object}
+ *          A new object that is the merged result of all sources.
+ */
+export function merge(...sources) {
+  const result = {};
+
+  sources.forEach(source => {
+    if (!source) {
+      return;
+    }
+
+    each(source, (value, key) => {
+      if (!isPlain(value)) {
+        result[key] = value;
+        return;
+      }
+
+      if (!isPlain(result[key])) {
+        result[key] = {};
+      }
+
+      result[key] = merge(result[key], value);
+    });
+  });
+
+  return result;
+}
+
+/**
+ * Returns an array of values for a given object
+ *
+ * @param  {Object} source - target object
+ * @return {Array<unknown>} - object values
+ */
+export function values(source = {}) {
+  const result = [];
+
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      const value = source[key];
+
+      result.push(value);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Object.defineProperty but "lazy", which means that the value is only set after
+ * it is retrieved the first time, rather than being set right away.
+ *
+ * @param {Object} obj the object to set the property on
+ * @param {string} key the key for the property to set
+ * @param {Function} getValue the function used to get the value when it is needed.
+ * @param {boolean} setter whether a setter should be allowed or not
+ */
+export function defineLazyProperty(obj, key, getValue, setter = true) {
+  const set = (value) =>
+    Object.defineProperty(obj, key, {value, enumerable: true, writable: true});
+
+  const options = {
+    configurable: true,
+    enumerable: true,
+    get() {
+      const value = getValue();
+
+      set(value);
+
+      return value;
+    }
+  };
+
+  if (setter) {
+    options.set = set;
+  }
+
+  return Object.defineProperty(obj, key, options);
 }

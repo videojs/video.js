@@ -16,7 +16,7 @@
   "Progress Bar": "Индикатор загрузки",
   "progress bar timing: currentTime={1} duration={2}": "{1} из {2}",
   "Fullscreen": "Полноэкранный режим",
-  "Non-Fullscreen": "Неполноэкранный режим",
+  "Exit Fullscreen": "Неполноэкранный режим",
   "Mute": "Без звука",
   "Unmute": "Со звуком",
   "Playback Rate": "Скорость воспроизведения",
@@ -85,5 +85,7 @@
   "End of dialog window.": "Конец диалогового окна.",
   "{1} is loading.": "{1} загружается.",
   "Exit Picture-in-Picture": "Закрыть картинку в картинке",
-  "Picture-in-Picture": "Картинка в картинке"
+  "Picture-in-Picture": "Картинка в картинке",
+  "Skip forward {1} seconds": "На {1} секунд вперед",
+  "Skip backward {1} seconds": "На {1} секунд назад"
 }

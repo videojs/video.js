@@ -78,6 +78,21 @@ function tryUpdateStyle(el, style, rule) {
 }
 
 /**
+ * Converts the CSS top/right/bottom/left property numeric value to string in pixels.
+ *
+ * @param {number} position
+ *        The CSS top/right/bottom/left property value.
+ *
+ * @return {string}
+ *          The CSS property value that was created, like '10px'.
+ *
+ * @private
+ */
+function getCSSPositionValue(position) {
+  return position ? `${position}px` : '';
+}
+
+/**
  * The component for displaying text track cues.
  *
  * @extends Component
@@ -87,29 +102,36 @@ class TextTrackDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when `TextTrackDisplay` is ready.
    */
   constructor(player, options, ready) {
     super(player, options, ready);
 
-    const updateDisplayHandler = (e) => this.updateDisplay(e);
+    const updateDisplayTextHandler = (e) => this.updateDisplay(e);
+    const updateDisplayHandler = (e) => {
+      this.updateDisplayOverlay();
+      this.updateDisplay(e);
+    };
 
     player.on('loadstart', (e) => this.toggleDisplay(e));
-    player.on('texttrackchange', updateDisplayHandler);
-    player.on('loadedmetadata', (e) => this.preselectTrack(e));
+    player.on('texttrackchange', updateDisplayTextHandler);
+    player.on('loadedmetadata', (e) => {
+      this.updateDisplayOverlay();
+      this.preselectTrack(e);
+    });
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(Fn.bind(this, function() {
+    player.ready(Fn.bind_(this, function() {
       if (player.tech_ && player.tech_.featuresNativeTextTracks) {
         this.hide();
         return;
@@ -118,8 +140,11 @@ class TextTrackDisplay extends Component {
       player.on('fullscreenchange', updateDisplayHandler);
       player.on('playerresize', updateDisplayHandler);
 
-      window.addEventListener('orientationchange', updateDisplayHandler);
-      player.on('dispose', () => window.removeEventListener('orientationchange', updateDisplayHandler));
+      const screenOrientation = window.screen.orientation || window;
+      const changeOrientationEvent = window.screen.orientation ? 'change' : 'orientationchange';
+
+      screenOrientation.addEventListener(changeOrientationEvent, updateDisplayHandler);
+      player.on('dispose', () => screenOrientation.removeEventListener(changeOrientationEvent, updateDisplayHandler));
 
       const tracks = this.options_.playerOptions.tracks || [];
 
@@ -295,6 +320,34 @@ class TextTrackDisplay extends Component {
   }
 
   /**
+   * Updates the displayed TextTrack to be sure it overlays the video when a either
+   * a {@link Player#texttrackchange} or a {@link Player#fullscreenchange} is fired.
+   */
+  updateDisplayOverlay() {
+    if (!this.player_.videoHeight()) {
+      return;
+    }
+
+    const playerWidth = this.player_.currentWidth();
+    const playerHeight = this.player_.currentHeight();
+    const playerAspectRatio = playerWidth / playerHeight;
+    const videoAspectRatio = this.player_.videoWidth() / this.player_.videoHeight();
+    let insetInlineMatch = 0;
+    let insetBlockMatch = 0;
+
+    if (Math.abs(playerAspectRatio - videoAspectRatio) > 0.1) {
+      if (playerAspectRatio > videoAspectRatio) {
+        insetInlineMatch = Math.round((playerWidth - playerHeight * videoAspectRatio) / 2);
+      } else {
+        insetBlockMatch = Math.round((playerHeight - playerWidth / videoAspectRatio) / 2);
+      }
+    }
+
+    tryUpdateStyle(this.el_, 'insetInline', getCSSPositionValue(insetInlineMatch));
+    tryUpdateStyle(this.el_, 'insetBlock', getCSSPositionValue(insetBlockMatch));
+  }
+
+  /**
    * Style {@Link TextTrack} activeCues according to {@Link TextTrackSettings}.
    *
    * @param {TextTrack} track
@@ -418,8 +471,7 @@ class TextTrackDisplay extends Component {
       for (let j = 0; j < track.activeCues.length; ++j) {
         const cueEl = track.activeCues[j].displayState;
 
-        Dom.addClass(cueEl, 'vjs-text-track-cue');
-        Dom.addClass(cueEl, 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
+        Dom.addClass(cueEl, 'vjs-text-track-cue', 'vjs-text-track-cue-' + ((track.language) ? track.language : i));
         if (track.language) {
           Dom.setAttribute(cueEl, 'lang', track.language);
         }

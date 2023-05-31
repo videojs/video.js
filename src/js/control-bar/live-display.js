@@ -17,7 +17,7 @@ class LiveDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -67,7 +67,7 @@ class LiveDisplay extends Component {
    * Check the duration to see if the LiveDisplay should be showing or not. Then show/hide
    * it accordingly
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link Player#durationchange} event that caused this function to run.
    *
    * @listens Player#durationchange

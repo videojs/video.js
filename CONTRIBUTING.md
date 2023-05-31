@@ -69,7 +69,7 @@ A good bug report should be as detailed as possible, so that others won't have t
 
 1. [Check the plugin list](https://videojs.com/plugins/) for any plugins that may already support the feature.
 1. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
-1. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
+1. If no previous requests exist, create a new issue. Please be as clear as possible about why the feature is needed and the intended use case.
 1. Once again, be as details as possible and follow the [issue template][]
 
 **[Request a feature](https://github.com/videojs/video.js/issues/new)**
@@ -87,11 +87,11 @@ There are a few labels that might be added to your issue or PR by a maintainer. 
 | first-timers-only        | Issue        | Marked as a good bug or enhancement to be done by a newcomer to open source                                                                              |
 | minor, patch, major      | PR           | Marks PR with the expected [semver](https://semver.org/) classification of the change                                                                    |
 | needs: more info         | Issue        | Marked by a maintainer as needing more information from the issue reporter. Please update your issue with more information to help us reproduce the bug. |
-| needs: reduced test case | Issue        | Marked by a maintainer as needing a reduced test case from the issue reporter. Please create a test page that we can inspect to help us indentify a bug. |
+| needs: reduced test case | Issue        | Marked by a maintainer as needing a reduced test case from the issue reporter. Please create a test page that we can inspect to help us identify a bug.  |
 
 ## Contributing code
 
-To contibute code you'll need to be able to build a copy of Video.js and run tests locally. There are a few requirements before getting started.
+To contribute code you'll need to be able to build a copy of Video.js and run tests locally. There are a few requirements before getting started.
 
 * Node.js
   Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)

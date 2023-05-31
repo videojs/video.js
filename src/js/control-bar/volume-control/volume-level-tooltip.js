@@ -15,7 +15,7 @@ class VolumeLevelTooltip extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]
@@ -23,7 +23,7 @@ class VolumeLevelTooltip extends Component {
    */
   constructor(player, options) {
     super(player, options);
-    this.update = Fn.throttle(Fn.bind(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
+    this.update = Fn.throttle(Fn.bind_(this, this.update), Fn.UPDATE_REFRESH_INTERVAL);
   }
 
   /**

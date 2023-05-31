@@ -1,10 +1,6 @@
 .vjs-poster {
   display: inline-block;
   vertical-align: middle;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
-  background-size: contain;
-  background-color: #000000;
   cursor: pointer;
   margin: 0;
   padding: 0;
@@ -24,6 +20,13 @@
 
 // Don't hide the poster if we're playing audio or when audio-poster-mode is true
 .vjs-audio.vjs-has-started .vjs-poster, 
-.vjs-has-started.vjs-audio-poster-mode  .vjs-poster {
+.vjs-has-started.vjs-audio-poster-mode  .vjs-poster,
+.vjs-pip-container.vjs-has-started .vjs-poster {
   display: block;
+}
+
+.vjs-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

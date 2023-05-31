@@ -50,13 +50,6 @@ module.exports = function(config) {
 
   config.browserStack.project = 'Video.js';
 
-  // pin Browserstack Firefox version to 64
-  /* eslint-disable camelcase */
-  if (config.customLaunchers && config.customLaunchers.bsFirefox) {
-    config.customLaunchers.bsFirefox.browser_version = '64.0';
-  }
-  /* eslint-enable camelcase */
-
   // uncomment the section below to re-enable all browserstack video recording
   // it is off by default because it slows the build
   /*

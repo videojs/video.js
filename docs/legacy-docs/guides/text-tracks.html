@@ -30,9 +30,9 @@
 <pre><code class="lang-html">&lt;video id=&quot;example_video_1&quot; class=&quot;video-js&quot;
   controls preload=&quot;auto&quot; width=&quot;640&quot; height=&quot;264&quot;
   data-setup=&#39;{&quot;example_option&quot;:true}&#39;&gt;
- &lt;source src=&quot;http://vjs.zencdn.net/v/oceans.mp4&quot; type=&quot;video/mp4&quot; /&gt;
- &lt;source src=&quot;http://vjs.zencdn.net/v/oceans.webm&quot; type=&quot;video/webm&quot; /&gt;
- &lt;source src=&quot;http://vjs.zencdn.net/v/oceans.ogv&quot; type=&quot;video/ogg&quot; /&gt;
+ &lt;source src=&quot;https://vjs.zencdn.net/v/oceans.mp4&quot; type=&quot;video/mp4&quot; /&gt;
+ &lt;source src=&quot;https://vjs.zencdn.net/v/oceans.webm&quot; type=&quot;video/webm&quot; /&gt;
+ &lt;source src=&quot;https://vjs.zencdn.net/v/oceans.ogv&quot; type=&quot;video/ogg&quot; /&gt;
 
  &lt;track kind=&quot;captions&quot; src=&quot;http://example.com/path/to/captions.vtt&quot; srclang=&quot;en&quot; label=&quot;English&quot; default&gt;
 
@@ -45,7 +45,7 @@ but the text track served from another, you&#39;ll need to <a href="http://enabl
 In addition to enabling CORS on the server serving the text tracks, you will need to add the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes"><code>crossorigin</code> attribute</a> to the video element itself. This attribute has two values <code>anonymous</code> and <code>use-credentials</code>. Most users will want to use <code>anonymous</code> with cross-origin tracks.
 It can be added to the video element like so:</p>
 <pre><code class="lang-html">&lt;video class=&quot;video-js&quot; crossorigin=&quot;anonymous&quot;&gt;
-  &lt;source src=&quot;http://vjs.zencdn.net/v/oceans.mp4&quot; type=&quot;video/mp4&quot;&gt;
+  &lt;source src=&quot;https://vjs.zencdn.net/v/oceans.mp4&quot; type=&quot;video/mp4&quot;&gt;
   &lt;track src=&quot;http://example.com/oceans.vtt&quot; kind=&quot;captions&quot; srclang=&quot;en&quot; label=&quot;English&quot;&gt;
 &lt;/video&gt;
 </code></pre>

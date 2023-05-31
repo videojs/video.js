@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Video.js Sandbox</title>
+    <link href="../dist/video-js.css" rel="stylesheet" type="text/css" />
+    <script src="../dist/video.js"></script>
+  </head>
+  <body>
+    <div>
+      <h2>Forward: 5, Backward: 10</h2>
+      <video-js
+        id="vid1"
+        controls
+        preload="auto"
+        width="640"
+        height="264"
+        poster="https://vjs.zencdn.net/v/oceans.png"
+      >
+        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+        <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+        <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
+        <track
+          kind="captions"
+          src="../docs/examples/shared/example-captions.vtt"
+          srclang="en"
+          label="English"
+        />
+        <p class="vjs-no-js">
+          To view this video please enable JavaScript, and consider upgrading to
+          a web browser that
+          <a href="https://videojs.com/html5-video-support/" target="_blank"
+            >supports HTML5 video</a
+          >
+        </p>
+      </video-js>
+    </div>
+
+    <div>
+      <h2>Forward: 10, Backward: 30</h2>
+      <video-js
+        id="vid2"
+        controls
+        preload="auto"
+        width="640"
+        height="264"
+        poster="https://vjs.zencdn.net/v/oceans.png"
+      >
+        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+        <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+        <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
+        <track
+          kind="captions"
+          src="../docs/examples/shared/example-captions.vtt"
+          srclang="en"
+          label="English"
+        />
+        <p class="vjs-no-js">
+          To view this video please enable JavaScript, and consider upgrading to
+          a web browser that
+          <a href="https://videojs.com/html5-video-support/" target="_blank"
+            >supports HTML5 video</a
+          >
+        </p>
+      </video-js>
+    </div>
+
+    <div>
+      <h2>Forward: 10</h2>
+      <video-js
+        id="vid3"
+        controls
+        preload="auto"
+        width="640"
+        height="264"
+        poster="https://vjs.zencdn.net/v/oceans.png"
+      >
+        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+        <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+        <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
+        <track
+          kind="captions"
+          src="../docs/examples/shared/example-captions.vtt"
+          srclang="en"
+          label="English"
+        />
+        <p class="vjs-no-js">
+          To view this video please enable JavaScript, and consider upgrading to
+          a web browser that
+          <a href="https://videojs.com/html5-video-support/" target="_blank"
+            >supports HTML5 video</a
+          >
+        </p>
+      </video-js>
+    </div>
+
+    <script>
+      var vid1 = document.getElementById("vid1");
+      var options = {
+        muted: true,
+        controlBar: { skipButtons: { forward: 5, backward: 10 } },
+      };
+      videojs(vid1, options);
+
+      var vid2 = document.getElementById("vid2");
+      options.controlBar.skipButtons = { forward: 10, backward: 30 };
+      videojs(vid2, options);
+
+      var vid3 = document.getElementById("vid3");
+      options.controlBar.skipButtons = {forward: 10}
+      videojs(vid3, options);
+    </script>
+  </body>
+</html>

@@ -16,7 +16,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -93,36 +93,6 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * Updates ARIA accessibility attributes
-   */
-  updateARIAAttributes() {
-    // Current playback rate
-    this.el().setAttribute('aria-valuenow', this.player().playbackRate());
-  }
-
-  /**
-   * This gets called when an `PlaybackRateMenuButton` is "clicked". See
-   * {@link ClickableComponent} for more detailed information on what a click can be.
-   *
-   * @param {EventTarget~Event} [event]
-   *        The `keydown`, `tap`, or `click` event that caused this function to be
-   *        called.
-   *
-   * @listens tap
-   * @listens click
-   */
-  handleClick(event) {
-    // select next rate option
-    const currentRate = this.player().playbackRate();
-    const rates = this.playbackRates();
-    const currentIndex = rates.indexOf(currentRate);
-    // this get the next rate and it will select first one if the last one currently selected
-    const newIndex = (currentIndex + 1) % rates.length;
-
-    this.player().playbackRate(rates[newIndex]);
-  }
-
-  /**
    * On playbackrateschange, update the menu to account for the new items.
    *
    * @listens Player#playbackrateschange
@@ -161,7 +131,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Hide playback rate controls when they're no playback rate options to select
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The event that caused this function to run.
    *
    * @listens Player#loadstart
@@ -177,7 +147,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Update button label when rate changed
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The event that caused this function to run.
    *
    * @listens Player#ratechange
@@ -191,10 +161,12 @@ class PlaybackRateMenuButton extends MenuButton {
 }
 
 /**
- * The text that should display over the `FullscreenToggle`s controls. Added for localization.
+ * The text that should display over the `PlaybackRateMenuButton`s controls.
+ *
+ * Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 PlaybackRateMenuButton.prototype.controlText_ = 'Playback Rate';
 

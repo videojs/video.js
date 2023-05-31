@@ -15,7 +15,7 @@ class SeekToLive extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -92,7 +92,12 @@ class SeekToLive extends Button {
     super.dispose();
   }
 }
-
+/**
+ * The text that should display over the `SeekToLive`s control. Added for localization.
+ *
+ * @type {string}
+ * @protected
+ */
 SeekToLive.prototype.controlText_ = 'Seek to live, currently playing live';
 
 Component.registerComponent('SeekToLive', SeekToLive);

@@ -17,7 +17,7 @@ class MuteToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -46,7 +46,7 @@ class MuteToggle extends Button {
    * This gets called when an `MuteToggle` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -71,7 +71,7 @@ class MuteToggle extends Button {
    * Update the `MuteToggle` button based on the state of `volume` and `muted`
    * on the player.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link Player#loadstart} event if this function was called
    *        through an event.
    *
@@ -113,10 +113,7 @@ class MuteToggle extends Button {
       level = 2;
     }
 
-    // TODO improve muted icon classes
-    for (let i = 0; i < 4; i++) {
-      Dom.removeClass(this.el_, `vjs-vol-${i}`);
-    }
+    Dom.removeClass(this.el_, [0, 1, 2, 3].reduce((str, i) => str + `${i ? ' ' : ''}vjs-vol-${i}`, ''));
     Dom.addClass(this.el_, `vjs-vol-${level}`);
   }
 
@@ -142,7 +139,7 @@ class MuteToggle extends Button {
  * The text that should display over the `MuteToggle`s controls. Added for localization.
  *
  * @type {string}
- * @private
+ * @protected
  */
 MuteToggle.prototype.controlText_ = 'Mute';
 

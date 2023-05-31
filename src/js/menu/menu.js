@@ -18,7 +18,7 @@ class Menu extends Component {
   /**
    * Create an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        the player that this component should attach to
    *
    * @param {Object} [options]
@@ -149,7 +149,7 @@ class Menu extends Component {
   /**
    * Called when a `MenuItem` loses focus.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `blur` event that caused this function to be called.
    *
    * @listens blur
@@ -172,7 +172,7 @@ class Menu extends Component {
   /**
    * Called when a `MenuItem` gets clicked or tapped.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `click` or `tap` event that caused this function to be called.
    *
    * @listens click,tap
@@ -205,7 +205,7 @@ class Menu extends Component {
   /**
    * Handle a `keydown` event on this menu. This listener is added in the constructor.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        A `keydown` event that happened on the menu.
    *
    * @listens keydown

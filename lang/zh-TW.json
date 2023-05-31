@@ -9,9 +9,11 @@
   "Loaded": "載入完畢",
   "Progress": "進度",
   "Fullscreen": "全螢幕",
-  "Non-Fullscreen": "退出全螢幕",
+  "Exit Fullscreen": "退出全螢幕",
+  "Picture-in-Picture": "子母畫面",
+  "Exit Picture-in-Picture": "退出子母畫面",
   "Mute": "靜音",
-  "Unmute": "取消靜音",
+  "Unmute": "開啟音效",
   "Playback Rate": " 播放速率",
   "Subtitles": "字幕",
   "subtitles off": "關閉字幕",
@@ -86,5 +88,11 @@
   "{1} is loading.": "{1} 正在載入。",
   "Exit Picture-in-Picture": "離開子母畫面",
   "Picture-in-Picture": "子母畫面",
-  "No content": "沒有內容"
+  "No content": "沒有內容",
+  "Color": "顏色",
+  "Opacity": "不透明度",
+  "Text Background": "文字背景",
+  "Caption Area Background": "字幕區域背景",
+  "Skip forward {1} seconds": "快轉 {1} 秒",
+  "Skip backward {1} seconds": "倒轉 {1} 秒"
 }

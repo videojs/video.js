@@ -3,7 +3,6 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import {assign} from '../utils/obj';
 import {MenuKeys} from './menu-keys.js';
 import keycode from 'keycode';
 import {createEl} from '../utils/dom.js';
@@ -18,7 +17,7 @@ class MenuItem extends ClickableComponent {
   /**
    * Creates an instance of the this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -64,7 +63,7 @@ class MenuItem extends ClickableComponent {
     // The control is textual, not just an icon
     this.nonIconControl = true;
 
-    const el = super.createEl('li', assign({
+    const el = super.createEl('li', Object.assign({
       className: 'vjs-menu-item',
       tabIndex: -1
     }, props), attrs);
@@ -82,7 +81,7 @@ class MenuItem extends ClickableComponent {
    * Ignore keys which are used by the menu, but pass any other ones up. See
    * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
@@ -98,7 +97,7 @@ class MenuItem extends ClickableComponent {
    * Any click on a `MenuItem` puts it into the selected state.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

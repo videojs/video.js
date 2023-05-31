@@ -14,7 +14,7 @@ class TextTrackList extends TrackList {
   /**
    * Add a {@link TextTrack} to the `TextTrackList`
    *
-   * @param {TextTrack} track
+   * @param { import('./text-track').default } track
    *        The text track to add to the list.
    *
    * @fires TrackList#addtrack

@@ -5,7 +5,7 @@
 import document from 'global/document';
 
 /**
- * Create a DOM syle element given a className for it.
+ * Create a DOM style element given a className for it.
  *
  * @param {string} className
  *        The className to add to the created style element.

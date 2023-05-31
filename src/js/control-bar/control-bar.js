@@ -2,7 +2,6 @@
  * @file control-bar.js
  */
 import Component from '../component.js';
-import document from 'global/document';
 
 // Required children
 import './play-toggle.js';
@@ -16,6 +15,8 @@ import './progress-control/progress-control.js';
 import './picture-in-picture-toggle.js';
 import './fullscreen-toggle.js';
 import './volume-panel.js';
+import './skip-buttons/skip-forward.js';
+import './skip-buttons/skip-backward.js';
 import './text-track-controls/chapters-button.js';
 import './text-track-controls/descriptions-button.js';
 import './text-track-controls/subtitles-button.js';
@@ -55,6 +56,8 @@ class ControlBar extends Component {
 ControlBar.prototype.options_ = {
   children: [
     'playToggle',
+    'skipBackward',
+    'skipForward',
     'volumePanel',
     'currentTimeDisplay',
     'timeDivider',
@@ -69,17 +72,10 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subsCapsButton',
     'audioTrackButton',
+    'pictureInPictureToggle',
     'fullscreenToggle'
   ]
 };
-
-if ('exitPictureInPicture' in document) {
-  ControlBar.prototype.options_.children.splice(
-    ControlBar.prototype.options_.children.length - 1,
-    0,
-    'pictureInPictureToggle'
-  );
-}
 
 Component.registerComponent('ControlBar', ControlBar);
 export default ControlBar;

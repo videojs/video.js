@@ -677,6 +677,41 @@ QUnit.test('should add and remove a CSS class', function(assert) {
   comp.dispose();
 });
 
+QUnit.test('should add and remove CSS classes', function(assert) {
+  const comp = new Component(this.player, {});
+
+  comp.addClass('first-class', 'second-class');
+  assert.ok(comp.el().className.indexOf('first-class') !== -1);
+  assert.ok(comp.el().className.indexOf('second-class') !== -1);
+  comp.removeClass('first-class', 'second-class');
+  assert.ok(comp.el().className.indexOf('first-class') === -1);
+  assert.ok(comp.el().className.indexOf('second-class') === -1);
+
+  comp.addClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class') !== -1);
+  assert.ok(comp.el().className.indexOf('second-class') !== -1);
+  comp.removeClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class') === -1);
+  assert.ok(comp.el().className.indexOf('second-class') === -1);
+
+  comp.addClass('be cool', 'scooby', 'doo');
+  assert.ok(comp.el().className.indexOf('be cool scooby doo') !== -1);
+  comp.removeClass('be cool', 'scooby', 'doo');
+  assert.ok(comp.el().className.indexOf('be cool scooby doo') === -1);
+
+  comp.addClass('multiple         spaces       between   words');
+  assert.ok(comp.el().className.indexOf('multiple spaces between words') !== -1);
+  comp.removeClass('multiple         spaces       between   words');
+  assert.ok(comp.el().className.indexOf('multiple spaces between words') === -1);
+
+  comp.toggleClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class second-class') !== -1);
+  comp.toggleClass('first-class second-class');
+  assert.ok(comp.el().className.indexOf('first-class second-class') === -1);
+
+  comp.dispose();
+});
+
 QUnit.test('should add CSS class passed in options', function(assert) {
   const comp = new Component(this.player, {className: 'class1 class2'});
 
@@ -865,7 +900,7 @@ QUnit.test('should emit a tap event', function(assert) {
   ]});
   comp.trigger('touchend');
 
-  // A touchmove with a lot of movement by modifying the exisiting touch object
+  // A touchmove with a lot of movement by modifying the existing touch object
   // should not trigger a tap
   singleTouch = { pageX: 0, pageY: 0 };
   Events.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
@@ -874,7 +909,7 @@ QUnit.test('should emit a tap event', function(assert) {
   Events.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
-  // A touchmove with not much movement by modifying the exisiting touch object
+  // A touchmove with not much movement by modifying the existing touch object
   // should still allow a tap
   singleTouch = { pageX: 0, pageY: 0 };
   Events.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
@@ -883,7 +918,7 @@ QUnit.test('should emit a tap event', function(assert) {
   Events.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
-  // Reset to orignial value
+  // Reset to original value
   browser.stub_TOUCH_ENABLED(origTouch);
   comp.dispose();
 });
@@ -969,9 +1004,6 @@ QUnit.test('should provide a requestAnimationFrame method that is cleared on dis
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   const spyRAF = sinon.spy();
 
   comp.requestNamedAnimationFrame('testing', spyRAF);
@@ -1005,9 +1037,6 @@ QUnit.test('should provide a requestNamedAnimationFrame method that is cleared o
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   const spyRAF = sinon.spy();
 
   comp.requestNamedAnimationFrame('testing', spyRAF);
@@ -1027,34 +1056,6 @@ QUnit.test('should provide a requestNamedAnimationFrame method that is cleared o
   this.clock.tick(1);
   assert.strictEqual(spyRAF.callCount, 1, 'third rAF callback was not called because the component was disposed');
 
-  window.requestAnimationFrame = oldRAF;
-  window.cancelAnimationFrame = oldCAF;
-});
-
-QUnit.test('requestAnimationFrame falls back to timers if rAF not supported', function(assert) {
-  const comp = new Component(this.player);
-  const oldRAF = window.requestAnimationFrame;
-  const oldCAF = window.cancelAnimationFrame;
-
-  // Stub the window.*AnimationFrame methods with window.setTimeout methods
-  // so we can control when the callbacks are called via sinon's timer stubs.
-  const rAF = window.requestAnimationFrame = sinon.spy();
-  const cAF = window.cancelAnimationFrame = sinon.spy();
-
-  // Make sure the component thinks it does not support rAF.
-  comp.supportsRaf_ = false;
-
-  sinon.spy(comp, 'setTimeout');
-  sinon.spy(comp, 'clearTimeout');
-
-  comp.cancelAnimationFrame(comp.requestAnimationFrame(() => {}));
-
-  assert.strictEqual(rAF.callCount, 0, 'window.requestAnimationFrame was not called');
-  assert.strictEqual(cAF.callCount, 0, 'window.cancelAnimationFrame was not called');
-  assert.strictEqual(comp.setTimeout.callCount, 1, 'Component#setTimeout was called');
-  assert.strictEqual(comp.clearTimeout.callCount, 1, 'Component#clearTimeout was called');
-
-  comp.dispose();
   window.requestAnimationFrame = oldRAF;
   window.cancelAnimationFrame = oldCAF;
 });
@@ -1083,9 +1084,6 @@ QUnit.test('requestNamedAnimationFrame should remove dispose handler on trigger'
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
-
   const spyRAF = sinon.spy();
 
   comp.requestNamedAnimationFrame('testFrame', spyRAF);
@@ -1113,9 +1111,6 @@ QUnit.test('requestAnimationFrame should remove dispose handler on trigger', fun
   // so we can control when the callbacks are called via sinon's timer stubs.
   window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
-
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
 
   const spyRAF = sinon.spy();
 
@@ -1271,9 +1266,6 @@ QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific n
 
   const oldRAF = window.requestAnimationFrame;
   const oldCAF = window.cancelAnimationFrame;
-
-  // Make sure the component thinks it supports rAF.
-  comp.supportsRaf_ = true;
 
   // Stub the window.*AnimationFrame methods with window.setTimeout methods
   // so we can control when the callbacks are called via sinon's timer stubs.

@@ -5,7 +5,6 @@ import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
 import * as Dom from './utils/dom.js';
 import {silencePromise} from './utils/promise';
-import * as browser from './utils/browser.js';
 
 /**
  * A `ClickableComponent` that handles showing the poster image for the player.
@@ -17,7 +16,7 @@ class PosterImage extends ClickableComponent {
   /**
    * Create an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]
@@ -47,14 +46,48 @@ class PosterImage extends ClickableComponent {
    *         The element that gets created.
    */
   createEl() {
-    const el = Dom.createEl('div', {
-      className: 'vjs-poster',
+    // The el is an empty div to keep position in the DOM
+    // A picture and img el will be inserted when a source is set
+    return Dom.createEl('div', { className: 'vjs-poster'});
+  }
 
-      // Don't want poster to be tabbable.
-      tabIndex: -1
-    });
+  /**
+   * Get or set the `PosterImage`'s crossOrigin option.
+   *
+   * @param {string|null} [value]
+   *        The value to set the crossOrigin to. If an argument is
+   *        given, must be one of `'anonymous'` or `'use-credentials'`, or 'null'.
+   *
+   * @return {string|null}
+   *         - The current crossOrigin value of the `Player` when getting.
+   *         - undefined when setting
+   */
+  crossOrigin(value) {
+    // `null` can be set to unset a value
+    if (typeof value === 'undefined') {
+      if (this.$('img')) {
+        // If the poster's element exists, give its value
+        return this.$('img').crossOrigin;
+      } else if (this.player_.tech_ && this.player_.tech_.isReady_) {
+        // If not but the tech is ready, query the tech
+        return this.player_.crossOrigin();
+      }
+      // Otherwise check options as the  poster is usually set before the state of crossorigin
+      // can be retrieved by the getter
+      return this.player_.options_.crossOrigin || this.player_.options_.crossorigin || null;
 
-    return el;
+    }
+
+    if (value !== null && value !== 'anonymous' && value !== 'use-credentials') {
+      this.player_.log.warn(`crossOrigin must be null,  "anonymous" or "use-credentials", given "${value}"`);
+      return;
+    }
+
+    if (this.$('img')) {
+      this.$('img').crossOrigin = value;
+    }
+
+    return;
   }
 
   /**
@@ -62,7 +95,7 @@ class PosterImage extends ClickableComponent {
    *
    * @listens Player#posterchange
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `Player#posterchange` event that triggered this function.
    */
   update(event) {
@@ -80,21 +113,38 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Set the source of the `PosterImage` depending on the display method.
+   * Set the source of the `PosterImage` depending on the display method. (Re)creates
+   * the inner picture and img elementss when needed.
    *
-   * @param {string} url
-   *        The URL to the source for the `PosterImage`.
+   * @param {string} [url]
+   *        The URL to the source for the `PosterImage`. If not specified or falsy,
+   *        any source and ant inner picture/img are removed.
    */
   setSrc(url) {
-    let backgroundImage = '';
-
-    // Any falsy value should stay as an empty string, otherwise
-    // this will throw an extra error
-    if (url) {
-      backgroundImage = `url("${url}")`;
+    if (!url) {
+      this.el_.textContent = '';
+      return;
     }
 
-    this.el_.style.backgroundImage = backgroundImage;
+    if (!this.$('img')) {
+      this.el_.appendChild(Dom.createEl(
+        'picture', {
+          className: 'vjs-poster',
+
+          // Don't want poster to be tabbable.
+          tabIndex: -1
+        },
+        {},
+        Dom.createEl('img', {
+          loading: 'lazy',
+          crossOrigin: this.crossOrigin()
+        }, {
+          alt: ''
+        })
+      ));
+    }
+
+    this.$('img').src = url;
   }
 
   /**
@@ -105,7 +155,7 @@ class PosterImage extends ClickableComponent {
    * @listens click
    * @listens keydown
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    +        The `click`, `tap` or `keydown` event that caused this function to be called.
    */
   handleClick(event) {
@@ -114,15 +164,7 @@ class PosterImage extends ClickableComponent {
       return;
     }
 
-    const sourceIsEncrypted = this.player_.usingPlugin('eme') &&
-                                this.player_.eme.sessions &&
-                                this.player_.eme.sessions.length > 0;
-
-    if (this.player_.tech(true) &&
-    // We've observed a bug in IE and Edge when playing back DRM content where
-    // calling .focus() on the video element causes the video to go black,
-    // so we avoid it in that specific case
-    !((browser.IE_VERSION || browser.IS_EDGE) && sourceIsEncrypted)) {
+    if (this.player_.tech(true)) {
       this.player_.tech(true).focus();
     }
 
@@ -134,6 +176,21 @@ class PosterImage extends ClickableComponent {
   }
 
 }
+
+/**
+ * Get or set the `PosterImage`'s crossorigin option. For the HTML5 player, this
+ * sets the `crossOrigin` property on the `<img>` tag to control the CORS
+ * behavior.
+ *
+ * @param {string|null} [value]
+ *        The value to set the `PosterImages`'s crossorigin to. If an argument is
+ *        given, must be one of `anonymous` or `use-credentials`.
+ *
+ * @return {string|null|undefined}
+ *         - The current crossorigin value of the `Player` when getting.
+ *         - undefined when setting
+ */
+PosterImage.prototype.crossorigin = PosterImage.prototype.crossOrigin;
 
 Component.registerComponent('PosterImage', PosterImage);
 export default PosterImage;
