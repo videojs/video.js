@@ -2,7 +2,6 @@
  * @file control-bar.js
  */
 import Component from '../component.js';
-import document from 'global/document';
 
 // Required children
 import './play-toggle.js';
@@ -73,17 +72,10 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subsCapsButton',
     'audioTrackButton',
+    'pictureInPictureToggle',
     'fullscreenToggle'
   ]
 };
-
-if ('exitPictureInPicture' in document) {
-  ControlBar.prototype.options_.children.splice(
-    ControlBar.prototype.options_.children.length - 1,
-    0,
-    'pictureInPictureToggle'
-  );
-}
 
 Component.registerComponent('ControlBar', ControlBar);
 export default ControlBar;
