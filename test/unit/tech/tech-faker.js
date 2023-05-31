@@ -48,6 +48,8 @@ class TechFaker extends Tech {
 
   setMuted() {}
 
+  setDefaultMuted() {}
+
   setAutoplay(v) {
     if (!v) {
       this.options_.autoplay = false;
@@ -118,6 +120,9 @@ class TechFaker extends Tech {
     return this.volume_ || 0;
   }
   muted() {
+    return false;
+  }
+  defaultMuted() {
     return false;
   }
   autoplay() {

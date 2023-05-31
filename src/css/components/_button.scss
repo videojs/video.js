@@ -10,8 +10,8 @@
   text-decoration: none;
   transition: none;
 
+  // Chrome < 83
   -webkit-appearance: none;
-  -moz-appearance:    none;
   appearance:         none;
 }
 

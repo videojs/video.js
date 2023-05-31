@@ -207,8 +207,11 @@ class Component {
    * @param {string|Event|Object} event
    *        The name of the event, an `Event`, or an object with a key of type set to
    *        an event name.
+   *
+   * @param {Object} [hash]
+   *        Optionally extra argument to pass through to an event listener
    */
-  trigger(event) {}
+  trigger(event, hash) {}
 
   /**
    * Dispose of the `Component` and all child components.

@@ -35,26 +35,6 @@ const apiMap = [
     'webkitfullscreenchange',
     'webkitfullscreenerror',
     '-webkit-full-screen'
-  ],
-  // Mozilla
-  [
-    'mozRequestFullScreen',
-    'mozCancelFullScreen',
-    'mozFullScreenElement',
-    'mozFullScreenEnabled',
-    'mozfullscreenchange',
-    'mozfullscreenerror',
-    '-moz-full-screen'
-  ],
-  // Microsoft
-  [
-    'msRequestFullscreen',
-    'msExitFullscreen',
-    'msFullscreenElement',
-    'msFullscreenEnabled',
-    'MSFullscreenChange',
-    'MSFullscreenError',
-    '-ms-fullscreen'
   ]
 ];
 

@@ -2242,6 +2242,29 @@ QUnit.test('should not allow to register custom player when any player has been 
   videojs.registerComponent('Player', Player);
 });
 
+QUnit.test('setters getters passed to tech', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
+
+  const setSpy = sinon.spy(player.tech_, 'setDefaultMuted');
+  const getSpy = sinon.spy(player.tech_, 'defaultMuted');
+
+  player.defaultMuted(true);
+  player.defaultMuted();
+
+  assert.ok(setSpy.calledWith(true), 'setSpy called');
+  assert.ok(getSpy.called);
+
+  setSpy.restore();
+  getSpy.restore();
+});
+
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
   let cts = 0;
   let muts = 0;
@@ -3183,6 +3206,7 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
   controlBar.getChild('ChaptersButton').update();
 
   player.trigger('ready');
+  player.trigger('loadedmetadata');
   player.hasStarted(true);
 
   // Show all control bar children
@@ -3190,8 +3214,12 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
     const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
     if (el) {
-      // Sanity check that component is showing
-      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+      if (!document.exitPictureInPicture && child === 'PictureInPictureToggle') {
+        assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is not visible if PiP is not supported`);
+      } else {
+        // Sanity check that component is showing
+        assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+      }
     }
   });
 
@@ -3220,7 +3248,11 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
         const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
         if (el) {
-          assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+          if (!document.exitPictureInPicture && child === 'PictureInPictureToggle') {
+            assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is not visible if PiP is not supported`);
+          } else {
+            assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+          }
         }
       });
     })
@@ -3262,4 +3294,77 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
       assert.ok(player.audioPosterMode(), 'audioPosterMode is true');
       assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
+});
+
+QUnit.test('player#load resets the media element to its initial state', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.src({ src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' });
+
+  // Declaring spies here avoids spying on previous calls
+  const techGet_ = sinon.spy(player, 'techCall_');
+  const src = sinon.spy(player, 'src');
+
+  player.load();
+
+  // Case when the VHS tech is not used
+  assert.ok(techGet_.calledOnce, 'techCall_ was called once');
+  assert.ok(src.notCalled, 'src was not called');
+
+  // Simulate the VHS tech
+  player.tech_.vhs = true;
+  player.load();
+
+  // Case when the VHS tech is used
+  assert.ok(techGet_.calledOnce, 'techCall_ remains the same');
+  assert.ok(src.calledOnce, 'src was called');
+
+  techGet_.restore();
+  src.restore();
+  player.dispose();
+});
+
+QUnit.test('crossOrigin value should be maintained after loadMedia is called', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const example1 = '<video id="example_1" class="video-js" preload="none"></video>';
+  const example2 = '<video id="example_2" class="video-js" preload="none"></video>';
+  const example3 = '<video id="example_3" class="video-js" crossorigin="anonymous" preload="none"></video>';
+
+  fixture.innerHTML += example1;
+  fixture.innerHTML += example2;
+  fixture.innerHTML += example3;
+
+  const tagExample1 = document.getElementById('example_1');
+  const tagExample2 = document.getElementById('example_2');
+  const tagExample3 = document.getElementById('example_3');
+  const playerExample1 = TestHelpers.makePlayer({techOrder: ['Html5']}, tagExample1);
+  const playerExample2 = TestHelpers.makePlayer({techOrder: ['Html5'], crossOrigin: 'use-credentials'}, tagExample2);
+  const playerExample3 = TestHelpers.makePlayer({techOrder: ['Html5']}, tagExample3);
+
+  this.clock.tick(1000);
+
+  playerExample1.crossOrigin('anonymous');
+  playerExample1.loadMedia({
+    src: 'foo.mp4'
+  });
+  playerExample2.loadMedia({
+    src: 'foo.mp4'
+  });
+  playerExample3.loadMedia({
+    src: 'foo.mp4'
+  });
+
+  assert.strictEqual(playerExample1.crossOrigin(), 'anonymous', 'crossOrigin value remains correct when assigned by the crossOrigin method and loadMedia is called');
+  assert.ok(tagExample1.crossOrigin === 'anonymous');
+
+  assert.strictEqual(playerExample2.crossOrigin(), 'use-credentials', 'crossOrigin value remains correct when passed through the options and loadMedia is called');
+  assert.ok(tagExample2.crossOrigin === 'use-credentials');
+
+  assert.strictEqual(playerExample3.crossOrigin(), 'anonymous', 'crossOrigin value remains correct when passed via the html property and loadMedia is called');
+  assert.ok(tagExample3.crossOrigin === 'anonymous');
+
+  playerExample1.dispose();
+  playerExample2.dispose();
+  playerExample3.dispose();
 });
