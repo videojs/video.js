@@ -4899,6 +4899,8 @@ class Player extends Component {
       return;
     }
 
+    const crossOrigin = this.crossOrigin();
+
     this.reset();
 
     // Clone the media object so it cannot be mutated from outside.
@@ -4912,6 +4914,10 @@ class Player extends Component {
         src: poster,
         type: getMimetype(poster)
       }];
+    }
+
+    if (crossOrigin) {
+      this.crossOrigin(crossOrigin);
     }
 
     if (src) {
