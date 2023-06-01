@@ -151,6 +151,8 @@ QUnit.test("SeekBar doesn't set scrubbing on mouse down, only on mouse move", fu
   const seekBar = new SeekBar(player);
   const doc = new EventTarget();
 
+  player.duration(0);
+
   // mousemove is listened to on the document.
   // Specifically, we check the ownerDocument of the seekBar's bar.
   // Therefore, we want to mock it out to be able to trigger mousemove
@@ -291,7 +293,11 @@ QUnit.test('Picture-in-Picture control is hidden when the source is audio', func
   player.src({src: 'example.mp4', type: 'video/mp4'});
   player.trigger('loadedmetadata');
 
-  assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+  if (document.exitPictureInPicture) {
+    assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+  } else {
+    assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden if PiP is not supported');
+  }
 
   player.src({src: 'example1.mp3', type: 'audio/mp3'});
   player.trigger('loadedmetadata');
@@ -316,13 +322,35 @@ QUnit.test('Picture-in-Picture control is displayed if docPiP is enabled', funct
   player.src({src: 'example.mp4', type: 'video/mp4'});
   player.trigger('loadedmetadata');
 
-  assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  if (document.exitPictureInPicture) {
+    assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  } else {
+    assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden if PiP is not supported');
+  }
 
   player.dispose();
   pictureInPictureToggle.dispose();
   if (window.documentPictureInPicture === testPiPObj) {
     delete window.documentPictureInPicture;
   }
+});
+
+QUnit.test('Picture-in-Picture control should only be displayed if the browser supports it', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.trigger('loadedmetadata');
+
+  if (document.exitPictureInPicture) {
+    // Browser that does support PiP
+    assert.false(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  } else {
+    // Browser that does not support PiP
+    assert.true(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {

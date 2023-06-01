@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@videojs/http-streaming": "3.0.2",
+    "@videojs/http-streaming": "3.3.1",
     "@videojs/vhs-utils": "^4.0.0",
     "@videojs/xhr": "2.6.0",
     "aes-decrypter": "^4.0.1",
@@ -135,7 +135,7 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.13",
     "postcss-cli": "^8.3.1",
-    "qunit": "^2.19.4",
+    "qunit": "2.13.0",
     "remark-cli": "^6.0.1",
     "remark-lint": "^6.0.6",
     "remark-parse": "^6.0.3",
