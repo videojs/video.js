@@ -3548,7 +3548,7 @@ class Player extends Component {
   load() {
     // Workaround to use the load method with the VHS.
     // Does not cover the case when the load method is called directly from the mediaElement.
-    if (this.tech_.vhs) {
+    if (this.tech_ && this.tech_.vhs) {
       this.src(this.currentSource());
 
       return;
