@@ -6,18 +6,10 @@
 }
 
 @mixin transform($transform) {
-  -moz-transform: $transform;
-  -ms-transform: $transform;
-  -o-transform: $transform;
-  -webkit-transform: $transform;
   transform: $transform;
 }
 
 @mixin transition($string: $transition--default) {
-  -webkit-transition: $string;
-  -moz-transition: $string;
-  -ms-transition: $string;
-  -o-transition: $string;
   transition: $string;
 }
 
@@ -32,44 +24,26 @@
 }
 
 @mixin border-radius($radius) {
-  -webkit-border-radius: $radius;
-  -moz-border-radius: $radius;
   border-radius: $radius;
 }
 
 @mixin animation($string: spin 1s infinite linear) {
-  -webkit-animation: $string;
-  -moz-animation: $string;
-  -o-animation: $string;
   animation: $string;
 }
 
 @mixin display-flex($alignment: '', $justification: '') {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
 
   @if $alignment != '' {
-    -webkit-box-align: $alignment;
-    -webkit-align-items: $alignment;
-    -ms-flex-align: $alignment;
     align-items: $alignment;
   }
 
   @if $justification != '' {
-    -webkit-box-pack: $justification;
-    -webkit-justify-content: $justification;
-    -ms-flex-pack: $justification;
     justify-content: $justification;
   }
 }
 
 @mixin flex($value) {
-  -webkit-box-flex: $value;
-  -moz-box-flex: $value;
-  -webkit-flex: $value;
-  -ms-flex: $value;
   flex: $value;
 }
 
@@ -78,30 +52,18 @@
 @mixin user-select($string: none) {
   /* iOS Safari */
   -webkit-touch-callout: $string;
-  /* Safari */
+  /* Safari, and Chrome 53 */
   -webkit-user-select: $string;
-  /* Konqueror HTML */
-  -khtml-user-select: $string;
-  /* Firefox */
-  -moz-user-select: $string;
-  /* Internet Explorer/Edge */
-  -ms-user-select: $string;
   /* Non-prefixed version, currently supported by Chrome and Opera */
   user-select: $string;
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
 @mixin box-shadow ($string: 0 0 1em rgba(0, 0, 0, 0.25)) {
-  -webkit-box-shadow: $string;
-  -moz-box-shadow: $string;
   box-shadow: $string;
 }
 
 @mixin order($value) {
-  -webkit-box-ordinal-group: $value;
-  -moz-box-ordinal-group: $value;
-  -ms-flex-order: $value;
-  -webkit-order: $value;
   order: $value;
 }
 

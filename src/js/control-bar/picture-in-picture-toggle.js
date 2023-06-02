@@ -27,23 +27,10 @@ class PictureInPictureToggle extends Button {
    */
   constructor(player, options) {
     super(player, options);
+
     this.on(player, ['enterpictureinpicture', 'leavepictureinpicture'], (e) => this.handlePictureInPictureChange(e));
     this.on(player, ['disablepictureinpicturechanged', 'loadedmetadata'], (e) => this.handlePictureInPictureEnabledChange(e));
-
-    this.on(player, ['loadedmetadata', 'audioonlymodechange', 'audiopostermodechange'], () => {
-      // This audio detection will not detect HLS or DASH audio-only streams because there was no reliable way to detect them at the time
-      const isSourceAudio = player.currentType().substring(0, 5) === 'audio';
-
-      if (isSourceAudio || player.audioPosterMode() || player.audioOnlyMode()) {
-        if (player.isInPictureInPicture()) {
-          player.exitPictureInPicture();
-        }
-        this.hide();
-      } else {
-        this.show();
-      }
-
-    });
+    this.on(player, ['loadedmetadata', 'audioonlymodechange', 'audiopostermodechange'], () => this.handlePictureInPictureAudioModeChange());
 
     // TODO: Deactivate button on player emptied event.
     this.disable();
@@ -56,7 +43,30 @@ class PictureInPictureToggle extends Button {
    *         The DOM `className` for this object.
    */
   buildCSSClass() {
-    return `vjs-picture-in-picture-control ${super.buildCSSClass()}`;
+    return `vjs-picture-in-picture-control vjs-hidden ${super.buildCSSClass()}`;
+  }
+
+  /**
+   * Displays or hides the button depending on the audio mode detection.
+   * Exits picture-in-picture if it is enabled when switching to audio mode.
+   */
+  handlePictureInPictureAudioModeChange() {
+    // This audio detection will not detect HLS or DASH audio-only streams because there was no reliable way to detect them at the time
+    const isSourceAudio = this.player_.currentType().substring(0, 5) === 'audio';
+    const isAudioMode =
+      isSourceAudio || this.player_.audioPosterMode() || this.player_.audioOnlyMode();
+
+    if (!isAudioMode) {
+      this.show();
+
+      return;
+    }
+
+    if (this.player_.isInPictureInPicture()) {
+      this.player_.exitPictureInPicture();
+    }
+
+    this.hide();
   }
 
   /**
@@ -117,6 +127,18 @@ class PictureInPictureToggle extends Button {
     }
   }
 
+  /**
+   * Show the `Component`s element if it is hidden by removing the
+   * 'vjs-hidden' class name from it only in browsers that support the Picture-in-Picture API.
+   */
+  show() {
+    // Does not allow to display the pictureInPictureToggle in browsers that do not support the Picture-in-Picture API, e.g. Firefox.
+    if (typeof document.exitPictureInPicture !== 'function') {
+      return;
+    }
+
+    super.show();
+  }
 }
 
 /**
