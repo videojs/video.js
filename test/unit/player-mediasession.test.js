@@ -4,38 +4,39 @@ import sinon from 'sinon';
 import window from 'global/window';
 
 QUnit.module('Player: MediaSession', {
-  before() {
-    if (!('mediaSession' in window.navigator)) {
-      window.navigator.mediaSession = {
-        setPositionState: () => {},
-        setHandlerAction: () => {},
-        metadata: {},
-        _mocked: true
-      };
+  // before() {
+  //   if (!('mediaSession' in window.navigator)) {
+  //     window.navigator.mediaSession = {
+  //       setPositionState: () => {},
+  //       setHandlerAction: () => {},
+  //       metadata: {},
+  //       _mocked: true
+  //     };
 
-      // Object.defineProperty(window.navigator, 'mediaSession', {
-      //   configurable: true,
-      //   enumerable: true,
-      //   value: mockMediaSession,
-      //   writable: true
-      // });
+  //     // Object.defineProperty(window.navigator, 'mediaSession', {
+  //     //   configurable: true,
+  //     //   enumerable: true,
+  //     //   value: mockMediaSession,
+  //     //   writable: true
+  //     // });
 
-      window.navigator.MediaMetadata = class MediaMetadata {
-        constructor(data) {
-          return data;
-        }
-      };
-    }
-  },
+  //     window.MediaMetadata = class MediaMetadata {
+  //       constructor(data) {
+  //         return data;
+  //       }
+  //     };
+  //   }
+  // },
   afterEach() {
     this.player.dispose();
-  },
-  after() {
-    if (window.navigator.mediaSession._mocked) {
-      delete window.navigator.mediaSession;
-      delete window.navigator.MediaMetadata;
-    }
   }
+  // ,
+  // after() {
+  //   if (window.navigator.mediaSession._mocked) {
+  //     delete window.navigator.mediaSession;
+  //     delete window.MediaMetadata;
+  //   }
+  // }
 });
 
 // const testOrSkip = 'mediasession' in window.navigator ? 'test' : 'skip';

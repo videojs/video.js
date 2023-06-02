@@ -97,11 +97,15 @@ export const initMediaSession = function() {
   };
 
   const updatePositionState = () => {
-    ms.setPositionState({
-      duration: this.duration(),
-      playbackRate: this.playbackRate(),
-      position: this.currentTime()
-    });
+    const dur = parseFloat(this.duration());
+
+    if (Number.isFinite(dur) && parseFloat(dur)) {
+      ms.setPositionState({
+        duration: dur,
+        playbackRate: this.playbackRate(),
+        position: this.currentTime()
+      });
+    }
   };
 
   this.on('playing', updateMediaSession);
