@@ -5,7 +5,7 @@ import {getMimetype} from './utils/mimetypes';
  *
  * Sets up media session if supported and configured
  *
- * @this Player
+ * @this { import('./player').default }
  */
 export const initMediaSession = function() {
   if (!this.options_.mediaSession || !('mediaSession' in window.navigator)) {

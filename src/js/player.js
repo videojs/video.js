@@ -584,7 +584,8 @@ class Player extends Component {
       this.audioOnlyMode(this.options_.audioOnlyMode);
     });
 
-    initMediaSession.bind(this)();
+    // Set up media session if supported
+    initMediaSession.call(this);
 
   }
 
