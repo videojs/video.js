@@ -4,14 +4,43 @@ import sinon from 'sinon';
 import window from 'global/window';
 
 QUnit.module('Player: MediaSession', {
+  before() {
+    if (!('mediaSession' in window.navigator)) {
+      window.navigator.mediaSession = {
+        setPositionState: () => {},
+        setHandlerAction: () => {},
+        metadata: {},
+        _mocked: true
+      };
+
+      // Object.defineProperty(window.navigator, 'mediaSession', {
+      //   configurable: true,
+      //   enumerable: true,
+      //   value: mockMediaSession,
+      //   writable: true
+      // });
+
+      window.navigator.MediaMetadata = class MediaMetadata {
+        constructor(data) {
+          return data;
+        }
+      };
+    }
+  },
   afterEach() {
     this.player.dispose();
+  },
+  after() {
+    if (window.navigator.mediaSession._mocked) {
+      delete window.navigator.mediaSession;
+      delete window.navigator.MediaMetadata;
+    }
   }
 });
 
-const testOrSkip = 'mediasession' in window.navigator ? 'test' : 'skip';
+// const testOrSkip = 'mediasession' in window.navigator ? 'test' : 'skip';
 
-QUnit[testOrSkip]('mediasession data is populated from getMedia', function(assert) {
+QUnit.test('mediasession data is populated from getMedia', function(assert) {
   const done = assert.async();
 
   this.player = TestHelpers.makePlayer({
@@ -45,7 +74,7 @@ QUnit[testOrSkip]('mediasession data is populated from getMedia', function(asser
   this.player.trigger('playing');
 });
 
-QUnit[testOrSkip]('mediasession data is populated from playlist', function(assert) {
+QUnit.test('mediasession data is populated from playlist', function(assert) {
   const done = assert.async();
 
   this.player = TestHelpers.makePlayer({
@@ -83,7 +112,7 @@ QUnit[testOrSkip]('mediasession data is populated from playlist', function(asser
   this.player.trigger('playing');
 });
 
-QUnit[testOrSkip]('mediasession data set', function(assert) {
+QUnit.test('mediasession data set', function(assert) {
   this.clock = sinon.useFakeTimers();
   this.player = TestHelpers.makePlayer({
     mediaSession: true
@@ -110,7 +139,7 @@ QUnit[testOrSkip]('mediasession data set', function(assert) {
   this.clock.restore();
 });
 
-QUnit[testOrSkip]('mediasession can be customised befire being set', function(assert) {
+QUnit.test('mediasession can be customised befire being set', function(assert) {
   assert.expect(3);
 
   this.clock = sinon.useFakeTimers();
