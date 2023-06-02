@@ -1,3 +1,40 @@
+<a name="8.4.0"></a>
+# [8.4.0](https://github.com/videojs/video.js/compare/v8.3.0...v8.4.0) (2023-06-02)
+
+### Features
+
+* **lang:** update fa translation ([#8288](https://github.com/videojs/video.js/issues/8288)) ([cb8b329](https://github.com/videojs/video.js/commit/cb8b329))
+* **lang:** update zh-TW translations ([#7877](https://github.com/videojs/video.js/issues/7877)) ([7e85324](https://github.com/videojs/video.js/commit/7e85324))
+* text track display overlays a video ([#8009](https://github.com/videojs/video.js/issues/8009)) ([1491d71](https://github.com/videojs/video.js/commit/1491d71))
+
+### Bug Fixes
+
+* ad icon is not visible on audio description track list element on Safari ([#8232](https://github.com/videojs/video.js/issues/8232)) ([52bad2b](https://github.com/videojs/video.js/commit/52bad2b))
+* Document Picture-in-Picture: Use width/height instead of initialAspectRatio ([#8270](https://github.com/videojs/video.js/issues/8270)) ([9e1e29d](https://github.com/videojs/video.js/commit/9e1e29d))
+* **jsdoc:** corrections to jsdoc ([#8277](https://github.com/videojs/video.js/issues/8277)) ([3af3638](https://github.com/videojs/video.js/commit/3af3638))
+* **picture-in-picture-control:** hide the component in non-compatible browsers ([#7899](https://github.com/videojs/video.js/issues/7899)) ([d524e57](https://github.com/videojs/video.js/commit/d524e57))
+* **player:** address loss of crossOrigin value when loadMedia is called ([#8085](https://github.com/videojs/video.js/issues/8085)) ([1a1adf3](https://github.com/videojs/video.js/commit/1a1adf3))
+* **player:** cache_.currentTime is not updated when the current time is set ([#8285](https://github.com/videojs/video.js/issues/8285)) ([b782cb0](https://github.com/videojs/video.js/commit/b782cb0)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370) [#6372](https://github.com/videojs/video.js/issues/6372)
+* **player:** load method fails to reset the media element to its initial state when the VHS is used ([#8274](https://github.com/videojs/video.js/issues/8274)) ([35fad1d](https://github.com/videojs/video.js/commit/35fad1d))
+* **player:** techGet is undefined ([#8256](https://github.com/videojs/video.js/issues/8256)) ([5151bc5](https://github.com/videojs/video.js/commit/5151bc5)), closes [#8255](https://github.com/videojs/video.js/issues/8255)
+* Replace Object.values with ponyfill ([#8267](https://github.com/videojs/video.js/issues/8267)) ([866ef24](https://github.com/videojs/video.js/commit/866ef24)), closes [#8266](https://github.com/videojs/video.js/issues/8266)
+* **seek-bar:** error when scrubbing after player reset ([#8257](https://github.com/videojs/video.js/issues/8257)) ([e73e05d](https://github.com/videojs/video.js/commit/e73e05d))
+* **skip-forward:** error when clicking after player reset ([#8258](https://github.com/videojs/video.js/issues/8258)) ([07effdf](https://github.com/videojs/video.js/commit/07effdf))
+* **videojs:** missing return in registerComponent ([#8247](https://github.com/videojs/video.js/issues/8247)) ([f1558c6](https://github.com/videojs/video.js/commit/f1558c6))
+
+### Chores
+
+* **package:** update to http-streaming v3.3.1 ([#8279](https://github.com/videojs/video.js/issues/8279)) ([53dfca4](https://github.com/videojs/video.js/commit/53dfca4))
+* remove legacy prefixes ([#8276](https://github.com/videojs/video.js/issues/8276)) ([665154f](https://github.com/videojs/video.js/commit/665154f))
+
+### Documentation
+
+* update version number in README.md ([#8271](https://github.com/videojs/video.js/issues/8271)) ([20df248](https://github.com/videojs/video.js/commit/20df248))
+
+### Tests
+
+* fix Safari test failures ([#8300](https://github.com/videojs/video.js/issues/8300)) ([9e5dd81](https://github.com/videojs/video.js/commit/9e5dd81))
+
 <a name="8.3.0"></a>
 # [8.3.0](https://github.com/videojs/video.js/compare/v8.2.1...v8.3.0) (2023-04-05)
 
