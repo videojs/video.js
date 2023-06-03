@@ -189,7 +189,7 @@ QUnit.test('mediasession artwork', function(assert) {
       artwork: [{
         src: 'https://example.com/getmedia'
       }]
-    }
+    };
   };
 
   this.player.playlist = () => {
@@ -197,10 +197,9 @@ QUnit.test('mediasession artwork', function(assert) {
       artwork: [{
         src: 'https://example.com/playlist'
       }]
-    }]
+    }];
   };
   this.player.playlist.currentItem = () => 0;
-
 
   this.player.one('updatemediasession', (e, metadata) => {
     assert.equal(metadata.artwork[0].src, 'https://example.com/getmedia', 'set with loadMedia data');
@@ -208,9 +207,11 @@ QUnit.test('mediasession artwork', function(assert) {
   this.player.trigger('playing');
   this.clock.tick(100);
 
-  this.player.getMedia = () => { return {}; };
+  this.player.getMedia = () => {
+    return {};
+  };
   this.player.usingPlugin = () => true;
-  
+
   this.player.one('updatemediasession', (e, metadata) => {
     assert.equal(metadata.artwork[0].src, 'https://example.com/playlist', 'set with playlist data');
   });
@@ -218,15 +219,15 @@ QUnit.test('mediasession artwork', function(assert) {
   this.clock.tick(100);
 
   this.player.usingPlugin = () => false;
-  
+
   this.player.one('updatemediasession', (e, metadata) => {
     assert.equal(metadata.artwork[0].src, 'https://example.com/poster', 'set with poster data');
   });
-  this.player.trigger('playing');  
+  this.player.trigger('playing');
   this.clock.tick(100);
 
   this.player.poster(null);
-  
+
   this.player.one('updatemediasession', (e, metadata) => {
     assert.equal(metadata.artwork, undefined, 'omitted with no data');
   });
@@ -273,7 +274,7 @@ QUnit.test('allows for action handlers that are not settable', function(assert) 
   this.player = TestHelpers.makePlayer({
     mediaSession: true
   });
-  
+
   sinon.stub(this.player.log, 'debug');
 
   this.player.trigger('pluginsetup:playlist');
