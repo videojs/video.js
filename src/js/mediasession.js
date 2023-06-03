@@ -44,7 +44,7 @@ export const initMediaSession = function() {
     }]
   ];
 
-  // Using Googles' recommendation that expects some handler may not be settable, especially as we
+  // Using Google's recommendation that expects some handler may not be settable, especially as we
   // want to support older Chrome
   // https://web.dev/media-session/#let-users-control-whats-playing
   for (const [action, handler] of actionHandlers) {
@@ -69,11 +69,7 @@ export const initMediaSession = function() {
   };
 
   // Only setup playlist handlers if / when playlist plugin is present
-  if (this.usingPlugin('playlist')) {
-    setUpMediaSessionPlaylist();
-  } else {
-    this.on('pluginsetup:playlist', setUpMediaSessionPlaylist);
-  }
+  this.on('pluginsetup:playlist', setUpMediaSessionPlaylist);
 
   /**
    *
@@ -111,7 +107,7 @@ export const initMediaSession = function() {
   const updatePositionState = () => {
     const dur = parseFloat(this.duration());
 
-    if (Number.isFinite(dur) && parseFloat(dur)) {
+    if (Number.isFinite(dur)) {
       ms.setPositionState({
         duration: dur,
         playbackRate: this.playbackRate(),
@@ -125,12 +121,11 @@ export const initMediaSession = function() {
     ms.playbackState = 'playing';
   });
 
-  this.on(['paused', 'paused'], () => {
-    updateMediaSession();
-    ms.playbackState = 'playing';
+  this.on('paused', () => {
+    ms.playbackState = 'paused';
   });
 
   if ('setPositionState' in ms) {
-    this.on(['playing', 'seeked', 'ratechange'], updatePositionState);
+    this.on('timeupdate', updatePositionState);
   }
 };
