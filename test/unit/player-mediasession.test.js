@@ -140,7 +140,7 @@ QUnit.test('mediasession data set', function(assert) {
   this.clock.restore();
 });
 
-QUnit.test('mediasession can be customised befire being set', function(assert) {
+QUnit.test('mediasession can be customised before being set', function(assert) {
   assert.expect(3);
 
   this.clock = sinon.useFakeTimers();
@@ -172,3 +172,34 @@ QUnit.test('mediasession can be customised befire being set', function(assert) {
   this.clock.restore();
 });
 
+QUnit.test('action handlers set up', function(assert) {
+  const spy = sinon.spy(window.navigator.mediaSession, 'setActionHandler');
+
+  this.player = TestHelpers.makePlayer({
+    mediaSession: true
+  });
+
+  assert.true(spy.calledWith('play'), 'play handler set');
+  assert.false(spy.calledWith('previoustrack'), 'playlist handler not set');
+
+  spy.restore();
+});
+
+QUnit.test('playlist action handlers set up', function(assert) {
+  const spy = sinon.spy(window.navigator.mediaSession, 'setActionHandler');
+
+  this.clock = sinon.useFakeTimers();
+  this.player = TestHelpers.makePlayer({
+    mediaSession: true
+  });
+
+  this.player.trigger('pluginsetup:playlist');
+
+  this.clock.tick(10);
+
+  assert.true(spy.calledWith('play'), 'play handler set');
+  assert.true(spy.calledWith('previoustrack'), 'playlist handler set');
+
+  spy.restore();
+  this.clock.restore();
+});

@@ -2,10 +2,8 @@ import window from 'global/window';
 import {getMimetype} from './utils/mimetypes';
 
 /**
- *
- * Sets up media session if supported and configured
- *
- * @this { import('./player').default }
+ * @method initMediaSession Sets up media session if supported and configured
+ * @this { import('./player').default } Player
  */
 export const initMediaSession = function() {
   if (!this.options_.mediaSession || !('mediaSession' in window.navigator)) {
@@ -25,6 +23,7 @@ export const initMediaSession = function() {
       this.pause();
       this.currentTime(0);
     }],
+    // videojs-contrib-ads
     ['seekbackward', (details) => {
       if (this.usingPlugin('ads') && this.ads.inAdBreak()) {
         return;
@@ -45,6 +44,9 @@ export const initMediaSession = function() {
     }]
   ];
 
+  // Using Googles' recommendation that expects some handler may not be settable, especially as we
+  // want to support older Chrome
+  // https://web.dev/media-session/#let-users-control-whats-playing
   for (const [action, handler] of actionHandlers) {
     try {
       ms.setActionHandler(action, handler);
@@ -74,23 +76,33 @@ export const initMediaSession = function() {
   }
 
   /**
+   *
+   * Updates the mediaSession metadata. Fires `updatemediasession` as an
+   * opportunity to modify the metadata
+   *
    * @fires Player#updatemediasession
    */
   const updateMediaSession = () => {
-    this.log('updatems');
     const currentMedia = this.getMedia();
     const playlistItem = this.usingPlugin('playlist') ? Object.assign({}, this.playlist()[this.playlist.currentItem()]) : {};
     const mediaSessionData = {
-      artwork: currentMedia.artwork || playlistItem.artwork || this.poster() ? [{
-        src: this.poster(),
-        type: getMimetype(this.poster())
-      }] : [],
       title: currentMedia.title || playlistItem.name || '',
       artist: currentMedia.artist || playlistItem.artist || '',
       album: currentMedia.album || playlistItem.album || ''
     };
 
-    // This allows the metadata to be updated before being set, e.g. if loadmedia() is not used.
+    if (currentMedia.artwork) {
+      mediaSessionData.artwork = currentMedia.artwork;
+    } else if (playlistItem.artwork) {
+      mediaSessionData.artwork = playlistItem.artwork;
+    } else if (this.poster()) {
+      mediaSessionData.artwork = {
+        src: this.poster(),
+        type: getMimetype(this.poster())
+      };
+    }
+
+    // This allows the metadata to be updated before being set, e.g. if loadMedia() is not used.
     this.trigger('updatemediasession', mediaSessionData);
 
     ms.metadata = new window.MediaMetadata(mediaSessionData);
@@ -108,7 +120,15 @@ export const initMediaSession = function() {
     }
   };
 
-  this.on('playing', updateMediaSession);
+  this.on('playing', () => {
+    updateMediaSession();
+    ms.playbackState = 'playing';
+  });
+
+  this.on(['paused', 'paused'], () => {
+    updateMediaSession();
+    ms.playbackState = 'playing';
+  });
 
   if ('setPositionState' in ms) {
     this.on(['playing', 'seeked', 'ratechange'], updatePositionState);
