@@ -64,7 +64,7 @@ export const initMediaSession = function() {
         this.playlist.next();
       });
     } catch (error) {
-      this.log('Couldn\'t register playlist media session actions.');
+      this.log.debug('Couldn\'t register playlist media session actions.');
     }
   };
 
@@ -92,10 +92,10 @@ export const initMediaSession = function() {
     } else if (playlistItem.artwork) {
       mediaSessionData.artwork = playlistItem.artwork;
     } else if (this.poster()) {
-      mediaSessionData.artwork = {
+      mediaSessionData.artwork = [{
         src: this.poster(),
         type: getMimetype(this.poster())
-      };
+      }];
     }
 
     // This allows the metadata to be updated before being set, e.g. if loadMedia() is not used.

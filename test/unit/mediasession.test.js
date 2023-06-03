@@ -29,6 +29,9 @@ QUnit.module('Player: MediaSession', {
   // },
   afterEach() {
     this.player.dispose();
+    if (this.clock) {
+      this.clock.restore();
+    }
   }
   // ,
   // after() {
@@ -172,6 +175,65 @@ QUnit.test('mediasession can be customised before being set', function(assert) {
   this.clock.restore();
 });
 
+QUnit.test('mediasession artwork', function(assert) {
+  assert.expect(4);
+
+  this.clock = sinon.useFakeTimers();
+  this.player = TestHelpers.makePlayer({
+    mediaSession: true,
+    poster: 'https://example.com/poster'
+  });
+
+  this.player.getMedia = () => {
+    return {
+      artwork: [{
+        src: 'https://example.com/getmedia'
+      }]
+    }
+  };
+
+  this.player.playlist = () => {
+    return [{
+      artwork: [{
+        src: 'https://example.com/playlist'
+      }]
+    }]
+  };
+  this.player.playlist.currentItem = () => 0;
+
+
+  this.player.one('updatemediasession', (e, metadata) => {
+    assert.equal(metadata.artwork[0].src, 'https://example.com/getmedia', 'set with loadMedia data');
+  });
+  this.player.trigger('playing');
+  this.clock.tick(100);
+
+  this.player.getMedia = () => { return {}; };
+  this.player.usingPlugin = () => true;
+  
+  this.player.one('updatemediasession', (e, metadata) => {
+    assert.equal(metadata.artwork[0].src, 'https://example.com/playlist', 'set with playlist data');
+  });
+  this.player.trigger('playing');
+  this.clock.tick(100);
+
+  this.player.usingPlugin = () => false;
+  
+  this.player.one('updatemediasession', (e, metadata) => {
+    assert.equal(metadata.artwork[0].src, 'https://example.com/poster', 'set with poster data');
+  });
+  this.player.trigger('playing');  
+  this.clock.tick(100);
+
+  this.player.poster(null);
+  
+  this.player.one('updatemediasession', (e, metadata) => {
+    assert.equal(metadata.artwork, undefined, 'omitted with no data');
+  });
+  this.player.trigger('playing');
+
+});
+
 QUnit.test('action handlers set up', function(assert) {
   const spy = sinon.spy(window.navigator.mediaSession, 'setActionHandler');
 
@@ -201,5 +263,26 @@ QUnit.test('playlist action handlers set up', function(assert) {
   assert.true(spy.calledWith('previoustrack'), 'playlist handler set');
 
   spy.restore();
+  this.clock.restore();
+});
+
+QUnit.test('allows for action handlers that are not settable', function(assert) {
+  sinon.stub(window.navigator.mediaSession, 'setActionHandler').throws();
+
+  this.clock = sinon.useFakeTimers();
+  this.player = TestHelpers.makePlayer({
+    mediaSession: true
+  });
+  
+  sinon.stub(this.player.log, 'debug');
+
+  this.player.trigger('pluginsetup:playlist');
+
+  this.clock.tick(10);
+
+  assert.true(this.player.log.debug.calledWith('Couldn\'t register playlist media session actions.'));
+
+  window.navigator.mediaSession.setActionHandler.restore();
+  this.player.log.debug.restore();
   this.clock.restore();
 });
