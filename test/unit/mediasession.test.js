@@ -4,45 +4,13 @@ import sinon from 'sinon';
 import window from 'global/window';
 
 QUnit.module('Player: MediaSession', {
-  // before() {
-  //   if (!('mediaSession' in window.navigator)) {
-  //     window.navigator.mediaSession = {
-  //       setPositionState: () => {},
-  //       setHandlerAction: () => {},
-  //       metadata: {},
-  //       _mocked: true
-  //     };
-
-  //     // Object.defineProperty(window.navigator, 'mediaSession', {
-  //     //   configurable: true,
-  //     //   enumerable: true,
-  //     //   value: mockMediaSession,
-  //     //   writable: true
-  //     // });
-
-  //     window.MediaMetadata = class MediaMetadata {
-  //       constructor(data) {
-  //         return data;
-  //       }
-  //     };
-  //   }
-  // },
   afterEach() {
     this.player.dispose();
     if (this.clock) {
       this.clock.restore();
     }
   }
-  // ,
-  // after() {
-  //   if (window.navigator.mediaSession._mocked) {
-  //     delete window.navigator.mediaSession;
-  //     delete window.MediaMetadata;
-  //   }
-  // }
 });
-
-// const testOrSkip = 'mediasession' in window.navigator ? 'test' : 'skip';
 
 QUnit.test('mediasession data is populated from getMedia', function(assert) {
   const done = assert.async();
@@ -139,8 +107,6 @@ QUnit.test('mediasession data set', function(assert) {
   assert.equal(window.navigator.mediaSession.metadata.title, 'TitleA', 'mediasession title retrieved');
   assert.equal(window.navigator.mediaSession.metadata.album, 'AlbumA', 'mediasession album retrieved');
   assert.ok(window.navigator.mediaSession.metadata.artwork[0].src.endsWith('posterA.jpg'), 'mediasession poster retrieved');
-
-  this.clock.restore();
 });
 
 QUnit.test('mediasession can be customised before being set', function(assert) {
@@ -172,7 +138,6 @@ QUnit.test('mediasession can be customised before being set', function(assert) {
   assert.equal(window.navigator.mediaSession.metadata.artist, 'Another artist', 'set with updated artist');
   assert.equal(window.navigator.mediaSession.metadata.title, 'TitleB', 'mediasession original title used');
 
-  this.clock.restore();
 });
 
 QUnit.test('mediasession artwork', function(assert) {
@@ -264,7 +229,6 @@ QUnit.test('playlist action handlers set up', function(assert) {
   assert.true(spy.calledWith('previoustrack'), 'playlist handler set');
 
   spy.restore();
-  this.clock.restore();
 });
 
 QUnit.test('allows for action handlers that are not settable', function(assert) {
@@ -285,5 +249,40 @@ QUnit.test('allows for action handlers that are not settable', function(assert) 
 
   window.navigator.mediaSession.setActionHandler.restore();
   this.player.log.debug.restore();
-  this.clock.restore();
+});
+
+QUnit.test('playback and position state', function(assert) {
+  sinon.stub(window.navigator.mediaSession, 'setPositionState');
+
+  this.player = TestHelpers.makePlayer({
+    mediaSession: true
+  });
+
+  this.player.loadMedia({
+    artist: 'ArtistA',
+    album: 'AlbumA',
+    title: 'TitleA',
+    description: 'DescriptionA',
+    poster: 'posterA.jpg',
+    src: 'fooA.mp4'
+  });
+
+  this.player.trigger('playing');
+  assert.strictEqual(window.navigator.mediaSession.playbackState, 'playing', 'playbackState set to playing');
+
+  this.player.currentTime = () => 5;
+  this.player.duration = () => 10;
+  this.player.playbackRate = () => 1.5;
+
+  this.player.trigger('timeupdate');
+  assert.true(window.navigator.mediaSession.setPositionState.calledWith({
+    duration: 10,
+    playbackRate: 1.5,
+    position: 5
+  }), 'setPositionState called');
+
+  this.player.trigger('paused');
+  assert.strictEqual(window.navigator.mediaSession.playbackState, 'paused', 'playbackState set to paused');
+
+  window.navigator.mediaSession.setPositionState.restore();
 });
