@@ -117,6 +117,7 @@ export const initMediaSession = function() {
   };
 
   this.on('playing', () => {
+    // Called on each `playing` rather than `sourceset`, in case of multiple players on a page
     updateMediaSession();
     ms.playbackState = 'playing';
   });
