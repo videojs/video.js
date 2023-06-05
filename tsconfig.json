@@ -8,7 +8,6 @@
     "declarationMap": true,
     "skipLibCheck": true,
     "checkJs": false,
-    "preserveWatchOutput": true,
-    "resolveJsonModule": true
+    "preserveWatchOutput": true
   }
 }
