@@ -1,3 +1,10 @@
+<a name="8.4.1"></a>
+## [8.4.1](https://github.com/videojs/video.js/compare/v8.4.0...v8.4.1) (2023-06-05)
+
+### Bug Fixes
+
+* revert resolveJsonModule in tsconfig ([#8310](https://github.com/videojs/video.js/issues/8310)) ([8f32b9f](https://github.com/videojs/video.js/commit/8f32b9f))
+
 <a name="8.4.0"></a>
 # [8.4.0](https://github.com/videojs/video.js/compare/v8.3.0...v8.4.0) (2023-06-02)
 
