@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <link rel="icon" href="data:;base64,=">
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
+    <pre>npm start</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+
+  <p>Tap on video to play/pause</p>
+
+  <test-custom-element id="customElement1"></test-custom-element>
+
+  <script>
+    // Custom Element definition
+    class TestCustomElement extends HTMLElement {
+
+      constructor() {
+        super();
+
+        const shadowRoot = this.attachShadow({ mode: 'closed' });
+
+        const styleLinkElem = document.createElement('link');
+
+        styleLinkElem.setAttribute('rel', 'stylesheet');
+        styleLinkElem.setAttribute('href', '../dist/video-js.css')
+        shadowRoot.append(styleLinkElem);
+
+        const containerElem = document.createElement('div');
+
+        containerElem.setAttribute('data-vjs-player', '');
+        shadowRoot.appendChild(containerElem);
+
+        const videoElem = document.createElement('video');
+
+        videoElem.setAttribute('preload', 'auto');
+        videoElem.setAttribute('width', 640);
+        videoElem.setAttribute('height', 260);
+        containerElem.appendChild(videoElem);
+
+        const sourceElem = document.createElement('source');
+
+        sourceElem.setAttribute('src', 'https://vjs.zencdn.net/v/oceans.mp4');
+        sourceElem.setAttribute('type', 'video/mp4');
+        videoElem.appendChild(sourceElem);
+
+        this.innerPlayer = videojs(videoElem);
+
+        containerElem.addEventListener('click', () => {
+          if (this.innerPlayer.paused()) {
+            this.innerPlayer.play();
+          }
+          else {
+            this.innerPlayer.pause();
+          }
+        });
+      }
+    }
+
+    window.customElements.define('test-custom-element', TestCustomElement);
+
+    // Main entry point
+
+    document.addEventListener('DOMContentLoaded', () => {
+      var customElem = document.getElementById('customElement1');
+      var innerPlayer = customElem.innerPlayer;
+      innerPlayer.log('Shadow DOM inner player created', innerPlayer);
+    });
+  </script>
+
+</body>
+</html>
