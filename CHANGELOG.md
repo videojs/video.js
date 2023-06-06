@@ -1,3 +1,13 @@
+<a name="8.4.2"></a>
+## [8.4.2](https://github.com/videojs/video.js/compare/v8.4.1...v8.4.2) (2023-06-06)
+
+### Bug Fixes
+
+* **loading-spinner:** fix loading spinner responsiveness when default font size is modified ([#8295](https://github.com/videojs/video.js/issues/8295)) ([f075177](https://github.com/videojs/video.js/commit/f075177))
+* **package:** update videojs-contrib-quality-levels to 4.0.0 to eliminate deprecation warning ([#8303](https://github.com/videojs/video.js/issues/8303)) ([fab8f95](https://github.com/videojs/video.js/commit/fab8f95))
+* **shadow-dom:** prevent warning 'element supplied is not included' ([#8192](https://github.com/videojs/video.js/issues/8192)) ([dc1e2bb](https://github.com/videojs/video.js/commit/dc1e2bb))
+* **text-track-settings:** fix text track settings responsiveness when default font size is modified ([#8294](https://github.com/videojs/video.js/issues/8294)) ([3dece50](https://github.com/videojs/video.js/commit/3dece50))
+
 <a name="8.4.1"></a>
 ## [8.4.1](https://github.com/videojs/video.js/compare/v8.4.0...v8.4.1) (2023-06-05)
 
