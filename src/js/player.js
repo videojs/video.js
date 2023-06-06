@@ -308,6 +308,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready) {
     // Make sure tag ID exists
+    // also here.. probably better
     tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
 
     // Set Options
@@ -517,6 +518,25 @@ class Player extends Component {
 
     this.playbackRates(options.playbackRates);
 
+    if (options.useSVGIcons) {
+      // Add SVG Sprite to the DOM
+      const parser = new window.DOMParser();
+      const parsedSVG = parser.parseFromString(icons, 'image/svg+xml');
+      const errorNode = parsedSVG.querySelector('parsererror');
+
+      if (errorNode) {
+        log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
+        this.options_.useSVGIcons = null;
+      } else {
+        const sprite = parsedSVG.documentElement;
+
+        sprite.style.display = 'none';
+        this.el_.appendChild(sprite);
+
+        this.addClass('vjs-svg-icons-enabled');
+      }
+    }
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -548,25 +568,6 @@ class Player extends Component {
     // (See https://github.com/videojs/video.js/issues/5683)
     if (browser.TOUCH_ENABLED) {
       this.addClass('vjs-touch-enabled');
-    }
-
-    if (options.useSVGIcons) {
-      // Add SVG Sprite to the DOM
-      const parser = new window.DOMParser();
-      const parsedSVG = parser.parseFromString(icons, 'image/svg+xml');
-      const errorNode = parsedSVG.querySelector('parsererror');
-
-      if (errorNode) {
-        log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
-        return;
-      }
-
-      const sprite = parsedSVG.documentElement;
-
-      sprite.style.display = 'none';
-      this.el_.appendChild(sprite);
-
-      this.addClass('vjs-svg-icons-enabled');
     }
 
     // iOS Safari has broken hover handling

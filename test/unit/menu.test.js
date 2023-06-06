@@ -7,6 +7,8 @@ import MenuItem from '../../src/js/menu/menu-item.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
 import sinon from 'sinon';
+import window from 'global/window';
+import document from 'global/document';
 
 QUnit.module('MenuButton');
 
@@ -157,8 +159,13 @@ QUnit.test('should add or remove role menu for accessibility purpose', function(
 });
 
 QUnit.test('setIcon should apply a child to the Button component', function(assert) {
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  // Stub a successful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => false,
+    documentElement: document.createElement('span')
+  });
 
+  const player = TestHelpers.makePlayer({useSVGIcons: true});
   const menuButton = new MenuButton(player);
 
   menuButton.createItems = () => [];
@@ -173,6 +180,7 @@ QUnit.test('setIcon should apply a child to the Button component', function(asse
 
   assert.equal(useEl.getAttribute('href'), '#vjs-icon-test', 'use should have an href set with the correct icon url');
 
+  window.DOMParser.prototype.parseFromString.restore();
   menuButton.dispose();
   player.dispose();
 });
