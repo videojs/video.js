@@ -2886,6 +2886,7 @@ QUnit.test('docPiP moves player and triggers events', function(assert) {
   const fakePiPWindow = document.createElement('div');
 
   fakePiPWindow.document = {
+    head: document.createElement('div'),
     body: document.createElement('div')
   };
   fakePiPWindow.querySelector = function(sel) {

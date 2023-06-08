@@ -3074,9 +3074,9 @@ class Player extends Component {
       return window.documentPictureInPicture.requestWindow({
         // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
         width: this.videoWidth(),
-        height: this.videoHeight(),
-        copyStyleSheets: true
+        height: this.videoHeight()
       }).then(pipWindow => {
+        this.copyStyleSheetsToWindow_(pipWindow);
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
         pipWindow.document.body.append(this.el_);
@@ -3107,6 +3107,36 @@ class Player extends Component {
       return this.techGet_('requestPictureInPicture');
     }
     return Promise.reject('No PiP mode is available');
+  }
+
+  /**
+   * Copy document style sheets to another window.
+   *
+   *  @param {Window} win
+   *
+   * @private
+   */
+  copyStyleSheetsToWindow_(win) {
+    const allCSS = [...document.styleSheets]
+      .map((styleSheet) => {
+        try {
+          return [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+        } catch (e) {
+          const link = document.createElement('link');
+
+          link.rel = 'stylesheet';
+          link.type = styleSheet.type;
+          link.media = styleSheet.media;
+          link.href = styleSheet.href;
+          win.document.head.appendChild(link);
+        }
+      })
+      .filter(Boolean)
+      .join('\n');
+    const style = document.createElement('style');
+
+    style.textContent = allCSS;
+    win.document.head.appendChild(style);
   }
 
   /**
