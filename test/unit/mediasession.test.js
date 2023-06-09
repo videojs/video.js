@@ -241,7 +241,7 @@ QUnit.test('allows for action handlers that are not settable', function(assert) 
 
   sinon.stub(this.player.log, 'debug');
 
-  this.player.trigger('playing');
+  this.player.trigger('pluginsetup:playlist');
 
   this.clock.tick(10);
 
