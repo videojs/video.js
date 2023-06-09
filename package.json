@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
-  "version": "8.4.0",
+  "version": "8.4.2",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
@@ -52,7 +52,7 @@
     "minify:css:cdn": "cleancss dist/alt/video-js-cdn.css -o dist/alt/video-js-cdn.min.css",
     "minify:css:default": "cleancss dist/video-js.css -o dist/video-js.min.css",
     "watch": "npm-run-all -p watch:*",
-    "watch:lang": "chokidar --initial 'lang/**/!(zh-Hans|zh-Hant)*.json' -c 'npm run build:lang'",
+    "watch:lang": "chokidar --initial \"lang/**/!(zh-Hans|zh-Hant)*.json\" -c \"npm run build:lang\"",
     "watch:rollup": "rollup -c -w --no-progress",
     "watch:types": "tsc -w",
     "watch:css": "npm-run-all -p build:css:default build:css:cdn watch:css:*",
@@ -96,7 +96,7 @@
     "mpd-parser": "^1.0.1",
     "mux.js": "^6.2.0",
     "safe-json-parse": "4.0.0",
-    "videojs-contrib-quality-levels": "3.0.0",
+    "videojs-contrib-quality-levels": "4.0.0",
     "videojs-font": "4.1.0",
     "videojs-vtt.js": "0.15.4"
   },

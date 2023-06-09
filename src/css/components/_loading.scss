@@ -3,20 +3,20 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  margin: -25px 0 0 -25px;
+  transform: translate(-50%, -50%);
   opacity: 0.85;
 
   // Need to fix centered page layouts
   text-align: left;
 
-  border: 6px solid rgba($primary-background-color, $primary-background-transparency);
+  border: .6em solid rgba($primary-background-color, $primary-background-transparency);
   // border: 6px solid rgba(43, 51, 63, 0.5);
 
   box-sizing: border-box;
   background-clip: padding-box;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: 5em;
+  height: 5em;
+  border-radius: 50%;
   visibility: hidden;
 }
 
@@ -31,7 +31,7 @@
 .vjs-loading-spinner:after {
   content: "";
   position: absolute;
-  margin: -6px;
+  margin: -0.6em;
   box-sizing: inherit;
   width: inherit;
   height: inherit;
