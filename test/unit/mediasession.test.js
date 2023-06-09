@@ -241,7 +241,7 @@ QUnit.test('allows for action handlers that are not settable', function(assert) 
 
   sinon.stub(this.player.log, 'debug');
 
-  this.player.trigger('pluginsetup:playlist');
+  this.player.trigger('playing');
 
   this.clock.tick(10);
 
@@ -285,4 +285,127 @@ QUnit.test('playback and position state', function(assert) {
   assert.strictEqual(window.navigator.mediaSession.playbackState, 'paused', 'playbackState set to paused');
 
   window.navigator.mediaSession.setPositionState.restore();
+});
+
+QUnit.test('action handlers', function(assert) {
+  const actions = {};
+
+  sinon.stub(window.navigator.mediaSession, 'setActionHandler').callsFake((action, handler) => {
+    actions[action] = handler;
+  });
+
+  this.clock = sinon.useFakeTimers();
+  this.player = sinon.spy(TestHelpers.makePlayer({
+    mediaSession: true
+  }));
+
+  this.player.trigger('playing');
+  this.clock.tick(10);
+
+  sinon.resetHistory();
+
+  actions.play();
+  assert.true(this.player.play.called, 'play handler calls play on player');
+
+  actions.pause();
+  assert.true(this.player.pause.called, 'pause handler calls play on player');
+
+  sinon.resetHistory();
+
+  assert.false(this.player.pause.called, 'pause handler should have been reset');
+
+  actions.stop();
+  assert.true(this.player.pause.called, 'pause handler calls play on player');
+  assert.true(this.player.currentTime.calledWith(0), 'pause handler calls play on player');
+
+  this.player.duration(600);
+  this.player.currentTime(0);
+
+  actions.seekforward({skipOffset: 10});
+  assert.true(this.player.currentTime.calledWith(10), 'seek handler sets current time to requested offset');
+  actions.seekforward({});
+  assert.true(this.player.currentTime.calledWith(10 + 15), 'seek handler sets current time to default offset');
+  actions.seekbackward({skipOffset: 10});
+  assert.true(this.player.currentTime.calledWith(10 + 15 - 10), 'seek handler sets current time to requested offset');
+  actions.seekbackward({});
+  assert.true(this.player.currentTime.calledWith(10 + 15 - 10 - 15), 'seek handler sets current time to default offset');
+  actions.seekbackward({});
+  assert.true(this.player.currentTime.calledWith(10 + 15 - 10 - 15), 'seek handler does not set current time below 0');
+
+  actions.seekto({seekTime: 10});
+  assert.true(this.player.currentTime.calledWith(10), 'seek handler sets current time');
+
+  window.navigator.mediaSession.setActionHandler.restore();
+});
+
+QUnit.test('seek action handlers ignored in ad breaks', function(assert) {
+  const actions = {};
+
+  sinon.stub(window.navigator.mediaSession, 'setActionHandler').callsFake((action, handler) => {
+    actions[action] = handler;
+  });
+
+  this.clock = sinon.useFakeTimers();
+  this.player = sinon.spy(TestHelpers.makePlayer({
+    mediaSession: true
+  }));
+
+  this.player.trigger('playing');
+
+  this.clock.tick(10);
+
+  // Mocked contrib-ads
+  this.player.activePlugins_ = {
+    ads: true
+  };
+  this.player.ads = {
+    inAdBreak: () => true
+  };
+
+  actions.seekto({seekTime: 15});
+  assert.false(this.player.currentTime.calledWith(15), 'seek handler does not sets current time in ad break');
+
+  actions.seekbackward({skipOffset: 10});
+  assert.false(this.player.currentTime.called, 'seekbackward handler does not sets current time in ad break');
+
+  actions.seekforward({skipOffset: 10});
+  assert.false(this.player.currentTime.called, 'seekforward handler does not sets current time in ad break');
+
+  window.navigator.mediaSession.setActionHandler.restore();
+});
+
+QUnit.test('playlist action handlers are called', function(assert) {
+  const actions = {};
+
+  sinon.stub(window.navigator.mediaSession, 'setActionHandler').callsFake((action, handler) => {
+    actions[action] = handler;
+  });
+
+  this.clock = sinon.useFakeTimers();
+  this.player = sinon.spy(TestHelpers.makePlayer({
+    mediaSession: true
+  }));
+
+  this.player.trigger('pluginsetup:playlist');
+
+  this.clock.tick(10);
+
+  // Mocked playlist
+  const mockPlaylist = {
+    next: sinon.spy(),
+    previous: sinon.spy()
+  };
+
+  this.player.activePlugins_ = {
+    playlist: true
+  };
+  this.player.playlist = mockPlaylist;
+
+  actions.previoustrack();
+  assert.true(mockPlaylist.previous.called, 'playlist previous handler called');
+
+  actions.nexttrack();
+  assert.true(mockPlaylist.next.called, 'playlist next handler called');
+
+  window.navigator.mediaSession.setActionHandler.restore();
 });

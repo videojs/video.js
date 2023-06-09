@@ -10,7 +10,7 @@ export const initMediaSession = function() {
     return;
   }
   const ms = window.navigator.mediaSession;
-  const skipTime = this.options_.mediaSession.skipTime || 15;
+  const defaultSkipTime = 15;
 
   const actionHandlers = [
     ['play', () => {
@@ -28,13 +28,13 @@ export const initMediaSession = function() {
       if (this.usingPlugin('ads') && this.ads.inAdBreak()) {
         return;
       }
-      this.currentTime(Math.max(0, this.currentTime() - (details.skipOffset || skipTime)));
+      this.currentTime(Math.max(0, this.currentTime() - (details.skipOffset || defaultSkipTime)));
     }],
     ['seekforward', (details) => {
       if (this.usingPlugin('ads') && this.ads.inAdBreak()) {
         return;
       }
-      this.currentTime(Math.min(this.duration(), this.currentTime() + (details.skipOffset || skipTime)));
+      this.currentTime(Math.min(this.duration(), this.currentTime() + (details.skipOffset || defaultSkipTime)));
     }],
     ['seekto', (details) => {
       if (this.usingPlugin('ads') && this.ads.inAdBreak()) {
