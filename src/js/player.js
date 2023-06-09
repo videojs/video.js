@@ -518,7 +518,7 @@ class Player extends Component {
 
     this.playbackRates(options.playbackRates);
 
-    if (options.useSVGIcons) {
+    if (options.experimentalSvgIcons) {
       // Add SVG Sprite to the DOM
       const parser = new window.DOMParser();
       const parsedSVG = parser.parseFromString(icons, 'image/svg+xml');
@@ -526,7 +526,7 @@ class Player extends Component {
 
       if (errorNode) {
         log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
-        this.options_.useSVGIcons = null;
+        this.options_.experimentalSvgIcons = null;
       } else {
         const sprite = parsedSVG.documentElement;
 

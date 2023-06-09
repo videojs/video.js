@@ -976,7 +976,7 @@ QUnit.test('should add a svg-icons-enabled classname when svg icons are supporte
 
   assert.expect(1);
 
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
 
   assert.ok(player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname added');
 
@@ -992,7 +992,7 @@ QUnit.test('should revert to font icons if the SVG sprite cannot be loaded', fun
 
   assert.expect(1);
 
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
 
   assert.ok(!player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname was not added');
 

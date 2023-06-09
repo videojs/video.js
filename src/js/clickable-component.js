@@ -85,7 +85,7 @@ class ClickableComponent extends Component {
 
     const el = Dom.createEl(tag, props, attributes);
 
-    if (!this.player_.options_.useSVGIcons) {
+    if (!this.player_.options_.experimentalSvgIcons) {
       el.appendChild(Dom.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {

@@ -29,7 +29,7 @@
 
   <script>
     var vid = document.getElementById('vid1');
-    var player = videojs(vid, {useSVGIcons: true});
+    var player = videojs(vid, {experimentalSvgIcons: true});
   </script>
 
 </body>

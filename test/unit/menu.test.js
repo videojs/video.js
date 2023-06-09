@@ -165,7 +165,7 @@ QUnit.test('setIcon should apply a child to the Button component', function(asse
     documentElement: document.createElement('span')
   });
 
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
   const menuButton = new MenuButton(player);
 
   menuButton.createItems = () => [];

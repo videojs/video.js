@@ -18,7 +18,7 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
     const parentSpan = el.querySelector('.vjs-menu-item-text');
 
     if (this.options_.track.kind === 'captions') {
-      if (this.player_.options_.useSVGIcons) {
+      if (this.player_.options_.experimentalSvgIcons) {
         this.setIcon('captions', el);
       } else {
         parentSpan.appendChild(createEl('span', {

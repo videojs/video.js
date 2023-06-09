@@ -183,7 +183,7 @@ QUnit.test('should allow for children that are elements', function(assert) {
   /* eslint-enable no-unused-vars */
 });
 
-QUnit.test('setIcon should not do anything when useSVGIcons is not set', function(assert) {
+QUnit.test('setIcon should not do anything when experimentalSvgIcons is not set', function(assert) {
   const comp = new Component(this.player);
   const iconName = 'test';
 
@@ -193,7 +193,7 @@ QUnit.test('setIcon should not do anything when useSVGIcons is not set', functio
 });
 
 QUnit.test('setIcon should return the correct SVG', function(assert) {
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
 
   const comp = new Component(player);
   const iconName = 'test';
@@ -220,7 +220,7 @@ QUnit.test('setIcon should return the correct SVG', function(assert) {
 });
 
 QUnit.test('setIcon should call replaceChild if an icon already exists', function(assert) {
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
 
   const comp = new Component(player);
 
@@ -251,7 +251,7 @@ QUnit.test('setIcon should call replaceChild if an icon already exists', functio
 });
 
 QUnit.test('setIcon should append a child to the element passed into the method', function(assert) {
-  const player = TestHelpers.makePlayer({useSVGIcons: true});
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
 
   const comp = new Component(player);
   const el = document.createElement('div');

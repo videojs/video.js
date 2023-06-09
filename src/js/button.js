@@ -46,7 +46,7 @@ class Button extends ClickableComponent {
 
     const el = createEl(tag, props, attributes);
 
-    if (!this.player_.options_.useSVGIcons) {
+    if (!this.player_.options_.experimentalSvgIcons) {
       el.appendChild(createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {

@@ -546,7 +546,7 @@ class Component {
     // the unecessary CSS for font icons, will need to be removed.
     // See https://github.com/videojs/video.js/pull/8260 as to which components
     // need updating.
-    if (!this.player_.options_.useSVGIcons) {
+    if (!this.player_.options_.experimentalSvgIcons) {
       return;
     }
 

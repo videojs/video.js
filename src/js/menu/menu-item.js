@@ -75,7 +75,7 @@ class MenuItem extends ClickableComponent {
     });
 
     // If using SVG icons, the element with vjs-icon-placeholder will be added separately.
-    if (this.player_.options_.useSVGIcons) {
+    if (this.player_.options_.experimentalSvgIcons) {
       el.appendChild(menuItemEl);
     } else {
       el.replaceChild(menuItemEl, el.querySelector('.vjs-icon-placeholder'));
