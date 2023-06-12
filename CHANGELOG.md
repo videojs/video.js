@@ -1,3 +1,10 @@
+<a name="8.5.0"></a>
+# [8.5.0](https://github.com/videojs/video.js/compare/v8.4.2...v8.5.0) (2023-06-12)
+
+### Features
+
+* Add useSVGIcons option ([#8260](https://github.com/videojs/video.js/issues/8260)) ([6fc0dc7](https://github.com/videojs/video.js/commit/6fc0dc7))
+
 <a name="8.4.2"></a>
 ## [8.4.2](https://github.com/videojs/video.js/compare/v8.4.1...v8.4.2) (2023-06-06)
 
