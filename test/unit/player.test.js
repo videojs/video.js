@@ -967,6 +967,39 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
+  // Stub a successful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => false,
+    documentElement: document.createElement('span')
+  });
+
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+
+  assert.ok(player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname added');
+
+  window.DOMParser.prototype.parseFromString.restore();
+  player.dispose();
+});
+
+QUnit.test('should revert to font icons if the SVG sprite cannot be loaded', function(assert) {
+  // Stub an unsuccessful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => true
+  });
+
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+
+  assert.ok(!player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname was not added');
+
+  window.DOMParser.prototype.parseFromString.restore();
+  player.dispose();
+});
+
 QUnit.test('should not add a touch-enabled classname when touch is not supported', function(assert) {
   assert.expect(1);
 

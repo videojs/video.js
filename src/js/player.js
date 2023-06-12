@@ -35,6 +35,7 @@ import {getMimetype, findMimetype} from './utils/mimetypes';
 import {hooks} from './utils/hooks';
 import {isObject} from './utils/obj';
 import keycode from 'keycode';
+import icons from '../images/icons.svg';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -307,6 +308,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready) {
     // Make sure tag ID exists
+    // also here.. probably better
     tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
 
     // Set Options
@@ -515,6 +517,25 @@ class Player extends Component {
     this.middleware_ = [];
 
     this.playbackRates(options.playbackRates);
+
+    if (options.experimentalSvgIcons) {
+      // Add SVG Sprite to the DOM
+      const parser = new window.DOMParser();
+      const parsedSVG = parser.parseFromString(icons, 'image/svg+xml');
+      const errorNode = parsedSVG.querySelector('parsererror');
+
+      if (errorNode) {
+        log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
+        this.options_.experimentalSvgIcons = null;
+      } else {
+        const sprite = parsedSVG.documentElement;
+
+        sprite.style.display = 'none';
+        this.el_.appendChild(sprite);
+
+        this.addClass('vjs-svg-icons-enabled');
+      }
+    }
 
     this.initChildren();
 

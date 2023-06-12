@@ -161,6 +161,17 @@ class MenuButton extends Component {
   }
 
   /**
+   * Overwrites the `setIcon` method from `Component`.
+   * In this case, we want the icon to be appended to the menuButton.
+   *
+   * @param {string} name
+   *         The icon name to be added.
+   */
+  setIcon(name) {
+    super.setIcon(name, this.menuButton_.el_);
+  }
+
+  /**
    * Allow sub components to stack CSS class names for the wrapper element
    *
    * @return {string}

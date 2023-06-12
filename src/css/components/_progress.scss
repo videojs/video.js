@@ -80,6 +80,23 @@
   }
 }
 
+// Remove content from play-progress when using SVGs.
+.vjs-svg-icons-enabled .vjs-play-progress {
+  &:before {
+    content: none !important;
+  }
+}
+
+.vjs-play-progress .vjs-svg-icon {
+  position: absolute;
+  top: -0.35em;
+  right: -0.4em;
+  width: 1em;
+  height: 1em;
+  pointer-events: none;
+  line-height: 0.15em;
+}
+
 .video-js .vjs-load-progress {
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
@@ -118,6 +135,15 @@
   top: -3.4em;
   visibility: hidden;
   z-index: 1;
+}
+
+// Update the size of the progress circle when using SVG icons
+.vjs-progress-control:hover .vjs-progress-holder .vjs-play-progress .vjs-svg-icon {
+  width: 0.8em;
+  height: 0.8em;
+  top: -0.25em;
+  right: -0.5em;
+  line-height: 0.35em;
 }
 
 .video-js .vjs-progress-holder:focus .vjs-time-tooltip {

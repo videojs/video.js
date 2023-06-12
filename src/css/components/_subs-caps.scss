@@ -14,6 +14,10 @@
   @extend .vjs-icon-subtitles;
 }
 
+.vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-svg-icon {
+  margin-left: 0.3em;
+}
+
 .video-js .vjs-subs-caps-button + .vjs-menu .vjs-captions-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
   vertical-align: middle;
   display: inline-block;

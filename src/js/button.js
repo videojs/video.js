@@ -46,11 +46,13 @@ class Button extends ClickableComponent {
 
     const el = createEl(tag, props, attributes);
 
-    el.appendChild(createEl('span', {
-      className: 'vjs-icon-placeholder'
-    }, {
-      'aria-hidden': true
-    }));
+    if (!this.player_.options_.experimentalSvgIcons) {
+      el.appendChild(createEl('span', {
+        className: 'vjs-icon-placeholder'
+      }, {
+        'aria-hidden': true
+      }));
+    }
 
     this.createControlTextEl(el);
 

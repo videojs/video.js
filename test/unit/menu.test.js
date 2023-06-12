@@ -7,6 +7,8 @@ import MenuItem from '../../src/js/menu/menu-item.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
 import sinon from 'sinon';
+import window from 'global/window';
+import document from 'global/document';
 
 QUnit.module('MenuButton');
 
@@ -152,6 +154,33 @@ QUnit.test('should add or remove role menu for accessibility purpose', function(
   assert.equal(menuButton.menu.contentEl_.hasAttribute('role'), true, 'the menu has a role attribute when it contains menu items');
   assert.strictEqual(menuButton.menu.contentEl_.getAttribute('role'), 'menu', 'the menu role is `menu`');
 
+  menuButton.dispose();
+  player.dispose();
+});
+
+QUnit.test('setIcon should apply a child to the Button component', function(assert) {
+  // Stub a successful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => false,
+    documentElement: document.createElement('span')
+  });
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+  const menuButton = new MenuButton(player);
+
+  menuButton.createItems = () => [];
+  menuButton.update();
+
+  menuButton.setIcon('test');
+
+  const buttonEl = menuButton.menuButton_.el_;
+  const spanEl = buttonEl.getElementsByClassName('vjs-svg-icon')[0];
+  const svgEl = spanEl.childNodes[0];
+  const useEl = svgEl.childNodes[0];
+
+  assert.equal(useEl.getAttribute('href'), '#vjs-icon-test', 'use should have an href set with the correct icon url');
+
+  window.DOMParser.prototype.parseFromString.restore();
   menuButton.dispose();
   player.dispose();
 });

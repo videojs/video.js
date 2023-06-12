@@ -69,10 +69,17 @@ class MenuItem extends ClickableComponent {
     }, props), attrs);
 
     // swap icon with menu item text.
-    el.replaceChild(createEl('span', {
+    const menuItemEl = createEl('span', {
       className: 'vjs-menu-item-text',
       textContent: this.localize(this.options_.label)
-    }), el.querySelector('.vjs-icon-placeholder'));
+    });
+
+    // If using SVG icons, the element with vjs-icon-placeholder will be added separately.
+    if (this.player_.options_.experimentalSvgIcons) {
+      el.appendChild(menuItemEl);
+    } else {
+      el.replaceChild(menuItemEl, el.querySelector('.vjs-icon-placeholder'));
+    }
 
     return el;
   }

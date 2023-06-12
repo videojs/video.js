@@ -95,6 +95,7 @@ class PlayToggle extends Button {
     this.removeClass('vjs-ended', 'vjs-paused');
     this.addClass('vjs-playing');
     // change the button text to "Pause"
+    this.setIcon('pause');
     this.controlText('Pause');
   }
 
@@ -110,6 +111,7 @@ class PlayToggle extends Button {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
     // change the button text to "Play"
+    this.setIcon('play');
     this.controlText('Play');
   }
 
@@ -125,6 +127,7 @@ class PlayToggle extends Button {
     this.removeClass('vjs-playing');
     this.addClass('vjs-ended');
     // change the button text to "Replay"
+    this.setIcon('replay');
     this.controlText('Replay');
 
     // on the next seek remove the replay button

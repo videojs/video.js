@@ -1,20 +1,20 @@
 .video-js .vjs-skip-forward-5 {
   cursor: pointer;
   & .vjs-icon-placeholder {
-  @extend .vjs-icon-forward-5;
+    @extend .vjs-icon-forward-5;
   }
 }
 
 .video-js .vjs-skip-forward-10 {
   cursor: pointer;
   & .vjs-icon-placeholder {
-  @extend .vjs-icon-forward-10;
+    @extend .vjs-icon-forward-10;
   }
 }
 .video-js .vjs-skip-forward-30 {
   cursor: pointer;
   & .vjs-icon-placeholder {
-  @extend .vjs-icon-forward-30;
+    @extend .vjs-icon-forward-30;
   }
 }
 

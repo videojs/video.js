@@ -33,6 +33,8 @@
 }
 
 .vjs-menu li {
+  display: flex;
+  justify-content: center;
   list-style: none;
   margin: 0;
   padding: 0.2em 0;
@@ -54,6 +56,11 @@
 .js-focus-visible .vjs-menu li.vjs-selected:hover {
   background-color: $primary-foreground-color;
   color: $primary-background-color;
+
+  // Change the SVG color when an item is selected
+  .vjs-svg-icon {
+    fill: #000000;
+  }
 }
 
 .video-js .vjs-menu *:not(.vjs-selected):focus:not(:focus-visible),

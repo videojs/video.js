@@ -25,6 +25,8 @@ class AudioTrackButton extends TrackButton {
     options.tracks = player.audioTracks();
 
     super(player, options);
+
+    this.setIcon('audio');
   }
 
   /**
