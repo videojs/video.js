@@ -3107,7 +3107,7 @@ class Player extends Component {
         this.player_.trigger('enterpictureinpicture');
 
         // Listen for the PiP closing event to move the video back.
-        pipWindow.addEventListener('unload', (event) => {
+        pipWindow.addEventListener('pagehide', (event) => {
           const pipVideo = event.target.querySelector('.video-js');
 
           pipContainer.replaceWith(pipVideo);
@@ -3142,7 +3142,7 @@ class Player extends Component {
    */
   exitPictureInPicture() {
     if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
-      // With documentPictureInPicture, Player#leavepictureinpicture is fired in the unload handler
+      // With documentPictureInPicture, Player#leavepictureinpicture is fired in the pagehide handler
       window.documentPictureInPicture.window.close();
       return Promise.resolve();
     }

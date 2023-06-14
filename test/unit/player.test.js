@@ -2925,7 +2925,7 @@ QUnit.test('docPiP moves player and triggers events', function(assert) {
     return fakePiPWindow.document.body.querySelector(sel);
   };
   fakePiPWindow.close = function() {
-    fakePiPWindow.dispatchEvent(new Event('unload'));
+    fakePiPWindow.dispatchEvent(new Event('pagehide'));
     delete window.documentPictureInPicture.window;
   };
 
