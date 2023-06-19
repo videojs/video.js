@@ -862,10 +862,10 @@ export function computedStyle(el, prop) {
  * Copy document style sheets to another window.
  *
  * @param    {Window} win
- *           The window element you want to copy the document style style to.
+ *           The window element you want to copy the document style sheets to.
  *
  */
-export function copyStyleSheetsToWindow_(win) {
+export function copyStyleSheetsToWindow(win) {
   const allCSS = [...document.styleSheets]
     .map((styleSheet) => {
       try {

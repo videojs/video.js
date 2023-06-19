@@ -686,3 +686,48 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
 
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
 });
+
+QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
+  const fakeWindow = document.createElement('div');
+
+  fakeWindow.document = {
+    head: document.createElement('div')
+  };
+
+  const style1 = document.createElement('style');
+
+  style1.textContent = 'body { background: white; }';
+  document.head.appendChild(style1);
+
+  const style2 = document.createElement('style');
+
+  style2.textContent = 'body { margin: 0px; }';
+  document.head.appendChild(style2);
+
+  const link = document.createElement('link');
+
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
+  link.media = 'print';
+  link.href = 'http://asdf.com/styles.css';
+  document.head.appendChild(link);
+
+  Dom.copyStyleSheetsToWindow(fakeWindow);
+
+  assert.expect(7);
+
+  assert.strictEqual(fakeWindow.document.head.querySelectorAll('style').length, 1, 'the fake window has one <style> element only');
+
+  const fakeWindowStyle = fakeWindow.document.head.querySelectorAll('style')[0];
+
+  assert.true(fakeWindowStyle.textContent.includes(style1.textContent), 'the <style> in the fake window contains content from first <style> element');
+  assert.true(fakeWindowStyle.textContent.includes(style2.textContent), 'the <style> in the fake window contains content from second <style> element');
+
+  assert.strictEqual(fakeWindow.document.head.querySelectorAll('link[rel=stylesheet]').length, 1, 'the fake window has one <link> stylesheet element');
+
+  const fakeWindowLink = fakeWindow.document.head.querySelectorAll('link[rel=stylesheet]')[0];
+
+  assert.strictEqual(fakeWindowLink.type, link.type, 'the <style> type attribute in the fake window is the one from <link> element');
+  assert.strictEqual(fakeWindowLink.href, link.href, 'the <style> href attribute in the fake window is the one from <link> element');
+  assert.strictEqual(fakeWindowLink.media, link.media, 'the <style> media attribute in the fake window is the one from <link> element');
+});

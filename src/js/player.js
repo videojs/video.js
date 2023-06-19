@@ -3076,7 +3076,7 @@ class Player extends Component {
         width: this.videoWidth(),
         height: this.videoHeight()
       }).then(pipWindow => {
-        Dom.copyStyleSheetsToWindow_(pipWindow);
+        Dom.copyStyleSheetsToWindow(pipWindow);
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
         pipWindow.document.body.append(this.el_);
