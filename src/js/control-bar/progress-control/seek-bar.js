@@ -52,7 +52,7 @@ class SeekBar extends Slider {
     this.update_ = Fn.bind_(this, this.update);
     this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
 
-    this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
+    this.on(this.player_, ['ended', 'durationchange'], this.update);
     if (this.player_.liveTracker) {
       this.on(this.player_.liveTracker, 'liveedgechange', this.update);
     }
@@ -73,14 +73,28 @@ class SeekBar extends Slider {
     if ('hidden' in document && 'visibilityState' in document) {
       this.on(document, 'visibilitychange', this.toggleVisibility_);
     }
+    // we also don't need to update the play progress if the user is
+    // inactive (the seek bar is hidden)
+    this.on(this.player_, ['useractive', 'userinactive'], this.toggleVisibility_);
+    this._inactive = true;
+    this.toggleVisibility_();
   }
 
   toggleVisibility_(e) {
-    if (document.visibilityState === 'hidden') {
+    const inactive = !this.player_.userActive() || document.visibilityState === 'hidden';
+
+    if (this.inactive_ === inactive) {
+      return;
+    }
+
+    this.inactive_ = inactive;
+    if (inactive) {
       this.cancelNamedAnimationFrame('SeekBar#update');
       this.cancelNamedAnimationFrame('Slider#update');
       this.disableInterval_(e);
+      this.off(this.player_, ['timeupdate'], this.update);
     } else {
+      this.on(this.player_, ['timeupdate'], this.update);
       if (!this.player_.ended() && !this.player_.paused()) {
         this.enableInterval_();
       }
@@ -139,7 +153,7 @@ class SeekBar extends Slider {
    */
   update(event) {
     // ignore updates while the tab is hidden
-    if (document.visibilityState === 'hidden') {
+    if (this.inactive_) {
       return;
     }
 
