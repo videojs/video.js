@@ -2,6 +2,9 @@
  * @file video.js
  * @module videojs
  */
+/**
+ * @typedef { string } version
+ */
 import {version} from '../../package.json';
 import window from 'global/window';
 import {

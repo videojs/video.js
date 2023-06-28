@@ -440,6 +440,7 @@ class TextTrack extends Track {
 
 /**
  * cuechange - One or more cues in the track have become active or stopped being active.
+ * @protected
  */
 TextTrack.prototype.allowedEvents_ = {
   cuechange: 'cuechange'
