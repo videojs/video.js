@@ -27,6 +27,8 @@ class PlayToggle extends Button {
     // show or hide replay icon
     options.replay = options.replay === undefined || options.replay;
 
+    this.setIcon('play');
+
     this.on(player, 'play', (e) => this.handlePlay(e));
     this.on(player, 'pause', (e) => this.handlePause(e));
 
