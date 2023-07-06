@@ -688,7 +688,7 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
 });
 
-QUnit.only('dom.getPointerPosition should return position with translated', function(assert) {
+QUnit.test('dom.getPointerPosition should return position with translated', function(assert) {
   const wrapper = document.createElement('div');
 
   const width = '100px';
