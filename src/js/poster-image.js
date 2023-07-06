@@ -16,7 +16,7 @@ class PosterImage extends ClickableComponent {
   /**
    * Create an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]
@@ -46,23 +46,9 @@ class PosterImage extends ClickableComponent {
    *         The element that gets created.
    */
   createEl() {
-    const el = Dom.createEl(
-      'picture', {
-        className: 'vjs-poster',
-
-        // Don't want poster to be tabbable.
-        tabIndex: -1
-      },
-      {},
-      Dom.createEl('img', {
-        loading: 'lazy',
-        crossOrigin: this.crossOrigin()
-      }, {
-        alt: ''
-      })
-    );
-
-    return el;
+    // The el is an empty div to keep position in the DOM
+    // A picture and img el will be inserted when a source is set
+    return Dom.createEl('div', { className: 'vjs-poster'});
   }
 
   /**
@@ -79,9 +65,9 @@ class PosterImage extends ClickableComponent {
   crossOrigin(value) {
     // `null` can be set to unset a value
     if (typeof value === 'undefined') {
-      if (this.el_) {
+      if (this.$('img')) {
         // If the poster's element exists, give its value
-        return this.el_.querySelector('img').crossOrigin;
+        return this.$('img').crossOrigin;
       } else if (this.player_.tech_ && this.player_.tech_.isReady_) {
         // If not but the tech is ready, query the tech
         return this.player_.crossOrigin();
@@ -97,7 +83,9 @@ class PosterImage extends ClickableComponent {
       return;
     }
 
-    this.el_.querySelector('img').crossOrigin = value;
+    if (this.$('img')) {
+      this.$('img').crossOrigin = value;
+    }
 
     return;
   }
@@ -107,7 +95,7 @@ class PosterImage extends ClickableComponent {
    *
    * @listens Player#posterchange
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `Player#posterchange` event that triggered this function.
    */
   update(event) {
@@ -125,13 +113,38 @@ class PosterImage extends ClickableComponent {
   }
 
   /**
-   * Set the source of the `PosterImage` depending on the display method.
+   * Set the source of the `PosterImage` depending on the display method. (Re)creates
+   * the inner picture and img elementss when needed.
    *
-   * @param {string} url
-   *        The URL to the source for the `PosterImage`.
+   * @param {string} [url]
+   *        The URL to the source for the `PosterImage`. If not specified or falsy,
+   *        any source and ant inner picture/img are removed.
    */
   setSrc(url) {
-    this.el_.querySelector('img').src = url;
+    if (!url) {
+      this.el_.textContent = '';
+      return;
+    }
+
+    if (!this.$('img')) {
+      this.el_.appendChild(Dom.createEl(
+        'picture', {
+          className: 'vjs-poster',
+
+          // Don't want poster to be tabbable.
+          tabIndex: -1
+        },
+        {},
+        Dom.createEl('img', {
+          loading: 'lazy',
+          crossOrigin: this.crossOrigin()
+        }, {
+          alt: ''
+        })
+      ));
+    }
+
+    this.$('img').src = url;
   }
 
   /**
@@ -142,7 +155,7 @@ class PosterImage extends ClickableComponent {
    * @listens click
    * @listens keydown
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    +        The `click`, `tap` or `keydown` event that caused this function to be called.
    */
   handleClick(event) {

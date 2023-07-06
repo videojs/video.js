@@ -1,3 +1,4 @@
+
 /**
  * @file dom.js
  * @module dom
@@ -61,7 +62,7 @@ export function isReal() {
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
- * @param  {Mixed} value
+ * @param  {*} value
  *         The value to check.
  *
  * @return {boolean}
@@ -126,7 +127,7 @@ function createQuerier(method) {
  * @param  {Object} [attributes={}]
  *         Element attributes to be applied.
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} [content]
  *        A content descriptor object.
  *
  * @return {Element}
@@ -161,7 +162,7 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
 /**
  * Injects text into an element, replacing any existing contents entirely.
  *
- * @param  {Element} el
+ * @param  {HTMLElement} el
  *         The element to add text content into
  *
  * @param  {string} text
@@ -342,18 +343,19 @@ export function getAttributes(tag) {
   // known boolean attributes
   // we can check for matching boolean properties, but not all browsers
   // and not all tags know about these attributes, so, we still want to check them manually
-  const knownBooleans = ',' + 'autoplay,controls,playsinline,loop,muted,default,defaultMuted' + ',';
+  const knownBooleans = ['autoplay', 'controls', 'playsinline', 'loop', 'muted', 'default', 'defaultMuted'];
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     const attrs = tag.attributes;
 
     for (let i = attrs.length - 1; i >= 0; i--) {
       const attrName = attrs[i].name;
+      /** @type {boolean|string} */
       let attrVal = attrs[i].value;
 
       // check for known booleans
       // the matching element property will return a value for typeof
-      if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(',' + attrName + ',') !== -1) {
+      if (knownBooleans.includes(attrName)) {
         // the value of an included boolean attribute is typically an empty
         // string ('') which would equal false if we just check for a false value.
         // we also don't want support bad code like autoplay='false'
@@ -547,7 +549,7 @@ export function findPosition(el) {
  * @param  {Element} el
  *         Element on which to get the pointer position on.
  *
- * @param  {EventTarget~Event} event
+ * @param  {Event} event
  *         Event object.
  *
  * @return {module:dom~Coordinates}
@@ -615,7 +617,7 @@ export function getPointerPosition(el, event) {
 /**
  * Determines, via duck typing, whether or not a value is a text node.
  *
- * @param  {Mixed} value
+ * @param  {*} value
  *         Check if this value is a text node.
  *
  * @return {boolean}
@@ -649,11 +651,11 @@ export function emptyEl(el) {
  * -----------|-------------
  * `string`   | The value will be normalized into a text node.
  * `Element`  | The value will be accepted as-is.
- * `TextNode` | The value will be accepted as-is.
+ * `Text`     | A TextNode. The value will be accepted as-is.
  * `Array`    | A one-dimensional array of strings, elements, text nodes, or functions. These functions should return a string, element, or text node (any other return value, like an array, will be ignored).
  * `Function` | A function, which is expected to return a string, element, text node, or array - any of the other possible values described above. This means that a content descriptor could be a function that returns an array of functions, but those second-level functions must return strings, elements, or text nodes.
  *
- * @typedef {string|Element|TextNode|Array|Function} module:dom~ContentDescriptor
+ * @typedef {string|Element|Text|Array|Function} ContentDescriptor
  */
 
 /**
@@ -666,7 +668,7 @@ export function emptyEl(el) {
  * The content for an element can be passed in multiple types and
  * combinations, whose behavior is as follows:
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} content
  *        A content descriptor value.
  *
  * @return {Array}
@@ -707,7 +709,7 @@ export function normalizeContent(content) {
  * @param  {Element} el
  *         Element to append normalized content to.
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} content
  *        A content descriptor value.
  *
  * @return {Element}
@@ -725,7 +727,7 @@ export function appendContent(el, content) {
  * @param {Element} el
  *        Element to insert normalized content into.
  *
- * @param {module:dom~ContentDescriptor} content
+ * @param {ContentDescriptor} content
  *        A content descriptor value.
  *
  * @return {Element}
@@ -738,7 +740,7 @@ export function insertContent(el, content) {
 /**
  * Check if an event was a single left click.
  *
- * @param  {EventTarget~Event} event
+ * @param  {MouseEvent} event
  *         Event object.
  *
  * @return {boolean}

@@ -19,7 +19,7 @@ class VolumeControl extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -83,7 +83,7 @@ class VolumeControl extends Component {
   /**
    * Handle `mousedown` or `touchstart` events on the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousedown
@@ -101,7 +101,7 @@ class VolumeControl extends Component {
   /**
    * Handle `mouseup` or `touchend` events on the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mouseup` or `touchend` event that triggered this function.
    *
    * @listens touchend
@@ -119,7 +119,7 @@ class VolumeControl extends Component {
   /**
    * Handle `mousedown` or `touchstart` events on the `VolumeControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousedown

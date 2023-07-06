@@ -13,7 +13,7 @@
   "Picture-in-Picture": "画中画",
   "Exit Picture-in-Picture": "退出画中画",
   "Mute": "静音",
-  "Unmute": "取消静音",
+  "Unmute": "开启音效",
   "Playback Rate": "播放速度",
   "Subtitles": "字幕",
   "subtitles off": "关闭字幕",
@@ -90,5 +90,7 @@
   "Color": "颜色",
   "Opacity": "不透明度",
   "Text Background": "文本背景",
-  "Caption Area Background": "字幕区域背景"
+  "Caption Area Background": "字幕区域背景",
+  "Skip forward {1} seconds": "快进 {1} 秒",
+  "Skip backward {1} seconds":  "快退 {1} 秒"
 }

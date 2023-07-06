@@ -106,7 +106,7 @@ class Track extends EventTarget {
            * > Note: This is not part of the spec!
            *
            * @event Track#labelchange
-           * @type {EventTarget~Event}
+           * @type {Event}
            */
           this.trigger('labelchange');
         }

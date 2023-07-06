@@ -6,7 +6,7 @@
 /**
  * @callback obj:EachCallback
  *
- * @param {Mixed} value
+ * @param {*} value
  *        The current key for the object that is being iterated over.
  *
  * @param {string} key
@@ -16,16 +16,16 @@
 /**
  * @callback obj:ReduceCallback
  *
- * @param {Mixed} accum
+ * @param {*} accum
  *        The value that is accumulating over the reduce loop.
  *
- * @param {Mixed} value
+ * @param {*} value
  *        The current key for the object that is being iterated over.
  *
  * @param {string} key
  *        The current key-value for object that is being iterated over
  *
- * @return {Mixed}
+ * @return {*}
  *         The new accumulated value.
  */
 const toString = Object.prototype.toString;
@@ -70,10 +70,10 @@ export function each(object, fn) {
  *         receives the accumulated value and the per-iteration value and key
  *         as arguments.
  *
- * @param {Mixed} [initial = 0]
+ * @param {*} [initial = 0]
  *        Starting value
  *
- * @return {Mixed}
+ * @return {*}
  *         The final accumulated value.
  */
 export function reduce(object, fn, initial = 0) {
@@ -144,6 +144,26 @@ export function merge(...sources) {
       result[key] = merge(result[key], value);
     });
   });
+
+  return result;
+}
+
+/**
+ * Returns an array of values for a given object
+ *
+ * @param  {Object} source - target object
+ * @return {Array<unknown>} - object values
+ */
+export function values(source = {}) {
+  const result = [];
+
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      const value = source[key];
+
+      result.push(value);
+    }
+  }
 
   return result;
 }

@@ -166,7 +166,7 @@ selectConfigs.windowColor.options = selectConfigs.backgroundColor.options;
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
  *
- * @return {Mixed}
+ * @return {*}
  *         - Will be `undefined` if no value exists
  *         - Will be `undefined` if the given value is "none".
  *         - Will be the actual value otherwise.
@@ -192,7 +192,7 @@ function parseOptionValue(value, parser) {
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
  *
- * @return {Mixed}
+ * @return {*}
  *         - Will be `undefined` if no value exists
  *         - Will be `undefined` if the given value is "none".
  *         - Will be the actual value otherwise.
@@ -243,7 +243,7 @@ class TextTrackSettings extends ModalDialog {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *         The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -604,6 +604,13 @@ class TextTrackSettings extends ModalDialog {
     } else if (ccBtn) {
       ccBtn.focus();
     }
+  }
+
+  /**
+   * Repopulate dialog with new localizations on languagechange
+   */
+  handleLanguagechange() {
+    this.fill();
   }
 
 }

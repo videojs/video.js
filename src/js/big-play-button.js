@@ -17,6 +17,8 @@ class BigPlayButton extends Button {
 
     this.mouseused_ = false;
 
+    this.setIcon('play');
+
     this.on('mousedown', (e) => this.handleMouseDown(e));
   }
 
@@ -34,7 +36,7 @@ class BigPlayButton extends Button {
    * This gets called when a `BigPlayButton` "clicked". See {@link ClickableComponent}
    * for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

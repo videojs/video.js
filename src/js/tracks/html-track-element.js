@@ -19,7 +19,7 @@ class HTMLTrackElement extends EventTarget {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param {Tech} options.tech
+   * @param { import('../tech/tech').default } options.tech
    *        A reference to the tech that owns this HTMLTrackElement.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']

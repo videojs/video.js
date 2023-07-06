@@ -15,7 +15,7 @@ class TrackButton extends MenuButton {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

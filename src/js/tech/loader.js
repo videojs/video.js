@@ -17,13 +17,13 @@ class MediaLoader extends Component {
   /**
    * Create an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function that is run when this component is ready.
    */
   constructor(player, options, ready) {

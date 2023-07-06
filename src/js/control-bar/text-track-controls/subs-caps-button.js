@@ -6,6 +6,7 @@ import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 import SubsCapsMenuItem from './subs-caps-menu-item.js';
 import {toTitleCase} from '../../utils/str.js';
+
 /**
  * The button component for toggling and selecting captions and/or subtitles
  *
@@ -13,14 +14,28 @@ import {toTitleCase} from '../../utils/str.js';
  */
 class SubsCapsButton extends TextTrackButton {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param { import('../../player').default } player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @param {Function} [ready]
+   *        The function to call when this component is ready.
+   */
   constructor(player, options = {}) {
     super(player, options);
 
     // Although North America uses "captions" in most cases for
     // "captions and subtitles" other locales use "subtitles"
     this.label_ = 'subtitles';
+    this.setIcon('subtitles');
     if (['en', 'en-us', 'en-ca', 'fr-ca'].indexOf(this.player_.language_) > -1) {
       this.label_ = 'captions';
+      this.setIcon('captions');
     }
     this.menuButton_.controlText(toTitleCase(this.label_));
   }

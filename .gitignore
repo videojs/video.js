@@ -2,6 +2,7 @@
 build/files/*
 build/temp/*
 docs/api/*
+docs/apistyles
 dev.html
 projects
 .zenflow-log

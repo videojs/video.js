@@ -146,7 +146,7 @@ QUnit.test('test defaultPlaybackRate', function(assert) {
   assert.strictEqual(tech.defaultPlaybackRate(), 0.75, 'can be changed from the API');
 });
 
-QUnit.test('blacklist playbackRate support on older verisons of Chrome on Android', function(assert) {
+QUnit.test('blacklist playbackRate support on older versions of Chrome on Android', function(assert) {
   if (!Html5.canControlPlaybackRate()) {
     assert.ok(true, 'playbackRate is not supported');
     return;

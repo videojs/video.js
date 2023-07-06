@@ -68,7 +68,7 @@ class VideoTrack extends Track {
          *         this internally without an event.
          *
          * @event VideoTrack#selectedchange
-         * @type {EventTarget~Event}
+         * @type {Event}
          */
         this.trigger('selectedchange');
       }

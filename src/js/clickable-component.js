@@ -17,7 +17,7 @@ class ClickableComponent extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param  {Player} player
+   * @param  { import('./player').default } player
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]
@@ -85,11 +85,13 @@ class ClickableComponent extends Component {
 
     const el = Dom.createEl(tag, props, attributes);
 
-    el.appendChild(Dom.createEl('span', {
-      className: 'vjs-icon-placeholder'
-    }, {
-      'aria-hidden': true
-    }));
+    if (!this.player_.options_.experimentalSvgIcons) {
+      el.appendChild(Dom.createEl('span', {
+        className: 'vjs-icon-placeholder'
+      }, {
+        'aria-hidden': true
+      }));
+    }
 
     this.createControlTextEl(el);
 
@@ -212,7 +214,7 @@ class ClickableComponent extends Component {
    * Event handler that is called when a `ClickableComponent` receives a
    * `click` or `tap` event.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `tap` or `click` event that caused this function to be called.
    *
    * @listens tap
@@ -231,7 +233,7 @@ class ClickableComponent extends Component {
    *
    * By default, if the key is Space or Enter, it will trigger a `click` event.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

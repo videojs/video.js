@@ -18,7 +18,7 @@ class Slider extends Component {
   /**
  * Create an instance of this class
  *
- * @param {Player} player
+ * @param { import('../player').default } player
  *        The `Player` that this class should be attached to.
  *
  * @param {Object} [options]
@@ -142,7 +142,7 @@ class Slider extends Component {
   /**
    * Handle `mousedown` or `touchstart` events on the `Slider`.
    *
-   * @param {EventTarget~Event} event
+   * @param {MouseEvent} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousedown
@@ -157,7 +157,7 @@ class Slider extends Component {
     }
     // Do not call preventDefault() on touchstart in Chrome
     // to avoid console warnings. Use a 'touch-action: none' style
-    // instead to prevent unintented scrolling.
+    // instead to prevent unintended scrolling.
     // https://developers.google.com/web/updates/2017/01/scrolling-intervention
     if (event.type === 'touchstart' && !IS_CHROME) {
       event.preventDefault();
@@ -169,7 +169,7 @@ class Slider extends Component {
      * Triggered when the slider is in an active state
      *
      * @event Slider#slideractive
-     * @type {EventTarget~Event}
+     * @type {MouseEvent}
      */
     this.trigger('slideractive');
 
@@ -187,7 +187,7 @@ class Slider extends Component {
    * `mousedown` and `touchstart`. This is due to {@link Slider#handleMouseDown} and
    * {@link Slider#handleMouseUp}.
    *
-   * @param {EventTarget~Event} event
+   * @param {MouseEvent} event
    *        `mousedown`, `mousemove`, `touchstart`, or `touchmove` event that triggered
    *        this function
    * @param {boolean} mouseDown this is a flag that should be set to true if `handleMouseMove` is called directly. It allows us to skip things that should not happen if coming from mouse down but should happen on regular mouse move handler. Defaults to false.
@@ -200,14 +200,14 @@ class Slider extends Component {
   /**
    * Handle `mouseup` or `touchend` events on the `Slider`.
    *
-   * @param {EventTarget~Event} event
+   * @param {MouseEvent} event
    *        `mouseup` or `touchend` event that triggered this function.
    *
    * @listens touchend
    * @listens mouseup
    * @fires Slider#sliderinactive
    */
-  handleMouseUp() {
+  handleMouseUp(event) {
     const doc = this.bar.el_.ownerDocument;
 
     Dom.unblockTextSelection();
@@ -217,7 +217,7 @@ class Slider extends Component {
      * Triggered when the slider is no longer in an active state.
      *
      * @event Slider#sliderinactive
-     * @type {EventTarget~Event}
+     * @type {Event}
      */
     this.trigger('sliderinactive');
 
@@ -280,7 +280,7 @@ class Slider extends Component {
   /**
    * Calculate distance for slider
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to run.
    *
    * @return {number}
@@ -298,11 +298,11 @@ class Slider extends Component {
   }
 
   /**
-   * Handle a `keydown` event on the `Slider`. Watches for left, rigth, up, and down
+   * Handle a `keydown` event on the `Slider`. Watches for left, right, up, and down
    * arrow keys. This function will only be called when the slider has focus. See
    * {@link Slider#handleFocus} and {@link Slider#handleBlur}.
    *
-   * @param {EventTarget~Event} event
+   * @param {KeyboardEvent} event
    *        the `keydown` event that caused this function to run.
    *
    * @listens keydown

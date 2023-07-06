@@ -17,7 +17,7 @@ class TimeDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -53,13 +53,11 @@ class TimeDisplay extends Component {
     this.contentEl_ = Dom.createEl('span', {
       className: `${className}-display`
     }, {
-      // tell screen readers not to automatically read the time as it changes
-      'aria-live': 'off',
       // span elements have no implicit role, but some screen readers (notably VoiceOver)
       // treat them as a break between items in the DOM when using arrow keys
       // (or left-to-right swipes on iOS) to read contents of a page. Using
       // role='presentation' causes VoiceOver to NOT treat this span as a break.
-      'role': 'presentation'
+      role: 'presentation'
     });
 
     el.appendChild(this.contentEl_);
@@ -120,7 +118,7 @@ class TimeDisplay extends Component {
    * To be filled out in the child class, should update the displayed time
    * in accordance with the fact that the current time has changed.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `timeupdate`  event that caused this to run.
    *
    * @listens Player#timeupdate

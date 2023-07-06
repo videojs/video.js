@@ -21,6 +21,8 @@ class VolumeLevel extends Component {
       className: 'vjs-volume-level'
     });
 
+    this.setIcon('circle', el);
+
     el.appendChild(super.createEl('span', {
       className: 'vjs-control-text'
     }));

@@ -4,6 +4,8 @@ import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 import sinon from 'sinon';
+// import custom element for Shadow DOM test
+import './utils/custom-element.test';
 
 QUnit.module('video.js', {
   beforeEach() {
@@ -85,7 +87,30 @@ QUnit.test(
 );
 
 QUnit.test(
-  'should log about already initalized players if options already passed',
+  'should not log if the supplied element is included in the Shadow DOM',
+  function(assert) {
+    const origWarnLog = log.warn;
+    const fixture = document.getElementById('qunit-fixture');
+    const warnLogs = [];
+
+    log.warn = (args) => {
+      warnLogs.push(args);
+    };
+
+    const customElem = document.createElement('test-custom-element');
+
+    fixture.appendChild(customElem);
+    const innerPlayer = customElem.innerPlayer;
+
+    assert.ok(innerPlayer, 'created player within Shadow DOM');
+    assert.equal(warnLogs.length, 0, 'no warn logs');
+
+    log.warn = origWarnLog;
+  }
+);
+
+QUnit.test(
+  'should log about already initialized players if options already passed',
   function(assert) {
     const origWarnLog = log.warn;
     const fixture = document.getElementById('qunit-fixture');
@@ -469,7 +494,7 @@ QUnit.test('should add video-js class to video-js embed if missing', function(as
 });
 
 QUnit.test(
-  'should log about already initalized players if options already passed',
+  'should log about already initialized players if options already passed',
   function(assert) {
     const origWarnLog = log.warn;
     const fixture = document.getElementById('qunit-fixture');

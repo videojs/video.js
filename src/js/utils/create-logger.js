@@ -82,7 +82,7 @@ export default function createLogger(name) {
    *
    * #### Arguments
    * ##### *args
-   * Mixed[]
+   * *[]
    *
    * Any combination of values that could be passed to `console.log()`.
    *
@@ -91,7 +91,7 @@ export default function createLogger(name) {
    * `undefined`
    *
    * @namespace
-   * @param    {Mixed[]} args
+   * @param    {...*} args
    *           One or more messages or objects that should be logged.
    */
   const log = function(...args) {
@@ -226,7 +226,7 @@ export default function createLogger(name) {
   /**
    * Logs error messages. Similar to `console.error`.
    *
-   * @param {Mixed[]} args
+   * @param {...*} args
    *        One or more messages or objects that should be logged as an error
    */
   log.error = (...args) => logByType('error', level, args);
@@ -234,7 +234,7 @@ export default function createLogger(name) {
   /**
    * Logs warning messages. Similar to `console.warn`.
    *
-   * @param {Mixed[]} args
+   * @param {...*} args
    *        One or more messages or objects that should be logged as a warning.
    */
   log.warn = (...args) => logByType('warn', level, args);
@@ -243,7 +243,7 @@ export default function createLogger(name) {
    * Logs debug messages. Similar to `console.debug`, but may also act as a comparable
    * log if `console.debug` is not available
    *
-   * @param {Mixed[]} args
+   * @param {...*} args
    *        One or more messages or objects that should be logged as debug.
    */
   log.debug = (...args) => logByType('debug', level, args);

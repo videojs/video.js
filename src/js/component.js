@@ -3,6 +3,7 @@
  *
  * @file component.js
  */
+import document from 'global/document';
 import window from 'global/window';
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
@@ -27,28 +28,28 @@ class Component {
    * A callback that is called when a component is ready. Does not have any
    * parameters and any callback value will be ignored.
    *
-   * @callback Component~ReadyCallback
+   * @callback ReadyCallback
    * @this Component
    */
 
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of component options.
    *
    * @param {Object[]} [options.children]
-   *        An array of children objects to intialize this component with. Children objects have
+   *        An array of children objects to initialize this component with. Children objects have
    *        a name property that will be used if more than one component of the same type needs to be
    *        added.
    *
    * @param  {string} [options.className]
    *         A class or space separated list of classes to add the component
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {ReadyCallback} [ready]
    *        Function that gets called when the `Component` is ready.
    */
   constructor(player, options, ready) {
@@ -95,6 +96,12 @@ class Component {
       options.className.split(' ').forEach(c => this.addClass(c));
     }
 
+    // Remove the placeholder event methods. If the component is evented, the
+    // real methods are added next
+    ['on', 'off', 'one', 'any', 'trigger'].forEach(fn => {
+      this[fn] = undefined;
+    });
+
     // if evented is anything except false, we want to mixin in evented
     if (options.evented !== false) {
       // Make this an evented object and use `el_`, if available, as its event bus
@@ -130,6 +137,82 @@ class Component {
 
   }
 
+  // `on`, `off`, `one`, `any` and `trigger` are here so tsc includes them in definitions.
+  // They are replaced or removed in the constructor
+
+  /**
+   * Adds an `event listener` to an instance of an `EventTarget`. An `event listener` is a
+   * function that will get called when an event with a certain name gets triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to call with `EventTarget`s
+   */
+  on(type, fn) {}
+
+  /**
+   * Removes an `event listener` for a specific event from an instance of `EventTarget`.
+   * This makes it so that the `event listener` will no longer get called when the
+   * named event happens.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to remove.
+   */
+  off(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once. After the
+   * first trigger it will get removed. This is like adding an `event listener`
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on itself.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  one(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once and is
+   * removed from all events. This is like adding an array of `event listener`s
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on all events the
+   * first time it is triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  any(type, fn) {}
+
+  /**
+   * This function causes an event to happen. This will then cause any `event listeners`
+   * that are waiting for that event, to get called. If there are no `event listeners`
+   * for an event then nothing will happen.
+   *
+   * If the name of the `Event` that is being triggered is in `EventTarget.allowedEvents_`.
+   * Trigger will also call the `on` + `uppercaseEventName` function.
+   *
+   * Example:
+   * 'click' is in `EventTarget.allowedEvents_`, so, trigger will attempt to call
+   * `onClick` if it exists.
+   *
+   * @param {string|Event|Object} event
+   *        The name of the event, an `Event`, or an object with a key of type set to
+   *        an event name.
+   *
+   * @param {Object} [hash]
+   *        Optionally extra argument to pass through to an event listener
+   */
+  trigger(event, hash) {}
+
   /**
    * Dispose of the `Component` and all child components.
    *
@@ -153,7 +236,7 @@ class Component {
      * Triggered when a `Component` is disposed.
      *
      * @event Component#dispose
-     * @type {EventTarget~Event}
+     * @type {Event}
      *
      * @property {boolean} [bubbles=false]
      *           set to false so that the dispose event does not
@@ -209,7 +292,7 @@ class Component {
   /**
    * Return the {@link Player} that the `Component` has attached to.
    *
-   * @return {Player}
+   * @return { import('./player').default }
    *         The player that this `Component` has attached to.
    */
   player() {
@@ -336,7 +419,7 @@ class Component {
   }
 
   /**
-   * Handles language change for the player in components. Should be overriden by sub-components.
+   * Handles language change for the player in components. Should be overridden by sub-components.
    *
    * @abstract
    */
@@ -443,6 +526,57 @@ class Component {
     }
 
     return currentChild;
+  }
+
+  /**
+   * Adds an SVG icon element to another element or component.
+   *
+   * @param {string} iconName
+   *        The name of icon. A list of all the icon names can be found at 'sandbox/svg-icons.html'
+   *
+   * @param {Element} [el=this.el()]
+   *        Element to set the title on. Defaults to the current Component's element.
+   *
+   * @return {Element}
+   *        The newly created icon element.
+   */
+  setIcon(iconName, el = this.el()) {
+    // TODO: In v9 of video.js, we will want to remove font icons entirely.
+    // This means this check, as well as the others throughout the code, and
+    // the unecessary CSS for font icons, will need to be removed.
+    // See https://github.com/videojs/video.js/pull/8260 as to which components
+    // need updating.
+    if (!this.player_.options_.experimentalSvgIcons) {
+      return;
+    }
+
+    const xmlnsURL = 'http://www.w3.org/2000/svg';
+
+    // The below creates an element in the format of:
+    // <span><svg><use>....</use></svg></span>
+    const iconContainer = Dom.createEl('span', {
+      className: 'vjs-icon-placeholder vjs-svg-icon'
+    }, {'aria-hidden': 'true'});
+
+    const svgEl = document.createElementNS(xmlnsURL, 'svg');
+
+    svgEl.setAttributeNS(null, 'viewBox', '0 0 512 512');
+    const useEl = document.createElementNS(xmlnsURL, 'use');
+
+    svgEl.appendChild(useEl);
+    useEl.setAttributeNS(null, 'href', `#vjs-icon-${iconName}`);
+    iconContainer.appendChild(svgEl);
+
+    // Replace a pre-existing icon if one exists.
+    if (this.iconIsSet_) {
+      el.replaceChild(iconContainer, el.querySelector('.vjs-icon-placeholder'));
+    } else {
+      el.appendChild(iconContainer);
+    }
+
+    this.iconIsSet_ = true;
+
+    return iconContainer;
   }
 
   /**
@@ -670,7 +804,7 @@ class Component {
         })
         .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
-        // techs are registerd as Components but can't aren't compatible
+        // techs are registered as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
           const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
@@ -682,7 +816,7 @@ class Component {
   }
 
   /**
-   * Builds the default DOM class name. Should be overriden by sub-components.
+   * Builds the default DOM class name. Should be overridden by sub-components.
    *
    * @return {string}
    *         The DOM class name for this object.
@@ -700,7 +834,7 @@ class Component {
    * Different from event listeners in that if the ready event has already happened
    * it will trigger the function immediately.
    *
-   * @param {Component~ReadyCallback} fn
+   * @param {ReadyCallback} fn
    *        Function that gets called when the `Component` is ready.
    *
    * @return {Component}
@@ -751,7 +885,7 @@ class Component {
        * Triggered when a `Component` is ready.
        *
        * @event Component#ready
-       * @type {EventTarget~Event}
+       * @type {Event}
        */
       this.trigger('ready');
     }, 1);
@@ -896,7 +1030,7 @@ class Component {
    *         - The value of the attribute that was asked for.
    *         - Can be an empty string on some browsers if the attribute does not exist
    *           or has no value
-   *         - Most browsers will return null if the attibute does not exist or has
+   *         - Most browsers will return null if the attribute does not exist or has
    *           no value.
    *
    * @see [DOM API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute}
@@ -1033,7 +1167,7 @@ class Component {
          * Triggered when a component is resized.
          *
          * @event Component#componentresize
-         * @type {EventTarget~Event}
+         * @type {Event}
          */
         this.trigger('componentresize');
       }
@@ -1169,7 +1303,7 @@ class Component {
    * When this Component receives a `keydown` event which it does not process,
    *  it passes the event to the Player for handling.
    *
-   * @param {EventTarget~Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    */
   handleKeyDown(event) {
@@ -1190,7 +1324,7 @@ class Component {
    * delegates to `handleKeyDown`. This means anyone calling `handleKeyPress`
    * will not see their method calls stop working.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to be called.
    */
   handleKeyPress(event) {
@@ -1283,7 +1417,7 @@ class Component {
            * Triggered when a `Component` is tapped.
            *
            * @event Component#tap
-           * @type {EventTarget~Event}
+           * @type {MouseEvent}
            */
           this.trigger('tap');
           // It may be good to copy the touchend event object and change the
@@ -1461,7 +1595,7 @@ class Component {
 
   /**
    * Clears an interval that gets created via `window.setInterval` or
-   * {@link Component#setInterval}. If you set an inteval via {@link Component#setInterval}
+   * {@link Component#setInterval}. If you set an interval via {@link Component#setInterval}
    * use this function instead of `window.clearInterval`. If you don't your dispose
    * listener will not get cleaned up until {@link Component#dispose}!
    *

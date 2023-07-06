@@ -14,7 +14,7 @@ class PlaybackRateMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -42,7 +42,7 @@ class PlaybackRateMenuItem extends MenuItem {
    * This gets called when an `PlaybackRateMenuItem` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -57,7 +57,7 @@ class PlaybackRateMenuItem extends MenuItem {
   /**
    * Update the PlaybackRateMenuItem when the playbackrate changes.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `ratechange` event that caused this function to run.
    *
    * @listens Player#ratechange

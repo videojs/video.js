@@ -20,7 +20,7 @@ class ProgressControl extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -52,7 +52,7 @@ class ProgressControl extends Component {
    * When the mouse moves over the `ProgressControl`, the pointer position
    * gets passed down to the `MouseTimeDisplay` component.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mousemove` event that caused this function to run.
    *
    * @listen mousemove
@@ -94,7 +94,7 @@ class ProgressControl extends Component {
    * A throttled version of the {@link ProgressControl#handleMouseSeek} listener.
    *
    * @method ProgressControl#throttledHandleMouseSeek
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `mousemove` event that caused this function to run.
    *
    * @listen mousemove
@@ -104,7 +104,7 @@ class ProgressControl extends Component {
   /**
    * Handle `mousemove` or `touchmove` events on the `ProgressControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousemove
@@ -191,7 +191,7 @@ class ProgressControl extends Component {
   /**
    * Handle `mousedown` or `touchstart` events on the `ProgressControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mousedown` or `touchstart` event that triggered this function
    *
    * @listens mousedown
@@ -214,7 +214,7 @@ class ProgressControl extends Component {
   /**
    * Handle `mouseup` or `touchend` events on the `ProgressControl`.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        `mouseup` or `touchend` event that triggered this function.
    *
    * @listens touchend

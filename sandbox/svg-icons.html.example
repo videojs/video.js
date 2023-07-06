@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VideoJS</title>
+  <link href="../../dist/video-js.css" rel="stylesheet" type="text/css">
+  <style>
+    body {
+      text-align: center;
+    }
+
+    .container-class {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    /* Overwrite default height and width */
+    .vjs-svg-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    div:not(.container-class) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #ccc;
+      width: 150px;
+      margin: 10px;
+      padding: 10px;
+      background-color: #5A5A5A;
+    }
+
+    div span:nth-of-type(2) {
+        color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>VideoJS SVG Icons</h1>
+  <p>In order to use SVG icons, the <code>experimentalSvgIcons</code> option must be enabled on the player. See: <a href="https://videojs.com/guides/options/#experimentalsvgicons">experimentalSvgIcons</a></p>
+  <p>SVG Icons are expected to be added to the player through components. Example: <code>myButton.setIcon('play');</code></p>
+  <div class="container-class vjs-svg-icons-enabled">
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-play" />
+        </svg>
+      </span>
+      <span>play</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-play-circle" />
+        </svg>
+      </span>
+      <span>play-circle</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-pause" />
+        </svg>
+      </span>
+      <span>pause</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-mute" />
+        </svg>
+      </span>
+      <span>volume-mute</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-low" />
+        </svg>
+      </span>
+      <span>volume-low</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-medium" />
+        </svg>
+      </span>
+      <span>volume-medium</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-volume-high" />
+        </svg>
+      </span>
+      <span>volume-high</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-fullscreen-enter" />
+        </svg>
+      </span>
+      <span>fullscreen-enter</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-fullscreen-exit" />
+        </svg>
+      </span>
+      <span>fullscreen-exit</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-spinner" />
+        </svg>
+      </span>
+      <span>spinner</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-subtitles" />
+        </svg>
+      </span>
+      <span>subtitles</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-captions" />
+        </svg>
+      </span>
+      <span>captions</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-hd" />
+        </svg>
+      </span>
+      <span>hd</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-chapters" />
+        </svg>
+      </span>
+      <span>chapters</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-downloading" />
+        </svg>
+      </span>
+      <span>downloading</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-file-download" />
+        </svg>
+      </span>
+      <span>file-download</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-file-download-done" />
+        </svg>
+      </span>
+      <span>file-download-done</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-file-download-off" />
+        </svg>
+      </span>
+      <span>file-download-off</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-share" />
+        </svg>
+      </span>
+      <span>share</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-cog" />
+        </svg>
+      </span>
+      <span>cog</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-square" />
+        </svg>
+      </span>
+      <span>square</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-circle" />
+        </svg>
+      </span>
+      <span>circle</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-circle-outline" />
+        </svg>
+      </span>
+      <span>circle-outline</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-circle-inner-circle" />
+        </svg>
+      </span>
+      <span>circle-inner-circle</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-cancel" />
+        </svg>
+      </span>
+      <span>cancel</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-repeat" />
+        </svg>
+      </span>
+      <span>repeat</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay" />
+        </svg>
+      </span>
+      <span>replay</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay-5" />
+        </svg>
+      </span>
+      <span>replay-5</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay-10" />
+        </svg>
+      </span>
+      <span>replay-10</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-replay-30" />
+        </svg>
+      </span>
+      <span>replay-30</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-forward-5" />
+        </svg>
+      </span>
+      <span>forward-5</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-forward-10" />
+        </svg>
+      </span>
+      <span>forward-10</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-forward-30" />
+        </svg>
+      </span>
+      <span>forward-30</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-audio" />
+        </svg>
+      </span>
+      <span>audio</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-next-item" />
+        </svg>
+      </span>
+      <span>next-item</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-previous-item" />
+        </svg>
+      </span>
+      <span>previous-item</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-shuffle" />
+        </svg>
+      </span>
+      <span>shuffle</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-cast" />
+        </svg>
+      </span>
+      <span>cast</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-picture-in-picture-enter" />
+        </svg>
+      </span>
+      <span>picture-in-picture-enter</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-picture-in-picture-exit" />
+        </svg>
+      </span>
+      <span>picture-in-picture-exit</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-facebook" />
+        </svg>
+      </span>
+      <span>facebook</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-linkedin" />
+        </svg>
+      </span>
+      <span>linkedin</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-twitter" />
+        </svg>
+      </span>
+      <span>twitter</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-tumblr" />
+        </svg>
+      </span>
+      <span>tumblr</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-pinterest" />
+        </svg>
+      </span>
+      <span>pinterest</span>
+    </div>
+    <div>
+      <span class="vjs-icon-placeholder vjs-svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <use xmlns="http://www.w3.org/2000/svg" href="../src/images/icons.svg#vjs-icon-audio-description" />
+        </svg>
+      </span>
+      <span>audio-description</span>
+    </div>  
+  </div>
+</body>
+</html>

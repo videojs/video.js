@@ -10,7 +10,7 @@ import {getAbsoluteURL} from '../utils/url';
  * with the source that was found or empty string if we cannot know. If it cannot
  * find a source then `sourceset` will not be fired.
  *
- * @param {Html5} tech
+ * @param { import('./html5').default } tech
  *        The tech object that sourceset was setup on
  *
  * @return {boolean}

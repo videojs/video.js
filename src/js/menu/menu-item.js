@@ -17,7 +17,7 @@ class MenuItem extends ClickableComponent {
   /**
    * Creates an instance of the this class.
    *
-   * @param {Player} player
+   * @param { import('../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -69,10 +69,17 @@ class MenuItem extends ClickableComponent {
     }, props), attrs);
 
     // swap icon with menu item text.
-    el.replaceChild(createEl('span', {
+    const menuItemEl = createEl('span', {
       className: 'vjs-menu-item-text',
       textContent: this.localize(this.options_.label)
-    }), el.querySelector('.vjs-icon-placeholder'));
+    });
+
+    // If using SVG icons, the element with vjs-icon-placeholder will be added separately.
+    if (this.player_.options_.experimentalSvgIcons) {
+      el.appendChild(menuItemEl);
+    } else {
+      el.replaceChild(menuItemEl, el.querySelector('.vjs-icon-placeholder'));
+    }
 
     return el;
   }
@@ -81,7 +88,7 @@ class MenuItem extends ClickableComponent {
    * Ignore keys which are used by the menu, but pass any other ones up. See
    * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
@@ -97,7 +104,7 @@ class MenuItem extends ClickableComponent {
    * Any click on a `MenuItem` puts it into the selected state.
    * See {@link ClickableComponent#handleClick} for instances where this is called.
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

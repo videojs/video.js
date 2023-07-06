@@ -14,7 +14,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -44,7 +44,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
    * This gets called when an `CaptionSettingsMenuItem` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
@@ -53,6 +53,15 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
    */
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
+  }
+
+  /**
+   * Update control text and label on languagechange
+   */
+  handleLanguagechange() {
+    this.$('.vjs-menu-item-text').textContent = this.player_.localize(this.options_.kind + ' settings');
+
+    super.handleLanguagechange();
   }
 }
 

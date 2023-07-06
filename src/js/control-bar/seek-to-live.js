@@ -15,7 +15,7 @@ class SeekToLive extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -42,6 +42,8 @@ class SeekToLive extends Button {
     const el = super.createEl('button', {
       className: 'vjs-seek-to-live-control vjs-control'
     });
+
+    this.setIcon('circle', el);
 
     this.textEl_ = Dom.createEl('span', {
       className: 'vjs-seek-to-live-text',

@@ -1,0 +1,40 @@
+.video-js .vjs-skip-forward-5 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-forward-5;
+  }
+}
+
+.video-js .vjs-skip-forward-10 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-forward-10;
+  }
+}
+.video-js .vjs-skip-forward-30 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-forward-30;
+  }
+}
+
+.video-js .vjs-skip-backward-5 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-replay-5;
+  }
+}
+
+.video-js .vjs-skip-backward-10 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-replay-10;
+  }
+}
+
+.video-js .vjs-skip-backward-30 {
+  cursor: pointer;
+  & .vjs-icon-placeholder {
+    @extend .vjs-icon-replay-30;
+  }
+}

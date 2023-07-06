@@ -15,17 +15,19 @@ class DescriptionsButton extends TextTrackButton {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when this component is ready.
    */
   constructor(player, options, ready) {
     super(player, options, ready);
+
+    this.setIcon('audio-description');
 
     const tracks = player.textTracks();
     const changeHandler = Fn.bind_(this, this.handleTracksChange);
@@ -39,7 +41,7 @@ class DescriptionsButton extends TextTrackButton {
   /**
    * Handle text track change
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} event
    *        The event that caused this function to run
    *
    * @listens TextTrackList#change

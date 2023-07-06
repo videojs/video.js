@@ -10,7 +10,7 @@ import TrackList from './track-list';
  * @param {AudioTrackList} list
  *        list to work on
  *
- * @param {AudioTrack} track
+ * @param { import('./audio-track').default } track
  *        The track to skip
  *
  * @private
@@ -56,7 +56,7 @@ class AudioTrackList extends TrackList {
   /**
    * Add an {@link AudioTrack} to the `AudioTrackList`.
    *
-   * @param {AudioTrack} track
+   * @param { import('./audio-track').default } track
    *        The AudioTrack to add to the list
    *
    * @fires TrackList#addtrack

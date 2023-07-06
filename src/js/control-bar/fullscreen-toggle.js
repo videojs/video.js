@@ -15,7 +15,7 @@ class FullscreenToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -23,6 +23,7 @@ class FullscreenToggle extends Button {
    */
   constructor(player, options) {
     super(player, options);
+    this.setIcon('fullscreen-enter');
     this.on(player, 'fullscreenchange', (e) => this.handleFullscreenChange(e));
 
     if (document[player.fsApi_.fullscreenEnabled] === false) {
@@ -43,7 +44,7 @@ class FullscreenToggle extends Button {
   /**
    * Handles fullscreenchange on the player and change control text accordingly.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The {@link Player#fullscreenchange} event that caused this function to be
    *        called.
    *
@@ -52,8 +53,10 @@ class FullscreenToggle extends Button {
   handleFullscreenChange(event) {
     if (this.player_.isFullscreen()) {
       this.controlText('Exit Fullscreen');
+      this.setIcon('fullscreen-exit');
     } else {
       this.controlText('Fullscreen');
+      this.setIcon('fullscreen-enter');
     }
   }
 
@@ -61,7 +64,7 @@ class FullscreenToggle extends Button {
    * This gets called when an `FullscreenToggle` is "clicked". See
    * {@link ClickableComponent} for more detailed information on what a click can be.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *

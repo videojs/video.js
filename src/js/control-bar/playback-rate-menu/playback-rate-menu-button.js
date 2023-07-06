@@ -16,7 +16,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -131,7 +131,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Hide playback rate controls when they're no playback rate options to select
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The event that caused this function to run.
    *
    * @listens Player#loadstart
@@ -147,7 +147,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Update button label when rate changed
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The event that caused this function to run.
    *
    * @listens Player#ratechange

@@ -128,7 +128,7 @@ class TextTrack extends Track {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param {Tech} options.tech
+   * @param { import('../tech/tech').default } options.tech
    *        A reference to the tech that owns this TextTrack.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']
@@ -277,7 +277,7 @@ class TextTrack extends Track {
            * > Note: This is not part of the spec!
            *
            * @event TextTrack#modechange
-           * @type {EventTarget~Event}
+           * @type {Event}
            */
           this.trigger('modechange');
 

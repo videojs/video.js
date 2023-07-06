@@ -1,6 +1,7 @@
 import Component from './component';
 import * as Dom from './utils/dom';
 import * as Guid from './utils/guid';
+import * as Obj from './utils/obj';
 
 /**
  * Displays an element over the player which contains an optional title and
@@ -39,7 +40,7 @@ class TitleBar extends Component {
 
     return Dom.createEl('div', {
       className: 'vjs-title-bar'
-    }, {}, Object.values(this.els));
+    }, {}, Obj.values(this.els));
   }
 
   /**

@@ -1,41 +1,72 @@
 {
   "source": {
-    "include": [ "src/js/" ],
+    "include": [
+      "src/js/"
+    ],
     "includePattern": ".js$"
   },
   "opts": {
     "destination": "docs/api",
     "readme": "docs/index.md",
-    "template": "node_modules/tui-jsdoc-template",
-    "package": "package.json",
+    "template": "node_modules/clean-jsdoc-theme",
+    "package": "",
     "recurse": true,
-    "tutorials": "docs/guides",
-    "encoding": "utf8"
+    "encoding": "utf8",
+    "theme_opts": {
+      "homepageTitle": "Video.js API docs",
+      "menu": [
+        {
+          "title": "Video.js website",
+          "link": "https://videojs.com",
+          "class": "link-vjs"
+        },
+        {
+          "title": "v8.2.1 source",
+          "link": "https://github.com/videojs/video.js",
+          "class": "link-gh"
+        },
+        {
+          "title": "Twitter",
+          "link": "https://twitter.com/videojs",
+          "class": "link-tw"
+        }
+      ],
+      "favicon": "https://videojs.com/favicon.ico",
+      "footer": "<span class='copyright'><a href='https://videojs.com'>Video.js</a> is a free and open source HTML5 video player. © <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>. <a href='https://github.com/videojs/video.js/blob/master/LICENSE' class='button blue' target='_blank'>View license</a></span>",
+      "include_css": [
+        "./build/docs/styles/videojs.css"
+      ],
+      "displayModuleHeader": true,
+      "meta": [
+        {
+          "name": "name",
+          "content": "Video.js API documentation"
+        },
+        {
+          "name": "description",
+          "content": "Generated API documentation for the latest version of Video.js."
+        }
+      ]
+    }
   },
   "templates": {
     "default": {
       "staticFiles": {
-        "include": ["build/docs/"]
+        "include": [
+          "build/docs/"
+        ]
       }
-    },
-    "logo": {
-      "url": "https://videojs.com/logo-white.png",
-      "height": "30px",
-      "width": "214px"
-    },
-    "name": "Video.js Documentation",
-    "tabNames": {
-      "tutorials": "Guides"
-    },
-    "footerText": "<span class='copyright'><a href='https://videojs.com'>Video.js</a> is a free and open source HTML5 video player. © <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>. <a href='https://github.com/videojs/video.js/blob/master/LICENSE' class='button blue' target='_blank'>View license</a></span> <ul class='other-links'><li><a href='https://videojs.com' class='button white'><i class='fa fa-external-link'></i> Video.js</a></li> <li><a href='https://twitter.com/videojs' class='button white' target='_blank'><i class='fa fa-twitter'></i> @videojs</a></li> <li><a href='https://github.com/videojs/video.js' class='button white' target='_blank'><i class='fa fa-github-alt'></i> Source</a></li> </ul>",
-    "css": [
-      "styles/videojs.css",
-      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
-    ]
+    }
   },
-  "plugins": ["plugins/markdown", "build/jsdoc-typeof-plugin"],
+  "plugins": [
+    "node_modules/jsdoc-tsimport-plugin/index.js",
+    "plugins/markdown",
+    "build/jsdoc-typeof-plugin"
+  ],
   "markdown": {
-    "tags": ["example"],
+    "tags": [
+      "example"
+    ],
     "idInHeadings": true
   }
 }

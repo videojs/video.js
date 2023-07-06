@@ -20,7 +20,7 @@ class LiveTracker extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -34,7 +34,7 @@ class LiveTracker extends Component {
    *        Number of seconds behind live that we have to be
    *        before we will be considered non-live. Note that this will only
    *        be used when playing at the live edge. This allows large seekable end
-   *        changes to not effect wether we are live or not.
+   *        changes to not effect whether we are live or not.
    */
   constructor(player, options) {
     // LiveTracker does not need an element
@@ -289,7 +289,7 @@ class LiveTracker extends Component {
    * is tracking live playback or not
    *
    * @return {boolean}
-   *         Wether liveTracker is tracking
+   *         Whether liveTracker is tracking
    */
   isLive() {
     return this.isTracking();
@@ -300,7 +300,7 @@ class LiveTracker extends Component {
    * on each seekableendchange
    *
    * @return {boolean}
-   *         Wether playback is at the live edge
+   *         Whether playback is at the live edge
    */
   atLiveEdge() {
     return !this.behindLiveEdge();
@@ -317,7 +317,7 @@ class LiveTracker extends Component {
   }
 
   /**
-   * The number of seconds that have occured after seekable end
+   * The number of seconds that have occurred after seekable end
    * changed. This will be reset to 0 once seekable end changes.
    *
    * @return {number}
@@ -345,7 +345,7 @@ class LiveTracker extends Component {
   }
 
   /**
-   * Wether live tracker is currently tracking or not.
+   * Whether live tracker is currently tracking or not.
    */
   isTracking() {
     return typeof this.trackingInterval_ === 'number';

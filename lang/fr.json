@@ -17,8 +17,8 @@
   "progress bar timing: currentTime={1} duration={2}": "{1} de {2}",
   "Fullscreen": "Plein écran",
   "Exit Fullscreen": "Fenêtré",
-  "Mute": "Sourdine",
-  "Unmute": "Son activé",
+  "Mute": "Mettre en sourdine",
+  "Unmute": "Activer le son",
   "Playback Rate": "Vitesse de lecture",
   "Subtitles": "Sous-titres",
   "subtitles off": "Sous-titres désactivés",
@@ -90,5 +90,7 @@
   "Color": "Couleur",
   "Opacity": "Opacité",
   "Text Background": "Arrière-plan du texte",
-  "Caption Area Background": "Arrière-plan de la zone de sous-titre"
+  "Caption Area Background": "Arrière-plan de la zone de sous-titre",
+  "Skip backward {1} seconds": "Reculer de {1} secondes",
+  "Skip forward {1} seconds": "Avancer de {1} secondes"
 }

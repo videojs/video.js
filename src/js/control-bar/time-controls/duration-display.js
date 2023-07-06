@@ -14,7 +14,7 @@ class DurationDisplay extends TimeDisplay {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -54,7 +54,7 @@ class DurationDisplay extends TimeDisplay {
   /**
    * Update duration time display.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        The `durationchange`, `timeupdate`, or `loadedmetadata` event that caused
    *        this function to be called.
    *

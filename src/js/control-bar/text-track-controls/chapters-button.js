@@ -18,17 +18,19 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param {Component~ReadyCallback} [ready]
+   * @param {Function} [ready]
    *        The function to call when this function is ready.
    */
   constructor(player, options, ready) {
     super(player, options, ready);
+
+    this.setIcon('chapters');
 
     this.selectCurrentItem_ = () => {
       this.items.forEach(item => {
@@ -54,7 +56,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Update the menu based on the current state of its items.
    *
-   * @param {EventTarget~Event} [event]
+   * @param {Event} [event]
    *        An event that triggered this function to run.
    *
    * @listens TextTrackList#addtrack
@@ -158,7 +160,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Create menu from chapter track
    *
-   * @return {Menu}
+   * @return { import('../../menu/menu').default }
    *         New menu for the chapter buttons
    */
   createMenu() {
@@ -169,7 +171,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Create a menu item for each text track
    *
-   * @return {TextTrackMenuItem[]}
+   * @return  { import('./text-track-menu-item').default[] }
    *         Array of menu items
    */
   createItems() {

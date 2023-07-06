@@ -13,6 +13,7 @@ import SeekBar from '../../src/js/control-bar/progress-control/seek-bar.js';
 import RemainingTimeDisplay from '../../src/js/control-bar/time-controls/remaining-time-display.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
 import sinon from 'sinon';
 
 QUnit.module('Controls', {
@@ -149,6 +150,8 @@ QUnit.test("SeekBar doesn't set scrubbing on mouse down, only on mouse move", fu
   const scrubbingSpy = sinon.spy(player, 'scrubbing');
   const seekBar = new SeekBar(player);
   const doc = new EventTarget();
+
+  player.duration(0);
 
   // mousemove is listened to on the document.
   // Specifically, we check the ownerDocument of the seekBar's bar.
@@ -290,11 +293,61 @@ QUnit.test('Picture-in-Picture control is hidden when the source is audio', func
   player.src({src: 'example.mp4', type: 'video/mp4'});
   player.trigger('loadedmetadata');
 
-  assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+  if (document.exitPictureInPicture) {
+    assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+  } else {
+    assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden if PiP is not supported');
+  }
 
   player.src({src: 'example1.mp3', type: 'audio/mp3'});
   player.trigger('loadedmetadata');
   assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden whenh the source is audio');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control is displayed if docPiP is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({
+    disablePictureInPicture: true,
+    enableDocumentPictureInPicture: true
+  });
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+  const testPiPObj = {};
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.src({src: 'example.mp4', type: 'video/mp4'});
+  player.trigger('loadedmetadata');
+
+  if (document.exitPictureInPicture) {
+    assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  } else {
+    assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden if PiP is not supported');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+  if (window.documentPictureInPicture === testPiPObj) {
+    delete window.documentPictureInPicture;
+  }
+});
+
+QUnit.test('Picture-in-Picture control should only be displayed if the browser supports it', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.trigger('loadedmetadata');
+
+  if (document.exitPictureInPicture) {
+    // Browser that does support PiP
+    assert.false(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  } else {
+    // Browser that does not support PiP
+    assert.true(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden');
+  }
 
   player.dispose();
   pictureInPictureToggle.dispose();

@@ -16,7 +16,7 @@ class TimeTooltip extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param {Player} player
+   * @param { import('../../player').default } player
    *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]
