@@ -866,24 +866,21 @@ export function computedStyle(el, prop) {
  *
  */
 export function copyStyleSheetsToWindow(win) {
-  const allCSS = [...document.styleSheets]
-    .map((styleSheet) => {
-      try {
-        return [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
-      } catch (e) {
-        const link = document.createElement('link');
+  [...document.styleSheets].forEach((styleSheet) => {
+    try {
+      const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+      const style = document.createElement('style');
 
-        link.rel = 'stylesheet';
-        link.type = styleSheet.type;
-        link.media = styleSheet.media;
-        link.href = styleSheet.href;
-        win.document.head.appendChild(link);
-      }
-    })
-    .filter(Boolean)
-    .join('\n');
-  const style = document.createElement('style');
+      style.textContent = cssRules;
+      win.document.head.appendChild(style);
+    } catch (e) {
+      const link = document.createElement('link');
 
-  style.textContent = allCSS;
-  win.document.head.appendChild(style);
+      link.rel = 'stylesheet';
+      link.type = styleSheet.type;
+      link.media = styleSheet.media;
+      link.href = styleSheet.href;
+      win.document.head.appendChild(link);
+    }
+  });
 }

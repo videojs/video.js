@@ -689,6 +689,9 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
 
 QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
   const fakeWindow = document.createElement('div');
+  const done = assert.async();
+
+  assert.expect(7);
 
   fakeWindow.document = {
     head: document.createElement('div')
@@ -710,24 +713,25 @@ QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', 
   link.type = 'text/css';
   link.media = 'print';
   link.href = 'http://asdf.com/styles.css';
+
+  const containsRulesFromStyle = (el) => {
+    return Boolean([...fakeWindow.document.head.querySelectorAll('style')].find(s => {
+      return s.textContent.includes(el.textContent);
+    }));
+  };
+
+  link.onload = link.onerror = () => {
+    Dom.copyStyleSheetsToWindow(fakeWindow);
+    assert.strictEqual(fakeWindow.document.head.querySelectorAll('style, link').length, document.styleSheets.length, 'the fake window has as many <style> or <link> elements as document.styleSheets');
+    assert.true(containsRulesFromStyle(style1), 'a <style> in the fake window contains content from first <style> element');
+    assert.true(containsRulesFromStyle(style2), 'a <style> in the fake window contains content from second <style> element');
+    assert.strictEqual(fakeWindow.document.head.querySelectorAll('link[rel=stylesheet]').length, 1, 'the fake window has one <link> stylesheet element');
+    const fakeWindowLink = fakeWindow.document.head.querySelectorAll('link[rel=stylesheet]')[0];
+
+    assert.strictEqual(fakeWindowLink.type, link.type, 'the <style> type attribute in the fake window is the one from <link> element');
+    assert.strictEqual(fakeWindowLink.href, link.href, 'the <style> href attribute in the fake window is the one from <link> element');
+    assert.strictEqual(fakeWindowLink.media, link.media, 'the <style> media attribute in the fake window is the one from <link> element');
+    done();
+  };
   document.head.appendChild(link);
-
-  Dom.copyStyleSheetsToWindow(fakeWindow);
-
-  assert.expect(7);
-
-  assert.strictEqual(fakeWindow.document.head.querySelectorAll('style').length, 1, 'the fake window has one <style> element only');
-
-  const fakeWindowStyle = fakeWindow.document.head.querySelectorAll('style')[0];
-
-  assert.true(fakeWindowStyle.textContent.includes(style1.textContent), 'the <style> in the fake window contains content from first <style> element');
-  assert.true(fakeWindowStyle.textContent.includes(style2.textContent), 'the <style> in the fake window contains content from second <style> element');
-
-  assert.strictEqual(fakeWindow.document.head.querySelectorAll('link[rel=stylesheet]').length, 1, 'the fake window has one <link> stylesheet element');
-
-  const fakeWindowLink = fakeWindow.document.head.querySelectorAll('link[rel=stylesheet]')[0];
-
-  assert.strictEqual(fakeWindowLink.type, link.type, 'the <style> type attribute in the fake window is the one from <link> element');
-  assert.strictEqual(fakeWindowLink.href, link.href, 'the <style> href attribute in the fake window is the one from <link> element');
-  assert.strictEqual(fakeWindowLink.media, link.media, 'the <style> media attribute in the fake window is the one from <link> element');
 });
