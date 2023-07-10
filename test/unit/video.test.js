@@ -3,6 +3,7 @@ import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
+import window from 'global/window';
 import sinon from 'sinon';
 // import custom element for Shadow DOM test
 import './utils/custom-element.test';
@@ -86,7 +87,9 @@ QUnit.test(
   }
 );
 
-QUnit.test(
+const skipWithoutCustomElements = 'customElements' in window ? 'test' : 'skip';
+
+QUnit[skipWithoutCustomElements](
   'should not log if the supplied element is included in the Shadow DOM',
   function(assert) {
     const origWarnLog = log.warn;
