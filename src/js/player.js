@@ -3095,9 +3095,9 @@ class Player extends Component {
       return window.documentPictureInPicture.requestWindow({
         // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
         width: this.videoWidth(),
-        height: this.videoHeight(),
-        copyStyleSheets: true
+        height: this.videoHeight()
       }).then(pipWindow => {
+        Dom.copyStyleSheetsToWindow(pipWindow);
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
         pipWindow.document.body.appendChild(this.el_);
