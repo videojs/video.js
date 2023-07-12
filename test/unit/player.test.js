@@ -2848,7 +2848,7 @@ QUnit.test('document pictureinpicture is opt-in', function(assert) {
 
   player.requestPictureInPicture().catch(e => {
     assert.equal(e, 'No PiP mode is available', 'docPiP not used when not enabled');
-  }).finally(_ => {
+  }).then(_ => {
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
     }
@@ -2888,7 +2888,7 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
     assert.ok(true, 'docPiP was called');
   }).catch(_ => {
     assert.ok(true, 'docPiP was called');
-  }).finally(_ => {
+  }).then(_ => {
     assert.equal(0, count, 'requestPictureInPicture not passed to tech');
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;

@@ -151,7 +151,7 @@ function videojs(id, options, ready) {
   // If the document is no longer attached to the dom, the defaultView of the document will be null.
   // If element is inside Shadow DOM (e.g. is part of a Custom element), ownerDocument.body
   // always returns false. Instead, use the Shadow DOM root.
-  const inShadowDom = el.getRootNode() instanceof window.ShadowRoot;
+  const inShadowDom = 'getRootNode' in el ? el.getRootNode() instanceof window.ShadowRoot : false;
   const rootNode = inShadowDom ? el.getRootNode() : el.ownerDocument.body;
 
   if (!el.ownerDocument.defaultView || !rootNode.contains(el)) {
