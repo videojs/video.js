@@ -34,7 +34,7 @@
   margin-left: -1px;
 }
 
-.video-js .vjs-volume-panel {
+.video-js:not(.vjs-touch-enabled) .vjs-volume-panel {
   &.vjs-hover .vjs-volume-control,
   &:active .vjs-volume-control,
   &:focus  .vjs-volume-control,
