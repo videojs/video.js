@@ -1,9 +1,7 @@
 /* eslint-env qunit */
 import document from 'global/document';
-import window from 'global/window';
 import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
-import { IS_SAFARI } from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 
 QUnit.module('utils/dom');
@@ -689,11 +687,14 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
 });
 
-// The next test is skipped on Safari < 14, which has a broken document.styleSheets
-// copyStyleSheetsToWindow() is only used on browsers supporting documentPictureInPicture - Chromium 113+
-const skipOnOldSafari = IS_SAFARI && parseInt(window.navigator.userAgent.match(/Version\/(\d+)\./)[1], 10) < 14 ? 'skip' : 'test';
+QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
+  /**
+   * This test is checking that styles are copied by comparing strings in original stylesheets to those in
+   * documents.styleSheets in the new (fake) window. This can be problematic on older Safari as documents.styleSheets
+   * does not always return the original style - a shorthand property like `background: white` may be returned as
+   * `background-color: white`.
+   */
 
-QUnit[skipOnOldSafari]('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
   const fakeWindow = document.createElement('div');
   const done = assert.async();
 
@@ -705,7 +706,7 @@ QUnit[skipOnOldSafari]('Dom.copyStyleSheetsToWindow() copies all style sheets to
 
   const style1 = document.createElement('style');
 
-  style1.textContent = 'body { background: white; }';
+  style1.textContent = 'body { background-color: white; }';
   document.head.appendChild(style1);
 
   const style2 = document.createElement('style');

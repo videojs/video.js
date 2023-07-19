@@ -878,7 +878,8 @@ export function copyStyleSheetsToWindow(win) {
 
       link.rel = 'stylesheet';
       link.type = styleSheet.type;
-      link.media = styleSheet.media;
+      // For older Safari this has to be the string; on other browsers setting the MediaList works
+      link.media = styleSheet.media.mediaText;
       link.href = styleSheet.href;
       win.document.head.appendChild(link);
     }
