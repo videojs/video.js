@@ -1,7 +1,9 @@
 /* eslint-env qunit */
 import document from 'global/document';
+import window from 'global/window';
 import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
+import { IS_SAFARI } from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 
 QUnit.module('utils/dom');
@@ -687,7 +689,11 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
 });
 
-QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
+// The next test is skipped on Safari < 14, which has a broken document.styleSheets
+// copyStyleSheetsToWindow() is only used on browsers supporting documentPictureInPicture - Chromium 113+
+const skipOnOldSafari = IS_SAFARI && parseInt(window.navigator.userAgent.match(/Version\/(\d+)\./)[1], 10) < 14 ? 'skip' : 'test';
+
+QUnit[skipOnOldSafari]('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
   const fakeWindow = document.createElement('div');
   const done = assert.async();
 
