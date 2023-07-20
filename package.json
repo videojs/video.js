@@ -98,7 +98,7 @@
     "safe-json-parse": "4.0.0",
     "videojs-contrib-quality-levels": "4.0.0",
     "videojs-font": "4.1.0",
-    "videojs-vtt.js": "0.15.4"
+    "videojs-vtt.js": "0.15.5"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
