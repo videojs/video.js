@@ -256,6 +256,9 @@ QUnit.test('can only remove one cue at a time', function(assert) {
 
   const cue1 = new Cue(0, 1, 'some-cue');
 
+  cue1.line = 15;
+  cue1.position = 10;
+
   assert.equal(tt.cues.length, 0, 'start with zero cues');
   tt.addCue(cue1);
   tt.addCue(cue1);
