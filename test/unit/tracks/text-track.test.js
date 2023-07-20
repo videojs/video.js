@@ -231,6 +231,21 @@ QUnit.test('original cue can be used to remove cue from cues list', function(ass
   assert.equal(tt.cues.length, 0, 'we have removed cue1');
 });
 
+QUnit.test('non-VTTCue can be used to remove cue from cues list', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+
+  const cue1 = { id: 1, text: 'test' };
+
+  assert.equal(tt.cues.length, 0, 'start with zero cues');
+  tt.addCue(cue1);
+  assert.equal(tt.cues.length, 1, 'we have one cue');
+
+  tt.removeCue(cue1);
+  assert.equal(tt.cues.length, 0, 'we have removed cue1');
+});
+
 QUnit.test('can only remove one cue at a time', function(assert) {
   const tt = new TextTrack({
     tech: this.tech
