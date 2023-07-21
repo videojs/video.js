@@ -1,3 +1,20 @@
+<a name="8.5.1"></a>
+## [8.5.1](https://github.com/videojs/video.js/compare/v8.5.0...v8.5.1) (2023-07-21)
+
+### Bug Fixes
+
+* Add skip button text for Spanish ([#8340](https://github.com/videojs/video.js/issues/8340)) ([e2f9231](https://github.com/videojs/video.js/commit/e2f9231))
+* Check for VTTCue ([#8370](https://github.com/videojs/video.js/issues/8370)) ([da15810](https://github.com/videojs/video.js/commit/da15810))
+* Don't use copyStyleSheets with documentPIP ([#8314](https://github.com/videojs/video.js/issues/8314)) ([8dd98f6](https://github.com/videojs/video.js/commit/8dd98f6))
+* Fullscreen styles for older Safari ([#8346](https://github.com/videojs/video.js/issues/8346)) ([c11d213](https://github.com/videojs/video.js/commit/c11d213))
+* **lang:** add skip button text for French ([#8341](https://github.com/videojs/video.js/issues/8341)) ([97ba60f](https://github.com/videojs/video.js/commit/97ba60f))
+* **lang:** add skip button text for Portuguese ([#8342](https://github.com/videojs/video.js/issues/8342)) ([6dac145](https://github.com/videojs/video.js/commit/6dac145))
+* make compatible with chrome 53 ([#8354](https://github.com/videojs/video.js/issues/8354)) ([c66bf40](https://github.com/videojs/video.js/commit/c66bf40))
+* **play-toggle:** missing svg play icon ([#8337](https://github.com/videojs/video.js/issues/8337)) ([b34cb2c](https://github.com/videojs/video.js/commit/b34cb2c)), closes [#8336](https://github.com/videojs/video.js/issues/8336)
+* **progress:** mouse-time-display overlaps the play-progress svg icon ([#8338](https://github.com/videojs/video.js/issues/8338)) ([e06465f](https://github.com/videojs/video.js/commit/e06465f))
+* **tests:** Fixes for old Safari ([#8368](https://github.com/videojs/video.js/issues/8368)) ([6fc1fd4](https://github.com/videojs/video.js/commit/6fc1fd4))
+* **tests:** Skip a test on old Safari ([#8356](https://github.com/videojs/video.js/issues/8356)) ([452a918](https://github.com/videojs/video.js/commit/452a918))
+
 <a name="8.5.0"></a>
 # [8.5.0](https://github.com/videojs/video.js/compare/v8.4.2...v8.5.0) (2023-06-12)
 
