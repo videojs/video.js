@@ -1,3 +1,11 @@
+<a name="7.21.5"></a>
+## [7.21.5](https://github.com/videojs/video.js/compare/v7.21.4...v7.21.5) (2023-07-21)
+
+### Bug Fixes
+
+* align and correct translation for mute and unmute ([#8226](https://github.com/videojs/video.js/issues/8226)) ([f27df30](https://github.com/videojs/video.js/commit/f27df30))
+* Check for VTTCue ([#8370](https://github.com/videojs/video.js/issues/8370)) ([#8372](https://github.com/videojs/video.js/issues/8372)) ([9f2d81f](https://github.com/videojs/video.js/commit/9f2d81f))
+
 <a name="7.21.4"></a>
 ## [7.21.4](https://github.com/videojs/video.js/compare/v7.21.3...v7.21.4) (2023-03-15)
 
