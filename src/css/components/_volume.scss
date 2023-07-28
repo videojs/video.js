@@ -146,13 +146,7 @@
   width: 0.9em;
   height: 0.9em;
   pointer-events: none;
-}
-
-// Due to this icon from Material UI being a bit smaller than the others,
-// we will adjust the height and width
-.vjs-mute-control .vjs-svg-icon {
-  width: 1.75em;
-  height: 1.75em;
+  z-index: 1;
 }
 
 .vjs-slider-horizontal .vjs-volume-level {
