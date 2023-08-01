@@ -3,7 +3,10 @@ import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
+import window from 'global/window';
 import sinon from 'sinon';
+// import custom element for Shadow DOM test
+import './utils/custom-element.test';
 
 QUnit.module('video.js', {
   beforeEach() {
@@ -79,6 +82,31 @@ QUnit.test(
     videojs(vid2);
     videojs('test_vid_id2');
     assert.equal(warnLogs.length, 1, 'did not log another warning');
+
+    log.warn = origWarnLog;
+  }
+);
+
+const skipWithoutCustomElements = 'customElements' in window ? 'test' : 'skip';
+
+QUnit[skipWithoutCustomElements](
+  'should not log if the supplied element is included in the Shadow DOM',
+  function(assert) {
+    const origWarnLog = log.warn;
+    const fixture = document.getElementById('qunit-fixture');
+    const warnLogs = [];
+
+    log.warn = (args) => {
+      warnLogs.push(args);
+    };
+
+    const customElem = document.createElement('test-custom-element');
+
+    fixture.appendChild(customElem);
+    const innerPlayer = customElem.innerPlayer;
+
+    assert.ok(innerPlayer, 'created player within Shadow DOM');
+    assert.equal(warnLogs.length, 0, 'no warn logs');
 
     log.warn = origWarnLog;
   }

@@ -52,21 +52,29 @@ QUnit.test('Calling resetProgressBar should reset the components displaying time
 
   // Do reset
   player.resetProgressBar_();
-  player.duration(0);
+  // Allows to have a duration state similar to player.reset() by combining the durationchange
+  player.duration(NaN);
+  player.trigger('durationchange');
   clock.tick(30);
+
+  const calculateDistance = sinon.spy(seekBar, 'calculateDistance');
+
+  // Simulate a mouse move
+  seekBar.handleMouseMove({ offsetX: 1 });
 
   assert.equal(player.currentTime(), 0, 'player current time is 0');
 
   // Current time display
   assert.equal(currentTimeDisplay.textNode_.textContent, '0:00', 'current time display is 0:00');
   // Duration display
-  assert.equal(durationDisplay.textNode_.textContent, '0:00', 'duration display is 0:00');
+  assert.equal(durationDisplay.textNode_.textContent, '-:-', 'duration display is -:-');
   // Remaining time display
-  assert.equal(remainingTimeDisplay.textNode_.textContent, '0:00', 'remaining time display is 0:00');
+  assert.equal(remainingTimeDisplay.textNode_.textContent, '-:-', 'remaining time display is -:-');
   // Seek bar
   assert.equal(seekBar.getProgress(), '0', 'seek bar progress is 0');
-  assert.equal(seekBar.getAttribute('aria-valuetext'), '0:00 of 0:00', 'seek bar progress holder aria value text is 0:00 of 0:00');
+  assert.equal(seekBar.getAttribute('aria-valuetext'), '0:00 of -:-', 'seek bar progress holder aria value text is 0:00 of -:-');
   assert.equal(seekBar.getAttribute('aria-valuenow'), '0.00', 'seek bar progress holder aria value now is 0.00');
+  assert.ok(!calculateDistance.called, 'calculateDistance was not called');
   // Load progress
   assert.equal(seekBar.loadProgressBar.el().textContent, 'Loaded: 0.00%', 'load progress bar textContent is Loaded: 0.00%');
   assert.equal(seekBar.loadProgressBar.el().style.width, '0%', 'load progress bar width is 0%');
@@ -76,6 +84,7 @@ QUnit.test('Calling resetProgressBar should reset the components displaying time
   assert.equal(seekBar.playProgressBar.timeTooltip.el().textContent, '0:00', 'player progress bar time tooltip is 0:00');
 
   clock.restore();
+  calculateDistance.restore();
   player.dispose();
 });
 

@@ -1,3 +1,81 @@
+<a name="8.5.1"></a>
+## [8.5.1](https://github.com/videojs/video.js/compare/v8.5.0...v8.5.1) (2023-07-21)
+
+### Bug Fixes
+
+* Add skip button text for Spanish ([#8340](https://github.com/videojs/video.js/issues/8340)) ([e2f9231](https://github.com/videojs/video.js/commit/e2f9231))
+* Check for VTTCue ([#8370](https://github.com/videojs/video.js/issues/8370)) ([da15810](https://github.com/videojs/video.js/commit/da15810))
+* Don't use copyStyleSheets with documentPIP ([#8314](https://github.com/videojs/video.js/issues/8314)) ([8dd98f6](https://github.com/videojs/video.js/commit/8dd98f6))
+* Fullscreen styles for older Safari ([#8346](https://github.com/videojs/video.js/issues/8346)) ([c11d213](https://github.com/videojs/video.js/commit/c11d213))
+* **lang:** add skip button text for French ([#8341](https://github.com/videojs/video.js/issues/8341)) ([97ba60f](https://github.com/videojs/video.js/commit/97ba60f))
+* **lang:** add skip button text for Portuguese ([#8342](https://github.com/videojs/video.js/issues/8342)) ([6dac145](https://github.com/videojs/video.js/commit/6dac145))
+* make compatible with chrome 53 ([#8354](https://github.com/videojs/video.js/issues/8354)) ([c66bf40](https://github.com/videojs/video.js/commit/c66bf40))
+* **play-toggle:** missing svg play icon ([#8337](https://github.com/videojs/video.js/issues/8337)) ([b34cb2c](https://github.com/videojs/video.js/commit/b34cb2c)), closes [#8336](https://github.com/videojs/video.js/issues/8336)
+* **progress:** mouse-time-display overlaps the play-progress svg icon ([#8338](https://github.com/videojs/video.js/issues/8338)) ([e06465f](https://github.com/videojs/video.js/commit/e06465f))
+* **tests:** Fixes for old Safari ([#8368](https://github.com/videojs/video.js/issues/8368)) ([6fc1fd4](https://github.com/videojs/video.js/commit/6fc1fd4))
+* **tests:** Skip a test on old Safari ([#8356](https://github.com/videojs/video.js/issues/8356)) ([452a918](https://github.com/videojs/video.js/commit/452a918))
+
+<a name="8.5.0"></a>
+# [8.5.0](https://github.com/videojs/video.js/compare/v8.4.2...v8.5.0) (2023-06-12)
+
+### Features
+
+* Add useSVGIcons option ([#8260](https://github.com/videojs/video.js/issues/8260)) ([6fc0dc7](https://github.com/videojs/video.js/commit/6fc0dc7))
+
+<a name="8.4.2"></a>
+## [8.4.2](https://github.com/videojs/video.js/compare/v8.4.1...v8.4.2) (2023-06-06)
+
+### Bug Fixes
+
+* **loading-spinner:** fix loading spinner responsiveness when default font size is modified ([#8295](https://github.com/videojs/video.js/issues/8295)) ([f075177](https://github.com/videojs/video.js/commit/f075177))
+* **package:** update videojs-contrib-quality-levels to 4.0.0 to eliminate deprecation warning ([#8303](https://github.com/videojs/video.js/issues/8303)) ([fab8f95](https://github.com/videojs/video.js/commit/fab8f95))
+* **shadow-dom:** prevent warning 'element supplied is not included' ([#8192](https://github.com/videojs/video.js/issues/8192)) ([dc1e2bb](https://github.com/videojs/video.js/commit/dc1e2bb))
+* **text-track-settings:** fix text track settings responsiveness when default font size is modified ([#8294](https://github.com/videojs/video.js/issues/8294)) ([3dece50](https://github.com/videojs/video.js/commit/3dece50))
+
+<a name="8.4.1"></a>
+## [8.4.1](https://github.com/videojs/video.js/compare/v8.4.0...v8.4.1) (2023-06-05)
+
+### Bug Fixes
+
+* revert resolveJsonModule in tsconfig ([#8310](https://github.com/videojs/video.js/issues/8310)) ([8f32b9f](https://github.com/videojs/video.js/commit/8f32b9f))
+
+<a name="8.4.0"></a>
+# [8.4.0](https://github.com/videojs/video.js/compare/v8.3.0...v8.4.0) (2023-06-02)
+
+### Features
+
+* **lang:** update fa translation ([#8288](https://github.com/videojs/video.js/issues/8288)) ([cb8b329](https://github.com/videojs/video.js/commit/cb8b329))
+* **lang:** update zh-TW translations ([#7877](https://github.com/videojs/video.js/issues/7877)) ([7e85324](https://github.com/videojs/video.js/commit/7e85324))
+* text track display overlays a video ([#8009](https://github.com/videojs/video.js/issues/8009)) ([1491d71](https://github.com/videojs/video.js/commit/1491d71))
+
+### Bug Fixes
+
+* ad icon is not visible on audio description track list element on Safari ([#8232](https://github.com/videojs/video.js/issues/8232)) ([52bad2b](https://github.com/videojs/video.js/commit/52bad2b))
+* Document Picture-in-Picture: Use width/height instead of initialAspectRatio ([#8270](https://github.com/videojs/video.js/issues/8270)) ([9e1e29d](https://github.com/videojs/video.js/commit/9e1e29d))
+* **jsdoc:** corrections to jsdoc ([#8277](https://github.com/videojs/video.js/issues/8277)) ([3af3638](https://github.com/videojs/video.js/commit/3af3638))
+* **picture-in-picture-control:** hide the component in non-compatible browsers ([#7899](https://github.com/videojs/video.js/issues/7899)) ([d524e57](https://github.com/videojs/video.js/commit/d524e57))
+* **player:** address loss of crossOrigin value when loadMedia is called ([#8085](https://github.com/videojs/video.js/issues/8085)) ([1a1adf3](https://github.com/videojs/video.js/commit/1a1adf3))
+* **player:** cache_.currentTime is not updated when the current time is set ([#8285](https://github.com/videojs/video.js/issues/8285)) ([b782cb0](https://github.com/videojs/video.js/commit/b782cb0)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370) [#6372](https://github.com/videojs/video.js/issues/6372)
+* **player:** load method fails to reset the media element to its initial state when the VHS is used ([#8274](https://github.com/videojs/video.js/issues/8274)) ([35fad1d](https://github.com/videojs/video.js/commit/35fad1d))
+* **player:** techGet is undefined ([#8256](https://github.com/videojs/video.js/issues/8256)) ([5151bc5](https://github.com/videojs/video.js/commit/5151bc5)), closes [#8255](https://github.com/videojs/video.js/issues/8255)
+* Replace Object.values with ponyfill ([#8267](https://github.com/videojs/video.js/issues/8267)) ([866ef24](https://github.com/videojs/video.js/commit/866ef24)), closes [#8266](https://github.com/videojs/video.js/issues/8266)
+* **seek-bar:** error when scrubbing after player reset ([#8257](https://github.com/videojs/video.js/issues/8257)) ([e73e05d](https://github.com/videojs/video.js/commit/e73e05d))
+* **skip-forward:** error when clicking after player reset ([#8258](https://github.com/videojs/video.js/issues/8258)) ([07effdf](https://github.com/videojs/video.js/commit/07effdf))
+* **videojs:** missing return in registerComponent ([#8247](https://github.com/videojs/video.js/issues/8247)) ([f1558c6](https://github.com/videojs/video.js/commit/f1558c6))
+
+### Chores
+
+* **package:** update to http-streaming v3.3.1 ([#8279](https://github.com/videojs/video.js/issues/8279)) ([53dfca4](https://github.com/videojs/video.js/commit/53dfca4))
+* remove legacy prefixes ([#8276](https://github.com/videojs/video.js/issues/8276)) ([665154f](https://github.com/videojs/video.js/commit/665154f))
+
+### Documentation
+
+* update version number in README.md ([#8271](https://github.com/videojs/video.js/issues/8271)) ([20df248](https://github.com/videojs/video.js/commit/20df248))
+
+### Tests
+
+* fix Safari test failures ([#8300](https://github.com/videojs/video.js/issues/8300)) ([9e5dd81](https://github.com/videojs/video.js/commit/9e5dd81))
+
 <a name="8.3.0"></a>
 # [8.3.0](https://github.com/videojs/video.js/compare/v8.2.1...v8.3.0) (2023-04-05)
 

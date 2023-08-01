@@ -90,5 +90,7 @@
   "Color": "Couleur",
   "Opacity": "Opacité",
   "Text Background": "Arrière-plan du texte",
-  "Caption Area Background": "Arrière-plan de la zone de sous-titre"
+  "Caption Area Background": "Arrière-plan de la zone de sous-titre",
+  "Skip backward {1} seconds": "Reculer de {1} secondes",
+  "Skip forward {1} seconds": "Avancer de {1} secondes"
 }

@@ -13,8 +13,10 @@ import multiEntry from 'rollup-plugin-multi-entry';
 import stub from 'rollup-plugin-stub';
 import isCI from 'is-ci';
 import replace from '@rollup/plugin-replace';
+import image from '@rollup/plugin-image';
 import istanbul from 'rollup-plugin-istanbul';
 import externalGlobals from 'rollup-plugin-external-globals';
+import svg from 'rollup-plugin-svg';
 
 const excludeCoverage = [
   'test/**',
@@ -151,6 +153,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -176,6 +179,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -201,6 +205,7 @@ export default cliargs => [
       primedCjs,
       CI_TEST_TYPE === 'coverage' ? istanbul({exclude: excludeCoverage}) : {},
       primedBabel,
+      image(),
       cliargs.progress !== false ? progress() : {}
 
     ],
@@ -238,6 +243,7 @@ export default cliargs => [
       }),
       json(),
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -264,6 +270,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -289,6 +296,7 @@ export default cliargs => [
     plugins: [
       json(),
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -311,6 +319,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,
@@ -334,6 +343,7 @@ export default cliargs => [
       primedExternalGlobals,
       primedCjs,
       primedBabel,
+      svg(),
       cliargs.progress !== false ? progress() : {}
     ],
     onwarn,

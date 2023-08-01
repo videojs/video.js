@@ -450,7 +450,9 @@ if (!Html5.supportsNativeTextTracks()) {
     );
   });
 
-  QUnit.test('text track display should overlay a video', function(assert) {
+  const skipOnOldChrome = window.CSS.supports('inset-inline: 10px') ? 'test' : 'skip';
+
+  QUnit[skipOnOldChrome]('text track display should overlay a video', function(assert) {
     const tag = document.createElement('video');
 
     tag.width = 320;

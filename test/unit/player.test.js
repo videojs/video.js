@@ -967,6 +967,39 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
+  // Stub a successful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => false,
+    documentElement: document.createElement('span')
+  });
+
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+
+  assert.ok(player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname added');
+
+  window.DOMParser.prototype.parseFromString.restore();
+  player.dispose();
+});
+
+QUnit.test('should revert to font icons if the SVG sprite cannot be loaded', function(assert) {
+  // Stub an unsuccessful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => true
+  });
+
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+
+  assert.ok(!player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname was not added');
+
+  window.DOMParser.prototype.parseFromString.restore();
+  player.dispose();
+});
+
 QUnit.test('should not add a touch-enabled classname when touch is not supported', function(assert) {
   assert.expect(1);
 
@@ -2165,6 +2198,12 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   window.VIDEOJS_NO_DYNAMIC_STYLE = originalVjsNoDynamicStyling;
 });
 
+QUnit.test('should return the registered component', function(assert) {
+  class CustomPlayer extends Player {}
+
+  assert.strictEqual(videojs.registerComponent('CustomPlayer', CustomPlayer), CustomPlayer, 'the component is returned');
+});
+
 QUnit.test('should allow to register custom player when any player has not been created', function(assert) {
   class CustomPlayer extends Player {}
   videojs.registerComponent('Player', CustomPlayer);
@@ -2201,6 +2240,29 @@ QUnit.test('should not allow to register custom player when any player has been 
 
   // reset the Player to the original value;
   videojs.registerComponent('Player', Player);
+});
+
+QUnit.test('setters getters passed to tech', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+
+  const player = videojs(tag, {
+    techOrder: ['techFaker']
+  });
+
+  const setSpy = sinon.spy(player.tech_, 'setDefaultMuted');
+  const getSpy = sinon.spy(player.tech_, 'defaultMuted');
+
+  player.defaultMuted(true);
+  player.defaultMuted();
+
+  assert.ok(setSpy.calledWith(true), 'setSpy called');
+  assert.ok(getSpy.called);
+
+  setSpy.restore();
+  getSpy.restore();
 });
 
 QUnit.test('techGet runs through middleware if allowedGetter', function(assert) {
@@ -2670,6 +2732,20 @@ QUnit.test('Should accept multiple calls to currentTime after player initializat
   assert.equal(player.currentTime(), 800, 'The last value passed is stored as the currentTime value');
 });
 
+QUnit.test('Should be able to set the cache currentTime after player initialization as soon the canplay event is fired', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.src('xyz.mp4');
+  player.currentTime(500);
+
+  assert.strictEqual(player.getCache().currentTime, 0, 'cache currentTime value was not changed');
+
+  this.clock.tick(100);
+  player.trigger('canplay');
+
+  assert.strictEqual(player.getCache().currentTime, 500, 'cache currentTime value is the one passed after initialization');
+});
+
 QUnit.test('Should fire debugon event when debug mode is enabled', function(assert) {
   const player = TestHelpers.makePlayer({});
   const debugOnSpy = sinon.spy();
@@ -2772,7 +2848,7 @@ QUnit.test('document pictureinpicture is opt-in', function(assert) {
 
   player.requestPictureInPicture().catch(e => {
     assert.equal(e, 'No PiP mode is available', 'docPiP not used when not enabled');
-  }).finally(_ => {
+  }).then(_ => {
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
     }
@@ -2812,7 +2888,7 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
     assert.ok(true, 'docPiP was called');
   }).catch(_ => {
     assert.ok(true, 'docPiP was called');
-  }).finally(_ => {
+  }).then(_ => {
     assert.equal(0, count, 'requestPictureInPicture not passed to tech');
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
@@ -2843,13 +2919,14 @@ QUnit.test('docPiP moves player and triggers events', function(assert) {
   const fakePiPWindow = document.createElement('div');
 
   fakePiPWindow.document = {
+    head: document.createElement('div'),
     body: document.createElement('div')
   };
   fakePiPWindow.querySelector = function(sel) {
     return fakePiPWindow.document.body.querySelector(sel);
   };
   fakePiPWindow.close = function() {
-    fakePiPWindow.dispatchEvent(new Event('unload'));
+    fakePiPWindow.dispatchEvent(new Event('pagehide'));
     delete window.documentPictureInPicture.window;
   };
 
@@ -3144,6 +3221,7 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
   controlBar.getChild('ChaptersButton').update();
 
   player.trigger('ready');
+  player.trigger('loadedmetadata');
   player.hasStarted(true);
 
   // Show all control bar children
@@ -3151,8 +3229,12 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
     const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
     if (el) {
-      // Sanity check that component is showing
-      assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+      if (!document.exitPictureInPicture && child === 'PictureInPictureToggle') {
+        assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is not visible if PiP is not supported`);
+      } else {
+        // Sanity check that component is showing
+        assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is initially visible`);
+      }
     }
   });
 
@@ -3181,7 +3263,11 @@ QUnit.test('audioOnlyMode(true/false) hides/shows video-specific control bar com
         const el = controlBar.getChild(child) && controlBar.getChild(child).el_;
 
         if (el) {
-          assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+          if (!document.exitPictureInPicture && child === 'PictureInPictureToggle') {
+            assert.equal(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is not visible if PiP is not supported`);
+          } else {
+            assert.notEqual(TestHelpers.getComputedStyle(el, 'display'), 'none', `${child} is shown`);
+          }
         }
       });
     })
@@ -3223,4 +3309,77 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
       assert.ok(player.audioPosterMode(), 'audioPosterMode is true');
       assert.notOk(player.audioOnlyMode(), 'audioOnlyMode is false');
     });
+});
+
+QUnit.test('player#load resets the media element to its initial state', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  player.src({ src: 'http://vjs.zencdn.net/v/oceans2.mp4', type: 'video/mp4' });
+
+  // Declaring spies here avoids spying on previous calls
+  const techGet_ = sinon.spy(player, 'techCall_');
+  const src = sinon.spy(player, 'src');
+
+  player.load();
+
+  // Case when the VHS tech is not used
+  assert.ok(techGet_.calledOnce, 'techCall_ was called once');
+  assert.ok(src.notCalled, 'src was not called');
+
+  // Simulate the VHS tech
+  player.tech_.vhs = true;
+  player.load();
+
+  // Case when the VHS tech is used
+  assert.ok(techGet_.calledOnce, 'techCall_ remains the same');
+  assert.ok(src.calledOnce, 'src was called');
+
+  techGet_.restore();
+  src.restore();
+  player.dispose();
+});
+
+QUnit.test('crossOrigin value should be maintained after loadMedia is called', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const example1 = '<video id="example_1" class="video-js" preload="none"></video>';
+  const example2 = '<video id="example_2" class="video-js" preload="none"></video>';
+  const example3 = '<video id="example_3" class="video-js" crossorigin="anonymous" preload="none"></video>';
+
+  fixture.innerHTML += example1;
+  fixture.innerHTML += example2;
+  fixture.innerHTML += example3;
+
+  const tagExample1 = document.getElementById('example_1');
+  const tagExample2 = document.getElementById('example_2');
+  const tagExample3 = document.getElementById('example_3');
+  const playerExample1 = TestHelpers.makePlayer({techOrder: ['Html5']}, tagExample1);
+  const playerExample2 = TestHelpers.makePlayer({techOrder: ['Html5'], crossOrigin: 'use-credentials'}, tagExample2);
+  const playerExample3 = TestHelpers.makePlayer({techOrder: ['Html5']}, tagExample3);
+
+  this.clock.tick(1000);
+
+  playerExample1.crossOrigin('anonymous');
+  playerExample1.loadMedia({
+    src: 'foo.mp4'
+  });
+  playerExample2.loadMedia({
+    src: 'foo.mp4'
+  });
+  playerExample3.loadMedia({
+    src: 'foo.mp4'
+  });
+
+  assert.strictEqual(playerExample1.crossOrigin(), 'anonymous', 'crossOrigin value remains correct when assigned by the crossOrigin method and loadMedia is called');
+  assert.ok(tagExample1.crossOrigin === 'anonymous');
+
+  assert.strictEqual(playerExample2.crossOrigin(), 'use-credentials', 'crossOrigin value remains correct when passed through the options and loadMedia is called');
+  assert.ok(tagExample2.crossOrigin === 'use-credentials');
+
+  assert.strictEqual(playerExample3.crossOrigin(), 'anonymous', 'crossOrigin value remains correct when passed via the html property and loadMedia is called');
+  assert.ok(tagExample3.crossOrigin === 'anonymous');
+
+  playerExample1.dispose();
+  playerExample2.dispose();
+  playerExample3.dispose();
 });

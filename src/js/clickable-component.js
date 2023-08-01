@@ -85,11 +85,13 @@ class ClickableComponent extends Component {
 
     const el = Dom.createEl(tag, props, attributes);
 
-    el.appendChild(Dom.createEl('span', {
-      className: 'vjs-icon-placeholder'
-    }, {
-      'aria-hidden': true
-    }));
+    if (!this.player_.options_.experimentalSvgIcons) {
+      el.appendChild(Dom.createEl('span', {
+        className: 'vjs-icon-placeholder'
+      }, {
+        'aria-hidden': true
+      }));
+    }
 
     this.createControlTextEl(el);
 

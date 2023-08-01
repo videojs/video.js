@@ -3,6 +3,7 @@
  *
  * @file component.js
  */
+import document from 'global/document';
 import window from 'global/window';
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
@@ -206,8 +207,11 @@ class Component {
    * @param {string|Event|Object} event
    *        The name of the event, an `Event`, or an object with a key of type set to
    *        an event name.
+   *
+   * @param {Object} [hash]
+   *        Optionally extra argument to pass through to an event listener
    */
-  trigger(event) {}
+  trigger(event, hash) {}
 
   /**
    * Dispose of the `Component` and all child components.
@@ -522,6 +526,57 @@ class Component {
     }
 
     return currentChild;
+  }
+
+  /**
+   * Adds an SVG icon element to another element or component.
+   *
+   * @param {string} iconName
+   *        The name of icon. A list of all the icon names can be found at 'sandbox/svg-icons.html'
+   *
+   * @param {Element} [el=this.el()]
+   *        Element to set the title on. Defaults to the current Component's element.
+   *
+   * @return {Element}
+   *        The newly created icon element.
+   */
+  setIcon(iconName, el = this.el()) {
+    // TODO: In v9 of video.js, we will want to remove font icons entirely.
+    // This means this check, as well as the others throughout the code, and
+    // the unecessary CSS for font icons, will need to be removed.
+    // See https://github.com/videojs/video.js/pull/8260 as to which components
+    // need updating.
+    if (!this.player_.options_.experimentalSvgIcons) {
+      return;
+    }
+
+    const xmlnsURL = 'http://www.w3.org/2000/svg';
+
+    // The below creates an element in the format of:
+    // <span><svg><use>....</use></svg></span>
+    const iconContainer = Dom.createEl('span', {
+      className: 'vjs-icon-placeholder vjs-svg-icon'
+    }, {'aria-hidden': 'true'});
+
+    const svgEl = document.createElementNS(xmlnsURL, 'svg');
+
+    svgEl.setAttributeNS(null, 'viewBox', '0 0 512 512');
+    const useEl = document.createElementNS(xmlnsURL, 'use');
+
+    svgEl.appendChild(useEl);
+    useEl.setAttributeNS(null, 'href', `#vjs-icon-${iconName}`);
+    iconContainer.appendChild(svgEl);
+
+    // Replace a pre-existing icon if one exists.
+    if (this.iconIsSet_) {
+      el.replaceChild(iconContainer, el.querySelector('.vjs-icon-placeholder'));
+    } else {
+      el.appendChild(iconContainer);
+    }
+
+    this.iconIsSet_ = true;
+
+    return iconContainer;
   }
 
   /**

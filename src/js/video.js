@@ -149,7 +149,12 @@ function videojs(id, options, ready) {
   // This will make sure that the element is indeed in the dom of that document.
   // Additionally, check that the document in question has a default view.
   // If the document is no longer attached to the dom, the defaultView of the document will be null.
-  if (!el.ownerDocument.defaultView || !el.ownerDocument.body.contains(el)) {
+  // If element is inside Shadow DOM (e.g. is part of a Custom element), ownerDocument.body
+  // always returns false. Instead, use the Shadow DOM root.
+  const inShadowDom = 'getRootNode' in el ? el.getRootNode() instanceof window.ShadowRoot : false;
+  const rootNode = inShadowDom ? el.getRootNode() : el.ownerDocument.body;
+
+  if (!el.ownerDocument.defaultView || !rootNode.contains(el)) {
     log.warn('The element supplied is not included in the DOM');
   }
 
@@ -323,7 +328,7 @@ videojs.registerComponent = (name, comp) => {
     log.warn(`The ${name} tech was registered as a component. It should instead be registered using videojs.registerTech(name, tech)`);
   }
 
-  Component.registerComponent.call(Component, name, comp);
+  return Component.registerComponent.call(Component, name, comp);
 };
 
 videojs.getTech = Tech.getTech;

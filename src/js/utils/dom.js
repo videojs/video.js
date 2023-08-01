@@ -1,3 +1,4 @@
+
 /**
  * @file dom.js
  * @module dom
@@ -161,7 +162,7 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
 /**
  * Injects text into an element, replacing any existing contents entirely.
  *
- * @param  {Element} el
+ * @param  {HTMLElement} el
  *         The element to add text content into
  *
  * @param  {string} text
@@ -342,18 +343,19 @@ export function getAttributes(tag) {
   // known boolean attributes
   // we can check for matching boolean properties, but not all browsers
   // and not all tags know about these attributes, so, we still want to check them manually
-  const knownBooleans = ',' + 'autoplay,controls,playsinline,loop,muted,default,defaultMuted' + ',';
+  const knownBooleans = ['autoplay', 'controls', 'playsinline', 'loop', 'muted', 'default', 'defaultMuted'];
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     const attrs = tag.attributes;
 
     for (let i = attrs.length - 1; i >= 0; i--) {
       const attrName = attrs[i].name;
+      /** @type {boolean|string} */
       let attrVal = attrs[i].value;
 
       // check for known booleans
       // the matching element property will return a value for typeof
-      if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(',' + attrName + ',') !== -1) {
+      if (knownBooleans.includes(attrName)) {
         // the value of an included boolean attribute is typically an empty
         // string ('') which would equal false if we just check for a false value.
         // we also don't want support bad code like autoplay='false'
@@ -730,7 +732,7 @@ export function insertContent(el, content) {
 /**
  * Check if an event was a single left click.
  *
- * @param  {Event} event
+ * @param  {MouseEvent} event
  *         Event object.
  *
  * @return {boolean}
@@ -854,4 +856,32 @@ export function computedStyle(el, prop) {
   }
 
   return '';
+}
+
+/**
+ * Copy document style sheets to another window.
+ *
+ * @param    {Window} win
+ *           The window element you want to copy the document style sheets to.
+ *
+ */
+export function copyStyleSheetsToWindow(win) {
+  [...document.styleSheets].forEach((styleSheet) => {
+    try {
+      const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+      const style = document.createElement('style');
+
+      style.textContent = cssRules;
+      win.document.head.appendChild(style);
+    } catch (e) {
+      const link = document.createElement('link');
+
+      link.rel = 'stylesheet';
+      link.type = styleSheet.type;
+      // For older Safari this has to be the string; on other browsers setting the MediaList works
+      link.media = styleSheet.media.mediaText;
+      link.href = styleSheet.href;
+      win.document.head.appendChild(link);
+    }
+  });
 }

@@ -23,6 +23,7 @@ class FullscreenToggle extends Button {
    */
   constructor(player, options) {
     super(player, options);
+    this.setIcon('fullscreen-enter');
     this.on(player, 'fullscreenchange', (e) => this.handleFullscreenChange(e));
 
     if (document[player.fsApi_.fullscreenEnabled] === false) {
@@ -52,8 +53,10 @@ class FullscreenToggle extends Button {
   handleFullscreenChange(event) {
     if (this.player_.isFullscreen()) {
       this.controlText('Exit Fullscreen');
+      this.setIcon('fullscreen-exit');
     } else {
       this.controlText('Fullscreen');
+      this.setIcon('fullscreen-enter');
     }
   }
 

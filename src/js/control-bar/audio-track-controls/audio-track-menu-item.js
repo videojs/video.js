@@ -49,7 +49,7 @@ class AudioTrackMenuItem extends MenuItem {
     const el = super.createEl(type, props, attrs);
     const parentSpan = el.querySelector('.vjs-menu-item-text');
 
-    if (this.options_.track.kind === 'main-desc') {
+    if (['main-desc', 'description'].indexOf(this.options_.track.kind) >= 0) {
       parentSpan.appendChild(Dom.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {
