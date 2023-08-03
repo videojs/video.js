@@ -41,6 +41,8 @@ module.exports = function(config) {
     'node_modules/es6-shim/es6-shim.js',
     // make sinon be available via karma's server but don't include it directly
     { pattern: 'node_modules/sinon/pkg/sinon.js', included: false, served: true },
+    // add sinon v8 to accommodate for Chrome v53 testing.
+    { pattern: 'node_modules/sinon8/pkg/sinon.js', included: false, served: true },
     'test/sinon.js',
     'dist/video-js.css',
     'test/dist/bundle.js',
