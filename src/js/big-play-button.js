@@ -36,8 +36,8 @@ class BigPlayButton extends Button {
    * This gets called when a `BigPlayButton` "clicked". See {@link ClickableComponent}
    * for more detailed information on what a click can be.
    *
-   * @param {MouseEvent|TouchEvent} event
-   *        The `tap` or `click` event that caused this function to be
+   * @param {KeyboardEvent|MouseEvent|TouchEvent} event
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
    * @listens tap
