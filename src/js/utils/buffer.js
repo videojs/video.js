@@ -29,10 +29,8 @@ export function bufferedPercent(buffered, duration) {
 
   for (let i = 0; i < buffered.length; i++) {
     const start = buffered.start(i);
-    const end = buffered.end(i);
-
     // buffered end can be bigger than duration by a very small fraction
-    end = Math.min(end, duration);
+    const end = Math.min(buffered.end(i), duration);
 
     bufferedDuration += end - start;
   }
