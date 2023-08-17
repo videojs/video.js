@@ -8,6 +8,11 @@
   pointer-events: none;
 }
 
+// Hide if an error occurs
+.vjs-error .vjs-text-track-display {
+  display: none;
+}
+
 // Move captions down when controls aren't being shown
 .video-js.vjs-controls-disabled .vjs-text-track-display,
 .video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
