@@ -31,8 +31,13 @@
 }
 
 .vjs-big-play-button .vjs-svg-icon {
-  width: 0.75em;
-  height: 0.75em;
+  width: 1em;
+  height: 1em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  line-height: 1;
+  transform: translate(-50%, -50%);
 }
 
 .video-js:hover .vjs-big-play-button,
