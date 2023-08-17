@@ -1,3 +1,14 @@
+<a name="8.5.2"></a>
+## [8.5.2](https://github.com/videojs/video.js/compare/v8.5.1...v8.5.2) (2023-08-14)
+
+### Bug Fixes
+
+* **text:** caption settings typo ([560b81a](https://github.com/videojs/video.js/commit/560b81a))
+
+### Chores
+
+* **package:** bump VHS version from 3.3.1 to 3.5.3 ([#8400](https://github.com/videojs/video.js/issues/8400)) ([9aff3de](https://github.com/videojs/video.js/commit/9aff3de))
+
 <a name="8.5.1"></a>
 ## [8.5.1](https://github.com/videojs/video.js/compare/v8.5.0...v8.5.1) (2023-07-21)
 

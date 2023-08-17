@@ -22,6 +22,11 @@
   width: 100%;
 }
 
+// Hide if an error occurs
+.vjs-error .vjs-title-bar {
+  display: none;
+}
+
 .vjs-title-bar-title,
 .vjs-title-bar-description {
   margin: 0;
