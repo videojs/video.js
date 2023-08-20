@@ -2160,7 +2160,9 @@ class Player extends Component {
   handleTechError_() {
     const error = this.tech_.error();
 
-    this.error(error);
+    if (error) {
+      this.error(error);
+    }
   }
 
   /**
