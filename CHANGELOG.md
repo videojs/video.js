@@ -1,3 +1,12 @@
+<a name="8.5.3"></a>
+## [8.5.3](https://github.com/videojs/video.js/compare/v8.5.2...v8.5.3) (2023-08-23)
+
+### Bug Fixes
+
+* **error-display:** avoids displaying visual components when an error occurs ([#8389](https://github.com/videojs/video.js/issues/8389)) ([42e17b2](https://github.com/videojs/video.js/commit/42e17b2))
+* **svg-icons:** default icons color ([#8382](https://github.com/videojs/video.js/issues/8382)) ([b95cd7a](https://github.com/videojs/video.js/commit/b95cd7a))
+* **svg-icons:** icon size consistency  ([#8380](https://github.com/videojs/video.js/issues/8380)) ([d040881](https://github.com/videojs/video.js/commit/d040881))
+
 <a name="8.5.2"></a>
 ## [8.5.2](https://github.com/videojs/video.js/compare/v8.5.1...v8.5.2) (2023-08-14)
 
