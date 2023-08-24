@@ -5,6 +5,7 @@ import Component from './component';
 import * as Dom from './utils/dom.js';
 import log from './utils/log.js';
 import keycode from 'keycode';
+import { throttle } from './utils/fn';
 
 /**
  * Component which is clickable or keyboard actionable, but is not a
@@ -41,9 +42,11 @@ class ClickableComponent extends Component {
       this.controlText(this.options_.controlText);
     }
 
+    const throttledClick = throttle(this.handleClick.bind(this), 50);
+
     this.handleMouseOver_ = (e) => this.handleMouseOver(e);
     this.handleMouseOut_ = (e) => this.handleMouseOut(e);
-    this.handleClick_ = (e) => this.handleClick(e);
+    this.handleClick_ = (e) => throttledClick(e);
     this.handleKeyDown_ = (e) => this.handleKeyDown(e);
 
     this.emitTapEvents();
