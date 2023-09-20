@@ -11,10 +11,10 @@ let history = [];
  * Log messages to the console and history based on the type of message
  *
  * @private
- * @param  {string} type
+ * @param  {string} name
  *         The name of the console method to use.
  *
- * @param  {Array} args
+ * @param  {Object} log
  *         The arguments to be passed to the matching console method.
  */
 const LogByTypeFactory = (name, log) => (type, level, args) => {
