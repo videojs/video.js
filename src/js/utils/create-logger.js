@@ -16,8 +16,11 @@ let history = [];
  *
  * @param  {Object} log
  *         The arguments to be passed to the matching console method.
+ *
+ * @param {string} [styles]
+ *        styles for name
  */
-const LogByTypeFactory = (name, log) => (type, level, args) => {
+const LogByTypeFactory = (name, log, styles) => (type, level, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
 
@@ -25,6 +28,11 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
 
     // Add the type to the front of the message when it's not "log".
     args.unshift(type.toUpperCase() + ':');
+  }
+
+  if (styles) {
+    name = `%c${name}`;
+    args.unshift(styles);
   }
 
   // Add console prefix after adding to history.
@@ -66,7 +74,7 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
   fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
 };
 
-export default function createLogger(name) {
+export default function createLogger(name, delimiter = ':', styles = '') {
   // This is the private tracking variable for logging level.
   let level = 'info';
 
@@ -99,10 +107,10 @@ export default function createLogger(name) {
   };
 
   // This is the logByType helper that the logging methods below use
-  logByType = LogByTypeFactory(name, log);
+  logByType = LogByTypeFactory(name, log, styles);
 
   /**
-   * Create a new sublogger which chains the old name to the new name.
+   * Create a new subLogger which chains the old name to the new name.
    *
    * For example, doing `videojs.log.createLogger('player')` and then using that logger will log the following:
    * ```js
@@ -110,11 +118,21 @@ export default function createLogger(name) {
    *  // > VIDEOJS: player: foo
    * ```
    *
-   * @param {string} name
+   * @param {string} subName
    *        The name to add call the new logger
+   * @param {string} [subDelimiter]
+   *        Optional delimiter
+   * @param {string} [subStyles]
+   *        Optional styles
    * @return {Object}
    */
-  log.createLogger = (subname) => createLogger(name + ': ' + subname);
+  log.createLogger = (subName, subDelimiter, subStyles) => {
+    const resultDelimiter = subDelimiter || delimiter;
+    const resultStyles = subStyles || styles;
+    const resultName = `${name} ${resultDelimiter} ${subName}`;
+
+    return createLogger(resultName, resultDelimiter, resultStyles);
+  };
 
   /**
    * Enumeration of available logging levels, where the keys are the level names
