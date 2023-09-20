@@ -24,6 +24,8 @@ const LogByTypeFactory = (name, log, styles) => (type, level, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
 
+  let resultName = name;
+
   if (type !== 'log') {
 
     // Add the type to the front of the message when it's not "log".
@@ -31,12 +33,12 @@ const LogByTypeFactory = (name, log, styles) => (type, level, args) => {
   }
 
   if (styles) {
-    name = `%c${name}`;
+    resultName = `%c${name}`;
     args.unshift(styles);
   }
 
   // Add console prefix after adding to history.
-  args.unshift(name + ':');
+  args.unshift(resultName + ':');
 
   // Add a clone of the args at this point to history.
   if (history) {
@@ -127,8 +129,8 @@ export default function createLogger(name, delimiter = ':', styles = '') {
    * @return {Object}
    */
   log.createLogger = (subName, subDelimiter, subStyles) => {
-    const resultDelimiter = subDelimiter || delimiter;
-    const resultStyles = subStyles || styles;
+    const resultDelimiter = subDelimiter !== undefined ? subDelimiter : delimiter;
+    const resultStyles = subStyles !== undefined ? subStyles : styles;
     const resultName = `${name} ${resultDelimiter} ${subName}`;
 
     return createLogger(resultName, resultDelimiter, resultStyles);
