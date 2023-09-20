@@ -151,7 +151,7 @@ export default function createLogger(name) {
    * If a string matching a key from {@link module:log.levels} is provided, acts
    * as a setter.
    *
-   * @param  {string} [lvl]
+   * @param  {'all'|'debug'|'info'|'warn'|'error'|'off'} [lvl]
    *         Pass a valid level to set a new logging level.
    *
    * @return {string}
