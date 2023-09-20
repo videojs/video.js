@@ -135,6 +135,21 @@ export default function createLogger(name, delimiter = ':', styles = '') {
   };
 
   /**
+   * Create a new logger.
+   *
+   * @param {string} newName
+   *        The name for the new logger
+   * @param {string} [newDelimiter]
+   *        Optional delimiter
+   * @param {string} [newStyles]
+   *        Optional styles
+   * @return {Object}
+   */
+  log.createNewLogger = (newName, newDelimiter, newStyles) => {
+    return createLogger(newName, newDelimiter, newStyles);
+  };
+
+  /**
    * Enumeration of available logging levels, where the keys are the level names
    * and the values are `|`-separated strings containing logging methods allowed
    * in that logging level. These strings are used to create a regular expression
