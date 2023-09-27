@@ -1,3 +1,14 @@
+<a name="8.6.0"></a>
+# [8.6.0](https://github.com/videojs/video.js/compare/v8.5.3...v8.6.0) (2023-09-25)
+
+### Features
+
+* enhanced logger ([#8444](https://github.com/videojs/video.js/issues/8444)) ([cf681e0](https://github.com/videojs/video.js/commit/cf681e0))
+
+### Chores
+
+* **package:** Update VHS version ([#8447](https://github.com/videojs/video.js/issues/8447)) ([372b816](https://github.com/videojs/video.js/commit/372b816))
+
 <a name="8.5.3"></a>
 ## [8.5.3](https://github.com/videojs/video.js/compare/v8.5.2...v8.5.3) (2023-08-23)
 

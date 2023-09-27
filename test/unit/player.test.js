@@ -3383,3 +3383,37 @@ QUnit.test('crossOrigin value should be maintained after loadMedia is called', f
   playerExample2.dispose();
   playerExample3.dispose();
 });
+
+QUnit.test('should not reset the error when the tech triggers an error that is null', function(assert) {
+  sinon.stub(log, 'error');
+
+  const player = TestHelpers.makePlayer();
+
+  player.src({
+    src: 'http://example.com/movie.unsupported-format',
+    type: 'video/unsupported-format'
+  });
+
+  this.clock.tick(60);
+
+  // Simulates Chromium's behavior when the poster is invalid
+
+  // is only there for context, but does nothing
+  player.poster('invalid');
+
+  const spyError = sinon.spy(player, 'error');
+  // Chromium behavior produced by the video element
+  const errorStub = sinon.stub(player.tech(true), 'error').callsFake(() => null);
+
+  player.tech(true).trigger('error');
+  // End
+
+  assert.ok(player.hasClass('vjs-error'), 'player has vjs-error class');
+  assert.ok(spyError.notCalled, 'error was not called');
+  assert.ok(player.error(), 'error is retained');
+
+  player.dispose();
+  spyError.restore();
+  errorStub.restore();
+  log.error.restore();
+});

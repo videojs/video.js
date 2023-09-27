@@ -10,6 +10,14 @@
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }
 
+// Locks the display only if:
+//  - controls are not disabled
+//  - native controls are not used
+//  - there is no error
+.video-js:not(.vjs-controls-disabled, .vjs-using-native-controls, .vjs-error) .vjs-control-bar.vjs-lock-showing {
+  display: flex !important;
+}
+
 // Video has started playing or we are in audioOnlyMode
 .vjs-has-started .vjs-control-bar,
 .vjs-audio-only-mode .vjs-control-bar {
