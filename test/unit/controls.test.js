@@ -19,6 +19,9 @@ import sinon from 'sinon';
 QUnit.module('Controls', {
   beforeEach(assert) {
     this.clock = sinon.useFakeTimers();
+    // because some click events are throttled we need to tick the clock
+    // forward for test click events to be handled
+    this.clock.tick(50);
   },
   afterEach(assert) {
     this.clock.restore();
