@@ -2,6 +2,7 @@
   "include": ["src/js/**/*"],
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "dist/types",

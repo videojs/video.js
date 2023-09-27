@@ -88,7 +88,7 @@ class MenuItem extends ClickableComponent {
    * Ignore keys which are used by the menu, but pass any other ones up. See
    * {@link ClickableComponent#handleKeyDown} for instances where this is called.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

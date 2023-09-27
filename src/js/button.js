@@ -106,7 +106,7 @@ class Button extends ClickableComponent {
    * This gets called when a `Button` has focus and `keydown` is triggered via a key
    * press.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The event that caused this function to get called.
    *
    * @listens keydown

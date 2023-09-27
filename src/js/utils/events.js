@@ -64,7 +64,7 @@ function _cleanUpEvents(elem, type) {
  * @param {Element|Object} elem
  *        Element or object to bind listeners to
  *
- * @param {string} type
+ * @param {string[]} types
  *        Type of event to bind to.
  *
  * @param {Function} callback
