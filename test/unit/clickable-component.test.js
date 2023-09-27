@@ -1,9 +1,18 @@
 /* eslint-env qunit */
+import { useFakeTimers } from 'sinon';
 import ClickableComponent from '../../src/js/clickable-component.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
 
-QUnit.module('ClickableComponent');
+QUnit.module('ClickableComponent', {
+  beforeEach() {
+    this.clock = useFakeTimers();
+  },
+
+  afterEach() {
+    this.clock.restore();
+  }
+});
 
 QUnit.test('should create a div with role="button"', function(assert) {
   assert.expect(2);
@@ -153,4 +162,57 @@ QUnit.test('class and text should be settable from options', function(assert) {
 
   testClickableComponent.dispose();
   player.dispose();
+});
+
+QUnit.test('should respect throttle option', function(assert) {
+  assert.expect(8);
+  let clicks = 0;
+
+  class ThrottlableComponent extends ClickableComponent {
+    constructor(player, options) {
+      super(player, options);
+    }
+    handleClick() {
+      clicks++;
+    }
+  }
+
+  const player = TestHelpers.makePlayer({});
+  const noThrottleComponent = new ThrottlableComponent(player);
+  const throttledComponent = new ThrottlableComponent(player, {throttle: true});
+  const customThrottledComponent1 = new ThrottlableComponent(player, {throttle: 10 });
+  const customThrottledComponent2 = new ThrottlableComponent(player, {throttle: 0 });
+  const noThrottleEl = noThrottleComponent.el();
+  const throttledEl = throttledComponent.el();
+  const customThrottledEl1 = customThrottledComponent1.el();
+  const customThrottledEl2 = customThrottledComponent2.el();
+
+  const testThrottledClicks = (el, wait, elName) => {
+    clicks = 0;
+    // We need to wait for the durarion of the throttle wait
+    // parameter before proceeding to test throttled functions
+    this.clock.tick(wait);
+    Events.trigger(el, 'click');
+    assert.equal(clicks, 1, `${elName}: First click is handled`);
+    Events.trigger(el, 'click');
+    assert.equal(clicks, 1, `${elName}: Second click is ignored`);
+    // allow time before next click
+    this.clock.tick(wait);
+    Events.trigger(el, 'click');
+    assert.equal(clicks, 2, `${elName}: third click is handled`);
+  };
+
+  // 2 instantaneous clicks on non-throttled el
+  Events.trigger(noThrottleEl, 'click');
+  Events.trigger(noThrottleEl, 'click');
+  assert.equal(clicks, 2, 'click on enabled ClickableComponent is handled twice');
+
+  clicks = 0;
+  // 0 wait is not throttled
+  Events.trigger(customThrottledEl2, 'click');
+  Events.trigger(customThrottledEl2, 'click');
+  assert.equal(clicks, 2, 'click on enabled ClickableComponent with wait of 0 is handled twice');
+
+  testThrottledClicks(throttledEl, 50, 'default wait');
+  testThrottledClicks(customThrottledEl1, 10, '10ms wait');
 });
