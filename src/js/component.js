@@ -1076,9 +1076,8 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the componentresize event trigger
    *
-   * @return {number|string}
-   *         The width when getting, zero if there is no width. Can be a string
-   *           postpixed with '%' or 'px'.
+   * @return {number|undefined}
+   *         The width when getting, zero if there is no width
    */
   width(num, skipListeners) {
     return this.dimension('width', num, skipListeners);
@@ -1094,9 +1093,8 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the componentresize event trigger
    *
-   * @return {number|string}
-   *         The width when getting, zero if there is no width. Can be a string
-   *         postpixed with '%' or 'px'.
+   * @return {number|undefined}
+   *         The height when getting, zero if there is no height
    */
   height(num, skipListeners) {
     return this.dimension('height', num, skipListeners);
@@ -1142,7 +1140,7 @@ class Component {
    * @param  {boolean} [skipListeners]
    *         Skip componentresize event trigger
    *
-   * @return {number}
+   * @return {number|undefined}
    *         The dimension when getting or 0 if unset
    */
   dimension(widthOrHeight, num, skipListeners) {

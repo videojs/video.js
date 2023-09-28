@@ -177,7 +177,7 @@ class TrackList extends EventTarget {
  * Events that can be called with on + eventName. See {@link EventHandler}.
  *
  * @property {Object} TrackList#allowedEvents_
- * @private
+ * @protected
  */
 TrackList.prototype.allowedEvents_ = {
   change: 'change',
