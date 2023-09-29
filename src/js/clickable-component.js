@@ -34,7 +34,7 @@ class ClickableComponent extends Component {
    *         A class or space separated list of classes to add the component
    *
    * @param  {number | boolean} [options.throttle]
-   *         A throttle will be applied to the clickHander if the number is >= 1 or the value is `true`
+   *         A throttle will be applied to the clickHandler if the number is >= 1 or the value is `true`
    *         A number specifies the desired wait time in ms or a default wait of 50ms will be applied
    *
    */
@@ -46,20 +46,22 @@ class ClickableComponent extends Component {
       this.controlText(this.options_.controlText);
     }
 
+    const throttleIsNumber = typeof this.options_.throttle === 'number';
+    const boundClick = this.handleClick.bind(this);
     const selectClickHandler = () => {
-      if (typeof this.options_.throttle === 'number' || this.options_.throttle === true) {
-        const wait = typeof this.options_.throttle === 'number' ? parseInt(this.options_.throttle, 10) : 50;
+      if (throttleIsNumber || this.options_.throttle === true) {
+        const wait = throttleIsNumber ? this.options_.throttle : 50;
 
-        return throttle(this.handleClick.bind(this), wait);
+        return throttle(boundClick, wait);
       }
-      return this.handleClick.bind(this);
+      return boundClick;
     };
 
-    const selectedClickHander = selectClickHandler();
+    const selectedClickHandler = selectClickHandler();
 
     this.handleMouseOver_ = (e) => this.handleMouseOver(e);
     this.handleMouseOut_ = (e) => this.handleMouseOut(e);
-    this.handleClick_ = (e) => selectedClickHander(e);
+    this.handleClick_ = (e) => selectedClickHandler(e);
     this.handleKeyDown_ = (e) => this.handleKeyDown(e);
 
     this.emitTapEvents();
