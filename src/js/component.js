@@ -582,7 +582,6 @@ class Component {
   /**
    * Add a child `Component` inside the current `Component`.
    *
-   *
    * @param {string|Component} child
    *        The name or instance of a child to add.
    *
@@ -593,7 +592,8 @@ class Component {
    * @param {number} [index=this.children_.length]
    *        The index to attempt to add a child into.
    *
-   * @return {typeof Component}
+   *
+   * @return {Component}
    *         The `Component` that gets added as a child. When using a string the
    *         `Component` will get created by this process.
    */
