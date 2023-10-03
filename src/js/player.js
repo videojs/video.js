@@ -286,8 +286,8 @@ const DEFAULT_BREAKPOINTS = {
  *
  * After an instance has been created it can be accessed globally in three ways:
  * 1. By calling `videojs.getPlayer('example_video_1');`
- * 2. By calling `videojs('example_video_1');` (not recomended)
- * 2. By using it directly via  `videojs.players.example_video_1;`
+ * 2. By calling `videojs('example_video_1');` (not recommended)
+ * 2. By using it directly via `videojs.players.example_video_1;`
  *
  * @extends Component
  * @global

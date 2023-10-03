@@ -320,10 +320,10 @@ videojs.getComponent = Component.getComponent;
  * @param {string} name
  *        The class name of the component
  *
- * @param {Component} comp
+ * @param {typeof Component} comp
  *        The component class
  *
- * @return {Component}
+ * @return {typeof Component}
  *         The newly registered component
  */
 videojs.registerComponent = (name, comp) => {
@@ -410,9 +410,11 @@ videojs.deregisterPlugin = Plugin.deregisterPlugin;
  *
  * @param {string} name
  *        The plugin name
- *
- * @param {Plugin|Function} plugin
+*
+ * @param {typeof Plugin|Function} plugin
  *         The plugin sub-class or function
+ *
+ * @return {typeof Plugin|Function}
  */
 videojs.plugin = (name, plugin) => {
   log.warn('videojs.plugin() is deprecated; use videojs.registerPlugin() instead');
