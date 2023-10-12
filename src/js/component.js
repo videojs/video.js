@@ -160,7 +160,7 @@ class Component {
    * @param {string|string[]} type
    *        An event name or an array of event names.
    *
-   * @param {Function} fn
+   * @param {Function} [fn]
    *        The function to remove.
    */
   off(type, fn) {}
@@ -1843,7 +1843,7 @@ class Component {
    * @param {string} name
    *        The Name of the component to get.
    *
-   * @return {Component}
+   * @return {typeof Component}
    *         The `Component` that got registered under the given name.
    */
   static getComponent(name) {
