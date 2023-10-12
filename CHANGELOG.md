@@ -1,3 +1,19 @@
+<a name="8.6.1"></a>
+## [8.6.1](https://github.com/videojs/video.js/compare/v8.6.0...v8.6.1) (2023-10-12)
+
+### Bug Fixes
+
+* **control-bar:** incorrect display when control bar display is locked ([#8435](https://github.com/videojs/video.js/issues/8435)) ([473176f](https://github.com/videojs/video.js/commit/473176f))
+* **error:** chromium reset mediaError when the poster is invalid ([#8410](https://github.com/videojs/video.js/issues/8410)) ([68f1429](https://github.com/videojs/video.js/commit/68f1429)), closes [#8409](https://github.com/videojs/video.js/issues/8409)
+* Resolves captions sizing issue when minified ([#8442](https://github.com/videojs/video.js/issues/8442)) ([9267c46](https://github.com/videojs/video.js/commit/9267c46))
+* **types:** improves quality of typescript definitions ([#8218](https://github.com/videojs/video.js/issues/8218)) ([781eb43](https://github.com/videojs/video.js/commit/781eb43))
+* **types:** use typeof for registerComponent and registerPlugin ([#8451](https://github.com/videojs/video.js/issues/8451)) ([2c36d25](https://github.com/videojs/video.js/commit/2c36d25))
+
+### Chores
+
+* **types:** fix issues in exported types ([#8333](https://github.com/videojs/video.js/issues/8333)) ([bad086d](https://github.com/videojs/video.js/commit/bad086d))
+* update VHS and mux.js versions ([#8462](https://github.com/videojs/video.js/issues/8462)) ([9701de9](https://github.com/videojs/video.js/commit/9701de9))
+
 <a name="8.6.0"></a>
 # [8.6.0](https://github.com/videojs/video.js/compare/v8.5.3...v8.6.0) (2023-09-25)
 
