@@ -161,7 +161,7 @@ class Component {
    *        An event name or an array of event names.
    *
    * @param {Function} [fn]
-   *        The function to remove.
+   *        The function to remove. If not specified, all listeners managed by Video.js will be removed.
    */
   off(type, fn) {}
 
