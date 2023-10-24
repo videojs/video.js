@@ -47,7 +47,7 @@ There's also other Video.js projects where you can help. (check the [video.js or
 
 [GitHub Issues](https://github.com/videojs/video.js/issues) are used for all discussions around the codebase, including **bugs**, **features**, and other **enhancements**.
 
-When filling out an issue, make sure to fill out the questions in the
+When filling out an issue, please respond to all of the questions in the template, including as much information as possible.
 
 ### Reporting a Bug
 
