@@ -5,7 +5,7 @@
 /**
  * The current list of {@link HtmlTrackElement}s.
  */
-class HtmlTrackElementList {
+export class HtmlTrackElementList {
 
   /**
    * Create an instance of this class.
