@@ -5411,51 +5411,56 @@ class Player extends Component {
  *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
  *
- * @return {VideoTrackList}
+ * @returns {import("./tracks/video-track-list").VideoTrackList}
  *         the current video track list
  *
  * @method Player.prototype.videoTracks
  */
+Player.prototype.videoTracks = () => {};
 
 /**
  * Get the {@link AudioTrackList}
  *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
  *
- * @return {AudioTrackList}
+ * @return {import("./tracks/audio-track-list").AudioTrackList}
  *         the current audio track list
  *
  * @method Player.prototype.audioTracks
  */
+Player.prototype.audioTracks = () => {};
 
 /**
  * Get the {@link TextTrackList}
  *
  * @link http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
  *
- * @return {TextTrackList}
+ * @return {import("./tracks/text-track-list").TextTrackList}
  *         the current text track list
  *
  * @method Player.prototype.textTracks
  */
+Player.prototype.textTracks = () => {};
 
 /**
  * Get the remote {@link TextTrackList}
  *
- * @return {TextTrackList}
+ * @return {import("./tracks/text-track-list").TextTrackList}
  *         The current remote text track list
  *
  * @method Player.prototype.remoteTextTracks
  */
+Player.prototype.remoteTextTracks = () => {};
 
 /**
  * Get the remote {@link HtmlTrackElementList} tracks.
  *
- * @return {HtmlTrackElementList}
+ * @return {import("./tracks/html-track-element-list").HtmlTrackElementList}
  *         The current remote text track element list
  *
  * @method Player.prototype.remoteTextTrackEls
  */
+Player.prototype.remoteTextTrackEls = () => {};
 
 TRACK_TYPES.names.forEach(function(name) {
   const props = TRACK_TYPES[name];
