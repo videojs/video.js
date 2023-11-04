@@ -3604,6 +3604,9 @@ class Player extends Component {
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     this.resetControlBarUI_();
+
+    this.error(null);
+
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
