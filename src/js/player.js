@@ -5313,7 +5313,11 @@ Player.prototype.options_ = {
   breakpoints: {},
   responsive: false,
   audioOnlyMode: false,
-  audioPosterMode: false
+  audioPosterMode: false,
+  spatialNavigation: {
+    enabled: false,
+    horizontalSeek: false
+  }
 };
 
 [

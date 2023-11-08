@@ -1309,7 +1309,7 @@ class Component {
 
       // We only stop propagation here because we want unhandled events to fall
       // back to the browser. Exclude Tab for focus trapping.
-      if (!keycode.isEventKey(event, 'Tab')) {
+      if (!keycode.isEventKey(event, 'Tab') && !(this.options_.playerOptions.spatialNavigation && this.options_.playerOptions.spatialNavigation.enabled)) {
         event.stopPropagation();
       }
       this.player_.handleKeyDown(event);
