@@ -294,6 +294,142 @@ class Component {
   }
 
   /**
+   * Determine whether or not this component can be focused.
+   *
+   * @return {boolean}
+   *         If the component can be focused, will be `true`. Otherwise, `false`.
+   */
+  getIsFocusable(foo = this) {
+    let componentCSSClass = this.buildCSSClass();
+    let DOMelement = document.querySelector("." + componentCSSClass);
+
+    /**
+     * Decide the style property of this element is specified whether it's visible or not.
+     * @function isVisibleStyleProperty
+     * @param element {CSSStyleDeclaration}
+     * @returns {boolean}
+     */
+     function isVisibleStyleProperty(element) {
+      const elementStyle = window.getComputedStyle(element, null);
+      const thisVisibility = elementStyle.getPropertyValue('visibility');
+      const thisDisplay = elementStyle.getPropertyValue('display');
+      const invisibleStyle = ['hidden', 'collapse'];
+
+      return (thisDisplay !== 'none' && !invisibleStyle.includes(thisVisibility));
+    }
+
+    /**
+     * Decide whether an element is overflow or not.
+     * @function isOverflow
+     * @param element {Node}
+     * @param dir {SpatialNavigationDirection} - The directional information for the spatial navigation (e.g. LRUD)
+     * @returns {boolean}
+     */
+    function isOverflow(element, dir) {
+      if (element && typeof element === 'object') {
+        if (dir && typeof dir === 'string') { // parameter: element, dir
+          switch (dir) {
+            case 'left':
+            /* falls through */
+            case 'right':
+              return (element.scrollWidth > element.clientWidth);
+            case 'up':
+            /* falls through */
+            case 'down':
+              return (element.scrollHeight > element.clientHeight);
+          }
+        } else { // parameter: element
+          return (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight);
+        }
+        return false;
+      }
+    }
+
+    /**
+   * Decide whether an element is a scrollable container or not.
+   * @see {@link https://drafts.csswg.org/css-overflow-3/#scroll-container}
+   * @function isScrollContainer
+   * @param element {Node}
+   * @returns {boolean}
+   */
+    function isScrollContainer(element) {
+      const elementStyle = window.getComputedStyle(element, null);
+      const overflowX = elementStyle.getPropertyValue('overflow-x');
+      const overflowY = elementStyle.getPropertyValue('overflow-y');
+
+      return ((overflowX !== 'visible' && overflowX !== 'clip' && isOverflow(element, 'left')) ||
+        (overflowY !== 'visible' && overflowY !== 'clip' && isOverflow(element, 'down'))) ?
+        true : false;
+    }
+
+    /**
+     * Decide whether this element is scrollable or not.
+     * NOTE: If the value of 'overflow' is given to either 'visible', 'clip', or 'hidden', the element isn't scrollable.
+     *       If the value is 'hidden', the element can be only programmically scrollable. (https://drafts.csswg.org/css-overflow-3/#valdef-overflow-hidden)
+     * @function isScrollable
+     * @param element {Node}
+     * @param dir {SpatialNavigationDirection} - The directional information for the spatial navigation (e.g. LRUD)
+     * @returns {boolean}
+     */
+    function isScrollable(element, dir) { // element, dir
+      if (element && typeof element === 'object') {
+        if (dir && typeof dir === 'string') { // parameter: dir, element
+          if (isOverflow(element, dir)) {
+            // style property
+            const elementStyle = window.getComputedStyle(element, null);
+            const overflowX = elementStyle.getPropertyValue('overflow-x');
+            const overflowY = elementStyle.getPropertyValue('overflow-y');
+
+            switch (dir) {
+              case 'left':
+              /* falls through */
+              case 'right':
+                return (overflowX !== 'visible' && overflowX !== 'clip' && overflowX !== 'hidden');
+              case 'up':
+              /* falls through */
+              case 'down':
+                return (overflowY !== 'visible' && overflowY !== 'clip' && overflowY !== 'hidden');
+            }
+          }
+          return false;
+        } else { // parameter: element
+          return (element.nodeName === 'HTML' || element.nodeName === 'BODY') ||
+            (isScrollContainer(element) && isOverflow(element));
+        }
+      }
+    }
+
+    /**
+     * Decide whether an element is focusable for spatial navigation.
+     * 1. If element is the browsing context (document, iframe), then it's focusable,
+     * 2. If the element is scrollable container (regardless of scrollable axis), then it's focusable,
+     * 3. The value of tabIndex >= 0, then it's focusable,
+     * 4. If the element is disabled, it isn't focusable,
+     * 5. If the element is expressly inert, it isn't focusable,
+     * 6. Whether the element is being rendered or not.
+     *
+     * @function isFocusable
+     * @param element {Node}
+     * @returns {boolean}
+     *
+     * @see {@link https://html.spec.whatwg.org/multipage/interaction.html#focusable-area}
+     */
+    function isFocusable(element) {
+      if ((element.tabIndex < 0) || !isVisibleStyleProperty(element)) {
+        return false;
+      } else if ((!element.parentElement) || (isScrollable(element) && isOverflow(element)) || (element.tabIndex >= 0)) {
+        return true;
+      }
+    }
+
+    if (isFocusable(DOMelement)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Return the {@link Player} that the `Component` has attached to.
    *
    * @return { import('./player').default }

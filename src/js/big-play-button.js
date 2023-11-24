@@ -100,6 +100,10 @@ class BigPlayButton extends Button {
   handleMouseDown(event) {
     this.mouseused_ = true;
   }
+
+  getIsFocusable() {
+    super.getIsFocusable();
+  }
 }
 
 /**
