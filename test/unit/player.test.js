@@ -1910,6 +1910,7 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
     options_: {
       techOrder: ['html5', 'youtube']
     },
+    error() {},
     resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
@@ -1942,6 +1943,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
     options_: {
       techOrder: ['youtube', 'html5']
     },
+    error() {},
     resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
