@@ -253,10 +253,6 @@ class ClickableComponent extends Component {
       super.handleKeyDown(event);
     }
   }
-
-  getIsFocusable() {
-    super.getIsFocusable();
-  }
 }
 
 Component.registerComponent('ClickableComponent', ClickableComponent);
