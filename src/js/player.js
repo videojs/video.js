@@ -3607,6 +3607,13 @@ class Player extends Component {
 
     this.error(null);
 
+    if (this.titleBar) {
+      this.titleBar.update({
+        title: undefined,
+        description: undefined
+      });
+    }
+
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
