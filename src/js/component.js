@@ -13,10 +13,10 @@ import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/str.js';
 import {merge} from './utils/obj.js';
 import keycode from 'keycode';
-import SpatialNavigation from './spatial-navigation';
+// import SpatialNavigation from './spatial-navigation';
 
-const _SpatialNavigation = new SpatialNavigation();
-window.SpatialNavigation = _SpatialNavigation;
+/* const _SpatialNavigation = new SpatialNavigation();
+window.SpatialNavigation = _SpatialNavigation; */
 
 /**
  * Base class for all UI Components.
@@ -113,6 +113,10 @@ class Component {
 
       this.handleLanguagechange = this.handleLanguagechange.bind(this);
       this.on(this.player_, 'languagechange', this.handleLanguagechange);
+
+      // Binding event handlers
+      this.on('focus', this.handleFocus.bind(this));
+      this.on('blur', this.handleBlur.bind(this));
     }
     stateful(this, this.constructor.defaultState);
 
@@ -1286,6 +1290,65 @@ class Component {
   currentHeight() {
     return this.currentDimension('height');
   }
+
+  /**
+   * Retrieves the position and size information of the component's element.
+   *
+   * @return {Object} An object with `boundingClientRect` and `center` properties.
+   *         - `boundingClientRect`: An object with properties `x`, `y`, `width`,
+   *           `height`, `top`, `right`, `bottom`, and `left`, representing
+   *           the bounding rectangle of the element.
+   *         - `center`: An object with properties `x` and `y`, representing
+   *           the center point of the element. `width` and `height` are set to 0.
+   */
+  getPositions() {
+    const rect = this.el_.getBoundingClientRect();
+
+    // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
+    const boundingClientRect = {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      left: rect.left
+    };
+
+    // Calculating the center position
+    const center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      width: 0,
+      height: 0,
+      top: rect.top + rect.height / 2,
+      right: rect.left + rect.width / 2,
+      bottom: rect.top + rect.height / 2,
+      left: rect.left + rect.width / 2
+    };
+
+    return {
+      boundingClientRect,
+      center
+    };
+  }
+
+  /**
+   * Abstract method to handle the focus event. This method should be overridden
+   * in subclasses to provide specific focus event handling.
+   *
+   * @abstract
+   */
+  handleFocus() {}
+
+  /**
+   * Abstract method to handle the blur event. This method should be overridden
+   * in subclasses to provide specific blur event handling.
+   *
+   * @abstract
+   */
+  handleBlur() {}
 
   /**
    * Set the focus to this component
