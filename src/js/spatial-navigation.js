@@ -63,6 +63,34 @@ class SpatialNavigation {
     this.pause = false;
   }
 
+  getComponents() {
+    const player = window.player;
+    let focusableComponents = [];
+
+    function searchForChildrenCandidates(componentsArray) {
+      for (let i of componentsArray) {
+        if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused()) {
+          focusableComponents.push(i.el_);
+        }
+        if (i.hasOwnProperty('children_') && i.children_ .length > 0) {
+          searchForChildrenCandidates(i.children_);
+        }
+      }
+    }
+
+    for (const [key, value] of Object.entries(player)) {
+      if (key && value && value.hasOwnProperty('el_') && key !== 'player_') {
+        if (player[key].getIsFocusable() && player[key].getIsAvailableToBeFocused()) {
+          focusableComponents.push(value.el_);
+        } else if (value.hasOwnProperty('children_') && player[key].children_.length > 0) {
+          searchForChildrenCandidates(player[key].children_);
+        }
+      }
+    }
+
+    return focusableComponents;
+  }
+
   // TODO METHODS
   // // add focusable component
   // add(component: Component): void;

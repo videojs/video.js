@@ -1916,58 +1916,37 @@ class Component {
      * @returns {boolean}
      */
     function isBeingRendered(element) {
-      if (!isVisibleStyleProperty(element.parentElement))
+      if (!isVisibleStyleProperty(element.parentElement)) {
         return false;
-      if (!isVisibleStyleProperty(element) || (element.style.opacity === '0') ||
-        (window.getComputedStyle(element).height === '0px' || window.getComputedStyle(element).width === '0px'))
-        return false;
+      }
+      if (!isVisibleStyleProperty(element) || (element.style.opacity === '0') || (window.getComputedStyle(element).height === '0px' || window.getComputedStyle(element).width === '0px')) {
+        return false; 
+      }
       return true;
     }
 
-    /**
-     * Decide whether an element is overflow or not.
-     * @function isOverflow
-     * @param element {Node}
-     * @returns {boolean}
-     */
-    function isOverflow(element) {
-      if (element && typeof element === 'object') {
-          return (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight);
+    function isVisible(element) {
+      if (element.offsetWidth + element.offsetHeight + element.getBoundingClientRect().height + element.getBoundingClientRect().width === 0) {
+        return false;
       }
-    }
-
-    /**
-     * Decide whether an element is a scrollable container or not.
-     * @see {@link https://drafts.csswg.org/css-overflow-3/#scroll-container}
-     * @function isScrollContainer
-     * @param element {Node}
-     * @returns {boolean}
-     */
-    function isScrollContainer(element) {
-      const elementStyle = window.getComputedStyle(element, null);
-      const overflowX = elementStyle.getPropertyValue('overflow-x');
-      const overflowY = elementStyle.getPropertyValue('overflow-y');
-
-      return ((overflowX !== 'visible' && overflowX !== 'clip' && isOverflow(element, 'left')) ||
-        (overflowY !== 'visible' && overflowY !== 'clip' && isOverflow(element, 'down'))) ?
-        true : false;
-    }
-
-    /**
-     * Decide whether this element is scrollable or not.
-     * NOTE: If the value of 'overflow' is given to either 'visible', 'clip', or 'hidden', the element isn't scrollable.
-     *       If the value is 'hidden', the element can be only programmically scrollable. (https://drafts.csswg.org/css-overflow-3/#valdef-overflow-hidden)
-     * @function isScrollable
-     * @param element {Node}
-     * @returns {boolean}
-     */
-    function isScrollable(element) { // element
-      if (element && typeof element === 'object') {
-          return (element.nodeName === 'HTML' || element.nodeName === 'BODY') || (isScrollContainer(element) && isOverflow(element));
+      const elementCenter = {
+        x: element.getBoundingClientRect().left + element.offsetWidth / 2,
+        y: element.getBoundingClientRect().top + element.offsetHeight / 2
+      };
+      if (elementCenter.x < 0) { 
+        return false;
       }
+      if (elementCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false;
+      if (elementCenter.y < 0) return false;
+      if (elementCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false;
+      let pointContainer = document.elementFromPoint(elementCenter.x, elementCenter.y);
+      do {
+        if (pointContainer === element) return true;
+      } while (pointContainer = pointContainer.parentNode);
+      return false;
     }
 
-    if (isBeingRendered(element) && ((!element.parentElement) || (isScrollable(element) && isOverflow(element)) || (element.tabIndex >= 0))) {
+    if (isVisible (element) && isBeingRendered(element) && ((!element.parentElement) || (element.tabIndex >= 0))) {
       return true;
     } else {
       return false;
