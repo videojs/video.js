@@ -36,6 +36,7 @@ import {hooks} from './utils/hooks';
 import {isObject} from './utils/obj';
 import keycode from 'keycode';
 import icons from '../images/icons.svg';
+import SpatialNavigation from './spatial-navigation.js';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -560,6 +561,13 @@ class Player extends Component {
 
     if (this.isAudio()) {
       this.addClass('vjs-audio');
+    }
+
+    // Check if spatial navigation is enabled in the options.
+    // If enabled, dynamically import the 'spatial-navigation' module.
+    // Upon successful import, instantiate the SpatialNavigation class.
+    if (options.spatialNavigation && options.spatialNavigation.enabled) {
+      window.SpatialNavigation = new SpatialNavigation();
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing

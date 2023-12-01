@@ -5,54 +5,62 @@
 */
 
 class SpatialNavigation {
-  // Start listen of keydown events
+
+  /**
+     * Constructs a SpatialNavigation instance with initial settings.
+     *
+     * @class
+     * @param {Component|null} initialFocusedComponent - The component that should initially have focus
+     *                                                   when the spatial navigation system starts.
+     *                                                   If null or not provided, no component will be initially focused.
+     */
+  constructor(initialFocusedComponent) {
+    // const ARROW_KEY_CODE = {37: 'left', 38: 'up', 39: 'right', 40: 'down'};
+    this.components = new Set();
+    this.isListening = false;
+    this.pause = false;
+    // Set the initial focused element or default to null
+    this.currentFocus = initialFocusedComponent || null;
+  }
+
+  /**
+     * Starts the spatial navigation by adding a keydown event listener to the video container.
+     * This method ensures that the event listener is added only once.
+     */
   start() {
-    if (window.spatialNavKeyListener.listener) {
-      window.addEventListener("keydown", window.spatialNavKeyListener.listener);
-      window.spatialNavKeyListener.listener = null;
+    if (!this.isListening) {
+      this.videoContainer.addEventListener('keydown', this.onKeyDown);
+      this.isListening = true;
     }
   }
 
-  // Stop listen key down events
+  /**
+     * Stops the spatial navigation by removing the keydown event listener from the video container.
+     * Also sets the `isListening` flag to false.
+     */
   stop() {
-    const keydownEventListeners = getEventListeners(window).keydown;
-
-    function getSpatialNavEventIndex() {
-      let SpatialNavEventIndex = null;
-
-      for (let i = 0; i < keydownEventListeners.length; i++) {
-        if (keydownEventListeners[i].listener) {
-          const keyDownFunctionString = "const currentKeyMode = (parent && parent.__spatialNavigation__.keyMode)";
-
-          if (keydownEventListeners[i].listener.toString().includes(keyDownFunctionString)) {
-            SpatialNavEventIndex = i;
-          }
-        }
-      }
-
-      return SpatialNavEventIndex;
-    }
-
-    let SpatialNavEventIndex = getSpatialNavEventIndex();
-
-    if ((typeof SpatialNavEventIndex) === "number") {
-      window.spatialNavKeyListener = getEventListeners(window).keydown[SpatialNavEventIndex];
-      window.removeEventListener("keydown", getEventListeners(window).keydown[SpatialNavEventIndex].listener);
-    }
+    this.videoContainer.removeEventListener('keydown', this.onKeyDown);
+    this.isListening = false;
   }
 
-  // Temporary pause spatial navigation
+  onKeyDown(e) {
+
+  }
+
+  /**
+     * Pauses the spatial navigation functionality.
+     * This method sets a flag that can be used to temporarily disable the navigation logic.
+     */
   pause() {
-    window.spatialNavSearch = window.Element.prototype.spatialNavigationSearch;
-    window.Element.prototype.spatialNavigationSearch = () => {};
+    this.pause = true;
   }
 
-  // Resume spatial navigation
+  /**
+     * Resumes the spatial navigation functionality if it has been paused.
+     * This method resets the pause flag, re-enabling the navigation logic.
+     */
   resume() {
-    if (window.spatialNavSearch) {
-      window.Element.prototype.spatialNavigationSearch = window.spatialNavSearch;
-      window.spatialNavSearch = null;
-    }
+    this.pause = false;
   }
 
   // TODO METHODS
