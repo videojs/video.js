@@ -3599,6 +3599,10 @@ class Player extends Component {
     if (this.tech_) {
       this.tech_.clearTracks('text');
     }
+
+    this.removeClass('vjs-playing');
+    this.addClass('vjs-paused');
+
     this.resetCache_();
     this.poster('');
     this.loadTech_(this.options_.techOrder[0], null);
