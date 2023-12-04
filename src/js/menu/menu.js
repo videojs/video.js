@@ -205,7 +205,7 @@ class Menu extends Component {
   /**
    * Handle a `keydown` event on this menu. This listener is added in the constructor.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        A `keydown` event that happened on the menu.
    *
    * @listens keydown

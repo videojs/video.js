@@ -87,7 +87,7 @@ const selectConfigs = {
       ['raised', 'Raised'],
       ['depressed', 'Depressed'],
       ['uniform', 'Uniform'],
-      ['dropshadow', 'Dropshadow']
+      ['dropshadow', 'Drop shadow']
     ]
   },
 

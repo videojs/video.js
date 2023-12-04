@@ -1,3 +1,67 @@
+<a name="8.6.1"></a>
+## [8.6.1](https://github.com/videojs/video.js/compare/v8.6.0...v8.6.1) (2023-10-12)
+
+### Bug Fixes
+
+* **control-bar:** incorrect display when control bar display is locked ([#8435](https://github.com/videojs/video.js/issues/8435)) ([473176f](https://github.com/videojs/video.js/commit/473176f))
+* **error:** chromium reset mediaError when the poster is invalid ([#8410](https://github.com/videojs/video.js/issues/8410)) ([68f1429](https://github.com/videojs/video.js/commit/68f1429)), closes [#8409](https://github.com/videojs/video.js/issues/8409)
+* Resolves captions sizing issue when minified ([#8442](https://github.com/videojs/video.js/issues/8442)) ([9267c46](https://github.com/videojs/video.js/commit/9267c46))
+* **types:** improves quality of typescript definitions ([#8218](https://github.com/videojs/video.js/issues/8218)) ([781eb43](https://github.com/videojs/video.js/commit/781eb43))
+* **types:** use typeof for registerComponent and registerPlugin ([#8451](https://github.com/videojs/video.js/issues/8451)) ([2c36d25](https://github.com/videojs/video.js/commit/2c36d25))
+
+### Chores
+
+* **types:** fix issues in exported types ([#8333](https://github.com/videojs/video.js/issues/8333)) ([bad086d](https://github.com/videojs/video.js/commit/bad086d))
+* update VHS and mux.js versions ([#8462](https://github.com/videojs/video.js/issues/8462)) ([9701de9](https://github.com/videojs/video.js/commit/9701de9))
+
+<a name="8.6.0"></a>
+# [8.6.0](https://github.com/videojs/video.js/compare/v8.5.3...v8.6.0) (2023-09-25)
+
+### Features
+
+* enhanced logger ([#8444](https://github.com/videojs/video.js/issues/8444)) ([cf681e0](https://github.com/videojs/video.js/commit/cf681e0))
+
+### Chores
+
+* **package:** Update VHS version ([#8447](https://github.com/videojs/video.js/issues/8447)) ([372b816](https://github.com/videojs/video.js/commit/372b816))
+
+<a name="8.5.3"></a>
+## [8.5.3](https://github.com/videojs/video.js/compare/v8.5.2...v8.5.3) (2023-08-23)
+
+### Bug Fixes
+
+* **error-display:** avoids displaying visual components when an error occurs ([#8389](https://github.com/videojs/video.js/issues/8389)) ([42e17b2](https://github.com/videojs/video.js/commit/42e17b2))
+* **svg-icons:** default icons color ([#8382](https://github.com/videojs/video.js/issues/8382)) ([b95cd7a](https://github.com/videojs/video.js/commit/b95cd7a))
+* **svg-icons:** icon size consistency  ([#8380](https://github.com/videojs/video.js/issues/8380)) ([d040881](https://github.com/videojs/video.js/commit/d040881))
+
+<a name="8.5.2"></a>
+## [8.5.2](https://github.com/videojs/video.js/compare/v8.5.1...v8.5.2) (2023-08-14)
+
+### Bug Fixes
+
+* **text:** caption settings typo ([560b81a](https://github.com/videojs/video.js/commit/560b81a))
+
+### Chores
+
+* **package:** bump VHS version from 3.3.1 to 3.5.3 ([#8400](https://github.com/videojs/video.js/issues/8400)) ([9aff3de](https://github.com/videojs/video.js/commit/9aff3de))
+
+<a name="8.5.1"></a>
+## [8.5.1](https://github.com/videojs/video.js/compare/v8.5.0...v8.5.1) (2023-07-21)
+
+### Bug Fixes
+
+* Add skip button text for Spanish ([#8340](https://github.com/videojs/video.js/issues/8340)) ([e2f9231](https://github.com/videojs/video.js/commit/e2f9231))
+* Check for VTTCue ([#8370](https://github.com/videojs/video.js/issues/8370)) ([da15810](https://github.com/videojs/video.js/commit/da15810))
+* Don't use copyStyleSheets with documentPIP ([#8314](https://github.com/videojs/video.js/issues/8314)) ([8dd98f6](https://github.com/videojs/video.js/commit/8dd98f6))
+* Fullscreen styles for older Safari ([#8346](https://github.com/videojs/video.js/issues/8346)) ([c11d213](https://github.com/videojs/video.js/commit/c11d213))
+* **lang:** add skip button text for French ([#8341](https://github.com/videojs/video.js/issues/8341)) ([97ba60f](https://github.com/videojs/video.js/commit/97ba60f))
+* **lang:** add skip button text for Portuguese ([#8342](https://github.com/videojs/video.js/issues/8342)) ([6dac145](https://github.com/videojs/video.js/commit/6dac145))
+* make compatible with chrome 53 ([#8354](https://github.com/videojs/video.js/issues/8354)) ([c66bf40](https://github.com/videojs/video.js/commit/c66bf40))
+* **play-toggle:** missing svg play icon ([#8337](https://github.com/videojs/video.js/issues/8337)) ([b34cb2c](https://github.com/videojs/video.js/commit/b34cb2c)), closes [#8336](https://github.com/videojs/video.js/issues/8336)
+* **progress:** mouse-time-display overlaps the play-progress svg icon ([#8338](https://github.com/videojs/video.js/issues/8338)) ([e06465f](https://github.com/videojs/video.js/commit/e06465f))
+* **tests:** Fixes for old Safari ([#8368](https://github.com/videojs/video.js/issues/8368)) ([6fc1fd4](https://github.com/videojs/video.js/commit/6fc1fd4))
+* **tests:** Skip a test on old Safari ([#8356](https://github.com/videojs/video.js/issues/8356)) ([452a918](https://github.com/videojs/video.js/commit/452a918))
+
 <a name="8.5.0"></a>
 # [8.5.0](https://github.com/videojs/video.js/compare/v8.4.2...v8.5.0) (2023-06-12)
 

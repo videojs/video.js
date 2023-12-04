@@ -36,7 +36,7 @@ class AudioTrackList extends TrackList {
   /**
    * Create an instance of this class.
    *
-   * @param {AudioTrack[]} [tracks=[]]
+   * @param { import('./audio-track').default[] } [tracks=[]]
    *        A list of `AudioTrack` to instantiate the list with.
    */
   constructor(tracks = []) {

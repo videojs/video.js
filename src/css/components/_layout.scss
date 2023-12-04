@@ -142,6 +142,8 @@ body.vjs-pip-window .video-js {
   height: 100% !important;
   // Undo any aspect ratio padding for fluid layouts
   padding-top: 0 !important;
+  // Older Safari (<= 15.6) needs display: block in fullscreen.
+  display: block;
 }
 
 .video-js.vjs-fullscreen.vjs-user-inactive {

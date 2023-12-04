@@ -23,4 +23,7 @@ export class TestCustomElement extends HTMLElement {
   }
 }
 
-window.customElements.define('test-custom-element', TestCustomElement);
+// Not supported on Chrome < 54
+if ('customElements' in window) {
+  window.customElements.define('test-custom-element', TestCustomElement);
+}

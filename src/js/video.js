@@ -2,6 +2,9 @@
  * @file video.js
  * @module videojs
  */
+/**
+ * @typedef { string } version
+ */
 import {version} from '../../package.json';
 import window from 'global/window';
 import {
@@ -151,7 +154,7 @@ function videojs(id, options, ready) {
   // If the document is no longer attached to the dom, the defaultView of the document will be null.
   // If element is inside Shadow DOM (e.g. is part of a Custom element), ownerDocument.body
   // always returns false. Instead, use the Shadow DOM root.
-  const inShadowDom = el.getRootNode() instanceof window.ShadowRoot;
+  const inShadowDom = 'getRootNode' in el ? el.getRootNode() instanceof window.ShadowRoot : false;
   const rootNode = inShadowDom ? el.getRootNode() : el.ownerDocument.body;
 
   if (!el.ownerDocument.defaultView || !rootNode.contains(el)) {
@@ -317,10 +320,10 @@ videojs.getComponent = Component.getComponent;
  * @param {string} name
  *        The class name of the component
  *
- * @param {Component} comp
+ * @param {typeof Component} comp
  *        The component class
  *
- * @return {Component}
+ * @return {typeof Component}
  *         The newly registered component
  */
 videojs.registerComponent = (name, comp) => {
@@ -407,9 +410,11 @@ videojs.deregisterPlugin = Plugin.deregisterPlugin;
  *
  * @param {string} name
  *        The plugin name
- *
- * @param {Plugin|Function} plugin
+*
+ * @param {typeof Plugin|Function} plugin
  *         The plugin sub-class or function
+ *
+ * @return {typeof Plugin|Function}
  */
 videojs.plugin = (name, plugin) => {
   log.warn('videojs.plugin() is deprecated; use videojs.registerPlugin() instead');

@@ -11,15 +11,20 @@ let history = [];
  * Log messages to the console and history based on the type of message
  *
  * @private
- * @param  {string} type
+ * @param  {string} name
  *         The name of the console method to use.
  *
- * @param  {Array} args
+ * @param  {Object} log
  *         The arguments to be passed to the matching console method.
+ *
+ * @param {string} [styles]
+ *        styles for name
  */
-const LogByTypeFactory = (name, log) => (type, level, args) => {
+const LogByTypeFactory = (name, log, styles) => (type, level, args) => {
   const lvl = log.levels[level];
   const lvlRegExp = new RegExp(`^(${lvl})$`);
+
+  let resultName = name;
 
   if (type !== 'log') {
 
@@ -27,8 +32,13 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
     args.unshift(type.toUpperCase() + ':');
   }
 
+  if (styles) {
+    resultName = `%c${name}`;
+    args.unshift(styles);
+  }
+
   // Add console prefix after adding to history.
-  args.unshift(name + ':');
+  args.unshift(resultName + ':');
 
   // Add a clone of the args at this point to history.
   if (history) {
@@ -66,7 +76,7 @@ const LogByTypeFactory = (name, log) => (type, level, args) => {
   fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
 };
 
-export default function createLogger(name) {
+export default function createLogger(name, delimiter = ':', styles = '') {
   // This is the private tracking variable for logging level.
   let level = 'info';
 
@@ -99,10 +109,10 @@ export default function createLogger(name) {
   };
 
   // This is the logByType helper that the logging methods below use
-  logByType = LogByTypeFactory(name, log);
+  logByType = LogByTypeFactory(name, log, styles);
 
   /**
-   * Create a new sublogger which chains the old name to the new name.
+   * Create a new subLogger which chains the old name to the new name.
    *
    * For example, doing `videojs.log.createLogger('player')` and then using that logger will log the following:
    * ```js
@@ -110,11 +120,36 @@ export default function createLogger(name) {
    *  // > VIDEOJS: player: foo
    * ```
    *
-   * @param {string} name
+   * @param {string} subName
    *        The name to add call the new logger
+   * @param {string} [subDelimiter]
+   *        Optional delimiter
+   * @param {string} [subStyles]
+   *        Optional styles
    * @return {Object}
    */
-  log.createLogger = (subname) => createLogger(name + ': ' + subname);
+  log.createLogger = (subName, subDelimiter, subStyles) => {
+    const resultDelimiter = subDelimiter !== undefined ? subDelimiter : delimiter;
+    const resultStyles = subStyles !== undefined ? subStyles : styles;
+    const resultName = `${name} ${resultDelimiter} ${subName}`;
+
+    return createLogger(resultName, resultDelimiter, resultStyles);
+  };
+
+  /**
+   * Create a new logger.
+   *
+   * @param {string} newName
+   *        The name for the new logger
+   * @param {string} [newDelimiter]
+   *        Optional delimiter
+   * @param {string} [newStyles]
+   *        Optional styles
+   * @return {Object}
+   */
+  log.createNewLogger = (newName, newDelimiter, newStyles) => {
+    return createLogger(newName, newDelimiter, newStyles);
+  };
 
   /**
    * Enumeration of available logging levels, where the keys are the level names
@@ -151,7 +186,7 @@ export default function createLogger(name) {
    * If a string matching a key from {@link module:log.levels} is provided, acts
    * as a setter.
    *
-   * @param  {string} [lvl]
+   * @param  {'all'|'debug'|'info'|'warn'|'error'|'off'} [lvl]
    *         Pass a valid level to set a new logging level.
    *
    * @return {string}

@@ -11,9 +11,9 @@
   background-repeat: no-repeat;
   background-position: center;
 
-  fill: #FFFFFF;
-  height: 1.5em;
-  width: 1.5em;
+  fill: currentColor;
+  height: 1.8em;
+  width: 1.8em;
 
   // Overwrite any font content
   &:before {

@@ -91,10 +91,11 @@
   position: absolute;
   top: -0.35em;
   right: -0.4em;
-  width: 1em;
-  height: 1em;
+  width: 0.9em;
+  height: 0.9em;
   pointer-events: none;
   line-height: 0.15em;
+  z-index: 1;
 }
 
 .video-js .vjs-load-progress {
@@ -135,15 +136,6 @@
   top: -3.4em;
   visibility: hidden;
   z-index: 1;
-}
-
-// Update the size of the progress circle when using SVG icons
-.vjs-progress-control:hover .vjs-progress-holder .vjs-play-progress .vjs-svg-icon {
-  width: 0.8em;
-  height: 0.8em;
-  top: -0.25em;
-  right: -0.5em;
-  line-height: 0.35em;
 }
 
 .video-js .vjs-progress-holder:focus .vjs-time-tooltip {

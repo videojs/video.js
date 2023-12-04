@@ -31,8 +31,13 @@
 }
 
 .vjs-big-play-button .vjs-svg-icon {
-  width: 0.75em;
-  height: 0.75em;
+  width: 1em;
+  height: 1em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  line-height: 1;
+  transform: translate(-50%, -50%);
 }
 
 .video-js:hover .vjs-big-play-button,
@@ -52,6 +57,6 @@
 }
 
 // Show big play button if video is paused and .vjs-show-big-play-button-on-pause is set on video element
-.vjs-has-started.vjs-paused.vjs-show-big-play-button-on-pause .vjs-big-play-button {
+.vjs-has-started.vjs-paused.vjs-show-big-play-button-on-pause:not(.vjs-seeking, .vjs-scrubbing, .vjs-error) .vjs-big-play-button {
   display: block;
 }

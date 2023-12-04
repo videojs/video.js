@@ -143,17 +143,10 @@
 
 .vjs-volume-level .vjs-svg-icon {
   position: absolute;
-  width: 0.6em;
-  height: 0.6em;
-  top: -0.55em;
+  width: 0.9em;
+  height: 0.9em;
   pointer-events: none;
-}
-
-// Due to this icon from Material UI being a bit smaller than the others,
-// we will adjust the height and width
-.vjs-mute-control .vjs-svg-icon {
-  width: 1.75em;
-  height: 1.75em;
+  z-index: 1;
 }
 
 .vjs-slider-horizontal .vjs-volume-level {
@@ -169,13 +162,12 @@
 // here
 // Update placement of circle icon when using SVG icons
 .vjs-slider-horizontal .vjs-volume-level .vjs-svg-icon {
-  top: -0.15em;
   right: -0.3em;
-  line-height: 0.05em;
+  transform: translateY(-50%);
 }
 .vjs-slider-vertical .vjs-volume-level .vjs-svg-icon {
-  top: -0.9em;
-  right: -0.15em;
+  top: -0.55em;
+  transform: translateX(-50%);
 }
 
 .video-js .vjs-volume-panel.vjs-volume-panel-vertical {

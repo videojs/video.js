@@ -286,8 +286,8 @@ const DEFAULT_BREAKPOINTS = {
  *
  * After an instance has been created it can be accessed globally in three ways:
  * 1. By calling `videojs.getPlayer('example_video_1');`
- * 2. By calling `videojs('example_video_1');` (not recomended)
- * 2. By using it directly via  `videojs.players.example_video_1;`
+ * 2. By calling `videojs('example_video_1');` (not recommended)
+ * 2. By using it directly via `videojs.players.example_video_1;`
  *
  * @extends Component
  * @global
@@ -2160,7 +2160,9 @@ class Player extends Component {
   handleTechError_() {
     const error = this.tech_.error();
 
-    this.error(error);
+    if (error) {
+      this.error(error);
+    }
   }
 
   /**
@@ -3095,22 +3097,22 @@ class Player extends Component {
       return window.documentPictureInPicture.requestWindow({
         // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
         width: this.videoWidth(),
-        height: this.videoHeight(),
-        copyStyleSheets: true
+        height: this.videoHeight()
       }).then(pipWindow => {
+        Dom.copyStyleSheetsToWindow(pipWindow);
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
 
-        pipWindow.document.body.append(this.el_);
+        pipWindow.document.body.appendChild(this.el_);
         pipWindow.document.body.classList.add('vjs-pip-window');
 
         this.player_.isInPictureInPicture(true);
         this.player_.trigger('enterpictureinpicture');
 
         // Listen for the PiP closing event to move the video back.
-        pipWindow.addEventListener('unload', (event) => {
+        pipWindow.addEventListener('pagehide', (event) => {
           const pipVideo = event.target.querySelector('.video-js');
 
-          pipContainer.replaceWith(pipVideo);
+          pipContainer.parentNode.replaceChild(pipVideo, pipContainer);
           this.player_.isInPictureInPicture(false);
           this.player_.trigger('leavepictureinpicture');
         });
@@ -3142,7 +3144,7 @@ class Player extends Component {
    */
   exitPictureInPicture() {
     if (window.documentPictureInPicture && window.documentPictureInPicture.window) {
-      // With documentPictureInPicture, Player#leavepictureinpicture is fired in the unload handler
+      // With documentPictureInPicture, Player#leavepictureinpicture is fired in the pagehide handler
       window.documentPictureInPicture.window.close();
       return Promise.resolve();
     }
@@ -3164,7 +3166,7 @@ class Player extends Component {
    * This allows player-wide hotkeys (either as defined below, or optionally
    * by an external function).
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
@@ -3602,6 +3604,16 @@ class Player extends Component {
     this.loadTech_(this.options_.techOrder[0], null);
     this.techCall_('reset');
     this.resetControlBarUI_();
+
+    this.error(null);
+
+    if (this.titleBar) {
+      this.titleBar.update({
+        title: undefined,
+        description: undefined
+      });
+    }
+
     if (isEvented(this)) {
       this.trigger('playerreset');
     }
