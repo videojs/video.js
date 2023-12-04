@@ -80,6 +80,24 @@
   }
 }
 
+// Remove content from play-progress when using SVGs.
+.vjs-svg-icons-enabled .vjs-play-progress {
+  &:before {
+    content: none !important;
+  }
+}
+
+.vjs-play-progress .vjs-svg-icon {
+  position: absolute;
+  top: -0.35em;
+  right: -0.4em;
+  width: 0.9em;
+  height: 0.9em;
+  pointer-events: none;
+  line-height: 0.15em;
+  z-index: 1;
+}
+
 .video-js .vjs-load-progress {
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }

@@ -134,6 +134,21 @@
     z-index: 1;
   }
 }
+// Remove content from volume-level when using SVGs.
+.vjs-svg-icons-enabled .vjs-volume-level {
+  &:before {
+    content: none;
+  }
+}
+
+.vjs-volume-level .vjs-svg-icon {
+  position: absolute;
+  width: 0.9em;
+  height: 0.9em;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .vjs-slider-horizontal .vjs-volume-level {
   height: 0.3em;
 
@@ -142,6 +157,17 @@
     line-height: .35em;
     right: -0.5em;
   }
+}
+
+// here
+// Update placement of circle icon when using SVG icons
+.vjs-slider-horizontal .vjs-volume-level .vjs-svg-icon {
+  right: -0.3em;
+  transform: translateY(-50%);
+}
+.vjs-slider-vertical .vjs-volume-level .vjs-svg-icon {
+  top: -0.55em;
+  transform: translateX(-50%);
 }
 
 .video-js .vjs-volume-panel.vjs-volume-panel-vertical {

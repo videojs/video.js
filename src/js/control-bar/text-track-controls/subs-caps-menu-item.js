@@ -18,11 +18,15 @@ class SubsCapsMenuItem extends TextTrackMenuItem {
     const parentSpan = el.querySelector('.vjs-menu-item-text');
 
     if (this.options_.track.kind === 'captions') {
-      parentSpan.appendChild(createEl('span', {
-        className: 'vjs-icon-placeholder'
-      }, {
-        'aria-hidden': true
-      }));
+      if (this.player_.options_.experimentalSvgIcons) {
+        this.setIcon('captions', el);
+      } else {
+        parentSpan.appendChild(createEl('span', {
+          className: 'vjs-icon-placeholder'
+        }, {
+          'aria-hidden': true
+        }));
+      }
       parentSpan.appendChild(createEl('span', {
         className: 'vjs-control-text',
         // space added as the text will visually flow with the

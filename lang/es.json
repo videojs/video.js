@@ -68,7 +68,7 @@
   "Raised": "En relieve",
   "Depressed": "Hundido",
   "Uniform": "Uniforme",
-  "Dropshadow": "Sombra paralela",
+  "Drop shadow": "Sombra paralela",
   "Font Family": "Familia de fuente",
   "Proportional Sans-Serif": "Sans-Serif proporcional",
   "Monospace Sans-Serif": "Sans-Serif monoespacio",
@@ -90,5 +90,7 @@
   "Color": "Color",
   "Opacity": "Opacidad",
   "Text Background": "Fondo del texto",
-  "Caption Area Background": "Fondo del área de subtítulos"
+  "Caption Area Background": "Fondo del área de subtítulos",
+  "Skip forward {1} seconds": "Avanza {1} segundos",
+  "Skip backward {1} seconds": "Retrocede {1} segundos"
 }

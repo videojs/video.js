@@ -30,6 +30,8 @@ class ChaptersButton extends TextTrackButton {
   constructor(player, options, ready) {
     super(player, options, ready);
 
+    this.setIcon('chapters');
+
     this.selectCurrentItem_ = () => {
       this.items.forEach(item => {
         item.selected(this.track_.activeCues[0] === item.cue);

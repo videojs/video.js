@@ -28,6 +28,8 @@ class PictureInPictureToggle extends Button {
   constructor(player, options) {
     super(player, options);
 
+    this.setIcon('picture-in-picture-enter');
+
     this.on(player, ['enterpictureinpicture', 'leavepictureinpicture'], (e) => this.handlePictureInPictureChange(e));
     this.on(player, ['disablepictureinpicturechanged', 'loadedmetadata'], (e) => this.handlePictureInPictureEnabledChange(e));
     this.on(player, ['loadedmetadata', 'audioonlymodechange', 'audiopostermodechange'], () => this.handlePictureInPictureAudioModeChange());
@@ -101,8 +103,10 @@ class PictureInPictureToggle extends Button {
    */
   handlePictureInPictureChange(event) {
     if (this.player_.isInPictureInPicture()) {
+      this.setIcon('picture-in-picture-exit');
       this.controlText('Exit Picture-in-Picture');
     } else {
+      this.setIcon('picture-in-picture-enter');
       this.controlText('Picture-in-Picture');
     }
     this.handlePictureInPictureEnabledChange();

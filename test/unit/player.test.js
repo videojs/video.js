@@ -967,6 +967,39 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
+  // Stub a successful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => false,
+    documentElement: document.createElement('span')
+  });
+
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+
+  assert.ok(player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname added');
+
+  window.DOMParser.prototype.parseFromString.restore();
+  player.dispose();
+});
+
+QUnit.test('should revert to font icons if the SVG sprite cannot be loaded', function(assert) {
+  // Stub an unsuccessful parsing of the SVG sprite.
+  sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
+    querySelector: () => true
+  });
+
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({experimentalSvgIcons: true});
+
+  assert.ok(!player.hasClass('vjs-svg-icons-enabled'), 'svg-icons-enabled classname was not added');
+
+  window.DOMParser.prototype.parseFromString.restore();
+  player.dispose();
+});
+
 QUnit.test('should not add a touch-enabled classname when touch is not supported', function(assert) {
   assert.expect(1);
 
@@ -1877,6 +1910,7 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
     options_: {
       techOrder: ['html5', 'youtube']
     },
+    error() {},
     resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
@@ -1909,6 +1943,7 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
     options_: {
       techOrder: ['youtube', 'html5']
     },
+    error() {},
     resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
@@ -2815,7 +2850,7 @@ QUnit.test('document pictureinpicture is opt-in', function(assert) {
 
   player.requestPictureInPicture().catch(e => {
     assert.equal(e, 'No PiP mode is available', 'docPiP not used when not enabled');
-  }).finally(_ => {
+  }).then(_ => {
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
     }
@@ -2855,7 +2890,7 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
     assert.ok(true, 'docPiP was called');
   }).catch(_ => {
     assert.ok(true, 'docPiP was called');
-  }).finally(_ => {
+  }).then(_ => {
     assert.equal(0, count, 'requestPictureInPicture not passed to tech');
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
@@ -2886,13 +2921,14 @@ QUnit.test('docPiP moves player and triggers events', function(assert) {
   const fakePiPWindow = document.createElement('div');
 
   fakePiPWindow.document = {
+    head: document.createElement('div'),
     body: document.createElement('div')
   };
   fakePiPWindow.querySelector = function(sel) {
     return fakePiPWindow.document.body.querySelector(sel);
   };
   fakePiPWindow.close = function() {
-    fakePiPWindow.dispatchEvent(new Event('unload'));
+    fakePiPWindow.dispatchEvent(new Event('pagehide'));
     delete window.documentPictureInPicture.window;
   };
 
@@ -3348,4 +3384,38 @@ QUnit.test('crossOrigin value should be maintained after loadMedia is called', f
   playerExample1.dispose();
   playerExample2.dispose();
   playerExample3.dispose();
+});
+
+QUnit.test('should not reset the error when the tech triggers an error that is null', function(assert) {
+  sinon.stub(log, 'error');
+
+  const player = TestHelpers.makePlayer();
+
+  player.src({
+    src: 'http://example.com/movie.unsupported-format',
+    type: 'video/unsupported-format'
+  });
+
+  this.clock.tick(60);
+
+  // Simulates Chromium's behavior when the poster is invalid
+
+  // is only there for context, but does nothing
+  player.poster('invalid');
+
+  const spyError = sinon.spy(player, 'error');
+  // Chromium behavior produced by the video element
+  const errorStub = sinon.stub(player.tech(true), 'error').callsFake(() => null);
+
+  player.tech(true).trigger('error');
+  // End
+
+  assert.ok(player.hasClass('vjs-error'), 'player has vjs-error class');
+  assert.ok(spyError.notCalled, 'error was not called');
+  assert.ok(player.error(), 'error is retained');
+
+  player.dispose();
+  spyError.restore();
+  errorStub.restore();
+  log.error.restore();
 });

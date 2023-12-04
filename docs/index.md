@@ -8,7 +8,7 @@ The most useful API doc to start with is usually the [Player][api-player] class.
 
 ## Guides
 
-More in-depth instructional [guides](vjs-guides) are found on the main [Video.js website](vjs-website). The guides explain general topics and use cases (e.g. setup).
+More in-depth instructional [guides][vjs-guides] are found on the main [Video.js website][vjs-website]. The guides explain general topics and use cases (e.g. setup).
 
 The full list of articles is on the [guides page][vjs-guides]. If you are looking for troubleshooting information, try the [FAQ][vjs-faq] and [troubleshooting][vjs-troubleshooting] pages.
 

@@ -105,6 +105,9 @@ class HTMLTrackElement extends EventTarget {
   }
 }
 
+/**
+ * @protected
+ */
 HTMLTrackElement.prototype.allowedEvents_ = {
   load: 'load'
 };

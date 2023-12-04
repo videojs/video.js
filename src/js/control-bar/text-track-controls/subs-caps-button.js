@@ -32,8 +32,10 @@ class SubsCapsButton extends TextTrackButton {
     // Although North America uses "captions" in most cases for
     // "captions and subtitles" other locales use "subtitles"
     this.label_ = 'subtitles';
+    this.setIcon('subtitles');
     if (['en', 'en-us', 'en-ca', 'fr-ca'].indexOf(this.player_.language_) > -1) {
       this.label_ = 'captions';
+      this.setIcon('captions');
     }
     this.menuButton_.controlText(toTitleCase(this.label_));
   }

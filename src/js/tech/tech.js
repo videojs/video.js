@@ -22,7 +22,7 @@ import * as Guid from '../utils/guid.js';
  * * `var SourceObject = {src: 'http://ex.com/video.mp4', type: 'video/mp4'};`
    * `var SourceString = 'http://example.com/some-video.mp4';`
  *
- * @typedef {Object|string} Tech~SourceObject
+ * @typedef {Object|string} SourceObject
  *
  * @property {string} src
  *           The url to the source
@@ -480,7 +480,7 @@ class Tech extends Component {
    * > NOTE: This implementation is incomplete. It does not track the played `TimeRange`.
    *         It only checks whether the source has played at all or not.
    *
-   * @return {TimeRange}
+   * @return { import('../utils/time').TimeRange }
    *         - A single time range if this video has played
    *         - An empty set of ranges if not.
    */
@@ -1280,7 +1280,7 @@ Tech.withSourceHandlers = function(_Tech) {
    *
    * TODO: Answer question: should 'probably' be prioritized over 'maybe'
    *
-   * @param {Tech~SourceObject} source
+   * @param {SourceObject} source
    *        The source object
    *
    * @param {Object} options
@@ -1308,7 +1308,7 @@ Tech.withSourceHandlers = function(_Tech) {
   /**
    * Check if the tech can support the given source.
    *
-   * @param {Tech~SourceObject} srcObj
+   * @param {SourceObject} srcObj
    *        The source object
    *
    * @param {Object} options
@@ -1371,7 +1371,7 @@ Tech.withSourceHandlers = function(_Tech) {
    * and source handlers.
    * Should never be called unless a source handler was found.
    *
-   * @param {Tech~SourceObject} source
+   * @param {SourceObject} source
    *        A source object with src and type keys
    */
   _Tech.prototype.setSource = function(source) {

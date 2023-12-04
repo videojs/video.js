@@ -1,0 +1,29 @@
+// CSS styles for SVG icons used throughout video.js.
+//
+// The goal is to replace all icons from the font family pulled from videojs/font entirely.
+// This project currently uses fonts. We want to replace this with SVGs from
+// images/icons.svg. This will ensure consitency between versions, as well as simplified
+// and straight-forward customization.
+
+// Default styling for all SVG icons
+.vjs-svg-icon {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  fill: currentColor;
+  height: 1.8em;
+  width: 1.8em;
+
+  // Overwrite any font content
+  &:before {
+    content: none !important;
+  }
+}
+
+// SVG shadow on hover and focus
+.vjs-svg-icon:hover,
+.vjs-control:focus .vjs-svg-icon {
+  -webkit-filter: drop-shadow(0 0 0.25em #fff);
+  filter: drop-shadow(0 0 0.25em #fff);
+}

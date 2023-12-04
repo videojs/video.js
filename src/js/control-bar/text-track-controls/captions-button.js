@@ -26,6 +26,8 @@ class CaptionsButton extends TextTrackButton {
    */
   constructor(player, options, ready) {
     super(player, options, ready);
+
+    this.setIcon('captions');
   }
 
   /**

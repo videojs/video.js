@@ -98,6 +98,8 @@ class MuteToggle extends Button {
     const vol = this.player_.volume();
     let level = 3;
 
+    this.setIcon('volume-high');
+
     // in iOS when a player is loaded with muted attribute
     // and volume is changed with a native mute button
     // we want to make sure muted state is updated
@@ -106,10 +108,13 @@ class MuteToggle extends Button {
     }
 
     if (vol === 0 || this.player_.muted()) {
+      this.setIcon('volume-mute');
       level = 0;
     } else if (vol < 0.33) {
+      this.setIcon('volume-low');
       level = 1;
     } else if (vol < 0.67) {
+      this.setIcon('volume-medium');
       level = 2;
     }
 

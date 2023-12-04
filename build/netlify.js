@@ -22,6 +22,9 @@ sh.rm('-rf', deployDir);
 // make sure the directory exists
 sh.mkdir('-p', deployDir);
 
+// create sub-directory for images
+sh.mkdir('-p', `${deployDir}/src`);
+
 // create nested directories
 files
   .map((file) => path.dirname(file))
@@ -29,7 +32,7 @@ files
 
 // copy files/folders to deploy dir
 files
-  .concat('dist', 'index.html', 'sandbox', 'docs')
+  .concat('dist', 'index.html', 'sandbox', 'docs', 'src/images')
   .forEach((file) => sh.cp('-r', file, path.join(deployDir, file)));
 
 sh.rm(path.join(deployDir, 'dist', `video-js-${pkg.version}.zip`));

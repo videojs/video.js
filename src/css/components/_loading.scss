@@ -27,6 +27,11 @@
   animation: vjs-spinner-show 0s linear 0.3s forwards;
 }
 
+// Hide if an error occurs
+.vjs-error .vjs-loading-spinner {
+  display: none;
+}
+
 .vjs-loading-spinner:before,
 .vjs-loading-spinner:after {
   content: "";

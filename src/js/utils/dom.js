@@ -857,3 +857,31 @@ export function computedStyle(el, prop) {
 
   return '';
 }
+
+/**
+ * Copy document style sheets to another window.
+ *
+ * @param    {Window} win
+ *           The window element you want to copy the document style sheets to.
+ *
+ */
+export function copyStyleSheetsToWindow(win) {
+  [...document.styleSheets].forEach((styleSheet) => {
+    try {
+      const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+      const style = document.createElement('style');
+
+      style.textContent = cssRules;
+      win.document.head.appendChild(style);
+    } catch (e) {
+      const link = document.createElement('link');
+
+      link.rel = 'stylesheet';
+      link.type = styleSheet.type;
+      // For older Safari this has to be the string; on other browsers setting the MediaList works
+      link.media = styleSheet.media.mediaText;
+      link.href = styleSheet.href;
+      win.document.head.appendChild(link);
+    }
+  });
+}

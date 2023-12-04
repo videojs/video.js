@@ -43,6 +43,8 @@ class SeekToLive extends Button {
       className: 'vjs-seek-to-live-control vjs-control'
     });
 
+    this.setIcon('circle', el);
+
     this.textEl_ = Dom.createEl('span', {
       className: 'vjs-seek-to-live-text',
       textContent: this.localize('LIVE')

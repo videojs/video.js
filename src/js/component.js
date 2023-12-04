@@ -3,6 +3,7 @@
  *
  * @file component.js
  */
+import document from 'global/document';
 import window from 'global/window';
 import evented from './mixins/evented';
 import stateful from './mixins/stateful';
@@ -159,8 +160,8 @@ class Component {
    * @param {string|string[]} type
    *        An event name or an array of event names.
    *
-   * @param {Function} fn
-   *        The function to remove.
+   * @param {Function} [fn]
+   *        The function to remove. If not specified, all listeners managed by Video.js will be removed.
    */
   off(type, fn) {}
 
@@ -528,8 +529,58 @@ class Component {
   }
 
   /**
-   * Add a child `Component` inside the current `Component`.
+   * Adds an SVG icon element to another element or component.
    *
+   * @param {string} iconName
+   *        The name of icon. A list of all the icon names can be found at 'sandbox/svg-icons.html'
+   *
+   * @param {Element} [el=this.el()]
+   *        Element to set the title on. Defaults to the current Component's element.
+   *
+   * @return {Element}
+   *        The newly created icon element.
+   */
+  setIcon(iconName, el = this.el()) {
+    // TODO: In v9 of video.js, we will want to remove font icons entirely.
+    // This means this check, as well as the others throughout the code, and
+    // the unecessary CSS for font icons, will need to be removed.
+    // See https://github.com/videojs/video.js/pull/8260 as to which components
+    // need updating.
+    if (!this.player_.options_.experimentalSvgIcons) {
+      return;
+    }
+
+    const xmlnsURL = 'http://www.w3.org/2000/svg';
+
+    // The below creates an element in the format of:
+    // <span><svg><use>....</use></svg></span>
+    const iconContainer = Dom.createEl('span', {
+      className: 'vjs-icon-placeholder vjs-svg-icon'
+    }, {'aria-hidden': 'true'});
+
+    const svgEl = document.createElementNS(xmlnsURL, 'svg');
+
+    svgEl.setAttributeNS(null, 'viewBox', '0 0 512 512');
+    const useEl = document.createElementNS(xmlnsURL, 'use');
+
+    svgEl.appendChild(useEl);
+    useEl.setAttributeNS(null, 'href', `#vjs-icon-${iconName}`);
+    iconContainer.appendChild(svgEl);
+
+    // Replace a pre-existing icon if one exists.
+    if (this.iconIsSet_) {
+      el.replaceChild(iconContainer, el.querySelector('.vjs-icon-placeholder'));
+    } else {
+      el.appendChild(iconContainer);
+    }
+
+    this.iconIsSet_ = true;
+
+    return iconContainer;
+  }
+
+  /**
+   * Add a child `Component` inside the current `Component`.
    *
    * @param {string|Component} child
    *        The name or instance of a child to add.
@@ -540,6 +591,7 @@ class Component {
    *
    * @param {number} [index=this.children_.length]
    *        The index to attempt to add a child into.
+   *
    *
    * @return {Component}
    *         The `Component` that gets added as a child. When using a string the
@@ -1024,9 +1076,8 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the componentresize event trigger
    *
-   * @return {number|string}
-   *         The width when getting, zero if there is no width. Can be a string
-   *           postpixed with '%' or 'px'.
+   * @return {number|undefined}
+   *         The width when getting, zero if there is no width
    */
   width(num, skipListeners) {
     return this.dimension('width', num, skipListeners);
@@ -1042,9 +1093,8 @@ class Component {
    * @param {boolean} [skipListeners]
    *        Skip the componentresize event trigger
    *
-   * @return {number|string}
-   *         The width when getting, zero if there is no width. Can be a string
-   *         postpixed with '%' or 'px'.
+   * @return {number|undefined}
+   *         The height when getting, zero if there is no height
    */
   height(num, skipListeners) {
     return this.dimension('height', num, skipListeners);
@@ -1090,7 +1140,7 @@ class Component {
    * @param  {boolean} [skipListeners]
    *         Skip componentresize event trigger
    *
-   * @return {number}
+   * @return {number|undefined}
    *         The dimension when getting or 0 if unset
    */
   dimension(widthOrHeight, num, skipListeners) {
@@ -1272,7 +1322,7 @@ class Component {
    * delegates to `handleKeyDown`. This means anyone calling `handleKeyPress`
    * will not see their method calls stop working.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The event that caused this function to be called.
    */
   handleKeyPress(event) {
@@ -1284,7 +1334,7 @@ class Component {
    * support toggling the controls through a tap on the video. They get enabled
    * because every sub-component would have extra overhead otherwise.
    *
-   * @private
+   * @protected
    * @fires Component#tap
    * @listens Component#touchstart
    * @listens Component#touchmove
@@ -1793,7 +1843,7 @@ class Component {
    * @param {string} name
    *        The Name of the component to get.
    *
-   * @return {Component}
+   * @return {typeof Component}
    *         The `Component` that got registered under the given name.
    */
   static getComponent(name) {

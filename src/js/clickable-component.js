@@ -85,11 +85,13 @@ class ClickableComponent extends Component {
 
     const el = Dom.createEl(tag, props, attributes);
 
-    el.appendChild(Dom.createEl('span', {
-      className: 'vjs-icon-placeholder'
-    }, {
-      'aria-hidden': true
-    }));
+    if (!this.player_.options_.experimentalSvgIcons) {
+      el.appendChild(Dom.createEl('span', {
+        className: 'vjs-icon-placeholder'
+      }, {
+        'aria-hidden': true
+      }));
+    }
 
     this.createControlTextEl(el);
 
@@ -231,7 +233,7 @@ class ClickableComponent extends Component {
    *
    * By default, if the key is Space or Enter, it will trigger a `click` event.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown
