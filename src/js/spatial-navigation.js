@@ -34,9 +34,9 @@ class SpatialNavigation {
   }
 
   /**
-     * Starts the spatial navigation by adding a keydown event listener to the video container.
-     * This method ensures that the event listener is added only once.
-     */
+   * Starts the spatial navigation by adding a keydown event listener to the video container.
+   * This method ensures that the event listener is added only once.
+   */
   start() {
     if (!this.isListening) {
       this.player.el().addEventListener('keydown', this.onKeyDown);
@@ -45,9 +45,9 @@ class SpatialNavigation {
   }
 
   /**
-     * Stops the spatial navigation by removing the keydown event listener from the video container.
-     * Also sets the `isListening` flag to false.
-     */
+   * Stops the spatial navigation by removing the keydown event listener from the video container.
+   * Also sets the `isListening` flag to false.
+   */
   stop() {
     this.player.el().removeEventListener('keydown', this.onKeyDown);
     this.isListening = false;
@@ -72,27 +72,27 @@ class SpatialNavigation {
   }
 
   /**
-     * Pauses the spatial navigation functionality.
-     * This method sets a flag that can be used to temporarily disable the navigation logic.
-     */
+   * Pauses the spatial navigation functionality.
+   * This method sets a flag that can be used to temporarily disable the navigation logic.
+   */
   pause() {
     this.isPaused = true;
   }
 
   /**
-     * Resumes the spatial navigation functionality if it has been paused.
-     * This method resets the pause flag, re-enabling the navigation logic.
-     */
+   * Resumes the spatial navigation functionality if it has been paused.
+   * This method resets the pause flag, re-enabling the navigation logic.
+   */
   resume() {
     this.isPaused = false;
   }
 
   getComponents() {
-    const player = window.player;
-    let focusableComponents = [];
+    const player = this.player;
+    const focusableComponents = [];
 
     function searchForChildrenCandidates(componentsArray) {
-      for (let i of componentsArray) {
+      for (const i of componentsArray) {
         if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused()) {
           focusableComponents.push(i.el_);
         }
