@@ -564,10 +564,9 @@ class Player extends Component {
     }
 
     // Check if spatial navigation is enabled in the options.
-    // If enabled, dynamically import the 'spatial-navigation' module.
-    // Upon successful import, instantiate the SpatialNavigation class.
+    // If enabled, instantiate the SpatialNavigation class.
     if (options.spatialNavigation && options.spatialNavigation.enabled) {
-      window.SpatialNavigation = new SpatialNavigation();
+      window.SpatialNavigation = new SpatialNavigation(this, null);
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing

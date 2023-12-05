@@ -7,20 +7,30 @@
 class SpatialNavigation {
 
   /**
-     * Constructs a SpatialNavigation instance with initial settings.
-     *
-     * @class
-     * @param {Component|null} initialFocusedComponent - The component that should initially have focus
-     *                                                   when the spatial navigation system starts.
-     *                                                   If null or not provided, no component will be initially focused.
-     */
-  constructor(initialFocusedComponent) {
-    // const ARROW_KEY_CODE = {37: 'left', 38: 'up', 39: 'right', 40: 'down'};
+   * Constructs a SpatialNavigation instance with initial settings.
+   * Initializes key codes for navigation, sets up the player instance,
+   * and prepares the spatial navigation system.
+   *
+   * @class
+   * @param {Object} player - The Video.js player instance to which the spatial navigation is attached.
+   * @param {Component|null} initialFocusedComponent - The component that should initially have focus
+   *                                                   when the spatial navigation system starts.
+   *                                                   If null or not provided, no component will be initially focused.
+   */
+  constructor(player, initialFocusedComponent) {
+    const self = this;
+
+    this.ARROW_KEY_CODE = {37: 'left', 38: 'up', 39: 'right', 40: 'down'};
+    this.player = player;
     this.components = new Set();
     this.isListening = false;
-    this.pause = false;
-    // Set the initial focused element or default to null
+    this.isPaused = false;
+    this.onKeyDown = this.onKeyDown.bind(this);
     this.currentFocus = initialFocusedComponent || null;
+    this.player.ready(function() {
+      self.start();
+      // Set the initial focused element or default to null
+    });
   }
 
   /**
@@ -29,7 +39,7 @@ class SpatialNavigation {
      */
   start() {
     if (!this.isListening) {
-      this.videoContainer.addEventListener('keydown', this.onKeyDown);
+      this.player.el().addEventListener('keydown', this.onKeyDown);
       this.isListening = true;
     }
   }
@@ -39,12 +49,26 @@ class SpatialNavigation {
      * Also sets the `isListening` flag to false.
      */
   stop() {
-    this.videoContainer.removeEventListener('keydown', this.onKeyDown);
+    this.player.el().removeEventListener('keydown', this.onKeyDown);
     this.isListening = false;
   }
 
+  /**
+   * Responds to keydown events for spatial navigation.
+   *
+   * Checks if navigation is active and handles arrow key inputs to move in the respective direction.
+   *
+   * @param {KeyboardEvent} e - The keydown event.
+   */
   onKeyDown(e) {
+    if (!this.isPaused) {
+      const direction = this.ARROW_KEY_CODE[e.keyCode];
 
+      if (direction) {
+        this.move(direction);
+        e.preventDefault();
+      }
+    }
   }
 
   /**
@@ -52,7 +76,7 @@ class SpatialNavigation {
      * This method sets a flag that can be used to temporarily disable the navigation logic.
      */
   pause() {
-    this.pause = true;
+    this.isPaused = true;
   }
 
   /**
@@ -60,8 +84,10 @@ class SpatialNavigation {
      * This method resets the pause flag, re-enabling the navigation logic.
      */
   resume() {
-    this.pause = false;
+    this.isPaused = false;
   }
+
+  move(direction) {}
 
   // TODO METHODS
   // // add focusable component
@@ -70,9 +96,6 @@ class SpatialNavigation {
   // remove(component: Component): void;
   // // clear current list of focusable components
   // clear(): void;
-  // // run spatial navigation Heuristics (re-use https://github.com/WICG/spatial-navigation/blob/main/polyfill/spatial-navigation-polyfill.js#L147)
-  // move(direction: SpatialNavigationDirection): void;
 }
 
 export default SpatialNavigation;
-
