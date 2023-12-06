@@ -23,6 +23,7 @@ class SpatialNavigation {
     this.ARROW_KEY_CODE = {37: 'left', 38: 'up', 39: 'right', 40: 'down'};
     this.player = player;
     this.components = new Set();
+    this.focusableComponents = [];
     this.isListening = false;
     this.isPaused = false;
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -94,7 +95,7 @@ class SpatialNavigation {
     function searchForChildrenCandidates(componentsArray) {
       for (const i of componentsArray) {
         if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused()) {
-          focusableComponents.push(i.el_);
+          focusableComponents.push(i);
         }
         if (i.hasOwnProperty('children_') && i.children_ .length > 0) {
           searchForChildrenCandidates(i.children_);
@@ -105,14 +106,37 @@ class SpatialNavigation {
     for (const [key, value] of Object.entries(player)) {
       if (key && value && value.hasOwnProperty('el_') && key !== 'player_') {
         if (player[key].getIsFocusable() && player[key].getIsAvailableToBeFocused()) {
-          focusableComponents.push(value.el_);
+          focusableComponents.push(value);
         } else if (value.hasOwnProperty('children_') && player[key].children_.length > 0) {
           searchForChildrenCandidates(player[key].children_);
         }
       }
     }
 
-    return focusableComponents;
+    this.focusableComponents = focusableComponents;
+    return this.focusableComponents;
+  }
+
+  add(component) {
+    const focusableComponents = [...this.focusableComponents];
+
+    if (component.hasOwnProperty('el_') && component.getIsFocusable() && component.getIsAvailableToBeFocused()) {
+      focusableComponents.push(component);
+    }
+
+    this.focusableComponents = focusableComponents;
+  }
+
+  remove(component) {
+    for (let i = 0; i < this.focusableComponents.length; i++) {
+      if (this.focusableComponents[i].name_ === component.name_) {
+        this.focusableComponents.splice(i, 1);
+      }
+    }
+  }
+
+  clear() {
+    this.focusableComponents = [];
   }
 
   move(direction) {}
