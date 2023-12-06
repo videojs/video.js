@@ -88,6 +88,12 @@ class SpatialNavigation {
     this.isPaused = false;
   }
 
+  /**
+   * Gets a set of focusable components.
+   *
+   * @return {Array}
+   *         Returns an array of focusable components.
+   */
   getComponents() {
     const player = this.player;
     const focusableComponents = [];
@@ -117,6 +123,12 @@ class SpatialNavigation {
     return this.focusableComponents;
   }
 
+  /**
+   * Adds a component to the array of focusable components.
+   *
+   * @param {Component} component
+   *        The `Component` to be added.
+   */
   add(component) {
     const focusableComponents = [...this.focusableComponents];
 
@@ -127,6 +139,11 @@ class SpatialNavigation {
     this.focusableComponents = focusableComponents;
   }
 
+  /**
+   * Removes component from the array of focusable components.
+   *
+   * @param {Component} component
+   */
   remove(component) {
     for (let i = 0; i < this.focusableComponents.length; i++) {
       if (this.focusableComponents[i].name_ === component.name_) {
@@ -135,6 +152,9 @@ class SpatialNavigation {
     }
   }
 
+  /**
+   * Clears array of focusable components.
+   */
   clear() {
     this.focusableComponents = [];
   }
