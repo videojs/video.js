@@ -124,6 +124,25 @@ class SpatialNavigation {
   }
 
   /**
+   * Gets the current focused component.
+   *
+   * @return {Component}
+   *         Returns a focused component.
+   */
+  getCurretComponent() {
+    this.getComponents();
+
+    if (this.focusableComponents.length) {
+      for (const i of this.focusableComponents) {
+        // eslint-disable-next-line
+        if (i.el_ === document.activeElement) {
+          return i;
+        }
+      }
+    }
+  }
+
+  /**
    * Adds a component to the array of focusable components.
    *
    * @param {Component} component
