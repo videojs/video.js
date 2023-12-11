@@ -122,7 +122,7 @@ export const initMediaSession = function() {
     ms.playbackState = 'playing';
   });
 
-  this.on('paused', () => {
+  this.on('pause', () => {
     ms.playbackState = 'paused';
   });
 
