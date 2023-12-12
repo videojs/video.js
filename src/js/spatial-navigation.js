@@ -198,8 +198,59 @@ class SpatialNavigation {
   }
 
   move(direction) {
-    this.findBestCandidate(direction);
-    // selectBestCandidate();
+    this.getComponents();
+
+    const currentFocusedComponent = this.getCurretComponent();
+
+    if (!currentFocusedComponent) {
+      return;
+    }
+
+    const currentRect = currentFocusedComponent.el_.getBoundingClientRect();
+    let bestCandidate = null;
+    let minDistance = Infinity;
+
+    for (const component of this.focusableComponents) {
+      if (component === currentFocusedComponent) {
+        continue;
+      }
+
+      const rect = component.el_.getBoundingClientRect();
+
+      let distance;
+
+      switch (direction) {
+      case 'right':
+        if (rect.left > currentRect.right) {
+          distance = rect.left - currentRect.right;
+        }
+        break;
+      case 'left':
+        if (rect.right < currentRect.left) {
+          distance = currentRect.left - rect.right;
+        }
+        break;
+      case 'down':
+        if (rect.top > currentRect.bottom) {
+          distance = rect.top - currentRect.bottom;
+        }
+        break;
+      case 'up':
+        if (rect.bottom < currentRect.top) {
+          distance = currentRect.top - rect.bottom;
+        }
+        break;
+      }
+
+      if (distance !== undefined && distance < minDistance) {
+        minDistance = distance;
+        bestCandidate = component;
+      }
+    }
+
+    if (bestCandidate) {
+      bestCandidate.focus();
+    }
   }
 
   // TODO METHODS
