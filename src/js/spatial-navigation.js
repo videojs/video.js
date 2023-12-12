@@ -143,6 +143,25 @@ class SpatialNavigation {
   }
 
   /**
+   * Gets the best candiate out of the focusable components.
+   *
+   * @return {Component}
+   *         Returns best candidate focusable component.
+   */
+  findBestCandidate(direction) {
+    this.getCurretComponent();
+
+    switch (direction) {
+    case 'left':
+    case 'right':
+    case 'up':
+    case 'down':
+    default:
+      return null;
+    }
+  }
+
+  /**
    * Adds a component to the array of focusable components.
    *
    * @param {Component} component
@@ -178,7 +197,10 @@ class SpatialNavigation {
     this.focusableComponents = [];
   }
 
-  move(direction) {}
+  move(direction) {
+    this.findBestCandidate(direction);
+    // selectBestCandidate();
+  }
 
   // TODO METHODS
   // // add focusable component
