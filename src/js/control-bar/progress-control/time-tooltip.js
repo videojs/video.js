@@ -72,9 +72,12 @@ class TimeTooltip extends Component {
     // of the player. We calculate the number of pixels from the `seekBarPoint`
     // to the right edge of the `SeekBar` and add to that any gap between the
     // right edge of the `SeekBar` and the player.
-    const spaceRightOfPoint = (seekBarRect.width - seekBarPointPx) +
+    let spaceRightOfPoint = (seekBarRect.width - seekBarPointPx) +
       (playerRect.right - seekBarRect.right);
 
+    if (!spaceRightOfPoint) {
+      spaceRightOfPoint = seekBarRect.width - seekBarPointPx;
+    }
     // This is the number of pixels by which the tooltip will need to be pulled
     // further to the right to center it over the `seekBarPoint`.
     let pullTooltipBy = tooltipRect.width / 2;
