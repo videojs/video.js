@@ -2622,6 +2622,92 @@ class Player extends Component {
   }
 
   /**
+   * Get the TimeRanges of the media that are currently available
+   * for seeking to.
+   *
+   * @see [Seekable Spec]{@link https://html.spec.whatwg.org/multipage/media.html#dom-media-seekable}
+   *
+   * @return { import('./utils/time').TimeRange }
+   *         A mock {@link TimeRanges} object (following HTML spec)
+   */
+  seekable() {
+    let seekable = this.techGet_('seekable');
+
+    if (!seekable || !seekable.length) {
+      seekable = createTimeRange(0, 0);
+    }
+
+    return seekable;
+  }
+
+  /**
+   * Returns whether the player is in the "seeking" state.
+   *
+   * @return {boolean} True if the player is in the seeking state, false if not.
+   */
+  seeking() {
+    return this.techGet_('seeking');
+  }
+
+  /**
+   * Returns whether the player is in the "ended" state.
+   *
+   * @return {boolean} True if the player is in the ended state, false if not.
+   */
+  ended() {
+    return this.techGet_('ended');
+  }
+
+  /**
+   * Returns the current state of network activity for the element, from
+   * the codes in the list below.
+   * - NETWORK_EMPTY (numeric value 0)
+   *   The element has not yet been initialised. All attributes are in
+   *   their initial states.
+   * - NETWORK_IDLE (numeric value 1)
+   *   The element's resource selection algorithm is active and has
+   *   selected a resource, but it is not actually using the network at
+   *   this time.
+   * - NETWORK_LOADING (numeric value 2)
+   *   The user agent is actively trying to download data.
+   * - NETWORK_NO_SOURCE (numeric value 3)
+   *   The element's resource selection algorithm is active, but it has
+   *   not yet found a resource to use.
+   *
+   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
+   * @return {number} the current network activity state
+   */
+  networkState() {
+    return this.techGet_('networkState');
+  }
+
+  /**
+   * Returns a value that expresses the current state of the element
+   * with respect to rendering the current playback position, from the
+   * codes in the list below.
+   * - HAVE_NOTHING (numeric value 0)
+   *   No information regarding the media resource is available.
+   * - HAVE_METADATA (numeric value 1)
+   *   Enough of the resource has been obtained that the duration of the
+   *   resource is available.
+   * - HAVE_CURRENT_DATA (numeric value 2)
+   *   Data for the immediate current playback position is available.
+   * - HAVE_FUTURE_DATA (numeric value 3)
+   *   Data for the immediate current playback position is available, as
+   *   well as enough data for the user agent to advance the current
+   *   playback position in the direction of playback.
+   * - HAVE_ENOUGH_DATA (numeric value 4)
+   *   The user agent estimates that enough data is available for
+   *   playback to proceed uninterrupted.
+   *
+   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
+   * @return {number} the current playback rendering state
+   */
+  readyState() {
+    return this.techGet_('readyState');
+  }
+
+  /**
    * Get the percent (as a decimal) of the video that's been downloaded.
    * This method is not a part of the native HTML video API.
    *
@@ -5329,80 +5415,6 @@ Player.prototype.options_ = {
   audioOnlyMode: false,
   audioPosterMode: false
 };
-
-[
-  /**
-   * Returns whether or not the player is in the "ended" state.
-   *
-   * @return {Boolean} True if the player is in the ended state, false if not.
-   * @method Player#ended
-   */
-  'ended',
-  /**
-   * Returns whether or not the player is in the "seeking" state.
-   *
-   * @return {Boolean} True if the player is in the seeking state, false if not.
-   * @method Player#seeking
-   */
-  'seeking',
-  /**
-   * Returns the TimeRanges of the media that are currently available
-   * for seeking to.
-   *
-   * @return {TimeRanges} the seekable intervals of the media timeline
-   * @method Player#seekable
-   */
-  'seekable',
-  /**
-   * Returns the current state of network activity for the element, from
-   * the codes in the list below.
-   * - NETWORK_EMPTY (numeric value 0)
-   *   The element has not yet been initialised. All attributes are in
-   *   their initial states.
-   * - NETWORK_IDLE (numeric value 1)
-   *   The element's resource selection algorithm is active and has
-   *   selected a resource, but it is not actually using the network at
-   *   this time.
-   * - NETWORK_LOADING (numeric value 2)
-   *   The user agent is actively trying to download data.
-   * - NETWORK_NO_SOURCE (numeric value 3)
-   *   The element's resource selection algorithm is active, but it has
-   *   not yet found a resource to use.
-   *
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
-   * @return {number} the current network activity state
-   * @method Player#networkState
-   */
-  'networkState',
-  /**
-   * Returns a value that expresses the current state of the element
-   * with respect to rendering the current playback position, from the
-   * codes in the list below.
-   * - HAVE_NOTHING (numeric value 0)
-   *   No information regarding the media resource is available.
-   * - HAVE_METADATA (numeric value 1)
-   *   Enough of the resource has been obtained that the duration of the
-   *   resource is available.
-   * - HAVE_CURRENT_DATA (numeric value 2)
-   *   Data for the immediate current playback position is available.
-   * - HAVE_FUTURE_DATA (numeric value 3)
-   *   Data for the immediate current playback position is available, as
-   *   well as enough data for the user agent to advance the current
-   *   playback position in the direction of playback.
-   * - HAVE_ENOUGH_DATA (numeric value 4)
-   *   The user agent estimates that enough data is available for
-   *   playback to proceed uninterrupted.
-   *
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
-   * @return {number} the current playback rendering state
-   * @method Player#readyState
-   */
-  'readyState'
-].forEach(function(fn) {
-  Player.prototype[fn] = function() {
-    return this.techGet_(fn);
-  };
-});
 
 TECH_EVENTS_RETRIGGER.forEach(function(event) {
   Player.prototype[`handleTech${toTitleCase(event)}_`] = function() {
