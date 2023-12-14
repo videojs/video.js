@@ -1,3 +1,14 @@
+<a name="8.8.0"></a>
+# [8.8.0](https://github.com/videojs/video.js/compare/v8.7.0...v8.8.0) (2023-12-14)
+
+### Features
+
+* update VHS to v3.9.0 ([#8526](https://github.com/videojs/video.js/issues/8526)) ([fe7cf98](https://github.com/videojs/video.js/commit/fe7cf98))
+
+### Chores
+
+* update player public interface for types visibility ([#8525](https://github.com/videojs/video.js/issues/8525)) ([1fff5c0](https://github.com/videojs/video.js/commit/1fff5c0))
+
 <a name="8.7.0"></a>
 # [8.7.0](https://github.com/videojs/video.js/compare/v8.6.1...v8.7.0) (2023-12-04)
 
