@@ -53,6 +53,38 @@ class TimeTooltip extends Component {
    */
   update(seekBarRect, seekBarPoint, content) {
     this.write(content);
+
+    const seekBarRectWidth = seekBarRect.width;
+    const position = seekBarRectWidth * seekBarPoint;
+    const timeTooltipWidth = parseFloat(Dom.computedStyle(this.el(), 'width'));
+    const timeTooltipPosition = position + timeTooltipWidth / 2;
+    const isSeekBarSmallerThanTimeTooltip = seekBarRectWidth < timeTooltipWidth;
+
+    // Keeps the component centered if were not reaching the far left/right
+    // of the seek bar or if the seek bar is smaller than the time tooltip
+    if (
+      timeTooltipPosition >= timeTooltipWidth &&
+      timeTooltipPosition <= seekBarRectWidth &&
+      this.el().style.length ||
+      isSeekBarSmallerThanTimeTooltip
+    ) {
+      this.el().style = '';
+      return;
+    }
+
+    // Avoid component right overflow
+    const isOverflowingRight = timeTooltipPosition >= seekBarRectWidth;
+
+    if (isOverflowingRight) {
+      this.el().style.transform = `translateX(calc(50% - ${Math.abs(seekBarRectWidth - timeTooltipPosition)}px))`;
+    }
+
+    // Avoid component left overflow
+    const isOverflowingLeft = timeTooltipPosition <= timeTooltipWidth;
+
+    if (isOverflowingLeft) {
+      this.el().style.transform = `translateX(calc(50% + ${Math.abs(timeTooltipPosition - timeTooltipWidth)}px))`;
+    }
   }
 
   /**
