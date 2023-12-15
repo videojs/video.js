@@ -102,7 +102,6 @@ class TimeTooltip extends Component {
     // progress time tooltip from jittering
     pullTooltipBy = Math.round(pullTooltipBy);
 
-    this.el_.style.right = `-${pullTooltipBy}px`;
     this.write(content);
   }
 
