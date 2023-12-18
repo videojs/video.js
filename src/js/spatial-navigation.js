@@ -31,6 +31,7 @@ class SpatialNavigation {
     this.player.ready(function() {
       self.start();
       // Set the initial focused element or default to null
+      this.focus();
     });
   }
 
@@ -129,7 +130,7 @@ class SpatialNavigation {
    * @return {Component}
    *         Returns a focused component.
    */
-  getCurretComponent() {
+  getCurrentComponent() {
     this.getComponents();
 
     if (this.focusableComponents.length) {
@@ -139,25 +140,6 @@ class SpatialNavigation {
           return i;
         }
       }
-    }
-  }
-
-  /**
-   * Gets the best candiate out of the focusable components.
-   *
-   * @return {Component}
-   *         Returns best candidate focusable component.
-   */
-  findBestCandidate(direction) {
-    this.getCurretComponent();
-
-    switch (direction) {
-    case 'left':
-    case 'right':
-    case 'up':
-    case 'down':
-    default:
-      return null;
     }
   }
 
@@ -197,69 +179,118 @@ class SpatialNavigation {
     this.focusableComponents = [];
   }
 
+  /**
+   * Navigates to the next focusable component based on the specified direction.
+   *
+   * @param {string} direction 'up', 'down', 'left', 'right'
+   */
   move(direction) {
-    this.getComponents();
-
-    const currentFocusedComponent = this.getCurretComponent();
+    const currentFocusedComponent = this.getCurrentComponent();
 
     if (!currentFocusedComponent) {
       return;
     }
 
-    const currentRect = currentFocusedComponent.el_.getBoundingClientRect();
-    let bestCandidate = null;
-    let minDistance = Infinity;
+    const currentPositions = currentFocusedComponent.getPositions();
+    const candidates = this.focusableComponents.filter(component =>
+      component !== currentFocusedComponent &&
+      this.isInDirection(currentPositions.boundingClientRect, component.getPositions().boundingClientRect, direction));
 
-    for (const component of this.focusableComponents) {
-      if (component === currentFocusedComponent) {
-        continue;
-      }
-
-      const rect = component.el_.getBoundingClientRect();
-
-      let distance;
-
-      switch (direction) {
-      case 'right':
-        if (rect.left > currentRect.right) {
-          distance = rect.left - currentRect.right;
-        }
-        break;
-      case 'left':
-        if (rect.right < currentRect.left) {
-          distance = currentRect.left - rect.right;
-        }
-        break;
-      case 'down':
-        if (rect.top > currentRect.bottom) {
-          distance = rect.top - currentRect.bottom;
-        }
-        break;
-      case 'up':
-        if (rect.bottom < currentRect.top) {
-          distance = currentRect.top - rect.bottom;
-        }
-        break;
-      }
-
-      if (distance !== undefined && distance < minDistance) {
-        minDistance = distance;
-        bestCandidate = component;
-      }
-    }
+    const bestCandidate = this.findBestCandidate(currentPositions.center, candidates, direction);
 
     if (bestCandidate) {
       bestCandidate.focus();
     }
   }
 
-  // TODO METHODS
-  // // add focusable component
-  // add(component: Component): void;
-  // // remove focusable component
-  // remove(component: Component): void;
-  // // clear current list of focusable components
-  // clear(): void;
+  /**
+   * Finds the best candidate on the current center position,
+   * the list of candidates, and the specified navigation direction.
+   *
+   * @param {Object} currentCenter The center position of the current focused component element.
+   * @param {Array} candidates An array of candidate components to receive focus.
+   * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
+   * @return The component that is the best candidate for receiving focus.
+   */
+  findBestCandidate(currentCenter, candidates, direction) {
+    let minDistance = Infinity;
+    let bestCandidate = null;
+
+    for (const candidate of candidates) {
+      const candidateCenter = candidate.getPositions().center;
+      const distance = this.calculateDistance(currentCenter, candidateCenter, direction);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestCandidate = candidate;
+      }
+    }
+
+    return bestCandidate;
+  }
+
+  /**
+   * Determines if a target rectangle is in the specified navigation direction
+   * relative to a source rectangle.
+   *
+   * @param {Object} srcRect The bounding rectangle of the source element.
+   * @param {Object} targetRect The bounding rectangle of the target element.
+   * @param {string} direction The navigation direction ('up', 'down', 'left', 'right').
+   * @return {boolean} True if the target is in the specified direction relative to the source.
+   */
+  isInDirection(srcRect, targetRect, direction) {
+    switch (direction) {
+    case 'right':
+      return targetRect.left >= srcRect.right;
+    case 'left':
+      return targetRect.right <= srcRect.left;
+    case 'down':
+      return targetRect.top >= srcRect.bottom;
+    case 'up':
+      return targetRect.bottom <= srcRect.top;
+    default:
+      return false;
+    }
+  }
+
+  /**
+   * Calculates the distance between two points, adjusting the calculation based on
+   * the specified navigation direction.
+   *
+   * @param {Object} center1 The center point of the first element.
+   * @param {Object} center2 The center point of the second element.
+   * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
+   * @return {number} The calculated distance between the two centers.
+   */
+  calculateDistance(center1, center2, direction) {
+    const dx = Math.abs(center1.x - center2.x);
+    const dy = Math.abs(center1.y - center2.y);
+
+    let distance;
+
+    switch (direction) {
+    case 'right':
+    case 'left':
+      // Higher weight for vertical distance in horizontal navigation
+      distance = dx + (dy * 100);
+      break;
+    case 'up':
+      // Strongly prioritize vertical proximity for UP navigation
+      // Adjust the weight to ensure that elements directly above are favored
+      distance = (dy * 2) + (dx * 0.5);
+      break;
+    case 'down':
+      // More balanced weight for vertical and horizontal distances
+      // Adjust the weights here to find the best balance
+      distance = (dy * 5) + dx;
+      break;
+    default:
+      distance = dx + dy;
+    }
+
+    return distance;
+  }
+
 }
 
 export default SpatialNavigation;
