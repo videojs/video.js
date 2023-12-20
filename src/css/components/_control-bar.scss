@@ -6,6 +6,7 @@
   left: 0;
   right: 0;
   height: 3.0em;
+  gap: 1px;
 
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }

@@ -13,10 +13,6 @@ import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/str.js';
 import {merge} from './utils/obj.js';
 import keycode from 'keycode';
-// import SpatialNavigation from './spatial-navigation';
-
-/* const _SpatialNavigation = new SpatialNavigation();
-window.SpatialNavigation = _SpatialNavigation; */
 
 /**
  * Base class for all UI Components.

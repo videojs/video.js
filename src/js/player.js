@@ -566,7 +566,7 @@ class Player extends Component {
     // Check if spatial navigation is enabled in the options.
     // If enabled, instantiate the SpatialNavigation class.
     if (options.spatialNavigation && options.spatialNavigation.enabled) {
-      window.SpatialNavigation = new SpatialNavigation(this, null);
+      window.SpatialNavigation = new SpatialNavigation(this, null, options.spatialNavigation.enableKeydownListener);
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
@@ -5323,7 +5323,8 @@ Player.prototype.options_ = {
   audioPosterMode: false,
   spatialNavigation: {
     enabled: false,
-    horizontalSeek: false
+    horizontalSeek: false,
+    enableKeydownListener: false
   }
 };
 
