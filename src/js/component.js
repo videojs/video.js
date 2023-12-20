@@ -1331,20 +1331,51 @@ class Component {
   }
 
   /**
-   * Abstract method to handle the focus event. This method should be overridden
+   * Handles the focus event. This method could be overridden
    * in subclasses to provide specific focus event handling.
    *
-   * @abstract
+   * Calls for handling of the Player Focus if:
+   * * SpatialNavigation is enabled, not paused & element is focusable.
    */
-  handleFocus() {}
+  handleFocus() {
+    // eslint-disable-next-line
+    const SpatialNavigation = window.SpatialNavigation;
+
+    if (SpatialNavigation && SpatialNavigation.isPaused && this.getIsFocusable()) {
+      SpatialNavigation.handlePlayerFocus();
+    }
+  }
 
   /**
-   * Abstract method to handle the blur event. This method should be overridden
-   * in subclasses to provide specific blur event handling.
+   * Handles the blur event. This method could be overridden
+   * in subclasses to provide specific focus event handling.
    *
-   * @abstract
+   * @param {string|Event|Object} event
+   *        The name of the event, an `Event`, or an object with a key of type set to
+   *        an event name.
+   *
+   * Calls for handling of the Player Blur if:
+   * * Next focused element is not a children of current focused element &
+   *   next focused element is not a children of Player.
+   * * There is no next focused element
    */
-  handleBlur() {}
+  handleBlur(event) {
+    // eslint-disable-next-line
+    const SpatialNavigation = window.SpatialNavigation;
+
+    if (SpatialNavigation && this.getIsFocusable()) {
+      const nextFocusedElement = event.relatedTarget;
+      let isChildrenOfPlayer = null;
+
+      if (nextFocusedElement) {
+        isChildrenOfPlayer = Boolean(nextFocusedElement.closest('.video-js'));
+      }
+
+      if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
+        SpatialNavigation.handlePlayerBlur();
+      }
+    }
+  }
 
   /**
    * Set the focus to this component
