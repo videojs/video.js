@@ -85,6 +85,22 @@ class SpatialNavigation {
   }
 
   /**
+   * Handles Player Blur.
+   *
+   */
+  handlePlayerBlur() {
+    this.pause();
+  }
+
+  /**
+   * Handles Player Focus.
+   *
+   */
+  handlePlayerFocus() {
+    this.resume();
+  }
+
+  /**
    * Gets a set of focusable components.
    *
    * @return {Array}
