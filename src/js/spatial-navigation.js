@@ -17,9 +17,7 @@ class SpatialNavigation {
    *                                                   when the spatial navigation system starts.
    *                                                   If null or not provided, no component will be initially focused.
    */
-  constructor(player, initialFocusedComponent, enableKeydownListener) {
-    const self = this;
-
+  constructor(player, initialFocusedComponent) {
     this.ARROW_KEY_CODE = {37: 'left', 38: 'up', 39: 'right', 40: 'down'};
     this.player = player;
     this.components = new Set();
@@ -28,13 +26,6 @@ class SpatialNavigation {
     this.isPaused = false;
     this.onKeyDown = this.onKeyDown.bind(this);
     this.currentFocus = initialFocusedComponent || null;
-    this.player.ready(function() {
-      if (enableKeydownListener) {
-        self.start();
-      }
-      // Set the initial focused element or default to null
-      // this.focus();
-    });
   }
 
   /**
@@ -45,6 +36,8 @@ class SpatialNavigation {
     if (!this.isListening) {
       this.player.el().addEventListener('keydown', this.onKeyDown);
       this.isListening = true;
+      // this set focus is currently here just for testing purposes
+      this.getComponents()[0].focus();
     }
   }
 
