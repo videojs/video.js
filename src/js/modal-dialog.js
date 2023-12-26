@@ -156,10 +156,8 @@ class ModalDialog extends Component {
    * @fires ModalDialog#modalopen
    */
   open() {
-    if (this.opened_) {
-      if (this.options_.fillAlways) {
-        this.fill();
-      }
+    if (this.opened_ && this.options_.fillAlways) {
+      this.fill();
       return;
     }
 
