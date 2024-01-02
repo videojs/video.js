@@ -5,7 +5,7 @@ import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 import './time-tooltip';
-import './frame-tooltip';
+import './thumbnail-tooltip';
 
 /**
  * The {@link MouseTimeDisplay} component tracks mouse movement over the
@@ -46,6 +46,7 @@ class MouseTimeDisplay extends Component {
   /**
    * Enqueues updates to its own DOM as well as the DOM of its
    * {@link TimeTooltip} child.
+   * {@link ThumbnailTooltip} child.
    *
    * @param {Object} seekBarRect
    *        The `ClientRect` for the {@link SeekBar} element.
@@ -61,9 +62,11 @@ class MouseTimeDisplay extends Component {
       this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
     });
 
-    this.getChild('frameTooltip').updateFrame(seekBarRect, seekBarPoint, time, () => {
-      this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
-    });
+    if (this.player_.options_.controlBar.thumbnailPreview) {
+      this.getChild('thumbnailTooltip').updateThumbnail(seekBarRect, seekBarPoint, time, () => {
+        this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
+      });
+    }
   }
 }
 
@@ -76,7 +79,7 @@ class MouseTimeDisplay extends Component {
 MouseTimeDisplay.prototype.options_ = {
   children: [
     'timeTooltip',
-    'frameTooltip'
+    'thumbnailTooltip'
   ]
 };
 

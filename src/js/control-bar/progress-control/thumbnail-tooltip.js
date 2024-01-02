@@ -1,16 +1,16 @@
 /**
- * @file frame-tooltip.js
+ * @file thumbnail-tooltip.js
  */
 import Component from '../../component';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
- * Frame tooltips display a frame above the progress bar.
+ * thumbnail tooltips display a thumbnail under the progress bar.
  *
  * @extends Component
  */
-class FrameTooltip extends Component {
+class ThumbnailTooltip extends Component {
 
   /**
    * Creates an instance of this class.
@@ -27,22 +27,22 @@ class FrameTooltip extends Component {
   }
 
   /**
-   * Create the frame tooltip DOM element
+   * Create the thumbnail tooltip DOM element
    *
    * @return {Element}
    *         The element that was created.
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-frame-tooltip',
-      id: 'frametooltip'
+      className: 'vjs-thumbnail-tooltip',
+      id: 'thumbnailtooltip'
     }, {
       'aria-hidden': 'true'
     });
   }
 
   /**
-   * Updates the position of the frame tooltip relative to the `SeekBar`.
+   * Updates the position of the thumbnail tooltip relative to the `SeekBar`.
    *
    * @param {Object} seekBarRect
    *        The `ClientRect` for the {@link SeekBar} element.
@@ -103,7 +103,7 @@ class FrameTooltip extends Component {
     // prevent small width fluctuations within 0.4px from
     // changing the value below.
     // This really helps for live to prevent the play
-    // progress time tooltip from jittering
+    // progress thumbnail tooltip from jittering
     pullTooltipBy = Math.round(pullTooltipBy);
 
     this.el_.style.right = `-${pullTooltipBy}px`;
@@ -111,10 +111,10 @@ class FrameTooltip extends Component {
   }
 
   /**
-   * Draw the frame at specific time to the tooltip DOM element.
+   * Draw the thumbnail at specific time to the tooltip DOM element.
    *
    * @param {string} content
-   *        The formatted time we want to frame for the tooltip.
+   *        The formatted time we want the thumbnail for the tooltip.
    */
   draw(content) {
     const videoElement = this.player().children()[0];
@@ -140,7 +140,7 @@ class FrameTooltip extends Component {
   }
 
   /**
-   * Updates the position of the time tooltip relative to the `SeekBar`.
+   * Updates the position of the thumbnail tooltip relative to the `SeekBar`.
    *
    * @param {Object} seekBarRect
    *        The `ClientRect` for the {@link SeekBar} element.
@@ -156,8 +156,8 @@ class FrameTooltip extends Component {
    *        A function that will be called during the request animation frame
    *        for tooltips that need to do additional animations from the default
    */
-  updateFrame(seekBarRect, seekBarPoint, time, cb) {
-    this.requestNamedAnimationFrame('TimeTooltip#updateFrame', () => {
+  updateThumbnail(seekBarRect, seekBarPoint, time, cb) {
+    this.requestNamedAnimationFrame('ThumbnailTooltip#updateThumbnail', () => {
       this.update(seekBarRect, seekBarPoint, time);
       if (cb) {
         cb();
@@ -166,5 +166,5 @@ class FrameTooltip extends Component {
   }
 }
 
-Component.registerComponent('FrameTooltip', FrameTooltip);
-export default FrameTooltip;
+Component.registerComponent('ThumbnailTooltip', ThumbnailTooltip);
+export default ThumbnailTooltip;
