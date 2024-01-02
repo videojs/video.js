@@ -1,3 +1,18 @@
+<a name="8.9.0"></a>
+# [8.9.0](https://github.com/videojs/video.js/compare/v8.8.0...v8.9.0) (2024-01-02)
+
+### Features
+
+* Seek bar smooth seeking ([#8287](https://github.com/videojs/video.js/issues/8287)) ([608a585](https://github.com/videojs/video.js/commit/608a585)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370) [#6372](https://github.com/videojs/video.js/issues/6372)
+
+### Bug Fixes
+
+* **skip-forward:** a11y ([#8532](https://github.com/videojs/video.js/issues/8532)) ([af0fca3](https://github.com/videojs/video.js/commit/af0fca3))
+
+### Chores
+
+* update vhs to 3.9.1 ([#8539](https://github.com/videojs/video.js/issues/8539)) ([17506b1](https://github.com/videojs/video.js/commit/17506b1))
+
 <a name="8.8.0"></a>
 # [8.8.0](https://github.com/videojs/video.js/compare/v8.7.0...v8.8.0) (2023-12-14)
 

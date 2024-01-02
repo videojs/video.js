@@ -3423,3 +3423,66 @@ QUnit.test('should not reset the error when the tech triggers an error that is n
   errorStub.restore();
   log.error.restore();
 });
+
+QUnit.test('smooth seeking set to false should not update the display time components or the seek bar', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const {
+    currentTimeDisplay,
+    remainingTimeDisplay,
+    progressControl: {
+      seekBar
+    }
+  } = player.controlBar;
+  const currentTimeDisplayUpdateContent = sinon.spy(currentTimeDisplay, 'updateContent');
+  const remainingTimeDisplayUpdateContent = sinon.spy(remainingTimeDisplay, 'updateContent');
+  const seekBarUpdate = sinon.spy(seekBar, 'update');
+
+  assert.false(player.options().enableSmoothSeeking, 'enableSmoothSeeking is false by default');
+
+  player.trigger('seeking');
+
+  assert.ok(currentTimeDisplayUpdateContent.notCalled, 'currentTimeDisplay updateContent was not called');
+  assert.ok(remainingTimeDisplayUpdateContent.notCalled, 'remainingTimeDisplay updateContent was not called');
+
+  seekBar.trigger('mousedown');
+  seekBar.trigger('mousemove');
+
+  assert.ok(seekBarUpdate.notCalled, 'seekBar update was not called');
+
+  currentTimeDisplayUpdateContent.restore();
+  remainingTimeDisplayUpdateContent.restore();
+  seekBarUpdate.restore();
+  player.dispose();
+});
+
+QUnit.test('smooth seeking set to true should update the display time components and the seek bar', function(assert) {
+  const player = TestHelpers.makePlayer({enableSmoothSeeking: true});
+  const {
+    currentTimeDisplay,
+    remainingTimeDisplay,
+    progressControl: {
+      seekBar
+    }
+  } = player.controlBar;
+  const currentTimeDisplayUpdateContent = sinon.spy(currentTimeDisplay, 'updateContent');
+  const remainingTimeDisplayUpdateContent = sinon.spy(remainingTimeDisplay, 'updateContent');
+  const seekBarUpdate = sinon.spy(seekBar, 'update');
+
+  assert.true(player.options().enableSmoothSeeking, 'enableSmoothSeeking is true');
+
+  player.duration(1);
+  player.trigger('seeking');
+
+  assert.ok(currentTimeDisplayUpdateContent.called, 'currentTimeDisplay updateContent was called');
+  assert.ok(remainingTimeDisplayUpdateContent.called, 'remainingTimeDisplay updateContent was called');
+
+  seekBar.trigger('mousedown');
+  seekBar.trigger('mousemove');
+
+  assert.ok(seekBarUpdate.called, 'seekBar update was called');
+
+  currentTimeDisplayUpdateContent.restore();
+  remainingTimeDisplayUpdateContent.restore();
+  seekBarUpdate.restore();
+  player.dispose();
+});
