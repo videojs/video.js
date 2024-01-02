@@ -117,33 +117,26 @@ class FrameTooltip extends Component {
    *        The formatted time we want to frame for the tooltip.
    */
   draw(content) {
+    const videoElement = this.player().children()[0];
 
-    // TODO : recuperer l'id du bon player pour ajouter le tooltip + recuperer autrement la video + un peu de css + commenter
+    const clonedVideo = videoElement.cloneNode(true);
 
-    // const videoElement = document.querySelector('.video-js .vjs-tech');
+    clonedVideo.currentTime = parseInt(content, 10);
 
-    // const clonedVideo = videoElement.cloneNode(true);
+    const canvas = Dom.createEl('canvas');
 
-    // clonedVideo.currentTime = parseInt(content, 10);
+    const context = canvas.getContext('2d');
 
-    // const canvas = document.createElement('canvas');
-
-    // const context = canvas.getContext('2d');
-
-    // const tooltip = document.getElementById('frametooltip');
-
-    // clonedVideo.addEventListener('loadedmetadata', function() {
-    //   clonedVideo.addEventListener('seeked', function() {
-    //     context.drawImage(clonedVideo, 0, 0, canvas.width, canvas.height);
-    //   });
-    //   clonedVideo.removeEventListener('loadedmetadata', null);
-    // });
-    // if (tooltip) {
-    //   if (tooltip.firstChild) {
-    //     tooltip.removeChild(tooltip.firstChild);
-    //   }
-    //   tooltip.appendChild(canvas);
-    // }
+    clonedVideo.addEventListener('loadedmetadata', function() {
+      clonedVideo.addEventListener('seeked', function() {
+        context.drawImage(clonedVideo, 0, 0, canvas.width, canvas.height);
+      });
+      clonedVideo.removeEventListener('loadedmetadata', null);
+    });
+    if (this.el_.firstChild) {
+      this.el_.removeChild(this.el_.firstChild);
+    }
+    this.el_.appendChild(canvas);
   }
 
   /**
