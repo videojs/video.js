@@ -5,6 +5,7 @@ import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 import './time-tooltip';
+import './frame-tooltip';
 
 /**
  * The {@link MouseTimeDisplay} component tracks mouse movement over the
@@ -59,6 +60,10 @@ class MouseTimeDisplay extends Component {
     this.getChild('timeTooltip').updateTime(seekBarRect, seekBarPoint, time, () => {
       this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
     });
+
+    this.getChild('frameTooltip').updateFrame(seekBarRect, seekBarPoint, time, () => {
+      this.el_.style.left = `${seekBarRect.width * seekBarPoint}px`;
+    });
   }
 }
 
@@ -70,7 +75,8 @@ class MouseTimeDisplay extends Component {
  */
 MouseTimeDisplay.prototype.options_ = {
   children: [
-    'timeTooltip'
+    'timeTooltip',
+    'frameTooltip'
   ]
 };
 
