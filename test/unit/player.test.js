@@ -1901,6 +1901,12 @@ QUnit.test('Player#tech logs a warning when called without a safety argument', f
   log.warn = oldLogWarn;
 });
 
+QUnit.test('player#version logs a warning when called without a safety argument', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  assert.strictEqual(player.version(), pkg.version, 'version is correct');
+});
+
 QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
   let loadedTech;
   let loadedSource;

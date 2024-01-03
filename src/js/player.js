@@ -1329,6 +1329,16 @@ class Player extends Component {
   }
 
   /**
+   * Return a Video.js version. Follows [semantic versioning](https://semver.org/).
+   *
+   * @return {string}
+   *          Video.js version
+   */
+  version() {
+    return version;
+  }
+
+  /**
    * Set up click and touch listeners for the playback element
    *
    * - On desktops: a click on the video itself will toggle playback
