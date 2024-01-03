@@ -118,6 +118,8 @@ class ThumbnailTooltip extends Component {
    */
   draw(content) {
     const videoElement = this.player().children()[0];
+    // clone the original video element to navigate in the video at the
+    // time we want without altering the original element
 
     const clonedVideo = videoElement.cloneNode(true);
 
@@ -127,12 +129,14 @@ class ThumbnailTooltip extends Component {
 
     const context = canvas.getContext('2d');
 
+    // wait for the metadata to load before drawing the thumbnail canvas
     clonedVideo.addEventListener('loadedmetadata', function() {
       clonedVideo.addEventListener('seeked', function() {
         context.drawImage(clonedVideo, 0, 0, canvas.width, canvas.height);
       });
       clonedVideo.removeEventListener('loadedmetadata', null);
     });
+    // delete the previous thumbnail loaded to render the new one
     if (this.el_.firstChild) {
       this.el_.removeChild(this.el_.firstChild);
     }
