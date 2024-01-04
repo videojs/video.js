@@ -15,6 +15,12 @@ import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
 /**
+ * @typedef {Object} ComponentOptions
+ * @property {Object[]} children
+ * @property {string} classname
+ */
+
+/**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
  * in the DOM. They can be children of other components, and can have
@@ -38,16 +44,8 @@ class Component {
    * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
    *
-   * @param {Object} [options]
+   * @param {ComponentOptions} [options]
    *        The key/value store of component options.
-   *
-   * @param {Object[]} [options.children]
-   *        An array of children objects to initialize this component with. Children objects have
-   *        a name property that will be used if more than one component of the same type needs to be
-   *        added.
-   *
-   * @param  {string} [options.className]
-   *         A class or space separated list of classes to add the component
    *
    * @param {ReadyCallback} [ready]
    *        Function that gets called when the `Component` is ready.
@@ -1777,11 +1775,11 @@ class Component {
    *
    * @param {string} name
    *        The name of the `Component` to register.
-   *
-   * @param {Component} ComponentToRegister
+   * @template {Component} C
+   * @param {C} ComponentToRegister
    *        The `Component` class to register.
    *
-   * @return {Component}
+   * @return {C}
    *         The `Component` that was registered.
    */
   static registerComponent(name, ComponentToRegister) {
