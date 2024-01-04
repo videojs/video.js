@@ -1329,13 +1329,23 @@ class Player extends Component {
   }
 
   /**
-   * Returns video.js version.
+   * An object that contains Video.js version.
    *
-   * @return {string}
-   *          Video.js version
+   * @typedef {Object} PlayerVersion
+   *
+   * @property {string} 'video.js' - Video.js version
+   */
+
+  /**
+   * Returns an object with Video.js version.
+   *
+   * @return {PlayerVersion}
+   *          An object with Video.js version.
    */
   version() {
-    return version;
+    return {
+      'video.js': version,
+    };
   }
 
   /**
