@@ -1329,7 +1329,7 @@ class Player extends Component {
   }
 
   /**
-   * Return a Video.js version. Follows [semantic versioning](https://semver.org/).
+   * Returns video.js version.
    *
    * @return {string}
    *          Video.js version
