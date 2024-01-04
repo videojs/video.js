@@ -1344,7 +1344,7 @@ class Player extends Component {
    */
   version() {
     return {
-      'video.js': version,
+      'video.js': version
     };
   }
 
