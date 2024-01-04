@@ -1329,6 +1329,26 @@ class Player extends Component {
   }
 
   /**
+   * An object that contains Video.js version.
+   *
+   * @typedef {Object} PlayerVersion
+   *
+   * @property {string} 'video.js' - Video.js version
+   */
+
+  /**
+   * Returns an object with Video.js version.
+   *
+   * @return {PlayerVersion}
+   *          An object with Video.js version.
+   */
+  version() {
+    return {
+      'video.js': version
+    };
+  }
+
+  /**
    * Set up click and touch listeners for the playback element
    *
    * - On desktops: a click on the video itself will toggle playback
