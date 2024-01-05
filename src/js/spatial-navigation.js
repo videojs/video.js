@@ -1,11 +1,4 @@
-/**
-* Player Component - Class that manages spatial navigation
-*
-* @file spatial-navigation.js
-*/
-
 class SpatialNavigation {
-
   /**
    * Constructs a SpatialNavigation instance with initial settings.
    * Initializes key codes for navigation, sets up the player instance,
@@ -18,12 +11,13 @@ class SpatialNavigation {
    *                                                   If null or not provided, no component will be initially focused.
    */
   constructor(player, initialFocusedComponent) {
-    this.ARROW_KEY_CODE = {37: 'left', 38: 'up', 39: 'right', 40: 'down'};
+    this.ARROW_KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
     this.player = player;
     this.components = new Set();
     this.focusableComponents = [];
     this.isListening = false;
     this.isPaused = false;
+    this.eventListeners = [];
     this.onKeyDown = this.onKeyDown.bind(this);
     this.currentFocus = initialFocusedComponent || null;
   }
@@ -115,7 +109,7 @@ class SpatialNavigation {
         if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused()) {
           focusableComponents.push(i);
         }
-        if (i.hasOwnProperty('children_') && i.children_ .length > 0) {
+        if (i.hasOwnProperty('children_') && i.children_.length > 0) {
           searchForChildrenCandidates(i.children_);
         }
       }
@@ -168,6 +162,9 @@ class SpatialNavigation {
     }
 
     this.focusableComponents = focusableComponents;
+    // Trigger the notification manually
+    this.notifyListeners('focusableComponentsChanged');
+
   }
 
   /**
@@ -181,13 +178,22 @@ class SpatialNavigation {
         this.focusableComponents.splice(i, 1);
       }
     }
+    // Trigger the notification manually
+    this.notifyListeners('focusableComponentsChanged');
   }
 
   /**
    * Clears array of focusable components.
    */
   clear() {
-    this.focusableComponents = [];
+    // Check if the array is already empty to avoid unnecessary event triggering
+    if (this.focusableComponents.length > 0) {
+      // Clear the array
+      this.focusableComponents = [];
+
+      // Trigger the notification manually
+      this.notifyListeners('focusableComponentsChanged');
+    }
   }
 
   /**
@@ -302,6 +308,42 @@ class SpatialNavigation {
     return distance;
   }
 
+  /**
+   * Adds an event listener for a specific event.
+   *
+   * @param {string} eventName - The name of the event to listen for.
+   * @param {Function} callback - The callback function to be executed when the event occurs.
+   */
+  addEventListener(eventName, callback) {
+    if (!this.eventListeners[eventName]) {
+      this.eventListeners[eventName] = [];
+    }
+
+    this.eventListeners[eventName].push(callback);
+  }
+
+  /**
+   * Notifies listeners for a specific event.
+   *
+   * @param {string} eventName - The name of the event to notify listeners for.
+   */
+  notifyListeners(eventName) {
+    const listeners = this.eventListeners[eventName];
+
+    if (listeners) {
+      const event = new CustomEvent(eventName, {
+        detail: {
+          focusableComponents: this.focusableComponents
+        }
+      });
+
+      listeners.forEach(listener => {
+        if (typeof listener === 'function') {
+          listener(event);
+        }
+      });
+    }
+  }
 }
 
 export default SpatialNavigation;
