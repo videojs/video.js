@@ -459,7 +459,10 @@ class ModalDialog extends Component {
     // Do not allow keydowns to reach out of the modal dialog.
     event.stopPropagation();
 
-    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
+    // eslint-disable-next-line
+    const SpatialNavigation = window.SpatialNavigation;
+
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && SpatialNavigation) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
