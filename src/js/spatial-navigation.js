@@ -20,6 +20,7 @@ class SpatialNavigation {
     this.eventListeners = [];
     this.onKeyDown = this.onKeyDown.bind(this);
     this.currentFocus = initialFocusedComponent || null;
+    this.lastFocusedComponent = null;
   }
 
   /**
@@ -82,8 +83,12 @@ class SpatialNavigation {
    * Handles Player Blur.
    *
    */
-  handlePlayerBlur() {
+  handlePlayerBlur(component) {
     this.pause();
+
+    if (component && component.el_) {
+      this.lastFocusedComponent = component;
+    }
   }
 
   /**
@@ -267,6 +272,23 @@ class SpatialNavigation {
       return targetRect.bottom <= srcRect.top;
     default:
       return false;
+    }
+  }
+
+  /**
+   * Focus last focused component saved before blur on player.
+   */
+  refocusComponent() {
+    if (this.lastFocusedComponent) {
+      this.getComponents();
+
+      for (let i = 0; i < this.focusableComponents.length; i++) {
+        if (this.focusableComponents[i].name_ === this.lastFocusedComponent.name_) {
+          this.focusableComponents[i].focus();
+        }
+      }
+    } else {
+      this.getComponents()[0].focus();
     }
   }
 

@@ -1372,7 +1372,7 @@ class Component {
       }
 
       if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
-        SpatialNavigation.handlePlayerBlur();
+        SpatialNavigation.handlePlayerBlur(this);
       }
     }
   }
