@@ -1339,10 +1339,10 @@ class Component {
    */
   handleFocus() {
     // eslint-disable-next-line
-    const SpatialNavigation = window.SpatialNavigation;
+    const spatialNavigation = this.player_.spatialNavigation;
 
-    if (SpatialNavigation && SpatialNavigation.isPaused && this.getIsFocusable()) {
-      SpatialNavigation.handlePlayerFocus();
+    if (spatialNavigation && spatialNavigation.isPaused && this.getIsFocusable()) {
+      spatialNavigation.handlePlayerFocus();
     }
   }
 
@@ -1361,9 +1361,9 @@ class Component {
    */
   handleBlur(event) {
     // eslint-disable-next-line
-    const SpatialNavigation = window.SpatialNavigation;
+    const spatialNavigation = this.player_.spatialNavigation;
 
-    if (SpatialNavigation && this.getIsFocusable()) {
+    if (spatialNavigation && this.getIsFocusable()) {
       const nextFocusedElement = event.relatedTarget;
       let isChildrenOfPlayer = null;
 
@@ -1372,7 +1372,7 @@ class Component {
       }
 
       if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
-        SpatialNavigation.handlePlayerBlur(this);
+        spatialNavigation.handlePlayerBlur(this);
       }
     }
   }
