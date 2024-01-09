@@ -268,10 +268,10 @@ class ModalDialog extends Component {
     }
 
     // eslint-disable-next-line
-    const SpatialNavigation = window.SpatialNavigation;
+    const spatialNavigation = player.spatialNavigation;
 
-    if (SpatialNavigation) {
-      SpatialNavigation.refocusComponent();
+    if (spatialNavigation) {
+      spatialNavigation.refocusComponent();
     }
   }
 
