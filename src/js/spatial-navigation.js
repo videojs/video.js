@@ -168,7 +168,7 @@ class SpatialNavigation {
 
     this.focusableComponents = focusableComponents;
     // Trigger the notification manually
-    this.notifyListeners('focusableComponentsChanged');
+    this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
 
   }
 
@@ -184,7 +184,7 @@ class SpatialNavigation {
       }
     }
     // Trigger the notification manually
-    this.notifyListeners('focusableComponentsChanged');
+    this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
   }
 
   /**
@@ -197,7 +197,7 @@ class SpatialNavigation {
       this.focusableComponents = [];
 
       // Trigger the notification manually
-      this.notifyListeners('focusableComponentsChanged');
+      this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
     }
   }
 
@@ -222,6 +222,8 @@ class SpatialNavigation {
 
     if (bestCandidate) {
       bestCandidate.focus();
+    } else {
+      this.notifyListeners('endOfFocusableComponents', { direction, focusedElement: currentFocusedComponent });
     }
   }
 
@@ -280,6 +282,9 @@ class SpatialNavigation {
    */
   refocusComponent() {
     if (this.lastFocusedComponent) {
+      if (!this.player.userActive()) {
+        this.player.userActive(true);
+      }
       this.getComponents();
 
       for (let i = 0; i < this.focusableComponents.length; i++) {
@@ -348,15 +353,14 @@ class SpatialNavigation {
    * Notifies listeners for a specific event.
    *
    * @param {string} eventName - The name of the event to notify listeners for.
+   * @param {Object} [eventDetails={}] - Additional details to include in the event object.
    */
-  notifyListeners(eventName) {
+  notifyListeners(eventName, eventDetails = {}) {
     const listeners = this.eventListeners[eventName];
 
     if (listeners) {
       const event = new CustomEvent(eventName, {
-        detail: {
-          focusableComponents: this.focusableComponents
-        }
+        detail: eventDetails
       });
 
       listeners.forEach(listener => {
