@@ -567,6 +567,7 @@ class Player extends Component {
     // If enabled, instantiate the SpatialNavigation class.
     if (options.spatialNavigation && options.spatialNavigation.enabled) {
       this.spatialNavigation = new SpatialNavigation(this, null);
+      this.addClass('vjs-spatial-navigation-enabled');
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
