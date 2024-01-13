@@ -124,8 +124,10 @@ class SpatialNavigation {
       if (key && value && value.hasOwnProperty('el_') && key !== 'player_') {
         if (player[key].getIsFocusable() && player[key].getIsAvailableToBeFocused()) {
           focusableComponents.push(value);
-        } else if (value.hasOwnProperty('children_') && player[key].children_.length > 0) {
+        } else if ((value.hasOwnProperty('children_') && player[key].children_.length > 0)) {
           searchForChildrenCandidates(player[key].children_);
+        } else if (value.hasOwnProperty('items') && player[key].items.length > 0) {
+          searchForChildrenCandidates(player[key].items);
         }
       }
     }
