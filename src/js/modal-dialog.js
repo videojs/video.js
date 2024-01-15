@@ -460,9 +460,9 @@ class ModalDialog extends Component {
     event.stopPropagation();
 
     // eslint-disable-next-line
-    const SpatialNavigation = window.SpatialNavigation;
+    const spatialNavigation = this.player_.spatialNavigation;
 
-    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && SpatialNavigation) && this.closeable()) {
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && spatialNavigation) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
