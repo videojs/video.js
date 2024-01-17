@@ -1,3 +1,19 @@
+<a name="8.10.0"></a>
+# [8.10.0](https://github.com/videojs/video.js/compare/v8.9.0...v8.10.0) (2024-01-17)
+
+### Features
+
+* **error:** remove confusing decorative X from error display modal ([#8553](https://github.com/videojs/video.js/issues/8553)) ([7345768](https://github.com/videojs/video.js/commit/7345768))
+* expose version from player.version() ([#8543](https://github.com/videojs/video.js/issues/8543)) ([abdfaac](https://github.com/videojs/video.js/commit/abdfaac)), closes [#8538](https://github.com/videojs/video.js/issues/8538)
+
+### Bug Fixes
+
+* Fixes form markup in text track settings ([#8557](https://github.com/videojs/video.js/issues/8557)) ([46c9907](https://github.com/videojs/video.js/commit/46c9907))
+
+### Chores
+
+* update to http-streaming v3.10.0 ([#8558](https://github.com/videojs/video.js/issues/8558)) ([eebcc07](https://github.com/videojs/video.js/commit/eebcc07))
+
 <a name="8.9.0"></a>
 # [8.9.0](https://github.com/videojs/video.js/compare/v8.8.0...v8.9.0) (2024-01-02)
 
