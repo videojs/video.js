@@ -75,6 +75,11 @@ class TimeTooltip extends Component {
     let spaceRightOfPoint = (seekBarRect.width - seekBarPointPx) +
       (playerRect.right - seekBarRect.right);
 
+    // spaceRightOfPoint is always NaN for mouse time display
+    // because the seekbarRect does not have a right property. This causes
+    // the mouse tool tip to be truncated when it's close to the right edge of the player.
+    // In such cases, we ignore the `playerRect.right - seekBarRect.right` value when calculating
+    // spaceRightofPoint.
     if (!spaceRightOfPoint) {
       spaceRightOfPoint = seekBarRect.width - seekBarPointPx;
     }
