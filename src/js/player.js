@@ -4200,6 +4200,7 @@ class Player extends Component {
       return;
     }
 
+    // error should contain eventtype, and be passed in
     this.error_ = new MediaError(err);
 
     // add the vjs-error classname to the player

@@ -617,4 +617,19 @@ videojs.str = Str;
  */
 videojs.url = Url;
 
+// TODO: Move this to another file and import it.
+videojs.Errors = {
+  DashManifestRequestError: 'dash-manifest-request-error',
+  DashManifestSidxContainerError: 'dash-sidx-container-error',
+  DashManifestSidxParsingError: 'dash-manifest-sidx-parsing-error',
+  HlsPlaylistRequestError: 'hls-playlist-request-error',
+  SegmentUnsupportedMediaFormat: 'segment-unsupported-media-format',
+  SegmentSwitchError: 'segment-switch-error',
+  SegmentExceedsBufferQuota: 'segment-exceeds-buffer-quota',
+  SegmentAppendError: 'segment-append-error',
+  VttLoadError: 'vtt-load-error',
+  VttCueParsingError: 'vtt-cue-parsing-error',
+  EMEKeySessionCreationError: 'eme-key-session-creation-error'
+};
+
 export default videojs;
