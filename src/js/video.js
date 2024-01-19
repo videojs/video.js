@@ -624,6 +624,7 @@ videojs.Errors = {
   DashManifestSidxParsingError: 'dash-manifest-sidx-parsing-error',
   HlsPlaylistRequestError: 'hls-playlist-request-error',
   SegmentUnsupportedMediaFormat: 'segment-unsupported-media-format',
+  SegmentUnsupportedContainer: 'segment-unsupported-container',
   SegmentSwitchError: 'segment-switch-error',
   SegmentExceedsBufferQuota: 'segment-exceeds-buffer-quota',
   SegmentAppendError: 'segment-append-error',
