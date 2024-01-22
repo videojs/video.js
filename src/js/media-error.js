@@ -76,16 +76,9 @@ MediaError.prototype.message = '';
 MediaError.prototype.status = null;
 
 /**
- * An object describing what type of error occured.
- *
- * @typedef {Object} VideoJsError
- * @property {string} errorType
- */
-
-/**
  * An object containing an error type, as well as other information regarding the error.
  *
- * @typedef {{error: VideoJsError, [key: string]: any}} ErrorMetadata
+ * @typedef {{errorType: string, [key: string]: any}} ErrorMetadata
  */
 
 /**
