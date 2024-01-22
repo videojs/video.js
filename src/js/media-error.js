@@ -85,7 +85,7 @@ MediaError.prototype.status = null;
 /**
  * An object containing an error type, as well as other information regarding the error.
  *
- * @typedef {Object} ErrorMetadata
+ * @typedef {{error: VideoJsError, [key: string]: any}} ErrorMetadata
  * @property {VideoJsError} error
  */
 
