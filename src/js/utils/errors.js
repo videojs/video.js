@@ -1,5 +1,4 @@
 export default {
-  DashManifestRequestError: 'dash-manifest-request-error',
   UnsupportedSidxContainer: 'unsupported-sidx-container-error',
   DashManifestSidxParsingError: 'dash-manifest-sidx-parsing-error',
   HlsPlaylistRequestError: 'hls-playlist-request-error',
