@@ -35,6 +35,7 @@ import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import * as Obj from './utils/obj';
 import xhr from '@videojs/xhr';
+import VjsErrors from './utils/errors';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
@@ -617,20 +618,7 @@ videojs.str = Str;
  */
 videojs.url = Url;
 
-// TODO: Move this to another file and import it.
-videojs.Errors = {
-  DashManifestRequestError: 'dash-manifest-request-error',
-  DashManifestSidxContainerError: 'dash-sidx-container-error',
-  DashManifestSidxParsingError: 'dash-manifest-sidx-parsing-error',
-  HlsPlaylistRequestError: 'hls-playlist-request-error',
-  SegmentUnsupportedMediaFormat: 'segment-unsupported-media-format',
-  SegmentUnsupportedContainer: 'segment-unsupported-container',
-  SegmentSwitchError: 'segment-switch-error',
-  SegmentExceedsBufferQuota: 'segment-exceeds-buffer-quota',
-  SegmentAppendError: 'segment-append-error',
-  VttLoadError: 'vtt-load-error',
-  VttCueParsingError: 'vtt-cue-parsing-error',
-  EMEKeySessionCreationError: 'eme-key-session-creation-error'
-};
+// The list of possible error types to occur in video.js
+videojs.Errors = VjsErrors;
 
 export default videojs;

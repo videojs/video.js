@@ -41,7 +41,6 @@ function MediaError(value) {
       this.code = value.code;
     }
 
-    // errorType should automatically be created here if it exists
     Object.assign(this, value);
   }
 
@@ -77,13 +76,27 @@ MediaError.prototype.message = '';
 MediaError.prototype.status = null;
 
 /**
- * An optional error type string to give more detail about the error. This can be used to give
- * a higher level of specificity to an error versus the more generic MediaError codes.
- * This value should align with the values from videojs.Errors
+ * An object describing what type of error occured.
  *
- * @type {string}
+ * @typedef {Object} VideoJsError
+ * @property {string} errorType
  */
-MediaError.prototype.errorType = null;
+
+/**
+ * An object containing an error type, as well as other information regarding the error.
+ *
+ * @typedef {Object} ErrorMetadata
+ * @property {VideoJsError} error
+ */
+
+/**
+ * An optional object to give more detail about the error. This can be used to give
+ * a higher level of specificity to an error versus the more generic MediaError codes.
+ * `metadata` expects an `errorType` string that should align with the values from videojs.Errors.
+ *
+ * @type {ErrorMetadata}
+ */
+MediaError.prototype.metadata = null;
 
 /**
  * Errors indexed by the W3C standard. The order **CANNOT CHANGE**! See the
