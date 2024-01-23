@@ -34,8 +34,8 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import * as Obj from './utils/obj';
+import VjsErrors from './consts/errors';
 import xhr from '@videojs/xhr';
-import VjsErrors from './utils/errors';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
