@@ -214,6 +214,7 @@ MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
  * @constant {number}
  * @default 4
  */
+MediaError.prototype.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
 
 /**
  * W3C error code for any time that a source is encrypted.
@@ -222,7 +223,7 @@ MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
  * @constant {number}
  * @default 5
  */
-MediaError.prototype.MEDIA_ERR_ENCRYPTED = 5;
+MediaError.MEDIA_ERR_ENCRYPTED = 5;
 
 /**
  * W3C error code for any time that a source is encrypted.
@@ -231,6 +232,6 @@ MediaError.prototype.MEDIA_ERR_ENCRYPTED = 5;
  * @constant {number}
  * @default 5
  */
-MediaError.MEDIA_ERR_ENCRYPTED = 5;
+MediaError.protoype.MEDIA_ERR_ENCRYPTED = 5;
 
 export default MediaError;
