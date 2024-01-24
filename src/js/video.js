@@ -619,6 +619,6 @@ videojs.str = Str;
 videojs.url = Url;
 
 // The list of possible error types to occur in video.js
-videojs.Errors = VjsErrors;
+videojs.Error = VjsErrors;
 
 export default videojs;
