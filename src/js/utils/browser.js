@@ -140,6 +140,10 @@ export let IS_IPAD = false;
 // http://artsy.github.io/blog/2012/10/18/the-perils-of-ios-user-agent-sniffing/
 export let IS_IPHONE = false;
 
+export let IS_TIZEN = false;
+
+export let IS_WEBOS = false;
+
 /**
  * Whether or not this device is touch-enabled.
  *
@@ -235,7 +239,11 @@ if (!IS_CHROMIUM) {
     return version;
   }());
 
-  IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE;
+  IS_TIZEN = (/Tizen/i).test(USER_AGENT);
+
+  IS_WEBOS = (/Web0S/i).test(USER_AGENT);
+
+  IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE && !IS_TIZEN && !IS_WEBOS;
 
   IS_WINDOWS = (/Windows/i).test(USER_AGENT);
 
