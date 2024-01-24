@@ -232,6 +232,6 @@ MediaError.MEDIA_ERR_ENCRYPTED = 5;
  * @constant {number}
  * @default 5
  */
-MediaError.protoype.MEDIA_ERR_ENCRYPTED = 5;
+MediaError.prototype.MEDIA_ERR_ENCRYPTED = 5;
 
 export default MediaError;
