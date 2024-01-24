@@ -140,8 +140,20 @@ export let IS_IPAD = false;
 // http://artsy.github.io/blog/2012/10/18/the-perils-of-ios-user-agent-sniffing/
 export let IS_IPHONE = false;
 
+/**
+ * Whether or not this is a Tizen device.
+ *
+ * @static
+ * @type {Boolean}
+ */
 export let IS_TIZEN = false;
 
+/**
+ * Whether or not this is a WebOS device.
+ *
+ * @static
+ * @type {Boolean}
+ */
 export let IS_WEBOS = false;
 
 /**
