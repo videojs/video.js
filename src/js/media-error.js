@@ -84,7 +84,7 @@ MediaError.prototype.status = null;
 /**
  * An optional object to give more detail about the error. This can be used to give
  * a higher level of specificity to an error versus the more generic MediaError codes.
- * `metadata` expects an `errorType` string that should align with the values from videojs.Errors.
+ * `metadata` expects an `errorType` string that should align with the values from videojs.Error.
  *
  * @type {ErrorMetadata}
  */
