@@ -7,6 +7,8 @@ import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
+import TrackSettingsColors from './test-track-settings-colors';
+import TrackSettingsFont from './text-track-settings-font';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
@@ -48,7 +50,8 @@ const selectConfigs = {
       COLOR_YELLOW,
       COLOR_MAGENTA,
       COLOR_CYAN
-    ]
+    ],
+    className: 'vjs-bg-color'
   },
 
   backgroundOpacity: {
@@ -59,7 +62,8 @@ const selectConfigs = {
       OPACITY_OPAQUE,
       OPACITY_SEMI,
       OPACITY_TRANS
-    ]
+    ],
+    className: 'vjs-bg-opacity vjs-opacity'
   },
 
   color: {
@@ -75,7 +79,8 @@ const selectConfigs = {
       COLOR_YELLOW,
       COLOR_MAGENTA,
       COLOR_CYAN
-    ]
+    ],
+    className: 'vjs-text-color'
   },
 
   edgeStyle: {
@@ -132,14 +137,16 @@ const selectConfigs = {
     options: [
       OPACITY_OPAQUE,
       OPACITY_SEMI
-    ]
+    ],
+    className: 'vjs-text-opacity vjs-opacity'
   },
 
   // Options for this object are defined below.
   windowColor: {
     selector: '.vjs-window-color > select',
     id: 'captions-window-color-%s',
-    label: 'Color'
+    label: 'Color',
+    className: 'vjs-window-color'
   },
 
   // Options for this object are defined below.
@@ -151,7 +158,8 @@ const selectConfigs = {
       OPACITY_TRANS,
       OPACITY_SEMI,
       OPACITY_OPAQUE
-    ]
+    ],
+    className: 'vjs-window-opacity vjs-opacity'
   }
 };
 
@@ -253,6 +261,7 @@ class TextTrackSettings extends ModalDialog {
     options.temporary = false;
 
     super(player, options);
+
     this.updateDisplay = this.updateDisplay.bind(this);
 
     // fill the modal and pretend we have opened it
@@ -264,6 +273,38 @@ class TextTrackSettings extends ModalDialog {
       textContent: this.localize('End of dialog window.')
     });
     this.el().appendChild(this.endDialog);
+
+    const trackSettingsColors = new TrackSettingsColors(
+      player,
+      {
+        textTrackComponentid: this.id_,
+        selectConfigs,
+        fieldSets:
+        [
+          ['color', 'textOpacity'],
+          ['backgroundColor', 'backgroundOpacity'],
+          ['windowColor', 'windowOpacity']
+        ]
+      }
+    );
+
+    this.addChild(trackSettingsColors);
+
+    const trackSettingsFont = new TrackSettingsFont(
+      player,
+      {
+        textTrackComponentid: this.id_,
+        selectConfigs,
+        fieldSets:
+        [
+          ['fontPercent'],
+          ['edgeStyle'],
+          ['fontFamily']
+        ]
+      }
+    );
+
+    this.addChild(trackSettingsFont);
 
     this.setDefaults();
 
@@ -479,8 +520,8 @@ class TextTrackSettings extends ModalDialog {
 
   content() {
     return [
-      this.createElColors_(),
-      this.createElFont_(),
+      // this.createElColors_(),
+      // this.createElFont_(),
       this.createElControls_()
     ];
   }

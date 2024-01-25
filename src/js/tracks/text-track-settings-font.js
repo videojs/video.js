@@ -1,0 +1,78 @@
+import Component from '../component';
+import * as Dom from '../utils/dom';
+import TextTrackFieldset from './text-track-fieldset';
+
+class TrackSettingsFont extends Component {
+  constructor(player, options = {}) {
+    super(player, options);
+
+    const id_ = this.options_.textTrackComponentid;
+
+    const ElFgColorFieldset = new TextTrackFieldset(
+      player,
+      {
+        id_,
+        legendId: `captions-font-size-${id_}`,
+        legendText: 'Font Size',
+        className: 'vjs-font-percent vjs-track-setting',
+        selects: this.options_.fieldSets[0],
+        selectConfigs: this.options_.selectConfigs,
+        type: 'font'
+      }
+    );
+
+    this.addChild(ElFgColorFieldset);
+
+    const ElBgColorFieldset = new TextTrackFieldset(
+      player,
+      {
+        id_,
+        legendId: `captions-background-${id_}`,
+        legendText: 'Text Edge Style',
+        className: 'vjs-edge-style vjs-track-setting',
+        selects: this.options_.fieldSets[1],
+        selectConfigs: this.options_.selectConfigs,
+        type: 'font'
+      }
+    );
+
+    this.addChild(ElBgColorFieldset);
+
+    const ElWinColorFieldset = new TextTrackFieldset(
+      player,
+      {
+        id_,
+        legendId: `captions-font-family-${id_}`,
+        legendText: 'Font Family',
+        className: 'vjs-font-family vjs-track-setting',
+        selects: this.options_.fieldSets[2],
+        selectConfigs: this.options_.selectConfigs,
+        type: 'font'
+      }
+    );
+
+    this.addChild(ElWinColorFieldset);
+
+    // Add created components
+    this.el().appendChild(ElFgColorFieldset.el());
+    this.el().appendChild(ElBgColorFieldset.el());
+    this.el().appendChild(ElWinColorFieldset.el());
+  }
+
+  /**
+   * Create the `TrackSettingsFont`'s DOM element
+   *
+   * @return {Element}
+   *         The DOM element that gets created.
+   */
+  createEl() {
+    const el = Dom.createEl('div', {
+      className: 'vjs-track-settings-font'
+    });
+
+    return el;
+  }
+}
+
+Component.registerComponent('TrackSettingsFont', TrackSettingsFont);
+export default TrackSettingsFont;
