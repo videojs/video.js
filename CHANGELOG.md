@@ -1,3 +1,10 @@
+<a name="8.11.0"></a>
+# [8.11.0](https://github.com/videojs/video.js/compare/v8.10.0...v8.11.0) (2024-01-25)
+
+### Features
+
+* improved error interface ([#8564](https://github.com/videojs/video.js/issues/8564)) ([43941a8](https://github.com/videojs/video.js/commit/43941a8))
+
 <a name="8.10.0"></a>
 # [8.10.0](https://github.com/videojs/video.js/compare/v8.9.0...v8.10.0) (2024-01-17)
 
