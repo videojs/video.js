@@ -1360,7 +1360,6 @@ class Component {
    * * There is no next focused element
    */
   handleBlur(event) {
-    // eslint-disable-next-line
     const spatialNavigation = this.player_.spatialNavigation;
 
     if (spatialNavigation && this.getIsFocusable()) {
@@ -1403,7 +1402,7 @@ class Component {
 
       // We only stop propagation here because we want unhandled events to fall
       // back to the browser. Exclude Tab for focus trapping.
-      if (!keycode.isEventKey(event, 'Tab') && !(this.options_.playerOptions.spatialNavigation && this.options_.playerOptions.spatialNavigation.enabled)) {
+      if (!keycode.isEventKey(event, 'Tab') && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
         event.stopPropagation();
       }
       this.player_.handleKeyDown(event);

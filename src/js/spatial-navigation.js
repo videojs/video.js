@@ -84,10 +84,14 @@ class SpatialNavigation {
    *
    */
   handlePlayerBlur(component) {
-    this.pause();
+    if (component.name() === 'CloseButton') {
+      this.refocusComponent();
+    } else {
+      this.pause();
 
-    if (component && component.el_) {
-      this.lastFocusedComponent = component;
+      if (component && component.el_) {
+        this.lastFocusedComponent = component;
+      }
     }
   }
 
@@ -120,17 +124,17 @@ class SpatialNavigation {
       }
     }
 
-    for (const [key, value] of Object.entries(player)) {
-      if (key && value && value.hasOwnProperty('el_') && key !== 'player_') {
-        if (player[key].getIsFocusable() && player[key].getIsAvailableToBeFocused()) {
+    player.children_.forEach((value) => {
+      if (value.hasOwnProperty('el_')) {
+        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused()) {
           focusableComponents.push(value);
-        } else if ((value.hasOwnProperty('children_') && player[key].children_.length > 0)) {
-          searchForChildrenCandidates(player[key].children_);
-        } else if (value.hasOwnProperty('items') && player[key].items.length > 0) {
-          searchForChildrenCandidates(player[key].items);
+        } else if (value.hasOwnProperty('children_') && value.children_.length > 0) {
+          searchForChildrenCandidates(value.children_);
+        } else if (value.hasOwnProperty('items') && value.items.length > 0) {
+          searchForChildrenCandidates(value.items);
         }
       }
-    }
+    });
 
     this.focusableComponents = focusableComponents;
     return this.focusableComponents;
