@@ -34,6 +34,7 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import * as Obj from './utils/obj';
+import VjsErrors from './consts/errors';
 import xhr from '@videojs/xhr';
 
 // Include the built-in techs
@@ -616,5 +617,8 @@ videojs.str = Str;
  * @see {@link module:url|url}
  */
 videojs.url = Url;
+
+// The list of possible error types to occur in video.js
+videojs.Error = VjsErrors;
 
 export default videojs;

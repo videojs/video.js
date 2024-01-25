@@ -76,6 +76,21 @@ MediaError.prototype.message = '';
 MediaError.prototype.status = null;
 
 /**
+ * An object containing an error type, as well as other information regarding the error.
+ *
+ * @typedef {{errorType: string, [key: string]: any}} ErrorMetadata
+ */
+
+/**
+ * An optional object to give more detail about the error. This can be used to give
+ * a higher level of specificity to an error versus the more generic MediaError codes.
+ * `metadata` expects an `errorType` string that should align with the values from videojs.Error.
+ *
+ * @type {ErrorMetadata}
+ */
+MediaError.prototype.metadata = null;
+
+/**
  * Errors indexed by the W3C standard. The order **CANNOT CHANGE**! See the
  * specification listed under {@link MediaError} for more information.
  *
@@ -111,16 +126,6 @@ MediaError.defaultMessages = {
   5: 'The media is encrypted and we do not have the keys to decrypt it.'
 };
 
-// Add types as properties on MediaError
-// e.g. MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
-for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
-  MediaError[MediaError.errorTypes[errNum]] = errNum;
-  // values should be accessible on both the class and instance
-  MediaError.prototype[MediaError.errorTypes[errNum]] = errNum;
-}
-
-// jsdocs for instance/static members added above
-// instance methods use `#` and static methods use `.`
 /**
  * W3C error code for any custom error.
  *
@@ -128,6 +133,8 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 0
  */
+MediaError.MEDIA_ERR_CUSTOM = 0;
+
 /**
  * W3C error code for any custom error.
  *
@@ -135,6 +142,7 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 0
  */
+MediaError.prototype.MEDIA_ERR_CUSTOM = 0;
 
 /**
  * W3C error code for media error aborted.
@@ -143,6 +151,8 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 1
  */
+MediaError.MEDIA_ERR_ABORTED = 1;
+
 /**
  * W3C error code for media error aborted.
  *
@@ -150,6 +160,7 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 1
  */
+MediaError.prototype.MEDIA_ERR_ABORTED = 1;
 
 /**
  * W3C error code for any network error.
@@ -158,6 +169,8 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 2
  */
+MediaError.MEDIA_ERR_NETWORK = 2;
+
 /**
  * W3C error code for any network error.
  *
@@ -165,6 +178,7 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 2
  */
+MediaError.prototype.MEDIA_ERR_NETWORK = 2;
 
 /**
  * W3C error code for any decoding error.
@@ -173,6 +187,8 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 3
  */
+MediaError.MEDIA_ERR_DECODE = 3;
+
 /**
  * W3C error code for any decoding error.
  *
@@ -180,6 +196,7 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 3
  */
+MediaError.prototype.MEDIA_ERR_DECODE = 3;
 
 /**
  * W3C error code for any time that a source is not supported.
@@ -188,6 +205,8 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 4
  */
+MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
+
 /**
  * W3C error code for any time that a source is not supported.
  *
@@ -195,6 +214,7 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 4
  */
+MediaError.prototype.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
 
 /**
  * W3C error code for any time that a source is encrypted.
@@ -203,6 +223,8 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 5
  */
+MediaError.MEDIA_ERR_ENCRYPTED = 5;
+
 /**
  * W3C error code for any time that a source is encrypted.
  *
@@ -210,5 +232,6 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
  * @constant {number}
  * @default 5
  */
+MediaError.prototype.MEDIA_ERR_ENCRYPTED = 5;
 
 export default MediaError;
