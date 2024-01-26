@@ -7,8 +7,9 @@ import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
-import TrackSettingsColors from './test-track-settings-colors';
+import TrackSettingsColors from './text-track-settings-colors';
 import TrackSettingsFont from './text-track-settings-font';
+import TrackSettingsControls from './text-track-controls';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
@@ -268,12 +269,6 @@ class TextTrackSettings extends ModalDialog {
     this.fill();
     this.hasBeenOpened_ = this.hasBeenFilled_ = true;
 
-    this.endDialog = createEl('p', {
-      className: 'vjs-control-text',
-      textContent: this.localize('End of dialog window.')
-    });
-    this.el().appendChild(this.endDialog);
-
     const trackSettingsColors = new TrackSettingsColors(
       player,
       {
@@ -305,6 +300,16 @@ class TextTrackSettings extends ModalDialog {
     );
 
     this.addChild(trackSettingsFont);
+
+    const trackSettingsControls = new TrackSettingsControls(player, {});
+
+    this.addChild(trackSettingsControls);
+
+    this.endDialog = createEl('p', {
+      className: 'vjs-control-text',
+      textContent: this.localize('End of dialog window.')
+    });
+    this.el().appendChild(this.endDialog);
 
     this.setDefaults();
 
@@ -516,14 +521,6 @@ class TextTrackSettings extends ModalDialog {
         `<button type="button" class="vjs-done-button">${this.localize('Done')}</button>`
       ].join('')
     });
-  }
-
-  content() {
-    return [
-      // this.createElColors_(),
-      // this.createElFont_(),
-      this.createElControls_()
-    ];
   }
 
   label() {
