@@ -1,3 +1,78 @@
+<a name="8.11.0"></a>
+# [8.11.0](https://github.com/videojs/video.js/compare/v8.10.0...v8.11.0) (2024-01-25)
+
+### Features
+
+* improved error interface ([#8564](https://github.com/videojs/video.js/issues/8564)) ([43941a8](https://github.com/videojs/video.js/commit/43941a8))
+
+<a name="8.10.0"></a>
+# [8.10.0](https://github.com/videojs/video.js/compare/v8.9.0...v8.10.0) (2024-01-17)
+
+### Features
+
+* **error:** remove confusing decorative X from error display modal ([#8553](https://github.com/videojs/video.js/issues/8553)) ([7345768](https://github.com/videojs/video.js/commit/7345768))
+* expose version from player.version() ([#8543](https://github.com/videojs/video.js/issues/8543)) ([abdfaac](https://github.com/videojs/video.js/commit/abdfaac)), closes [#8538](https://github.com/videojs/video.js/issues/8538)
+
+### Bug Fixes
+
+* Fixes form markup in text track settings ([#8557](https://github.com/videojs/video.js/issues/8557)) ([46c9907](https://github.com/videojs/video.js/commit/46c9907))
+
+### Chores
+
+* update to http-streaming v3.10.0 ([#8558](https://github.com/videojs/video.js/issues/8558)) ([eebcc07](https://github.com/videojs/video.js/commit/eebcc07))
+
+<a name="8.9.0"></a>
+# [8.9.0](https://github.com/videojs/video.js/compare/v8.8.0...v8.9.0) (2024-01-02)
+
+### Features
+
+* Seek bar smooth seeking ([#8287](https://github.com/videojs/video.js/issues/8287)) ([608a585](https://github.com/videojs/video.js/commit/608a585)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370) [#6372](https://github.com/videojs/video.js/issues/6372)
+
+### Bug Fixes
+
+* **skip-forward:** a11y ([#8532](https://github.com/videojs/video.js/issues/8532)) ([af0fca3](https://github.com/videojs/video.js/commit/af0fca3))
+
+### Chores
+
+* update vhs to 3.9.1 ([#8539](https://github.com/videojs/video.js/issues/8539)) ([17506b1](https://github.com/videojs/video.js/commit/17506b1))
+
+<a name="8.8.0"></a>
+# [8.8.0](https://github.com/videojs/video.js/compare/v8.7.0...v8.8.0) (2023-12-14)
+
+### Features
+
+* update VHS to v3.9.0 ([#8526](https://github.com/videojs/video.js/issues/8526)) ([fe7cf98](https://github.com/videojs/video.js/commit/fe7cf98))
+
+### Chores
+
+* update player public interface for types visibility ([#8525](https://github.com/videojs/video.js/issues/8525)) ([1fff5c0](https://github.com/videojs/video.js/commit/1fff5c0))
+
+<a name="8.7.0"></a>
+# [8.7.0](https://github.com/videojs/video.js/compare/v8.6.1...v8.7.0) (2023-12-04)
+
+### Features
+
+* bump VHS 3.8.0 ([#8506](https://github.com/videojs/video.js/issues/8506)) ([5f4aa91](https://github.com/videojs/video.js/commit/5f4aa91))
+* Support for nepali language and a small typo fix for hindi language ([#8323](https://github.com/videojs/video.js/issues/8323)) ([4af7461](https://github.com/videojs/video.js/commit/4af7461))
+
+### Bug Fixes
+
+* **big-play-button:** component remains displayed after an error ([#8483](https://github.com/videojs/video.js/issues/8483)) ([6d8af0c](https://github.com/videojs/video.js/commit/6d8af0c))
+* **big-play-button:** component remains displayed when seeking ([#8484](https://github.com/videojs/video.js/issues/8484)) ([92b5e79](https://github.com/videojs/video.js/commit/92b5e79))
+* **error-display:** component remains displayed after player reset ([#8482](https://github.com/videojs/video.js/issues/8482)) ([7972c23](https://github.com/videojs/video.js/commit/7972c23))
+* **error-display:** update display on consecutive errors ([#8485](https://github.com/videojs/video.js/issues/8485)) ([7831046](https://github.com/videojs/video.js/commit/7831046))
+* **i18n:** new italian labels ([#8495](https://github.com/videojs/video.js/issues/8495)) ([8240427](https://github.com/videojs/video.js/commit/8240427))
+* **loading-spinner:** border size costumization ([#8369](https://github.com/videojs/video.js/issues/8369)) ([1866118](https://github.com/videojs/video.js/commit/1866118))
+* **player:** reset CSS classes at player.reset ([#8487](https://github.com/videojs/video.js/issues/8487)) ([849098f](https://github.com/videojs/video.js/commit/849098f))
+* **title-bar:** component remains displayed after player reset ([#8481](https://github.com/videojs/video.js/issues/8481)) ([161a09c](https://github.com/videojs/video.js/commit/161a09c))
+* **types:** Minor fix for types ([#8466](https://github.com/videojs/video.js/issues/8466)) ([a6a0f57](https://github.com/videojs/video.js/commit/a6a0f57))
+
+### Chores
+
+* Added Azerbaijani language ([#8472](https://github.com/videojs/video.js/issues/8472)) ([8cdb228](https://github.com/videojs/video.js/commit/8cdb228))
+* Fixed an incomplete sentence in contributing guide ([#8471](https://github.com/videojs/video.js/issues/8471)) ([f7b1e3d](https://github.com/videojs/video.js/commit/f7b1e3d))
+* update mpd-parser & m3u8-parser dependencies ([#8494](https://github.com/videojs/video.js/issues/8494)) ([3c110f0](https://github.com/videojs/video.js/commit/3c110f0))
+
 <a name="8.6.1"></a>
 ## [8.6.1](https://github.com/videojs/video.js/compare/v8.6.0...v8.6.1) (2023-10-12)
 

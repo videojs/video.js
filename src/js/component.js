@@ -164,8 +164,8 @@ class Component {
    * @param {string|string[]} type
    *        An event name or an array of event names.
    *
-   * @param {Function} fn
-   *        The function to remove.
+   * @param {Function} [fn]
+   *        The function to remove. If not specified, all listeners managed by Video.js will be removed.
    */
   off(type, fn) {}
 
@@ -2090,7 +2090,7 @@ class Component {
    * @param {string} name
    *        The Name of the component to get.
    *
-   * @return {Component}
+   * @return {typeof Component}
    *         The `Component` that got registered under the given name.
    */
   static getComponent(name) {

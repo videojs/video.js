@@ -6,6 +6,7 @@ import Component from '../component';
 import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
+import * as Guid from '../utils/guid.js';
 import log from '../utils/log';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
@@ -303,6 +304,12 @@ class TextTrackSettings extends ModalDialog {
    * @param {string} key
    *        Configuration key to use during creation.
    *
+   * @param {string} [legendId]
+   *        Id of associated <legend>.
+   *
+   * @param {string} [type=label]
+   *        Type of labelling element, `label` or `legend`
+   *
    * @return {string}
    *         An HTML string.
    *
@@ -312,12 +319,13 @@ class TextTrackSettings extends ModalDialog {
     const config = selectConfigs[key];
     const id = config.id.replace('%s', this.id_);
     const selectLabelledbyIds = [legendId, id].join(' ').trim();
+    const guid = `vjs_select_${Guid.newGUID()}`;
 
     return [
-      `<${type} id="${id}" class="${type === 'label' ? 'vjs-label' : ''}">`,
+      `<${type} id="${id}"${type === 'label' ? ` for="${guid}" class="vjs-label"` : ''}>`,
       this.localize(config.label),
       `</${type}>`,
-      `<select aria-labelledby="${selectLabelledbyIds}">`
+      `<select aria-labelledby="${selectLabelledbyIds}" id="${guid}">`
     ].
       concat(config.options.map(o => {
         const optionId = id + '-' + o[1].replace(/\W+/g, '');
