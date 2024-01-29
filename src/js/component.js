@@ -1341,7 +1341,7 @@ class Component {
     // eslint-disable-next-line
     const spatialNavigation = this.player_.spatialNavigation;
 
-    if (spatialNavigation && spatialNavigation.isPaused && this.getIsFocusable()) {
+    if (spatialNavigation && spatialNavigation.isPaused && this.getIsFocusable(this.el_)) {
       spatialNavigation.handlePlayerFocus();
     }
   }
@@ -1362,7 +1362,7 @@ class Component {
   handleBlur(event) {
     const spatialNavigation = this.player_.spatialNavigation;
 
-    if (spatialNavigation && this.getIsFocusable()) {
+    if (spatialNavigation && this.getIsFocusable(this.el_)) {
       const nextFocusedElement = event.relatedTarget;
       let isChildrenOfPlayer = null;
 
@@ -1861,10 +1861,11 @@ class Component {
   /**
    * Determine whether or not this component can be considered as focusable component.
    *
+   * @param {HTMLElement} el - The HTML element representing the component.
    * @return {boolean}
    *         If the component can be focused, will be `true`. Otherwise, `false`.
    */
-  getIsFocusable() {
+  getIsFocusable(el) {
     /**
      * Decide whether an element is actually disabled or not.
      *
@@ -1897,7 +1898,7 @@ class Component {
 
     }
 
-    if (!(this.el_.tabIndex < 0) && !isExpresslyInert(this.el_) && !isActuallyDisabled(this.el_)) {
+    if (!(el.tabIndex < 0) && !isExpresslyInert(el) && !isActuallyDisabled(el)) {
       return true;
     }
     return false;
@@ -1907,10 +1908,11 @@ class Component {
   /**
    * Determine whether or not this component is currently visible/enabled/etc...
    *
+   * @param {HTMLElement} el - The HTML element representing the component.
    * @return {boolean}
    *         If the component can is currently visible & enabled, will be `true`. Otherwise, `false`.
    */
-  getIsAvailableToBeFocused() {
+  getIsAvailableToBeFocused(el) {
     /**
      * Decide the style property of this element is specified whether it's visible or not.
      *
@@ -2003,7 +2005,7 @@ class Component {
       }
     }
 
-    if (isVisible(this.el_) && isBeingRendered(this.el_) && ((!this.el_.parentElement) || (this.el_.tabIndex >= 0))) {
+    if (isVisible(el) && isBeingRendered(el) && ((!el.parentElement) || (el.tabIndex >= 0))) {
       return true;
     }
     return false;
