@@ -32,7 +32,7 @@ class SpatialNavigation {
       this.player.el().addEventListener('keydown', this.onKeyDown);
       this.isListening = true;
       // this set focus is currently here just for testing purposes
-      this.getComponents()[0].focus();
+      this.focus(this.getComponents()[0]);
     }
   }
 
@@ -115,7 +115,7 @@ class SpatialNavigation {
 
     function searchForChildrenCandidates(componentsArray) {
       for (const i of componentsArray) {
-        if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused()) {
+        if (i.hasOwnProperty('el_') && i.getIsFocusable(i.el_) && i.getIsAvailableToBeFocused(i.el_)) {
           focusableComponents.push(i);
         }
         if (i.hasOwnProperty('children_') && i.children_.length > 0) {
@@ -126,18 +126,47 @@ class SpatialNavigation {
 
     player.children_.forEach((value) => {
       if (value.hasOwnProperty('el_')) {
-        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused()) {
+        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable(value.el_) && value.getIsAvailableToBeFocused(value.el_)) {
           focusableComponents.push(value);
         } else if (value.hasOwnProperty('children_') && value.children_.length > 0) {
           searchForChildrenCandidates(value.children_);
         } else if (value.hasOwnProperty('items') && value.items.length > 0) {
           searchForChildrenCandidates(value.items);
+        } else if (this.findSuitableDOMChild(value)) {
+          focusableComponents.push(value);
         }
       }
     });
 
     this.focusableComponents = focusableComponents;
     return this.focusableComponents;
+  }
+
+  /**
+   * Finds a suitable child element within the provided component's DOM element.
+   *
+   * @param {Object} component - The component containing the DOM element to search within.
+   * @return {HTMLElement|null} Returns the suitable child element if found, or null if not found.
+   */
+  findSuitableDOMChild(component) {
+    function searchForSuitableChild(node) {
+      if (component.getIsFocusable(node) && component.getIsAvailableToBeFocused(node)) {
+        return node;
+      }
+
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        const suitableChild = searchForSuitableChild(child);
+
+        if (suitableChild) {
+          return suitableChild;
+        }
+      }
+
+      return null;
+    }
+
+    return searchForSuitableChild(component.el_);
   }
 
   /**
@@ -227,7 +256,7 @@ class SpatialNavigation {
     const bestCandidate = this.findBestCandidate(currentPositions.center, candidates, direction);
 
     if (bestCandidate) {
-      bestCandidate.focus();
+      this.focus(bestCandidate);
     } else {
       this.notifyListeners('endOfFocusableComponents', { direction, focusedElement: currentFocusedComponent });
     }
@@ -295,11 +324,26 @@ class SpatialNavigation {
 
       for (let i = 0; i < this.focusableComponents.length; i++) {
         if (this.focusableComponents[i].name_ === this.lastFocusedComponent.name_) {
-          this.focusableComponents[i].focus();
+          this.focus(this.focusableComponents[i]);
         }
       }
     } else {
-      this.getComponents()[0].focus();
+      this.focus(this.getComponents()[0]);
+    }
+  }
+
+  /**
+   * Focuses on a given component.
+   * If the component is available to be focused, it focuses on the component.
+   * If not, it attempts to find a suitable DOM child within the component and focuses on it.
+   *
+   * @param {Component} component - The component to be focused.
+   */
+  focus(component) {
+    if (component.getIsAvailableToBeFocused(component.el_)) {
+      component.focus();
+    } else if (this.findSuitableDOMChild(component)) {
+      this.findSuitableDOMChild(component).focus();
     }
   }
 

@@ -144,3 +144,40 @@ QUnit.test('Calling resetVolumeBar player method should reset volume bar', funct
 
   player.dispose();
 });
+
+QUnit.test('Calling reset player method should reset both error display and player error', function(assert) {
+  const player = TestHelpers.makePlayer({techOrder: ['html5']});
+
+  player.error('ERROR');
+
+  assert.notOk(player.errorDisplay.hasClass('vjs-hidden'), 'ErrorDisplay is displayed if there is an error');
+  assert.strictEqual(player.error().message, 'ERROR', 'player error has content');
+
+  player.reset();
+
+  assert.ok(player.errorDisplay.hasClass('vjs-hidden'), 'ErrorDisplay is not displayed if there is no error');
+  assert.strictEqual(player.error(), null, 'player error has content');
+
+  player.dispose();
+});
+
+QUnit.test('Calling reset player method should reset title bar', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.titleBar.update({
+    title: 'Title',
+    description: 'Description'
+  });
+
+  assert.notOk(player.titleBar.hasClass('vjs-hidden'), 'TitleBar is visible if not empty');
+  assert.strictEqual(player.titleBar.els.title.textContent, 'Title', 'TitleBar title element has content');
+  assert.strictEqual(player.titleBar.els.description.textContent, 'Description', 'TitleBar description element has content');
+
+  player.reset();
+
+  assert.ok(player.titleBar.hasClass('vjs-hidden'), 'TitleBar is not visible if empty');
+  assert.strictEqual(player.titleBar.els.title.textContent, '', 'TitleBar title element has no content');
+  assert.strictEqual(player.titleBar.els.description.textContent, '', 'TitleBar description element has no content');
+
+  player.dispose();
+});

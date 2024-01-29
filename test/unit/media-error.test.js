@@ -41,12 +41,19 @@ QUnit.test('can be constructed from a string', function(assert) {
 
 QUnit.test('can be constructed from an object', function(assert) {
   const mediaError = new MediaError({code: 2});
-  const mediaErrorMsg = new MediaError({code: 2, message: 'hello, world'});
+  const mediaErrorMsg = new MediaError({
+    code: 2,
+    message: 'hello, world',
+    metadata: {
+      errorType: 'test-error'
+    }
+  });
 
   assert.strictEqual(mediaError.code, 2);
   assert.strictEqual(mediaError.message, MediaError.defaultMessages['2']);
   assert.strictEqual(mediaErrorMsg.code, 2);
   assert.strictEqual(mediaErrorMsg.message, 'hello, world');
+  assert.strictEqual(mediaErrorMsg.metadata.errorType, 'test-error');
 });
 
 if (isModernBrowser) {

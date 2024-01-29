@@ -73,6 +73,8 @@ class SkipForward extends Button {
   }
 }
 
+SkipForward.prototype.controlText_ = 'Skip Forward';
+
 Component.registerComponent('SkipForward', SkipForward);
 
 export default SkipForward;
