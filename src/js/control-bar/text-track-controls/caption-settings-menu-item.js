@@ -53,6 +53,23 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
    */
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
+
+    const spatialNavigation = this.player().spatialNavigation;
+
+    if (spatialNavigation.isPaused === false) {
+      let componentToFocus = null;
+
+      for (const component of (spatialNavigation.getComponents())) {
+        if (component.constructor.name === 'TextTrackSelect') {
+          componentToFocus = component;
+          break;
+        }
+      }
+
+      if (componentToFocus) {
+        spatialNavigation.focus(componentToFocus);
+      }
+    }
   }
 
   /**
