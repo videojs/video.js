@@ -1,3 +1,10 @@
+<a name="8.11.1"></a>
+## [8.11.1](https://github.com/videojs/video.js/compare/v8.11.0...v8.11.1) (2024-01-29)
+
+### Bug Fixes
+
+* browser util flagging smart TV as Safari ([#8566](https://github.com/videojs/video.js/issues/8566)) ([14b5fde](https://github.com/videojs/video.js/commit/14b5fde))
+
 <a name="8.11.0"></a>
 # [8.11.0](https://github.com/videojs/video.js/compare/v8.10.0...v8.11.0) (2024-01-25)
 
