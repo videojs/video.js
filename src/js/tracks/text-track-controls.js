@@ -6,6 +6,7 @@ class TrackSettingsControls extends Component {
   constructor(player, options = {}) {
     super(player, options);
 
+    // Create DOM elements
     const defaultsDescription = this.localize('restore all settings to the default values');
 
     const resetButton = new Button(player, {
@@ -23,6 +24,7 @@ class TrackSettingsControls extends Component {
       className: 'vjs-done-button'
     });
 
+    // Remove unrequired style classes
     doneButton.el().classList.remove('vjs-control', 'vjs-button');
     doneButton.el().textContent = this.localize('Done');
 
@@ -47,18 +49,3 @@ class TrackSettingsControls extends Component {
 
 Component.registerComponent('TrackSettingsControls', TrackSettingsControls);
 export default TrackSettingsControls;
-
-// createElControls_() {
-//   const defaultsDescription = this.localize('restore all settings to the default values');
-
-//   return createEl('div', {
-//     className: 'vjs-track-settings-controls',
-//     innerHTML: [
-//       `<button type="button" class="vjs-default-button" title="${defaultsDescription}">`,
-//       this.localize('Reset'),
-//       `<span class="vjs-control-text"> ${defaultsDescription}</span>`,
-//       '</button>',
-//       `<button type="button" class="vjs-done-button">${this.localize('Done')}</button>`
-//     ].join('')
-//   });
-// }
