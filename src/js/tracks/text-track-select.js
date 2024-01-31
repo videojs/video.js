@@ -16,6 +16,7 @@ class TextTrackSelect extends Component {
   createEl() {
     this.selectLabelledbyIds = [this.options_.legendId, this.options_.id].join(' ').trim();
 
+    // Create select & inner options
     const selectoptions = Dom.createEl(
       'select',
       {},
