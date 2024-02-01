@@ -227,6 +227,8 @@ class ModalDialog extends Component {
    * @fires ModalDialog#modalclose
    */
   close() {
+    const spatialNavigation = this.player_.spatialNavigation;
+
     if (!this.opened_) {
       return;
     }
@@ -266,9 +268,6 @@ class ModalDialog extends Component {
     if (this.options_.temporary) {
       this.dispose();
     }
-
-    // eslint-disable-next-line
-    const spatialNavigation = player.spatialNavigation;
 
     if (spatialNavigation) {
       spatialNavigation.refocusComponent();
@@ -455,7 +454,6 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
-    // eslint-disable-next-line
     const spatialNavigation = this.player_.spatialNavigation;
 
     // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled
@@ -463,6 +461,7 @@ class ModalDialog extends Component {
       event.stopPropagation();
     }
 
+    // If Esc is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
     if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && spatialNavigation) && this.closeable()) {
       event.preventDefault();
       this.close();
