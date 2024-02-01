@@ -456,8 +456,10 @@ class ModalDialog extends Component {
   handleKeyDown(event) {
     const spatialNavigation = this.player_.spatialNavigation;
 
-    // Do not allow keydowns to reach out of the modal dialog.
-    event.stopPropagation();
+    // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled
+    if (!spatialNavigation) {
+      event.stopPropagation();
+    }
 
     // If Esc is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
     if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && spatialNavigation) && this.closeable()) {
