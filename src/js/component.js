@@ -1338,10 +1338,9 @@ class Component {
    * * SpatialNavigation is enabled, not paused & element is focusable.
    */
   handleFocus() {
-    // eslint-disable-next-line
     const spatialNavigation = this.player_.spatialNavigation;
 
-    if (spatialNavigation && spatialNavigation.isPaused && this.getIsFocusable(this.el_)) {
+    if (spatialNavigation && !(spatialNavigation.isPaused) && this.getIsFocusable(this.el_)) {
       spatialNavigation.handlePlayerFocus();
     }
   }
@@ -1401,7 +1400,7 @@ class Component {
     if (this.player_) {
 
       // We only stop propagation here because we want unhandled events to fall
-      // back to the browser. Exclude Tab for focus trapping.
+      // back to the browser. Exclude Tab for focus trapping, exclude also when spatialNavigation is enabled.
       if (!keycode.isEventKey(event, 'Tab') && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
         event.stopPropagation();
       }
@@ -2005,11 +2004,11 @@ class Component {
       }
     }
 
+    // If element is visible, is being rendered, does not have a parent element & its tabIndex is not negative.
     if (isVisible(el) && isBeingRendered(el) && ((!el.parentElement) || (el.tabIndex >= 0))) {
       return true;
     }
     return false;
-
   }
 
   /**

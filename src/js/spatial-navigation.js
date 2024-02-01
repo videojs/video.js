@@ -113,6 +113,12 @@ class SpatialNavigation {
     const player = this.player;
     const focusableComponents = [];
 
+    /**
+   * Searchs for children candidates.
+   *
+   * Pushes Components to array of 'focusableComponents'.
+   * Calls itself if there is children elements inside of iterated component.
+   */
     function searchForChildrenCandidates(componentsArray) {
       for (const i of componentsArray) {
         if (i.hasOwnProperty('el_') && i.getIsFocusable(i.el_) && i.getIsAvailableToBeFocused(i.el_)) {
@@ -124,14 +130,19 @@ class SpatialNavigation {
       }
     }
 
+    // Iterate inside of all children components of the player.
     player.children_.forEach((value) => {
       if (value.hasOwnProperty('el_')) {
+        // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & avilable to be focused.
         if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable(value.el_) && value.getIsAvailableToBeFocused(value.el_)) {
           focusableComponents.push(value);
+        // If component has posible children components as candidates.
         } else if (value.hasOwnProperty('children_') && value.children_.length > 0) {
           searchForChildrenCandidates(value.children_);
+        // If component has posible item components as candidates.
         } else if (value.hasOwnProperty('items') && value.items.length > 0) {
           searchForChildrenCandidates(value.items);
+        // If there is a suitable child element within the component's DOM element.
         } else if (this.findSuitableDOMChild(value)) {
           focusableComponents.push(value);
         }
@@ -180,6 +191,8 @@ class SpatialNavigation {
 
     if (this.focusableComponents.length) {
       for (const i of this.focusableComponents) {
+
+        // If component Node is equal to the current active element.
         // eslint-disable-next-line
         if (i.el_ === document.activeElement) {
           return i;
@@ -313,15 +326,19 @@ class SpatialNavigation {
   }
 
   /**
-   * Focus last focused component saved before blur on player.
+   * Focus the last focused component saved before blur on player.
    */
   refocusComponent() {
     if (this.lastFocusedComponent) {
+      // If use is not active, set it to active.
       if (!this.player.userActive()) {
         this.player.userActive(true);
       }
+
       this.getComponents();
 
+      // Search inside array of 'focusableComponents' for a match of name of
+      // the last focused component.
       for (let i = 0; i < this.focusableComponents.length; i++) {
         if (this.focusableComponents[i].name_ === this.lastFocusedComponent.name_) {
           this.focus(this.focusableComponents[i]);
@@ -365,17 +382,17 @@ class SpatialNavigation {
     switch (direction) {
     case 'right':
     case 'left':
-      // Higher weight for vertical distance in horizontal navigation
+      // Higher weight for vertical distance in horizontal navigation.
       distance = dx + (dy * 100);
       break;
     case 'up':
-      // Strongly prioritize vertical proximity for UP navigation
-      // Adjust the weight to ensure that elements directly above are favored
+      // Strongly prioritize vertical proximity for UP navigation.
+      // Adjust the weight to ensure that elements directly above are favored.
       distance = (dy * 2) + (dx * 0.5);
       break;
     case 'down':
-      // More balanced weight for vertical and horizontal distances
-      // Adjust the weights here to find the best balance
+      // More balanced weight for vertical and horizontal distances.
+      // Adjust the weights here to find the best balance.
       distance = (dy * 5) + dx;
       break;
     default:
