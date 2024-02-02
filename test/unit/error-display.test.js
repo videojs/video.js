@@ -54,10 +54,10 @@ QUnit.test('should update errorDisplay when several errors occur in succession',
     'Error 2',
     'error display contentEl textContent has been updated with the new error message'
   );
-  assert.strictEqual(events.beforemodalopen, 2, 'beforemodalopen has been called for the second time');
-  assert.strictEqual(events.modalopen, 2, 'modalopen has been called for the second time');
-  assert.strictEqual(events.beforemodalclose, 1, 'beforemodalclose was called once');
-  assert.strictEqual(events.modalclose, 1, 'modalclose was called once');
+  assert.strictEqual(events.beforemodalopen, 1, 'beforemodalopen was called once');
+  assert.strictEqual(events.modalopen, 1, 'modalopen has been called once');
+  assert.strictEqual(events.beforemodalclose, 0, 'beforemodalclose was not called');
+  assert.strictEqual(events.modalclose, 0, 'modalclose was not called');
 
   player.dispose();
 });

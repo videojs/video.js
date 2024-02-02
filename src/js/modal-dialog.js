@@ -99,7 +99,8 @@ class ModalDialog extends Component {
       'aria-describedby': `${this.id()}_description`,
       'aria-hidden': 'true',
       'aria-label': this.label(),
-      'role': 'dialog'
+      'role': 'dialog',
+      'aria-live': 'polite'
     });
   }
 
@@ -156,51 +157,56 @@ class ModalDialog extends Component {
    * @fires ModalDialog#modalopen
    */
   open() {
-    if (!this.opened_) {
-      const player = this.player();
-
-      /**
-        * Fired just before a `ModalDialog` is opened.
-        *
-        * @event ModalDialog#beforemodalopen
-        * @type {Event}
-        */
-      this.trigger('beforemodalopen');
-      this.opened_ = true;
-
-      // Fill content if the modal has never opened before and
-      // never been filled.
-      if (this.options_.fillAlways || !this.hasBeenOpened_ && !this.hasBeenFilled_) {
+    if (this.opened_) {
+      if (this.options_.fillAlways) {
         this.fill();
       }
-
-      // If the player was playing, pause it and take note of its previously
-      // playing state.
-      this.wasPlaying_ = !player.paused();
-
-      if (this.options_.pauseOnOpen && this.wasPlaying_) {
-        player.pause();
-      }
-
-      this.on('keydown', this.handleKeyDown_);
-
-      // Hide controls and note if they were enabled.
-      this.hadControls_ = player.controls();
-      player.controls(false);
-
-      this.show();
-      this.conditionalFocus_();
-      this.el().setAttribute('aria-hidden', 'false');
-
-      /**
-        * Fired just after a `ModalDialog` is opened.
-        *
-        * @event ModalDialog#modalopen
-        * @type {Event}
-        */
-      this.trigger('modalopen');
-      this.hasBeenOpened_ = true;
+      return;
     }
+
+    const player = this.player();
+
+    /**
+      * Fired just before a `ModalDialog` is opened.
+      *
+      * @event ModalDialog#beforemodalopen
+      * @type {Event}
+      */
+    this.trigger('beforemodalopen');
+    this.opened_ = true;
+
+    // Fill content if the modal has never opened before and
+    // never been filled.
+    if (this.options_.fillAlways || !this.hasBeenOpened_ && !this.hasBeenFilled_) {
+      this.fill();
+    }
+
+    // If the player was playing, pause it and take note of its previously
+    // playing state.
+    this.wasPlaying_ = !player.paused();
+
+    if (this.options_.pauseOnOpen && this.wasPlaying_) {
+      player.pause();
+    }
+
+    this.on('keydown', this.handleKeyDown_);
+
+    // Hide controls and note if they were enabled.
+    this.hadControls_ = player.controls();
+    player.controls(false);
+
+    this.show();
+    this.conditionalFocus_();
+    this.el().setAttribute('aria-hidden', 'false');
+
+    /**
+      * Fired just after a `ModalDialog` is opened.
+      *
+      * @event ModalDialog#modalopen
+      * @type {Event}
+      */
+    this.trigger('modalopen');
+    this.hasBeenOpened_ = true;
   }
 
   /**

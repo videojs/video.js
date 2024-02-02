@@ -24,7 +24,6 @@ class ErrorDisplay extends ModalDialog {
   constructor(player, options) {
     super(player, options);
     this.on(player, 'error', (e) => {
-      this.close();
       this.open(e);
     });
   }
