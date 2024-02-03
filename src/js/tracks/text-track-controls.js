@@ -2,6 +2,15 @@ import Component from '../component';
 import * as Dom from '../utils/dom';
 import Button from '../button';
 
+/**
+ * Buttons of reset & done that modal 'TextTrackSettings'
+ * uses as part of its content.
+ *
+ * 'Reset': Resets all settings on 'TextTrackSettings'.
+ * 'Done': Closes 'TextTrackSettings' modal.
+ *
+ * @extends Component
+ */
 class TrackSettingsControls extends Component {
   constructor(player, options = {}) {
     super(player, options);

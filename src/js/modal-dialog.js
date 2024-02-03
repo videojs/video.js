@@ -21,7 +21,7 @@ const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 class ModalDialog extends Component {
 
   /**
-   * Create an instance of this class.
+   * Creates an instance of this class.
    *
    * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
@@ -233,12 +233,13 @@ class ModalDialog extends Component {
    * @fires ModalDialog#modalclose
    */
   close() {
-    const spatialNavigation = this.player_.spatialNavigation;
-
     if (!this.opened_) {
       return;
     }
+
     const player = this.player();
+    const spatialNavigation = this.player_.spatialNavigation;
+    const spatialNavEnabled = this.player().options().spatialNavigation.enabled;
 
     /**
       * Fired just before a `ModalDialog` is closed.
@@ -275,7 +276,7 @@ class ModalDialog extends Component {
       this.dispose();
     }
 
-    if (spatialNavigation) {
+    if (spatialNavEnabled) {
       spatialNavigation.refocusComponent();
     }
   }
@@ -460,23 +461,24 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
-    const spatialNavigation = this.player_.spatialNavigation;
+    const spatialNavEnabled = this.player().options().spatialNavigation.enabled;
 
-    // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled
-    if (!spatialNavigation) {
+    // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled.
+    if (!spatialNavEnabled) {
       event.stopPropagation();
     }
 
-    // If Esc is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
-    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && spatialNavigation) && this.closeable()) {
+    // If 'Esc' is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && spatialNavEnabled) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
-    } else if (keycode.isEventKey(event, 'Enter') && spatialNavigation && this.handleClick) {
+    // If 'Enter' is pressed & spatialNavigation is enabled & handleClick is available.
+    } else if (keycode.isEventKey(event, 'Enter') && spatialNavEnabled && this.handleClick) {
       this.handleClick();
     }
 
-    // exit early if it isn't a tab key
+    // Exit early if it isn't a tab key.
     if (!keycode.isEventKey(event, 'Tab')) {
       return;
     }

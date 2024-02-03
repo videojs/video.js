@@ -2,7 +2,35 @@ import Component from '../component';
 import * as Dom from '../utils/dom';
 import TextTrackFieldset from './text-track-fieldset';
 
+/**
+ * The component 'TrackSettingsColors' displays a set of 'fieldsets'
+ * using the component 'TextTrackFieldset'.
+ *
+ * @extends Component
+ */
 class TrackSettingsColors extends Component {
+
+  /**
+   * Creates an instance of this class.
+   *
+   * @param { import('./player').default } player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @param { import('./utils/dom').ContentDescriptor} [options.content=undefined]
+   *        Provide customized content for this modal.
+   *
+   * @param {Array} [options.fieldSets]
+   *        Array that contains the configurations for the selects.
+   *
+   * @param {Object} [options.selectConfigs]
+   *        Object with the following properties that are the select confugations:
+   *        backgroundColor, backgroundOpacity, color, edgeStyle, fontFamily,
+   *        fontPercent, textOpacity, windowColor, windowOpacity.
+   *        it passes to 'TextTrackFieldset'.
+   */
   constructor(player, options = {}) {
     super(player, options);
 
