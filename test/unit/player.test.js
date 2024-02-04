@@ -3401,6 +3401,33 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
     });
 });
 
+QUnit.test('player height should match control bar height when audioOnlyMode is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({ responsive: true, width: 320, height: 240 });
+
+  player.trigger('ready');
+
+  player.audioOnlyMode(true).then(() => {
+    const initialPlayerHeight = player.currentHeight();
+
+    player.width(768);
+    player.el().style.fontSize = '20px';
+    player.trigger('playerresize');
+
+    assert.ok(initialPlayerHeight !== player.currentHeight(), 'player height is updated');
+  })
+    .then(() => player.audioOnlyMode(false))
+    .then(() => {
+      const initialPlayerHeight = player.currentHeight();
+
+      player.width(768);
+      player.el().style.fontSize = '20px';
+      player.trigger('playerresize');
+
+      assert.equal(player.currentHeight(), initialPlayerHeight, 'player height remains unchanged');
+      assert.ok(initialPlayerHeight !== player.controlBar.currentHeight(), 'player height is different from control bar height');
+    });
+});
+
 QUnit.test('player#load resets the media element to its initial state', function(assert) {
   const player = TestHelpers.makePlayer({});
 
