@@ -11,7 +11,7 @@ class SpatialNavigation {
    *                                                   If null or not provided, no component will be initially focused.
    */
   constructor(player, initialFocusedComponent) {
-    this.ARROW_KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
+    this.KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down', 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
     this.player = player;
     this.components = new Set();
     this.focusableComponents = [];
@@ -21,6 +21,8 @@ class SpatialNavigation {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.currentFocus = initialFocusedComponent || null;
     this.lastFocusedComponent = null;
+    // The number of seconds the `step*` functions move the timeline.
+    this.STEP_SECONDS = 5;
   }
 
   /**
@@ -46,21 +48,69 @@ class SpatialNavigation {
   }
 
   /**
-   * Responds to keydown events for spatial navigation.
+   * Responds to keydown events for spatial navigation and media control.
    *
-   * Checks if navigation is active and handles arrow key inputs to move in the respective direction.
+   * Determines if spatial navigation or media control is active and handles key inputs accordingly.
    *
-   * @param {KeyboardEvent} e - The keydown event.
+   * @param {KeyboardEvent} e - The keydown event to be handled.
    */
   onKeyDown(e) {
-    if (!this.isPaused) {
-      const direction = this.ARROW_KEY_CODE[e.keyCode];
+    const key = this.KEY_CODE[e.keyCode];
 
-      if (direction) {
-        this.move(direction);
-        e.preventDefault();
+    if (!this.isPaused && ['up', 'right', 'down', 'left'].includes(key)) {
+      this.move(key);
+    } else if (['play', 'pause', 'ff', 'rw'].includes(key)) {
+      this.performMediaAction(key);
+    }
+    e.preventDefault();
+  }
+
+  /**
+   * Performs media control actions based on the given key input.
+   *
+   * Controls the playback and seeking functionalities of the media player.
+   *
+   * @param {string} key - The key representing the media action to be performed.
+   *   Accepted keys: 'play', 'pause', 'ff' (fast-forward), 'rw' (rewind).
+   */
+  performMediaAction(key) {
+    if (this.player) {
+      switch (key) {
+      case 'play':
+        if (this.player.paused()) {
+          this.player.play();
+        }
+        break;
+      case 'pause':
+        if (!this.player.paused()) {
+          this.player.pause();
+        }
+        break;
+      case 'ff':
+        this.userSeek_(this.player.currentTime() + this.STEP_SECONDS);
+        break;
+      case 'rw':
+        this.userSeek_(this.player.currentTime() - this.STEP_SECONDS);
+        break;
+      default:
+        break;
       }
     }
+  }
+
+  /**
+   * Prevent liveThreshold from causing seeks to seem like they
+   * are not happening from a user perspective.
+   *
+   * @param {number} ct
+   *        current time to seek to
+   */
+  userSeek_(ct) {
+    if (this.player.liveTracker && this.player.liveTracker.isLive()) {
+      this.player.liveTracker.nextSeekedFromUser();
+    }
+
+    this.player.currentTime(ct);
   }
 
   /**
