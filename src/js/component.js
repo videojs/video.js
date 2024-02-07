@@ -1340,7 +1340,7 @@ class Component {
   handleFocus() {
     const spatialNavigation = this.player_.spatialNavigation;
 
-    if (spatialNavigation && !(spatialNavigation.isPaused) && this.getIsFocusable(this.el_)) {
+    if (spatialNavigation && this.getIsFocusable(this.el_)) {
       spatialNavigation.handlePlayerFocus();
     }
   }
