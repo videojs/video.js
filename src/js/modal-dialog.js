@@ -239,7 +239,7 @@ class ModalDialog extends Component {
 
     const player = this.player();
     const spatialNavigation = this.player_.spatialNavigation;
-    const spatialNavEnabled = this.player().options().spatialNavigation.enabled;
+    const isSpatialNavlistening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
 
     /**
       * Fired just before a `ModalDialog` is closed.
@@ -276,7 +276,7 @@ class ModalDialog extends Component {
       this.dispose();
     }
 
-    if (spatialNavEnabled) {
+    if (isSpatialNavlistening) {
       spatialNavigation.refocusComponent();
     }
   }
@@ -461,20 +461,21 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
-    const spatialNavEnabled = this.player().options().spatialNavigation.enabled;
+    const spatialNavigation = this.player_.spatialNavigation;
+    const isSpatialNavlistening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
 
     // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled.
-    if (!spatialNavEnabled) {
+    if (!isSpatialNavlistening) {
       event.stopPropagation();
     }
 
     // If 'Esc' is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
-    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && spatialNavEnabled) && this.closeable()) {
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && isSpatialNavlistening) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
     // If 'Enter' is pressed & spatialNavigation is enabled & handleClick is available.
-    } else if (keycode.isEventKey(event, 'Enter') && spatialNavEnabled && this.handleClick) {
+    } else if (keycode.isEventKey(event, 'Enter') && isSpatialNavlistening && this.handleClick) {
       this.handleClick();
     }
 
