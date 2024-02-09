@@ -187,13 +187,14 @@ class SpatialNavigation {
         // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & avilable to be focused.
         if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable(value.el_) && value.getIsAvailableToBeFocused(value.el_)) {
           focusableComponents.push(value);
-        // If component has posible children components as candidates.
+          return;
+          // If component has posible children components as candidates.
         } else if (value.hasOwnProperty('children_') && value.children_.length > 0) {
           searchForChildrenCandidates(value.children_);
-        // If component has posible item components as candidates.
+          // If component has posible item components as candidates.
         } else if (value.hasOwnProperty('items') && value.items.length > 0) {
           searchForChildrenCandidates(value.items);
-        // If there is a suitable child element within the component's DOM element.
+          // If there is a suitable child element within the component's DOM element.
         } else if (this.findSuitableDOMChild(value)) {
           focusableComponents.push(value);
         }
@@ -280,6 +281,7 @@ class SpatialNavigation {
     for (let i = 0; i < this.focusableComponents.length; i++) {
       if (this.focusableComponents[i].name_ === component.name_) {
         this.focusableComponents.splice(i, 1);
+        return;
       }
     }
     // Trigger the notification manually
@@ -393,6 +395,7 @@ class SpatialNavigation {
       for (let i = 0; i < this.focusableComponents.length; i++) {
         if (this.focusableComponents[i].name_ === this.lastFocusedComponent.name_) {
           this.focus(this.focusableComponents[i]);
+          return;
         }
       }
     } else {
