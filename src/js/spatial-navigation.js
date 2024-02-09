@@ -59,10 +59,11 @@ class SpatialNavigation {
 
     if (!this.isPaused && ['up', 'right', 'down', 'left'].includes(key)) {
       this.move(key);
+      e.preventDefault();
     } else if (['play', 'pause', 'ff', 'rw'].includes(key)) {
       this.performMediaAction(key);
+      e.preventDefault();
     }
-    e.preventDefault();
   }
 
   /**
