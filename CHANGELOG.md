@@ -1,3 +1,14 @@
+<a name="8.11.2"></a>
+## [8.11.2](https://github.com/videojs/video.js/compare/v8.11.1...v8.11.2) (2024-02-13)
+
+### Bug Fixes
+
+* error-display ([#8529](https://github.com/videojs/video.js/issues/8529)) ([6eb0230](https://github.com/videojs/video.js/commit/6eb0230))
+
+### Chores
+
+* update http-streaming to v3.11.1 ([#8584](https://github.com/videojs/video.js/issues/8584)) ([7f7e2a3](https://github.com/videojs/video.js/commit/7f7e2a3))
+
 <a name="8.11.1"></a>
 ## [8.11.1](https://github.com/videojs/video.js/compare/v8.11.0...v8.11.1) (2024-01-29)
 
