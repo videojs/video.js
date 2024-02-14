@@ -67,7 +67,6 @@ class TimeTooltip extends Component {
     // and the left edge of the `SeekBar` and add the number of pixels in the
     // `SeekBar` before hitting the `seekBarPoint`
     let spaceLeftOfPoint = (seekBarRect.left - playerRect.left) + seekBarPointPx;
-    // (seekBarRect.left - playerRect.left) + seekBarPointPx;
 
     // This is the space right of the `seekBarPoint` available within the bounds
     // of the player. We calculate the number of pixels from the `seekBarPoint`
