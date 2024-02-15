@@ -1354,7 +1354,7 @@ class Component {
    *        an event name.
    *
    * Calls for handling of the Player Blur if:
-   * * Next focused element is not a children of current focused element &
+   * * The next focused element is not a child of current focused element &
    *   next focused element is not a children of Player.
    * * There is no next focused element
    */
