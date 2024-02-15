@@ -172,7 +172,7 @@ class SpatialNavigation {
    */
     function searchForChildrenCandidates(componentsArray) {
       for (const i of componentsArray) {
-        if (i.hasOwnProperty('el_') && i.getIsFocusable(i.el_) && i.getIsAvailableToBeFocused(i.el_)) {
+        if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused(i.el_)) {
           focusableComponents.push(i);
         }
         if (i.hasOwnProperty('children_') && i.children_.length > 0) {
@@ -185,7 +185,7 @@ class SpatialNavigation {
     player.children_.forEach((value) => {
       if (value.hasOwnProperty('el_')) {
         // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & avilable to be focused.
-        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable(value.el_) && value.getIsAvailableToBeFocused(value.el_)) {
+        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused(value.el_)) {
           focusableComponents.push(value);
           return;
           // If component has posible children components as candidates.
@@ -213,7 +213,7 @@ class SpatialNavigation {
    */
   findSuitableDOMChild(component) {
     function searchForSuitableChild(node) {
-      if (component.getIsFocusable(node) && component.getIsAvailableToBeFocused(node)) {
+      if (component.getIsFocusable() && component.getIsAvailableToBeFocused(node)) {
         return node;
       }
 
