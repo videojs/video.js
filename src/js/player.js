@@ -3200,10 +3200,13 @@ class Player extends Component {
       }
       pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in picture-in-picture')));
 
+      const pipWidth = this.videoWidth();
+      const pipHeight = this.videoHeight();
+
       return window.documentPictureInPicture.requestWindow({
         // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
-        width: this.videoWidth(),
-        height: this.videoHeight()
+        width: pipWidth,
+        height: pipHeight
       }).then(pipWindow => {
         Dom.copyStyleSheetsToWindow(pipWindow);
         this.el_.parentNode.insertBefore(pipContainer, this.el_);
@@ -3212,7 +3215,7 @@ class Player extends Component {
         pipWindow.document.body.classList.add('vjs-pip-window');
 
         this.player_.isInPictureInPicture(true);
-        this.player_.trigger('enterpictureinpicture');
+        this.player_.trigger({type: 'enterpictureinpicture', width: pipWidth, height: pipHeight});
 
         // Listen for the PiP closing event to move the video back.
         pipWindow.addEventListener('pagehide', (event) => {
