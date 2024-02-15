@@ -3212,7 +3212,7 @@ class Player extends Component {
         pipWindow.document.body.classList.add('vjs-pip-window');
 
         this.player_.isInPictureInPicture(true);
-        this.player_.trigger('enterpictureinpicture');
+        this.player_.trigger({type: 'enterpictureinpicture', pipWindow});
 
         // Listen for the PiP closing event to move the video back.
         pipWindow.addEventListener('pagehide', (event) => {
