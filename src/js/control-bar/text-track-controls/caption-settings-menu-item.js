@@ -54,9 +54,9 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
     const spatialNavigation = this.player_.spatialNavigation;
-    const isSpatialNavlistening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
 
-    if (isSpatialNavlistening) {
+    if (isSpatialNavListening) {
       this.searchForTrackSelect();
     }
   }
