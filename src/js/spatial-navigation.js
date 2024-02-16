@@ -165,7 +165,7 @@ class SpatialNavigation {
     const focusableComponents = [];
 
     /**
-   * Searchs for children candidates.
+   * Searches for children candidates.
    *
    * Pushes Components to array of 'focusableComponents'.
    * Calls itself if there is children elements inside of iterated component.
