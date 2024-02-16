@@ -11,7 +11,6 @@ class SpatialNavigation {
    *                                                   If null or not provided, no component will be initially focused.
    */
   constructor(player, initialFocusedComponent) {
-    this.KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down', 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
     this.player = player;
     this.components = new Set();
     this.focusableComponents = [];
@@ -24,6 +23,10 @@ class SpatialNavigation {
     // The number of seconds the `step*` functions move the timeline.
     this.STEP_SECONDS = 5;
   }
+
+  // Static maps for key presses.
+  static DirectionKeys = { 37: 'left', 38: 'up', 39: 'right', 40: 'down'};
+  static MediaActionKeys = { 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
 
   /**
    * Starts the spatial navigation by adding a keydown event listener to the video container.
@@ -52,17 +55,26 @@ class SpatialNavigation {
    *
    * Determines if spatial navigation or media control is active and handles key inputs accordingly.
    *
-   * @param {KeyboardEvent} e - The keydown event to be handled.
+   * @param {KeyboardEvent} event - The keydown event to be handled.
    */
-  onKeyDown(e) {
-    const key = this.KEY_CODE[e.keyCode];
+  onKeyDown(event) {
+    if (this.isPaused) {
+      return;
+    }
 
-    if (!this.isPaused && ['up', 'right', 'down', 'left'].includes(key)) {
-      this.move(key);
-      e.preventDefault();
-    } else if (['play', 'pause', 'ff', 'rw'].includes(key)) {
-      this.performMediaAction(key);
-      e.preventDefault();
+    const direction = SpatialNavigation.DirectionKeys[event.keyCode];
+
+    if (direction) {
+      event.preventDefault();
+      this.move(direction);
+      return;
+    }
+
+    const mediaAction = SpatialNavigation.MediaActionKeys[event.keyCode];
+
+    if (mediaAction) {
+      event.preventDefault();
+      this.performMediaAction(mediaAction);
     }
   }
 
