@@ -55,8 +55,7 @@ class SpatialNavigation {
    *
    * @param {KeyboardEvent} event - The keydown event to be handled.
    */
-<<<<<<< HEAD
-  onKeyDown(event) {
+  onKeyDown_(event) {
     if (this.isPaused) {
       return;
     }
@@ -74,17 +73,6 @@ class SpatialNavigation {
     if (mediaAction) {
       event.preventDefault();
       this.performMediaAction(mediaAction);
-=======
-  onKeyDown_(e) {
-    const key = this.KEY_CODE[e.keyCode];
-
-    if (!this.isPaused_ && ['up', 'right', 'down', 'left'].includes(key)) {
-      this.move(key);
-      e.preventDefault();
-    } else if (['play', 'pause', 'ff', 'rw'].includes(key)) {
-      this.performMediaAction(key);
-      e.preventDefault();
->>>>>>> 8d0701ef78aca726875283ab0ae7635d6372286d
     }
   }
 
