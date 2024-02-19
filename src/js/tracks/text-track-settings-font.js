@@ -3,12 +3,12 @@ import * as Dom from '../utils/dom';
 import TextTrackFieldset from './text-track-fieldset';
 
 /**
- * The component 'TrackSettingsFont' displays a set of 'fieldsets'
+ * The component 'TextTrackSettingsFont' displays a set of 'fieldsets'
  * using the component 'TextTrackFieldset'.
  *
  * @extends Component
  */
-class TrackSettingsFont extends Component {
+class TextTrackSettingsFont extends Component {
 
   /**
    * Creates an instance of this class.
@@ -88,7 +88,7 @@ class TrackSettingsFont extends Component {
   }
 
   /**
-   * Create the `TrackSettingsFont`'s DOM element
+   * Create the `TextTrackSettingsFont`'s DOM element
    *
    * @return {Element}
    *         The DOM element that gets created.
@@ -102,5 +102,5 @@ class TrackSettingsFont extends Component {
   }
 }
 
-Component.registerComponent('TrackSettingsFont', TrackSettingsFont);
-export default TrackSettingsFont;
+Component.registerComponent('TextTrackSettingsFont', TextTrackSettingsFont);
+export default TextTrackSettingsFont;

@@ -3,12 +3,12 @@ import * as Dom from '../utils/dom';
 import TextTrackFieldset from './text-track-fieldset';
 
 /**
- * The component 'TrackSettingsColors' displays a set of 'fieldsets'
+ * The component 'TextTrackSettingsColors' displays a set of 'fieldsets'
  * using the component 'TextTrackFieldset'.
  *
  * @extends Component
  */
-class TrackSettingsColors extends Component {
+class TextTrackSettingsColors extends Component {
 
   /**
    * Creates an instance of this class.
@@ -91,7 +91,7 @@ class TrackSettingsColors extends Component {
   }
 
   /**
-   * Create the `TrackSettingsColors`'s DOM element
+   * Create the `TextTrackSettingsColors`'s DOM element
    *
    * @return {Element}
    *         The DOM element that gets created.
@@ -105,5 +105,5 @@ class TrackSettingsColors extends Component {
   }
 }
 
-Component.registerComponent('TrackSettingsColors', TrackSettingsColors);
-export default TrackSettingsColors;
+Component.registerComponent('TextTrackSettingsColors', TextTrackSettingsColors);
+export default TextTrackSettingsColors;

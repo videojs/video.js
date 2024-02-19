@@ -7,8 +7,8 @@ import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
-import TrackSettingsColors from './text-track-settings-colors';
-import TrackSettingsFont from './text-track-settings-font';
+import TextTrackSettingsColors from './text-track-settings-colors';
+import TextTrackSettingsFont from './text-track-settings-font';
 import TrackSettingsControls from './text-track-controls';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
@@ -269,7 +269,7 @@ class TextTrackSettings extends ModalDialog {
     this.fill();
     this.hasBeenOpened_ = this.hasBeenFilled_ = true;
 
-    const trackSettingsColors = new TrackSettingsColors(
+    const textTrackSettingsColors = new TextTrackSettingsColors(
       player,
       {
         textTrackComponentid: this.id_,
@@ -283,9 +283,9 @@ class TextTrackSettings extends ModalDialog {
       }
     );
 
-    this.addChild(trackSettingsColors);
+    this.addChild(textTrackSettingsColors);
 
-    const trackSettingsFont = new TrackSettingsFont(
+    const textTrackSettingsFont = new TextTrackSettingsFont(
       player,
       {
         textTrackComponentid: this.id_,
@@ -299,7 +299,7 @@ class TextTrackSettings extends ModalDialog {
       }
     );
 
-    this.addChild(trackSettingsFont);
+    this.addChild(textTrackSettingsFont);
 
     const trackSettingsControls = new TrackSettingsControls(player, {});
 
