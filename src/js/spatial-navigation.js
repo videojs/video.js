@@ -13,7 +13,6 @@ class SpatialNavigation {
   constructor(player, initialFocusedComponent) {
     this.KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down', 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
     this.player = player;
-    this.components = new Set();
     this.focusableComponents = [];
     this.isListening = false;
     this.isPaused = false;
@@ -33,8 +32,6 @@ class SpatialNavigation {
     if (!this.isListening) {
       this.player.el().addEventListener('keydown', this.onKeyDown);
       this.isListening = true;
-      // this set focus is currently here just for testing purposes
-      this.focus(this.getComponents()[0]);
     }
   }
 
