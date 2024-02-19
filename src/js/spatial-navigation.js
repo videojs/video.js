@@ -140,7 +140,7 @@ class SpatialNavigation {
     } else {
       this.pause();
 
-      if (component && component.el_) {
+      if (component && component.el()) {
         this.lastFocusedComponent = component;
       }
     }
@@ -165,14 +165,14 @@ class SpatialNavigation {
     const focusableComponents = [];
 
     /**
-   * Searchs for children candidates.
+   * Searches for children candidates.
    *
    * Pushes Components to array of 'focusableComponents'.
    * Calls itself if there is children elements inside of iterated component.
    */
     function searchForChildrenCandidates(componentsArray) {
       for (const i of componentsArray) {
-        if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused(i.el_)) {
+        if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused(i.el())) {
           focusableComponents.push(i);
         }
         if (i.hasOwnProperty('children_') && i.children_.length > 0) {
@@ -185,7 +185,7 @@ class SpatialNavigation {
     player.children_.forEach((value) => {
       if (value.hasOwnProperty('el_')) {
         // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & avilable to be focused.
-        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused(value.el_)) {
+        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused(value.el())) {
           focusableComponents.push(value);
           return;
           // If component has posible children components as candidates.
@@ -229,7 +229,7 @@ class SpatialNavigation {
       return null;
     }
 
-    return searchForSuitableChild(component.el_);
+    return searchForSuitableChild(component.el());
   }
 
   /**
@@ -246,7 +246,7 @@ class SpatialNavigation {
 
         // If component Node is equal to the current active element.
         // eslint-disable-next-line
-        if (i.el_ === document.activeElement) {
+        if (i.el() === document.activeElement) {
           return i;
         }
       }
@@ -411,7 +411,7 @@ class SpatialNavigation {
    * @param {Component} component - The component to be focused.
    */
   focus(component) {
-    if (component.getIsAvailableToBeFocused(component.el_)) {
+    if (component.getIsAvailableToBeFocused(component.el())) {
       component.focus();
     } else if (this.findSuitableDOMChild(component)) {
       this.findSuitableDOMChild(component).focus();
