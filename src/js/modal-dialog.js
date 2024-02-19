@@ -239,7 +239,7 @@ class ModalDialog extends Component {
 
     const player = this.player();
     const spatialNavigation = this.player_.spatialNavigation;
-    const isSpatialNavlistening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
 
     /**
       * Fired just before a `ModalDialog` is closed.
@@ -276,7 +276,7 @@ class ModalDialog extends Component {
       this.dispose();
     }
 
-    if (isSpatialNavlistening) {
+    if (isSpatialNavListening) {
       spatialNavigation.refocusComponent();
     }
   }
@@ -462,20 +462,20 @@ class ModalDialog extends Component {
    */
   handleKeyDown(event) {
     const spatialNavigation = this.player_.spatialNavigation;
-    const isSpatialNavlistening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
 
     // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled.
-    if (!isSpatialNavlistening) {
+    if (!isSpatialNavListening) {
       event.stopPropagation();
     }
 
     // If 'Esc' is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
-    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && isSpatialNavlistening) && this.closeable()) {
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && isSpatialNavListening) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
     // If 'Enter' is pressed & spatialNavigation is enabled & handleClick is available.
-    } else if (keycode.isEventKey(event, 'Enter') && isSpatialNavlistening && this.handleClick) {
+    } else if (keycode.isEventKey(event, 'Enter') && isSpatialNavListening && this.handleClick) {
       this.handleClick();
     }
 
