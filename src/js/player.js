@@ -566,7 +566,7 @@ class Player extends Component {
     // Check if spatial navigation is enabled in the options.
     // If enabled, instantiate the SpatialNavigation class.
     if (options.spatialNavigation && options.spatialNavigation.enabled) {
-      this.spatialNavigation = new SpatialNavigation(this, null);
+      this.spatialNavigation = new SpatialNavigation(this);
       this.addClass('vjs-spatial-navigation-enabled');
     }
 

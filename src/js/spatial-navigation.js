@@ -1,3 +1,6 @@
+// The number of seconds the `step*` functions move the timeline.
+const STEP_SECONDS = 5;
+
 class SpatialNavigation {
   /**
    * Constructs a SpatialNavigation instance with initial settings.
@@ -6,22 +9,16 @@ class SpatialNavigation {
    *
    * @class
    * @param {Object} player - The Video.js player instance to which the spatial navigation is attached.
-   * @param {Component|null} initialFocusedComponent - The component that should initially have focus
-   *                                                   when the spatial navigation system starts.
-   *                                                   If null or not provided, no component will be initially focused.
    */
-  constructor(player, initialFocusedComponent) {
+  constructor(player) {
     this.KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down', 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
-    this.player = player;
+    this.player_ = player;
     this.focusableComponents = [];
-    this.isListening = false;
-    this.isPaused = false;
-    this.eventListeners = [];
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.currentFocus = initialFocusedComponent || null;
-    this.lastFocusedComponent = null;
-    // The number of seconds the `step*` functions move the timeline.
-    this.STEP_SECONDS = 5;
+    this.isListening_ = false;
+    this.isPaused_ = false;
+    this.eventListeners_ = [];
+    this.onKeyDown_ = this.onKeyDown_.bind(this);
+    this.lastFocusedComponent_ = null;
   }
 
   /**
@@ -29,19 +26,23 @@ class SpatialNavigation {
    * This method ensures that the event listener is added only once.
    */
   start() {
-    if (!this.isListening) {
-      this.player.el().addEventListener('keydown', this.onKeyDown);
-      this.isListening = true;
+    // If the listener is already active, exit early.
+    if (this.isListening_) {
+      return;
     }
+
+    // Add the event listener since the listener is not yet active.
+    this.player_.el().addEventListener('keydown', this.onKeyDown_);
+    this.isListening_ = true;
   }
 
   /**
    * Stops the spatial navigation by removing the keydown event listener from the video container.
-   * Also sets the `isListening` flag to false.
+   * Also sets the `isListening_` flag to false.
    */
   stop() {
-    this.player.el().removeEventListener('keydown', this.onKeyDown);
-    this.isListening = false;
+    this.player_.el().removeEventListener('keydown', this.onKeyDown_);
+    this.isListening_ = false;
   }
 
   /**
@@ -51,10 +52,10 @@ class SpatialNavigation {
    *
    * @param {KeyboardEvent} e - The keydown event to be handled.
    */
-  onKeyDown(e) {
+  onKeyDown_(e) {
     const key = this.KEY_CODE[e.keyCode];
 
-    if (!this.isPaused && ['up', 'right', 'down', 'left'].includes(key)) {
+    if (!this.isPaused_ && ['up', 'right', 'down', 'left'].includes(key)) {
       this.move(key);
       e.preventDefault();
     } else if (['play', 'pause', 'ff', 'rw'].includes(key)) {
@@ -72,23 +73,23 @@ class SpatialNavigation {
    *   Accepted keys: 'play', 'pause', 'ff' (fast-forward), 'rw' (rewind).
    */
   performMediaAction(key) {
-    if (this.player) {
+    if (this.player_) {
       switch (key) {
       case 'play':
-        if (this.player.paused()) {
-          this.player.play();
+        if (this.player_.paused()) {
+          this.player_.play();
         }
         break;
       case 'pause':
-        if (!this.player.paused()) {
-          this.player.pause();
+        if (!this.player_.paused()) {
+          this.player_.pause();
         }
         break;
       case 'ff':
-        this.userSeek_(this.player.currentTime() + this.STEP_SECONDS);
+        this.userSeek_(this.player_.currentTime() + STEP_SECONDS);
         break;
       case 'rw':
-        this.userSeek_(this.player.currentTime() - this.STEP_SECONDS);
+        this.userSeek_(this.player_.currentTime() - STEP_SECONDS);
         break;
       default:
         break;
@@ -104,11 +105,11 @@ class SpatialNavigation {
    *        current time to seek to
    */
   userSeek_(ct) {
-    if (this.player.liveTracker && this.player.liveTracker.isLive()) {
-      this.player.liveTracker.nextSeekedFromUser();
+    if (this.player_.liveTracker && this.player_.liveTracker.isLive()) {
+      this.player_.liveTracker.nextSeekedFromUser();
     }
 
-    this.player.currentTime(ct);
+    this.player_.currentTime(ct);
   }
 
   /**
@@ -116,7 +117,7 @@ class SpatialNavigation {
    * This method sets a flag that can be used to temporarily disable the navigation logic.
    */
   pause() {
-    this.isPaused = true;
+    this.isPaused_ = true;
   }
 
   /**
@@ -124,7 +125,7 @@ class SpatialNavigation {
    * This method resets the pause flag, re-enabling the navigation logic.
    */
   resume() {
-    this.isPaused = false;
+    this.isPaused_ = false;
   }
 
   /**
@@ -138,7 +139,7 @@ class SpatialNavigation {
       this.pause();
 
       if (component && component.el()) {
-        this.lastFocusedComponent = component;
+        this.lastFocusedComponent_ = component;
       }
     }
   }
@@ -158,7 +159,7 @@ class SpatialNavigation {
    *         Returns an array of focusable components.
    */
   getComponents() {
-    const player = this.player;
+    const player = this.player_;
     const focusableComponents = [];
 
     /**
@@ -276,7 +277,7 @@ class SpatialNavigation {
    */
   remove(component) {
     for (let i = 0; i < this.focusableComponents.length; i++) {
-      if (this.focusableComponents[i].name_ === component.name_) {
+      if (this.focusableComponents[i].name() === component.name()) {
         this.focusableComponents.splice(i, 1);
         return;
       }
@@ -379,10 +380,10 @@ class SpatialNavigation {
    * Focus the last focused component saved before blur on player.
    */
   refocusComponent() {
-    if (this.lastFocusedComponent) {
+    if (this.lastFocusedComponent_) {
       // If use is not active, set it to active.
-      if (!this.player.userActive()) {
-        this.player.userActive(true);
+      if (!this.player_.userActive()) {
+        this.player_.userActive(true);
       }
 
       this.getComponents();
@@ -390,7 +391,7 @@ class SpatialNavigation {
       // Search inside array of 'focusableComponents' for a match of name of
       // the last focused component.
       for (let i = 0; i < this.focusableComponents.length; i++) {
-        if (this.focusableComponents[i].name_ === this.lastFocusedComponent.name_) {
+        if (this.focusableComponents[i].name() === this.lastFocusedComponent_.name()) {
           this.focus(this.focusableComponents[i]);
           return;
         }
@@ -460,11 +461,11 @@ class SpatialNavigation {
    * @param {Function} callback - The callback function to be executed when the event occurs.
    */
   addEventListener(eventName, callback) {
-    if (!this.eventListeners[eventName]) {
-      this.eventListeners[eventName] = [];
+    if (!this.eventListeners_[eventName]) {
+      this.eventListeners_[eventName] = [];
     }
 
-    this.eventListeners[eventName].push(callback);
+    this.eventListeners_[eventName].push(callback);
   }
 
   /**
@@ -474,7 +475,7 @@ class SpatialNavigation {
    * @param {Object} [eventDetails={}] - Additional details to include in the event object.
    */
   notifyListeners(eventName, eventDetails = {}) {
-    const listeners = this.eventListeners[eventName];
+    const listeners = this.eventListeners_[eventName];
 
     if (listeners) {
       const event = new CustomEvent(eventName, {
