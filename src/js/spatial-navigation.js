@@ -56,13 +56,15 @@ class SpatialNavigation {
    * @param {KeyboardEvent} event - The keydown event to be handled.
    */
   onKeyDown_(event) {
-    if (this.isPaused) {
-      return;
-    }
+    
 
     const direction = SpatialNavigation.DirectionKeys[event.keyCode];
 
     if (direction) {
+      // Return early if paused and a direction key is pressed.
+      if (this.isPaused) {
+        return;
+      }
       event.preventDefault();
       this.move(direction);
       return;
