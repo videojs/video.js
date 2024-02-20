@@ -62,7 +62,7 @@ class SpatialNavigation {
 
     if (direction) {
       // Return early if paused and a direction key is pressed.
-      if (this.isPaused) {
+      if (this.isPaused_) {
         return;
       }
       event.preventDefault();

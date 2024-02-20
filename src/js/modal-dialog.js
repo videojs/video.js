@@ -239,7 +239,7 @@ class ModalDialog extends Component {
 
     const player = this.player();
     const spatialNavigation = this.player_.spatialNavigation;
-    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening_ && !spatialNavigation.isPaused_;
 
     /**
       * Fired just before a `ModalDialog` is closed.
@@ -462,7 +462,7 @@ class ModalDialog extends Component {
    */
   handleKeyDown(event) {
     const spatialNavigation = this.player_.spatialNavigation;
-    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening && !spatialNavigation.isPaused;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening_ && !spatialNavigation.isPaused_;
 
     // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled.
     if (!isSpatialNavListening) {
