@@ -110,9 +110,11 @@ class Component {
       this.handleLanguagechange = this.handleLanguagechange.bind(this);
       this.on(this.player_, 'languagechange', this.handleLanguagechange);
 
-      // Binding event handlers
-      this.on('focus', this.handleFocus.bind(this));
-      this.on('blur', this.handleBlur.bind(this));
+      // Binding event handlers if spatial navigation is enabled
+      if (options.playerOptions && options.playerOptions.spatialNavigation && options.playerOptions.spatialNavigation.enabled) {
+        this.on('focus', this.handleFocus.bind(this));
+        this.on('blur', this.handleBlur.bind(this));
+      }
     }
     stateful(this, this.constructor.defaultState);
 
