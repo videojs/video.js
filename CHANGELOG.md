@@ -1,3 +1,11 @@
+<a name="8.11.3"></a>
+## [8.11.3](https://github.com/videojs/video.js/compare/v8.11.2...v8.11.3) (2024-02-20)
+
+### Chores
+
+* update pip enter event with window metadata ([#8591](https://github.com/videojs/video.js/issues/8591)) ([4c1f63b](https://github.com/videojs/video.js/commit/4c1f63b))
+* update playbackRates jsdoc ([#8583](https://github.com/videojs/video.js/issues/8583)) ([395d608](https://github.com/videojs/video.js/commit/395d608))
+
 <a name="8.11.2"></a>
 ## [8.11.2](https://github.com/videojs/video.js/compare/v8.11.1...v8.11.2) (2024-02-13)
 
