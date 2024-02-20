@@ -80,11 +80,6 @@ class TextTrackSettingsFont extends Component {
     );
 
     this.addChild(ElWinColorFieldset);
-
-    // Add created components
-    this.el().appendChild(ElFgColorFieldset.el());
-    this.el().appendChild(ElBgColorFieldset.el());
-    this.el().appendChild(ElWinColorFieldset.el());
   }
 
   /**
