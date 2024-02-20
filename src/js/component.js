@@ -1342,7 +1342,7 @@ class Component {
   handleFocus() {
     const spatialNavigation = this.player_.spatialNavigation;
 
-    if (spatialNavigation && this.getIsFocusable(this.el_)) {
+    if (spatialNavigation && this.getIsFocusable()) {
       spatialNavigation.handlePlayerFocus();
     }
   }
@@ -1363,7 +1363,7 @@ class Component {
   handleBlur(event) {
     const spatialNavigation = this.player_.spatialNavigation;
 
-    if (spatialNavigation && this.getIsFocusable(this.el_)) {
+    if (spatialNavigation && this.getIsFocusable()) {
       const nextFocusedElement = event.relatedTarget;
       let isChildrenOfPlayer = null;
 
@@ -1866,7 +1866,7 @@ class Component {
    * @return {boolean}
    *         If the component can be focused, will be `true`. Otherwise, `false`.
    */
-  getIsFocusable(el) {
+  getIsFocusable() {
     /**
      * Decide whether an element is actually disabled or not.
      *
@@ -1899,7 +1899,7 @@ class Component {
 
     }
 
-    if (!(el.tabIndex < 0) && !isExpresslyInert(el) && !isActuallyDisabled(el)) {
+    if (!(this.el_.tabIndex < 0) && !isExpresslyInert(this.el_) && !isActuallyDisabled(this.el_)) {
       return true;
     }
     return false;
