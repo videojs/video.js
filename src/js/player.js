@@ -3220,7 +3220,7 @@ class Player extends Component {
         pipWindow.document.body.classList.add('vjs-pip-window');
 
         this.player_.isInPictureInPicture(true);
-        this.player_.trigger('enterpictureinpicture');
+        this.player_.trigger({type: 'enterpictureinpicture', pipWindow});
 
         // Listen for the PiP closing event to move the video back.
         pipWindow.addEventListener('pagehide', (event) => {
@@ -5254,7 +5254,7 @@ class Player extends Component {
    * Values other than arrays are ignored.
    *
    * @fires Player#playbackrateschange
-   * @param {number[]} newRates
+   * @param {number[]} [newRates]
    *                   The new rates that the playback rates menu should update to.
    *                   An empty array will hide the menu
    * @return {number[]} When used as a getter will return the current playback rates
