@@ -56,8 +56,6 @@ class SpatialNavigation {
    * @param {KeyboardEvent} event - The keydown event to be handled.
    */
   onKeyDown_(event) {
-    
-
     const direction = SpatialNavigation.DirectionKeys[event.keyCode];
 
     if (direction) {

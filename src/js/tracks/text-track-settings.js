@@ -301,7 +301,7 @@ class TextTrackSettings extends ModalDialog {
 
     this.addChild(textTrackSettingsFont);
 
-    const trackSettingsControls = new TrackSettingsControls(player, {});
+    const trackSettingsControls = new TrackSettingsControls(player);
 
     this.addChild(trackSettingsControls);
 
