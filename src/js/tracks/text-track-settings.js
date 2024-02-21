@@ -6,8 +6,10 @@ import Component from '../component';
 import ModalDialog from '../modal-dialog';
 import {createEl} from '../utils/dom';
 import * as Obj from '../utils/obj';
-import * as Guid from '../utils/guid.js';
 import log from '../utils/log';
+import TextTrackSettingsColors from './text-track-settings-colors';
+import TextTrackSettingsFont from './text-track-settings-font';
+import TrackSettingsControls from './text-track-controls';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
@@ -49,7 +51,8 @@ const selectConfigs = {
       COLOR_YELLOW,
       COLOR_MAGENTA,
       COLOR_CYAN
-    ]
+    ],
+    className: 'vjs-bg-color'
   },
 
   backgroundOpacity: {
@@ -60,7 +63,8 @@ const selectConfigs = {
       OPACITY_OPAQUE,
       OPACITY_SEMI,
       OPACITY_TRANS
-    ]
+    ],
+    className: 'vjs-bg-opacity vjs-opacity'
   },
 
   color: {
@@ -76,7 +80,8 @@ const selectConfigs = {
       COLOR_YELLOW,
       COLOR_MAGENTA,
       COLOR_CYAN
-    ]
+    ],
+    className: 'vjs-text-color'
   },
 
   edgeStyle: {
@@ -133,14 +138,16 @@ const selectConfigs = {
     options: [
       OPACITY_OPAQUE,
       OPACITY_SEMI
-    ]
+    ],
+    className: 'vjs-text-opacity vjs-opacity'
   },
 
   // Options for this object are defined below.
   windowColor: {
     selector: '.vjs-window-color > select',
     id: 'captions-window-color-%s',
-    label: 'Color'
+    label: 'Color',
+    className: 'vjs-window-color'
   },
 
   // Options for this object are defined below.
@@ -152,7 +159,8 @@ const selectConfigs = {
       OPACITY_TRANS,
       OPACITY_SEMI,
       OPACITY_OPAQUE
-    ]
+    ],
+    className: 'vjs-window-opacity vjs-opacity'
   }
 };
 
@@ -254,11 +262,48 @@ class TextTrackSettings extends ModalDialog {
     options.temporary = false;
 
     super(player, options);
+
     this.updateDisplay = this.updateDisplay.bind(this);
 
     // fill the modal and pretend we have opened it
     this.fill();
     this.hasBeenOpened_ = this.hasBeenFilled_ = true;
+
+    const textTrackSettingsColors = new TextTrackSettingsColors(
+      player,
+      {
+        textTrackComponentid: this.id_,
+        selectConfigs,
+        fieldSets:
+        [
+          ['color', 'textOpacity'],
+          ['backgroundColor', 'backgroundOpacity'],
+          ['windowColor', 'windowOpacity']
+        ]
+      }
+    );
+
+    this.addChild(textTrackSettingsColors);
+
+    const textTrackSettingsFont = new TextTrackSettingsFont(
+      player,
+      {
+        textTrackComponentid: this.id_,
+        selectConfigs,
+        fieldSets:
+        [
+          ['fontPercent'],
+          ['edgeStyle'],
+          ['fontFamily']
+        ]
+      }
+    );
+
+    this.addChild(textTrackSettingsFont);
+
+    const trackSettingsControls = new TrackSettingsControls(player);
+
+    this.addChild(trackSettingsControls);
 
     this.endDialog = createEl('p', {
       className: 'vjs-control-text',
@@ -296,201 +341,6 @@ class TextTrackSettings extends ModalDialog {
     this.endDialog = null;
 
     super.dispose();
-  }
-
-  /**
-   * Create a <select> element with configured options.
-   *
-   * @param {string} key
-   *        Configuration key to use during creation.
-   *
-   * @param {string} [legendId]
-   *        Id of associated <legend>.
-   *
-   * @param {string} [type=label]
-   *        Type of labelling element, `label` or `legend`
-   *
-   * @return {string}
-   *         An HTML string.
-   *
-   * @private
-   */
-  createElSelect_(key, legendId = '', type = 'label') {
-    const config = selectConfigs[key];
-    const id = config.id.replace('%s', this.id_);
-    const selectLabelledbyIds = [legendId, id].join(' ').trim();
-    const guid = `vjs_select_${Guid.newGUID()}`;
-
-    return [
-      `<${type} id="${id}"${type === 'label' ? ` for="${guid}" class="vjs-label"` : ''}>`,
-      this.localize(config.label),
-      `</${type}>`,
-      `<select aria-labelledby="${selectLabelledbyIds}" id="${guid}">`
-    ].
-      concat(config.options.map(o => {
-        const optionId = id + '-' + o[1].replace(/\W+/g, '');
-
-        return [
-          `<option id="${optionId}" value="${o[0]}" `,
-          `aria-labelledby="${selectLabelledbyIds} ${optionId}">`,
-          this.localize(o[1]),
-          '</option>'
-        ].join('');
-      })).
-      concat('</select>').join('');
-  }
-
-  /**
-   * Create foreground color element for the component
-   *
-   * @return {string}
-   *         An HTML string.
-   *
-   * @private
-   */
-  createElFgColor_() {
-    const legendId = `captions-text-legend-${this.id_}`;
-
-    return [
-      '<fieldset class="vjs-fg vjs-track-setting">',
-      `<legend id="${legendId}">`,
-      this.localize('Text'),
-      '</legend>',
-      '<span class="vjs-text-color">',
-      this.createElSelect_('color', legendId),
-      '</span>',
-      '<span class="vjs-text-opacity vjs-opacity">',
-      this.createElSelect_('textOpacity', legendId),
-      '</span>',
-      '</fieldset>'
-    ].join('');
-  }
-
-  /**
-   * Create background color element for the component
-   *
-   * @return {string}
-   *         An HTML string.
-   *
-   * @private
-   */
-  createElBgColor_() {
-    const legendId = `captions-background-${this.id_}`;
-
-    return [
-      '<fieldset class="vjs-bg vjs-track-setting">',
-      `<legend id="${legendId}">`,
-      this.localize('Text Background'),
-      '</legend>',
-      '<span class="vjs-bg-color">',
-      this.createElSelect_('backgroundColor', legendId),
-      '</span>',
-      '<span class="vjs-bg-opacity vjs-opacity">',
-      this.createElSelect_('backgroundOpacity', legendId),
-      '</span>',
-      '</fieldset>'
-    ].join('');
-  }
-
-  /**
-   * Create window color element for the component
-   *
-   * @return {string}
-   *         An HTML string.
-   *
-   * @private
-   */
-  createElWinColor_() {
-    const legendId = `captions-window-${this.id_}`;
-
-    return [
-      '<fieldset class="vjs-window vjs-track-setting">',
-      `<legend id="${legendId}">`,
-      this.localize('Caption Area Background'),
-      '</legend>',
-      '<span class="vjs-window-color">',
-      this.createElSelect_('windowColor', legendId),
-      '</span>',
-      '<span class="vjs-window-opacity vjs-opacity">',
-      this.createElSelect_('windowOpacity', legendId),
-      '</span>',
-      '</fieldset>'
-    ].join('');
-  }
-
-  /**
-   * Create color elements for the component
-   *
-   * @return {Element}
-   *         The element that was created
-   *
-   * @private
-   */
-  createElColors_() {
-    return createEl('div', {
-      className: 'vjs-track-settings-colors',
-      innerHTML: [
-        this.createElFgColor_(),
-        this.createElBgColor_(),
-        this.createElWinColor_()
-      ].join('')
-    });
-  }
-
-  /**
-   * Create font elements for the component
-   *
-   * @return {Element}
-   *         The element that was created.
-   *
-   * @private
-   */
-  createElFont_() {
-    return createEl('div', {
-      className: 'vjs-track-settings-font',
-      innerHTML: [
-        '<fieldset class="vjs-font-percent vjs-track-setting">',
-        this.createElSelect_('fontPercent', '', 'legend'),
-        '</fieldset>',
-        '<fieldset class="vjs-edge-style vjs-track-setting">',
-        this.createElSelect_('edgeStyle', '', 'legend'),
-        '</fieldset>',
-        '<fieldset class="vjs-font-family vjs-track-setting">',
-        this.createElSelect_('fontFamily', '', 'legend'),
-        '</fieldset>'
-      ].join('')
-    });
-  }
-
-  /**
-   * Create controls for the component
-   *
-   * @return {Element}
-   *         The element that was created.
-   *
-   * @private
-   */
-  createElControls_() {
-    const defaultsDescription = this.localize('restore all settings to the default values');
-
-    return createEl('div', {
-      className: 'vjs-track-settings-controls',
-      innerHTML: [
-        `<button type="button" class="vjs-default-button" title="${defaultsDescription}">`,
-        this.localize('Reset'),
-        `<span class="vjs-control-text"> ${defaultsDescription}</span>`,
-        '</button>',
-        `<button type="button" class="vjs-done-button">${this.localize('Done')}</button>`
-      ].join('')
-    });
-  }
-
-  content() {
-    return [
-      this.createElColors_(),
-      this.createElFont_(),
-      this.createElControls_()
-    ];
   }
 
   label() {
@@ -592,25 +442,6 @@ class TextTrackSettings extends ModalDialog {
 
     if (ttDisplay) {
       ttDisplay.updateDisplay();
-    }
-  }
-
-  /**
-   * conditionally blur the element and refocus the captions button
-   *
-   * @private
-   */
-  conditionalBlur_() {
-    this.previouslyActiveEl_ = null;
-
-    const cb = this.player_.controlBar;
-    const subsCapsBtn = cb && cb.subsCapsButton;
-    const ccBtn = cb && cb.captionsButton;
-
-    if (subsCapsBtn) {
-      subsCapsBtn.focus();
-    } else if (ccBtn) {
-      ccBtn.focus();
     }
   }
 

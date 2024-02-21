@@ -1,0 +1,506 @@
+// The number of seconds the `step*` functions move the timeline.
+const STEP_SECONDS = 5;
+
+class SpatialNavigation {
+  /**
+   * Constructs a SpatialNavigation instance with initial settings.
+   * Initializes key codes for navigation, sets up the player instance,
+   * and prepares the spatial navigation system.
+   *
+   * @class
+   * @param {Object} player - The Video.js player instance to which the spatial navigation is attached.
+   */
+  constructor(player) {
+    this.player_ = player;
+    this.focusableComponents = [];
+    this.isListening_ = false;
+    this.isPaused_ = false;
+    this.eventListeners_ = [];
+    this.onKeyDown_ = this.onKeyDown_.bind(this);
+    this.lastFocusedComponent_ = null;
+  }
+
+  // Static maps for key presses.
+  static DirectionKeys = { 37: 'left', 38: 'up', 39: 'right', 40: 'down'};
+  static MediaActionKeys = { 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
+
+  /**
+   * Starts the spatial navigation by adding a keydown event listener to the video container.
+   * This method ensures that the event listener is added only once.
+   */
+  start() {
+    // If the listener is already active, exit early.
+    if (this.isListening_) {
+      return;
+    }
+
+    // Add the event listener since the listener is not yet active.
+    this.player_.el().addEventListener('keydown', this.onKeyDown_);
+    this.isListening_ = true;
+  }
+
+  /**
+   * Stops the spatial navigation by removing the keydown event listener from the video container.
+   * Also sets the `isListening_` flag to false.
+   */
+  stop() {
+    this.player_.el().removeEventListener('keydown', this.onKeyDown_);
+    this.isListening_ = false;
+  }
+
+  /**
+   * Responds to keydown events for spatial navigation and media control.
+   *
+   * Determines if spatial navigation or media control is active and handles key inputs accordingly.
+   *
+   * @param {KeyboardEvent} event - The keydown event to be handled.
+   */
+  onKeyDown_(event) {
+    const direction = SpatialNavigation.DirectionKeys[event.keyCode];
+
+    if (direction) {
+      // Return early if paused and a direction key is pressed.
+      if (this.isPaused_) {
+        return;
+      }
+      event.preventDefault();
+      this.move(direction);
+      return;
+    }
+
+    const mediaAction = SpatialNavigation.MediaActionKeys[event.keyCode];
+
+    if (mediaAction) {
+      event.preventDefault();
+      this.performMediaAction(mediaAction);
+    }
+  }
+
+  /**
+   * Performs media control actions based on the given key input.
+   *
+   * Controls the playback and seeking functionalities of the media player.
+   *
+   * @param {string} key - The key representing the media action to be performed.
+   *   Accepted keys: 'play', 'pause', 'ff' (fast-forward), 'rw' (rewind).
+   */
+  performMediaAction(key) {
+    if (this.player_) {
+      switch (key) {
+      case 'play':
+        if (this.player_.paused()) {
+          this.player_.play();
+        }
+        break;
+      case 'pause':
+        if (!this.player_.paused()) {
+          this.player_.pause();
+        }
+        break;
+      case 'ff':
+        this.userSeek_(this.player_.currentTime() + STEP_SECONDS);
+        break;
+      case 'rw':
+        this.userSeek_(this.player_.currentTime() - STEP_SECONDS);
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  /**
+   * Prevent liveThreshold from causing seeks to seem like they
+   * are not happening from a user perspective.
+   *
+   * @param {number} ct
+   *        current time to seek to
+   */
+  userSeek_(ct) {
+    if (this.player_.liveTracker && this.player_.liveTracker.isLive()) {
+      this.player_.liveTracker.nextSeekedFromUser();
+    }
+
+    this.player_.currentTime(ct);
+  }
+
+  /**
+   * Pauses the spatial navigation functionality.
+   * This method sets a flag that can be used to temporarily disable the navigation logic.
+   */
+  pause() {
+    this.isPaused_ = true;
+  }
+
+  /**
+   * Resumes the spatial navigation functionality if it has been paused.
+   * This method resets the pause flag, re-enabling the navigation logic.
+   */
+  resume() {
+    this.isPaused_ = false;
+  }
+
+  /**
+   * Handles Player Blur.
+   *
+   */
+  handlePlayerBlur(component) {
+    if (component.name() === 'CloseButton') {
+      this.refocusComponent();
+    } else {
+      this.pause();
+
+      if (component && component.el()) {
+        this.lastFocusedComponent_ = component;
+      }
+    }
+  }
+
+  /**
+   * Handles Player Focus.
+   *
+   */
+  handlePlayerFocus() {
+    this.resume();
+  }
+
+  /**
+   * Gets a set of focusable components.
+   *
+   * @return {Array}
+   *         Returns an array of focusable components.
+   */
+  getComponents() {
+    const player = this.player_;
+    const focusableComponents = [];
+
+    /**
+   * Searches for children candidates.
+   *
+   * Pushes Components to array of 'focusableComponents'.
+   * Calls itself if there is children elements inside of iterated component.
+   */
+    function searchForChildrenCandidates(componentsArray) {
+      for (const i of componentsArray) {
+        if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused(i.el())) {
+          focusableComponents.push(i);
+        }
+        if (i.hasOwnProperty('children_') && i.children_.length > 0) {
+          searchForChildrenCandidates(i.children_);
+        }
+      }
+    }
+
+    // Iterate inside of all children components of the player.
+    player.children_.forEach((value) => {
+      if (value.hasOwnProperty('el_')) {
+        // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & avilable to be focused.
+        if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused(value.el())) {
+          focusableComponents.push(value);
+          return;
+          // If component has posible children components as candidates.
+        } else if (value.hasOwnProperty('children_') && value.children_.length > 0) {
+          searchForChildrenCandidates(value.children_);
+          // If component has posible item components as candidates.
+        } else if (value.hasOwnProperty('items') && value.items.length > 0) {
+          searchForChildrenCandidates(value.items);
+          // If there is a suitable child element within the component's DOM element.
+        } else if (this.findSuitableDOMChild(value)) {
+          focusableComponents.push(value);
+        }
+      }
+    });
+
+    this.focusableComponents = focusableComponents;
+    return this.focusableComponents;
+  }
+
+  /**
+   * Finds a suitable child element within the provided component's DOM element.
+   *
+   * @param {Object} component - The component containing the DOM element to search within.
+   * @return {HTMLElement|null} Returns the suitable child element if found, or null if not found.
+   */
+  findSuitableDOMChild(component) {
+    function searchForSuitableChild(node) {
+      if (component.getIsFocusable() && component.getIsAvailableToBeFocused(node)) {
+        return node;
+      }
+
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        const suitableChild = searchForSuitableChild(child);
+
+        if (suitableChild) {
+          return suitableChild;
+        }
+      }
+
+      return null;
+    }
+
+    return searchForSuitableChild(component.el());
+  }
+
+  /**
+   * Gets the current focused component.
+   *
+   * @return {Component}
+   *         Returns a focused component.
+   */
+  getCurrentComponent() {
+    this.getComponents();
+
+    if (this.focusableComponents.length) {
+      for (const i of this.focusableComponents) {
+
+        // If component Node is equal to the current active element.
+        // eslint-disable-next-line
+        if (i.el() === document.activeElement) {
+          return i;
+        }
+      }
+    }
+  }
+
+  /**
+   * Adds a component to the array of focusable components.
+   *
+   * @param {Component} component
+   *        The `Component` to be added.
+   */
+  add(component) {
+    const focusableComponents = [...this.focusableComponents];
+
+    if (component.hasOwnProperty('el_') && component.getIsFocusable() && component.getIsAvailableToBeFocused()) {
+      focusableComponents.push(component);
+    }
+
+    this.focusableComponents = focusableComponents;
+    // Trigger the notification manually
+    this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
+
+  }
+
+  /**
+   * Removes component from the array of focusable components.
+   *
+   * @param {Component} component
+   */
+  remove(component) {
+    for (let i = 0; i < this.focusableComponents.length; i++) {
+      if (this.focusableComponents[i].name() === component.name()) {
+        this.focusableComponents.splice(i, 1);
+        return;
+      }
+    }
+    // Trigger the notification manually
+    this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
+  }
+
+  /**
+   * Clears array of focusable components.
+   */
+  clear() {
+    // Check if the array is already empty to avoid unnecessary event triggering
+    if (this.focusableComponents.length > 0) {
+      // Clear the array
+      this.focusableComponents = [];
+
+      // Trigger the notification manually
+      this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
+    }
+  }
+
+  /**
+   * Navigates to the next focusable component based on the specified direction.
+   *
+   * @param {string} direction 'up', 'down', 'left', 'right'
+   */
+  move(direction) {
+    const currentFocusedComponent = this.getCurrentComponent();
+
+    if (!currentFocusedComponent) {
+      return;
+    }
+
+    const currentPositions = currentFocusedComponent.getPositions();
+    const candidates = this.focusableComponents.filter(component =>
+      component !== currentFocusedComponent &&
+      this.isInDirection(currentPositions.boundingClientRect, component.getPositions().boundingClientRect, direction));
+
+    const bestCandidate = this.findBestCandidate(currentPositions.center, candidates, direction);
+
+    if (bestCandidate) {
+      this.focus(bestCandidate);
+    } else {
+      this.notifyListeners('endOfFocusableComponents', { direction, focusedElement: currentFocusedComponent });
+    }
+  }
+
+  /**
+   * Finds the best candidate on the current center position,
+   * the list of candidates, and the specified navigation direction.
+   *
+   * @param {Object} currentCenter The center position of the current focused component element.
+   * @param {Array} candidates An array of candidate components to receive focus.
+   * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
+   * @return The component that is the best candidate for receiving focus.
+   */
+  findBestCandidate(currentCenter, candidates, direction) {
+    let minDistance = Infinity;
+    let bestCandidate = null;
+
+    for (const candidate of candidates) {
+      const candidateCenter = candidate.getPositions().center;
+      const distance = this.calculateDistance(currentCenter, candidateCenter, direction);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestCandidate = candidate;
+      }
+    }
+
+    return bestCandidate;
+  }
+
+  /**
+   * Determines if a target rectangle is in the specified navigation direction
+   * relative to a source rectangle.
+   *
+   * @param {Object} srcRect The bounding rectangle of the source element.
+   * @param {Object} targetRect The bounding rectangle of the target element.
+   * @param {string} direction The navigation direction ('up', 'down', 'left', 'right').
+   * @return {boolean} True if the target is in the specified direction relative to the source.
+   */
+  isInDirection(srcRect, targetRect, direction) {
+    switch (direction) {
+    case 'right':
+      return targetRect.left >= srcRect.right;
+    case 'left':
+      return targetRect.right <= srcRect.left;
+    case 'down':
+      return targetRect.top >= srcRect.bottom;
+    case 'up':
+      return targetRect.bottom <= srcRect.top;
+    default:
+      return false;
+    }
+  }
+
+  /**
+   * Focus the last focused component saved before blur on player.
+   */
+  refocusComponent() {
+    if (this.lastFocusedComponent_) {
+      // If use is not active, set it to active.
+      if (!this.player_.userActive()) {
+        this.player_.userActive(true);
+      }
+
+      this.getComponents();
+
+      // Search inside array of 'focusableComponents' for a match of name of
+      // the last focused component.
+      for (let i = 0; i < this.focusableComponents.length; i++) {
+        if (this.focusableComponents[i].name() === this.lastFocusedComponent_.name()) {
+          this.focus(this.focusableComponents[i]);
+          return;
+        }
+      }
+    } else {
+      this.focus(this.getComponents()[0]);
+    }
+  }
+
+  /**
+   * Focuses on a given component.
+   * If the component is available to be focused, it focuses on the component.
+   * If not, it attempts to find a suitable DOM child within the component and focuses on it.
+   *
+   * @param {Component} component - The component to be focused.
+   */
+  focus(component) {
+    if (component.getIsAvailableToBeFocused(component.el())) {
+      component.focus();
+    } else if (this.findSuitableDOMChild(component)) {
+      this.findSuitableDOMChild(component).focus();
+    }
+  }
+
+  /**
+   * Calculates the distance between two points, adjusting the calculation based on
+   * the specified navigation direction.
+   *
+   * @param {Object} center1 The center point of the first element.
+   * @param {Object} center2 The center point of the second element.
+   * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
+   * @return {number} The calculated distance between the two centers.
+   */
+  calculateDistance(center1, center2, direction) {
+    const dx = Math.abs(center1.x - center2.x);
+    const dy = Math.abs(center1.y - center2.y);
+
+    let distance;
+
+    switch (direction) {
+    case 'right':
+    case 'left':
+      // Higher weight for vertical distance in horizontal navigation.
+      distance = dx + (dy * 100);
+      break;
+    case 'up':
+      // Strongly prioritize vertical proximity for UP navigation.
+      // Adjust the weight to ensure that elements directly above are favored.
+      distance = (dy * 2) + (dx * 0.5);
+      break;
+    case 'down':
+      // More balanced weight for vertical and horizontal distances.
+      // Adjust the weights here to find the best balance.
+      distance = (dy * 5) + dx;
+      break;
+    default:
+      distance = dx + dy;
+    }
+
+    return distance;
+  }
+
+  /**
+   * Adds an event listener for a specific event.
+   *
+   * @param {string} eventName - The name of the event to listen for.
+   * @param {Function} callback - The callback function to be executed when the event occurs.
+   */
+  addEventListener(eventName, callback) {
+    if (!this.eventListeners_[eventName]) {
+      this.eventListeners_[eventName] = [];
+    }
+
+    this.eventListeners_[eventName].push(callback);
+  }
+
+  /**
+   * Notifies listeners for a specific event.
+   *
+   * @param {string} eventName - The name of the event to notify listeners for.
+   * @param {Object} [eventDetails={}] - Additional details to include in the event object.
+   */
+  notifyListeners(eventName, eventDetails = {}) {
+    const listeners = this.eventListeners_[eventName];
+
+    if (listeners) {
+      const event = new CustomEvent(eventName, {
+        detail: eventDetails
+      });
+
+      listeners.forEach(listener => {
+        if (typeof listener === 'function') {
+          listener(event);
+        }
+      });
+    }
+  }
+}
+
+export default SpatialNavigation;

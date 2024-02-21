@@ -21,7 +21,7 @@ const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 class ModalDialog extends Component {
 
   /**
-   * Create an instance of this class.
+   * Creates an instance of this class.
    *
    * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
@@ -236,7 +236,10 @@ class ModalDialog extends Component {
     if (!this.opened_) {
       return;
     }
+
     const player = this.player();
+    const spatialNavigation = this.player_.spatialNavigation;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening_ && !spatialNavigation.isPaused_;
 
     /**
       * Fired just before a `ModalDialog` is closed.
@@ -271,6 +274,10 @@ class ModalDialog extends Component {
 
     if (this.options_.temporary) {
       this.dispose();
+    }
+
+    if (isSpatialNavListening) {
+      spatialNavigation.refocusComponent();
     }
   }
 
@@ -454,17 +461,25 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
+    const spatialNavigation = this.player_.spatialNavigation;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening_ && !spatialNavigation.isPaused_;
 
-    // Do not allow keydowns to reach out of the modal dialog.
-    event.stopPropagation();
+    // Do not allow keydowns to reach out of the modal dialog unless spatialNavigation is enabled.
+    if (!isSpatialNavListening) {
+      event.stopPropagation();
+    }
 
-    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
+    // If 'Esc' is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && isSpatialNavListening) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
+    // If 'Enter' is pressed & spatialNavigation is enabled & handleClick is available.
+    } else if (keycode.isEventKey(event, 'Enter') && isSpatialNavListening && this.handleClick) {
+      this.handleClick();
     }
 
-    // exit early if it isn't a tab key
+    // Exit early if it isn't a tab key.
     if (!keycode.isEventKey(event, 'Tab')) {
       return;
     }

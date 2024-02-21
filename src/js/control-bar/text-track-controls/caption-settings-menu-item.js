@@ -53,6 +53,33 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
    */
   handleClick(event) {
     this.player().getChild('textTrackSettings').open();
+
+    const spatialNavigation = this.player_.spatialNavigation;
+    const isSpatialNavListening = spatialNavigation && spatialNavigation.isListening_ && !spatialNavigation.isPaused_;
+
+    if (isSpatialNavListening) {
+      this.searchForTrackSelect();
+    }
+  }
+
+  /**
+   * This gets called by 'handleClick' if 'spatialNavigation' is enabled.
+   * Searches for the first 'TextTrackSelect' inside of modal to focus.
+   */
+  searchForTrackSelect() {
+    const spatialNavigation = this.player().spatialNavigation;
+    let componentToFocus = null;
+
+    for (const component of (spatialNavigation.getComponents())) {
+      if (component.constructor.name === 'TextTrackSelect') {
+        componentToFocus = component;
+        break;
+      }
+    }
+
+    if (componentToFocus) {
+      spatialNavigation.focus(componentToFocus);
+    }
   }
 
   /**

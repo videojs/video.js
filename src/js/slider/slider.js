@@ -308,14 +308,32 @@ class Slider extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
+    const spatialNavOptions = this.options_.playerOptions.spatialNavigation;
+    const spatialNavEnabled = spatialNavOptions && spatialNavOptions.enabled;
+    const horizontalSeek = spatialNavOptions && spatialNavOptions.horizontalSeek;
 
-    // Left and Down Arrows
-    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
+    if (spatialNavEnabled) {
+      if ((horizontalSeek && keycode.isEventKey(event, 'Left')) ||
+        (!horizontalSeek && keycode.isEventKey(event, 'Down'))) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.stepBack();
+      } else if ((horizontalSeek && keycode.isEventKey(event, 'Right')) ||
+        (!horizontalSeek && keycode.isEventKey(event, 'Up'))) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.stepForward();
+      } else {
+        super.handleKeyDown(event);
+      }
+
+      // Left and Down Arrows
+    } else if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
       event.preventDefault();
       event.stopPropagation();
       this.stepBack();
 
-    // Up and Right Arrows
+      // Up and Right Arrows
     } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
       event.preventDefault();
       event.stopPropagation();
