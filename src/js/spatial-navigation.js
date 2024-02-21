@@ -170,7 +170,7 @@ class SpatialNavigation {
    * @return {Array}
    *         Returns an array of focusable components.
    */
-  getComponents() {
+  updateFocusableComponents() {
     const player = this.player_;
     const focusableComponents = [];
 
@@ -249,7 +249,7 @@ class SpatialNavigation {
    *         Returns a focused component.
    */
   getCurrentComponent() {
-    this.getComponents();
+    this.updateFocusableComponents();
 
     if (this.focusableComponents.length) {
       for (const i of this.focusableComponents) {
@@ -398,7 +398,7 @@ class SpatialNavigation {
         this.player_.userActive(true);
       }
 
-      this.getComponents();
+      this.updateFocusableComponents();
 
       // Search inside array of 'focusableComponents' for a match of name of
       // the last focused component.
@@ -409,7 +409,7 @@ class SpatialNavigation {
         }
       }
     } else {
-      this.focus(this.getComponents()[0]);
+      this.focus(this.updateFocusableComponents()[0]);
     }
   }
 
