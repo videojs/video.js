@@ -1,21 +1,32 @@
+/**
+ * @file spatial-navigation.js
+ */
+import EventTarget from './event-target';
+
+/**
+ * Spatial Navigation
+ *
+ * @extends EventTarget
+ */
+
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
-class SpatialNavigation {
+class SpatialNavigation extends EventTarget {
+
   /**
    * Constructs a SpatialNavigation instance with initial settings.
-   * Initializes key codes for navigation, sets up the player instance,
-   * and prepares the spatial navigation system.
+   * Sets up the player instance, and prepares the spatial navigation system.
    *
    * @class
    * @param {Object} player - The Video.js player instance to which the spatial navigation is attached.
    */
   constructor(player) {
+    super();
     this.player_ = player;
     this.focusableComponents = [];
     this.isListening_ = false;
     this.isPaused_ = false;
-    this.eventListeners_ = [];
     this.onKeyDown_ = this.onKeyDown_.bind(this);
     this.lastFocusedComponent_ = null;
   }
@@ -35,7 +46,7 @@ class SpatialNavigation {
     }
 
     // Add the event listener since the listener is not yet active.
-    this.player_.el().addEventListener('keydown', this.onKeyDown_);
+    this.player_.on('keydown', this.onKeyDown_);
     this.isListening_ = true;
   }
 
@@ -44,7 +55,7 @@ class SpatialNavigation {
    * Also sets the `isListening_` flag to false.
    */
   stop() {
-    this.player_.el().removeEventListener('keydown', this.onKeyDown_);
+    this.player_.off('keydown', this.onKeyDown_);
     this.isListening_ = false;
   }
 
@@ -278,8 +289,7 @@ class SpatialNavigation {
 
     this.focusableComponents = focusableComponents;
     // Trigger the notification manually
-    this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
-
+    this.trigger({type: 'focusableComponentsChanged', focusableComponents: this.focusableComponents});
   }
 
   /**
@@ -291,11 +301,11 @@ class SpatialNavigation {
     for (let i = 0; i < this.focusableComponents.length; i++) {
       if (this.focusableComponents[i].name() === component.name()) {
         this.focusableComponents.splice(i, 1);
+        // Trigger the notification manually
+        this.trigger({type: 'focusableComponentsChanged', focusableComponents: this.focusableComponents});
         return;
       }
     }
-    // Trigger the notification manually
-    this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
   }
 
   /**
@@ -308,7 +318,7 @@ class SpatialNavigation {
       this.focusableComponents = [];
 
       // Trigger the notification manually
-      this.notifyListeners('focusableComponentsChanged', { focusableComponents: this.focusableComponents });
+      this.trigger({type: 'focusableComponentsChanged', focusableComponents: this.focusableComponents});
     }
   }
 
@@ -334,7 +344,7 @@ class SpatialNavigation {
     if (bestCandidate) {
       this.focus(bestCandidate);
     } else {
-      this.notifyListeners('endOfFocusableComponents', { direction, focusedElement: currentFocusedComponent });
+      this.trigger({type: 'endOfFocusableComponents', direction, focusedComponent: currentFocusedComponent});
     }
   }
 
@@ -464,42 +474,6 @@ class SpatialNavigation {
     }
 
     return distance;
-  }
-
-  /**
-   * Adds an event listener for a specific event.
-   *
-   * @param {string} eventName - The name of the event to listen for.
-   * @param {Function} callback - The callback function to be executed when the event occurs.
-   */
-  addEventListener(eventName, callback) {
-    if (!this.eventListeners_[eventName]) {
-      this.eventListeners_[eventName] = [];
-    }
-
-    this.eventListeners_[eventName].push(callback);
-  }
-
-  /**
-   * Notifies listeners for a specific event.
-   *
-   * @param {string} eventName - The name of the event to notify listeners for.
-   * @param {Object} [eventDetails={}] - Additional details to include in the event object.
-   */
-  notifyListeners(eventName, eventDetails = {}) {
-    const listeners = this.eventListeners_[eventName];
-
-    if (listeners) {
-      const event = new CustomEvent(eventName, {
-        detail: eventDetails
-      });
-
-      listeners.forEach(listener => {
-        if (typeof listener === 'function') {
-          listener(event);
-        }
-      });
-    }
   }
 }
 
