@@ -294,7 +294,7 @@ class SpatialNavigation extends EventTarget {
   add(component) {
     const focusableComponents = [...this.focusableComponents];
 
-    if (component.hasOwnProperty('el_') && component.getIsFocusable() && component.getIsAvailableToBeFocused()) {
+    if (component.hasOwnProperty('el_') && component.getIsFocusable() && component.getIsAvailableToBeFocused(component.el())) {
       focusableComponents.push(component);
     }
 
