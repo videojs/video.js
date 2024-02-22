@@ -70,7 +70,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
     const spatialNavigation = this.player().spatialNavigation;
     let componentToFocus = null;
 
-    for (const component of (spatialNavigation.getComponents())) {
+    for (const component of (spatialNavigation.updateFocusableComponents())) {
       if (component.constructor.name === 'TextTrackSelect') {
         componentToFocus = component;
         break;
