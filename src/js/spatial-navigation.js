@@ -2,16 +2,18 @@
  * @file spatial-navigation.js
  */
 import EventTarget from './event-target';
-
-/**
- * Spatial Navigation
- *
- * @extends EventTarget
- */
+import keycode from './utils/spatial-navigation-keycodes';
 
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
+/**
+ * Spatial Navigation in Video.js enhances user experience and accessibility on smartTV devices,
+ * enabling seamless navigation through interactive elements within the player using remote control arrow keys.
+ * This functionality allows users to effortlessly navigate through focusable components.
+ *
+ * @extends EventTarget
+ */
 class SpatialNavigation extends EventTarget {
 
   /**
@@ -30,10 +32,6 @@ class SpatialNavigation extends EventTarget {
     this.onKeyDown_ = this.onKeyDown_.bind(this);
     this.lastFocusedComponent_ = null;
   }
-
-  // Static maps for key presses.
-  static DirectionKeys = { 37: 'left', 38: 'up', 39: 'right', 40: 'down'};
-  static MediaActionKeys = { 415: 'play', 19: 'pause', 417: 'ff', 412: 'rw' };
 
   /**
    * Starts the spatial navigation by adding a keydown event listener to the video container.
@@ -67,23 +65,23 @@ class SpatialNavigation extends EventTarget {
    * @param {KeyboardEvent} event - The keydown event to be handled.
    */
   onKeyDown_(event) {
-    const direction = SpatialNavigation.DirectionKeys[event.keyCode];
-
-    if (direction) {
-      // Return early if paused and a direction key is pressed.
+    if (keycode.isEventKey(event, 'left') || keycode.isEventKey(event, 'up') ||
+      keycode.isEventKey(event, 'right') || keycode.isEventKey(event, 'down')) {
+      // Handle directional navigation
       if (this.isPaused_) {
         return;
       }
       event.preventDefault();
+      const direction = keycode(event);
+
       this.move(direction);
-      return;
-    }
-
-    const mediaAction = SpatialNavigation.MediaActionKeys[event.keyCode];
-
-    if (mediaAction) {
+    } else if (keycode.isEventKey(event, 'play') || keycode.isEventKey(event, 'pause') ||
+      keycode.isEventKey(event, 'ff') || keycode.isEventKey(event, 'rw')) {
+      // Handle media actions
       event.preventDefault();
-      this.performMediaAction(mediaAction);
+      const action = keycode(event);
+
+      this.performMediaAction(action);
     }
   }
 
@@ -154,6 +152,7 @@ class SpatialNavigation extends EventTarget {
   /**
    * Handles Player Blur.
    *
+   * @param {Component} component - The component that triggered the blur event.
    */
   handlePlayerBlur(component) {
     if (component.name() === 'CloseButton') {
@@ -186,11 +185,13 @@ class SpatialNavigation extends EventTarget {
     const focusableComponents = [];
 
     /**
-   * Searches for children candidates.
-   *
-   * Pushes Components to array of 'focusableComponents'.
-   * Calls itself if there is children elements inside of iterated component.
-   */
+     * Searches for children candidates.
+     *
+     * Pushes Components to array of 'focusableComponents'.
+     * Calls itself if there is children elements inside iterated component.
+     *
+     * @param {Array} componentsArray - The array of components to search for focusable children.
+     */
     function searchForChildrenCandidates(componentsArray) {
       for (const i of componentsArray) {
         if (i.hasOwnProperty('el_') && i.getIsFocusable() && i.getIsAvailableToBeFocused(i.el())) {
@@ -202,10 +203,10 @@ class SpatialNavigation extends EventTarget {
       }
     }
 
-    // Iterate inside of all children components of the player.
+    // Iterate inside all children components of the player.
     player.children_.forEach((value) => {
       if (value.hasOwnProperty('el_')) {
-        // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & avilable to be focused.
+        // If component has required functions 'getIsFocusable' & 'getIsAvailableToBeFocused', is focusable & available to be focused.
         if (value.getIsFocusable && value.getIsAvailableToBeFocused && value.getIsFocusable() && value.getIsAvailableToBeFocused(value.el())) {
           focusableComponents.push(value);
           return;
@@ -233,6 +234,16 @@ class SpatialNavigation extends EventTarget {
    * @return {HTMLElement|null} Returns the suitable child element if found, or null if not found.
    */
   findSuitableDOMChild(component) {
+    /**
+     * Recursively searches for a suitable child node that can be focused within a given component.
+     * It first checks if the provided node itself can be focused according to the component's
+     * `getIsFocusable` and `getIsAvailableToBeFocused` methods. If not, it recursively searches
+     * through the node's children to find a suitable child node that meets the focusability criteria.
+     *
+     * @param {HTMLElement} node - The DOM node to start the search from.
+     * @return {HTMLElement|null} The first child node that is focusable and available to be focused,
+     * or `null` if no suitable child is found.
+     */
     function searchForSuitableChild(node) {
       if (component.getIsFocusable() && component.getIsAvailableToBeFocused(node)) {
         return node;
@@ -295,7 +306,7 @@ class SpatialNavigation extends EventTarget {
   /**
    * Removes component from the array of focusable components.
    *
-   * @param {Component} component
+   * @param {Component} component - The component to be removed from the focusable components array.
    */
   remove(component) {
     for (let i = 0; i < this.focusableComponents.length; i++) {
@@ -355,7 +366,7 @@ class SpatialNavigation extends EventTarget {
    * @param {Object} currentCenter The center position of the current focused component element.
    * @param {Array} candidates An array of candidate components to receive focus.
    * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
-   * @return The component that is the best candidate for receiving focus.
+   * @return {Object|null} The component that is the best candidate for receiving focus.
    */
   findBestCandidate(currentCenter, candidates, direction) {
     let minDistance = Infinity;
