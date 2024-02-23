@@ -1860,6 +1860,31 @@ class Component {
   }
 
   /**
+    * Decide whether an element is actually disabled or not.
+    *
+    * @function isActuallyDisabled
+    * @param element {Node}
+    * @return {boolean}
+    *
+    * @see {@link https://html.spec.whatwg.org/multipage/semantics-other.html#concept-element-disabled}
+    */
+  getIsDisabled() {
+    return Boolean(this.el_.disabled);
+  }
+
+  /**
+    * Decide whether the element is expressly inert or not.
+    *
+    * @see {@link https://html.spec.whatwg.org/multipage/interaction.html#expressly-inert}
+    * @function isExpresslyInert
+    * @param element {Node}
+    * @return {boolean}
+    */
+  getIsExpresslyInert() {
+    return this.el_.inert && !this.el_.ownerDocument.documentElement.inert;
+  }
+
+  /**
    * Determine whether or not this component can be considered as focusable component.
    *
    * @param {HTMLElement} el - The HTML element representing the component.
@@ -1867,43 +1892,7 @@ class Component {
    *         If the component can be focused, will be `true`. Otherwise, `false`.
    */
   getIsFocusable() {
-    /**
-     * Decide whether an element is actually disabled or not.
-     *
-     * @function isActuallyDisabled
-     * @param element {Node}
-     * @return {boolean}
-     *
-     * @see {@link https://html.spec.whatwg.org/multipage/semantics-other.html#concept-element-disabled}
-     */
-    function isActuallyDisabled(element) {
-      if (['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'OPTGROUP', 'OPTION', 'FIELDSET'].includes(element.tagName)) {
-        return (element.disabled);
-      }
-      return false;
-    }
-
-    /**
-     * Decide whether the element is expressly inert or not.
-     *
-     * @see {@link https://html.spec.whatwg.org/multipage/interaction.html#expressly-inert}
-     * @function isExpresslyInert
-     * @param element {Node}
-     * @return {boolean}
-     */
-    function isExpresslyInert(element) {
-      if ((element.inert) && (!element.ownerDocument.documentElement.inert)) {
-        return true;
-      }
-      return false;
-
-    }
-
-    if (!(this.el_.tabIndex < 0) && !isExpresslyInert(this.el_) && !isActuallyDisabled(this.el_)) {
-      return true;
-    }
-    return false;
-
+    return this.el_.tabIndex >= 0 && !(this.getIsDisabled() || this.getIsExpresslyInert());
   }
 
   /**
