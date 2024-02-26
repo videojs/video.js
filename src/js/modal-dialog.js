@@ -470,7 +470,7 @@ class ModalDialog extends Component {
     }
 
     // If 'Esc' is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
-    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Backspace') && isSpatialNavListening) && this.closeable()) {
+    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Back') && isSpatialNavListening) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
