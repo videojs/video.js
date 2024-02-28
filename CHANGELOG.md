@@ -1,3 +1,10 @@
+<a name="8.11.5"></a>
+## [8.11.5](https://github.com/videojs/video.js/compare/v8.11.4...v8.11.5) (2024-02-28)
+
+### Chores
+
+* update vhs version ([#8621](https://github.com/videojs/video.js/issues/8621)) ([1f76abd](https://github.com/videojs/video.js/commit/1f76abd))
+
 <a name="8.11.4"></a>
 ## [8.11.4](https://github.com/videojs/video.js/compare/v8.11.3...v8.11.4) (2024-02-21)
 
