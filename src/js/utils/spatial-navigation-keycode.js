@@ -21,16 +21,17 @@ const SpatialNavKeycode = {
       19: 'pause',
       417: 'ff',
       412: 'rw',
-      backKeyCode: 'back'
+      [backKeyCode]: 'back'
     }
   },
 
   isEventKey(event, keyName) {
+    keyName = keyName.toLowerCase();
+
     if (this.keyCodes.names[event.keyCode] && this.keyCodes.names[event.keyCode] === keyName) {
       return true;
     }
     return false;
-
   },
 
   getEventName(event) {
@@ -42,7 +43,6 @@ const SpatialNavKeycode = {
       return this.keyCodes.names[code];
     }
     return null;
-
   }
 };
 

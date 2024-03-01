@@ -6,6 +6,7 @@ import Component from './component';
 import window from 'global/window';
 import document from 'global/document';
 import keycode from 'keycode';
+import SpatialNavKeycode from './utils/spatial-navigation-keycode';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 
@@ -470,7 +471,7 @@ class ModalDialog extends Component {
     }
 
     // If 'Esc' is pressed or Backspace is pressed & spatialNavigation is enabled & Modal is 'closeable'.
-    if (keycode.isEventKey(event, 'Escape') || (keycode.isEventKey(event, 'Back') && isSpatialNavListening) && this.closeable()) {
+    if (keycode.isEventKey(event, 'Escape') || (SpatialNavKeycode.isEventKey(event, 'Back') && isSpatialNavListening) && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
