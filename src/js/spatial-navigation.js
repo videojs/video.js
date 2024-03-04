@@ -3,7 +3,7 @@
  */
 import EventTarget from './event-target';
 import keycode from 'keycode';
-import SpatialNavKeycode from './utils/spatial-navigation-keycode';
+import SpatialNavKeycode from './utils/spatial-navigation-keycode.js';
 
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
