@@ -15,6 +15,6 @@ export default {
   AdsPrerollError: 'ads-preroll-error',
   AdsMidrollError: 'ads-midroll-error',
   AdsPostrollError: 'ads-postroll-error',
-  AdsMacroReplacementFailed: 'ads-marco-replacement-failed',
+  AdsMacroReplacementFailed: 'ads-macro-replacement-failed',
   AdsResumeContentFailed: 'ads-resume-content-failed'
 };
