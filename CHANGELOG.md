@@ -1,3 +1,11 @@
+<a name="8.11.6"></a>
+## [8.11.6](https://github.com/videojs/video.js/compare/v8.11.5...v8.11.6) (2024-03-04)
+
+### Chores
+
+* Add action to validate PR titles ([#8614](https://github.com/videojs/video.js/issues/8614)) ([04d10ef](https://github.com/videojs/video.js/commit/04d10ef))
+* additional vjs ad errors ([#8623](https://github.com/videojs/video.js/issues/8623)) ([7ed47de](https://github.com/videojs/video.js/commit/7ed47de))
+
 <a name="8.11.5"></a>
 ## [8.11.5](https://github.com/videojs/video.js/compare/v8.11.4...v8.11.5) (2024-02-28)
 
