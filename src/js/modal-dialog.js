@@ -6,7 +6,7 @@ import Component from './component';
 import window from 'global/window';
 import document from 'global/document';
 import keycode from 'keycode';
-import SpatialNavKeycode from './utils/spatial-navigation-keycode.js';
+import SpatialNavKeycode from './utils/spatialnav-keycodes.js';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 
