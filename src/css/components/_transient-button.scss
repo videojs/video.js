@@ -19,19 +19,23 @@
 }
 
 .video-js .vjs-transient-button.vjs-left {
-  left: 5px;
+  left: 1em;
 }
 
 .video-js .vjs-transient-button.vjs-right {
-  right: 5px;
+  right: 1em;
 }
 
 .video-js .vjs-transient-button.vjs-top {
-  top: 5px;
+  top: 1em;
+}
+
+.video-js .vjs-transient-button.vjs-near-top {
+  top: 4em;
 }
 
 .video-js .vjs-transient-button.vjs-bottom {
-  bottom: 35px;
+  bottom: 4em;
 }
 
 .video-js.vjs-layout-large .vjs-transient-button {
@@ -46,10 +50,6 @@
   padding: 0 1.5em;
 
   font-size: 150%;
-}
-
-.video-js .vjs-transient-button.vjs-top.avoid-title {
-  top: 80px;
 }
 
 .video-js .vjs-transient-button:hover {
