@@ -10,6 +10,10 @@
   transition: opacity 1s;
 }
 
+.video-js:not(.vjs-has-started) .vjs-transient-button {
+  display: none;
+}
+
 .video-js .vjs-transient-button span {
   padding: 0 0.5em;
 }
