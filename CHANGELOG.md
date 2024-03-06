@@ -1,3 +1,14 @@
+<a name="8.11.7"></a>
+## [8.11.7](https://github.com/videojs/video.js/compare/v8.11.6...v8.11.7) (2024-03-06)
+
+### Bug Fixes
+
+* typo in error const ([#8628](https://github.com/videojs/video.js/issues/8628)) ([b59a89b](https://github.com/videojs/video.js/commit/b59a89b))
+
+### Chores
+
+* **package:** update quality-levels version ([#8630](https://github.com/videojs/video.js/issues/8630)) ([d113ce5](https://github.com/videojs/video.js/commit/d113ce5))
+
 <a name="8.11.6"></a>
 ## [8.11.6](https://github.com/videojs/video.js/compare/v8.11.5...v8.11.6) (2024-03-04)
 
