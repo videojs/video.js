@@ -38,20 +38,6 @@
   bottom: 4em;
 }
 
-.video-js.vjs-layout-large .vjs-transient-button {
-  height: 5em;
-  padding: 0 1em;
-  font-size: 120%;
-}
-
-.video-js.vjs-layout-x-large .vjs-transient-button,
-.video-js.vjs-layout-huge .vjs-transient-button {
-  height: 8em;
-  padding: 0 1.5em;
-
-  font-size: 150%;
-}
-
 .video-js .vjs-transient-button:hover {
   background-color: rgba(50, 50, 50, 0.9);
 }
