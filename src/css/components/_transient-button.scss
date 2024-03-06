@@ -18,19 +18,19 @@
   padding: 0 0.5em;
 }
 
-.video-js .vjs-transient-button.left {
+.video-js .vjs-transient-button.vjs-left {
   left: 5px;
 }
 
-.video-js .vjs-transient-button.right {
+.video-js .vjs-transient-button.vjs-right {
   right: 5px;
 }
 
-.video-js .vjs-transient-button.top {
+.video-js .vjs-transient-button.vjs-top {
   top: 5px;
 }
 
-.video-js .vjs-transient-button.bottom {
+.video-js .vjs-transient-button.vjs-bottom {
   bottom: 35px;
 }
 
@@ -48,7 +48,7 @@
   font-size: 150%;
 }
 
-.video-js .vjs-transient-button.top.avoid-title {
+.video-js .vjs-transient-button.vjs-top.avoid-title {
   top: 80px;
 }
 

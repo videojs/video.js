@@ -36,7 +36,7 @@ class TransientButton extends Button {
   }
 
   buildCSSClass() {
-    return `vjs-transient-button ${this.options_.position}`;
+    return `vjs-transient-button ${this.options_.position.split(' ').map((c) => `vjs-${c}`).join(' ')}`;
   }
 
   createEl() {
