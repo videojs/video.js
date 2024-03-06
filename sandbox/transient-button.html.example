@@ -86,6 +86,7 @@ Credits
               clickHandler: () => {
                 player.currentTime(cue.endTime);
               },
+              takeFocus: true
             });
             skipButtons.push(skipButton);
             skipButton.show();

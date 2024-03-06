@@ -7,7 +7,8 @@ import * as Dom from './utils/dom.js';
 // `position` is redeundant with `className` but allows position to be set without overriding className or vice versa.
 const defaults = {
   forceTimeout: 4000,
-  position: 'bottom left'
+  position: 'bottom left',
+  takeFocus: false
 };
 
 /**
@@ -36,7 +37,7 @@ class TransientButton extends Button {
   }
 
   buildCSSClass() {
-    return `vjs-transient-button ${this.options_.position.split(' ').map((c) => `vjs-${c}`).join(' ')}`;
+    return `vjs-transient-button focus-visible ${this.options_.position.split(' ').map((c) => `vjs-${c}`).join(' ')}`;
   }
 
   createEl() {
@@ -57,6 +58,10 @@ class TransientButton extends Button {
   show() {
     super.show();
     this.addClass('force-display');
+    if (this.options_.takeFocus) {
+      this.el().focus({ preventScroll: true});
+    }
+
     this.forceDisplayTimeout = this.player_.setTimeout(() => {
       this.removeClass('force-display');
     }, this.options_.forceTimeout);
