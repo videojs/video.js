@@ -16,5 +16,9 @@ export default {
   AdsMidrollError: 'ads-midroll-error',
   AdsPostrollError: 'ads-postroll-error',
   AdsMacroReplacementFailed: 'ads-macro-replacement-failed',
-  AdsResumeContentFailed: 'ads-resume-content-failed'
+  AdsResumeContentFailed: 'ads-resume-content-failed',
+  // Errors used in contrib-eme:
+  EMEEncryptedError: 'eme-encrypted-error',
+  MSKeyError: 'ms-key-error',
+  WebkitKeyError: 'webkit-key-error'
 };
