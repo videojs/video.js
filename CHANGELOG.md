@@ -1,3 +1,36 @@
+<a name="8.11.7"></a>
+## [8.11.7](https://github.com/videojs/video.js/compare/v8.11.6...v8.11.7) (2024-03-06)
+
+### Bug Fixes
+
+* typo in error const ([#8628](https://github.com/videojs/video.js/issues/8628)) ([b59a89b](https://github.com/videojs/video.js/commit/b59a89b))
+
+### Chores
+
+* **package:** update quality-levels version ([#8630](https://github.com/videojs/video.js/issues/8630)) ([d113ce5](https://github.com/videojs/video.js/commit/d113ce5))
+
+<a name="8.11.6"></a>
+## [8.11.6](https://github.com/videojs/video.js/compare/v8.11.5...v8.11.6) (2024-03-04)
+
+### Chores
+
+* Add action to validate PR titles ([#8614](https://github.com/videojs/video.js/issues/8614)) ([04d10ef](https://github.com/videojs/video.js/commit/04d10ef))
+* additional vjs ad errors ([#8623](https://github.com/videojs/video.js/issues/8623)) ([7ed47de](https://github.com/videojs/video.js/commit/7ed47de))
+
+<a name="8.11.5"></a>
+## [8.11.5](https://github.com/videojs/video.js/compare/v8.11.4...v8.11.5) (2024-02-28)
+
+### Chores
+
+* update vhs version ([#8621](https://github.com/videojs/video.js/issues/8621)) ([1f76abd](https://github.com/videojs/video.js/commit/1f76abd))
+
+<a name="8.11.4"></a>
+## [8.11.4](https://github.com/videojs/video.js/compare/v8.11.3...v8.11.4) (2024-02-21)
+
+### Chores
+
+* update vhs to 3.11.2 ([#8603](https://github.com/videojs/video.js/issues/8603)) ([ac2eb84](https://github.com/videojs/video.js/commit/ac2eb84))
+
 <a name="8.11.3"></a>
 ## [8.11.3](https://github.com/videojs/video.js/compare/v8.11.2...v8.11.3) (2024-02-20)
 

@@ -9,5 +9,12 @@ export default {
   SegmentAppendError: 'segment-append-error',
   VttLoadError: 'vtt-load-error',
   VttCueParsingError: 'vtt-cue-parsing-error',
-  EMEKeySessionCreationError: 'eme-key-session-creation-error'
+  EMEKeySessionCreationError: 'eme-key-session-creation-error',
+  // Errors used in contrib-ads:
+  AdsBeforePrerollError: 'ads-before-preroll-error',
+  AdsPrerollError: 'ads-preroll-error',
+  AdsMidrollError: 'ads-midroll-error',
+  AdsPostrollError: 'ads-postroll-error',
+  AdsMacroReplacementFailed: 'ads-macro-replacement-failed',
+  AdsResumeContentFailed: 'ads-resume-content-failed'
 };
