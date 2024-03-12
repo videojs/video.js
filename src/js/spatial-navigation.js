@@ -3,7 +3,7 @@
  */
 import EventTarget from './event-target';
 import keycode from 'keycode';
-import SpatialNavKeycode from './utils/spatialnav-keycodes.js';
+import SpatialNavKeycode from './utils/spatialnav-keycodes';
 
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
@@ -46,6 +46,10 @@ class SpatialNavigation extends EventTarget {
 
     // Add the event listener since the listener is not yet active.
     this.player_.on('keydown', this.onKeyDown_);
+    // Listen for source change events
+    this.player_.on('loadedmetadata', () => {
+      this.focus(this.updateFocusableComponents()[0]);
+    });
     this.isListening_ = true;
   }
 
