@@ -9,7 +9,6 @@ export default {
   SegmentAppendError: 'segment-append-error',
   VttLoadError: 'vtt-load-error',
   VttCueParsingError: 'vtt-cue-parsing-error',
-  EMEKeySessionCreationError: 'eme-key-session-creation-error',
   // Errors used in contrib-ads:
   AdsBeforePrerollError: 'ads-before-preroll-error',
   AdsPrerollError: 'ads-preroll-error',
@@ -20,5 +19,13 @@ export default {
   // Errors used in contrib-eme:
   EMEEncryptedError: 'eme-encrypted-error',
   MSKeyError: 'ms-key-error',
-  WebkitKeyError: 'webkit-key-error'
+  WebkitKeyError: 'webkit-key-error',
+  EMEFailedToRequestMediaKeySystemAccess: 'eme-failed-request-media-key-system-access',
+  EMEFailedToCreateMediaKeys: 'eme-failed-create-media-keys',
+  EMEFailedToAttachMediaKeysToVideoElement: 'eme-failed-attach-media-keys-to-video',
+  EMEFailedToCreateMediaKeySession: 'eme-failed-create-media-key-session',
+  EMEFailedToSetServerCertificate: 'eme-failed-set-server-certificate',
+  EMEFailedToGenerateLicenseRequest: 'eme-failed-generate-license-request',
+  EMEFailedToUpdateSessionWithReceivedLicenseKeys: 'eme-failed-update-session',
+  EMEFailedToCloseSession: 'eme-failed-close-session'
 };
