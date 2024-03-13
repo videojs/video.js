@@ -3,7 +3,7 @@
  */
 import EventTarget from './event-target';
 import keycode from 'keycode';
-import SpatialNavKeycode from './utils/spatialnav-keycodes';
+import SpatialNavKeyCodes from './utils/spatial-navigation-key-codes';
 
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
@@ -80,11 +80,11 @@ class SpatialNavigation extends EventTarget {
       const direction = keycode(event);
 
       this.move(direction);
-    } else if (SpatialNavKeycode.isEventKey(event, 'play') || SpatialNavKeycode.isEventKey(event, 'pause') ||
-      SpatialNavKeycode.isEventKey(event, 'ff') || SpatialNavKeycode.isEventKey(event, 'rw')) {
+    } else if (SpatialNavKeyCodes.isEventKey(event, 'play') || SpatialNavKeyCodes.isEventKey(event, 'pause') ||
+      SpatialNavKeyCodes.isEventKey(event, 'ff') || SpatialNavKeyCodes.isEventKey(event, 'rw')) {
       // Handle media actions
       event.preventDefault();
-      const action = SpatialNavKeycode.getEventName(event);
+      const action = SpatialNavKeyCodes.getEventName(event);
 
       this.performMediaAction(action);
     }
