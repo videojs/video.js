@@ -269,6 +269,29 @@ class TextTrackSettings extends ModalDialog {
     this.fill();
     this.hasBeenOpened_ = this.hasBeenFilled_ = true;
 
+    this.renderModalComponents(player);
+
+    this.endDialog = createEl('p', {
+      className: 'vjs-control-text',
+      textContent: this.localize('End of dialog window.')
+    });
+    this.el().appendChild(this.endDialog);
+
+    this.setDefaults();
+
+    // Grab `persistTextTrackSettings` from the player options if not passed in child options
+    if (options.persistTextTrackSettings === undefined) {
+      this.options_.persistTextTrackSettings = this.options_.playerOptions.persistTextTrackSettings;
+    }
+
+    this.bindFunctionsToSelectsAndButtons();
+
+    if (this.options_.persistTextTrackSettings) {
+      this.restoreSettings();
+    }
+  }
+
+  renderModalComponents(player) {
     const textTrackSettingsColors = new TextTrackSettingsColors(
       player,
       {
@@ -304,20 +327,9 @@ class TextTrackSettings extends ModalDialog {
     const trackSettingsControls = new TrackSettingsControls(player);
 
     this.addChild(trackSettingsControls);
+  }
 
-    this.endDialog = createEl('p', {
-      className: 'vjs-control-text',
-      textContent: this.localize('End of dialog window.')
-    });
-    this.el().appendChild(this.endDialog);
-
-    this.setDefaults();
-
-    // Grab `persistTextTrackSettings` from the player options if not passed in child options
-    if (options.persistTextTrackSettings === undefined) {
-      this.options_.persistTextTrackSettings = this.options_.playerOptions.persistTextTrackSettings;
-    }
-
+  bindFunctionsToSelectsAndButtons() {
     this.on(this.$('.vjs-done-button'), 'click', () => {
       this.saveSettings();
       this.close();
@@ -331,10 +343,6 @@ class TextTrackSettings extends ModalDialog {
     Obj.each(selectConfigs, config => {
       this.on(this.$(config.selector), 'change', this.updateDisplay);
     });
-
-    if (this.options_.persistTextTrackSettings) {
-      this.restoreSettings();
-    }
   }
 
   dispose() {
@@ -450,6 +458,8 @@ class TextTrackSettings extends ModalDialog {
    */
   handleLanguagechange() {
     this.fill();
+    this.renderModalComponents(this.player_);
+    this.bindFunctionsToSelectsAndButtons();
   }
 
 }
