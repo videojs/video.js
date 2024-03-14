@@ -1,3 +1,11 @@
+<a name="8.11.8"></a>
+## [8.11.8](https://github.com/videojs/video.js/compare/v8.11.7...v8.11.8) (2024-03-12)
+
+### Chores
+
+* add contrib-eme errors ([#8634](https://github.com/videojs/video.js/issues/8634)) ([42fe1e6](https://github.com/videojs/video.js/commit/42fe1e6))
+* update VHS to v3.12.0 ([#8637](https://github.com/videojs/video.js/issues/8637)) ([66b74eb](https://github.com/videojs/video.js/commit/66b74eb))
+
 <a name="8.11.7"></a>
 ## [8.11.7](https://github.com/videojs/video.js/compare/v8.11.6...v8.11.7) (2024-03-06)
 
