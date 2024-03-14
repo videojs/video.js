@@ -86,7 +86,7 @@ class SpatialNavigation extends EventTarget {
       event.preventDefault();
       const action = SpatialNavKeyCodes.getEventName(event);
 
-      this.performMediaAction(action);
+      this.performMediaAction_(action);
     }
   }
 
@@ -98,7 +98,7 @@ class SpatialNavigation extends EventTarget {
    * @param {string} key - The key representing the media action to be performed.
    *   Accepted keys: 'play', 'pause', 'ff' (fast-forward), 'rw' (rewind).
    */
-  performMediaAction(key) {
+  performMediaAction_(key) {
     if (this.player_) {
       switch (key) {
       case 'play':
@@ -353,9 +353,9 @@ class SpatialNavigation extends EventTarget {
     const currentPositions = currentFocusedComponent.getPositions();
     const candidates = this.focusableComponents.filter(component =>
       component !== currentFocusedComponent &&
-      this.isInDirection(currentPositions.boundingClientRect, component.getPositions().boundingClientRect, direction));
+      this.isInDirection_(currentPositions.boundingClientRect, component.getPositions().boundingClientRect, direction));
 
-    const bestCandidate = this.findBestCandidate(currentPositions.center, candidates, direction);
+    const bestCandidate = this.findBestCandidate_(currentPositions.center, candidates, direction);
 
     if (bestCandidate) {
       this.focus(bestCandidate);
@@ -373,13 +373,13 @@ class SpatialNavigation extends EventTarget {
    * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
    * @return {Object|null} The component that is the best candidate for receiving focus.
    */
-  findBestCandidate(currentCenter, candidates, direction) {
+  findBestCandidate_(currentCenter, candidates, direction) {
     let minDistance = Infinity;
     let bestCandidate = null;
 
     for (const candidate of candidates) {
       const candidateCenter = candidate.getPositions().center;
-      const distance = this.calculateDistance(currentCenter, candidateCenter, direction);
+      const distance = this.calculateDistance_(currentCenter, candidateCenter, direction);
 
       if (distance < minDistance) {
         minDistance = distance;
@@ -399,7 +399,7 @@ class SpatialNavigation extends EventTarget {
    * @param {string} direction The navigation direction ('up', 'down', 'left', 'right').
    * @return {boolean} True if the target is in the specified direction relative to the source.
    */
-  isInDirection(srcRect, targetRect, direction) {
+  isInDirection_(srcRect, targetRect, direction) {
     switch (direction) {
     case 'right':
       return targetRect.left >= srcRect.right;
@@ -463,7 +463,7 @@ class SpatialNavigation extends EventTarget {
    * @param {string} direction The direction of navigation ('up', 'down', 'left', 'right').
    * @return {number} The calculated distance between the two centers.
    */
-  calculateDistance(center1, center2, direction) {
+  calculateDistance_(center1, center2, direction) {
     const dx = Math.abs(center1.x - center2.x);
     const dy = Math.abs(center1.y - center2.y);
 
