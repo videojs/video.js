@@ -9,7 +9,7 @@ import * as Obj from '../utils/obj';
 import log from '../utils/log';
 import TextTrackSettingsColors from './text-track-settings-colors';
 import TextTrackSettingsFont from './text-track-settings-font';
-import TrackSettingsControls from './text-track-controls';
+import TrackSettingsControls from './text-track-settings-controls';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 

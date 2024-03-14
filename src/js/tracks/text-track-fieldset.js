@@ -1,5 +1,6 @@
 import Component from '../component';
 import * as Dom from '../utils/dom';
+import * as Guid from '../utils/guid';
 import TextTrackSelect from './text-track-select';
 
 /**
@@ -72,6 +73,7 @@ class TextTrackFieldset extends Component {
       const selectClassName = selectConfig.className;
       const id = selectConfig.id.replace('%s', this.options_.id_);
       let span = null;
+      const guid = `vjs_select_${Guid.newGUID()}`;
 
       // Conditionally create span to add on the component
       if (this.options_.type === 'colors') {
@@ -85,13 +87,15 @@ class TextTrackFieldset extends Component {
           textContent: selectConfig.label
         });
 
+        label.setAttribute('for', guid);
         span.appendChild(label);
       }
 
       const textTrackSelect = new TextTrackSelect(player, {
         SelectOptions: selectConfig.options,
         legendId: this.options_.legendId,
-        id
+        id: guid,
+        labelId: id
       });
 
       this.addChild(textTrackSelect);

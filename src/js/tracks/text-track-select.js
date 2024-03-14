@@ -44,15 +44,17 @@ class TextTrackSelect extends Component {
    *         The DOM element that gets created.
    */
   createEl() {
-    this.selectLabelledbyIds = [this.options_.legendId, this.options_.id].join(' ').trim();
+    this.selectLabelledbyIds = [this.options_.legendId, this.options_.labelId].join(' ').trim();
 
     // Create select & inner options
     const selectoptions = Dom.createEl(
       'select',
-      {},
+      {
+        id: this.options_.id
+      },
       {},
       this.options_.SelectOptions.map((optionText) => {
-        const optionId = this.options_.id + '-' + optionText[1].replace(/\W+/g, '');
+        const optionId = this.options_.labelId + '-' + optionText[1].replace(/\W+/g, '');
 
         const option = Dom.createEl(
           'option',
