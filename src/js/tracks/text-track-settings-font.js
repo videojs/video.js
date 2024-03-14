@@ -56,7 +56,7 @@ class TextTrackSettingsFont extends Component {
       {
         id_,
         legendId: `captions-background-${id_}`,
-        legendText: 'Text Edge Style',
+        legendText: this.localize('Text Edge Style'),
         className: 'vjs-edge-style vjs-track-setting',
         selects: this.options_.fieldSets[1],
         selectConfigs: this.options_.selectConfigs,
@@ -71,7 +71,7 @@ class TextTrackSettingsFont extends Component {
       {
         id_,
         legendId: `captions-font-family-${id_}`,
-        legendText: 'Font Family',
+        legendText: this.localize('Font Family'),
         className: 'vjs-font-family vjs-track-setting',
         selects: this.options_.fieldSets[2],
         selectConfigs: this.options_.selectConfigs,

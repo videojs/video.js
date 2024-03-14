@@ -42,7 +42,7 @@ class TextTrackSettingsColors extends Component {
       {
         id_,
         legendId: `captions-text-legend-${id_}`,
-        legendText: 'Text',
+        legendText: this.localize('Text'),
         className: 'vjs-fg vjs-track-setting',
         selects: this.options_.fieldSets[0],
         selectConfigs: this.options_.selectConfigs,
@@ -58,7 +58,7 @@ class TextTrackSettingsColors extends Component {
       {
         id_,
         legendId: `captions-background-${id_}`,
-        legendText: 'Text Background',
+        legendText: this.localize('Text Background'),
         className: 'vjs-bg vjs-track-setting',
         selects: this.options_.fieldSets[1],
         selectConfigs: this.options_.selectConfigs,
@@ -74,7 +74,7 @@ class TextTrackSettingsColors extends Component {
       {
         id_,
         legendId: `captions-window-${id_}`,
-        legendText: 'Caption Area Background',
+        legendText: this.localize('Caption Area Background'),
         className: 'vjs-window vjs-track-setting',
         selects: this.options_.fieldSets[2],
         selectConfigs: this.options_.selectConfigs,
