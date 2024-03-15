@@ -19,7 +19,7 @@ class TextTrackSettingsFont extends Component {
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param { import('./utils/dom').ContentDescriptor} [options.content=undefined]
+   * @param { import('../utils/dom').ContentDescriptor} [options.content=undefined]
    *        Provide customized content for this modal.
    *
    * @param {Array} [options.fieldSets]
