@@ -19,7 +19,9 @@
 
   <script>
     var vid = document.getElementById('vid1');
-    var player = videojs(vid);
+    var player = videojs(vid, {
+      mediaSession: true
+    });
 
     player.log('window.player created', player);
 
