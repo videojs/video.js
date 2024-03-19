@@ -26,6 +26,7 @@ class PictureInPictureToggle extends Button {
    * @listens Player#leavepictureinpicture
    */
   constructor(player, options) {
+    options = Object.assign({}, options, {throttle: true});
     super(player, options);
 
     this.setIcon('picture-in-picture-enter');

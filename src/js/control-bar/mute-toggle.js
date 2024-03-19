@@ -24,6 +24,7 @@ class MuteToggle extends Button {
    *        The key/value store of player options.
    */
   constructor(player, options) {
+    options = Object.assign({}, options, {throttle: true});
     super(player, options);
 
     // hide this control if volume support is missing

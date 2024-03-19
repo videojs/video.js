@@ -22,6 +22,7 @@ class FullscreenToggle extends Button {
    *        The key/value store of player options.
    */
   constructor(player, options) {
+    options = Object.assign({}, options, {throttle: true});
     super(player, options);
     this.setIcon('fullscreen-enter');
     this.on(player, 'fullscreenchange', (e) => this.handleFullscreenChange(e));

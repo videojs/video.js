@@ -5,6 +5,7 @@ import Component from './component';
 import * as Dom from './utils/dom.js';
 import log from './utils/log.js';
 import keycode from 'keycode';
+import { throttle } from './utils/fn';
 
 /**
  * Component which is clickable or keyboard actionable, but is not a
@@ -32,6 +33,10 @@ class ClickableComponent extends Component {
    * @param  {string} [options.className]
    *         A class or space separated list of classes to add the component
    *
+   * @param  {number | boolean} [options.throttle]
+   *         A throttle will be applied to the clickHandler if the number is >= 1 or the value is `true`
+   *         A number specifies the desired wait time in ms or a default wait of 50ms will be applied
+   *
    */
   constructor(player, options) {
 
@@ -41,9 +46,22 @@ class ClickableComponent extends Component {
       this.controlText(this.options_.controlText);
     }
 
+    const throttleIsNumber = typeof this.options_.throttle === 'number';
+    const boundClick = this.handleClick.bind(this);
+    const selectClickHandler = () => {
+      if (throttleIsNumber || this.options_.throttle === true) {
+        const wait = throttleIsNumber ? this.options_.throttle : 50;
+
+        return throttle(boundClick, wait);
+      }
+      return boundClick;
+    };
+
+    const selectedClickHandler = selectClickHandler();
+
     this.handleMouseOver_ = (e) => this.handleMouseOver(e);
     this.handleMouseOut_ = (e) => this.handleMouseOut(e);
-    this.handleClick_ = (e) => this.handleClick(e);
+    this.handleClick_ = (e) => selectedClickHandler(e);
     this.handleKeyDown_ = (e) => this.handleKeyDown(e);
 
     this.emitTapEvents();

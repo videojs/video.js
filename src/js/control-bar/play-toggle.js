@@ -22,6 +22,7 @@ class PlayToggle extends Button {
    *        The key/value store of player options.
    */
   constructor(player, options = {}) {
+    options = Object.assign({}, options, {throttle: true});
     super(player, options);
 
     // show or hide replay icon
