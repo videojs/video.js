@@ -18,8 +18,6 @@ import { createTimeRange } from './time.js';
  */
 export function bufferedPercent(buffered, duration) {
   let bufferedDuration = 0;
-  let start;
-  let end;
 
   if (!duration) {
     return 0;
@@ -30,13 +28,9 @@ export function bufferedPercent(buffered, duration) {
   }
 
   for (let i = 0; i < buffered.length; i++) {
-    start = buffered.start(i);
-    end = buffered.end(i);
-
+    const start = buffered.start(i);
     // buffered end can be bigger than duration by a very small fraction
-    if (end > duration) {
-      end = duration;
-    }
+    const end = Math.min(buffered.end(i), duration);
 
     bufferedDuration += end - start;
   }
