@@ -1526,3 +1526,45 @@ QUnit.test('a component\'s el can be replaced on dispose', function(assert) {
   assert.strictEqual(Array.from(this.player.el_.childNodes).indexOf(replacementEl), prevIndex, 'replacement was inserted at same position');
 
 });
+
+QUnit.test('should be able to call `handleFocus` if spatial navigation is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      volumePanel: true,
+      pictureInPictureToggle: true
+    },
+    spatialNavigation: {
+      enabled: true
+    }
+  });
+
+  player.spatialNavigation.start();
+  const appendSpy = sinon.spy(player, 'handleFocus');
+
+  player.handleFocus();
+
+  assert.expect(1);
+  assert.ok(appendSpy.calledOnce, '`handleFocus` has been called');
+  player.dispose();
+});
+
+QUnit.test('should be able to call `handleBlur` if spatial navigation is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      volumePanel: true,
+      pictureInPictureToggle: true
+    },
+    spatialNavigation: {
+      enabled: true
+    }
+  });
+
+  player.spatialNavigation.start();
+  const appendSpy = sinon.spy(player, 'handleBlur');
+
+  player.handleBlur();
+
+  assert.expect(1);
+  assert.ok(appendSpy.calledOnce, '`handleBlur` has been called');
+  player.dispose();
+});
