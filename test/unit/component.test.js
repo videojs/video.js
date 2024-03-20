@@ -1568,3 +1568,21 @@ QUnit.test('should be able to call `handleBlur` if spatial navigation is enabled
   assert.ok(appendSpy.calledOnce, '`handleBlur` has been called');
   player.dispose();
 });
+
+QUnit.test('getPositions() returns properties of `boundingClientRect` & `center` from elements that support it', function(assert) {
+  assert.expect(5);
+
+  const player = TestHelpers.makePlayer({
+    spatialNavigation: {
+      enabled: true
+    }
+  });
+
+  assert.ok(player.bigPlayButton.getPositions().boundingClientRect, '`boundingClientRect` present in `bigPlayButton`');
+  assert.ok(player.bigPlayButton.getPositions().center, '`center` present in `bigPlayButton`');
+
+  assert.ok(player.controlBar.getPositions().boundingClientRect, '`boundingClientRect` present in `controlBar`');
+  assert.ok(player.controlBar.getPositions().center, '`center` present in `controlBar`');
+
+  player.dispose();
+});
