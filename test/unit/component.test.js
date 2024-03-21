@@ -1569,20 +1569,60 @@ QUnit.test('should be able to call `handleBlur` if spatial navigation is enabled
   player.dispose();
 });
 
-QUnit.test('getPositions() returns properties of `boundingClientRect` & `center` from elements that support it', function(assert) {
-  assert.expect(5);
+QUnit.test('should be able to call `getPositions()` from a component', function(assert) {
+  const player = TestHelpers.makePlayer({});
 
+  const appendSpy = sinon.spy(player.controlBar, 'getPositions');
+
+  player.controlBar.getPositions();
+
+  assert.expect(1);
+  assert.ok(appendSpy.calledOnce, '`handleBlur` has been called');
+  player.dispose();
+});
+
+QUnit.test('getPositions() returns properties of `boundingClientRect` & `center` from elements that support it', function(assert) {
   const player = TestHelpers.makePlayer({
     spatialNavigation: {
       enabled: true
     }
   });
 
-  assert.ok(player.bigPlayButton.getPositions().boundingClientRect, '`boundingClientRect` present in `bigPlayButton`');
-  assert.ok(player.bigPlayButton.getPositions().center, '`center` present in `bigPlayButton`');
-
+  assert.expect(4);
   assert.ok(player.controlBar.getPositions().boundingClientRect, '`boundingClientRect` present in `controlBar`');
   assert.ok(player.controlBar.getPositions().center, '`center` present in `controlBar`');
+  assert.ok(typeof player.controlBar.getPositions().boundingClientRect === 'object', '`boundingClientRect` is an object');
+  assert.ok(typeof player.controlBar.getPositions().center === 'object', '`center` is an object`');
+
+  player.dispose();
+});
+
+QUnit.test('getPositions() properties should not be empty', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
+  let hasEmptyProperties = false;
+  const getPositionsProps = player.bigPlayButton.getPositions();
+
+  for (const property in getPositionsProps) {
+    const getPositionsProp = getPositionsProps[property];
+
+    for (const innerProperty in getPositionsProp) {
+      if (isEmpty(innerProperty)) {
+        hasEmptyProperties = true;
+      }
+    }
+  }
+
+  assert.expect(1);
+  assert.ok(!hasEmptyProperties, '`getPositions()` properties are not empty');
 
   player.dispose();
 });
