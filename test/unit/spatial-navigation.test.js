@@ -102,20 +102,62 @@ QUnit.test('onKeyDown_ handles media keys', function(assert) {
 });
 
 QUnit.test('performMediaAction_ executes play', function(assert) {
-  // Spy on the play method to monitor its calls.
   const playSpy = sinon.spy(this.player, 'play');
 
-  // Trigger the performMediaAction_ with 'play'
   this.spatialNav.performMediaAction_('play');
 
-  // Assert the play method was called.
   assert.ok(playSpy.calledOnce, 'play method should be called once for "play" action');
 
-  // Restore the spy.
   playSpy.restore();
 });
 
-QUnit.test('focus method sets focus on a real player component', function(assert) {
+QUnit.test('performMediaAction_ executes pause', function(assert) {
+  const pauseSpy = sinon.spy(this.player, 'pause');
+
+  sinon.stub(this.player, 'paused').returns(false);
+
+  this.spatialNav.performMediaAction_('pause');
+
+  assert.ok(pauseSpy.calledOnce, 'pause method should be called once for "pause" action');
+
+  pauseSpy.restore();
+});
+
+QUnit.test('performMediaAction_ executes fast forward', function(assert) {
+  const userSeekSpy = sinon.spy(this.spatialNav, 'userSeek_');
+  const STEP_SECONDS = 5;
+  const initialTime = 30;
+
+  this.player.currentTime = () => initialTime;
+
+  this.spatialNav.performMediaAction_('ff');
+
+  const expectedNewTime = initialTime + STEP_SECONDS;
+
+  assert.ok(userSeekSpy.calledOnce, 'userSeek_ method should be called once for "fast forward" action');
+  assert.ok(userSeekSpy.calledWith(expectedNewTime), `userSeek_ method should be called with correct time offset: expected ${expectedNewTime}, got ${userSeekSpy.firstCall.args[0]}`);
+
+  userSeekSpy.restore();
+});
+
+QUnit.test('performMediaAction_ executes rewind', function(assert) {
+  const userSeekSpy = sinon.spy(this.spatialNav, 'userSeek_');
+  const STEP_SECONDS = 5;
+  const initialTime = 30;
+
+  this.player.currentTime = () => initialTime;
+
+  this.spatialNav.performMediaAction_('rw');
+
+  const expectedNewTime = initialTime - STEP_SECONDS;
+
+  assert.ok(userSeekSpy.calledOnce, 'userSeek_ method should be called once for "rewind" action');
+  assert.ok(userSeekSpy.calledWith(expectedNewTime), `userSeek_ method should be called with correct time offset: expected ${expectedNewTime}, got ${userSeekSpy.firstCall.args[0]}`);
+
+  userSeekSpy.restore();
+});
+
+QUnit.test('focus method sets focus on a player component', function(assert) {
   this.spatialNav.start();
 
   const component = this.player.getChild('bigPlayButton');
@@ -158,36 +200,116 @@ QUnit.test('refocusComponent method refocuses the last focused component after l
   assert.strictEqual(this.spatialNav.lastFocusedComponent_, bigPlayButton, 'lastFocusedComponent_ should be set to the blurred component');
 });
 
-QUnit.test('move method changes focus based on direction', function(assert) {
+QUnit.test('move method changes focus to the right component', function(assert) {
   this.spatialNav.start();
 
-  // Create mock components that mimic the necessary properties and methods.
-  const button1 = {
-    name: () => 'button1',
+  const rightComponent = {
+    name: () => 'rightComponent',
     el: () => document.createElement('div'),
     focus: sinon.spy(),
-    getPositions: () => ({ center: { x: 0, y: 0 }, boundingClientRect: { top: 0, left: 0, bottom: 100, right: 100 } }),
+    getPositions: () => ({ center: { x: 300, y: 100 }, boundingClientRect: { top: 0, left: 300, bottom: 200, right: 400 } }),
     getIsAvailableToBeFocused: () => true
   };
 
-  const button2 = {
-    name: () => 'button2',
+  const currentComponent = {
+    name: () => 'currentComponent',
     el: () => document.createElement('div'),
     focus: sinon.spy(),
-    getPositions: () => ({ center: { x: 200, y: 200 }, boundingClientRect: { top: 200, left: 200, bottom: 300, right: 300 } }),
+    getPositions: () => ({ center: { x: 100, y: 100 }, boundingClientRect: { top: 0, left: 100, bottom: 200, right: 200 } }),
     getIsAvailableToBeFocused: () => true
   };
 
-  // Simulate adding these mock components to the list of focusable components.
-  this.spatialNav.focusableComponents = [button1, button2];
-  this.spatialNav.getCurrentComponent = () => button1;
+  this.spatialNav.focusableComponents = [currentComponent, rightComponent];
+  this.spatialNav.getCurrentComponent = () => currentComponent;
 
-  // Execute the move method to simulate focus change.
   this.spatialNav.move('right');
 
-  // Assert the focus method was called on button2 but not on button1.
-  assert.notOk(button1.focus.called, 'Focus should not be called on button1');
-  assert.ok(button2.focus.calledOnce, 'Focus should move to button2');
+  assert.ok(rightComponent.focus.calledOnce, 'Focus should move to the right component');
+  assert.notOk(currentComponent.focus.called, 'Focus should not remain on the current component');
+});
+
+QUnit.test('move method changes focus to the left component', function(assert) {
+  this.spatialNav.start();
+
+  const leftComponent = {
+    name: () => 'leftComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 0, y: 100 }, boundingClientRect: { top: 0, left: 0, bottom: 200, right: 100 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  const currentComponent = {
+    name: () => 'currentComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 200, y: 100 }, boundingClientRect: { top: 0, left: 200, bottom: 200, right: 300 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  this.spatialNav.focusableComponents = [leftComponent, currentComponent];
+  this.spatialNav.getCurrentComponent = () => currentComponent;
+
+  this.spatialNav.move('left');
+
+  assert.ok(leftComponent.focus.calledOnce, 'Focus should move to the left component');
+  assert.notOk(currentComponent.focus.called, 'Focus should not remain on the current component');
+});
+
+QUnit.test('move method changes focus to the above component', function(assert) {
+  this.spatialNav.start();
+
+  const aboveComponent = {
+    name: () => 'aboveComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 100, y: 0 }, boundingClientRect: { top: 0, left: 0, bottom: 100, right: 200 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  const currentComponent = {
+    name: () => 'currentComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 100, y: 200 }, boundingClientRect: { top: 200, left: 0, bottom: 300, right: 200 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  this.spatialNav.focusableComponents = [aboveComponent, currentComponent];
+  this.spatialNav.getCurrentComponent = () => currentComponent;
+
+  this.spatialNav.move('up');
+
+  assert.ok(aboveComponent.focus.calledOnce, 'Focus should move to the above component');
+  assert.notOk(currentComponent.focus.called, 'Focus should not remain on the current component');
+});
+
+QUnit.test('move method changes focus to the below component', function(assert) {
+  this.spatialNav.start();
+
+  const belowComponent = {
+    name: () => 'belowComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 100, y: 300 }, boundingClientRect: { top: 300, left: 0, bottom: 400, right: 200 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  const currentComponent = {
+    name: () => 'currentComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 100, y: 100 }, boundingClientRect: { top: 0, left: 0, bottom: 200, right: 200 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  this.spatialNav.focusableComponents = [belowComponent, currentComponent];
+  this.spatialNav.getCurrentComponent = () => currentComponent;
+
+  this.spatialNav.move('down');
+
+  assert.ok(belowComponent.focus.calledOnce, 'Focus should move to the below component');
+  assert.notOk(currentComponent.focus.called, 'Focus should not remain on the current component');
 });
 
 QUnit.test('getCurrentComponent method returns the current focused component', function(assert) {
