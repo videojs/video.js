@@ -1626,3 +1626,31 @@ QUnit.test('getPositions() properties should not be empty', function(assert) {
 
   player.dispose();
 });
+
+QUnit.test('component blur get handled by spatial navigation if next focused element is not part of the player', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    controlBar: {
+      playToggle: true,
+      volumePanel: true,
+      pictureInPictureToggle: true
+    },
+    spatialNavigation: { enabled: true }
+  });
+
+  this.spatialNav = player.spatialNavigation;
+
+  const event = {
+    relatedTarget: document.createElement('div'),
+    currentTarget: player.bigPlayButton.el_
+  };
+
+  const handlerSpy = sinon.spy(this.spatialNav, 'handlePlayerBlur');
+
+  player.bigPlayButton.handleBlur(event);
+  assert.ok(handlerSpy.calledOnce);
+
+  handlerSpy.restore();
+  player.dispose();
+});
