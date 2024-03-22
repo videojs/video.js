@@ -1631,11 +1631,6 @@ QUnit.test('component blur get handled by spatial navigation if next focused ele
   const player = TestHelpers.makePlayer({
     controls: true,
     bigPlayButton: true,
-    controlBar: {
-      playToggle: true,
-      volumePanel: true,
-      pictureInPictureToggle: true
-    },
     spatialNavigation: { enabled: true }
   });
 
@@ -1653,4 +1648,33 @@ QUnit.test('component blur get handled by spatial navigation if next focused ele
 
   handlerSpy.restore();
   player.dispose();
+});
+
+QUnit.test('component keydown event propagation does not stop if spatial navigation is active', function(assert) {
+  // Ensure each test starts with a player that has spatial navigation enabled
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+  // Directly reference the instantiated SpatialNavigation from the player
+  this.spatialNav = this.player.spatialNavigation;
+
+  this.spatialNav.start();
+  const handlerSpy = sinon.spy(this.player, 'handleKeyDown');
+
+  // Create and dispatch a mock keydown event.
+  const event = new KeyboardEvent('keydown', { // eslint-disable-line no-undef
+    key: 'ArrowRight',
+    code: 'ArrowRight',
+    keyCode: 39,
+    location: 2,
+    repeat: true
+  });
+
+  this.player.bigPlayButton.handleKeyDown(event);
+  assert.ok(handlerSpy.calledOnce);
+
+  handlerSpy.restore();
+  this.player.dispose();
 });
