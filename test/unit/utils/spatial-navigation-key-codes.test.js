@@ -63,3 +63,24 @@ QUnit.test('should return event name type when given a keycode', function(assert
   assert.equal(isffEvent, 'ff', 'should return `ff` when passed keycode `417`');
   assert.equal(isrwEvent, 'rw', 'should return `rw` when passed keycode `412`');
 });
+
+QUnit.test('should return event name if keyCode is not available', function(assert) {
+  // Create and dispatch a mock keydown event.
+  const ffKeydown = new KeyboardEvent('keydown', { // eslint-disable-line no-undef
+    keyCode: null,
+    code: 'ff'
+  });
+
+  const isffEvent = SpatialNavKeyCodes.getEventName(ffKeydown);
+
+  // Create and dispatch a mock keydown event.
+  const rwKeydown = new KeyboardEvent('keydown', { // eslint-disable-line no-undef
+    keyCode: null,
+    code: 'rw'
+  });
+
+  const isrwEvent = SpatialNavKeyCodes.getEventName(rwKeydown);
+
+  assert.equal(isffEvent, 'ff', 'should return `ff` when passed code `ff`');
+  assert.equal(isrwEvent, 'rw', 'should return `rw` when passed code `rw`');
+});
