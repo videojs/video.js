@@ -520,3 +520,33 @@ QUnit.test('handleKeyDown traps tab focus', function(assert) {
   tabTester(1, 0, true);
   tabTester(0, 3, true);
 });
+
+QUnit.test('should call `spatialNavigation.refocusComponent()` when closed if spatial navigation is active', function(assert) {
+  // Ensure each test starts with a player that has spatial navigation enabled
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+
+  // Directly reference the instantiated SpatialNavigation from the player
+  this.spatialNav = this.player.spatialNavigation;
+  this.spatialNav.refocusComponent = () => true;
+  this.spatialNav.start();
+  this.player.createModal('Testing Modal.');
+
+  function checkModalDialog(component) {
+    return component.constructor.name === 'ModalDialog';
+  }
+
+  const functionSpy = sinon.spy(this.spatialNav, 'refocusComponent');
+  const component = this.player.children_.find(checkModalDialog);
+
+  component.open();
+  component.close();
+  assert.ok(functionSpy.calledOnce);
+
+  // Clean up
+  functionSpy.restore();
+  this.player.dispose();
+});
