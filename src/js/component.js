@@ -1995,6 +1995,11 @@ class Component {
       }
     }
 
+    // If no DOM element was passed as argument use this component's element.
+    if (!el) {
+      el = this.el();
+    }
+
     // If element is visible, is being rendered, does not have a parent element & its tabIndex is not negative.
     if (isVisible(el) && isBeingRendered(el) && ((!el.parentElement) || (el.tabIndex >= 0))) {
       return true;

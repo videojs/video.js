@@ -1657,6 +1657,7 @@ QUnit.test('component keydown event propagation does not stop if spatial navigat
     bigPlayButton: true,
     spatialNavigation: { enabled: true }
   });
+
   // Directly reference the instantiated SpatialNavigation from the player
   this.spatialNav = this.player.spatialNavigation;
 
@@ -1676,5 +1677,29 @@ QUnit.test('component keydown event propagation does not stop if spatial navigat
   assert.ok(handlerSpy.calledOnce);
 
   handlerSpy.restore();
+  this.player.dispose();
+});
+
+QUnit.test('Should be able to call `getIsAvailableToBeFocused()` even without passing an HTML element', function(assert) {
+  // Ensure each test starts with a player that has spatial navigation enabled
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+
+  // Directly reference the instantiated SpatialNavigation from the player
+  this.spatialNav = this.player.spatialNavigation;
+
+  const component = this.player.getChild('bigPlayButton');
+  const focusSpy = sinon.spy(component, 'getIsAvailableToBeFocused');
+
+  component.getIsAvailableToBeFocused(component.el());
+  component.getIsAvailableToBeFocused();
+
+  assert.ok(focusSpy.getCalls().length === 2, 'focus method called on component');
+
+  // Clean up
+  focusSpy.restore();
   this.player.dispose();
 });
