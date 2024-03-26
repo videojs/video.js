@@ -15,6 +15,12 @@
   appearance:         none;
 }
 
+// Replacement for focus in case spatial navigation is enabled
+.video-js.vjs-spatial-navigation-enabled .vjs-button:focus {
+  outline: 0.0625em solid rgba($primary-foreground-color, 1);
+  box-shadow: none;
+}
+
 .vjs-control .vjs-button {
   width: 100%;
   height: 100%;

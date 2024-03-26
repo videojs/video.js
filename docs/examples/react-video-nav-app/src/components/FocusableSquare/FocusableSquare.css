@@ -1,0 +1,10 @@
+.focusable_square {
+    background-color: grey;
+    border: 1px solid darkgray;
+    width: 100px;
+    height: 100px;
+}
+
+.focusable_square:focus {
+    outline: 2px solid crimson;
+}
