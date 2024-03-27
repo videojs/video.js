@@ -52,7 +52,8 @@ class SeekBar extends Slider {
     this.update_ = Fn.bind_(this, this.update);
     this.update = Fn.throttle(this.update_, Fn.UPDATE_REFRESH_INTERVAL);
 
-    this.on(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
+    this.on(this.player_, ['durationchange', 'timeupdate'], this.update);
+    this.on(this.player_, ['ended'], this.update_);
     if (this.player_.liveTracker) {
       this.on(this.player_.liveTracker, 'liveedgechange', this.update);
     }
@@ -478,7 +479,8 @@ class SeekBar extends Slider {
   dispose() {
     this.disableInterval_();
 
-    this.off(this.player_, ['ended', 'durationchange', 'timeupdate'], this.update);
+    this.off(this.player_, ['durationchange', 'timeupdate'], this.update);
+    this.off(this.player_, ['ended'], this.update_);
     if (this.player_.liveTracker) {
       this.off(this.player_.liveTracker, 'liveedgechange', this.update);
     }
