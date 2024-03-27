@@ -83,5 +83,15 @@
   "Caption Settings Dialog": "Innstillingsvindu for teksting for hørselshemmede",
   "Beginning of dialog window. Escape will cancel and close the window.": "Begynnelse på dialogvindu. Trykk Escape for å avbryte og lukke vinduet.",
   "End of dialog window.": "Avslutning på dialogvindu.",
-  "{1} is loading.": "{1} laster."
+  "{1} is loading.": "{1} laster.",
+  "Exit Picture-in-Picture": "Avslutt bilde-i-bilde",
+  "Picture-in-Picture": "Bilde-i-bilde",
+  "No content": "Ingen innhold",
+  "Color": "Farge",
+  "Opacity": "Gjennomsiktighet",
+  "Text Background": "Tekstbakgrunn",
+  "Caption Area Background": "Undertekstbakgrunn",
+  "Playing in Picture-in-Picture": "Spiller av i bilde-i-bilde",
+  "Skip backward {1} seconds": "Hopp tilbake {1} sekunder",
+  "Skip forward {1} seconds": "Hopp frem {1} sekunder"
 }
