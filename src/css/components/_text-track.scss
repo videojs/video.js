@@ -40,3 +40,9 @@ video::-webkit-media-text-track-display {
 .video-js.vjs-user-inactive.vjs-playing video::-webkit-media-text-track-display {
   @include transform(translateY(-1.5em));
 }
+
+// force cues to be center aligned
+.video-js.vjs-force-center-align-cues .vjs-text-track-cue {
+  text-align: center !important;
+  width: 80% !important;
+}
