@@ -90,5 +90,7 @@
   "Color": "اللون",
   "Opacity": "معدل الشفافية",
   "Text Background": "خلفية النص",
-  "Caption Area Background": "خلفية منطقة التسمية التوضيحية"
+  "Caption Area Background": "خلفية منطقة التسمية التوضيحية",
+  "Skip forward {1} seconds": "التخطي للأمام {1}",
+  "Skip backward {1} seconds": "الرجوع للخلف {1}"
 }
