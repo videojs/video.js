@@ -123,7 +123,7 @@
   // with the right edge of their parent element. However, in order to have them
   // centered, they must be pulled further to the right via positioning (e.g.
   // `right: -10px;`. This part is left to JavaScript.
-  float: right;
+  // float: right;
   font-family: $text-font-family;
 
   // The font-size should translate to a consistent 10px for time tooltips in
@@ -134,6 +134,8 @@
   pointer-events: none;
   position: absolute;
   top: -3.4em;
+  right: 0;
+  transform: translateX(50%);
   visibility: hidden;
   z-index: 1;
 }
