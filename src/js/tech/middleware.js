@@ -244,7 +244,9 @@ function executeRight(mws, method, value, terminated) {
  *         A {@link Player} instance.
  */
 export function clearCacheForPlayer(player) {
-  middlewareInstances[player.id()] = null;
+  if (middlewareInstances.hasOwnProperty(player.id())) {
+    middlewareInstances[player.id()] = null;
+  }
 }
 
 /**
