@@ -776,6 +776,19 @@ class Player extends Component {
     // Default state of video is paused
     this.addClass('vjs-paused');
 
+    const deviceClassNames = [
+      'IS_SMART_TV',
+      'IS_TIZEN',
+      'IS_WEBOS',
+      'IS_ANDROID',
+      'IS_IPAD',
+      'IS_IPHONE'
+    ].filter(key => browser[key]).map(key => {
+      return 'vjs-device-' + key.substring(3).toLowerCase().replace(/\_/g, '-');
+    });
+
+    this.addClass(...deviceClassNames);
+
     // Add a style element in the player that we'll use to set the width/height
     // of the player in a way that's still overridable by CSS, just like the
     // video element

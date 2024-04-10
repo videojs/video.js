@@ -967,6 +967,84 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add smart-tv classname when on smart tv', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_SMART_TV(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-smart-tv'), 'smart-tv classname added');
+
+  browser.reset_IS_SMART_TV();
+  player.dispose();
+});
+
+QUnit.test('should add webos classname when on webos', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_WEBOS(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-webos'), 'webos classname added');
+
+  browser.reset_IS_WEBOS();
+  player.dispose();
+});
+
+QUnit.test('should add tizen classname when on tizen', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_TIZEN(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-tizen'), 'tizen classname added');
+
+  browser.reset_IS_TIZEN();
+  player.dispose();
+});
+
+QUnit.test('should add android classname when on android', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_ANDROID(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-android'), 'android classname added');
+
+  browser.reset_IS_ANDROID();
+  player.dispose();
+});
+
+QUnit.test('should add ipad classname when on ipad', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_IPAD(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-ipad'), 'ipad classname added');
+
+  browser.reset_IS_IPAD();
+  player.dispose();
+});
+
+QUnit.test('should add iphone classname when on iphone', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_IPHONE(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-iphone'), 'iphone classname added');
+
+  browser.reset_IS_IPHONE();
+  player.dispose();
+});
+
 QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
   // Stub a successful parsing of the SVG sprite.
   sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
@@ -3492,3 +3570,4 @@ QUnit.test('smooth seeking set to true should update the display time components
   seekBarUpdate.restore();
   player.dispose();
 });
+
