@@ -168,7 +168,7 @@ class EventTarget {
 /**
  * All event listeners should follow the following format.
  *
- * @callback EventTarget~EventListener
+ * @callback EventListener
  * @this {EventTarget}
  *
  * @param {Event} event
@@ -185,7 +185,7 @@ class EventTarget {
  *         will have extra functionality. See that function for more information.
  *
  * @property EventTarget.prototype.allowedEvents_
- * @private
+ * @protected
  */
 EventTarget.prototype.allowedEvents_ = {};
 

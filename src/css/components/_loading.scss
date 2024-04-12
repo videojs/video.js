@@ -22,16 +22,23 @@
 
 .vjs-seeking .vjs-loading-spinner,
 .vjs-waiting .vjs-loading-spinner {
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   // add a delay before actual show the spinner
   animation: vjs-spinner-show 0s linear 0.3s forwards;
+}
+
+// Hide if an error occurs
+.vjs-error .vjs-loading-spinner {
+  display: none;
 }
 
 .vjs-loading-spinner:before,
 .vjs-loading-spinner:after {
   content: "";
   position: absolute;
-  margin: -0.6em;
   box-sizing: inherit;
   width: inherit;
   height: inherit;

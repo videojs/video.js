@@ -38,5 +38,8 @@ export class TestSlotElement extends HTMLElement {
   }
 }
 
-window.customElements.define('test-custom-element', TestCustomElement);
-window.customElements.define('test-slot-element', TestSlotElement);
+// Not supported on Chrome < 54
+if ('customElements' in window) {
+  window.customElements.define('test-custom-element', TestCustomElement);
+  window.customElements.define('test-slot-element', TestSlotElement);
+}

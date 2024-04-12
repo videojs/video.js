@@ -16,9 +16,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 3)     | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| ar.json (missing 1)     | Playing in Picture-in-Picture                                                       |
+| az.json (Complete)      |                                                                                     |
 | ba.json (missing 71)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -64,7 +63,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -135,7 +134,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -169,77 +168,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| ca.json (missing 71)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| ca.json (Complete)      |                                                                                     |
 | cs.json (missing 12)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
@@ -309,7 +238,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -367,7 +296,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -394,9 +323,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
 | en-GB.json (has 1)      | Needs manual checking. Can safely use most default strings.                         |
-| es.json (missing 3)     | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| es.json (missing 1)     | Playing in Picture-in-Picture                                                       |
 | et.json (missing 8)     | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
@@ -413,12 +340,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| fa.json (missing 6)     | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
+| fa.json (Complete)      |                                                                                     |
 | fi.json (missing 71)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -464,7 +386,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -490,9 +412,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| fr.json (missing 3)     | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| fr.json (missing 1)     | Playing in Picture-in-Picture                                                       |
 | gd.json (missing 10)    | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
@@ -579,7 +499,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -652,6 +572,15 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
+| np.json (missing 9)     | Drop shadow                                                                         |
+|                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+|                         | Playing in Picture-in-Picture                                                       |
+|                         | Skip backward {1} seconds                                                           |
+|                         | Skip forward {1} seconds                                                            |
 | oc.json (missing 7)     | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
@@ -659,7 +588,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| pl.json (missing 7)     | Color                                                                               |
+| pl.json (missing 8)     | Drop shadow                                                                         |
+|                         | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
@@ -676,7 +606,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| pt-PT.json (missing 56) | Audio Player                                                                        |
+| pt-PT.json (missing 54) | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
@@ -706,7 +636,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -730,9 +660,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
 |                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
-| ro.json (missing 8)     | No content                                                                          |
+| ro.json (missing 9)     | Drop shadow                                                                         |
+|                         | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
 |                         | Text Background                                                                     |
@@ -746,8 +675,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
 |                         | Playing in Picture-in-Picture                                                       |
-| sk.json (missing 12)    | Seek to live, currently behind live                                                 |
+| sk.json (missing 13)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
+|                         | Drop shadow                                                                         |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
@@ -817,7 +747,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
 |                         | Uniform                                                                             |
-|                         | Dropshadow                                                                          |
+|                         | Drop shadow                                                                         |
 |                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
@@ -876,8 +806,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| uk.json (missing 12)    | Seek to live, currently behind live                                                 |
+| uk.json (missing 13)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
+|                         | Drop shadow                                                                         |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
@@ -888,8 +819,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| vi.json (missing 13)    | Seek to live, currently behind live                                                 |
+| vi.json (missing 14)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
+|                         | Drop shadow                                                                         |
 |                         | {1} is loading.                                                                     |
 |                         | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
@@ -901,7 +833,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| zh-CN.json (missing 1)  | Playing in Picture-in-Picture                                                       |
+| zh-CN.json (missing 2)  | Drop shadow                                                                         |
+|                         | Playing in Picture-in-Picture                                                       |
 | zh-TW.json (missing 1)  | Playing in Picture-in-Picture                                                       |
 
 <!-- END langtable -->

@@ -233,7 +233,7 @@ class ClickableComponent extends Component {
    *
    * By default, if the key is Space or Enter, it will trigger a `click` event.
    *
-   * @param {Event} event
+   * @param {KeyboardEvent} event
    *        The `keydown` event that caused this function to be called.
    *
    * @listens keydown

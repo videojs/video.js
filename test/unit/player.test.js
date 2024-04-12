@@ -967,6 +967,84 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add smart-tv classname when on smart tv', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_SMART_TV(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-smart-tv'), 'smart-tv classname added');
+
+  browser.reset_IS_SMART_TV();
+  player.dispose();
+});
+
+QUnit.test('should add webos classname when on webos', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_WEBOS(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-webos'), 'webos classname added');
+
+  browser.reset_IS_WEBOS();
+  player.dispose();
+});
+
+QUnit.test('should add tizen classname when on tizen', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_TIZEN(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-tizen'), 'tizen classname added');
+
+  browser.reset_IS_TIZEN();
+  player.dispose();
+});
+
+QUnit.test('should add android classname when on android', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_ANDROID(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-android'), 'android classname added');
+
+  browser.reset_IS_ANDROID();
+  player.dispose();
+});
+
+QUnit.test('should add ipad classname when on ipad', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_IPAD(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-ipad'), 'ipad classname added');
+
+  browser.reset_IS_IPAD();
+  player.dispose();
+});
+
+QUnit.test('should add iphone classname when on iphone', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_IPHONE(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-iphone'), 'iphone classname added');
+
+  browser.reset_IS_IPHONE();
+  player.dispose();
+});
+
 QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
   // Stub a successful parsing of the SVG sprite.
   sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
@@ -1901,6 +1979,12 @@ QUnit.test('Player#tech logs a warning when called without a safety argument', f
   log.warn = oldLogWarn;
 });
 
+QUnit.test('player#version will return an object with video.js version', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  assert.strictEqual(player.version()['video.js'], pkg.version, 'version is correct');
+});
+
 QUnit.test('player#reset loads the Html5 tech and then techCalls reset', function(assert) {
   let loadedTech;
   let loadedSource;
@@ -1910,6 +1994,9 @@ QUnit.test('player#reset loads the Html5 tech and then techCalls reset', functio
     options_: {
       techOrder: ['html5', 'youtube']
     },
+    error() {},
+    addClass() {},
+    removeClass() {},
     resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
@@ -1942,6 +2029,9 @@ QUnit.test('player#reset loads the first item in the techOrder and then techCall
     options_: {
       techOrder: ['youtube', 'html5']
     },
+    error() {},
+    addClass() {},
+    removeClass() {},
     resetCache_() {},
     loadTech_(tech, source) {
       loadedTech = tech;
@@ -2848,7 +2938,7 @@ QUnit.test('document pictureinpicture is opt-in', function(assert) {
 
   player.requestPictureInPicture().catch(e => {
     assert.equal(e, 'No PiP mode is available', 'docPiP not used when not enabled');
-  }).finally(_ => {
+  }).then(_ => {
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
     }
@@ -2888,7 +2978,7 @@ QUnit.test('docPiP is used in preference to winPiP', function(assert) {
     assert.ok(true, 'docPiP was called');
   }).catch(_ => {
     assert.ok(true, 'docPiP was called');
-  }).finally(_ => {
+  }).then(_ => {
     assert.equal(0, count, 'requestPictureInPicture not passed to tech');
     if (window.documentPictureInPicture === testPiPObj) {
       delete window.documentPictureInPicture;
@@ -2919,6 +3009,7 @@ QUnit.test('docPiP moves player and triggers events', function(assert) {
   const fakePiPWindow = document.createElement('div');
 
   fakePiPWindow.document = {
+    head: document.createElement('div'),
     body: document.createElement('div')
   };
   fakePiPWindow.querySelector = function(sel) {
@@ -3382,3 +3473,101 @@ QUnit.test('crossOrigin value should be maintained after loadMedia is called', f
   playerExample2.dispose();
   playerExample3.dispose();
 });
+
+QUnit.test('should not reset the error when the tech triggers an error that is null', function(assert) {
+  sinon.stub(log, 'error');
+
+  const player = TestHelpers.makePlayer();
+
+  player.src({
+    src: 'http://example.com/movie.unsupported-format',
+    type: 'video/unsupported-format'
+  });
+
+  this.clock.tick(60);
+
+  // Simulates Chromium's behavior when the poster is invalid
+
+  // is only there for context, but does nothing
+  player.poster('invalid');
+
+  const spyError = sinon.spy(player, 'error');
+  // Chromium behavior produced by the video element
+  const errorStub = sinon.stub(player.tech(true), 'error').callsFake(() => null);
+
+  player.tech(true).trigger('error');
+  // End
+
+  assert.ok(player.hasClass('vjs-error'), 'player has vjs-error class');
+  assert.ok(spyError.notCalled, 'error was not called');
+  assert.ok(player.error(), 'error is retained');
+
+  player.dispose();
+  spyError.restore();
+  errorStub.restore();
+  log.error.restore();
+});
+
+QUnit.test('smooth seeking set to false should not update the display time components or the seek bar', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const {
+    currentTimeDisplay,
+    remainingTimeDisplay,
+    progressControl: {
+      seekBar
+    }
+  } = player.controlBar;
+  const currentTimeDisplayUpdateContent = sinon.spy(currentTimeDisplay, 'updateContent');
+  const remainingTimeDisplayUpdateContent = sinon.spy(remainingTimeDisplay, 'updateContent');
+  const seekBarUpdate = sinon.spy(seekBar, 'update');
+
+  assert.false(player.options().enableSmoothSeeking, 'enableSmoothSeeking is false by default');
+
+  player.trigger('seeking');
+
+  assert.ok(currentTimeDisplayUpdateContent.notCalled, 'currentTimeDisplay updateContent was not called');
+  assert.ok(remainingTimeDisplayUpdateContent.notCalled, 'remainingTimeDisplay updateContent was not called');
+
+  seekBar.trigger('mousedown');
+  seekBar.trigger('mousemove');
+
+  assert.ok(seekBarUpdate.notCalled, 'seekBar update was not called');
+
+  currentTimeDisplayUpdateContent.restore();
+  remainingTimeDisplayUpdateContent.restore();
+  seekBarUpdate.restore();
+  player.dispose();
+});
+
+QUnit.test('smooth seeking set to true should update the display time components and the seek bar', function(assert) {
+  const player = TestHelpers.makePlayer({enableSmoothSeeking: true});
+  const {
+    currentTimeDisplay,
+    remainingTimeDisplay,
+    progressControl: {
+      seekBar
+    }
+  } = player.controlBar;
+  const currentTimeDisplayUpdateContent = sinon.spy(currentTimeDisplay, 'updateContent');
+  const remainingTimeDisplayUpdateContent = sinon.spy(remainingTimeDisplay, 'updateContent');
+  const seekBarUpdate = sinon.spy(seekBar, 'update');
+
+  assert.true(player.options().enableSmoothSeeking, 'enableSmoothSeeking is true');
+
+  player.duration(1);
+  player.trigger('seeking');
+
+  assert.ok(currentTimeDisplayUpdateContent.called, 'currentTimeDisplay updateContent was called');
+  assert.ok(remainingTimeDisplayUpdateContent.called, 'remainingTimeDisplay updateContent was called');
+
+  seekBar.trigger('mousedown');
+  seekBar.trigger('mousemove');
+
+  assert.ok(seekBarUpdate.called, 'seekBar update was called');
+
+  currentTimeDisplayUpdateContent.restore();
+  remainingTimeDisplayUpdateContent.restore();
+  seekBarUpdate.restore();
+  player.dispose();
+});
+

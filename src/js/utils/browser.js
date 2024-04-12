@@ -141,6 +141,30 @@ export let IS_IPAD = false;
 export let IS_IPHONE = false;
 
 /**
+ * Whether or not this is a Tizen device.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_TIZEN = false;
+
+/**
+ * Whether or not this is a WebOS device.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_WEBOS = false;
+
+/**
+ * Whether or not this is a Smart TV (Tizen or WebOS) device.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_SMART_TV = false;
+
+/**
  * Whether or not this device is touch-enabled.
  *
  * @static
@@ -154,7 +178,7 @@ export const TOUCH_ENABLED = Boolean(Dom.isReal() && (
 
 const UAD = window.navigator && window.navigator.userAgentData;
 
-if (UAD) {
+if (UAD && UAD.platform && UAD.brands) {
   // If userAgentData is present, use it instead of userAgent to avoid warnings
   // Currently only implemented on Chromium
   // userAgentData does not expose Android version, so ANDROID_VERSION remains `null`
@@ -235,7 +259,13 @@ if (!IS_CHROMIUM) {
     return version;
   }());
 
-  IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE;
+  IS_TIZEN = (/Tizen/i).test(USER_AGENT);
+
+  IS_WEBOS = (/Web0S/i).test(USER_AGENT);
+
+  IS_SMART_TV = IS_TIZEN || IS_WEBOS;
+
+  IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE && !IS_SMART_TV;
 
   IS_WINDOWS = (/Windows/i).test(USER_AGENT);
 

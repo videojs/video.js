@@ -18,7 +18,7 @@ class SkipBackward extends Button {
 
     if (this.skipTime && this.validOptions.includes(this.skipTime)) {
       this.setIcon(`replay-${this.skipTime}`);
-      this.controlText(this.localize('Skip backward {1} seconds', [this.skipTime]));
+      this.controlText(this.localize('Skip backward {1} seconds', [this.skipTime.toLocaleString(player.language())]));
       this.show();
     } else {
       this.hide();

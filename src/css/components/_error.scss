@@ -2,22 +2,3 @@
   font-size: 1.4em;
   text-align: center;
 }
-
-.vjs-error .vjs-error-display:before {
-  color: #fff;
-  content: 'X';
-  font-family: $text-font-family;
-  font-size: 4em;
-  left: 0;
-
-  // In order to center the play icon vertically we need to set the line height
-  // to the same as the button height
-  line-height: 1;
-  margin-top: -0.5em;
-  position: absolute;
-  text-shadow: 0.05em 0.05em 0.1em #000;
-  text-align: center;
-  top: 50%;
-  vertical-align: middle;
-  width: 100%;
-}

@@ -18,7 +18,7 @@ class SkipForward extends Button {
 
     if (this.skipTime && this.validOptions.includes(this.skipTime)) {
       this.setIcon(`forward-${this.skipTime}`);
-      this.controlText(this.localize('Skip forward {1} seconds', [this.skipTime]));
+      this.controlText(this.localize('Skip forward {1} seconds', [this.skipTime.toLocaleString(player.language())]));
       this.show();
     } else {
       this.hide();
@@ -72,6 +72,8 @@ class SkipForward extends Button {
     this.controlText(this.localize('Skip forward {1} seconds', [this.skipTime]));
   }
 }
+
+SkipForward.prototype.controlText_ = 'Skip Forward';
 
 Component.registerComponent('SkipForward', SkipForward);
 
