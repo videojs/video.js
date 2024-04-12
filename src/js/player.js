@@ -56,15 +56,6 @@ import './title-bar.js';
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
 
-// Just something as an uncovered change.
-let aa;
-
-if (1 === 1) {
-  aa = 'b';
-}
-
-window.console.log(aa);
-
 // The following tech events are simply re-triggered
 // on the player when they happen
 const TECH_EVENTS_RETRIGGER = [
