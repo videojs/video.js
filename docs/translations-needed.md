@@ -16,9 +16,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 3)     | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| ar.json (missing 1)     | Playing in Picture-in-Picture                                                       |
 | az.json (Complete)      |                                                                                     |
 | ba.json (missing 71)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -557,6 +555,15 @@ This default value is hardcoded as a default to the localize method in the SeekB
 | nl.json (missing 1)     | Playing in Picture-in-Picture                                                       |
 | nn.json (missing 10)    | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
+|                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+|                         | Playing in Picture-in-Picture                                                       |
+|                         | Skip backward {1} seconds                                                           |
+|                         | Skip forward {1} seconds                                                            |
+| np.json (missing 9)     | Drop shadow                                                                         |
 |                         | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
