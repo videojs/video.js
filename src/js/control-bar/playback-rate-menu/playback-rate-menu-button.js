@@ -25,6 +25,13 @@ class PlaybackRateMenuButton extends MenuButton {
   constructor(player, options) {
     super(player, options);
 
+    this.labelElId_ = 'vjs-playback-rate-value-label-' + this.id_;
+    this.labelEl_ = Dom.createEl('div', {
+      className: 'vjs-playback-rate-value',
+      id: this.labelElId_,
+      textContent: '1x'
+    });
+    this.menuButton_.el_.appendChild(this.labelEl_);
     this.menuButton_.el_.setAttribute('aria-describedby', this.labelElId_);
 
     this.updateVisibility();
@@ -33,28 +40,6 @@ class PlaybackRateMenuButton extends MenuButton {
     this.on(player, 'loadstart', (e) => this.updateVisibility(e));
     this.on(player, 'ratechange', (e) => this.updateLabel(e));
     this.on(player, 'playbackrateschange', (e) => this.handlePlaybackRateschange(e));
-  }
-
-  /**
-   * Create the `Component`'s DOM element
-   *
-   * @return {Element}
-   *         The element that was created.
-   */
-  createEl() {
-    const el = super.createEl();
-
-    this.labelElId_ = 'vjs-playback-rate-value-label-' + this.id_;
-
-    this.labelEl_ = Dom.createEl('div', {
-      className: 'vjs-playback-rate-value',
-      id: this.labelElId_,
-      textContent: '1x'
-    });
-
-    el.appendChild(this.labelEl_);
-
-    return el;
   }
 
   dispose() {
