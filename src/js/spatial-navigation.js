@@ -50,6 +50,8 @@ class SpatialNavigation extends EventTarget {
     this.player_.on('loadedmetadata', () => {
       this.focus(this.updateFocusableComponents()[0]);
     });
+    this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
+    this.player_.on('focusout', this.handlePlayerBlur_.bind(this));
     this.isListening_ = true;
   }
 
@@ -157,26 +159,46 @@ class SpatialNavigation extends EventTarget {
   /**
    * Handles Player Blur.
    *
-   * @param {Component} component - The component that triggered the blur event.
+   * @param {string|Event|Object} event
+   *        The name of the event, an `Event`, or an object with a key of type set to
+   *        an event name.
+   *
+   * Calls for handling of the Player Blur if:
+   * *The next focused element is not a child of current focused element &
+   * The next focused element is not a child of the Player.
+   * *There is no next focused element
    */
-  handlePlayerBlur(component) {
-    if (component.name() === 'CloseButton') {
-      this.refocusComponent();
-    } else {
-      this.pause();
+  handlePlayerBlur_(event) {
+    const nextFocusedElement = event.relatedTarget;
+    let isChildrenOfPlayer = null;
+    const currentComponent = this.getCurrentComponent(event.target);
 
-      if (component && component.el()) {
-        this.lastFocusedComponent_ = component;
+    if (nextFocusedElement) {
+      isChildrenOfPlayer = Boolean(nextFocusedElement.closest('.video-js'));
+    }
+
+    if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
+      if (currentComponent.name() === 'CloseButton') {
+        this.refocusComponent();
+      } else {
+        this.pause();
+
+        if (currentComponent && currentComponent.el()) {
+          this.lastFocusedComponent_ = currentComponent;
+        }
       }
     }
   }
 
   /**
-   * Handles Player Focus.
+   * Handles the Player focus event.
    *
+   * Calls for handling of the Player Focus if current element is focusable.
    */
-  handlePlayerFocus() {
-    this.resume();
+  handlePlayerFocus_() {
+    if (this.getCurrentComponent() && this.getCurrentComponent().getIsFocusable()) {
+      this.resume();
+    }
   }
 
   /**
@@ -270,20 +292,24 @@ class SpatialNavigation extends EventTarget {
   }
 
   /**
-   * Gets the current focused component.
+   * Gets the currently focused component from the list of focusable components.
+   * If a target element is provided, it uses that element to find the corresponding
+   * component. If no target is provided, it defaults to using the document's currently
+   * active element.
    *
-   * @return {Component}
-   *         Returns a focused component.
+   * @param {HTMLElement} [target] - The DOM element to check against the focusable components.
+   *                                 If not provided, `document.activeElement` is used.
+   * @return {Component|null} - Returns the focused component if found among the focusable components,
+   *                            otherwise returns null if no matching component is found.
    */
-  getCurrentComponent() {
+  getCurrentComponent(target) {
     this.updateFocusableComponents();
-
+    // eslint-disable-next-line
+    const curComp = target || document.activeElement;
     if (this.focusableComponents.length) {
       for (const i of this.focusableComponents) {
-
         // If component Node is equal to the current active element.
-        // eslint-disable-next-line
-        if (i.el() === document.activeElement) {
+        if (i.el() === curComp) {
           return i;
         }
       }
