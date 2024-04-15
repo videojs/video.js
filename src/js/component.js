@@ -109,12 +109,6 @@ class Component {
 
       this.handleLanguagechange = this.handleLanguagechange.bind(this);
       this.on(this.player_, 'languagechange', this.handleLanguagechange);
-
-      // Binding event handlers if spatial navigation is enabled
-      if (options.playerOptions && options.playerOptions.spatialNavigation && options.playerOptions.spatialNavigation.enabled) {
-        this.on('focus', this.handleFocus.bind(this));
-        this.on('blur', this.handleBlur.bind(this));
-      }
     }
     stateful(this, this.constructor.defaultState);
 
@@ -1330,51 +1324,6 @@ class Component {
       boundingClientRect,
       center
     };
-  }
-
-  /**
-   * Handles the focus event. This method could be overridden
-   * in subclasses to provide specific focus event handling.
-   *
-   * Calls for handling of the Player Focus if:
-   * * SpatialNavigation is enabled, not paused & element is focusable.
-   */
-  handleFocus() {
-    const spatialNavigation = this.player_.spatialNavigation;
-
-    if (spatialNavigation && this.getIsFocusable()) {
-      spatialNavigation.handlePlayerFocus();
-    }
-  }
-
-  /**
-   * Handles the blur event. This method could be overridden
-   * in subclasses to provide specific focus event handling.
-   *
-   * @param {string|Event|Object} event
-   *        The name of the event, an `Event`, or an object with a key of type set to
-   *        an event name.
-   *
-   * Calls for handling of the Player Blur if:
-   * * The next focused element is not a child of current focused element &
-   * The next focused element is not a child of the Player.
-   * * There is no next focused element
-   */
-  handleBlur(event) {
-    const spatialNavigation = this.player_.spatialNavigation;
-
-    if (spatialNavigation && this.getIsFocusable()) {
-      const nextFocusedElement = event.relatedTarget;
-      let isChildrenOfPlayer = null;
-
-      if (nextFocusedElement) {
-        isChildrenOfPlayer = Boolean(nextFocusedElement.closest('.video-js'));
-      }
-
-      if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
-        spatialNavigation.handlePlayerBlur(this);
-      }
-    }
   }
 
   /**
