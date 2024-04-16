@@ -1,3 +1,26 @@
+<a name="8.12.0"></a>
+# [8.12.0](https://github.com/videojs/video.js/compare/v8.11.8...v8.12.0) (2024-04-16)
+
+### Features
+
+* add browser.IS_SMART_TV and class names for CSS targeting devices ([#8676](https://github.com/videojs/video.js/issues/8676)) ([8e5870f](https://github.com/videojs/video.js/commit/8e5870f))
+* **emulated-tracks:** add class to force cues to be center aligned ([#8625](https://github.com/videojs/video.js/issues/8625)) ([d715e0f](https://github.com/videojs/video.js/commit/d715e0f))
+* **lang:** Add support for Marathi Language ([#8596](https://github.com/videojs/video.js/issues/8596)) ([80429fa](https://github.com/videojs/video.js/commit/80429fa))
+* **lang:** added arabic seek button translations ([#8616](https://github.com/videojs/video.js/issues/8616)) ([ee07382](https://github.com/videojs/video.js/commit/ee07382))
+
+### Bug Fixes
+
+* add additional and remove unused error const ([#8656](https://github.com/videojs/video.js/issues/8656)) ([caf6d30](https://github.com/videojs/video.js/commit/caf6d30))
+* **build:** Use quoted dbl quotes to support Windows ([#8681](https://github.com/videojs/video.js/issues/8681)) ([3f32de3](https://github.com/videojs/video.js/commit/3f32de3))
+* **i18n:** better Italian translation for "captions" ([#8513](https://github.com/videojs/video.js/issues/8513)) ([4a17426](https://github.com/videojs/video.js/commit/4a17426)), closes [/www.w3.org/Translations/WCAG22-it/#h-note-76](https://github.com//www.w3.org/Translations/WCAG22-it//issues/h-note-76)
+* time tooltip truncated ([#8527](https://github.com/videojs/video.js/issues/8527)) ([50f14bd](https://github.com/videojs/video.js/commit/50f14bd))
+
+### Chores
+
+* Remove unused type.js file ([#8658](https://github.com/videojs/video.js/issues/8658)) ([4ccedc1](https://github.com/videojs/video.js/commit/4ccedc1))
+* update GitHub Actions version and remove xvfb ([#8682](https://github.com/videojs/video.js/issues/8682)) ([af06f50](https://github.com/videojs/video.js/commit/af06f50))
+* update VHS to v3.12.1 ([#8687](https://github.com/videojs/video.js/issues/8687)) ([12310ed](https://github.com/videojs/video.js/commit/12310ed))
+
 <a name="8.11.8"></a>
 ## [8.11.8](https://github.com/videojs/video.js/compare/v8.11.7...v8.11.8) (2024-03-12)
 
