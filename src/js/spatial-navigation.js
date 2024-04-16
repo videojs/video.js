@@ -530,17 +530,12 @@ class SpatialNavigation extends EventTarget {
    */
   searchForTrackSelect() {
     const spatialNavigation = this;
-    let componentToFocus = null;
 
     for (const component of (spatialNavigation.updateFocusableComponents())) {
       if (component.constructor.name === 'TextTrackSelect') {
-        componentToFocus = component;
+        spatialNavigation.focus(component);
         break;
       }
-    }
-
-    if (componentToFocus) {
-      spatialNavigation.focus(componentToFocus);
     }
   }
 }
