@@ -175,6 +175,11 @@ class SpatialNavigation extends EventTarget {
 
     if (nextFocusedElement) {
       isChildrenOfPlayer = Boolean(nextFocusedElement.closest('.video-js'));
+
+      // If nextFocusedElement is the 'TextTrackSettings' component
+      if (nextFocusedElement.classList.contains('vjs-text-track-settings') && !this.isPaused_) {
+        this.searchForTrackSelect();
+      }
     }
 
     if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
@@ -184,6 +189,7 @@ class SpatialNavigation extends EventTarget {
         this.pause();
 
         if (currentComponent && currentComponent.el()) {
+          // Store last focused component
           this.lastFocusedComponent_ = currentComponent;
         }
       }
@@ -516,6 +522,21 @@ class SpatialNavigation extends EventTarget {
     }
 
     return distance;
+  }
+
+  /**
+   * This gets called by 'handleClick' if 'spatialNavigation' is enabled.
+   * Searches for the first 'TextTrackSelect' inside of modal to focus.
+   */
+  searchForTrackSelect() {
+    const spatialNavigation = this;
+
+    for (const component of (spatialNavigation.updateFocusableComponents())) {
+      if (component.constructor.name === 'TextTrackSelect') {
+        spatialNavigation.focus(component);
+        break;
+      }
+    }
   }
 }
 
