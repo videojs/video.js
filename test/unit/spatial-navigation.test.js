@@ -3,6 +3,7 @@ import SpatialNavigation from '../../src/js/spatial-navigation.js';
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import document from 'global/document';
+import TextTrackSelect from '../../src/js/tracks/text-track-select';
 
 QUnit.module('SpatialNavigation', {
   beforeEach() {
@@ -417,4 +418,35 @@ QUnit.test('clear method removes all focusable components', function(assert) {
 
   // Check if the focusableComponents array is empty after clearing
   assert.strictEqual(this.spatialNav.focusableComponents.length, 0, 'All components should be cleared');
+});
+
+QUnit.test('should call `searchForTrackSelect()` if spatial navigation is enabled on click event', function(assert) {
+  const element = document.createElement('div');
+
+  element.classList.add('vjs-text-track-settings');
+
+  const clickEvent = new MouseEvent('click', { // eslint-disable-line no-undef
+    view: this.window,
+    bubbles: true,
+    cancelable: true,
+    currentTarget: element
+  });
+
+  Object.defineProperty(clickEvent, 'relatedTarget', {writable: false, value: element});
+  Object.defineProperty(clickEvent, 'currentTarget', {writable: false, value: element});
+
+  const trackSelectSpy = sinon.spy(this.spatialNav, 'searchForTrackSelect');
+
+  const textTrackSelectComponent = new TextTrackSelect(this.player, {
+    SelectOptions: ['Option 1', 'Option 2', 'Option 3'],
+    legendId: '1',
+    id: 1,
+    labelId: '1'
+  });
+
+  this.spatialNav.updateFocusableComponents = () => [textTrackSelectComponent];
+
+  this.spatialNav.handlePlayerBlur_(clickEvent);
+
+  assert.ok(trackSelectSpy.calledOnce);
 });

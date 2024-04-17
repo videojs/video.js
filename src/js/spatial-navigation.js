@@ -525,7 +525,7 @@ class SpatialNavigation extends EventTarget {
   }
 
   /**
-   * This gets called by 'handleClick' if 'spatialNavigation' is enabled.
+   * This gets called by 'handlePlayerBlur_' if 'spatialNavigation' is enabled.
    * Searches for the first 'TextTrackSelect' inside of modal to focus.
    */
   searchForTrackSelect() {
