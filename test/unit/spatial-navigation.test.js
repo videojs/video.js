@@ -1,5 +1,6 @@
 /* eslint-env qunit */
 import SpatialNavigation from '../../src/js/spatial-navigation.js';
+import SpatialNavigationKeyCodes from '../../src/js/utils/spatial-navigation-key-codes';
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import document from 'global/document';
@@ -37,9 +38,11 @@ QUnit.test('start method initializes event listeners', function(assert) {
 
   this.spatialNav.start();
 
-  // Check if both keydown and loadedmetadata event listeners are added
+  // Check if event listeners are added
   assert.ok(onSpy.calledWith('keydown'), 'keydown event listener added');
   assert.ok(onSpy.calledWith('loadedmetadata'), 'loadedmetadata event listener added');
+  assert.ok(onSpy.calledWith('modalKeydown'), 'modalKeydown event listener added');
+  assert.ok(onSpy.calledWith('modalclose'), 'modalclose event listener added');
 
   // Additionally, check if isListening_ flag is set
   assert.ok(this.spatialNav.isListening_, 'isListening_ flag is set');
@@ -99,6 +102,44 @@ QUnit.test('onKeyDown_ handles media keys', function(assert) {
   assert.ok(performMediaActionSpy.calledWith('play'), 'performMediaAction_ should be called with "play"');
 
   performMediaActionSpy.restore();
+});
+
+QUnit.test('onKeyDown_ handles Back key when target is closeable', function(assert) {
+  // Create a spy for the close method.
+  const closeSpy = sinon.spy();
+
+  // Create a spy for the preventDefault method.
+  const preventDefaultSpy = sinon.spy();
+
+  // Create a mock event target that is closeable.
+  const closeableTarget = {
+    close: closeSpy,
+    closeable: () => true
+  };
+
+  // Create a mock event for the 'Back' key, including a properly mocked originalEvent.
+  const event = {
+    preventDefault: preventDefaultSpy,
+    target: closeableTarget,
+    originalEvent: {
+      keyCode: SpatialNavigationKeyCodes.BACK,
+      preventDefault: preventDefaultSpy
+    }
+  };
+
+  // Stub the SpatialNavigationKeyCodes.isEventKey to return true when the 'Back' key is pressed.
+  sinon.stub(SpatialNavigationKeyCodes, 'isEventKey').callsFake((evt, keyName) => keyName === 'Back');
+
+  // Call the onKeyDown_ method with the mock event.
+  this.spatialNav.onKeyDown_(event);
+
+  // Asserts
+  assert.ok(SpatialNavigationKeyCodes.isEventKey.calledWith(event.originalEvent, 'Back'), 'isEventKey should be called with Back');
+  assert.ok(preventDefaultSpy.calledOnce, 'preventDefault should be called once');
+  assert.ok(closeSpy.calledOnce, 'close method should be called on the target');
+
+  // Restore stubs
+  SpatialNavigationKeyCodes.isEventKey.restore();
 });
 
 QUnit.test('performMediaAction_ executes play', function(assert) {
