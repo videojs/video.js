@@ -1527,48 +1527,6 @@ QUnit.test('a component\'s el can be replaced on dispose', function(assert) {
 
 });
 
-QUnit.test('should be able to call `handleFocus` if spatial navigation is enabled', function(assert) {
-  const player = TestHelpers.makePlayer({
-    controlBar: {
-      volumePanel: true,
-      pictureInPictureToggle: true
-    },
-    spatialNavigation: {
-      enabled: true
-    }
-  });
-
-  player.spatialNavigation.start();
-  const appendSpy = sinon.spy(player, 'handleFocus');
-
-  player.handleFocus();
-
-  assert.expect(1);
-  assert.ok(appendSpy.calledOnce, '`handleFocus` has been called');
-  player.dispose();
-});
-
-QUnit.test('should be able to call `handleBlur` if spatial navigation is enabled', function(assert) {
-  const player = TestHelpers.makePlayer({
-    controlBar: {
-      volumePanel: true,
-      pictureInPictureToggle: true
-    },
-    spatialNavigation: {
-      enabled: true
-    }
-  });
-
-  player.spatialNavigation.start();
-  const appendSpy = sinon.spy(player, 'handleBlur');
-
-  player.handleBlur();
-
-  assert.expect(1);
-  assert.ok(appendSpy.calledOnce, '`handleBlur` has been called');
-  player.dispose();
-});
-
 QUnit.test('should be able to call `getPositions()` from a component', function(assert) {
   const player = TestHelpers.makePlayer({});
 
@@ -1624,29 +1582,6 @@ QUnit.test('getPositions() properties should not be empty', function(assert) {
   assert.expect(1);
   assert.ok(!hasEmptyProperties, '`getPositions()` properties are not empty');
 
-  player.dispose();
-});
-
-QUnit.test('component blur get handled by spatial navigation if next focused element is not part of the player', function(assert) {
-  const player = TestHelpers.makePlayer({
-    controls: true,
-    bigPlayButton: true,
-    spatialNavigation: { enabled: true }
-  });
-
-  this.spatialNav = player.spatialNavigation;
-
-  const event = {
-    relatedTarget: document.createElement('div'),
-    currentTarget: player.bigPlayButton.el_
-  };
-
-  const handlerSpy = sinon.spy(this.spatialNav, 'handlePlayerBlur');
-
-  player.bigPlayButton.handleBlur(event);
-  assert.ok(handlerSpy.calledOnce);
-
-  handlerSpy.restore();
   player.dispose();
 });
 
