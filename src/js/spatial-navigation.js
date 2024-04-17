@@ -46,9 +46,13 @@ class SpatialNavigation extends EventTarget {
 
     // Add the event listener since the listener is not yet active.
     this.player_.on('keydown', this.onKeyDown_);
+    this.player_.on('modalKeydown', this.onKeyDown_);
     // Listen for source change events
     this.player_.on('loadedmetadata', () => {
       this.focus(this.updateFocusableComponents()[0]);
+    });
+    this.player_.on('modalclose', () => {
+      this.refocusComponent();
     });
     this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
     this.player_.on('focusout', this.handlePlayerBlur_.bind(this));
@@ -72,23 +76,29 @@ class SpatialNavigation extends EventTarget {
    * @param {KeyboardEvent} event - The keydown event to be handled.
    */
   onKeyDown_(event) {
-    if (keycode.isEventKey(event, 'left') || keycode.isEventKey(event, 'up') ||
-      keycode.isEventKey(event, 'right') || keycode.isEventKey(event, 'down')) {
+    // Determine if the event is a custom modalKeydown event
+    const actualEvent = event.originalEvent ? event.originalEvent : event;
+
+    if (keycode.isEventKey(actualEvent, 'left') || keycode.isEventKey(actualEvent, 'up') ||
+      keycode.isEventKey(actualEvent, 'right') || keycode.isEventKey(actualEvent, 'down')) {
       // Handle directional navigation
       if (this.isPaused_) {
         return;
       }
-      event.preventDefault();
-      const direction = keycode(event);
+      actualEvent.preventDefault();
+      const direction = keycode(actualEvent);
 
       this.move(direction);
-    } else if (SpatialNavKeyCodes.isEventKey(event, 'play') || SpatialNavKeyCodes.isEventKey(event, 'pause') ||
-      SpatialNavKeyCodes.isEventKey(event, 'ff') || SpatialNavKeyCodes.isEventKey(event, 'rw')) {
+    } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'play') || SpatialNavKeyCodes.isEventKey(actualEvent, 'pause') ||
+      SpatialNavKeyCodes.isEventKey(actualEvent, 'ff') || SpatialNavKeyCodes.isEventKey(actualEvent, 'rw')) {
       // Handle media actions
-      event.preventDefault();
-      const action = SpatialNavKeyCodes.getEventName(event);
+      actualEvent.preventDefault();
+      const action = SpatialNavKeyCodes.getEventName(actualEvent);
 
       this.performMediaAction_(action);
+    } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'Back') && event.target && event.target.closeable()) {
+      actualEvent.preventDefault();
+      event.target.close();
     }
   }
 
