@@ -1949,7 +1949,7 @@ class Component {
       el = this.el();
     }
 
-    // If element is visible, is being rendered, does not have a parent element & its tabIndex is not negative.
+    // If element is visible, is being rendered & either does not have a parent element or its tabIndex is not negative.
     if (isVisible(el) && isBeingRendered(el) && ((!el.parentElement) || (el.tabIndex >= 0))) {
       return true;
     }
