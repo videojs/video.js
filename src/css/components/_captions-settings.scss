@@ -3,6 +3,11 @@
   background-color: rgba($primary-background-color, 0.75);
   color: $primary-foreground-color;
   height: 70%;
+
+  // When Spatial Navigation is enabled
+  .vjs-spatial-navigation-enabled & {
+    height: 80%;
+  }
 }
 
 // Hide if an error occurs

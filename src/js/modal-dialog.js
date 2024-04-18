@@ -21,7 +21,7 @@ const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 class ModalDialog extends Component {
 
   /**
-   * Create an instance of this class.
+   * Creates an instance of this class.
    *
    * @param { import('./player').default } player
    *        The `Player` that this class should be attached to.
@@ -236,6 +236,7 @@ class ModalDialog extends Component {
     if (!this.opened_) {
       return;
     }
+
     const player = this.player();
 
     /**
@@ -265,8 +266,10 @@ class ModalDialog extends Component {
       *
       * @event ModalDialog#modalclose
       * @type {Event}
+      *
+      * @property {boolean} [bubbles=true]
       */
-    this.trigger('modalclose');
+    this.trigger({type: 'modalclose', bubbles: true});
     this.conditionalBlur_();
 
     if (this.options_.temporary) {
@@ -454,7 +457,13 @@ class ModalDialog extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
-
+    /**
+     * Fired a custom keyDown event that bubbles.
+     *
+     * @event ModalDialog#modalKeydown
+     * @type {Event}
+     */
+    this.trigger({type: 'modalKeydown', originalEvent: event, target: this, bubbles: true});
     // Do not allow keydowns to reach out of the modal dialog.
     event.stopPropagation();
 

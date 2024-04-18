@@ -1284,6 +1284,49 @@ class Component {
   }
 
   /**
+   * Retrieves the position and size information of the component's element.
+   *
+   * @return {Object} An object with `boundingClientRect` and `center` properties.
+   *         - `boundingClientRect`: An object with properties `x`, `y`, `width`,
+   *           `height`, `top`, `right`, `bottom`, and `left`, representing
+   *           the bounding rectangle of the element.
+   *         - `center`: An object with properties `x` and `y`, representing
+   *           the center point of the element. `width` and `height` are set to 0.
+   */
+  getPositions() {
+    const rect = this.el_.getBoundingClientRect();
+
+    // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
+    const boundingClientRect = {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      left: rect.left
+    };
+
+    // Calculating the center position
+    const center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      width: 0,
+      height: 0,
+      top: rect.top + rect.height / 2,
+      right: rect.left + rect.width / 2,
+      bottom: rect.top + rect.height / 2,
+      left: rect.left + rect.width / 2
+    };
+
+    return {
+      boundingClientRect,
+      center
+    };
+  }
+
+  /**
    * Set the focus to this component
    */
   focus() {
@@ -1308,8 +1351,8 @@ class Component {
     if (this.player_) {
 
       // We only stop propagation here because we want unhandled events to fall
-      // back to the browser. Exclude Tab for focus trapping.
-      if (!keycode.isEventKey(event, 'Tab')) {
+      // back to the browser. Exclude Tab for focus trapping, exclude also when spatialNavigation is enabled.
+      if (!keycode.isEventKey(event, 'Tab') && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
         event.stopPropagation();
       }
       this.player_.handleKeyDown(event);
@@ -1763,6 +1806,154 @@ class Component {
 
       this.clearingTimersOnDispose_ = false;
     });
+  }
+
+  /**
+    * Decide whether an element is actually disabled or not.
+    *
+    * @function isActuallyDisabled
+    * @param element {Node}
+    * @return {boolean}
+    *
+    * @see {@link https://html.spec.whatwg.org/multipage/semantics-other.html#concept-element-disabled}
+    */
+  getIsDisabled() {
+    return Boolean(this.el_.disabled);
+  }
+
+  /**
+    * Decide whether the element is expressly inert or not.
+    *
+    * @see {@link https://html.spec.whatwg.org/multipage/interaction.html#expressly-inert}
+    * @function isExpresslyInert
+    * @param element {Node}
+    * @return {boolean}
+    */
+  getIsExpresslyInert() {
+    return this.el_.inert && !this.el_.ownerDocument.documentElement.inert;
+  }
+
+  /**
+   * Determine whether or not this component can be considered as focusable component.
+   *
+   * @param {HTMLElement} el - The HTML element representing the component.
+   * @return {boolean}
+   *         If the component can be focused, will be `true`. Otherwise, `false`.
+   */
+  getIsFocusable() {
+    return this.el_.tabIndex >= 0 && !(this.getIsDisabled() || this.getIsExpresslyInert());
+  }
+
+  /**
+   * Determine whether or not this component is currently visible/enabled/etc...
+   *
+   * @param {HTMLElement} el - The HTML element representing the component.
+   * @return {boolean}
+   *         If the component can is currently visible & enabled, will be `true`. Otherwise, `false`.
+   */
+  getIsAvailableToBeFocused(el) {
+    /**
+     * Decide the style property of this element is specified whether it's visible or not.
+     *
+     * @function isVisibleStyleProperty
+     * @param element {CSSStyleDeclaration}
+     * @return {boolean}
+     */
+    function isVisibleStyleProperty(element) {
+      const elementStyle = window.getComputedStyle(element, null);
+      const thisVisibility = elementStyle.getPropertyValue('visibility');
+      const thisDisplay = elementStyle.getPropertyValue('display');
+      const invisibleStyle = ['hidden', 'collapse'];
+
+      return (thisDisplay !== 'none' && !invisibleStyle.includes(thisVisibility));
+    }
+
+    /**
+     * Decide whether the element is being rendered or not.
+     * 1. If an element has the style as "visibility: hidden | collapse" or "display: none", it is not being rendered.
+     * 2. If an element has the style as "opacity: 0", it is not being rendered.(that is, invisible).
+     * 3. If width and height of an element are explicitly set to 0, it is not being rendered.
+     * 4. If a parent element is hidden, an element itself is not being rendered.
+     * (CSS visibility property and display property are inherited.)
+     *
+     * @see {@link https://html.spec.whatwg.org/multipage/rendering.html#being-rendered}
+     * @function isBeingRendered
+     * @param element {Node}
+     * @return {boolean}
+     */
+    function isBeingRendered(element) {
+      if (!isVisibleStyleProperty(element.parentElement)) {
+        return false;
+      }
+      if (!isVisibleStyleProperty(element) || (element.style.opacity === '0') || (window.getComputedStyle(element).height === '0px' || window.getComputedStyle(element).width === '0px')) {
+        return false;
+      }
+      return true;
+    }
+
+    /**
+     * Determine if the element is visible for the user or not.
+     * 1. If an element sum of its offsetWidth, offsetHeight, height and width is less than 1 is not visible.
+     * 2. If elementCenter.x is less than is not visible.
+     * 3. If elementCenter.x is more than the document's width is not visible.
+     * 4. If elementCenter.y is less than 0 is not visible.
+     * 5. If elementCenter.y is the document's height is not visible.
+     *
+     * @function isVisible
+     * @param element {Node}
+     * @return {boolean}
+     */
+    function isVisible(element) {
+      if ((element.offsetWidth + element.offsetHeight + element.getBoundingClientRect().height + element.getBoundingClientRect().width) === 0) {
+        return false;
+      }
+
+      // Define elementCenter object with props of x and y
+      // x: Left position relative to the viewport plus element's width (no margin) divided between 2.
+      // y: Top position relative to the viewport plus element's height (no margin) divided between 2.
+      const elementCenter = {
+        x: element.getBoundingClientRect().left + element.offsetWidth / 2,
+        y: element.getBoundingClientRect().top + element.offsetHeight / 2
+      };
+
+      if (elementCenter.x < 0) {
+        return false;
+      }
+      if (elementCenter.x > (document.documentElement.clientWidth || window.innerWidth)) {
+        return false;
+      }
+      if (elementCenter.y < 0) {
+        return false;
+      }
+      if (elementCenter.y > (document.documentElement.clientHeight || window.innerHeight)) {
+        return false;
+      }
+
+      let pointContainer = document.elementFromPoint(elementCenter.x, elementCenter.y);
+
+      while (pointContainer) {
+        if (pointContainer === element) {
+          return true;
+        }
+        if (pointContainer.parentNode) {
+          pointContainer = pointContainer.parentNode;
+        } else {
+          return false;
+        }
+
+      }
+    }
+
+    // If no DOM element was passed as argument use this component's element.
+    if (!el) {
+      el = this.el();
+    }
+
+    // If element is visible, is being rendered & either does not have a parent element or its tabIndex is not negative.
+    if (isVisible(el) && isBeingRendered(el) && ((!el.parentElement) || (el.tabIndex >= 0))) {
+      return true;
+    }
+    return false;
   }
 
   /**

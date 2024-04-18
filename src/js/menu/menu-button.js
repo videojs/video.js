@@ -308,7 +308,7 @@ class MenuButton extends Component {
         this.menuButton_.focus();
       }
     // Up Arrow or Down Arrow also 'press' the button to open the menu
-    } else if (keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) {
+    } else if ((keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
       if (!this.buttonPressed_) {
         event.preventDefault();
         this.pressButton();
