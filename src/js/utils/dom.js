@@ -594,7 +594,7 @@ export function getPointerPosition(el, event) {
 
   if (event.changedTouches) {
     offsetX = event.changedTouches[0].pageX - box.left;
-    offsetY = event.changedTouches[0].pageY + box.top;
+    offsetY = event.changedTouches[0].pageY - box.top;
     if (browser.IS_IOS) {
       offsetX -= translated.x;
       offsetY -= translated.y;
