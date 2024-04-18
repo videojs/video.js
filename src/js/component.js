@@ -1840,8 +1840,10 @@ class Component {
    * @return {boolean}
    *         If the component can be focused, will be `true`. Otherwise, `false`.
    */
-  getIsFocusable() {
-    return this.el_.tabIndex >= 0 && !(this.getIsDisabled() || this.getIsExpresslyInert());
+  getIsFocusable(el) {
+    const element = el || this.el_;
+
+    return element.tabIndex >= 0 && !(this.getIsDisabled() || this.getIsExpresslyInert());
   }
 
   /**
