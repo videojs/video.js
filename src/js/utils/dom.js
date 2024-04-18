@@ -773,6 +773,11 @@ export function isSingleLeftClick(event) {
     return true;
   }
 
+  // MacOS Sonoma trackpad when "tap to click enabled"
+  if (event.type === 'mousedown' && event.button === 0 && event.buttons === 0) {
+    return true;
+  }
+
   if (event.button !== 0 || event.buttons !== 1) {
     // This is the reason we have those if else block above
     // if any special case we can catch and let it slide
