@@ -188,7 +188,7 @@ class SpatialNavigation extends EventTarget {
 
       // If nextFocusedElement is the 'TextTrackSettings' component
       if (nextFocusedElement.classList.contains('vjs-text-track-settings') && !this.isPaused_) {
-        this.searchForTrackSelect();
+        this.searchForTrackSelect_();
       }
     }
 
@@ -288,7 +288,7 @@ class SpatialNavigation extends EventTarget {
      * or `null` if no suitable child is found.
      */
     function searchForSuitableChild(node) {
-      if (component.getIsFocusable() && component.getIsAvailableToBeFocused(node)) {
+      if (component.getIsFocusable(node) && component.getIsAvailableToBeFocused(node)) {
         return node;
       }
 
@@ -537,8 +537,10 @@ class SpatialNavigation extends EventTarget {
   /**
    * This gets called by 'handlePlayerBlur_' if 'spatialNavigation' is enabled.
    * Searches for the first 'TextTrackSelect' inside of modal to focus.
+   *
+   * @private
    */
-  searchForTrackSelect() {
+  searchForTrackSelect_() {
     const spatialNavigation = this;
 
     for (const component of (spatialNavigation.updateFocusableComponents())) {

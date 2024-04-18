@@ -476,7 +476,7 @@ QUnit.test('should call `searchForTrackSelect()` if spatial navigation is enable
   Object.defineProperty(clickEvent, 'relatedTarget', {writable: false, value: element});
   Object.defineProperty(clickEvent, 'currentTarget', {writable: false, value: element});
 
-  const trackSelectSpy = sinon.spy(this.spatialNav, 'searchForTrackSelect');
+  const trackSelectSpy = sinon.spy(this.spatialNav, 'searchForTrackSelect_');
 
   const textTrackSelectComponent = new TextTrackSelect(this.player, {
     SelectOptions: ['Option 1', 'Option 2', 'Option 3'],
