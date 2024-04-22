@@ -1045,6 +1045,19 @@ QUnit.test('should add iphone classname when on iphone', function(assert) {
   player.dispose();
 });
 
+QUnit.test('should add chromecast-receiver classname when on chromecast receiver', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_CHROMECAST_RECEIVER(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-chromecast-receiver'), 'chromecast-receiver classname added');
+
+  browser.reset_IS_CHROMECAST_RECEIVER();
+  player.dispose();
+});
+
 QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
   // Stub a successful parsing of the SVG sprite.
   sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
