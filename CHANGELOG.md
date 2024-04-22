@@ -1,3 +1,15 @@
+<a name="8.13.0"></a>
+# [8.13.0](https://github.com/videojs/video.js/compare/v8.12.0...v8.13.0) (2024-04-22)
+
+### Features
+
+* implement spatial navigation ([#8570](https://github.com/videojs/video.js/issues/8570)) ([21b4a52](https://github.com/videojs/video.js/commit/21b4a52))
+* **player:** Make 'searchForTrackSelect_' private & use 'el' as parameter in function 'getIsFocusable' ([#8697](https://github.com/videojs/video.js/issues/8697)) ([ec69d5e](https://github.com/videojs/video.js/commit/ec69d5e))
+
+### Bug Fixes
+
+* update vhs version ([#8704](https://github.com/videojs/video.js/issues/8704)) ([8699deb](https://github.com/videojs/video.js/commit/8699deb))
+
 <a name="8.12.0"></a>
 # [8.12.0](https://github.com/videojs/video.js/compare/v8.11.8...v8.12.0) (2024-04-16)
 
