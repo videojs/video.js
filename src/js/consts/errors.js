@@ -8,23 +8,5 @@ export default {
   SegmentExceedsSourceBufferQuota: 'segment-exceeds-source-buffer-quota-error',
   SegmentAppendError: 'segment-append-error',
   VttLoadError: 'vtt-load-error',
-  VttCueParsingError: 'vtt-cue-parsing-error',
-  // Errors used in contrib-ads:
-  AdsBeforePrerollError: 'ads-before-preroll-error',
-  AdsPrerollError: 'ads-preroll-error',
-  AdsMidrollError: 'ads-midroll-error',
-  AdsPostrollError: 'ads-postroll-error',
-  AdsMacroReplacementFailed: 'ads-macro-replacement-failed',
-  AdsResumeContentFailed: 'ads-resume-content-failed',
-  // Errors used in contrib-eme:
-  EMEFailedToRequestMediaKeySystemAccess: 'eme-failed-request-media-key-system-access',
-  EMEFailedToCreateMediaKeys: 'eme-failed-create-media-keys',
-  EMEFailedToAttachMediaKeysToVideoElement: 'eme-failed-attach-media-keys-to-video',
-  EMEFailedToCreateMediaKeySession: 'eme-failed-create-media-key-session',
-  EMEFailedToSetServerCertificate: 'eme-failed-set-server-certificate',
-  EMEFailedToGenerateLicenseRequest: 'eme-failed-generate-license-request',
-  EMEFailedToUpdateSessionWithReceivedLicenseKeys: 'eme-failed-update-session',
-  EMEFailedToCloseSession: 'eme-failed-close-session',
-  EMEFailedToRemoveKeysFromSession: 'eme-failed-remove-keys',
-  EMEFailedToLoadSessionBySessionId: 'eme-failed-load-session'
+  VttCueParsingError: 'vtt-cue-parsing-error'
 };
