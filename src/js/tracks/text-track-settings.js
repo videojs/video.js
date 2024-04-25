@@ -86,7 +86,7 @@ const selectConfigs = {
 
   edgeStyle: {
     selector: '.vjs-edge-style > select',
-    id: '%s',
+    id: '',
     label: 'Text Edge Style',
     options: [
       ['none', 'None'],
@@ -99,7 +99,7 @@ const selectConfigs = {
 
   fontFamily: {
     selector: '.vjs-font-family > select',
-    id: 'captions-font-family-%s',
+    id: '',
     label: 'Font Family',
     options: [
       ['proportionalSansSerif', 'Proportional Sans-Serif'],
@@ -114,7 +114,7 @@ const selectConfigs = {
 
   fontPercent: {
     selector: '.vjs-font-percent > select',
-    id: 'captions-font-size-%s',
+    id: '',
     label: 'Font Size',
     options: [
       ['0.50', '50%'],

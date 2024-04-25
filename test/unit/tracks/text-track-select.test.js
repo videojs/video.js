@@ -23,3 +23,21 @@ QUnit.test('should associate with <select>s with <options>s', function(assert) {
     "select property 'aria-labelledby' is included in its option's property 'aria-labelledby'"
   );
 });
+
+QUnit.test('aria-labelledby values must be valid and unique', function(assert) {
+  const player = TestHelpers.makePlayer({
+    tracks
+  });
+  const albs = player.$$('.vjs-text-track-settings select[aria-labelledby]');
+
+  albs.forEach(el => {
+    const ids = el.getAttribute('aria-labelledby').split(' ');
+    const invalidIds = ids.find(id => {
+      return !(player.$(`#${id}`));
+    });
+
+    assert.notOk(invalidIds, `${el.id} has valid aria-labelledby ids`);
+
+    assert.ok((new Set(ids)).size === ids.length, `${el.id} does not contain duplicate ids`);
+  });
+});
