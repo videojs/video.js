@@ -35,6 +35,7 @@ import {getMimetype, findMimetype} from './utils/mimetypes';
 import {hooks} from './utils/hooks';
 import {isObject} from './utils/obj';
 import keycode from 'keycode';
+import { initMediaSession } from './mediasession.js';
 import icons from '../images/icons.svg';
 import SpatialNavigation from './spatial-navigation.js';
 
@@ -611,6 +612,10 @@ class Player extends Component {
       this.audioPosterMode(this.options_.audioPosterMode);
       this.audioOnlyMode(this.options_.audioOnlyMode);
     });
+
+    // Set up media session if supported
+    initMediaSession.call(this);
+
   }
 
   /**
