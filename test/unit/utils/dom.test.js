@@ -658,12 +658,6 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
 
   // Left mouse click
   mouseEvent.button = 0;
-  mouseEvent.buttons = 0;
-
-  assert.notOk(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on an older browser (Safari) is a single left click');
-
-  // Left mouse click
-  mouseEvent.button = 0;
   mouseEvent.buttons = 1;
 
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a left mouse click on browsers that supporting buttons property is a single left click');
@@ -685,6 +679,12 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
   mouseEvent.buttons = undefined;
 
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a touch event on simulated mobiles is a single left click');
+
+  // MacOS trackpad "tap to click". Sonoma always does this, previous MacOS did this inconsistently, buttons was usally 1.
+  mouseEvent.button = 0;
+  mouseEvent.buttons = 0;
+
+  assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a tap-to-click on Mac trackpad is a single left click');
 });
 
 QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
