@@ -17,7 +17,7 @@ jobs:
 
   ci:
     needs: should-skip
-    if: ${{needs.should-skip.outputs.should-skip-job != 'true' || github.ref == 'refs/heads/main'}}
+    if: ${{needs.should-skip.outputs.should-skip-job != 'true' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/karma-browserstack-test'}}
     strategy:
       fail-fast: false
       matrix:
