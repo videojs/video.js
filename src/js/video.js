@@ -621,4 +621,15 @@ videojs.url = Url;
 // The list of possible error types to occur in video.js
 videojs.Error = VjsErrors;
 
+// Just for testing file size action
+videojs.nonsense = function(letter) {
+  const someStrings = {
+    latin: 'abcdefghijklmnopqrstuvwxyz',
+    greek: 'αβγδεζηθικλμνξοπρστυφχψω',
+    cyrillic: 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+  };
+
+  return Object.keys(someStrings).find(key => someStrings[key].includes(letter));
+};
+
 export default videojs;
