@@ -20,16 +20,6 @@ module.exports = function(config) {
         return {};
       }
 
-      defaults.bsOldChrome = {
-        'base': 'BrowserStack',
-        'browser': 'chrome',
-        'os': 'Windows',
-        'os_version': '11',
-        'browserstack.local': 'false',
-        'browserstack.video': 'false',
-        'browser_version': 53.0
-      };
-
       return defaults;
     },
     coverage: CI_TEST_TYPE === 'coverage' ? true : false
