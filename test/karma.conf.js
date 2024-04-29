@@ -27,7 +27,7 @@ module.exports = function(config) {
         'os_version': '11',
         'browserstack.local': 'false',
         'browserstack.video': 'false',
-        'browserVersion': 53.0
+        'browser_version': 53.0
       };
 
       return defaults;
