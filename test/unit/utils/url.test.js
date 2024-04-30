@@ -82,7 +82,7 @@ QUnit.test('isCrossOrigin can identify cross origin urls', function(assert) {
 
   const location = new URL('https:/google.com');
 
-  assert.ok(!Url.isCrossOrigin('https://google.com/example.vtt', location), 'http://google.com from https://google.com is not cross origin');
+  assert.ok(!Url.isCrossOrigin('https://google.com/example.vtt', location), 'https://google.com from https://google.com is not cross origin');
   assert.ok(Url.isCrossOrigin('http://google.com/example.vtt', location), 'http://google.com from https://google.com is cross origin');
   assert.ok(Url.isCrossOrigin('http://example.com/example.vtt', location), 'http://example.com from https://google.com is cross origin');
   assert.ok(Url.isCrossOrigin('https://example.com/example.vtt', location), 'https://example.com from https://google.com is cross origin');
