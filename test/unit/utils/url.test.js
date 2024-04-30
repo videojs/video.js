@@ -41,8 +41,7 @@ QUnit.test('should strip port from hosts using http or https', function(assert) 
 });
 
 QUnit.test('should get an absolute URL', function(assert) {
-  // Errors on compiled tests that don't use unit.html. Need a better solution.
-  // assert.ok(Url.getAbsoluteURL('unit.html') === window.location.href);
+  assert.ok(Url.getAbsoluteURL(window.location.pathname + window.location.search) === window.location.href);
   assert.ok(Url.getAbsoluteURL('http://asdf.com') === 'http://asdf.com/');
   assert.ok(Url.getAbsoluteURL('https://asdf.com/index.html') === 'https://asdf.com/index.html');
 });
