@@ -28,8 +28,6 @@ export const parseUrl = function(url) {
  *
  * @return   {string}
  *           Absolute URL
- *
- * @see      http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
  */
 export const getAbsoluteURL = function(url) {
   return (new URL(url, document.baseURI)).href;
