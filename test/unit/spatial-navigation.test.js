@@ -485,7 +485,7 @@ QUnit.test('should call `searchForTrackSelect()` if spatial navigation is enable
     labelId: '1'
   });
 
-  this.spatialNav.updateFocusableComponents = () => [textTrackSelectComponent];
+  this.spatialNav.getFocusableComponents = () => [textTrackSelectComponent];
 
   this.spatialNav.handlePlayerBlur_(clickEvent);
 

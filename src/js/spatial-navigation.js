@@ -49,7 +49,7 @@ class SpatialNavigation extends EventTarget {
     this.player_.on('modalKeydown', this.onKeyDown_);
     // Listen for source change events
     this.player_.on('loadedmetadata', () => {
-      this.focus(this.updateFocusableComponents()[0]);
+      this.focus(this.getFocusableComponents()[0]);
     });
     this.player_.on('modalclose', () => {
       this.refocusComponent();
@@ -223,7 +223,7 @@ class SpatialNavigation extends EventTarget {
    * @return {Array}
    *         Returns an array of focusable components.
    */
-  updateFocusableComponents() {
+  getFocusableComponents() {
     const player = this.player_;
     const focusableComponents = [];
 
@@ -319,7 +319,7 @@ class SpatialNavigation extends EventTarget {
    *                            otherwise returns null if no matching component is found.
    */
   getCurrentComponent(target) {
-    this.updateFocusableComponents();
+    this.getFocusableComponents();
     // eslint-disable-next-line
     const curComp = target || document.activeElement;
     if (this.focusableComponents.length) {
@@ -466,7 +466,7 @@ class SpatialNavigation extends EventTarget {
         this.player_.userActive(true);
       }
 
-      this.updateFocusableComponents();
+      this.getFocusableComponents();
 
       // Search inside array of 'focusableComponents' for a match of name of
       // the last focused component.
@@ -477,7 +477,7 @@ class SpatialNavigation extends EventTarget {
         }
       }
     } else {
-      this.focus(this.updateFocusableComponents()[0]);
+      this.focus(this.getFocusableComponents()[0]);
     }
   }
 
@@ -543,7 +543,7 @@ class SpatialNavigation extends EventTarget {
   searchForTrackSelect_() {
     const spatialNavigation = this;
 
-    for (const component of (spatialNavigation.updateFocusableComponents())) {
+    for (const component of (spatialNavigation.getFocusableComponents())) {
       if (component.constructor.name === 'TextTrackSelect') {
         spatialNavigation.focus(component);
         break;
