@@ -27,5 +27,11 @@ export default {
   ContentSteeringNoPathwaysError: 'content-steering-no-pathways-error',
   LowLatencyManifestError: 'low-latency-manifest-error',
   LowLatencySegmentError: 'low-latency-segment-error',
-  AudioTrackLoadError: 'audio-track-load-error'
+  AudioTrackLoadError: 'audio-track-load-error',
+  SegmentRequestError: 'segment-request-error',
+  SegmentRequestAborted: 'segment-request-aborted',
+  SegmentRequestTimeout: 'segment-request-timeout',
+  ManifestRequestError: 'manifest-request-error',
+  ManifestRequestAborted: 'manifest-request-aborted',
+  ManifestRequestTimeout: 'manifest-request-timeout'
 };
