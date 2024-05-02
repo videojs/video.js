@@ -13,6 +13,7 @@ export default {
   ClosedCaptionsLoadError: 'captions-load-error',
   SegmentInvalidKeyError: 'segment-invalid-key-error',
   CaptionCueParsingError: 'caption-cue-parsing-error',
+  MetadataCueParsingError: 'metadata-cue-parsing-error',
   TransmuxingFailedError: 'transmuxing-failed-error',
   TransmuxerAudioError: 'transmuxer-audio-error',
   TransmuxerVideoError: 'transmuxer-video-error',
