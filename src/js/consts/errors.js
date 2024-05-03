@@ -3,7 +3,7 @@ export default {
   NetworkRequestFailed: 'networkrequestfailed',
   NetworkRequestAborted: 'networkrequestaborted',
   NetworkRequestTimeout: 'networkrequesttimeout',
-  NetworkBodyParser: 'networkbodyparser',
+  NetworkBodyParserFailed: 'networkbodyparserfailed',
   StreamingHlsPlaylistParserError: 'streaminghlsplaylistparsererror',
   StreamingDashManifestParserError: 'streamingdashmanifestparsererror',
   StreamingContentSteeringParserError: 'streamingcontentsteeringparsererror',
