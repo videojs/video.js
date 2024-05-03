@@ -360,6 +360,8 @@ class Player extends Component {
     this.boundHandleTechTouchEnd_ = (e) => this.handleTechTouchEnd_(e);
     this.boundHandleTechTap_ = (e) => this.handleTechTap_(e);
 
+    this.boundUpdatePlayerHeightOnAudioOnlyMode_ = (e) => this.updatePlayerHeightOnAudioOnlyMode_(e);
+
     // default isFullscreen_ to false
     this.isFullscreen_ = false;
 
@@ -396,6 +398,7 @@ class Player extends Component {
 
     // Init state audioOnlyCache_
     this.audioOnlyCache_ = {
+      controlBarHeight: null,
       playerHeight: null,
       hiddenChildren: []
     };
@@ -4504,6 +4507,17 @@ class Player extends Component {
     return !!this.isAudio_;
   }
 
+  updatePlayerHeightOnAudioOnlyMode_() {
+    const controlBar = this.getChild('ControlBar');
+
+    if (!controlBar || this.audioOnlyCache_.controlBarHeight === controlBar.currentHeight()) {
+      return;
+    }
+
+    this.audioOnlyCache_.controlBarHeight = controlBar.currentHeight();
+    this.height(this.audioOnlyCache_.controlBarHeight);
+  }
+
   enableAudioOnlyUI_() {
     // Update styling immediately to show the control bar so we can get its height
     this.addClass('vjs-audio-only-mode');
@@ -4527,6 +4541,9 @@ class Player extends Component {
     });
 
     this.audioOnlyCache_.playerHeight = this.currentHeight();
+    this.audioOnlyCache_.controlBarHeight = controlBarHeight;
+
+    this.on('playerresize', this.boundUpdatePlayerHeightOnAudioOnlyMode_);
 
     // Set the player height the same as the control bar
     this.height(controlBarHeight);
@@ -4535,6 +4552,7 @@ class Player extends Component {
 
   disableAudioOnlyUI_() {
     this.removeClass('vjs-audio-only-mode');
+    this.off('playerresize', this.boundUpdatePlayerHeightOnAudioOnlyMode_);
 
     // Show player components that were previously hidden
     this.audioOnlyCache_.hiddenChildren.forEach(child => child.show());
