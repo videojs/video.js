@@ -41,9 +41,8 @@ QUnit.test('should strip port from hosts using http or https', function(assert) 
 });
 
 QUnit.test('should get an absolute URL', function(assert) {
-  // Errors on compiled tests that don't use unit.html. Need a better solution.
-  // assert.ok(Url.getAbsoluteURL('unit.html') === window.location.href);
-  assert.ok(Url.getAbsoluteURL('http://asdf.com') === 'http://asdf.com');
+  assert.ok(Url.getAbsoluteURL(window.location.pathname + window.location.search) === window.location.href);
+  assert.ok(Url.getAbsoluteURL('http://asdf.com') === 'http://asdf.com/');
   assert.ok(Url.getAbsoluteURL('https://asdf.com/index.html') === 'https://asdf.com/index.html');
 });
 
@@ -81,12 +80,9 @@ QUnit.test('isCrossOrigin can identify cross origin urls', function(assert) {
   // we cannot test that relative urls work on https, though
   assert.ok(!Url.isCrossOrigin('example.vtt'), 'relative url is not cross origin');
 
-  const location = {
-    protocol: 'https:',
-    host: 'google.com'
-  };
+  const location = new URL('https:/google.com');
 
-  assert.ok(!Url.isCrossOrigin('https://google.com/example.vtt', location), 'http://google.com from https://google.com is not cross origin');
+  assert.ok(!Url.isCrossOrigin('https://google.com/example.vtt', location), 'https://google.com from https://google.com is not cross origin');
   assert.ok(Url.isCrossOrigin('http://google.com/example.vtt', location), 'http://google.com from https://google.com is cross origin');
   assert.ok(Url.isCrossOrigin('http://example.com/example.vtt', location), 'http://example.com from https://google.com is cross origin');
   assert.ok(Url.isCrossOrigin('https://example.com/example.vtt', location), 'https://example.com from https://google.com is cross origin');
