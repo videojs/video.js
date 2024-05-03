@@ -176,6 +176,53 @@ QUnit.test("SeekBar doesn't set scrubbing on mouse down, only on mouse move", fu
   player.dispose();
 });
 
+QUnit.test('SeekBar should be filled on 100% when the video/audio ends', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  player.triggerReady();
+  player.duration(1.5);
+
+  this.clock.tick(30);
+  player.trigger('timeupdate');
+  this.clock.tick(1);
+
+  assert.equal(seekBar.duration_, 1.5, 'SeekBar duration should equal player duration');
+  assert.equal(seekBar.currentTime_, 0, 'SeekBar current time should be zero on start');
+  assert.equal(seekBar.getPercent(), 0, 'SeekBar percent should be zero on start');
+
+  this.clock.tick(30);
+  player.currentTime(0.75);
+  player.trigger('timeupdate');
+  this.clock.tick(1);
+
+  assert.equal(seekBar.currentTime_, 0.75, 'SeekBar currentTime should equal player currentTime');
+  assert.equal(seekBar.getPercent(), 0.5, 'SeekBar percent equal to 50%');
+
+  this.clock.tick(30);
+  player.currentTime(1.495);
+  player.trigger('timeupdate');
+  this.clock.tick(1);
+  player.currentTime(1.5);
+  // The following 'timeupdate' should be wiped out by the throttle function!
+  player.trigger('timeupdate');
+  // The following 'ended' shouldn't be wiped out by the throttle function!
+  player.trigger('ended');
+  this.clock.tick(1);
+
+  assert.equal(seekBar.currentTime_, 1.5, 'SeekBar currentTime should equal player currentTime');
+  assert.equal(seekBar.getPercent(), 1, 'SeekBar percent equal to 100%');
+  player.dispose();
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
 QUnit.test('playback rate button is hidden by default', function(assert) {
   assert.expect(1);
 
