@@ -3,6 +3,7 @@ import document from 'global/document';
 import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
 import TestHelpers from '../test-helpers.js';
+import * as browser from '../../../src/js/utils/browser.js';
 
 QUnit.module('utils/dom');
 
@@ -685,6 +686,89 @@ QUnit.test('isSingleLeftClick() checks return values for mousedown event', funct
   mouseEvent.buttons = 0;
 
   assert.ok(Dom.isSingleLeftClick(mouseEvent), 'a tap-to-click on Mac trackpad is a single left click');
+});
+
+QUnit.test('dom.getPointerPosition should return position with translated', function(assert) {
+  const wrapper = document.createElement('div');
+
+  const width = '100px';
+  const height = '50px';
+
+  wrapper.style.width = width;
+  wrapper.style.height = height;
+  wrapper.style.position = 'absolute';
+  wrapper.style.top = '0';
+  wrapper.style.left = '0';
+
+  let position;
+
+  document.body.appendChild(wrapper);
+  const event = {
+    offsetX: 20,
+    offsetY: 0,
+    target: wrapper
+  };
+
+  position = Dom.getPointerPosition(wrapper, event);
+
+  // Default click on element without any transform
+  assert.deepEqual(position, { x: 0.2, y: 1 });
+
+  const origIOS = browser.IS_IOS;
+
+  wrapper.style.transform = 'translate(5px)';
+
+  const transformedTouch = {
+    offsetX: 20,
+    offsetY: 0,
+    target: wrapper,
+    changedTouches: [
+      {
+        pageX: 20,
+        pageY: 0
+      }
+    ]
+  };
+
+  // Ignore translate x/y when not in IOS
+  position = Dom.getPointerPosition(wrapper, transformedTouch);
+  assert.deepEqual(position, { x: 0.2, y: 1 });
+
+  // Add calculate with IOS to true
+  browser.stub_IS_IOS(true);
+  position = Dom.getPointerPosition(wrapper, transformedTouch);
+  assert.deepEqual(position, { x: 0.15, y: 1 });
+
+  // Create complex template where position of each video is controlled by
+  // a web component with transform
+  wrapper.style.transform = '';
+  const progressStyle = `position: absolute; height: ${height}; width: ${width};`;
+
+  wrapper.innerHTML = `
+    <test-slot-element id="slides" style="position: absolute" data-style="position: relative; transform: translate(5px);">
+      <div class="video-01">
+        <div class="progress-01" style="${progressStyle}"></div>
+      </div>
+      <div class="video-02">
+        <div class="progress-02" style="${progressStyle}"></div>
+      </div>
+    </test-slot-element>
+  `;
+  document.body.appendChild(wrapper);
+
+  const slottedProgressBar = wrapper.querySelector('div.progress-02');
+
+  // Handle slot elements pointer position
+  transformedTouch.target = slottedProgressBar;
+  position = Dom.getPointerPosition(slottedProgressBar, transformedTouch);
+  assert.deepEqual(position, { x: 0.15, y: 1 });
+
+  // Non IOS slot element pointer position
+  browser.stub_IS_IOS(false);
+  position = Dom.getPointerPosition(slottedProgressBar, transformedTouch);
+  assert.deepEqual(position, { x: 0.20, y: 1 });
+
+  browser.stub_IS_IOS(origIOS);
 });
 
 QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
