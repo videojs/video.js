@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
-  "version": "8.13.0",
+  "version": "8.14.0",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",

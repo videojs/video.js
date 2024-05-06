@@ -1,3 +1,28 @@
+<a name="8.14.0"></a>
+# [8.14.0](https://github.com/videojs/video.js/compare/v8.13.0...v8.14.0) (2024-05-06)
+
+### Features
+
+* refactor error consts ([#8719](https://github.com/videojs/video.js/issues/8719)) ([4dfea61](https://github.com/videojs/video.js/commit/4dfea61))
+
+### Bug Fixes
+
+* **dom:** handle slotted parent transform position ([#8158](https://github.com/videojs/video.js/issues/8158)) ([9946a19](https://github.com/videojs/video.js/commit/9946a19))
+* Ensure aria-labelledby values in track settings are valid ([#8711](https://github.com/videojs/video.js/issues/8711)) ([ad3be35](https://github.com/videojs/video.js/commit/ad3be35))
+* **player:** adapt player height to control bar height in audioOnly mode ([#8579](https://github.com/videojs/video.js/issues/8579)) ([8050466](https://github.com/videojs/video.js/commit/8050466))
+* prevent error for root shadow elements when restorEl is enabled ([#8679](https://github.com/videojs/video.js/issues/8679)) ([31b0378](https://github.com/videojs/video.js/commit/31b0378))
+* progress bar sometimes is not filled on 100% ([#8633](https://github.com/videojs/video.js/issues/8633)) ([3e697e9](https://github.com/videojs/video.js/commit/3e697e9))
+* Support MacOS trackpad with tap-to-click ([#8700](https://github.com/videojs/video.js/issues/8700)) ([cb76a24](https://github.com/videojs/video.js/commit/cb76a24))
+
+### Chores
+
+* **css:** fix typo in postcss-config browserslist and update list ([#8578](https://github.com/videojs/video.js/issues/8578)) ([3df0e9b](https://github.com/videojs/video.js/commit/3df0e9b))
+* remove plugin errors from error const ([#8706](https://github.com/videojs/video.js/issues/8706)) ([466fa97](https://github.com/videojs/video.js/commit/466fa97))
+
+### Code Refactoring
+
+* use URL API ([#8716](https://github.com/videojs/video.js/issues/8716)) ([992af3b](https://github.com/videojs/video.js/commit/992af3b))
+
 <a name="8.13.0"></a>
 # [8.13.0](https://github.com/videojs/video.js/compare/v8.12.0...v8.13.0) (2024-04-22)
 
