@@ -11,6 +11,8 @@ import {silencePromise} from '../../utils/promise';
 import keycode from 'keycode';
 import document from 'global/document';
 
+/** @import Player from '../../player' */
+
 import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './mouse-time-display.js';
@@ -32,7 +34,7 @@ class SeekBar extends Slider {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

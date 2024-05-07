@@ -3,6 +3,9 @@ import * as Dom from '../utils/dom';
 import * as Guid from '../utils/guid';
 import TextTrackSelect from './text-track-select';
 
+/** @import Player from './player' */
+/** @import { ContentDescriptor } from '../utils/dom' */
+
 /**
  * Creates fieldset section of 'TextTrackSettings'.
  * Manganes two versions of fieldsets, one for type of 'colors'
@@ -16,13 +19,13 @@ class TextTrackFieldset extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param { import('../utils/dom').ContentDescriptor} [options.content=undefined]
+   * @param {ContentDescriptor} [options.content=undefined]
    *        Provide customized content for this modal.
    *
    * @param {string} [options.legendId]
@@ -36,11 +39,11 @@ class TextTrackFieldset extends Component {
    * @param {string} [options.legendText]
    *        A text to use as the text content of the legend element.
    *
-   * @param {array} [options.selects]
+   * @param {Array} [options.selects]
    *        Array that contains the selects that are use to create 'selects'
    *        components.
    *
-   * @param {array} [options.SelectOptions]
+   * @param {Array} [options.SelectOptions]
    *        Array that contains the value & textContent of for each of the
    *        options elements, it passes to 'TextTrackSelect'.
    *

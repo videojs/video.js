@@ -2,6 +2,9 @@ import Component from '../component';
 import * as Dom from '../utils/dom';
 import TextTrackFieldset from './text-track-fieldset';
 
+/** @import Player from './player' */
+/** @import { ContentDescriptor } from  '../utils/dom' */
+
 /**
  * The component 'TextTrackSettingsColors' displays a set of 'fieldsets'
  * using the component 'TextTrackFieldset'.
@@ -13,13 +16,13 @@ class TextTrackSettingsColors extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param { import('../utils/dom').ContentDescriptor} [options.content=undefined]
+   * @param {ContentDescriptor} [options.content=undefined]
    *        Provide customized content for this modal.
    *
    * @param {Array} [options.fieldSets]

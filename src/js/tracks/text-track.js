@@ -11,6 +11,8 @@ import { isCrossOrigin } from '../utils/url.js';
 import XHR from '@videojs/xhr';
 import {merge} from '../utils/obj';
 
+/** @import Tech from '../tech/tech' */
+
 /**
  * Takes a webvtt file contents and parses it into cues
  *
@@ -128,7 +130,7 @@ class TextTrack extends Track {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param { import('../tech/tech').default } options.tech
+   * @param {Tech} options.tech
    *        A reference to the tech that owns this TextTrack.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']
@@ -441,6 +443,7 @@ class TextTrack extends Track {
 
 /**
  * cuechange - One or more cues in the track have become active or stopped being active.
+ *
  * @protected
  */
 TextTrack.prototype.allowedEvents_ = {

@@ -7,6 +7,8 @@ import * as Dom from '../utils/dom.js';
 import * as Events from '../utils/events.js';
 import keycode from 'keycode';
 
+/** @import Player from '../player' */
+
 /**
  * The Menu component is used to build popup menus, including subtitle and
  * captions selection menus.
@@ -18,7 +20,7 @@ class Menu extends Component {
   /**
    * Create an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        the player that this component should attach to
    *
    * @param {Object} [options]

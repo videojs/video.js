@@ -11,6 +11,8 @@ import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
 import keycode from 'keycode';
 
+/** @import Player from '../player' */
+
 /**
  * A `MenuButton` class for any popup {@link Menu}.
  *
@@ -21,7 +23,7 @@ class MenuButton extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

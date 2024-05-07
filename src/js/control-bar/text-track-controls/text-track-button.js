@@ -6,6 +6,8 @@ import Component from '../../component.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
 import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 
+/** @import Player from '../../player' */
+
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
@@ -16,7 +18,7 @@ class TextTrackButton extends TrackButton {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

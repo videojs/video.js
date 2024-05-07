@@ -5,6 +5,8 @@ import TimeDisplay from './time-display';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
+/** @import Player from '../../player' */
+
 /**
  * Displays the time left in the video
  *
@@ -15,7 +17,7 @@ class RemainingTimeDisplay extends TimeDisplay {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

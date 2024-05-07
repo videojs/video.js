@@ -4,6 +4,8 @@
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
+/** @import Player from '../../player' */
+
 /**
  * A special menu item for turning off a specific type of text track
  *
@@ -14,7 +16,7 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

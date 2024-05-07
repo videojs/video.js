@@ -7,6 +7,8 @@ import {IS_CHROME} from '../utils/browser.js';
 import {clamp} from '../utils/num.js';
 import keycode from 'keycode';
 
+/** @import Player from '../player' */
+
 /**
  * The base functionality for a slider. Can be vertical or horizontal.
  * For instance the volume bar or the seek bar on a video is a slider.
@@ -18,7 +20,7 @@ class Slider extends Component {
   /**
  * Create an instance of this class
  *
- * @param { import('../player').default } player
+ * @param {Player} player
  *        The `Player` that this class should be attached to.
  *
  * @param {Object} [options]

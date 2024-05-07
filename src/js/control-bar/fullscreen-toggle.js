@@ -5,6 +5,8 @@ import Button from '../button.js';
 import Component from '../component.js';
 import document from 'global/document';
 
+/** @import Player from './player' */
+
 /**
  * Toggle fullscreen video
  *
@@ -15,7 +17,7 @@ class FullscreenToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

@@ -14,6 +14,8 @@ import {toTitleCase, toLowerCase} from './utils/str.js';
 import {merge} from './utils/obj.js';
 import keycode from 'keycode';
 
+/** @import Player from './player' */
+
 /**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
@@ -35,7 +37,7 @@ class Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -292,7 +294,7 @@ class Component {
   /**
    * Return the {@link Player} that the `Component` has attached to.
    *
-   * @return { import('./player').default }
+   * @return {Player}
    *         The player that this `Component` has attached to.
    */
   player() {

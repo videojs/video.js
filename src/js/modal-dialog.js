@@ -7,6 +7,9 @@ import window from 'global/window';
 import document from 'global/document';
 import keycode from 'keycode';
 
+/** @import Player from './player' */
+/** @import { ContentDescriptor } from './utils/dom' */
+
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 
 /**
@@ -23,13 +26,13 @@ class ModalDialog extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
    *        The key/value store of player options.
    *
-   * @param { import('./utils/dom').ContentDescriptor} [options.content=undefined]
+   * @param {ContentDescriptor} [options.content=undefined]
    *        Provide customized content for this modal.
    *
    * @param {string} [options.description]
@@ -329,7 +332,7 @@ class ModalDialog extends Component {
    * @fires ModalDialog#beforemodalfill
    * @fires ModalDialog#modalfill
    *
-   * @param { import('./utils/dom').ContentDescriptor} [content]
+   * @param {ContentDescriptor} [content]
    *        The same rules apply to this as apply to the `content` option.
    */
   fillWith(content) {
@@ -406,12 +409,12 @@ class ModalDialog extends Component {
    * This does not update the DOM or fill the modal, but it is called during
    * that process.
    *
-   * @param  { import('./utils/dom').ContentDescriptor} [value]
+   * @param  {ContentDescriptor} [value]
    *         If defined, sets the internal content value to be used on the
    *         next call(s) to `fill`. This value is normalized before being
    *         inserted. To "clear" the internal content value, pass `null`.
    *
-   * @return { import('./utils/dom').ContentDescriptor}
+   * @return {ContentDescriptor}
    *         The current content of the modal dialog
    */
   content(value) {
