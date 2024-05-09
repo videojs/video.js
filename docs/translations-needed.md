@@ -16,7 +16,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 1)     | Playing in Picture-in-Picture                                                       |
+| ar.json (Complete)     |                                                       |
 | az.json (Complete)      |                                                                                     |
 | ba.json (missing 71)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
