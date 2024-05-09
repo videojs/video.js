@@ -2,7 +2,7 @@
   "Play": "تشغيل",
   "Pause": "إيقاف",
   "Current Time": "الوقت الحالي",
-  "Duration": "مدة",
+  "Duration": "المدة",
   "Remaining Time": "الوقت المتبقي",
   "Stream Type": "نوع التيار",
   "LIVE": "مباشر",
@@ -91,6 +91,7 @@
   "Opacity": "معدل الشفافية",
   "Text Background": "خلفية النص",
   "Caption Area Background": "خلفية منطقة التسمية التوضيحية",
+  "Playing in Picture-in-Picture": "صورة داخل صورة قيد التشغيل",
   "Skip forward {1} seconds": "التخطي للأمام {1}",
   "Skip backward {1} seconds": "الرجوع للخلف {1}"
 }
