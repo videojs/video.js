@@ -7,6 +7,8 @@ import * as Events from '../utils/events.js';
 import keycode from 'keycode';
 import document from 'global/document';
 
+/** @import Player from './player' */
+
 // Required children
 import './volume-control/volume-control.js';
 import './mute-toggle.js';
@@ -22,7 +24,7 @@ class VolumePanel extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]

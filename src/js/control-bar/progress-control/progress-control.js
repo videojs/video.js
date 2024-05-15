@@ -7,6 +7,8 @@ import {clamp} from '../../utils/num.js';
 import {bind_, throttle, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 import {silencePromise} from '../../utils/promise';
 
+/** @import Player from '../../player' */
+
 import './seek-bar.js';
 
 /**
@@ -20,7 +22,7 @@ class ProgressControl extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

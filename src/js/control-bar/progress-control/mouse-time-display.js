@@ -4,6 +4,8 @@
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
+/** @import Player from '../../player' */
+
 import './time-tooltip';
 
 /**
@@ -19,7 +21,7 @@ class MouseTimeDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]

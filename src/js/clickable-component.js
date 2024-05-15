@@ -6,6 +6,8 @@ import * as Dom from './utils/dom.js';
 import log from './utils/log.js';
 import keycode from 'keycode';
 
+/** @import Player from './player' */
+
 /**
  * Component which is clickable or keyboard actionable, but is not a
  * native HTML button.
@@ -17,7 +19,7 @@ class ClickableComponent extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param  { import('./player').default } player
+   * @param  {Player} player
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]

@@ -5,6 +5,8 @@ import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
+/** @import Player from '../../player' */
+
 /**
  * The button component for toggling and selecting descriptions
  *
@@ -15,7 +17,7 @@ class DescriptionsButton extends TextTrackButton {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

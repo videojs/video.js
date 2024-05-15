@@ -11,6 +11,8 @@ import TextTrackSettingsColors from './text-track-settings-colors';
 import TextTrackSettingsFont from './text-track-settings-font';
 import TrackSettingsControls from './text-track-settings-controls';
 
+/** @import Player from '../player' */
+
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
 const COLOR_BLACK = ['#000', 'Black'];
@@ -252,7 +254,7 @@ class TextTrackSettings extends ModalDialog {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *         The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

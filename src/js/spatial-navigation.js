@@ -5,6 +5,9 @@ import EventTarget from './event-target';
 import keycode from 'keycode';
 import SpatialNavKeyCodes from './utils/spatial-navigation-key-codes';
 
+/** @import Component from './component' */
+/** @import Player from './player' */
+
 // The number of seconds the `step*` functions move the timeline.
 const STEP_SECONDS = 5;
 
@@ -22,7 +25,7 @@ class SpatialNavigation extends EventTarget {
    * Sets up the player instance, and prepares the spatial navigation system.
    *
    * @class
-   * @param {Object} player - The Video.js player instance to which the spatial navigation is attached.
+   * @param {Player} player - The Video.js player instance to which the spatial navigation is attached.
    */
   constructor(player) {
     super();

@@ -57,6 +57,9 @@ import './title-bar.js';
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
 
+/** @import { TimeRange } from './utils/time' */
+/** @import HtmlTrackElement from './tracks/html-track-element' */
+
 // The following tech events are simply re-triggered
 // on the player when they happen
 const TECH_EVENTS_RETRIGGER = [
@@ -2484,7 +2487,7 @@ class Player extends Component {
    * Get a TimeRange object representing the current ranges of time that the user
    * has played.
    *
-   * @return { import('./utils/time').TimeRange }
+   * @return {TimeRange}
    *         A time range object that represents all the increments of time that have
    *         been played.
    */
@@ -2652,7 +2655,7 @@ class Player extends Component {
    *
    * @see [Buffered Spec]{@link http://dev.w3.org/html5/spec/video.html#dom-media-buffered}
    *
-   * @return { import('./utils/time').TimeRange }
+   * @return {TimeRange}
    *         A mock {@link TimeRanges} object (following HTML spec)
    */
   buffered() {
@@ -2671,7 +2674,7 @@ class Player extends Component {
    *
    * @see [Seekable Spec]{@link https://html.spec.whatwg.org/multipage/media.html#dom-media-seekable}
    *
-   * @return { import('./utils/time').TimeRange }
+   * @return {TimeRange}
    *         A mock {@link TimeRanges} object (following HTML spec)
    */
   seekable() {
@@ -4703,7 +4706,7 @@ class Player extends Component {
    *                                        from the TextTrackList and HtmlTrackElementList
    *                                        after a source change
    *
-   * @return { import('./tracks/html-track-element').default }
+   * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
    *         to the HtmlTrackElementList and the remote
    *         TextTrackList

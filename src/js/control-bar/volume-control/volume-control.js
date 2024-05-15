@@ -6,6 +6,8 @@ import checkVolumeSupport from './check-volume-support';
 import {isPlain} from '../../utils/obj';
 import {throttle, bind_, UPDATE_REFRESH_INTERVAL} from '../../utils/fn.js';
 
+/** @import Player from '../../player' */
+
 // Required children
 import './volume-bar.js';
 
@@ -19,7 +21,7 @@ class VolumeControl extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
