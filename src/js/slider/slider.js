@@ -5,7 +5,6 @@ import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {IS_CHROME} from '../utils/browser.js';
 import {clamp} from '../utils/num.js';
-import keycode from 'keycode';
 
 /** @import Player from '../player' */
 
@@ -315,13 +314,13 @@ class Slider extends Component {
     const horizontalSeek = spatialNavOptions && spatialNavOptions.horizontalSeek;
 
     if (spatialNavEnabled) {
-      if ((horizontalSeek && keycode.isEventKey(event, 'Left')) ||
-        (!horizontalSeek && keycode.isEventKey(event, 'Down'))) {
+      if ((horizontalSeek && event.key === 'ArrowLeft') ||
+        (!horizontalSeek && event.key === 'ArrowDown')) {
         event.preventDefault();
         event.stopPropagation();
         this.stepBack();
-      } else if ((horizontalSeek && keycode.isEventKey(event, 'Right')) ||
-        (!horizontalSeek && keycode.isEventKey(event, 'Up'))) {
+      } else if ((horizontalSeek && event.key === 'ArrowRight') ||
+        (!horizontalSeek && event.key === 'ArrowUp')) {
         event.preventDefault();
         event.stopPropagation();
         this.stepForward();
@@ -330,13 +329,13 @@ class Slider extends Component {
       }
 
       // Left and Down Arrows
-    } else if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
       event.preventDefault();
       event.stopPropagation();
       this.stepBack();
 
       // Up and Right Arrows
-    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
       event.preventDefault();
       event.stopPropagation();
       this.stepForward();

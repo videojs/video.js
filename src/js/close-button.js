@@ -3,7 +3,6 @@
  */
 import Button from './button';
 import Component from './component';
-import keycode from 'keycode';
 
 /** @import Player from './player' */
 
@@ -80,7 +79,7 @@ class CloseButton extends Button {
    */
   handleKeyDown(event) {
     // Esc button will trigger `click` event
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
       this.trigger('click');

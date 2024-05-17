@@ -3,8 +3,6 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import {MenuKeys} from './menu-keys.js';
-import keycode from 'keycode';
 import {createEl} from '../utils/dom.js';
 
 /** @import Player from '../player' */
@@ -96,7 +94,7 @@ class MenuItem extends ClickableComponent {
    * @listens keydown
    */
   handleKeyDown(event) {
-    if (!MenuKeys.some((key) => keycode.isEventKey(event, key))) {
+    if (['Tab', 'Escape', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(event.key)) {
       // Pass keydown handling up for unused keys
       super.handleKeyDown(event);
     }
