@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import TestHelpers from './test-helpers';
 
 const getMockEscapeEvent = () => ({
+  key: 'Escape',
   which: 27,
   preventDefault() {},
   stopPropagation() {}
