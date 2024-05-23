@@ -61,6 +61,7 @@ module.exports = {
   plugins: [
     'plugins/markdown',
     'build/jsdoc-typeof-plugin',
+    'build/jsdoc-workarounds',
   ],
   markdown: {
     tags: ['example'],
