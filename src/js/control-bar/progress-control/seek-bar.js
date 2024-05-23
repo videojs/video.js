@@ -8,7 +8,6 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import {formatTime} from '../../utils/time.js';
 import {silencePromise} from '../../utils/promise';
-import keycode from 'keycode';
 import document from 'global/document';
 
 /** @import Player from '../../player' */
@@ -438,15 +437,15 @@ class SeekBar extends Slider {
   handleKeyDown(event) {
     const liveTracker = this.player_.liveTracker;
 
-    if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
+    if (event.key === ' ' || event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
       this.handleAction(event);
-    } else if (keycode.isEventKey(event, 'Home')) {
+    } else if (event.key === 'Home') {
       event.preventDefault();
       event.stopPropagation();
       this.userSeek_(0);
-    } else if (keycode.isEventKey(event, 'End')) {
+    } else if (event.key === 'End') {
       event.preventDefault();
       event.stopPropagation();
       if (liveTracker && liveTracker.isLive()) {
@@ -454,21 +453,21 @@ class SeekBar extends Slider {
       } else {
         this.userSeek_(this.player_.duration());
       }
-    } else if (/^[0-9]$/.test(keycode(event))) {
+    } else if (/^[0-9]$/.test(event.key)) {
       event.preventDefault();
       event.stopPropagation();
-      const gotoFraction = (keycode.codes[keycode(event)] - keycode.codes['0']) * 10.0 / 100.0;
+      const gotoFraction = parseInt(event.key, 10) * 0.1;
 
       if (liveTracker && liveTracker.isLive()) {
         this.userSeek_(liveTracker.seekableStart() + (liveTracker.liveWindow() * gotoFraction));
       } else {
         this.userSeek_(this.player_.duration() * gotoFraction);
       }
-    } else if (keycode.isEventKey(event, 'PgDn')) {
+    } else if (event.key === 'PageDown') {
       event.preventDefault();
       event.stopPropagation();
       this.userSeek_(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
-    } else if (keycode.isEventKey(event, 'PgUp')) {
+    } else if (event.key === 'PageUp') {
       event.preventDefault();
       event.stopPropagation();
       this.userSeek_(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));

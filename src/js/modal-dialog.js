@@ -5,7 +5,6 @@ import * as Dom from './utils/dom';
 import Component from './component';
 import window from 'global/window';
 import document from 'global/document';
-import keycode from 'keycode';
 
 /** @import Player from './player' */
 /** @import { ContentDescriptor } from './utils/dom' */
@@ -470,14 +469,14 @@ class ModalDialog extends Component {
     // Do not allow keydowns to reach out of the modal dialog.
     event.stopPropagation();
 
-    if (keycode.isEventKey(event, 'Escape') && this.closeable()) {
+    if (event.key === 'Escape' && this.closeable()) {
       event.preventDefault();
       this.close();
       return;
     }
 
     // exit early if it isn't a tab key
-    if (!keycode.isEventKey(event, 'Tab')) {
+    if (event.key !== 'Tab') {
       return;
     }
 

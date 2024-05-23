@@ -12,7 +12,6 @@ import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import {toTitleCase, toLowerCase} from './utils/str.js';
 import {merge} from './utils/obj.js';
-import keycode from 'keycode';
 
 /** @import Player from './player' */
 
@@ -1354,7 +1353,7 @@ class Component {
 
       // We only stop propagation here because we want unhandled events to fall
       // back to the browser. Exclude Tab for focus trapping, exclude also when spatialNavigation is enabled.
-      if (!keycode.isEventKey(event, 'Tab') && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
+      if (event.key !== 'Tab' && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
         event.stopPropagation();
       }
       this.player_.handleKeyDown(event);

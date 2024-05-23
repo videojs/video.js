@@ -2,7 +2,6 @@
  * @file spatial-navigation.js
  */
 import EventTarget from './event-target';
-import keycode from 'keycode';
 import SpatialNavKeyCodes from './utils/spatial-navigation-key-codes';
 
 /** @import Component from './component' */
@@ -82,14 +81,15 @@ class SpatialNavigation extends EventTarget {
     // Determine if the event is a custom modalKeydown event
     const actualEvent = event.originalEvent ? event.originalEvent : event;
 
-    if (keycode.isEventKey(actualEvent, 'left') || keycode.isEventKey(actualEvent, 'up') ||
-      keycode.isEventKey(actualEvent, 'right') || keycode.isEventKey(actualEvent, 'down')) {
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(actualEvent.key)) {
       // Handle directional navigation
       if (this.isPaused_) {
         return;
       }
       actualEvent.preventDefault();
-      const direction = keycode(actualEvent);
+
+      // "ArrowLeft" => "left" etc
+      const direction = actualEvent.key.substring(5).toLowerCase();
 
       this.move(direction);
     } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'play') || SpatialNavKeyCodes.isEventKey(actualEvent, 'pause') ||

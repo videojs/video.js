@@ -4,7 +4,6 @@
 import Component from '../component.js';
 import {isPlain} from '../utils/obj';
 import * as Events from '../utils/events.js';
-import keycode from 'keycode';
 import document from 'global/document';
 
 /** @import Player from './player' */
@@ -140,7 +139,7 @@ class VolumePanel extends Component {
    * @listens keyup
    */
   handleVolumeControlKeyUp(event) {
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       this.muteToggle.focus();
     }
   }
@@ -185,7 +184,7 @@ class VolumePanel extends Component {
    * @listens keydown | keyup
    */
   handleKeyPress(event) {
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       this.handleMouseOut();
     }
   }

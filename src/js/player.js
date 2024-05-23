@@ -34,7 +34,6 @@ import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
 import {hooks} from './utils/hooks';
 import {isObject} from './utils/obj';
-import keycode from 'keycode';
 import icons from '../images/icons.svg';
 import SpatialNavigation from './spatial-navigation.js';
 
@@ -3121,7 +3120,7 @@ class Player extends Component {
    *        Event to check for key press
    */
   fullWindowOnEscKey(event) {
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       if (this.isFullscreen() === true) {
         if (!this.isFullWindow) {
           this.exitFullscreen();
@@ -3371,9 +3370,9 @@ class Player extends Component {
 
     // set fullscreenKey, muteKey, playPauseKey from `hotkeys`, use defaults if not set
     const {
-      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f'),
-      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm'),
-      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'))
+      fullscreenKey = keydownEvent => (event.key.toLowerCase() === 'f'),
+      muteKey = keydownEvent => (event.key.toLowerCase() === 'm'),
+      playPauseKey = keydownEvent => (event.key.toLowerCase() === 'k' || event.key.toLowerCase() === ' ')
     } = hotkeys;
 
     if (fullscreenKey.call(this, event)) {
