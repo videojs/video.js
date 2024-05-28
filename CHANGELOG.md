@@ -1,3 +1,10 @@
+<a name="7.21.6"></a>
+## [7.21.6](https://github.com/videojs/video.js/compare/v7.21.5...v7.21.6) (2024-05-28)
+
+### Features
+
+* Update VHS to 2.16.3 ([#8677](https://github.com/videojs/video.js/issues/8677)) ([3a128d1](https://github.com/videojs/video.js/commit/3a128d1))
+
 <a name="7.21.5"></a>
 ## [7.21.5](https://github.com/videojs/video.js/compare/v7.21.4...v7.21.5) (2023-07-21)
 
