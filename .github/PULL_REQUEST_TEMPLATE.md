@@ -13,4 +13,6 @@ Please list the specific changes involved in this pull request.
   - [ ] Unit Tests updated or fixed
   - [ ] Docs/guides updated
   - [ ] Example created ([starter template on JSBin](https://codepen.io/gkatsev/pen/GwZegv?editors=1000#0))
+  - [ ] Has no DOM changes which impact accessiblilty or trigger warnings (e.g. Chrome issues tab)
+  - [ ] Has no changes to JSDoc which cause `npm run docs:api` to error
 - [ ] Reviewed by Two Core Contributors
