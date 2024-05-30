@@ -1,3 +1,23 @@
+<a name="8.14.1"></a>
+## [8.14.1](https://github.com/videojs/video.js/compare/v8.14.0...v8.14.1) (2024-05-30)
+
+### Bug Fixes
+
+* **docs:** Add workaround for ErrorMetadata typedef ([#8737](https://github.com/videojs/video.js/issues/8737)) ([4de09e4](https://github.com/videojs/video.js/commit/4de09e4))
+* **lang:** Arabic translation grammar, spelling and vocabulary errors ([#8724](https://github.com/videojs/video.js/issues/8724)) ([ad357b5](https://github.com/videojs/video.js/commit/ad357b5))
+* lockfile for vhs v3.13.0 ([#8751](https://github.com/videojs/video.js/issues/8751)) ([38198f6](https://github.com/videojs/video.js/commit/38198f6))
+* Remove Firefox warnings about deprecated event props ([#8736](https://github.com/videojs/video.js/issues/8736)) ([084af2f](https://github.com/videojs/video.js/commit/084af2f))
+
+### Chores
+
+* Update karma dependenciess ([#8743](https://github.com/videojs/video.js/issues/8743)) ([42e167c](https://github.com/videojs/video.js/commit/42e167c))
+* Update PR template ([#8750](https://github.com/videojs/video.js/issues/8750)) ([c5f548b](https://github.com/videojs/video.js/commit/c5f548b))
+* update VHS to v3.13.0 ([#8742](https://github.com/videojs/video.js/issues/8742)) ([978731e](https://github.com/videojs/video.js/commit/978731e))
+
+### Code Refactoring
+
+* Replace keycode dependency with event.key ([#8735](https://github.com/videojs/video.js/issues/8735)) ([35de64c](https://github.com/videojs/video.js/commit/35de64c))
+
 <a name="8.14.0"></a>
 # [8.14.0](https://github.com/videojs/video.js/compare/v8.13.0...v8.14.0) (2024-05-06)
 
