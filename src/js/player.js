@@ -795,7 +795,8 @@ class Player extends Component {
       'IS_WEBOS',
       'IS_ANDROID',
       'IS_IPAD',
-      'IS_IPHONE'
+      'IS_IPHONE',
+      'IS_CHROMECAST_RECEIVER'
     ].filter(key => browser[key]).map(key => {
       return 'vjs-device-' + key.substring(3).toLowerCase().replace(/\_/g, '-');
     });
