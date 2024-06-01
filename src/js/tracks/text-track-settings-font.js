@@ -58,7 +58,7 @@ class TextTrackSettingsFont extends Component {
       player,
       {
         id_,
-        legendId: `captions-background-${id_}`,
+        legendId: `captions-edge-style-${id_}`,
         legendText: this.localize('Text Edge Style'),
         className: 'vjs-edge-style vjs-track-setting',
         selects: this.options_.fieldSets[1],
