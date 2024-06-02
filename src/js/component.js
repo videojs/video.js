@@ -26,14 +26,6 @@ import {merge} from './utils/obj.js';
 class Component {
 
   /**
-   * A callback that is called when a component is ready. Does not have any
-   * parameters and any callback value will be ignored.
-   *
-   * @callback ReadyCallback
-   * @this Component
-   */
-
-  /**
    * Creates an instance of this class.
    *
    * @param {Player} player
@@ -835,7 +827,7 @@ class Component {
    * Different from event listeners in that if the ready event has already happened
    * it will trigger the function immediately.
    *
-   * @param {ReadyCallback} fn
+   * @param {function():void} fn
    *        Function that gets called when the `Component` is ready.
    *
    * @return {Component}
