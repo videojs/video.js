@@ -1,3 +1,14 @@
+<a name="8.15.0"></a>
+# [8.15.0](https://github.com/videojs/video.js/compare/v8.14.1...v8.15.0) (2024-06-06)
+
+### Features
+
+* update xhr ([#8757](https://github.com/videojs/video.js/issues/8757)) ([8cfd6c4](https://github.com/videojs/video.js/commit/8cfd6c4))
+
+### Bug Fixes
+
+* removes duplicate id in text track settings ([#8755](https://github.com/videojs/video.js/issues/8755)) ([a10d258](https://github.com/videojs/video.js/commit/a10d258)), closes [#8754](https://github.com/videojs/video.js/issues/8754) [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.14.1"></a>
 ## [8.14.1](https://github.com/videojs/video.js/compare/v8.14.0...v8.14.1) (2024-05-30)
 
