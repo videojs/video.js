@@ -59,6 +59,12 @@ import './tech/html5.js';
 /** @import { TimeRange } from './utils/time' */
 /** @import HtmlTrackElement from './tracks/html-track-element' */
 
+/**
+ * @callback PlayerReadyCallback
+ * @this     {Player}
+ * @returns  {void}
+ */
+
 // The following tech events are simply re-triggered
 // on the player when they happen
 const TECH_EVENTS_RETRIGGER = [
@@ -306,7 +312,7 @@ class Player extends Component {
    * @param {Object} [options]
    *        Object of option names and values.
    *
-   * @param {Function} [ready]
+   * @param {PlayerReadyCallback} [ready]
    *        Ready callback function.
    */
   constructor(tag, options, ready) {
