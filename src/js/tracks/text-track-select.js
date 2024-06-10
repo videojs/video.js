@@ -1,5 +1,6 @@
 import Component from '../component';
 import * as Dom from '../utils/dom';
+import { newGUID } from '../utils/guid';
 
 /** @import Player from './player' */
 /** @import { ContentDescriptor } from  '../utils/dom' */
@@ -29,11 +30,10 @@ class TextTrackSelect extends Component {
    * @param {string} [options.id]
    *        A text with part of an string to create atribute of aria-labelledby.
    *
-   * @param {array} [options.SelectOptions]
+   * @param {Array} [options.SelectOptions]
    *        Array that contains the value & textContent of for each of the
    *        options elements.
    */
-
   constructor(player, options = {}) {
     super(player, options);
 
@@ -57,7 +57,11 @@ class TextTrackSelect extends Component {
       },
       {},
       this.options_.SelectOptions.map((optionText) => {
-        const optionId = this.options_.labelId + '-' + optionText[1].replace(/\W+/g, '');
+        // Constructs an id for the <option>.
+        // For the colour settings that have two <selects> with a <label> each, generates an id based off the label value
+        // For font size/family and edge style with one <select> and no <label>, generates an id with a guid
+        const optionId = (this.options_.labelId ? this.options_.labelId : `vjs-track-option-${newGUID()}`) +
+          '-' + optionText[1].replace(/\W+/g, '');
 
         const option = Dom.createEl(
           'option',
