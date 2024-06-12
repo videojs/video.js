@@ -3,6 +3,8 @@
  */
 import TrackList from './track-list';
 
+/** @import TextTrack from './text-track' */
+
 /**
  * The current list of {@link TextTrack} for a media file.
  *
@@ -14,7 +16,7 @@ class TextTrackList extends TrackList {
   /**
    * Add a {@link TextTrack} to the `TextTrackList`
    *
-   * @param { import('./text-track').default } track
+   * @param {TextTrack} track
    *        The text track to add to the list.
    *
    * @fires TrackList#addtrack

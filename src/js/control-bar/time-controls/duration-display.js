@@ -4,6 +4,8 @@
 import TimeDisplay from './time-display';
 import Component from '../../component.js';
 
+/** @import Player from '../../player' */
+
 /**
  * Displays the duration
  *
@@ -14,7 +16,7 @@ class DurationDisplay extends TimeDisplay {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

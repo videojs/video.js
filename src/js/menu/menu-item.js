@@ -3,9 +3,9 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import {MenuKeys} from './menu-keys.js';
-import keycode from 'keycode';
 import {createEl} from '../utils/dom.js';
+
+/** @import Player from '../player' */
 
 /**
  * The component for a menu item. `<li>`
@@ -17,7 +17,7 @@ class MenuItem extends ClickableComponent {
   /**
    * Creates an instance of the this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -94,7 +94,7 @@ class MenuItem extends ClickableComponent {
    * @listens keydown
    */
   handleKeyDown(event) {
-    if (!MenuKeys.some((key) => keycode.isEventKey(event, key))) {
+    if (['Tab', 'Escape', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(event.key)) {
       // Pass keydown handling up for unused keys
       super.handleKeyDown(event);
     }

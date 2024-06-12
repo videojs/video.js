@@ -7,6 +7,8 @@ import * as Dom from '../utils/dom.js';
 import checkMuteSupport from './volume-control/check-mute-support';
 import * as browser from '../utils/browser.js';
 
+/** @import Player from './player' */
+
 /**
  * A button component for muting the audio.
  *
@@ -17,7 +19,7 @@ class MuteToggle extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

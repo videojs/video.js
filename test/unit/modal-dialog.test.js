@@ -6,6 +6,7 @@ import * as Dom from '../../src/js/utils/dom';
 import TestHelpers from './test-helpers';
 
 const getMockEscapeEvent = () => ({
+  key: 'Escape',
   which: 27,
   preventDefault() {},
   stopPropagation() {}

@@ -18,3 +18,8 @@
 
   @include box-shadow(0 0 1em $primary-foreground-color);
 }
+
+// Replacement for focus in case spatial navigation is enabled
+.video-js.vjs-spatial-navigation-enabled .vjs-slider:focus {
+  outline: 0.0625em solid rgba($primary-foreground-color, 1);
+}

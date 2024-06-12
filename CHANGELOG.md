@@ -1,3 +1,94 @@
+<a name="8.15.0"></a>
+# [8.15.0](https://github.com/videojs/video.js/compare/v8.14.1...v8.15.0) (2024-06-06)
+
+### Features
+
+* update xhr ([#8757](https://github.com/videojs/video.js/issues/8757)) ([8cfd6c4](https://github.com/videojs/video.js/commit/8cfd6c4))
+
+### Bug Fixes
+
+* removes duplicate id in text track settings ([#8755](https://github.com/videojs/video.js/issues/8755)) ([a10d258](https://github.com/videojs/video.js/commit/a10d258)), closes [#8754](https://github.com/videojs/video.js/issues/8754) [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.14.1"></a>
+## [8.14.1](https://github.com/videojs/video.js/compare/v8.14.0...v8.14.1) (2024-05-30)
+
+### Bug Fixes
+
+* **docs:** Add workaround for ErrorMetadata typedef ([#8737](https://github.com/videojs/video.js/issues/8737)) ([4de09e4](https://github.com/videojs/video.js/commit/4de09e4))
+* **lang:** Arabic translation grammar, spelling and vocabulary errors ([#8724](https://github.com/videojs/video.js/issues/8724)) ([ad357b5](https://github.com/videojs/video.js/commit/ad357b5))
+* lockfile for vhs v3.13.0 ([#8751](https://github.com/videojs/video.js/issues/8751)) ([38198f6](https://github.com/videojs/video.js/commit/38198f6))
+* Remove Firefox warnings about deprecated event props ([#8736](https://github.com/videojs/video.js/issues/8736)) ([084af2f](https://github.com/videojs/video.js/commit/084af2f))
+
+### Chores
+
+* Update karma dependenciess ([#8743](https://github.com/videojs/video.js/issues/8743)) ([42e167c](https://github.com/videojs/video.js/commit/42e167c))
+* Update PR template ([#8750](https://github.com/videojs/video.js/issues/8750)) ([c5f548b](https://github.com/videojs/video.js/commit/c5f548b))
+* update VHS to v3.13.0 ([#8742](https://github.com/videojs/video.js/issues/8742)) ([978731e](https://github.com/videojs/video.js/commit/978731e))
+
+### Code Refactoring
+
+* Replace keycode dependency with event.key ([#8735](https://github.com/videojs/video.js/issues/8735)) ([35de64c](https://github.com/videojs/video.js/commit/35de64c))
+
+<a name="8.14.0"></a>
+# [8.14.0](https://github.com/videojs/video.js/compare/v8.13.0...v8.14.0) (2024-05-06)
+
+### Features
+
+* refactor error consts ([#8719](https://github.com/videojs/video.js/issues/8719)) ([4dfea61](https://github.com/videojs/video.js/commit/4dfea61))
+
+### Bug Fixes
+
+* **dom:** handle slotted parent transform position ([#8158](https://github.com/videojs/video.js/issues/8158)) ([9946a19](https://github.com/videojs/video.js/commit/9946a19))
+* Ensure aria-labelledby values in track settings are valid ([#8711](https://github.com/videojs/video.js/issues/8711)) ([ad3be35](https://github.com/videojs/video.js/commit/ad3be35))
+* **player:** adapt player height to control bar height in audioOnly mode ([#8579](https://github.com/videojs/video.js/issues/8579)) ([8050466](https://github.com/videojs/video.js/commit/8050466))
+* prevent error for root shadow elements when restorEl is enabled ([#8679](https://github.com/videojs/video.js/issues/8679)) ([31b0378](https://github.com/videojs/video.js/commit/31b0378))
+* progress bar sometimes is not filled on 100% ([#8633](https://github.com/videojs/video.js/issues/8633)) ([3e697e9](https://github.com/videojs/video.js/commit/3e697e9))
+* Support MacOS trackpad with tap-to-click ([#8700](https://github.com/videojs/video.js/issues/8700)) ([cb76a24](https://github.com/videojs/video.js/commit/cb76a24))
+
+### Chores
+
+* **css:** fix typo in postcss-config browserslist and update list ([#8578](https://github.com/videojs/video.js/issues/8578)) ([3df0e9b](https://github.com/videojs/video.js/commit/3df0e9b))
+* remove plugin errors from error const ([#8706](https://github.com/videojs/video.js/issues/8706)) ([466fa97](https://github.com/videojs/video.js/commit/466fa97))
+
+### Code Refactoring
+
+* use URL API ([#8716](https://github.com/videojs/video.js/issues/8716)) ([992af3b](https://github.com/videojs/video.js/commit/992af3b))
+
+<a name="8.13.0"></a>
+# [8.13.0](https://github.com/videojs/video.js/compare/v8.12.0...v8.13.0) (2024-04-22)
+
+### Features
+
+* implement spatial navigation ([#8570](https://github.com/videojs/video.js/issues/8570)) ([21b4a52](https://github.com/videojs/video.js/commit/21b4a52))
+* **player:** Make 'searchForTrackSelect_' private & use 'el' as parameter in function 'getIsFocusable' ([#8697](https://github.com/videojs/video.js/issues/8697)) ([ec69d5e](https://github.com/videojs/video.js/commit/ec69d5e))
+
+### Bug Fixes
+
+* update vhs version ([#8704](https://github.com/videojs/video.js/issues/8704)) ([8699deb](https://github.com/videojs/video.js/commit/8699deb))
+
+<a name="8.12.0"></a>
+# [8.12.0](https://github.com/videojs/video.js/compare/v8.11.8...v8.12.0) (2024-04-16)
+
+### Features
+
+* add browser.IS_SMART_TV and class names for CSS targeting devices ([#8676](https://github.com/videojs/video.js/issues/8676)) ([8e5870f](https://github.com/videojs/video.js/commit/8e5870f))
+* **emulated-tracks:** add class to force cues to be center aligned ([#8625](https://github.com/videojs/video.js/issues/8625)) ([d715e0f](https://github.com/videojs/video.js/commit/d715e0f))
+* **lang:** Add support for Marathi Language ([#8596](https://github.com/videojs/video.js/issues/8596)) ([80429fa](https://github.com/videojs/video.js/commit/80429fa))
+* **lang:** added arabic seek button translations ([#8616](https://github.com/videojs/video.js/issues/8616)) ([ee07382](https://github.com/videojs/video.js/commit/ee07382))
+
+### Bug Fixes
+
+* add additional and remove unused error const ([#8656](https://github.com/videojs/video.js/issues/8656)) ([caf6d30](https://github.com/videojs/video.js/commit/caf6d30))
+* **build:** Use quoted dbl quotes to support Windows ([#8681](https://github.com/videojs/video.js/issues/8681)) ([3f32de3](https://github.com/videojs/video.js/commit/3f32de3))
+* **i18n:** better Italian translation for "captions" ([#8513](https://github.com/videojs/video.js/issues/8513)) ([4a17426](https://github.com/videojs/video.js/commit/4a17426)), closes [/www.w3.org/Translations/WCAG22-it/#h-note-76](https://github.com//www.w3.org/Translations/WCAG22-it//issues/h-note-76)
+* time tooltip truncated ([#8527](https://github.com/videojs/video.js/issues/8527)) ([50f14bd](https://github.com/videojs/video.js/commit/50f14bd))
+
+### Chores
+
+* Remove unused type.js file ([#8658](https://github.com/videojs/video.js/issues/8658)) ([4ccedc1](https://github.com/videojs/video.js/commit/4ccedc1))
+* update GitHub Actions version and remove xvfb ([#8682](https://github.com/videojs/video.js/issues/8682)) ([af06f50](https://github.com/videojs/video.js/commit/af06f50))
+* update VHS to v3.12.1 ([#8687](https://github.com/videojs/video.js/issues/8687)) ([12310ed](https://github.com/videojs/video.js/commit/12310ed))
+
 <a name="8.11.8"></a>
 ## [8.11.8](https://github.com/videojs/video.js/compare/v8.11.7...v8.11.8) (2024-03-12)
 

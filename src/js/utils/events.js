@@ -112,15 +112,19 @@ export function fixEvent(event) {
     // IE8 Doesn't like when you mess with native event properties
     // Firefox returns false for event.hasOwnProperty('type') and other props
     //  which makes copying more difficult.
-    // TODO: Probably best to create a whitelist of event props
+
+    // TODO: Probably best to create an allowlist of event props
+    const deprecatedProps = [
+      'layerX', 'layerY', 'keyLocation', 'path',
+      'webkitMovementX', 'webkitMovementY', 'mozPressure', 'mozInputSource'
+    ];
+
     for (const key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
       // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
       // and webkitMovementX/Y
       // Lighthouse complains if Event.path is copied
-      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation' &&
-          key !== 'webkitMovementX' && key !== 'webkitMovementY' &&
-          key !== 'path') {
+      if (!deprecatedProps.includes(key)) {
         // Chrome 32+ warns if you try to copy deprecated returnValue, but
         // we still want to if preventDefault isn't supported (IE8).
         if (!(key === 'returnValue' && old.preventDefault)) {

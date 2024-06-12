@@ -6,6 +6,8 @@ import * as Dom from '../../utils/dom.js';
 import {formatTime} from '../../utils/time.js';
 import * as Fn from '../../utils/fn.js';
 
+/** @import Player from '../../player' */
+
 /**
  * Time tooltips display a time above the progress bar.
  *
@@ -16,7 +18,7 @@ class TimeTooltip extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]
@@ -66,15 +68,24 @@ class TimeTooltip extends Component {
     // of the player. We calculate any gap between the left edge of the player
     // and the left edge of the `SeekBar` and add the number of pixels in the
     // `SeekBar` before hitting the `seekBarPoint`
-    const spaceLeftOfPoint = (seekBarRect.left - playerRect.left) + seekBarPointPx;
+    let spaceLeftOfPoint = (seekBarRect.left - playerRect.left) + seekBarPointPx;
 
     // This is the space right of the `seekBarPoint` available within the bounds
     // of the player. We calculate the number of pixels from the `seekBarPoint`
     // to the right edge of the `SeekBar` and add to that any gap between the
     // right edge of the `SeekBar` and the player.
-    const spaceRightOfPoint = (seekBarRect.width - seekBarPointPx) +
+    let spaceRightOfPoint = (seekBarRect.width - seekBarPointPx) +
       (playerRect.right - seekBarRect.right);
 
+    // spaceRightOfPoint is always NaN for mouse time display
+    // because the seekbarRect does not have a right property. This causes
+    // the mouse tool tip to be truncated when it's close to the right edge of the player.
+    // In such cases, we ignore the `playerRect.right - seekBarRect.right` value when calculating.
+    // For the sake of consistency, we ignore seekBarRect.left - playerRect.left for the left edge.
+    if (!spaceRightOfPoint) {
+      spaceRightOfPoint = seekBarRect.width - seekBarPointPx;
+      spaceLeftOfPoint = seekBarPointPx;
+    }
     // This is the number of pixels by which the tooltip will need to be pulled
     // further to the right to center it over the `seekBarPoint`.
     let pullTooltipBy = tooltipRect.width / 2;
