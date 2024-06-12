@@ -104,9 +104,9 @@ export default function createLogger(name, delimiter = ':', styles = '') {
    * @param    {...*} args
    *           One or more messages or objects that should be logged.
    */
-  const log = function(...args) {
+  function log(...args) {
     logByType('log', level, args);
-  };
+  }
 
   // This is the logByType helper that the logging methods below use
   logByType = LogByTypeFactory(name, log, styles);
@@ -114,7 +114,7 @@ export default function createLogger(name, delimiter = ':', styles = '') {
   /**
    * Create a new subLogger which chains the old name to the new name.
    *
-   * For example, doing `videojs.log.createLogger('player')` and then using that logger will log the following:
+   * For example, doing `mylogger = videojs.log.createLogger('player')` and then using that logger will log the following:
    * ```js
    *  mylogger('foo');
    *  // > VIDEOJS: player: foo
