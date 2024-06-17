@@ -7,6 +7,8 @@ import * as Dom from '../../utils/dom.js';
 import {clamp} from '../../utils/num.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 
+/** @import Player from '../../player' */
+
 // Required children
 import './volume-level.js';
 import './mouse-volume-level-display.js';
@@ -21,7 +23,7 @@ class VolumeBar extends Slider {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

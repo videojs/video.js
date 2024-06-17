@@ -7,6 +7,8 @@ import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 import SubsCapsMenuItem from './subs-caps-menu-item.js';
 import {toTitleCase} from '../../utils/str.js';
 
+/** @import Player from '../../player' */
+
 /**
  * The button component for toggling and selecting captions and/or subtitles
  *
@@ -17,7 +19,7 @@ class SubsCapsButton extends TextTrackButton {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

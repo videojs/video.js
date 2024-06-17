@@ -16,9 +16,8 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (missing 3)     | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| ar.json (Complete)     |                                                       |
+| az.json (Complete)      |                                                                                     |
 | ba.json (missing 71)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
 |                         | Replay                                                                              |
@@ -169,77 +168,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| ca.json (missing 71)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
-|                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
-|                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | Volume Level                                                                        |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | Close                                                                               |
-|                         | Close Modal Dialog                                                                  |
-|                         | Modal Window                                                                        |
-|                         | This is a modal window                                                              |
-|                         | This modal can be closed by pressing the Escape key or activating the close button. |
-|                         | , opens captions settings dialog                                                    |
-|                         | , opens subtitles settings dialog                                                   |
-|                         | , opens descriptions settings dialog                                                |
-|                         | , selected                                                                          |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
-|                         | Raised                                                                              |
-|                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Drop shadow                                                                         |
-|                         | Font Family                                                                         |
-|                         | Proportional Sans-Serif                                                             |
-|                         | Monospace Sans-Serif                                                                |
-|                         | Proportional Serif                                                                  |
-|                         | Monospace Serif                                                                     |
-|                         | Casual                                                                              |
-|                         | Script                                                                              |
-|                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| ca.json (Complete)      |                                                                                     |
 | cs.json (missing 12)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | Exit Picture-in-Picture                                                             |
@@ -622,7 +551,9 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
 |                         | Playing in Picture-in-Picture                                                       |
-| nb.json (missing 10)    | Exit Picture-in-Picture                                                             |
+| nb.json (Complete)      |                                                                                     |
+| nl.json (missing 1)     | Playing in Picture-in-Picture                                                       |
+| nn.json (missing 10)    | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
 |                         | No content                                                                          |
 |                         | Color                                                                               |
@@ -632,9 +563,16 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| nl.json (missing 1)     | Playing in Picture-in-Picture                                                       |
-| nn.json (missing 10)    | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
+| np.json (missing 9)     | Drop shadow                                                                         |
+|                         | No content                                                                          |
+|                         | Color                                                                               |
+|                         | Opacity                                                                             |
+|                         | Text Background                                                                     |
+|                         | Caption Area Background                                                             |
+|                         | Playing in Picture-in-Picture                                                       |
+|                         | Skip backward {1} seconds                                                           |
+|                         | Skip forward {1} seconds                                                            |
+| np.json (missing 9)     | Drop shadow                                                                         |
 |                         | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |

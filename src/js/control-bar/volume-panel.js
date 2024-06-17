@@ -4,8 +4,9 @@
 import Component from '../component.js';
 import {isPlain} from '../utils/obj';
 import * as Events from '../utils/events.js';
-import keycode from 'keycode';
 import document from 'global/document';
+
+/** @import Player from './player' */
 
 // Required children
 import './volume-control/volume-control.js';
@@ -22,7 +23,7 @@ class VolumePanel extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -138,7 +139,7 @@ class VolumePanel extends Component {
    * @listens keyup
    */
   handleVolumeControlKeyUp(event) {
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       this.muteToggle.focus();
     }
   }
@@ -183,7 +184,7 @@ class VolumePanel extends Component {
    * @listens keydown | keyup
    */
   handleKeyPress(event) {
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       this.handleMouseOut();
     }
   }

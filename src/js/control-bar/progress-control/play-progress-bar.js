@@ -5,6 +5,8 @@ import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Fn from '../../utils/fn.js';
 
+/** @import Player from '../../player' */
+
 import './time-tooltip';
 
 /**
@@ -18,7 +20,7 @@ class PlayProgressBar extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The {@link Player} that this class should be attached to.
    *
    * @param {Object} [options]

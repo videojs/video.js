@@ -5,6 +5,8 @@ import Button from '../button';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
+/** @import Player from './player' */
+
 /**
  * Displays the live indicator when duration is Infinity.
  *
@@ -15,7 +17,7 @@ class SeekToLive extends Button {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('./player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

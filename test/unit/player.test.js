@@ -967,6 +967,97 @@ QUnit.test('should add a touch-enabled classname when touch is supported', funct
   player.dispose();
 });
 
+QUnit.test('should add smart-tv classname when on smart tv', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_SMART_TV(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-smart-tv'), 'smart-tv classname added');
+
+  browser.reset_IS_SMART_TV();
+  player.dispose();
+});
+
+QUnit.test('should add webos classname when on webos', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_WEBOS(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-webos'), 'webos classname added');
+
+  browser.reset_IS_WEBOS();
+  player.dispose();
+});
+
+QUnit.test('should add tizen classname when on tizen', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_TIZEN(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-tizen'), 'tizen classname added');
+
+  browser.reset_IS_TIZEN();
+  player.dispose();
+});
+
+QUnit.test('should add android classname when on android', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_ANDROID(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-android'), 'android classname added');
+
+  browser.reset_IS_ANDROID();
+  player.dispose();
+});
+
+QUnit.test('should add ipad classname when on ipad', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_IPAD(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-ipad'), 'ipad classname added');
+
+  browser.reset_IS_IPAD();
+  player.dispose();
+});
+
+QUnit.test('should add iphone classname when on iphone', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_IPHONE(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-iphone'), 'iphone classname added');
+
+  browser.reset_IS_IPHONE();
+  player.dispose();
+});
+
+QUnit.test('should add chromecast-receiver classname when on chromecast receiver', function(assert) {
+  assert.expect(1);
+
+  browser.stub_IS_CHROMECAST_RECEIVER(true);
+
+  const player = TestHelpers.makePlayer({});
+
+  assert.ok(player.hasClass('vjs-device-chromecast-receiver'), 'chromecast-receiver classname added');
+
+  browser.reset_IS_CHROMECAST_RECEIVER();
+  player.dispose();
+});
+
 QUnit.test('should add a svg-icons-enabled classname when svg icons are supported', function(assert) {
   // Stub a successful parsing of the SVG sprite.
   sinon.stub(window.DOMParser.prototype, 'parseFromString').returns({
@@ -3323,6 +3414,33 @@ QUnit.test('turning on audioPosterMode when audioOnlyMode is already on will tur
     });
 });
 
+QUnit.test('player height should match control bar height when audioOnlyMode is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({ responsive: true, width: 320, height: 240 });
+
+  player.trigger('ready');
+
+  player.audioOnlyMode(true).then(() => {
+    const initialPlayerHeight = player.currentHeight();
+
+    player.width(768);
+    player.el().style.fontSize = '20px';
+    player.trigger('playerresize');
+
+    assert.ok(initialPlayerHeight !== player.currentHeight(), 'player height is updated');
+  })
+    .then(() => player.audioOnlyMode(false))
+    .then(() => {
+      const initialPlayerHeight = player.currentHeight();
+
+      player.width(768);
+      player.el().style.fontSize = '20px';
+      player.trigger('playerresize');
+
+      assert.equal(player.currentHeight(), initialPlayerHeight, 'player height remains unchanged');
+      assert.ok(initialPlayerHeight !== player.controlBar.currentHeight(), 'player height is different from control bar height');
+    });
+});
+
 QUnit.test('player#load resets the media element to its initial state', function(assert) {
   const player = TestHelpers.makePlayer({});
 
@@ -3492,3 +3610,4 @@ QUnit.test('smooth seeking set to true should update the display time components
   seekBarUpdate.restore();
   player.dispose();
 });
+

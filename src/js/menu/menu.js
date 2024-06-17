@@ -5,7 +5,8 @@ import Component from '../component.js';
 import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Events from '../utils/events.js';
-import keycode from 'keycode';
+
+/** @import Player from '../player' */
 
 /**
  * The Menu component is used to build popup menus, including subtitle and
@@ -18,7 +19,7 @@ class Menu extends Component {
   /**
    * Create an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        the player that this component should attach to
    *
    * @param {Object} [options]
@@ -213,13 +214,13 @@ class Menu extends Component {
   handleKeyDown(event) {
 
     // Left and Down Arrows
-    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
       event.preventDefault();
       event.stopPropagation();
       this.stepForward();
 
     // Up and Right Arrows
-    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
       event.preventDefault();
       event.stopPropagation();
       this.stepBack();

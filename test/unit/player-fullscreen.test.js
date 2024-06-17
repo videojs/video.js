@@ -274,6 +274,7 @@ QUnit.test('fullwindow mode should exit when ESC event triggered', function(asse
 
   const evt = TestHelpers.createEvent('keydown');
 
+  evt.key = 'Escape';
   evt.keyCode = 27;
   evt.which = 27;
   player.boundFullWindowOnEscKey_(evt);

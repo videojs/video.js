@@ -16,6 +16,8 @@ import {toTitleCase, toLowerCase} from '../utils/str.js';
 import vtt from 'videojs-vtt.js';
 import * as Guid from '../utils/guid.js';
 
+/** @import { TimeRange } from '../utils/time' */
+
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
  * that just contains the src url alone.
@@ -275,7 +277,7 @@ class Tech extends Component {
   /**
    * Get and create a `TimeRange` object for buffering.
    *
-   * @return { import('../utils/time').TimeRange }
+   * @return {TimeRange}
    *         The time range object that was created.
    */
   buffered() {
@@ -480,7 +482,7 @@ class Tech extends Component {
    * > NOTE: This implementation is incomplete. It does not track the played `TimeRange`.
    *         It only checks whether the source has played at all or not.
    *
-   * @return { import('../utils/time').TimeRange }
+   * @return {TimeRange}
    *         - A single time range if this video has played
    *         - An empty set of ranges if not.
    */

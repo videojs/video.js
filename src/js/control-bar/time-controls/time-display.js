@@ -7,6 +7,8 @@ import * as Dom from '../../utils/dom.js';
 import {formatTime} from '../../utils/time.js';
 import log from '../../utils/log.js';
 
+/** @import Player from '../../player' */
+
 /**
  * Displays time information about the video
  *
@@ -17,7 +19,7 @@ class TimeDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

@@ -3,7 +3,8 @@
  */
 import Button from './button';
 import Component from './component';
-import keycode from 'keycode';
+
+/** @import Player from './player' */
 
 /**
  * The `CloseButton` is a `{@link Button}` that fires a `close` event when
@@ -16,7 +17,7 @@ class CloseButton extends Button {
   /**
   * Creates an instance of the this class.
   *
-  * @param  { import('./player').default } player
+  * @param  {Player} player
   *         The `Player` that this class should be attached to.
   *
   * @param  {Object} [options]
@@ -78,7 +79,7 @@ class CloseButton extends Button {
    */
   handleKeyDown(event) {
     // Esc button will trigger `click` event
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
       this.trigger('click');

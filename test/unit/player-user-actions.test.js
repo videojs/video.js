@@ -1,6 +1,5 @@
 /* eslint-env qunit */
 import document from 'global/document';
-import keycode from 'keycode';
 import sinon from 'sinon';
 import TestHelpers from './test-helpers';
 import FullscreenApi from '../../src/js/fullscreen-api.js';
@@ -254,7 +253,7 @@ const mockKeyDownEvent = (key) => {
     preventDefault() {},
     stopPropagation() {},
     type: 'keydown',
-    which: keycode.codes[key]
+    key
   };
 };
 
@@ -354,7 +353,7 @@ const defaultKeyTests = {
     }
 
     paused = true;
-    player.handleKeyDown(mockKeyDownEvent('space'));
+    player.handleKeyDown(mockKeyDownEvent(' '));
 
     if (positive) {
       assert.strictEqual(player.pause.callCount, 1, 'has paused');
@@ -365,7 +364,7 @@ const defaultKeyTests = {
     }
 
     paused = false;
-    player.handleKeyDown(mockKeyDownEvent('space'));
+    player.handleKeyDown(mockKeyDownEvent(' '));
 
     if (positive) {
       assert.strictEqual(player.pause.callCount, 2, 'has paused twice');
@@ -425,7 +424,7 @@ QUnit.test('when userActions.hotkeys.fullscreenKey can be a function', function(
     controls: true,
     userActions: {
       hotkeys: {
-        fullscreenKey: sinon.spy((e) => keycode.isEventKey(e, 'x'))
+        fullscreenKey: sinon.spy((e) => e.key === 'x')
       }
     }
   });
@@ -460,7 +459,7 @@ QUnit.test('when userActions.hotkeys.muteKey can be a function', function(assert
     controls: true,
     userActions: {
       hotkeys: {
-        muteKey: sinon.spy((e) => keycode.isEventKey(e, 'x'))
+        muteKey: sinon.spy((e) => e.key === 'x')
       }
     }
   });
@@ -495,7 +494,7 @@ QUnit.test('when userActions.hotkeys.playPauseKey can be a function', function(a
     controls: true,
     userActions: {
       hotkeys: {
-        playPauseKey: sinon.spy((e) => keycode.isEventKey(e, 'x'))
+        playPauseKey: sinon.spy((e) => e.key === 'x')
       }
     }
   });
@@ -508,7 +507,7 @@ QUnit.test('when userActions.hotkeys.playPauseKey can be a function', function(a
 
   paused = true;
   this.player.handleKeyDown(mockKeyDownEvent('k'));
-  this.player.handleKeyDown(mockKeyDownEvent('space'));
+  this.player.handleKeyDown(mockKeyDownEvent(' '));
 
   assert.strictEqual(this.player.pause.callCount, 0, 'has not paused');
   assert.strictEqual(this.player.play.callCount, 0, 'has not played');

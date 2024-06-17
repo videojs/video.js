@@ -6,6 +6,8 @@ import PlaybackRateMenuItem from './playback-rate-menu-item.js';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
+/** @import Player from '../../player' */
+
 /**
  * The component for controlling the playback rate.
  *
@@ -16,7 +18,7 @@ class PlaybackRateMenuButton extends MenuButton {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

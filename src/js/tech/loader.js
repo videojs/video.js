@@ -6,6 +6,8 @@ import Tech from './tech.js';
 import {toTitleCase} from '../utils/str.js';
 import {merge} from '../utils/obj.js';
 
+/** @import Player from '../player' */
+
 /**
  * The `MediaLoader` is the `Component` that decides which playback technology to load
  * when a player is initialized.
@@ -17,7 +19,7 @@ class MediaLoader extends Component {
   /**
    * Create an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]

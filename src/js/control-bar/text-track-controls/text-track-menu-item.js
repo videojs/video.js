@@ -6,6 +6,8 @@ import Component from '../../component.js';
 import window from 'global/window';
 import document from 'global/document';
 
+/** @import Player from '../../player' */
+
 /**
  * The specific menu item type for selecting a language within a text track kind
  *
@@ -16,7 +18,7 @@ class TextTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

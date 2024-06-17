@@ -5,7 +5,8 @@ import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import {IS_CHROME} from '../utils/browser.js';
 import {clamp} from '../utils/num.js';
-import keycode from 'keycode';
+
+/** @import Player from '../player' */
 
 /**
  * The base functionality for a slider. Can be vertical or horizontal.
@@ -18,7 +19,7 @@ class Slider extends Component {
   /**
  * Create an instance of this class
  *
- * @param { import('../player').default } player
+ * @param {Player} player
  *        The `Player` that this class should be attached to.
  *
  * @param {Object} [options]
@@ -308,15 +309,33 @@ class Slider extends Component {
    * @listens keydown
    */
   handleKeyDown(event) {
+    const spatialNavOptions = this.options_.playerOptions.spatialNavigation;
+    const spatialNavEnabled = spatialNavOptions && spatialNavOptions.enabled;
+    const horizontalSeek = spatialNavOptions && spatialNavOptions.horizontalSeek;
 
-    // Left and Down Arrows
-    if (keycode.isEventKey(event, 'Left') || keycode.isEventKey(event, 'Down')) {
+    if (spatialNavEnabled) {
+      if ((horizontalSeek && event.key === 'ArrowLeft') ||
+        (!horizontalSeek && event.key === 'ArrowDown')) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.stepBack();
+      } else if ((horizontalSeek && event.key === 'ArrowRight') ||
+        (!horizontalSeek && event.key === 'ArrowUp')) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.stepForward();
+      } else {
+        super.handleKeyDown(event);
+      }
+
+      // Left and Down Arrows
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
       event.preventDefault();
       event.stopPropagation();
       this.stepBack();
 
-    // Up and Right Arrows
-    } else if (keycode.isEventKey(event, 'Right') || keycode.isEventKey(event, 'Up')) {
+      // Up and Right Arrows
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
       event.preventDefault();
       event.stopPropagation();
       this.stepForward();

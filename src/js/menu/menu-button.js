@@ -9,7 +9,8 @@ import * as Events from '../utils/events.js';
 import {toTitleCase} from '../utils/str.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
-import keycode from 'keycode';
+
+/** @import Player from '../player' */
 
 /**
  * A `MenuButton` class for any popup {@link Menu}.
@@ -21,7 +22,7 @@ class MenuButton extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options={}]
@@ -296,19 +297,19 @@ class MenuButton extends Component {
   handleKeyDown(event) {
 
     // Escape or Tab unpress the 'button'
-    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
+    if (event.key === 'Esc' || event.key === 'Tab') {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
 
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (!keycode.isEventKey(event, 'Tab')) {
+      if (!event.key === 'Tab') {
         event.preventDefault();
         // Set focus back to the menu button's button
         this.menuButton_.focus();
       }
     // Up Arrow or Down Arrow also 'press' the button to open the menu
-    } else if (keycode.isEventKey(event, 'Up') || keycode.isEventKey(event, 'Down')) {
+    } else if ((event.key === 'Up') || event.key === 'Down' && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
       if (!this.buttonPressed_) {
         event.preventDefault();
         this.pressButton();
@@ -327,7 +328,7 @@ class MenuButton extends Component {
    */
   handleMenuKeyUp(event) {
     // Escape hides popup menu
-    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
+    if (event.key === 'Esc' || event.key === 'Tab') {
       this.removeClass('vjs-hover');
     }
   }
@@ -355,12 +356,12 @@ class MenuButton extends Component {
    */
   handleSubmenuKeyDown(event) {
     // Escape or Tab unpress the 'button'
-    if (keycode.isEventKey(event, 'Esc') || keycode.isEventKey(event, 'Tab')) {
+    if (event.key === 'Esc' || event.key === 'Tab') {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
       // Don't preventDefault for Tab key - we still want to lose focus
-      if (!keycode.isEventKey(event, 'Tab')) {
+      if (!event.key === 'Tab') {
         event.preventDefault();
         // Set focus back to the menu button's button
         this.menuButton_.focus();
