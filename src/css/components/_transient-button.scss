@@ -14,6 +14,11 @@
   display: none;
 }
 
+.video-js.not-hover .vjs-transient-button:not(.force-display),
+.video-js.vjs-user-inactive .vjs-transient-button:not(.force-display) {
+  opacity: 0;
+}
+
 .video-js .vjs-transient-button span {
   padding: 0 0.5em;
 }
@@ -40,9 +45,4 @@
 
 .video-js .vjs-transient-button:hover {
   background-color: rgba(50, 50, 50, 0.9);
-}
-
-.video-js.not-hover .vjs-transient-button:not(.force-display),
-.video-js.vjs-user-inactive .vjs-transient-button:not(.force-display) {
-  opacity: 0;
 }

@@ -5,35 +5,46 @@
     <title>Video.js Sandbox</title>
     <link href="../dist/video-js.css" rel="stylesheet" type="text/css" />
     <script src="../dist/video.js"></script>
-  </head>
-  <body>
-    <video-js
-      id="vid1"
-      controls
-      muted
-      preload="auto"
-      width="640"
-      height="264"
-      poster="https://vjs.zencdn.net/v/oceans.png"
-    >
-      <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
-      <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
-      <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
-      <track
-        kind="captions"
-        src="../docs/examples/shared/example-captions.vtt"
-        srclang="en"
-        label="English"
-      />
-    </video-js>
-
     <style>
+      article {
+        max-width: 800px;
+        margin: 0 auto;
+      }
       .vjs-transient-button.unmute-button span::before {
         content: "\f104";
         font-family: "VideoJS";
+        vertical-align: middle;
+        padding-right: 0.3em;
       }
     </style>
-
+  </head>
+  <body>
+    <article>
+      <h1>Transient button demo</h1>
+      <video-js
+        id="vid1"
+        class="vjs-fluid"
+        controls
+        muted
+        preload="auto"
+        poster="https://vjs.zencdn.net/v/oceans.png"
+      >
+        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+        <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+        <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
+        <track
+          kind="captions"
+          src="../docs/examples/shared/example-captions.vtt"
+          srclang="en"
+          label="English"
+        />
+      </video-js>
+    </article>
+    <p>An unmute transient button will show after playback starts if muted.</p>
+    <p>
+      Transient buttons to skip into / credits / recap display at times defined
+      in a metadata track.
+    </p>
     <script>
       const player = videojs("#vid1");
 
@@ -41,35 +52,39 @@
         // Adds an unmute button that umutes and goes away when clicked
         player.one("playing", function () {
           if (this.muted()) {
-            const unmuteButton = player.addChild("TransientButton", {
-              controlText: "Unmute",
-              position: "top left",
-              className: "unmute-button",
-              clickHandler: function () {
-                this.player().muted(false);
-                this.dispose();
+            const unmuteButton = player.addChild(
+              "TransientButton",
+              {
+                controlText: "Unmute",
+                position: ["top", "left"],
+                className: "unmute-button",
+                clickHandler: function () {
+                  this.player().muted(false);
+                  this.dispose();
+                },
               },
-            });
+              player.children().indexOf(player.getChild("ControlBar"))
+            );
             unmuteButton.show();
-            console.log(unmuteButton.el());
           }
         });
 
+        // A track that defines skippable parts
         const track = player.addRemoteTextTrack({
           src:
             "data:text/vtt;base64," +
             btoa(`WEBVTT
 
-00:00.000 --> 00:10.000
-Recap
+      00:01.000 --> 00:10.000
+      Recap
 
-00:15.000 --> 00:20.000
-Intro
+      00:15.000 --> 00:20.000
+      Intro
 
-00:40.000 --> 00:47.000
-Credits
+      00:40.000 --> 00:47.000
+      Credits
 
-`),
+      `),
           kind: "metadata",
           label: "skip_sections",
         }).track;
@@ -78,16 +93,19 @@ Credits
 
         track.addEventListener("cuechange", function () {
           const cue = track.activeCues[0];
-          console.log(cue);
           if (cue) {
-            const skipButton = player.addChild("TransientButton", {
-              controlText: `Skip ${cue.text}`,
-              position: "bottom right",
-              clickHandler: () => {
-                player.currentTime(cue.endTime);
+            const skipButton = player.addChild(
+              "TransientButton",
+              {
+                controlText: `Skip ${cue.text}`,
+                position: ["bottom", "right"],
+                clickHandler: () => {
+                  player.currentTime(cue.endTime);
+                },
+                takeFocus: true,
               },
-              takeFocus: true
-            });
+              player.children().indexOf(player.getChild("ControlBar"))
+            );
             skipButtons.push(skipButton);
             skipButton.show();
           } else {

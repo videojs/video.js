@@ -5,12 +5,6 @@ import * as Dom from './utils/dom.js';
 
 /** @import Player from './player' */
 
-const defaults = {
-  initialDisplay: 4000,
-  position: [],
-  takeFocus: false
-};
-
 /**
  * @typedef {object} TransientButtonOptions
  * @property {string} [controlText] Control text, usually visible for these buttons
@@ -20,6 +14,13 @@ const defaults = {
  * @property {boolean} [takeFocus=false] Whether element sohuld take focus when shown
  * @property {Function} [clickHandler] Function called on button activation
  */
+
+/** @type {TransientButtonOptions} */
+const defaults = {
+  initialDisplay: 4000,
+  position: [],
+  takeFocus: false
+};
 
 /**
  * A floating transient button.
@@ -40,7 +41,7 @@ class TransientButton extends Button {
 
     // When shown, the float button will be visible even if the user is inactive.
     // Clear this if there is any interaction.
-    player.on(['useractive', 'userinactive'], () => {
+    player.on(['useractive', 'userinactive'], (e) => {
       this.removeClass('force-display');
     });
   }
@@ -77,7 +78,7 @@ class TransientButton extends Button {
 
     this.forceDisplayTimeout = this.player_.setTimeout(() => {
       this.removeClass('force-display');
-    }, this.options_.forceTimeout);
+    }, this.options_.initialDisplay);
   }
 
   /**
