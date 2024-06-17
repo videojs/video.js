@@ -3,25 +3,34 @@ import Component from './component.js';
 import {merge} from './utils/obj';
 import * as Dom from './utils/dom.js';
 
-// Options type will need to extend button options, because `className`, `clickHandler` may be used
-// `position` is redeundant with `className` but allows position to be set without overriding className or vice versa.
+/** @import Player from './player' */
+
 const defaults = {
-  forceTimeout: 4000,
-  position: 'bottom left',
+  initialDisplay: 4000,
+  position: [],
   takeFocus: false
 };
 
 /**
- * A floating transient button
+ * @typedef {object} TransientButtonOptions
+ * @property {string} [controlText] Control text, usually visible for these buttons
+ * @property {number} [initialDisplay=4000] Time in ms that button should initially remain visible
+ * @property {Array<'top'|'neartop'|'bottom'|'left'|'right'>} [position] Array of position strings to add basic styles for positioning
+ * @property {string} [className] Class(es) to add
+ * @property {boolean} [takeFocus=false] Whether element sohuld take focus when shown
+ * @property {Function} [clickHandler] Function called on button activation
+ */
+
+/**
+ * A floating transient button.
+ * It's recommended to insert these buttons _before_ the control bar for a logic tab order.
  *
  * @extends Button
  */
 class TransientButton extends Button {
   /**
-   *
-   * @param { import('./player').default } player
-   *
-   * @param {object} options
+   * @param {Player} player
+   * @param {TransientButtonOptions} options Options for the transient button
    */
   constructor(player, options) {
     options = merge(defaults, options);
@@ -37,7 +46,7 @@ class TransientButton extends Button {
   }
 
   buildCSSClass() {
-    return `vjs-transient-button focus-visible ${this.options_.position.split(' ').map((c) => `vjs-${c}`).join(' ')}`;
+    return `vjs-transient-button focus-visible ${this.options_.position.map((c) => `vjs-${c}`).join(' ')}`;
   }
 
   createEl() {
@@ -55,6 +64,10 @@ class TransientButton extends Button {
     return el;
   }
 
+  /**
+   * Show the button. The button will remain visible for the `initialDisplay` time, default 4s,
+   * and when there is user activity.
+   */
   show() {
     super.show();
     this.addClass('force-display');
@@ -67,6 +80,9 @@ class TransientButton extends Button {
     }, this.options_.forceTimeout);
   }
 
+  /**
+   * Hide the display, even if during the `initialDisplay` time.
+   */
   hide() {
     this.removeClass('force-display');
     super.hide();
