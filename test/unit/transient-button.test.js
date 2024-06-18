@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 QUnit.module('TransientButton');
 
-QUnit.only('show and hide should add and remove force-display class', function(assert) {
+QUnit.test('show and hide should add and remove force-display class', function(assert) {
   const player = TestHelpers.makePlayer();
 
   const testButton = new TransientButton(player, {});
@@ -23,7 +23,7 @@ QUnit.only('show and hide should add and remove force-display class', function(a
   player.dispose();
 });
 
-QUnit.only('show and hide should add and remove force-display class', function(assert) {
+QUnit.test('show and hide should add and remove force-display class', function(assert) {
   this.clock = sinon.useFakeTimers();
 
   const player = TestHelpers.makePlayer();
@@ -51,7 +51,7 @@ QUnit.only('show and hide should add and remove force-display class', function(a
   this.clock.restore();
 });
 
-QUnit.only('applies posiiton classes', function(assert) {
+QUnit.test('applies posiiton classes', function(assert) {
   const player = TestHelpers.makePlayer();
   const testButton1 = new TransientButton(player, { position: ['top', 'left']});
   const testButton2 = new TransientButton(player, { position: ['bottom', 'right']});
@@ -68,7 +68,7 @@ QUnit.only('applies posiiton classes', function(assert) {
   player.dispose();
 });
 
-QUnit.only('takes focus only when specified', function(assert) {
+QUnit.test('takes focus only when specified', function(assert) {
 
   const player = TestHelpers.makePlayer();
   const testButton1 = new TransientButton(player, {});
