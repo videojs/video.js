@@ -24,13 +24,25 @@ const defaults = {
 
 /**
  * A floating transient button.
- * It's recommended to insert these buttons _before_ the control bar for a logic tab order.
+ * It's recommended to insert these buttons _before_ the control bar with the this argument to `addChild`
+ * for a logical tab order.
+ *
+ * @example
+ * ```
+ * player.addChild(
+ *   'TransientButton',
+ *   options,
+ *   player.children().indexOf(player.getChild("ControlBar"))
+ * )
+ * ```
  *
  * @extends Button
  */
 class TransientButton extends Button {
   /**
-   * @param {Player} player
+   * TransientButton constructor
+   *
+   * @param {Player} player The button's player
    * @param {TransientButtonOptions} options Options for the transient button
    */
   constructor(player, options) {
@@ -46,10 +58,20 @@ class TransientButton extends Button {
     });
   }
 
+  /**
+   * Return CSS class including position classes
+   *
+   * @return {string} CSS class list
+   */
   buildCSSClass() {
     return `vjs-transient-button focus-visible ${this.options_.position.map((c) => `vjs-${c}`).join(' ')}`;
   }
 
+  /**
+   * Create the button element
+   *
+   * @return {HTMLButtonElement} The button element
+   */
   createEl() {
     /** @type HTMLButtonElement */
     const el = Dom.createEl(
@@ -89,6 +111,9 @@ class TransientButton extends Button {
     super.hide();
   }
 
+  /**
+   * Dispose the component
+   */
   dispose() {
     this.player_.clearTimeout(this.forceDisplayTimeout);
     super.dispose();
