@@ -1,3 +1,16 @@
+<a name="8.16.0"></a>
+# [8.16.0](https://github.com/videojs/video.js/compare/v8.15.0...v8.16.0) (2024-06-12)
+
+### Features
+
+* **icons:** update Twitter X logo ([#8764](https://github.com/videojs/video.js/issues/8764)) ([b58b4c5](https://github.com/videojs/video.js/commit/b58b4c5)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Bug Fixes
+
+* improve ts output for create logger ([#8763](https://github.com/videojs/video.js/issues/8763)) ([86ff612](https://github.com/videojs/video.js/commit/86ff612)), closes [1000#0](https://github.com/1000/issues/0)
+* update to VHS v3.13.1 ([#8765](https://github.com/videojs/video.js/issues/8765)) ([864074d](https://github.com/videojs/video.js/commit/864074d))
+* use guid to ensure uniqueness of track setting options ([#8762](https://github.com/videojs/video.js/issues/8762)) ([f4186a0](https://github.com/videojs/video.js/commit/f4186a0)), closes [#8761](https://github.com/videojs/video.js/issues/8761) [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.15.0"></a>
 # [8.15.0](https://github.com/videojs/video.js/compare/v8.14.1...v8.15.0) (2024-06-06)
 
