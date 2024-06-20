@@ -248,7 +248,7 @@ function executeRight(mws, method, value, terminated) {
  */
 export function clearCacheForPlayer(player) {
   if (middlewareInstances.hasOwnProperty(player.id())) {
-    middlewareInstances[player.id()] = null;
+    delete middlewareInstances[player.id()];
   }
 }
 
