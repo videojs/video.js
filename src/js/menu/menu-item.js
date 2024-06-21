@@ -94,7 +94,7 @@ class MenuItem extends ClickableComponent {
    * @listens keydown
    */
   handleKeyDown(event) {
-    if (['Tab', 'Escape', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(event.key)) {
+    if (!['Tab', 'Escape', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(event.key)) {
       // Pass keydown handling up for unused keys
       super.handleKeyDown(event);
     }
