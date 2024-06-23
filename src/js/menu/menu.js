@@ -5,6 +5,17 @@ import Component from '../component.js';
 import document from 'global/document';
 import * as Dom from '../utils/dom.js';
 import * as Events from '../utils/events.js';
+import log from '../utils/log.js';
+
+const branchCoverageHandleKeyDown = {
+  ifPath: false,
+  elsePath: false
+};
+
+export function exportCoverage() {
+  log('Branch arrowLeft and arrowDown covered:', branchCoverageHandleKeyDown.ifPath);
+  log('Branch arrowRight and arrowUp covered:', branchCoverageHandleKeyDown.elsePath);
+}
 
 /** @import Player from '../player' */
 
@@ -215,12 +226,14 @@ class Menu extends Component {
 
     // Left and Down Arrows
     if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+      branchCoverageHandleKeyDown.ifPath = true;
       event.preventDefault();
       event.stopPropagation();
       this.stepForward();
 
     // Up and Right Arrows
     } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+      branchCoverageHandleKeyDown.elsePath = true;
       event.preventDefault();
       event.stopPropagation();
       this.stepBack();
