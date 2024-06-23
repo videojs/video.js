@@ -9,6 +9,7 @@ import * as Events from '../utils/events.js';
 import {toTitleCase} from '../utils/str.js';
 import { IS_IOS } from '../utils/browser.js';
 import document from 'global/document';
+import log from '../utils/log.js';
 
 /** @import Player from '../player' */
 
@@ -17,6 +18,12 @@ import document from 'global/document';
  *
  * @extends Component
  */
+const menuCoverage = {
+  'branch1: ESC or Tab is hit': false,
+  'branch2: Up or Down is hit': false,
+  'branch3: ESC or Tab is hit': false
+};
+
 class MenuButton extends Component {
 
   /**
@@ -298,6 +305,7 @@ class MenuButton extends Component {
 
     // Escape or Tab unpress the 'button'
     if (event.key === 'Esc' || event.key === 'Tab') {
+      menuCoverage['branch1: ESC or Tab is hit'] = true;
       if (this.buttonPressed_) {
         this.unpressButton();
       }
@@ -310,6 +318,7 @@ class MenuButton extends Component {
       }
     // Up Arrow or Down Arrow also 'press' the button to open the menu
     } else if ((event.key === 'Up') || event.key === 'Down' && !(this.player_.options_.playerOptions.spatialNavigation && this.player_.options_.playerOptions.spatialNavigation.enabled)) {
+      menuCoverage['branch2: Up or Down is hit'] = true;
       if (!this.buttonPressed_) {
         event.preventDefault();
         this.pressButton();
@@ -357,6 +366,7 @@ class MenuButton extends Component {
   handleSubmenuKeyDown(event) {
     // Escape or Tab unpress the 'button'
     if (event.key === 'Esc' || event.key === 'Tab') {
+      menuCoverage['branch3: ESC or Tab is hit'] = true;
       if (this.buttonPressed_) {
         this.unpressButton();
       }
@@ -431,4 +441,12 @@ class MenuButton extends Component {
 }
 
 Component.registerComponent('MenuButton', MenuButton);
+function printCoverage() {
+  log('menu button coverage:');
+  for (const [branch, hit] of Object.entries(menuCoverage)) {
+    log(`${branch}: ${hit ? 'hit' : 'not hit'}`);
+  }
+}
+
+export {printCoverage};
 export default MenuButton;
