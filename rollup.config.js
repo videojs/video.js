@@ -25,7 +25,7 @@ const excludeCoverage = [
   /^data-files!/
 ];
 
-const CI_TEST_TYPE = process.env.CI_TEST_TYPE || '';
+const CI_TEST_TYPE = 'coverage';
 const compiledLicense = _.template(fs.readFileSync('./build/license-header.txt', 'utf8'));
 const bannerData = _.pick(pkg, ['version', 'copyright']);
 const banner = compiledLicense(Object.assign({includesVtt: true}, bannerData));

@@ -1,5 +1,5 @@
 const generate = require('videojs-generate-karma-config');
-const CI_TEST_TYPE = process.env.CI_TEST_TYPE || '';
+const CI_TEST_TYPE = 'coverage';
 
 module.exports = function(config) {
   // see https://github.com/videojs/videojs-generate-karma-config
