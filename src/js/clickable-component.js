@@ -250,13 +250,13 @@ class ClickableComponent extends Component {
     // prevent the event from propagating through the DOM and triggering
     // Player hotkeys.
     if (event.key === ' ' || event.key === 'Enter') {
-      branchCoverage.set('branch_1', true);
+      branchCoverage.set('branch_1_handleKeyDown_clickable-component', true);
       event.preventDefault();
       event.stopPropagation();
       this.trigger('click');
     } else {
       // Pass keypress handling up for unsupported keys
-      branchCoverage.set('branch_2', true);
+      branchCoverage.set('branch_2_handleKeyDown_clickable-component', true);
       super.handleKeyDown(event);
     }
   }
