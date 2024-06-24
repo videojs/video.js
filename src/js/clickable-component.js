@@ -9,8 +9,8 @@ import log from './utils/log.js';
 
 const branchCoverage = new Map();
 
-branchCoverage.set('branch_1', false);
-branchCoverage.set('branch_2', false);
+branchCoverage.set('branch_1_handleKeyDown_clickable-component', false);
+branchCoverage.set('branch_2_handleKeyDown_clickable-component', false);
 
 /**
  * Component which is clickable or keyboard actionable, but is not a
@@ -265,9 +265,9 @@ class ClickableComponent extends Component {
 function printCoverage() {
   for (const [branch, hit] of branchCoverage) {
     if (hit) {
-      log(branch + 'is hit');
+      log(branch + 'was hit');
     } else {
-      log(branch + 'is not hit');
+      log(branch + 'was not hit');
     }
   }
 }

@@ -8,8 +8,8 @@ import {createEl} from './utils/dom.js';
 
 const branchCoverage = new Map();
 
-branchCoverage.set('branch_1', false);
-branchCoverage.set('branch_2', false);
+branchCoverage.set('branch_1_handleKeyDown_button', false);
+branchCoverage.set('branch_2_handleKeyDown_button', false);
 
 /**
  * Base class for all buttons.
