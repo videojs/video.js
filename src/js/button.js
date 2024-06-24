@@ -123,11 +123,11 @@ class Button extends ClickableComponent {
     // hotkeys. We do not preventDefault here because we _want_ the browser to
     // handle it.
     if (event.key === ' ' || event.key === 'Enter') {
-      branchCoverage.set('branch_1', true);
+      branchCoverage.set('branch_1_handleKeyDown_button', true);
       event.stopPropagation();
       return;
     }
-    branchCoverage.set('branch_2', true);
+    branchCoverage.set('branch_2_handleKeyDown_button', true);
     // Pass keypress handling up for unsupported keys
     super.handleKeyDown(event);
   }
