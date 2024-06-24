@@ -7,6 +7,11 @@ import log from './utils/log.js';
 
 /** @import Player from './player' */
 
+const branchCoverage = new Map();
+
+branchCoverage.set('branch_1', false);
+branchCoverage.set('branch_2', false);
+
 /**
  * Component which is clickable or keyboard actionable, but is not a
  * native HTML button.
@@ -245,16 +250,29 @@ class ClickableComponent extends Component {
     // prevent the event from propagating through the DOM and triggering
     // Player hotkeys.
     if (event.key === ' ' || event.key === 'Enter') {
+      branchCoverage.set('branch_1', true);
       event.preventDefault();
       event.stopPropagation();
       this.trigger('click');
     } else {
-
       // Pass keypress handling up for unsupported keys
+      branchCoverage.set('branch_2', true);
       super.handleKeyDown(event);
     }
   }
 }
+
+function printCoverage() {
+  for (const [branch, hit] of branchCoverage) {
+    if (hit) {
+      log(branch + 'is hit');
+    } else {
+      log(branch + 'is not hit');
+    }
+  }
+}
+
+export {printCoverage};
 
 Component.registerComponent('ClickableComponent', ClickableComponent);
 export default ClickableComponent;
