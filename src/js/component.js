@@ -16,6 +16,14 @@ import {merge} from './utils/obj.js';
 /** @import Player from './player' */
 
 /**
+ * A callback to be called if and when the component is ready.
+ * `this` will be the Component instance.
+ *
+ * @callback ReadyCallback
+ * @returns  {void}
+ */
+
+/**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
  * in the DOM. They can be children of other components, and can have
@@ -24,14 +32,6 @@ import {merge} from './utils/obj.js';
  * Components can also use methods from {@link EventTarget}
  */
 class Component {
-
-  /**
-   * A callback that is called when a component is ready. Does not have any
-   * parameters and any callback value will be ignored.
-   *
-   * @callback ReadyCallback
-   * @this Component
-   */
 
   /**
    * Creates an instance of this class.
@@ -837,9 +837,6 @@ class Component {
    *
    * @param {ReadyCallback} fn
    *        Function that gets called when the `Component` is ready.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
    */
   ready(fn, sync = false) {
     if (!fn) {
