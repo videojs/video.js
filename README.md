@@ -20,4 +20,4 @@ After digging around and getting some basic knowledge and intuition about the pr
 In both rollup.config.js and karma.conf.js files:
 
 This is the initial value of const CI_TEST_TYPE:
-![Description of the image]((https://github.com/thinhrick0101/demo/blob/main/t%E1%BA%A3i%20xu%E1%BB%91ng.jpeg))
+![Description of the image](https://github.com/thinhrick0101/demo/blob/main/t%E1%BA%A3i%20xu%E1%BB%91ng.jpeg)
