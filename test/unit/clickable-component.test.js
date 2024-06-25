@@ -2,6 +2,7 @@
 import ClickableComponent from '../../src/js/clickable-component.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
+import sinon from 'sinon';
 
 QUnit.module('ClickableComponent');
 
@@ -150,6 +151,30 @@ QUnit.test('class and text should be settable from options', function(assert) {
 
   assert.equal(testClickableComponent.controlText(), 'some text', 'text was set');
   assert.ok(testClickableComponent.hasClass('class1'), 'class was set');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});
+
+QUnit.test('handleKeyDown()_clickable-component', function(assert) {
+  assert.expect(3);
+  const player = TestHelpers.makePlayer({});
+
+  const testClickableComponent = new ClickableComponent(player);
+
+  const event = new KeyboardEvent('keydown', {key: 'Enter'}); // eslint-disable-line no-undef
+
+  const stopPropagationSpy = sinon.spy(event, 'stopPropagation');
+
+  const preventDefaultSpy = sinon.spy(event, 'preventDefault');
+
+  const triggerSpy = sinon.spy(testClickableComponent, 'trigger');
+
+  testClickableComponent.handleKeyDown(event);
+
+  assert.ok(stopPropagationSpy.called, 'stopPropagation is called');
+  assert.ok(preventDefaultSpy.called, 'preventDefaultSpy is called');
+  assert.ok(triggerSpy.calledWith('click'), 'trigger click is called');
 
   testClickableComponent.dispose();
   player.dispose();
