@@ -3,7 +3,6 @@ import ClickableComponent from '../../src/js/clickable-component.js';
 import TestHelpers from './test-helpers.js';
 import * as Events from '../../src/js/utils/events.js';
 import sinon from 'sinon';
-import { printCoverage } from '../../src/js/clickable-component.js';
 
 QUnit.module('ClickableComponent');
 
@@ -179,5 +178,4 @@ QUnit.test('handleKeyDown()_clickable-component', function(assert) {
 
   testClickableComponent.dispose();
   player.dispose();
-  printCoverage();
 });

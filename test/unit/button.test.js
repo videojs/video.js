@@ -2,7 +2,6 @@
 import Button from '../../src/js/button.js';
 import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
-import { printCoverage } from '../../src/js/button.js';
 
 QUnit.module('Button');
 
@@ -53,5 +52,4 @@ QUnit.test('handleKeyDown()_button', function(assert) {
 
   testButton.dispose();
   player.dispose();
-  printCoverage();
 });
