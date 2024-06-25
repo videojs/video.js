@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+  <link rel="icon" href="data:;base64,=">
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started run `npm start` and open the index.html</p>
+    <pre>npm start</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: 1em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>
+      In developer console, Sources tab, look for <code>clearCacheForPlayer</code> function.
+      Place a logpoint at function closing. Logpoint content should be:
+    </p>
+    <pre style="font-size: 1.2em;">'middlewareInstances nr', Object.keys(middlewareInstances).length</pre>
+    <p>
+      When one or more players are removed, the number of instances should *NOT* grow.
+    </p>
+  </div>
+
+  <div>
+    <button id="add-player" style="min-height: 36px;">Add player</button>
+    <button id="remove-all" style="min-height: 36px;">Remove all players</button>
+  </div>
+
+  <div id="player-container"></div>
+
+  <script>
+    let playerList = [];
+
+    document.querySelector('#add-player').addEventListener('click', addPlayer);
+    document.querySelector('#remove-all').addEventListener('click', removeAll);
+
+    function addPlayer() {
+      const videoJsElem = document.createElement('video-js');
+      videoJsElem.setAttribute('controls', '');
+      videoJsElem.setAttribute('preload', 'auto');
+      videoJsElem.setAttribute('width', '640');
+      videoJsElem.setAttribute('height', '264');
+      videoJsElem.setAttribute('poster', 'https://vjs.zencdn.net/v/oceans.png');
+
+      document.querySelector('#player-container').appendChild(videoJsElem);
+
+      const player = videojs(videoJsElem);
+      player.src({
+        src: 'https://vjs.zencdn.net/v/oceans.mp4',
+        type: 'video/mp4',
+      });
+
+      playerList.push(player);
+
+      player.log('Video.js player created', player.id());
+    }
+
+    function removeAll() {
+      for (const player of playerList) {
+        player.dispose();
+      }
+      playerList.length = 0;
+    }
+  </script>
+
+</body>
+</html>
