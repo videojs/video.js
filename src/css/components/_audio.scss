@@ -2,7 +2,7 @@
   @extend .vjs-icon-audio;
 }
 
-.video-js .vjs-audio-button + .vjs-menu .vjs-description-menu-item .vjs-menu-item-text .vjs-icon-placeholder,
+.video-js .vjs-audio-button + .vjs-menu .vjs-descriptions-menu-item .vjs-menu-item-text .vjs-icon-placeholder,
 .video-js .vjs-audio-button + .vjs-menu .vjs-main-desc-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
   vertical-align: middle;
   display: inline-block;
@@ -10,7 +10,7 @@
 }
 
 // Mark a main-desc-menu-item (main + description) or description item with a trailing Audio Description icon
-.video-js .vjs-audio-button + .vjs-menu .vjs-description-menu-item .vjs-menu-item-text .vjs-icon-placeholder:before,
+.video-js .vjs-audio-button + .vjs-menu .vjs-descriptions-menu-item .vjs-menu-item-text .vjs-icon-placeholder:before,
 .video-js .vjs-audio-button + .vjs-menu .vjs-main-desc-menu-item .vjs-menu-item-text .vjs-icon-placeholder:before {
   font-family: VideoJS;
   content: " \f12e";
