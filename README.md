@@ -29,4 +29,4 @@ Coverage results:
 
 ![logSubMenu](hieuimgs/logSubMenu.png)
 
-![coverageResSubMenu](hieuimgs/coverageResSubMenu.png)
+![coverageSubMenu](hieuimgs/coverageSubMenu.png)
