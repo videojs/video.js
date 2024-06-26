@@ -47,6 +47,7 @@ Hieu Nguyen Viet
 <Provide a screenshot of the new coverage results>
 ![coverageResKeyDown](hieuimgs/coverageKeyDownAfter.PNG)
 <State the coverage improvement with a number and elaborate on why the coverage is improved>
+
 The previous version of the test file did not cover the situation where the ESC or Tab was pressed. What we did was simply add tests in. The function coverage was 0% and we got it up to 85%.
 
 <Test 2>
@@ -55,5 +56,6 @@ The previous version of the test file did not cover the situation where the ESC 
 <Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
 [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 ![coverageSubMenu](hieuimgs/coverageSubMenu.png)
-![coverageSubMenu](hieuimgs/coverageSubMenuAfter.png)
+
+![coverageSubMenu](hieuimgs/coverageSubMenuAfter.PNG)
 ****
