@@ -268,7 +268,7 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
 });
 
 QUnit.test('handleKeyDown coverage', function(assert) {
-  assert.expect(5);
+  assert.expect(4);
 
   function KeyboardEvent(key) {
     this.key = key;
