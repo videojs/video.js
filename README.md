@@ -26,6 +26,7 @@ The code after the instrumentation:
 ![subMenuAfter](hieuimgs/subMenuAfter.png)
 
 Coverage results:
+
 ![logSubMenu](hieuimgs/logSubMenu.png)
 
-
+![coverageResSubMenu](hieuimgs/coverageResSubMenu.png)
