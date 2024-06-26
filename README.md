@@ -5,7 +5,7 @@ Function 1: handleKeydown() in menu-button.js
 
 The code before the instrumentation:
 
-![keyDownBefore](hieuimgs/keyDownBefore)
+![keyDownBefore](hieuimgs/keyDownBefore.png)
 
 The code after the instrumentation:
 
