@@ -47,6 +47,7 @@ Hieu Nguyen Viet
 <Provide a screenshot of the new coverage results>
 ![coverageResKeyDown](hieuimgs/coverageResKeyDownBe4.png)
 <State the coverage improvement with a number and elaborate on why the coverage is improved>
+The previous version of the test file did not cover the situation where the ESC or Tab was pressed. What we did was simply add tests in. The function coverage was 0% and we got it up to 85%.
 
 <Test 2>
 
