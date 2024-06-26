@@ -5,6 +5,7 @@ import document from 'global/document';
 import * as Fn from '../../src/js/utils/fn';
 import { printCoverageButton } from '../../src/js/button.js';
 import { printCoverageClickableComponent } from '../../src/js/clickable-component.js';
+import { exportCoverage } from '../../src/js/tech/middleware.js';
 
 QUnit.module('videojs-integration');
 
@@ -15,6 +16,7 @@ QUnit.module('videojs-integration');
 QUnit.test('create a real player and dispose', function(assert) {
   printCoverageButton();
   printCoverageClickableComponent();
+  exportCoverage();
   assert.timeout(30000);
   const done = assert.async();
   const fixture = document.getElementById('qunit-fixture');
