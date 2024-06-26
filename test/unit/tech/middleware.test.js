@@ -2,7 +2,6 @@
 import * as middleware from '../../../src/js/tech/middleware.js';
 import sinon from 'sinon';
 import window from 'global/window';
-import { exportCoverage } from '../../../src/js/tech/middleware.js';
 import _ from 'lodash';
 
 QUnit.module('Middleware', {
@@ -540,10 +539,10 @@ QUnit.test('a middleware without a setSource gets chosen implicitly', function(a
 });
 
 QUnit.test('getMiddleware()_test', function(assert) {
-    assert.expect(1);
-    const type = false;
+  assert.expect(1);
+  const type = false;
 
-    const middlewares = {'*': [], 'foo': [], 'video/bar': [], 'video/foo': []};
+  const middlewares = {'*': [], 'foo': [], 'video/bar': [], 'video/foo': []};
 
-    assert.ok(_.isEqual(middlewares, middleware.getMiddleware(type)), 'The object should be empty');
+  assert.ok(_.isEqual(middlewares, middleware.getMiddleware(type)), 'The object should be empty');
 });
