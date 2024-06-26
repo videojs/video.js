@@ -58,4 +58,6 @@ The previous version of the test file did not cover the situation where the ESC 
 ![coverageSubMenu](hieuimgs/coverageSubMenu.png)
 
 ![coverageSubMenu](hieuimgs/coverageSubMenuAfter.PNG)
+
+This coverage was basically the same and two tests was included to cover the cases where ESC or Tab is pressed.
 ****
