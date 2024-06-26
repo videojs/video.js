@@ -2,8 +2,11 @@
 Viet Hieu Nguyen
 
 Function 1: handleKeydown() in menu-button.js
-The code before the instrumentation: \n
-<img src="hieuimgs/keyDownBefore" alt="Sample Image" width="200"/>
+
+The code before the instrumentation:
+
+![keyDownBefore](hieuimgs/keyDownBefore)
+
 The code after the instrumentation:
 
 
