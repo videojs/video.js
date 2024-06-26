@@ -41,6 +41,7 @@ Hieu Nguyen Viet
 <Test 1>
 
 <Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
+
 [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 <Provide a screenshot of the old coverage results (the same as you already showed above)>
 ![coverageResKeyDown](hieuimgs/coverageResKeyDownBe4.png)
@@ -54,6 +55,7 @@ The previous version of the test file did not cover the situation where the ESC 
 
 <Provide the same kind of information provided for Test 1>
 <Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
+
 [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 ![coverageSubMenu](hieuimgs/coverageSubMenu.png)
 
