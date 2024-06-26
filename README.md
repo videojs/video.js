@@ -12,7 +12,8 @@ The code after the instrumentation:
 ![keyDownAfter](hieuimgs/keyDownAfter.png)
 
 Coverage results:
-![logKeyDown](hieuimgs/logKeyDown.png)
+
+![logKeyDown](hieuimgs/logKeyDown.PNG)
 ![coverageResKeyDown](hieuimgs/coverageResKeyDownBe4.png)
 
 Function 2: handleSubmenuKeyDown() in menu-button.js
