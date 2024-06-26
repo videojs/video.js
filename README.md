@@ -14,6 +14,7 @@ The code after the instrumentation:
 Coverage results:
 
 ![logKeyDown](hieuimgs/logKeyDown.PNG)
+
 ![coverageResKeyDown](hieuimgs/coverageResKeyDownBe4.png)
 
 Function 2: handleSubmenuKeyDown() in menu-button.js
@@ -40,24 +41,26 @@ Hieu Nguyen Viet
 
 <Test 1>
 
-<Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
-
 [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
-<Provide a screenshot of the old coverage results (the same as you already showed above)>
+Old Coverage Results:
+
 ![coverageResKeyDown](hieuimgs/coverageResKeyDownBe4.png)
-<Provide a screenshot of the new coverage results>
+
+New Coverage Results:
+
 ![coverageResKeyDown](hieuimgs/coverageKeyDownAfter.PNG)
-<State the coverage improvement with a number and elaborate on why the coverage is improved>
 
 The previous version of the test file did not cover the situation where the ESC or Tab was pressed. What we did was simply add tests in. The function coverage was 0% and we got it up to 85%.
 
 <Test 2>
 
-<Provide the same kind of information provided for Test 1>
-<Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
-
 [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
+
+Old Coverage Results:
+
 ![coverageSubMenu](hieuimgs/coverageSubMenu.png)
+
+New Coverage Results:
 
 ![coverageSubMenu](hieuimgs/coverageSubMenuAfter.PNG)
 
