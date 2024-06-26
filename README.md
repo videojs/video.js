@@ -64,5 +64,5 @@ New Coverage Results:
 
 ![coverageSubMenu](hieuimgs/coverageSubMenuAfter.PNG)
 
-This coverage was basically the same and two tests was included to cover the cases where ESC or Tab is pressed.
+This coverage was basically the same and two tests was included to cover the cases where ESC or Tab is pressed. The coverage went from 0% to 90%.
 ****
