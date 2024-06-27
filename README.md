@@ -137,7 +137,7 @@ You can see that the first branch now was hit by the test. The case is relativel
 
 #### Hieu Nguyen Viet
 
-##### <Test 1>
+##### Test 1: 
 
 [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 Old Coverage Results:
@@ -167,5 +167,10 @@ This coverage was basically the same and two tests was included to cover the cas
 
 ## Statement of individual contributions
 
-<Write what each group member did>
-Hieu Nguyen Viet: I looked through the functions and found 2 similar ones to deal with. It was obvious what the problem was when the cases of pressing ESC and TAB was not covered. I took the previous tests that the owners made as examples and went along with it. I wrote down all the branches that was included in the code and created tests for each of those branch.
+#### Tuan An Hoang
+I implemented the instrumentation for two handleKeyDown() functions of src/button.js and src/clickable-component.js and also created new test cases for these two function to improve branch coverage from 50% to 100%.
+
+#### Hieu Nguyen Viet 
+I looked through the functions and found 2 similar ones to deal with. It was obvious what the problem was when the cases of pressing ESC and TAB was not covered. I took the previous tests that the owners made as examples and went along with it. I wrote down all the branches that was included in the code and created tests for each of those branch.
+
+#### Duc Thinh Nguyen
