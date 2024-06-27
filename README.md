@@ -84,8 +84,7 @@ This is the new coverage result:
 
 ![new_coverage](https://github.com/cukibe123/images/blob/main/button_after__new_tests.jpg)
 
-You can see that the first branch now was hit by the test. The report shows the second branch was not hit because we only run the print coverage function inside the new created test.		
-The branch coverage of this function has increased from 50% (½) to 100% after the creation of this test case. The coverage is improved because the new test case manipulates the input to trigger an event via the “Enter” button, therefore, the first branch statement is passed. 
+You can see that the first branch now was hit by the test. The branch coverage of this function has increased from 50% (½) to 100% after the creation of this test case. The coverage is improved because the new test case manipulates the input to trigger an event via the “Enter” button, therefore, the first branch statement is passed. 
 
 ##### Test 2: handleKeyDown()_clickable-component
 This is the new implemented test case:
@@ -93,8 +92,10 @@ This is the new implemented test case:
 
 This is the old coverage result:
 
-![old_coverage]()
+![old_coverage](https://github.com/cukibe123/images/blob/main/clickable-component_before_new_test.jpg)
 
 This is the new coverage result:
 
-![new_coverage]()
+![new_coverage](https://github.com/cukibe123/images/blob/main/clickable-component_after_new_test.jpg.png)
+
+You can see that the first branch now was hit by the test. The case is relatively the same with the test case above when in this new test case, we manipulate the data so that it can simulate a trigger event via the "Enter" button.
