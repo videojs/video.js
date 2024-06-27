@@ -137,9 +137,9 @@ You can see that the first branch now was hit by the test. The case is relativel
 
 #### Hieu Nguyen Viet
 
-##### Test 1: 
+##### Test 1:
+This is the link to the new enhanced test cases: [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 
-[test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 Old Coverage Results:
 
 ![coverageResKeyDown](hieuimgs/coverageResKeyDownBe4.png)
@@ -152,7 +152,7 @@ The previous version of the test file did not cover the situation where the ESC 
 
 ##### <Test 2>
 
-[test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
+This is the link to the new enhanced test cases: [test/unit/menu.test.js](https://github.com/cukibe123/SEP-Group-46/commit/e9ab648893a67a62dcc9073888fb5aa9e687051d)
 
 Old Coverage Results:
 
