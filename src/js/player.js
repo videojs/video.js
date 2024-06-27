@@ -52,6 +52,7 @@ import './tracks/text-track-settings.js';
 import './resize-manager.js';
 import './live-tracker.js';
 import './title-bar.js';
+import './transient-button.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
