@@ -38,6 +38,37 @@ This is the coverage report that we received after running all unit tests.
 
 ### Your own coverage tool
 
+#### Tuan An Hoang
+##### Function 1: handleKeyDown() in src/js/button.js
+
+The code before being instrumented:
+
+![handleKeyDown()_button](https://github.com/cukibe123/images/blob/main/handleKeyDown()_button.png)
+
+The code after being instrumented:
+![handleKeyDown()_button](https://github.com/cukibe123/images/blob/main/handleKeyDown()_button_instrumented.jpg)
+
+This is the report we obtained after running our own coverage tool:
+![coverage_tool](https://github.com/cukibe123/images/blob/main/button_before_new_tests.jpg)
+
+This is the evidence showing that the function is not fully covered in the original coverage report:
+![handleKeyDown()_button_evidence](https://github.com/cukibe123/images/blob/main/button_evidence.jpg)
+
+
+##### Function 2: handleKeyDown() in src/js/clickable-component.js
+The code before being instrumented:
+
+![handleKeyDown()_clickable-component](https://github.com/cukibe123/images/blob/main/handleKeyDown()_clickable-component_no_instrument.jpg.png)
+
+The code after being instrumented:
+![handleKeyDown()_clickable-component](https://github.com/cukibe123/images/blob/main/handleKeyDown()_clickable-component_instrumented.jpg)
+
+This is the report we obtained after running our own coverage tool:
+![coverage_tool](https://github.com/cukibe123/images/blob/main/clickable-component_before_new_test.jpg)
+
+This is the evidence showing that the function is not fully covered in the original coverage report:
+![handleKeyDown()_clickable-component_evidence](https://github.com/cukibe123/images/blob/main/clickable-component_evidence.jpg)
+
 #### Hieu Nguyen Viet
 
 ##### Function 1: handleKeydown() in menu-button.js
@@ -72,9 +103,37 @@ Coverage results:
 
 ![coverageSubMenu](hieuimgs/coverageSubMenu.png)
 
-## Coverage improvement
+### Coverage Improvement
 
-### Individual tests
+#### Tuan An Hoang
+
+##### Test 1: handleKeyDown()_button
+This is the new implemented test case:
+![new_test](https://github.com/cukibe123/images/blob/main/button_test.jpg)
+
+This is the old coverage result:
+
+![old_coverage](https://github.com/cukibe123/images/blob/main/button_before_new_tests.jpg)
+
+This is the new coverage result:
+
+![new_coverage](https://github.com/cukibe123/images/blob/main/button_after__new_tests.jpg)
+
+You can see that the first branch now was hit by the test. The branch coverage of this function has increased from 50% (½) to 100% after the creation of this test case. The coverage is improved because the new test case manipulates the input to trigger an event via the “Enter” button, therefore, the first branch statement is passed. 
+
+##### Test 2: handleKeyDown()_clickable-component
+This is the new implemented test case:
+![new_test](https://github.com/cukibe123/images/blob/main/clickable-component-test.jpg)
+
+This is the old coverage result:
+
+![old_coverage](https://github.com/cukibe123/images/blob/main/clickable-component_before_new_test.jpg)
+
+This is the new coverage result:
+
+![new_coverage](https://github.com/cukibe123/images/blob/main/clickable-component_after_new_test.jpg.png)
+
+You can see that the first branch now was hit by the test. The case is relatively the same with the test case above when in this new test case, we manipulate the data so that it can simulate a trigger event via the "Enter" button.
 
 #### Hieu Nguyen Viet
 
