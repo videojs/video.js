@@ -9,6 +9,8 @@ import * as Events from '../../src/js/utils/events.js';
 import sinon from 'sinon';
 import window from 'global/window';
 import document from 'global/document';
+import { printCoverage } from '../../src/js/menu/menu-button.js';
+import { exportCoverage } from '../../src/js/menu/menu.js';
 
 QUnit.module('MenuButton');
 
@@ -264,4 +266,162 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
   newMenu.dispose();
   oldMenu.dispose();
   menuButton.dispose();
+});
+QUnit.test('should unpress the button on Escape or Tab key press', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player);
+
+  menuButton.buttonPressed_ = true;
+  const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
+  const focusSpy = sinon.spy(menuButton.menuButton_, 'focus');
+  let event = new Event('keydown');
+
+  event.key = 'Esc';
+  menuButton.handleKeyDown(event);
+  assert.ok(unpressButtonSpy.calledOnce, 'unpressButton should be called on Escape key');
+  assert.ok(event.defaultPrevented, 'default action should be prevented on Escape key');
+  assert.ok(focusSpy.notCalled, 'focus should not be called on Escape key');
+  event = new Event('keydown');
+  event.key = 'Tab';
+  menuButton.handleKeyDown(event);
+  assert.ok(unpressButtonSpy.calledTwice, 'unpressButton should be called on Tab key');
+  assert.ok(!event.defaultPrevented, 'default action should not be prevented on Tab key');
+  assert.ok(focusSpy.notCalled, 'focus should not be called on Tab key');
+  unpressButtonSpy.restore();
+  focusSpy.restore();
+  menuButton.dispose();
+  player.dispose();
+  printCoverage();
+});
+
+QUnit.test('should press the button on Up Arrow or Down Arrow key press', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player);
+
+  menuButton.buttonPressed_ = false;
+  const pressButtonSpy = sinon.spy(menuButton, 'pressButton');
+
+  let event = new Event('keydown');
+
+  event.key = 'Up';
+  menuButton.handleKeyDown(event);
+
+  assert.ok(pressButtonSpy.calledOnce, 'pressButton should be called on Up Arrow key');
+  assert.ok(event.defaultPrevented, 'default action should be prevented on Up Arrow key');
+
+  event = new Event('keydown');
+  event.key = 'Down';
+  menuButton.handleKeyDown(event);
+
+  assert.ok(pressButtonSpy.calledTwice, 'pressButton should be called on Down Arrow key');
+  assert.ok(event.defaultPrevented, 'default action should be prevented on Down Arrow key');
+
+  pressButtonSpy.restore();
+  menuButton.dispose();
+  player.dispose();
+  printCoverage();
+});
+
+QUnit.test('should unpress the button on Escape or Tab key press', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player);
+
+  menuButton.buttonPressed_ = true;
+  const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
+  const focusSpy = sinon.spy(menuButton.menuButton_, 'focus');
+  let event = new Event('keydown');
+
+  event.key = 'Esc';
+  menuButton.handleSubmenuKeyDown(event);
+  assert.ok(unpressButtonSpy.calledOnce, 'unpressButton should be called on Escape key');
+  assert.ok(event.defaultPrevented, 'default action should be prevented on Escape key');
+  assert.ok(focusSpy.calledOnce, 'focus should be called on Escape key');
+  event = new Event('keydown');
+  event.key = 'Tab';
+  menuButton.handleSubmenuKeyDown(event);
+  assert.ok(unpressButtonSpy.calledTwice, 'unpressButton should be called on Tab key');
+  assert.ok(!event.defaultPrevented, 'default action should not be prevented on Tab key');
+  assert.ok(focusSpy.calledTwice, 'focus should be called on Tab key');
+  unpressButtonSpy.restore();
+  focusSpy.restore();
+  menuButton.dispose();
+  player.dispose();
+  printCoverage();
+});
+
+QUnit.test('should not prevent default action for Tab key press', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player);
+
+  menuButton.buttonPressed_ = true;
+  const focusSpy = sinon.spy(menuButton.menuButton_, 'focus');
+  const event = new Event('keydown');
+
+  event.key = 'Tab';
+  menuButton.handleSubmenuKeyDown(event);
+  assert.ok(focusSpy.calledOnce, 'focus should be called on Tab key');
+  assert.ok(!event.defaultPrevented, 'default action should not be prevented on Tab key');
+  focusSpy.restore();
+  menuButton.dispose();
+  player.dispose();
+  printCoverage();
+});
+
+QUnit.test('should not prevent default action or call unpressButton for other keys', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player);
+
+  menuButton.buttonPressed_ = true;
+  const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
+  const focusSpy = sinon.spy(menuButton.menuButton_, 'focus');
+  const event = new Event('keydown');
+
+  event.key = 'Enter';
+  menuButton.handleSubmenuKeyDown(event);
+  assert.ok(unpressButtonSpy.notCalled, 'unpressButton should not be called for other keys');
+  assert.ok(focusSpy.notCalled, 'focus should not be called for other keys');
+  assert.ok(!event.defaultPrevented, 'default action should not be prevented for other keys');
+  unpressButtonSpy.restore();
+  focusSpy.restore();
+  menuButton.dispose();
+  player.dispose();
+  printCoverage();
+});
+
+QUnit.test('handleKeyDown coverage', function(assert) {
+  assert.expect(4);
+
+  function KeyboardEvent(key) {
+    this.key = key;
+  }
+
+  KeyboardEvent.prototype.stopPropagation = function() {
+    this.key = 'Passed function';
+  };
+
+  KeyboardEvent.prototype.preventDefault = function() {
+    this.key = 'Passed function';
+  };
+
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player, {});
+  const testingMenu = new Menu(player, { menuButton });
+  const testArrowLeft = new KeyboardEvent('ArrowLeft');
+  const testArrowDown = new KeyboardEvent('ArrowDown');
+  const testArrowRight = new KeyboardEvent('ArrowRight');
+  const testArrowUp = new KeyboardEvent('ArrowUp');
+
+  testingMenu.handleKeyDown(testArrowLeft);
+  assert.ok(testArrowLeft.key.match('Passed function'));
+
+  testingMenu.handleKeyDown(testArrowDown);
+  assert.ok(testArrowDown.key.match('Passed function'));
+
+  testingMenu.handleKeyDown(testArrowRight);
+  assert.ok(testArrowRight.key.match('Passed function'));
+
+  testingMenu.handleKeyDown(testArrowUp);
+  assert.ok(testArrowUp.key.match('Passed function'));
+
+  exportCoverage();
 });

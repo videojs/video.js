@@ -100,6 +100,11 @@ export function isInFrame() {
  * @return  {Function}
  *          The query method
  */
+const branchCoverage = {
+  branch1TextConent: false,
+  branch2TextConent: false
+};
+
 function createQuerier(method) {
   return function(selector, context) {
     if (!isNonBlankString(selector)) {
@@ -171,15 +176,25 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}, cont
  * @return {Element}
  *         The element with added text content.
  */
+
 export function textContent(el, text) {
   if (typeof el.textContent === 'undefined') {
     el.innerText = text;
+    branchCoverage.branch1TextConent = true;
   } else {
     el.textContent = text;
+    branchCoverage.branch2TextConent = true;
   }
   return el;
 }
 
+function printCoverageInfo() {
+  for (const branch in branchCoverage) {
+    log(`${branch} was ${branchCoverage[branch] ? 'hit' : 'not hit'}`);
+  }
+}
+
+export {printCoverageInfo};
 /**
  * Insert an element as the first child node of another
  *

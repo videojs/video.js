@@ -4,7 +4,8 @@ import sinon from 'sinon';
 import * as Dom from '../../../src/js/utils/dom.js';
 import TestHelpers from '../test-helpers.js';
 import * as browser from '../../../src/js/utils/browser.js';
-
+import { printCoverageInfo } from '../../../src/js/utils/dom.js';
+import { textContent } from '../../../src/js/utils/dom.js';
 QUnit.module('utils/dom');
 
 QUnit.test('should create an element', function(assert) {
@@ -19,6 +20,21 @@ QUnit.test('should create an element', function(assert) {
   assert.strictEqual(span.nodeName, 'SPAN');
   assert.strictEqual(span.getAttribute('data-test'), 'asdf');
   assert.strictEqual(span.innerHTML, 'fdsa');
+});
+
+// new test case
+
+QUnit.test('should update element text, supporting textContent', function(assert) {
+  const element = { innerText: '' };
+
+  textContent(element, 'Hello');
+
+  if (typeof element.textContent === 'undefined') {
+    assert.strictEqual(element.innerText, 'Hello', 'works in browsers that DO NOT support textContent');
+  } else {
+    assert.strictEqual(element.textContent, 'Hello', 'works in browsers that support textContent');
+  }
+  printCoverageInfo();
 });
 
 QUnit.test('should create an element, supporting textContent', function(assert) {
