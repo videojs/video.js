@@ -3,6 +3,9 @@ import videojs from '../../src/js/video.js';
 import window from 'global/window';
 import document from 'global/document';
 import * as Fn from '../../src/js/utils/fn';
+import { printCoverageButton } from '../../src/js/button.js';
+import { printCoverageClickableComponent } from '../../src/js/clickable-component.js';
+import { exportCoverage } from '../../src/js/tech/middleware.js';
 
 QUnit.module('videojs-integration');
 
@@ -11,6 +14,9 @@ QUnit.module('videojs-integration');
  * as it runs through a basic player lifecycle for real.
  */
 QUnit.test('create a real player and dispose', function(assert) {
+  printCoverageButton();
+  printCoverageClickableComponent();
+  exportCoverage();
   assert.timeout(30000);
   const done = assert.async();
   const fixture = document.getElementById('qunit-fixture');

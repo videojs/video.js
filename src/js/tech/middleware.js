@@ -3,6 +3,7 @@
  * @module middleware
  */
 import {toTitleCase} from '../utils/str.js';
+import log from '../utils/log';
 
 /** @import Player from '../player' */
 /** @import Tech from '../tech/tech' */
@@ -50,6 +51,11 @@ export function use(type, middleware) {
   middlewares[type].push(middleware);
 }
 
+const branchCoveragegetMiddleware = {
+  ifPath: false,
+  hiddenElsePath: false
+};
+
 /**
  * Gets middlewares by type (or all middlewares).
  *
@@ -61,10 +67,16 @@ export function use(type, middleware) {
  */
 export function getMiddleware(type) {
   if (type) {
+    branchCoveragegetMiddleware.ifPath = true;
     return middlewares[type];
   }
-
+  branchCoveragegetMiddleware.hiddenElsePath = true;
   return middlewares;
+}
+
+export function exportCoverage() {
+  log('If covered:', branchCoveragegetMiddleware.ifPath);
+  log('Else covered:', branchCoveragegetMiddleware.hiddenElsePath);
 }
 
 /**

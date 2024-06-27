@@ -6,6 +6,11 @@ import Component from './component';
 import log from './utils/log.js';
 import {createEl} from './utils/dom.js';
 
+const branchCoverage = new Map();
+
+branchCoverage.set('branch_1_handleKeyDown()_button', false);
+branchCoverage.set('branch_2_handleKeyDown()_button', false);
+
 /**
  * Base class for all buttons.
  *
@@ -118,14 +123,26 @@ class Button extends ClickableComponent {
     // hotkeys. We do not preventDefault here because we _want_ the browser to
     // handle it.
     if (event.key === ' ' || event.key === 'Enter') {
+      branchCoverage.set('branch_1_handleKeyDown()_button', true);
       event.stopPropagation();
       return;
     }
-
+    branchCoverage.set('branch_2_handleKeyDown()_button', true);
     // Pass keypress handling up for unsupported keys
     super.handleKeyDown(event);
   }
 }
 
+function printCoverageButton() {
+  for (const [branch, hit] of branchCoverage) {
+    if (hit) {
+      log(branch + ' was hit');
+    } else {
+      log(branch + ' was not hit');
+    }
+  }
+}
+
+export {printCoverageButton};
 Component.registerComponent('Button', Button);
 export default Button;

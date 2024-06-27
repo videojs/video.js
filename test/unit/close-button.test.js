@@ -1,5 +1,5 @@
 /* eslint-env qunit */
-import CloseButton from '../../src/js/close-button';
+import CloseButton, { printCoverage } from '../../src/js/close-button';
 import sinon from 'sinon';
 import TestHelpers from './test-helpers';
 
@@ -64,4 +64,21 @@ QUnit.test('pressing ESC triggers close()', function(assert) {
   this.btn.handleKeyDown(getMockEscapeEvent());
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'ESC closed the modal');
+});
+
+// New test case added
+
+QUnit.test('handleKeyDown()_close_button_not_escape', function(assert) {
+  assert.expect(2);
+  const event = new KeyboardEvent('keydown', {key: 'a'}); // eslint-disable-line no-undef
+
+  const stopPropagationSpy = sinon.spy(event, 'stopPropagation');
+
+  const preventDefaultSpy = sinon.spy(event, 'preventDefault');
+
+  this.btn.handleKeyDown(event);
+
+  assert.ok(stopPropagationSpy.called, 'stopPropagation be called');
+  assert.ok(!preventDefaultSpy.called, 'preventDefaultSpy should not be called');
+  printCoverage();
 });

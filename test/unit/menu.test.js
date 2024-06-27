@@ -10,6 +10,7 @@ import sinon from 'sinon';
 import window from 'global/window';
 import document from 'global/document';
 import { printCoverage } from '../../src/js/menu/menu-button.js';
+import { exportCoverage } from '../../src/js/menu/menu.js';
 
 QUnit.module('MenuButton');
 
@@ -266,7 +267,6 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
   oldMenu.dispose();
   menuButton.dispose();
 });
-
 QUnit.test('should unpress the button on Escape or Tab key press', function(assert) {
   const player = TestHelpers.makePlayer();
   const menuButton = new MenuButton(player);
@@ -386,4 +386,42 @@ QUnit.test('should not prevent default action or call unpressButton for other ke
   menuButton.dispose();
   player.dispose();
   printCoverage();
+});
+
+QUnit.test('handleKeyDown coverage', function(assert) {
+  assert.expect(4);
+
+  function KeyboardEvent(key) {
+    this.key = key;
+  }
+
+  KeyboardEvent.prototype.stopPropagation = function() {
+    this.key = 'Passed function';
+  };
+
+  KeyboardEvent.prototype.preventDefault = function() {
+    this.key = 'Passed function';
+  };
+
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player, {});
+  const testingMenu = new Menu(player, { menuButton });
+  const testArrowLeft = new KeyboardEvent('ArrowLeft');
+  const testArrowDown = new KeyboardEvent('ArrowDown');
+  const testArrowRight = new KeyboardEvent('ArrowRight');
+  const testArrowUp = new KeyboardEvent('ArrowUp');
+
+  testingMenu.handleKeyDown(testArrowLeft);
+  assert.ok(testArrowLeft.key.match('Passed function'));
+
+  testingMenu.handleKeyDown(testArrowDown);
+  assert.ok(testArrowDown.key.match('Passed function'));
+
+  testingMenu.handleKeyDown(testArrowRight);
+  assert.ok(testArrowRight.key.match('Passed function'));
+
+  testingMenu.handleKeyDown(testArrowUp);
+  assert.ok(testArrowUp.key.match('Passed function'));
+
+  exportCoverage();
 });
