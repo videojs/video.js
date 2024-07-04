@@ -1,3 +1,14 @@
+<a name="8.16.1"></a>
+## [8.16.1](https://github.com/videojs/video.js/compare/v8.16.0...v8.16.1) (2024-06-24)
+
+### Bug Fixes
+
+* enable keyboard controls on menu items ([#8777](https://github.com/videojs/video.js/issues/8777)) ([04b9bb2](https://github.com/videojs/video.js/commit/04b9bb2)), closes [/github.com/videojs/video.js/commit/35de64ceb04b4b7dd6be067e275128d02c6d6e91#diff-9fd94576fe3b609171a426feb961b0954d70c8c14e598024d49ae9c8836a71](https://github.com//github.com/videojs/video.js/commit/35de64ceb04b4b7dd6be067e275128d02c6d6e91/issues/diff-9fd94576fe3b609171a426feb961b0954d70c8c14e598024d49ae9c8836a71) [1000#0](https://github.com/1000/issues/0)
+
+### Chores
+
+* Update typescript to 5.5.2 ([#8776](https://github.com/videojs/video.js/issues/8776)) ([fa9c41c](https://github.com/videojs/video.js/commit/fa9c41c))
+
 <a name="8.16.0"></a>
 # [8.16.0](https://github.com/videojs/video.js/compare/v8.15.0...v8.16.0) (2024-06-12)
 

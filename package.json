@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
-  "version": "8.16.0",
+  "version": "8.16.1",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
@@ -160,7 +160,7 @@
     "shelljs": "^0.8.5",
     "shx": "^0.3.2",
     "sinon": "^11.1.1",
-    "typescript": "^5.5.1-rc",
+    "typescript": "^5.5.2",
     "uglify-js": "^3.6.0",
     "unified": "^7.0.2",
     "videojs-generate-karma-config": "^8.1.0",
