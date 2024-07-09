@@ -23,7 +23,23 @@ export class TestCustomElement extends HTMLElement {
   }
 }
 
+export class TestSlotElement extends HTMLElement {
+
+  constructor() {
+    super();
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    const wrapperEl = document.createElement('div');
+
+    wrapperEl.style = this.dataset.style;
+    const slot = document.createElement('slot');
+
+    wrapperEl.appendChild(slot);
+    shadowRoot.appendChild(wrapperEl);
+  }
+}
+
 // Not supported on Chrome < 54
 if ('customElements' in window) {
   window.customElements.define('test-custom-element', TestCustomElement);
+  window.customElements.define('test-slot-element', TestSlotElement);
 }

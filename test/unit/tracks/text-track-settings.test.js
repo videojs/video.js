@@ -383,3 +383,29 @@ QUnit.test('should update on languagechange', function(assert) {
 
   player.dispose();
 });
+
+QUnit.test('should associate <label>s with <select>s', function(assert) {
+  const player = TestHelpers.makePlayer({
+    tracks
+  });
+
+  const firstLabelFor = player.textTrackSettings.el_.querySelector('label').getAttribute('for');
+
+  assert.ok(
+    videojs.dom.isEl(player.textTrackSettings.el_.querySelector(`#${firstLabelFor}`)),
+    'label has a `for` attribute matching an `id`'
+  );
+
+});
+
+QUnit.test('should not duplicate ids', function(assert) {
+  const player = TestHelpers.makePlayer({
+    tracks
+  });
+
+  const elements = [...player.el().querySelectorAll('[id]')];
+  const ids = elements.map(el => el.id);
+  const duplicates = elements.filter(el => ids.filter(id => id === el.id).length > 1);
+
+  assert.strictEqual(duplicates.length, 0, 'there should be no duplicate ids');
+});

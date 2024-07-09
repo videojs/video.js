@@ -5,6 +5,8 @@ import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
+/** @import Player from '../../player' */
+
 /**
  * An {@link AudioTrack} {@link MenuItem}
  *
@@ -15,7 +17,7 @@ class AudioTrackMenuItem extends MenuItem {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -49,7 +51,7 @@ class AudioTrackMenuItem extends MenuItem {
     const el = super.createEl(type, props, attrs);
     const parentSpan = el.querySelector('.vjs-menu-item-text');
 
-    if (['main-desc', 'description'].indexOf(this.options_.track.kind) >= 0) {
+    if (['main-desc', 'descriptions'].indexOf(this.options_.track.kind) >= 0) {
       parentSpan.appendChild(Dom.createEl('span', {
         className: 'vjs-icon-placeholder'
       }, {

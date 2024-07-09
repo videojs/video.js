@@ -5,6 +5,8 @@
 import EventTarget from '../event-target';
 import TextTrack from '../tracks/text-track';
 
+/** @import Tech from '../tech/tech' */
+
 /**
  * A single track represented in the DOM.
  *
@@ -19,7 +21,7 @@ class HTMLTrackElement extends EventTarget {
    * @param {Object} options={}
    *        Object of option names and values
    *
-   * @param { import('../tech/tech').default } options.tech
+   * @param {Tech} options.tech
    *        A reference to the tech that owns this HTMLTrackElement.
    *
    * @param {TextTrack~Kind} [options.kind='subtitles']

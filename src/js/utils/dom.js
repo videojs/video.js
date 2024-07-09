@@ -580,7 +580,15 @@ export function getPointerPosition(el, event) {
         translated.y += values[13];
       }
 
-      item = item.parentNode;
+      if (item.assignedSlot && item.assignedSlot.parentElement && window.WebKitCSSMatrix) {
+        const transformValue = window.getComputedStyle(item.assignedSlot.parentElement).transform;
+        const matrix = new window.WebKitCSSMatrix(transformValue);
+
+        translated.x += matrix.m41;
+        translated.y += matrix.m42;
+      }
+
+      item = item.parentNode || item.host;
     }
   }
 
@@ -770,6 +778,11 @@ export function isSingleLeftClick(event) {
   // `button` and `buttons` equal to 0
   if (event.type === 'mouseup' && event.button === 0 &&
       event.buttons === 0) {
+    return true;
+  }
+
+  // MacOS Sonoma trackpad when "tap to click enabled"
+  if (event.type === 'mousedown' && event.button === 0 && event.buttons === 0) {
     return true;
   }
 

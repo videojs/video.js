@@ -4,6 +4,8 @@
 import Component from './component';
 import ModalDialog from './modal-dialog';
 
+/** @import Player from './player' */
+
 /**
  * A display that indicates an error has occurred. This means that the video
  * is unplayable.
@@ -15,7 +17,7 @@ class ErrorDisplay extends ModalDialog {
   /**
    * Creates an instance of this class.
    *
-   * @param  { import('./player').default } player
+   * @param  {Player} player
    *         The `Player` that this class should be attached to.
    *
    * @param  {Object} [options]
@@ -24,7 +26,6 @@ class ErrorDisplay extends ModalDialog {
   constructor(player, options) {
     super(player, options);
     this.on(player, 'error', (e) => {
-      this.close();
       this.open(e);
     });
   }

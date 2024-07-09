@@ -6,6 +6,8 @@ import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
 
+/** @import Player from '../player' */
+
 const darkGray = '#222';
 const lightGray = '#ccc';
 const fontMap = {
@@ -102,7 +104,7 @@ class TextTrackDisplay extends Component {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]

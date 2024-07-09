@@ -11,7 +11,7 @@ jobs:
       should-skip-job: ${{steps.skip-check.outputs.should_skip}}
     steps:
       - id: skip-check
-        uses: fkirc/skip-duplicate-actions@v5.3.0
+        uses: fkirc/skip-duplicate-actions@v5.3.1
         with:
           github_token: ${{github.token}}
 
@@ -30,7 +30,7 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
     - name: checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: read node version from .nvmrc
       run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
@@ -47,7 +47,7 @@ jobs:
       run: pulseaudio -D
 
     - name: setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '${{steps.nvm.outputs.NVMRC}}'
         cache: npm
@@ -61,12 +61,10 @@ jobs:
       run: npm i --prefer-offline --no-audit
 
     - name: run npm test
-      uses: coactions/setup-xvfb@v1
-      with:
-        run: npm run test
+      run: npm run test
 
     - name: coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         files: './test/dist/coverage/coverage-final.json'

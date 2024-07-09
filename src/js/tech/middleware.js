@@ -4,6 +4,9 @@
  */
 import {toTitleCase} from '../utils/str.js';
 
+/** @import Player from '../player' */
+/** @import Tech from '../tech/tech' */
+
 const middlewares = {};
 const middlewareInstances = {};
 
@@ -27,7 +30,7 @@ export const TERMINATOR = {};
  * passed in as an argument.
  *
  * @callback MiddlewareFactory
- * @param { import('../player').default } player
+ * @param {Player} player
  *        A Video.js player.
  */
 
@@ -69,7 +72,7 @@ export function getMiddleware(type) {
  * matching middlewares and calling `setSource` on each, passing along the
  * previous returned value each time.
  *
- * @param  { import('../player').default } player
+ * @param  {Player} player
  *         A {@link Player} instance.
  *
  * @param  {Tech~SourceObject} src
@@ -88,7 +91,7 @@ export function setSource(player, src, next) {
  * @param {Object[]} middleware
  *        An array of middleware instances.
  *
- * @param { import('../tech/tech').default } tech
+ * @param {Tech} tech
  *        A Video.js tech.
  */
 export function setTech(middleware, tech) {
@@ -102,7 +105,7 @@ export function setTech(middleware, tech) {
  * @param  {Object[]} middleware
  *         An array of middleware instances.
  *
- * @param  { import('../tech/tech').default } tech
+ * @param  {Tech} tech
  *         The current tech.
  *
  * @param  {string} method
@@ -122,7 +125,7 @@ export function get(middleware, tech, method) {
  * @param  {Object[]} middleware
  *         An array of middleware instances.
  *
- * @param  { import('../tech/tech').default } tech
+ * @param  {Tech} tech
  *         The current tech.
  *
  * @param  {string} method
@@ -148,7 +151,7 @@ export function set(middleware, tech, method, arg) {
  * @param  {Object[]} middleware
  *         An array of middleware instances.
  *
- * @param  { import('../tech/tech').default } tech
+ * @param  {Tech} tech
  *         The current tech.
  *
  * @param  {string} method
@@ -240,11 +243,13 @@ function executeRight(mws, method, value, terminated) {
 /**
  * Clear the middleware cache for a player.
  *
- * @param  { import('../player').default } player
+ * @param  {Player} player
  *         A {@link Player} instance.
  */
 export function clearCacheForPlayer(player) {
-  middlewareInstances[player.id()] = null;
+  if (middlewareInstances.hasOwnProperty(player.id())) {
+    delete middlewareInstances[player.id()];
+  }
 }
 
 /**

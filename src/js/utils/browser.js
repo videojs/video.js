@@ -97,6 +97,14 @@ export let CHROMIUM_VERSION = null;
 export let CHROME_VERSION = null;
 
 /**
+ * Whether or not this is a Chromecast receiver application.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export const IS_CHROMECAST_RECEIVER = Boolean(window.cast && window.cast.framework && window.cast.framework.CastReceiverContext);
+
+/**
  * The detected Internet Explorer version - or `null`.
  *
  * @static
@@ -139,6 +147,30 @@ export let IS_IPAD = false;
 // to identify iPhones, we need to exclude iPads.
 // http://artsy.github.io/blog/2012/10/18/the-perils-of-ios-user-agent-sniffing/
 export let IS_IPHONE = false;
+
+/**
+ * Whether or not this is a Tizen device.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_TIZEN = false;
+
+/**
+ * Whether or not this is a WebOS device.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_WEBOS = false;
+
+/**
+ * Whether or not this is a Smart TV (Tizen or WebOS) device.
+ *
+ * @static
+ * @type {Boolean}
+ */
+export let IS_SMART_TV = false;
 
 /**
  * Whether or not this device is touch-enabled.
@@ -235,7 +267,13 @@ if (!IS_CHROMIUM) {
     return version;
   }());
 
-  IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE;
+  IS_TIZEN = (/Tizen/i).test(USER_AGENT);
+
+  IS_WEBOS = (/Web0S/i).test(USER_AGENT);
+
+  IS_SMART_TV = IS_TIZEN || IS_WEBOS;
+
+  IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE && !IS_SMART_TV;
 
   IS_WINDOWS = (/Windows/i).test(USER_AGENT);
 

@@ -1526,3 +1526,115 @@ QUnit.test('a component\'s el can be replaced on dispose', function(assert) {
   assert.strictEqual(Array.from(this.player.el_.childNodes).indexOf(replacementEl), prevIndex, 'replacement was inserted at same position');
 
 });
+
+QUnit.test('should be able to call `getPositions()` from a component', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  const appendSpy = sinon.spy(player.controlBar, 'getPositions');
+
+  player.controlBar.getPositions();
+
+  assert.expect(1);
+  assert.ok(appendSpy.calledOnce, '`handleBlur` has been called');
+  player.dispose();
+});
+
+QUnit.test('getPositions() returns properties of `boundingClientRect` & `center` from elements that support it', function(assert) {
+  const player = TestHelpers.makePlayer({
+    spatialNavigation: {
+      enabled: true
+    }
+  });
+
+  assert.expect(4);
+  assert.ok(player.controlBar.getPositions().boundingClientRect, '`boundingClientRect` present in `controlBar`');
+  assert.ok(player.controlBar.getPositions().center, '`center` present in `controlBar`');
+  assert.ok(typeof player.controlBar.getPositions().boundingClientRect === 'object', '`boundingClientRect` is an object');
+  assert.ok(typeof player.controlBar.getPositions().center === 'object', '`center` is an object`');
+
+  player.dispose();
+});
+
+QUnit.test('getPositions() properties should not be empty', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
+  let hasEmptyProperties = false;
+  const getPositionsProps = player.bigPlayButton.getPositions();
+
+  for (const property in getPositionsProps) {
+    const getPositionsProp = getPositionsProps[property];
+
+    for (const innerProperty in getPositionsProp) {
+      if (isEmpty(innerProperty)) {
+        hasEmptyProperties = true;
+      }
+    }
+  }
+
+  assert.expect(1);
+  assert.ok(!hasEmptyProperties, '`getPositions()` properties are not empty');
+
+  player.dispose();
+});
+
+QUnit.test('component keydown event propagation does not stop if spatial navigation is active', function(assert) {
+  // Ensure each test starts with a player that has spatial navigation enabled
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+
+  // Directly reference the instantiated SpatialNavigation from the player
+  this.spatialNav = this.player.spatialNavigation;
+
+  this.spatialNav.start();
+  const handlerSpy = sinon.spy(this.player, 'handleKeyDown');
+
+  // Create and dispatch a mock keydown event.
+  const event = new KeyboardEvent('keydown', { // eslint-disable-line no-undef
+    key: 'ArrowRight',
+    code: 'ArrowRight',
+    keyCode: 39,
+    location: 2,
+    repeat: true
+  });
+
+  this.player.bigPlayButton.handleKeyDown(event);
+  assert.ok(handlerSpy.calledOnce);
+
+  handlerSpy.restore();
+  this.player.dispose();
+});
+
+QUnit.test('Should be able to call `getIsAvailableToBeFocused()` even without passing an HTML element', function(assert) {
+  // Ensure each test starts with a player that has spatial navigation enabled
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    bigPlayButton: true,
+    spatialNavigation: { enabled: true }
+  });
+
+  // Directly reference the instantiated SpatialNavigation from the player
+  this.spatialNav = this.player.spatialNavigation;
+
+  const component = this.player.getChild('bigPlayButton');
+  const focusSpy = sinon.spy(component, 'getIsAvailableToBeFocused');
+
+  component.getIsAvailableToBeFocused(component.el());
+  component.getIsAvailableToBeFocused();
+
+  assert.ok(focusSpy.getCalls().length === 2, 'focus method called on component');
+
+  // Clean up
+  focusSpy.restore();
+  this.player.dispose();
+});

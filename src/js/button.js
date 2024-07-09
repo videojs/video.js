@@ -4,7 +4,6 @@
 import ClickableComponent from './clickable-component.js';
 import Component from './component';
 import log from './utils/log.js';
-import keycode from 'keycode';
 import {createEl} from './utils/dom.js';
 
 /**
@@ -118,7 +117,7 @@ class Button extends ClickableComponent {
     // prevent the event from propagating through the DOM and triggering Player
     // hotkeys. We do not preventDefault here because we _want_ the browser to
     // handle it.
-    if (keycode.isEventKey(event, 'Space') || keycode.isEventKey(event, 'Enter')) {
+    if (event.key === ' ' || event.key === 'Enter') {
       event.stopPropagation();
       return;
     }

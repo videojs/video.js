@@ -1,11 +1,14 @@
+/** @import Component from '../../component' */
+/** @import Player from '../../player' */
+
 /**
  * Check if muting volume is supported and if it isn't hide the mute toggle
  * button.
  *
- * @param { import('../../component').default } self
+ * @param {Component} self
  *        A reference to the mute toggle button
  *
- * @param { import('../../player').default } player
+ * @param {Player} player
  *        A reference to the player
  *
  * @private

@@ -1,0 +1,48 @@
+.video-js .vjs-transient-button {
+  position: absolute;
+  height: 3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(50, 50, 50, 0.5);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 1s;
+}
+
+.video-js:not(.vjs-has-started) .vjs-transient-button {
+  display: none;
+}
+
+.video-js.not-hover .vjs-transient-button:not(.force-display),
+.video-js.vjs-user-inactive .vjs-transient-button:not(.force-display) {
+  opacity: 0;
+}
+
+.video-js .vjs-transient-button span {
+  padding: 0 0.5em;
+}
+
+.video-js .vjs-transient-button.vjs-left {
+  left: 1em;
+}
+
+.video-js .vjs-transient-button.vjs-right {
+  right: 1em;
+}
+
+.video-js .vjs-transient-button.vjs-top {
+  top: 1em;
+}
+
+.video-js .vjs-transient-button.vjs-near-top {
+  top: 4em;
+}
+
+.video-js .vjs-transient-button.vjs-bottom {
+  bottom: 4em;
+}
+
+.video-js .vjs-transient-button:hover {
+  background-color: rgba(50, 50, 50, 0.9);
+}

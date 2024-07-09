@@ -3,6 +3,8 @@ import document from 'global/document';
 import {merge} from '../utils/obj';
 import {getAbsoluteURL} from '../utils/url';
 
+/** @import Html5 from './html5' */
+
 /**
  * This function is used to fire a sourceset when there is something
  * similar to `mediaEl.load()` being called. It will try to find the source via
@@ -10,7 +12,7 @@ import {getAbsoluteURL} from '../utils/url';
  * with the source that was found or empty string if we cannot know. If it cannot
  * find a source then `sourceset` will not be fired.
  *
- * @param { import('./html5').default } tech
+ * @param {Html5} tech
  *        The tech object that sourceset was setup on
  *
  * @return {boolean}

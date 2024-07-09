@@ -6,6 +6,11 @@ import Component from '../../component.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
 import {toTitleCase} from '../../utils/str.js';
 
+/** @import Player from '../../player' */
+/** @import Menu from '../../menu/menu' */
+/** @import TextTrack from '../../tracks/text-track' */
+/** @import TextTrackMenuItem from '../text-track-controls/text-track-menu-item' */
+
 /**
  * The button component for toggling and selecting chapters
  * Chapters act much differently than other text tracks
@@ -18,7 +23,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Creates an instance of this class.
    *
-   * @param { import('../../player').default } player
+   * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
    * @param {Object} [options]
@@ -160,7 +165,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Create menu from chapter track
    *
-   * @return { import('../../menu/menu').default }
+   * @return {Menu}
    *         New menu for the chapter buttons
    */
   createMenu() {
@@ -171,7 +176,7 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Create a menu item for each text track
    *
-   * @return  { import('./text-track-menu-item').default[] }
+   * @return  {TextTrackMenuItem[]}
    *         Array of menu items
    */
   createItems() {

@@ -34,8 +34,8 @@ import filterSource from './utils/filter-source';
 import {getMimetype, findMimetype} from './utils/mimetypes';
 import {hooks} from './utils/hooks';
 import {isObject} from './utils/obj';
-import keycode from 'keycode';
 import icons from '../images/icons.svg';
+import SpatialNavigation from './spatial-navigation.js';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -52,9 +52,19 @@ import './tracks/text-track-settings.js';
 import './resize-manager.js';
 import './live-tracker.js';
 import './title-bar.js';
+import './transient-button.js';
 
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
+
+/** @import { TimeRange } from './utils/time' */
+/** @import HtmlTrackElement from './tracks/html-track-element' */
+
+/**
+ * @callback PlayerReadyCallback
+ * @this     {Player}
+ * @returns  {void}
+ */
 
 // The following tech events are simply re-triggered
 // on the player when they happen
@@ -303,7 +313,7 @@ class Player extends Component {
    * @param {Object} [options]
    *        Object of option names and values.
    *
-   * @param {Function} [ready]
+   * @param {PlayerReadyCallback} [ready]
    *        Ready callback function.
    */
   constructor(tag, options, ready) {
@@ -359,6 +369,8 @@ class Player extends Component {
     this.boundHandleTechTouchEnd_ = (e) => this.handleTechTouchEnd_(e);
     this.boundHandleTechTap_ = (e) => this.handleTechTap_(e);
 
+    this.boundUpdatePlayerHeightOnAudioOnlyMode_ = (e) => this.updatePlayerHeightOnAudioOnlyMode_(e);
+
     // default isFullscreen_ to false
     this.isFullscreen_ = false;
 
@@ -395,6 +407,7 @@ class Player extends Component {
 
     // Init state audioOnlyCache_
     this.audioOnlyCache_ = {
+      controlBarHeight: null,
       playerHeight: null,
       hiddenChildren: []
     };
@@ -560,6 +573,13 @@ class Player extends Component {
 
     if (this.isAudio()) {
       this.addClass('vjs-audio');
+    }
+
+    // Check if spatial navigation is enabled in the options.
+    // If enabled, instantiate the SpatialNavigation class.
+    if (options.spatialNavigation && options.spatialNavigation.enabled) {
+      this.spatialNavigation = new SpatialNavigation(this);
+      this.addClass('vjs-spatial-navigation-enabled');
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
@@ -775,6 +795,20 @@ class Player extends Component {
     tag.player = el.player = this;
     // Default state of video is paused
     this.addClass('vjs-paused');
+
+    const deviceClassNames = [
+      'IS_SMART_TV',
+      'IS_TIZEN',
+      'IS_WEBOS',
+      'IS_ANDROID',
+      'IS_IPAD',
+      'IS_IPHONE',
+      'IS_CHROMECAST_RECEIVER'
+    ].filter(key => browser[key]).map(key => {
+      return 'vjs-device-' + key.substring(3).toLowerCase().replace(/\_/g, '-');
+    });
+
+    this.addClass(...deviceClassNames);
 
     // Add a style element in the player that we'll use to set the width/height
     // of the player in a way that's still overridable by CSS, just like the
@@ -1326,6 +1360,26 @@ class Player extends Component {
     }
 
     return this.tech_;
+  }
+
+  /**
+   * An object that contains Video.js version.
+   *
+   * @typedef {Object} PlayerVersion
+   *
+   * @property {string} 'video.js' - Video.js version
+   */
+
+  /**
+   * Returns an object with Video.js version.
+   *
+   * @return {PlayerVersion}
+   *          An object with Video.js version.
+   */
+  version() {
+    return {
+      'video.js': version
+    };
   }
 
   /**
@@ -2440,7 +2494,7 @@ class Player extends Component {
    * Get a TimeRange object representing the current ranges of time that the user
    * has played.
    *
-   * @return { import('./utils/time').TimeRange }
+   * @return {TimeRange}
    *         A time range object that represents all the increments of time that have
    *         been played.
    */
@@ -2608,7 +2662,7 @@ class Player extends Component {
    *
    * @see [Buffered Spec]{@link http://dev.w3.org/html5/spec/video.html#dom-media-buffered}
    *
-   * @return { import('./utils/time').TimeRange }
+   * @return {TimeRange}
    *         A mock {@link TimeRanges} object (following HTML spec)
    */
   buffered() {
@@ -2627,7 +2681,7 @@ class Player extends Component {
    *
    * @see [Seekable Spec]{@link https://html.spec.whatwg.org/multipage/media.html#dom-media-seekable}
    *
-   * @return { import('./utils/time').TimeRange }
+   * @return {TimeRange}
    *         A mock {@link TimeRanges} object (following HTML spec)
    */
   seekable() {
@@ -3074,7 +3128,7 @@ class Player extends Component {
    *        Event to check for key press
    */
   fullWindowOnEscKey(event) {
-    if (keycode.isEventKey(event, 'Esc')) {
+    if (event.key === 'Escape') {
       if (this.isFullscreen() === true) {
         if (!this.isFullWindow) {
           this.exitFullscreen();
@@ -3192,7 +3246,7 @@ class Player extends Component {
         pipWindow.document.body.classList.add('vjs-pip-window');
 
         this.player_.isInPictureInPicture(true);
-        this.player_.trigger('enterpictureinpicture');
+        this.player_.trigger({type: 'enterpictureinpicture', pipWindow});
 
         // Listen for the PiP closing event to move the video back.
         pipWindow.addEventListener('pagehide', (event) => {
@@ -3324,9 +3378,9 @@ class Player extends Component {
 
     // set fullscreenKey, muteKey, playPauseKey from `hotkeys`, use defaults if not set
     const {
-      fullscreenKey = keydownEvent => keycode.isEventKey(keydownEvent, 'f'),
-      muteKey = keydownEvent => keycode.isEventKey(keydownEvent, 'm'),
-      playPauseKey = keydownEvent => (keycode.isEventKey(keydownEvent, 'k') || keycode.isEventKey(keydownEvent, 'Space'))
+      fullscreenKey = keydownEvent => (event.key.toLowerCase() === 'f'),
+      muteKey = keydownEvent => (event.key.toLowerCase() === 'm'),
+      playPauseKey = keydownEvent => (event.key.toLowerCase() === 'k' || event.key.toLowerCase() === ' ')
     } = hotkeys;
 
     if (fullscreenKey.call(this, event)) {
@@ -4463,6 +4517,17 @@ class Player extends Component {
     return !!this.isAudio_;
   }
 
+  updatePlayerHeightOnAudioOnlyMode_() {
+    const controlBar = this.getChild('ControlBar');
+
+    if (!controlBar || this.audioOnlyCache_.controlBarHeight === controlBar.currentHeight()) {
+      return;
+    }
+
+    this.audioOnlyCache_.controlBarHeight = controlBar.currentHeight();
+    this.height(this.audioOnlyCache_.controlBarHeight);
+  }
+
   enableAudioOnlyUI_() {
     // Update styling immediately to show the control bar so we can get its height
     this.addClass('vjs-audio-only-mode');
@@ -4486,6 +4551,9 @@ class Player extends Component {
     });
 
     this.audioOnlyCache_.playerHeight = this.currentHeight();
+    this.audioOnlyCache_.controlBarHeight = controlBarHeight;
+
+    this.on('playerresize', this.boundUpdatePlayerHeightOnAudioOnlyMode_);
 
     // Set the player height the same as the control bar
     this.height(controlBarHeight);
@@ -4494,6 +4562,7 @@ class Player extends Component {
 
   disableAudioOnlyUI_() {
     this.removeClass('vjs-audio-only-mode');
+    this.off('playerresize', this.boundUpdatePlayerHeightOnAudioOnlyMode_);
 
     // Show player components that were previously hidden
     this.audioOnlyCache_.hiddenChildren.forEach(child => child.show());
@@ -4695,7 +4764,7 @@ class Player extends Component {
    *                                        from the TextTrackList and HtmlTrackElementList
    *                                        after a source change
    *
-   * @return { import('./tracks/html-track-element').default }
+   * @return {HtmlTrackElement}
    *         the HTMLTrackElement that was created and added
    *         to the HtmlTrackElementList and the remote
    *         TextTrackList
@@ -5277,7 +5346,7 @@ class Player extends Component {
    * Values other than arrays are ignored.
    *
    * @fires Player#playbackrateschange
-   * @param {number[]} newRates
+   * @param {number[]} [newRates]
    *                   The new rates that the playback rates menu should update to.
    *                   An empty array will hide the menu
    * @return {number[]} When used as a getter will return the current playback rates
@@ -5414,6 +5483,10 @@ Player.prototype.options_ = {
   responsive: false,
   audioOnlyMode: false,
   audioPosterMode: false,
+  spatialNavigation: {
+    enabled: false,
+    horizontalSeek: false
+  },
   // Default smooth seeking to false
   enableSmoothSeeking: false
 };
