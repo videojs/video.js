@@ -1,3 +1,16 @@
+<a name="8.17.0"></a>
+# [8.17.0](https://github.com/videojs/video.js/compare/v8.16.1...v8.17.0) (2024-07-10)
+
+### Features
+
+* Adds a transient button component ([#8629](https://github.com/videojs/video.js/issues/8629)) ([1afe504](https://github.com/videojs/video.js/commit/1afe504))
+
+### Bug Fixes
+
+* apply correct styles to audio descriptions track menu items  ([#8770](https://github.com/videojs/video.js/issues/8770)) ([f701102](https://github.com/videojs/video.js/commit/f701102)), closes [#8769](https://github.com/videojs/video.js/issues/8769)
+* **middleware:** cache grows even if no middleware created ([#8674](https://github.com/videojs/video.js/issues/8674)) ([6221a8f](https://github.com/videojs/video.js/commit/6221a8f)), closes [#8653](https://github.com/videojs/video.js/issues/8653) [1000#0](https://github.com/1000/issues/0)
+* **types:** fix and improve component ready callback definition ([#8766](https://github.com/videojs/video.js/issues/8766)) ([970faa8](https://github.com/videojs/video.js/commit/970faa8)), closes [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.16.1"></a>
 ## [8.16.1](https://github.com/videojs/video.js/compare/v8.16.0...v8.16.1) (2024-06-24)
 
