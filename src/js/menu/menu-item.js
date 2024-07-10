@@ -74,6 +74,15 @@ class MenuItem extends ClickableComponent {
       textContent: this.localize(this.options_.label)
     });
 
+    const containsHexCode = (s) => {
+      return /\w*(&#x...)\w*/.test(s);
+    };
+
+    if (containsHexCode(menuItemEl.textContent)) {
+      // Replacement that allows innerHTML to be render properly.
+      menuItemEl.innerHTML = menuItemEl.textContent;
+    }
+
     // If using SVG icons, the element with vjs-icon-placeholder will be added separately.
     if (this.player_.options_.experimentalSvgIcons) {
       el.appendChild(menuItemEl);
