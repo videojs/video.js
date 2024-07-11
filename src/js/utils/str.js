@@ -52,3 +52,15 @@ export const toTitleCase = function(string) {
 export const titleCaseEquals = function(str1, str2) {
   return toTitleCase(str1) === toTitleCase(str2);
 };
+
+/**
+ *
+ * @param {string} string
+ *        The string that will be tested
+ *
+ * @return {boolean}
+ *          Whether the string contains a Hex Code
+ */
+export const containsHexCode = (string) => {
+  return /\w*(&#x.{2,4};)\w*/.test(string);
+};

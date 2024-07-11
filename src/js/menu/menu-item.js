@@ -4,6 +4,7 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {createEl} from '../utils/dom.js';
+import { containsHexCode } from '../utils/str.js';
 
 /** @import Player from '../player' */
 
@@ -73,10 +74,6 @@ class MenuItem extends ClickableComponent {
       className: 'vjs-menu-item-text',
       textContent: this.localize(this.options_.label)
     });
-
-    const containsHexCode = (s) => {
-      return /\w*(&#x...)\w*/.test(s);
-    };
 
     if (containsHexCode(menuItemEl.textContent)) {
       // Replacement that allows innerHTML to be render properly.
