@@ -1714,8 +1714,6 @@ class Component {
    */
   requestNamedAnimationFrame(name, fn) {
     if (this.namedRafs_.has(name)) {
-      // Don't return, because we want to overwrite
-      // return;
       this.cancelNamedAnimationFrame(name);
     }
     this.clearTimersOnDispose_();
