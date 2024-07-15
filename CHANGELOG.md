@@ -1,3 +1,10 @@
+<a name="8.17.1"></a>
+## [8.17.1](https://github.com/videojs/video.js/compare/v8.17.0...v8.17.1) (2024-07-15)
+
+### Bug Fixes
+
+* ensure transient button event listeners are removed on dispose ([#8796](https://github.com/videojs/video.js/issues/8796)) ([0a836e1](https://github.com/videojs/video.js/commit/0a836e1)), closes [#8795](https://github.com/videojs/video.js/issues/8795) [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.17.0"></a>
 # [8.17.0](https://github.com/videojs/video.js/compare/v8.16.1...v8.17.0) (2024-07-10)
 
