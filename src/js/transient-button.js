@@ -53,7 +53,7 @@ class TransientButton extends Button {
 
     // When shown, the float button will be visible even if the user is inactive.
     // Clear this if there is any interaction.
-    player.on(['useractive', 'userinactive'], (e) => {
+    this.on(this.player_, ['useractive', 'userinactive'], (e) => {
       this.removeClass('force-display');
     });
   }
