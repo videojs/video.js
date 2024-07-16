@@ -64,3 +64,8 @@ export const titleCaseEquals = function(str1, str2) {
 export const containsHexCode = (string) => {
   return /[a-zA-Z\040]*(&#x[0-9a-fA-F]{2,4};)[a-zA-Z\040]*/.test(string);
 };
+
+export const sanitizeString = (string) => {
+  string = string.replace(/[^a-z0-9 áéíóúñü\&#;_]/gim, '');
+  return string.trim();
+};

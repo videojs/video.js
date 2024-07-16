@@ -4,7 +4,7 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {createEl} from '../utils/dom.js';
-import { containsHexCode } from '../utils/str.js';
+import { containsHexCode, sanitizeString } from '../utils/str.js';
 
 /** @import Player from '../player' */
 
@@ -75,9 +75,11 @@ class MenuItem extends ClickableComponent {
       textContent: this.localize(this.options_.label)
     });
 
-    if (containsHexCode(menuItemEl.textContent)) {
+    const sanitizedString = sanitizeString(menuItemEl.textContent);
+
+    if (containsHexCode(sanitizedString)) {
       // Replacement that allows innerHTML to be render properly.
-      menuItemEl.innerHTML = menuItemEl.textContent;
+      menuItemEl.innerHTML = sanitizedString;
     }
 
     // If using SVG icons, the element with vjs-icon-placeholder will be added separately.
