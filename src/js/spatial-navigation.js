@@ -57,7 +57,6 @@ class SpatialNavigation extends EventTarget {
       this.refocusComponent();
     });
     this.player_.on('error', () => {
-      // focus vjs close button when error modal appears
       this.focus(this.updateFocusableComponents()[0]);
     });
     this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
