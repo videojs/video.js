@@ -5339,11 +5339,11 @@ class Player extends Component {
    * @return {boolean}
    *         Whether or not this player has the requested plugin available.
    */
-  // exclude start
+  /* start-delete-from-build */
   hasPlugin(name) {
     return false;
   }
-  // exclude end
+  /* end-delete-from-build */
 
   /**
    * Reports whether or not a player is using a plugin by name.
@@ -5358,9 +5358,11 @@ class Player extends Component {
    * @return {boolean}
    *         Whether or not this player is using the requested plugin.
    */
+  /* start-delete-from-build */
   usingPlugin(name) {
     return false;
   }
+  /* end-delete-from-build */
 }
 
 /**
