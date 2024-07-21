@@ -17,6 +17,7 @@ import image from '@rollup/plugin-image';
 import istanbul from 'rollup-plugin-istanbul';
 import externalGlobals from 'rollup-plugin-external-globals';
 import svg from 'rollup-plugin-svg';
+import { excludeLines } from './build/rollup-ignore';
 
 const excludeCoverage = [
   'test/**',
@@ -143,6 +144,10 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      excludeLines({
+        include: 'src/**',
+        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+      }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
       }),
