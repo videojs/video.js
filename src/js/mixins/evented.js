@@ -182,7 +182,10 @@ const normalizeListenArgs = (self, args, fnName) => {
 
     [type, listener] = args;
   } else {
-    [target, type, listener] = args;
+    target = args[0];
+    type = args[1];
+    listener = args[2];
+    // [target, type, listener] = args;
   }
 
   validateTarget(target, self, fnName);
