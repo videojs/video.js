@@ -145,8 +145,7 @@ export default cliargs => [
     external: externals.browser,
     plugins: [
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
@@ -175,8 +174,7 @@ export default cliargs => [
     external: externals.browser,
     plugins: [
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
@@ -203,8 +201,7 @@ export default cliargs => [
     external: externals.test,
     plugins: [
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       multiEntry({exports: false}),
       alias({
@@ -242,8 +239,7 @@ export default cliargs => [
     external: externals.module,
     plugins: [
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js'),
@@ -278,8 +274,7 @@ export default cliargs => [
     plugins: [
       primedIgnore,
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
@@ -314,8 +309,7 @@ export default cliargs => [
     external: externals.module,
     plugins: [
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       json(),
       primedBabel,
@@ -339,8 +333,7 @@ export default cliargs => [
     plugins: [
       primedResolve,
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       json(),
       primedExternalGlobals,
@@ -367,8 +360,7 @@ export default cliargs => [
       primedIgnore,
       primedResolve,
       excludeLines({
-        include: 'src/js/**',
-        patterns: [/\/\/\s*exclude\s*start[\s\S]*?\/\/\s*exclude\s*end/g]
+        include: 'src/js/**'
       }),
       json(),
       primedExternalGlobals,
