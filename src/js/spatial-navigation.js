@@ -499,12 +499,14 @@ class SpatialNavigation extends EventTarget {
    * @param {Component} component - The component to be focused.
    */
   focus(component) {
-    if (component) {
-      if (component.getIsAvailableToBeFocused(component.el())) {
-        component.focus();
-      } else if (this.findSuitableDOMChild(component)) {
-        this.findSuitableDOMChild(component).focus();
-      }
+    if (typeof component !== 'object') {
+      return;
+    }
+
+    if (component.getIsAvailableToBeFocused(component.el())) {
+      component.focus();
+    } else if (this.findSuitableDOMChild(component)) {
+      this.findSuitableDOMChild(component).focus();
     }
   }
 
