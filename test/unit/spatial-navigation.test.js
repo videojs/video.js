@@ -492,3 +492,13 @@ QUnit.test('should call `searchForTrackSelect()` if spatial navigation is enable
 
   assert.ok(trackSelectSpy.calledOnce);
 });
+
+QUnit.test('error on player calls updateFocusableComponents', function(assert) {
+  const updateFocusableComponentsSpy = sinon.spy(this.spatialNav, 'updateFocusableComponents');
+
+  this.spatialNav.start();
+
+  this.player.error('Error 1');
+
+  assert.ok(updateFocusableComponentsSpy.calledOnce, 'on error event spatial navigation should call "updateFocusableComponents"');
+});
