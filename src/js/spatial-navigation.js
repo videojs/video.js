@@ -56,6 +56,9 @@ class SpatialNavigation extends EventTarget {
     this.player_.on('modalclose', () => {
       this.refocusComponent();
     });
+    this.player_.on('error', () => {
+      this.focus(this.updateFocusableComponents()[0]);
+    });
     this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
     this.player_.on('focusout', this.handlePlayerBlur_.bind(this));
     this.isListening_ = true;
@@ -196,7 +199,7 @@ class SpatialNavigation extends EventTarget {
     }
 
     if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
-      if (currentComponent.name() === 'CloseButton') {
+      if (currentComponent && currentComponent.name() === 'CloseButton') {
         this.refocusComponent();
       } else {
         this.pause();
@@ -307,7 +310,11 @@ class SpatialNavigation extends EventTarget {
       return null;
     }
 
-    return searchForSuitableChild(component.el());
+    if (component.el()) {
+      return searchForSuitableChild(component.el());
+    }
+    return null;
+
   }
 
   /**
@@ -464,7 +471,7 @@ class SpatialNavigation extends EventTarget {
    */
   refocusComponent() {
     if (this.lastFocusedComponent_) {
-      // If use is not active, set it to active.
+      // If user is not active, set it to active.
       if (!this.player_.userActive()) {
         this.player_.userActive(true);
       }
@@ -492,6 +499,10 @@ class SpatialNavigation extends EventTarget {
    * @param {Component} component - The component to be focused.
    */
   focus(component) {
+    if (typeof component !== 'object') {
+      return;
+    }
+
     if (component.getIsAvailableToBeFocused(component.el())) {
       component.focus();
     } else if (this.findSuitableDOMChild(component)) {

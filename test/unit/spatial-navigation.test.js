@@ -44,6 +44,7 @@ QUnit.test('start method initializes event listeners', function(assert) {
   assert.ok(onSpy.calledWith('loadedmetadata'), 'loadedmetadata event listener added');
   assert.ok(onSpy.calledWith('modalKeydown'), 'modalKeydown event listener added');
   assert.ok(onSpy.calledWith('modalclose'), 'modalclose event listener added');
+  assert.ok(onSpy.calledWith('error'), 'error event listener added');
 
   // Additionally, check if isListening_ flag is set
   assert.ok(this.spatialNav.isListening_, 'isListening_ flag is set');
@@ -490,4 +491,14 @@ QUnit.test('should call `searchForTrackSelect()` if spatial navigation is enable
   this.spatialNav.handlePlayerBlur_(clickEvent);
 
   assert.ok(trackSelectSpy.calledOnce);
+});
+
+QUnit.test('error on player calls updateFocusableComponents', function(assert) {
+  const updateFocusableComponentsSpy = sinon.spy(this.spatialNav, 'updateFocusableComponents');
+
+  this.spatialNav.start();
+
+  this.player.error('Error 1');
+
+  assert.ok(updateFocusableComponentsSpy.calledOnce, 'on error event spatial navigation should call "updateFocusableComponents"');
 });
