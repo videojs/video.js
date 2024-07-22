@@ -332,12 +332,12 @@ class TextTrackSettings extends ModalDialog {
   }
 
   bindFunctionsToSelectsAndButtons() {
-    this.on(this.$('.vjs-done-button'), 'click', () => {
+    this.on(this.$('.vjs-done-button'), ['click', 'tap'], () => {
       this.saveSettings();
       this.close();
     });
 
-    this.on(this.$('.vjs-default-button'), 'click', () => {
+    this.on(this.$('.vjs-default-button'), ['click', 'tap'], () => {
       this.setDefaults();
       this.updateDisplay();
     });
