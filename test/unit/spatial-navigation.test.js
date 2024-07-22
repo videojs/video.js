@@ -44,6 +44,7 @@ QUnit.test('start method initializes event listeners', function(assert) {
   assert.ok(onSpy.calledWith('loadedmetadata'), 'loadedmetadata event listener added');
   assert.ok(onSpy.calledWith('modalKeydown'), 'modalKeydown event listener added');
   assert.ok(onSpy.calledWith('modalclose'), 'modalclose event listener added');
+  assert.ok(onSpy.calledWith('error'), 'error event listener added');
 
   // Additionally, check if isListening_ flag is set
   assert.ok(this.spatialNav.isListening_, 'isListening_ flag is set');
