@@ -62,6 +62,7 @@ class SpatialNavigation extends EventTarget {
     this.player_.errorDisplay.on('aftermodalfill', () => {
       this.updateFocusableComponents();
 
+      // Focus the buttons of the modal
       if (this.focusableComponents.length > 1) {
         this.focusableComponents[1].el().focus();
       }
@@ -279,16 +280,15 @@ class SpatialNavigation extends EventTarget {
         const buttonContainer = value.el_.querySelector('.vjs-errors-ok-button-container');
         const modalButtons = buttonContainer.querySelectorAll('button');
 
-        modalButtons.forEach((item, index) => {
+        modalButtons.forEach((element, index) => {
+          // Add elements as objects to be handled by the spatial navigation
           focusableComponents.push({
-            name_: 'ModalButton' + index + 1,
             name: () => {
               return 'ModalButton' + index + 1;
             },
-            el_: item,
-            el: () => item,
+            el: () => element,
             getPositions: () => {
-              const rect = item.getBoundingClientRect();
+              const rect = element.getBoundingClientRect();
 
               // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
               const boundingClientRect = {
@@ -319,9 +319,10 @@ class SpatialNavigation extends EventTarget {
                 center
               };
             },
+            // Asume that the following are always focusable
             getIsAvailableToBeFocused: () => true,
             getIsFocusable: (el) => true,
-            focus: () => item.focus()
+            focus: () => element.focus()
           });
         });
       }
