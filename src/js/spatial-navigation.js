@@ -56,12 +56,16 @@ class SpatialNavigation extends EventTarget {
     this.player_.on('modalclose', () => {
       this.refocusComponent();
     });
-    this.player_.on('error', () => {
-      this.focus(this.updateFocusableComponents()[0]);
-    });
     this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
     this.player_.on('focusout', this.handlePlayerBlur_.bind(this));
     this.isListening_ = true;
+    this.player_.errorDisplay.on('aftermodalfill', () => {
+      this.updateFocusableComponents();
+
+      if (this.focusableComponents.length > 1) {
+        this.focusableComponents[1].el().focus();
+      }
+    });
   }
 
   /**
@@ -270,9 +274,61 @@ class SpatialNavigation extends EventTarget {
           focusableComponents.push(value);
         }
       }
+
+      if (value.name_ === 'ErrorDisplay' && value.children_.length > 0) {
+        const buttonContainer = value.el_.querySelector('.vjs-errors-ok-button-container');
+        const modalButtons = buttonContainer.querySelectorAll('button');
+
+        modalButtons.forEach((item, index) => {
+          focusableComponents.push({
+            name_: 'ModalButton' + index + 1,
+            name: () => {
+              return 'ModalButton' + index + 1;
+            },
+            el_: item,
+            el: () => item,
+            getPositions: () => {
+              const rect = item.getBoundingClientRect();
+
+              // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
+              const boundingClientRect = {
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+                top: rect.top,
+                right: rect.right,
+                bottom: rect.bottom,
+                left: rect.left
+              };
+
+              // Calculating the center position
+              const center = {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+                width: 0,
+                height: 0,
+                top: rect.top + rect.height / 2,
+                right: rect.left + rect.width / 2,
+                bottom: rect.top + rect.height / 2,
+                left: rect.left + rect.width / 2
+              };
+
+              return {
+                boundingClientRect,
+                center
+              };
+            },
+            getIsAvailableToBeFocused: () => true,
+            getIsFocusable: (el) => true,
+            focus: () => item.focus()
+          });
+        });
+      }
     });
 
     this.focusableComponents = focusableComponents;
+
     return this.focusableComponents;
   }
 
