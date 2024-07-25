@@ -276,6 +276,7 @@ class SpatialNavigation extends EventTarget {
         }
       }
 
+      // TODO - Refactor the following logic after refactor of videojs-errors elements to be components is done.
       if (value.name_ === 'ErrorDisplay' && value.children_.length > 0) {
         const buttonContainer = value.el_.querySelector('.vjs-errors-ok-button-container');
         const modalButtons = buttonContainer.querySelectorAll('button');
