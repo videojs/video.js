@@ -64,7 +64,7 @@ class SpatialNavigation extends EventTarget {
 
       // Focus the buttons of the modal
       if (this.focusableComponents.length > 1) {
-        this.focusableComponents[1].el().focus();
+        this.focusableComponents[1].focus();
       }
     });
   }

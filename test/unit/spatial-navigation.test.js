@@ -501,3 +501,37 @@ QUnit.test('error on player calls updateFocusableComponents', function(assert) {
 
   assert.ok(updateFocusableComponentsSpy.calledOnce, 'on error event spatial navigation should call "updateFocusableComponents"');
 });
+
+QUnit.test('error on player focus the second focusable element of error modal', function(assert) {
+  this.spatialNav.start();
+
+  const firstComponent = {
+    name: () => 'firstComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 100, y: 100 }, boundingClientRect: { top: 0, left: 100, bottom: 200, right: 200 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  const secondComponent = {
+    name: () => 'secondComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getPositions: () => ({ center: { x: 300, y: 100 }, boundingClientRect: { top: 0, left: 300, bottom: 200, right: 400 } }),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  this.spatialNav.focusableComponents = [firstComponent, secondComponent];
+  this.spatialNav.getCurrentComponent = () => firstComponent;
+  this.spatialNav.updateFocusableComponents = () => [firstComponent, secondComponent];
+
+  this.player.error({
+    code: 1,
+    dismiss: true
+  });
+
+  this.spatialNav.focusableComponents[1].el().focus();
+
+  assert.ok(secondComponent.focus.calledOnce, 'Focus should move to the second component');
+  assert.notOk(firstComponent.focus.called, 'Focus should not remain on the first component');
+});
