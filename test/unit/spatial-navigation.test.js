@@ -566,7 +566,28 @@ QUnit.test('on error, modalButtons should get the buttons if those are available
   assert.ok(getPositionsEl2Spy.calledOnce, 'getPositions method called on button');
   assert.strictEqual(this.spatialNav.focusableComponents[0].name(), 'ModalButton1', 'testEl1 name should be ModalButton1');
   assert.strictEqual(this.spatialNav.focusableComponents[1].name(), 'ModalButton2', 'testEl2 name should be ModalButton2');
+
+  getPositionsEl1Spy.restore();
+  getPositionsEl2Spy.restore();
+});
+
+QUnit.test('on error, modalButtons added functions should work properly', function(assert) {
+  this.spatialNav.start();
+
+  const buttonContainer = Dom.createEl('div', {}, {class: 'vjs-errors-ok-button-container'});
+
+  const testEl1 = Dom.createEl('button', {}, {class: 'c1'});
+
+  // Add first element to error modal
+  buttonContainer.appendChild(testEl1);
+
+  this.player.errorDisplay.el().appendChild(buttonContainer);
+
+  this.player.error({ code: 1, dismiss: true });
+
   assert.strictEqual(this.spatialNav.focusableComponents[0].el() instanceof Element, true, 'el function from modal buttons should return a DOM element'); // eslint-disable-line no-undef
   assert.strictEqual(this.spatialNav.focusableComponents[0].getIsFocusable(), true, 'getIsFocusable function from modal buttons is always true');
   assert.strictEqual(this.spatialNav.focusableComponents[0].getIsAvailableToBeFocused(), true, 'getIsAvailableToBeFocused function from modal buttons is always true');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].getIsAvailableToBeFocused(), true, 'getIsAvailableToBeFocused function from modal buttons is always true');
+  assert.strictEqual(typeof this.spatialNav.focusableComponents[0].getPositions(), 'object', 'focusableComponents function from modal buttons should return an object');
 });
