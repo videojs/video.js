@@ -5,6 +5,7 @@ import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import document from 'global/document';
 import TextTrackSelect from '../../src/js/tracks/text-track-select';
+import * as Dom from '../../src/js/utils/dom.js';
 
 QUnit.module('SpatialNavigation', {
   beforeEach() {
@@ -534,4 +535,30 @@ QUnit.test('error on player focus the second focusable element of error modal', 
 
   assert.ok(secondComponent.focus.calledOnce, 'Focus should move to the second component');
   assert.notOk(firstComponent.focus.called, 'Focus should not remain on the first component');
+});
+
+QUnit.test('on error modalButtons should get the buttons if those are available', function(assert) {
+  this.spatialNav.start();
+
+  const buttonContainer = Dom.createEl('div', {}, {class: 'vjs-errors-ok-button-container'});
+
+  const testEl1 = Dom.createEl('button', {}, {class: 'c1'});
+
+  // Add first element to error modal
+  buttonContainer.appendChild(testEl1);
+
+  const testEl2 = Dom.createEl('button', {}, {class: 'c1'});
+
+  // Add second element to error modal
+  buttonContainer.appendChild(testEl2);
+  this.player.errorDisplay.el().appendChild(buttonContainer);
+
+  this.player.error({
+    code: 1,
+    dismiss: true
+  });
+
+  this.spatialNav.move('left');
+
+  assert.strictEqual(this.spatialNav.focusableComponents.length, 2, 'button elements are now part of the array of focusableComponents');
 });

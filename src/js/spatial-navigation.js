@@ -277,55 +277,58 @@ class SpatialNavigation extends EventTarget {
       }
 
       // TODO - Refactor the following logic after refactor of videojs-errors elements to be components is done.
-      if (value.name_ === 'ErrorDisplay' && value.children_.length > 0) {
+      if (value.name_ === 'ErrorDisplay' && value.opened_) {
         const buttonContainer = value.el_.querySelector('.vjs-errors-ok-button-container');
-        const modalButtons = buttonContainer.querySelectorAll('button');
 
-        modalButtons.forEach((element, index) => {
-          // Add elements as objects to be handled by the spatial navigation
-          focusableComponents.push({
-            name: () => {
-              return 'ModalButton' + index + 1;
-            },
-            el: () => element,
-            getPositions: () => {
-              const rect = element.getBoundingClientRect();
+        if (buttonContainer) {
+          const modalButtons = buttonContainer.querySelectorAll('button');
 
-              // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
-              const boundingClientRect = {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height,
-                top: rect.top,
-                right: rect.right,
-                bottom: rect.bottom,
-                left: rect.left
-              };
+          modalButtons.forEach((element, index) => {
+            // Add elements as objects to be handled by the spatial navigation
+            focusableComponents.push({
+              name: () => {
+                return 'ModalButton' + index + 1;
+              },
+              el: () => element,
+              getPositions: () => {
+                const rect = element.getBoundingClientRect();
 
-              // Calculating the center position
-              const center = {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-                width: 0,
-                height: 0,
-                top: rect.top + rect.height / 2,
-                right: rect.left + rect.width / 2,
-                bottom: rect.top + rect.height / 2,
-                left: rect.left + rect.width / 2
-              };
+                // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
+                const boundingClientRect = {
+                  x: rect.x,
+                  y: rect.y,
+                  width: rect.width,
+                  height: rect.height,
+                  top: rect.top,
+                  right: rect.right,
+                  bottom: rect.bottom,
+                  left: rect.left
+                };
 
-              return {
-                boundingClientRect,
-                center
-              };
-            },
-            // Asume that the following are always focusable
-            getIsAvailableToBeFocused: () => true,
-            getIsFocusable: (el) => true,
-            focus: () => element.focus()
+                // Calculating the center position
+                const center = {
+                  x: rect.left + rect.width / 2,
+                  y: rect.top + rect.height / 2,
+                  width: 0,
+                  height: 0,
+                  top: rect.top + rect.height / 2,
+                  right: rect.left + rect.width / 2,
+                  bottom: rect.top + rect.height / 2,
+                  left: rect.left + rect.width / 2
+                };
+
+                return {
+                  boundingClientRect,
+                  center
+                };
+              },
+              // Asume that the following are always focusable
+              getIsAvailableToBeFocused: () => true,
+              getIsFocusable: (el) => true,
+              focus: () => element.focus()
+            });
           });
-        });
+        }
       }
     });
 
