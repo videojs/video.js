@@ -510,7 +510,6 @@ QUnit.test('error on player focus the second focusable element of error modal', 
     name: () => 'firstComponent',
     el: () => document.createElement('div'),
     focus: sinon.spy(),
-    getPositions: () => ({ center: { x: 100, y: 100 }, boundingClientRect: { top: 0, left: 100, bottom: 200, right: 200 } }),
     getIsAvailableToBeFocused: () => true
   };
 
@@ -518,7 +517,6 @@ QUnit.test('error on player focus the second focusable element of error modal', 
     name: () => 'secondComponent',
     el: () => document.createElement('div'),
     focus: sinon.spy(),
-    getPositions: () => ({ center: { x: 300, y: 100 }, boundingClientRect: { top: 0, left: 300, bottom: 200, right: 400 } }),
     getIsAvailableToBeFocused: () => true
   };
 
@@ -531,13 +529,11 @@ QUnit.test('error on player focus the second focusable element of error modal', 
     dismiss: true
   });
 
-  this.spatialNav.focusableComponents[1].el().focus();
-
   assert.ok(secondComponent.focus.calledOnce, 'Focus should move to the second component');
   assert.notOk(firstComponent.focus.called, 'Focus should not remain on the first component');
 });
 
-QUnit.test('on error modalButtons should get the buttons if those are available', function(assert) {
+QUnit.test('on error, modalButtons should get the buttons if those are available', function(assert) {
   this.spatialNav.start();
 
   const buttonContainer = Dom.createEl('div', {}, {class: 'vjs-errors-ok-button-container'});
@@ -558,7 +554,14 @@ QUnit.test('on error modalButtons should get the buttons if those are available'
     dismiss: true
   });
 
+  this.spatialNav.getCurrentComponent = () => this.spatialNav.focusableComponents[0];
+
+  const getPositionsEl1Spy = sinon.spy(this.spatialNav.focusableComponents[0], 'getPositions');
+  const getPositionsEl2Spy = sinon.spy(this.spatialNav.focusableComponents[1], 'getPositions');
+
   this.spatialNav.move('left');
 
   assert.strictEqual(this.spatialNav.focusableComponents.length, 2, 'button elements are now part of the array of focusableComponents');
+  assert.ok(getPositionsEl1Spy.calledOnce, 'getPositions method called on button');
+  assert.ok(getPositionsEl2Spy.calledOnce, 'getPositions method called on button');
 });
