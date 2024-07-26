@@ -287,7 +287,7 @@ class SpatialNavigation extends EventTarget {
             // Add elements as objects to be handled by the spatial navigation
             focusableComponents.push({
               name: () => {
-                return 'ModalButton' + index + 1;
+                return 'ModalButton' + (index + 1);
               },
               el: () => element,
               getPositions: () => {
