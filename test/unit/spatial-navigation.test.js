@@ -568,4 +568,5 @@ QUnit.test('on error, modalButtons should get the buttons if those are available
   assert.strictEqual(this.spatialNav.focusableComponents[1].name(), 'ModalButton2', 'testEl2 name should be ModalButton2');
   assert.strictEqual(this.spatialNav.focusableComponents[0].el() instanceof Element, true, 'el function from modal buttons should return a DOM element'); // eslint-disable-line no-undef
   assert.strictEqual(this.spatialNav.focusableComponents[0].getIsFocusable(), true, 'getIsFocusable function from modal buttons is always true');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].getIsAvailableToBeFocused(), true, 'getIsAvailableToBeFocused function from modal buttons is always true');
 });
