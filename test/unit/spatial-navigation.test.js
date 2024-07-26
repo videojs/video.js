@@ -591,3 +591,24 @@ QUnit.test('on error, modalButtons added functions should work properly', functi
   assert.strictEqual(this.spatialNav.focusableComponents[0].getIsAvailableToBeFocused(), true, 'getIsAvailableToBeFocused function from modal buttons is always true');
   assert.strictEqual(typeof this.spatialNav.focusableComponents[0].getPositions(), 'object', 'focusableComponents function from modal buttons should return an object');
 });
+
+QUnit.test('If component passes the required functions it should be added to focusableComponents', function(assert) {
+  this.spatialNav.start();
+
+  const firstComponent = {
+    name_: 'firstComponent',
+    name: () => this.name,
+    el_: document.createElement('div'),
+    el: () => this.el_,
+    focus: sinon.spy(),
+    getIsAvailableToBeFocused: () => true,
+    getIsFocusable: () => true
+  };
+
+  this.player.children_.push(firstComponent);
+  this.spatialNav.getCurrentComponent = () => firstComponent;
+  this.spatialNav.updateFocusableComponents();
+
+  assert.strictEqual(this.spatialNav.focusableComponents.length, 1, 'focusableComponents array should have 1 component');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].name_, 'firstComponent', 'the name of the component in focusableComponents array should be "firstComponent"');
+});
