@@ -374,6 +374,14 @@ class ModalDialog extends Component {
     if (closeButton) {
       parentEl.appendChild(closeButton.el_);
     }
+
+    /**
+     * Fired after `ModalDialog` is re-filled with content & close button is appended.
+     *
+     * @event ModalDialog#aftermodalfill
+     * @type {Event}
+     */
+    this.trigger('aftermodalfill');
   }
 
   /**
