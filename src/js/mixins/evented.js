@@ -182,7 +182,12 @@ const normalizeListenArgs = (self, args, fnName) => {
 
     [type, listener] = args;
   } else {
-    [target, type, listener] = args;
+    // This was `[target, type, listener] = args;` but this block needs more than
+    // one statement to produce minified output compatible with Chrome 53.
+    // See https://github.com/videojs/video.js/pull/8810
+    target = args[0];
+    type = args[1];
+    listener = args[2];
   }
 
   validateTarget(target, self, fnName);

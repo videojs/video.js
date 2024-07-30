@@ -1,3 +1,28 @@
+<a name="8.17.3"></a>
+## [8.17.3](https://github.com/videojs/video.js/compare/v8.17.2...v8.17.3) (2024-07-30)
+
+### Bug Fixes
+
+* Listen to taps on track controls ([#8809](https://github.com/videojs/video.js/issues/8809)) ([86d29cd](https://github.com/videojs/video.js/commit/86d29cd)), closes [#8808](https://github.com/videojs/video.js/issues/8808) [1000#0](https://github.com/1000/issues/0)
+* Refactor evented to make mincompatable with Chrome 53 ([#8810](https://github.com/videojs/video.js/issues/8810)) ([a7c9f26](https://github.com/videojs/video.js/commit/a7c9f26)), closes [/github.com/videojs/video.js/blob/e78bcc7b2d829fce01451cf105b918d8feec4548/src/js/mixins/evented.js#L165-L195](https://github.com//github.com/videojs/video.js/blob/e78bcc7b2d829fce01451cf105b918d8feec4548/src/js/mixins/evented.js/issues/L165-L195) [#8783](https://github.com/videojs/video.js/issues/8783) [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** focus lost in error modal ([#8817](https://github.com/videojs/video.js/issues/8817)) ([daf40bd](https://github.com/videojs/video.js/commit/daf40bd)), closes [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** keep navigation going when player has an error ([#8805](https://github.com/videojs/video.js/issues/8805)) ([76e99b7](https://github.com/videojs/video.js/commit/76e99b7)), closes [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** refocus available also to the close button of the error modal ([#8819](https://github.com/videojs/video.js/issues/8819)) ([45570d9](https://github.com/videojs/video.js/commit/45570d9)), closes [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.17.2"></a>
+## [8.17.2](https://github.com/videojs/video.js/compare/v8.17.1...v8.17.2) (2024-07-22)
+
+### Chores
+
+* update vhs version 3.13.2 ([#8812](https://github.com/videojs/video.js/issues/8812)) ([49151ee](https://github.com/videojs/video.js/commit/49151ee)), closes [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.17.1"></a>
+## [8.17.1](https://github.com/videojs/video.js/compare/v8.17.0...v8.17.1) (2024-07-15)
+
+### Bug Fixes
+
+* ensure transient button event listeners are removed on dispose ([#8796](https://github.com/videojs/video.js/issues/8796)) ([0a836e1](https://github.com/videojs/video.js/commit/0a836e1)), closes [#8795](https://github.com/videojs/video.js/issues/8795) [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.17.0"></a>
 # [8.17.0](https://github.com/videojs/video.js/compare/v8.16.1...v8.17.0) (2024-07-10)
 
