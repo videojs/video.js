@@ -35,27 +35,30 @@
 }
 
 .video-js .vjs-volume-panel {
+  @include transition(width 1s);
+
   &.vjs-hover .vjs-volume-control,
   &:active .vjs-volume-control,
   &:focus  .vjs-volume-control,
   & .vjs-volume-control:active,
   &.vjs-hover .vjs-mute-control  ~ .vjs-volume-control,
   & .vjs-volume-control.vjs-slider-active {
+    visibility: visible;
+    opacity: 1;
+    position: relative;
+    $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
+    @include transition($transition-property);
+
     &.vjs-volume-horizontal {
       width: 5em;
       height: 3em;
       margin-right: 0;
     }
-    visibility: visible;
-    opacity: 1;
-    position: relative;
 
     &.vjs-volume-vertical {
       left: -3.5em;
       @include transition(left 0s);
     }
-    $transition-property: visibility 0.1s, opacity 0.1s, height 0.1s, width 0.1s, left 0s, top 0s;
-    @include transition($transition-property);
   }
 
   &.vjs-volume-panel-horizontal {
@@ -70,8 +73,6 @@
       width: 4em;
     }
   }
-
-  @include transition(width 1s);
 }
 
 .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
