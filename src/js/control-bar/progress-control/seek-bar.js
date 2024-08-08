@@ -39,10 +39,10 @@ class SeekBar extends Slider {
    *        The multiplier of stepSeconds that PgUp/PgDown move the timeline.
    */
   constructor(player, options) {
-    options = merge(options, {
+    options = merge({
       stepSeconds: 5,
       pageMultiplier: 12
-    });
+    }, options);
     super(player, options);
     this.setEventHandlers_();
   }
