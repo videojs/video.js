@@ -319,6 +319,23 @@ class TextTrackDisplay extends Component {
       }
       this.updateForTrack(descriptionsTrack);
     }
+
+    if (!window.CSS.supports('inset', '0')) {
+      const textTrack = window.document.querySelector('.vjs-text-track-display');
+      const player = window.document.querySelector('video-js');
+      const textTrackHeight = textTrack.getBoundingClientRect().height;
+
+      // This styles are required to be inline
+      textTrack.style.position = 'relative';
+      textTrack.style.height = textTrackHeight + 'px';
+      textTrack.style.top = 'unset';
+
+      if (player.classList.contains('vjs-fullscreen')) {
+        textTrack.style.bottom = textTrackHeight + 'px';
+      } else {
+        textTrack.style.bottom = '0px';
+      }
+    }
   }
 
   /**
@@ -482,6 +499,19 @@ class TextTrackDisplay extends Component {
       }
       if (this.player_.textTrackSettings) {
         this.updateDisplayState(track);
+      }
+    }
+
+    if (!window.CSS.supports('inset', '0')) {
+      const document_ = window.document;
+      const vjsTextTrackCue = document_.querySelector('.vjs-text-track-cue');
+
+      if (vjsTextTrackCue) {
+        const insetStyles = vjsTextTrackCue.style.inset.split(' ');
+
+        if (insetStyles.length === 3) {
+          Object.assign(vjsTextTrackCue.style, { top: insetStyles[0], right: insetStyles[1], bottom: insetStyles[2], left: 'unset' });
+        }
       }
     }
   }
