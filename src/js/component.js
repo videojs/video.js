@@ -1966,11 +1966,10 @@ class Component {
    *
    * @param {string} name
    *        The name of the `Component` to register.
-   * @template {Component} C
-   * @param {C} ComponentToRegister
+   * @param {Component} ComponentToRegister
    *        The `Component` class to register.
    *
-   * @return {C}
+   * @return {Component}
    *         The `Component` that was registered.
    */
   static registerComponent(name, ComponentToRegister) {
