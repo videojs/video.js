@@ -17,6 +17,7 @@ import image from '@rollup/plugin-image';
 import istanbul from 'rollup-plugin-istanbul';
 import externalGlobals from 'rollup-plugin-external-globals';
 import svg from 'rollup-plugin-svg';
+import excludeLines from './build/rollup-exclude-lines';
 
 const excludeCoverage = [
   'test/**',
@@ -143,6 +144,9 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      excludeLines({
+        include: 'src/js/**'
+      }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
       }),
@@ -169,6 +173,9 @@ export default cliargs => [
     },
     external: externals.browser,
     plugins: [
+      excludeLines({
+        include: 'src/js/**'
+      }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
       }),
@@ -193,6 +200,9 @@ export default cliargs => [
     },
     external: externals.test,
     plugins: [
+      excludeLines({
+        include: 'src/js/**'
+      }),
       multiEntry({exports: false}),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
@@ -228,6 +238,9 @@ export default cliargs => [
     ],
     external: externals.module,
     plugins: [
+      excludeLines({
+        include: 'src/js/**'
+      }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js'),
         'videojs-contrib-quality-levels': path.resolve(__dirname, './node_modules/videojs-contrib-quality-levels/dist/videojs-contrib-quality-levels.es.js'),
@@ -260,6 +273,9 @@ export default cliargs => [
     external: externals.browser,
     plugins: [
       primedIgnore,
+      excludeLines({
+        include: 'src/js/**'
+      }),
       alias({
         'video.js': path.resolve(__dirname, './src/js/video.js')
       }),
@@ -292,6 +308,9 @@ export default cliargs => [
     ],
     external: externals.module,
     plugins: [
+      excludeLines({
+        include: 'src/js/**'
+      }),
       json(),
       primedBabel,
       svg(),
@@ -313,6 +332,9 @@ export default cliargs => [
     external: externals.browser,
     plugins: [
       primedResolve,
+      excludeLines({
+        include: 'src/js/**'
+      }),
       json(),
       primedExternalGlobals,
       primedCjs,
@@ -337,6 +359,9 @@ export default cliargs => [
     plugins: [
       primedIgnore,
       primedResolve,
+      excludeLines({
+        include: 'src/js/**'
+      }),
       json(),
       primedExternalGlobals,
       primedCjs,
