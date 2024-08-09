@@ -5,6 +5,7 @@ import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
+import * as browser from '../utils/browser';
 
 /** @import Player from '../player' */
 
@@ -320,21 +321,15 @@ class TextTrackDisplay extends Component {
       this.updateForTrack(descriptionsTrack);
     }
 
-    if (!window.CSS.supports('inset', '0')) {
+    if (browser.IS_SMART_TV && !window.CSS.supports('inset', '10px')) {
       const textTrack = window.document.querySelector('.vjs-text-track-display');
-      const player = window.document.querySelector('video-js');
       const textTrackHeight = textTrack.getBoundingClientRect().height;
 
       // This styles are required to be inline
       textTrack.style.position = 'relative';
       textTrack.style.height = textTrackHeight + 'px';
       textTrack.style.top = 'unset';
-
-      if (player.classList.contains('vjs-fullscreen')) {
-        textTrack.style.bottom = textTrackHeight + 'px';
-      } else {
-        textTrack.style.bottom = '0px';
-      }
+      textTrack.style.bottom = '0px';
     }
   }
 
@@ -502,7 +497,7 @@ class TextTrackDisplay extends Component {
       }
     }
 
-    if (!window.CSS.supports('inset', '0')) {
+    if (browser.IS_SMART_TV && !window.CSS.supports('inset', '10px')) {
       const document_ = window.document;
       const vjsTextTrackCue = document_.querySelector('.vjs-text-track-cue');
 

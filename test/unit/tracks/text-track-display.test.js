@@ -500,4 +500,32 @@ if (!Html5.supportsNativeTextTracks()) {
 
     player.dispose();
   });
+
+  QUnit.test('should use relative position for vjs-text-track-display element if browser is does not support inset property', function(assert) {
+    // Set conditions for the use of the style modifications
+    window.CSS.supports = () => false;
+    browser.IS_SMART_TV = () => true;
+
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt',
+      default: true
+    };
+
+    // Add the text track
+    player.addRemoteTextTrack(track1, true);
+
+    // Make sure the ready handler runs
+    this.clock.tick(1);
+
+    const textTrack = window.document.querySelector('.vjs-text-track-display');
+
+    assert.ok(textTrack.style.position === 'relative', 'Style of position for vjs-text-track-display element should be relative');
+    assert.ok(textTrack.style.top === 'unset', 'Style of position for vjs-text-track-display element should be unset');
+    assert.ok(textTrack.style.bottom === '0px', 'Style of bottom for vjs-text-track-display element should be 0px');
+    player.dispose();
+  });
 }
