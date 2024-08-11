@@ -22,7 +22,6 @@ import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
-import safeParseTuple from 'safe-json-parse/tuple';
 import {merge} from './utils/obj';
 import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
@@ -5231,13 +5230,12 @@ class Player extends Component {
     // Check if data-setup attr exists.
     if (dataSetup !== null) {
       // Parse options JSON
-      // If empty string, make it a parsable json object.
-      const [err, data] = safeParseTuple(dataSetup || '{}');
-
-      if (err) {
-        log.error(err);
+      try {
+        // If empty string, make it a parsable json object.
+        Object.assign(tagOptions, JSON.parse(dataSetup || '{}'));
+      } catch (e) {
+        log.error('data-setup', e);
       }
-      Object.assign(tagOptions, data);
     }
 
     Object.assign(baseOptions, tagOptions);
