@@ -151,7 +151,9 @@ class Component {
    * @param {Function} fn
    *        The function to call with `EventTarget`s
    */
+  /* start-delete-from-build */
   on(type, fn) {}
+  /* end-delete-from-build */
 
   /**
    * Removes an `event listener` for a specific event from an instance of `EventTarget`.
@@ -164,7 +166,9 @@ class Component {
    * @param {Function} [fn]
    *        The function to remove. If not specified, all listeners managed by Video.js will be removed.
    */
+  /* start-delete-from-build */
   off(type, fn) {}
+  /* end-delete-from-build */
 
   /**
    * This function will add an `event listener` that gets triggered only once. After the
@@ -177,7 +181,9 @@ class Component {
    * @param {Function} fn
    *        The function to be called once for each event name.
    */
+  /* start-delete-from-build */
   one(type, fn) {}
+  /* end-delete-from-build */
 
   /**
    * This function will add an `event listener` that gets triggered only once and is
@@ -191,7 +197,9 @@ class Component {
    * @param {Function} fn
    *        The function to be called once for each event name.
    */
+  /* start-delete-from-build */
   any(type, fn) {}
+  /* end-delete-from-build */
 
   /**
    * This function causes an event to happen. This will then cause any `event listeners`
@@ -212,7 +220,9 @@ class Component {
    * @param {Object} [hash]
    *        Optionally extra argument to pass through to an event listener
    */
+  /* start-delete-from-build */
   trigger(event, hash) {}
+  /* end-delete-from-build */
 
   /**
    * Dispose of the `Component` and all child components.
