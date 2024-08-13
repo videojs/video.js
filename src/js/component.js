@@ -1724,7 +1724,7 @@ class Component {
    */
   requestNamedAnimationFrame(name, fn) {
     if (this.namedRafs_.has(name)) {
-      return;
+      this.cancelNamedAnimationFrame(name);
     }
     this.clearTimersOnDispose_();
 
