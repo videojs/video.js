@@ -983,10 +983,10 @@ class Component {
    * - `classToToggle` gets removed when {@link Component#hasClass} would return true.
    *
    * @param  {string} classToToggle
-   *         The class to add or remove based on (@link Component#hasClass}
+   *         The class to add or remove. Passed to DOMTokenList's toggle()
    *
-   * @param  {boolean|Dom~predicate} [predicate]
-   *         An {@link Dom~predicate} function or a boolean
+   * @param  {boolean|Dom.PredicateCallback} [predicate]
+   *         A boolean or function that returns a boolean. Passed to DOMTokenList's toggle().
    */
   toggleClass(classToToggle, predicate) {
     Dom.toggleClass(this.el_, classToToggle, predicate);

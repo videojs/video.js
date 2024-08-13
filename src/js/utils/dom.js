@@ -262,7 +262,7 @@ export function removeClass(element, ...classesToRemove) {
 /**
  * The callback definition for toggleClass.
  *
- * @callback module:dom~PredicateCallback
+ * @callback PredicateCallback
  * @param    {Element} element
  *           The DOM element of the Component.
  *
@@ -271,8 +271,9 @@ export function removeClass(element, ...classesToRemove) {
  *
  * @return   {boolean|undefined}
  *           If `true` is returned, the `classToToggle` will be added to the
- *           `element`. If `false`, the `classToToggle` will be removed from
- *           the `element`. If `undefined`, the callback will be ignored.
+ *           `element`, but not removed. If `false`, the `classToToggle` will be removed from
+ *           the `element`, but not added. If `undefined`, the callback will be ignored.
+ *
  */
 
 /**
@@ -285,7 +286,7 @@ export function removeClass(element, ...classesToRemove) {
  * @param  {string} classToToggle
  *         The class that should be toggled.
  *
- * @param  {boolean|module:dom~PredicateCallback} [predicate]
+ * @param  {boolean|PredicateCallback} [predicate]
  *         See the return value for {@link module:dom~PredicateCallback}
  *
  * @return {Element}
