@@ -322,14 +322,27 @@ class TextTrackDisplay extends Component {
     }
 
     if (browser.IS_SMART_TV && !window.CSS.supports('inset', '10px')) {
-      const textTrack = window.document.querySelector('.vjs-text-track-display');
-      const textTrackHeight = textTrack.getBoundingClientRect().height;
+      const textTrackDisplay = this.el_;
+      const textTrackDisplayHeight = textTrackDisplay.getBoundingClientRect().height;
+      const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
 
-      // This styles are required to be inline
-      textTrack.style.position = 'relative';
-      textTrack.style.height = textTrackHeight + 'px';
-      textTrack.style.top = 'unset';
-      textTrack.style.bottom = '0px';
+      // textrack style updates, this styles are required to be inline
+      textTrackDisplay.style.position = 'relative';
+      textTrackDisplay.style.height = textTrackDisplayHeight + 'px';
+      textTrackDisplay.style.top = 'unset';
+      textTrackDisplay.style.bottom = '0px';
+
+      // vjsTextTrackCue style updates
+      if (vjsTextTrackCues.length > 0) {
+        vjsTextTrackCues.forEach((vjsTextTrackCue) => {
+          const insetStyles = vjsTextTrackCue.style.inset.split(' ');
+
+          // expected value is always 3
+          if (insetStyles.length === 3) {
+            Object.assign(vjsTextTrackCue.style, { top: insetStyles[0], right: insetStyles[1], bottom: insetStyles[2], left: 'unset' });
+          }
+        });
+      }
     }
   }
 
@@ -494,19 +507,6 @@ class TextTrackDisplay extends Component {
       }
       if (this.player_.textTrackSettings) {
         this.updateDisplayState(track);
-      }
-    }
-
-    if (browser.IS_SMART_TV && !window.CSS.supports('inset', '10px')) {
-      const document_ = window.document;
-      const vjsTextTrackCue = document_.querySelector('.vjs-text-track-cue');
-
-      if (vjsTextTrackCue) {
-        const insetStyles = vjsTextTrackCue.style.inset.split(' ');
-
-        if (insetStyles.length === 3) {
-          Object.assign(vjsTextTrackCue.style, { top: insetStyles[0], right: insetStyles[1], bottom: insetStyles[2], left: 'unset' });
-        }
       }
     }
   }
