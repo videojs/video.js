@@ -501,7 +501,7 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 
-  QUnit.test('should use relative position for vjs-text-track-display element if browser is does not support inset property', function(assert) {
+  QUnit.test('should use relative position for vjs-text-track-display element if browser does not support inset property', function(assert) {
     // Set conditions for the use of the style modifications
     window.CSS.supports = () => false;
     browser.IS_SMART_TV = () => true;
