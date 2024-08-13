@@ -22,7 +22,6 @@ import { bufferedPercent } from './utils/buffer.js';
 import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
-import safeParseTuple from 'safe-json-parse/tuple';
 import {merge} from './utils/obj';
 import {silencePromise, isPromise} from './utils/promise';
 import textTrackConverter from './tracks/text-track-list-converter.js';
@@ -5282,13 +5281,12 @@ class Player extends Component {
     // Check if data-setup attr exists.
     if (dataSetup !== null) {
       // Parse options JSON
-      // If empty string, make it a parsable json object.
-      const [err, data] = safeParseTuple(dataSetup || '{}');
-
-      if (err) {
-        log.error(err);
+      try {
+        // If empty string, make it a parsable json object.
+        Object.assign(tagOptions, JSON.parse(dataSetup || '{}'));
+      } catch (e) {
+        log.error('data-setup', e);
       }
-      Object.assign(tagOptions, data);
     }
 
     Object.assign(baseOptions, tagOptions);
@@ -5376,6 +5374,44 @@ class Player extends Component {
     */
     this.trigger('playbackrateschange');
   }
+
+  /**
+   * Reports whether or not a player has a plugin available.
+   *
+   * This does not report whether or not the plugin has ever been initialized
+   * on this player. For that, [usingPlugin]{@link Player#usingPlugin}.
+   *
+   * @method hasPlugin
+   * @param  {string}  name
+   *         The name of a plugin.
+   *
+   * @return {boolean}
+   *         Whether or not this player has the requested plugin available.
+   */
+  /* start-delete-from-build */
+  hasPlugin(name) {
+    return false;
+  }
+  /* end-delete-from-build */
+
+  /**
+   * Reports whether or not a player is using a plugin by name.
+   *
+   * For basic plugins, this only reports whether the plugin has _ever_ been
+   * initialized on this player.
+   *
+   * @method Player#usingPlugin
+   * @param  {string} name
+   *         The name of a plugin.
+   *
+   * @return {boolean}
+   *         Whether or not this player is using the requested plugin.
+   */
+  /* start-delete-from-build */
+  usingPlugin(name) {
+    return false;
+  }
+  /* end-delete-from-build */
 }
 
 TRACK_TYPES.names.forEach(function(name) {
@@ -5525,34 +5561,6 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
  *
  * @event Player#volumechange
  * @type {Event}
- */
-
-/**
- * Reports whether or not a player has a plugin available.
- *
- * This does not report whether or not the plugin has ever been initialized
- * on this player. For that, [usingPlugin]{@link Player#usingPlugin}.
- *
- * @method Player#hasPlugin
- * @param  {string}  name
- *         The name of a plugin.
- *
- * @return {boolean}
- *         Whether or not this player has the requested plugin available.
- */
-
-/**
- * Reports whether or not a player is using a plugin by name.
- *
- * For basic plugins, this only reports whether the plugin has _ever_ been
- * initialized on this player.
- *
- * @method Player#usingPlugin
- * @param  {string} name
- *         The name of a plugin.
- *
- * @return {boolean}
- *         Whether or not this player is using the requested plugin.
  */
 
 Component.registerComponent('Player', Player);
