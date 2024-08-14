@@ -331,11 +331,14 @@ class TextTrackDisplay extends Component {
       // vjsTextTrackCue style updates
       if (vjsTextTrackCues.length > 0) {
         vjsTextTrackCues.forEach((vjsTextTrackCue) => {
-          const insetStyles = vjsTextTrackCue.style.inset.split(' ');
+          // verify if inset styles are inline
+          if (vjsTextTrackCue.style.inset) {
+            const insetStyles = vjsTextTrackCue.style.inset.split(' ');
 
-          // expected value is always 3
-          if (insetStyles.length === 3) {
-            Object.assign(vjsTextTrackCue.style, { top: insetStyles[0], right: insetStyles[1], bottom: insetStyles[2], left: 'unset' });
+            // expected value is always 3
+            if (insetStyles.length === 3) {
+              Object.assign(vjsTextTrackCue.style, { top: insetStyles[0], right: insetStyles[1], bottom: insetStyles[2], left: 'unset' });
+            }
           }
         });
       }
