@@ -320,7 +320,7 @@ class TextTrackDisplay extends Component {
       this.updateForTrack(descriptionsTrack);
     }
 
-    if (window.CSS.supports('inset', '10px')) {
+    if (!window.CSS.supports('inset', '10px')) {
       const textTrackDisplay = this.el_;
       const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
 
