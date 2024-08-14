@@ -612,3 +612,11 @@ QUnit.test('If component passes the required functions it should be added to foc
   assert.strictEqual(this.spatialNav.focusableComponents.length, 1, 'focusableComponents array should have 1 component');
   assert.strictEqual(this.spatialNav.focusableComponents[0].name_, 'firstComponent', 'the name of the component in focusableComponents array should be "firstComponent"');
 });
+
+QUnit.test('Doesn\'t error if no ErrorDisplay component is present', function(assert) {
+  this.player.errorDisplay.dispose();
+  delete this.player.errorDisplay;
+
+  this.spatialNav.start();
+  assert.ok(true, 'started without throwing when errorDisplay not present');
+});
