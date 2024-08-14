@@ -320,7 +320,7 @@ class TextTrackDisplay extends Component {
       this.updateForTrack(descriptionsTrack);
     }
 
-    if (!window.CSS.supports('inset', '10px')) {
+    if (window.CSS.supports('inset', '10px')) {
       const textTrackDisplay = this.el_;
       const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
 
@@ -341,10 +341,10 @@ class TextTrackDisplay extends Component {
       }
 
       // textrack style updates, this styles are required to be inline
-      textTrackDisplay.style.position = 'relative';
-      textTrackDisplay.style.height = textTrackDisplayHeight + 'px';
-      textTrackDisplay.style.top = 'unset';
-      textTrackDisplay.style.bottom = '0px';
+      tryUpdateStyle(textTrackDisplay, 'position', 'relative');
+      tryUpdateStyle(textTrackDisplay, 'height', textTrackDisplayHeight + 'px');
+      tryUpdateStyle(textTrackDisplay, 'top', 'unset');
+      tryUpdateStyle(textTrackDisplay, 'bottom', '0px');
     }
   }
 
