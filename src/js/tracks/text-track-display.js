@@ -323,14 +323,7 @@ class TextTrackDisplay extends Component {
 
     if (browser.IS_SMART_TV && !window.CSS.supports('inset', '10px')) {
       const textTrackDisplay = this.el_;
-      const textTrackDisplayHeight = textTrackDisplay.getBoundingClientRect().height;
       const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
-
-      // textrack style updates, this styles are required to be inline
-      textTrackDisplay.style.position = 'relative';
-      textTrackDisplay.style.height = textTrackDisplayHeight + 'px';
-      textTrackDisplay.style.top = 'unset';
-      textTrackDisplay.style.bottom = '0px';
 
       // vjsTextTrackCue style updates
       if (vjsTextTrackCues.length > 0) {
@@ -354,6 +347,17 @@ class TextTrackDisplay extends Component {
     // inset-inline and inset-block are not supprted on old chrome, but these are
     // only likely to be used on TV devices
     if (!this.player_.videoHeight() || !window.CSS.supports('inset-inline: 10px')) {
+      if (browser.IS_SMART_TV && !window.CSS.supports('inset', '10px')) {
+        const textTrackDisplay = this.el_;
+        const textTrackDisplayHeight = textTrackDisplay.getBoundingClientRect().height;
+
+        // textrack style updates, this styles are required to be inline
+        textTrackDisplay.style.position = 'relative';
+        textTrackDisplay.style.height = textTrackDisplayHeight + 'px';
+        textTrackDisplay.style.top = 'unset';
+        textTrackDisplay.style.bottom = '0px';
+      }
+
       return;
     }
 
