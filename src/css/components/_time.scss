@@ -19,3 +19,7 @@
   display: none;
   line-height: 3em;
 }
+
+.vjs-normalise-time-controls:not(.vjs-live) .vjs-time-control {
+  display: flex;
+}
