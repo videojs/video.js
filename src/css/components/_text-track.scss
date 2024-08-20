@@ -48,6 +48,7 @@ video::-webkit-media-text-track-display {
 }
 
 .video-js .vjs-text-track-display > div {
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;

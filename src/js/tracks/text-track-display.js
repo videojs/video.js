@@ -5,6 +5,7 @@ import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
+import * as browser from '../utils/browser';
 
 /** @import Player from '../player' */
 
@@ -323,10 +324,22 @@ class TextTrackDisplay extends Component {
     if (!window.CSS.supports('inset', '10px')) {
       const textTrackDisplay = this.el_;
       const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
+      const controlBarHeight = this.player_.controlBar.el_.getBoundingClientRect().height;
+      const playerHeight = this.player_.el_.getBoundingClientRect().height;
 
       // Clear inline style before getting actual height of textTrackDisplay
       textTrackDisplay.style = '';
-      const textTrackDisplayHeight = textTrackDisplay.getBoundingClientRect().height;
+
+      // textrack style updates, this styles are required to be inline
+      tryUpdateStyle(textTrackDisplay, 'position', 'relative');
+      tryUpdateStyle(textTrackDisplay, 'height', (playerHeight - controlBarHeight) + 'px');
+      tryUpdateStyle(textTrackDisplay, 'top', 'unset');
+
+      if (browser.IS_SMART_TV) {
+        tryUpdateStyle(textTrackDisplay, 'bottom', playerHeight + 'px');
+      } else {
+        tryUpdateStyle(textTrackDisplay, 'bottom', '0px');
+      }
 
       // vjsTextTrackCue style updates
       if (vjsTextTrackCues.length > 0) {
@@ -342,12 +355,6 @@ class TextTrackDisplay extends Component {
           }
         });
       }
-
-      // textrack style updates, this styles are required to be inline
-      tryUpdateStyle(textTrackDisplay, 'position', 'relative');
-      tryUpdateStyle(textTrackDisplay, 'height', textTrackDisplayHeight + 'px');
-      tryUpdateStyle(textTrackDisplay, 'top', 'unset');
-      tryUpdateStyle(textTrackDisplay, 'bottom', '0px');
     }
   }
 
