@@ -575,7 +575,7 @@ if (!Html5.supportsNativeTextTracks()) {
     assert.ok(player.textTrackDisplay.el_.querySelector('.vjs-text-track-cue').style.left === 'unset', 'Style of left for vjs-text-track-cue element should be unset');
     assert.ok(player.textTrackDisplay.el_.querySelector('.vjs-text-track-cue').style.top === '1px', 'Style of top for vjs-text-track-cue element should be 1px');
     assert.ok(player.textTrackDisplay.el_.querySelector('.vjs-text-track-cue').style.right === '2px', 'Style of right for vjs-text-track-cue element should be 2px');
-    assert.ok(player.textTrackDisplay.el_.firstChild.classList.contains('inset-alternative'), 'Child of textTrackDisplay should contain class of inset-alternative');
+    assert.ok(player.textTrackDisplay.el_.firstChild.classList.contains('vjs-text-track-display-inset'), 'Child of textTrackDisplay should contain class of inset-alternative');
     player.dispose();
   });
 }

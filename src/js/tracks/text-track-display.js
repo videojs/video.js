@@ -331,7 +331,7 @@ class TextTrackDisplay extends Component {
       textTrackDisplay.style = '';
 
       // Add custom class to textTrackDisplay div child for not inset support styles
-      textTrackDisplay.firstChild.classList.add('inset-alternative');
+      textTrackDisplay.firstChild.classList.add('vjs-text-track-display-inset');
 
       // textrack style updates, this styles are required to be inline
       tryUpdateStyle(textTrackDisplay, 'position', 'relative');
