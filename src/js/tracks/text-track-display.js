@@ -330,6 +330,9 @@ class TextTrackDisplay extends Component {
       // Clear inline style before getting actual height of textTrackDisplay
       textTrackDisplay.style = '';
 
+      // Add custom class to textTrackDisplay div child for not inset support styles
+      textTrackDisplay.firstChild.classList.add('inset-alternative');
+
       // textrack style updates, this styles are required to be inline
       tryUpdateStyle(textTrackDisplay, 'position', 'relative');
       tryUpdateStyle(textTrackDisplay, 'height', (playerHeight - controlBarHeight) + 'px');
