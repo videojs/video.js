@@ -143,7 +143,9 @@
 }
 
 .video-js .vjs-progress-control:hover .vjs-time-tooltip,
-.video-js .vjs-progress-control:hover .vjs-progress-holder:focus .vjs-time-tooltip {
+.video-js .vjs-progress-control:hover .vjs-progress-holder:focus .vjs-time-tooltip,
+// For mobile
+.video-js .vjs-progress-control .vjs-sliding .vjs-time-tooltip {
   display: block;
 
   // Ensure that we maintain a font-size of ~10px.
