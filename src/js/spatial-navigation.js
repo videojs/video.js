@@ -59,25 +59,27 @@ class SpatialNavigation extends EventTarget {
     this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
     this.player_.on('focusout', this.handlePlayerBlur_.bind(this));
     this.isListening_ = true;
-    this.player_.errorDisplay.on('aftermodalfill', () => {
-      this.updateFocusableComponents();
+    if (this.player_.errorDisplay) {
+      this.player_.errorDisplay.on('aftermodalfill', () => {
+        this.updateFocusableComponents();
 
-      if (this.focusableComponents.length) {
-        // The modal has focusable components:
+        if (this.focusableComponents.length) {
+          // The modal has focusable components:
 
-        if (this.focusableComponents.length > 1) {
-          // The modal has close button + some additional buttons.
-          // Focusing first additional button:
+          if (this.focusableComponents.length > 1) {
+            // The modal has close button + some additional buttons.
+            // Focusing first additional button:
 
-          this.focusableComponents[1].focus();
-        } else {
-          // The modal has only close button,
-          // Focusing it:
+            this.focusableComponents[1].focus();
+          } else {
+            // The modal has only close button,
+            // Focusing it:
 
-          this.focusableComponents[0].focus();
+            this.focusableComponents[0].focus();
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   /**
