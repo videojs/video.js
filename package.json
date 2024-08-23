@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
-  "version": "8.17.3",
+  "version": "8.17.4",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
@@ -77,7 +77,7 @@
     "netlify": "node ./build/netlify.js",
     "netlify-docs": "node ./build/netlify-docs.js",
     "prepublishOnly": "run-p build",
-    "version": "is-prerelease || npm run changelog && git add CHANGELOG.md",
+    "version": "is-prerelease || npm run changelog && node build/readme-version.js && git add CHANGELOG.md README.md",
     "zip": "cd dist && cross-env bestzip \"./video-js-${npm_package_version}.zip\" * && cd .."
   },
   "repository": {
