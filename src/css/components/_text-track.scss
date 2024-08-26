@@ -48,7 +48,7 @@ video::-webkit-media-text-track-display {
 }
 
 @supports (inset: 10px) {
-  .video-js .vjs-text-track-display {
+  .video-js .vjs-text-track-display > div {
     top: 0;
     right: 0;
     bottom: 0;
