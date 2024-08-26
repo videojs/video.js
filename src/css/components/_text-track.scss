@@ -47,7 +47,7 @@ video::-webkit-media-text-track-display {
   width: 80% !important;
 }
 
-@supports (inset: 10px) {
+@supports not (inset: 10px) {
   .video-js .vjs-text-track-display > div {
     top: 0;
     right: 0;
