@@ -500,4 +500,81 @@ if (!Html5.supportsNativeTextTracks()) {
 
     player.dispose();
   });
+
+  QUnit.test('should use relative position for vjs-text-track-display element if browser does not support inset property', function(assert) {
+    // Set conditions for the use of the style modifications
+    window.CSS.supports = () => false;
+    browser.IS_SMART_TV = () => true;
+
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt',
+      default: true
+    };
+
+    // Add the text track
+    player.addRemoteTextTrack(track1, true);
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    player.play();
+
+    // as if metadata was loaded
+    player.textTrackDisplay.updateDisplayOverlay();
+
+    // Make sure the ready handler runs
+    this.clock.tick(1);
+
+    const textTrack = window.document.querySelector('.vjs-text-track-display');
+
+    assert.ok(textTrack.style.position === 'relative', 'Style of position for vjs-text-track-display element should be relative');
+    assert.ok(textTrack.style.top === 'unset', 'Style of position for vjs-text-track-display element should be unset');
+    assert.ok(textTrack.style.bottom === '0px', 'Style of bottom for vjs-text-track-display element should be 0px');
+    player.dispose();
+  });
+
+  QUnit.test('track cue should use values of top, right, botton, left if browser does not support inset property', function(assert) {
+    // Set conditions for the use of the style modifications
+    window.CSS.supports = () => false;
+    browser.IS_SMART_TV = () => true;
+
+    const player = TestHelpers.makePlayer();
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt',
+      default: true
+    };
+
+    // Add the text track
+    player.addRemoteTextTrack(track1, true);
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    player.play();
+
+    // mock caption
+    const textTrackDisplay = window.document.querySelector('.vjs-text-track-display').firstChild;
+    const node = document.createElement('div');
+
+    node.classList.add('vjs-text-track-cue');
+    node.style.inset = '1px 2px 3px';
+    const textnode = document.createTextNode('Sample text');
+
+    node.appendChild(textnode);
+    textTrackDisplay.appendChild(node);
+
+    // avoid captions clear
+    player.textTrackDisplay.clearDisplay = () => '';
+
+    // as if metadata was loaded
+    player.textTrackDisplay.updateDisplay();
+
+    assert.ok(player.textTrackDisplay.el_.querySelector('.vjs-text-track-cue').style.left === 'unset', 'Style of left for vjs-text-track-cue element should be unset');
+    assert.ok(player.textTrackDisplay.el_.querySelector('.vjs-text-track-cue').style.top === '1px', 'Style of top for vjs-text-track-cue element should be 1px');
+    assert.ok(player.textTrackDisplay.el_.querySelector('.vjs-text-track-cue').style.right === '2px', 'Style of right for vjs-text-track-cue element should be 2px');
+    player.dispose();
+  });
 }
