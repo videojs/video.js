@@ -4,6 +4,7 @@
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import {createEl} from '../utils/dom.js';
+import { containsHexCode, decodeString } from '../utils/str.js';
 
 /** @import Player from '../player' */
 
@@ -68,10 +69,18 @@ class MenuItem extends ClickableComponent {
       tabIndex: -1
     }, props), attrs);
 
+    const createTextContent = () => {
+      if (containsHexCode(this.options_.label)) {
+        return this.localize(decodeString(this.options_.label));
+      }
+
+      return this.localize(this.options_.label);
+    };
+
     // swap icon with menu item text.
     const menuItemEl = createEl('span', {
       className: 'vjs-menu-item-text',
-      textContent: this.localize(this.options_.label)
+      textContent: createTextContent()
     });
 
     // If using SVG icons, the element with vjs-icon-placeholder will be added separately.

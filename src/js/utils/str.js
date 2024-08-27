@@ -52,3 +52,30 @@ export const toTitleCase = function(string) {
 export const titleCaseEquals = function(str1, str2) {
   return toTitleCase(str1) === toTitleCase(str2);
 };
+
+/**
+ *
+ * @param {string} string
+ *        The string that will be tested
+ *
+ * @return {boolean}
+ *          Whether the string contains a Hex Code
+ */
+export const containsHexCode = (string) => {
+  return /(&#x[0-9a-fA-F]{2,4};)/.test(string);
+};
+
+/**
+ *
+ * @param {string} string
+ *        The string that will be decoded
+ *
+ * @return {string}
+ *        Decoded string without problematic characters
+ */
+export const decodeString = (string) => {
+  // eslint-disable-next-line no-undef
+  const doc = new DOMParser().parseFromString(string, 'text/html');
+
+  return doc.documentElement.textContent;
+};
