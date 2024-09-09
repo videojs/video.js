@@ -1,15 +1,14 @@
-![Video.js logo][logo]
+[![Video.js logo][logo]][vjs]
 
-# [Video.js - HTML5 Video Player][vjs]
-
-[![Build Status][travis-icon]][travis-link]
-[![Coverage Status][coveralls-icon]][coveralls-link]
-[![Greenkeeper badge](https://badges.greenkeeper.io/videojs/video.js.svg)](https://greenkeeper.io/)
-[![Slack Status][slack-icon]][slack-link]
+# Video.js® - Web Video Player
 
 [![NPM][npm-icon]][npm-link]
 
-> Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 video and Media Source Extensions, as well as other playback techs like YouTube and Vimeo (through [plugins][plugins]). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ ~~400,000~~ [700,000 websites][builtwith].
+Video.js is a full featured, open source video player for all web-based platforms.
+
+Right out of the box, Video.js supports all common media formats used on the web including streaming formats like HLS and DASH. It works on desktops, mobile devices, tablets, and web-based Smart TVs. It can be further extended and customized by a robust ecosystem of [plugins][plugins].
+
+Video.js was started in the middle of 2010 and is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ ~~400,000~~ ~~700,000~~ [800,000 websites][builtwith].
 
 ## Table of Contents
 
@@ -18,26 +17,16 @@
 * [Code of Conduct](#code-of-conduct)
 * [License](#license)
 
-## Quick Start
+## [Quick Start][getting-started]
 
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
 
 ```html
-<link href="//vjs.zencdn.net/8.3.0/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/8.3.0/video.min.js"></script>
+<link href="//vjs.zencdn.net/8.17.3/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/8.17.3/video.min.js"></script>
 ```
 
-> For the latest version of video.js and URLs to use, check out the [Getting Started][getting-started] page on our website.
-
-Video.js version 7 (and newer) CDN builds do not send any data to Google Analytics.
-
-In older versions of Video.js (6 and earlier), in the `vjs.zencdn.net` CDN-hosted versions we include a [stripped down Google Analytics pixel](https://github.com/videojs/cdn/blob/master/src/analytics.js) that tracks a random sampling (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global before including Video.js via the free CDN:
-
-```html
-<script>window.HELP_IMPROVE_VIDEOJS = false;</script>
-```
-
-Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#install-via-npm), downloading from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN like CDNjs. These releases _do not_ include Google Analytics tracking at all.
+Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#install-via-npm), downloading it from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN, like CDNjs.
 
 ```html
 <!-- unpkg : use the latest version of Video.js -->
@@ -45,12 +34,12 @@ Alternatively, you can include Video.js by getting it from [npm](https://videojs
 <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
 
 <!-- unpkg : use a specific version of Video.js (change the version numbers as necessary) -->
-<link href="https://unpkg.com/video.js@8.3.0/dist/video-js.min.css" rel="stylesheet">
-<script src="https://unpkg.com/video.js@8.3.0/dist/video.min.js"></script>
+<link href="https://unpkg.com/video.js@8.17.3/dist/video-js.min.css" rel="stylesheet">
+<script src="https://unpkg.com/video.js@8.17.3/dist/video.min.js"></script>
 
 <!-- cdnjs : use a specific version of Video.js (change the version numbers as necessary) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.3.0/video-js.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.3.0/video.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.17.3/video-js.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.17.3/video.min.js"></script>
 ```
 
 Next, using Video.js is as simple as creating a `<video>` element, but with an additional `data-setup` attribute. At a minimum, this attribute must have a value of `'{}'`, but it can include any Video.js [options][options] - just make sure it contains valid JSON!
@@ -84,8 +73,7 @@ If you don't want to use automatic setup, you can leave off the `data-setup` att
 var player = videojs('my-player');
 ```
 
-The `videojs` function also accepts an `options` object and a callback to be invoked
- when the player is ready:
+The `videojs` function also accepts an `options` object and a callback to be invoked when the player is ready:
 
 ```js
 var options = {};
@@ -103,9 +91,9 @@ var player = videojs('my-player', options, function onPlayerReady() {
 });
 ```
 
-If you're ready to dive in, the [Getting Started][getting-started] page and [documentation][docs] are the best places to go for more information. If you get stuck, head over to our [Slack channel][slack-link]!
+If you're ready to dive in, the [Getting Started][getting-started] page and [documentation][docs] are the best places to go for more information. If you get stuck, head over to our [Slack][slack-link]!
 
-## Contributing
+## [Contributing][contributing]
 
 Video.js is a free and open source library, and we appreciate any help you're willing to give - whether it's fixing bugs, improving documentation, or suggesting new features. Check out the [contributing guide][contributing] for more!
 
@@ -119,15 +107,15 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 Video.js is [licensed][license] under the Apache License, Version 2.0.
 
+Video.js is a registered trademark of [Brightcove, Inc][bc].
+
+[bc]: https://www.brightcove.com/
+
 [browserstack]: https://browserstack.com
 
 [builtwith]: https://trends.builtwith.com/media/VideoJS
 
-[contributing]: CONTRIBUTING.md
-
-[coveralls-icon]: https://coveralls.io/repos/github/videojs/video.js/badge.svg?branch=main
-
-[coveralls-link]: https://coveralls.io/github/videojs/video.js?branch=main
+[contributing]: https://github.com/videojs/admin/blob/main/CONTRIBUTING.md
 
 [docs]: https://docs.videojs.com
 
@@ -147,14 +135,8 @@ Video.js is [licensed][license] under the Apache License, Version 2.0.
 
 [plugins]: https://videojs.com/plugins/
 
-[slack-icon]: http://slack.videojs.com/badge.svg
-
-[slack-link]: http://slack.videojs.com
-
-[travis-icon]: https://travis-ci.org/videojs/video.js.svg?branch=main
-
-[travis-link]: https://travis-ci.org/videojs/video.js
+[slack-link]: https://slack.videojs.com
 
 [vjs]: https://videojs.com
 
-[coc]: CODE_OF_CONDUCT.md
+[coc]: https://github.com/videojs/admin/blob/main/CODE_OF_CONDUCT.md
