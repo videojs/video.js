@@ -1,3 +1,21 @@
+<a name="8.18.0"></a>
+# [8.18.0](https://github.com/videojs/video.js/compare/v8.17.4...v8.18.0) (2024-09-10)
+
+### Features
+
+* add class to normalise time control display ([#8833](https://github.com/videojs/video.js/issues/8833)) ([5e6b536](https://github.com/videojs/video.js/commit/5e6b536)), closes [#8534](https://github.com/videojs/video.js/issues/8534) [1000#0](https://github.com/1000/issues/0)
+
+### Bug Fixes
+
+* check for closeable() before calling in spatialnavigation ([#8832](https://github.com/videojs/video.js/issues/8832)) ([8c56e31](https://github.com/videojs/video.js/commit/8c56e31))
+* **lang:** Update el.json ([#8848](https://github.com/videojs/video.js/issues/8848)) ([1e2ea61](https://github.com/videojs/video.js/commit/1e2ea61)), closes [1000#0](https://github.com/1000/issues/0)
+* update VHS to v3.14.1 ([#8860](https://github.com/videojs/video.js/issues/8860)) ([c8e546f](https://github.com/videojs/video.js/commit/c8e546f)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Chores
+
+* update version number in readme on release ([#8840](https://github.com/videojs/video.js/issues/8840)) ([5fac9e1](https://github.com/videojs/video.js/commit/5fac9e1))
+* Update VHS to 3.14.0, and its dependencies ([#8839](https://github.com/videojs/video.js/issues/8839)) ([1128425](https://github.com/videojs/video.js/commit/1128425)), closes [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.17.4"></a>
 ## [8.17.4](https://github.com/videojs/video.js/compare/v8.17.3...v8.17.4) (2024-08-27)
 
