@@ -265,39 +265,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
 | de.json (Complete)      |                                                                                     |
-| el.json (missing 57)    | Audio Player                                                                        |
-|                         | Video Player                                                                        |
-|                         | Replay                                                                              |
-|                         | Seek to live, currently behind live                                                 |
+| el.json (missing 12)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
-|                         | Progress Bar                                                                        |
 |                         | progress bar timing: currentTime={1} duration={2}                                   |
-|                         | Volume Level                                                                        |
-|                         | captions settings                                                                   |
-|                         | subtitles settings                                                                  |
-|                         | descriptions settings                                                               |
-|                         | Text                                                                                |
-|                         | White                                                                               |
-|                         | Black                                                                               |
-|                         | Red                                                                                 |
-|                         | Green                                                                               |
-|                         | Blue                                                                                |
-|                         | Yellow                                                                              |
-|                         | Magenta                                                                             |
-|                         | Cyan                                                                                |
-|                         | Background                                                                          |
-|                         | Window                                                                              |
-|                         | Transparent                                                                         |
-|                         | Semi-Transparent                                                                    |
-|                         | Opaque                                                                              |
-|                         | Font Size                                                                           |
-|                         | Text Edge Style                                                                     |
-|                         | None                                                                                |
 |                         | Raised                                                                              |
 |                         | Depressed                                                                           |
-|                         | Uniform                                                                             |
-|                         | Drop shadow                                                                         |
-|                         | Font Family                                                                         |
 |                         | Proportional Sans-Serif                                                             |
 |                         | Monospace Sans-Serif                                                                |
 |                         | Proportional Serif                                                                  |
@@ -305,23 +277,6 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Casual                                                                              |
 |                         | Script                                                                              |
 |                         | Small Caps                                                                          |
-|                         | Reset                                                                               |
-|                         | restore all settings to the default values                                          |
-|                         | Done                                                                                |
-|                         | Caption Settings Dialog                                                             |
-|                         | Beginning of dialog window. Escape will cancel and close the window.                |
-|                         | End of dialog window.                                                               |
-|                         | {1} is loading.                                                                     |
-|                         | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
 | en-GB.json (has 1)      | Needs manual checking. Can safely use most default strings.                         |
 | es.json (missing 1)     | Playing in Picture-in-Picture                                                       |
 | et.json (missing 8)     | No content                                                                          |
