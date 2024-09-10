@@ -120,7 +120,8 @@ class SpatialNavigation extends EventTarget {
       const action = SpatialNavKeyCodes.getEventName(actualEvent);
 
       this.performMediaAction_(action);
-    } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'Back') && event.target && event.target.closeable()) {
+    } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'Back') &&
+        event.target && typeof event.target.closeable === 'function' && event.target.closeable()) {
       actualEvent.preventDefault();
       event.target.close();
     }
