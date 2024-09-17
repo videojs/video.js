@@ -11,7 +11,7 @@ import TrackList from './track-list';
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist}
  * @extends TrackList
  */
-class TextTrackList extends TrackList {
+export class TextTrackList extends TrackList {
 
   /**
    * Add a {@link TextTrack} to the `TextTrackList`
