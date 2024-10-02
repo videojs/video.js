@@ -151,6 +151,19 @@ QUnit.test('by default, double-click opens fullscreen', function(assert) {
   assert.strictEqual(this.player.exitFullscreen.callCount, 1, 'has exited fullscreen');
 });
 
+QUnit.test('in document picture in picture mode, double-click exits pip', function(assert) {
+  this.player.isInPictureInPicture = () => true;
+  this.player.exitPictureInPicture = sinon.spy();
+  this.player.requestFullscreen = sinon.spy();
+  this.player.exitFullscreen = sinon.spy();
+
+  this.player.handleTechDoubleClick_({target: this.player.tech_.el_});
+
+  assert.strictEqual(this.player.exitPictureInPicture.callCount, 1, 'has exited pip once');
+  assert.strictEqual(this.player.requestFullscreen.callCount, 0, 'has not entered fullscreen');
+  assert.strictEqual(this.player.exitFullscreen.callCount, 0, 'has not exited fullscreen');
+});
+
 QUnit.test('when controls are disabled, double-click does nothing', function(assert) {
   let fullscreen = false;
 
