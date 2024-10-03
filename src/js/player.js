@@ -2049,7 +2049,7 @@ class Player extends Component {
         } else if (this.isInPictureInPicture() && !document.pictureInPictureElement) {
           // Checking the presence of `window.documentPictureInPicture.window` complicates
           // tests, checking `document.pictureInPictureElement` also works. It wouldn't
-          // be null in  regular picture in picture.
+          // be null in regular picture in picture.
           // Exit picture in picture mode. This gesture can't trigger pip on the main window.
           this.exitPictureInPicture();
         } else if (this.isFullscreen()) {
