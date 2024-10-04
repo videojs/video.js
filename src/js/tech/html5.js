@@ -784,6 +784,26 @@ class Html5 extends Tech {
   }
 
   /**
+   * Add a <source> element to the <video> element.
+   *
+   * @param {Tech~SourceObject} [src]
+   *        The source object to append as a <source> element. Should have a `src` and `type`.
+   */
+  addSrcAsSourceElement(src) {
+    if (!src || !src.type || !src.src) {
+      log.error('Invalid source object. Must contain `src` and `type` properties.');
+      return;
+    }
+
+    const sourceElement = document.createElement('source');
+
+    sourceElement.type = src.type;
+    sourceElement.src = src.src;
+
+    this.el_.appendChild(sourceElement);
+  }
+
+  /**
    * Reset the tech by removing all sources and then calling
    * {@link Html5.resetMediaElement}.
    */
