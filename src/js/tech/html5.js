@@ -786,16 +786,25 @@ class Html5 extends Tech {
   /**
    * Add a <source> element to the <video> element.
    *
-   * @param {Tech~SourceObject} [srcObj]
-   *        The source object to append as a <source> element. Must have a `src` and it is recommended to have a `type` property.
+   * @param {string} srcUrl
+   *        The URL of the video source.
+   *
+   * @param {string} [mimeType]
+   *        The MIME type of the video source. Optional but recommended.
    */
-  addSrcAsSourceElement(srcObj) {
-    if (!srcObj || !srcObj.src) {
-      log.error('Invalid source object. Must contain `src` property.');
+  addSourceElement(srcUrl, mimeType) {
+    if (!srcUrl) {
+      log.error('Invalid source URL.');
       return;
     }
 
-    const sourceElement = Dom.createEl('source', srcObj);
+    const sourceAttributes = { src: srcUrl };
+
+    if (mimeType) {
+      sourceAttributes.type = mimeType;
+    }
+
+    const sourceElement = Dom.createEl('source', {}, sourceAttributes);
 
     this.el_.appendChild(sourceElement);
   }
