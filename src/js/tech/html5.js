@@ -786,21 +786,48 @@ class Html5 extends Tech {
   /**
    * Add a <source> element to the <video> element.
    *
-   * @param {Tech~SourceObject} [src]
-   *        The source object to append as a <source> element. Should have a `src` and `type`.
+   * @param {Tech~SourceObject} [srcObj]
+   *        The source object to append as a <source> element. Must have a `src` and it is recommended to have a `type` property.
    */
-  addSrcAsSourceElement(src) {
-    if (!src || !src.type || !src.src) {
-      log.error('Invalid source object. Must contain `src` and `type` properties.');
+  addSrcAsSourceElement(srcObj) {
+    if (!srcObj || !srcObj.src) {
+      log.error('Invalid source object. Must contain `src` property.');
       return;
     }
 
-    const sourceElement = document.createElement('source');
-
-    sourceElement.type = src.type;
-    sourceElement.src = src.src;
+    const sourceElement = Dom.createEl('source', srcObj);
 
     this.el_.appendChild(sourceElement);
+  }
+
+  /**
+   * Remove a <source> element from the <video> element by its URL.
+   *
+   * @param {string} srcUrl
+   *        The URL of the source to remove.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully removed, false otherwise.
+   */
+  removeSourceElement(srcUrl) {
+    if (!srcUrl) {
+      log.error('Source URL is required to remove the source element.');
+      return false;
+    }
+
+    const sourceElements = this.el_.querySelectorAll('source');
+
+    for (const sourceElement of sourceElements) {
+      if (sourceElement.src === srcUrl) {
+        this.el_.removeChild(sourceElement);
+
+        return true;
+      }
+    }
+
+    log.warn(`No matching source element found with src: ${srcUrl}`);
+
+    return false;
   }
 
   /**

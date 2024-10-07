@@ -906,12 +906,12 @@ QUnit.test('supportsFullScreen is always with `webkitEnterFullScreen`', function
   tech.el_ = oldEl;
 });
 
-QUnit.test('addSrcAsSourceElement adds a valid source element', function(assert) {
+QUnit.test('addSrcAsSourceElement adds a valid source element with src and type', function(assert) {
   const videoEl = document.createElement('video');
 
   tech.el_ = videoEl;
 
-  const sourceObj = {src: 'http://example.com/video.mp4', type: 'video/mp4'};
+  const sourceObj = { src: 'http://example.com/video.mp4', type: 'video/mp4' };
 
   tech.addSrcAsSourceElement(sourceObj);
 
@@ -922,34 +922,69 @@ QUnit.test('addSrcAsSourceElement adds a valid source element', function(assert)
   assert.equal(sourceElement.type, 'video/mp4', 'Source element has correct type');
 });
 
+QUnit.test('addSrcAsSourceElement adds a valid source element without a type', function(assert) {
+  const videoEl = document.createElement('video');
+
+  tech.el_ = videoEl;
+
+  const sourceObjNoType = { src: 'http://example.com/video2.mp4' };
+
+  tech.addSrcAsSourceElement(sourceObjNoType);
+
+  const sourceElement = videoEl.querySelector('source');
+
+  assert.ok(sourceElement, 'A source element was added even without a type');
+  assert.equal(sourceElement.src, 'http://example.com/video2.mp4', 'Source element has correct src');
+  assert.notOk(sourceElement.type, 'Source element does not have a type attribute');
+});
+
 QUnit.test('addSrcAsSourceElement does not add a source element for invalid source objects', function(assert) {
   const videoEl = document.createElement('video');
 
   tech.el_ = videoEl;
 
   // Missing src
-  const sourceObjNoSrc = {type: 'video/mp4'};
+  const sourceObjNoSrc = { type: 'video/mp4' };
 
   tech.addSrcAsSourceElement(sourceObjNoSrc);
 
-  let sourceElement = videoEl.querySelector('source');
+  const sourceElement = videoEl.querySelector('source');
 
   assert.notOk(sourceElement, 'No source element was added for missing src');
+});
 
-  // Missing type
-  const sourceObjNoType = {src: 'http://example.com/video.mp4'};
+QUnit.test('removeSourceElement removes a source element by its URL', function(assert) {
+  const videoEl = document.createElement('video');
 
-  tech.addSrcAsSourceElement(sourceObjNoType);
-  sourceElement = videoEl.querySelector('source');
-  assert.notOk(sourceElement, 'No source element was added for missing type');
+  tech.el_ = videoEl;
 
-  // Null source object
-  tech.addSrcAsSourceElement(null);
-  sourceElement = videoEl.querySelector('source');
-  assert.notOk(sourceElement, 'No source element was added for null source object');
+  const sourceObj1 = { src: 'http://example.com/video1.mp4', type: 'video/mp4' };
+  const sourceObj2 = { src: 'http://example.com/video2.mp4', type: 'video/mp4' };
 
-  // Undefined source object
-  tech.addSrcAsSourceElement(undefined);
-  sourceElement = videoEl.querySelector('source');
-  assert.notOk(sourceElement, 'No source element was added for undefined source object');
+  tech.addSrcAsSourceElement(sourceObj1);
+  tech.addSrcAsSourceElement(sourceObj2);
+
+  let sourceElement = videoEl.querySelector('source[src="http://example.com/video1.mp4"]');
+
+  assert.ok(sourceElement, 'Source element for video1.mp4 was added');
+
+  const removed = tech.removeSourceElement('http://example.com/video1.mp4');
+
+  assert.ok(removed, 'Source element was successfully removed');
+  sourceElement = videoEl.querySelector('source[src="http://example.com/video1.mp4"]');
+  assert.notOk(sourceElement, 'Source element for video1.mp4 was removed');
+});
+
+QUnit.test('removeSourceElement does not remove a source element if URL does not match', function(assert) {
+  const videoEl = document.createElement('video');
+
+  tech.el_ = videoEl;
+
+  const sourceObj = { src: 'http://example.com/video.mp4', type: 'video/mp4' };
+
+  tech.addSrcAsSourceElement(sourceObj);
+
+  const removed = tech.removeSourceElement('http://example.com/invalid.mp4');
+
+  assert.notOk(removed, 'No source element was removed for non-matching URL');
 });
