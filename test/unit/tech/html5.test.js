@@ -914,10 +914,10 @@ QUnit.test('addSourceElement adds a valid source element with srcUrl and mimeTyp
   const srcUrl = 'http://example.com/video.mp4';
   const mimeType = 'video/mp4';
 
-  tech.addSourceElement(srcUrl, mimeType);
-
+  const added = tech.addSourceElement(srcUrl, mimeType);
   const sourceElement = videoEl.querySelector('source');
 
+  assert.ok(added, 'Returned true');
   assert.ok(sourceElement, 'A source element was added');
   assert.equal(sourceElement.src, srcUrl, 'Source element has correct src');
   assert.equal(sourceElement.type, mimeType, 'Source element has correct type');
@@ -930,10 +930,10 @@ QUnit.test('addSourceElement adds a valid source element without a mimeType', fu
 
   const srcUrl = 'http://example.com/video2.mp4';
 
-  tech.addSourceElement(srcUrl);
-
+  const added = tech.addSourceElement(srcUrl);
   const sourceElement = videoEl.querySelector('source');
 
+  assert.ok(added, 'Returned true');
   assert.ok(sourceElement, 'A source element was added even without a type');
   assert.equal(sourceElement.src, srcUrl, 'Source element has correct src');
   assert.notOk(sourceElement.type, 'Source element does not have a type attribute');
@@ -944,10 +944,10 @@ QUnit.test('addSourceElement does not add a source element for invalid source UR
 
   tech.el_ = videoEl;
 
-  tech.addSourceElement('');
-
+  const added = tech.addSourceElement('');
   const sourceElement = videoEl.querySelector('source');
 
+  assert.notOk(added, 'Returned false');
   assert.notOk(sourceElement, 'No source element was added for missing src');
 });
 

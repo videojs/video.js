@@ -3626,6 +3626,19 @@ QUnit.test('addSourceElement calls tech method with correct args', function(asse
   player.dispose();
 });
 
+QUnit.test('addSourceElement returns false if no tech', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const srcUrl = 'http://example.com/video.mp4';
+  const mimeType = 'video/mp4';
+
+  player.tech_ = undefined;
+
+  const added = player.addSourceElement(srcUrl, mimeType);
+
+  assert.notOk(added, 'Returned false');
+  player.dispose();
+});
+
 QUnit.test('removeSourceElement calls tech method with correct args', function(assert) {
   const player = TestHelpers.makePlayer();
   const removeSourceElementSpy = sinon.spy(player.tech_, 'removeSourceElement');
@@ -3637,5 +3650,18 @@ QUnit.test('removeSourceElement calls tech method with correct args', function(a
   assert.ok(removeSourceElementSpy.calledWith(srcUrl), 'removeSourceElement called with correct arguments');
 
   removeSourceElementSpy.restore();
+  player.dispose();
+});
+
+QUnit.test('removeSourceElement returns false if no tech', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const srcUrl = 'http://example.com/video.mp4';
+  const mimeType = 'video/mp4';
+
+  player.tech_ = undefined;
+
+  const removed = player.removeSourceElement(srcUrl, mimeType);
+
+  assert.notOk(removed, 'Returned false');
   player.dispose();
 });

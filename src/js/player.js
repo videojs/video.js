@@ -3718,11 +3718,16 @@ class Player extends Component {
    *
    * @param {string} [mimeType]
    *        The MIME type of the video source. Optional but recommended.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully added, false otherwise.
    */
   addSourceElement(srcUrl, mimeType) {
-    if (this.tech_) {
-      this.tech_.addSourceElement(srcUrl, mimeType);
+    if (!this.tech_) {
+      return false;
     }
+
+    return this.tech_.addSourceElement(srcUrl, mimeType);
   }
 
   /**
@@ -3735,9 +3740,11 @@ class Player extends Component {
    *         Returns true if the source element was successfully removed, false otherwise.
    */
   removeSourceElement(srcUrl) {
-    if (this.tech_) {
-      return this.tech_.removeSourceElement(srcUrl);
+    if (!this.tech_) {
+      return false;
     }
+
+    return this.tech_.removeSourceElement(srcUrl);
   }
 
   /**

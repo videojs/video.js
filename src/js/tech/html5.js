@@ -791,11 +791,14 @@ class Html5 extends Tech {
    *
    * @param {string} [mimeType]
    *        The MIME type of the video source. Optional but recommended.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully added, false otherwise.
    */
   addSourceElement(srcUrl, mimeType) {
     if (!srcUrl) {
       log.error('Invalid source URL.');
-      return;
+      return false;
     }
 
     const sourceAttributes = { src: srcUrl };
@@ -807,6 +810,8 @@ class Html5 extends Tech {
     const sourceElement = Dom.createEl('source', {}, sourceAttributes);
 
     this.el_.appendChild(sourceElement);
+
+    return true;
   }
 
   /**
