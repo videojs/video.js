@@ -3711,6 +3711,36 @@ class Player extends Component {
   }
 
   /**
+   * Add a <source> element to the <video> element.
+   *
+   * @param {string} srcUrl
+   *        The URL of the video source.
+   *
+   * @param {string} [mimeType]
+   *        The MIME type of the video source. Optional but recommended.
+   */
+  addSourceElement(srcUrl, mimeType) {
+    if (this.tech_) {
+      this.tech_.addSourceElement(srcUrl, mimeType);
+    }
+  }
+
+  /**
+   * Remove a <source> element from the <video> element by its URL.
+   *
+   * @param {string} srcUrl
+   *        The URL of the source to remove.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully removed, false otherwise.
+   */
+  removeSourceElement(srcUrl) {
+    if (this.tech_) {
+      return this.tech_.removeSourceElement(srcUrl);
+    }
+  }
+
+  /**
    * Begin loading the src data.
    */
   load() {

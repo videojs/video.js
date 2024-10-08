@@ -3611,3 +3611,31 @@ QUnit.test('smooth seeking set to true should update the display time components
   player.dispose();
 });
 
+QUnit.test('addSourceElement calls tech method with correct args', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const addSourceElementSpy = sinon.spy(player.tech_, 'addSourceElement');
+  const srcUrl = 'http://example.com/video.mp4';
+  const mimeType = 'video/mp4';
+
+  player.addSourceElement(srcUrl, mimeType);
+
+  assert.ok(addSourceElementSpy.calledOnce, 'addSourceElement method called');
+  assert.ok(addSourceElementSpy.calledWith(srcUrl, mimeType), 'addSourceElement called with correct arguments');
+
+  addSourceElementSpy.restore();
+  player.dispose();
+});
+
+QUnit.test('removeSourceElement calls tech method with correct args', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const removeSourceElementSpy = sinon.spy(player.tech_, 'removeSourceElement');
+  const srcUrl = 'http://example.com/video.mp4';
+
+  player.removeSourceElement(srcUrl);
+
+  assert.ok(removeSourceElementSpy.calledOnce, 'removeSourceElement method called');
+  assert.ok(removeSourceElementSpy.calledWith(srcUrl), 'removeSourceElement called with correct arguments');
+
+  removeSourceElementSpy.restore();
+  player.dispose();
+});
