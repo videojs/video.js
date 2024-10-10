@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@videojs/http-streaming": "^3.14.2",
+    "@videojs/http-streaming": "^3.15.0",
     "@videojs/vhs-utils": "^4.1.1",
     "@videojs/xhr": "2.7.0",
     "aes-decrypter": "^4.0.2",
