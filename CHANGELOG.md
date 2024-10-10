@@ -1,3 +1,11 @@
+<a name="8.19.1"></a>
+## [8.19.1](https://github.com/videojs/video.js/compare/v8.19.0...v8.19.1) (2024-10-10)
+
+### Chores
+
+* **package:** update http-streaming to v3.15.0 ([#8889](https://github.com/videojs/video.js/issues/8889)) ([84f4905](https://github.com/videojs/video.js/commit/84f4905))
+* update mpd-parser to v1.3.1 ([#8888](https://github.com/videojs/video.js/issues/8888)) ([7c17d75](https://github.com/videojs/video.js/commit/7c17d75))
+
 <a name="8.19.0"></a>
 # [8.19.0](https://github.com/videojs/video.js/compare/v8.18.0...v8.19.0) (2024-10-09)
 
