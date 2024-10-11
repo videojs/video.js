@@ -4717,6 +4717,57 @@ class Player extends Component {
     });
   }
 
+  // The following empty getters are defined below the class. They are declared here
+  // for `tsc` to pick them up in type definitions.
+
+  /**
+   * Get the {@link VideoTrackList}
+   *
+   * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
+   *
+   * @return {VideoTrackList}
+   *         the current video track list
+   *
+   * @method Player.prototype.videoTracks
+   */
+  videoTracks() {}
+
+  /**
+   * Get the {@link AudioTrackList}
+   *
+   * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
+   *
+   * @return {AudioTrackList}
+   *         the current audio track list
+   */
+  audioTracks() {}
+
+  /**
+   * Get the {@link TextTrackList}
+   *
+   * @link http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+   *
+   * @return {TextTrackList}
+   *         the current text track list
+   */
+  textTracks() {}
+
+  /**
+   * Get the remote {@link TextTrackList}
+   *
+   * @return {TextTrackList}
+   *         The current remote text track list
+   */
+  remoteTextTracks() {}
+
+  /**
+   * Get the remote {@link HtmlTrackElementList} tracks.
+   *
+   * @return {HtmlTrackElementList}
+   *         The current remote text track element list
+   */
+  remoteTextTrackEls() {}
+
   /**
    * A helper method for adding a {@link TextTrack} to our
    * {@link TextTrackList}.
@@ -5406,57 +5457,6 @@ class Player extends Component {
   /* end-delete-from-build */
 }
 
-/**
- * Get the {@link VideoTrackList}
- *
- * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
- *
- * @return {VideoTrackList}
- *         the current video track list
- *
- * @method Player.prototype.videoTracks
- */
-
-/**
- * Get the {@link AudioTrackList}
- *
- * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
- *
- * @return {AudioTrackList}
- *         the current audio track list
- *
- * @method Player.prototype.audioTracks
- */
-
-/**
- * Get the {@link TextTrackList}
- *
- * @link http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
- *
- * @return {TextTrackList}
- *         the current text track list
- *
- * @method Player.prototype.textTracks
- */
-
-/**
- * Get the remote {@link TextTrackList}
- *
- * @return {TextTrackList}
- *         The current remote text track list
- *
- * @method Player.prototype.remoteTextTracks
- */
-
-/**
- * Get the remote {@link HtmlTrackElementList} tracks.
- *
- * @return {HtmlTrackElementList}
- *         The current remote text track element list
- *
- * @method Player.prototype.remoteTextTrackEls
- */
-
 TRACK_TYPES.names.forEach(function(name) {
   const props = TRACK_TYPES[name];
 
@@ -5608,3 +5608,5 @@ TECH_EVENTS_RETRIGGER.forEach(function(event) {
 
 Component.registerComponent('Player', Player);
 export default Player;
+// Including a named export so Typescript can use module augmentation with plugins
+export { Player };
