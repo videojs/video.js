@@ -141,7 +141,7 @@ function createTimeRangesObj(ranges) {
 export function createTimeRanges(start, end) {
   if (Array.isArray(start)) {
     return createTimeRangesObj(start);
-  } else if (start === undefined || end === undefined) {
+  } if (start === undefined || end === undefined) {
     return createTimeRangesObj();
   }
   return createTimeRangesObj([[start, end]]);
