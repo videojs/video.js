@@ -530,25 +530,7 @@ class Player extends Component {
 
     this.playbackRates(options.playbackRates);
 
-    if (options.experimentalSvgIcons) {
-      // Add SVG Sprite to the DOM
-      const parser = new window.DOMParser();
-      const parsedSVG = parser.parseFromString(icons, 'image/svg+xml');
-      const errorNode = parsedSVG.querySelector('parsererror');
-
-      if (errorNode) {
-        log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
-        this.options_.experimentalSvgIcons = null;
-      } else {
-        const sprite = parsedSVG.documentElement;
-
-        sprite.style.display = 'none';
-        this.el_.appendChild(sprite);
-
-        this.addClass('vjs-svg-icons-enabled');
-      }
-    }
-
+    this.initSvgIcons_(options.experimentalSvgIcons);
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -5301,6 +5283,39 @@ class Player extends Component {
     }
 
     return baseOptions;
+  }
+
+  /**
+   * Initialize SVG icons.
+   *
+   * @param {boolean|string} svgIconsOption
+   *        Takes a Boolean or a string as parameter, if true will activate
+   *        the default icons, if the string represents an svg it will replace
+   *        the default icons.
+   */
+  initSvgIcons_(svgIconsOption) {
+    if (!svgIconsOption) {
+      return;
+    }
+
+    const hasCustomSvgIcons = typeof svgIconsOption === 'string';
+    const svgIcons = hasCustomSvgIcons ? svgIconsOption : icons;
+    // Add SVG Sprite to the DOM
+    const parser = new window.DOMParser();
+    const parsedSVG = parser.parseFromString(svgIcons, 'image/svg+xml');
+    const errorNode = parsedSVG.querySelector('parsererror');
+
+    if (errorNode) {
+      log.warn('Failed to load SVG Icons. Falling back to Font Icons.');
+      this.options_.experimentalSvgIcons = null;
+    } else {
+      const sprite = parsedSVG.documentElement;
+
+      sprite.style.display = 'none';
+      this.el_.appendChild(sprite);
+
+      this.addClass('vjs-svg-icons-enabled');
+    }
   }
 
   /**
