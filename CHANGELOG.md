@@ -1,3 +1,26 @@
+<a name="8.19.1"></a>
+## [8.19.1](https://github.com/videojs/video.js/compare/v8.19.0...v8.19.1) (2024-10-10)
+
+### Chores
+
+* **package:** update http-streaming to v3.15.0 ([#8889](https://github.com/videojs/video.js/issues/8889)) ([84f4905](https://github.com/videojs/video.js/commit/84f4905))
+* update mpd-parser to v1.3.1 ([#8888](https://github.com/videojs/video.js/issues/8888)) ([7c17d75](https://github.com/videojs/video.js/commit/7c17d75))
+
+<a name="8.19.0"></a>
+# [8.19.0](https://github.com/videojs/video.js/compare/v8.18.0...v8.19.0) (2024-10-09)
+
+### Features
+
+* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Bug Fixes
+
+* Don't request fullscreen from document PIP window ([#8881](https://github.com/videojs/video.js/issues/8881)) ([077077b](https://github.com/videojs/video.js/commit/077077b)), closes [#8877](https://github.com/videojs/video.js/issues/8877)
+
+### Chores
+
+* **package:** Update to VHS v3.14.2 ([#8869](https://github.com/videojs/video.js/issues/8869)) ([89eb454](https://github.com/videojs/video.js/commit/89eb454))
+
 <a name="8.18.1"></a>
 ## [8.18.1](https://github.com/videojs/video.js/compare/v8.18.0...v8.18.1) (2024-09-17)
 
