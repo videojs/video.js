@@ -2003,7 +2003,8 @@ class Player extends Component {
   }
 
   /**
-   * Handle a double-click on the media element to enter/exit fullscreen
+   * Handle a double-click on the media element to enter/exit fullscreen,
+   * or exit documentPictureInPicture mode
    *
    * @param {Event} event
    *        the event that caused this function to trigger
@@ -2045,7 +2046,12 @@ class Player extends Component {
         ) {
 
           this.options_.userActions.doubleClick.call(this, event);
-
+        } else if (this.isInPictureInPicture() && !document.pictureInPictureElement) {
+          // Checking the presence of `window.documentPictureInPicture.window` complicates
+          // tests, checking `document.pictureInPictureElement` also works. It wouldn't
+          // be null in regular picture in picture.
+          // Exit picture in picture mode. This gesture can't trigger pip on the main window.
+          this.exitPictureInPicture();
         } else if (this.isFullscreen()) {
           this.exitFullscreen();
         } else {
@@ -3702,6 +3708,43 @@ class Player extends Component {
     }, true);
 
     return false;
+  }
+
+  /**
+   * Add a <source> element to the <video> element.
+   *
+   * @param {string} srcUrl
+   *        The URL of the video source.
+   *
+   * @param {string} [mimeType]
+   *        The MIME type of the video source. Optional but recommended.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully added, false otherwise.
+   */
+  addSourceElement(srcUrl, mimeType) {
+    if (!this.tech_) {
+      return false;
+    }
+
+    return this.tech_.addSourceElement(srcUrl, mimeType);
+  }
+
+  /**
+   * Remove a <source> element from the <video> element by its URL.
+   *
+   * @param {string} srcUrl
+   *        The URL of the source to remove.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully removed, false otherwise.
+   */
+  removeSourceElement(srcUrl) {
+    if (!this.tech_) {
+      return false;
+    }
+
+    return this.tech_.removeSourceElement(srcUrl);
   }
 
   /**
