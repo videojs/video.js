@@ -41,7 +41,8 @@
 
 // This increases the size of the progress holder so there is an increased
 // hit area for clicks/touches.
-.video-js .vjs-progress-control:hover .vjs-progress-holder {
+.video-js .vjs-progress-control:hover .vjs-progress-holder,
+.video-js.vjs-scrubbing.vjs-touch-enabled .vjs-progress-control .vjs-progress-holder {
   font-size: 1.666666666666666666em;
 }
 
@@ -143,7 +144,8 @@
 }
 
 .video-js .vjs-progress-control:hover .vjs-time-tooltip,
-.video-js .vjs-progress-control:hover .vjs-progress-holder:focus .vjs-time-tooltip {
+.video-js .vjs-progress-control:hover .vjs-progress-holder:focus .vjs-time-tooltip,
+.video-js.vjs-scrubbing.vjs-touch-enabled .vjs-progress-control .vjs-time-tooltip {
   display: block;
 
   // Ensure that we maintain a font-size of ~10px.
@@ -169,6 +171,10 @@
 }
 
 .video-js .vjs-progress-control:hover .vjs-mouse-display {
+  display: block;
+}
+
+.video-js.vjs-scrubbing.vjs-touch-enabled .vjs-progress-control .vjs-mouse-display {
   display: block;
 }
 
