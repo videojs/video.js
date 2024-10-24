@@ -43,7 +43,10 @@ class SeekBar extends Slider {
   constructor(player, options) {
     options = merge(SeekBar.prototype.options_, options);
 
-    const shouldDisableSeekWhileScrubbingOnMobile = options.playerOptions.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID);
+    // Avoid mutating the prototype's `children` array by creating a copy
+    options.children = [...options.children];
+
+    const shouldDisableSeekWhileScrubbingOnMobile = player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID);
 
     // Add the TimeTooltip as a child if we are on desktop, or on mobile with `disableSeekWhileScrubbingOnMobile: true`
     if ((!IS_IOS && !IS_ANDROID) || shouldDisableSeekWhileScrubbingOnMobile) {
@@ -240,7 +243,7 @@ class SeekBar extends Slider {
    */
   getPercent() {
     // If we have a pending seek time, we are scrubbing on mobile and should set the slider percent
-    // to reflect where the user is scrubbing.
+    // to reflect the current scrub location.
     if (this.pendingSeekTime_) {
       return this.pendingSeekTime_ / this.player_.duration();
     }
