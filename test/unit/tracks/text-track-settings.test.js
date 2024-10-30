@@ -375,10 +375,16 @@ QUnit.test('should update on languagechange', function(assert) {
     tracks
   });
 
-  videojs.addLanguage('test', {'Font Size': 'FONTSIZE'});
+  videojs.addLanguage('test', {
+    'Font Size': 'FONTSIZE',
+    'Color': 'COLOR',
+    'White': 'WHITE'
+  });
   player.language('test');
 
   assert.equal(player.$('.vjs-font-percent legend').textContent, 'FONTSIZE', 'settings dialog updates on languagechange');
+  assert.equal(player.$('.vjs-text-color label').textContent, 'COLOR', 'settings dialog label updates on languagechange');
+  assert.equal(player.$('.vjs-text-color select option').textContent, 'WHITE', 'settings dialog select updates on languagechange');
 
   player.dispose();
 });
