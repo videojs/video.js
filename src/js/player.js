@@ -370,6 +370,8 @@ class Player extends Component {
 
     this.boundUpdatePlayerHeightOnAudioOnlyMode_ = (e) => this.updatePlayerHeightOnAudioOnlyMode_(e);
 
+    this.boundGlobalKeydown_ = (e) => this.handleGlobalKeydown_(e);
+
     // default isFullscreen_ to false
     this.isFullscreen_ = false;
 
@@ -611,6 +613,10 @@ class Player extends Component {
     this.on('keydown', (e) => this.handleKeyDown(e));
     this.on('languagechange', (e) => this.handleLanguagechange(e));
 
+    if (this.isGlobalHotKeysEnabled()) {
+      Events.on(document.body, 'keydown', this.boundGlobalKeydown_);
+    }
+
     this.breakpoints(this.options_.breakpoints);
     this.responsive(this.options_.responsive);
 
@@ -646,6 +652,7 @@ class Player extends Component {
     // Make sure all player-specific document listeners are unbound. This is
     Events.off(document, this.fsApi_.fullscreenchange, this.boundDocumentFullscreenChange_);
     Events.off(document, 'keydown', this.boundFullWindowOnEscKey_);
+    Events.off(document.body, 'keydown', this.boundGlobalKeydown_);
 
     if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
@@ -2245,6 +2252,12 @@ class Player extends Component {
      * @type {Event}
      */
     this.trigger('textdata', data);
+  }
+
+  handleGlobalKeydown_(event) {
+    if (event.target === document.body) {
+      this.handleKeyDown(event);
+    }
   }
 
   /**
@@ -4568,6 +4581,10 @@ class Player extends Component {
 
     this.audioOnlyCache_.controlBarHeight = controlBar.currentHeight();
     this.height(this.audioOnlyCache_.controlBarHeight);
+  }
+
+  isGlobalHotKeysEnabled() {
+    return !!(this.options_ && this.options_.userActions && this.options_.userActions.globalHotkeys);
   }
 
   enableAudioOnlyUI_() {
