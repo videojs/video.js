@@ -24,6 +24,12 @@ import {merge} from './utils/obj.js';
  */
 
 /**
+  * @typedef {Object} ComponentOptions
+  * @property {Object[]} [children]
+  * @property {string} [classname]
+  */
+
+/**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
  * in the DOM. They can be children of other components, and can have
@@ -39,7 +45,7 @@ class Component {
    * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
-   * @param {Object} [options]
+   * @param {ComponentOptions} [options]
    *        The key/value store of component options.
    *
    * @param {Object[]} [options.children]
@@ -589,11 +595,43 @@ class Component {
 
     return iconContainer;
   }
-
+  // /**
+  //  * Add a child `Component` inside the current `Component`.
+  //  *
+  //  * @template {Component} T
+  //  * @param {string|T} child
+  //  *        The name or instance of a child to add.
+  //  *
+  //  * @param {Object} [options={}]
+  //  *        The key/value store of options that will get passed to children of
+  //  *        the child.
+  //  *
+  //  * @param {number} [index=this.children_.length]
+  //  *        The index to attempt to add a child into.
+  //  *
+  //  *
+  //  * @return {T}
+  //  *         The `Component` that gets added as a child. When using a string the
+  //  *         `Component` will get created by this process.
+  //  */
+  /**
+   * @overload
+   * @param {typeof Component} child
+   * @param {Object} [options={}]
+   * @param {number} [index=this.children_.length]
+   * @return {typeof Component}
+   */
+  /**
+   * @overload
+   * @param {string} child
+   * @param {Object} [options={}]
+   * @param {number} [index=this.children_.length]
+   * @return {typeof Component}
+   */
   /**
    * Add a child `Component` inside the current `Component`.
    *
-   * @param {string|Component} child
+   * @param {string|typeof Component} child
    *        The name or instance of a child to add.
    *
    * @param {Object} [options={}]
@@ -604,7 +642,7 @@ class Component {
    *        The index to attempt to add a child into.
    *
    *
-   * @return {Component}
+   * @return {typeof Component}
    *         The `Component` that gets added as a child. When using a string the
    *         `Component` will get created by this process.
    */
@@ -1979,10 +2017,10 @@ class Component {
    * @param {string} name
    *        The name of the `Component` to register.
    *
-   * @param {Component} ComponentToRegister
+   * @param {typeof Component} ComponentToRegister
    *        The `Component` class to register.
    *
-   * @return {Component}
+   * @return {typeof Component}
    *         The `Component` that was registered.
    */
   static registerComponent(name, ComponentToRegister) {

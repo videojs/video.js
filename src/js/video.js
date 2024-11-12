@@ -617,3 +617,5 @@ videojs.url = Url;
 videojs.Error = VjsErrors;
 
 export default videojs;
+export {Player};
+export {Plugin};
