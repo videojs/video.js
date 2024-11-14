@@ -297,7 +297,7 @@ class MenuButton extends Component {
   handleKeyDown(event) {
 
     // Escape or Tab unpress the 'button'
-    if (event.key === 'Esc' || event.key === 'Tab') {
+    if (event.key === 'Escape' || event.key === 'Tab') {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
@@ -328,7 +328,7 @@ class MenuButton extends Component {
    */
   handleMenuKeyUp(event) {
     // Escape hides popup menu
-    if (event.key === 'Esc' || event.key === 'Tab') {
+    if (event.key === 'Escape' || event.key === 'Tab') {
       this.removeClass('vjs-hover');
     }
   }
@@ -356,7 +356,7 @@ class MenuButton extends Component {
    */
   handleSubmenuKeyDown(event) {
     // Escape or Tab unpress the 'button'
-    if (event.key === 'Esc' || event.key === 'Tab') {
+    if (event.key === 'Escape' || event.key === 'Tab') {
       if (this.buttonPressed_) {
         this.unpressButton();
       }
