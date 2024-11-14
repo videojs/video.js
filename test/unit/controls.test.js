@@ -223,7 +223,7 @@ QUnit.test('SeekBar should be filled on 100% when the video/audio ends', functio
   window.cancelAnimationFrame = oldCAF;
 });
 
-QUnit.only('SeekBar keyboard increment is configurable', function(assert) {
+QUnit.test('SeekBar keyboard increment is configurable', function(assert) {
   const player = TestHelpers.makePlayer({
     controlBar: {
       progressControl: {
@@ -262,7 +262,7 @@ QUnit.only('SeekBar keyboard increment is configurable', function(assert) {
   player.dispose();
 });
 
-QUnit.only('SeekBar keyboard increment is configurable at runtime', function(assert) {
+QUnit.test('SeekBar keyboard increment is configurable at runtime', function(assert) {
   const player = TestHelpers.makePlayer({});
 
   const ctSpy = sinon.spy(player, 'currentTime');
