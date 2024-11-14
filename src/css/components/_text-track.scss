@@ -46,3 +46,12 @@ video::-webkit-media-text-track-display {
   text-align: center !important;
   width: 80% !important;
 }
+
+@supports not (inset: 10px) {
+  .video-js .vjs-text-track-display > div {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+}

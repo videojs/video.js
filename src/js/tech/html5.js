@@ -784,6 +784,67 @@ class Html5 extends Tech {
   }
 
   /**
+   * Add a <source> element to the <video> element.
+   *
+   * @param {string} srcUrl
+   *        The URL of the video source.
+   *
+   * @param {string} [mimeType]
+   *        The MIME type of the video source. Optional but recommended.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully added, false otherwise.
+   */
+  addSourceElement(srcUrl, mimeType) {
+    if (!srcUrl) {
+      log.error('Invalid source URL.');
+      return false;
+    }
+
+    const sourceAttributes = { src: srcUrl };
+
+    if (mimeType) {
+      sourceAttributes.type = mimeType;
+    }
+
+    const sourceElement = Dom.createEl('source', {}, sourceAttributes);
+
+    this.el_.appendChild(sourceElement);
+
+    return true;
+  }
+
+  /**
+   * Remove a <source> element from the <video> element by its URL.
+   *
+   * @param {string} srcUrl
+   *        The URL of the source to remove.
+   *
+   * @return {boolean}
+   *         Returns true if the source element was successfully removed, false otherwise.
+   */
+  removeSourceElement(srcUrl) {
+    if (!srcUrl) {
+      log.error('Source URL is required to remove the source element.');
+      return false;
+    }
+
+    const sourceElements = this.el_.querySelectorAll('source');
+
+    for (const sourceElement of sourceElements) {
+      if (sourceElement.src === srcUrl) {
+        this.el_.removeChild(sourceElement);
+
+        return true;
+      }
+    }
+
+    log.warn(`No matching source element found with src: ${srcUrl}`);
+
+    return false;
+  }
+
+  /**
    * Reset the tech by removing all sources and then calling
    * {@link Html5.resetMediaElement}.
    */

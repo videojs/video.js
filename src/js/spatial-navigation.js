@@ -59,6 +59,27 @@ class SpatialNavigation extends EventTarget {
     this.player_.on('focusin', this.handlePlayerFocus_.bind(this));
     this.player_.on('focusout', this.handlePlayerBlur_.bind(this));
     this.isListening_ = true;
+    if (this.player_.errorDisplay) {
+      this.player_.errorDisplay.on('aftermodalfill', () => {
+        this.updateFocusableComponents();
+
+        if (this.focusableComponents.length) {
+          // The modal has focusable components:
+
+          if (this.focusableComponents.length > 1) {
+            // The modal has close button + some additional buttons.
+            // Focusing first additional button:
+
+            this.focusableComponents[1].focus();
+          } else {
+            // The modal has only close button,
+            // Focusing it:
+
+            this.focusableComponents[0].focus();
+          }
+        }
+      });
+    }
   }
 
   /**
@@ -99,7 +120,8 @@ class SpatialNavigation extends EventTarget {
       const action = SpatialNavKeyCodes.getEventName(actualEvent);
 
       this.performMediaAction_(action);
-    } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'Back') && event.target && event.target.closeable()) {
+    } else if (SpatialNavKeyCodes.isEventKey(actualEvent, 'Back') &&
+        event.target && typeof event.target.closeable === 'function' && event.target.closeable()) {
       actualEvent.preventDefault();
       event.target.close();
     }
@@ -196,7 +218,7 @@ class SpatialNavigation extends EventTarget {
     }
 
     if (!(event.currentTarget.contains(event.relatedTarget)) && !isChildrenOfPlayer || !nextFocusedElement) {
-      if (currentComponent.name() === 'CloseButton') {
+      if (currentComponent && currentComponent.name() === 'CloseButton') {
         this.refocusComponent();
       } else {
         this.pause();
@@ -267,9 +289,65 @@ class SpatialNavigation extends EventTarget {
           focusableComponents.push(value);
         }
       }
+
+      // TODO - Refactor the following logic after refactor of videojs-errors elements to be components is done.
+      if (value.name_ === 'ErrorDisplay' && value.opened_) {
+        const buttonContainer = value.el_.querySelector('.vjs-errors-ok-button-container');
+
+        if (buttonContainer) {
+          const modalButtons = buttonContainer.querySelectorAll('button');
+
+          modalButtons.forEach((element, index) => {
+            // Add elements as objects to be handled by the spatial navigation
+            focusableComponents.push({
+              name: () => {
+                return 'ModalButton' + (index + 1);
+              },
+              el: () => element,
+              getPositions: () => {
+                const rect = element.getBoundingClientRect();
+
+                // Creating objects that mirror DOMRectReadOnly for boundingClientRect and center
+                const boundingClientRect = {
+                  x: rect.x,
+                  y: rect.y,
+                  width: rect.width,
+                  height: rect.height,
+                  top: rect.top,
+                  right: rect.right,
+                  bottom: rect.bottom,
+                  left: rect.left
+                };
+
+                // Calculating the center position
+                const center = {
+                  x: rect.left + rect.width / 2,
+                  y: rect.top + rect.height / 2,
+                  width: 0,
+                  height: 0,
+                  top: rect.top + rect.height / 2,
+                  right: rect.left + rect.width / 2,
+                  bottom: rect.top + rect.height / 2,
+                  left: rect.left + rect.width / 2
+                };
+
+                return {
+                  boundingClientRect,
+                  center
+                };
+              },
+              // Asume that the following are always focusable
+              getIsAvailableToBeFocused: () => true,
+              getIsFocusable: (el) => true,
+              focus: () => element.focus()
+            });
+          });
+        }
+      }
     });
 
     this.focusableComponents = focusableComponents;
+
     return this.focusableComponents;
   }
 
@@ -307,7 +385,11 @@ class SpatialNavigation extends EventTarget {
       return null;
     }
 
-    return searchForSuitableChild(component.el());
+    if (component.el()) {
+      return searchForSuitableChild(component.el());
+    }
+    return null;
+
   }
 
   /**
@@ -464,7 +546,7 @@ class SpatialNavigation extends EventTarget {
    */
   refocusComponent() {
     if (this.lastFocusedComponent_) {
-      // If use is not active, set it to active.
+      // If user is not active, set it to active.
       if (!this.player_.userActive()) {
         this.player_.userActive(true);
       }
@@ -492,6 +574,10 @@ class SpatialNavigation extends EventTarget {
    * @param {Component} component - The component to be focused.
    */
   focus(component) {
+    if (typeof component !== 'object') {
+      return;
+    }
+
     if (component.getIsAvailableToBeFocused(component.el())) {
       component.focus();
     } else if (this.findSuitableDOMChild(component)) {

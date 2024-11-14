@@ -1,3 +1,284 @@
+<a name="8.19.2"></a>
+## [8.19.2](https://github.com/videojs/video.js/compare/v8.3.0...v8.19.2) (2024-11-14)
+
+### Features
+
+* add browser.IS_SMART_TV and class names for CSS targeting devices ([#8676](https://github.com/videojs/video.js/issues/8676)) ([8e5870f](https://github.com/videojs/video.js/commit/8e5870f))
+* add class to normalise time control display ([#8833](https://github.com/videojs/video.js/issues/8833)) ([5e6b536](https://github.com/videojs/video.js/commit/5e6b536)), closes [#8534](https://github.com/videojs/video.js/issues/8534) [1000#0](https://github.com/1000/issues/0)
+* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [1000#0](https://github.com/1000/issues/0)
+* Add useSVGIcons option ([#8260](https://github.com/videojs/video.js/issues/8260)) ([6fc0dc7](https://github.com/videojs/video.js/commit/6fc0dc7))
+* Adds a transient button component ([#8629](https://github.com/videojs/video.js/issues/8629)) ([1afe504](https://github.com/videojs/video.js/commit/1afe504))
+* bump VHS 3.8.0 ([#8506](https://github.com/videojs/video.js/issues/8506)) ([5f4aa91](https://github.com/videojs/video.js/commit/5f4aa91))
+* **emulated-tracks:** add class to force cues to be center aligned ([#8625](https://github.com/videojs/video.js/issues/8625)) ([d715e0f](https://github.com/videojs/video.js/commit/d715e0f))
+* enhanced logger ([#8444](https://github.com/videojs/video.js/issues/8444)) ([cf681e0](https://github.com/videojs/video.js/commit/cf681e0))
+* **error:** remove confusing decorative X from error display modal ([#8553](https://github.com/videojs/video.js/issues/8553)) ([7345768](https://github.com/videojs/video.js/commit/7345768))
+* expose version from player.version() ([#8543](https://github.com/videojs/video.js/issues/8543)) ([abdfaac](https://github.com/videojs/video.js/commit/abdfaac)), closes [#8538](https://github.com/videojs/video.js/issues/8538)
+* **icons:** update Twitter X logo ([#8764](https://github.com/videojs/video.js/issues/8764)) ([b58b4c5](https://github.com/videojs/video.js/commit/b58b4c5)), closes [1000#0](https://github.com/1000/issues/0)
+* implement spatial navigation ([#8570](https://github.com/videojs/video.js/issues/8570)) ([21b4a52](https://github.com/videojs/video.js/commit/21b4a52))
+* improved error interface ([#8564](https://github.com/videojs/video.js/issues/8564)) ([43941a8](https://github.com/videojs/video.js/commit/43941a8))
+* **lang:** Add support for Marathi Language ([#8596](https://github.com/videojs/video.js/issues/8596)) ([80429fa](https://github.com/videojs/video.js/commit/80429fa))
+* **lang:** added arabic seek button translations ([#8616](https://github.com/videojs/video.js/issues/8616)) ([ee07382](https://github.com/videojs/video.js/commit/ee07382))
+* **lang:** update fa translation ([#8288](https://github.com/videojs/video.js/issues/8288)) ([cb8b329](https://github.com/videojs/video.js/commit/cb8b329))
+* **lang:** update zh-TW translations ([#7877](https://github.com/videojs/video.js/issues/7877)) ([7e85324](https://github.com/videojs/video.js/commit/7e85324))
+* **player:** Make 'searchForTrackSelect_' private & use 'el' as parameter in function 'getIsFocusable' ([#8697](https://github.com/videojs/video.js/issues/8697)) ([ec69d5e](https://github.com/videojs/video.js/commit/ec69d5e))
+* refactor error consts ([#8719](https://github.com/videojs/video.js/issues/8719)) ([4dfea61](https://github.com/videojs/video.js/commit/4dfea61))
+* Seek bar smooth seeking ([#8287](https://github.com/videojs/video.js/issues/8287)) ([608a585](https://github.com/videojs/video.js/commit/608a585)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370) [#6372](https://github.com/videojs/video.js/issues/6372)
+* Support for nepali language and a small typo fix for hindi language ([#8323](https://github.com/videojs/video.js/issues/8323)) ([4af7461](https://github.com/videojs/video.js/commit/4af7461))
+* text track display overlays a video ([#8009](https://github.com/videojs/video.js/issues/8009)) ([1491d71](https://github.com/videojs/video.js/commit/1491d71))
+* update VHS to v3.9.0 ([#8526](https://github.com/videojs/video.js/issues/8526)) ([fe7cf98](https://github.com/videojs/video.js/commit/fe7cf98))
+* update xhr ([#8757](https://github.com/videojs/video.js/issues/8757)) ([8cfd6c4](https://github.com/videojs/video.js/commit/8cfd6c4))
+
+### Bug Fixes
+
+* ad icon is not visible on audio description track list element on Safari ([#8232](https://github.com/videojs/video.js/issues/8232)) ([52bad2b](https://github.com/videojs/video.js/commit/52bad2b))
+* add additional and remove unused error const ([#8656](https://github.com/videojs/video.js/issues/8656)) ([caf6d30](https://github.com/videojs/video.js/commit/caf6d30))
+* Add skip button text for Spanish ([#8340](https://github.com/videojs/video.js/issues/8340)) ([e2f9231](https://github.com/videojs/video.js/commit/e2f9231))
+* allow captions in devices that use old chrome to be shown ([#8826](https://github.com/videojs/video.js/issues/8826)) ([3e9e4e8](https://github.com/videojs/video.js/commit/3e9e4e8)), closes [1000#0](https://github.com/1000/issues/0)
+* apply correct styles to audio descriptions track menu items  ([#8770](https://github.com/videojs/video.js/issues/8770)) ([f701102](https://github.com/videojs/video.js/commit/f701102)), closes [#8769](https://github.com/videojs/video.js/issues/8769)
+* **big-play-button:** component remains displayed after an error ([#8483](https://github.com/videojs/video.js/issues/8483)) ([6d8af0c](https://github.com/videojs/video.js/commit/6d8af0c))
+* **big-play-button:** component remains displayed when seeking ([#8484](https://github.com/videojs/video.js/issues/8484)) ([92b5e79](https://github.com/videojs/video.js/commit/92b5e79))
+* browser util flagging smart TV as Safari ([#8566](https://github.com/videojs/video.js/issues/8566)) ([14b5fde](https://github.com/videojs/video.js/commit/14b5fde))
+* **build:** Use quoted dbl quotes to support Windows ([#8681](https://github.com/videojs/video.js/issues/8681)) ([3f32de3](https://github.com/videojs/video.js/commit/3f32de3))
+* change http to https in examples ([#8905](https://github.com/videojs/video.js/issues/8905)) ([079cbe1](https://github.com/videojs/video.js/commit/079cbe1))
+* Change requestNamedAnimationFrame to apply last change per frame instead of first ([#8799](https://github.com/videojs/video.js/issues/8799)) ([e715145](https://github.com/videojs/video.js/commit/e715145)), closes [#8633](https://github.com/videojs/video.js/issues/8633) [#8782](https://github.com/videojs/video.js/issues/8782) [1000#0](https://github.com/1000/issues/0)
+* check for closeable() before calling in spatialnavigation ([#8832](https://github.com/videojs/video.js/issues/8832)) ([8c56e31](https://github.com/videojs/video.js/commit/8c56e31))
+* Check for VTTCue ([#8370](https://github.com/videojs/video.js/issues/8370)) ([da15810](https://github.com/videojs/video.js/commit/da15810))
+* **control-bar:** incorrect display when control bar display is locked ([#8435](https://github.com/videojs/video.js/issues/8435)) ([473176f](https://github.com/videojs/video.js/commit/473176f))
+* **docs:** Add workaround for ErrorMetadata typedef ([#8737](https://github.com/videojs/video.js/issues/8737)) ([4de09e4](https://github.com/videojs/video.js/commit/4de09e4))
+* Document Picture-in-Picture: Use width/height instead of initialAspectRatio ([#8270](https://github.com/videojs/video.js/issues/8270)) ([9e1e29d](https://github.com/videojs/video.js/commit/9e1e29d))
+* **dom:** handle slotted parent transform position ([#8158](https://github.com/videojs/video.js/issues/8158)) ([9946a19](https://github.com/videojs/video.js/commit/9946a19))
+* Don't request fullscreen from document PIP window ([#8881](https://github.com/videojs/video.js/issues/8881)) ([077077b](https://github.com/videojs/video.js/commit/077077b)), closes [#8877](https://github.com/videojs/video.js/issues/8877)
+* Don't use copyStyleSheets with documentPIP ([#8314](https://github.com/videojs/video.js/issues/8314)) ([8dd98f6](https://github.com/videojs/video.js/commit/8dd98f6))
+* enable keyboard controls on menu items ([#8777](https://github.com/videojs/video.js/issues/8777)) ([04b9bb2](https://github.com/videojs/video.js/commit/04b9bb2)), closes [/github.com/videojs/video.js/commit/35de64ceb04b4b7dd6be067e275128d02c6d6e91#diff-9fd94576fe3b609171a426feb961b0954d70c8c14e598024d49ae9c8836a71](https://github.com//github.com/videojs/video.js/commit/35de64ceb04b4b7dd6be067e275128d02c6d6e91/issues/diff-9fd94576fe3b609171a426feb961b0954d70c8c14e598024d49ae9c8836a71) [1000#0](https://github.com/1000/issues/0)
+* Ensure aria-labelledby values in track settings are valid ([#8711](https://github.com/videojs/video.js/issues/8711)) ([ad3be35](https://github.com/videojs/video.js/commit/ad3be35))
+* ensure spatial navigation starts without error without an ErrorD… ([#8830](https://github.com/videojs/video.js/issues/8830)) ([73db132](https://github.com/videojs/video.js/commit/73db132)), closes [1000#0](https://github.com/1000/issues/0)
+* ensure transient button event listeners are removed on dispose ([#8796](https://github.com/videojs/video.js/issues/8796)) ([0a836e1](https://github.com/videojs/video.js/commit/0a836e1)), closes [#8795](https://github.com/videojs/video.js/issues/8795) [1000#0](https://github.com/1000/issues/0)
+* error-display ([#8529](https://github.com/videojs/video.js/issues/8529)) ([6eb0230](https://github.com/videojs/video.js/commit/6eb0230))
+* **error-display:** avoids displaying visual components when an error occurs ([#8389](https://github.com/videojs/video.js/issues/8389)) ([42e17b2](https://github.com/videojs/video.js/commit/42e17b2))
+* **error-display:** component remains displayed after player reset ([#8482](https://github.com/videojs/video.js/issues/8482)) ([7972c23](https://github.com/videojs/video.js/commit/7972c23))
+* **error-display:** update display on consecutive errors ([#8485](https://github.com/videojs/video.js/issues/8485)) ([7831046](https://github.com/videojs/video.js/commit/7831046))
+* **error:** chromium reset mediaError when the poster is invalid ([#8410](https://github.com/videojs/video.js/issues/8410)) ([68f1429](https://github.com/videojs/video.js/commit/68f1429)), closes [#8409](https://github.com/videojs/video.js/issues/8409)
+* Fix Escape handling in menus  ([#8916](https://github.com/videojs/video.js/issues/8916)) ([d0cf139](https://github.com/videojs/video.js/commit/d0cf139))
+* Fixes form markup in text track settings ([#8557](https://github.com/videojs/video.js/issues/8557)) ([46c9907](https://github.com/videojs/video.js/commit/46c9907))
+* Fullscreen styles for older Safari ([#8346](https://github.com/videojs/video.js/issues/8346)) ([c11d213](https://github.com/videojs/video.js/commit/c11d213))
+* **i18n:** better Italian translation for "captions" ([#8513](https://github.com/videojs/video.js/issues/8513)) ([4a17426](https://github.com/videojs/video.js/commit/4a17426)), closes [/www.w3.org/Translations/WCAG22-it/#h-note-76](https://github.com//www.w3.org/Translations/WCAG22-it//issues/h-note-76)
+* **i18n:** new italian labels ([#8495](https://github.com/videojs/video.js/issues/8495)) ([8240427](https://github.com/videojs/video.js/commit/8240427))
+* improve ts output for create logger ([#8763](https://github.com/videojs/video.js/issues/8763)) ([86ff612](https://github.com/videojs/video.js/commit/86ff612)), closes [1000#0](https://github.com/1000/issues/0)
+* **jsdoc:** corrections to jsdoc ([#8277](https://github.com/videojs/video.js/issues/8277)) ([3af3638](https://github.com/videojs/video.js/commit/3af3638))
+* **lang:** add skip button text for French ([#8341](https://github.com/videojs/video.js/issues/8341)) ([97ba60f](https://github.com/videojs/video.js/commit/97ba60f))
+* **lang:** add skip button text for Portuguese ([#8342](https://github.com/videojs/video.js/issues/8342)) ([6dac145](https://github.com/videojs/video.js/commit/6dac145))
+* **lang:** Arabic translation grammar, spelling and vocabulary errors ([#8724](https://github.com/videojs/video.js/issues/8724)) ([ad357b5](https://github.com/videojs/video.js/commit/ad357b5))
+* **lang:** Update el.json ([#8848](https://github.com/videojs/video.js/issues/8848)) ([1e2ea61](https://github.com/videojs/video.js/commit/1e2ea61)), closes [1000#0](https://github.com/1000/issues/0)
+* Listen to taps on track controls ([#8809](https://github.com/videojs/video.js/issues/8809)) ([86d29cd](https://github.com/videojs/video.js/commit/86d29cd)), closes [#8808](https://github.com/videojs/video.js/issues/8808) [1000#0](https://github.com/1000/issues/0)
+* **loading-spinner:** border size costumization ([#8369](https://github.com/videojs/video.js/issues/8369)) ([1866118](https://github.com/videojs/video.js/commit/1866118))
+* **loading-spinner:** fix loading spinner responsiveness when default font size is modified ([#8295](https://github.com/videojs/video.js/issues/8295)) ([f075177](https://github.com/videojs/video.js/commit/f075177))
+* lockfile for vhs v3.13.0 ([#8751](https://github.com/videojs/video.js/issues/8751)) ([38198f6](https://github.com/videojs/video.js/commit/38198f6))
+* make compatible with chrome 53 ([#8354](https://github.com/videojs/video.js/issues/8354)) ([c66bf40](https://github.com/videojs/video.js/commit/c66bf40))
+* **middleware:** cache grows even if no middleware created ([#8674](https://github.com/videojs/video.js/issues/8674)) ([6221a8f](https://github.com/videojs/video.js/commit/6221a8f)), closes [#8653](https://github.com/videojs/video.js/issues/8653) [1000#0](https://github.com/1000/issues/0)
+* **package:** update videojs-contrib-quality-levels to 4.0.0 to eliminate deprecation warning ([#8303](https://github.com/videojs/video.js/issues/8303)) ([fab8f95](https://github.com/videojs/video.js/commit/fab8f95))
+* **picture-in-picture-control:** hide the component in non-compatible browsers ([#7899](https://github.com/videojs/video.js/issues/7899)) ([d524e57](https://github.com/videojs/video.js/commit/d524e57))
+* **play-toggle:** missing svg play icon ([#8337](https://github.com/videojs/video.js/issues/8337)) ([b34cb2c](https://github.com/videojs/video.js/commit/b34cb2c)), closes [#8336](https://github.com/videojs/video.js/issues/8336)
+* **player:** adapt player height to control bar height in audioOnly mode ([#8579](https://github.com/videojs/video.js/issues/8579)) ([8050466](https://github.com/videojs/video.js/commit/8050466))
+* **player:** address loss of crossOrigin value when loadMedia is called ([#8085](https://github.com/videojs/video.js/issues/8085)) ([1a1adf3](https://github.com/videojs/video.js/commit/1a1adf3))
+* **player:** cache_.currentTime is not updated when the current time is set ([#8285](https://github.com/videojs/video.js/issues/8285)) ([b782cb0](https://github.com/videojs/video.js/commit/b782cb0)), closes [#6232](https://github.com/videojs/video.js/issues/6232) [#6234](https://github.com/videojs/video.js/issues/6234) [#6370](https://github.com/videojs/video.js/issues/6370) [#6372](https://github.com/videojs/video.js/issues/6372)
+* **player:** load method fails to reset the media element to its initial state when the VHS is used ([#8274](https://github.com/videojs/video.js/issues/8274)) ([35fad1d](https://github.com/videojs/video.js/commit/35fad1d))
+* **player:** reset CSS classes at player.reset ([#8487](https://github.com/videojs/video.js/issues/8487)) ([849098f](https://github.com/videojs/video.js/commit/849098f))
+* **player:** techGet is undefined ([#8256](https://github.com/videojs/video.js/issues/8256)) ([5151bc5](https://github.com/videojs/video.js/commit/5151bc5)), closes [#8255](https://github.com/videojs/video.js/issues/8255)
+* prevent error for root shadow elements when restorEl is enabled ([#8679](https://github.com/videojs/video.js/issues/8679)) ([31b0378](https://github.com/videojs/video.js/commit/31b0378))
+* progress bar sometimes is not filled on 100% ([#8633](https://github.com/videojs/video.js/issues/8633)) ([3e697e9](https://github.com/videojs/video.js/commit/3e697e9))
+* **progress:** mouse-time-display overlaps the play-progress svg icon ([#8338](https://github.com/videojs/video.js/issues/8338)) ([e06465f](https://github.com/videojs/video.js/commit/e06465f))
+* Refactor evented to make mincompatable with Chrome 53 ([#8810](https://github.com/videojs/video.js/issues/8810)) ([a7c9f26](https://github.com/videojs/video.js/commit/a7c9f26)), closes [/github.com/videojs/video.js/blob/e78bcc7b2d829fce01451cf105b918d8feec4548/src/js/mixins/evented.js#L165-L195](https://github.com//github.com/videojs/video.js/blob/e78bcc7b2d829fce01451cf105b918d8feec4548/src/js/mixins/evented.js/issues/L165-L195) [#8783](https://github.com/videojs/video.js/issues/8783) [1000#0](https://github.com/1000/issues/0)
+* Remove Firefox warnings about deprecated event props ([#8736](https://github.com/videojs/video.js/issues/8736)) ([084af2f](https://github.com/videojs/video.js/commit/084af2f))
+* removes duplicate id in text track settings ([#8755](https://github.com/videojs/video.js/issues/8755)) ([a10d258](https://github.com/videojs/video.js/commit/a10d258)), closes [#8754](https://github.com/videojs/video.js/issues/8754) [1000#0](https://github.com/1000/issues/0)
+* Replace Object.values with ponyfill ([#8267](https://github.com/videojs/video.js/issues/8267)) ([866ef24](https://github.com/videojs/video.js/commit/866ef24)), closes [#8266](https://github.com/videojs/video.js/issues/8266)
+* Resolves captions sizing issue when minified ([#8442](https://github.com/videojs/video.js/issues/8442)) ([9267c46](https://github.com/videojs/video.js/commit/9267c46))
+* revert resolveJsonModule in tsconfig ([#8310](https://github.com/videojs/video.js/issues/8310)) ([8f32b9f](https://github.com/videojs/video.js/commit/8f32b9f))
+* **seek-bar:** error when scrubbing after player reset ([#8257](https://github.com/videojs/video.js/issues/8257)) ([e73e05d](https://github.com/videojs/video.js/commit/e73e05d))
+* **shadow-dom:** prevent warning 'element supplied is not included' ([#8192](https://github.com/videojs/video.js/issues/8192)) ([dc1e2bb](https://github.com/videojs/video.js/commit/dc1e2bb))
+* **skip-forward:** a11y ([#8532](https://github.com/videojs/video.js/issues/8532)) ([af0fca3](https://github.com/videojs/video.js/commit/af0fca3))
+* **skip-forward:** error when clicking after player reset ([#8258](https://github.com/videojs/video.js/issues/8258)) ([07effdf](https://github.com/videojs/video.js/commit/07effdf))
+* **spatial-navigation:** focus lost in error modal ([#8817](https://github.com/videojs/video.js/issues/8817)) ([daf40bd](https://github.com/videojs/video.js/commit/daf40bd)), closes [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** keep navigation going when player has an error ([#8805](https://github.com/videojs/video.js/issues/8805)) ([76e99b7](https://github.com/videojs/video.js/commit/76e99b7)), closes [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** refocus available also to the close button of the error modal ([#8819](https://github.com/videojs/video.js/issues/8819)) ([45570d9](https://github.com/videojs/video.js/commit/45570d9)), closes [1000#0](https://github.com/1000/issues/0)
+* Support MacOS trackpad with tap-to-click ([#8700](https://github.com/videojs/video.js/issues/8700)) ([cb76a24](https://github.com/videojs/video.js/commit/cb76a24))
+* **svg-icons:** default icons color ([#8382](https://github.com/videojs/video.js/issues/8382)) ([b95cd7a](https://github.com/videojs/video.js/commit/b95cd7a))
+* **svg-icons:** icon size consistency  ([#8380](https://github.com/videojs/video.js/issues/8380)) ([d040881](https://github.com/videojs/video.js/commit/d040881))
+* **tests:** Fixes for old Safari ([#8368](https://github.com/videojs/video.js/issues/8368)) ([6fc1fd4](https://github.com/videojs/video.js/commit/6fc1fd4))
+* **tests:** Skip a test on old Safari ([#8356](https://github.com/videojs/video.js/issues/8356)) ([452a918](https://github.com/videojs/video.js/commit/452a918))
+* **text-track-settings:** fix text track settings responsiveness when default font size is modified ([#8294](https://github.com/videojs/video.js/issues/8294)) ([3dece50](https://github.com/videojs/video.js/commit/3dece50))
+* **text-track-settings:** localization not correctly applied ([#8904](https://github.com/videojs/video.js/issues/8904)) ([ecef37c](https://github.com/videojs/video.js/commit/ecef37c))
+* **text:** caption settings typo ([560b81a](https://github.com/videojs/video.js/commit/560b81a))
+* time tooltip truncated ([#8527](https://github.com/videojs/video.js/issues/8527)) ([50f14bd](https://github.com/videojs/video.js/commit/50f14bd))
+* **title-bar:** component remains displayed after player reset ([#8481](https://github.com/videojs/video.js/issues/8481)) ([161a09c](https://github.com/videojs/video.js/commit/161a09c))
+* **types:** Add has|usingPlugin to typedef by adding stubs which are removed from builds ([#8811](https://github.com/videojs/video.js/issues/8811)) ([820ef38](https://github.com/videojs/video.js/commit/820ef38)), closes [1000#0](https://github.com/1000/issues/0)
+* **types:** ensure toggleClass's second arg is optional ([#8829](https://github.com/videojs/video.js/issues/8829)) ([65f8546](https://github.com/videojs/video.js/commit/65f8546)), closes [1000#0](https://github.com/1000/issues/0)
+* **types:** fix and improve component ready callback definition ([#8766](https://github.com/videojs/video.js/issues/8766)) ([970faa8](https://github.com/videojs/video.js/commit/970faa8)), closes [1000#0](https://github.com/1000/issues/0)
+* **types:** improves quality of typescript definitions ([#8218](https://github.com/videojs/video.js/issues/8218)) ([781eb43](https://github.com/videojs/video.js/commit/781eb43))
+* **types:** Minor fix for types ([#8466](https://github.com/videojs/video.js/issues/8466)) ([a6a0f57](https://github.com/videojs/video.js/commit/a6a0f57))
+* **types:** use typeof for registerComponent and registerPlugin ([#8451](https://github.com/videojs/video.js/issues/8451)) ([2c36d25](https://github.com/videojs/video.js/commit/2c36d25))
+* typo in error const ([#8628](https://github.com/videojs/video.js/issues/8628)) ([b59a89b](https://github.com/videojs/video.js/commit/b59a89b))
+* update to VHS v3.13.1 ([#8765](https://github.com/videojs/video.js/issues/8765)) ([864074d](https://github.com/videojs/video.js/commit/864074d))
+* update VHS to v3.14.1 ([#8860](https://github.com/videojs/video.js/issues/8860)) ([c8e546f](https://github.com/videojs/video.js/commit/c8e546f)), closes [1000#0](https://github.com/1000/issues/0)
+* update vhs version ([#8704](https://github.com/videojs/video.js/issues/8704)) ([8699deb](https://github.com/videojs/video.js/commit/8699deb))
+* use backup styles when inset is not supported ([#8844](https://github.com/videojs/video.js/issues/8844)) ([1d771d9](https://github.com/videojs/video.js/commit/1d771d9))
+* use guid to ensure uniqueness of track setting options ([#8762](https://github.com/videojs/video.js/issues/8762)) ([f4186a0](https://github.com/videojs/video.js/commit/f4186a0)), closes [#8761](https://github.com/videojs/video.js/issues/8761) [1000#0](https://github.com/1000/issues/0)
+* **videojs:** missing return in registerComponent ([#8247](https://github.com/videojs/video.js/issues/8247)) ([f1558c6](https://github.com/videojs/video.js/commit/f1558c6))
+
+### Chores
+
+* Add action to validate PR titles ([#8614](https://github.com/videojs/video.js/issues/8614)) ([04d10ef](https://github.com/videojs/video.js/commit/04d10ef))
+* add contrib-eme errors ([#8634](https://github.com/videojs/video.js/issues/8634)) ([42fe1e6](https://github.com/videojs/video.js/commit/42fe1e6))
+* Added Azerbaijani language ([#8472](https://github.com/videojs/video.js/issues/8472)) ([8cdb228](https://github.com/videojs/video.js/commit/8cdb228))
+* additional vjs ad errors ([#8623](https://github.com/videojs/video.js/issues/8623)) ([7ed47de](https://github.com/videojs/video.js/commit/7ed47de))
+* **css:** fix typo in postcss-config browserslist and update list ([#8578](https://github.com/videojs/video.js/issues/8578)) ([3df0e9b](https://github.com/videojs/video.js/commit/3df0e9b))
+* Fixed an incomplete sentence in contributing guide ([#8471](https://github.com/videojs/video.js/issues/8471)) ([f7b1e3d](https://github.com/videojs/video.js/commit/f7b1e3d))
+* **package:** bump VHS version from 3.3.1 to 3.5.3 ([#8400](https://github.com/videojs/video.js/issues/8400)) ([9aff3de](https://github.com/videojs/video.js/commit/9aff3de))
+* **package:** update http-streaming to v3.15.0 ([#8889](https://github.com/videojs/video.js/issues/8889)) ([84f4905](https://github.com/videojs/video.js/commit/84f4905))
+* **package:** update quality-levels version ([#8630](https://github.com/videojs/video.js/issues/8630)) ([d113ce5](https://github.com/videojs/video.js/commit/d113ce5))
+* **package:** update to http-streaming v3.3.1 ([#8279](https://github.com/videojs/video.js/issues/8279)) ([53dfca4](https://github.com/videojs/video.js/commit/53dfca4))
+* **package:** Update to VHS v3.14.2 ([#8869](https://github.com/videojs/video.js/issues/8869)) ([89eb454](https://github.com/videojs/video.js/commit/89eb454))
+* **package:** Update VHS version ([#8447](https://github.com/videojs/video.js/issues/8447)) ([372b816](https://github.com/videojs/video.js/commit/372b816))
+* remove legacy prefixes ([#8276](https://github.com/videojs/video.js/issues/8276)) ([665154f](https://github.com/videojs/video.js/commit/665154f))
+* remove plugin errors from error const ([#8706](https://github.com/videojs/video.js/issues/8706)) ([466fa97](https://github.com/videojs/video.js/commit/466fa97))
+* Remove safe-json-parse ([#8790](https://github.com/videojs/video.js/issues/8790)) ([3380d33](https://github.com/videojs/video.js/commit/3380d33)), closes [1000#0](https://github.com/1000/issues/0)
+* Remove unused type.js file ([#8658](https://github.com/videojs/video.js/issues/8658)) ([4ccedc1](https://github.com/videojs/video.js/commit/4ccedc1))
+* **types:** fix issues in exported types ([#8333](https://github.com/videojs/video.js/issues/8333)) ([bad086d](https://github.com/videojs/video.js/commit/bad086d))
+* update GitHub Actions version and remove xvfb ([#8682](https://github.com/videojs/video.js/issues/8682)) ([af06f50](https://github.com/videojs/video.js/commit/af06f50))
+* update http-streaming to v3.11.1 ([#8584](https://github.com/videojs/video.js/issues/8584)) ([7f7e2a3](https://github.com/videojs/video.js/commit/7f7e2a3))
+* update http-streaming to v3.13.3 ([#8827](https://github.com/videojs/video.js/issues/8827)) ([790078b](https://github.com/videojs/video.js/commit/790078b))
+* Update karma dependenciess ([#8743](https://github.com/videojs/video.js/issues/8743)) ([42e167c](https://github.com/videojs/video.js/commit/42e167c))
+* update mpd-parser & m3u8-parser dependencies ([#8494](https://github.com/videojs/video.js/issues/8494)) ([3c110f0](https://github.com/videojs/video.js/commit/3c110f0))
+* update mpd-parser to v1.3.1 ([#8888](https://github.com/videojs/video.js/issues/8888)) ([7c17d75](https://github.com/videojs/video.js/commit/7c17d75))
+* update pip enter event with window metadata ([#8591](https://github.com/videojs/video.js/issues/8591)) ([4c1f63b](https://github.com/videojs/video.js/commit/4c1f63b))
+* update playbackRates jsdoc ([#8583](https://github.com/videojs/video.js/issues/8583)) ([395d608](https://github.com/videojs/video.js/commit/395d608))
+* update player public interface for types visibility ([#8525](https://github.com/videojs/video.js/issues/8525)) ([1fff5c0](https://github.com/videojs/video.js/commit/1fff5c0))
+* Update PR template ([#8750](https://github.com/videojs/video.js/issues/8750)) ([c5f548b](https://github.com/videojs/video.js/commit/c5f548b))
+* update to http-streaming v3.10.0 ([#8558](https://github.com/videojs/video.js/issues/8558)) ([eebcc07](https://github.com/videojs/video.js/commit/eebcc07))
+* Update typescript to 5.5.2 ([#8776](https://github.com/videojs/video.js/issues/8776)) ([fa9c41c](https://github.com/videojs/video.js/commit/fa9c41c))
+* update version number in readme on release ([#8840](https://github.com/videojs/video.js/issues/8840)) ([5fac9e1](https://github.com/videojs/video.js/commit/5fac9e1))
+* update VHS and mux.js versions ([#8462](https://github.com/videojs/video.js/issues/8462)) ([9701de9](https://github.com/videojs/video.js/commit/9701de9))
+* update vhs to 3.11.2 ([#8603](https://github.com/videojs/video.js/issues/8603)) ([ac2eb84](https://github.com/videojs/video.js/commit/ac2eb84))
+* Update VHS to 3.14.0, and its dependencies ([#8839](https://github.com/videojs/video.js/issues/8839)) ([1128425](https://github.com/videojs/video.js/commit/1128425)), closes [1000#0](https://github.com/1000/issues/0)
+* update vhs to 3.9.1 ([#8539](https://github.com/videojs/video.js/issues/8539)) ([17506b1](https://github.com/videojs/video.js/commit/17506b1))
+* update VHS to v3.12.0 ([#8637](https://github.com/videojs/video.js/issues/8637)) ([66b74eb](https://github.com/videojs/video.js/commit/66b74eb))
+* update VHS to v3.12.1 ([#8687](https://github.com/videojs/video.js/issues/8687)) ([12310ed](https://github.com/videojs/video.js/commit/12310ed))
+* update VHS to v3.13.0 ([#8742](https://github.com/videojs/video.js/issues/8742)) ([978731e](https://github.com/videojs/video.js/commit/978731e))
+* update vhs version ([#8621](https://github.com/videojs/video.js/issues/8621)) ([1f76abd](https://github.com/videojs/video.js/commit/1f76abd))
+* update vhs version 3.13.2 ([#8812](https://github.com/videojs/video.js/issues/8812)) ([49151ee](https://github.com/videojs/video.js/commit/49151ee)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Code Refactoring
+
+* Reorder SASS styles to address deprecation ([#8821](https://github.com/videojs/video.js/issues/8821)) ([57c27f8](https://github.com/videojs/video.js/commit/57c27f8)), closes [1000#0](https://github.com/1000/issues/0)
+* Replace keycode dependency with event.key ([#8735](https://github.com/videojs/video.js/issues/8735)) ([35de64c](https://github.com/videojs/video.js/commit/35de64c))
+* use URL API ([#8716](https://github.com/videojs/video.js/issues/8716)) ([992af3b](https://github.com/videojs/video.js/commit/992af3b))
+
+### Documentation
+
+* Refresh README.md and point other docs to admin repo ([#8837](https://github.com/videojs/video.js/issues/8837)) ([f0db8f1](https://github.com/videojs/video.js/commit/f0db8f1))
+* update version number in README.md ([#8271](https://github.com/videojs/video.js/issues/8271)) ([20df248](https://github.com/videojs/video.js/commit/20df248))
+
+### Tests
+
+* fix Safari test failures ([#8300](https://github.com/videojs/video.js/issues/8300)) ([9e5dd81](https://github.com/videojs/video.js/commit/9e5dd81))
+
+<a name="8.19.1"></a>
+## [8.19.1](https://github.com/videojs/video.js/compare/v8.19.0...v8.19.1) (2024-10-10)
+
+### Chores
+
+* **package:** update http-streaming to v3.15.0 ([#8889](https://github.com/videojs/video.js/issues/8889)) ([84f4905](https://github.com/videojs/video.js/commit/84f4905))
+* update mpd-parser to v1.3.1 ([#8888](https://github.com/videojs/video.js/issues/8888)) ([7c17d75](https://github.com/videojs/video.js/commit/7c17d75))
+
+<a name="8.19.0"></a>
+# [8.19.0](https://github.com/videojs/video.js/compare/v8.18.0...v8.19.0) (2024-10-09)
+
+### Features
+
+* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Bug Fixes
+
+* Don't request fullscreen from document PIP window ([#8881](https://github.com/videojs/video.js/issues/8881)) ([077077b](https://github.com/videojs/video.js/commit/077077b)), closes [#8877](https://github.com/videojs/video.js/issues/8877)
+
+### Chores
+
+* **package:** Update to VHS v3.14.2 ([#8869](https://github.com/videojs/video.js/issues/8869)) ([89eb454](https://github.com/videojs/video.js/commit/89eb454))
+
+<a name="8.18.1"></a>
+## [8.18.1](https://github.com/videojs/video.js/compare/v8.18.0...v8.18.1) (2024-09-17)
+
+### Chores
+
+* **package:** Update to VHS v3.14.2 ([#8869](https://github.com/videojs/video.js/issues/8869)) ([89eb454](https://github.com/videojs/video.js/commit/89eb454))
+
+<a name="8.18.0"></a>
+# [8.18.0](https://github.com/videojs/video.js/compare/v8.17.4...v8.18.0) (2024-09-10)
+
+### Features
+
+* add class to normalise time control display ([#8833](https://github.com/videojs/video.js/issues/8833)) ([5e6b536](https://github.com/videojs/video.js/commit/5e6b536)), closes [#8534](https://github.com/videojs/video.js/issues/8534) [1000#0](https://github.com/1000/issues/0)
+
+### Bug Fixes
+
+* check for closeable() before calling in spatialnavigation ([#8832](https://github.com/videojs/video.js/issues/8832)) ([8c56e31](https://github.com/videojs/video.js/commit/8c56e31))
+* **lang:** Update el.json ([#8848](https://github.com/videojs/video.js/issues/8848)) ([1e2ea61](https://github.com/videojs/video.js/commit/1e2ea61)), closes [1000#0](https://github.com/1000/issues/0)
+* update VHS to v3.14.1 ([#8860](https://github.com/videojs/video.js/issues/8860)) ([c8e546f](https://github.com/videojs/video.js/commit/c8e546f)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Chores
+
+* update version number in readme on release ([#8840](https://github.com/videojs/video.js/issues/8840)) ([5fac9e1](https://github.com/videojs/video.js/commit/5fac9e1))
+* Update VHS to 3.14.0, and its dependencies ([#8839](https://github.com/videojs/video.js/issues/8839)) ([1128425](https://github.com/videojs/video.js/commit/1128425)), closes [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.17.4"></a>
+## [8.17.4](https://github.com/videojs/video.js/compare/v8.17.3...v8.17.4) (2024-08-27)
+
+### Bug Fixes
+
+* allow captions in devices that use old chrome to be shown ([#8826](https://github.com/videojs/video.js/issues/8826)) ([3e9e4e8](https://github.com/videojs/video.js/commit/3e9e4e8)), closes [1000#0](https://github.com/1000/issues/0)
+* Change requestNamedAnimationFrame to apply last change per frame instead of first ([#8799](https://github.com/videojs/video.js/issues/8799)) ([e715145](https://github.com/videojs/video.js/commit/e715145)), closes [#8633](https://github.com/videojs/video.js/issues/8633) [#8782](https://github.com/videojs/video.js/issues/8782) [1000#0](https://github.com/1000/issues/0)
+* ensure spatial navigation starts without error without an ErrorD… ([#8830](https://github.com/videojs/video.js/issues/8830)) ([73db132](https://github.com/videojs/video.js/commit/73db132)), closes [1000#0](https://github.com/1000/issues/0)
+* **types:** Add has|usingPlugin to typedef by adding stubs which are removed from builds ([#8811](https://github.com/videojs/video.js/issues/8811)) ([820ef38](https://github.com/videojs/video.js/commit/820ef38)), closes [1000#0](https://github.com/1000/issues/0)
+* **types:** ensure toggleClass's second arg is optional ([#8829](https://github.com/videojs/video.js/issues/8829)) ([65f8546](https://github.com/videojs/video.js/commit/65f8546)), closes [1000#0](https://github.com/1000/issues/0)
+* use backup styles when inset is not supported ([#8844](https://github.com/videojs/video.js/issues/8844)) ([1d771d9](https://github.com/videojs/video.js/commit/1d771d9))
+
+### Chores
+
+* Remove safe-json-parse ([#8790](https://github.com/videojs/video.js/issues/8790)) ([3380d33](https://github.com/videojs/video.js/commit/3380d33)), closes [1000#0](https://github.com/1000/issues/0)
+* update http-streaming to v3.13.3 ([#8827](https://github.com/videojs/video.js/issues/8827)) ([790078b](https://github.com/videojs/video.js/commit/790078b))
+
+### Code Refactoring
+
+* Reorder SASS styles to address deprecation ([#8821](https://github.com/videojs/video.js/issues/8821)) ([57c27f8](https://github.com/videojs/video.js/commit/57c27f8)), closes [1000#0](https://github.com/1000/issues/0)
+
+### Documentation
+
+* Refresh README.md and point other docs to admin repo ([#8837](https://github.com/videojs/video.js/issues/8837)) ([f0db8f1](https://github.com/videojs/video.js/commit/f0db8f1))
+
+<a name="8.17.3"></a>
+## [8.17.3](https://github.com/videojs/video.js/compare/v8.17.2...v8.17.3) (2024-07-30)
+
+### Bug Fixes
+
+* Listen to taps on track controls ([#8809](https://github.com/videojs/video.js/issues/8809)) ([86d29cd](https://github.com/videojs/video.js/commit/86d29cd)), closes [#8808](https://github.com/videojs/video.js/issues/8808) [1000#0](https://github.com/1000/issues/0)
+* Refactor evented to make mincompatable with Chrome 53 ([#8810](https://github.com/videojs/video.js/issues/8810)) ([a7c9f26](https://github.com/videojs/video.js/commit/a7c9f26)), closes [/github.com/videojs/video.js/blob/e78bcc7b2d829fce01451cf105b918d8feec4548/src/js/mixins/evented.js#L165-L195](https://github.com//github.com/videojs/video.js/blob/e78bcc7b2d829fce01451cf105b918d8feec4548/src/js/mixins/evented.js/issues/L165-L195) [#8783](https://github.com/videojs/video.js/issues/8783) [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** focus lost in error modal ([#8817](https://github.com/videojs/video.js/issues/8817)) ([daf40bd](https://github.com/videojs/video.js/commit/daf40bd)), closes [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** keep navigation going when player has an error ([#8805](https://github.com/videojs/video.js/issues/8805)) ([76e99b7](https://github.com/videojs/video.js/commit/76e99b7)), closes [1000#0](https://github.com/1000/issues/0)
+* **spatial-navigation:** refocus available also to the close button of the error modal ([#8819](https://github.com/videojs/video.js/issues/8819)) ([45570d9](https://github.com/videojs/video.js/commit/45570d9)), closes [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.17.2"></a>
+## [8.17.2](https://github.com/videojs/video.js/compare/v8.17.1...v8.17.2) (2024-07-22)
+
+### Chores
+
+* update vhs version 3.13.2 ([#8812](https://github.com/videojs/video.js/issues/8812)) ([49151ee](https://github.com/videojs/video.js/commit/49151ee)), closes [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.17.1"></a>
+## [8.17.1](https://github.com/videojs/video.js/compare/v8.17.0...v8.17.1) (2024-07-15)
+
+### Bug Fixes
+
+* ensure transient button event listeners are removed on dispose ([#8796](https://github.com/videojs/video.js/issues/8796)) ([0a836e1](https://github.com/videojs/video.js/commit/0a836e1)), closes [#8795](https://github.com/videojs/video.js/issues/8795) [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.17.0"></a>
 # [8.17.0](https://github.com/videojs/video.js/compare/v8.16.1...v8.17.0) (2024-07-10)
 

@@ -87,7 +87,7 @@ class TextTrackFieldset extends Component {
         const label = Dom.createEl('label', {
           id,
           className: 'vjs-label',
-          textContent: selectConfig.label
+          textContent: this.localize(selectConfig.label)
         });
 
         label.setAttribute('for', guid);

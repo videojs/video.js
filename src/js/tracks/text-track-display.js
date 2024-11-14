@@ -5,6 +5,7 @@ import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
+import * as browser from '../utils/browser';
 
 /** @import Player from '../player' */
 
@@ -318,6 +319,42 @@ class TextTrackDisplay extends Component {
         this.setAttribute('aria-live', 'assertive');
       }
       this.updateForTrack(descriptionsTrack);
+    }
+
+    if (!window.CSS.supports('inset', '10px')) {
+      const textTrackDisplay = this.el_;
+      const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
+      const controlBarHeight = this.player_.controlBar.el_.getBoundingClientRect().height;
+      const playerHeight = this.player_.el_.getBoundingClientRect().height;
+
+      // Clear inline style before getting actual height of textTrackDisplay
+      textTrackDisplay.style = '';
+
+      // textrack style updates, this styles are required to be inline
+      tryUpdateStyle(textTrackDisplay, 'position', 'relative');
+      tryUpdateStyle(textTrackDisplay, 'height', (playerHeight - controlBarHeight) + 'px');
+      tryUpdateStyle(textTrackDisplay, 'top', 'unset');
+
+      if (browser.IS_SMART_TV) {
+        tryUpdateStyle(textTrackDisplay, 'bottom', playerHeight + 'px');
+      } else {
+        tryUpdateStyle(textTrackDisplay, 'bottom', '0px');
+      }
+
+      // vjsTextTrackCue style updates
+      if (vjsTextTrackCues.length > 0) {
+        vjsTextTrackCues.forEach((vjsTextTrackCue) => {
+          // verify if inset styles are inline
+          if (vjsTextTrackCue.style.inset) {
+            const insetStyles = vjsTextTrackCue.style.inset.split(' ');
+
+            // expected value is always 3
+            if (insetStyles.length === 3) {
+              Object.assign(vjsTextTrackCue.style, { top: insetStyles[0], right: insetStyles[1], bottom: insetStyles[2], left: 'unset' });
+            }
+          }
+        });
+      }
     }
   }
 

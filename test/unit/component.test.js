@@ -1377,7 +1377,7 @@ QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific n
 
   comp.requestNamedAnimationFrame(name, handlerTwo);
 
-  assert.deepEqual(cancelNames, [], 'no named cancels');
+  assert.deepEqual(cancelNames, ['testing'], 'one handler was cancelled');
   assert.equal(comp.namedRafs_.size, 1, 'still only one named raf');
   assert.equal(comp.rafIds_.size, 1, 'still only one raf id');
 
@@ -1386,16 +1386,16 @@ QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific n
   assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
   assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
   assert.deepEqual(calls, {
-    one: 1,
-    two: 0,
+    one: 0,
+    two: 1,
     three: 0
-  }, 'only handlerOne was called');
+  }, 'only handlerTwo was called');
 
   comp.requestNamedAnimationFrame(name, handlerOne);
   comp.requestNamedAnimationFrame(name, handlerTwo);
   comp.requestNamedAnimationFrame(name, handlerThree);
 
-  assert.deepEqual(cancelNames, [], 'no named cancels for testing');
+  assert.deepEqual(cancelNames, ['testing', 'testing', 'testing'], 'two more cancels');
   assert.equal(comp.namedRafs_.size, 1, 'only added one named raf');
   assert.equal(comp.rafIds_.size, 1, 'only added one named raf');
 
@@ -1404,10 +1404,10 @@ QUnit.test('requestNamedAnimationFrame should only allow one raf of a specific n
   assert.equal(comp.namedRafs_.size, 0, 'we removed a named raf');
   assert.equal(comp.rafIds_.size, 0, 'we removed a raf id');
   assert.deepEqual(calls, {
-    one: 2,
-    two: 0,
-    three: 0
-  }, 'only the handlerOne called');
+    one: 0,
+    two: 1,
+    three: 1
+  }, 'now handlerThree has also been called');
 
   window.requestAnimationFrame = oldRAF;
   window.cancelAnimationFrame = oldCAF;

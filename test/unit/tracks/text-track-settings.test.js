@@ -2,7 +2,6 @@
 import TextTrackSettings from '../../../src/js/tracks/text-track-settings.js';
 import TestHelpers from '../test-helpers.js';
 import * as Events from '../../../src/js/utils/events.js';
-import safeParseTuple from 'safe-json-parse/tuple';
 import sinon from 'sinon';
 import window from 'global/window';
 import Component from '../../../src/js/component.js';
@@ -120,7 +119,7 @@ QUnit.test('should update settings', function(assert) {
   Events.trigger(player.$('.vjs-done-button'), 'click');
 
   assert.deepEqual(
-    safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'))[1],
+    JSON.parse(window.localStorage.getItem('vjs-text-track-settings')),
     newSettings,
     'values are saved'
   );
@@ -376,10 +375,16 @@ QUnit.test('should update on languagechange', function(assert) {
     tracks
   });
 
-  videojs.addLanguage('test', {'Font Size': 'FONTSIZE'});
+  videojs.addLanguage('test', {
+    'Font Size': 'FONTSIZE',
+    'Color': 'COLOR',
+    'White': 'WHITE'
+  });
   player.language('test');
 
   assert.equal(player.$('.vjs-font-percent legend').textContent, 'FONTSIZE', 'settings dialog updates on languagechange');
+  assert.equal(player.$('.vjs-text-color label').textContent, 'COLOR', 'settings dialog label updates on languagechange');
+  assert.equal(player.$('.vjs-text-color select option').textContent, 'WHITE', 'settings dialog select updates on languagechange');
 
   player.dispose();
 });

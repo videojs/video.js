@@ -5,6 +5,7 @@ import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import document from 'global/document';
 import TextTrackSelect from '../../src/js/tracks/text-track-select';
+import * as Dom from '../../src/js/utils/dom.js';
 
 QUnit.module('SpatialNavigation', {
   beforeEach() {
@@ -490,4 +491,132 @@ QUnit.test('should call `searchForTrackSelect()` if spatial navigation is enable
   this.spatialNav.handlePlayerBlur_(clickEvent);
 
   assert.ok(trackSelectSpy.calledOnce);
+});
+
+QUnit.test('error on player calls updateFocusableComponents', function(assert) {
+  const updateFocusableComponentsSpy = sinon.spy(this.spatialNav, 'updateFocusableComponents');
+
+  this.spatialNav.start();
+
+  this.player.error('Error 1');
+
+  assert.ok(updateFocusableComponentsSpy.calledOnce, 'on error event spatial navigation should call "updateFocusableComponents"');
+});
+
+QUnit.test('error on player focus the second focusable element of error modal', function(assert) {
+  this.spatialNav.start();
+
+  const firstComponent = {
+    name: () => 'firstComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  const secondComponent = {
+    name: () => 'secondComponent',
+    el: () => document.createElement('div'),
+    focus: sinon.spy(),
+    getIsAvailableToBeFocused: () => true
+  };
+
+  this.spatialNav.focusableComponents = [firstComponent, secondComponent];
+  this.spatialNav.getCurrentComponent = () => firstComponent;
+  this.spatialNav.updateFocusableComponents = () => [firstComponent, secondComponent];
+
+  this.player.error({
+    code: 1,
+    dismiss: true
+  });
+
+  assert.ok(secondComponent.focus.calledOnce, 'Focus should move to the second component');
+  assert.notOk(firstComponent.focus.called, 'Focus should not remain on the first component');
+});
+
+QUnit.test('on error, modalButtons should get the buttons if those are available', function(assert) {
+  this.spatialNav.start();
+
+  const buttonContainer = Dom.createEl('div', {}, {class: 'vjs-errors-ok-button-container'});
+
+  const testEl1 = Dom.createEl('button', {}, {class: 'c1'});
+
+  // Add first element to error modal
+  buttonContainer.appendChild(testEl1);
+
+  const testEl2 = Dom.createEl('button', {}, {class: 'c1'});
+
+  // Add second element to error modal
+  buttonContainer.appendChild(testEl2);
+  this.player.errorDisplay.el().appendChild(buttonContainer);
+
+  this.player.error({
+    code: 1,
+    dismiss: true
+  });
+
+  this.spatialNav.getCurrentComponent = () => this.spatialNav.focusableComponents[0];
+
+  const getPositionsEl1Spy = sinon.spy(this.spatialNav.focusableComponents[0], 'getPositions');
+  const getPositionsEl2Spy = sinon.spy(this.spatialNav.focusableComponents[1], 'getPositions');
+
+  this.spatialNav.move('left');
+
+  assert.strictEqual(this.spatialNav.focusableComponents.length, 2, 'button elements are now part of the array of focusableComponents');
+  assert.ok(getPositionsEl1Spy.calledOnce, 'getPositions method called on button');
+  assert.ok(getPositionsEl2Spy.calledOnce, 'getPositions method called on button');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].name(), 'ModalButton1', 'testEl1 name should be ModalButton1');
+  assert.strictEqual(this.spatialNav.focusableComponents[1].name(), 'ModalButton2', 'testEl2 name should be ModalButton2');
+
+  getPositionsEl1Spy.restore();
+  getPositionsEl2Spy.restore();
+});
+
+QUnit.test('on error, modalButtons added functions should work properly', function(assert) {
+  this.spatialNav.start();
+
+  const buttonContainer = Dom.createEl('div', {}, {class: 'vjs-errors-ok-button-container'});
+
+  const testEl1 = Dom.createEl('button', {}, {class: 'c1'});
+
+  // Add first element to error modal
+  buttonContainer.appendChild(testEl1);
+
+  this.player.errorDisplay.el().appendChild(buttonContainer);
+
+  this.player.error({ code: 1, dismiss: true });
+
+  assert.strictEqual(this.spatialNav.focusableComponents[0].el() instanceof Element, true, 'el function from modal buttons should return a DOM element'); // eslint-disable-line no-undef
+  assert.strictEqual(this.spatialNav.focusableComponents[0].getIsFocusable(), true, 'getIsFocusable function from modal buttons is always true');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].getIsAvailableToBeFocused(), true, 'getIsAvailableToBeFocused function from modal buttons is always true');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].getIsAvailableToBeFocused(), true, 'getIsAvailableToBeFocused function from modal buttons is always true');
+  assert.strictEqual(typeof this.spatialNav.focusableComponents[0].getPositions(), 'object', 'focusableComponents function from modal buttons should return an object');
+});
+
+QUnit.test('If component passes the required functions it should be added to focusableComponents', function(assert) {
+  this.spatialNav.start();
+
+  const firstComponent = {
+    name_: 'firstComponent',
+    name: () => this.name,
+    el_: document.createElement('div'),
+    el: () => this.el_,
+    focus: sinon.spy(),
+    getIsAvailableToBeFocused: () => true,
+    getIsFocusable: () => true
+  };
+
+  this.player.children_.push(firstComponent);
+  this.spatialNav.getCurrentComponent = () => firstComponent;
+  this.spatialNav.updateFocusableComponents();
+
+  assert.strictEqual(this.spatialNav.focusableComponents.length, 1, 'focusableComponents array should have 1 component');
+  assert.strictEqual(this.spatialNav.focusableComponents[0].name_, 'firstComponent', 'the name of the component in focusableComponents array should be "firstComponent"');
+});
+
+QUnit.test('Doesn\'t error if no ErrorDisplay component is present', function(assert) {
+  this.player.errorDisplay.dispose();
+  delete this.player.errorDisplay;
+
+  this.spatialNav.start();
+  assert.ok(true, 'started without throwing when errorDisplay not present');
 });
