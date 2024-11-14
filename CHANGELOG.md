@@ -1,5 +1,5 @@
 <a name="8.19.2"></a>
-## [8.19.2](https://github.com/videojs/video.js/compare/v8.3.0...v8.19.2) (2024-11-14)
+## [8.19.2](https://github.com/videojs/video.js/compare/v8.19.1...v8.19.2) (2024-11-14)
 
 ### Bug Fixes
 
