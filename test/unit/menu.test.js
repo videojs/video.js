@@ -235,7 +235,7 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
 
     assert.ok(clickListenerSpy.calledOnce, 'click event listener should be called');
     assert.strictEqual(clickListenerSpy.getCall(0).args[0].target, menuItem.el(), 'event target should be the `menuItem`');
-    assert.ok(unpressButtonSpy.calledOnce, '`menuButton`.`unpressButtion` has been called');
+    assert.ok(unpressButtonSpy.calledOnce, '`menuButton`.`unpressButton` has been called');
     assert.ok(focusSpy.calledOnce, '`menuButton`.`focus` has been called');
 
     unpressButtonSpy.restore();
@@ -264,4 +264,22 @@ QUnit.test('should remove old event listeners when the menu item adds to the new
   newMenu.dispose();
   oldMenu.dispose();
   menuButton.dispose();
+});
+
+QUnit.test('Escape should close menu', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const menuButton = new MenuButton(player, {});
+  const unpressButtonSpy = sinon.spy(menuButton, 'unpressButton');
+
+  menuButton.createItems = () => [new MenuItem(player, {})];
+  menuButton.update();
+  menuButton.handleClick(new window.PointerEvent('click'));
+  menuButton.menu.children()[0].el_.dispatchEvent(new window.KeyboardEvent('keydown', {
+    key: 'Escape',
+    bubbles: true,
+    cancelable: true
+  }));
+
+  assert.ok(unpressButtonSpy.calledOnce, '`menuButton`.`unpressButton` has been called');
+
 });
