@@ -1,3 +1,12 @@
+<a name="8.19.2"></a>
+## [8.19.2](https://github.com/videojs/video.js/compare/v8.19.1...v8.19.2) (2024-11-14)
+
+### Bug Fixes
+
+* change http to https in examples ([#8905](https://github.com/videojs/video.js/issues/8905)) ([079cbe1](https://github.com/videojs/video.js/commit/079cbe1))
+* Fix Escape handling in menus  ([#8916](https://github.com/videojs/video.js/issues/8916)) ([d0cf139](https://github.com/videojs/video.js/commit/d0cf139))
+* **text-track-settings:** localization not correctly applied ([#8904](https://github.com/videojs/video.js/issues/8904)) ([ecef37c](https://github.com/videojs/video.js/commit/ecef37c))
+
 <a name="8.19.1"></a>
 ## [8.19.1](https://github.com/videojs/video.js/compare/v8.19.0...v8.19.1) (2024-10-10)
 
