@@ -128,6 +128,7 @@ class TextTrackDisplay extends Component {
     player.on('loadedmetadata', (e) => {
       this.updateDisplayOverlay();
       this.preselectTrack(e);
+      this.updateDisplay(e);
     });
 
     // This used to be called during player init, but was causing an error
