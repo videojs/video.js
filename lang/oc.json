@@ -86,5 +86,12 @@
   "{1} is loading.": "{1} es a cargar.",
   "Exit Picture-in-Picture": "Sortir de la vidèo incrustada",
   "Picture-in-Picture": "Vidèo incrustada",
-  "No content": "Cap de contengut"  
+  "No content": "Cap de contengut",
+  "Color": "Color",
+  "Opacity": "Opacitat",
+  "Text Background": "Rèireplan del tèxte",
+  "Caption Area Background": "Rèireplan de la zòna de la legenda",
+  "Playing in Picture-in-Picture": "Lectura en vidèo incrustada",
+  "Skip backward {1} seconds": "Avançar de {1} segondas",
+  "Skip forward {1} seconds": "Recular de {1} segondas"
 }
