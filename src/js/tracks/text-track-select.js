@@ -68,7 +68,7 @@ class TextTrackSelect extends Component {
           {
             id: optionId,
             value: this.localize(optionText[0]),
-            textContent: optionText[1]
+            textContent: this.localize(optionText[1])
           }
         );
 

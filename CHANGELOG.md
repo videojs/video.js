@@ -1,3 +1,20 @@
+<a name="8.20.0"></a>
+# [8.20.0](https://github.com/videojs/video.js/compare/v8.19.2...v8.20.0) (2024-11-19)
+
+### Chores
+
+* Correct changelog for 8.19.2 ([#8918](https://github.com/videojs/video.js/issues/8918)) ([964c40e](https://github.com/videojs/video.js/commit/964c40e))
+* **package:** Update [@videojs](https://github.com/videojs)/http-streaming to 3.16.0 ([#8921](https://github.com/videojs/video.js/issues/8921)) ([7420467](https://github.com/videojs/video.js/commit/7420467)), closes [1000#0](https://github.com/1000/issues/0)
+
+<a name="8.19.2"></a>
+## [8.19.2](https://github.com/videojs/video.js/compare/v8.19.1...v8.19.2) (2024-11-14)
+
+### Bug Fixes
+
+* change http to https in examples ([#8905](https://github.com/videojs/video.js/issues/8905)) ([079cbe1](https://github.com/videojs/video.js/commit/079cbe1))
+* Fix Escape handling in menus  ([#8916](https://github.com/videojs/video.js/issues/8916)) ([d0cf139](https://github.com/videojs/video.js/commit/d0cf139))
+* **text-track-settings:** localization not correctly applied ([#8904](https://github.com/videojs/video.js/issues/8904)) ([ecef37c](https://github.com/videojs/video.js/commit/ecef37c))
+
 <a name="8.19.1"></a>
 ## [8.19.1](https://github.com/videojs/video.js/compare/v8.19.0...v8.19.1) (2024-10-10)
 
