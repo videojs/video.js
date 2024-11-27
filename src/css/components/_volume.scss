@@ -56,7 +56,11 @@
     }
 
     &.vjs-volume-vertical {
-      left: -3.5em;
+      height: 8em;
+      width: 3em;
+
+      pointer-events: initial;
+
       @include transition(left 0s);
     }
   }
@@ -76,10 +80,6 @@
 }
 
 .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
-  height: 8em;
-  width: 3em;
-  left: -3000em;
-
   $transition-property: visibility 1s, opacity 1s, height 1s 1s, width 1s 1s, left 1s 1s, top 1s 1s;
   @include transition($transition-property)
 }
@@ -185,9 +185,10 @@
 }
 
 .video-js .vjs-volume-vertical {
-  width: 3em;
-  height: 8em;
+  left: -3.5em;
   bottom: 8em;
+
+  pointer-events: none;
 
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }
