@@ -206,6 +206,12 @@ class Plugin {
       this.log = this.player.log.createLogger(this.name);
     }
 
+    // Remove the placeholder event methods. If the component is evented, the
+    // real methods are added next
+    ['on', 'off', 'one', 'any', 'trigger'].forEach(fn => {
+      this[fn] = undefined;
+    });
+
     // Make this object evented, but remove the added `trigger` method so we
     // use the prototype version instead.
     evented(this);
@@ -247,6 +253,61 @@ class Plugin {
     hash.instance = this;
     return hash;
   }
+
+  // `on`, `off`, `one`, and `any` are here so tsc includes them in definitions.
+  // They are replaced or removed in the constructor
+
+  /**
+   * Adds an `event listener` to an instance of an `EventTarget`. An `event listener` is a
+   * function that will get called when an event with a certain name gets triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to call with `EventTarget`s
+   */
+  on(type, fn) {}
+
+  /**
+   * Removes an `event listener` for a specific event from an instance of `EventTarget`.
+   * This makes it so that the `event listener` will no longer get called when the
+   * named event happens.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} [fn]
+   *        The function to remove. If not specified, all listeners managed by Video.js will be removed.
+   */
+  off(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once. After the
+   * first trigger it will get removed. This is like adding an `event listener`
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on itself.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  one(type, fn) {}
+
+  /**
+   * This function will add an `event listener` that gets triggered only once and is
+   * removed from all events. This is like adding an array of `event listener`s
+   * with {@link EventTarget#on} that calls {@link EventTarget#off} on all events the
+   * first time it is triggered.
+   *
+   * @param {string|string[]} type
+   *        An event name or an array of event names.
+   *
+   * @param {Function} fn
+   *        The function to be called once for each event name.
+   */
+  any(type, fn) {}
 
   /**
    * Triggers an event on the plugin object and overrides
@@ -477,6 +538,9 @@ Player.prototype.hasPlugin = function(name) {
 };
 
 export default Plugin;
+
+// Including a named export so Typescript can use module augmentation with plugins
+export { Plugin };
 
 /**
  * Signals that a plugin is about to be set up on a player.
