@@ -1,3 +1,11 @@
+<a name="8.20.0"></a>
+# [8.20.0](https://github.com/videojs/video.js/compare/v8.19.2...v8.20.0) (2024-11-19)
+
+### Chores
+
+* Correct changelog for 8.19.2 ([#8918](https://github.com/videojs/video.js/issues/8918)) ([964c40e](https://github.com/videojs/video.js/commit/964c40e))
+* **package:** Update [@videojs](https://github.com/videojs)/http-streaming to 3.16.0 ([#8921](https://github.com/videojs/video.js/issues/8921)) ([7420467](https://github.com/videojs/video.js/commit/7420467)), closes [1000#0](https://github.com/1000/issues/0)
+
 <a name="8.19.2"></a>
 ## [8.19.2](https://github.com/videojs/video.js/compare/v8.19.1...v8.19.2) (2024-11-14)
 
