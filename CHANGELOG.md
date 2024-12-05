@@ -1,3 +1,11 @@
+<a name="8.21.1"></a>
+## [8.21.1](https://github.com/videojs/video.js/compare/v8.21.0...v8.21.1) (2024-12-05)
+
+### Chores
+
+* **lang:** update zh-TW translations ([#8929](https://github.com/videojs/video.js/issues/8929)) ([b6cec4f](https://github.com/videojs/video.js/commit/b6cec4f)), closes [1000#0](https://github.com/1000/issues/0)
+* update Occitan locale file ([#8927](https://github.com/videojs/video.js/issues/8927)) ([a0ca168](https://github.com/videojs/video.js/commit/a0ca168))
+
 <a name="8.21.0"></a>
 # [8.21.0](https://github.com/videojs/video.js/compare/v8.20.0...v8.21.0) (2024-12-05)
 
