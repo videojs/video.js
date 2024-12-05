@@ -1,3 +1,18 @@
+<a name="8.21.0"></a>
+# [8.21.0](https://github.com/videojs/video.js/compare/v8.20.0...v8.21.0) (2024-12-05)
+
+### Features
+
+* Add option to disable seeking while scrubbing on mobile ([#8903](https://github.com/videojs/video.js/issues/8903)) ([57d6ab6](https://github.com/videojs/video.js/commit/57d6ab6))
+
+### Bug Fixes
+
+* update vhs version ([#8930](https://github.com/videojs/video.js/issues/8930)) ([f87a699](https://github.com/videojs/video.js/commit/f87a699))
+
+### Chores
+
+* update VHS version ([#8933](https://github.com/videojs/video.js/issues/8933)) ([a7ba9f2](https://github.com/videojs/video.js/commit/a7ba9f2))
+
 <a name="8.20.0"></a>
 # [8.20.0](https://github.com/videojs/video.js/compare/v8.19.2...v8.20.0) (2024-11-19)
 
