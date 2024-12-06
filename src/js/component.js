@@ -2023,12 +2023,14 @@ class Component {
 
       // If we have players that were disposed, then their name will still be
       // in Players.players. So, we must loop through and verify that the value
-      // for each item is not null. This allows registration of the Player component
+      // for each item is null. This allows registration of the Player component
       // after all players have been disposed or before any were created.
-      if (players &&
-          playerNames.length > 0 &&
-          playerNames.map((pname) => players[pname]).every(Boolean)) {
-        throw new Error('Can not register Player component after player has been created.');
+      if (players && playerNames.length > 0) {
+        for (let i = 0; i < playerNames.length; i++) {
+          if (players[playerNames[i]] !== null) {
+            throw new Error('Can not register Player component after player has been created.');
+          }
+        }
       }
     }
 
