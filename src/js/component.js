@@ -595,46 +595,14 @@ class Component {
 
     return iconContainer;
   }
-  // /**
-  //  * Add a child `Component` inside the current `Component`.
-  //  *
-  //  * @template {Component} T
-  //  * @param {string|T} child
-  //  *        The name or instance of a child to add.
-  //  *
-  //  * @param {Object} [options={}]
-  //  *        The key/value store of options that will get passed to children of
-  //  *        the child.
-  //  *
-  //  * @param {number} [index=this.children_.length]
-  //  *        The index to attempt to add a child into.
-  //  *
-  //  *
-  //  * @return {T}
-  //  *         The `Component` that gets added as a child. When using a string the
-  //  *         `Component` will get created by this process.
-  //  */
-  /**
-   * @overload
-   * @param {typeof Component} child
-   * @param {Object} [options={}]
-   * @param {number} [index=this.children_.length]
-   * @return {typeof Component}
-   */
-  /**
-   * @overload
-   * @param {string} child
-   * @param {Object} [options={}]
-   * @param {number} [index=this.children_.length]
-   * @return {typeof Component}
-   */
   /**
    * Add a child `Component` inside the current `Component`.
    *
-   * @param {string|typeof Component} child
+   * @template {Component} T
+   * @param {string|T} child
    *        The name or instance of a child to add.
    *
-   * @param {Object} [options={}]
+   * @param {ComponentOptions} [options={}]
    *        The key/value store of options that will get passed to children of
    *        the child.
    *
@@ -642,7 +610,7 @@ class Component {
    *        The index to attempt to add a child into.
    *
    *
-   * @return {typeof Component}
+   * @return {T}
    *         The `Component` that gets added as a child. When using a string the
    *         `Component` will get created by this process.
    */
