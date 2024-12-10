@@ -3611,6 +3611,154 @@ QUnit.test('smooth seeking set to true should update the display time components
   player.dispose();
 });
 
+QUnit.test('mouseTimeDisplay should be added as child when disableSeekWhileScrubbingOnMobile is true on mobile', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: true });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
+
+  assert.ok(mouseTimeDisplay, 'mouseTimeDisplay added as a child');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
+QUnit.test('mouseTimeDisplay should not be added as child on mobile when disableSeekWhileScrubbingOnMobile is false', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: false });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const mouseTimeDisplay = seekBar.getChild('mouseTimeDisplay');
+
+  assert.notOk(mouseTimeDisplay, 'mouseTimeDisplay not added as a child');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
+QUnit.test('Seeking should occur while scrubbing on mobile when disableSeekWhileScrubbingOnMobile is false', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: false });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const userSeekSpy = sinon.spy(seekBar, 'userSeek_');
+
+  // Simulate a source loaded
+  player.duration(10);
+
+  // Simulate scrub
+  seekBar.handleMouseMove({ pageX: 200 });
+
+  assert.ok(userSeekSpy.calledOnce, 'Seek initiated while scrubbing');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
+QUnit.test('Seeking should not occur while scrubbing on mobile when disableSeekWhileScrubbingOnMobile is true', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: true });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const userSeekSpy = sinon.spy(seekBar, 'userSeek_');
+
+  // Simulate a source loaded
+  player.duration(10);
+
+  // Simulate scrub
+  seekBar.handleMouseMove({ pageX: 200 });
+
+  assert.ok(userSeekSpy.notCalled, 'Seek not initiated while scrubbing');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
+QUnit.test('Seek should occur when scrubbing completes on mobile when disableSeekWhileScrubbingOnMobile is true', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: true });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const userSeekSpy = sinon.spy(seekBar, 'userSeek_');
+  const targetSeekTime = 5;
+
+  // Simulate a source loaded
+  player.duration(10);
+
+  seekBar.pendingSeekTime_ = targetSeekTime;
+
+  // Simulate scrubbing completion
+  seekBar.handleMouseUp();
+
+  assert.ok(userSeekSpy.calledWith(targetSeekTime), 'Seeks to correct location when scrubbing completes');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
+QUnit.test('Player should pause while scrubbing on mobile when disableSeekWhileScrubbingOnMobile is false', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: false });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const pauseSpy = sinon.spy(player, 'pause');
+
+  // Simulate start playing
+  player.play();
+
+  const mockMouseDownEvent = {
+    pageX: 200,
+    stopPropagation: () => {}
+  };
+
+  // Simulate scrubbing start
+  seekBar.handleMouseDown(mockMouseDownEvent);
+
+  assert.ok(pauseSpy.calledOnce, 'Player paused');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
+QUnit.test('Player should not pause while scrubbing on mobile when disableSeekWhileScrubbingOnMobile is true', function(assert) {
+  const originalIsIos = browser.IS_IOS;
+
+  browser.stub_IS_IOS(true);
+
+  const player = TestHelpers.makePlayer({ disableSeekWhileScrubbingOnMobile: true });
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const pauseSpy = sinon.spy(player, 'pause');
+
+  // Simulate start playing
+  player.play();
+
+  const mockMouseDownEvent = {
+    pageX: 200,
+    stopPropagation: () => { }
+  };
+
+  // Simulate scrubbing start
+  seekBar.handleMouseDown(mockMouseDownEvent);
+
+  assert.ok(pauseSpy.notCalled, 'Player not paused');
+
+  player.dispose();
+  browser.stub_IS_IOS(originalIsIos);
+});
+
 QUnit.test('addSourceElement calls tech method with correct args', function(assert) {
   const player = TestHelpers.makePlayer();
   const addSourceElementSpy = sinon.spy(player.tech_, 'addSourceElement');
