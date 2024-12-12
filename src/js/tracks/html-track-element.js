@@ -24,10 +24,10 @@ class HTMLTrackElement extends EventTarget {
    * @param {Tech} options.tech
    *        A reference to the tech that owns this HTMLTrackElement.
    *
-   * @param {TextTrack~Kind} [options.kind='subtitles']
+   * @param {TextTrackKind} [options.kind='subtitles']
    *        A valid text track kind.
    *
-   * @param {TextTrack~Mode} [options.mode='disabled']
+   * @param {TextTrackMode} [options.mode='disabled']
    *        A valid text track mode.
    *
    * @param {string} [options.id='vjs_track_' + Guid.newGUID()]
