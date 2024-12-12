@@ -1248,7 +1248,7 @@ class Component {
    * An object that contains width and height values of the `Component`s
    * computed style. Uses `window.getComputedStyle`.
    *
-   * @typedef {Object} Component~DimensionObject
+   * @typedef {Object} DimensionObject
    *
    * @property {number} width
    *           The width of the `Component`s computed style.
@@ -1263,7 +1263,7 @@ class Component {
    *
    * Uses `window.getComputedStyle`.
    *
-   * @return {Component~DimensionObject}
+   * @return {DimensionObject}
    *         The computed dimensions of the component's element.
    */
   currentDimensions() {

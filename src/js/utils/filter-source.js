@@ -4,15 +4,17 @@
 import {isObject} from './obj';
 import {getMimetype} from './mimetypes';
 
+/** @import { SourceObject } from '../tech/tech' */
+
 /**
  * Filter out single bad source objects or multiple source objects in an
  * array. Also flattens nested source object arrays into a 1 dimensional
  * array of source objects.
  *
- * @param {Tech~SourceObject|Tech~SourceObject[]} src
+ * @param {string|SourceObject|Array.<SourceObject|string>} src
  *        The src object to filter
  *
- * @return {Tech~SourceObject[]}
+ * @return {SourceObject[]}
  *         An array of sourceobjects containing only valid sources
  *
  * @private
@@ -50,9 +52,9 @@ const filterSource = function(src) {
 /**
  * Checks src mimetype, adding it when possible
  *
- * @param {Tech~SourceObject} src
+ * @param {SourceObject} src
  *        The src object to check
- * @return {Tech~SourceObject}
+ * @return {SourceObject}
  *        src Object with known type
  */
 function fixSource(src) {

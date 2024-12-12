@@ -3534,7 +3534,7 @@ class Player extends Component {
   /**
    * Executes source setting and getting logic
    *
-   * @param {SourceObject|SourceObject[]|string} [source]
+   * @param {string|SourceObject|Array.<SourceObject|string>} [source]
    *        A SourceObject, an array of SourceObjects, or a string referencing
    *        a URL to a media source. It is _highly recommended_ that an object
    *        or array of objects is used here, so that source selection
@@ -3645,7 +3645,7 @@ class Player extends Component {
   /**
    * Get or set the video source.
    *
-   * @param {SourceObject|SourceObject[]|string} [source]
+   * @param {string|SourceObject|Array.<SourceObject|string>} [source]
    *        A SourceObject, an array of SourceObjects, or a string referencing
    *        a URL to a media source. It is _highly recommended_ that an object
    *        or array of objects is used here, so that source selection
@@ -5114,8 +5114,10 @@ class Player extends Component {
    * Properties that are not part of this type description will be retained; so,
    * this can be viewed as a generic metadata storage mechanism as well.
    *
+   * Contains properties from MediaMetadata
+   *
    * @see      {@link https://wicg.github.io/mediasession/#the-mediametadata-interface}
-   * @typedef  {Object} Player~MediaObject
+   * @typedef  {Object} MediaObject
    *
    * @property {string} [album]
    *           Unused, except if this object is passed to the `MediaSession`
@@ -5133,7 +5135,7 @@ class Player extends Component {
    * @property {string} [poster]
    *           URL to an image that will display before playback.
    *
-   * @property {SourceObject|SourceObject[]|string} [src]
+   * @property {string|SourceObject|Array.<SourceObject|string>} [src]
    *           A single source object, an array of source objects, or a string
    *           referencing a URL to a media source. It is _highly recommended_
    *           that an object or array of objects is used here, so that source
@@ -5156,7 +5158,7 @@ class Player extends Component {
   /**
    * Populate the player using a {@link Player~MediaObject|MediaObject}.
    *
-   * @param  {Player~MediaObject} media
+   * @param  {MediaObject} media
    *         A media object.
    *
    * @param  {Function} ready
@@ -5214,9 +5216,9 @@ class Player extends Component {
    * Get a clone of the current {@link Player~MediaObject} for this player.
    *
    * If the `loadMedia` method has not been used, will attempt to return a
-   * {@link Player~MediaObject} based on the current state of the player.
+   * {@link MediaObject} based on the current state of the player.
    *
-   * @return {Player~MediaObject}
+   * @return {MediaObject}
    */
   getMedia() {
     if (!this.cache_.media) {
