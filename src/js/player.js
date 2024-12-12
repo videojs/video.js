@@ -1568,7 +1568,7 @@ class Player extends Component {
    *         in the current `currentSources` cache.
    *
    *
-   * @param {SourceObject} srcObj
+   * @param {SourceObject|string} srcObj
    *        A string or object source to update our caches to.
    */
   updateSourceCaches_(srcObj = '') {
@@ -3535,10 +3535,8 @@ class Player extends Component {
    * Executes source setting and getting logic
    *
    * @param {string|SourceObject|Array.<SourceObject|string>} [source]
-   *        A SourceObject, an array of SourceObjects, or a string referencing
-   *        a URL to a media source. It is _highly recommended_ that an object
-   *        or array of objects is used here, so that source selection
-   *        algorithms can take the `type` into account.
+   *        A SourceObject, a string or an array of strings and/or SourceObjects
+   *        passed by src().
    *
    *        If not provided, this method acts as a getter.
    * @param {boolean} [isRetry]
@@ -3646,9 +3644,9 @@ class Player extends Component {
    * Get or set the video source.
    *
    * @param {string|SourceObject|Array.<SourceObject|string>} [source]
-   *        A SourceObject, an array of SourceObjects, or a string referencing
-   *        a URL to a media source. It is _highly recommended_ that an object
-   *        or array of objects is used here, so that source selection
+   *        A SourceObject, a string or an array of strings and/or SourceObjects
+   *        referencing a URL to a media source. It is _highly recommended_ that
+   *        a SourceObject or array of objects is used here, so that source selection
    *        algorithms can take the `type` into account.
    *
    *        If not provided, this method acts as a getter.
@@ -5136,10 +5134,10 @@ class Player extends Component {
    *           URL to an image that will display before playback.
    *
    * @property {string|SourceObject|Array.<SourceObject|string>} [src]
-   *           A single source object, an array of source objects, or a string
-   *           referencing a URL to a media source. It is _highly recommended_
-   *           that an object or array of objects is used here, so that source
-   *           selection algorithms can take the `type` into account.
+   *           A SourceObject, a string or an array of strings and/or SourceObjects
+   *           referencing a URL to a media source. It is _highly recommended_ that
+   *           a SourceObject or array of objects is used here, so that source selection
+   *           algorithms can take the `type` into account.
    *
    * @property {string} [title]
    *           Unused, except if this object is passed to the `MediaSession`
