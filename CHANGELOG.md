@@ -1,3 +1,26 @@
+<a name="8.21.1"></a>
+## [8.21.1](https://github.com/videojs/video.js/compare/v8.21.0...v8.21.1) (2024-12-05)
+
+### Chores
+
+* **lang:** update zh-TW translations ([#8929](https://github.com/videojs/video.js/issues/8929)) ([b6cec4f](https://github.com/videojs/video.js/commit/b6cec4f)), closes [1000#0](https://github.com/1000/issues/0)
+* update Occitan locale file ([#8927](https://github.com/videojs/video.js/issues/8927)) ([a0ca168](https://github.com/videojs/video.js/commit/a0ca168))
+
+<a name="8.21.0"></a>
+# [8.21.0](https://github.com/videojs/video.js/compare/v8.20.0...v8.21.0) (2024-12-05)
+
+### Features
+
+* Add option to disable seeking while scrubbing on mobile ([#8903](https://github.com/videojs/video.js/issues/8903)) ([57d6ab6](https://github.com/videojs/video.js/commit/57d6ab6))
+
+### Bug Fixes
+
+* update vhs version ([#8930](https://github.com/videojs/video.js/issues/8930)) ([f87a699](https://github.com/videojs/video.js/commit/f87a699))
+
+### Chores
+
+* update VHS version ([#8933](https://github.com/videojs/video.js/issues/8933)) ([a7ba9f2](https://github.com/videojs/video.js/commit/a7ba9f2))
+
 <a name="8.20.0"></a>
 # [8.20.0](https://github.com/videojs/video.js/compare/v8.19.2...v8.20.0) (2024-11-19)
 
