@@ -223,6 +223,20 @@ QUnit.test('SeekBar should be filled on 100% when the video/audio ends', functio
   window.cancelAnimationFrame = oldCAF;
 });
 
+QUnit.test('Seek bar percent should represent scrub location if we are scrubbing on mobile and have a pending seek time', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const seekBar = player.controlBar.progressControl.seekBar;
+
+  player.duration(100);
+  seekBar.pendingSeekTime_ = 20;
+
+  assert.equal(seekBar.getPercent(), 0.2, 'seek bar percent set correctly to pending seek time');
+
+  seekBar.pendingSeekTime_ = 50;
+
+  assert.equal(seekBar.getPercent(), 0.5, 'seek bar percent set correctly to next pending seek time');
+});
+
 QUnit.test('playback rate button is hidden by default', function(assert) {
   assert.expect(1);
 
