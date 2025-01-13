@@ -41,7 +41,10 @@ import xhr from '@videojs/xhr';
 import Tech from './tech/tech.js';
 import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
 
-/** @import { PlayerReadyCallback } from './player' */
+/** @import { PlayerReadyCallback, PlayerOptions } from './player' */
+
+// Redefine the typedef, so that tsc includes it in the generated d.ts file
+/** @typedef {PlayerOptions} PlayerOptions Player setup options */
 
 /**
  * Normalize an `id` value by trimming off a leading `#`
@@ -112,8 +115,8 @@ const normalizeId = (id) => id.indexOf('#') === 0 ? id.slice(1) : id;
  * @param  {string|Element} id
  *         Video element or video element ID.
  *
- * @param  {Object} [options]
- *         Options object for providing settings.
+ * @param  {PlayerOptions} [options]
+ *         Player options. Only applies when constructing a player, not getting an existing player.
  *         See: [Options Guide](https://docs.videojs.com/tutorial-options.html).
  *
  * @param  {PlayerReadyCallback} [ready]

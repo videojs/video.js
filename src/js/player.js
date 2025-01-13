@@ -66,6 +66,147 @@ import './tech/html5.js';
  * @returns  {void}
  */
 
+/**
+ * @typedef {Object} PlayerOptions Options in the player.js file
+ * @property  {boolean|'play'|'muted'|'any'} [autoplay]
+ *              Autoplay behaviour. Don't use the `autoplay` attribute if set.
+ *              - `false` or `'none'`: No autoplay
+ *              - `true`: Browser's autoplay
+ *              - `'muted'`: Mute, then play on `loadstart`
+ *              - `'any'`: Attempt to play on `loadstart`. If rejected, mute and then play
+ * @property  {Object} [controlBar]
+ *              Options for the controlbar component
+ * @property  {boolean} [controlBar.remainingTimeDisplay.displayNegative]
+ *              If false, show remaining time without a negative sign
+ * @property  {boolean} [controls]
+ *              Whether to show controls
+ * @property  {number|string} [height]
+ *              Player height in pixels
+ * @property  {boolean} [loop]
+ *              Whether to loop
+ * @property  {boolean} [muted]
+ *              Whether to mute
+ * @property  {string} [poster]
+ *              Poster image URL
+ * @property  {'auto'|'metadata'|'none'} [preload]
+ *              Whether to preload
+ * @property  {string|Object|Array} [src]
+ *              Source or source object or array of source objects
+ * @property  {number|string} [width]
+ *              Player height in pixels
+ * @property  {string} [aspectRatio]
+ *              e.g. '16:9'. Sets aspect ratio of player using fluid mode
+ * @property  {boolean} [audioOnlyMode]
+ *              If true show only control bar and appropriate controls
+ * @property  {boolean} [audioPosterMode]
+ *              Show poster throughtout audio playback
+ * @property  {Object} [breakpoints]
+ *              Breakpoints for responsive layout mode
+ * @property  {number} [breakpoints.tiny=300]
+ * @property  {number} [breakpoints.xsmall=400]
+ * @property  {number} [breakpoints.small=500]
+ * @property  {number} [breakpoints.medium=600]
+ * @property  {number} [breakpoints.large=700]
+ * @property  {number} [breakpoints.xlarge=800]
+ * @property  {number} [breakpoints.huge=900]
+ * @property  {Array|Object} [children]
+ * @property  {boolean} [disablePictureInPicture]
+ *              Prevents picture-in-picture mode
+ * @property  {boolean} [enableDocumentPictureInPicture]
+ *              Enable picture-in-picture using the document picture-in-picture API if available
+ * @property  {boolean} [enableSmoothSeeking]
+ *              Smoother seeking experience
+ *              TODO: Why not?
+ * @property  {boolean} [experimentalSvgIcons]
+ *              Use SVG icons istead of the default font icons
+ * @property  {boolean} [fluid]
+ *              Resize the player to the video's intrinsic ratio once known (metadata has loaded), fitting the contianers width.
+ * @property  {Object} [fullscreen]
+ * @property  {'auto'|'hide'|'show'} [fullscreen.options.navigationUI]
+ *              Navigation UI preference to pass to browser fullscreen API
+ * @property  {string} [id]
+ *              If the player element doesn't already have an id, set this id.
+ * @property  {number} [inactivityTimeout]
+ *              Milliseconds before considered inactive, e.g. controls hide
+ * @property  {string} [language]
+ *              Language to use for localisation. If unset, detect from HTML or navigator.language
+ * @property  {Object.<string, Object>} [languages]
+ *              Object of translations to add to the player
+ * @property  {boolean} [liveui]
+ *              Inlcude live UI with seekbar for DVR
+ * @property  {number} [liveTracker.trackingThreshold]
+ *              An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 20s on the seekBar then we do not show the new liveui even with the liveui option set.
+ * @property  {number} [liveTracker.liveTolerance]
+ *              How far from the seekable end should be considered live playback. Default 15s.
+ * @property {boolean} [nativeControlsForTouch]
+ *              Explicitly set a default value for tech option
+ * @property {boolean} [normalizeAutoplay]
+ *              Specify whether setting `autoplay: true` or `<video autoplay>` should be treated the same as `autoplay: 'play'`, i.e. the `autoplay` attribute should be removed from (or not added to) the video element and `play()` be initiated manually by Video.js rather than the browser.
+ * @property {string} [notSupportedMessage]
+ *              Allows overriding the default message that is displayed when Video.js cannot play back a media source.
+ * @property {boolean} [noUITitleAttributes]
+ *              Whether UI elements have a `title` attribute
+ * @property {Number[]} [playbackRates]
+ *             An array of numbers strictly greater than 0, where 1 means regular speed
+ * @property {boolean} [playsinline]
+ *             Indicates to the browser that non-fullscreen playback is preferred when fullscreen playback is the native default, such as in iOS Safari.
+ * @property {Object.<string, Object>} [plugins]
+ *             Plugin names and their options
+ * @property {boolean} [persistTextTrackSettings=false]
+ *             Whether to store text track settings to local storage
+ * @property {boolean} [preferFullWindow]
+ *             On devices that don't support the HTML fullscreen UI but do support fullscreen on the video element (iPhone), use "full window" mode instead of fullscreen.
+ * @property {boolean} [responsive]
+ *              Setting this option to `true` will cause the player layout to customize itself based on responsive breakpoints
+ * @property {boolean|HTMLElement} [restoreEl]
+ *              If set to `true`, a _copy_ of the placeholder element will be made before the player is initalised. If the player is disposed, the copy is put back into the DOM in the player's place.
+ *              If set to an HTML Element, that element would replace the disposed player instead.
+ * @property {Object} [skipButtons]
+ * @property {5|10|30} [skipButtons.forward]
+ * @property {5|10|30} [skipButtons.backward]
+ * @property {Array} [sources]
+ * @property {boolean} [suppressNotSupportedError]
+ *             Don't show a not supported error before playback has been attempted.
+ * @property {boolean} [techCanOverridePoster]
+ * @property {string[]} [techOrder]
+ * @property {Object} [userActions]
+ * @property {boolean|Function} [userActions.click]
+ *             By default (`true`), clicking toggles play/pause
+ *             If `false`, clicking on the player el (except controls) does not toggle play/pause
+ *             If a function, function will be called and passed the event
+ * @property {boolean|Function} [userActions.doubleClick]
+ *             By default (`true`), double clicking toggles fullscreen
+ *             If `false`, clicking on the player el (except controls) does not toggle fullscreen
+ *             If a function, function will be called and passed the event
+ * @property {boolean|Function|Object} [userActions.hotkeys]
+ *             `true` or `false` enables or disables default hotkeys
+ *             If a function, that is called with the keydown event
+ *             If an object, defines keys for standard actions
+ * @property {Function} [userActions.hotkeys.fullscreenKey]
+ *             Override the fullscreen key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the fullscreen toggle action is performed.
+ * @property {Function} [userActions.hotkeys.muteKey]
+ *             Override the mute key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the mute toggle action is performed.
+ * @property {Function} [userActions.hotkeys.playPauseKey]
+ *             Override the play/pause key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the play/pause toggle action is performed.
+ * @property {string} [vtt.js]
+ *             Allows overriding the default URL to vtt.js, which may be loaded asynchronously to polyfill support for `WebVTT`.
+ * @property {Object} [html5]
+ *              Options for the html5 tech
+ * @property {boolean} [html5.nativeControlsForTouch]
+ * @property {boolean} [html5.nativeAudioTracks]
+ * @property {boolean} [html5.nativeTextTracks]
+ * @property {boolean} [html5.nativeVideoTracks]
+ * @property {boolean} [html5.preloadTextTracks]
+ * @property {boolean} [html5.preloadTextTracks]
+ * @property {Object} [html5.vhs]
+ *             Options for videojs/http-streaming
+ * @property {boolean} [html5.vhs.overrideNative]
+ *             Use VHS/MSE playback rather than native on Safari
+ * @property {boolean} [html5.vhs.experimentalUseMMS]
+ *             Use Managed Media Source with VHS where available
+ * @property {{enabled: boolean}} [spatialNavigation]
+ */
+
 // The following tech events are simply re-triggered
 // on the player when they happen
 const TECH_EVENTS_RETRIGGER = [
@@ -310,8 +451,8 @@ class Player extends Component {
    * @param {Element} tag
    *        The original video DOM element used for configuring options.
    *
-   * @param {Object} [options]
-   *        Object of option names and values.
+   * @param {PlayerOptions} [options]
+   *        Player options.
    *
    * @param {PlayerReadyCallback} [ready]
    *        Ready callback function.
