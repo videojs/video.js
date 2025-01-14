@@ -67,7 +67,7 @@ import './tech/html5.js';
  */
 
 /**
- * @typedef {Object} PlayerOptions Options in the player.js file
+ * @typedef {Object} PlayerOptions Player setup options
  * @property  {boolean|'play'|'muted'|'any'} [autoplay]
  *              Autoplay behaviour. Don't use the `autoplay` attribute if set.
  *              - `false` or `'none'`: No autoplay
@@ -196,7 +196,6 @@ import './tech/html5.js';
  * @property {boolean} [html5.nativeAudioTracks]
  * @property {boolean} [html5.nativeTextTracks]
  * @property {boolean} [html5.nativeVideoTracks]
- * @property {boolean} [html5.preloadTextTracks]
  * @property {boolean} [html5.preloadTextTracks]
  * @property {Object} [html5.vhs]
  *             Options for videojs/http-streaming

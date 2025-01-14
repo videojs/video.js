@@ -41,10 +41,10 @@ import xhr from '@videojs/xhr';
 import Tech from './tech/tech.js';
 import { use as middlewareUse, TERMINATOR } from './tech/middleware.js';
 
-/** @import { PlayerReadyCallback, PlayerOptions } from './player' */
+/** @import { PlayerReadyCallback, PlayerOptions as PlayerOptions_ } from './player' */
 
 // Redefine the typedef, so that tsc includes it in the generated d.ts file
-/** @typedef {PlayerOptions} PlayerOptions Player setup options */
+/** @typedef {PlayerOptions_} PlayerOptions Player setup options */
 
 /**
  * Normalize an `id` value by trimming off a leading `#`

@@ -6,7 +6,7 @@ import {toTitleCase} from '../utils/str.js';
 
 /** @import Player from '../player' */
 /** @import Tech from '../tech/tech' */
-/** @import { SourceObject } from './tech/tech' */
+/** @import { SourceObject } from './tech' */
 
 const middlewares = {};
 const middlewareInstances = {};
