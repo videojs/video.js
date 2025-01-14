@@ -16,7 +16,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 
 | Language file           | Missing translations                                                                |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| ar.json (Complete)     |                                                       |
+| ar.json (Complete)      |                                                                                     |
 | az.json (Complete)      |                                                                                     |
 | ba.json (missing 71)    | Audio Player                                                                        |
 |                         | Video Player                                                                        |
@@ -506,19 +506,11 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Text Background                                                                     |
 |                         | Caption Area Background                                                             |
 |                         | Playing in Picture-in-Picture                                                       |
+| mr.json (Complete)      |                                                                                     |
 | nb.json (Complete)      |                                                                                     |
 | nl.json (missing 1)     | Playing in Picture-in-Picture                                                       |
 | nn.json (missing 10)    | Exit Picture-in-Picture                                                             |
 |                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
-| np.json (missing 9)     | Drop shadow                                                                         |
 |                         | No content                                                                          |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
@@ -790,6 +782,6 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Skip forward {1} seconds                                                            |
 | zh-CN.json (missing 2)  | Drop shadow                                                                         |
 |                         | Playing in Picture-in-Picture                                                       |
-| zh-TW.json (missing 1)  | Playing in Picture-in-Picture                                                       |
+| zh-TW.json (Complete)   |                                                                                     |
 
 <!-- END langtable -->
