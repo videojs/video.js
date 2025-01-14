@@ -16,7 +16,6 @@ import document from 'global/document';
 import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './mouse-time-display.js';
-import { merge } from '../../utils/obj.js';
 
 /**
  * Seek bar and container for the progress bars. Uses {@link PlayProgressBar}
