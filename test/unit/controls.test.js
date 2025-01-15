@@ -223,6 +223,98 @@ QUnit.test('SeekBar should be filled on 100% when the video/audio ends', functio
   window.cancelAnimationFrame = oldCAF;
 });
 
+QUnit.test('SeekBar keyboard increment is configurable', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      progressControl: {
+        seekBar: {
+          stepSeconds: 2,
+          pageMultiplier: 4
+        }
+      }
+    }
+  });
+
+  const ctSpy = sinon.spy(player, 'currentTime');
+
+  player.duration(100);
+  player.currentTime(10);
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowRight'});
+  // 10 + 2
+  assert.ok(ctSpy.calledWith(12), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageUp'});
+  // 12 + (2 * 4)
+  assert.ok(ctSpy.calledWith(20), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowLeft'});
+  // 20 - 2
+  assert.ok(ctSpy.calledWith(18), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageDown'});
+  // 18 - (2 * 4)
+  assert.ok(ctSpy.calledWith(10), 'seeked configured amount with multiplier');
+
+  player.dispose();
+});
+
+QUnit.test('SeekBar keyboard increment is configurable at runtime', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  const ctSpy = sinon.spy(player, 'currentTime');
+
+  player.duration(100);
+  player.currentTime(10);
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowRight'});
+  // 10 + 5
+  assert.ok(ctSpy.calledWith(15), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageUp'});
+  // 15 + (5 * 12)
+  assert.ok(ctSpy.calledWith(75), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowLeft'});
+  // 75 - 5
+  assert.ok(ctSpy.calledWith(70), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageDown'});
+  // 70 - (5 * 12)
+  assert.ok(ctSpy.calledWith(10), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.options().stepSeconds = 3;
+  player.controlBar.progressControl.seekBar.options().pageMultiplier = 3;
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowRight'});
+  // 10 + 3
+  assert.ok(ctSpy.calledWith(13), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageUp'});
+  // 13 + (3 * 3)
+  assert.ok(ctSpy.calledWith(22), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowLeft'});
+  // 22 - 3
+  assert.ok(ctSpy.calledWith(19), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageDown'});
+  // 19 - (3 * 3)
+  assert.ok(ctSpy.calledWith(10), 'seeked configured amount with multiplier');
+
+  player.dispose();
+});
+
 QUnit.test('Seek bar percent should represent scrub location if we are scrubbing on mobile and have a pending seek time', function(assert) {
   const player = TestHelpers.makePlayer();
   const seekBar = player.controlBar.progressControl.seekBar;

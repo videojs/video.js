@@ -17,12 +17,6 @@ import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './mouse-time-display.js';
 
-// The number of seconds the `step*` functions move the timeline.
-const STEP_SECONDS = 5;
-
-// The multiplier of STEP_SECONDS that PgUp/PgDown move the timeline.
-const PAGE_KEY_MULTIPLIER = 12;
-
 /**
  * Seek bar and container for the progress bars. Uses {@link PlayProgressBar}
  * as its `bar`.
@@ -39,6 +33,10 @@ class SeekBar extends Slider {
    *
    * @param {Object} [options]
    *        The key/value store of player options.
+   * @param {number} [options.stepSeconds=5]
+   *        The number of seconds to increment on keyboard control
+   * @param {number} [options.pageMultiplier=12]
+   *        The multiplier of stepSeconds that PgUp/PgDown move the timeline.
    */
   constructor(player, options) {
     options = merge(SeekBar.prototype.options_, options);
@@ -431,14 +429,14 @@ class SeekBar extends Slider {
    * Move more quickly fast forward for keyboard-only users
    */
   stepForward() {
-    this.userSeek_(this.player_.currentTime() + STEP_SECONDS);
+    this.userSeek_(this.player_.currentTime() + this.options().stepSeconds);
   }
 
   /**
    * Move more quickly rewind for keyboard-only users
    */
   stepBack() {
-    this.userSeek_(this.player_.currentTime() - STEP_SECONDS);
+    this.userSeek_(this.player_.currentTime() - this.options().stepSeconds);
   }
 
   /**
@@ -505,11 +503,11 @@ class SeekBar extends Slider {
     } else if (event.key === 'PageDown') {
       event.preventDefault();
       event.stopPropagation();
-      this.userSeek_(this.player_.currentTime() - (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+      this.userSeek_(this.player_.currentTime() - (this.options().stepSeconds * this.options().pageMultiplier));
     } else if (event.key === 'PageUp') {
       event.preventDefault();
       event.stopPropagation();
-      this.userSeek_(this.player_.currentTime() + (STEP_SECONDS * PAGE_KEY_MULTIPLIER));
+      this.userSeek_(this.player_.currentTime() + (this.options().stepSeconds * this.options().pageMultiplier));
     } else {
       // Pass keydown handling up for unsupported keys
       super.handleKeyDown(event);
@@ -549,7 +547,9 @@ SeekBar.prototype.options_ = {
     'loadProgressBar',
     'playProgressBar'
   ],
-  barName: 'playProgressBar'
+  barName: 'playProgressBar',
+  stepSeconds: 5,
+  pageMultiplier: 12
 };
 
 Component.registerComponent('SeekBar', SeekBar);
