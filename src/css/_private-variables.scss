@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Text, icons, hover states
 $primary-foreground-color: #fff !default;
 
@@ -6,7 +8,7 @@ $primary-background-color: #2B333F !default;
 $primary-background-transparency: 0.7 !default;
 
 // Hover states, slider backgrounds
-$secondary-background-color: lighten($primary-background-color, 33%) !default;
+$secondary-background-color: color.adjust($primary-background-color, $lightness: 33%, $space: hsl) !default;
 $secondary-background-transparency: 0.5 !default;
 
 // Avoiding helvetica: issue #376
