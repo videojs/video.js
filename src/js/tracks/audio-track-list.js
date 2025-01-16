@@ -33,7 +33,7 @@ const disableOthers = function(list, track) {
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist}
  * @extends TrackList
  */
-class AudioTrackList extends TrackList {
+export class AudioTrackList extends TrackList {
 
   /**
    * Create an instance of this class.
