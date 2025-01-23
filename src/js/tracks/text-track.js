@@ -3,7 +3,7 @@
  */
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
-import {TextTrackKind, TextTrackMode} from './track-enums';
+import {TextTrackKind as TextTrackKindEnum, TextTrackMode as TextTrackModeEnum} from './track-enums';
 import log from '../utils/log.js';
 import window from 'global/window';
 import Track from './track.js';
@@ -133,10 +133,10 @@ class TextTrack extends Track {
    * @param {Tech} options.tech
    *        A reference to the tech that owns this TextTrack.
    *
-   * @param {TextTrack~Kind} [options.kind='subtitles']
+   * @param {TextTrackKind} [options.kind='subtitles']
    *        A valid text track kind.
    *
-   * @param {TextTrack~Mode} [options.mode='disabled']
+   * @param {TextTrackMode} [options.mode='disabled']
    *        A valid text track mode.
    *
    * @param {string} [options.id='vjs_track_' + Guid.newGUID()]
@@ -164,10 +164,10 @@ class TextTrack extends Track {
     }
 
     const settings = merge(options, {
-      kind: TextTrackKind[options.kind] || 'subtitles',
+      kind: TextTrackKindEnum[options.kind] || 'subtitles',
       language: options.language || options.srclang || ''
     });
-    let mode = TextTrackMode[settings.mode] || 'disabled';
+    let mode = TextTrackModeEnum[settings.mode] || 'disabled';
     const default_ = settings.default;
 
     if (settings.kind === 'metadata' || settings.kind === 'chapters') {
@@ -255,7 +255,7 @@ class TextTrack extends Track {
           return mode;
         },
         set(newMode) {
-          if (!TextTrackMode[newMode]) {
+          if (!TextTrackModeEnum[newMode]) {
             return;
           }
           if (mode === newMode) {
@@ -387,7 +387,7 @@ class TextTrack extends Track {
   /**
    * Add a cue to the internal list of cues.
    *
-   * @param {TextTrack~Cue} cue
+   * @param {TextTrackCue} cue
    *        The cue to add to our internal list
    */
   addCue(originalCue) {
@@ -423,7 +423,7 @@ class TextTrack extends Track {
   /**
    * Remove a cue from our internal list
    *
-   * @param {TextTrack~Cue} removeCue
+   * @param {TextTrackCue} removeCue
    *        The cue to remove from our internal list
    */
   removeCue(removeCue) {
