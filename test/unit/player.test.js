@@ -2345,6 +2345,41 @@ QUnit.test('should not allow to register custom player when any player has been 
   videojs.registerComponent('Player', Player);
 });
 
+QUnit.test('should not allow to register custom player when any player still exists', function(assert) {
+  const videoTag1 = document.createElement('video');
+  const videoTag2 = document.createElement('video');
+
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(videoTag1);
+  fixture.appendChild(videoTag2);
+
+  const player1 = videojs(videoTag1);
+  const player2 = videojs(videoTag2);
+
+  class CustomPlayer extends Player {}
+
+  assert.throws(function() {
+    videojs.registerComponent('Player', CustomPlayer);
+  }, 'Can not register Player component after player has been created');
+
+  player1.dispose();
+
+  // still throws, because player2 still exists
+  assert.throws(function() {
+    videojs.registerComponent('Player', CustomPlayer);
+  }, 'Can not register Player component after player has been created');
+
+  player2.dispose();
+
+  // successfully registers, because no player exists anymore
+  // should not throw
+  videojs.registerComponent('Player', CustomPlayer);
+
+  // reset the Player to the original value;
+  videojs.registerComponent('Player', Player);
+});
+
 QUnit.test('setters getters passed to tech', function(assert) {
   const tag = TestHelpers.makeTag();
   const fixture = document.getElementById('qunit-fixture');
