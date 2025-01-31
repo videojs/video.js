@@ -62,6 +62,20 @@ class HTMLTrackElement extends EventTarget {
     this.label = track.label;
     this.default = track.default;
 
+    // This is only necessary because of tsc's incomplete jsdoc support
+    /* eslint-disable no-unused-expressions */
+    /**
+     * @type {TextTrack}
+     * @public
+     */
+    this.track;
+    /**
+     * @type {0|1|2|3}
+     * @public
+     */
+    this.readyState;
+    /* eslint-enable no-unused-expressions */
+
     Object.defineProperties(this, {
 
       /**
