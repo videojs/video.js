@@ -316,10 +316,11 @@ videojs.getComponent = Component.getComponent;
  * @param {string} name
  *        The class name of the component
  *
- * @param {typeof Component} comp
- *        The component class
+ * @template {typeof Component} C
+ * @param {C} comp
+ *        The `Component` class to register.
  *
- * @return {typeof Component}
+ * @return {C}
  *         The newly registered component
  */
 videojs.registerComponent = (name, comp) => {
