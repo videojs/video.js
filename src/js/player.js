@@ -56,8 +56,12 @@ import './transient-button.js';
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
 
-/** @import { TimeRange } from './utils/time' */
+/** @import AudioTrackList from './tracks/audio-track-list' */
 /** @import HtmlTrackElement from './tracks/html-track-element' */
+/** @import HtmlTrackElementList from './tracks/html-track-element-list' */
+/** @import TextTrackList from './tracks/text-track-list' */
+/** @import { TimeRange } from './utils/time' */
+/** @import VideoTrackList from './tracks/video-track-list' */
 
 /**
  * @callback PlayerReadyCallback
@@ -5411,7 +5415,7 @@ class Player extends Component {
  *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
  *
- * @returns {import("./tracks/video-track-list").VideoTrackList}
+ * @return {VideoTrackList}
  *         the current video track list
  *
  * @method Player.prototype.videoTracks
@@ -5423,7 +5427,7 @@ Player.prototype.videoTracks = () => {};
  *
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
  *
- * @return {import("./tracks/audio-track-list").AudioTrackList}
+ * @return {AudioTrackList}
  *         the current audio track list
  *
  * @method Player.prototype.audioTracks
@@ -5435,7 +5439,7 @@ Player.prototype.audioTracks = () => {};
  *
  * @link http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
  *
- * @return {import("./tracks/text-track-list").TextTrackList}
+ * @return {TextTrackList}
  *         the current text track list
  *
  * @method Player.prototype.textTracks
@@ -5445,7 +5449,7 @@ Player.prototype.textTracks = () => {};
 /**
  * Get the remote {@link TextTrackList}
  *
- * @return {import("./tracks/text-track-list").TextTrackList}
+ * @return {TextTrackList}
  *         The current remote text track list
  *
  * @method Player.prototype.remoteTextTracks
@@ -5455,7 +5459,7 @@ Player.prototype.remoteTextTracks = () => {};
 /**
  * Get the remote {@link HtmlTrackElementList} tracks.
  *
- * @return {import("./tracks/html-track-element-list").HtmlTrackElementList}
+ * @return {HtmlTrackElementList}
  *         The current remote text track element list
  *
  * @method Player.prototype.remoteTextTrackEls

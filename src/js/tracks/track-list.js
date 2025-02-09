@@ -12,7 +12,7 @@ import {isEvented} from '../mixins/evented';
  *
  * @extends EventTarget
  */
-export class TrackList extends EventTarget {
+class TrackList extends EventTarget {
   /**
    * Create an instance of this class
    *
