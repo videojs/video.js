@@ -56,9 +56,14 @@ import './transient-button.js';
 // Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
 
-/** @import { TimeRange } from './utils/time' */
+/** @import AudioTrackList from './tracks/audio-track-list' */
 /** @import HtmlTrackElement from './tracks/html-track-element' */
+/** @import HtmlTrackElementList from './tracks/html-track-element-list' */
+/** @import TextTrackList from './tracks/text-track-list' */
+/** @import { TimeRange } from './utils/time' */
+/** @import VideoTrackList from './tracks/video-track-list' */
 /** @import { SourceObject } from './tech/tech' */
+
 
 /**
  * @callback PlayerReadyCallback
@@ -5557,6 +5562,7 @@ class Player extends Component {
  *
  * @method Player.prototype.videoTracks
  */
+Player.prototype.videoTracks = () => {};
 
 /**
  * Get the {@link AudioTrackList}
@@ -5568,6 +5574,7 @@ class Player extends Component {
  *
  * @method Player.prototype.audioTracks
  */
+Player.prototype.audioTracks = () => {};
 
 /**
  * Get the {@link TextTrackList}
@@ -5579,6 +5586,7 @@ class Player extends Component {
  *
  * @method Player.prototype.textTracks
  */
+Player.prototype.textTracks = () => {};
 
 /**
  * Get the remote {@link TextTrackList}
@@ -5588,6 +5596,7 @@ class Player extends Component {
  *
  * @method Player.prototype.remoteTextTracks
  */
+Player.prototype.remoteTextTracks = () => {};
 
 /**
  * Get the remote {@link HtmlTrackElementList} tracks.
@@ -5597,6 +5606,7 @@ class Player extends Component {
  *
  * @method Player.prototype.remoteTextTrackEls
  */
+Player.prototype.remoteTextTrackEls = () => {};
 
 TRACK_TYPES.names.forEach(function(name) {
   const props = TRACK_TYPES[name];

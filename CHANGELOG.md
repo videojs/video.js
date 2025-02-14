@@ -1,3 +1,21 @@
+<a name="8.22.0"></a>
+# [8.22.0](https://github.com/videojs/video.js/compare/v8.21.1...v8.22.0) (2025-02-05)
+
+### Features
+
+* Make seek bar keyboard skip increment configurable ([#8919](https://github.com/videojs/video.js/issues/8919)) ([f2311c8](https://github.com/videojs/video.js/commit/f2311c8)), closes [1000#0](https://github.com/1000/issues/0)
+* **package:** Update to [@videojs](https://github.com/videojs)/http-streaming v3.17.0 ([#8976](https://github.com/videojs/video.js/issues/8976)) ([88aa1e7](https://github.com/videojs/video.js/commit/88aa1e7))
+
+### Bug Fixes
+
+* hide mouse tooltip on touch devices when not scrubbing ([#8945](https://github.com/videojs/video.js/issues/8945)) ([4661aa7](https://github.com/videojs/video.js/commit/4661aa7))
+* registering new player component ([#8932](https://github.com/videojs/video.js/issues/8932)) ([f8e9bfc](https://github.com/videojs/video.js/commit/f8e9bfc)), closes [#8925](https://github.com/videojs/video.js/issues/8925)
+
+### Chores
+
+* Enable supply chain security through npm provenance attestation ([#8911](https://github.com/videojs/video.js/issues/8911)) ([c1a8cbf](https://github.com/videojs/video.js/commit/c1a8cbf)), closes [1000#0](https://github.com/1000/issues/0)
+* Update sass and change colour syntax ([#8894](https://github.com/videojs/video.js/issues/8894)) ([55bb0fd](https://github.com/videojs/video.js/commit/55bb0fd))
+
 <a name="8.21.1"></a>
 ## [8.21.1](https://github.com/videojs/video.js/compare/v8.21.0...v8.21.1) (2024-12-05)
 

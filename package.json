@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 video player that supports HLS and DASH with a common API and skin.",
-  "version": "8.21.1",
+  "version": "8.22.0",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@videojs/http-streaming": "^3.16.2",
+    "@videojs/http-streaming": "^3.17.0",
     "@videojs/vhs-utils": "^4.1.1",
     "@videojs/xhr": "2.7.0",
     "aes-decrypter": "^4.0.2",
@@ -155,7 +155,7 @@
     "rollup-plugin-progress": "^1.1.2",
     "rollup-plugin-stub": "^1.2.0",
     "rollup-plugin-svg": "^2.0.0",
-    "sass": "^1.34.0",
+    "sass": "^1.79.3",
     "semver": "^5.7.0",
     "shelljs": "^0.8.5",
     "shx": "^0.3.2",
