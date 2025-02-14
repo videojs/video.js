@@ -64,7 +64,6 @@ import './tech/html5.js';
 /** @import VideoTrackList from './tracks/video-track-list' */
 /** @import { SourceObject } from './tech/tech' */
 
-
 /**
  * @callback PlayerReadyCallback
  * @this     {Player}
