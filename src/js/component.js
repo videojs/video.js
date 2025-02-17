@@ -1971,6 +1971,8 @@ class Component {
   }
 
   /**
+   * @template {typeof Component} T
+   *
    * Register a `Component` with `videojs` given the name and the component.
    *
    * > NOTE: {@link Tech}s should not be registered as a `Component`. {@link Tech}s
@@ -1983,10 +1985,10 @@ class Component {
    * @param {string} name
    *        The name of the `Component` to register.
    *
-   * @param {typeof Component} ComponentToRegister
+   * @param {T} ComponentToRegister
    *        The `Component` class to register.
    *
-   * @return {typeof Component}
+   * @return {T}
    *         The `Component` that was registered.
    */
   static registerComponent(name, ComponentToRegister) {
