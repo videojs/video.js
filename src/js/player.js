@@ -62,11 +62,152 @@ import './tech/html5.js';
 /** @import TextTrackList from './tracks/text-track-list' */
 /** @import { TimeRange } from './utils/time' */
 /** @import VideoTrackList from './tracks/video-track-list' */
+/** @import { SourceObject } from './tech/tech' */
 
 /**
  * @callback PlayerReadyCallback
  * @this     {Player}
  * @returns  {void}
+ */
+
+/**
+ * @typedef {Object} PlayerOptions Player setup options
+ * @property  {boolean|'play'|'muted'|'any'} [autoplay]
+ *              Autoplay behaviour. Don't use the `autoplay` attribute if set.
+ *              - `false` or `'none'`: No autoplay
+ *              - `true`: Browser's autoplay
+ *              - `'muted'`: Mute, then play on `loadstart`
+ *              - `'any'`: Attempt to play on `loadstart`. If rejected, mute and then play
+ * @property  {Object} [controlBar]
+ *              Options for the controlbar component
+ * @property  {boolean} [controlBar.remainingTimeDisplay.displayNegative]
+ *              If false, show remaining time without a negative sign
+ * @property  {boolean} [controls]
+ *              Whether to show controls
+ * @property  {number|string} [height]
+ *              Player height in pixels
+ * @property  {boolean} [loop]
+ *              Whether to loop
+ * @property  {boolean} [muted]
+ *              Whether to mute
+ * @property  {string} [poster]
+ *              Poster image URL
+ * @property  {'auto'|'metadata'|'none'} [preload]
+ *              Whether to preload
+ * @property  {string|Object|Array} [src]
+ *              Source or source object or array of source objects
+ * @property  {number|string} [width]
+ *              Player height in pixels
+ * @property  {string} [aspectRatio]
+ *              e.g. '16:9'. Sets aspect ratio of player using fluid mode
+ * @property  {boolean} [audioOnlyMode]
+ *              If true show only control bar and appropriate controls
+ * @property  {boolean} [audioPosterMode]
+ *              Show poster throughtout audio playback
+ * @property  {Object} [breakpoints]
+ *              Breakpoints for responsive layout mode
+ * @property  {number} [breakpoints.tiny=300]
+ * @property  {number} [breakpoints.xsmall=400]
+ * @property  {number} [breakpoints.small=500]
+ * @property  {number} [breakpoints.medium=600]
+ * @property  {number} [breakpoints.large=700]
+ * @property  {number} [breakpoints.xlarge=800]
+ * @property  {number} [breakpoints.huge=900]
+ * @property  {Array|Object} [children]
+ * @property  {boolean} [disablePictureInPicture]
+ *              Prevents picture-in-picture mode
+ * @property  {boolean} [enableDocumentPictureInPicture]
+ *              Enable picture-in-picture using the document picture-in-picture API if available
+ * @property  {boolean} [enableSmoothSeeking]
+ *              Smoother seeking experience
+ *              TODO: Why not?
+ * @property  {boolean} [experimentalSvgIcons]
+ *              Use SVG icons istead of the default font icons
+ * @property  {boolean} [fluid]
+ *              Resize the player to the video's intrinsic ratio once known (metadata has loaded), fitting the contianers width.
+ * @property  {Object} [fullscreen]
+ * @property  {'auto'|'hide'|'show'} [fullscreen.options.navigationUI]
+ *              Navigation UI preference to pass to browser fullscreen API
+ * @property  {string} [id]
+ *              If the player element doesn't already have an id, set this id.
+ * @property  {number} [inactivityTimeout]
+ *              Milliseconds before considered inactive, e.g. controls hide
+ * @property  {string} [language]
+ *              Language to use for localisation. If unset, detect from HTML or navigator.language
+ * @property  {Object.<string, Object>} [languages]
+ *              Object of translations to add to the player
+ * @property  {boolean} [liveui]
+ *              Inlcude live UI with seekbar for DVR
+ * @property  {number} [liveTracker.trackingThreshold]
+ *              An option for the liveTracker component of the player that controls when the liveui should be shown. By default if a stream has less than 20s on the seekBar then we do not show the new liveui even with the liveui option set.
+ * @property  {number} [liveTracker.liveTolerance]
+ *              How far from the seekable end should be considered live playback. Default 15s.
+ * @property {boolean} [nativeControlsForTouch]
+ *              Explicitly set a default value for tech option
+ * @property {boolean} [normalizeAutoplay]
+ *              Specify whether setting `autoplay: true` or `<video autoplay>` should be treated the same as `autoplay: 'play'`, i.e. the `autoplay` attribute should be removed from (or not added to) the video element and `play()` be initiated manually by Video.js rather than the browser.
+ * @property {string} [notSupportedMessage]
+ *              Allows overriding the default message that is displayed when Video.js cannot play back a media source.
+ * @property {boolean} [noUITitleAttributes]
+ *              Whether UI elements have a `title` attribute
+ * @property {Number[]} [playbackRates]
+ *             An array of numbers strictly greater than 0, where 1 means regular speed
+ * @property {boolean} [playsinline]
+ *             Indicates to the browser that non-fullscreen playback is preferred when fullscreen playback is the native default, such as in iOS Safari.
+ * @property {Object.<string, Object>} [plugins]
+ *             Plugin names and their options
+ * @property {boolean} [persistTextTrackSettings=false]
+ *             Whether to store text track settings to local storage
+ * @property {boolean} [preferFullWindow]
+ *             On devices that don't support the HTML fullscreen UI but do support fullscreen on the video element (iPhone), use "full window" mode instead of fullscreen.
+ * @property {boolean} [responsive]
+ *              Setting this option to `true` will cause the player layout to customize itself based on responsive breakpoints
+ * @property {boolean|HTMLElement} [restoreEl]
+ *              If set to `true`, a _copy_ of the placeholder element will be made before the player is initalised. If the player is disposed, the copy is put back into the DOM in the player's place.
+ *              If set to an HTML Element, that element would replace the disposed player instead.
+ * @property {Object} [skipButtons]
+ * @property {5|10|30} [skipButtons.forward]
+ * @property {5|10|30} [skipButtons.backward]
+ * @property {Array} [sources]
+ * @property {boolean} [suppressNotSupportedError]
+ *             Don't show a not supported error before playback has been attempted.
+ * @property {boolean} [techCanOverridePoster]
+ * @property {string[]} [techOrder]
+ * @property {Object} [userActions]
+ * @property {boolean|Function} [userActions.click]
+ *             By default (`true`), clicking toggles play/pause
+ *             If `false`, clicking on the player el (except controls) does not toggle play/pause
+ *             If a function, function will be called and passed the event
+ * @property {boolean|Function} [userActions.doubleClick]
+ *             By default (`true`), double clicking toggles fullscreen
+ *             If `false`, clicking on the player el (except controls) does not toggle fullscreen
+ *             If a function, function will be called and passed the event
+ * @property {boolean|Function|Object} [userActions.hotkeys]
+ *             `true` or `false` enables or disables default hotkeys
+ *             If a function, that is called with the keydown event
+ *             If an object, defines keys for standard actions
+ * @property {Function} [userActions.hotkeys.fullscreenKey]
+ *             Override the fullscreen key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the fullscreen toggle action is performed.
+ * @property {Function} [userActions.hotkeys.muteKey]
+ *             Override the mute key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the mute toggle action is performed.
+ * @property {Function} [userActions.hotkeys.playPauseKey]
+ *             Override the play/pause key definition. If this is set, the function receives the `keydown` event; if the function returns `true`, then the play/pause toggle action is performed.
+ * @property {string} [vtt.js]
+ *             Allows overriding the default URL to vtt.js, which may be loaded asynchronously to polyfill support for `WebVTT`.
+ * @property {Object} [html5]
+ *              Options for the html5 tech
+ * @property {boolean} [html5.nativeControlsForTouch]
+ * @property {boolean} [html5.nativeAudioTracks]
+ * @property {boolean} [html5.nativeTextTracks]
+ * @property {boolean} [html5.nativeVideoTracks]
+ * @property {boolean} [html5.preloadTextTracks]
+ * @property {Object} [html5.vhs]
+ *             Options for videojs/http-streaming
+ * @property {boolean} [html5.vhs.overrideNative]
+ *             Use VHS/MSE playback rather than native on Safari
+ * @property {boolean} [html5.vhs.experimentalUseMMS]
+ *             Use Managed Media Source with VHS where available
+ * @property {{enabled: boolean}} [spatialNavigation]
  */
 
 // The following tech events are simply re-triggered
@@ -313,8 +454,8 @@ class Player extends Component {
    * @param {Element} tag
    *        The original video DOM element used for configuring options.
    *
-   * @param {Object} [options]
-   *        Object of option names and values.
+   * @param {PlayerOptions} [options]
+   *        Player options.
    *
    * @param {PlayerReadyCallback} [ready]
    *        Ready callback function.
@@ -1571,7 +1712,7 @@ class Player extends Component {
    *         in the current `currentSources` cache.
    *
    *
-   * @param {Tech~SourceObject} srcObj
+   * @param {SourceObject|string} srcObj
    *        A string or object source to update our caches to.
    */
   updateSourceCaches_(srcObj = '') {
@@ -3537,11 +3678,9 @@ class Player extends Component {
   /**
    * Executes source setting and getting logic
    *
-   * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
-   *        A SourceObject, an array of SourceObjects, or a string referencing
-   *        a URL to a media source. It is _highly recommended_ that an object
-   *        or array of objects is used here, so that source selection
-   *        algorithms can take the `type` into account.
+   * @param {string|SourceObject|Array.<SourceObject|string>} [source]
+   *        A SourceObject, a string or an array of strings and/or SourceObjects
+   *        passed by src().
    *
    *        If not provided, this method acts as a getter.
    * @param {boolean} [isRetry]
@@ -3648,10 +3787,10 @@ class Player extends Component {
   /**
    * Get or set the video source.
    *
-   * @param {Tech~SourceObject|Tech~SourceObject[]|string} [source]
-   *        A SourceObject, an array of SourceObjects, or a string referencing
-   *        a URL to a media source. It is _highly recommended_ that an object
-   *        or array of objects is used here, so that source selection
+   * @param {string|SourceObject|Array.<SourceObject|string>} [source]
+   *        A SourceObject, a string or an array of strings and/or SourceObjects
+   *        referencing a URL to a media source. It is _highly recommended_ that
+   *        a SourceObject or array of objects is used here, so that source selection
    *        algorithms can take the `type` into account.
    *
    *        If not provided, this method acts as a getter.
@@ -3668,7 +3807,7 @@ class Player extends Component {
    * Set the source object on the tech, returns a boolean that indicates whether
    * there is a tech that can play the source or not
    *
-   * @param {Tech~SourceObject} source
+   * @param {SourceObject} source
    *        The source object to set on the Tech
    *
    * @return {boolean}
@@ -3873,7 +4012,7 @@ class Player extends Component {
   /**
    * Returns all of the current source objects.
    *
-   * @return {Tech~SourceObject[]}
+   * @return {SourceObject[]}
    *         The current source objects
    */
   currentSources() {
@@ -3891,7 +4030,7 @@ class Player extends Component {
   /**
    * Returns the current source object.
    *
-   * @return {Tech~SourceObject}
+   * @return {SourceObject}
    *         The current source object
    */
   currentSource() {
@@ -5117,8 +5256,10 @@ class Player extends Component {
    * Properties that are not part of this type description will be retained; so,
    * this can be viewed as a generic metadata storage mechanism as well.
    *
+   * Contains properties from MediaMetadata
+   *
    * @see      {@link https://wicg.github.io/mediasession/#the-mediametadata-interface}
-   * @typedef  {Object} Player~MediaObject
+   * @typedef  {Object} MediaObject
    *
    * @property {string} [album]
    *           Unused, except if this object is passed to the `MediaSession`
@@ -5136,11 +5277,11 @@ class Player extends Component {
    * @property {string} [poster]
    *           URL to an image that will display before playback.
    *
-   * @property {Tech~SourceObject|Tech~SourceObject[]|string} [src]
-   *           A single source object, an array of source objects, or a string
-   *           referencing a URL to a media source. It is _highly recommended_
-   *           that an object or array of objects is used here, so that source
-   *           selection algorithms can take the `type` into account.
+   * @property {string|SourceObject|Array.<SourceObject|string>} [src]
+   *           A SourceObject, a string or an array of strings and/or SourceObjects
+   *           referencing a URL to a media source. It is _highly recommended_ that
+   *           a SourceObject or array of objects is used here, so that source selection
+   *           algorithms can take the `type` into account.
    *
    * @property {string} [title]
    *           Unused, except if this object is passed to the `MediaSession`
@@ -5159,7 +5300,7 @@ class Player extends Component {
   /**
    * Populate the player using a {@link Player~MediaObject|MediaObject}.
    *
-   * @param  {Player~MediaObject} media
+   * @param  {MediaObject} media
    *         A media object.
    *
    * @param  {Function} ready
@@ -5217,9 +5358,9 @@ class Player extends Component {
    * Get a clone of the current {@link Player~MediaObject} for this player.
    *
    * If the `loadMedia` method has not been used, will attempt to return a
-   * {@link Player~MediaObject} based on the current state of the player.
+   * {@link MediaObject} based on the current state of the player.
    *
-   * @return {Player~MediaObject}
+   * @return {MediaObject}
    */
   getMedia() {
     if (!this.cache_.media) {
