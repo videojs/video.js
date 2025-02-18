@@ -44,16 +44,16 @@ class SeekBar extends Slider {
     // Avoid mutating the prototype's `children` array by creating a copy
     options.children = [...options.children];
 
-    const shouldDisableSeekWhileScrubbingOnMobile = player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID);
+    const shouldDisableSeekWhileScrubbing = (player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID)) || (player.options_.disableSeekWhileScrubbingOnSTV);
 
     // Add the TimeTooltip as a child if we are on desktop, or on mobile with `disableSeekWhileScrubbingOnMobile: true`
-    if ((!IS_IOS && !IS_ANDROID) || shouldDisableSeekWhileScrubbingOnMobile) {
+    if ((!IS_IOS && !IS_ANDROID) || shouldDisableSeekWhileScrubbing) {
       options.children.splice(1, 0, 'mouseTimeDisplay');
     }
 
     super(player, options);
 
-    this.shouldDisableSeekWhileScrubbingOnMobile_ = shouldDisableSeekWhileScrubbingOnMobile;
+    this.shouldDisableSeekWhileScrubbing_ = shouldDisableSeekWhileScrubbing;
     this.pendingSeekTime_ = null;
 
     this.setEventHandlers_();
@@ -196,7 +196,7 @@ class SeekBar extends Slider {
 
       // update the progress bar time tooltip with the current time
       if (this.bar) {
-        this.bar.update(Dom.getBoundingClientRect(this.el()), this.getProgress());
+        this.bar.update(Dom.getBoundingClientRect(this.el()), this.getProgress(), event);
       }
     });
 
@@ -234,6 +234,20 @@ class SeekBar extends Slider {
   }
 
   /**
+   * Getter and setter for pendingSeekTime.
+   * Acts as a setter if a value is provided, or as a getter if no argument is given.
+   *
+   * @param {number|null} [time] - Optional. The new pending seek time, can be a number or null.
+   * @return {number|null} - The current pending seek time.
+   */
+  pendingSeekTime(time) {
+    if (time !== undefined) {
+      this.pendingSeekTime_ = time;
+    }
+    return this.pendingSeekTime_;
+  }
+
+  /**
    * Get the percentage of media played so far.
    *
    * @return {number}
@@ -242,8 +256,8 @@ class SeekBar extends Slider {
   getPercent() {
     // If we have a pending seek time, we are scrubbing on mobile and should set the slider percent
     // to reflect the current scrub location.
-    if (this.pendingSeekTime_) {
-      return this.pendingSeekTime_ / this.player_.duration();
+    if (this.pendingSeekTime() !== null) {
+      return this.pendingSeekTime() / this.player_.duration();
     }
 
     const currentTime = this.getCurrentTime_();
@@ -284,7 +298,7 @@ class SeekBar extends Slider {
 
     // Don't pause if we are on mobile and `disableSeekWhileScrubbingOnMobile: true`.
     // In that case, playback should continue while the player scrubs to a new location.
-    if (!this.shouldDisableSeekWhileScrubbingOnMobile_) {
+    if (!this.shouldDisableSeekWhileScrubbing_) {
       this.player_.pause();
     }
 
@@ -351,8 +365,8 @@ class SeekBar extends Slider {
     }
 
     // if on mobile and `disableSeekWhileScrubbingOnMobile: true`, keep track of the desired seek point but we won't initiate the seek until 'touchend'
-    if (this.shouldDisableSeekWhileScrubbingOnMobile_) {
-      this.pendingSeekTime_ = newTime;
+    if (this.shouldDisableSeekWhileScrubbing_) {
+      this.pendingSeekTime(newTime);
     } else {
       this.userSeek_(newTime);
     }
@@ -402,10 +416,10 @@ class SeekBar extends Slider {
     this.player_.scrubbing(false);
 
     // If we have a pending seek time, then we have finished scrubbing on mobile and should initiate a seek.
-    if (this.pendingSeekTime_) {
-      this.userSeek_(this.pendingSeekTime_);
+    if (this.pendingSeekTime() !== null) {
+      this.userSeek_(this.pendingSeekTime());
 
-      this.pendingSeekTime_ = null;
+      this.pendingSeekTime(null);
     }
 
     /**
@@ -429,14 +443,40 @@ class SeekBar extends Slider {
    * Move more quickly fast forward for keyboard-only users
    */
   stepForward() {
-    this.userSeek_(this.player_.currentTime() + this.options().stepSeconds);
+    // if `disableSeekWhileScrubbingOnSTV: true`, keep track of the desired seek point but we won't initiate the seek
+    if (this.shouldDisableSeekWhileScrubbing_) {
+      if (!this.player_.paused()) {
+        this.player_.pause();
+      }
+      const currentPos = this.pendingSeekTime() !== null ?
+        this.pendingSeekTime() :
+        this.player_.currentTime();
+
+      this.pendingSeekTime(currentPos + this.options().stepSeconds);
+      this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+    } else {
+      this.userSeek_(this.player_.currentTime() + this.options().stepSeconds);
+    }
   }
 
   /**
    * Move more quickly rewind for keyboard-only users
    */
   stepBack() {
-    this.userSeek_(this.player_.currentTime() - this.options().stepSeconds);
+    // if `disableSeekWhileScrubbingOnSTV: true`, keep track of the desired seek point but we won't initiate the seek
+    if (this.shouldDisableSeekWhileScrubbing_) {
+      if (!this.player_.paused()) {
+        this.player_.pause();
+      }
+      const currentPos = this.pendingSeekTime() !== null ?
+        this.pendingSeekTime() :
+        this.player_.currentTime();
+
+      this.pendingSeekTime(currentPos - this.options().stepSeconds);
+      this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+    } else {
+      this.userSeek_(this.player_.currentTime() - this.options().stepSeconds);
+    }
   }
 
   /**
@@ -448,6 +488,10 @@ class SeekBar extends Slider {
    *
    */
   handleAction(event) {
+    if (this.pendingSeekTime() !== null) {
+      this.userSeek_(this.pendingSeekTime());
+      this.pendingSeekTime(null);
+    }
     if (this.player_.paused()) {
       this.player_.play();
     } else {
