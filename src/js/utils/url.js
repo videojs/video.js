@@ -47,7 +47,7 @@ export const getAbsoluteURL = function(url) {
  */
 export const getFileExtension = function(path) {
   if (typeof path === 'string') {
-    const splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/;
+    const splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.*([^\.\/\?]+)))(?:[\/]*|[\?].*)$/;
     const pathParts = splitPathRe.exec(path);
 
     if (pathParts) {
@@ -74,3 +74,4 @@ export const getFileExtension = function(path) {
 export const isCrossOrigin = function(url, winLoc = window.location) {
   return parseUrl(url).origin !== winLoc.origin;
 };
+
