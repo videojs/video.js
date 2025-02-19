@@ -31,9 +31,14 @@ const parseCues = function(srcContent, track) {
     window.WebVTT.StringDecoder()
   );
   const errors = [];
+  const regions = [];
 
   parser.oncue = function(cue) {
     track.addCue(cue);
+  };
+
+  parser.onregion = function(region) {
+    regions.push(region);
   };
 
   parser.onparsingerror = function(error) {
@@ -41,6 +46,7 @@ const parseCues = function(srcContent, track) {
   };
 
   parser.onflush = function() {
+    track.regionList = regions;
     track.trigger({
       type: 'loadeddata',
       target: track
