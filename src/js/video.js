@@ -24,9 +24,13 @@ import Plugin from './plugin';
 import * as Fn from './utils/fn.js';
 import * as Num from './utils/num.js';
 import * as Str from './utils/str.js';
+import TrackList from './tracks/track-list.js';
 import TextTrack from './tracks/text-track.js';
+import TextTrackList from './tracks/text-track-list.js';
 import AudioTrack from './tracks/audio-track.js';
+import AudioTrackList from './tracks/audio-track-list.js';
 import VideoTrack from './tracks/video-track.js';
+import VideoTrackList from './tracks/video-track-list.js';
 import { deprecateForMajor } from './utils/deprecate';
 import * as Time from './utils/time.js';
 import log, { createLogger } from './utils/log.js';
@@ -547,9 +551,13 @@ videojs.trigger = Events.trigger;
  */
 videojs.xhr = xhr;
 
+videojs.TrackList = TrackList;
 videojs.TextTrack = TextTrack;
+videojs.TextTrackList = TextTrackList;
 videojs.AudioTrack = AudioTrack;
+videojs.AudioTrackList = AudioTrackList;
 videojs.VideoTrack = VideoTrack;
+videojs.VideoTrackList = VideoTrackList;
 
 [
   'isEl',
