@@ -16,6 +16,7 @@ import * as middleware from '../../src/js/tech/middleware.js';
 import * as Events from '../../src/js/utils/events.js';
 import pkg from '../../package.json';
 import * as Guid from '../../src/js/utils/guid.js';
+import SeekBar from '../../src/js/control-bar/progress-control/seek-bar';
 
 QUnit.module('Player', {
   beforeEach() {
@@ -3731,7 +3732,7 @@ QUnit.test('Seek should occur when scrubbing completes on mobile when disableSee
   // Simulate a source loaded
   player.duration(10);
 
-  seekBar.pendingSeekTime_ = targetSeekTime;
+  seekBar.pendingSeekTime(targetSeekTime);
 
   // Simulate scrubbing completion
   seekBar.handleMouseUp();
@@ -3847,4 +3848,110 @@ QUnit.test('removeSourceElement returns false if no tech', function(assert) {
 
   assert.notOk(removed, 'Returned false');
   player.dispose();
+});
+
+QUnit.module('SmartTV Seek Logic', function(hooks) {
+  let player;
+  let seekBar;
+
+  hooks.beforeEach(function() {
+    player = TestHelpers.makePlayer({
+      disableSeekWhileScrubbingOnSTV: true,
+      controlBar: {
+        progressControl: {
+          seekBar: {
+            stepSeconds: 5
+          }
+        }
+      }
+    });
+
+    seekBar = player.controlBar.progressControl.seekBar;
+    player.duration(100);
+  });
+
+  hooks.afterEach(function() {
+    player.dispose();
+  });
+
+  QUnit.test('Step forward updates pendingSeekTime but does not seek immediately', function(assert) {
+    player.currentTime(40);
+    seekBar.stepForward();
+
+    assert.equal(
+      seekBar.pendingSeekTime(),
+      45,
+      'pendingSeekTime should be 45 (40 + 5) after stepForward'
+    );
+
+    assert.equal(
+      player.currentTime(),
+      40,
+      'Player currentTime remains unchanged (no immediate seek)'
+    );
+  });
+
+  QUnit.test('Step back updates pendingSeekTime but does not seek immediately', function(assert) {
+    player.currentTime(40);
+    seekBar.stepBack();
+
+    assert.equal(
+      seekBar.pendingSeekTime(),
+      35,
+      'pendingSeekTime should be 35 (40 - 5) after stepBack'
+    );
+
+    assert.equal(
+      player.currentTime(),
+      40,
+      'Player currentTime remains unchanged (no immediate seek)'
+    );
+  });
+
+  QUnit.test('Pressing Enter seeks to pendingSeekTime and resets it', function(assert) {
+    seekBar.pendingSeekTime(50);
+
+    const userSeekSpy = sinon.spy(seekBar, 'userSeek_');
+
+    seekBar.handleAction();
+
+    assert.ok(
+      userSeekSpy.calledWith(50),
+      'Pressing Enter should trigger seek to pendingSeekTime (50)'
+    );
+
+    assert.equal(
+      seekBar.pendingSeekTime(),
+      null,
+      'pendingSeekTime should be reset to null after seeking'
+    );
+
+    assert.equal(
+      player.currentTime(),
+      50,
+      'Player currentTime should be updated to 50 after pressing Enter'
+    );
+  });
+
+  QUnit.test('Step forward/back seeks immediately when disableSeekWhileScrubbingOnSTV is false', function(assert) {
+    player.options_.disableSeekWhileScrubbingOnSTV = false;
+    seekBar = new SeekBar(player);
+    player.currentTime(40);
+
+    seekBar.stepForward();
+
+    assert.equal(
+      player.currentTime(),
+      45,
+      'Player currentTime should update immediately when stepping forward'
+    );
+
+    seekBar.stepBack();
+
+    assert.equal(
+      player.currentTime(),
+      40,
+      'Player currentTime should update immediately when stepping back'
+    );
+  });
 });
