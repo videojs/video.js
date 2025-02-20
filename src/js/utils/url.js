@@ -47,7 +47,7 @@ export const getAbsoluteURL = function(url) {
  */
 export const getFileExtension = function(path) {
   if (typeof path === 'string') {
-    const cleanPath = path.split('?')[0];
+    const cleanPath = path.split('?')[0].replace(/\/+$/, '');
 
     const match = cleanPath.match(/\.([^.\/]+)$/);
 
