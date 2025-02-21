@@ -688,6 +688,7 @@ QUnit.module('SmartTV UI Updates (Progress Bar & Time Display)', function(hooks)
 
   hooks.beforeEach(function() {
     player = TestHelpers.makePlayer({
+      spatialNavigation: { enabled: true },
       disableSeekWhileScrubbingOnSTV: true,
       controlBar: {
         progressControl: {
@@ -777,5 +778,16 @@ QUnit.module('SmartTV UI Updates (Progress Bar & Time Display)', function(hooks)
       '0:45',
       'Current-time-display should remain at 45s after seeking'
     );
+  });
+
+  QUnit.test('Resets pendingSeekTime when SmartTV focus moves away without confirmation', function(assert) {
+    const userSeekSpy = sinon.spy(seekBar, 'userSeek_');
+
+    seekBar.trigger({ type: 'keydown', key: 'ArrowUp' });
+    assert.ok(seekBar.pendingSeekTime() !== null, 'pendingSeekTime should be set after ArrowUp keydown');
+    seekBar.trigger({ type: 'keydown', key: 'ArrowLeft' });
+    assert.equal(seekBar.pendingSeekTime(), null, 'pendingSeekTime should be reset when SeekBar loses focus');
+    assert.ok(userSeekSpy.calledWith(player.currentTime()), 'userSeek_ should be called with current player time');
+    userSeekSpy.restore();
   });
 });
