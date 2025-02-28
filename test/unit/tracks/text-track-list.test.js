@@ -5,8 +5,6 @@ import EventTarget from '../../../src/js/event-target.js';
 import TechFaker from '../tech/tech-faker';
 import sinon from 'sinon';
 
-// here
-
 QUnit.module('Text Track List', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();

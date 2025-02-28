@@ -64,15 +64,7 @@ class TextTrackList extends TrackList {
    * @return {Object[]} A serializable list of objects for the text track list
    */
   toJSON() {
-    const trackCopies = [];
-
-    this.tracks_.forEach((track) => {
-      const copy = track.toJSON();
-
-      trackCopies.push(copy);
-    });
-
-    return trackCopies;
+    return this.tracks_.map((track) => track.toJSON());
   }
 
   /**
@@ -81,7 +73,8 @@ class TextTrackList extends TrackList {
    * @return {string} The serialized list of text tracks
    */
   serialize() {
-    return JSON.stringify(this.toJSON());
+    // Stringify calls toJSON if it exists, so the method above will be used.
+    return JSON.stringify(this);
   }
 }
 export default TextTrackList;

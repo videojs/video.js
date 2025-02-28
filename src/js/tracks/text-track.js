@@ -447,7 +447,8 @@ class TextTrack extends Track {
    * @return {string} The serialized string for the text track
    */
   serialize() {
-    return JSON.stringify(this.toJSON());
+    // Stringify calls toJSON if it exists, so the method above will be used.
+    return JSON.stringify(this);
   }
 
   /**
