@@ -235,14 +235,20 @@ class SeekBar extends Slider {
 
   /**
    * Getter and setter for pendingSeekTime.
-   * Acts as a setter if a value is provided, or as a getter if no argument is given.
+   * Ensures the value is clamped between 0 and duration.
    *
    * @param {number|null} [time] - Optional. The new pending seek time, can be a number or null.
    * @return {number|null} - The current pending seek time.
    */
   pendingSeekTime(time) {
     if (time !== undefined) {
-      this.pendingSeekTime_ = time;
+      if (time !== null) {
+        const duration = this.player_.duration();
+
+        this.pendingSeekTime_ = Math.max(0, Math.min(time, duration));
+      } else {
+        this.pendingSeekTime_ = null;
+      }
     }
     return this.pendingSeekTime_;
   }
