@@ -421,6 +421,36 @@ class TextTrack extends Track {
   }
 
   /**
+   * Makes the text track serializable by removing circular dependencies.
+   *
+   * @return {Object} The track information as a serializable object
+   */
+  toJSON() {
+    const track = this;
+    // Get inherited properties as well as the ones in this class.
+    const props = Object.getOwnPropertyNames(track);
+    const copy = {};
+
+    props.forEach((prop) => {
+      // Do not include tech_, this is the property with circular references.
+      if (track.hasOwnProperty(prop) && prop !== 'tech_') {
+        copy[prop] = track[prop];
+      }
+    });
+
+    return copy;
+  }
+
+  /**
+   * Serializes the text track.
+   *
+   * @return {string} The serialized string for the text track
+   */
+  serialize() {
+    return JSON.stringify(this.toJSON());
+  }
+
+  /**
    * Remove a cue from our internal list
    *
    * @param {TextTrack~Cue} removeCue

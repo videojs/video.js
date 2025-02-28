@@ -56,5 +56,32 @@ class TextTrackList extends TrackList {
       }
     }
   }
+
+  /**
+   * Makes the text track list serializable.
+   * This transforms each track into a serializable object.
+   *
+   * @return {Object[]} A serializable list of objects for the text track list
+   */
+  toJSON() {
+    const trackCopies = [];
+
+    this.tracks_.forEach((track) => {
+      const copy = track.toJSON();
+
+      trackCopies.push(copy);
+    });
+
+    return trackCopies;
+  }
+
+  /**
+   * A method to serialize the text track list.
+   *
+   * @return {string} The serialized list of text tracks
+   */
+  serialize() {
+    return JSON.stringify(this.toJSON());
+  }
 }
 export default TextTrackList;
