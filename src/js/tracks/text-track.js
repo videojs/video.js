@@ -7,6 +7,7 @@ import {TextTrackKind, TextTrackMode} from './track-enums';
 import log from '../utils/log.js';
 import window from 'global/window';
 import Track from './track.js';
+import textTrackConverter from './text-track-list-converter.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from '@videojs/xhr';
 import {merge} from '../utils/obj';
@@ -426,29 +427,8 @@ class TextTrack extends Track {
    * @return {Object} The track information as a serializable object
    */
   toJSON() {
-    const track = this;
-    // Get inherited properties as well as the ones in this class.
-    const props = Object.getOwnPropertyNames(track);
-    const copy = {};
 
-    props.forEach((prop) => {
-      // Do not include tech_, this is the property with circular references.
-      if (track.hasOwnProperty(prop) && prop !== 'tech_') {
-        copy[prop] = track[prop];
-      }
-    });
-
-    return copy;
-  }
-
-  /**
-   * Serializes the text track.
-   *
-   * @return {string} The serialized string for the text track
-   */
-  serialize() {
-    // Stringify calls toJSON if it exists, so the method above will be used.
-    return JSON.stringify(this);
+    return textTrackConverter.trackToJson(this);
   }
 
   /**

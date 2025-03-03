@@ -66,15 +66,5 @@ class TextTrackList extends TrackList {
   toJSON() {
     return this.tracks_.map((track) => track.toJSON());
   }
-
-  /**
-   * A method to serialize the text track list.
-   *
-   * @return {string} The serialized list of text tracks
-   */
-  serialize() {
-    // Stringify calls toJSON if it exists, so the method above will be used.
-    return JSON.stringify(this);
-  }
 }
 export default TextTrackList;

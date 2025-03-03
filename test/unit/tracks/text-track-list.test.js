@@ -88,14 +88,14 @@ QUnit.test('toJSON', function(assert) {
   assert.equal(textTrackListJSON[2].id, tt3.id, 'text track in third spot of array should match the original track');
 });
 
-QUnit.test('toJSON', function(assert) {
+QUnit.test('serialize', function(assert) {
   const tech = new TechFaker();
   const tt1 = new TextTrack({tech});
   const tt2 = new TextTrack({tech});
   const tt3 = new TextTrack({tech});
   const ttl = new TextTrackList([tt1, tt2, tt3]);
 
-  const serializedTrackList = ttl.serialize();
+  const serializedTrackList = JSON.stringify(ttl);
 
   assert.notOk(serializedTrackList.includes('"tech_":'), 'tech_ does not exist in the serialized data');
 

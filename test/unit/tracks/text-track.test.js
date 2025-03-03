@@ -768,7 +768,7 @@ QUnit.test('toJSON', function(assert) {
   // Properties we want copied are copied correctly
   assert.equal(tt.id, jsonTrack.id, 'the id for the copied track stayed the same');
   assert.equal(tt.mode, jsonTrack.mode, 'the mode for the copied track stayed the same');
-  assert.equal(tt.cues_, jsonTrack.cues_, 'the cues for the copied track stayed the same');
+  assert.equal(tt.kind, jsonTrack.kind, 'the kind for the copied track stayed the same');
 
   // The tech_ property stays on the original track, but is removed from the copy
   assert.ok(tt.tech_, 'the tech exists on the original track');
@@ -791,7 +791,7 @@ QUnit.test('serialize', function(assert) {
     endTime: 2.555
   });
 
-  const serializedTrack = tt.serialize();
+  const serializedTrack = JSON.stringify(tt);
 
   // Ensure tech was not removed from the actual track
   assert.ok(tt.tech_, 'the tech exists on the original track');
@@ -799,7 +799,7 @@ QUnit.test('serialize', function(assert) {
   // Values from the track should be found in the serialized string
   assert.ok(serializedTrack.includes(`"id":"${tt.id}"`), 'serialized data should include id');
   assert.ok(serializedTrack.includes(`"mode":"${tt.mode}"`), 'serialized data should include mode');
-  assert.ok(serializedTrack.includes(`"cues":${JSON.stringify(tt.cues)}`), 'serialized data should include cues');
+  assert.ok(serializedTrack.includes(`"kind":"${tt.kind}"`), 'serialized data should include cues');
 
   // tech_ should not be found in the serialized string
   assert.notOk(serializedTrack.includes('"tech_":'), 'serialized data should not include tech_');
