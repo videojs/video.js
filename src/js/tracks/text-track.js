@@ -422,12 +422,12 @@ class TextTrack extends Track {
   }
 
   /**
-   * Makes the text track serializable by removing circular dependencies.
+   * Creates a copy of the text track and makes it serializable
+   * by removing circular dependencies.
    *
    * @return {Object} The track information as a serializable object
    */
   toJSON() {
-
     return textTrackConverter.trackToJson(this);
   }
 
