@@ -58,8 +58,8 @@ class TextTrackList extends TrackList {
   }
 
   /**
-   * Makes the text track list serializable.
-   * This transforms each track into a serializable object.
+   * Creates a serializable array of objects that contains serialized copies
+   * of each text track.
    *
    * @return {Object[]} A serializable list of objects for the text track list
    */
