@@ -7,6 +7,7 @@ import {TextTrackKind, TextTrackMode} from './track-enums';
 import log from '../utils/log.js';
 import window from 'global/window';
 import Track from './track.js';
+import textTrackConverter from './text-track-list-converter.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from '@videojs/xhr';
 import {merge} from '../utils/obj';
@@ -418,6 +419,16 @@ class TextTrack extends Track {
 
     this.cues_.push(cue);
     this.cues.setCues_(this.cues_);
+  }
+
+  /**
+   * Creates a copy of the text track and makes it serializable
+   * by removing circular dependencies.
+   *
+   * @return {Object} The track information as a serializable object
+   */
+  toJSON() {
+    return textTrackConverter.trackToJson(this);
   }
 
   /**
