@@ -746,3 +746,61 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   testTech.off();
   log.error = oldLogError;
 });
+
+QUnit.test('toJSON', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 2.555
+  });
+  tt.addCue({
+    id: '2',
+    startTime: 2.555,
+    endTime: 2.555
+  });
+
+  const jsonTrack = tt.toJSON();
+
+  // Properties we want copied are copied correctly
+  assert.equal(tt.id, jsonTrack.id, 'the id for the copied track stayed the same');
+  assert.equal(tt.mode, jsonTrack.mode, 'the mode for the copied track stayed the same');
+  assert.equal(tt.kind, jsonTrack.kind, 'the kind for the copied track stayed the same');
+
+  // The tech_ property stays on the original track, but is removed from the copy
+  assert.ok(tt.tech_, 'the tech exists on the original track');
+  assert.notOk(jsonTrack.tech_, 'the tech does not exist on the copied track');
+});
+
+QUnit.test('serialize', function(assert) {
+  const tt = new TextTrack({
+    tech: this.tech
+  });
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 2.555
+  });
+  tt.addCue({
+    id: '2',
+    startTime: 2.555,
+    endTime: 2.555
+  });
+
+  const serializedTrack = JSON.stringify(tt);
+
+  // Ensure tech was not removed from the actual track
+  assert.ok(tt.tech_, 'the tech exists on the original track');
+
+  // Values from the track should be found in the serialized string
+  assert.ok(serializedTrack.includes(`"id":"${tt.id}"`), 'serialized data should include id');
+  assert.ok(serializedTrack.includes(`"mode":"${tt.mode}"`), 'serialized data should include mode');
+  assert.ok(serializedTrack.includes(`"kind":"${tt.kind}"`), 'serialized data should include cues');
+
+  // tech_ should not be found in the serialized string
+  assert.notOk(serializedTrack.includes('"tech_":'), 'serialized data should not include tech_');
+});
