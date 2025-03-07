@@ -325,6 +325,10 @@ class Slider extends Component {
         event.stopPropagation();
         this.stepForward();
       } else {
+        if (this.pendingSeekTime()) {
+          this.pendingSeekTime(null);
+          this.userSeek_(this.player_.currentTime());
+        }
         super.handleKeyDown(event);
       }
 

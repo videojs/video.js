@@ -35,6 +35,8 @@ class CurrentTimeDisplay extends TimeDisplay {
 
     if (this.player_.ended()) {
       time = this.player_.duration();
+    } else if (event && event.target && typeof event.target.pendingSeekTime === 'function') {
+      time = event.target.pendingSeekTime();
     } else {
       time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     }

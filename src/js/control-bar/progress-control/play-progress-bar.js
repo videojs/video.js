@@ -56,17 +56,25 @@ class PlayProgressBar extends Component {
    * @param {number} seekBarPoint
    *        A number from 0 to 1, representing a horizontal reference point
    *        from the left edge of the {@link SeekBar}
+   *
+   * @param {Event} [event]
+   *        The `timeupdate` event that caused this function to run.
    */
-  update(seekBarRect, seekBarPoint) {
+  update(seekBarRect, seekBarPoint, event) {
     const timeTooltip = this.getChild('timeTooltip');
 
     if (!timeTooltip) {
       return;
     }
 
-    const time = (this.player_.scrubbing()) ?
-      this.player_.getCache().currentTime :
-      this.player_.currentTime();
+    // Combined logic: if an event with a valid pendingSeekTime getter exists, use it.
+    const time = (event &&
+      event.target &&
+      typeof event.target.pendingSeekTime === 'function') ?
+      event.target.pendingSeekTime() :
+      (this.player_.scrubbing() ?
+        this.player_.getCache().currentTime :
+        this.player_.currentTime());
 
     timeTooltip.updateTime(seekBarRect, seekBarPoint, time);
   }
