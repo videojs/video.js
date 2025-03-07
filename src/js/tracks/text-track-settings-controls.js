@@ -16,10 +16,8 @@ class TrackSettingsControls extends Component {
     super(player, options);
 
     // Create DOM elements
-    const defaultsDescription = this.localize('restore all settings to the default values');
-
     const resetButton = new Button(player, {
-      controlText: defaultsDescription,
+      controlText: this.localize('restore all settings to the default values'),
       className: 'vjs-default-button'
     });
 
@@ -28,14 +26,15 @@ class TrackSettingsControls extends Component {
 
     this.addChild(resetButton);
 
+    const doneText = this.localize('Done');
     const doneButton = new Button(player, {
-      controlText: defaultsDescription,
+      controlText: doneText,
       className: 'vjs-done-button'
     });
 
     // Remove unrequired style classes
     doneButton.el().classList.remove('vjs-control', 'vjs-button');
-    doneButton.el().textContent = this.localize('Done');
+    doneButton.el().textContent = doneText;
 
     this.addChild(doneButton);
   }
