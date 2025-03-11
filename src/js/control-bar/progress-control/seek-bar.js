@@ -45,8 +45,8 @@ class SeekBar extends Slider {
     options.children = [...options.children];
 
     const shouldDisableSeekWhileScrubbing =
-      (player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID))
-      || (player.options_.disableSeekWhileScrubbingOnSTV);
+      (player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID)) ||
+      (player.options_.disableSeekWhileScrubbingOnSTV);
 
     // Add the TimeTooltip as a child if we are on desktop, or on mobile with `disableSeekWhileScrubbingOnMobile: true`
     if ((!IS_IOS && !IS_ANDROID) || shouldDisableSeekWhileScrubbing) {
@@ -448,20 +448,30 @@ class SeekBar extends Slider {
   }
 
   /**
+   * Handles pending seek time when `disableSeekWhileScrubbingOnSTV` is enabled.
+   *
+   * @param {number} stepAmount - The number of seconds to step (positive for forward, negative for backward).
+   */
+  handlePendingSeek_(stepAmount) {
+    if (!this.player_.paused()) {
+      this.player_.pause();
+    }
+
+    const currentPos = this.pendingSeekTime() !== null ?
+      this.pendingSeekTime() :
+      this.player_.currentTime();
+
+    this.pendingSeekTime(currentPos + stepAmount);
+    this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+  }
+
+  /**
    * Move more quickly fast forward for keyboard-only users
    */
   stepForward() {
     // if `disableSeekWhileScrubbingOnSTV: true`, keep track of the desired seek point but we won't initiate the seek
     if (this.shouldDisableSeekWhileScrubbing_) {
-      if (!this.player_.paused()) {
-        this.player_.pause();
-      }
-      const currentPos = this.pendingSeekTime() !== null ?
-        this.pendingSeekTime() :
-        this.player_.currentTime();
-
-      this.pendingSeekTime(currentPos + this.options().stepSeconds);
-      this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+      this.handlePendingSeek_(this.options().stepSeconds);
     } else {
       this.userSeek_(this.player_.currentTime() + this.options().stepSeconds);
     }
@@ -473,15 +483,7 @@ class SeekBar extends Slider {
   stepBack() {
     // if `disableSeekWhileScrubbingOnSTV: true`, keep track of the desired seek point but we won't initiate the seek
     if (this.shouldDisableSeekWhileScrubbing_) {
-      if (!this.player_.paused()) {
-        this.player_.pause();
-      }
-      const currentPos = this.pendingSeekTime() !== null ?
-        this.pendingSeekTime() :
-        this.player_.currentTime();
-
-      this.pendingSeekTime(currentPos - this.options().stepSeconds);
-      this.player_.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+      this.handlePendingSeek_(-this.options().stepSeconds);
     } else {
       this.userSeek_(this.player_.currentTime() - this.options().stepSeconds);
     }
