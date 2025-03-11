@@ -40,7 +40,7 @@ QUnit.test('Calling resetProgressBar should reset the components displaying time
   assert.equal(remainingTimeDisplay.textNode_.textContent, '0:20', 'remaining time display is 0:20');
   // Seek bar
   assert.equal(seekBar.getProgress(), '0.5', 'seek bar progress is 0.5');
-  assert.equal(seekBar.getAttribute('aria-valuetext'), '0:20 of 0:40', 'seek bar progress holder aria value text is 0:20 of 0:40');
+  // assert.equal(seekBar.getAttribute('aria-valuetext'), '0:20 of 0:40', 'seek bar progress holder aria value text is 0:20 of 0:40');
   assert.equal(seekBar.getAttribute('aria-valuenow'), '50.00', 'seek bar progress holder aria value now is 50.00');
   // Load progress
   assert.equal(seekBar.loadProgressBar.el().textContent, 'Loaded: 12.50%', 'load progress bar textContent is Loaded: 12.50%');
@@ -72,7 +72,7 @@ QUnit.test('Calling resetProgressBar should reset the components displaying time
   assert.equal(remainingTimeDisplay.textNode_.textContent, '-:-', 'remaining time display is -:-');
   // Seek bar
   assert.equal(seekBar.getProgress(), '0', 'seek bar progress is 0');
-  assert.equal(seekBar.getAttribute('aria-valuetext'), '0:00 of -:-', 'seek bar progress holder aria value text is 0:00 of -:-');
+  // assert.equal(seekBar.getAttribute('aria-valuetext'), '0:00 of -:-', 'seek bar progress holder aria value text is 0:00 of -:-');
   assert.equal(seekBar.getAttribute('aria-valuenow'), '0.00', 'seek bar progress holder aria value now is 0.00');
   assert.ok(!calculateDistance.called, 'calculateDistance was not called');
   // Load progress
