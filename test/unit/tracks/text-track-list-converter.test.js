@@ -32,7 +32,7 @@ if (Html5.supportsNativeTextTracks()) {
     track.srclang = 'en';
     track.label = 'English';
 
-    assert.deepEqual(cleanup(c.trackToJson_(track.track)), {
+    assert.deepEqual(cleanup(c.trackToJson(track.track)), {
       kind: 'captions',
       label: 'English',
       language: 'en',
@@ -181,7 +181,7 @@ QUnit.test('trackToJson_ produces correct representation for emulated track obje
     }
   });
 
-  assert.deepEqual(cleanup(c.trackToJson_(track)), {
+  assert.deepEqual(cleanup(c.trackToJson(track)), {
     src: 'example.com/english.vtt',
     kind: 'captions',
     label: 'English',
