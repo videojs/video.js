@@ -44,7 +44,9 @@ class SeekBar extends Slider {
     // Avoid mutating the prototype's `children` array by creating a copy
     options.children = [...options.children];
 
-    const shouldDisableSeekWhileScrubbing = (player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID)) || (player.options_.disableSeekWhileScrubbingOnSTV);
+    const shouldDisableSeekWhileScrubbing =
+      (player.options_.disableSeekWhileScrubbingOnMobile && (IS_IOS || IS_ANDROID))
+      || (player.options_.disableSeekWhileScrubbingOnSTV);
 
     // Add the TimeTooltip as a child if we are on desktop, or on mobile with `disableSeekWhileScrubbingOnMobile: true`
     if ((!IS_IOS && !IS_ANDROID) || shouldDisableSeekWhileScrubbing) {
