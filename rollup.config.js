@@ -137,6 +137,9 @@ export default cliargs => [
     input: 'src/js/index.js',
     output: {
       format: 'umd',
+      amd: {
+        id: 'videojs'
+      },
       file: 'dist/video.js',
       name: 'videojs',
       banner,
