@@ -395,7 +395,8 @@ class TextTrack extends Track {
   addCue(originalCue) {
     let cue = originalCue;
 
-    if (cue.constructor && cue.constructor.name !== 'VTTCue') {
+    // Testing if the cue is a VTTCue in a way that survives minification
+    if (!('getCueAsHTML' in cue)) {
       cue = new window.vttjs.VTTCue(originalCue.startTime, originalCue.endTime, originalCue.text);
 
       for (const prop in originalCue) {
