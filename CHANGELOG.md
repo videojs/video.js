@@ -1,3 +1,10 @@
+<a name="7.21.7"></a>
+## [7.21.7](https://github.com/videojs/video.js/compare/v7.21.6...v7.21.7) (2025-03-20)
+
+### Bug Fixes
+
+* Resolves captions sizing issue when minified (v7) ([#9012](https://github.com/videojs/video.js/issues/9012)) ([71641aa](https://github.com/videojs/video.js/commit/71641aa))
+
 <a name="7.21.6"></a>
 ## [7.21.6](https://github.com/videojs/video.js/compare/v7.21.5...v7.21.6) (2024-05-28)
 
