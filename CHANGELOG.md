@@ -1,3 +1,19 @@
+<a name="8.23.0"></a>
+# [8.23.0](https://github.com/videojs/video.js/compare/v8.22.0...v8.23.0) (2025-03-11)
+
+### Features
+
+* Improve SmartTV scrubbing behavior ([#8988](https://github.com/videojs/video.js/issues/8988)) ([77c99d2](https://github.com/videojs/video.js/commit/77c99d2))
+* toJSON methods for text track serialization ([#8998](https://github.com/videojs/video.js/issues/8998)) ([1c282a3](https://github.com/videojs/video.js/commit/1c282a3))
+
+### Bug Fixes
+
+* Improve getFileExtension() readability and handle leading dot extensions. ([#8980](https://github.com/videojs/video.js/issues/8980)) ([5b9795d](https://github.com/videojs/video.js/commit/5b9795d))
+
+### Code Refactoring
+
+* **types:** track and track list types generation ([#8978](https://github.com/videojs/video.js/issues/8978)) ([8842d37](https://github.com/videojs/video.js/commit/8842d37)), closes [#8486](https://github.com/videojs/video.js/issues/8486) [/github.com/videojs/video.js/pull/8486/files#r1635782771](https://github.com//github.com/videojs/video.js/pull/8486/files/issues/r1635782771)
+
 <a name="8.22.0"></a>
 # [8.22.0](https://github.com/videojs/video.js/compare/v8.21.1...v8.22.0) (2025-02-05)
 

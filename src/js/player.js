@@ -5718,7 +5718,8 @@ Player.prototype.options_ = {
   },
   // Default smooth seeking to false
   enableSmoothSeeking: false,
-  disableSeekWhileScrubbingOnMobile: false
+  disableSeekWhileScrubbingOnMobile: false,
+  disableSeekWhileScrubbingOnSTV: false
 };
 
 TECH_EVENTS_RETRIGGER.forEach(function(event) {
