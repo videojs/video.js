@@ -124,6 +124,8 @@ class TextTrackDisplay extends Component {
     };
 
     player.on('loadstart', (e) => this.toggleDisplay(e));
+    player.on('useractive', updateDisplayTextHandler);
+    player.on('userinactive', updateDisplayTextHandler);
     player.on('texttrackchange', updateDisplayTextHandler);
     player.on('loadedmetadata', (e) => {
       this.updateDisplayOverlay();
