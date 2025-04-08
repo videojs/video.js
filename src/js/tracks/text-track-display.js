@@ -264,7 +264,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Update the displayed TextTrack when a either a {@link Player#texttrackchange},
+   * Update the displayed {@link TextTrack} when either a {@link Player#texttrackchange},
    * a {@link Player#fullscreenchange}, a {@link Player#useractive}, or a
    * {@link Player#userinactive} is fired.
    *
