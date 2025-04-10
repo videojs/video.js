@@ -124,6 +124,8 @@ class TextTrackDisplay extends Component {
     };
 
     player.on('loadstart', (e) => this.toggleDisplay(e));
+    player.on('useractive', updateDisplayTextHandler);
+    player.on('userinactive', updateDisplayTextHandler);
     player.on('texttrackchange', updateDisplayTextHandler);
     player.on('loadedmetadata', (e) => {
       this.updateDisplayOverlay();
@@ -262,11 +264,14 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Update the displayed TextTrack when a either a {@link Player#texttrackchange} or
-   * a {@link Player#fullscreenchange} is fired.
+   * Update the displayed {@link TextTrack} when either a {@link Player#texttrackchange},
+   * a {@link Player#fullscreenchange}, a {@link Player#useractive}, or a
+   * {@link Player#userinactive} is fired.
    *
    * @listens Player#texttrackchange
    * @listens Player#fullscreenchange
+   * @listens Player#useractive
+   * @listens Player#userinactive
    */
   updateDisplay() {
     const tracks = this.player_.textTracks();
