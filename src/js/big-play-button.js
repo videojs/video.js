@@ -46,8 +46,8 @@ class BigPlayButton extends Button {
   handleClick(event) {
     const playPromise = this.player_.play();
 
-    // exit early if clicked via the mouse
-    if (this.mouseused_ && 'clientX' in event && 'clientY' in event) {
+    // exit early if tapped or clicked via the mouse
+    if (event.type === 'tap' || this.mouseused_ && 'clientX' in event && 'clientY' in event) {
       silencePromise(playPromise);
 
       if (this.player_.tech(true)) {
