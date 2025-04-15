@@ -85,7 +85,7 @@
 
 ### Features
 
-* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [1000#0](https://github.com/1000/issues/0)
+* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [#8886](https://github.com/videojs/video.js/issues/8886)
 
 ### Bug Fixes
 
