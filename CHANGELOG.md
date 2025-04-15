@@ -1,3 +1,12 @@
+<a name="8.23.1"></a>
+## [8.23.1](https://github.com/videojs/video.js/compare/v8.23.0...v8.23.1) (2025-04-15)
+
+### Bug Fixes
+
+* controlText for text track modal ([#8989](https://github.com/videojs/video.js/issues/8989)) ([751ac56](https://github.com/videojs/video.js/commit/751ac56))
+* only change focus from BPB if not tap or mouse click ([#9015](https://github.com/videojs/video.js/issues/9015)) ([76aadfe](https://github.com/videojs/video.js/commit/76aadfe))
+* update text-track-cue styles on useractive ([#9023](https://github.com/videojs/video.js/issues/9023)) ([8e1889c](https://github.com/videojs/video.js/commit/8e1889c))
+
 <a name="8.23.0"></a>
 # [8.23.0](https://github.com/videojs/video.js/compare/v8.22.0...v8.23.0) (2025-03-11)
 
