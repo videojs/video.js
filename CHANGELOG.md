@@ -1,3 +1,10 @@
+<a name="8.23.2"></a>
+## [8.23.2](https://github.com/videojs/video.js/compare/v8.23.1...v8.23.2) (2025-04-16)
+
+### Bug Fixes
+
+* update release workfow permissions ([#9027](https://github.com/videojs/video.js/issues/9027)) ([e0b2521](https://github.com/videojs/video.js/commit/e0b2521))
+
 <a name="8.23.1"></a>
 ## [8.23.1](https://github.com/videojs/video.js/compare/v8.23.0...v8.23.1) (2025-04-15)
 
