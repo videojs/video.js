@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Required for creating a release
+      discussions: write   # Required for creating a release
       id-token: write      # Required for provenance
       packages: write      # Required for publishing
     steps:
