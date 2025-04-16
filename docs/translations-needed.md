@@ -378,16 +378,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| gl.json (missing 10)    | Exit Picture-in-Picture                                                             |
-|                         | Picture-in-Picture                                                                  |
-|                         | No content                                                                          |
-|                         | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| gl.json (Complete)      |                                                                                     |
 | he.json (missing 13)    | Seek to live, currently behind live                                                 |
 |                         | Seek to live, currently playing live                                                |
 |                         | {1} is loading.                                                                     |
@@ -528,13 +519,7 @@ This default value is hardcoded as a default to the localize method in the SeekB
 |                         | Playing in Picture-in-Picture                                                       |
 |                         | Skip backward {1} seconds                                                           |
 |                         | Skip forward {1} seconds                                                            |
-| oc.json (missing 7)     | Color                                                                               |
-|                         | Opacity                                                                             |
-|                         | Text Background                                                                     |
-|                         | Caption Area Background                                                             |
-|                         | Playing in Picture-in-Picture                                                       |
-|                         | Skip backward {1} seconds                                                           |
-|                         | Skip forward {1} seconds                                                            |
+| oc.json (Complete)      |                                                                                     |
 | pl.json (missing 8)     | Drop shadow                                                                         |
 |                         | Color                                                                               |
 |                         | Opacity                                                                             |
