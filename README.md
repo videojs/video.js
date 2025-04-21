@@ -4,7 +4,7 @@
 
 [![NPM][npm-icon]][npm-link]
 
-Video.js is a full featured, open source video player for all web-based platforms.
+Video.js is a full featured, open source video player for all web-based platforms
 
 Right out of the box, Video.js supports all common media formats used on the web including streaming formats like HLS and DASH. It works on desktops, mobile devices, tablets, and web-based Smart TVs. It can be further extended and customized by a robust ecosystem of [plugins][plugins].
 
