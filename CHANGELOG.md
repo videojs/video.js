@@ -1,3 +1,26 @@
+<a name="8.23.3"></a>
+## [8.23.3](https://github.com/videojs/video.js/compare/v8.23.2...v8.23.3) (2025-04-16)
+
+### Bug Fixes
+
+* update release workflow `discussion` permission ([#9031](https://github.com/videojs/video.js/issues/9031)) ([1a09554](https://github.com/videojs/video.js/commit/1a09554))
+
+<a name="8.23.2"></a>
+## [8.23.2](https://github.com/videojs/video.js/compare/v8.23.1...v8.23.2) (2025-04-16)
+
+### Bug Fixes
+
+* update release workfow permissions ([#9027](https://github.com/videojs/video.js/issues/9027)) ([e0b2521](https://github.com/videojs/video.js/commit/e0b2521))
+
+<a name="8.23.1"></a>
+## [8.23.1](https://github.com/videojs/video.js/compare/v8.23.0...v8.23.1) (2025-04-15)
+
+### Bug Fixes
+
+* controlText for text track modal ([#8989](https://github.com/videojs/video.js/issues/8989)) ([751ac56](https://github.com/videojs/video.js/commit/751ac56))
+* only change focus from BPB if not tap or mouse click ([#9015](https://github.com/videojs/video.js/issues/9015)) ([76aadfe](https://github.com/videojs/video.js/commit/76aadfe))
+* update text-track-cue styles on useractive ([#9023](https://github.com/videojs/video.js/issues/9023)) ([8e1889c](https://github.com/videojs/video.js/commit/8e1889c))
+
 <a name="8.23.0"></a>
 # [8.23.0](https://github.com/videojs/video.js/compare/v8.22.0...v8.23.0) (2025-03-11)
 
@@ -85,7 +108,7 @@
 
 ### Features
 
-* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [1000#0](https://github.com/1000/issues/0)
+* Add methods to add and remove <source> elements ([#8886](https://github.com/videojs/video.js/issues/8886)) ([eddda97](https://github.com/videojs/video.js/commit/eddda97)), closes [#8886](https://github.com/videojs/video.js/issues/8886)
 
 ### Bug Fixes
 

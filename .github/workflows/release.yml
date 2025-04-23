@@ -12,7 +12,8 @@ jobs:
       NETLIFY_BASE: 'videojs-preview.netlify.app'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write      # Required for creating a release
+      discussions: write   # Required for creating a release
       id-token: write      # Required for provenance
       packages: write      # Required for publishing
     steps:
