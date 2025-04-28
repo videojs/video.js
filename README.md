@@ -1,14 +1,20 @@
 [![Video.js logo][logo]][vjs]
 
-# Video.js® - Web Video Player
+# Video.js - Web Video Player & Framework
 
 [![NPM][npm-icon]][npm-link]
+
+**Update:** Big changes coming in Video.js 10, early 2026! [Read the discussion.](https://github.com/videojs/video.js/discussions/9035)
 
 Video.js is a full featured, open source video player for all web-based platforms.
 
 Right out of the box, Video.js supports all common media formats used on the web including streaming formats like HLS and DASH. It works on desktops, mobile devices, tablets, and web-based Smart TVs. It can be further extended and customized by a robust ecosystem of [plugins][plugins].
 
-Video.js was started in the middle of 2010 and is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ ~~400,000~~ ~~700,000~~ [800,000 websites][builtwith].
+Video.js was started in May 2010 and since then:
+* Millions of websites have used VideoJS over time (source [Builtwith][builtwith])
+* Billions of end-users every month of just the CDN-hosted copy (source Fastly stats)
+* 900+ amazing contributors to the video.js core
+* Hundreds of [plugins](https://videojs.com/plugins/)
 
 ## Table of Contents
 
