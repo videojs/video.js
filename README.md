@@ -6,7 +6,7 @@
 
 **Update:** Big changes coming in Video.js 10, early 2026! [Read the discussion.](https://github.com/videojs/video.js/discussions/9035)
 
-Video.js is a full featured, open source video player for all web-based platforms.
+Video.js is a powerful and customizable open-source video player that runs smoothly across all major web platforms, including desktop, mobile, and Smart TVs.
 
 Right out of the box, Video.js supports all common media formats used on the web including streaming formats like HLS and DASH. It works on desktops, mobile devices, tablets, and web-based Smart TVs. It can be further extended and customized by a robust ecosystem of [plugins][plugins].
 
@@ -23,6 +23,8 @@ Video.js was started in May 2010 and since then:
 * [Code of Conduct](#code-of-conduct)
 * [License](#license)
 
+There are several ways to include Video.js in your project. You can use a CDN, install via npm, or download directly. Below is a quick example using a CDN. For advanced users, installation via npm is also supported.
+
 ## [Quick Start][getting-started]
 
 Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted version of Video.js that anyone can use. Add these tags to your document's `<head>`:
@@ -35,7 +37,7 @@ Thanks to the awesome folks over at [Fastly][fastly], there's a free, CDN hosted
 Alternatively, you can include Video.js by getting it from [npm](https://videojs.com/getting-started/#install-via-npm), downloading it from [GitHub releases](https://github.com/videojs/video.js/releases) or by including it via [unpkg](https://unpkg.com) or another JavaScript CDN, like CDNjs.
 
 ```html
-<!-- unpkg : use the latest version of Video.js -->
+<!-- Include the latest version of Video.js from unpkg CDN -->
 <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
 <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
 
@@ -97,7 +99,7 @@ var player = videojs('my-player', options, function onPlayerReady() {
 });
 ```
 
-If you're ready to dive in, the [Getting Started][getting-started] page and [documentation][docs] are the best places to go for more information. If you get stuck, head over to our [Slack][slack-link]!
+If you're ready to dive in, the [Getting Started][getting-started] page and [documentation][docs] are the best places to go for more information. Need help? Join our [Slack community][slack-link] to ask questions or get support from other developers!
 
 ## [Contributing][contributing]
 
