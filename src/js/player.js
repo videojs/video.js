@@ -14,7 +14,6 @@ import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as browser from './utils/browser.js';
-import {IS_CHROME, IS_WINDOWS} from './utils/browser.js';
 import log, { createLogger } from './utils/log.js';
 import {toTitleCase, titleCaseEquals} from './utils/str.js';
 import { createTimeRange } from './utils/time.js';
@@ -753,15 +752,6 @@ class Player extends Component {
     // set tabindex to -1 to remove the video element from the focus order
     tag.setAttribute('tabindex', '-1');
     attrs.tabindex = '-1';
-
-    // Workaround for #4583 on Chrome (on Windows) with JAWS.
-    // See https://github.com/FreedomScientific/VFO-standards-support/issues/78
-    // Note that we can't detect if JAWS is being used, but this ARIA attribute
-    // doesn't change behavior of Chrome if JAWS is not being used
-    if (IS_CHROME && IS_WINDOWS) {
-      tag.setAttribute('role', 'application');
-      attrs.role = 'application';
-    }
 
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
