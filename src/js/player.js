@@ -2131,7 +2131,7 @@ class Player extends Component {
    */
   documentFullscreenChange_(e) {
     const targetPlayer = e.target.player;
-
+    console.log(targetPlayer, "lll");
     // if another player was fullscreen
     // do a null check for targetPlayer because older firefox's would put document as e.target
     if (targetPlayer && targetPlayer !== this) {
@@ -2140,10 +2140,23 @@ class Player extends Component {
 
     const el = this.el();
     let isFs = document[this.fsApi_.fullscreenElement] === el;
-
+    let playerContainer = targetPlayer.el_;
+    // console.log(isFss, 'kk')
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
+    // in mobile screen if the video width is longer than video height then it would be in landscale
+    if((targetPlayer.el_.querySelector('video').videoHeight
+    <  targetPlayer.el_.querySelector('video').videoWidth) && screen.orientation && screen.orientation.lock){
+      // console.log("mobile full screen")
+      // if (isLandscape ) {
+        screen.orientation.lock('landscape').catch(err => {
+          console.warn('Orientation lock failed:', err);
+        });
+      // }
+    }
+    // console.log(targetPlayer.el_.querySelector('video').videoHeight, targetPlayer.el_.querySelector('video').videoWidth  );
+
 
     this.isFullscreen(isFs);
   }
@@ -2169,7 +2182,7 @@ class Player extends Component {
           this.removeClass('vjs-ios-native-fs');
         });
       }
-      this.isFullscreen(data.isFullscreen);
+      this.isFullscreen(data.isFullscreen, event);
     }
   }
 
@@ -2938,6 +2951,7 @@ class Player extends Component {
    *         - Nothing when setting
    */
   isFullscreen(isFS) {
+    
     if (isFS !== undefined) {
       const oldValue = this.isFullscreen_;
 
