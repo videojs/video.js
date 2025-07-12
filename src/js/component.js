@@ -690,7 +690,7 @@ class Component {
    * the child `Component`s element from this `Component`s element.
    *
    * @param {string|Component} component
-   *        The child `Component` to remove.
+   *       The name or instance of a child to remove.
    */
   removeChild(component) {
     if (typeof component === 'string') {
