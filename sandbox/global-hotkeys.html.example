@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Video.js Sandbox</title>
+  <link href="../dist/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../dist/video.js"></script>
+</head>
+<body>
+<div
+  style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+  <p>Focus outside the player (e.g. click anywhere in the page) and press a hotkey (e.g. space bar).
+    The player hotkey should trigger and perform the action.</p>
+  <p>By setting <code>globalHotkeys: true</code> extends the normal hotkey behavior at the global level. Therefore
+    <code>hotkeys: true</code> also need to be set.</p>
+  <p>Note that if the focus is on an interactive element in the page, the global hotkey behavior would not trigger.</p>
+</div>
+
+<div>
+  <h2>Player with default hotkeys</h2>
+  <video-js
+    id="vid1"
+    controls
+    preload="auto"
+    width="640"
+    height="264"
+    poster="https://vjs.zencdn.net/v/oceans.png">
+    <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a
+      href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+
+  <h2>Player with 'x' button linked to play/pause</h2>
+  <video-js
+    id="vid2"
+    controls
+    preload="auto"
+    width="640"
+    height="264"
+    poster="https://vjs.zencdn.net/v/oceans.png">
+    <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a
+      href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video-js>
+
+  <script>
+    var player1 = videojs('vid1', {
+      userActions: {
+        globalHotkeys: true,
+        hotkeys: true
+      }
+    });
+    player1.log('window.player 1 created', player1);
+    var player2 = videojs('vid2', {
+      userActions: {
+        globalHotkeys: true,
+        hotkeys: function (event) {
+          // `x` key = play/pause
+          if (event.which === 88) {
+            this.paused() ? this.play() : this.pause();
+          }
+        }
+      }
+    });
+    player2.log('window.player 2 created', player2);
+  </script>
+</div>
+
+<div id="test-interactive-area" style="margin-top: 50px">
+  <h2>Test Interactive Area</h2>
+
+  <div>
+    <label for="sample-input">Sample Input:</label>
+    <input id="sample-input" type="text" name="foo" value="bar">
+  </div>
+
+  <div>
+    <label for="sample-password">Password:</label>
+    <input id="sample-password" type="password" name="password">
+  </div>
+
+  <div>
+    <label for="sample-checkbox">
+      <input id="sample-checkbox" type="checkbox"> Check me
+    </label>
+  </div>
+
+  <div>
+    <label for="sample-radio1">
+      <input id="sample-radio1" type="radio" name="sample-radio" value="option1"> Option 1
+    </label>
+    <label for="sample-radio2">
+      <input id="sample-radio2" type="radio" name="sample-radio" value="option2"> Option 2
+    </label>
+  </div>
+
+  <div>
+    <label for="sample-select">Choose an option:</label>
+    <select id="sample-select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+      <option value="3">Option 3</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="sample-textarea">Sample Textarea:</label>
+    <textarea id="sample-textarea" rows="4" cols="50">This is a sample textarea with some test content.</textarea>
+  </div>
+
+  <div>
+    <label for="sample-range">Select range:</label>
+    <input id="sample-range" type="range" min="0" max="100">
+  </div>
+
+  <div>
+    <label for="sample-date">Pick a date:</label>
+    <input id="sample-date" type="date">
+  </div>
+
+  <div>
+    <label for="sample-color">Pick a color:</label>
+    <input id="sample-color" type="color">
+  </div>
+
+  <div>
+    <p>This is a sample paragraph with some interactive content.</p>
+  </div>
+
+  <div>
+    <ul>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </ul>
+  </div>
+
+  <div>
+    <button onclick="alert('Button clicked!')">Click Me</button>
+  </div>
+</div>
+</body>
+</html>
