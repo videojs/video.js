@@ -6,7 +6,6 @@ import Component from '../../component.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
-import {formatTime} from '../../utils/time.js';
 import {silencePromise} from '../../utils/promise';
 import {merge} from '../../utils/obj';
 import document from 'global/document';
@@ -16,6 +15,7 @@ import document from 'global/document';
 import './load-progress-bar.js';
 import './play-progress-bar.js';
 import './mouse-time-display.js';
+import './progress-time-display.js';
 
 /**
  * Seek bar and container for the progress bars. Uses {@link PlayProgressBar}
@@ -140,7 +140,8 @@ class SeekBar extends Slider {
     return super.createEl('div', {
       className: 'vjs-progress-holder'
     }, {
-      'aria-label': this.localize('Progress Bar')
+      'aria-label': this.localize('Progress Bar'),
+      'aria-labelledby': 'vjs-current-time-display-label'
     });
   }
 
@@ -163,6 +164,7 @@ class SeekBar extends Slider {
     }
 
     const percent = super.update();
+    const progressTimeDisplay = this.getChild('progressTimeDisplay');
 
     this.requestNamedAnimationFrame('SeekBar#update', () => {
       const currentTime = this.player_.ended() ?
@@ -182,15 +184,9 @@ class SeekBar extends Slider {
 
       if (this.currentTime_ !== currentTime || this.duration_ !== duration) {
         // human readable value of progress bar (time complete)
-        this.el_.setAttribute(
-          'aria-valuetext',
-          this.localize(
-            'progress bar timing: currentTime={1} duration={2}',
-            [formatTime(currentTime, duration),
-              formatTime(duration, duration)],
-            '{1} of {2}'
-          )
-        );
+        if (progressTimeDisplay) {
+          progressTimeDisplay.update();
+        }
 
         this.currentTime_ = currentTime;
         this.duration_ = duration;
@@ -598,6 +594,7 @@ class SeekBar extends Slider {
  */
 SeekBar.prototype.options_ = {
   children: [
+    'progressTimeDisplay',
     'loadProgressBar',
     'playProgressBar'
   ],
