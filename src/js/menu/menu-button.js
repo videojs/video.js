@@ -31,6 +31,8 @@ class MenuButton extends Component {
   constructor(player, options = {}) {
     super(player, options);
 
+    this.el_.setAttribute('role', 'group');
+
     this.menuButton_ = new Button(player, options);
 
     this.menuButton_.controlText(this.controlText_);
