@@ -33,7 +33,7 @@ class PlayProgressBar extends Component {
   }
 
   /**
-   * Create the the DOM element for this class.
+   * Create the DOM element for this class.
    *
    * @return {Element}
    *         The element that was created.
