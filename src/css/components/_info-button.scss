@@ -1,0 +1,17 @@
+.video-js .vjs-info-button {
+  cursor: pointer;
+
+  .vjs-icon-placeholder:before {
+    content: "ℹ"; /* Info symbol */
+    font-size: 1.8em;
+    line-height: 1.67;
+  }
+}
+
+.video-js .vjs-info-button:hover {
+  color: #46d;
+}
+
+.video-js .vjs-info-button.vjs-button > .vjs-icon-placeholder:before {
+  content: "ℹ";
+}

@@ -25,6 +25,9 @@ import './text-track-controls/subs-caps-button.js';
 import './audio-track-controls/audio-track-button.js';
 import './playback-rate-menu/playback-rate-menu-button.js';
 import './spacer-controls/custom-control-spacer.js';
+import InfoButton from './custom-buttons/info-button.js';
+// Ensure InfoButton is registered (to avoid linter error)
+void InfoButton;
 
 /**
  * Container of main controls.
@@ -72,6 +75,7 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subsCapsButton',
     'audioTrackButton',
+    'infoButton',
     'pictureInPictureToggle',
     'fullscreenToggle'
   ]
