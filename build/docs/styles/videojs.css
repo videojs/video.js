@@ -66,6 +66,100 @@ footer .logo {
 }
 
 /* ==============
+Search container Light
+================= */
+
+/* Light Search close button */
+.light .search-container .search-close-button {
+    background: rgba(164, 164, 164, .26);
+    transition: background .4s;
+}
+.light .search-container .search-close-button:hover {
+    background: rgba(117, 117, 117, .26);
+}
+.light .search-container .search-close-button svg {
+    transition: fill .4s;
+}
+.light .search-container .search-close-button:hover svg {
+    fill: #4b2d2d;
+}
+
+/* Light Backdrop */
+.light .search-container {
+    background: rgb(0 0 0 / 26%);
+    transition: background .4s;
+    @starting-style {
+        background: rgb(0 0 0 / 0%);
+    }
+}
+
+/* Light Search controls */
+.light .search-container .wrapper {
+    border: 1px solid #828282;
+    transition: opacity .2s;
+    opacity: 1;
+    @starting-style {
+        opacity: 0;
+    }
+}
+
+/* ==============
+Search container Dark
+================= */
+
+/* Dark Search close button */
+.dark .search-container .search-close-button {
+    background: rgb(0 0 0 / 26%);
+    transition: background .4s;
+}
+.dark .search-container .search-close-button:hover {
+    background: rgba(151, 151, 151, .26);
+}
+.dark .search-container .search-close-button svg {
+    transition: fill .4s;
+}
+
+.dark .search-container .search-close-button:hover svg {
+    fill: white;
+}
+
+/* Dark Backdrop */
+.dark  .search-container {
+    background: rgba(71, 71, 71, .26);
+    transition: background .4s;
+    @starting-style {
+        background: rgb(0 0 0 / 0%);
+    }
+}
+
+/* Dark Search controls */
+.dark .search-container .wrapper {
+    border: 1px solid #393939;
+    transition: opacity .2s;
+    opacity: 1;
+    @starting-style {
+        opacity: 0;
+    }
+}
+
+/* ==============
+Search
+================= */
+
+.light .search-container {
+    /*
+    This progressive enhancement will work soon on a future version of Firefox.
+    It will work as normal in the mean-time.
+    */
+    background: rgb(0 0 0 / 26%);
+    transition: background .2s; /* fallback */
+    transition: background .2s, display .3s allow-discrete;
+    @starting-style: {
+        background: rgb(0 0 0 / 0%);
+    }
+}
+    
+/* ==============
 Table of contents
 ================= */
 
