@@ -65,11 +65,94 @@ footer .logo {
     border-radius: 1rem;
 }
 
+
+/* ==============
+Content jump-to links
+================= */
+.light .has-anchor .link-anchor {
+    color: #b7b7b7;
+    transition: .2s color;
+}
+.light .has-anchor .link-anchor:hover {
+    color: #515151;
+}
+
+/* ==============
+Navbar border
+================= */
+.dark .navbar {
+    border: 1px solid #424141;
+}
+.light .navbar {
+    border: 1px solid #c6c6c6;
+}
+
+/* ==============
+Navbar items
+================= */
+.navbar-left-items,
+.mobile-nav-links {
+    column-gap: .5rem;
+}
+.mobile-nav-links {
+    padding-left: 2rem;
+}
+.navbar-left-items .navbar-item,
+.mobile-nav-links .navbar-item {
+    transition: .4s background;
+}
+
+.light .mobile-nav-links .navbar-item {
+    border: 1px solid #d5d5d5;
+}
+.dark .mobile-nav-links .navbar-item {
+    background: #2b2b2b;
+}
+.dark .navbar-left-items .navbar-item:hover {
+    background: #1c1c1c
+}
+.dark .mobile-nav-links .navbar-item:hover {
+    background: #373737;
+}
+.light .navbar-left-items .navbar-item:hover,
+.light .mobile-nav-links .navbar-item:hover{
+    background: #e0e0e0;
+    border-color: #e0e0e0;
+}
+
+/* Fix mobile responsive issues with theme */
+@media screen and (max-width: 1192px) {
+    .navbar-left-items .navbar-item {
+        display: flex;
+        align-items: center;
+    }
+    .navbar-left-items .navbar-item a {
+        padding: 1rem;
+        text-align: center;
+    }
+}
+@media screen and (max-width: 1100px) {
+    .navbar-left-items .navbar-item a::before {
+        display: block;
+        left: 50%;
+        transform: translate(-25%, 0);
+        top: 0;
+    }
+}
+@media screen and (max-width: 1040px) {
+    .navbar-left-items .navbar-item a::before {
+        display: block;
+        left: 50%;
+        transform: translate(-25%, 0);
+        top: 0;
+    }
+}
+
 /* ==============
 Search container Light
 ================= */
 
-/* Light Search close button */
+/* Search close button */
 .light .search-container .search-close-button {
     background: rgba(164, 164, 164, .26);
     transition: background .4s;
@@ -84,7 +167,7 @@ Search container Light
     fill: #4b2d2d;
 }
 
-/* Light Backdrop */
+/* Backdrop */
 .light .search-container {
     background: rgb(0 0 0 / 26%);
     transition: background .4s;
@@ -93,7 +176,7 @@ Search container Light
     }
 }
 
-/* Light Search controls */
+/* Search controls */
 .light .search-container .wrapper {
     border: 1px solid #828282;
     transition: opacity .2s;
@@ -107,7 +190,7 @@ Search container Light
 Search container Dark
 ================= */
 
-/* Dark Search close button */
+/* Search close button */
 .dark .search-container .search-close-button {
     background: rgb(0 0 0 / 26%);
     transition: background .4s;
@@ -123,7 +206,7 @@ Search container Dark
     fill: white;
 }
 
-/* Dark Backdrop */
+/* Backdrop */
 .dark  .search-container {
     background: rgba(71, 71, 71, .26);
     transition: background .4s;
@@ -132,7 +215,7 @@ Search container Dark
     }
 }
 
-/* Dark Search controls */
+/* Search controls */
 .dark .search-container .wrapper {
     border: 1px solid #393939;
     transition: opacity .2s;
@@ -142,23 +225,6 @@ Search container Dark
     }
 }
 
-/* ==============
-Search
-================= */
-
-.light .search-container {
-    /*
-    This progressive enhancement will work soon on a future version of Firefox.
-    It will work as normal in the mean-time.
-    */
-    background: rgb(0 0 0 / 26%);
-    transition: background .2s; /* fallback */
-    transition: background .2s, display .3s allow-discrete;
-    @starting-style: {
-        background: rgb(0 0 0 / 0%);
-    }
-}
-    
 /* ==============
 Table of contents
 ================= */
@@ -188,24 +254,27 @@ Sidebar Dark
 
 /* Title */
 
-.dark .sidebar-section-title:hover {
+.dark .sidebar-section-title:not([data-isopen="true"]):hover {
     background: #1a1a1a;
+    border-color: #3c3c3c;
 }
 
+.dark .sidebar-section-title[data-isopen="true"] {
+    background: #333;
+    border-color: #6f6f6f;
+}
 .dark .sidebar-section-title[data-isopen="true"].with-arrow svg {
     background: #404040;
     border-radius: 50%;
 }
 
 /* Reference Links */
-
 .dark .sidebar-section-children.active {
     background: #4b4b4b;
 }
 
 .dark .sidebar-section-children.active a:hover {
-    /* Don't change background for active sidebar child */
-    background: #4b4b4b;
+    background: #4b4b4b; /* don't change background for active sidebar child */
     text-decoration: underline;
 }
 
@@ -223,30 +292,57 @@ Sidebar Light
 .sidebar-section-title {
     border: 1px solid transparent;
 }
-
 .light .sidebar-section-title:hover {
-    background: #efefef;
+    background: #f0f0f0;
     border-color: #d7d7d7;
 }
-
+.light .sidebar-section-title[data-isopen="true"] {
+    background: #ececec;
+    border-color: #69696954;
+}
 .light .sidebar-section-title[data-isopen="true"].with-arrow svg {
     background: #d7d7d7;
     border-radius: 50%;
 }
 
 /* Reference Links */
-
 .light .sidebar-section-children.active {
     background: #c2c2c2;
 }
 
 .light .sidebar-section-children.active a:hover {
-    /* Don't change background for active sidebar child */
-    background: #c2c2c2;
+    background: #c2c2c2;; /* don't change background for active sidebar child */
     text-decoration: underline;
 }
 
 .light .sidebar-section-children:not(.active) a:hover {
     background: #dcdcdc;
     text-decoration: underline;
+}
+
+/* =============
+Mobile container
+================ */
+/* Button */
+.mobile-menu-icon-container #mobile-menu {
+    border: 1px solid #6f6f6f;
+}
+.light .mobile-menu-icon-container #mobile-menu {
+    transition: .8s background, .4s border-color;
+    background: #ddd;
+}
+
+.light .mobile-menu-icon-container #mobile-menu[data-isopen="true"] {
+    background: #ccc;
+    border-color: #8f8f8f;
+}
+/* Container */
+.mobile-sidebar-container {
+    transition: .2s opacity;
+}
+.mobile-sidebar-container.show {
+    opacity: 1;
+    @starting-style {
+        opacity: 0;
+    }
 }
