@@ -121,7 +121,7 @@ Navbar items
 }
 
 /* Fix mobile responsive issues with theme */
-@media screen and (max-width: 1192px) {
+@media screen and (max-width: 74.5rem) {
     .navbar-left-items .navbar-item {
         display: flex;
         align-items: center;
@@ -131,7 +131,7 @@ Navbar items
         text-align: center;
     }
 }
-@media screen and (max-width: 1100px) {
+@media screen and (max-width: 68.75rem) {
     .navbar-left-items .navbar-item a::before {
         display: block;
         left: 50%;
@@ -139,7 +139,7 @@ Navbar items
         top: 0;
     }
 }
-@media screen and (max-width: 1040px) {
+@media screen and (max-width: 65rem) {
     .navbar-left-items .navbar-item a::before {
         display: block;
         left: 50%;
@@ -233,8 +233,9 @@ Table of contents
     transition: .2s color, .2s font-weight;
 }
 
-.toc-link.is-active-link {
+.toc-list .toc-link.is-active-link {
     font-weight: bold;
+    text-decoration: underline;
     font-family: inherit;
 }
 
@@ -306,7 +307,7 @@ Sidebar Light
 }
 
 /* Reference Links */
-.light .sidebar-section-children.active {
+.light .sidebar-section-children-container .sidebar-section-children.active {
     background: #c2c2c2;
 }
 
