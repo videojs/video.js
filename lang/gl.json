@@ -75,7 +75,7 @@
   "Proportional Serif": "Serif proporcional",
   "Monospace Serif": "Serif monoespazo (caixa fixa)",
   "Casual": "Manuscrito",
-  "Script": "Itálica",
+  "Script": "Cursiva",
   "Small Caps": "Pequenas maiúsculas",
   "Reset": "Reiniciar",
   "restore all settings to the default values": "restaurar todos os axustes aos valores predeterminados",
@@ -83,5 +83,15 @@
   "Caption Settings Dialog": "Diálogo de axustes dos subtítulos para xordos",
   "Beginning of dialog window. Escape will cancel and close the window.": "Inicio da xanela de diálogo. A tecla Escape cancelará e pechará a xanela.",
   "End of dialog window.": "Fin da xanela de diálogo.",
-  "{1} is loading.": "{1} está a cargar."
+  "{1} is loading.": "{1} está a cargar.",
+  "Exit Picture-in-Picture": "Saír de imaxe en imaxe",
+  "Picture-in-Picture": "Imaxe en imaxe",
+  "No content": "Sen contido",
+  "Color": "Cor",
+  "Opacity": "Opacidade",
+  "Text Background": "Fondo do texto",
+  "Caption Area Background": "Fondo da área de subtítulos",
+  "Playing in Picture-in-Picture": "Reproducindo en imaxe en imaxe",
+  "Skip backward {1} seconds": "Retroceder {1} segundos",
+  "Skip forward {1} seconds": "Avanzar {1} segundos"
 }
