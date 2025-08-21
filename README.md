@@ -1,4 +1,4 @@
-[![Video.js logo][logo]][vjs]
+[![Video.js logo][logo]][vjs] 
 
 # Video.js - Web Video Player & Framework
 
