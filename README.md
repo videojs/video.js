@@ -104,7 +104,13 @@ If you're ready to dive in, the [Getting Started][getting-started] page and [doc
 
 Video.js is a free and open source library, and we appreciate any help you're willing to give - whether it's fixing bugs, improving documentation, or suggesting new features. Check out the [contributing guide][contributing] for more!
 
-_Video.js uses [BrowserStack][browserstack] for compatibility testing._
+No contributor license agreement (CLA) has ever been required for contributions to Video.js.
+
+By submitting a pull request, you agree that your contribution is provided under the
+[Apache 2.0 License](LICENSE) and may be included in future releases.
+
+Contributions and project decisions are overseen by the
+[Video.js Technical Steering Committee (TSC)](https://github.com/videojs/admin/blob/main/GOVERNANCE.md).
 
 ## [Code of Conduct][coc]
 

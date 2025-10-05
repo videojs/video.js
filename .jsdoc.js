@@ -35,7 +35,7 @@ module.exports = {
       ],
       favicon: 'https://videojs.com/favicon.ico',
       footer:
-        '<span class="copyright"><a href="https://videojs.com">Video.js</a> is a free and open source HTML5 video player. © <a href="https://brightcove.com" target="_blank">Brightcove, Inc</a>. <a href="https://github.com/videojs/video.js/blob/master/LICENSE" class="button blue" target="_blank">View license</a></span>',
+        '<span class="copyright"><a href="https://videojs.com">Video.js</a> is a free and open source HTML5 video player. © Video.js Contributors. <a href="https://github.com/videojs/video.js/blob/master/LICENSE" class="button blue" target="_blank">View license</a></span>',
       include_css: ['./build/docs/styles/videojs.css'],
       displayModuleHeade: true,
       meta: [

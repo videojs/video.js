@@ -6,7 +6,7 @@
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
   "types": "./dist/types/video.d.ts",
-  "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
+  "copyright": "Copyright 2010-present Video.js contributors",
   "license": "Apache-2.0",
   "keywords": [
     "dash",
