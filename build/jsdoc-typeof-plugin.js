@@ -3,7 +3,7 @@
  */
 exports.handlers = {
   jsdocCommentFound: event => {
-    event.comment = (event.comment || '').replace(/\{.*typeof\s+([^\s\|]+).*\}/g, typeExpression => {
+    event.comment = (event.comment || '').replace(/\{(?:(?!\{).)*typeof\s+([^\s\|]+)(?:(?![^\s\|]).)*\}/g, typeExpression => {
       return typeExpression.replace(/typeof\s+([^\s\|\}]+)/g, (expression, className) => {
         return 'Class<' + className + '>';
       });
