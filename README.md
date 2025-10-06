@@ -23,6 +23,7 @@ Video.js was started in May 2010 and since then:
 * [Contributing](#contributing)
 * [Code of Conduct](#code-of-conduct)
 * [License](#license)
+* [Sponsorship](#sponsorship)
 
 ## [Quick Start][getting-started]
 
@@ -102,15 +103,12 @@ If you're ready to dive in, the [Getting Started][getting-started] page and [doc
 
 ## [Contributing][contributing]
 
-Video.js is a free and open source library, and we appreciate any help you're willing to give - whether it's fixing bugs, improving documentation, or suggesting new features. Check out the [contributing guide][contributing] for more!
-
-No contributor license agreement (CLA) has ever been required for contributions to Video.js.
+Video.js is a free and open source library, and we appreciate any help you're willing to give - whether it's fixing bugs, improving documentation, or suggesting new features. Check out the [contributing guide][contributing] for more! Contributions and project decisions are overseen by the
+[Video.js Technical Steering Committee (TSC)](https://github.com/videojs/admin/blob/main/GOVERNANCE.md).
 
 By submitting a pull request, you agree that your contribution is provided under the
-[Apache 2.0 License](LICENSE) and may be included in future releases.
-
-Contributions and project decisions are overseen by the
-[Video.js Technical Steering Committee (TSC)](https://github.com/videojs/admin/blob/main/GOVERNANCE.md).
+[Apache 2.0 License](LICENSE) and may be included in future releases. No contributor license agreement (CLA) has ever been required for contributions to Video.js. See the [Developer's Certificate of Origin 1.1
+](https://github.com/videojs/admin/blob/main/CONTRIBUTING.md#developers-certificate-of-origin-11).
 
 ## [Code of Conduct][coc]
 
@@ -118,9 +116,21 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 ## [License][license]
 
-Video.js is [licensed][license] under the Apache License, Version 2.0.
+Video.js is [licensed][license] under the Apache License, Version 2.0. "Video.js" is a registered trademark of [Brightcove, Inc][bc].
 
-Video.js is a registered trademark of [Brightcove, Inc][bc].
+## Sponsorship
+
+Project development is sponsored by the role of [Corporate Shepherd](https://github.com/videojs/admin/blob/main/GOVERNANCE.md#corporate-shepherd), held by various companies throughout the project history:
+
+* 2010-2012: Zencoder Inc.
+* 2013-2025: [Brightcove Inc.][bc]
+* 2025-present: [Mux Inc.][mux]
+
+Video.js uses [BrowserStack][browserstack] for compatibility testing.
+
+The free CDN-hosted copy of the libray is sponsored by [Fastly][fastly].
+
+Website hosting is sponsored by [Netlify][netlify]
 
 [bc]: https://www.brightcove.com/
 
@@ -139,6 +149,10 @@ Video.js is a registered trademark of [Brightcove, Inc][bc].
 [license]: LICENSE
 
 [logo]: https://videojs.com/logo-white.png
+
+[mux]: https://www.mux.com/
+
+[netlify]: https://www.netlify.com
 
 [npm-icon]: https://nodei.co/npm/video.js.png?downloads=true&downloadRank=true
 
