@@ -56,7 +56,7 @@ class SeekBar extends Slider {
     super(player, options);
 
     this.shouldDisableSeekWhileScrubbing_ = shouldDisableSeekWhileScrubbing;
-    this.pendingSeekTime_ = null;
+    this.pendingSeekTime = this.getCurrentTime_;
 
     this.setEventHandlers_();
   }
