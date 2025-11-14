@@ -43,8 +43,6 @@ jobs:
       # publish runs build for us via a prepublishOnly script
       - name: npm release
         run: npm publish --provenance --tag next
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: get current changelog
         run: node -e "console.log(require('./build/current-changelog.js')())" > CHANGELOG-LATEST.md
