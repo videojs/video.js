@@ -1,3 +1,10 @@
+<a name="8.23.6"></a>
+## [8.23.6](https://github.com/videojs/video.js/compare/v8.23.5...v8.23.6) (2025-11-14)
+
+### Bug Fixes
+
+* revert minor change to test trusted publishing workflow e2e sans npm token in release.yml ([f3de5f3](https://github.com/videojs/video.js/commit/f3de5f3))
+
 <a name="8.23.5"></a>
 ## [8.23.5](https://github.com/videojs/video.js/compare/v8.23.4...v8.23.5) (2025-11-14)
 
