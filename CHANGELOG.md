@@ -1,3 +1,14 @@
+<a name="8.23.5"></a>
+## [8.23.5](https://github.com/videojs/video.js/compare/v8.23.4...v8.23.5) (2025-11-14)
+
+### Bug Fixes
+
+* minor change to test trusted publishing workflow e2e ([836d8cb](https://github.com/videojs/video.js/commit/836d8cb))
+
+### Documentation
+
+* Clarify copyright and project stewardship ([#9104](https://github.com/videojs/video.js/issues/9104)) ([20f8d76](https://github.com/videojs/video.js/commit/20f8d76))
+
 <a name="8.23.4"></a>
 ## [8.23.4](https://github.com/videojs/video.js/compare/v8.23.3...v8.23.4) (2025-08-01)
 
