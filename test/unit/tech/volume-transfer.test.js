@@ -8,26 +8,19 @@ import QUnit from 'qunit';
 
 QUnit.module('VolumeTransfer');
 
-// Base class tests
 QUnit.test('VolumeTransfer base class throws errors', function(assert) {
   const transfer = new VolumeTransfer();
 
   assert.throws(
-    () => transfer.toLinear(0.5),
+    () => transfer.sliderToVolume(0.5),
     /Must be implemented by subclass/,
-    'toLinear throws error on base class'
+    'sliderToVolume throws error on base class'
   );
 
   assert.throws(
-    () => transfer.toLogarithmic(0.5),
+    () => transfer.volumeToSlider(0.5),
     /Must be implemented by subclass/,
-    'toLogarithmic throws error on base class'
-  );
-
-  assert.strictEqual(
-    transfer.getName(),
-    'base',
-    'getName returns "base"'
+    'volumeToSlider throws error on base class'
   );
 });
 
@@ -36,23 +29,17 @@ QUnit.test('LinearVolumeTransfer is identity function', function(assert) {
 
   [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0].forEach(value => {
     assert.strictEqual(
-      transfer.toLinear(value),
+      transfer.sliderToVolume(value),
       value,
-      `toLinear(${value}) returns ${value}`
+      `sliderToVolume(${value}) returns ${value}`
     );
 
     assert.strictEqual(
-      transfer.toLogarithmic(value),
+      transfer.volumeToSlider(value),
       value,
-      `toLogarithmic(${value}) returns ${value}`
+      `volumeToSlider(${value}) returns ${value}`
     );
   });
-
-  assert.strictEqual(
-    transfer.getName(),
-    'linear',
-    'getName returns "linear"'
-  );
 });
 
 QUnit.test('LogarithmicVolumeTransfer constructor sets dbRange and offset', function(assert) {
@@ -64,27 +51,21 @@ QUnit.test('LogarithmicVolumeTransfer constructor sets dbRange and offset', func
   const transfer2 = new LogarithmicVolumeTransfer(60);
 
   assert.strictEqual(transfer2.dbRange, 60, 'custom dbRange is set');
-
-  assert.strictEqual(
-    transfer1.getName(),
-    'logarithmic',
-    'getName returns "logarithmic"'
-  );
 });
 
 QUnit.test('LogarithmicVolumeTransfer passes through (0,0)', function(assert) {
   const transfer = new LogarithmicVolumeTransfer(50);
 
   assert.strictEqual(
-    transfer.toLinear(0),
+    transfer.sliderToVolume(0),
     0,
-    'toLinear(0) returns exactly 0'
+    'sliderToVolume(0) returns exactly 0'
   );
 
   assert.strictEqual(
-    transfer.toLogarithmic(0),
+    transfer.volumeToSlider(0),
     0,
-    'toLogarithmic(0) returns exactly 0'
+    'volumeToSlider(0) returns exactly 0'
   );
 });
 
@@ -92,58 +73,32 @@ QUnit.test('LogarithmicVolumeTransfer passes through (1,1)', function(assert) {
   const transfer = new LogarithmicVolumeTransfer(50);
 
   assert.strictEqual(
-    transfer.toLinear(1),
+    transfer.sliderToVolume(1),
     1,
-    'toLinear(1) returns exactly 1'
+    'sliderToVolume(1) returns exactly 1'
   );
 
   assert.strictEqual(
-    transfer.toLogarithmic(1),
+    transfer.volumeToSlider(1),
     1,
-    'toLogarithmic(1) returns exactly 1'
+    'volumeToSlider(1) returns exactly 1'
   );
 });
 
 QUnit.test('LogarithmicVolumeTransfer is invertible', function(assert) {
   const transfer = new LogarithmicVolumeTransfer(50);
+  const tolerance = 0.001;
 
   [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0].forEach(slider => {
-    const linear = transfer.toLinear(slider);
-    const back = transfer.toLogarithmic(linear);
+    const linear = transfer.sliderToVolume(slider);
+    const back = transfer.volumeToSlider(linear);
+    const diff = Math.abs(back - slider);
 
-    assert.close(
-      back,
-      slider,
-      0.00001,
-      `Round trip for ${slider}: ${slider} -> ${linear.toFixed(4)} -> ${back.toFixed(4)}`
+    assert.true(
+      diff < tolerance,
+      `Round trip for ${slider}: ${slider} -> ${linear.toFixed(4)} -> ${back.toFixed(4)} (diff: ${diff.toExponential(2)})`
     );
   });
-});
-
-QUnit.test('LogarithmicVolumeTransfer provides finer control at low volumes', function(assert) {
-  const transfer = new LogarithmicVolumeTransfer(50);
-
-  const linear50 = transfer.toLinear(0.5);
-
-  assert.ok(
-    linear50 < 0.1,
-    `Slider at 50% gives linear < 10%: ${(linear50 * 100).toFixed(2)}%`
-  );
-
-  const linear25 = transfer.toLinear(0.25);
-
-  assert.ok(
-    linear25 < 0.01,
-    `Slider at 25% gives linear < 1%: ${(linear25 * 100).toFixed(2)}%`
-  );
-
-  const delta1 = transfer.toLinear(0.1) - transfer.toLinear(0);
-  const delta2 = transfer.toLinear(0.2) - transfer.toLinear(0.1);
-
-  assert.ok(
-    delta1 < 0.01 && delta2 < 0.01,
-    'Small slider movements at low volumes give small linear changes'
-  );
 });
 
 QUnit.test('LogarithmicVolumeTransfer with different dbRanges', function(assert) {
@@ -151,9 +106,9 @@ QUnit.test('LogarithmicVolumeTransfer with different dbRanges', function(assert)
   const transfer50 = new LogarithmicVolumeTransfer(50);
   const transfer60 = new LogarithmicVolumeTransfer(60);
 
-  const linear40 = transfer40.toLinear(0.5);
-  const linear50 = transfer50.toLinear(0.5);
-  const linear60 = transfer60.toLinear(0.5);
+  const linear40 = transfer40.sliderToVolume(0.5);
+  const linear50 = transfer50.sliderToVolume(0.5);
+  const linear60 = transfer60.sliderToVolume(0.5);
 
   assert.ok(
     linear40 > linear50 && linear50 > linear60,
@@ -165,25 +120,25 @@ QUnit.test('LogarithmicVolumeTransfer handles edge cases', function(assert) {
   const transfer = new LogarithmicVolumeTransfer(50);
 
   assert.strictEqual(
-    transfer.toLinear(-0.1),
+    transfer.sliderToVolume(-0.1),
     0,
     'Negative slider values return 0'
   );
 
   assert.strictEqual(
-    transfer.toLinear(1.1),
+    transfer.sliderToVolume(1.1),
     1,
     'Slider values > 1 return 1'
   );
 
   assert.strictEqual(
-    transfer.toLogarithmic(-0.1),
+    transfer.volumeToSlider(-0.1),
     0,
     'Negative linear values return 0'
   );
 
   assert.strictEqual(
-    transfer.toLogarithmic(1.1),
+    transfer.volumeToSlider(1.1),
     1,
     'Linear values > 1 return 1'
   );

@@ -1,53 +1,74 @@
 /**
- * Base class for volume transfer functions
+ * Base class for volume transfer functions.
+ *
+ * Volume transfer functions convert between slider position (UI space) and
+ * player volume (audio space). This allows different scaling behaviors like
+ * linear or logarithmic (decibel-based) volume control.
  */
 class VolumeTransfer {
   /**
-   * Convert logarithmic (slider) to linear (tech)
+   * Convert slider position to player volume.
    *
-   * @param {number} logarithmic - Volume from 0-1
-   * @return {number} Linear volume from 0-1
+   * @param {number} sliderPosition - Slider position from 0-1
+   * @return {number} Player volume from 0-1
    */
-  toLinear(logarithmic) {
+  sliderToVolume(sliderPosition) {
     throw new Error('Must be implemented by subclass');
   }
 
   /**
-   * Convert linear (tech) to logarithmic (slider)
+   * Convert player volume to slider position.
    *
-   * @param {number} linear - Volume from 0-1
-   * @return {number} Logarithmic volume from 0-1
+   * @param {number} volume - Player volume from 0-1
+   * @return {number} Slider position from 0-1
    */
-  toLogarithmic(linear) {
+  volumeToSlider(volume) {
     throw new Error('Must be implemented by subclass');
   }
-
-  getName() {
-    return 'base';
-  }
 }
 
 /**
- * Linear transfer - no conversion (current default behavior)
+ * Linear volume transfer - direct 1:1 mapping between slider and volume.
+ *
+ * This is the default behavior where moving the slider linearly adjusts
+ * the volume linearly. Simple but may not match human perception of loudness.
  */
 class LinearVolumeTransfer extends VolumeTransfer {
-  toLinear(value) {
-    return value;
+  /**
+   * Convert slider position to player volume (1:1 mapping).
+   *
+   * @param {number} sliderPosition - Slider position from 0-1
+   * @return {number} Player volume from 0-1
+   */
+  sliderToVolume(sliderPosition) {
+    return sliderPosition;
   }
 
-  toLogarithmic(value) {
-    return value;
-  }
-
-  getName() {
-    return 'linear';
+  /**
+   * Convert player volume to slider position (1:1 mapping).
+   *
+   * @param {number} volume - Player volume from 0-1
+   * @return {number} Slider position from 0-1
+   */
+  volumeToSlider(volume) {
+    return volume;
   }
 }
 
 /**
- * Logarithmic transfer using decibel scaling
+ * Logarithmic volume transfer using decibel scaling.
+ *
+ * Provides exponential volume changes as the slider moves linearly, which
+ * better matches human perception of loudness. Uses decibel (dB) scaling
+ * where volume = 10^(dB/20).
  */
 class LogarithmicVolumeTransfer extends VolumeTransfer {
+  /**
+   * Creates a logarithmic volume transfer function.
+   *
+   * @param {number} [dbRange=50] - The decibel range for the transfer function.
+   *        Larger values create a more dramatic curve. Typical range: 40-60 dB.
+   */
   constructor(dbRange = 50) {
     super();
     this.dbRange = dbRange;
@@ -55,12 +76,15 @@ class LogarithmicVolumeTransfer extends VolumeTransfer {
   }
 
   /**
-   * Convert logarithmic slider position to linear volume for tech
+   * Convert slider position to player volume using logarithmic scaling.
    *
-   * @param {number} sliderPosition - Slider position (0-1)
-   * @return {number} Linear volume (0-1)
+   * Applies exponential scaling so that linear slider movement produces
+   * logarithmic volume changes, matching human loudness perception.
+   *
+   * @param {number} sliderPosition - Slider position from 0-1
+   * @return {number} Player volume from 0-1
    */
-  toLinear(sliderPosition) {
+  sliderToVolume(sliderPosition) {
     if (sliderPosition <= 0) {
       return 0;
     }
@@ -70,34 +94,32 @@ class LogarithmicVolumeTransfer extends VolumeTransfer {
     }
 
     const dB = sliderPosition * this.dbRange - this.dbRange;
-    const linear = Math.pow(10, dB / 20);
 
-    return linear;
+    return Math.pow(10, dB / 20) * (1 + this.offset);
   }
 
   /**
-   * Convert linear volume from tech to logarithmic slider position
+   * Convert player volume to slider position using logarithmic scaling.
    *
-   * @param {number} linear - Linear volume (0-1)
-   * @return {number} Slider position (0-1)
+   * Inverse of sliderToVolume - converts linear volume back to the
+   * corresponding logarithmic slider position.
+   *
+   * @param {number} volume - Player volume from 0-1
+   * @return {number} Slider position from 0-1
    */
-  toLogarithmic(linear) {
-    if (linear <= 0) {
+  volumeToSlider(volume) {
+    if (volume <= 0) {
       return 0;
     }
 
-    if (linear >= 1) {
+    if (volume >= 1) {
       return 1;
     }
 
-    const dB = 20 * Math.log10(linear);
+    const dB = 20 * Math.log10(volume);
     const position = (dB + this.dbRange) / this.dbRange;
 
     return position;
-  }
-
-  getName() {
-    return 'logarithmic';
   }
 }
 

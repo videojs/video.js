@@ -102,7 +102,7 @@ class VolumeBar extends Slider {
     this.checkMuted();
 
     const sliderPosition = this.calculateDistance(event);
-    const linearVolume = this.volumeTransfer_.toLinear(sliderPosition);
+    const linearVolume = this.volumeTransfer_.sliderToVolume(sliderPosition);
 
     this.player_.volume(linearVolume);
   }
@@ -129,7 +129,7 @@ class VolumeBar extends Slider {
 
     const linearVolume = this.player_.volume();
 
-    return this.volumeTransfer_.toLogarithmic(linearVolume);
+    return this.volumeTransfer_.volumeToSlider(linearVolume);
   }
 
   /**
@@ -142,7 +142,7 @@ class VolumeBar extends Slider {
 
     const newSlider = Math.min(currentSlider + 0.1, 1);
 
-    const linearVolume = this.volumeTransfer_.toLinear(newSlider);
+    const linearVolume = this.volumeTransfer_.sliderToVolume(newSlider);
 
     this.player_.volume(linearVolume);
   }
@@ -162,7 +162,7 @@ class VolumeBar extends Slider {
       return;
     }
 
-    const linearVolume = this.volumeTransfer_.toLinear(newSlider);
+    const linearVolume = this.volumeTransfer_.sliderToVolume(newSlider);
 
     this.player_.volume(linearVolume);
   }
