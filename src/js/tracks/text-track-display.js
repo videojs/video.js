@@ -368,7 +368,7 @@ class TextTrackDisplay extends Component {
    * a {@link Player#texttrackchange} or a {@link Player#fullscreenchange} is fired.
    */
   updateDisplayOverlay() {
-    // inset-inline and inset-block are not supprted on old chrome, but these are
+    // inset-inline and inset-block are not supported on old chrome, but these are
     // only likely to be used on TV devices
     if (!this.player_.videoHeight() || !window.CSS.supports('inset-inline: 10px')) {
       return;
