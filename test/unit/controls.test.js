@@ -791,3 +791,258 @@ QUnit.module('SmartTV UI Updates (Progress Bar & Time Display)', function(hooks)
     userSeekSpy.restore();
   });
 });
+
+QUnit.test('VolumeBar initializes with LinearVolumeTransfer by default', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  assert.ok(volumeBar.volumeTransfer_, 'volumeTransfer_ should be initialized');
+  assert.equal(
+    volumeBar.volumeTransfer_.constructor.name, 'LinearVolumeTransfer',
+    'should use LinearVolumeTransfer by default'
+  );
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar initializes with LogarithmicVolumeTransfer when logarithmicVolume is true', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  assert.ok(volumeBar.volumeTransfer_, 'volumeTransfer_ should be initialized');
+  assert.equal(
+    volumeBar.volumeTransfer_.constructor.name, 'LogarithmicVolumeTransfer',
+    'should use LogarithmicVolumeTransfer when logarithmicVolume is true'
+  );
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar getPercent() uses volume transfer function with logarithmic mode', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0);
+  assert.equal(volumeBar.getPercent(), 0, 'should return 0 for volume 0');
+
+  player.volume(1);
+  assert.equal(volumeBar.getPercent(), 1, 'should return 1 for volume 1');
+
+  player.volume(0.5);
+  const percent = volumeBar.getPercent();
+
+  assert.ok(percent > 0.5 && percent < 1, 'should return non-linear value for volume 0.5');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar handleMouseMove uses volume transfer with logarithmic mode', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  const originalCalc = volumeBar.calculateDistance;
+
+  volumeBar.calculateDistance = function() {
+    return 0.5;
+  };
+
+  volumeBar.handleMouseMove({ pageX: 100, pageY: 100 });
+
+  const volume = player.volume();
+
+  assert.ok(volume > 0 && volume < 0.5, 'logarithmic mode should set low volume for 50% position');
+
+  volumeBar.calculateDistance = originalCalc;
+  player.dispose();
+});
+
+QUnit.test('VolumeBar stepForward increases volume with logarithmic transfer', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0.5);
+  const initialVolume = player.volume();
+
+  volumeBar.stepForward();
+
+  assert.ok(player.volume() > initialVolume, 'should increase volume');
+  assert.ok(player.volume() <= 1, 'should not exceed max volume');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar stepBack decreases volume with logarithmic transfer', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0.5);
+  const initialVolume = player.volume();
+
+  volumeBar.stepBack();
+
+  assert.ok(player.volume() < initialVolume, 'should decrease volume');
+  assert.ok(player.volume() >= 0, 'should not go below min volume');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar passes logarithmicVolumeRange option to LogarithmicVolumeTransfer', function(assert) {
+  const customRange = 60;
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true,
+    logarithmicVolumeRange: customRange
+  });
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  assert.equal(
+    volumeBar.volumeTransfer_.dbRange, customRange,
+    'should use custom logarithmicVolumeRange value'
+  );
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar getPercent() returns correct values with linear transfer', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0);
+  assert.equal(volumeBar.getPercent(), 0, 'should return 0 for volume 0');
+
+  player.volume(0.5);
+  assert.equal(volumeBar.getPercent(), 0.5, 'should return 0.5 for volume 0.5');
+
+  player.volume(1);
+  assert.equal(volumeBar.getPercent(), 1, 'should return 1 for volume 1');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar handleMouseMove() sets correct volume with linear transfer', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  const originalCalculateDistance = volumeBar.calculateDistance;
+
+  volumeBar.calculateDistance = function() {
+    return 0.5;
+  };
+
+  const event = {
+    pageX: 100,
+    pageY: 100
+  };
+
+  volumeBar.handleMouseMove(event);
+
+  assert.equal(player.volume(), 0.5, 'should set volume to 0.5 for 50% position with linear transfer');
+
+  volumeBar.calculateDistance = originalCalculateDistance;
+  player.dispose();
+});
+
+QUnit.test('VolumeBar handleMouseMove() sets correct volume with logarithmic transfer', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  const originalCalculateDistance = volumeBar.calculateDistance;
+
+  volumeBar.calculateDistance = function() {
+    return 0.5;
+  };
+
+  const event = {
+    pageX: 100,
+    pageY: 100
+  };
+
+  volumeBar.handleMouseMove(event);
+
+  const volume = player.volume();
+
+  assert.ok(volume < 0.5, 'logarithmic transfer should set volume < 0.5 for 50% slider position');
+  assert.ok(volume > 0, 'volume should be greater than 0');
+
+  volumeBar.calculateDistance = originalCalculateDistance;
+  player.dispose();
+});
+
+QUnit.test('VolumeBar stepForward() increases volume correctly with linear transfer', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0.5);
+  volumeBar.stepForward();
+
+  assert.ok(player.volume() > 0.5, 'should increase volume');
+  assert.ok(player.volume() <= 1, 'should not exceed max volume');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar stepForward() increases volume correctly with logarithmic transfer', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  const initialVolume = 0.5;
+
+  player.volume(initialVolume);
+  volumeBar.stepForward();
+
+  assert.ok(player.volume() > initialVolume, 'should increase volume');
+  assert.ok(player.volume() <= 1, 'should not exceed max volume');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar stepBack() decreases volume correctly with linear transfer', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0.5);
+  volumeBar.stepBack();
+
+  assert.ok(player.volume() < 0.5, 'should decrease volume');
+  assert.ok(player.volume() >= 0, 'should not go below min volume');
+
+  player.dispose();
+});
+
+QUnit.test('VolumeBar stepBack() decreases volume correctly with logarithmic transfer', function(assert) {
+  const player = TestHelpers.makePlayer({
+    logarithmicVolume: true
+  });
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  const initialVolume = 0.5;
+
+  player.volume(initialVolume);
+  volumeBar.stepBack();
+
+  assert.ok(player.volume() < initialVolume, 'should decrease volume');
+  assert.ok(player.volume() >= 0, 'should not go below min volume');
+
+  player.dispose();
+});
