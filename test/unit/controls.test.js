@@ -1046,3 +1046,17 @@ QUnit.test('VolumeBar stepBack() decreases volume correctly with logarithmic tra
 
   player.dispose();
 });
+
+QUnit.test('VolumeBar stepBack() sets volume to 0 when slider would go below threshold', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  const volumeBar = player.controlBar.volumePanel.volumeControl.volumeBar;
+
+  player.volume(0.02);
+
+  volumeBar.stepBack();
+
+  assert.equal(player.volume(), 0, 'volume is set to 0 when reduced slider is below threshold');
+
+  player.dispose();
+});
