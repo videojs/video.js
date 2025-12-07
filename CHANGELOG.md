@@ -1,3 +1,18 @@
+<a name="8.23.4"></a>
+## [8.23.4](https://github.com/videojs/video.js/compare/v8.23.3...v8.23.4) (2025-08-01)
+
+### Bug Fixes
+
+* Component.js string arg type for for removeChild ([#9070](https://github.com/videojs/video.js/issues/9070)) ([31f8d7c](https://github.com/videojs/video.js/commit/31f8d7c))
+
+### Chores
+
+* **package:** update VHS to v3.17.2 ([#9079](https://github.com/videojs/video.js/issues/9079)) ([c3e4f6b](https://github.com/videojs/video.js/commit/c3e4f6b))
+
+### Documentation
+
+* Update README.md w/ v10 news link ([#9037](https://github.com/videojs/video.js/issues/9037)) ([09eb715](https://github.com/videojs/video.js/commit/09eb715))
+
 <a name="8.23.3"></a>
 ## [8.23.3](https://github.com/videojs/video.js/compare/v8.23.2...v8.23.3) (2025-04-16)
 
