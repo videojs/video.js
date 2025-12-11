@@ -6,7 +6,7 @@
   "module": "./dist/video.es.js",
   "style": "./dist/video-js.css",
   "types": "./dist/types/video.d.ts",
-  "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
+  "copyright": "Copyright 2010-present Video.js contributors",
   "license": "Apache-2.0",
   "keywords": [
     "dash",
@@ -85,7 +85,7 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
+    "@babel/runtime": "^7.28.4",
     "@videojs/http-streaming": "^3.17.2",
     "@videojs/vhs-utils": "^4.1.1",
     "@videojs/xhr": "2.7.0",
