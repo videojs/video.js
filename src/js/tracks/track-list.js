@@ -10,13 +10,14 @@ import {isEvented} from '../mixins/evented';
  * Common functionaliy between {@link TextTrackList}, {@link AudioTrackList}, and
  * {@link VideoTrackList}
  *
+ * @template [T=Track] extends Track
  * @extends EventTarget
  */
 class TrackList extends EventTarget {
   /**
    * Create an instance of this class
    *
-   * @param { Track[] } tracks
+   * @param { T[] } tracks
    *        A list of tracks to initialize the list with.
    *
    * @abstract
@@ -24,6 +25,10 @@ class TrackList extends EventTarget {
   constructor(tracks = []) {
     super();
 
+    /**
+     * @type {T[]} tracks_
+     *        The list of tracks.
+     */
     this.tracks_ = [];
 
     /**
@@ -46,7 +51,7 @@ class TrackList extends EventTarget {
   /**
    * Add a {@link Track} to the `TrackList`
    *
-   * @param {Track} track
+   * @param {T} track
    *        The audio, video, or text track to add to the list.
    *
    * @fires TrackList#addtrack
@@ -104,7 +109,7 @@ class TrackList extends EventTarget {
   /**
    * Remove a {@link Track} from the `TrackList`
    *
-   * @param {Track} rtrack
+   * @param {T} rtrack
    *        The audio, video, or text track to remove from the list.
    *
    * @fires TrackList#removetrack
@@ -134,7 +139,7 @@ class TrackList extends EventTarget {
      *
      * @event TrackList#removetrack
      * @type {Event}
-     * @property {Track} track
+     * @property {T} track
      *           A reference to track that was removed.
      */
     this.trigger({
