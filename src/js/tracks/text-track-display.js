@@ -326,7 +326,7 @@ class TextTrackDisplay extends Component {
       this.updateForTrack(descriptionsTrack);
     }
 
-    if (!window.CSS.supports('inset', '10px')) {
+    if (!(window.CSS !== undefined && window.CSS.supports('inset', '10px'))) {
       const textTrackDisplay = this.el_;
       const vjsTextTrackCues = textTrackDisplay.querySelectorAll('.vjs-text-track-cue');
       const controlBarHeight = this.player_.controlBar.el_.getBoundingClientRect().height;
@@ -370,7 +370,7 @@ class TextTrackDisplay extends Component {
   updateDisplayOverlay() {
     // inset-inline and inset-block are not supprted on old chrome, but these are
     // only likely to be used on TV devices
-    if (!this.player_.videoHeight() || !window.CSS.supports('inset-inline: 10px')) {
+    if (!this.player_.videoHeight() || !(window.CSS !== undefined && window.CSS.supports('inset-inline: 10px'))) {
       return;
     }
 
