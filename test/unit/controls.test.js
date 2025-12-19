@@ -681,6 +681,28 @@ QUnit.test('Remaing time negative sign can be optional', function(assert) {
   player.dispose();
 });
 
+QUnit.test('Current time display shouldn\'t flash zero on seek', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const currentTimeDisplay = player.controlBar.currentTimeDisplay;
+  const spy = sinon.spy(currentTimeDisplay, 'updateTextNode_');
+
+  player.ended = () => false;
+  player.currentTime = () => 10;
+
+  currentTimeDisplay.updateContent({
+    target: {
+      pendingSeekTime: () => null
+    }
+  });
+
+  this.clock.tick(1);
+
+  assert.ok(spy.calledWith(10), 'control was updated with currentTime');
+  assert.notOk(spy.calledWith(null), 'control was not updated with null');
+  assert.notStrictEqual(currentTimeDisplay.formattedTime_, '0:00', 'display text not set to 0:00');
+
+});
+
 QUnit.module('SmartTV UI Updates (Progress Bar & Time Display)', function(hooks) {
   let player;
   let seekBar;
