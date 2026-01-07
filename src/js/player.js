@@ -323,13 +323,13 @@ class Player extends Component {
     // Make sure tag ID exists
     // also here.. probably better
     tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
-
     // Set Options
     // The options argument overrides options set in the video tag
     // which overrides globally set options.
     // This latter part coincides with the load order
     // (tag must exist before Player)
     options = Object.assign(Player.getTagSettings(tag), options);
+    console.log(options, "options")
 
     // Delay the initialization of children because we need to set up
     // player properties first, and can't use `this` before `super()`
@@ -2140,10 +2140,19 @@ class Player extends Component {
 
     const el = this.el();
     let isFs = document[this.fsApi_.fullscreenElement] === el;
-
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
+  if(this.options_.enableResponsiveFullscreen === true){
+
+    let playerContainer = targetPlayer.el_;
+    if((targetPlayer.el_.querySelector('video').videoHeight
+      <  targetPlayer.el_.querySelector('video').videoWidth) && screen.orientation && screen.orientation.lock){
+          screen.orientation.lock('landscape').catch(err => {
+            console.warn('Orientation lock failed:', err);
+          });
+      }
+  }    
 
     this.isFullscreen(isFs);
   }
