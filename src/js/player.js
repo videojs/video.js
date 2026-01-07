@@ -329,7 +329,6 @@ class Player extends Component {
     // This latter part coincides with the load order
     // (tag must exist before Player)
     options = Object.assign(Player.getTagSettings(tag), options);
-    console.log(options, "options")
 
     // Delay the initialization of children because we need to set up
     // player properties first, and can't use `this` before `super()`
