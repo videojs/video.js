@@ -2143,7 +2143,7 @@ class Player extends Component {
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
-    if (this.options_.enableResponsiveFullscreen === true) {
+    if (this.options_.enableAdaptiveFullscreen === true) {
 
       const videoHeight = targetPlayer.videoHeight();
       const videoWidth = targetPlayer.videoWidth();

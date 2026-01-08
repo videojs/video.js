@@ -80,11 +80,11 @@
 
   <script>
     videojs('portraitVideo', {
-      enableResponsiveFullscreen: true
+      enableAdaptiveFullscreen: true
     });
 
     videojs('landscapeVideo', {
-      enableResponsiveFullscreen: true
+      enableAdaptiveFullscreen: true
     });
   </script>
 
