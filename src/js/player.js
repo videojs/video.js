@@ -2142,16 +2142,18 @@ class Player extends Component {
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
-  if(this.options_.enableResponsiveFullscreen === true){
+    if (this.options_.enableAdaptiveFullscreen === true) {
 
-    let playerContainer = targetPlayer.el_;
-    if((targetPlayer.el_.querySelector('video').videoHeight
-      <  targetPlayer.el_.querySelector('video').videoWidth) && screen.orientation && screen.orientation.lock){
-          screen.orientation.lock('landscape').catch(err => {
-            console.warn('Orientation lock failed:', err);
-          });
+      const videoHeight = targetPlayer.videoHeight();
+      const videoWidth = targetPlayer.videoWidth();
+      const videoscreen = window.screen;
+
+      if ((videoHeight < videoWidth) && videoscreen.orientation && videoscreen.orientation.lock) {
+        videoscreen.orientation.lock('landscape').catch(err => {
+          log.warn('Orientation lock failed:', err);
+        });
       }
-  }    
+    }
 
     this.isFullscreen(isFs);
   }
