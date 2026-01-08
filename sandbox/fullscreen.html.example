@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Responsive Fullscreen Orientation Demo</title>
+
+  <link href="../dist/video-js.css" rel="stylesheet" />
+  <script src="../dist/video.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 16px;
+    }
+
+    .example {
+      margin-bottom: 40px;
+    }
+
+    .note {
+      background: #f5f5f5;
+      border-left: 4px solid #777;
+      padding: 10px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Responsive Fullscreen Orientation Demo</h2>
+
+  <div class="note">
+    <strong>Expected behavior:</strong><br>
+    • Mobile devices rotate fullscreen based on <em>video aspect ratio</em><br>
+    • Desktop browsers never rotate or lock orientation<br>
+    • OS orientation lock is always respected
+  </div>
+
+  <div class="example">
+    <h3>Portrait Video (Taller than Wide)</h3>
+    <p>
+      📱 On mobile fullscreen → <strong>Portrait orientation</strong><br>
+      🖥 On desktop fullscreen → <strong>No rotation</strong>
+    </p>
+
+    <video-js
+      id="portraitVideo"
+      controls
+      preload="auto"
+      width="360"
+      height="640"
+    >
+      <source
+        src="https://github.com/Codinplus31/Portfolio/raw/refs/heads/main/public/football.mp4"
+        type="video/mp4"
+      />
+    </video-js>
+  </div>
+
+  <div class="example">
+    <h3>Landscape Video (Wider than Tall)</h3>
+    <p>
+      📱 On mobile fullscreen → <strong>Landscape orientation</strong><br>
+      🖥 On desktop fullscreen → <strong>No rotation</strong>
+    </p>
+
+    <video-js
+      id="landscapeVideo"
+      controls
+      preload="auto"
+      width="640"
+      height="360"
+      poster="https://vjs.zencdn.net/v/oceans.png"
+    >
+      <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+    </video-js>
+  </div>
+
+  <script>
+    videojs('portraitVideo', {
+      enableResponsiveFullscreen: true
+    });
+
+    videojs('landscapeVideo', {
+      enableResponsiveFullscreen: true
+    });
+  </script>
+
+</body>
+</html>

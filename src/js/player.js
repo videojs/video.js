@@ -323,7 +323,6 @@ class Player extends Component {
     // Make sure tag ID exists
     // also here.. probably better
     tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
-
     // Set Options
     // The options argument overrides options set in the video tag
     // which overrides globally set options.
@@ -2143,6 +2142,18 @@ class Player extends Component {
 
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
+    }
+    if (this.options_.enableResponsiveFullscreen === true) {
+
+      const videoHeight = targetPlayer.videoHeight();
+      const videoWidth = targetPlayer.videoWidth();
+      const videoscreen = window.screen;
+
+      if ((videoHeight < videoWidth) && videoscreen.orientation && videoscreen.orientation.lock) {
+        videoscreen.orientation.lock('landscape').catch(err => {
+          log.warn('Orientation lock failed:', err);
+        });
+      }
     }
 
     this.isFullscreen(isFs);
