@@ -2139,7 +2139,6 @@ class Player extends Component {
 
     const el = this.el();
     let isFs = document[this.fsApi_.fullscreenElement] === el;
-
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
