@@ -167,9 +167,12 @@ class MenuButton extends Component {
    *
    * @param {string} name
    *         The icon name to be added.
+   *
+   * @return {Element}
+   *         The element that gets created.
    */
   setIcon(name) {
-    super.setIcon(name, this.menuButton_.el_);
+    return super.setIcon(name, this.menuButton_.el_);
   }
 
   /**
