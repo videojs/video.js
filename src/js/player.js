@@ -2128,7 +2128,7 @@ class Player extends Component {
   /**
    * when the document fschange event triggers it calls this
    */
-  adaptiveFullscreenOrientation(targetPlayer) {
+  adaptiveFullscreenOrientation_(targetPlayer) {
     const videoHeight = targetPlayer.videoHeight();
     const videoWidth = targetPlayer.videoWidth();
     const videoscreen = window.screen;
