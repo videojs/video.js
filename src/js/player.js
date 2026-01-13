@@ -2128,7 +2128,7 @@ class Player extends Component {
   /**
    * when the document fschange event triggers it calls this
    */
-  AdaptiveFullscreenOrientation(targetPlayer) {
+  adaptiveFullscreenOrientation(targetPlayer) {
     const videoHeight = targetPlayer.videoHeight();
     const videoWidth = targetPlayer.videoWidth();
     const videoscreen = window.screen;
@@ -2156,7 +2156,7 @@ class Player extends Component {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
     if (this.options_.enableAdaptiveLandscapeLock === true) {
-      this.AdaptiveFullscreenOrientation(targetPlayer);
+      this.adaptiveFullscreenOrientation(targetPlayer);
     }
 
     this.isFullscreen(isFs);
