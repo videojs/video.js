@@ -716,7 +716,7 @@ class Player extends Component {
     if (playerElIngest) {
       el = this.el_ = tag.parentNode;
     } else if (!divEmbed) {
-      el = this.el_ = super.createEl('div');
+      el = this.el_ = super.createEl('section');
     }
 
     // Copy over all the attributes from the tag, including ID and class
