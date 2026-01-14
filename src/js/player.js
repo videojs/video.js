@@ -2124,10 +2124,10 @@ class Player extends Component {
       this.removeClass('vjs-fullscreen');
     }
   }
-
   /**
-   * when the document fschange event triggers it calls this
+   * this documents should trigger when a `enableAdaptiveLandscapeLock` is true. and it makes the fullscreen choose between landscape and portrait depending on the video aspect ratio
    */
+
   adaptiveFullscreenOrientation_(targetPlayer) {
     const videoHeight = targetPlayer.videoHeight();
     const videoWidth = targetPlayer.videoWidth();
@@ -2139,6 +2139,9 @@ class Player extends Component {
       });
     }
   }
+  /**
+   * when the document fschange event triggers it calls this
+   */
 
   documentFullscreenChange_(e) {
     const targetPlayer = e.target.player;
@@ -2156,7 +2159,7 @@ class Player extends Component {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
     }
     if (this.options_.enableAdaptiveLandscapeLock === true) {
-      this.adaptiveFullscreenOrientation(targetPlayer);
+      this.adaptiveFullscreenOrientation_(targetPlayer);
     }
 
     this.isFullscreen(isFs);
