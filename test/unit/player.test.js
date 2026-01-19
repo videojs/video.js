@@ -37,9 +37,9 @@ QUnit.module('Player', {
 QUnit.test(
   'should lock portrait when video is taller than wide  and enableAdaptiveLandscapeLock is true',
   function(assert) {
-    const player = this.player;
-
-    player.options_.enableAdaptiveLandscapeLock = true;
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true
+    });
 
     sinon.stub(player, 'videoWidth').returns(720);
     sinon.stub(player, 'videoHeight').returns(1280);
@@ -65,9 +65,9 @@ QUnit.test(
 QUnit.test(
   'should lock landscape when video is wider than tall and enableAdaptiveLandscapeLock is true',
   function(assert) {
-    const player = this.player;
-
-    player.options_.enableAdaptiveLandscapeLock = true;
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true
+    });
 
     sinon.stub(player, 'videoWidth').returns(1920);
     sinon.stub(player, 'videoHeight').returns(1080);
@@ -93,9 +93,9 @@ QUnit.test(
 QUnit.test(
   'does not force orientation on devices without orientation support when  enableAdaptiveLandscapeLock is true',
   function(assert) {
-    const player = this.player;
-
-    player.options_.enableAdaptiveLandscapeLock = true;
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true
+    });
 
     sinon.stub(player, 'videoWidth').returns(1920);
     sinon.stub(player, 'videoHeight').returns(1080);
@@ -120,9 +120,9 @@ QUnit.test(
 QUnit.test(
   'does not call lock when orientation.lock is unavailable and when when  enableAdaptiveLandscapeLock is true',
   function(assert) {
-    const player = this.player;
-
-    player.options_.enableAdaptiveLandscapeLock = true;
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true
+    });
 
     sinon.stub(player, 'videoWidth').returns(1920);
     sinon.stub(player, 'videoHeight').returns(1080);
@@ -145,9 +145,9 @@ QUnit.test(
 QUnit.test(
   'does nothing when enableAdaptiveLandscapeLock is disabled',
   function(assert) {
-    const player = this.player;
-
-    player.options_.enableAdaptiveLandscapeLock = false;
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: false
+    });
 
     const lockSpy = sinon.spy();
 
