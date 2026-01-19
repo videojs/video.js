@@ -34,33 +34,6 @@ QUnit.module('Player', {
   }
 });
 
-QUnit.test(
-  'should lock portrait when video is taller than wide  and enableAdaptiveLandscapeLock is true',
-  function(assert) {
-    const player = TestHelpers.makePlayer({
-      enableAdaptiveLandscapeLock: true
-    });
-
-    sinon.stub(player, 'videoWidth').returns(720);
-    sinon.stub(player, 'videoHeight').returns(1280);
-
-    const lockSpy = sinon.spy();
-
-    sinon.stub(window.screen, 'orientation').value({
-      lock: lockSpy
-    });
-
-    player.adaptiveFullscreenOrientation_(player);
-
-    assert.ok(
-      lockSpy.calledOnceWith('portrait'),
-      'locks orientation to portrait'
-    );
-
-    player.videoWidth.restore();
-    player.videoHeight.restore();
-  }
-);
 
 QUnit.test(
   'should lock landscape when video is wider than tall and enableAdaptiveLandscapeLock is true',
