@@ -18,6 +18,26 @@ import pkg from '../../package.json';
 import * as Guid from '../../src/js/utils/guid.js';
 import SeekBar from '../../src/js/control-bar/progress-control/seek-bar';
 
+(function() {
+  if (typeof window !== 'undefined' && window.screen) {
+    // Create a complete, safe mock that won't crash
+    Object.defineProperty(window.screen, 'orientation', {
+      value: {
+        lock() {
+          // Return a proper Promise object that has .catch()
+          return Promise.resolve();
+        },
+        unlock() {},
+        addEventListener() {},
+        removeEventListener() {},
+        type: 'landscape-primary',
+        angle: 0
+      },
+      writable: true
+    });
+  }
+})();
+
 QUnit.module('Player', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
@@ -33,6 +53,278 @@ QUnit.module('Player', {
     this.clock.restore();
   }
 });
+
+// QUnit.test(
+//   'should lock landscape when video is wider than tall and enableAdaptiveLandscapeLock is true',
+//   function(assert) {
+//     const player = TestHelpers.makePlayer({
+//       enableAdaptiveLandscapeLock: true,
+//       sources: []
+//     });
+
+//     sinon.stub(player, 'videoWidth').returns(1920);
+//     sinon.stub(player, 'videoHeight').returns(1080);
+
+//     const lockSpy = sinon.spy();
+
+//     sinon.stub(window.screen, 'orientation').value({
+//       lock: lockSpy
+//     });
+
+//     player.adaptiveFullscreenOrientation_(player);
+
+//     assert.ok(
+//       lockSpy.calledOnceWith('landscape'),
+//       'locks orientation to landscape'
+//     );
+
+//     player.videoWidth.restore();
+//     player.videoHeight.restore();
+//   }
+// );
+
+// QUnit.test(
+//   'does not force orientation on devices without orientation support when  enableAdaptiveLandscapeLock is true',
+//   function(assert) {
+//     const player = TestHelpers.makePlayer({
+//       enableAdaptiveLandscapeLock: true,
+//       sources: []
+//     });
+
+//     sinon.stub(player, 'videoWidth').returns(1920);
+//     sinon.stub(player, 'videoHeight').returns(1080);
+
+//     // Simulate laptop / desktop environment
+//     sinon.stub(window.screen, 'orientation').value(undefined);
+
+//     assert.expect(1);
+
+//     try {
+//       player.adaptiveFullscreenOrientation_(player);
+//       assert.ok(true, 'no orientation lock attempted');
+//     } catch (e) {
+//       assert.notOk(true, 'should not throw on desktop devices');
+//     }
+
+//     player.videoWidth.restore();
+//     player.videoHeight.restore();
+//   }
+// );
+
+// QUnit.test(
+//   'does not call lock when orientation.lock is unavailable and when when  enableAdaptiveLandscapeLock is true',
+//   function(assert) {
+//     const player = TestHelpers.makePlayer({
+//       enableAdaptiveLandscapeLock: true,
+//       sources: []
+//     });
+
+//     sinon.stub(player, 'videoWidth').returns(1920);
+//     sinon.stub(player, 'videoHeight').returns(1080);
+
+//     const orientationObj = {};
+
+//     sinon.stub(window.screen, 'orientation').value(orientationObj);
+
+//     assert.expect(1);
+
+//     player.adaptiveFullscreenOrientation_(player);
+
+//     assert.ok(true, 'no attempt to force orientation');
+
+//     player.videoWidth.restore();
+//     player.videoHeight.restore();
+//   }
+// );
+
+// QUnit.test(
+//   'does nothing when enableAdaptiveLandscapeLock is disabled',
+//   function(assert) {
+//     const player = TestHelpers.makePlayer({
+//       enableAdaptiveLandscapeLock: false,
+//       sources: []
+//     });
+
+//     const lockSpy = sinon.spy();
+
+//     sinon.stub(window.screen, 'orientation').value({
+//       lock: lockSpy
+//     });
+
+//     player.documentFullscreenChange_({ target: { player } });
+
+//     assert.notOk(
+//       lockSpy.called,
+//       'orientation lock not called when disabled'
+//     );
+//   }
+// );
+
+// In test/helpers/screen-orientation-mock.js or at the top of your test file
+function mockScreenOrientation(options = {}) {
+  const original = window.screen.orientation;
+
+  const mock = {
+    lock: options.lock || (() => Promise.resolve()),
+    unlock: options.unlock || (() => {}),
+    addEventListener: options.addEventListener || sinon.stub(),
+    removeEventListener: options.removeEventListener || sinon.stub(),
+    type: options.type || 'landscape-primary',
+    angle: options.angle || 0
+  };
+
+  Object.defineProperty(window.screen, 'orientation', {
+    value: mock,
+    writable: true,
+    configurable: true
+  });
+
+  return {
+    mock,
+    restore: () => {
+      Object.defineProperty(window.screen, 'orientation', {
+        value: original,
+        writable: true,
+        configurable: true
+      });
+    }
+  };
+}
+
+// Then use it in your tests:
+QUnit.test(
+  'should lock landscape when video is wider than tall and enableAdaptiveLandscapeLock is true',
+  function(assert) {
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true,
+      sources: []
+    });
+
+    sinon.stub(player, 'videoWidth').returns(1920);
+    sinon.stub(player, 'videoHeight').returns(1080);
+
+    const lockSpy = sinon.stub().returns(Promise.resolve());
+    const orientationMock = mockScreenOrientation({ lock: lockSpy });
+
+    player.adaptiveFullscreenOrientation_(player);
+
+    return Promise.resolve().then(() => {
+      assert.ok(
+        lockSpy.calledOnceWith('landscape'),
+        'locks orientation to landscape'
+      );
+
+      player.videoWidth.restore();
+      player.videoHeight.restore();
+      orientationMock.restore();
+    });
+  }
+);
+
+QUnit.test(
+  'does not force orientation on devices without orientation support when enableAdaptiveLandscapeLock is true',
+  function(assert) {
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true,
+      sources: []
+    });
+
+    sinon.stub(player, 'videoWidth').returns(1920);
+    sinon.stub(player, 'videoHeight').returns(1080);
+
+    // Simulate laptop/desktop by mocking as undefined
+    const original = window.screen.orientation;
+
+    Object.defineProperty(window.screen, 'orientation', {
+      value: undefined,
+      writable: true,
+      configurable: true
+    });
+
+    assert.expect(1);
+
+    try {
+      player.adaptiveFullscreenOrientation_(player);
+      assert.ok(true, 'no orientation lock attempted');
+    } catch (e) {
+      assert.notOk(true, 'should not throw on desktop devices');
+    }
+
+    player.videoWidth.restore();
+    player.videoHeight.restore();
+
+    // Restore
+    Object.defineProperty(window.screen, 'orientation', {
+      value: original,
+      writable: true,
+      configurable: true
+    });
+  }
+);
+
+QUnit.test(
+  'does not call lock when orientation.lock is unavailable and when enableAdaptiveLandscapeLock is true',
+  function(assert) {
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: true,
+      sources: []
+    });
+
+    sinon.stub(player, 'videoWidth').returns(1920);
+    sinon.stub(player, 'videoHeight').returns(1080);
+
+    // Provide a mock with addEventListener but no lock method
+    const orientationObj = {
+      addEventListener: () => {},
+      removeEventListener: () => {}
+    };
+
+    sinon.stub(window.screen, 'orientation').value(orientationObj);
+
+    assert.expect(1);
+
+    player.adaptiveFullscreenOrientation_(player);
+
+    assert.ok(true, 'no attempt to force orientation');
+
+    player.videoWidth.restore();
+    player.videoHeight.restore();
+
+    // Restore the stub
+    window.screen.orientation = undefined;
+  }
+);
+
+QUnit.test(
+  'does nothing when enableAdaptiveLandscapeLock is disabled',
+  function(assert) {
+    const player = TestHelpers.makePlayer({
+      enableAdaptiveLandscapeLock: false,
+      sources: []
+    });
+
+    const lockSpy = sinon.spy();
+
+    // Provide a complete mock
+    const mockOrientation = {
+      lock: lockSpy,
+      addEventListener: () => {},
+      removeEventListener: () => {}
+    };
+
+    sinon.stub(window.screen, 'orientation').value(mockOrientation);
+
+    player.documentFullscreenChange_({ target: { player } });
+
+    assert.notOk(
+      lockSpy.called,
+      'orientation lock not called when disabled'
+    );
+
+    // Restore the stub
+    window.screen.orientation = undefined;
+  }
+);
 
 QUnit.test('the default ID of the first player remains "vjs_video_3"', function(assert) {
   Guid.resetGuidInTestsOnly();
@@ -90,7 +382,6 @@ QUnit.test('dispose should not throw if playerEl is missing', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
   fixture.appendChild(videoTag);
-
   const player = new Player(videoTag);
 
   player.el_.parentNode.removeChild(player.el_);
