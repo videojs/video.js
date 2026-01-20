@@ -34,7 +34,6 @@ QUnit.module('Player', {
   }
 });
 
-
 QUnit.test(
   'should lock landscape when video is wider than tall and enableAdaptiveLandscapeLock is true',
   function(assert) {
