@@ -37,19 +37,39 @@ class TrackButton extends MenuButton {
     }
 
     const updateHandler = Fn.bind_(this, this.update);
+    const disposeHandler = Fn.bind_(this, this.dispose);
+
+    // keep references to the event handlers so subclasses / callers can remove listeners if they dispose the component
+    this.updateHandler_ = updateHandler;
+    this.disposeHandler_ = disposeHandler;
 
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);
     tracks.addEventListener('labelchange', updateHandler);
     this.player_.on('ready', updateHandler);
-
-    this.player_.on('dispose', function() {
-      tracks.removeEventListener('removetrack', updateHandler);
-      tracks.removeEventListener('addtrack', updateHandler);
-      tracks.removeEventListener('labelchange', updateHandler);
-    });
+    this.player_.on('dispose', disposeHandler);
   }
 
+  /**
+   * Dispose of the Component and remove all event listeners
+   *
+   * @override
+   */
+  dispose() {
+    const tracks = this.options_.tracks;
+
+    tracks.removeEventListener('removetrack', this.updateHandler_);
+    tracks.removeEventListener('addtrack', this.updateHandler_);
+    tracks.removeEventListener('labelchange', this.updateHandler_);
+
+    this.player_.off('ready', this.updateHandler_);
+    this.player_.off('dispose', this.disposeHandler_);
+
+    delete this.updateHandler_;
+    delete this.disposeHandler_;
+
+    super.dispose();
+  }
 }
 
 Component.registerComponent('TrackButton', TrackButton);
