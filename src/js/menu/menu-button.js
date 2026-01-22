@@ -31,6 +31,8 @@ class MenuButton extends Component {
   constructor(player, options = {}) {
     super(player, options);
 
+    this.el_.setAttribute('role', 'menu');
+
     this.menuButton_ = new Button(player, options);
 
     this.menuButton_.controlText(this.controlText_);
@@ -89,11 +91,11 @@ class MenuButton extends Component {
 
     if (this.items && this.items.length <= this.hideThreshold_) {
       this.hide();
-      this.menu.contentEl_.removeAttribute('role');
+      this.menu.contentEl_.setAttribute('aria-hidden', 'true');
 
     } else {
       this.show();
-      this.menu.contentEl_.setAttribute('role', 'menu');
+      this.menu.contentEl_.removeAttribute('aria-hidden');
     }
   }
 
