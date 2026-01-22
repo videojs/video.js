@@ -31,7 +31,7 @@ const disableOthers = function(list, track) {
  * The current list of {@link AudioTrack} for a media file.
  *
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist}
- * @extends TrackList
+ * @extends TrackList<AudioTrack>
  */
 class AudioTrackList extends TrackList {
 
