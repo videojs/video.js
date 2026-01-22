@@ -24,6 +24,18 @@ import {merge} from './utils/obj.js';
  */
 
 /**
+  * @typedef {Object} ComponentOptions
+  * @property {Object[]}    [children]
+  * @property {string}      [classname]
+  * @property {boolean}     [initChildren]
+  * @property {boolean}     [reportTouchActivity]
+  * @property {string}      [name]
+  * @property {boolean}     [createEl=true]
+  * @property {HTMLElement} [el]
+  * @property {boolean}     [evented]
+  */
+
+/**
  * Base class for all UI Components.
  * Components are UI objects which represent both a javascript object and an element
  * in the DOM. They can be children of other components, and can have
@@ -39,16 +51,8 @@ class Component {
    * @param {Player} player
    *        The `Player` that this class should be attached to.
    *
-   * @param {Object} [options]
+   * @param {ComponentOptions} [options]
    *        The key/value store of component options.
-   *
-   * @param {Object[]} [options.children]
-   *        An array of children objects to initialize this component with. Children objects have
-   *        a name property that will be used if more than one component of the same type needs to be
-   *        added.
-   *
-   * @param  {string} [options.className]
-   *         A class or space separated list of classes to add the component
    *
    * @param {ReadyCallback} [ready]
    *        Function that gets called when the `Component` is ready.
@@ -589,14 +593,14 @@ class Component {
 
     return iconContainer;
   }
-
   /**
    * Add a child `Component` inside the current `Component`.
    *
-   * @param {string|Component} child
+   * @template {Component} T
+   * @param {string|T} child
    *        The name or instance of a child to add.
    *
-   * @param {Object} [options={}]
+   * @param {ComponentOptions} [options={}]
    *        The key/value store of options that will get passed to children of
    *        the child.
    *
@@ -604,7 +608,7 @@ class Component {
    *        The index to attempt to add a child into.
    *
    *
-   * @return {Component}
+   * @return {T}
    *         The `Component` that gets added as a child. When using a string the
    *         `Component` will get created by this process.
    */
@@ -1242,7 +1246,7 @@ class Component {
    * An object that contains width and height values of the `Component`s
    * computed style. Uses `window.getComputedStyle`.
    *
-   * @typedef {Object} Component~DimensionObject
+   * @typedef {Object} DimensionObject
    *
    * @property {number} width
    *           The width of the `Component`s computed style.
@@ -1257,7 +1261,7 @@ class Component {
    *
    * Uses `window.getComputedStyle`.
    *
-   * @return {Component~DimensionObject}
+   * @return {DimensionObject}
    *         The computed dimensions of the component's element.
    */
   currentDimensions() {
@@ -1967,6 +1971,8 @@ class Component {
   }
 
   /**
+   * @template {typeof Component} T
+   *
    * Register a `Component` with `videojs` given the name and the component.
    *
    * > NOTE: {@link Tech}s should not be registered as a `Component`. {@link Tech}s
@@ -1979,10 +1985,10 @@ class Component {
    * @param {string} name
    *        The name of the `Component` to register.
    *
-   * @param {Component} ComponentToRegister
+   * @param {T} ComponentToRegister
    *        The `Component` class to register.
    *
-   * @return {Component}
+   * @return {T}
    *         The `Component` that was registered.
    */
   static registerComponent(name, ComponentToRegister) {

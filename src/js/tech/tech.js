@@ -19,18 +19,24 @@ import * as Guid from '../utils/guid.js';
 /** @import { TimeRange } from '../utils/time' */
 
 /**
- * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
- * that just contains the src url alone.
+ * An Object containing a structure like: `{src: 'url', type: 'mimetype'}`
  * * `var SourceObject = {src: 'http://ex.com/video.mp4', type: 'video/mp4'};`
-   * `var SourceString = 'http://example.com/some-video.mp4';`
  *
- * @typedef {Object|string} SourceObject
+ * @typedef {Object} SourceObject
  *
  * @property {string} src
  *           The url to the source
  *
  * @property {string} type
  *           The mime type of the source
+ *
+ * @property {boolean} [withCredentials]
+ * @property {boolean} [allowSeeksWithinUnsafeLiveWindow]
+ * @property {Array} [customTagParsers]
+ * @property {Array} [customTagMappers]
+ * @property {boolean} [cacheEncryptionKeys]
+ * @property {boolean} [useForcedSubtitles]
+ * @property {Object} [keySystems]
  */
 
 /**

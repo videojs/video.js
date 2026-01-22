@@ -17,7 +17,7 @@ class AudioTrack extends Track {
    * @param {Object} [options={}]
    *        Object of option names and values
    *
-   * @param {AudioTrack~Kind} [options.kind='']
+   * @param {('alternative'|'descriptions'|'main'|'main-desc'|'translation'|'commentary')} [options.kind='']
    *        A valid audio track kind
    *
    * @param {string} [options.id='vjs_track_' + Guid.newGUID()]
