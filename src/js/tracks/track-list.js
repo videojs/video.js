@@ -26,21 +26,18 @@ class TrackList extends EventTarget {
 
     this.tracks_ = [];
 
-    /**
-     * @memberof TrackList
-     * @member {number} length
-     *         The current number of `Track`s in the this Trackist.
-     * @instance
-     */
-    Object.defineProperty(this, 'length', {
-      get() {
-        return this.tracks_.length;
-      }
-    });
-
     for (let i = 0; i < tracks.length; i++) {
       this.addTrack(tracks[i]);
     }
+  }
+
+  /**
+   * The current number of `Track`s in this TrackList.
+   *
+   * @type {number}
+   */
+  get length() {
+    return this.tracks_.length;
   }
 
   /**
@@ -83,10 +80,10 @@ class TrackList extends EventTarget {
     /**
      * Triggered when a track label is changed.
      *
-     * @event TrackList#addtrack
+     * @event TrackList#labelchange
      * @type {Event}
      * @property {Track} track
-     *           A reference to track that was added.
+     *           A reference to track whose label was changed.
      */
     track.labelchange_ = () => {
       this.trigger({
