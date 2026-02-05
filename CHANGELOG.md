@@ -1,3 +1,25 @@
+<a name="8.23.7"></a>
+## [8.23.7](https://github.com/videojs/video.js/compare/v8.23.4...v8.23.7) (2026-02-05)
+
+### Bug Fixes
+
+* Allow use in jsdom environments without `window.CSS` ([#9137](https://github.com/videojs/video.js/issues/9137)) ([08f3ee3](https://github.com/videojs/video.js/commit/08f3ee3))
+* Broken menu button setIcon type ([#9089](https://github.com/videojs/video.js/issues/9089)) ([93ecc35](https://github.com/videojs/video.js/commit/93ecc35))
+* convert Tracklist length to a getter and fix event docs ([#9142](https://github.com/videojs/video.js/issues/9142)) ([46779e8](https://github.com/videojs/video.js/commit/46779e8))
+* **lang:** improve finnish lang support ([#9114](https://github.com/videojs/video.js/issues/9114)) ([9cc0b34](https://github.com/videojs/video.js/commit/9cc0b34))
+* **lang:** updated translations for gl ([#9026](https://github.com/videojs/video.js/issues/9026)) ([553253c](https://github.com/videojs/video.js/commit/553253c))
+* prevent current time display showing 0:00 during seek ([#9135](https://github.com/videojs/video.js/issues/9135)) ([ec33990](https://github.com/videojs/video.js/commit/ec33990))
+
+### Chores
+
+* **package:** update vhs to v3.17.3 ([#9147](https://github.com/videojs/video.js/issues/9147)) ([e27bb32](https://github.com/videojs/video.js/commit/e27bb32))
+* tags and version changes into main ([#9123](https://github.com/videojs/video.js/issues/9123)) ([67ba442](https://github.com/videojs/video.js/commit/67ba442))
+* update prod dependencies ([#9129](https://github.com/videojs/video.js/issues/9129)) ([d203eab](https://github.com/videojs/video.js/commit/d203eab))
+
+### Documentation
+
+* Clarify copyright and project stewardship ([#9104](https://github.com/videojs/video.js/issues/9104)) ([20f8d76](https://github.com/videojs/video.js/commit/20f8d76))
+
 <a name="8.23.6"></a>
 ## [8.23.6](https://github.com/videojs/video.js/compare/v8.23.5...v8.23.6) (2025-11-14)
 
