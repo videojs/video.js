@@ -1,3 +1,11 @@
+<a name="8.23.8"></a>
+## [8.23.8](https://github.com/videojs/video.js/compare/v8.23.7...v8.23.8) (2026-02-11)
+
+### Chores
+
+* Convert PR title action to module ([#9152](https://github.com/videojs/video.js/issues/9152)) ([6dec037](https://github.com/videojs/video.js/commit/6dec037))
+* **package:** update vhs to 3.17.4 ([#9151](https://github.com/videojs/video.js/issues/9151)) ([6ec1314](https://github.com/videojs/video.js/commit/6ec1314))
+
 <a name="8.23.7"></a>
 ## [8.23.7](https://github.com/videojs/video.js/compare/v8.23.4...v8.23.7) (2026-02-05)
 
