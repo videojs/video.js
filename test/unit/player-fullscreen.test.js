@@ -5,7 +5,6 @@ import TestHelpers from './test-helpers.js';
 import sinon from 'sinon';
 import window from 'global/window';
 import document from 'global/document';
-import * as browser from '../../src/js/utils/browser.js';
 
 const FullscreenTestHelpers = {
   makePlayer(prefixed, playerOptions, videoTag) {
@@ -267,82 +266,6 @@ QUnit.test('fullscreen mode should exit picture-in-picture if it was enabled', f
   player.dispose();
 });
 
-QUnit.test('adaptive fullscreen orientation lock should match video aspect ratio on mobile', function(assert) {
-  const player = FullscreenTestHelpers.makePlayer(false, {
-    enableAdaptiveLandscapeLock: true
-  });
-  const oldScreen = window.screen;
-  const oldIsIos = browser.IS_IOS;
-  const oldIsAndroid = browser.IS_ANDROID;
-  const lockSpy = sinon.stub().returns(Promise.resolve());
-
-  window.screen = {
-    orientation: {
-      lock: lockSpy
-    }
-  };
-
-  browser.stub_IS_IOS(true);
-  browser.stub_IS_ANDROID(false);
-
-  sinon.stub(player, 'videoWidth').returns(1920);
-  sinon.stub(player, 'videoHeight').returns(1080);
-  player.adaptiveFullscreenOrientation_(player);
-
-  assert.strictEqual(lockSpy.callCount, 1, 'orientation lock called for landscape video');
-  assert.strictEqual(lockSpy.firstCall.args[0], 'landscape', 'landscape lock requested');
-
-  player.videoWidth.restore();
-  player.videoHeight.restore();
-
-  sinon.stub(player, 'videoWidth').returns(1080);
-  sinon.stub(player, 'videoHeight').returns(1920);
-  player.adaptiveFullscreenOrientation_(player);
-
-  assert.strictEqual(lockSpy.callCount, 2, 'orientation lock called for portrait video');
-  assert.strictEqual(lockSpy.secondCall.args[0], 'portrait', 'portrait lock requested');
-
-  player.videoWidth.restore();
-  player.videoHeight.restore();
-  browser.stub_IS_IOS(oldIsIos);
-  browser.stub_IS_ANDROID(oldIsAndroid);
-  window.screen = oldScreen;
-  player.dispose();
-});
-
-QUnit.test('adaptive fullscreen orientation lock should not force orientation on desktop', function(assert) {
-  const player = FullscreenTestHelpers.makePlayer(false, {
-    enableAdaptiveLandscapeLock: true
-  });
-  const oldScreen = window.screen;
-  const oldIsIos = browser.IS_IOS;
-  const oldIsAndroid = browser.IS_ANDROID;
-  const lockSpy = sinon.stub().returns(Promise.resolve());
-
-  window.screen = {
-    orientation: {
-      lock: lockSpy
-    }
-  };
-
-  browser.stub_IS_IOS(false);
-  browser.stub_IS_ANDROID(false);
-
-  sinon.stub(player, 'videoWidth').returns(1920);
-  sinon.stub(player, 'videoHeight').returns(1080);
-
-  player.adaptiveFullscreenOrientation_(player);
-
-  assert.strictEqual(lockSpy.callCount, 0, 'orientation lock is not called on desktop');
-
-  player.videoWidth.restore();
-  player.videoHeight.restore();
-  browser.stub_IS_IOS(oldIsIos);
-  browser.stub_IS_ANDROID(oldIsAndroid);
-  window.screen = oldScreen;
-  player.dispose();
-});
-
 QUnit.test('fullwindow mode should exit when ESC event triggered', function(assert) {
   const player = TestHelpers.makePlayer();
 
@@ -496,4 +419,32 @@ QUnit[skipOrTest]('exitFullscreen returns a resolved promise if we were fullscre
   player.exitFullscreen().then(() => assert.ok(true, 'our promise resolved'));
 
   stub.restore();
+});
+
+QUnit.test('adaptive fullscreen orientation locks landscape for wider video and portrait for taller video', function(assert) {
+  const oldScreen = window.screen;
+  const lockSpy = sinon.stub().returns(Promise.resolve());
+  const player = FullscreenTestHelpers.makePlayer(false);
+
+  window.screen = {
+    orientation: {
+      lock: lockSpy
+    }
+  };
+
+  sinon.stub(player, 'videoWidth').returns(1920);
+  sinon.stub(player, 'videoHeight').returns(1080);
+  player.adaptiveFullscreenOrientation_(player);
+
+  assert.ok(lockSpy.calledWith('landscape'), 'locks landscape when width is wider than height');
+
+  lockSpy.resetHistory();
+  player.videoWidth.returns(720);
+  player.videoHeight.returns(1280);
+  player.adaptiveFullscreenOrientation_(player);
+
+  assert.ok(lockSpy.calledWith('portrait'), 'locks portrait when height is wider than width');
+
+  player.dispose();
+  window.screen = oldScreen;
 });
