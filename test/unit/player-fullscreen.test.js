@@ -421,7 +421,7 @@ QUnit[skipOrTest]('exitFullscreen returns a resolved promise if we were fullscre
   stub.restore();
 });
 
-QUnit.test('adaptive fullscreen orientation locks landscape for wider video and portrait for taller video', function(assert) {
+QUnit.test('adaptive fullscreen orientation locks landscape only when width is wider than height', function(assert) {
   const oldScreen = window.screen;
   const lockSpy = sinon.stub().returns(Promise.resolve());
   const player = FullscreenTestHelpers.makePlayer(false);
@@ -443,7 +443,7 @@ QUnit.test('adaptive fullscreen orientation locks landscape for wider video and 
   player.videoHeight.returns(1280);
   player.adaptiveFullscreenOrientation_(player);
 
-  assert.ok(lockSpy.calledWith('portrait'), 'locks portrait when height is wider than width');
+  assert.strictEqual(lockSpy.callCount, 0, 'does not lock orientation when height is wider than width');
 
   player.dispose();
   window.screen = oldScreen;
