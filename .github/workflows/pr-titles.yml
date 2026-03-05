@@ -19,4 +19,4 @@ jobs:
         with:
           node-version: '20'
       - run: npm i @actions/core @actions/github
-      - run: node .github/actions/pr-titles.js
+      - run: node .github/actions/pr-titles.mjs
