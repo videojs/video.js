@@ -420,3 +420,31 @@ QUnit[skipOrTest]('exitFullscreen returns a resolved promise if we were fullscre
 
   stub.restore();
 });
+
+QUnit.test('adaptive fullscreen orientation locks landscape only when width is wider than height', function(assert) {
+  const oldScreen = window.screen;
+  const lockSpy = sinon.stub().returns(Promise.resolve());
+  const player = FullscreenTestHelpers.makePlayer(false);
+
+  window.screen = {
+    orientation: {
+      lock: lockSpy
+    }
+  };
+
+  sinon.stub(player, 'videoWidth').returns(1920);
+  sinon.stub(player, 'videoHeight').returns(1080);
+  player.adaptiveFullscreenOrientation_(player);
+
+  assert.ok(lockSpy.calledWith('landscape'), 'locks landscape when width is wider than height');
+
+  lockSpy.resetHistory();
+  player.videoWidth.returns(720);
+  player.videoHeight.returns(1280);
+  player.adaptiveFullscreenOrientation_(player);
+
+  assert.strictEqual(lockSpy.callCount, 0, 'does not lock orientation when height is wider than width');
+
+  player.dispose();
+  window.screen = oldScreen;
+});
