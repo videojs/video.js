@@ -5,7 +5,7 @@ import MenuButton from '../menu/menu-button.js';
 import Component from '../component.js';
 import * as Fn from '../utils/fn.js';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 /**
  * The base class for buttons that toggle specific  track types (e.g. subtitles).

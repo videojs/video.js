@@ -6,7 +6,7 @@ import Component from '../component.js';
 import document from 'global/document';
 import window from 'global/window';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 /**
  * Toggle Picture-in-Picture mode

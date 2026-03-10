@@ -5,7 +5,7 @@ import Button from '../button';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 /**
  * Displays the live indicator when duration is Infinity.
