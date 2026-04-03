@@ -13,5 +13,5 @@ const config = {
 };
 
 pa11y(testFile, config).then((results) => {
-   process.stdout.write(JSON.stringify(results, null, 2));
+  process.stdout.write(JSON.stringify(results, null, 2));
 });
