@@ -114,8 +114,12 @@
     "videojs-languages": {
       "globby": "^16.2.0"
     },
-    "videojs-standard": {
-      "eslint": "^10.1.0"
+   
+    "browserify-sign": {
+      "elliptic": "^6.6.1"
+    },
+    "crypto-browserify": {
+      "browserify-sign": "^4.2.5"
     },
     "browserify": {
       "crypto-browserify": "^3.12.1",
@@ -124,11 +128,11 @@
     "archiver-utils": {
       "glob": "~13.0.6"
     },
-    "browserify-sign": {
-      "elliptic": "^6.6.1"
-    },
     "create-ecdh": {
       "elliptic": "^6.6.1"
+    },
+    "videojs-generate-karma-config": {
+      "karma-browserstack-launcher": "~1.6.0"
     }
   },
   "dependencies": {
