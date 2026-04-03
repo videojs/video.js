@@ -9,7 +9,7 @@ import ignore from 'rollup-plugin-ignore';
 import alias from 'rollup-plugin-alias';
 import _ from 'lodash';
 import pkg from './package.json';
-import multiEntry from 'rollup-plugin-multi-entry';
+import multiEntry from '@rollup/plugin-multi-entry';
 import stub from 'rollup-plugin-stub';
 import isCI from 'is-ci';
 import replace from '@rollup/plugin-replace';

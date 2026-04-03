@@ -66,7 +66,7 @@
     "pretest": "npm run build-dev",
     "test": "npm-run-all -p test:*",
     "test:node-require": "node test/require/node.js",
-    "test:a11y": "node build/test-a11y.js",
+    "test:a11y": "node build/test-pa11y.js",
     "test:unit": "karma start test/karma.conf.js",
     "docs": "npm-run-all clean docs:lint docs:api",
     "docs:api": "jsdoc -c .jsdoc.js",
@@ -84,13 +84,7 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
-
-  
   "overrides": {
-    "access-sniff": {
-      "validator": "^13.15.26",
-      "glob": "~13.0.6"
-    },
     "jsdoc": {
       "underscore": "^1.13.8"
     },
@@ -114,10 +108,27 @@
       "minimatch": "~10.2.5"
     },
     "gh-release": {
-       "update-notifier": "^7.3.1"
+      "update-notifier": "^7.3.1",
+      "@octokit/rest": "^22.0.1"
     },
     "videojs-languages": {
       "globby": "^16.2.0"
+    },
+    "videojs-standard": {
+      "eslint": "^10.1.0"
+    },
+    "browserify": {
+      "crypto-browserify": "^3.12.1",
+      "glob": "~13.0.6"
+    },
+    "archiver-utils": {
+      "glob": "~13.0.6"
+    },
+    "browserify-sign": {
+      "elliptic": "^6.6.1"
+    },
+    "create-ecdh": {
+      "elliptic": "^6.6.1"
     }
   },
   "dependencies": {
@@ -135,15 +146,17 @@
     "videojs-vtt.js": "0.15.5"
   },
   "devDependencies": {
+    "pa11y": "^9.1.1",
     "@babel/core": "^7.29.0",
     "@babel/plugin-transform-runtime": "^7.29.0",
     "@babel/preset-env": "^7.29.2",
+    "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-multi-entry": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/pluginutils": "^5.3.0",
     "@types/node": "^25.5.0",
-    "access-sniff": "^3.2.0",
     "autoprefixer": "^10.4.27",
     "bestzip": "^2.2.3",
     "browserify": "^17.0.1",
@@ -181,12 +194,10 @@
     "replace": "^1.2.2",
     "rollup": "^4.60.1",
     "rollup-plugin-alias": "^2.2.0",
-    "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-external-globals": "^0.13.0",
     "rollup-plugin-ignore": "^1.0.10",
     "rollup-plugin-istanbul": "^5.0.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-multi-entry": "^2.1.0",
     "rollup-plugin-progress": "^1.1.2",
     "rollup-plugin-stub": "^1.2.0",
     "rollup-plugin-svg": "^2.0.0",
