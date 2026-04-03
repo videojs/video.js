@@ -4,6 +4,7 @@
   "version": "8.23.8",
   "main": "./dist/video.cjs.js",
   "module": "./dist/video.es.js",
+  "type": "module",
   "style": "./dist/video-js.css",
   "types": "./dist/types/video.d.ts",
   "copyright": "Copyright 2010-present Video.js contributors",
@@ -114,7 +115,6 @@
     "videojs-languages": {
       "globby": "^16.2.0"
     },
-   
     "browserify-sign": {
       "elliptic": "^6.6.1"
     },
@@ -150,10 +150,10 @@
     "videojs-vtt.js": "0.15.5"
   },
   "devDependencies": {
-    "pa11y": "^9.1.1",
     "@babel/core": "^7.29.0",
     "@babel/plugin-transform-runtime": "^7.29.0",
     "@babel/preset-env": "^7.29.2",
+    "@rollup/plugin-babel": "^7.0.0",
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-multi-entry": "^7.1.0",
@@ -186,6 +186,7 @@
     "not-prerelease": "^1.0.1",
     "npm-merge-driver-install": "^3.0.0",
     "npm-run-all": "^4.1.5",
+    "pa11y": "^9.1.1",
     "postcss": "^8.5.8",
     "postcss-cli": "^11.0.1",
     "qunit": "2.25.0",
@@ -196,7 +197,7 @@
     "remark-toc": "^9.0.0",
     "remark-validate-links": "^13.1.0",
     "replace": "^1.2.2",
-    "rollup": "^4.60.1",
+    "rollup": "^2.2.0",
     "rollup-plugin-alias": "^2.2.0",
     "rollup-plugin-external-globals": "^0.13.0",
     "rollup-plugin-ignore": "^1.0.10",

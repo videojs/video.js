@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import commonjs from '@rollup/plugin-commonjs';
 import json from 'rollup-plugin-json';
 import progressPlugin from 'rollup-plugin-progress';
 import ignore from 'rollup-plugin-ignore';
@@ -17,7 +17,7 @@ import image from '@rollup/plugin-image';
 import istanbul from 'rollup-plugin-istanbul';
 import externalGlobals from 'rollup-plugin-external-globals';
 import svg from 'rollup-plugin-svg';
-import excludeLines from './build/rollup-exclude-lines';
+import excludeLines from './build/rollup-exclude-lines.js';
 
 const excludeCoverage = [
   'test/**',
@@ -54,7 +54,7 @@ const primedCjs = commonjs({
   sourceMap: false
 });
 const primedBabel = babel({
-  runtimeHelpers: true,
+  babelHelpers: 'runtime',
   babelrc: false,
   exclude: 'node_modules/**(!http-streaming)',
   compact: false,
