@@ -86,54 +86,15 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "overrides": {
-    "jsdoc": {
-      "underscore": "^1.13.8"
-    },
-    "nomnom": {
-      "underscore": "^1.13.8"
-    },
-    "@eslint/eslintrc": {
-      "minimatch": "~10.2.5"
-    },
-    "config-array": {
-      "minimatch": "~10.2.5"
-    },
-    "@npmcli/map-workspaces": {
-      "glob": "~13.0.6",
-      "minimatch": "~10.2.5"
-    },
-    "@npmcli/package-json": {
-      "glob": "~13.0.6"
-    },
-    "replace": {
-      "minimatch": "~10.2.5"
-    },
-    "gh-release": {
-      "update-notifier": "^7.3.1",
-      "@octokit/rest": "^22.0.1"
-    },
-    "videojs-languages": {
-      "globby": "^16.2.0"
-    },
-    "browserify-sign": {
-      "elliptic": "^6.6.1"
-    },
-    "crypto-browserify": {
-      "browserify-sign": "^4.2.5"
-    },
-    "browserify": {
-      "crypto-browserify": "^3.12.1",
-      "glob": "~13.0.6"
-    },
-    "archiver-utils": {
-      "glob": "~13.0.6"
-    },
-    "create-ecdh": {
-      "elliptic": "^6.6.1"
-    },
-    "videojs-generate-karma-config": {
-      "karma-browserstack-launcher": "~1.6.0"
-    }
+    "minimatch": "~10.2.5",
+    "elliptic": "^6.6.1",
+    "update-notifier": "^7.3.1",
+    "@octokit/rest": "^22.0.1",
+    "underscore": "^1.13.8",
+    "globby": "^16.2.0",
+    "glob": "~13.0.6",
+    "crypto-browserify": "^3.12.1",
+    "browserify-sign": "^4.2.5"
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",
