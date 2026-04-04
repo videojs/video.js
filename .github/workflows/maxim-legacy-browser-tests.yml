@@ -1,0 +1,108 @@
+name: Maxim Legacy Browser Tests
+
+on:
+  push:
+    branches: [main, maxim-legacy-browser-tests, fix/cr66-legacy-compat]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-west-2
+  ECR_REGISTRY: 864899829402.dkr.ecr.us-west-2.amazonaws.com
+  TARGET_URL: http://172.17.0.1:9999
+
+jobs:
+  legacy-browser-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build video.js
+        run: npm run build-dev
+
+      - name: Prepare sandbox
+        run: cp sandbox/index.html.example sandbox/index.html
+
+      - name: Start local web server
+        run: |
+          docker run -d --name local-app -p 9999:80 \
+            -v ${{ github.workspace }}:/usr/share/nginx/html:ro \
+            nginx:alpine
+          sleep 2
+          curl -sf http://localhost:9999/sandbox/index.html > /dev/null
+          echo "Video.js sandbox running at http://localhost:9999"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} \
+            | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+
+      - name: Pull browser images
+        run: |
+          for img in chromium-38 chromium-44 chromium-46 chromium-53 chromium-66 wpe-webkit; do
+            docker pull ${{ env.ECR_REGISTRY }}/tanagram/maxim/${img}:latest
+          done
+
+      - name: Pull maxim runner image
+        run: docker pull ${{ env.ECR_REGISTRY }}/tanagram/maxim/runner:latest
+
+      - name: Run Maxim legacy browser tests
+        run: |
+          mkdir -p ${{ github.workspace }}/maxim-results
+          docker run --rm \
+            --network host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${{ github.workspace }}/maxim-results:/results \
+            -e TARGET_URL=${{ env.TARGET_URL }}/sandbox/index.html \
+            ${{ env.ECR_REGISTRY }}/tanagram/maxim/runner:latest \
+              --config configs/smoke-test.yaml \
+              --url ${{ env.TARGET_URL }}/sandbox/index.html \
+              --browsers cr38,cr44,cr46,cr53,cr66,wpe \
+              --parallel 5 \
+              --output /results/
+
+      - name: Stop local web server
+        if: always()
+        run: docker rm -f local-app || true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maxim-results
+          path: ${{ github.workspace }}/maxim-results/
+
+      - name: Publish JUnit report
+        if: always()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: ${{ github.workspace }}/maxim-results/results.xml
+          check_name: Legacy Browser Tests
+
+      - name: Check for failures
+        run: |
+          RESULTS="${{ github.workspace }}/maxim-results/results.json"
+          if [ -f "$RESULTS" ]; then
+            FAILED=$(jq '.summary.failed' "$RESULTS")
+            if [ "$FAILED" != "0" ]; then
+              echo "::error::Maxim detected ${FAILED} legacy browser test failure(s)"
+              exit 1
+            fi
+          fi
