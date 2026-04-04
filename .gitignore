@@ -42,3 +42,4 @@ lang/zh-Han*.json
 
 # netlify deploy
 deploy/
+sandbox/index.html
