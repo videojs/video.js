@@ -2,7 +2,7 @@ import Component from '../component';
 import * as Dom from '../utils/dom';
 import TextTrackFieldset from './text-track-fieldset';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 /** @import { ContentDescriptor } from  '../utils/dom' */
 
 /**

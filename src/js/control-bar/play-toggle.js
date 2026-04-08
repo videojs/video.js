@@ -5,7 +5,7 @@ import Button from '../button.js';
 import Component from '../component.js';
 import {silencePromise} from '../utils/promise';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 /**
  * Button to toggle between play and pause.

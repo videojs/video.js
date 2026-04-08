@@ -5,7 +5,7 @@ import Button from '../button.js';
 import Component from '../component.js';
 import document from 'global/document';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 /**
  * Toggle fullscreen video

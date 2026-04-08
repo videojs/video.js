@@ -7,7 +7,7 @@ import * as Dom from '../utils/dom.js';
 import checkMuteSupport from './volume-control/check-mute-support';
 import * as browser from '../utils/browser.js';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 /**
  * A button component for muting the audio.

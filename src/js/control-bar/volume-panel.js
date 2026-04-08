@@ -6,7 +6,7 @@ import {isPlain} from '../utils/obj';
 import * as Events from '../utils/events.js';
 import document from 'global/document';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 // Required children
 import './volume-control/volume-control.js';

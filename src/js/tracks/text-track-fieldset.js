@@ -3,7 +3,7 @@ import * as Dom from '../utils/dom';
 import * as Guid from '../utils/guid';
 import TextTrackSelect from './text-track-select';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 /** @import { ContentDescriptor } from '../utils/dom' */
 
 /**
