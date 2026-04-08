@@ -323,7 +323,6 @@ class Player extends Component {
     // Make sure tag ID exists
     // also here.. probably better
     tag.id = tag.id || options.id || `vjs_video_${Guid.newGUID()}`;
-
     // Set Options
     // The options argument overrides options set in the video tag
     // which overrides globally set options.
@@ -2125,10 +2124,25 @@ class Player extends Component {
       this.removeClass('vjs-fullscreen');
     }
   }
+  /**
+   * this documents should trigger when a `enableAdaptiveLandscapeLock` is true. and it makes the fullscreen choose between landscape and portrait depending on the video aspect ratio
+   */
 
+  adaptiveFullscreenOrientation_(targetPlayer) {
+    const videoHeight = targetPlayer.videoHeight();
+    const videoWidth = targetPlayer.videoWidth();
+    const videoscreen = window.screen;
+
+    if ((videoHeight < videoWidth) && videoscreen.orientation && videoscreen.orientation.lock) {
+      videoscreen.orientation.lock('landscape').catch(err => {
+        log.warn('Orientation lock failed:', err);
+      });
+    }
+  }
   /**
    * when the document fschange event triggers it calls this
    */
+
   documentFullscreenChange_(e) {
     const targetPlayer = e.target.player;
 
@@ -2143,6 +2157,9 @@ class Player extends Component {
 
     if (!isFs && el.matches) {
       isFs = el.matches(':' + this.fsApi_.fullscreen);
+    }
+    if (this.options_.enableAdaptiveLandscapeLock === true) {
+      this.adaptiveFullscreenOrientation_(targetPlayer);
     }
 
     this.isFullscreen(isFs);
