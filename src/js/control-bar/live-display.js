@@ -5,7 +5,7 @@ import Component from '../component';
 import * as Dom from '../utils/dom.js';
 import document from 'global/document';
 
-/** @import Player from './player' */
+/** @import Player from '../player' */
 
 // TODO - Future make it click to snap to live
 
