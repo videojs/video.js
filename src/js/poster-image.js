@@ -27,6 +27,10 @@ class PosterImage extends ClickableComponent {
   constructor(player, options) {
     super(player, options);
 
+    const { maincontent } = (options && options.playerOptions) || {};
+
+    this.isMainContent = maincontent;
+
     this.update();
 
     this.update_ = (e) => this.update(e);
@@ -138,7 +142,8 @@ class PosterImage extends ClickableComponent {
         },
         {},
         Dom.createEl('img', {
-          loading: 'lazy',
+          loading: this.isMainContent ? 'eager' : 'lazy',
+          fetchPriority: this.isMainContent ? 'high' : 'auto',
           crossOrigin: this.crossOrigin()
         }, {
           alt: ''
