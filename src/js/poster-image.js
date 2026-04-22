@@ -27,9 +27,9 @@ class PosterImage extends ClickableComponent {
   constructor(player, options) {
     super(player, options);
 
-    const { maincontent } = (options && options.playerOptions) || {};
+    const { mainContent } = (options && options.playerOptions) || {};
 
-    this.isMainContent = maincontent;
+    this.isMainContent = mainContent;
 
     this.update();
 

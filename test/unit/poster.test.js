@@ -31,8 +31,8 @@ QUnit.test('should create and update a poster image', function(assert) {
   posterImage.dispose();
 });
 
-QUnit.test('should mark img as prioritized request when maincontent is true', function(assert) {
-  const posterImage = new PosterImage(this.mockPlayer, { playerOptions: { maincontent: true } });
+QUnit.test('should mark img as prioritized request when mainContent is true', function(assert) {
+  const posterImage = new PosterImage(this.mockPlayer, { playerOptions: { mainContent: true } });
 
   assert.equal(posterImage.$('img').loading, 'eager', 'img is loading eager');
   assert.equal(posterImage.$('img').fetchPriority, 'high', 'img has fetchpriority high');
