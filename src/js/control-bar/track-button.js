@@ -36,37 +36,52 @@ class TrackButton extends MenuButton {
       return;
     }
 
-    const updateHandler = Fn.bind_(this, this.update);
-    const disposeHandler = Fn.bind_(this, this.dispose);
+    this.updateHandler_ = Fn.bind_(this, this.update);
+    this.cleanupHandler_ = Fn.bind_(this, this.cleanupTrackListeners_);
 
-    // keep references to the event handlers so subclasses / callers can remove listeners if they dispose the component
-    this.updateHandler_ = updateHandler;
-    this.disposeHandler_ = disposeHandler;
+    tracks.addEventListener('removetrack', this.updateHandler_);
+    tracks.addEventListener('addtrack', this.updateHandler_);
+    tracks.addEventListener('labelchange', this.updateHandler_);
 
-    tracks.addEventListener('removetrack', updateHandler);
-    tracks.addEventListener('addtrack', updateHandler);
-    tracks.addEventListener('labelchange', updateHandler);
-    this.player_.on('ready', updateHandler);
-    this.player_.on('dispose', disposeHandler);
+    this.player_.on('ready', this.updateHandler_);
+    this.player_.on('dispose', this.cleanupHandler_);
   }
 
   /**
-   * Dispose of the Component and remove all event listeners
+   * Remove all track list event listeners without triggering a full dispose.
+   * Used as the player 'dispose' handler and called by dispose() before super.
+   *
+   * @private
+   */
+  cleanupTrackListeners_() {
+    if (!this.updateHandler_) {
+      return;
+    }
+
+    const tracks = this.options_.tracks;
+
+    if (tracks) {
+      tracks.removeEventListener('removetrack', this.updateHandler_);
+      tracks.removeEventListener('addtrack', this.updateHandler_);
+      tracks.removeEventListener('labelchange', this.updateHandler_);
+    }
+
+    if (this.player_) {
+      this.player_.off('ready', this.updateHandler_);
+      this.player_.off('dispose', this.cleanupHandler_);
+    }
+
+    this.updateHandler_ = null;
+    this.cleanupHandler_ = null;
+  }
+
+  /**
+   * Dispose of the Component and remove all event listeners.
    *
    * @override
    */
   dispose() {
-    const tracks = this.options_.tracks;
-
-    tracks.removeEventListener('removetrack', this.updateHandler_);
-    tracks.removeEventListener('addtrack', this.updateHandler_);
-    tracks.removeEventListener('labelchange', this.updateHandler_);
-
-    this.player_.off('ready', this.updateHandler_);
-    this.player_.off('dispose', this.disposeHandler_);
-
-    delete this.updateHandler_;
-    delete this.disposeHandler_;
+    this.cleanupTrackListeners_();
 
     super.dispose();
   }
