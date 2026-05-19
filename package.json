@@ -30,7 +30,7 @@
     "build:test": "npm-run-all build:test:*",
     "build:test:a11y": "shx cp sandbox/descriptions.html.example sandbox/descriptions.test-a11y.html",
     "build:test:browserify": "browserify test/require/browserify.js -o test/dist/browserify.js",
-    "build:test:webpack": "webpack --hide-modules test/require/webpack.js test/dist/webpack.js",
+    "build:test:webpack": "webpack --entry ./test/require/webpack.js --output-path ./test/dist --output-filename webpack.js --mode production --no-stats",
     "copy": "npm-run-all copy:*",
     "copy:fonts": "shx cp -R node_modules/videojs-font/fonts dist/font",
     "copy:examples": "shx cp -R docs/examples dist/",
@@ -66,7 +66,7 @@
     "pretest": "npm run build-dev",
     "test": "npm-run-all -p test:*",
     "test:node-require": "node test/require/node.js",
-    "test:a11y": "node build/test-a11y.js",
+    "test:a11y": "node build/test-pa11y.js",
     "test:unit": "karma start test/karma.conf.js",
     "docs": "npm-run-all clean docs:lint docs:api",
     "docs:api": "jsdoc -c .jsdoc.js",
@@ -83,6 +83,28 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
+  },
+  "overrides": {
+    "minimatch": "^3.1.2",
+    "elliptic": "^6.6.1",
+    "@octokit/rest": "^22.0.1",
+    "underscore": "^1.13.8",
+    "crypto-browserify": "^3.12.1",
+    "browserify-sign": "^4.2.5",
+    "loader-utils": "^2.0.4",
+    "sha.js": "^2.4.12",
+    "form-data": "^4.0.2",
+    "trim": "^1.0.1",
+    "trim-newlines": "^4.0.0",
+    "braces": "^3.0.3",
+    "ansi-regex": "^5.0.1",
+    "micromatch": "^4.0.8",
+    "json5": "^2.2.3",
+    "follow-redirects": "^1.15.9",
+    "ws": "^8.18.0",
+    "cross-spawn": "^7.0.6",
+    "tough-cookie": "^4.1.3",
+    "update-notifier": "^7.3.1"
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
@@ -106,7 +128,6 @@
     "@rollup/plugin-replace": "^2.4.1",
     "@rollup/pluginutils": "^5.1.0",
     "@types/node": "^18.8.3",
-    "access-sniff": "^3.2.0",
     "autoprefixer": "^10.2.5",
     "bestzip": "^2.2.0",
     "browserify": "^16.2.3",
@@ -132,6 +153,7 @@
     "not-prerelease": "^1.0.1",
     "npm-merge-driver-install": "^2.0.1",
     "npm-run-all": "^4.1.5",
+    "pa11y": "^9.1.1",
     "postcss": "^8.2.13",
     "postcss-cli": "^8.3.1",
     "qunit": "2.13.0",
@@ -156,7 +178,7 @@
     "rollup-plugin-stub": "^1.2.0",
     "rollup-plugin-svg": "^2.0.0",
     "sass": "^1.79.3",
-    "semver": "^5.7.0",
+    "semver": "^7.5.4",
     "shelljs": "^0.8.5",
     "shx": "^0.3.2",
     "sinon": "^11.1.1",
@@ -166,7 +188,8 @@
     "videojs-generate-karma-config": "^8.1.0",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^9.0.1",
-    "webpack": "^1.15.0"
+    "webpack": "^5.106.0",
+    "webpack-cli": "^5.1.4"
   },
   "vjsstandard": {
     "ignore": [
