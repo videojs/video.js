@@ -1695,6 +1695,11 @@ class Player extends Component {
             return;
           }
 
+          // tech_ may have been disposed while waiting for the async callback
+          if (!this.tech_) {
+            return;
+          }
+
           const techSrc = this.techGet_('currentSrc');
 
           this.lastSource_.tech = techSrc;
