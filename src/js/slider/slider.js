@@ -87,6 +87,9 @@ class Slider extends Component {
     if (!this.enabled()) {
       return;
     }
+    if (!this.bar || !this.bar.el_) {
+      return;
+    }
     const doc = this.bar.el_.ownerDocument;
 
     this.off('mousedown', this.handleMouseDown_);
@@ -151,6 +154,9 @@ class Slider extends Component {
    * @fires Slider#slideractive
    */
   handleMouseDown(event) {
+    if (!this.bar || !this.bar.el_) {
+      return;
+    }
     const doc = this.bar.el_.ownerDocument;
 
     if (event.type === 'mousedown') {
