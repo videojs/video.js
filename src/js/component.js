@@ -1914,7 +1914,11 @@ class Component {
      * @return {boolean}
      */
     function isVisible(element) {
-      if ((element.offsetWidth + element.offsetHeight + element.getBoundingClientRect().height + element.getBoundingClientRect().width) === 0) {
+      const rect = element.getBoundingClientRect();
+      const width = element.offsetWidth;
+      const height = element.offsetHeight;
+
+      if ((width + height + rect.height + rect.width) === 0) {
         return false;
       }
 
@@ -1922,8 +1926,8 @@ class Component {
       // x: Left position relative to the viewport plus element's width (no margin) divided between 2.
       // y: Top position relative to the viewport plus element's height (no margin) divided between 2.
       const elementCenter = {
-        x: element.getBoundingClientRect().left + element.offsetWidth / 2,
-        y: element.getBoundingClientRect().top + element.offsetHeight / 2
+        x: rect.left + width / 2,
+        y: rect.top + height / 2
       };
 
       if (elementCenter.x < 0) {
