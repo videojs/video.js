@@ -39,21 +39,29 @@ detachable without stopping playback. Exactly one session.
 - [ ] Surface attach/detach: iOS `AVPlayerLayer` re-point; Android
       `ExoPlayer.setVideoSurface(...)`. Must be glitch-free across navigation.
 
-### 3. Surface hand-off via the provider
+### 3. Surface hand-off — LIFO registry
 
-- [ ] Hand-off rides the existing media-registration flow (`setMedia` /
-      `setContainer`): a screen's provider attaches its surface on connect,
-      detaches on disconnect.
-- [ ] Detaching a surface must NOT stop playback (engine lives in the service).
-      Verify the disconnect-vs-destroy distinction holds for an external store.
-- [ ] Sequence the now-playing ↔ mini-bar ↔ background transitions; confirm no
-      black-frame / audio hitch on swap.
+- [ ] Session owns a **surface registry (LIFO stack)**: surfaces register on
+      mount (via the existing `setMedia` / `setContainer` flow), pop on unmount.
+- [ ] Engine renders into the **top** surface only (single-holder: Android
+      `setVideoSurface`; iOS `AVPlayerLayer` re-point). Lower surfaces show
+      poster/blank.
+- [ ] Pop falls back to the next still-registered surface (now-playing pops →
+      mini-bar resumes output, no re-registration). Popping must NOT stop
+      playback — verify the disconnect-vs-destroy distinction holds for an
+      external store.
+- [ ] Push/pop swap must be glitch-free (no black frame / audio hitch).
+- [ ] **Tentative LIFO** — fallback alternative is a flat latest-pointer
+      (blanks on top unmount until re-register). Revisit if the stack is awkward.
 
-### 4. Imperative API over the store
+### 4. Imperative API + control binding over the store
 
 - [ ] `backgroundSession` JS facade: `play()`, `pause()`, `seek(t)`, `state`,
       `subscribe(cb)` — all delegating to the persistent store's actions /
       selectors / `subscribe`. NOT a separate path to native.
+- [ ] `useBackgroundSession()` hook resolves the session store from **anywhere**
+      (non-descendant controls, e.g. a sidebar); descendants use React context.
+      Both resolve the same store — all controls bind and dispatch; no contention.
 - [ ] Importable from non-React JS; stays in lockstep with mounted components
       because it shares the store.
 

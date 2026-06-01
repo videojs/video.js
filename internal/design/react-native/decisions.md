@@ -14,12 +14,15 @@ the DOM-free `Media` contract from [`media.md`](../media.md) — the capability
 interfaces plus `EventLike` / `EventTargetLike` — rather than impersonating
 `HTMLMediaElement`.
 
-**Context:** The current features in
-[`packages/core/src/dom/store/features/`](../../../packages/core/src/dom/store/features/)
-are coupled to `HTMLMediaElement` (`addEventListener('play')`, `media.paused`,
-`HTMLMediaElement.HAVE_FUTURE_DATA`). The store is generic over its `Target`,
-so the RN `media` target can be any shape — the only pressure toward an
-HTML-like shape comes from those features.
+**Context:** The store is generic over its `Target`, so the RN `media` target
+can be any shape. The contract is already built and adopted at the store
+boundary: [`core/media/types.ts`](../../../packages/core/src/core/media/types.ts)
+defines `EventLike` / `EventTargetLike` and the capability interfaces,
+[`dom/media/predicate.ts`](../../../packages/core/src/dom/media/predicate.ts)
+provides the guards, and `PlayerTarget.media` is typed as `Media` (not
+`HTMLMediaElement`), so features already narrow via predicates. The only
+remaining pressure toward an HTML-like shape is a few residual DOM-global leaks
+in the shared features.
 
 **Alternatives:**
 
@@ -37,19 +40,24 @@ HTML-like shape comes from those features.
   web's `HTMLMediaElement` satisfies the contract natively; RN satisfies it via
   the adapter; features generalize over the contract.
 
-**Rationale:** The contract is the seam the codebase is already moving toward.
-Building the RN adapter against it (rather than a fake element) shrinks the
-"looks like media" surface from all of `HTMLMediaElement` to the handful of
-capabilities features actually consume, and avoids duplicating feature logic.
-Caveat: this depends on the [`media.md`](../media.md) contract landing and on
-the shared features being generalized off `HTMLMediaElement` — until then, a
-thin HTML-shaped adapter is an acceptable interim for the adapter-shared
-features.
+**Rationale:** The contract is the seam the codebase already adopts at the
+target boundary, so this is a commitment grounded in shipped code, not a bet on
+future refactoring. Building the RN host against it (rather than a fake element)
+shrinks the "looks like media" surface from all of `HTMLMediaElement` to the
+handful of capabilities features actually consume, and avoids duplicating
+feature logic. The remaining work is bounded and enumerated — close the residual
+DOM-global leaks in the shared features (export `MediaReadyState` and swap the
+`HTMLMediaElement.HAVE_*` references in `playback.ts` / `source.ts`; RN variants
+for `volume` / `text-track` / `controls`), not fake an element. Residual risk:
+`media.md` is `status: draft`, so the contract surface could still shift — a thin
+HTML-shaped adapter remains a fallback for individual adapter-shared features if
+a specific one can't yet run on the contract, but the committed direction is the
+contract.
 
 ## Two providers over a shared core for background playback
 
 **Decision:** Background playback is a **separate provider component**
-(`<BackgroundPlayer.Provider>`), not a `backgroundPlayback` boolean on
+(`<BackgroundablePlayer.Provider>`), not a `backgroundPlayback` boolean on
 `<Player.Provider>`. The two providers are thin wrappers over one shared core
 hook. They differ on two axes: (1) *what the store is* — the background store
 composes the shared base feature array plus background features

@@ -22,7 +22,7 @@ so it needs buy-in rather than being decided unilaterally:
 
 - It constrains the RN API to track the React API (and arguably the reverse — RN
   needs may push capabilities like external-store ownership back onto web).
-- It introduces platform-only surface (a separate `<BackgroundPlayer.Provider>`
+- It introduces platform-only surface (a separate `<BackgroundablePlayer.Provider>`
   and a persistent `backgroundSession`) that has no web equivalent.
 - It defines where divergence is allowed (styling, accessibility mapping).
 
@@ -67,7 +67,7 @@ the right cross-package tradeoff and to align on the divergence list.
 - Whether external/hoisted-store ownership (needed for the RN persistent
   session) is also exposed on the web for true parity.
 - Public shape of platform-only surface: the separate
-  `<BackgroundPlayer.Provider>` (vs. a `backgroundPlayback` boolean on the
+  `<BackgroundablePlayer.Provider>` (vs. a `backgroundPlayback` boolean on the
   shared provider), the `backgroundSession` imperative API, and the
   persistent-session model. Whether two providers (over a shared core) is the
   right web-parity tradeoff vs. distinguishing by a `store` prop on a single
