@@ -91,26 +91,31 @@ Keep the store and the state shapes; replace the DOM-bound layers.
 └─────────────────────────────────────────────────────────────┘
                           ▲ refs
 ┌──────────────────────────────┐    ┌─────────────────────────┐
-│  <Video> / <Audio>           │    │  container <View>       │
-│  wraps native player ref;    │    │  player-wide surface    │
-│  exposes the Media contract  │    │  (gestures, layout)     │
+│  <Video> / <Audio> (Fabric)  │    │  container <View>       │
+│  dumb surface bound to an    │    │  player-wide surface    │
+│  engine handle               │    │  (gestures, layout)     │
 └──────────────────────────────┘    └─────────────────────────┘
                           ▲ JSI / bridge
 ┌─────────────────────────────────────────────────────────────┐
-│  Native player (AVQueuePlayer / ExoPlayer)                   │
+│  control TurboModule (engines by handle)                    │
+│    → AVQueuePlayer / ExoPlayer | backgroundable session     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Three pieces of new work, in dependency order:
+Four pieces of new work, in dependency order:
 
-1. **A `Media` adapter** — wraps the native player ref and implements the
-   DOM-free `Media` contract from [`media.md`](../media.md) (capability
-   interfaces + `EventLike` / `EventTargetLike`), *not* a fake
-   `HTMLMediaElement`. This is the seam that lets features stay shared.
-2. **An RN provider component** — owns the store and the `attach()` lifecycle
+1. **The native interface** — one control TurboModule (engines by handle) + one
+   dumb Fabric surface, with platform-specific backings. See
+   [Native module structure](#native-module-structure).
+2. **A `Media` adapter** — implements the DOM-free `Media` contract from
+   [`media.md`](../media.md) (capability interfaces + `EventLike` /
+   `EventTargetLike`), *not* a fake `HTMLMediaElement`, by talking to the single
+   control TurboModule for its handle. This is the seam that lets features stay
+   shared.
+3. **An RN provider component** — owns the store and the `attach()` lifecycle
    using React idiom (`useState` initializer + `useEffect`) instead of
    custom-element callbacks.
-3. **RN feature variants** for the genuinely DOM-coupled concerns
+4. **RN feature variants** for the genuinely DOM-coupled concerns
    (fullscreen, PiP, pointer-driven controls activity, remote playback). State
    shapes stay identical so UI components and selectors are unaffected; only
    the `attach()` implementations differ.
@@ -339,6 +344,120 @@ See [decisions.md § Multiple player instances; platform-native background, no c
 > Detailed construction (the `MediaSessionService` wiring, iOS audio-session /
 > now-playing sequencing, background hand-off) is an implementation concern —
 > it belongs in a `.claude/plans/` plan, not this doc.
+
+## Native module structure
+
+The JS API is sliced into features, but the **native boundary is a single flat
+interface** — features are a pure-JS store-composition concern that the native
+side never sees. The one seam that maps the flat native surface to the sliced
+capability contract is the JS `Media` adapter:
+
+```
+features ↔ store ↔ Media adapter ↔ ONE native interface
+```
+
+RN's New Architecture splits native into two artifact kinds — Fabric components
+(views) and TurboModules (modules). The structure keeps a native MVC split but
+**composes model and view in JS** to present one good React component:
+
+- **Model = engine.** One **control TurboModule** is the single interface. It
+  owns engines addressed by **handle**, and carries the full flat command set
+  (`play` / `pause` / `seek` / `setSource` / `setVolume` / `setRate` / `setLoop`
+  / … ; future `setQueue`) plus a **single event channel tagged by handle** that
+  the adapter demuxes into the right store. Not sliced per feature.
+- **View = surface.** One **dumb Fabric component** (`<Video>`): a window onto
+  an `engineHandle` (props: handle, `resizeMode`, `poster`). It binds the native
+  surface (`AVPlayerLayer` / Android `Surface`) and renders — **no control
+  logic**. Commands and events live on the TurboModule.
+
+Control lives on the TurboModule (not Fabric view-commands) precisely because the
+[persistent session](#persistent-background-session) must be controllable with
+**no view mounted** — view-commands can't reach an absent view, but a
+view-independent module can. See
+[decisions.md § Dumb surface + single control TurboModule (engine-by-handle)](decisions.md#dumb-surface--single-control-turbomodule-engine-by-handle).
+
+**Backing differs by handle kind, the interface does not:**
+
+| Handle | Backing |
+| --- | --- |
+| Normal player | A plain engine the module owns — `AVQueuePlayer` (iOS, per the [looping decision](decisions.md#ios-looping-uses-an-always-present-avqueueplayer)) / `ExoPlayer` (Android). Lifecycle = the provider; destroyed on unmount. No session/service/now-playing. |
+| Backgroundable session | The well-known **session handle**. Android: a Media3 `MediaSessionService` hosting the session's `ExoPlayer` + `MediaSession`. iOS: a process singleton owning the `AVQueuePlayer` + `AVAudioSession` + `MPNowPlayingInfoCenter` / `MPRemoteCommandCenter`. |
+
+**Android service is declared by the app.** The library ships a ready-to-use
+`MediaSessionService` subclass, but the **`<service>` entry lives in the app's
+`AndroidManifest.xml`** (with `foregroundServiceType="mediaPlayback"`, the
+`MediaSessionService` intent-filter, and the `FOREGROUND_SERVICE*` permissions).
+This is the standard Media3 integration and gives maximum customization (custom
+subclass, notification branding, service flags) for one documented integration
+step. iOS has no service equivalent — the singleton + audio session is it.
+
+This is what makes the [LIFO surface registry](#persistent-background-session)
+fall out for free: multiple `<Video>` views sharing the session's `engineHandle`
+register on the stack, and native renders frames into the top one only.
+
+## Native integration (app setup)
+
+Integration cost scales with what you use. **Foreground-only players need
+nothing special** beyond network access; the **`BackgroundablePlayer` / remote
+playback** require per-platform declarations, because the OS gates
+foreground-service and background-audio behind app-level manifest/plist entries
+the library cannot declare on the app's behalf.
+
+> Exact keys/values are confirmed at implementation; the set below is the
+> expected baseline and belongs in the package README once built.
+
+### Foreground-only
+
+- **Android** — `<uses-permission android:name="android.permission.INTERNET" />`
+  for network sources. Nothing else.
+- **iOS** — nothing (add `NSAppTransportSecurity` only if loading non-HTTPS).
+
+### BackgroundablePlayer — Android
+
+Declare the library's `MediaSessionService` subclass in *your*
+`AndroidManifest.xml` (see
+[decisions.md § Dumb surface + single control TurboModule](decisions.md#dumb-surface--single-control-turbomodule-engine-by-handle)),
+plus the foreground-service and notification permissions:
+
+```xml
+<!-- permissions -->
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" /> <!-- API 34+ -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />               <!-- API 33+, runtime -->
+
+<application>
+  <!-- the library ships the Service class; you register (and may subclass) it -->
+  <service
+    android:name=".PlaybackService"
+    android:foregroundServiceType="mediaPlayback"
+    android:exported="true">
+    <intent-filter>
+      <action android:name="androidx.media3.session.MediaSessionService" />
+    </intent-filter>
+  </service>
+</application>
+```
+
+`POST_NOTIFICATIONS` is a runtime permission on API 33+ (the media notification);
+the app requests it. Subclass the provided Service for custom notification
+branding / service flags.
+
+### BackgroundablePlayer — iOS
+
+Enable the background-audio mode in `Info.plist` (the `audio` value also covers
+AirPlay and Picture-in-Picture):
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+  <string>audio</string>
+</array>
+```
+
+The library configures `AVAudioSession` (`.playback`) and now-playing at runtime;
+no further plist entries are required for background audio. (`NSAppTransportSecurity`
+only if loading non-HTTPS sources.)
 
 ## Persistent background session
 

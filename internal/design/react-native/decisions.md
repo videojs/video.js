@@ -236,3 +236,45 @@ feature or component API.
 live `AVQueuePlayer` mid-playback re-templates the queue from the current item.
 Confirm this causes no audible/visible hitch; if it does, debounce or document
 that toggling `loop` mid-play may cause a brief discontinuity.
+
+## Dumb surface + single control TurboModule (engine-by-handle)
+
+**Decision:** The native boundary is a single flat interface: one **control
+TurboModule** owns engines addressed by **handle** and carries the full command
+set + a single handle-tagged event channel; one **dumb Fabric component**
+(`<Video>`) is a pure rendering surface bound to an `engineHandle`, with no
+control logic. The JS `Media` adapter is the sole client and maps this flat
+interface to the sliced capability contract. Engine (model) and surface (view)
+are composed in JS to present one React component. Normal players and the
+backgroundable session use the same interface; only the backing per handle
+differs.
+
+**Context:** The JS API is sliced into features, but RN's New Architecture
+splits native into Fabric views and TurboModules. We want one native interface,
+not a native module per feature (which would fight RN and the adapter seam).
+Control must also reach the [persistent session](index.md#persistent-background-session)
+when **no view is mounted** (pure background, imperative `backgroundSession`).
+
+**Alternatives:**
+
+- **Fabric view owns the engine + view-Commands** (`ref.play()`) — natural for a
+  normal player, but breaks for the backgroundable session: view-commands can't
+  reach an absent view, forcing a second control path (not a single interface).
+- **A native module per feature** (playback module, volume module, …) — mirrors
+  the JS feature slicing but multiplies the bridge surface and fights the
+  adapter, which already maps one native surface to the capability contract.
+- **Dumb surface + single control TurboModule, engine-by-handle (chosen).**
+
+**Rationale:** Routing all control through one view-independent TurboModule is
+what makes "single interface" true — it works with or without a mounted view, so
+the no-view session falls out for free. The Fabric view shrinks to a window onto
+a handle, which makes the [LIFO surface registry](index.md#persistent-background-session)
+trivial (multiple views share the session handle; native renders the top). The
+feature slicing stays a pure-JS concern behind the adapter. Backing by handle:
+normal = a plain `AVQueuePlayer` / `ExoPlayer` the module owns (lifecycle = the
+provider); backgroundable session = Android Media3 `MediaSessionService` (the
+library ships the `MediaSessionService` subclass; the **app declares the
+`<service>` in its `AndroidManifest.xml`** for foreground-service correctness and
+customization), iOS = a process singleton (`AVQueuePlayer` + `AVAudioSession` +
+now-playing). Normal players route control through the same TurboModule even
+though their engine is a plain instance — uniformity over a marginal shortcut.
