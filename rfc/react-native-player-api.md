@@ -72,6 +72,15 @@ the right cross-package tradeoff and to align on the divergence list.
   persistent-session model. Whether two providers (over a shared core) is the
   right web-parity tradeoff vs. distinguishing by a `store` prop on a single
   provider.
+- **Playlists / source queue — cross-platform feature or RN-only?** v10 is
+  single-source and the web deliberately left queues out of scope, but native
+  players make a gapless queue trivial (see
+  [design § Future work: playlists](../internal/design/react-native/index.md#future-work-playlists--source-queue)).
+  Adding it to RN gets *ahead* of web on feature set (not platform-forced
+  divergence), so the question is whether `MediaQueueCapability` + a
+  `playlistFeature` become the shared cross-platform concept (web adopting a
+  `loadSource`-backed fallback later) or stay RN-only. Decide the shared state
+  shape here to avoid drift.
 
 ## Final Decision
 

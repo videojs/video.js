@@ -193,6 +193,15 @@ and prop names match `@videojs/react` wherever the platform allows.
 | Media | `<Video>` / `<Audio>` | the native player element + native media attributes |
 | UI | `<PlayButton>`, `<TimeRange>`, … | individual chrome pieces |
 
+Provider-level props decided this session:
+
+- **`loop?: boolean`** — mirrors the HTML `loop` attribute as a cheap,
+  runtime-togglable property, on either provider. The iOS implementation keeps
+  this contract by always using `AVQueuePlayer`. See
+  [decisions.md § iOS looping uses AVQueuePlayer](decisions.md#ios-looping-uses-an-always-present-avqueueplayer).
+
+## <Player.Provider> and <BackgroundablePlayer.Provider>
+
 Two providers, one shared core — `<Player.Provider>` (foreground, N,
 component-scoped) and `<BackgroundablePlayer.Provider>` (the singleton persistent
 background session). Background playback is **not** a boolean on the regular
@@ -200,13 +209,6 @@ provider; it's a distinct component, because enabling it changes the contract on
 four axes at once (lifetime, cardinality, store ownership, system integration).
 See [Two providers over a shared core](#two-providers-over-a-shared-core) and
 [decisions.md § Two providers over a shared core for background playback](decisions.md#two-providers-over-a-shared-core-for-background-playback).
-
-Provider-level props decided this session:
-
-- **`loop?: boolean`** — mirrors the HTML `loop` attribute as a cheap,
-  runtime-togglable property, on either provider. The iOS implementation keeps
-  this contract by always using `AVQueuePlayer`. See
-  [decisions.md § iOS looping uses AVQueuePlayer](decisions.md#ios-looping-uses-an-always-present-avqueueplayer).
 
 ## State & store
 
@@ -478,6 +480,55 @@ This is also the clearest case for the **naming consideration** in
 *sibling capabilities* of one persistent single-owner session, not sub-cases of
 "background." The provider's identity may be better framed as the persistent
 session than as `BackgroundablePlayer`.
+
+## Future work: playlists / source queue
+
+> Not scoped or committed — recorded to show the architecture absorbs it, and to
+> flag a parity question that needs an RFC, **not** a unilateral RN call.
+
+**v10 is single-source today.** `MediaSourceState`
+([`core/media/state.ts`](../../../packages/core/src/core/media/state.ts)) is a
+scalar `source: string | null` plus `loadSource(src)`, and the SPF explicitly
+rules out queues —
+[`source-replacement.md`](../spf/features/source-replacement.md): *"replacement
+is teardown-then-rebuild; the engine doesn't support pre-warming the next source
+… Playlist / queue semantics are out of scope."* So a playlist is net-new, and
+the web's only path (app code calling `loadSource` on `ended`) has a **gap**
+between items.
+
+**Native players make it not just easy but better.** `AVQueuePlayer` and
+ExoPlayer (`setMediaItems` / concatenating sources) hold a real queue and
+**pre-buffer the next item for gapless transitions** — the pre-warm the web
+engine can't do. It also reuses a decision already made: the always-present
+`AVQueuePlayer` (chosen for [looping](decisions.md#ios-looping-uses-an-always-present-avqueueplayer))
+*is* the queue — looping is a 1-item looped queue, a playlist is an N-item queue,
+same object.
+
+**How the architecture absorbs it — an optional capability, not a contract
+change.** Model the queue as `MediaQueueCapability`, an *optional* capability in
+the same pattern as `MediaPauseCapability` / `MediaSeekCapability`
+([`core/media/types.ts`](../../../packages/core/src/core/media/types.ts)),
+narrowed via an `isMediaQueueCapable` predicate:
+
+- The RN native host implements it (gapless, pre-buffered). `HTMLMediaElement`
+  does not, so web reports unsupported — or later adds a JS-managed fallback
+  over `loadSource`.
+- A `playlistFeature` mirrors queue state into the store with a **shared state
+  shape** (`queue`, `currentIndex`, `next` / `previous` actions), so UI
+  components stay portable.
+
+This uses v10's own capability mechanism to expose a native queue without faking
+it on web or bloating the base `Media` contract.
+
+**The parity catch — this needs an RFC.** Unlike background/Cast (platform-only
+capabilities that *can't* exist on the web), a playlist *could* exist on the web
+— the web team chose to leave it out. So adding it to RN isn't platform-forced
+divergence; it's RN getting **ahead** of web on feature set, which the
+[parity principle](#guiding-principle-parity-with-the-react-player) flags as
+needing justification. To avoid drift: design `MediaQueueCapability` and the
+`playlistFeature` state shape as the **shared cross-platform concept** (web can
+adopt the same feature later, backed by `loadSource`), and treat "does playlist
+become a cross-platform feature" as an RFC question — not a unilateral RN call.
 
 ## Styling
 
