@@ -649,13 +649,68 @@ needing justification. To avoid drift: design `MediaQueueCapability` and the
 adopt the same feature later, backed by `loadSource`), and treat "does playlist
 become a cross-platform feature" as an RFC question — not a unilateral RN call.
 
-## Styling
+## Chrome / UI
 
-React Native has no CSS, so `@videojs/skins` (CSS + Tailwind tokens) does not
-transfer. The RN package needs its own styling answer (`StyleSheet`, or a
-styling lib). State shapes stay identical so UI components driven by the store
-are portable in logic; only their presentation layer is RN-native. Treated as
-an open question below.
+Chrome is drawn in **RN by default**. The overlap with the DOM chrome is large
+but sits *below the render line*: every control already has a framework-agnostic
+headless core in [`core/ui/*`](../../../packages/core/src/core/ui/)
+(`PlayButtonCore`, `MuteButtonCore`, `FullscreenButtonCore`, sliders, …) that
+imports only `@videojs/store` + `@videojs/utils` — no DOM. On web, `@videojs/react`'s
+`createMediaButton` is a thin adapter: instantiate the core, wire it to the store
+via a selector, render a `<button>`, and map core state → data-attributes for
+CSS. RN swaps **only that top layer**.
+
+**Reuse strategy (same shape as [feature reuse](#state--store)):**
+
+1. **Reuse the `*Core` classes as-is** — they compute state / label / actions
+   from the store with no DOM.
+2. **An RN render adapter** (analog of `createMediaButton`) instantiates the
+   core, consumes the store via the existing `useSelector` / `usePlayer` hooks
+   (unchanged in RN), renders `Pressable` / `View` / `Text`, and maps core state
+   → **style + `accessibility*` props** instead of data-attributes + ARIA.
+3. **Component names, props, and the `render` prop pattern match web**
+   (`<PlayButton render={(props, state) => …} />`) — the parity surface; only
+   the rendered primitives differ.
+
+Does not transfer: `createMediaButton` (DOM), the `stateAttrMap` / data-attribute
+styling hooks, `useButton` / `renderElement`, DOM elements, ARIA, and the
+slider's pointer-event machinery.
+
+### Theming (no CSS)
+
+`@videojs/skins` (CSS + Tailwind tokens) does not transfer. Instead: a **theme
+tokens object** (colors, spacing, radii, typography, icon set, control sizes,
+light/dark) via a `ThemeProvider` / context; each component computes a
+`StyleSheet` from tokens + its core state. Bounded but real — covers colors,
+sizing, dark mode (`useColorScheme`), responsive (`useWindowDimensions`), icon
+swaps, and part show/hide; no arbitrary cascade / pseudo-classes / media queries.
+**Mirror the `@videojs/skins` `@theme` token names/semantics** in the RN tokens
+so theming *concepts* carry across even though CSS → `StyleSheet` is a hard
+divergence.
+
+### Three chrome modes
+
+1. **Default — RN-drawn chrome.** A default skin: RN components over the shared
+   cores, themeable via tokens. Ships out of the box.
+2. **System chrome — a *separate* `<Video>` variant.** A distinct surface
+   component backed by the platform's controls-bearing view (iOS
+   `AVPlayerViewController`; Android ExoPlayer `PlayerView` / `PlayerControlView`)
+   — native polish, AirPlay route picker, native PiP/fullscreen UI and platform
+   a11y for free, at the cost of custom control and theming. Stays consistent
+   with the model: native controls drive the engine, the store still mirrors
+   (engine = source of truth). **Tentative:** a separate variant rather than a
+   `controls="system"` mode flag, because the platform controls view *owns* the
+   presentation (`AVPlayerViewController` is a full `UIViewController`, not a bare
+   layer) and a separate component avoids re-creating the native view on a
+   runtime mode switch. See
+   [decisions.md § System chrome is a separate `<Video>` variant](decisions.md#system-chrome-is-a-separate-video-variant-tentative).
+3. **Headless / BYO.** No default chrome; the app composes UI components or raw
+   store hooks itself.
+
+> **The slider is the long pole.** Scrubber/volume has the least logic-reuse
+> benefit and the most platform work — web leans on `<input type=range>` /
+> pointer events; RN needs `react-native-gesture-handler` + Reanimated plus
+> buffered-range / thumbnail / chapter overlays. Prototype the time-slider first.
 
 ## Accessibility
 
@@ -670,12 +725,13 @@ Detailed mapping is deferred until the UI component layer is scoped.
 - **Closing the shared-feature DOM leaks.** The direction is committed —
   adapter-shared features generalize over the `Media` contract (see
   [decisions.md § Media adapter implements the Media contract](decisions.md#media-adapter-implements-the-media-contract-not-a-fake-htmlmediaelement)
-  and [Not portable as-is](#not-portable-as-is)). What remains is mechanical and
-  enumerated: export `MediaReadyState` and swap the `HTMLMediaElement.HAVE_*`
-  references in `playback.ts` / `source.ts`; provide RN variants for `volume` /
-  `text-track` / `controls`; decide on a contract-native `listen` helper. The
-  one genuine unknown is `media.md`'s `draft` status — the contract surface
-  could shift before this work lands.
+  and [Not portable as-is](#not-portable-as-is)). The required base-lib work is
+  audited and planned in
+  [`.claude/plans/react-native/media-contract-feature-reuse.md`](../../../.claude/plans/react-native/media-contract-feature-reuse.md)
+  (export `MediaReadyState`; DOM-free `listen`/`onEvent`/`serializeTimeRanges`;
+  a non-DOM volume probe; verify against an in-memory `Media` host). The one
+  genuine unknown is `media.md`'s `draft` status — the contract surface could
+  shift before this work lands.
 - **Persistent session naming: "backgroundable" vs. capability-neutral.**
   `BackgroundablePlayer` was chosen to disambiguate from vjs's existing
   *ambient-video* "background" preset (`backgroundFeatures` /
@@ -691,8 +747,13 @@ Detailed mapping is deferred until the UI component layer is scoped.
   mode, RN-aware `tsconfig` (no `dom` lib), peer deps on `react` +
   `react-native`. Verification (Expo example app vs. bare RN vs. CI simulator
   runs) is the dominant cost, not the package itself.
-- **Styling system.** `StyleSheet` vs. a styling library; what `@videojs/skins`
-  means (if anything) for RN.
+- **Theming details.** Direction is set ([Chrome / UI](#chrome--ui)): a theme
+  tokens object + `StyleSheet`, mirroring `@videojs/skins` `@theme` token
+  names. Open: raw `StyleSheet` vs. a styling library, and the exact token set.
+- **System-chrome variant shape.** The separate-`<Video>`-variant call is
+  [tentative](decisions.md#system-chrome-is-a-separate-video-variant-tentative);
+  open: the variant's API/naming and how much of the store-driven control model
+  it cedes to the native controls.
 - **Native player libraries.** Whether to build on `react-native-video` /
   `expo-video` or a custom Fabric component. The `Media` adapter is the
   insulation layer regardless.

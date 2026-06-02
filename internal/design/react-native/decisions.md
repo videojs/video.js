@@ -278,3 +278,37 @@ library ships the `MediaSessionService` subclass; the **app declares the
 customization), iOS = a process singleton (`AVQueuePlayer` + `AVAudioSession` +
 now-playing). Normal players route control through the same TurboModule even
 though their engine is a plain instance — uniformity over a marginal shortcut.
+
+## System chrome is a separate `<Video>` variant (tentative)
+
+**Decision (tentative):** Native "system chrome" (iOS `AVPlayerViewController`;
+Android ExoPlayer `PlayerView` / `PlayerControlView`) is exposed as a **distinct
+surface component / `<Video>` variant**, not as a `controls="system"` mode flag
+on the standard surface. Default chrome remains RN-drawn over the shared
+[headless `*Core` classes](index.md#chrome--ui).
+
+**Context:** Chrome is RN-drawn by default, but some teams want native polish
+(platform scrubber, AirPlay route picker, native PiP/fullscreen UI, platform
+a11y). The platform controls view is not a bare surface: `AVPlayerViewController`
+is a full `UIViewController` that *owns* the player presentation (Android
+`PlayerView` similarly wraps surface + controls), so it doesn't slot into the
+[dumb-surface / engine-handle](#dumb-surface--single-control-turbomodule-engine-by-handle)
+model the standard surface uses.
+
+**Alternatives:**
+
+- **`controls="system" | "custom"` mode flag on one surface** — fewer component
+  names, but flipping it at runtime means tearing down and re-creating the native
+  view (bare layer ↔ `AVPlayerViewController`), with the attendant surface
+  re-point / state-transfer churn. Two native backings behind one component.
+- **Separate `<Video>` variant (chosen, tentative)** — the variant is fixed at
+  mount, so no runtime view re-creation; each component has a single, simple
+  native backing.
+
+**Rationale:** A separate variant is the simpler implementation — the native
+backing is decided at mount and never swapped, avoiding the re-create-on-toggle
+problem entirely. It also keeps the standard surface a clean dumb-surface; the
+system-chrome variant owns the heavier `AVPlayerViewController` / `PlayerView`
+presentation without contaminating it. Tentative because the variant's API shape
+and how much of the store-driven model it cedes to the native controls are still
+open.
