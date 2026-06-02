@@ -138,8 +138,8 @@ justified by a genuine platform constraint, documented where it occurs:
 
 - **DOM-only props/attributes** that have no native analog (and vice versa).
 - **Styling** — React Native has no CSS, so the `@videojs/skins` mechanism
-  can't transfer (see [Styling](#styling)); the *components* it styles should
-  still match.
+  can't transfer (see [Chrome / UI](#chrome--ui)); the *components* it styles
+  should still match.
 - **Accessibility** — ARIA maps to RN's `accessibility*` props (see
   [Accessibility](#accessibility)); the mapping changes, the behavior shouldn't.
 - **Platform-only capabilities** that don't exist on the web — e.g. the
@@ -190,20 +190,17 @@ layer a prop lives in defines its scope. Per the
 [parity principle](#guiding-principle-parity-with-the-react-player), component
 and prop names match `@videojs/react` wherever the platform allows.
 
-| Layer | Component | Owns |
+The RN API surface can use many of video.js's existing abstractions.
+
+| Layer | Component | RN approach |
 | --- | --- | --- |
-| Preset | import path (`@videojs/react-native/video`) | "what kind of player" + default feature set |
-| Provider | `<Player.Provider>` / `<BackgroundablePlayer.Provider>` | source, store, player-wide capabilities (`loop`, autoplay) |
+| Preset | import path (`@videojs/react-native/video`) | Use the existing presets where possible |
+| Provider | `<Player.Provider>` / `<BackgroundablePlayer.Provider>` | RN-specific Providers managing native player objects by handle via a TurboModule |
 | Container | container `<View>` | player-wide surface: layout, gestures |
-| Media | `<Video>` / `<Audio>` | the native player element + native media attributes |
-| UI | `<PlayButton>`, `<TimeRange>`, … | individual chrome pieces |
+| Media | `<Video>` / `<Audio>` | "Dumb" rendering surface. Implemented by native SurfaceView/AVPlayerLayer/AVPlayerVC/etc |
+| UI | `<PlayButton>`, `<TimeRange>`, … | individual chrome pieces. Reuse the `.*Core` classes for state logic |
 
-Provider-level props decided this session:
-
-- **`loop?: boolean`** — mirrors the HTML `loop` attribute as a cheap,
-  runtime-togglable property, on either provider. The iOS implementation keeps
-  this contract by always using `AVQueuePlayer`. See
-  [decisions.md § iOS looping uses AVQueuePlayer](decisions.md#ios-looping-uses-an-always-present-avqueueplayer).
+The rest of this doc details how these abstractions can be used in an RN context.
 
 ## <Player.Provider> and <BackgroundablePlayer.Provider>
 
@@ -217,18 +214,34 @@ See [Two providers over a shared core](#two-providers-over-a-shared-core) and
 
 ## State & store
 
-- **Shared, unchanged:** the store itself, `combine`, selectors, the state
-  shapes (`paused`, `ended`, `started`, `waiting`, `volume`, `muted`,
-  `currentTime`, `duration`, …). RN consumers read identical state.
-- **New RN feature set** (parallel to `videoFeatures` /
-  [`presets.ts`](../../../packages/core/src/dom/store/features/presets.ts)):
-  - *Adapter-shared* features (`playback`, `volume`, `time`, `source`,
-    `buffer`) — work against the `Media` contract once the adapter satisfies
-    it; ideally the *same* feature code, generalized over the contract rather
-    than `HTMLMediaElement`.
-  - *RN-specific* feature variants (`fullscreen`, `pip`, `controls` activity,
-    `remotePlayback`) — same state shape, RN `attach()` using `AppState`,
-    `PanResponder`, native modules.
+**The goal is to reuse the shared presets as-is.** RN composes the existing
+`videoFeatures` / `audioFeatures` from
+[`presets.ts`](../../../packages/core/src/dom/store/features/presets.ts)
+directly — *not* a parallel RN feature set. The store, `combine`, selectors, and
+state shapes (`paused`, `ended`, `started`, `waiting`, `volume`, `muted`,
+`currentTime`, `duration`, …) are shared and unchanged; RN consumers read
+identical state. Where a preset feature has a DOM leak, **the preferred fix is to
+de-DOM the feature in the base lib** so the *same* feature runs on web and RN —
+not to fork it.
+
+Two kinds of preset feature, then:
+
+- **Fixable in the base lib (keep shared).** Features that are logically
+  platform-agnostic but reach for a DOM global — `playback` / `source`
+  (readyState constants), `volume` (support probe), and the shared DOM utilities
+  (`listen` / `onEvent` / `serializeTimeRanges`). De-DOM these in place so the
+  preset uses the same code on both platforms. Enumerated and planned in
+  [`media-contract-feature-reuse.md`](../../../.claude/plans/react-native/media-contract-feature-reuse.md);
+  see also [Not portable as-is](#not-portable-as-is).
+- **Inherently platform-specific (RN variant).** `fullscreen`, `pip`,
+  `controls` activity, `remotePlayback`, `text-track` — DOM/platform APIs by
+  nature. RN supplies feature variants with the **same state shape** but an RN
+  `attach()` (`AppState`, `react-native-gesture-handler`, native modules), so UI
+  components and selectors are unaffected.
+
+So an RN preset is the shared preset with only the inherently-platform-specific
+features swapped for RN variants; everything else is literally the shared
+feature.
 
 ### Two providers over a shared core
 
@@ -474,6 +487,16 @@ iOS already splits `AVPlayer` (engine) from `AVPlayerLayer` (surface), Android
 from `ExoPlayer` to `setVideoSurface(...)`. The surface can move between the
 now-playing screen, a mini-bar, and nothing.
 
+**Handle-based native wiring.** This maps directly onto the
+[native module structure](#native-module-structure): the session is the
+**well-known session handle** on the control TurboModule — distinct from a
+normal player's per-instance `createEngine()` handle, and backed by the
+`MediaSessionService` (Android) / process singleton (iOS) rather than a plain
+engine the module owns. The dumb Fabric `<Video>` surfaces bind to *that*
+handle, so the LIFO surface registry below is simply "multiple surfaces sharing
+the session handle, native renders the top." The session handle outliving any
+view is exactly why the engine survives with no surface mounted.
+
 **One JS hub, three kinds of client.** All clients read selectors / dispatch
 actions on the **same** persistent store; the imperative API is a thin JS
 facade over that store, not a separate path to native:
@@ -483,8 +506,8 @@ Native engine (service)         ← ground truth
       │ adapter (commands down / events up, via TurboModule)
       ▼
 persistent-session store        ← the one JS-side hub
-      ├── <NowPlayingScreen/>    full controls + attached surface
-      ├── <MiniBar/>             compact controls, no surface
+      ├── now-playing screen     <Video/> surface + control components
+      ├── mini-bar               control components only — no <Video/>
       └── backgroundSession.*    imperative API for non-React JS
 ```
 
