@@ -102,6 +102,29 @@ Keep the store and the state shapes; replace the DOM-bound layers.
 └─────────────────────────────────────────────────────────────┘
 ```
 
+```mermaid
+flowchart TB
+    UI["JS controls — RN components<br/>(PlayButton, TimeRange … over *Core classes)"]
+    Provider["&lt;Player.Provider&gt; / &lt;BackgroundablePlayer.Provider&gt;<br/>React component — owns or binds store, useEffect → attach()"]
+    subgraph Surfaces[" "]
+        direction LR
+        Video["&lt;Video&gt; / &lt;Audio&gt;<br/>dumb Fabric surface, bound to engineHandle"]
+        Container["container &lt;View&gt;<br/>layout, gestures"]
+    end
+    Store["@videojs/store — features, combine, selectors<br/>(shared, unchanged)"]
+    Adapter["Media adapter<br/>implements DOM-free Media contract"]
+    TM["control TurboModule<br/>engines by handle + handle-tagged event channel"]
+
+    UI -- "useSelector / useStore" --> Store
+    Provider -- "React context" --> UI
+    Provider -- "createStore + RN feature set" --> Store
+    Store -- "attach({ media, container })" --> Adapter
+    Provider -. "refs" .-> Video
+    Provider -. "refs" .-> Container
+    Adapter -- "commands ↓ / events ↑ (JSI/bridge)" --> TM
+    Video -- "engineHandle" --> TM
+```
+
 Four pieces of new work, in dependency order:
 
 1. **The native interface** — one control TurboModule (engines by handle) + one
@@ -111,7 +134,10 @@ Four pieces of new work, in dependency order:
    [`media.md`](../media.md) (capability interfaces + `EventLike` /
    `EventTargetLike`), *not* a fake `HTMLMediaElement`, by talking to the single
    control TurboModule for its handle. This is the seam that lets features stay
-   shared.
+   shared. **This adapter — not the `<Video>` component — is what
+   `store.attach({ media })` receives**, because the presets call the contract on
+   it (`media.play()`, `media.currentTime`, `listen(media, …)`); see
+   [What `media` is](#what-media-is-adapter-vs-surface).
 3. **An RN provider component** — owns the store and the `attach()` lifecycle
    using React idiom (`useState` initializer + `useEffect`) instead of
    custom-element callbacks.
@@ -296,6 +322,30 @@ providers — so shared controls work on both. A component reading
 BG-only surface is reachable only where the BG features are composed — honest
 typing, enforced structurally.
 
+```mermaid
+flowchart TB
+    subgraph Features["feature composition"]
+        Base["baseFeatures<br/>playback, volume, time, source, buffer …"]
+        BG["backgroundFeatures<br/>backgroundPlayback, nowPlaying"]
+    end
+
+    Base --> CreatePlayer["createPlayerStore()<br/>combine(...baseFeatures)"]
+    Base --> CreateBg["createBackgroundStore()<br/>combine(...baseFeatures, ...backgroundFeatures)"]
+    BG --> CreateBg
+
+    Core["usePlayerProviderCore(config)<br/>store ownership, context broadcast,<br/>surface registration, attach lifecycle"]
+
+    CreatePlayer -.->|"{ factory }"| PlayerProvider
+    CreateBg -->|"owned externally by session module"| Singleton["backgroundSession.store (singleton)"]
+    Singleton -.->|"{ store }"| BgProvider
+
+    PlayerProvider["&lt;Player.Provider&gt;<br/>owns store · N · ephemeral"] --> Core
+    BgProvider["&lt;BackgroundablePlayer.Provider&gt;<br/>binds persistent store · singleton"] --> Core
+
+    Core --> CtxBase["base state (s.paused …)<br/>type-checks against BOTH"]
+    CreateBg --> CtxBg["s.backgroundPlayback<br/>reachable only where BG composed"]
+```
+
 **Keep BG features additive.** `combine` is last-wins on key conflict; if a
 background feature overrode a base behavior the base would stop being a true
 shared subset. Background features add slots (`backgroundPlayback`, now-playing
@@ -383,6 +433,35 @@ RN's New Architecture splits native into two artifact kinds — Fabric component
   surface (`AVPlayerLayer` / Android `Surface`) and renders — **no control
   logic**. Commands and events live on the TurboModule.
 
+### What `media` is (adapter vs. surface)
+
+The web fuses two roles into one object: `HTMLMediaElement` is **both** the thing
+the presets control (`media.play()`, `media.currentTime`, `listen(media, …)`)
+**and** the rendered surface. So `store.attach({ media: videoEl })` reads a ref to
+the rendered element and the two roles are never distinguished. **RN splits them**,
+joined by the engine handle:
+
+| Role | Web | RN |
+| --- | --- | --- |
+| Contract / control — `store.media`, what presets call | `HTMLMediaElement` | **the `Media` adapter** (forwards to the TurboModule by handle) |
+| Render surface — pixels on screen | *the same* `HTMLMediaElement` | **`<Video>`** Fabric view (binds a handle) |
+
+So `store.attach({ media })` receives the **adapter**, never the `<Video>`
+component — the dumb surface has no `play` / `currentTime` / `addEventListener` by
+design. This forces an ownership inversion from web: the engine + adapter are
+**provider-owned** (foreground) or **session-module-owned** (background) and
+created independently of any surface; the provider does `createEngine() → handle`,
+wraps it in the adapter, `attach({ media: adapter })`, and *separately* hands the
+handle to `<Video>` for rendering. That inversion is exactly what lets the presets
+keep running with **no `<Video>` mounted** (background, audio-only) — if `<Video>`
+owned the engine the way `HTMLMediaElement` does, surface-less playback would
+collapse. See
+[decisions.md § Engine and adapter ownership follows store ownership](decisions.md#engine-and-adapter-ownership-follows-store-ownership).
+
+`container` does **not** invert the same way — it stays a real rendered `<View>`
+ref (gestures/layout need an actual view). So `attach` is asymmetric in RN:
+`media` is a synthetic handle-backed adapter, `container` is a genuine surface ref.
+
 Control lives on the TurboModule (not Fabric view-commands) precisely because the
 [persistent session](#persistent-background-session) must be controllable with
 **no view mounted** — view-commands can't reach an absent view, but a
@@ -395,6 +474,32 @@ view-independent module can. See
 | --- | --- |
 | Normal player | A plain engine the module owns — `AVQueuePlayer` (iOS, per the [looping decision](decisions.md#ios-looping-uses-an-always-present-avqueueplayer)) / `ExoPlayer` (Android). Lifecycle = the provider; destroyed on unmount. No session/service/now-playing. |
 | Backgroundable session | The well-known **session handle**. Android: a Media3 `MediaSessionService` hosting the session's `ExoPlayer` + `MediaSession`. iOS: a process singleton owning the `AVQueuePlayer` + `AVAudioSession` + `MPNowPlayingInfoCenter` / `MPRemoteCommandCenter`. |
+
+```mermaid
+flowchart TB
+    Adapter["Media adapter (JS)"] --> TM
+
+    subgraph TM["control TurboModule — single flat interface"]
+        Cmd["commands: play / pause / seek / setSource<br/>setVolume / setRate / setLoop / … (future setQueue)"]
+        Evt["one event channel, tagged by handle → demuxed per store"]
+    end
+
+    TM -->|"normal handle"| Normal
+    TM -->|"well-known session handle"| Session
+
+    subgraph Normal["Normal player — N, lifecycle = provider"]
+        direction LR
+        NiOS["iOS: AVQueuePlayer"]
+        NAnd["Android: ExoPlayer"]
+        Nnote["no session / service / now-playing"]
+    end
+
+    subgraph Session["Backgroundable session — ≤1 owner, platform-native"]
+        direction LR
+        SiOS["iOS: process singleton<br/>AVQueuePlayer + AVAudioSession<br/>+ MPNowPlayingInfoCenter / MPRemoteCommandCenter"]
+        SAnd["Android: MediaSessionService<br/>hosting ExoPlayer + MediaSession<br/>(fg service, notification)"]
+    end
+```
 
 **Android service is declared by the app.** The library ships a ready-to-use
 `MediaSessionService` subclass, but the **`<service>` entry lives in the app's
@@ -542,6 +647,31 @@ persistent-session store ── all controls bind & dispatch  (shared; context o
                                               lower surfaces: poster/blank; pop → fall back
 ```
 
+```mermaid
+flowchart TB
+    Engine["Native engine in service / audio session<br/>ExoPlayer / AVQueuePlayer — ground truth, long-lived, surface-optional"]
+    Adapter["Media adapter — commands ↓ / events ↑ via TurboModule"]
+    Store["persistent-session store<br/>the one JS-side hub"]
+
+    Engine <--> Adapter
+    Adapter <--> Store
+
+    Store --> NowPlaying["now-playing screen<br/>&lt;Video/&gt; surface + controls"]
+    Store --> MiniBar["mini-bar<br/>controls only — no &lt;Video/&gt;"]
+    Store --> Imperative["backgroundSession.*<br/>imperative API for non-React JS"]
+
+    subgraph Reg["surface registry — LIFO stack (owned by session)"]
+        direction TB
+        Top["TOP surface ← receives engine video output"]
+        Lower["lower surfaces ← poster / blank"]
+        Top -. "pop on unmount → fall back to next" .-> Lower
+    end
+
+    NowPlaying -- "push on mount / pop on unmount" --> Reg
+    MiniBar -. "stays registered below" .-> Reg
+    Reg -- "render top only" --> Engine
+```
+
 **Externally-owned store (not a second architecture).** The store already
 outlives mount — `attach`/`detach` are separate from create/destroy, and the
 provider distinguishes *disconnect* (drop listeners, keep state) from *destroy*
@@ -553,10 +683,15 @@ the session module rather than a component. This is the RN expression of
 bring-your-own/hoisted store, a capability the web shares — so
 [parity](#guiding-principle-parity-with-the-react-player) holds.
 
-**Surface hand-off rides registration + the LIFO policy.** A surface component
-registers onto the session's stack on mount (the existing `setMedia` /
-`setContainer` media-registration flow, against a persistent store) and pops on
-unmount; the session points the engine's video output at the current top.
+**Surface hand-off rides registration + the LIFO policy.** Two axes that the web
+fuses but RN keeps separate (see
+[What `media` is](#what-media-is-adapter-vs-surface)): the contract `media` (the
+adapter) is attached to the session **once** and is stable, while the **LIFO
+surface stack registers render targets** (`<Video>` handles) — a different axis
+from `setMedia`. A surface component pushes onto the session's stack on mount and
+pops on unmount, reusing the existing `setMedia` / `setContainer`
+connect/disconnect *machinery* against the persistent store; the session points
+the engine's video output at the current top.
 Because the store is external and the engine lives in the service, popping a
 surface does **not** stop playback. So the glitch-prone `AVPlayerLayer` re-point
 / `setVideoSurface` swap is driven by stack push/pop, handled by the same

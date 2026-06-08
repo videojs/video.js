@@ -279,6 +279,52 @@ customization), iOS = a process singleton (`AVQueuePlayer` + `AVAudioSession` +
 now-playing). Normal players route control through the same TurboModule even
 though their engine is a plain instance — uniformity over a marginal shortcut.
 
+## Engine and adapter ownership follows store ownership
+
+**Decision:** The `Media` adapter is what `store.attach({ media })` receives — not
+the `<Video>` surface — and **whoever owns the store owns the engine + adapter**.
+`<Player.Provider>` (foreground) creates its own: `createEngine() → handle`, wrap
+the handle in the adapter, `attach({ media: adapter })`, and destroy the engine on
+unmount. `<BackgroundablePlayer.Provider>` does **not** call `createEngine`; it
+binds the externally-owned [persistent session](index.md#persistent-background-session),
+whose engine + adapter are owned by the session module and already long-lived. The
+`<Video>` surface never owns the engine in either case — it binds a handle for
+rendering only.
+
+**Context:** The web fuses two roles into one object — `HTMLMediaElement` is both
+the rendered surface **and** the thing the presets control (`media.play()`,
+`media.currentTime`, `listen(media, …)`), so `attach({ media: videoEl })` reads a
+ref to the rendered element and ownership is never a question. RN splits those
+roles (see [What `media` is](index.md#what-media-is-adapter-vs-surface)): the
+adapter is the contract, the `<Video>` Fabric view is the surface, joined by the
+engine handle. That split forces an explicit choice of who calls `createEngine`
+and holds the adapter — and the persistent session must keep running with **no
+surface mounted**, so the engine cannot be surface-owned.
+
+**Alternatives:**
+
+- **Surface owns the engine** (`<Video>` calls `createEngine`, exposes the adapter
+  via ref, mirroring the web element) — breaks surface-less background playback:
+  unmounting the view would destroy the engine, and a pure-background or
+  audio-only session has no `<Video>` at all.
+- **The session module always owns the engine** (even for foreground players) —
+  over-centralizes the common case, contradicting the per-provider independence of
+  [N foreground players](index.md#native-architecture-independent-instances-platform-native-background)
+  and adding a coordinator the design deliberately avoids.
+- **Ownership follows store ownership (chosen)** — the provider that owns the store
+  owns the engine/adapter; the provider that binds an external store binds an
+  external engine/adapter.
+
+**Rationale:** This collapses engine lifecycle onto the store-ownership split the
+[two-providers-over-a-shared-core](index.md#two-providers-over-a-shared-core)
+design already draws: owns-store ⇒ owns-engine (foreground, ephemeral, destroyed
+on unmount), binds-external-store ⇒ binds-external-engine (the persistent session,
+long-lived, surface-optional). No new ownership axis is introduced. The `<Video>`
+surface stays a dumb handle consumer, consistent with the
+[dumb-surface decision](#dumb-surface--single-control-turbomodule-engine-by-handle),
+and surface-less background playback falls out because the engine never depended on
+a surface in the first place.
+
 ## System chrome is a separate `<Video>` variant (tentative)
 
 **Decision (tentative):** Native "system chrome" (iOS `AVPlayerViewController`;
