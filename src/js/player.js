@@ -1695,9 +1695,17 @@ class Player extends Component {
             return;
           }
 
+          // The tech may have been disposed between when this listener was
+          // registered and when it fires; bail out if that has happened.
+          if (!this.tech_) {
+            return;
+          }
+
           const techSrc = this.techGet_('currentSrc');
 
-          this.lastSource_.tech = techSrc;
+          if (this.lastSource_) {
+            this.lastSource_.tech = techSrc;
+          }
           this.updateSourceCaches_(techSrc);
         });
       }
