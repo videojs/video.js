@@ -64,6 +64,28 @@ QUnit.test('setting breakpoints/responsive via option', function(assert) {
   player.dispose();
 });
 
+QUnit.test('changing breakpoints removes the previous layout class', function(assert) {
+  const currentWidth = 200;
+
+  this.player.currentWidth = () => currentWidth;
+  this.player.responsive(true);
+
+  assert.strictEqual(this.player.currentBreakpoint(), 'tiny', 'initial breakpoint set');
+  assert.ok(this.player.hasClass('vjs-layout-tiny'), 'initial layout class applied');
+
+  // Re-setting breakpoints lands on a different breakpoint for the same width.
+  this.player.breakpoints({tiny: 100});
+
+  assert.strictEqual(this.player.currentBreakpoint(), 'xsmall', 'breakpoint recomputed');
+  assert.ok(this.player.hasClass('vjs-layout-x-small'), 'new layout class applied');
+  assert.notOk(this.player.hasClass('vjs-layout-tiny'), 'previous layout class removed');
+  assert.strictEqual(
+    this.player.el().className.match(/vjs-layout-\S+/g).length,
+    1,
+    'exactly one layout class remains on the player'
+  );
+});
+
 QUnit.test('changing the player size triggers breakpoints', function(assert) {
   let currentWidth;
 

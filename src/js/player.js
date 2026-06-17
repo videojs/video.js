@@ -5031,7 +5031,7 @@ class Player extends Component {
       return Object.assign(this.breakpoints_);
     }
 
-    this.breakpoint_ = '';
+    this.removeCurrentBreakpoint_();
     this.breakpoints_ = Object.assign({}, DEFAULT_BREAKPOINTS, breakpoints);
 
     // When breakpoint definitions change, we need to update the currently
