@@ -1,3 +1,17 @@
+<a name="8.23.9"></a>
+## [8.23.9](https://github.com/videojs/video.js/compare/v8.23.8...v8.23.9) (2026-06-19)
+
+### Bug Fixes
+
+* **audio-tracks:** missing AD icon in Safari ([#9153](https://github.com/videojs/video.js/issues/9153)) ([c625b0b](https://github.com/videojs/video.js/commit/c625b0b))
+* **player:** strip stale layout class when breakpoints() is re-set ([#9205](https://github.com/videojs/video.js/issues/9205)) ([0054c0b](https://github.com/videojs/video.js/commit/0054c0b))
+* **track-button:** properly remove event listeners on dispose to prevent leaks and runtime errors ([#9101](https://github.com/videojs/video.js/issues/9101)) ([00440ee](https://github.com/videojs/video.js/commit/00440ee))
+* **types:** 'Cannot find name Player' error in type generation ([#9162](https://github.com/videojs/video.js/issues/9162)) ([69ea0e0](https://github.com/videojs/video.js/commit/69ea0e0))
+
+### Chores
+
+* update [@videojs](https://github.com/videojs)/http-streaming to 3.17.5, vhs-utils to 4.1.2, mpd-parser to 1.4.0 ([91423aa](https://github.com/videojs/video.js/commit/91423aa))
+
 <a name="8.23.8"></a>
 ## [8.23.8](https://github.com/videojs/video.js/compare/v8.23.7...v8.23.8) (2026-02-11)
 
