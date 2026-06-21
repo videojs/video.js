@@ -639,3 +639,58 @@ QUnit.test('hotkeys are NOT ignored when focus is on a button input', function(a
   defaultKeyTests.mute(this.player, assert, true);
   defaultKeyTests.playPause(this.player, assert, true);
 });
+
+QUnit.module('Player: User Actions: Global Hotkeys', {
+
+  beforeEach() {
+    this.clock = sinon.useFakeTimers();
+    this.player = TestHelpers.makePlayer();
+  },
+
+  afterEach() {
+    this.player.dispose();
+    this.clock.restore();
+  }
+});
+
+QUnit.test('when userActions.globalHotkeys is true, hotkeys are enabled at document.body level', function(assert) {
+  this.player.dispose();
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    userActions: {
+      globalHotkeys: true,
+      hotkeys: true
+    }
+  });
+
+  this.player.requestFullscreen = sinon.spy();
+
+  const event = new KeyboardEvent('keydown', { // eslint-disable-line no-undef
+    key: 'f'
+  });
+
+  document.body.dispatchEvent(event);
+
+  assert.strictEqual(this.player.requestFullscreen.callCount, 1, 'has gone fullscreen');
+});
+
+QUnit.test('when userActions.globalHotkeys is NOT true, hotkeys are NOT enabled at document.body level', function(assert) {
+  this.player.dispose();
+  this.player = TestHelpers.makePlayer({
+    controls: true,
+    userActions: {
+      globalHotkeys: false,
+      hotkeys: true
+    }
+  });
+
+  this.player.requestFullscreen = sinon.spy();
+
+  const event = new KeyboardEvent('keydown', { // eslint-disable-line no-undef
+    key: 'f'
+  });
+
+  document.body.dispatchEvent(event);
+
+  assert.strictEqual(this.player.requestFullscreen.callCount, 0, 'has not gone fullscreen');
+});
