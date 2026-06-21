@@ -14,6 +14,8 @@ import {NORMAL as TRACK_TYPES, REMOTE} from '../tracks/track-types';
 import setupSourceset from './setup-sourceset';
 import {silencePromise} from '../utils/promise';
 
+/** @import { SourceObject } from './tech' */
+
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  *
@@ -765,10 +767,10 @@ class Html5 extends Tech {
    * A getter/setter for the `Html5` Tech's source object.
    * > Note: Please use {@link Html5#setSource}
    *
-   * @param {Tech~SourceObject} [src]
+   * @param {SourceObject} [src]
    *        The source object you want to set on the `HTML5` techs element.
    *
-   * @return {Tech~SourceObject|undefined}
+   * @return {string|undefined}
    *         - The current source object when a source is not passed in.
    *         - undefined when setting
    *
@@ -856,8 +858,8 @@ class Html5 extends Tech {
    * Get the current source on the `HTML5` Tech. Falls back to returning the source from
    * the HTML5 media element.
    *
-   * @return {Tech~SourceObject}
-   *         The current source object from the HTML5 tech. With a fallback to the
+   * @return {string}
+   *         The current source from the HTML5 tech. With a fallback to the
    *         elements source.
    */
   currentSrc() {
@@ -1934,7 +1936,7 @@ Html5.resetMediaElement = function(el) {
    * {@link Tech~SourceObject} for the media.
    *
    * @method Html5#setSrc
-   * @param {Tech~SourceObject} src
+   * @param {string} src
    *        The source object to set as the current source.
    *
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-src}
@@ -2078,7 +2080,7 @@ Tech.withSourceHandlers(Html5);
 /**
  * Native source handler for Html5, simply passes the source to the media element.
  *
- * @property {Tech~SourceObject} source
+ * @property {SourceObject} source
  *        The source object
  *
  * @property {Html5} tech
@@ -2107,7 +2109,7 @@ Html5.nativeSourceHandler.canPlayType = function(type) {
 /**
  * Check if the media element can handle a source natively.
  *
- * @param {Tech~SourceObject} source
+ * @param {SourceObject} source
  *         The source object
  *
  * @param {Object} [options]
@@ -2135,7 +2137,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source, options) {
 /**
  * Pass the source to the native media element.
  *
- * @param {Tech~SourceObject} source
+ * @param {SourceObject} source
  *        The source object
  *
  * @param {Html5} tech

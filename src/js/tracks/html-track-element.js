@@ -24,10 +24,10 @@ class HTMLTrackElement extends EventTarget {
    * @param {Tech} options.tech
    *        A reference to the tech that owns this HTMLTrackElement.
    *
-   * @param {TextTrack~Kind} [options.kind='subtitles']
+   * @param {TextTrackKind} [options.kind='subtitles']
    *        A valid text track kind.
    *
-   * @param {TextTrack~Mode} [options.mode='disabled']
+   * @param {TextTrackMode} [options.mode='disabled']
    *        A valid text track mode.
    *
    * @param {string} [options.id='vjs_track_' + Guid.newGUID()]
@@ -61,6 +61,20 @@ class HTMLTrackElement extends EventTarget {
     this.srclang = track.language;
     this.label = track.label;
     this.default = track.default;
+
+    // This is only necessary because of tsc's incomplete jsdoc support
+    /* eslint-disable no-unused-expressions */
+    /**
+     * @type {TextTrack}
+     * @public
+     */
+    this.track;
+    /**
+     * @type {0|1|2|3}
+     * @public
+     */
+    this.readyState;
+    /* eslint-enable no-unused-expressions */
 
     Object.defineProperties(this, {
 

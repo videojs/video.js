@@ -6,6 +6,7 @@ import {toTitleCase} from '../utils/str.js';
 
 /** @import Player from '../player' */
 /** @import Tech from '../tech/tech' */
+/** @import { SourceObject } from './tech' */
 
 const middlewares = {};
 const middlewareInstances = {};
@@ -75,7 +76,7 @@ export function getMiddleware(type) {
  * @param  {Player} player
  *         A {@link Player} instance.
  *
- * @param  {Tech~SourceObject} src
+ * @param  {SourceObject} src
  *         A source object.
  *
  * @param  {Function}

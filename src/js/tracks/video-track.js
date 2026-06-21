@@ -16,7 +16,7 @@ class VideoTrack extends Track {
    * @param {Object} [options={}]
    *        Object of option names and values
    *
-   * @param {string} [options.kind='']
+   * @param {('alternative'|'captions'|'main'|'sign'|'subtitles'|'commentary')} [options.kind='']
    *        A valid {@link VideoTrack~Kind}
    *
    * @param {string} [options.id='vjs_track_' + Guid.newGUID()]
