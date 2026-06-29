@@ -4219,13 +4219,13 @@ class Player extends Component {
   }
 
   /**
-   * Set or get the current MediaError
+   * Set, clear, or get the current MediaError
    *
    * @fires Player#error
    *
-   * @param  {MediaError|string|number} [err]
+   * @param  {MediaError|string|number|null} [err]
    *         A MediaError or a string/number to be turned
-   *         into a MediaError
+   *         into a MediaError. Pass `null` to clear the current error state.
    *
    * @return {MediaError|null|undefined}
    *         - The current MediaError when getting (or null)
