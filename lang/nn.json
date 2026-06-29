@@ -33,7 +33,7 @@
   "A network error caused the media download to fail part-way.": "Ein nettverksfeil avbraut nedlasting av videoen.",
   "The media could not be loaded, either because the server or network failed or because the format is not supported.": "Videoen kunne ikkje lastas ned, på grunn av ein nettverksfeil eller serverfeil, eller av di formatet ikkje er stoda.",
   "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "Videoavspelinga blei broten på grunn av øydelagde data eller av di videoen ville gjera noe som nettlesaren din ikkje stodar.",
-  "No compatible source was found for this media.": "Fant ikke en kompatibel kilde for dette mediainnholdet.",
+  "No compatible source was found for this media.": "Fann inga kompatibel kjelde for dette mediainnhaldet.",
   "The media is encrypted and we do not have the keys to decrypt it.": "Mediefila er kryptert og vi manglar nyklar for å dekryptere ho.",
   "Play Video": "Spel av video",
   "Close": "Lukk",
@@ -83,5 +83,15 @@
   "Caption Settings Dialog": "Innstillingsvindauge for teksting for høyrselshemma",
   "Beginning of dialog window. Escape will cancel and close the window.": "Byrjing på dialogvindauge. Trykk Escape for å avbryte og lukke vindauget.",
   "End of dialog window.": "Avslutning på dialogvindauge.",
-  "{1} is loading.": "{1} lastar."
+  "{1} is loading.": "{1} lastar.",
+  "Exit Picture-in-Picture": "Avslutt bilete-i-bilete",
+  "Picture-in-Picture": "Bilete-i-bilete",
+  "No content": "Ikkje noko innhald",
+  "Color": "Farge",
+  "Opacity": "Tettleik",
+  "Text Background": "Tekstbakgrunn",
+  "Caption Area Background": "Bakgrunn for tekstområde",
+  "Playing in Picture-in-Picture": "Spelar i bilete-i-bilete",
+  "Skip backward {1} seconds": "Hopp {1} sekund bakover",
+  "Skip forward {1} seconds": "Hopp {1} sekund framover"
 }
