@@ -320,8 +320,8 @@ class TextTrackDisplay extends Component {
       }
       this.updateForTrack(captionsSubtitlesTrack);
     } else if (descriptionsTrack) {
-      if (this.getAttribute('aria-live') !== 'assertive') {
-        this.setAttribute('aria-live', 'assertive');
+      if (this.getAttribute('aria-live') !== 'polite') {
+        this.setAttribute('aria-live', 'polite');
       }
       this.updateForTrack(descriptionsTrack);
     }
