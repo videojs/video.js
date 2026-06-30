@@ -31,6 +31,15 @@ QUnit.test('should create and update a poster image', function(assert) {
   posterImage.dispose();
 });
 
+QUnit.test('should mark img as prioritized request when mainContent is true', function(assert) {
+  const posterImage = new PosterImage(this.mockPlayer, { playerOptions: { mainContent: true } });
+
+  assert.equal(posterImage.$('img').loading, 'eager', 'img is loading eager');
+  assert.equal(posterImage.$('img').fetchPriority, 'high', 'img has fetchpriority high');
+
+  posterImage.dispose();
+});
+
 QUnit.test('should mirror crossOrigin', function(assert) {
   assert.strictEqual(this.mockPlayer.posterImage.$('img').crossOrigin, null, 'crossOrigin not set when not present in options');
   assert.strictEqual(this.mockPlayer.posterImage.crossOrigin(), null, 'crossOrigin not set from getter when not present in options');
