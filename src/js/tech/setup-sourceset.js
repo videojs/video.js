@@ -139,7 +139,7 @@ const getInnerHTMLDescriptor = (tech) => getDescriptor([
 /**
  * Patches browser internal functions so that we can tell synchronously
  * if a `<source>` was appended to the media element. For some reason this
- * causes a `sourceset` if the the media element is ready and has no source.
+ * causes a `sourceset` if the media element is ready and has no source.
  * This happens when:
  * - The page has just loaded and the media element does not have a source.
  * - The media element was emptied of all sources, then `load()` was called.

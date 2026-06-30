@@ -438,7 +438,7 @@ class Component {
 
   /**
    * Return the `Component`s DOM element. This is where children get inserted.
-   * This will usually be the the same as the element returned in {@link Component#el}.
+   * This will usually be the same as the element returned in {@link Component#el}.
    *
    * @return {Element}
    *         The content element for this `Component`.
