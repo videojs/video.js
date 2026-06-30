@@ -74,7 +74,7 @@ class ProgressControl extends Component {
     }
 
     const seekBarEl = seekBar.el();
-    const seekBarRect = Dom.findPosition(seekBarEl);
+    const seekBarRect = Dom.getBoundingClientRect(seekBarEl);
     let seekBarPoint = Dom.getPointerPosition(seekBarEl, event).x;
 
     // The default skin has a gap on either side of the `SeekBar`. This means
