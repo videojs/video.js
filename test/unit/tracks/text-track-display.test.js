@@ -106,6 +106,29 @@ QUnit.test('shows the default caption track first', function(assert) {
 });
 
 if (!Html5.supportsNativeTextTracks()) {
+  QUnit.test('playerresize forces cue recompute on updateForTrack', function(assert) {
+    const player = TestHelpers.makePlayer();
+    const textTrackDisplay = player.textTrackDisplay;
+    const updateForTrackSpy = sinon.spy(textTrackDisplay, 'updateForTrack');
+    const showingTrack = {
+      mode: 'showing',
+      kind: 'captions',
+      activeCues: []
+    };
+
+    textTrackDisplay.clearDisplay = () => '';
+    sinon.stub(player, 'textTracks').returns([showingTrack]);
+
+    textTrackDisplay.updateDisplay({type: 'playerresize'});
+
+    assert.ok(updateForTrackSpy.calledOnce, 'updateForTrack was called');
+    assert.strictEqual(updateForTrackSpy.firstCall.args[1], true, 'cue recompute flag is true on playerresize');
+
+    updateForTrackSpy.restore();
+    player.textTracks.restore();
+    player.dispose();
+  });
+
   QUnit.test('text track display should attach screen orientation change event handler', function(assert) {
     const oldScreen = window.screen;
     const removeHandlerSpy = sinon.spy();
