@@ -1268,8 +1268,8 @@ QUnit.test('player should handle different error types', function(assert) {
   player.dispose();
 });
 
-QUnit.test('error() should not throw when called after the player has been disposed', function(assert) {
-  assert.expect(1);
+QUnit.test('error() should be a no-op when called after the player has been disposed', function(assert) {
+  assert.expect(2);
   const player = TestHelpers.makePlayer({});
 
   // prevent error log messages in the console
@@ -1282,6 +1282,10 @@ QUnit.test('error() should not throw when called after the player has been dispo
   player.error(1);
 
   assert.ok(true, 'error() did not throw after dispose()');
+  // Matches the existing isDisposed() bail-out convention elsewhere in the
+  // codebase (e.g. text-track.js's timeupdateHandler): once disposed, the
+  // whole call is a no-op, not just the DOM-touching part of it.
+  assert.equal(player.error(), null, 'error() did not record an error for an already-disposed player');
 
   log.error.restore();
 });
