@@ -1268,6 +1268,24 @@ QUnit.test('player should handle different error types', function(assert) {
   player.dispose();
 });
 
+QUnit.test('error() should not throw when called after the player has been disposed', function(assert) {
+  assert.expect(1);
+  const player = TestHelpers.makePlayer({});
+
+  // prevent error log messages in the console
+  sinon.stub(log, 'error');
+
+  player.dispose();
+
+  // A source-resolution/DRM/texttrack async callback racing against
+  // dispose() can still call error() after this.el_ has been nulled out.
+  player.error(1);
+
+  assert.ok(true, 'error() did not throw after dispose()');
+
+  log.error.restore();
+});
+
 QUnit.test('beforeerror hook allows us to modify errors', function(assert) {
   const player = TestHelpers.makePlayer({});
   const beforeerrorHook = function(p, err) {
