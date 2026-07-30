@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import PosterImage from '../../src/js/poster-image.js';
 import TestHelpers from './test-helpers.js';
+import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
 
 QUnit.module('PosterImage', {
@@ -74,6 +75,41 @@ QUnit.test('should remove itself from the document flow when there is no poster'
   assert.ok(posterImage.$('img'), 'Poster image with source restores img el');
 
   posterImage.dispose();
+});
+
+// Regression guard for videojs/video.js#6270: on Edge, focusing the <video>
+// element when the poster is clicked leaves protected (DRM/EME) video black.
+QUnit.test('handleClick focuses the play toggle, not the tech, on Edge', function(assert) {
+  const player = this.mockPlayer;
+
+  player.controls(true);
+  player.play = () => {};
+
+  const tech = player.tech(true);
+  const playToggle = player.getChild('ControlBar').getChild('PlayToggle');
+  let techFocus = 0;
+  let toggleFocus = 0;
+
+  tech.focus = () => {
+    techFocus++;
+  };
+  playToggle.focus = () => {
+    toggleFocus++;
+  };
+
+  const origEdge = browser.IS_EDGE;
+
+  browser.stubIsEdge(true);
+  player.posterImage.handleClick({type: 'tap'});
+  assert.strictEqual(toggleFocus, 1, 'play toggle focused on Edge');
+  assert.strictEqual(techFocus, 0, 'tech not focused on Edge');
+
+  browser.stubIsEdge(false);
+  player.posterImage.handleClick({type: 'tap'});
+  assert.strictEqual(techFocus, 1, 'tech focused on non-Edge');
+  assert.strictEqual(toggleFocus, 1, 'play toggle not focused again on non-Edge');
+
+  browser.stubIsEdge(origEdge);
 });
 
 QUnit.test('should hide the poster in the appropriate player states', function(assert) {

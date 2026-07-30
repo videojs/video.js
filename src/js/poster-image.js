@@ -4,6 +4,7 @@
 import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
 import * as Dom from './utils/dom.js';
+import * as browser from './utils/browser.js';
 import {silencePromise} from './utils/promise';
 
 /** @import Player from './player' */
@@ -166,7 +167,17 @@ class PosterImage extends ClickableComponent {
       return;
     }
 
-    if (this.player_.tech(true)) {
+    // On Microsoft Edge, moving focus to the <video> (tech) element as playback
+    // starts prevents a protected (DRM/EME) video surface from being presented:
+    // audio plays but the frame stays black until a later repaint or focus change.
+    // Focus the control-bar play toggle instead of the tech on Edge. See
+    // https://github.com/videojs/video.js/issues/6270.
+    const cb = this.player_.getChild('controlBar');
+    const playToggle = cb && cb.getChild('playToggle');
+
+    if (browser.IS_EDGE && playToggle) {
+      playToggle.focus();
+    } else if (this.player_.tech(true)) {
       this.player_.tech(true).focus();
     }
 

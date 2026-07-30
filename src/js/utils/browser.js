@@ -54,6 +54,19 @@ export let IS_FIREFOX = false;
 export let IS_EDGE = false;
 
 /**
+ * Overwrite the {@link IS_EDGE} flag. Test-only seam so the play-start focus
+ * redirect in `big-play-button.js` / `poster-image.js` (the DRM black-frame fix
+ * for Microsoft Edge) can be exercised without spoofing a real Edge user agent.
+ *
+ * @private
+ * @param  {boolean} value
+ *         The value to force `IS_EDGE` to.
+ */
+export function stubIsEdge(value) {
+  IS_EDGE = value;
+}
+
+/**
  * Whether or not this is any Chromium Browser
  *
  * @static
