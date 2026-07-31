@@ -175,8 +175,8 @@ class PosterImage extends ClickableComponent {
     const cb = this.player_.getChild('controlBar');
     const playToggle = cb && cb.getChild('playToggle');
 
-    if (browser.IS_EDGE && playToggle) {
-      playToggle.focus();
+    if (browser.IS_EDGE) {
+      (playToggle || this.player_).focus();
     } else if (this.player_.tech(true)) {
       this.player_.tech(true).focus();
     }

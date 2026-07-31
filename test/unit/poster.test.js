@@ -99,17 +99,17 @@ QUnit.test('handleClick focuses the play toggle, not the tech, on Edge', functio
 
   const origEdge = browser.IS_EDGE;
 
-  browser.stubIsEdge(true);
+  browser.stub_IS_EDGE(true);
   player.posterImage.handleClick({type: 'tap'});
   assert.strictEqual(toggleFocus, 1, 'play toggle focused on Edge');
   assert.strictEqual(techFocus, 0, 'tech not focused on Edge');
 
-  browser.stubIsEdge(false);
+  browser.stub_IS_EDGE(false);
   player.posterImage.handleClick({type: 'tap'});
   assert.strictEqual(techFocus, 1, 'tech focused on non-Edge');
   assert.strictEqual(toggleFocus, 1, 'play toggle not focused again on non-Edge');
 
-  browser.stubIsEdge(origEdge);
+  browser.stub_IS_EDGE(origEdge);
 });
 
 QUnit.test('should hide the poster in the appropriate player states', function(assert) {

@@ -61,8 +61,8 @@ class BigPlayButton extends Button {
       // https://github.com/videojs/video.js/issues/6270 (#6318/#6508 redirected only
       // the keyboard path; the mouse/tap tech.focus() survived and regressed on
       // Chromium Edge with hardware-accelerated DRM).
-      if (browser.IS_EDGE && playToggle) {
-        playToggle.focus();
+      if (browser.IS_EDGE) {
+        (playToggle || this.player_).focus();
       } else if (this.player_.tech(true)) {
         this.player_.tech(true).focus();
       }

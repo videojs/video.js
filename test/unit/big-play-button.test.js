@@ -25,13 +25,13 @@ QUnit.module('BigPlayButton', {
     this.origEdge = browser.IS_EDGE;
   },
   afterEach() {
-    browser.stubIsEdge(this.origEdge);
+    browser.stub_IS_EDGE(this.origEdge);
     this.player.dispose();
   }
 });
 
 QUnit.test('mouse/tap click focuses the tech on non-Edge browsers', function(assert) {
-  browser.stubIsEdge(false);
+  browser.stub_IS_EDGE(false);
 
   this.bigPlayButton.handleClick({type: 'tap'});
 
@@ -42,7 +42,7 @@ QUnit.test('mouse/tap click focuses the tech on non-Edge browsers', function(ass
 // Regression guard for videojs/video.js#6270: focusing the <video> element as
 // playback starts on Edge leaves protected (DRM/EME) video as a black frame.
 QUnit.test('mouse/tap click focuses the play toggle, not the tech, on Edge', function(assert) {
-  browser.stubIsEdge(true);
+  browser.stub_IS_EDGE(true);
 
   this.bigPlayButton.handleClick({type: 'tap'});
 
