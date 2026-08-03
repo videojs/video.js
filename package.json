@@ -66,7 +66,7 @@
     "pretest": "npm run build-dev",
     "test": "npm-run-all -p test:*",
     "test:node-require": "node test/require/node.js",
-    "test:a11y": "node build/test-a11y.js",
+    "test:a11y": "node build/test-pa11y.js",
     "test:unit": "karma start test/karma.conf.js",
     "docs": "npm-run-all clean docs:lint docs:api",
     "docs:api": "jsdoc -c .jsdoc.js",
@@ -83,6 +83,17 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
+  },
+  "overrides": {
+    "minimatch": "~10.2.5",
+    "elliptic": "^6.6.1",
+    "update-notifier": "^7.3.1",
+    "@octokit/rest": "^22.0.1",
+    "underscore": "^1.13.8",
+    "globby": "^16.2.0",
+    "glob": "~13.0.6",
+    "crypto-browserify": "^3.12.1",
+    "browserify-sign": "^4.2.5"
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
@@ -106,15 +117,14 @@
     "@rollup/plugin-replace": "^2.4.1",
     "@rollup/pluginutils": "^5.1.0",
     "@types/node": "^18.8.3",
-    "access-sniff": "^3.2.0",
     "autoprefixer": "^10.2.5",
     "bestzip": "^2.2.0",
     "browserify": "^16.2.3",
     "chokidar-cli": "^2.1.0",
     "clean-css-cli": "^4.3.0",
-    "clean-jsdoc-theme": "^4.2.1",
+    "clean-jsdoc-theme": "^4.3.3",
     "cli-table": "^0.3.1",
-    "conventional-changelog-cli": "^2.0.21",
+    "conventional-changelog-cli": "^5.0.0",
     "conventional-changelog-videojs": "^3.0.1",
     "cross-env": "^7.0.3",
     "es5-shim": "^4.5.15",
@@ -132,12 +142,13 @@
     "not-prerelease": "^1.0.1",
     "npm-merge-driver-install": "^2.0.1",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.2.13",
-    "postcss-cli": "^8.3.1",
+    "pa11y": "^9.1.1",
+    "postcss": "^8.5.16",
+    "postcss-cli": "^11.0.1",
     "qunit": "2.13.0",
-    "remark-cli": "^6.0.1",
-    "remark-lint": "^6.0.6",
-    "remark-parse": "^6.0.3",
+    "remark-cli": "^12.0.1",
+    "remark-lint": "^10.0.1",
+    "remark-parse": "^11.0.0",
     "remark-stringify": "^6.0.4",
     "remark-toc": "^5.1.1",
     "remark-validate-links": "^8.0.2",
@@ -166,7 +177,7 @@
     "videojs-generate-karma-config": "^8.1.0",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^9.0.1",
-    "webpack": "^1.15.0"
+    "webpack": "^5.108.3"
   },
   "vjsstandard": {
     "ignore": [
