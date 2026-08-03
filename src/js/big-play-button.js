@@ -3,6 +3,7 @@
  */
 import Button from './button.js';
 import Component from './component.js';
+import * as browser from './utils/browser.js';
 import {isPromise, silencePromise} from './utils/promise';
 
 /**
@@ -45,20 +46,29 @@ class BigPlayButton extends Button {
    */
   handleClick(event) {
     const playPromise = this.player_.play();
+    const cb = this.player_.getChild('controlBar');
+    const playToggle = cb && cb.getChild('playToggle');
 
     // exit early if tapped or clicked via the mouse
     if (event.type === 'tap' || this.mouseused_ && 'clientX' in event && 'clientY' in event) {
       silencePromise(playPromise);
 
-      if (this.player_.tech(true)) {
+      // On Microsoft Edge, moving focus to the <video> (tech) element as playback
+      // starts prevents a protected (DRM/EME) video surface from being presented:
+      // audio plays but the frame stays black until a later repaint or focus change.
+      // Focus the control-bar play toggle instead of the tech on Edge, mirroring the
+      // keyboard branch below. This is the pointer-path counterpart to the fix for
+      // https://github.com/videojs/video.js/issues/6270 (#6318/#6508 redirected only
+      // the keyboard path; the mouse/tap tech.focus() survived and regressed on
+      // Chromium Edge with hardware-accelerated DRM).
+      if (browser.IS_EDGE) {
+        (playToggle || this.player_).focus();
+      } else if (this.player_.tech(true)) {
         this.player_.tech(true).focus();
       }
 
       return;
     }
-
-    const cb = this.player_.getChild('controlBar');
-    const playToggle = cb && cb.getChild('playToggle');
 
     if (!playToggle) {
       this.player_.tech(true).focus();
