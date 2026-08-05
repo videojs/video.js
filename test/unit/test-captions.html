@@ -1,0 +1,46 @@
+// test-fix.html
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://vjs.zencdn.net/8.0.4/video-js.css" rel="stylesheet" />
+</head>
+<body>
+    <video-js id="my-video" class="video-js" controls preload="auto" width="640" height="264">
+        <source src="https://course-dev.heysimon.com/asset/draft/7baab12c-3cbb-45f7-9047-f4635f6d8b0f/a9c44c80-fd57-4158-a3da-9c353b2cde7c/5d50b519-6335-4ed9-8284-3e46834aff43.m3u8" type="application/x-mpegURL">
+    </video-js>
+
+    <!-- Include your interceptors FIRST -->
+    <script src="vtt-interceptor.js"></script>
+    <script src="https://vjs.zencdn.net/8.0.4/video.min.js"></script>
+    
+    <script>
+        const player = videojs('my-video');
+        
+        player.ready(function() {
+            console.log('🎬 Player ready - testing captions...');
+            
+            // Wait a bit then check if captions are available
+            setTimeout(() => {
+                const tracks = player.textTracks();
+                console.log('📝 Available text tracks:', tracks.length);
+                
+                for (let i = 0; i < tracks.length; i++) {
+                    const track = tracks[i];
+                    console.log(`Track ${i}:`, track.label, track.language, track.kind);
+                    
+                    // Try to enable English captions
+                    if (track.language === 'en' || track.label === 'English') {
+                        track.mode = 'showing';
+                        console.log('✅ Enabled English captions');
+                    }
+                }
+            }, 3000);
+        });
+        
+        // Listen for errors
+        player.on('error', function() {
+            console.error('❌ Player error:', player.error());
+        });
+    </script>
+</body>
+</html>
