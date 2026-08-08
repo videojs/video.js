@@ -38,7 +38,6 @@ export const AudioTrackKind = {
  * All possible `TextTrackKind`s
  *
  * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-texttrack-kind
- * @typedef TextTrack~Kind
  * @enum
  */
 export const TextTrackKind = {
@@ -53,7 +52,6 @@ export const TextTrackKind = {
  * All possible `TextTrackMode`s
  *
  * @see https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
- * @typedef TextTrack~Mode
  * @enum
  */
 export const TextTrackMode = {

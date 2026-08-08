@@ -8,6 +8,14 @@ import document from 'global/document';
  * Store the browser-specific methods for the fullscreen API.
  *
  * @type {Object}
+ * @property {string} requestFullscreen
+ * @property {string} exitFullscreen
+ * @property {string} fullscreenElement
+ * @property {string} fullscreenEnabled
+ * @property {string} fullscreenchange
+ * @property {string} fullscreenerror
+ * @property {string} fullscreen
+ * @property {boolean} prefixed
  * @see [Specification]{@link https://fullscreen.spec.whatwg.org}
  * @see [Map Approach From Screenfull.js]{@link https://github.com/sindresorhus/screenfull.js}
  */
