@@ -60,19 +60,15 @@ export const bind_ = function(context, fn, uid) {
  *
  * @return   {Function}
  */
-export const throttle = function(fn, wait) {
-  let last = window.performance.now();
-
-  const throttled = function(...args) {
-    const now = window.performance.now();
-
-    if (now - last >= wait) {
-      fn(...args);
-      last = now;
-    }
+export const throttle = function(func, delay) {
+  let lastCallTime = 0;
+  return function throttled(...args) {
+      const currentTime = Date.now()
+      if (currentTime - lastCallTime >= delay) {
+          lastCallTime = currentTime;
+          func(...args);
+      }
   };
-
-  return throttled;
 };
 
 /**

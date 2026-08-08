@@ -309,12 +309,11 @@ export function on(elem, type, fn) {
         for (let m = 0, n = handlersCopy.length; m < n; m++) {
           if (event.isImmediatePropagationStopped()) {
             break;
-          } else {
-            try {
-              handlersCopy[m].call(elem, event, hash);
-            } catch (e) {
-              log.error(e);
-            }
+          }
+          try {
+            handlersCopy[m].call(elem, event, hash);
+          } catch (e) {
+            log.error(e);
           }
         }
       }

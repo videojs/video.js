@@ -231,8 +231,9 @@ if (!IS_CHROMIUM) {
     const minor = match[2] && parseFloat(match[2]);
 
     if (major && minor) {
-      return parseFloat(match[1] + '.' + match[2]);
-    } else if (major) {
+      return parseFloat(`${match[1]}.${match[2]}`);
+    }
+    if (major) {
       return major;
     }
     return null;
