@@ -58,6 +58,7 @@ class MenuButton extends Component {
     this.on(this.menuButton_, 'mouseenter', () => {
       this.addClass('vjs-hover');
       this.menu.show();
+      this.menuButton_.el_.setAttribute('aria-expanded', 'true');
       Events.on(document, 'keyup', this.handleMenuKeyUp_);
     });
     this.on('mouseleave', (e) => this.handleMouseLeave(e));
@@ -272,6 +273,11 @@ class MenuButton extends Component {
   handleMouseLeave(event) {
     this.removeClass('vjs-hover');
     Events.off(document, 'keyup', this.handleMenuKeyUp_);
+
+    if (!this.buttonPressed_) {
+      this.menuButton_.el_.setAttribute('aria-expanded', 'false');
+      this.menuButton_.el_.removeAttribute('aria-activedescendant');
+    }
   }
 
   /**
@@ -395,6 +401,7 @@ class MenuButton extends Component {
       }
 
       this.menu.focus();
+      this.updateActiveDescendant_();
     }
   }
 
@@ -407,7 +414,31 @@ class MenuButton extends Component {
       this.menu.unlockShowing();
       this.menu.hide();
       this.menuButton_.el_.setAttribute('aria-expanded', 'false');
+      this.menuButton_.el_.removeAttribute('aria-activedescendant');
     }
+  }
+
+  /**
+   * Synchronize `aria-activedescendant` on the menu button with the currently
+   * focused menu item. If the focused item has no `id`, one is generated so it
+   * can be referenced.
+   *
+   * @private
+   */
+  updateActiveDescendant_() {
+    const children = this.menu.children();
+    const focusedChild = children && children[this.menu.focusedChild_];
+
+    if (!focusedChild || !focusedChild.el_) {
+      this.menuButton_.el_.removeAttribute('aria-activedescendant');
+      return;
+    }
+
+    if (!focusedChild.el_.id) {
+      focusedChild.el_.id = `${this.menuButton_.id()}-item-${this.menu.focusedChild_}`;
+    }
+
+    this.menuButton_.el_.setAttribute('aria-activedescendant', focusedChild.el_.id);
   }
 
   /**
