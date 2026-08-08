@@ -93,5 +93,10 @@
   "Caption Area Background": "Caption Area Background",
   "Playing in Picture-in-Picture": "Playing in Picture-in-Picture",
   "Skip backward {1} seconds": "Skip backward {1} seconds",
-  "Skip forward {1} seconds": "Skip forward {1} seconds"
+  "Skip forward {1} seconds": "Skip forward {1} seconds",
+  "time_units": {
+    "hour": { "one": "hour", "other": "hours" },
+    "minute": { "one": "minute", "other": "minutes" },
+    "second": { "one": "second", "other": "seconds" }
+  }
 }
