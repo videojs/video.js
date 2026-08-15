@@ -10,7 +10,7 @@ class HtmlTrackElementList {
   /**
    * Create an instance of this class.
    *
-   * @param {HtmlTrackElement[]} [tracks=[]]
+   * @param {HtmlTrackElement[]} [trackElements=[]]
    *        A list of `HtmlTrackElement` to instantiate the list with.
    */
   constructor(trackElements = []) {
