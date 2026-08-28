@@ -107,11 +107,15 @@ export const IS_CHROMECAST_RECEIVER = Boolean(window.cast && window.cast.framewo
 /**
  * The detected Internet Explorer version - or `null`.
  *
+ * Always `null`: Internet Explorer support was removed in Video.js 8
+ * and Video.js does not run in any version of IE. This export is kept
+ * for backwards compatibility only.
+ *
  * @static
  * @deprecated
  * @type {number|null}
  */
-export let IE_VERSION = null;
+export const IE_VERSION = null;
 
 /**
  * Whether or not this is desktop Safari.
@@ -253,18 +257,6 @@ if (!IS_CHROMIUM) {
       return parseFloat(match[2]);
     }
     return null;
-  }());
-
-  IE_VERSION = (function() {
-    const result = (/MSIE\s(\d+)\.\d/).exec(USER_AGENT);
-    let version = result && parseFloat(result[1]);
-
-    if (!version && (/Trident\/7.0/i).test(USER_AGENT) && (/rv:11.0/).test(USER_AGENT)) {
-      // IE 11 has a different user agent string than other IE versions
-      version = 11.0;
-    }
-
-    return version;
   }());
 
   IS_TIZEN = (/Tizen/i).test(USER_AGENT);
