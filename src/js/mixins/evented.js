@@ -400,8 +400,11 @@ const EventedMixin = {
    */
   off(targetOrType, typeOrListener, listener) {
 
-    // Targeting this evented object.
-    if (!targetOrType || isValidEventType(targetOrType)) {
+    // Targeting this evented object. As in `normalizeListenArgs()`, three
+    // arguments always mean the first one is a target, so a falsy target is
+    // not mistaken for an omitted event type - which would remove every
+    // listener on this object.
+    if ((!targetOrType && arguments.length < 3) || isValidEventType(targetOrType)) {
       Events.off(this.eventBusEl_, targetOrType, typeOrListener);
 
     // Targeting another evented object.

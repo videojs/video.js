@@ -924,6 +924,27 @@ QUnit.test('should set controls and trigger events', function(assert) {
   player.dispose();
 });
 
+QUnit.test('removeTechControlsListeners_() without a tech keeps other listeners', function(assert) {
+  const player = TestHelpers.makePlayer({ controls: true });
+  const spy = sinon.spy();
+  const tech = player.tech_;
+
+  player.on('foo', spy);
+
+  // The state reported in #4627: the tech is gone while the controls are
+  // being torn down. The undefined tech was passed to `off()` as a target,
+  // which took it for an omitted event type and removed every listener.
+  player.tech_ = undefined;
+  player.removeTechControlsListeners_();
+  player.tech_ = tech;
+
+  player.trigger('foo');
+
+  assert.strictEqual(spy.callCount, 1, 'the unrelated listener was not removed');
+
+  player.dispose();
+});
+
 QUnit.test('should toggle user the user state between active and inactive', function(assert) {
   const player = TestHelpers.makePlayer({});
 
