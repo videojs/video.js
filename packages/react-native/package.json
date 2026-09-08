@@ -1,0 +1,111 @@
+{
+  "name": "@videojs/react-native",
+  "version": "0.1.0",
+  "description": "video.js for react-native",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "react-native-source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "react-native.config.js",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "example": "yarn workspace react-native-example",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "prepare": "bob build",
+    "typecheck": "tsc"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/videojs/v10/react-native.git"
+  },
+  "author": "Mux, Inc <support@mux.com> (https://github.com/videojs/v10)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/videojs/v10/react-native/issues"
+  },
+  "homepage": "https://github.com/videojs/v10/react-native#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@react-native/babel-preset": "0.86.2",
+    "@types/react": "^19.2.0",
+    "del-cli": "^7.0.0",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-builder-bob": "^0.43.0",
+    "turbo": "^2.10.8",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "codegenConfig": {
+    "name": "ReactNativeViewSpec",
+    "type": "all",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.reactnative"
+    },
+    "ios": {
+      "components": {
+        "ReactNativeView": {
+          "className": "ReactNativeView"
+        }
+      }
+    }
+  },
+  "create-react-native-library": {
+    "type": "fabric-view",
+    "languages": "kotlin-objc",
+    "tools": [],
+    "version": "0.63.1"
+  }
+}

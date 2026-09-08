@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature Request 💡
+    url: https://github.com/videojs/v10/react-native/discussions/new?category=ideas
+    about: If you have a feature request, please create a new discussion on GitHub.
+  - name: Discussions on GitHub 💬
+    url: https://github.com/videojs/v10/react-native/discussions
+    about: If this library works as promised but you need help, please ask questions there.
