@@ -1,9 +1,19 @@
 {
   "name": "@videojs/react-native",
-  "version": "0.1.0",
+  "type": "module",
+  "version": "10.0.0-beta.24",
+  "private": true,
   "description": "video.js for react-native",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/v10",
+    "directory": "packages/react-native"
+  },
   "main": "./lib/module/index.js",
+  "module": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "react-native-source": "./src/index.tsx",
@@ -32,9 +42,8 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-example",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
+    "build": "bob build",
+    "clean": "rimraf --glob lib types android/build ios/build '*.tsbuildinfo'",
     "typecheck": "tsc"
   },
   "keywords": [
@@ -42,27 +51,12 @@
     "ios",
     "android"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/videojs/v10/react-native.git"
-  },
-  "author": "Mux, Inc <support@mux.com> (https://github.com/videojs/v10)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/videojs/v10/react-native/issues"
-  },
-  "homepage": "https://github.com/videojs/v10/react-native#readme",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "devDependencies": {
     "@react-native/babel-preset": "0.86.2",
     "@types/react": "^19.2.0",
-    "del-cli": "^7.0.0",
     "react": "19.2.3",
     "react-native": "0.86.2",
     "react-native-builder-bob": "^0.43.0",
-    "turbo": "^2.10.8",
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
