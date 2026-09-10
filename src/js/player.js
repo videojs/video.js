@@ -1580,8 +1580,8 @@ class Player extends Component {
     let type = '';
 
     if (typeof src !== 'string') {
-      src = srcObj.src;
-      type = srcObj.type;
+      src = srcObj?.src ?? '';
+      type = srcObj?.type ?? '';
     }
 
     // make sure all the caches are set to default values
