@@ -9,14 +9,22 @@ Infer commit scope from changed file paths.
 | `packages/core/`         | `core`         |
 | `packages/store/`        | `store`        |
 | `packages/utils/`        | `utils`        |
+| `packages/element/`      | `element`      |
+| `packages/spf/`          | `spf`          |
 | `packages/html/`         | `html`         |
 | `packages/react/`        | `react`        |
 | `packages/react-native/` | `react-native` |
 | `packages/icons/`        | `icons`        |
+| `packages/skins/`        | `skin`         |
+| `packages/cli/`          | `cli`          |
+| `apps/sandbox/`          | `sandbox`      |
+| `apps/e2e/`              | `test`         |
+| `apps/react-native/`     | `react-native` |
 | `site/`                  | `site`         |
 | `rfc/`                   | `rfc`          |
 | `internal/design/`       | `design`       |
 | `.claude/`               | `claude`       |
+| `build/`                 | `build`        |
 | `.github/workflows/`     | `ci`           |
 | `.github/`               | `cd`           |
 | Root config files        | `root`         |
@@ -34,9 +42,9 @@ When changes span multiple packages:
 From `commitlint.config.js`:
 
 ```
-cd, ci, claude, core, design, docs, html, icons, packages,
-plan, react-native, react, rfc, root, site, store,
-test, utils
+build, cd, ci, claude, cli, core, design, docs, element,
+html, icons, packages, plan, react-native, react, rfc,
+root, sandbox, site, skin, spf, store, test, utils
 ```
 
 ## Examples
