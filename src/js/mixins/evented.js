@@ -318,19 +318,23 @@ const EventedMixin = {
 
     // Targeting another evented object.
     } else {
-      // TODO: This wrapper is incorrect! It should only
-      //       remove the wrapper for the event type that called it.
-      //       Instead all listeners are removed on the first trigger!
-      //       see https://github.com/videojs/video.js/issues/5962
-      const wrapper = (...largs) => {
-        this.off(target, type, wrapper);
-        listener.apply(null, largs);
+      const listenOnce = (typeName) => {
+        const wrapper = (...largs) => {
+          this.off(target, typeName, wrapper);
+          listener.apply(null, largs);
+        };
+
+        // Use the same function ID as the listener so we can remove it later
+        // it using the ID of the original listener.
+        wrapper.guid = listener.guid;
+        listen(target, 'one', typeName, wrapper);
       };
 
-      // Use the same function ID as the listener so we can remove it later
-      // it using the ID of the original listener.
-      wrapper.guid = listener.guid;
-      listen(target, 'one', type, wrapper);
+      if (Array.isArray(type)) {
+        type.forEach(listenOnce);
+      } else {
+        listenOnce(type);
+      }
     }
   },
 
