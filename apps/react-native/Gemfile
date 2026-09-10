@@ -1,15 +1,17 @@
 source 'https://rubygems.org'
 
-# You may use http://rbenv.org/ or https://rvm.io/ to install and use this version
-ruby ">= 2.6.10"
+# Ruby version is managed by mise — see mise.toml.
+ruby ">= 4.0.0"
 
-# Exclude problematic versions of cocoapods and activesupport that causes build failures.
-gem 'cocoapods', '>= 1.13', '!= 1.15.0', '!= 1.15.1'
+# Pinned to match mise.toml's `gem:cocoapods`. `react-native run-ios` runs pod
+# through `bundle exec` when this Gemfile exists, so a mismatch here means the
+# CLI and a direct `pod install` use different CocoaPods and fight over
+# Podfile.lock. The template's `xcodeproj < 1.26.0` / `concurrent-ruby < 1.3.4`
+# caps were removed because they hold CocoaPods down to 1.15.2.
+gem 'cocoapods', '1.17.0'
 gem 'activesupport', '>= 6.1.7.5', '!= 7.1.0'
-gem 'xcodeproj', '< 1.26.0'
-gem 'concurrent-ruby', '< 1.3.4'
 
-# Ruby 3.4.0 has removed some libraries from the standard library.
+# Ruby 3.4.0 removed some libraries from the standard library.
 gem 'bigdecimal'
 gem 'logger'
 gem 'benchmark'

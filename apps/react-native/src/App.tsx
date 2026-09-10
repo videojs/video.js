@@ -5,7 +5,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>@videojs/react-native</Text>
-      <ReactNativeView color="#32a852" style={styles.box} />
+      <ReactNativeView color="#02a8a2" style={styles.box} />
     </View>
   );
 }
