@@ -84,6 +84,9 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
+  "overrides": {
+    "underscore": "^1.13.8"
+  },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
     "@videojs/http-streaming": "^3.17.5",
