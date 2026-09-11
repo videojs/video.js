@@ -30,7 +30,7 @@
     "build:test": "npm-run-all build:test:*",
     "build:test:a11y": "shx cp sandbox/descriptions.html.example sandbox/descriptions.test-a11y.html",
     "build:test:browserify": "browserify test/require/browserify.js -o test/dist/browserify.js",
-    "build:test:webpack": "webpack --hide-modules test/require/webpack.js test/dist/webpack.js",
+    "build:test:webpack": "webpack --mode development --devtool false --stats errors-warnings --entry ./test/require/webpack.js --output-path ./test/dist --output-filename webpack.js",
     "copy": "npm-run-all copy:*",
     "copy:fonts": "shx cp -R node_modules/videojs-font/fonts dist/font",
     "copy:examples": "shx cp -R docs/examples dist/",
@@ -99,7 +99,7 @@
     "videojs-vtt.js": "0.15.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
+    "@babel/core": "^7.29.7",
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
     "@rollup/plugin-image": "^3.0.2",
@@ -132,7 +132,7 @@
     "not-prerelease": "^1.0.1",
     "npm-merge-driver-install": "^2.0.1",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.2.13",
+    "postcss": "^8.5.28",
     "postcss-cli": "^8.3.1",
     "qunit": "2.13.0",
     "remark-cli": "^6.0.1",
@@ -142,7 +142,7 @@
     "remark-toc": "^5.1.1",
     "remark-validate-links": "^8.0.2",
     "replace": "^1.2.1",
-    "rollup": "^2.2.0",
+    "rollup": "^2.80.0",
     "rollup-plugin-alias": "^1.5.2",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^9.3.4",
@@ -166,7 +166,8 @@
     "videojs-generate-karma-config": "^8.1.0",
     "videojs-languages": "^2.0.0",
     "videojs-standard": "^9.0.1",
-    "webpack": "^1.15.0"
+    "webpack": "^5.110.3",
+    "webpack-cli": "^5.1.4"
   },
   "vjsstandard": {
     "ignore": [
