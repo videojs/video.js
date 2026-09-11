@@ -13,7 +13,12 @@ const options = {
   ignore: [
     // Ignore warning about contrast of the "vjs-no-js" fallback link
     'WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.BgImage'
-  ]
+  ],
+  chromeLaunchConfig: {
+    // CI runners restrict unprivileged user namespaces, so Chromium's
+    // sandbox cannot start there. The page under test is a local fixture.
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  }
 };
 
 Promise.all(testFiles.map((file) => pa11y(`file://${file}`, options))).
