@@ -6,6 +6,7 @@ import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import {clamp} from '../../utils/num.js';
 import {IS_IOS, IS_ANDROID} from '../../utils/browser.js';
+import {LinearVolumeTransfer, LogarithmicVolumeTransfer} from '../../utils/volume-transfer.js';
 
 /** @import Player from '../../player' */
 
@@ -31,6 +32,7 @@ class VolumeBar extends Slider {
    */
   constructor(player, options) {
     super(player, options);
+    this.initVolumeTransfer_();
     this.on('slideractive', (e) => this.updateLastVolume_(e));
     this.on(player, 'volumechange', (e) => this.updateARIAAttributes(e));
     player.ready(() => this.updateARIAAttributes());
@@ -98,7 +100,11 @@ class VolumeBar extends Slider {
     }
 
     this.checkMuted();
-    this.player_.volume(this.calculateDistance(event));
+
+    const sliderPosition = this.calculateDistance(event);
+    const linearVolume = this.volumeTransfer_.sliderToVolume(sliderPosition);
+
+    this.player_.volume(linearVolume);
   }
 
   /**
@@ -120,7 +126,10 @@ class VolumeBar extends Slider {
     if (this.player_.muted()) {
       return 0;
     }
-    return this.player_.volume();
+
+    const linearVolume = this.player_.volume();
+
+    return this.volumeTransfer_.volumeToSlider(linearVolume);
   }
 
   /**
@@ -128,7 +137,14 @@ class VolumeBar extends Slider {
    */
   stepForward() {
     this.checkMuted();
-    this.player_.volume(this.player_.volume() + 0.1);
+
+    const currentSlider = this.getPercent();
+
+    const newSlider = Math.min(currentSlider + 0.1, 1);
+
+    const linearVolume = this.volumeTransfer_.sliderToVolume(newSlider);
+
+    this.player_.volume(linearVolume);
   }
 
   /**
@@ -136,7 +152,19 @@ class VolumeBar extends Slider {
    */
   stepBack() {
     this.checkMuted();
-    this.player_.volume(this.player_.volume() - 0.1);
+
+    const currentSlider = this.getPercent();
+
+    const newSlider = Math.max(currentSlider - 0.1, 0);
+
+    if (newSlider < 0.05) {
+      this.player_.volume(0);
+      return;
+    }
+
+    const linearVolume = this.volumeTransfer_.sliderToVolume(newSlider);
+
+    this.player_.volume(linearVolume);
   }
 
   /**
@@ -181,6 +209,20 @@ class VolumeBar extends Slider {
     });
   }
 
+  /**
+   * Initialize the volume transfer function
+   *
+   * @private
+   */
+  initVolumeTransfer_() {
+    if (this.player_.options_.logarithmicVolume) {
+      const dbRange = this.player_.options_.logarithmicVolumeRange;
+
+      this.volumeTransfer_ = new LogarithmicVolumeTransfer(dbRange);
+    } else {
+      this.volumeTransfer_ = new LinearVolumeTransfer();
+    }
+  }
 }
 
 /**
