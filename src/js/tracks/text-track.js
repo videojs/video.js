@@ -388,7 +388,7 @@ class TextTrack extends Track {
   /**
    * Add a cue to the internal list of cues.
    *
-   * @param {TextTrack~Cue} cue
+   * @param {TextTrack~Cue} originalCue
    *        The cue to add to our internal list
    */
   addCue(originalCue) {
