@@ -52,6 +52,10 @@ jobs:
         node-version: '${{steps.nvm.outputs.NVMRC}}'
         cache: npm
 
+    # Note: This can be deleted once node version is upgraded 
+    - name: set npm version
+      run: npm install -g npm@9.9.4
+
     # turn off the default setup-node problem watchers...
     - run: echo "::remove-matcher owner=eslint-compact::"
     - run: echo "::remove-matcher owner=eslint-stylish::"

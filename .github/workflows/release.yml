@@ -30,12 +30,16 @@ jobs:
         id: nvm
 
       - name: setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '${{steps.nvm.outputs.NVMRC}}'
           cache: npm
           # this line is required for the setup-node action to be able to run the npm publish below.
           registry-url: 'https://registry.npmjs.org'
+
+      # Note: This can be deleted once node version is upgraded 
+      - name: set npm version
+        run: npm install -g npm@9.9.4
 
       - name: npm install
         run: npm i --prefer-offline --no-audit
