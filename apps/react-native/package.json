@@ -10,7 +10,8 @@
     "bundle:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output /dev/null",
     "bundle:ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output /dev/null",
     "typecheck": "tsc",
-    "clean": "rimraf --glob android/build android/app/build android/.cxx ios/Pods ios/build 'ios/*.xcworkspace' vendor"
+    "clean": "rimraf --glob android/build android/app/build android/.cxx ios/Pods ios/build 'ios/*.xcworkspace' vendor",
+    "postinstall": "node scripts/hoist-gradle-plugin.mjs"
   },
   "dependencies": {
     "@videojs/react-native": "workspace:*",
