@@ -19,3 +19,10 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// The daemon JVM criteria in gradle/gradle-daemon-jvm.properties are generated
+// by `./gradlew updateDaemonJvm`. Pin the version only since this project installs JVMs via mise
+tasks.named("updateDaemonJvm") {
+    languageVersion = JavaLanguageVersion.of(17)
+    toolchainDownloadUrls = [:]
+}
