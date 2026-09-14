@@ -19,12 +19,14 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:8.7.2"
+    // AGP is deliberately not pinned here. This module is only ever built as a
+    // subproject of a host app, and a second AGP version on the classpath
+    // breaks Android Studio's per-module model ("Missing ExternalProject for :")
+    // even though the CLI build tolerates it.
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}"
   }
 }
-
 
 apply plugin: "com.android.library"
 
