@@ -513,6 +513,87 @@ This is what makes the [LIFO surface registry](#persistent-background-session)
 fall out for free: multiple `<Video>` views sharing the session's `engineHandle`
 register on the stack, and native renders frames into the top one only.
 
+### Codegen surface
+
+The two artifacts above are RN codegen specs, so their TypeScript declarations
+*are* the native contract — every C++ / ObjC / Java binding is generated from
+them. Both live in `packages/react-native/src/`; codegen keys TurboModules off
+the `Native*` filename prefix and Fabric components off the `*NativeComponent`
+suffix, and the package's `codegenConfig.type` is already `all`, so both are
+picked up without config changes.
+
+**The surface** — props only, no view-commands, no events (control lives on the
+module, per
+[decisions.md § Dumb surface + single control TurboModule](decisions.md#dumb-surface--single-control-turbomodule-engine-by-handle)):
+
+```ts
+interface NativeProps extends ViewProps {
+  engineHandle: Int32;
+  resizeMode?: WithDefault<'contain' | 'cover' | 'fill', 'contain'>;
+  poster?: string;
+}
+
+export default codegenNativeComponent<NativeProps>('ReactNativeView');
+```
+
+**The control module** — the flat command set plus the single handle-tagged
+event channel, consumed only by the `Media` adapter:
+
+```ts
+export interface Spec extends TurboModule {
+  createEngine(): Int32;
+  destroyEngine(handle: Int32): void;
+
+  play(handle: Int32): void;
+  pause(handle: Int32): void;
+  seek(handle: Int32, time: Double): void;
+  setSource(handle: Int32, uri: string): void;
+  setVolume(handle: Int32, volume: Double): void;
+  setRate(handle: Int32, rate: Double): void;
+  setLoop(handle: Int32, loop: boolean): void;
+
+  readonly onEngineEvent: EventEmitter<EngineEvent>;
+}
+```
+
+`EventEmitter<T>` is codegen's first-class module event channel (RN 0.76+),
+which is what makes "one event channel, tagged by handle" a declared part of the
+spec rather than a side-channel `NativeEventEmitter`.
+
+#### Codegen constraints that shape the design
+
+Three limits are load-bearing — each one forces a design consequence, not just
+an implementation workaround. All three were verified against the RN 0.86.2
+codegen in this repo (`@react-native/codegen` parser + native generators).
+
+- **The event payload must be one flat object, not a discriminated union.**
+  `EventEmitter<TimeUpdate | Ended>` *parses* — the schema emits a
+  `UnionTypeAnnotation` over type aliases — but the native generators then fail
+  with `Unsupported union member types`. A single `Readonly<{ handle: Int32;
+  type: string; ...optional fields }>` generates cleanly for iOS, Android, and
+  C++. **Consequence:** the demux the adapter performs is a hand-written JS
+  narrowing layer over a lowest-common-denominator payload, and it is *not*
+  typechecked against what native can actually emit. That seam needs its own
+  guard — see [Open questions](#open-questions).
+
+- **Handles cannot be branded in the spec.** `Int32 & { __brand: 'EngineHandle' }`
+  fails at parse: codegen flattens intersections into object types, so a branded
+  primitive is read as an object and rejected. **Consequence:** the spec says
+  `Int32`, and the opaque `EngineHandle` type lives in the adapter-facing types
+  with a cast at the module boundary. Nothing at the codegen layer stops an
+  `engineHandle` and a React tag being transposed; the branding has to be
+  enforced entirely in the JS layer above.
+
+- **`createEngine()` is synchronous, so it returns on the JS thread.** Handle
+  allocation is cheap and safe there, but engine construction
+  (`AVQueuePlayer` / `ExoPlayer`) is not. **Consequence:** the handle is
+  *valid-before-ready*, and commands arriving between `createEngine()` and
+  engine readiness must queue natively rather than no-op — otherwise a provider
+  that does `createEngine()` → `attach()` → `play()` in one tick races
+  construction. Queue mechanics are an implementation concern for the plan; the
+  contract-level commitment is that no command issued against a valid handle is
+  silently dropped.
+
 ## Native integration (app setup)
 
 Integration cost scales with what you use. **Foreground-only players need
@@ -890,6 +971,15 @@ Detailed mapping is deferred until the UI component layer is scoped.
   a non-DOM volume probe; verify against an in-memory `Media` host). The one
   genuine unknown is `media.md`'s `draft` status — the contract surface could
   shift before this work lands.
+- **Keeping the adapter's event demux honest.** The
+  [flat event payload](#codegen-constraints-that-shape-the-design) codegen
+  forces means the adapter narrows `{ type: string, ...optionals }` into typed
+  store events with no compile-time link to what native emits — a `type` string
+  renamed natively fails silently as a dropped event, not a build error. Options:
+  a shared generated constant table, an exhaustiveness-checked union in the
+  adapter plus a native-side test asserting the emitted set matches, or a dev-only
+  warning on unrecognized `type`. Cheap to add; worth deciding before the event
+  set grows.
 - **Persistent session naming: "backgroundable" vs. capability-neutral.**
   `BackgroundablePlayer` was chosen to disambiguate from vjs's existing
   *ambient-video* "background" preset (`backgroundFeatures` /
