@@ -1,2 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Playback sources are remote by default; declared here so a host app
+       doesn't have to discover the requirement. -->
+  <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

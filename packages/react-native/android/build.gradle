@@ -2,7 +2,8 @@ buildscript {
   ext.ReactNative = [
     kotlinVersion: "2.0.21",
     minSdkVersion: 24,
-    compileSdkVersion: 36
+    compileSdkVersion: 36,
+    media3Version: "1.11.0"
   ]
 
   ext.getExtOrDefault = { prop ->
@@ -54,4 +55,11 @@ android {
 
 dependencies {
   implementation "com.facebook.react:react-android"
+
+  def media3Version = getExtOrDefault("media3Version")
+
+  implementation "androidx.media3:media3-exoplayer:${media3Version}"
+  // Pulled in for its side effect: DefaultMediaSourceFactory discovers the HLS
+  // source reflectively, so no engine code references this artifact.
+  implementation "androidx.media3:media3-exoplayer-hls:${media3Version}"
 }

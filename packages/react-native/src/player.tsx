@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import type { ViewProps } from 'react-native';
 
 import type { PlayerStatus } from './player-context';
@@ -14,9 +15,11 @@ interface PlayerRef {
   pause: () => void;
 }
 
-export function Player(_props: PlayerProps): never {
+// Mirrors the native component's `forwardRef` signature so the two files
+// present the same type — consumers typecheck against whichever resolves.
+export const Player = forwardRef<PlayerRef, PlayerProps>(function Player() {
   throw new Error("'@videojs/react-native' is only supported on native platforms.");
-}
+});
 
 export namespace Player {
   export type Props = PlayerProps;
