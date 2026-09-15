@@ -813,3 +813,173 @@ QUnit.module('SmartTV UI Updates (Progress Bar & Time Display)', function(hooks)
     userSeekSpy.restore();
   });
 });
+
+QUnit.module('ProgressControl mouseTimeDisplay hover CSS (#9224)');
+
+/**
+ * Walk same-origin stylesheets looking for a rule whose selector includes
+ * all of `needles` and whose declaration block sets `visibility: hidden`.
+ *
+ * @param {string[]} needles
+ *        Substrings that must all appear in the selector.
+ * @param {boolean} inHoverNoneMedia
+ *        If true, only consider rules inside `@media (hover: none)`.
+ * @param {string} [skipIfSelectorIncludes]
+ *        Ignore rules whose selector contains this substring.
+ * @return {boolean}
+ *         Whether a matching hide rule was found.
+ */
+function findMouseDisplayHideRule(needles, inHoverNoneMedia, skipIfSelectorIncludes) {
+  const sheets = window.document.styleSheets;
+
+  for (let i = 0; i < sheets.length; i++) {
+    let rules;
+
+    try {
+      rules = sheets[i].cssRules;
+    } catch (e) {
+      continue;
+    }
+
+    if (!rules) {
+      continue;
+    }
+
+    for (let j = 0; j < rules.length; j++) {
+      const rule = rules[j];
+
+      if (inHoverNoneMedia) {
+        if (rule.type !== window.CSSRule.MEDIA_RULE) {
+          continue;
+        }
+
+        const condition = rule.conditionText || rule.media && rule.media.mediaText || '';
+
+        if (!/\(\s*hover\s*:\s*none\s*\)/.test(condition)) {
+          continue;
+        }
+
+        const innerRules = rule.cssRules;
+
+        for (let k = 0; k < innerRules.length; k++) {
+          if (ruleMatchesNeedles(innerRules[k], needles, skipIfSelectorIncludes)) {
+            return true;
+          }
+        }
+      } else if (rule.type === window.CSSRule.STYLE_RULE &&
+        ruleMatchesNeedles(rule, needles, skipIfSelectorIncludes)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Whether a CSS rule hides mouse-display and matches the given selector needles.
+ *
+ * @param {CSSRule} rule
+ *        A CSS style rule to inspect.
+ * @param {string[]} needles
+ *        Substrings that must all appear in the selector.
+ * @param {string} [skipIfSelectorIncludes]
+ *        Ignore rules whose selector contains this substring.
+ * @return {boolean}
+ *         Whether this rule should count as a match.
+ */
+function ruleMatchesNeedles(rule, needles, skipIfSelectorIncludes) {
+  const selector = rule.selectorText || '';
+  const style = rule.style;
+
+  if (!style || style.getPropertyValue('visibility') !== 'hidden') {
+    return false;
+  }
+
+  if (skipIfSelectorIncludes && selector.indexOf(skipIfSelectorIncludes) !== -1) {
+    return false;
+  }
+
+  for (let i = 0; i < needles.length; i++) {
+    if (selector.indexOf(needles[i]) === -1) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Mount a progress-control probe in the QUnit fixture and return its mouse-display.
+ *
+ * @param {string} className
+ *        Class names to apply to the root `.video-js` element.
+ * @return {Element}
+ *         The `.vjs-mouse-display` element.
+ */
+function makeMouseDisplayProbe(className) {
+  const probe = document.createElement('div');
+
+  probe.className = className;
+  probe.innerHTML = '<div class="vjs-progress-control"><div class="vjs-mouse-display"></div></div>';
+  document.getElementById('qunit-fixture').appendChild(probe);
+
+  return probe.querySelector('.vjs-mouse-display');
+}
+
+QUnit.test('touch-enabled mouse-display hide is scoped to hover:none media', function(assert) {
+  assert.ok(
+    findMouseDisplayHideRule(['vjs-touch-enabled', 'vjs-mouse-display', 'vjs-scrubbing'], true),
+    'compiled CSS hides .vjs-mouse-display for vjs-touch-enabled inside @media (hover: none)'
+  );
+  assert.notOk(
+    findMouseDisplayHideRule(['vjs-touch-enabled', 'vjs-mouse-display', 'vjs-scrubbing'], false, 'vjs-workinghover'),
+    'compiled CSS does not unconditionally hide .vjs-mouse-display for all vjs-touch-enabled players'
+  );
+});
+
+QUnit.test('hover-capable touch devices do not force-hide mouse-display; scrubbing stays visible', function(assert) {
+  const canHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+  const hoverProbe = makeMouseDisplayProbe('video-js vjs-touch-enabled vjs-workinghover');
+  const hoverVis = TestHelpers.getComputedStyle(hoverProbe, 'visibility');
+
+  if (canHover) {
+    assert.notEqual(
+      hoverVis,
+      'hidden',
+      'mouse-display is not force-hidden on hover-capable + touch-capable hardware'
+    );
+  } else {
+    assert.equal(
+      hoverVis,
+      'hidden',
+      'mouse-display stays hidden on no-hover touch-capable hardware when not scrubbing'
+    );
+  }
+
+  const scrubProbe = makeMouseDisplayProbe('video-js vjs-touch-enabled vjs-workinghover vjs-scrubbing');
+
+  assert.notEqual(
+    TestHelpers.getComputedStyle(scrubProbe, 'visibility'),
+    'hidden',
+    'mouse-display is not force-hidden while scrubbing on touch-enabled players'
+  );
+});
+
+QUnit.test('iOS (no workinghover) still hides persistent mouse-display unless scrubbing', function(assert) {
+  const iosProbe = makeMouseDisplayProbe('video-js vjs-touch-enabled');
+
+  assert.equal(
+    TestHelpers.getComputedStyle(iosProbe, 'visibility'),
+    'hidden',
+    'mouse-display is hidden on touch-enabled players without vjs-workinghover'
+  );
+
+  const iosScrubProbe = makeMouseDisplayProbe('video-js vjs-touch-enabled vjs-scrubbing');
+
+  assert.notEqual(
+    TestHelpers.getComputedStyle(iosScrubProbe, 'visibility'),
+    'hidden',
+    'mouse-display is not force-hidden while scrubbing without vjs-workinghover'
+  );
+});
