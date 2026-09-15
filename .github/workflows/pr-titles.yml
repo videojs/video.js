@@ -15,8 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: read node version from .nvmrc
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+        shell: bash
+        id: nvm
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '${{steps.nvm.outputs.NVMRC}}'
       - run: npm i @actions/core @actions/github
       - run: node .github/actions/pr-titles.mjs

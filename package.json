@@ -84,6 +84,9 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  },
   "overrides": {
     "underscore": "^1.13.8"
   },
@@ -108,7 +111,7 @@
     "@rollup/plugin-image": "^3.0.2",
     "@rollup/plugin-replace": "^2.4.1",
     "@rollup/pluginutils": "^5.1.0",
-    "@types/node": "^18.8.3",
+    "@types/node": "^24.13.4",
     "autoprefixer": "^10.2.5",
     "bestzip": "^2.2.0",
     "browserify": "^16.2.3",
