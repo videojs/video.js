@@ -1,3 +1,10 @@
+<a name="8.24.1"></a>
+## [8.24.1](https://github.com/videojs/video.js/compare/v8.24.0...v8.24.1) (2026-09-10)
+
+### Chores
+
+* **package:** update [@xmldom](https://github.com/xmldom)/xmldom to 0.8.15 ([#9230](https://github.com/videojs/video.js/issues/9230)) ([70f498b](https://github.com/videojs/video.js/commit/70f498b))
+
 <a name="8.24.0"></a>
 # [8.24.0](https://github.com/videojs/video.js/compare/v8.23.9...v8.24.0) (2026-08-03)
 
