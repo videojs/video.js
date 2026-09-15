@@ -2,6 +2,7 @@ import { Player, type PlayerStatus } from '@videojs/react-native';
 import { useRef, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
+// biome-ignore lint/correctness/noUnusedVariables: kept alongside SOURCE_VOD to swap between while testing
 const SOURCE_LIVE = 'https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8';
 
 // warning - this asset's encoding doesn't work well in android emulator, but that's just an emulator quirk. It works fine on a real device.

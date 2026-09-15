@@ -93,6 +93,9 @@
       "components": {
         "ReactNativeView": {
           "className": "ReactNativeView"
+        },
+        "VideoJSPlayerView": {
+          "className": "VideoJSPlayerView"
         }
       }
     }
