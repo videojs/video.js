@@ -11,7 +11,7 @@ import {
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 
 import type { RemotionAdapterProps, RemotionPlayerProps } from './props';
-import { isSameComposition, type RemotionSource, resolveChapterSpans } from './source';
+import { isSameSource, type RemotionSource, resolveChapterSpans } from './source';
 
 /**
  * A Video.js Media over Remotion's `<Player>` and its `PlayerRef`. It implements the capabilities a composition can
@@ -143,12 +143,21 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     if (source === this.#source) return;
 
     const previous = this.#source;
+    const previousDuration = this.duration;
 
     this.#source = source;
     this.#notifyPlayerProps();
 
-    // Editing input props is a live update of the same composition, not a new source.
-    if (previous && source && isSameComposition(previous, source)) return;
+    // Same `id`, so the mounted `<Player>` keeps playing and takes the rest as props. Nothing reloads, but the tracks
+    // and the duration it reports have to follow what the new object says.
+    if (previous && source && isSameSource(previous, source)) {
+      this.#syncChapters();
+      this.#syncSubtitles();
+
+      if (this.duration !== previousDuration) this.dispatchEvent(new Event('durationchange'));
+
+      return;
+    }
 
     this.dispatchEvent(new Event('sourcechange'));
     void this.load();
@@ -183,18 +192,27 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return type === 'video/remotion' ? ('probably' as const) : ('' as const);
   }
 
-  /** Re-announce the current source. The façade remounts `<Player>` when `source` changes, which re-attaches. */
+  /**
+   * Start the current source over. A new `id` remounts `<Player>` through the façade's key, which re-attaches; a direct
+   * call leaves the same one mounted, so take it back to a paused first frame rather than let it play on under a state
+   * that says otherwise.
+   */
   async load() {
     this.#resetPlaybackState();
-    this.dispatchEvent(new Event('emptied'));
 
-    if (!this.#source) {
-      this.#syncChapters();
-      this.#syncSubtitles();
-      return;
+    if (this.#player) {
+      this.#player.pause();
+      this.#player.seekTo(0);
     }
 
-    // Chapters are in place before `loadstart`, which is when the text-track feature re-reads the list.
+    // A `TextTrack` cannot be removed from its list and its label and language are fixed at creation, so the host that
+    // owns them is replaced instead. The store re-reads the list on `loadstart`.
+    this.#resetTextTracks();
+    this.dispatchEvent(new Event('emptied'));
+
+    if (!this.#source) return;
+
+    // Tracks are in place before `loadstart`, which is when the text-track feature re-reads the list.
     this.#syncChapters();
     this.#syncSubtitles();
     this.dispatchEvent(new Event('loadstart'));
@@ -231,6 +249,7 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#error = null;
     this.#swallowPause = 0;
     this.#swallowPlay = 0;
+    this.#seekTargetFrame = -1;
   }
 
   // ----------------------------------------
@@ -264,6 +283,10 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
   pause() {
     this.#swallowPause = 0;
+
+    // A play before the Player mounted only armed `autoplay`; pausing before it mounts has to disarm it again, or the
+    // façade still mounts with `autoPlay` and playback starts anyway.
+    this.#autoplay = false;
     this.#player?.pause();
   }
 
@@ -273,7 +296,9 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   set currentTime(value) {
     const frame = this.#timeToFrame(value);
     const snapped = this.#frameToTime(frame);
-    if (snapped === this.#currentTime && !this.#seeking) return;
+    // Already on that frame, or already on the way to it. Re-running would tell Remotion to seek where it is going
+    // anyway and leave a second pause/play pair owed, which the next real one would then be swallowed to repay.
+    if (this.#seeking ? frame === this.#seekTargetFrame : snapped === this.#currentTime) return;
 
     this.#seeking = true;
     // Like a media element, leaving the end clears `ended`.
@@ -423,6 +448,13 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return host?.addTextTrack?.(kind, label, language) ?? null;
   }
 
+  /** Drop the host so the next source builds its own tracks, with its own labels and languages. */
+  #resetTextTracks() {
+    this.#textTracksHost = null;
+    this.#chaptersTrack = null;
+    this.#subtitlesTrack = null;
+  }
+
   #syncSubtitles() {
     const subtitles = this.#source?.subtitles;
     // Created on first use, so a composition without captions leaves the captions menu empty.
@@ -451,8 +483,10 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
   #syncChapters() {
     const source = this.#source;
+    const spans = source ? resolveChapterSpans(source) : [];
+    // Created on first use, so a composition without scenes leaves no empty track behind in the list.
+    if (!spans.length && !this.#chaptersTrack) return;
 
-    // One track for the adapter's lifetime: a `TextTrack` cannot be removed from its list, so its cues are replaced.
     const track = (this.#chaptersTrack ??= this.#hostTextTrack('chapters', 'Scenes'));
     if (!track) return;
 
@@ -461,11 +495,7 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
     for (const cue of Array.from(track.cues ?? [])) track.removeCue(cue);
 
-    if (!source) return;
-
-    for (const span of resolveChapterSpans(source)) {
-      track.addCue(new VTTCue(span.startTime, span.endTime, span.title));
-    }
+    for (const span of spans) track.addCue(new VTTCue(span.startTime, span.endTime, span.title));
   }
 
   get error() {

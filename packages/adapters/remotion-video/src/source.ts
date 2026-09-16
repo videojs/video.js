@@ -46,25 +46,20 @@ export interface RemotionSubtitles {
 export interface RemotionChapter {
   title: string;
   from: number;
-  /** Defaults to the span up to the next chapter, or the end of the composition. */
+  /** Defaults to the span up to the next chapter, or the end of the composition. `0` is a zero-length span. */
   durationInFrames?: number;
 }
 
 /**
- * True when two sources differ only in `inputProps`, which Remotion's `<Player>` takes live without a reload. Editing
- * parameters is then a live update of the same composition rather than a new source.
+ * Whether two sources name the same thing to play. `id` alone decides: it is what `src` reports, what the React façade
+ * keys `<Player>` on, and the only part of a source the player can act on when it changes. Everything else — the
+ * composition, its timing, chapters, captions — reaches a mounted `<Player>` as props, so it updates in place.
+ *
+ * Comparing more than `id` would also make an inline `chapters` or `subtitles` array, rebuilt on every parent render,
+ * read as a new source and reset playback.
  */
-export function isSameComposition(a: RemotionSource, b: RemotionSource) {
-  return (
-    a.id === b.id &&
-    a.composition.component === b.composition.component &&
-    a.composition.durationInFrames === b.composition.durationInFrames &&
-    a.composition.fps === b.composition.fps &&
-    a.composition.compositionWidth === b.composition.compositionWidth &&
-    a.composition.compositionHeight === b.composition.compositionHeight &&
-    a.chapters === b.chapters &&
-    a.subtitles === b.subtitles
-  );
+export function isSameSource(a: RemotionSource, b: RemotionSource) {
+  return a.id === b.id;
 }
 
 /** One chapter resolved to the time span it covers, in seconds. */
@@ -83,9 +78,10 @@ export function resolveChapterSpans(source: RemotionSource): RemotionChapterSpan
   const chapters = [...(source.chapters ?? [])].sort((a, b) => a.from - b.from);
 
   return chapters.map((chapter, index) => {
-    const endFrame = chapter.durationInFrames
-      ? chapter.from + chapter.durationInFrames
-      : (chapters[index + 1]?.from ?? durationInFrames);
+    const endFrame =
+      chapter.durationInFrames === undefined
+        ? (chapters[index + 1]?.from ?? durationInFrames)
+        : chapter.from + chapter.durationInFrames;
 
     return { title: chapter.title, startTime: chapter.from / fps, endTime: endFrame / fps };
   });

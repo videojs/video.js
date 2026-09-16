@@ -132,7 +132,7 @@ describe('RemotionAdapter', () => {
       expect(media.source?.composition.inputProps).toEqual({ name: 'Ada' });
     });
 
-    it('treats a different composition as a new source', () => {
+    it('treats a different id as a new source', () => {
       media.source = createSource();
 
       const seen = recordEvents(media, ['sourcechange', 'emptied', 'loadstart']);
@@ -140,6 +140,30 @@ describe('RemotionAdapter', () => {
       media.source = createSource({ id: 'outro', composition: { durationInFrames: 60 } });
 
       expect(seen).toEqual(['sourcechange', 'emptied', 'loadstart']);
+    });
+
+    it('keeps the same source when only the composition changes, and re-reports the duration', () => {
+      media.source = createSource();
+
+      const seen = recordEvents(media, ['sourcechange', 'emptied', 'durationchange']);
+
+      media.source = createSource({ composition: { durationInFrames: 60 } });
+
+      // `id` names the source, so a mounted Player keeps playing and takes the rest as props.
+      expect(seen).toEqual(['durationchange']);
+      expect(media.duration).toBe(2);
+    });
+
+    it('does not reload when an equal chapters array is rebuilt, as an inline one is on every render', () => {
+      const chapters = () => [{ title: 'Intro', from: 0 }];
+
+      media.source = createSource({ chapters: chapters() });
+
+      const seen = recordEvents(media, ['sourcechange', 'emptied']);
+
+      media.source = createSource({ chapters: chapters() });
+
+      expect(seen).toEqual([]);
     });
 
     it('only claims its own content type', () => {
@@ -235,6 +259,21 @@ describe('RemotionAdapter', () => {
       expect(media.paused).toBe(false);
     });
 
+    it('ignores a repeat seek to the frame already in flight', () => {
+      player.play();
+      media.currentTime = 1;
+      media.currentTime = 1;
+
+      const seen = recordEvents(media, ['pause', 'play']);
+
+      // One seek, so one pause/play pair is owed. A second debt would eat this real pause.
+      player.emit('pause');
+      player.emit('play');
+      player.emit('pause');
+
+      expect(seen).toEqual(['pause']);
+    });
+
     it('does not swallow a deliberate play', () => {
       player.play();
       media.currentTime = 1;
@@ -244,6 +283,39 @@ describe('RemotionAdapter', () => {
       void media.play();
 
       expect(seen).toEqual(['play']);
+    });
+  });
+
+  describe('autoplay', () => {
+    it('arms autoplay when play lands before a Player mounts', () => {
+      media.source = createSource();
+      void media.play();
+
+      expect(media.autoplay).toBe(true);
+    });
+
+    it('disarms it again when pause lands before a Player mounts', () => {
+      media.source = createSource();
+      void media.play();
+      media.pause();
+
+      expect(media.autoplay).toBe(false);
+    });
+  });
+
+  describe('load', () => {
+    it('takes an attached Player back to a paused first frame', () => {
+      media.source = createSource();
+      media.attach(player.asRef());
+      player.play();
+      player.frame = 90;
+
+      void media.load();
+
+      expect(player.pause).toHaveBeenCalled();
+      expect(player.seekTo).toHaveBeenCalledWith(0);
+      expect(media.currentTime).toBe(0);
+      expect(media.paused).toBe(true);
     });
   });
 
@@ -421,6 +493,19 @@ describe('resolveChapterSpans', () => {
     );
 
     expect(spans.map((span) => span.title)).toEqual(['Intro', 'Body']);
+  });
+
+  it('honors an explicit zero-length chapter rather than filling to the next', () => {
+    const spans = resolveChapterSpans(
+      createSource({
+        chapters: [
+          { title: 'Marker', from: 30, durationInFrames: 0 },
+          { title: 'Body', from: 60 },
+        ],
+      })
+    );
+
+    expect(spans[0]).toEqual({ title: 'Marker', startTime: 1, endTime: 1 });
   });
 
   it('is empty for a composition without chapters', () => {
