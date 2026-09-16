@@ -62,6 +62,12 @@ catalog:
   '@vitest/browser-playwright': 5.0.3
   '@vitest/coverage-v8': 5.0.3
   '@vitest/ui': 5.0.3
+  # Remotion throws `Multiple versions of Remotion detected` when its packages
+  # disagree, and @remotion/player carries an exact `remotion` dependency of its
+  # own. Catalog them so every workspace package resolves the same version.
+  remotion: 4.0.522
+  '@remotion/player': 4.0.522
+  '@remotion/media': 4.0.522
 overrides:
   vite@*: 'catalog:'
   vitest@*: 'catalog:'

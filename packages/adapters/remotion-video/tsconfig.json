@@ -1,0 +1,13 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "declarationDir": "types",
+    "useDefineForClassFields": false
+  },
+  "references": [{ "path": "../../media" }, { "path": "../../media/src/dom" }, { "path": "../../utils" }],
+  "include": ["src"]
+}
