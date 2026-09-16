@@ -11,7 +11,7 @@ import {
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 
 import type { RemotionAdapterProps, RemotionPlayerProps } from './props';
-import { isSameSource, type RemotionSource, resolveChapterSpans } from './source';
+import { isSameChapters, isSameSource, isSameSubtitles, type RemotionSource, resolveChapterSpans } from './source';
 
 /**
  * A Video.js Media over Remotion's `<Player>` and its `PlayerRef`. It implements the capabilities a composition can
@@ -148,11 +148,25 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#source = source;
     this.#notifyPlayerProps();
 
-    // Same `id`, so the mounted `<Player>` keeps playing and takes the rest as props. Nothing reloads, but the tracks
-    // and the duration it reports have to follow what the new object says.
+    // Same `id`, so the mounted `<Player>` keeps playing and takes the rest as props. Nothing reloads, but what the
+    // adapter reports has to follow what the new object says.
     if (previous && source && isSameSource(previous, source)) {
-      this.#syncChapters();
-      this.#syncSubtitles();
+      // Only when the tracks really changed: rewriting cues walks the track's `mode`, which the store's text-track
+      // feature listens to, and an `inputProps` edit arrives on every keystroke.
+      if (!isSameChapters(previous.chapters, source.chapters)) this.#syncChapters();
+
+      if (!isSameSubtitles(previous.subtitles, source.subtitles)) this.#syncSubtitles();
+
+      // `currentTime` is seconds derived from a frame, so a new `fps` remaps it and a shorter composition can leave it
+      // past the end. Re-read the frame the Player is actually on rather than wait for the next `frameupdate`.
+      if (this.#player) {
+        const currentTime = this.#frameToTime(this.#player.getCurrentFrame());
+
+        if (currentTime !== this.#currentTime) {
+          this.#currentTime = currentTime;
+          this.dispatchEvent(new Event('timeupdate'));
+        }
+      }
 
       if (this.duration !== previousDuration) this.dispatchEvent(new Event('durationchange'));
 
@@ -463,16 +477,17 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     const track = (this.#subtitlesTrack ??= this.#hostTextTrack('subtitles', subtitles?.label, subtitles?.language));
     if (!track) return;
 
-    // Cues are only enumerable while the track is not disabled; restore the mode afterwards so the menu state holds.
+    // Cues are only enumerable while the track is not disabled, so a disabled one is lifted to `hidden` for the
+    // rewrite and put back. Any other mode is left alone: each write fires `change`, which the store reads.
     const mode = track.mode;
 
-    track.mode = 'hidden';
+    if (mode === 'disabled') track.mode = 'hidden';
 
     for (const cue of Array.from(track.cues ?? [])) track.removeCue(cue);
 
     for (const cue of subtitles?.cues ?? []) track.addCue(new VTTCue(cue.startMs / 1000, cue.endMs / 1000, cue.text));
 
-    track.mode = mode === 'showing' ? 'showing' : 'disabled';
+    if (track.mode !== mode) track.mode = mode;
   }
 
   get textTracks() {
@@ -491,7 +506,7 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     if (!track) return;
 
     // Cues are only readable while the track is not disabled.
-    track.mode = 'hidden';
+    if (track.mode !== 'hidden') track.mode = 'hidden';
 
     for (const cue of Array.from(track.cues ?? [])) track.removeCue(cue);
 
