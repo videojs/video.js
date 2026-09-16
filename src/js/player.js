@@ -1432,6 +1432,11 @@ class Player extends Component {
    * @private
    */
   removeTechControlsListeners_() {
+    // There is nothing to remove before a tech has been loaded.
+    if (!this.tech_) {
+      return;
+    }
+
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
     this.off(this.tech_, 'tap', this.boundHandleTechTap_);

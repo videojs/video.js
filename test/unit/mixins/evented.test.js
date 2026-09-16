@@ -136,6 +136,27 @@ QUnit.test('off() errors', function(assert) {
   });
 });
 
+QUnit.test('off() errors for a falsy target instead of removing every listener', function(assert) {
+  const a = this.targets.a = evented({});
+  const spy = sinon.spy();
+
+  a.on('x', spy);
+
+  // Three arguments always mean the first one is a target - the same rule
+  // `on()`, `one()`, and `any()` follow - so a falsy target is invalid.
+  [undefined, null, false, 0, ''].forEach(function(falsyTarget) {
+    assert.throws(
+      () => a.off(falsyTarget, 'x', () => {}),
+      errors.target('Object', 'off'),
+      'expected error'
+    );
+  });
+
+  a.trigger('x');
+
+  assert.strictEqual(spy.callCount, 1, 'the unrelated listener was not removed');
+});
+
 QUnit.test('on() can add a listener to one event type on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
