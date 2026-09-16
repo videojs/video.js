@@ -273,9 +273,10 @@ class TextTrackDisplay extends Component {
    * @listens Player#useractive
    * @listens Player#userinactive
    */
-  updateDisplay() {
+  updateDisplay(event) {
     const tracks = this.player_.textTracks();
     const allowMultipleShowingTracks = this.options_.allowMultipleShowingTracks;
+    const forceCueRecompute = event && event.type === 'playerresize';
 
     this.clearDisplay();
 
@@ -290,7 +291,7 @@ class TextTrackDisplay extends Component {
         }
         showingTracks.push(track);
       }
-      this.updateForTrack(showingTracks);
+      this.updateForTrack(showingTracks, forceCueRecompute);
       return;
     }
 
@@ -318,12 +319,12 @@ class TextTrackDisplay extends Component {
       if (this.getAttribute('aria-live') !== 'off') {
         this.setAttribute('aria-live', 'off');
       }
-      this.updateForTrack(captionsSubtitlesTrack);
+      this.updateForTrack(captionsSubtitlesTrack, forceCueRecompute);
     } else if (descriptionsTrack) {
       if (this.getAttribute('aria-live') !== 'assertive') {
         this.setAttribute('aria-live', 'assertive');
       }
-      this.updateForTrack(descriptionsTrack);
+      this.updateForTrack(descriptionsTrack, forceCueRecompute);
     }
 
     if (!(window.CSS !== undefined && window.CSS.supports('inset', '10px'))) {
@@ -485,7 +486,7 @@ class TextTrackDisplay extends Component {
    * @param {TextTrack|TextTrack[]} tracks
    *        Text track object or text track array to be added to the list.
    */
-  updateForTrack(tracks) {
+  updateForTrack(tracks, forceCueRecompute = false) {
     if (!Array.isArray(tracks)) {
       tracks = [tracks];
     }
@@ -503,7 +504,13 @@ class TextTrackDisplay extends Component {
       const track = tracks[i];
 
       for (let j = 0; j < track.activeCues.length; ++j) {
-        cues.push(track.activeCues[j]);
+        const cue = track.activeCues[j];
+
+        if (forceCueRecompute && cue) {
+          cue.hasBeenReset = true;
+        }
+
+        cues.push(cue);
       }
     }
 
