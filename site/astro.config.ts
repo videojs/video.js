@@ -196,10 +196,17 @@ export default defineConfig({
       // hydrateRoot) are exposed as ESM bindings to the @astrojs/react client
       // renderer. Excluding @videojs/react above shadows the include list the
       // React integration injects, so re-declare them here.
-      include: ['react-dom', 'react-dom/client'],
+      //
+      // remotion and @remotion/player are optimized together so they share one
+      // copy of remotion. A composition reads the frame from remotion's React
+      // context, which @remotion/player provides; discovered separately, the
+      // optimizer gives @remotion/player a private copy and the demo would hold
+      // two contexts. @videojs/react is excluded above, so the player arrives
+      // through an unoptimized module and cannot pull remotion in with it.
+      include: ['react-dom', 'react-dom/client', 'remotion', '@remotion/player'],
     },
     resolve: {
-      dedupe: ['react', 'react-dom'],
+      dedupe: ['react', 'react-dom', 'remotion'],
       alias: {
         '@': new URL('./src', import.meta.url).pathname,
       },
