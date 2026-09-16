@@ -176,6 +176,7 @@
     "react-compiler-runtime": "^1.0.0"
   },
   "devDependencies": {
+    "@remotion/player": "catalog:",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@videojs/cloudflare-video": "workspace:*",
@@ -190,6 +191,7 @@
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
+    "@videojs/remotion-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spf": "workspace:*",
@@ -205,6 +207,7 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
+    "@remotion/player": "^4.0.275",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
@@ -216,6 +219,7 @@
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
+    "@videojs/remotion-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
@@ -228,6 +232,9 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
+    "@remotion/player": {
+      "optional": true
+    },
     "@videojs/cloudflare-video": {
       "optional": true
     },
@@ -259,6 +266,9 @@
       "optional": true
     },
     "@videojs/playerjs-video": {
+      "optional": true
+    },
+    "@videojs/remotion-video": {
       "optional": true
     },
     "@videojs/shaka-video": {
