@@ -1465,6 +1465,9 @@ importers:
       '@nanostores/react':
         specifier: ^1.0.0
         version: 1.0.0(nanostores@1.1.1)(react@19.3.0)
+      '@remotion/player':
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2
@@ -1489,6 +1492,9 @@ importers:
       '@videojs/react':
         specifier: workspace:*
         version: link:../packages/react
+      '@videojs/remotion-video':
+        specifier: workspace:*
+        version: link:../packages/adapters/remotion-video
       astro:
         specifier: ^7.4.0
         version: 7.4.0(@netlify/blobs@11.1.4(supports-color@8.1.1))(@types/node@22.19.15)(@typescript/native-preview@7.0.0-dev.20260421.2)(@typescript/typescript6@6.0.0)(@volar/typescript@2.4.28(@typescript/typescript6@6.0.0))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(unrun@0.2.39)(yaml@2.9.0)
@@ -1531,6 +1537,9 @@ importers:
       reading-time:
         specifier: ^1.5.0
         version: 1.5.0
+      remotion:
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       satori:
         specifier: ^0.26.0
         version: 0.26.0
