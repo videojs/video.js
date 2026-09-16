@@ -51,6 +51,9 @@
     "ios",
     "android"
   ],
+  "dependencies": {
+    "@videojs/core": "workspace:*"
+  },
   "devDependencies": {
     "@babel/runtime": "^7.25.0",
     "@react-native/babel-preset": "0.86.2",
