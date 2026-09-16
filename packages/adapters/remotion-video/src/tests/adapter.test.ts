@@ -2,7 +2,14 @@ import type { PlayerRef } from '@remotion/player';
 import { MediaReadyState } from '@videojs/media';
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { RemotionAdapter, type RemotionComposition, type RemotionSource, resolveChapterSpans } from '..';
+import {
+  isSameChapters,
+  isSameSubtitles,
+  RemotionAdapter,
+  type RemotionComposition,
+  type RemotionSource,
+  resolveChapterSpans,
+} from '..';
 
 type Listener = (data: { detail: unknown }) => void;
 
@@ -152,6 +159,24 @@ describe('RemotionAdapter', () => {
       // `id` names the source, so a mounted Player keeps playing and takes the rest as props.
       expect(seen).toEqual(['durationchange']);
       expect(media.duration).toBe(2);
+    });
+
+    it('re-reads the playhead when a live composition change remaps the frame rate', () => {
+      media.source = createSource();
+      media.attach(player.asRef());
+      player.frame = 60;
+      media.currentTime = 2;
+      player.emit('seeked', { frame: 60 });
+
+      expect(media.currentTime).toBe(2);
+
+      const seen = recordEvents(media, ['timeupdate', 'durationchange']);
+
+      // 60 frames at 60fps is 1s, not the 2s it was at 30fps.
+      media.source = createSource({ composition: { fps: 60 } });
+
+      expect(media.currentTime).toBe(1);
+      expect(seen).toEqual(['timeupdate', 'durationchange']);
     });
 
     it('does not reload when an equal chapters array is rebuilt, as an inline one is on every render', () => {
@@ -510,5 +535,37 @@ describe('resolveChapterSpans', () => {
 
   it('is empty for a composition without chapters', () => {
     expect(resolveChapterSpans(createSource())).toEqual([]);
+  });
+});
+
+// jsdom's `addTextTrack` is a no-op that never populates `textTracks`, so what the adapter does with a real track is
+// covered in the browser. These guard the decision it makes before touching one: rewriting cues walks the track's
+// `mode`, which the store's text-track feature listens to, so an `inputProps` keystroke must not reach it.
+describe('isSameChapters', () => {
+  it('accepts an equal list rebuilt inline', () => {
+    expect(isSameChapters([{ title: 'Intro', from: 0 }], [{ title: 'Intro', from: 0 }])).toBe(true);
+  });
+
+  it('treats absent and empty alike', () => {
+    expect(isSameChapters(undefined, [])).toBe(true);
+  });
+
+  it('rejects a changed title, frame, or length', () => {
+    expect(isSameChapters([{ title: 'Intro', from: 0 }], [{ title: 'Outro', from: 0 }])).toBe(false);
+    expect(isSameChapters([{ title: 'Intro', from: 0 }], [{ title: 'Intro', from: 30 }])).toBe(false);
+    expect(isSameChapters([{ title: 'Intro', from: 0 }], [])).toBe(false);
+  });
+});
+
+describe('isSameSubtitles', () => {
+  const subtitles = (text: string) => ({ label: 'English', language: 'en', cues: [{ text, startMs: 0, endMs: 1000 }] });
+
+  it('accepts an equal set rebuilt inline', () => {
+    expect(isSameSubtitles(subtitles('Hello'), subtitles('Hello'))).toBe(true);
+  });
+
+  it('rejects changed cue text, and one side being absent', () => {
+    expect(isSameSubtitles(subtitles('Hello'), subtitles('Goodbye'))).toBe(false);
+    expect(isSameSubtitles(subtitles('Hello'), undefined)).toBe(false);
   });
 });

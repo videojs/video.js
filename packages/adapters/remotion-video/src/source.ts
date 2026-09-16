@@ -86,3 +86,38 @@ export function resolveChapterSpans(source: RemotionSource): RemotionChapterSpan
     return { title: chapter.title, startTime: chapter.from / fps, endTime: endFrame / fps };
   });
 }
+
+/** Whether two chapter lists describe the same scenes, so an equal list rebuilt inline is not republished. */
+export function isSameChapters(a: RemotionSource['chapters'], b: RemotionSource['chapters']) {
+  if (a === b) return true;
+
+  if (!a || !b || a.length !== b.length) return !a?.length && !b?.length;
+
+  return a.every((chapter, index) => {
+    const other = b[index]!;
+
+    return (
+      chapter.title === other.title &&
+      chapter.from === other.from &&
+      chapter.durationInFrames === other.durationInFrames
+    );
+  });
+}
+
+/** Whether two caption sets describe the same track, so an equal one rebuilt inline is not republished. */
+export function isSameSubtitles(a: RemotionSubtitles | undefined, b: RemotionSubtitles | undefined) {
+  if (a === b) return true;
+
+  if (!a || !b) return false;
+
+  return (
+    a.label === b.label &&
+    a.language === b.language &&
+    a.cues.length === b.cues.length &&
+    a.cues.every((cue, index) => {
+      const other = b.cues[index]!;
+
+      return cue.text === other.text && cue.startMs === other.startMs && cue.endMs === other.endMs;
+    })
+  );
+}
