@@ -22,4 +22,4 @@ export interface Spec extends TurboModule {
 
 // `get` rather than `getEnforcing` so importing the package doesn't throw
 // before the native module is registered — callers surface a clearer error.
-export default TurboModuleRegistry.get<Spec>('VideoJSPlayerStore');
+export default TurboModuleRegistry.get<Spec>('VideoJSEngineStore');

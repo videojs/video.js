@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// A window onto an engine owned by `VideoJSPlayerStore`. Holds no playback
+/// A window onto an engine owned by `VideoJSEngineStore`. Holds no playback
 /// state and issues no commands — it registers its layer with the engine for
 /// the handle it is given and renders whatever that engine plays.
 @interface VideoJSPlayerView : RCTViewComponentView

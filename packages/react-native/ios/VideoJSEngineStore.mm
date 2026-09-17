@@ -1,10 +1,10 @@
-#import "VideoJSPlayerStore.h"
+#import "VideoJSEngineStore.h"
 
 #import "VideoJSPlayerRegistry.h"
 
-@implementation VideoJSPlayerStore
+@implementation VideoJSEngineStore
 
-RCT_EXPORT_MODULE(VideoJSPlayerStore)
+RCT_EXPORT_MODULE(VideoJSEngineStore)
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -73,7 +73,7 @@ RCT_EXPORT_MODULE(VideoJSPlayerStore)
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
 {
-  return std::make_shared<facebook::react::NativePlayerStoreSpecJSI>(params);
+  return std::make_shared<facebook::react::NativeEngineStoreSpecJSI>(params);
 }
 
 @end

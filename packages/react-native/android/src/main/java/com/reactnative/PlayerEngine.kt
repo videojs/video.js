@@ -6,7 +6,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 
-/** Mirrors `PlayerEvent['type']` in `src/NativePlayerStore.ts`. */
+/** Mirrors `PlayerEvent['type']` in `src/NativeEngineStore.ts`. */
 internal enum class PlayerEventType(val jsName: String) {
   PLAYING("playing"),
   PAUSED("paused"),

@@ -5,7 +5,7 @@ import android.view.SurfaceView
 import android.widget.FrameLayout
 
 /**
- * A window onto an engine owned by [VideoJSPlayerStoreModule]. Holds no
+ * A window onto an engine owned by [VideoJSEngineStoreModule]. Holds no
  * playback state and issues no commands — it registers its surface with the
  * engine for the handle it is given and renders whatever that engine plays.
  */

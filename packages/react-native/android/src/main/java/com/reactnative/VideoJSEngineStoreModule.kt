@@ -9,11 +9,11 @@ import com.facebook.react.module.annotations.ReactModule
  * channel tagged by handle that the JS adapter demuxes. Deliberately
  * view-independent so a player stays controllable with no surface mounted.
  */
-@ReactModule(name = VideoJSPlayerStoreModule.NAME)
-class VideoJSPlayerStoreModule internal constructor(
+@ReactModule(name = VideoJSEngineStoreModule.NAME)
+class VideoJSEngineStoreModule internal constructor(
   reactContext: ReactApplicationContext,
   private val registry: PlayerRegistry,
-) : NativePlayerStoreSpec(reactContext) {
+) : NativeEngineStoreSpec(reactContext) {
   init {
     registry.onEvent = ::emitPlayerEvent
   }
@@ -53,6 +53,6 @@ class VideoJSPlayerStoreModule internal constructor(
   }
 
   companion object {
-    const val NAME = "VideoJSPlayerStore"
+    const val NAME = "VideoJSEngineStore"
   }
 }

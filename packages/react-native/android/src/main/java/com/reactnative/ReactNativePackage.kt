@@ -18,16 +18,16 @@ class ReactNativeViewPackage : BaseReactPackage() {
 
   override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? =
     when (name) {
-      VideoJSPlayerStoreModule.NAME -> VideoJSPlayerStoreModule(reactContext, playerRegistry)
+      VideoJSEngineStoreModule.NAME -> VideoJSEngineStoreModule(reactContext, playerRegistry)
       else -> null
     }
 
   override fun getReactModuleInfoProvider() = ReactModuleInfoProvider {
     mapOf(
-      VideoJSPlayerStoreModule.NAME to
+      VideoJSEngineStoreModule.NAME to
         ReactModuleInfo(
-          VideoJSPlayerStoreModule.NAME,
-          VideoJSPlayerStoreModule.NAME,
+          VideoJSEngineStoreModule.NAME,
+          VideoJSEngineStoreModule.NAME,
           /* canOverrideExistingModule = */ false,
           /* needsEagerInit = */ false,
           /* isCxxModule = */ false,

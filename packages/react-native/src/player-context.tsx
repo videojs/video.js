@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import NativePlayerStore, { type PlayerEvent, type Spec } from './NativePlayerStore';
+import NativeEngineStore, { type PlayerEvent, type Spec } from './NativeEngineStore';
 
 export type PlayerStatus = PlayerEvent['type'];
 
@@ -13,11 +13,11 @@ interface PlayerContextValue {
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 function requireStore(): Spec {
-  const store = NativePlayerStore;
+  const store = NativeEngineStore;
 
   if (store === null || store === undefined) {
     throw new Error(
-      "@videojs/react-native: the 'VideoJSPlayerStore' native module is not registered. Rebuild the native app after adding the package."
+      "@videojs/react-native: the 'VideoJSEngineStore' native module is not registered. Rebuild the native app after adding the package."
     );
   }
 
