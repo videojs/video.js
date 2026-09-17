@@ -109,6 +109,7 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#bindPlayerEvents(player);
 
     // Mirror what the mounted Player already holds; `initiallyMuted`/`initialVolume` only apply at mount.
+    this.#volume = player.getVolume();
     this.#muted = player.isMuted();
     this.#paused = !player.isPlaying();
     this.#currentTime = this.#frameToTime(player.getCurrentFrame());

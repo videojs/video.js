@@ -5,7 +5,6 @@ description: Video component that plays a Remotion composition through the Video
 
 import Demo from "@/components/docs/demos/Demo.astro";
 import DocsLink from "@/components/docs/DocsLink.astro";
-import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 
 {/* React demo */}
@@ -22,8 +21,6 @@ pnpm add @videojs/react @videojs/remotion-video remotion
 ```tsx
 import { RemotionVideo } from "@videojs/react/media/remotion-video";
 ```
-
-<FrameworkCase frameworks={["react"]}>
 
 `RemotionVideo` plays a [Remotion](https://www.remotion.dev) composition as the player's media. Remotion renders compositions with React, so this is the one media with no HTML counterpart.
 
@@ -119,5 +116,3 @@ source={{
     <BasicUsageDemoReact client:idle />
   </Demo>
 </StyleCase>
-
-</FrameworkCase>
