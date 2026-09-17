@@ -9,7 +9,7 @@ import TrackList from './track-list';
  * The current list of {@link TextTrack} for a media file.
  *
  * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist}
- * @extends TrackList
+ * @extends TrackList<TextTrack>
  */
 class TextTrackList extends TrackList {
 
