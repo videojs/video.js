@@ -17,11 +17,14 @@ extern NSString *VideoJSPlayerEventTypeJSName(VideoJSPlayerEventType type);
 /// the Fabric surface, which is already on the main queue.
 @interface VideoJSPlayerEngine : NSObject
 
-- (instancetype)initWithSource:(NSString *)source
+/// A nil source leaves the player idle until `setSource:` supplies one.
+- (instancetype)initWithSource:(nullable NSString *)source
                        onEvent:(void (^)(VideoJSPlayerEventType type))onEvent
     NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
+
+- (void)setSource:(NSString *)source;
 
 - (void)play;
 - (void)pause;

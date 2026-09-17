@@ -25,16 +25,19 @@ function requireStore(): Spec {
 }
 
 interface PlayerProviderProps {
-  source: string;
+  source?: string | undefined;
   onStatusChange?: ((status: PlayerStatus) => void) | undefined;
   children?: ReactNode | undefined;
 }
 
 /**
  * Owns the native player for its subtree: creates a handle on mount, destroys
- * it on unmount, and demuxes the shared event channel down to this handle.
- * The handle never leaves this module's consumers — see `Player` for the
- * public surface.
+ * it on unmount, and demuxes the shared event channel down to this handle. The
+ * handle survives a `source` change — the player is reused, not rebuilt, so the
+ * surface never unmounts and there is no black frame between sources. A player
+ * created without a source sits idle until one arrives. The
+ * handle never leaves this module's consumers — see `Player` for the public
+ * surface.
  */
 export function PlayerProvider({ source, onStatusChange, children }: PlayerProviderProps) {
   const [handle, setHandle] = useState<number | null>(null);
@@ -46,16 +49,33 @@ export function PlayerProvider({ source, onStatusChange, children }: PlayerProvi
     onStatusChangeRef.current = onStatusChange;
   }, [onStatusChange]);
 
+  // The source the native player currently holds. Seeded with the mount-time
+  // source because `createPlayer` applies it, so the first run of the effect
+  // below is a no-op rather than an immediate reload.
+  const appliedSource = useRef(source);
+
+  // Mount-only: a source change swaps the source on the existing player, so
+  // unmounting is the only thing that destroys one.
   useEffect(() => {
     const store = requireStore();
-    const created = store.createPlayer(source);
+    const created = store.createPlayer(appliedSource.current ?? null);
     setHandle(created);
 
     return () => {
       store.destroyPlayer(created);
       setHandle(null);
     };
-  }, [source]);
+  }, []);
+
+  // An undefined source leaves whatever the player already has alone — the
+  // spec has no clear operation, so an idle player stays idle and a loaded one
+  // keeps playing.
+  useEffect(() => {
+    if (handle === null || source === undefined || appliedSource.current === source) return;
+
+    appliedSource.current = source;
+    requireStore().setSource(handle, source);
+  }, [handle, source]);
 
   useEffect(() => {
     if (handle === null) return;

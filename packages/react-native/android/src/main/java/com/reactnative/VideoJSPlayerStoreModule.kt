@@ -18,11 +18,15 @@ class VideoJSPlayerStoreModule internal constructor(
     registry.onEvent = ::emitPlayerEvent
   }
 
-  override fun createPlayer(source: String): Double =
+  override fun createPlayer(source: String?): Double =
     registry.create(reactApplicationContext, source).toDouble()
 
   override fun destroyPlayer(handle: Double) {
     registry.destroy(handle.toInt())
+  }
+
+  override fun setSource(handle: Double, source: String) {
+    registry.command(handle.toInt()) { it.setSource(source) }
   }
 
   override fun play(handle: Double) {

@@ -27,7 +27,7 @@ RCT_EXPORT_MODULE(VideoJSPlayerStore)
   return self;
 }
 
-- (NSNumber *)createPlayer:(NSString *)source
+- (NSNumber *)createPlayer:(NSString * _Nullable)source
 {
   return @([VideoJSPlayerRegistry.sharedRegistry createPlayerWithSource:source]);
 }
@@ -35,6 +35,14 @@ RCT_EXPORT_MODULE(VideoJSPlayerStore)
 - (void)destroyPlayer:(NSInteger)handle
 {
   [VideoJSPlayerRegistry.sharedRegistry destroyPlayer:handle];
+}
+
+- (void)setSource:(NSInteger)handle source:(NSString *)source
+{
+  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+                                                block:^(VideoJSPlayerEngine *engine) {
+                                                  [engine setSource:source];
+                                                }];
 }
 
 - (void)play:(NSInteger)handle

@@ -25,7 +25,7 @@ internal class PlayerRegistry {
 
   var onEvent: ((handle: Int, type: PlayerEventType) -> Unit)? = null
 
-  fun create(context: Context, source: String): Int {
+  fun create(context: Context, source: String?): Int {
     val handle = nextHandle.getAndIncrement()
 
     onMain {

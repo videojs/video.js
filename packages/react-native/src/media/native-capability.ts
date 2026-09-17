@@ -4,8 +4,6 @@ import type {
   MediaEvents,
   MediaPauseCapability,
   MediaPauseEvents,
-  MediaPlaybackCapability,
-  MediaPlaybackEvents,
 } from '../../../core/dist/dev/core/media/types';
 
 // ----------------------------------------

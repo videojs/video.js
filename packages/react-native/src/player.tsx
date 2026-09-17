@@ -6,7 +6,7 @@ import type { PlayerStatus } from './player-context';
 export type { PlayerStatus };
 
 interface PlayerProps extends ViewProps {
-  source: string;
+  source?: string | undefined;
   onStatusChange?: ((status: PlayerStatus) => void) | undefined;
 }
 

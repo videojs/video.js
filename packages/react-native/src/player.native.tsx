@@ -7,7 +7,7 @@ import { PlayerSurface } from './player-surface';
 export type { PlayerStatus };
 
 interface PlayerProps extends ViewProps {
-  source: string;
+  source?: string | undefined;
   onStatusChange?: ((status: PlayerStatus) => void) | undefined;
 }
 

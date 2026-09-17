@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, nonatomic, readonly) VideoJSPlayerRegistry *sharedRegistry;
 
-- (NSInteger)createPlayerWithSource:(NSString *)source;
+- (NSInteger)createPlayerWithSource:(nullable NSString *)source;
 - (void)destroyPlayer:(NSInteger)handle;
 - (void)commandPlayer:(NSInteger)handle block:(void (^)(VideoJSPlayerEngine *engine))block;
 

@@ -33,19 +33,16 @@ static void *VideoJSPlayerTimeControlStatusContext = &VideoJSPlayerTimeControlSt
   VideoJSPlayerEventType _lastType;
 }
 
-- (instancetype)initWithSource:(NSString *)source onEvent:(void (^)(VideoJSPlayerEventType))onEvent
+- (instancetype)initWithSource:(nullable NSString *)source onEvent:(void (^)(VideoJSPlayerEventType))onEvent
 {
   if (self = [super init]) {
     _onEvent = [onEvent copy];
     _layers = [NSMutableArray new];
 
-    NSURL *url = [NSURL URLWithString:source];
-    AVPlayerItem *item = url == nil ? nil : [AVPlayerItem playerItemWithURL:url];
-
     // Always an AVQueuePlayer, even with looping off, so enabling loop later
     // never changes player identity — see decisions.md § iOS looping uses an
     // always-present AVQueuePlayer.
-    _player = item == nil ? [[AVQueuePlayer alloc] init] : [AVQueuePlayer queuePlayerWithItems:@[ item ]];
+    _player = [[AVQueuePlayer alloc] init];
 
     // The queue default advances past the finished item, leaving nothing to
     // render. Holding keeps the last frame up, matching ExoPlayer.
@@ -60,9 +57,35 @@ static void *VideoJSPlayerTimeControlStatusContext = &VideoJSPlayerTimeControlSt
                                           selector:@selector(handleItemDidPlayToEnd:)
                                               name:AVPlayerItemDidPlayToEndTimeNotification
                                             object:nil];
+
+    if (source != nil) {
+      [self setSource:source];
+    }
   }
 
   return self;
+}
+
+// AVQueuePlayer documents replaceCurrentItem: as unsupported, so the swap goes
+// through the queue. removeAllItems drops the rate, so a player that was
+// playing is restarted to match ExoPlayer's surviving `playWhenReady`.
+- (void)setSource:(NSString *)source
+{
+  NSURL *url = [NSURL URLWithString:source];
+  AVPlayerItem *item = url == nil ? nil : [AVPlayerItem playerItemWithURL:url];
+  BOOL wasPlaying = _player.timeControlStatus != AVPlayerTimeControlStatusPaused;
+
+  [_player removeAllItems];
+
+  if (item == nil) {
+    return;
+  }
+
+  [_player insertItem:item afterItem:nil];
+
+  if (wasPlaying) {
+    [_player play];
+  }
 }
 
 - (void)dealloc

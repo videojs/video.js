@@ -12,8 +12,9 @@ export type PlayerEvent = Readonly<{
 }>;
 
 export interface Spec extends TurboModule {
-  createPlayer(source: string): CodegenTypes.Int32;
+  createPlayer(source: string | null): CodegenTypes.Int32;
   destroyPlayer(handle: CodegenTypes.Int32): void;
+  setSource(handle: CodegenTypes.Int32, source: string): void;
   play(handle: CodegenTypes.Int32): void;
   pause(handle: CodegenTypes.Int32): void;
   readonly onPlayerEvent: CodegenTypes.EventEmitter<PlayerEvent>;

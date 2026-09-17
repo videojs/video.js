@@ -31,7 +31,7 @@
   return self;
 }
 
-- (NSInteger)createPlayerWithSource:(NSString *)source
+- (NSInteger)createPlayerWithSource:(nullable NSString *)source
 {
   // Allocated from 1, so the 0 the Fabric props default to is unambiguously
   // "no player".

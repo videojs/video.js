@@ -20,7 +20,7 @@ internal enum class PlayerEventType(val jsName: String) {
  */
 internal class PlayerEngine(
   context: Context,
-  source: String,
+  source: String?,
   private val onEvent: (PlayerEventType) -> Unit,
 ) {
   private val exo = ExoPlayer.Builder(context).build()
@@ -43,6 +43,15 @@ internal class PlayerEngine(
       }
     )
 
+    // A null source leaves the player idle until `setSource` supplies one.
+    if (source != null) setSource(source)
+  }
+
+  /**
+   * Swaps the source on the running player. `playWhenReady` survives the swap,
+   * so a player that was playing continues into the new source.
+   */
+  fun setSource(source: String) {
     exo.setMediaItem(MediaItem.fromUri(source))
     exo.prepare()
   }

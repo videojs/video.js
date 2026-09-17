@@ -2,7 +2,6 @@ import { Player, type PlayerStatus } from '@videojs/react-native';
 import { useRef, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
-// biome-ignore lint/correctness/noUnusedVariables: kept alongside SOURCE_VOD to swap between while testing
 const SOURCE_LIVE = 'https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8';
 
 // warning - this asset's encoding doesn't work well in android emulator, but that's just an emulator quirk. It works fine on a real device.
@@ -11,15 +10,21 @@ const SOURCE_VOD = 'https://stream.mux.com/u02xH9SB1ZZNNjPiQp4l6mhzBKJ101uExYx4L
 export default function App() {
   const player = useRef<Player.Ref>(null);
   const [status, setStatus] = useState<PlayerStatus | 'idle'>('idle');
+  const [source, setSource] = useState(SOURCE_VOD);
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>@videojs/react-native</Text>
-      <Player ref={player} source={SOURCE_VOD} onStatusChange={setStatus} style={styles.video} />
+      <Player ref={player} source={source} onStatusChange={setStatus} style={styles.video} />
       <Text>status: {status}</Text>
+      <Text>source: {source === SOURCE_VOD ? 'vod' : 'live'}</Text>
       <View style={styles.controls}>
         <Button title="Play" onPress={() => player.current?.play()} />
         <Button title="Pause" onPress={() => player.current?.pause()} />
+        <Button
+          title="Swap source"
+          onPress={() => setSource((current) => (current === SOURCE_VOD ? SOURCE_LIVE : SOURCE_VOD))}
+        />
       </View>
     </View>
   );
