@@ -91,10 +91,9 @@ export const RemotionVideo = forwardRef<HTMLDivElement, RemotionVideoProps>(func
           loop={playerProps.loop}
           playbackRate={playerProps.playbackRate}
           initiallyMuted={playerProps.initiallyMuted}
+          // Passing a volume at all is what keeps Remotion off its own localStorage preference; the store owns it.
           initialVolume={playerProps.initialVolume}
           autoPlay={media.autoplay}
-          // Keep Remotion's own volume persistence out of the picture; the store owns volume state.
-          volumePersistenceKey="__videojs-remotion-unused"
           acknowledgeRemotionLicense
         />
       ) : null}

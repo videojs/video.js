@@ -16,6 +16,7 @@ vi.mock('@remotion/player', () => ({
     useImperativeHandle(ref, () => ({
       isMuted: () => false,
       isPlaying: () => false,
+      getVolume: () => 1,
       getCurrentFrame: () => 0,
       addEventListener: () => {},
       removeEventListener: () => {},

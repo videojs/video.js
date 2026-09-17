@@ -205,11 +205,14 @@ describe('RemotionAdapter', () => {
 
       const seen = recordEvents(media, ['loadedmetadata', 'durationchange', 'loadeddata', 'canplay', 'canplaythrough']);
 
+      player.volume = 0.25;
+
       media.attach(player.asRef());
 
       expect(seen).toEqual(['loadedmetadata', 'durationchange', 'loadeddata', 'canplay', 'canplaythrough']);
       expect(media.readyState).toBe(MediaReadyState.HAVE_ENOUGH_DATA);
       expect(media.muted).toBe(true);
+      expect(media.volume).toBe(0.25);
       expect(media.currentTime).toBe(1);
     });
 
