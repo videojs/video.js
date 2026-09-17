@@ -609,31 +609,23 @@ QUnit.test('$() and $$()', function(assert) {
   );
 });
 
-QUnit.test('getBoundingClientRect() returns an object for elements that support it', function(assert) {
+QUnit.test('getBoundingClientRect() returns the native DOMRect for elements that support it', function(assert) {
+  const mockRect = {
+    bottom: 3,
+    height: 10,
+    left: 4,
+    right: 2,
+    top: 1,
+    width: 20
+  };
   const mockEl = {
-    getBoundingClientRect: sinon.spy(() => {
-      return {
-        bottom: 3,
-        height: 10,
-        left: 4,
-        right: 2,
-        top: 1,
-        width: 20
-      };
-    }),
+    getBoundingClientRect: sinon.spy(() => mockRect),
     parentNode: true
   };
 
   const actual = Dom.getBoundingClientRect(mockEl);
 
-  // The expected result is what is returned by the mock element.
-  const expected = mockEl.getBoundingClientRect.firstCall.returnValue;
-
-  assert.notStrictEqual(actual, expected, 'the object returned by the mock element was cloned and not returned directly');
-
-  Object.keys(expected).forEach(k => {
-    assert.strictEqual(actual[k], expected[k], `the "${k}" returned by the Dom util matches what was returned by the mock element`);
-  });
+  assert.strictEqual(actual, mockRect, 'returns the native DOMRect directly');
 });
 
 QUnit.test('isSingleLeftClick() returns false for mousemove event', function(assert) {
