@@ -52,7 +52,8 @@
     "android"
   ],
   "dependencies": {
-    "@videojs/core": "workspace:*"
+    "@videojs/core": "workspace:*",
+    "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
     "@babel/runtime": "^7.25.0",
