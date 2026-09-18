@@ -1,6 +1,6 @@
 import type { ViewProps } from 'react-native';
-import NativePlayerView from './PlayerViewNativeComponent';
-import { usePlayerContext } from './player-context';
+import NativePlayerView from '../PlayerViewNativeComponent';
+import { usePlayerContext } from '../player-context';
 
 /**
  * Renders nothing until the provider has a handle — the native view is a

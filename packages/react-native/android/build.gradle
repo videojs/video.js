@@ -1,5 +1,5 @@
 buildscript {
-  ext.ReactNative = [
+  ext.VideoJS = [
     kotlinVersion: "2.0.21",
     minSdkVersion: 24,
     compileSdkVersion: 36,
@@ -11,7 +11,7 @@ buildscript {
       return rootProject.ext.get(prop)
     }
 
-    return ReactNative[prop]
+    return VideoJS[prop]
   }
 
   repositories {

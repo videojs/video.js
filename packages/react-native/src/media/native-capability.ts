@@ -1,10 +1,4 @@
-import type {
-  EventLike,
-  Media,
-  MediaEvents,
-  MediaPauseCapability,
-  MediaPauseEvents,
-} from '../../../core/dist/dev/core/media/types';
+import type { EventLike, Media, MediaEvents, MediaPauseCapability, MediaPauseEvents } from '@videojs/core';
 
 // ----------------------------------------
 //  Native-App Media Capabilities

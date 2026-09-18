@@ -533,7 +533,7 @@ interface NativeProps extends ViewProps {
   poster?: string;
 }
 
-export default codegenNativeComponent<NativeProps>('ReactNativeView');
+export default codegenNativeComponent<NativeProps>('VideoJSPlayerView');
 ```
 
 **The control module** — the flat command set plus the single handle-tagged

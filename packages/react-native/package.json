@@ -86,7 +86,7 @@
     ]
   },
   "codegenConfig": {
-    "name": "ReactNativeViewSpec",
+    "name": "VideoJSSpec",
     "type": "all",
     "jsSrcsDir": "src",
     "android": {
@@ -94,9 +94,6 @@
     },
     "ios": {
       "components": {
-        "ReactNativeView": {
-          "className": "ReactNativeView"
-        },
         "VideoJSPlayerView": {
           "className": "VideoJSPlayerView"
         }

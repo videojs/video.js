@@ -7,13 +7,13 @@ import com.facebook.react.module.model.ReactModuleInfo
 import com.facebook.react.module.model.ReactModuleInfoProvider
 import com.facebook.react.uimanager.ViewManager
 
-class ReactNativeViewPackage : BaseReactPackage() {
+class VideoJSPackage : BaseReactPackage() {
   // One registry per package instance, shared by the control module and the
   // surface so the Fabric view can resolve a handle without going through JS.
   private val playerRegistry = PlayerRegistry()
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
-    return listOf(ReactNativeViewManager(), VideoJSPlayerViewManager(playerRegistry))
+    return listOf(VideoJSPlayerViewManager(playerRegistry))
   }
 
   override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? =

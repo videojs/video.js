@@ -1,8 +1,7 @@
 import { forwardRef, type Ref as ReactRef, useImperativeHandle } from 'react';
 import type { ViewProps } from 'react-native';
-
+import { PlayerSurface } from './element/player-surface';
 import { PlayerProvider, type PlayerStatus, usePlayerContext } from './player-context';
-import { PlayerSurface } from './player-surface';
 
 export type { PlayerStatus };
 

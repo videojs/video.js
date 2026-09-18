@@ -1,5 +1,5 @@
 #import <React/RCTBridgeModule.h>
-#import <ReactNativeViewSpec/ReactNativeViewSpec.h>
+#import <VideoJSSpec/VideoJSSpec.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

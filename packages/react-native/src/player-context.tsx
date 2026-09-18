@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import NativeEngineStore, { type PlayerEvent, type Spec } from './NativeEngineStore';
+import NativeEngineStore, { type PlayerEvent, type Spec } from './media/NativeEngineStore';
 
 export type PlayerStatus = PlayerEvent['type'];
 

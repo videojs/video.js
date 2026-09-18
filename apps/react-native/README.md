@@ -27,7 +27,7 @@ pnpm -F @videojs/react-native-example android
 ```
 
 `ios` and `android` run Fabric codegen as part of the native build, so changes
-to `packages/react-native/src/ReactNativeViewNativeComponent.ts` require a
+to `packages/react-native/src/PlayerViewNativeComponent.ts` require a
 native rebuild — Fast Refresh alone won't pick up new props.
 
 ## Monorepo wiring

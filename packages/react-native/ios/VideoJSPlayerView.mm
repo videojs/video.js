@@ -4,9 +4,9 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-#import <react/renderer/components/ReactNativeViewSpec/ComponentDescriptors.h>
-#import <react/renderer/components/ReactNativeViewSpec/Props.h>
-#import <react/renderer/components/ReactNativeViewSpec/RCTComponentViewHelpers.h>
+#import <react/renderer/components/VideoJSSpec/ComponentDescriptors.h>
+#import <react/renderer/components/VideoJSSpec/Props.h>
+#import <react/renderer/components/VideoJSSpec/RCTComponentViewHelpers.h>
 
 using namespace facebook::react;
 

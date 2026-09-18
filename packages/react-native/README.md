@@ -13,12 +13,12 @@ npm install react-native
 ## Usage
 
 
-```js
-import { ReactNativeView } from "react-native";
+```tsx
+import { Player } from "@videojs/react-native";
 
 // ...
 
-<ReactNativeView color="tomato" />
+<Player source="https://stream.mux.com/{PLAYBACK_ID}.m3u8" style={{ width: 320, height: 180 }} />
 ```
 
 
