@@ -175,6 +175,10 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     }
 
     this.dispatchEvent(new Event('sourcechange'));
+    // A new `id` remounts `<Player>`, and the one on its way out has nothing to say about a composition it never
+    // rendered. Let go of it now so `load()` neither rewinds it nor announces readiness on its behalf; the remount
+    // re-attaches and announces once.
+    this.detach();
     void this.load();
   }
 
@@ -208,9 +212,9 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   }
 
   /**
-   * Start the current source over. A new `id` remounts `<Player>` through the façade's key, which re-attaches; a direct
-   * call leaves the same one mounted, so take it back to a paused first frame rather than let it play on under a state
-   * that says otherwise.
+   * Start the current source over. A new `id` arrives here with no Player attached and leaves announcing to the remount
+   * the façade's key forces; a direct call leaves the same one mounted, so take it back to a paused first frame rather
+   * than let it play on under a state that says otherwise.
    */
   async load() {
     this.#resetPlaybackState();
@@ -302,6 +306,16 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     // A play before the Player mounted only armed `autoplay`; pausing before it mounts has to disarm it again, or the
     // façade still mounts with `autoPlay` and playback starts anyway.
     this.#autoplay = false;
+
+    // A seek from a playing state left Remotion paused with a resume pending, and one `play` owed here. Its `pause()`
+    // cancels that resume, but it is already paused so it emits nothing: the owed `play` never comes, and the pause is
+    // reported from here.
+    if (this.#swallowPlay > 0) {
+      this.#swallowPlay = 0;
+      this.#paused = true;
+      this.dispatchEvent(new Event('pause'));
+    }
+
     this.#player?.pause();
   }
 

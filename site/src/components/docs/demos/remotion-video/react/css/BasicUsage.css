@@ -1,11 +1,12 @@
 .remotion-video-container {
   position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
 }
 
 .remotion-video {
-  display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
 }
 
 .remotion-video-scene {

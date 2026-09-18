@@ -25,7 +25,10 @@ class MockPlayer {
     this.playing = true;
     this.emit('play');
   });
+  // Like Remotion, a pause while already paused emits nothing.
   pause = vi.fn(() => {
+    if (!this.playing) return;
+
     this.playing = false;
     this.emit('pause');
   });
@@ -147,6 +150,26 @@ describe('RemotionAdapter', () => {
       media.source = createSource({ id: 'outro', composition: { durationInFrames: 60 } });
 
       expect(seen).toEqual(['sourcechange', 'emptied', 'loadstart']);
+    });
+
+    it('lets go of the outgoing Player on a new id and leaves announcing to the remount', () => {
+      media.source = createSource();
+      media.attach(player.asRef());
+      player.play();
+
+      const seen = recordEvents(media, ['emptied', 'loadstart', 'canplay']);
+
+      media.source = createSource({ id: 'outro' });
+
+      // The façade remounts `<Player>` on the new id; the one on its way out is neither rewound nor spoken for.
+      expect(player.pause).not.toHaveBeenCalled();
+      expect(player.seekTo).not.toHaveBeenCalled();
+      expect(media.engine).toBeNull();
+      expect(seen).toEqual(['emptied', 'loadstart']);
+
+      media.attach(new MockPlayer().asRef());
+
+      expect(seen).toEqual(['emptied', 'loadstart', 'canplay']);
     });
 
     it('keeps the same source when only the composition changes, and re-reports the duration', () => {
@@ -285,6 +308,25 @@ describe('RemotionAdapter', () => {
 
       expect(seen).toEqual([]);
       expect(media.paused).toBe(false);
+    });
+
+    it('reports a pause that lands while Remotion still owes the resume from a seek', () => {
+      player.play();
+      media.currentTime = 1;
+      // Remotion paused for the seek; its resume waits on an effect that has not run yet.
+      player.pause();
+
+      const seen = recordEvents(media, ['pause', 'play']);
+
+      media.pause();
+
+      // Remotion's `pause()` cancels that resume and, already paused, emits nothing.
+      expect(media.paused).toBe(true);
+      expect(seen).toEqual(['pause']);
+
+      void media.play();
+
+      expect(seen).toEqual(['pause', 'play']);
     });
 
     it('ignores a repeat seek to the frame already in flight', () => {
