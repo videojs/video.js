@@ -13,8 +13,7 @@ const root = path.resolve(__dirname, '../..');
 const { packages: workspaces } = parse(fs.readFileSync(path.join(root, 'pnpm-workspace.yaml'), 'utf8'));
 
 /**
- * Metro configuration
- * https://reactnative.dev/docs/metro
+ * Metro configuration https://reactnative.dev/docs/metro
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */

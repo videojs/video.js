@@ -6,14 +6,14 @@ status: draft
 
 > **STUB** — opened to get buy-in on the RN player's public API surface. The
 > owned design (architecture, native construction, decisions) lives in
-> [`internal/design/react-native/`](../internal/design/react-native/index.md);
+> [`internal/design/react-native/`](../.agents/plans/react-native/index.md);
 > this RFC exists for the cross-package, user-facing contract that needs
 > alignment.
 
 ## Problem Statement
 
 The planned `@videojs/react-native` package needs a public API. The design doc
-commits to a [parity principle](../internal/design/react-native/index.md#guiding-principle-parity-with-the-react-player):
+commits to a [parity principle](../.agents/plans/react-native/index.md#guiding-principle-parity-with-the-react-player):
 the RN player should match `@videojs/react` as closely as the platform allows —
 same component names, prop names, hook signatures, layer split, and feature set.
 
@@ -75,7 +75,7 @@ the right cross-package tradeoff and to align on the divergence list.
 - **Playlists / source queue — cross-platform feature or RN-only?** v10 is
   single-source and the web deliberately left queues out of scope, but native
   players make a gapless queue trivial (see
-  [design § Future work: playlists](../internal/design/react-native/index.md#future-work-playlists--source-queue)).
+  [design § Future work: playlists](../.agents/plans/react-native/index.md#future-work-playlists--source-queue)).
   Adding it to RN gets *ahead* of web on feature set (not platform-forced
   divergence), so the question is whether `MediaQueueCapability` + a
   `playlistFeature` become the shared cross-platform concept (web adopting a
@@ -92,11 +92,11 @@ the right cross-package tradeoff and to align on the divergence list.
 
 ## See Also
 
-- [`internal/design/react-native/index.md`](../internal/design/react-native/index.md)
+- [`internal/design/react-native/index.md`](../.agents/plans/react-native/index.md)
   — owned design (architecture + API surface).
-- [`internal/design/react-native/decisions.md`](../internal/design/react-native/decisions.md)
+- [`internal/design/react-native/decisions.md`](../.agents/plans/react-native/decisions.md)
   — debated native-construction decisions.
 - [`.claude/plans/react-native/persistent-session.md`](../.claude/plans/react-native/persistent-session.md)
   — implementation plan for the persistent session.
-- [`rfc/player-api/`](./player-api/index.md) — the web player API RFC this aims
+- [`rfc/player-api/`](./player-api.md) — the web player API RFC this aims
   for parity with.

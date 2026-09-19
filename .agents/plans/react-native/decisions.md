@@ -10,15 +10,15 @@ Debated decisions for the [React Native player design](index.md).
 ## Media adapter implements the Media contract, not a fake HTMLMediaElement
 
 **Decision:** The RN media adapter wraps the native player ref and satisfies
-the DOM-free `Media` contract from [`media.md`](../media.md) — the capability
+the DOM-free `Media` contract from [`media/architecture.md`](../../../internal/design/media/architecture.md) — the capability
 interfaces plus `EventLike` / `EventTargetLike` — rather than impersonating
 `HTMLMediaElement`.
 
 **Context:** The store is generic over its `Target`, so the RN `media` target
 can be any shape. The contract is already built and adopted at the store
-boundary: [`core/media/types.ts`](../../../packages/core/src/core/media/types.ts)
+boundary: [`media/core/types.ts`](../../../packages/media/src/core/types.ts)
 defines `EventLike` / `EventTargetLike` and the capability interfaces,
-[`dom/media/predicate.ts`](../../../packages/core/src/dom/media/predicate.ts)
+[`media/core/predicate.ts`](../../../packages/media/src/core/predicate.ts)
 provides the guards, and `PlayerTarget.media` is typed as `Media` (not
 `HTMLMediaElement`), so features already narrow via predicates. The only
 remaining pressure toward an HTML-like shape is a few residual DOM-global leaks
@@ -35,7 +35,7 @@ in the shared features.
   to a native-shaped target idiomatically. Cleanest RN code, but duplicates
   feature logic across web and RN; every new feature is authored twice.
 - **Implement the `Media` contract (chosen)** — the contract already captures
-  exactly the subset features use, and [`media.md`](../media.md) explicitly
+  exactly the subset features use, and [`media/architecture.md`](../../../internal/design/media/architecture.md) explicitly
   names React Native as a motivating case for decoupling it from the DOM. The
   web's `HTMLMediaElement` satisfies the contract natively; RN satisfies it via
   the adapter; features generalize over the contract.
@@ -49,7 +49,7 @@ feature logic. The remaining work is bounded and enumerated — close the residu
 DOM-global leaks in the shared features (export `MediaReadyState` and swap the
 `HTMLMediaElement.HAVE_*` references in `playback.ts` / `source.ts`; RN variants
 for `volume` / `text-track` / `controls`), not fake an element. Residual risk:
-`media.md` is `status: draft`, so the contract surface could still shift — a thin
+`media/architecture.md` is `status: draft`, so the contract surface could still shift — a thin
 HTML-shaped adapter remains a fallback for individual adapter-shared features if
 a specific one can't yet run on the contract, but the committed direction is the
 contract.

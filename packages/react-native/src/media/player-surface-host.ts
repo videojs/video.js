@@ -1,43 +1,35 @@
-import type { EventLike, EventTargetLike } from '@videojs/core';
+import type { EventLike, EventTargetLike } from '@videojs/media';
 import { isUndefined } from '@videojs/utils/predicate';
 import type { HostInstance } from 'react-native';
 
 import type { NativeEvents } from './native-capability';
 
 /**
- * The Fabric view's host instance — what a ref on `PlayerViewNativeComponent`
- * hands back.
+ * The Fabric view's host instance — what a ref on `PlayerViewNativeComponent` hands back.
  *
- * Concrete on purpose: there is exactly one surface kind today. If a second
- * appears (system chrome, an audio-only no-op surface), introduce a
- * `PlayerSurfaceLike` interface and make the host generic over
- * `Target extends PlayerSurfaceLike`, mirroring how `HTMLMediaElementHost`
- * takes `Target extends HTMLMediaTargetLike`.
+ * Concrete on purpose: there is exactly one surface kind today. If a second appears (system chrome, an audio-only no-op
+ * surface), introduce a `PlayerSurfaceLike` interface and make the host generic over `Target extends
+ * PlayerSurfaceLike`, mirroring how `HTMLMediaElementHost` takes `Target extends HTMLMediaTargetLike`.
  */
 export type PlayerSurface = HostInstance;
 
 type Listener = (event: never) => void;
 
 /**
- * Base for react-native media adapters: an `EventTargetLike` emitter plus the
- * attach/detach/destroy lifecycle.
+ * Base for react-native media adapters: an `EventTargetLike` emitter plus the attach/detach/destroy lifecycle.
  *
- * Unlike `HTMLMediaElementHost`, this does not forward the media contract to
- * its target. An `HTMLMediaElement` *is* the playback engine and owns
- * `paused`/`currentTime`, so the web host can delegate reads to it. A Fabric
- * view owns no playback state — it renders frames for a handle — so subclasses
- * mirror state from the native event channel instead. Closest web analogue is
- * `VimeoMedia`, which mirrors for the same reason.
+ * Unlike `HTMLMediaElementHost`, this does not forward the media contract to its target. An `HTMLMediaElement` _is_ the
+ * playback engine and owns `paused`/`currentTime`, so the web host can delegate reads to it. A Fabric view owns no
+ * playback state — it renders frames for a handle — so subclasses mirror state from the native event channel instead.
+ * Closest web analogue is `VimeoMedia`, which mirrors for the same reason.
  *
- * The emitter is hand-rolled rather than `TypedEventTarget()` from core: that
- * returns the global `EventTarget`, whose `dispatchEvent` demands a real
- * `Event` instance, and `Event` is not available as a value under this
- * package's DOM-free `lib`. A plain map needs no globals and dispatches the
- * `EventLike` objects the contract actually specifies.
+ * The emitter is hand-rolled rather than `TypedEventTarget()` from core: that returns the global `EventTarget`, whose
+ * `dispatchEvent` demands a real `Event` instance, and `Event` is not available as a value under this package's
+ * DOM-free `lib`. A plain map needs no globals and dispatches the `EventLike` objects the contract actually specifies.
  */
-export class PlayerSurfaceHost<Events extends { [K in keyof Events]: EventLike } = NativeEvents>
-  implements EventTargetLike<Events>
-{
+export class PlayerSurfaceHost<
+  Events extends { [K in keyof Events]: EventLike } = NativeEvents,
+> implements EventTargetLike<Events> {
   #listeners = new Map<string, Set<Listener>>();
   #surface: PlayerSurface | null = null;
   #destroyed = false;
@@ -74,6 +66,7 @@ export class PlayerSurfaceHost<Events extends { [K in keyof Events]: EventLike }
     if (isUndefined(listeners)) return;
 
     listeners.delete(listener as Listener);
+
     if (listeners.size === 0) this.#listeners.delete(type);
   }
 
@@ -98,15 +91,14 @@ export class PlayerSurfaceHost<Events extends { [K in keyof Events]: EventLike }
   /**
    * Record the surface rendering this player.
    *
-   * Bookkeeping only today: native already binds surfaces itself when the
-   * Fabric view mounts with a `playerHandle` — Android keeps a LIFO
-   * `ArrayDeque<SurfaceView>` in `PlayerEngine`, iOS has
-   * `attachLayer`/`detachLayer`, and neither is exposed on the TurboModule.
-   * The seam exists for `MediaEngineHost` conformance, parity with the web
-   * hooks, and as the place any JS-side multi-surface policy would go.
+   * Bookkeeping only today: native already binds surfaces itself when the Fabric view mounts with a `playerHandle` —
+   * Android keeps a LIFO `ArrayDeque<SurfaceView>` in `PlayerEngine`, iOS has `attachLayer`/`detachLayer`, and neither
+   * is exposed on the TurboModule. The seam exists for `EngineAdapter` conformance, parity with the web hooks, and as
+   * the place any JS-side multi-surface policy would go.
    */
   attach(surface: PlayerSurface): void {
     if (this.#destroyed || this.#surface === surface) return;
+
     this.#surface = surface;
   }
 
@@ -116,6 +108,7 @@ export class PlayerSurfaceHost<Events extends { [K in keyof Events]: EventLike }
 
   destroy(): void {
     if (this.#destroyed) return;
+
     this.#destroyed = true;
     this.detach();
     this.#listeners.clear();

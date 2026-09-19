@@ -1,26 +1,18 @@
 {
   "name": "@videojs/react-native",
-  "type": "module",
-  "version": "10.0.0-beta.24",
+  "version": "10.0.0-rc.2",
   "private": true,
   "description": "video.js for react-native",
+  "keywords": [
+    "android",
+    "ios",
+    "react-native"
+  ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/videojs/v10",
     "directory": "packages/react-native"
-  },
-  "main": "./lib/module/index.js",
-  "module": "./lib/module/index.js",
-  "types": "./lib/typescript/src/index.d.ts",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "react-native-source": "./src/index.tsx",
-      "types": "./lib/typescript/src/index.d.ts",
-      "default": "./lib/module/index.js"
-    },
-    "./package.json": "./package.json"
   },
   "files": [
     "src",
@@ -41,18 +33,26 @@
     "!**/__mocks__",
     "!**/.*"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./lib/module/index.js",
+  "module": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "react-native-source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "bob build",
     "clean": "rimraf --glob lib types android/build ios/build '*.tsbuildinfo'",
     "typecheck": "tsc"
   },
-  "keywords": [
-    "react-native",
-    "ios",
-    "android"
-  ],
   "dependencies": {
-    "@videojs/core": "workspace:*",
+    "@videojs/media": "workspace:*",
     "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
@@ -67,24 +67,6 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
-  },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      [
-        "module",
-        {
-          "esm": true
-        }
-      ],
-      [
-        "typescript",
-        {
-          "project": "tsconfig.build.json"
-        }
-      ]
-    ]
   },
   "codegenConfig": {
     "name": "VideoJSSpec",
@@ -106,5 +88,24 @@
     "languages": "kotlin-objc",
     "tools": [],
     "version": "0.63.1"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true,
+          "configFile": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
   }
 }

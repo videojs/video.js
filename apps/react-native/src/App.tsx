@@ -10,8 +10,8 @@ const SOURCE_VOD = 'https://stream.mux.com/u02xH9SB1ZZNNjPiQp4l6mhzBKJ101uExYx4L
 /**
  * The original path: a Player that drives the TurboModule through React context.
  *
- * Intentionally kept but not rendered — swap it into `App` to compare the two
- * implementations. Both control paths are supported, neither is deprecated.
+ * Intentionally kept but not rendered — swap it into `App` to compare the two implementations. Both control paths are
+ * supported, neither is deprecated.
  */
 // biome-ignore lint/correctness/noUnusedVariables: kept as a switchable alternative to AdapterVideo
 function ContextPlayer() {
@@ -38,9 +38,8 @@ function ContextPlayer() {
 }
 
 /**
- * The adapter path: a Video backed by a ReactNativeMedia implementing the
- * `Media` contract. Status comes from contract events rather than a callback
- * prop, which is what lets the shared store features consume it later.
+ * The adapter path: a Video backed by a ReactNativeMedia implementing the `Media` contract. Status comes from contract
+ * events rather than a callback prop, which is what lets the shared store features consume it later.
  */
 function AdapterVideo() {
   const media = useRef<ReactNativeMedia>(null);

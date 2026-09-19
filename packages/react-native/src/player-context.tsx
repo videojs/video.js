@@ -20,13 +20,10 @@ interface PlayerProviderProps {
 }
 
 /**
- * Owns the native player for its subtree: creates a handle on mount, destroys
- * it on unmount, and demuxes the shared event channel down to this handle. The
- * handle survives a `source` change — the player is reused, not rebuilt, so the
- * surface never unmounts and there is no black frame between sources. A player
- * created without a source sits idle until one arrives. The
- * handle never leaves this module's consumers — see `Player` for the public
- * surface.
+ * Owns the native player for its subtree: creates a handle on mount, destroys it on unmount, and demuxes the shared
+ * event channel down to this handle. The handle survives a `source` change — the player is reused, not rebuilt, so the
+ * surface never unmounts and there is no black frame between sources. A player created without a source sits idle until
+ * one arrives. The handle never leaves this module's consumers — see `Player` for the public surface.
  */
 export function PlayerProvider({ source, onStatusChange, children }: PlayerProviderProps) {
   const [handle, setHandle] = useState<number | null>(null);
@@ -48,6 +45,7 @@ export function PlayerProvider({ source, onStatusChange, children }: PlayerProvi
   useEffect(() => {
     const store = requireStore();
     const created = store.createPlayer(appliedSource.current ?? null);
+
     setHandle(created);
 
     return () => {
@@ -71,6 +69,7 @@ export function PlayerProvider({ source, onStatusChange, children }: PlayerProvi
 
     const subscription = requireStore().onPlayerEvent((event) => {
       if (event.handle !== handle) return;
+
       onStatusChangeRef.current?.(event.type);
     });
 

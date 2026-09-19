@@ -1,9 +1,9 @@
-import type { MediaEngineHost } from '@videojs/core';
+import type { EngineAdapter } from '@videojs/media';
 import { isNull, isUndefined } from '@videojs/utils/predicate';
 
 import { requireEngineStore } from './engine-store';
-import type { PlayerEvent } from './NativeEngineStore';
 import type { NativeEvents, NativeMedia } from './native-capability';
+import type { PlayerEvent } from './NativeEngineStore';
 import { type PlayerSurface, PlayerSurfaceHost } from './player-surface-host';
 
 export interface ReactNativeMediaProps {
@@ -21,19 +21,17 @@ export interface NativePlaybackState {
 }
 
 /**
- * Compile-time proof that every `PlayerEvent['type']` is handled. Adding a
- * member to the native union without a matching case makes this call fail to
- * typecheck, so a new native event can't become a silently dropped one.
+ * Compile-time proof that every `PlayerEvent['type']` is handled. Adding a member to the native union without a
+ * matching case makes this call fail to typecheck, so a new native event can't become a silently dropped one.
  */
 function assertHandled(_type: never): void {}
 
 /**
- * Translate one native event into the mirrored state it implies and the
- * contract events to emit, given the state it arrived in.
+ * Translate one native event into the mirrored state it implies and the contract events to emit, given the state it
+ * arrived in.
  *
- * Split out from the class so the mapping is inspectable and testable on its
- * own. The `switch` is exhaustive over `PlayerEvent['type']`, so adding a
- * native event type without handling it here is a compile error rather than a
+ * Split out from the class so the mapping is inspectable and testable on its own. The `switch` is exhaustive over
+ * `PlayerEvent['type']`, so adding a native event type without handling it here is a compile error rather than a
  * silently dropped event.
  */
 export function resolveNativeEvent(
@@ -78,13 +76,12 @@ export function resolveNativeEvent(
 /**
  * Media adapter over a native player addressed by an `Int32` handle.
  *
- * Commands forward to the `VideoJSEngineStore` TurboModule; readable state is
- * mirrored from the handle-tagged `onPlayerEvent` channel. See
- * `PlayerSurfaceHost` for why state is mirrored rather than delegated.
+ * Commands forward to the `VideoJSEngineStore` TurboModule; readable state is mirrored from the handle-tagged
+ * `onPlayerEvent` channel. See `PlayerSurfaceHost` for why state is mirrored rather than delegated.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>
-  implements NativeMedia<NativeEvents>, MediaEngineHost<number, PlayerSurface>
+  implements NativeMedia<NativeEvents>, EngineAdapter<number, PlayerSurface>
 {
   #handle: number | null;
   #ownsHandle: boolean;
@@ -93,8 +90,8 @@ export class ReactNativeMedia
   #state: NativePlaybackState = { paused: true, ended: false };
 
   /**
-   * @param options - Pass `handle` to adopt an externally owned native player;
-   *   it will not be destroyed with this adapter. Omit it to create and own one.
+   * @param options - Pass `handle` to adopt an externally owned native player; it will not be destroyed with this
+   *   adapter. Omit it to create and own one.
    */
   constructor(options?: { handle?: number }) {
     super();
@@ -107,18 +104,19 @@ export class ReactNativeMedia
 
     this.#subscription = store.onPlayerEvent((event) => {
       if (event.handle !== this.#handle) return;
+
       this.#handleNativeEvent(event.type);
     });
   }
 
-  /** The native player handle. `MediaEngineHost`'s engine reference. */
+  /** The native player handle. `EngineAdapter`'s engine reference. */
   get engine(): number | null {
     return this.#handle;
   }
 
   /**
-   * Readable during render — the handle is created in the constructor, so a
-   * surface can bind it on first paint with no null pass.
+   * Readable during render — the handle is created in the constructor, so a surface can bind it on first paint with no
+   * null pass.
    */
   get handle(): number | null {
     return this.#handle;
@@ -130,18 +128,19 @@ export class ReactNativeMedia
 
   set src(value: string) {
     if (this.#src === value) return;
+
     this.#src = value;
 
     // An empty src has no native equivalent — the spec has no clear operation,
     // so an idle player stays idle rather than being handed ''.
     if (isNull(this.#handle) || value === '') return;
+
     requireEngineStore().setSource(this.#handle, value);
   }
 
   /**
-   * Resolves as soon as the command is dispatched, not when playback begins.
-   * Native `play` returns void and there is no error channel to reject on, so
-   * waiting for the next `playing` event could hang indefinitely.
+   * Resolves as soon as the command is dispatched, not when playback begins. Native `play` returns void and there is no
+   * error channel to reject on, so waiting for the next `playing` event could hang indefinitely.
    */
   play(): Promise<void> {
     if (isNull(this.#handle)) {
@@ -154,6 +153,7 @@ export class ReactNativeMedia
 
   pause(): void {
     if (isNull(this.#handle)) return;
+
     requireEngineStore().pause(this.#handle);
   }
 
@@ -186,6 +186,7 @@ export class ReactNativeMedia
       if (__DEV__) {
         console.warn(`@videojs/react-native: unrecognized native player event '${type}'.`);
       }
+
       return;
     }
 

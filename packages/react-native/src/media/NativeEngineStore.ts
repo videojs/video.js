@@ -1,10 +1,9 @@
 import { type CodegenTypes, type TurboModule, TurboModuleRegistry } from 'react-native';
 
 /**
- * One event channel for every player, tagged by handle. Codegen rejects a
- * discriminated union as an event payload (the parser accepts it, the native
- * generators do not), so the payload stays flat and consumers filter on
- * `handle` before narrowing on `type`.
+ * One event channel for every player, tagged by handle. Codegen rejects a discriminated union as an event payload (the
+ * parser accepts it, the native generators do not), so the payload stays flat and consumers filter on `handle` before
+ * narrowing on `type`.
  */
 export type PlayerEvent = Readonly<{
   handle: CodegenTypes.Int32;

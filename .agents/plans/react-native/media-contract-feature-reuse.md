@@ -4,7 +4,7 @@
 
 Required work before RN can reuse the base-lib store features over the DOM-free
 `Media` contract instead of faking an `HTMLMediaElement`. Design context:
-[`internal/design/react-native/index.md` § Not portable as-is](../../../internal/design/react-native/index.md)
+[`internal/design/react-native/index.md` § Not portable as-is](./index.md)
 and the "Closing the shared-feature DOM leaks" open question.
 
 **Important:** almost all of this work lands in `packages/core` and

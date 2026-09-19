@@ -28,8 +28,8 @@ Two layers make this tractable, and two layers stand in the way:
 
 **Not portable as-is:**
 
-- The HTML provider is a **custom-element mixin** (`createProviderMixin` in
-  [`packages/html/src/store/provider-mixin.ts`](../../../packages/html/src/store/provider-mixin.ts))
+- The HTML provider is a **custom-element mixin** (`createMediaAttachMixin` in
+  [`packages/html/src/store/media-attach-mixin.ts`](../../../packages/html/src/store/media-attach-mixin.ts))
   built on the custom-element connect/disconnect lifecycle and the DOM context
   protocol. Neither exists in React Native.
 - The player **features** in
@@ -42,15 +42,15 @@ Two layers make this tractable, and two layers stand in the way:
   implements the contract's capability interfaces, never a faked
   `HTMLMediaElement`.** That commitment is well-grounded: the contract is
   already built and adopted at the store boundary —
-  [`core/media/types.ts`](../../../packages/core/src/core/media/types.ts)
+  [`media/core/types.ts`](../../../packages/media/src/core/types.ts)
   defines `EventLike` / `EventTargetLike` and the full set of capability
   interfaces (`MediaPauseCapability`, `MediaSeekCapability`, …),
-  [`dom/media/predicate.ts`](../../../packages/core/src/dom/media/predicate.ts)
+  [`media/core/predicate.ts`](../../../packages/media/src/core/predicate.ts)
   provides the capability guards, and `PlayerTarget.media` is typed as `Media`
   (not `HTMLMediaElement`), so features already narrow via predicates rather
   than assuming a full element. RN supplies a native host implementing those
   interfaces (the web's `HTMLMediaElementHost` in
-  [`dom/media/media-host.ts`](../../../packages/core/src/dom/media/media-host.ts)
+  [`media/dom/html-media-adapter.ts`](../../../packages/media/src/dom/html-media-adapter/html-media-adapter.ts)
   is the reference).
 
   The remaining work is **closing enumerated DOM leaks in the shared features**,
@@ -58,7 +58,7 @@ Two layers make this tractable, and two layers stand in the way:
   - `playback.ts` / `source.ts` reference `HTMLMediaElement.HAVE_FUTURE_DATA` /
     `HAVE_ENOUGH_DATA` — these crash in RN (`HTMLMediaElement` is undefined).
     The contract already defines the constants (`MediaReadyState` in
-    `core/media/types.ts`) but only exports the *type*; **exporting the constant
+    `media/core/types.ts`) but only exports the *type*; **exporting the constant
     and swapping these two references is a prerequisite** and removes the leak
     from two core features.
   - `volume.ts` (`document.createElement('video')` probe), `text-track.ts`
@@ -70,7 +70,7 @@ Two layers make this tractable, and two layers stand in the way:
     `addEventListener`/`removeEventListener`, and a contract-native `listen`
     helper (not the DOM-typed one) may be warranted.
 
-  `media.md` is still `status: draft`, so the contract surface could shift —
+  `media/architecture.md` is still `status: draft`, so the contract surface could shift —
   tracked in [Open questions](#open-questions).
 
 ## Solution overview
@@ -131,7 +131,7 @@ Four pieces of new work, in dependency order:
    dumb Fabric surface, with platform-specific backings. See
    [Native module structure](#native-module-structure).
 2. **A `Media` adapter** — implements the DOM-free `Media` contract from
-   [`media.md`](../media.md) (capability interfaces + `EventLike` /
+   [`media/architecture.md`](../../../internal/design/media/architecture.md) (capability interfaces + `EventLike` /
    `EventTargetLike`), *not* a fake `HTMLMediaElement`, by talking to the single
    control TurboModule for its handle. This is the seam that lets features stay
    shared. **This adapter — not the `<Video>` component — is what
@@ -146,7 +146,7 @@ Four pieces of new work, in dependency order:
    shapes stay identical so UI components and selectors are unaffected; only
    the `attach()` implementations differ.
 
-The media-contract redesign in [`media.md`](../media.md) is the linchpin: it
+The media-contract redesign in [`media/architecture.md`](../../../internal/design/media/architecture.md) is the linchpin: it
 already names React Native as a motivating case for decoupling the contract
 from the DOM. RN is the first consumer that exercises a non-DOM `Media`
 implementation end to end.
@@ -757,7 +757,7 @@ flowchart TB
 outlives mount — `attach`/`detach` are separate from create/destroy, and the
 provider distinguishes *disconnect* (drop listeners, keep state) from *destroy*
 (release store); see
-[`provider-mixin.ts`](../../../packages/html/src/store/provider-mixin.ts). The
+[`media-attach-mixin.ts`](../../../packages/html/src/store/media-attach-mixin.ts). The
 only new capability is: **a provider can bind to an externally-owned store
 instead of creating its own.** The persistent session is that store, owned by
 the session module rather than a component. This is the RN expression of
@@ -804,7 +804,7 @@ The architecture handles it without new primitives:
 - **It's the RN form of `remotePlayback`, not a new concept.** The web already
   models this as `remotePlaybackFeature` ([`remote-playback.ts`](../../../packages/core/src/dom/store/features/remote-playback.ts))
   over the W3C Remote Playback API, with `MediaRemotePlaybackState` in
-  [`media.md`](../media.md). **Mirror the W3C Remote Playback API shape wherever
+  [`media/architecture.md`](../../../internal/design/media/architecture.md). **Mirror the W3C Remote Playback API shape wherever
   possible** — same state slots (`watchAvailability`, a `connect`-style action,
   a `connected`/device-name read) so the RN surface matches web
   [parity](#guiding-principle-parity-with-the-react-player). Cast is the
@@ -845,10 +845,10 @@ session than as `BackgroundablePlayer`.
 > flag a parity question that needs an RFC, **not** a unilateral RN call.
 
 **v10 is single-source today.** `MediaSourceState`
-([`core/media/state.ts`](../../../packages/core/src/core/media/state.ts)) is a
+([`media/core/state.ts`](../../../packages/media/src/core/state.ts)) is a
 scalar `source: string | null` plus `loadSource(src)`, and the SPF explicitly
 rules out queues —
-[`source-replacement.md`](../spf/features/source-replacement.md): *"replacement
+[`source-replacement.md`](../../../internal/design/spf/features/source-replacement.md): *"replacement
 is teardown-then-rebuild; the engine doesn't support pre-warming the next source
 … Playlist / queue semantics are out of scope."* So a playlist is net-new, and
 the web's only path (app code calling `loadSource` on `ended`) has a **gap**
@@ -865,7 +865,7 @@ same object.
 **How the architecture absorbs it — an optional capability, not a contract
 change.** Model the queue as `MediaQueueCapability`, an *optional* capability in
 the same pattern as `MediaPauseCapability` / `MediaSeekCapability`
-([`core/media/types.ts`](../../../packages/core/src/core/media/types.ts)),
+([`media/core/types.ts`](../../../packages/media/src/core/types.ts)),
 narrowed via an `isMediaQueueCapable` predicate:
 
 - The RN native host implements it (gapless, pre-buffered). `HTMLMediaElement`
@@ -969,7 +969,7 @@ Detailed mapping is deferred until the UI component layer is scoped.
   [`.claude/plans/react-native/media-contract-feature-reuse.md`](../../../.claude/plans/react-native/media-contract-feature-reuse.md)
   (export `MediaReadyState`; DOM-free `listen`/`onEvent`/`serializeTimeRanges`;
   a non-DOM volume probe; verify against an in-memory `Media` host). The one
-  genuine unknown is `media.md`'s `draft` status — the contract surface could
+  genuine unknown is `media/architecture.md`'s `draft` status — the contract surface could
   shift before this work lands.
 - **Keeping the adapter's event demux honest.** The
   [flat event payload](#codegen-constraints-that-shape-the-design) codegen
@@ -1012,11 +1012,11 @@ Detailed mapping is deferred until the UI component layer is scoped.
 
 ## Related
 
-- [`media.md`](../media.md) — the DOM-free `Media` contract this package is the
+- [`media/architecture.md`](../../../internal/design/media/architecture.md) — the DOM-free `Media` contract this package is the
   first non-DOM consumer of.
 - [`packages/store/README.md`](../../../packages/store/README.md) — the shared
   store and slice/feature model.
-- [`packages/html/src/store/provider-mixin.ts`](../../../packages/html/src/store/provider-mixin.ts)
+- [`packages/html/src/store/media-attach-mixin.ts`](../../../packages/html/src/store/media-attach-mixin.ts)
   — the web provider whose lifecycle the RN provider mirrors in React idiom.
 - [`packages/core/src/dom/store/features/`](../../../packages/core/src/dom/store/features/)
   — the feature set the RN feature set parallels.

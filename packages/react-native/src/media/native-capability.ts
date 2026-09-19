@@ -1,4 +1,4 @@
-import type { EventLike, Media, MediaEvents, MediaPauseCapability, MediaPauseEvents } from '@videojs/core';
+import type { EventLike, Media, MediaEvents, MediaPauseCapability, MediaPauseEvents } from '@videojs/media';
 
 // ----------------------------------------
 //  Native-App Media Capabilities
@@ -18,5 +18,4 @@ import type { EventLike, Media, MediaEvents, MediaPauseCapability, MediaPauseEve
 export interface NativeEvents extends MediaEvents, MediaPauseEvents {}
 
 export interface NativeMedia<Events extends { [K in keyof Events]: EventLike } = NativeEvents>
-  extends Media<Events>,
-    MediaPauseCapability {}
+  extends Media<Events>, MediaPauseCapability {}

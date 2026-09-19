@@ -3,9 +3,9 @@
 **Status:** STUB — not started
 
 Implementation plan for the persistent background session described in
-[`internal/design/react-native/index.md` § Persistent background session](../../../internal/design/react-native/index.md).
+[`internal/design/react-native/index.md` § Persistent background session](./index.md).
 This file is the **how**; the design doc owns the **what/why** and the decisions
-(see [`decisions.md`](../../../internal/design/react-native/decisions.md)).
+(see [`decisions.md`](./decisions.md)).
 
 Prerequisite: the `packages/react-native/` package, `Media` adapter, and RN
 provider don't exist yet. This plan assumes those are in place (or scoped

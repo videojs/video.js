@@ -1,5 +1,6 @@
 import { forwardRef, type Ref as ReactRef, useImperativeHandle } from 'react';
 import type { ViewProps } from 'react-native';
+
 import { PlayerSurface } from './element/player-surface';
 import { PlayerProvider, type PlayerStatus, usePlayerContext } from './player-context';
 
@@ -24,9 +25,8 @@ function PlayerBody({ forwardedRef, ...viewProps }: ViewProps & { forwardedRef: 
 }
 
 /**
- * A video player that behaves like an ordinary RN view. The native handle and
- * the Fabric surface backing it are implementation details — control the
- * player through the ref.
+ * A video player that behaves like an ordinary RN view. The native handle and the Fabric surface backing it are
+ * implementation details — control the player through the ref.
  */
 export const Player = forwardRef<PlayerRef, PlayerProps>(function Player(
   { source, onStatusChange, ...viewProps },
