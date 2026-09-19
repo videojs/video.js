@@ -56,3 +56,26 @@ and `../../node_modules/@react-native/codegen`. pnpm's isolated layout only link
 a package's *direct* dependencies, so `@react-native/gradle-plugin`,
 `@react-native/codegen`, and `react-native` are declared explicitly in
 `package.json` even though they'd normally come in transitively. Don't remove them.
+
+### One `react-native` instance
+
+`packages/react-native` declares `@react-native-community/cli` and
+`@react-native/metro-config` as devDependencies purely so its `react-native`
+resolves to the same pnpm instance this app uses. pnpm keys an instance by its
+peer closure, and those two packages propagate into `react-native`'s — so
+without them the library gets a second copy.
+
+Two copies break the app in a way that gives no useful error. Metro resolves
+`getModulesRunBeforeMainModule` (i.e. `InitializeCore`) against this app's copy;
+if the graph was built from the library's copy, that module isn't in it and gets
+dropped silently. The bundle then ends with only `__r(0)` instead of
+`__r(<InitializeCore>); __r(0)`, so RN's globals never get set up and the first
+dev-only module to touch `window` throws `ReferenceError: Property 'window'
+doesn't exist`.
+
+To check for a regression:
+
+```bash
+ls -d node_modules/.pnpm/react-native@* # expect one peer-resolved entry
+curl -s 'http://localhost:8081/index.bundle?platform=android&dev=true' | grep -o '^__r([0-9]*);'
+```

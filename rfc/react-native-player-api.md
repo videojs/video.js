@@ -6,7 +6,7 @@ status: draft
 
 > **STUB** — opened to get buy-in on the RN player's public API surface. The
 > owned design (architecture, native construction, decisions) lives in
-> [`internal/design/react-native/`](../.agents/plans/react-native/index.md);
+> [`.agents/plans/react-native/`](../.agents/plans/react-native/index.md);
 > this RFC exists for the cross-package, user-facing contract that needs
 > alignment.
 
@@ -92,11 +92,11 @@ the right cross-package tradeoff and to align on the divergence list.
 
 ## See Also
 
-- [`internal/design/react-native/index.md`](../.agents/plans/react-native/index.md)
+- [`.agents/plans/react-native/index.md`](../.agents/plans/react-native/index.md)
   — owned design (architecture + API surface).
-- [`internal/design/react-native/decisions.md`](../.agents/plans/react-native/decisions.md)
+- [`.agents/plans/react-native/decisions.md`](../.agents/plans/react-native/decisions.md)
   — debated native-construction decisions.
-- [`.claude/plans/react-native/persistent-session.md`](../.claude/plans/react-native/persistent-session.md)
+- [`.agents/plans/react-native/persistent-session.md`](../.agents/plans/react-native/persistent-session.md)
   — implementation plan for the persistent session.
 - [`rfc/player-api/`](./player-api.md) — the web player API RFC this aims
   for parity with.
