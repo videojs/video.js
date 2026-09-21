@@ -17,7 +17,7 @@ const { packages: workspaces } = parse(fs.readFileSync(path.join(root, 'pnpm-wor
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */
-module.exports = withMetroConfig(getDefaultConfig(__dirname), {
+const config = withMetroConfig(getDefaultConfig(__dirname), {
   root,
   dirname: __dirname,
   workspaces,
@@ -25,3 +25,14 @@ module.exports = withMetroConfig(getDefaultConfig(__dirname), {
   // built lib/, so edits in packages/react-native show up on Fast Refresh.
   conditions: ['react-native-source'],
 });
+
+// Babel's runtime transform injects `@babel/runtime` helper imports into every
+// file Metro transforms, workspace package dists included. pnpm keeps
+// node_modules isolated per package, so a file under packages/store/dist can't
+// reach it by walking up. Pin it to this app's copy.
+config.resolver.extraNodeModules = {
+  ...config.resolver.extraNodeModules,
+  '@babel/runtime': path.dirname(require.resolve('@babel/runtime/package.json')),
+};
+
+module.exports = config;

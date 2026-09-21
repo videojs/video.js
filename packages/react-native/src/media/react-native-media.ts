@@ -78,6 +78,18 @@ export function resolveNativeEvent(
  *
  * Commands forward to the `VideoJSEngineStore` TurboModule; readable state is mirrored from the handle-tagged
  * `onPlayerEvent` channel. See `PlayerSurfaceHost` for why state is mirrored rather than delegated.
+ *
+ * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` — which is the whole capability surface today. Two gaps
+ * keep the shared store features out of reach, and closing them is what would let react-native drop its own feature
+ * variants in favour of `packages/core/src/dom/store/features/`:
+ *
+ * - TODO: add seek and source capability. `isMediaSeekCapable` wants `currentTime`, `duration` and `seeking`;
+ *   `isMediaSourceCapable` wants `currentSrc`, `readyState` and `load()` on top of the `src` that already exists.
+ *   Core's `playbackFeature` guards on both and returns early without them, so it would attach and then do nothing. The
+ *   TurboModule has to report position and duration before any of this can be mirrored.
+ * - TODO: emit the rest of the standard media events. `resolveNativeEvent` covers `play`, `playing`, `pause` and `ended`;
+ *   the shared features also listen for `emptied`, `timeupdate`, `canplay`, `seeking`, `seeked` and `waiting`. Each
+ *   needs a native counterpart, which means extending `PlayerEvent['type']` — a codegen spec change.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>

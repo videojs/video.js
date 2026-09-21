@@ -1,4 +1,4 @@
-import { Player, type PlayerStatus, type ReactNativeMedia, Video } from '@videojs/react-native';
+import { Player, type PlayerStatus, type ReactNativeMedia, Video, VideoPlayer, VideoSkin } from '@videojs/react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -38,9 +38,12 @@ function ContextPlayer() {
 }
 
 /**
- * The adapter path: a Video backed by a ReactNativeMedia implementing the `Media` contract. Status comes from contract
- * events rather than a callback prop, which is what lets the shared store features consume it later.
+ * The adapter path with no store: a Video backed by a ReactNativeMedia implementing the `Media` contract, driven
+ * through its ref. Status comes from contract events rather than a callback prop.
+ *
+ * Intentionally kept but not rendered — swap it into `App` to compare against the store-backed skin below.
  */
+// biome-ignore lint/correctness/noUnusedVariables: kept as a switchable alternative to SkinnedPlayer
 function AdapterVideo() {
   const media = useRef<ReactNativeMedia>(null);
   const [status, setStatus] = useState('idle');
@@ -80,11 +83,41 @@ function AdapterVideo() {
   );
 }
 
+/**
+ * The store-backed path: a VideoPlayer holding the store and media adapter, a VideoSkin supplying the container and
+ * chrome, and a Video rendering the surface. Same composition as the react-dom preset.
+ *
+ * Nothing here holds a ref or a status callback — the play button reads the store and the store mirrors the adapter.
+ */
+function SkinnedPlayer() {
+  const [src, setSrc] = useState(SOURCE_VOD);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.heading}>{'<VideoPlayer> + <VideoSkin>'}</Text>
+
+      <VideoPlayer>
+        <VideoSkin style={styles.video}>
+          <Video src={src} style={styles.surface} />
+        </VideoSkin>
+      </VideoPlayer>
+
+      <Text>src: {src === SOURCE_VOD ? 'vod' : 'live'}</Text>
+      <View style={styles.controls}>
+        <Button
+          title="Swap src"
+          onPress={() => setSrc((current) => (current === SOURCE_VOD ? SOURCE_LIVE : SOURCE_VOD))}
+        />
+      </View>
+    </View>
+  );
+}
+
 export default function App() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>@videojs/react-native</Text>
-      <AdapterVideo />
+      <SkinnedPlayer />
     </ScrollView>
   );
 }
@@ -111,6 +144,13 @@ const styles = StyleSheet.create({
     width: 320,
     height: 180,
     backgroundColor: 'black',
+  },
+  surface: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   controls: {
     flexDirection: 'row',
