@@ -10,14 +10,20 @@ export {
 export { Video, type VideoProps } from './media/video';
 export { Player, type PlayerStatus } from './player';
 export { Container, type ContainerProps } from './player/container';
+export type { NativePlayerContextValue } from './player/context';
 export {
-  type NativePlayerContextValue,
-  useMedia,
-  useNativePlayerContext,
-  useOptionalMedia,
-  usePlayer,
-} from './player/context';
-export { VideoPlayer, type VideoPlayerProps } from './player/video-player';
+  type AnyNativeFeature,
+  type AnyNativePlayerStore,
+  createPlayer,
+  type CreatePlayerConfig,
+  type CreatePlayerResult,
+  type NativePlayerStore,
+  type PlayerProps,
+  type UsePlayerHook,
+} from './player/create-player';
+// `usePlayer` and `useMedia` come from the preset, not `./player/context` — the factory's are typed
+// against the composed features, while the context pair is untyped and stays internal.
+export { nativeVideoFeatures, useMedia, usePlayer, VideoPlayer, type VideoPlayerProps } from './player/video-player';
 export { VideoSkin, type VideoSkinProps } from './skins/video-skin';
 export type { NativePlayerTarget } from './store/native-player-target';
 export { nativePlaybackFeature, selectNativePlayback } from './store/playback';
