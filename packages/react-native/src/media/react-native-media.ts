@@ -1,7 +1,7 @@
 import type { EngineAdapter } from '@videojs/media';
 import { isNull, isUndefined } from '@videojs/utils/predicate';
 
-import { requireEngineStore } from './engine-store';
+import { type NativeEngineHandle, requireEngineStore, toEngineHandle } from './engine-store';
 import type { NativeEvents, NativeMedia } from './native-capability';
 import type { PlayerEvent } from './NativeEngineStore';
 import { type PlayerSurface, PlayerSurfaceHost } from './player-surface-host';
@@ -74,7 +74,7 @@ export function resolveNativeEvent(
 }
 
 /**
- * Media adapter over a native player addressed by an `Int32` handle.
+ * Media adapter over a native player addressed by a {@link NativeEngineHandle}.
  *
  * Commands forward to the `VideoJSEngineStore` TurboModule; readable state is mirrored from the handle-tagged
  * `onPlayerEvent` channel. See `PlayerSurfaceHost` for why state is mirrored rather than delegated.
@@ -93,9 +93,9 @@ export function resolveNativeEvent(
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>
-  implements NativeMedia<NativeEvents>, EngineAdapter<number, PlayerSurface>
+  implements NativeMedia<NativeEvents>, EngineAdapter<NativeEngineHandle, PlayerSurface>
 {
-  #handle: number | null;
+  #handle: NativeEngineHandle | null;
   #ownsHandle: boolean;
   #subscription: { remove(): void } | null = null;
   #src = reactNativeMediaDefaultProps.src;
@@ -105,14 +105,14 @@ export class ReactNativeMedia
    * @param options - Pass `handle` to adopt an externally owned native player; it will not be destroyed with this
    *   adapter. Omit it to create and own one.
    */
-  constructor(options?: { handle?: number }) {
+  constructor(options?: { handle?: NativeEngineHandle }) {
     super();
 
     const store = requireEngineStore();
     const adopted = options?.handle;
 
     this.#ownsHandle = isUndefined(adopted);
-    this.#handle = this.#ownsHandle ? store.createPlayer(null) : adopted!;
+    this.#handle = this.#ownsHandle ? toEngineHandle(store.createPlayer(null)) : adopted!;
 
     this.#subscription = store.onPlayerEvent((event) => {
       if (event.handle !== this.#handle) return;
@@ -122,7 +122,7 @@ export class ReactNativeMedia
   }
 
   /** The native player handle. `EngineAdapter`'s engine reference. */
-  get engine(): number | null {
+  get engine(): NativeEngineHandle | null {
     return this.#handle;
   }
 
@@ -130,7 +130,7 @@ export class ReactNativeMedia
    * Readable during render — the handle is created in the constructor, so a surface can bind it on first paint with no
    * null pass.
    */
-  get handle(): number | null {
+  get handle(): NativeEngineHandle | null {
     return this.#handle;
   }
 

@@ -1,3 +1,6 @@
+// The type only. `toEngineHandle` stays internal on purpose — exporting a blessed `number` -> handle
+// cast would hand consumers the escape hatch the brand exists to close.
+export type { NativeEngineHandle } from './media/engine-store';
 export type { NativeEvents, NativeMedia } from './media/native-capability';
 export { type PlayerSurface, PlayerSurfaceHost } from './media/player-surface-host';
 export {

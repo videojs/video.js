@@ -1,12 +1,12 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { requireEngineStore as requireStore } from './media/engine-store';
+import { type NativeEngineHandle, requireEngineStore as requireStore, toEngineHandle } from './media/engine-store';
 import type { PlayerEvent } from './media/NativeEngineStore';
 
 export type PlayerStatus = PlayerEvent['type'];
 
 interface PlayerContextValue {
-  handle: number | null;
+  handle: NativeEngineHandle | null;
   play: () => void;
   pause: () => void;
 }
@@ -26,7 +26,7 @@ interface PlayerProviderProps {
  * one arrives. The handle never leaves this module's consumers — see `Player` for the public surface.
  */
 export function PlayerProvider({ source, onStatusChange, children }: PlayerProviderProps) {
-  const [handle, setHandle] = useState<number | null>(null);
+  const [handle, setHandle] = useState<NativeEngineHandle | null>(null);
 
   // Kept in a ref so an inline onStatusChange doesn't resubscribe every render.
   const onStatusChangeRef = useRef(onStatusChange);
@@ -44,7 +44,7 @@ export function PlayerProvider({ source, onStatusChange, children }: PlayerProvi
   // unmounting is the only thing that destroys one.
   useEffect(() => {
     const store = requireStore();
-    const created = store.createPlayer(appliedSource.current ?? null);
+    const created = toEngineHandle(store.createPlayer(appliedSource.current ?? null));
 
     setHandle(created);
 
