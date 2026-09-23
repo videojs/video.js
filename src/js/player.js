@@ -4236,6 +4236,14 @@ class Player extends Component {
       return this.error_ || null;
     }
 
+    // Bail out if the player has already been disposed: an async
+    // source-resolution/DRM/texttrack callback can still call error()
+    // after dispose() has nulled out this.el_, and both branches below
+    // reach into the DOM element via addClass/removeClass.
+    if (this.isDisposed()) {
+      return;
+    }
+
     // allow hooks to modify error object
     hooks('beforeerror').forEach((hookFunction) => {
       const newErr = hookFunction(this, err);
