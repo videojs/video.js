@@ -1,113 +1,82 @@
-import type { ImportDeclaration, JSXElementName, Program } from '@oxc-project/types';
+import type { ArrayExpression, JSXElementName } from '@oxc-project/types';
 import { walk } from 'oxc-walker';
-import type { Plugin } from 'rolldown';
 
+import { type SourceEdit, sourceError } from '../ast';
+import type { TargetBindings } from '../target/bindings';
 import type { JsxClassNameOptions } from '../target/definition';
-import { createTargetModuleImports } from '../target/module-imports';
-import { SCRIPT_MODULE_ID } from '../utils/module-id';
-import { type ComponentTargetPluginOptions, selectComponentTargets } from './component-target';
+import type { TargetModule } from '../target/module';
 
-interface ImportBinding {
-  readonly imported: string;
-  readonly source: string;
-}
+/**
+ * Lower `className={[...]}` arrays through the class-name runtime of the target that asks for it. An array that
+ * forwards `className` to an element accepting a state callback becomes that callback, so the element can resolve the
+ * forwarded value against its state. Returns the edits rather than applying them, so templates can render them.
+ */
+export function lowerClassNames(module: TargetModule): readonly SourceEdit[] {
+  const targets = module.targets.filter((target) => target.jsx.className);
+  if (targets.length === 0 || !module.code.includes('className')) return [];
 
-export function reactTargetPropsPlugin(options: ComponentTargetPluginOptions): Plugin {
-  return {
-    name: 'vjsc:react-target-props',
-    transform: {
-      filter: { id: SCRIPT_MODULE_ID, code: 'className' },
-      handler(code, id, transform) {
-        const targets = selectComponentTargets(options.targets, id).filter((target) => target.jsx.className);
-        if (targets.length === 0 || !transform.ast || !transform.magicString) return null;
+  if (targets.length > 1) throw new Error('Only one component target per module may lower `className` arrays.');
 
-        if (targets.length > 1) throw new Error('Only one component target per module may lower `className` arrays.');
+  const className = targets[0]!.jsx.className!;
+  const { code, bindings, imports } = module;
+  const edits: SourceEdit[] = [];
 
-        const className = targets[0]!.jsx.className!;
+  walk(module.ast, {
+    enter(node, parent) {
+      if (
+        node.type !== 'JSXAttribute' ||
+        node.name.type !== 'JSXIdentifier' ||
+        node.name.name !== 'className' ||
+        node.value?.type !== 'JSXExpressionContainer' ||
+        node.value.expression.type !== 'ArrayExpression' ||
+        parent?.type !== 'JSXOpeningElement'
+      ) {
+        return;
+      }
 
-        const bindings = importBindings(transform.ast);
-        const imports = createTargetModuleImports(transform.ast, transform.magicString);
-        let changed = false;
+      const array = node.value.expression;
+      const values = array.elements.filter((value) => value !== null);
+      const forwarded = values.find((value) => value.type === 'Identifier' && value.name === 'className');
+      const callback = Boolean(forwarded && acceptsClassNameCallback(parent.name, bindings, className));
+      const cn = imports.reference(className.merge);
+      const args = values.filter((value) => value !== forwarded).map((value) => code.slice(value.start, value.end));
+      let replacement: string;
 
-        walk(transform.ast, {
-          enter(node, parent) {
-            if (
-              node.type !== 'JSXAttribute' ||
-              node.name.type !== 'JSXIdentifier' ||
-              node.name.name !== 'className' ||
-              node.value?.type !== 'JSXExpressionContainer' ||
-              node.value.expression.type !== 'ArrayExpression' ||
-              parent?.type !== 'JSXOpeningElement'
-            ) {
-              return;
-            }
+      if (callback) {
+        if (!className.resolve) {
+          throw sourceError(
+            'The component target marks an element as state-aware but has no `className.resolve`.',
+            node.start
+          );
+        }
 
-            const values = node.value.expression.elements.filter((value) => value !== null);
-            const forwarded = values.find((value) => value.type === 'Identifier' && value.name === 'className');
-            const callback = Boolean(forwarded && acceptsClassNameCallback(parent.name, bindings, className));
-            const cn = imports.reference(className.merge);
-            const args = values
-              .filter((value) => value !== forwarded)
-              .map((value) => code.slice(value.start, value.end));
+        // The callback's parameter must not shadow a binding the class list itself reads.
+        const state = referencesName(array, 'state') ? freshName('state', module.names) : 'state';
 
-            if (callback) {
-              if (!className.resolve) {
-                throw new Error('The component target marks an element as state-aware but has no `className.resolve`.');
-              }
+        args.push(`${imports.reference(className.resolve)}(className, ${state})`);
+        replacement = `{${state} => ${cn}(${args.join(', ')})}`;
+      } else {
+        if (forwarded) args.push('className');
 
-              args.push(`${imports.reference(className.resolve)}(className, state)`);
-            } else if (forwarded) {
-              args.push('className');
-            }
+        replacement = `{${cn}(${args.join(', ')})}`;
+      }
 
-            const expression = `${cn}(${args.join(', ')})`;
-            const replacement = callback ? `{state => ${expression}}` : `{${expression}}`;
-
-            transform.magicString!.overwrite(node.value.start, node.value.end, replacement);
-            changed = true;
-          },
-        });
-
-        if (!changed) return null;
-
-        imports.commit();
-        return { code: transform.magicString };
-      },
+      edits.push({ start: node.value.start, end: node.value.end, content: replacement });
     },
-  };
-}
+  });
 
-function importBindings(ast: Program): ReadonlyMap<string, ImportBinding> {
-  const bindings = new Map<string, ImportBinding>();
-
-  for (const statement of ast.body) {
-    if (statement.type !== 'ImportDeclaration' || statement.importKind === 'type') continue;
-
-    collectImportBindings(statement, bindings);
-  }
-
-  return bindings;
-}
-
-function collectImportBindings(declaration: ImportDeclaration, bindings: Map<string, ImportBinding>): void {
-  for (const specifier of declaration.specifiers) {
-    if (specifier.type !== 'ImportSpecifier' || specifier.importKind === 'type') continue;
-
-    const imported = specifier.imported.type === 'Identifier' ? specifier.imported.name : specifier.imported.value;
-
-    bindings.set(specifier.local.name, { imported, source: declaration.source.value });
-  }
+  return edits;
 }
 
 function acceptsClassNameCallback(
   name: JSXElementName,
-  bindings: ReadonlyMap<string, ImportBinding>,
+  bindings: TargetBindings,
   className: JsxClassNameOptions
 ): boolean {
   const root = jsxNameRoot(name);
-  const binding = root ? bindings.get(root) : undefined;
+  const binding = root ? bindings.imports.get(root) : undefined;
 
-  return Boolean(binding && className.stateAware?.(binding));
+  return Boolean(binding && !binding.type && className.stateAware?.(binding));
 }
 
 function jsxNameRoot(name: JSXElementName): string | undefined {
@@ -116,4 +85,25 @@ function jsxNameRoot(name: JSXElementName): string | undefined {
   if (name.type === 'JSXNamespacedName') return undefined;
 
   return jsxNameRoot(name.object);
+}
+
+function referencesName(array: ArrayExpression, name: string): boolean {
+  let found = false;
+
+  walk(array, {
+    enter(node) {
+      if (node.type === 'Identifier' && node.name === name) found = true;
+    },
+  });
+
+  return found;
+}
+
+function freshName(base: string, names: Set<string>): string {
+  let suffix = 2;
+
+  while (names.has(`${base}${suffix}`)) suffix += 1;
+
+  names.add(`${base}${suffix}`);
+  return `${base}${suffix}`;
 }

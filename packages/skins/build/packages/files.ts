@@ -1,38 +1,42 @@
-import { type Dirent, globSync } from 'node:fs';
-import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
-import { dirname, posix, resolve } from 'node:path';
+import type { Dirent } from 'node:fs';
+import { mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { dirname, isAbsolute, posix, resolve } from 'node:path';
 
-export interface GeneratedPackageFile {
+export interface GeneratedFile {
   /** Workspace-relative generated path. */
   readonly path: string;
   readonly content: string;
 }
 
 /**
- * Synchronize generated framework inputs and remove stale files from their owned roots. An owned path is a file, a
- * directory, or a glob of files.
+ * Write generated files into the workspace and remove stale files from their owned paths. Every generated file must sit
+ * inside an owned path, so a generator can never overwrite a file it does not own and leave it behind when it stops.
  */
 export async function syncGeneratedFiles(
   workspaceDir: string,
-  files: readonly GeneratedPackageFile[],
+  files: readonly GeneratedFile[],
   ownedPaths: readonly string[]
 ): Promise<number> {
-  const expected = new Map(files.map((file) => [file.path, file.content]));
+  const owned = ownedPaths.map((path) => workspacePath(path));
+  const expected = new Map(files.map((file) => [workspacePath(file.path), file.content]));
   const existing = new Set<string>();
+  const unowned = [...expected.keys()].filter(
+    (path) => !owned.some((root) => path === root || path.startsWith(`${root}/`))
+  );
 
-  for (const path of ownedPaths) {
-    if (path.includes('*')) {
-      for (const file of globSync(path, { cwd: workspaceDir })) existing.add(file.replaceAll('\\', '/'));
+  if (unowned.length > 0) {
+    throw new Error(
+      `Generated files are outside every owned path: ${unowned.map((path) => `\`${path}\``).join(', ')}.`
+    );
+  }
 
-      continue;
-    }
-
+  for (const path of owned) {
     const filename = resolve(workspaceDir, path);
     const entries = await readdir(filename, { withFileTypes: true }).catch((): Dirent[] | undefined => undefined);
 
     if (entries) {
       for (const file of await filesWithin(workspaceDir, path, entries)) existing.add(file);
-    } else if (await readFile(filename).catch(() => undefined)) {
+    } else if ((await stat(filename).catch(() => undefined))?.isFile()) {
       existing.add(path);
     }
   }
@@ -57,6 +61,26 @@ export async function syncGeneratedFiles(
   }
 
   return changed;
+}
+
+/**
+ * A generated path in normalized workspace-relative form. Ownership is checked on this form, so a path such as
+ * `out/../elsewhere.ts` cannot pass as a file under `out`.
+ */
+function workspacePath(path: string): string {
+  const normalized = posix.normalize(path.replaceAll('\\', '/'));
+
+  if (
+    isAbsolute(path) ||
+    posix.isAbsolute(normalized) ||
+    normalized === '..' ||
+    normalized.startsWith('../') ||
+    normalized === '.'
+  ) {
+    throw new Error(`Generated path \`${path}\` must be relative to the workspace and inside it.`);
+  }
+
+  return normalized.replace(/\/$/, '');
 }
 
 async function filesWithin(workspaceDir: string, root: string, entries?: readonly Dirent[]): Promise<string[]> {

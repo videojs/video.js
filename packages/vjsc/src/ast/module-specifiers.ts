@@ -1,6 +1,9 @@
-import type { Node } from '@oxc-project/types';
+import type { BindingPattern, BindingRestElement, Node, Program } from '@oxc-project/types';
 import { parseSync } from 'oxc-parser';
 import { walk } from 'oxc-walker';
+
+import { parseError } from './errors';
+import { moduleExportName } from './traverse';
 
 /** One name an `import` declaration binds; `default` and `*` name the default and namespace imports. */
 export interface ImportBinding {
@@ -22,10 +25,21 @@ export interface ImportReplacement extends ImportReference {
   readonly replacement: string;
 }
 
+export interface ModuleAnalysis {
+  readonly imports: readonly ImportReference[];
+  /** Names the module exports at runtime, including `default`; `export *` re-exports are not expanded. */
+  readonly exports: readonly string[];
+}
+
 /** Locate editable ESM import specifiers without changing source formatting. */
 export function analyzeImports(source: string, fileName: string): ImportReference[] {
+  return [...analyzeModule(source, fileName).imports];
+}
+
+/** Read a module's import references and runtime export names from one parse. */
+export function analyzeModule(source: string, fileName: string): ModuleAnalysis {
   const parsed = parseSync(fileName, source);
-  if (parsed.errors.length > 0) throw new Error(parsed.errors.map((error) => error.message).join('\n'));
+  if (parsed.errors.length > 0) throw parseError(`Cannot analyze \`${fileName}\`.`, fileName, source, parsed.errors);
 
   const references: ImportReference[] = [];
 
@@ -47,7 +61,61 @@ export function analyzeImports(source: string, fileName: string): ImportReferenc
     },
   });
 
-  return references;
+  return { imports: references, exports: exportNames(parsed.program) };
+}
+
+function exportNames(program: Program): string[] {
+  const names = new Set<string>();
+
+  for (const statement of program.body) {
+    if (statement.type === 'ExportDefaultDeclaration') {
+      names.add('default');
+    } else if (statement.type === 'ExportAllDeclaration') {
+      if (statement.exported && statement.exportKind !== 'type') names.add(moduleExportName(statement.exported));
+    } else if (statement.type === 'ExportNamedDeclaration' && statement.exportKind !== 'type') {
+      for (const specifier of statement.specifiers) {
+        if (specifier.exportKind !== 'type') names.add(moduleExportName(specifier.exported));
+      }
+
+      for (const name of declaredNames(statement.declaration)) names.add(name);
+    }
+  }
+
+  return [...names];
+}
+
+function declaredNames(declaration: Extract<Node, { type: 'ExportNamedDeclaration' }>['declaration']): string[] {
+  if (!declaration) return [];
+
+  if (declaration.type === 'VariableDeclaration') {
+    return declaration.declarations.flatMap((declarator) => bindingNames(declarator.id));
+  }
+
+  if (declaration.type === 'FunctionDeclaration' || declaration.type === 'ClassDeclaration') {
+    return declaration.id ? [declaration.id.name] : [];
+  }
+
+  // Types, interfaces, and ambient declarations have no runtime binding.
+  return declaration.type === 'TSEnumDeclaration' && !declaration.declare ? [declaration.id.name] : [];
+}
+
+function bindingNames(pattern: BindingPattern | BindingRestElement): string[] {
+  switch (pattern.type) {
+    case 'Identifier':
+      return [pattern.name];
+    case 'ObjectPattern':
+      return pattern.properties.flatMap((property) =>
+        property.type === 'RestElement' ? bindingNames(property.argument) : bindingNames(property.value)
+      );
+    case 'ArrayPattern':
+      return pattern.elements.flatMap((element) => (element ? bindingNames(element) : []));
+    case 'AssignmentPattern':
+      return bindingNames(pattern.left);
+    case 'RestElement':
+      return bindingNames(pattern.argument);
+    default:
+      return [];
+  }
 }
 
 /** Replace import specifiers while preserving all other authored source text. */
@@ -97,6 +165,7 @@ function importReference(
   }
 
   if (node.type === 'ImportExpression') {
+    // `typeof` narrows the literal union to a string literal; a predicate would narrow only its value.
     if (node.source.type === 'Literal' && typeof node.source.value === 'string') {
       return { literal: node.source, kind: 'dynamic' };
     }
@@ -124,9 +193,7 @@ function importBindings(node: Extract<Node, { type: 'ImportDeclaration' }>): Imp
     else if (specifier.type === 'ImportNamespaceSpecifier')
       bindings.push({ imported: '*', local: specifier.local.name });
     else if (specifier.importKind !== 'type') {
-      const imported = specifier.imported.type === 'Identifier' ? specifier.imported.name : specifier.imported.value;
-
-      bindings.push({ imported, local: specifier.local.name });
+      bindings.push({ imported: moduleExportName(specifier.imported), local: specifier.local.name });
     }
   }
 

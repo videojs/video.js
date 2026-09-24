@@ -1,4 +1,11 @@
-export { type StyleDefinition, type StyleRule, type StyleValue, styles } from './define';
+export {
+  type StyleDefinition,
+  type StyleReferences,
+  type StyleRule,
+  type StyleTree,
+  type StyleValue,
+  styles,
+} from './define';
 
 /**
  * Variant names a project selects at compile time. Augment this interface from the project that owns the variants so

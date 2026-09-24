@@ -1,72 +1,66 @@
-import { createHash } from 'node:crypto';
-import { existsSync } from 'node:fs';
-import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 
-import type { Expression, ImportDeclaration, Node, Program } from '@oxc-project/types';
-import { isFunction, isString } from '@videojs/utils/predicate';
-import { walk } from 'oxc-walker';
-import type { Plugin, RolldownMagicString } from 'rolldown';
+import { isFunction } from '@videojs/utils/predicate';
+import type { Plugin } from 'rolldown';
 
-import { type SourceEdit, sourceError } from '../ast';
 import { insertModuleImports } from '../ast/imports';
+import { mergeModuleBuildMeta } from '../graph/build-meta';
+import {
+  CANDIDATES_ALIAS,
+  type CandidateManifest,
+  type CandidateManifestOptions,
+  candidateManifestOptions,
+  createCandidateManifest,
+  discoverStyleModules,
+  resolveCandidateManifestPath,
+} from '../styles/candidates';
 import { compileStyles } from '../styles/compile';
-import { type DesignSystem, loadDesignSystem } from '../styles/design-system';
+import { loadDesignSystem } from '../styles/design-system';
 import {
   diagnoseCompiledStyles,
   diagnoseStyles,
-  formatStyleDiagnostic,
-  type StyleDiagnostic,
+  reportStyleDiagnostics,
   type StyleDiagnosticsOptions,
 } from '../styles/diagnostics';
-import { isStyleModulePath, resolveStyleModule, resolveStyleModuleFile } from '../styles/modules';
 import type { StyleTransformOptions } from '../styles/options';
+import { assertCompositionOrder } from '../styles/precedence';
+import { importedStyleFiles, transformStyleReferences } from '../styles/references';
+import { createResolvedStyles, type LoadedStyleModule, loadStyleModule, type ResolvedStyles } from '../styles/resolved';
 import {
-  createResolvedStyles,
-  type LoadedStyleModule,
-  loadStyleModule,
-  ruleForToken,
-  type ResolvedStyles,
-  type ResolvedStyleRule,
-  utilityGroupsForRule,
-} from '../styles/resolved';
-import { moduleFilename, parseModuleId, type TransformModule, SCRIPT_MODULE_ID } from '../utils/module-id';
+  createVirtualCssId,
+  createVirtualCssRegistry,
+  VIRTUAL_CSS_ID,
+  type VirtualCssLifecycle,
+} from '../styles/virtual-css';
+import { createFileCache } from '../utils/file-cache';
+import { moduleFilename, parseModuleId, SCRIPT_MODULE_ID, type TransformModule } from '../utils/module-id';
 import { toPosixPath } from '../utils/path';
 
 export type StylePluginConfig =
   | StyleTransformOptions
   | ((module: TransformModule) => StyleTransformOptions | null | Promise<StyleTransformOptions | null>);
 
-interface CachedStyleModule {
-  readonly module: LoadedStyleModule;
-  readonly versions: ReadonlyMap<string, number>;
-}
-
-interface CachedDesignSystem {
-  readonly design: DesignSystem;
-  versions: ReadonlyMap<string, number>;
-}
-
-interface StyleBinding {
-  readonly declaration: ImportDeclaration;
-  readonly modulePath: string;
-}
-
-interface VirtualCssModule {
-  source: string;
-  readonly owners: Set<string>;
-}
-
-export interface StylePluginLifecycle {
-  readonly retainReleasedCss: boolean;
-  onCssChange(id: string): void;
+export interface StylePluginLifecycle extends VirtualCssLifecycle {
+  /** An owner was transformed and now depends on these style modules and design files. */
   onOwnerTransform(id: string, watchFiles: readonly string[]): void;
 }
 
 export type StylePluginDiagnostics = StyleDiagnosticsOptions | false | (() => StyleDiagnosticsOptions | false);
 
-/** Import specifier Tailwind entries use for the generated candidate manifest. */
-export const CANDIDATES_ALIAS = 'vjsc:candidates';
+export interface StylePluginOptions {
+  /** Style options for each module, or `null` to leave its style references alone. */
+  readonly transform: StylePluginConfig;
+  /** Complex-selector warnings; isolation errors fail every build regardless. @default {} */
+  readonly diagnostics?: StylePluginDiagnostics | undefined;
+  readonly lifecycle?: StylePluginLifecycle | undefined;
+  /** Write every resolved utility to a Tailwind candidate manifest. */
+  readonly candidates?: string | boolean | CandidateManifestOptions | undefined;
+  /**
+   * Leave generated stylesheet imports unresolved, for builds whose output is assets derived from the graph rather than
+   * bundled CSS. The graph reads their source through `cssSource`.
+   */
+  readonly external?: boolean | undefined;
+}
 
 /** Vite configuration fields the style plugin reads while registering the candidate manifest alias. */
 interface ViteUserConfig {
@@ -84,27 +78,52 @@ type StylePluginHooks = Plugin & {
   config?(config: ViteUserConfig): CandidateManifestViteConfig | null;
 };
 
-export function stylePlugin(
-  config: StylePluginConfig,
-  diagnostics: StylePluginDiagnostics = {},
-  lifecycle?: StylePluginLifecycle,
-  candidates?: string | boolean
-): Plugin {
-  const designs = new Map<string, Promise<CachedDesignSystem>>();
-  const styleCache = new Map<string, Promise<CachedStyleModule>>();
-  const cssById = new Map<string, VirtualCssModule>();
-  const cssByOwner = new Map<string, ReadonlySet<string>>();
+/** The style plugin, which also serves the source of the stylesheets it generated. */
+export type StylePlugin = StylePluginHooks & { cssSource(id: string): string | undefined };
+
+interface CachedStyleSet {
+  readonly modules: readonly LoadedStyleModule[];
+  readonly styles: ResolvedStyles;
+}
+
+export function stylePlugin(options: StylePluginOptions): StylePlugin {
+  const { diagnostics = {}, lifecycle } = options;
+  const styleModules = createFileCache(loadStyleModule, (module) => module.watchFiles);
+  const designs = createFileCache(loadDesignSystem, (design) => design.watchFiles);
+  const styleSets = new Map<string, CachedStyleSet>();
+  const css = createVirtualCssRegistry(lifecycle);
   const reportedWarnings = new Set<string>();
+  const manifestOptions = candidateManifestOptions(options.candidates);
   let manifest: CandidateManifest | undefined;
+  let manifestRoot = process.cwd();
   let cwd = process.cwd();
 
   const useManifest = (root: string, cacheDir?: string): CandidateManifest | undefined => {
-    if (!candidates) return undefined;
+    if (!manifestOptions) return undefined;
 
-    manifest ??= createCandidateManifest(
-      isString(candidates) ? resolve(root, candidates) : resolveCandidateManifestPath(root, cacheDir)
-    );
+    if (!manifest) {
+      manifestRoot = root;
+      manifest = createCandidateManifest(
+        manifestOptions.path ? resolve(root, manifestOptions.path) : resolveCandidateManifestPath(root, cacheDir),
+        { persist: !manifestOptions.include }
+      );
+    }
+
     return manifest;
+  };
+
+  // Owners importing the same style modules share one resolved set, so its validation and diagnostics run once.
+  const styleSet = async (files: readonly string[]): Promise<ResolvedStyles> => {
+    const paths = [...new Set(files.map((file) => resolve(file)))].sort();
+    const modules = await Promise.all(paths.map((file) => styleModules.get(file)));
+    const key = paths.join('\0');
+    const cached = styleSets.get(key);
+    if (cached?.modules.every((module, index) => module === modules[index])) return cached.styles;
+
+    const styles = createResolvedStyles(modules);
+
+    styleSets.set(key, { modules, styles });
+    return styles;
   };
 
   const plugin: StylePluginHooks = {
@@ -120,576 +139,158 @@ export function stylePlugin(
         server: { watch: { ignored: [`!${escapeGlobPath(toPosixPath(current.path))}`] } },
       };
     },
-    options(options) {
-      cwd = resolve(options.cwd ?? process.cwd());
+    options(inputOptions) {
+      cwd = resolve(inputOptions.cwd ?? process.cwd());
       useManifest(cwd);
       return null;
     },
     async buildStart() {
       reportedWarnings.clear();
       await manifest?.ensure();
-    },
-    resolveId(id) {
-      return cssById.has(id) ? `\0${id}` : null;
-    },
-    load(id) {
-      const publicId = id.startsWith('\0') ? id.slice(1) : id;
 
-      return cssById.get(publicId)?.source ?? null;
+      if (manifest && manifestOptions?.include) {
+        const files = discoverStyleModules(manifestRoot, manifestOptions.include);
+        const loaded = await Promise.all(files.map((file) => styleModules.get(file)));
+
+        for (const module of loaded) this.addWatchFile(module.modulePath);
+
+        await manifest.record({ modules: new Map(loaded.map((module) => [module.modulePath, module.rules])) });
+      }
+    },
+    resolveId: {
+      filter: { id: VIRTUAL_CSS_ID },
+      handler(id) {
+        if (css.source(id) === undefined) return null;
+
+        return options.external ? { id, external: true } : `\0${id}`;
+      },
+    },
+    load: {
+      filter: { id: VIRTUAL_CSS_ID },
+      handler(id) {
+        return css.source(id) ?? null;
+      },
     },
     transform: {
       filter: { id: SCRIPT_MODULE_ID, code: '.styles' },
       async handler(_code, id, transform) {
-        const options: StyleTransformOptions | null = isFunction(config) ? await config(parseModuleId(id)) : config;
+        const config = options.transform;
+        const styleOptions = isFunction(config) ? await config(parseModuleId(id)) : config;
+        const { ast, magicString } = transform;
 
-        if (!options || !transform.ast || !transform.magicString) {
-          replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
+        if (!styleOptions || !ast || !magicString) {
+          css.replace(id, []);
           return null;
         }
-
-        lifecycle?.onOwnerTransform(id, []);
 
         const filename = moduleFilename(id);
-        const files = importedStyleFiles(filename, transform.ast);
+        const files = importedStyleFiles(filename, ast);
+        const styles = files.length > 0 ? await styleSet(files) : undefined;
 
-        if (files.length === 0) {
-          replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
+        // Only Tailwind output needs Tailwind to generate the utilities; CSS output compiles its own.
+        if (styles && styleOptions.mode === 'tailwind') await manifest?.record(styles);
+
+        if (!styles || styles.rules.length === 0) {
+          lifecycle?.onOwnerTransform(id, styles?.watchFiles ?? []);
+          css.replace(id, []);
           return null;
         }
 
-        const styles = await cachedStyles(styleCache, files);
+        const stylesheet = styleOptions.stylesheet;
+        const design = stylesheet ? await designs.get(resolve(cwd, stylesheet.input)) : undefined;
+        const watch = (): void => {
+          const watchFiles = [...new Set([...styles.watchFiles, ...(design?.watchFiles ?? [])])];
 
-        await manifest?.record(styles);
-        lifecycle?.onOwnerTransform(id, styles.watchFiles);
+          lifecycle?.onOwnerTransform(id, watchFiles);
 
-        if (styles.rules.length === 0) {
-          replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
-          return null;
-        }
+          for (const file of watchFiles) this.addWatchFile(file);
+        };
 
-        for (const file of styles.watchFiles) this.addWatchFile(file);
+        watch();
 
-        const cachedDesign = options.stylesheet
-          ? await cachedDesignSystem(designs, resolve(cwd, options.stylesheet.input))
-          : undefined;
+        const found = [...diagnoseStyles(styles, styleOptions.variants, design?.merge)];
+        const references = transformStyleReferences(filename, ast, magicString, styles, styleOptions, design?.merge);
+        const compiled =
+          styleOptions.mode === 'css' && references.referencedRules.size > 0 ? styleOptions.stylesheet : undefined;
 
-        if (cachedDesign) {
-          lifecycle?.onOwnerTransform(id, [...new Set([...styles.watchFiles, ...cachedDesign.design.watchFiles])]);
-
-          for (const file of cachedDesign.design.watchFiles) this.addWatchFile(file);
+        if (compiled && design) {
+          found.push(...diagnoseCompiledStyles(styles, design, references.referencedRules, styleOptions.variants));
         }
 
         const diagnosticOptions = isFunction(diagnostics) ? diagnostics() : diagnostics;
-        const styleDiagnostics = diagnosticOptions
-          ? [...diagnoseStyles(styles, options.variants, cachedDesign?.design.merge)]
-          : [];
-        const report = () => {
-          if (!diagnosticOptions) return;
 
-          for (const diagnostic of mergeStyleDiagnostics(styleDiagnostics)) {
-            reportStyleDiagnostic(diagnostic, diagnosticOptions, reportedWarnings, (message) => this.warn(message));
-          }
-        };
+        reportStyleDiagnostics(found, diagnosticOptions, reportedWarnings, (message) => this.warn(message));
 
-        const referencedRules = transformStyles(
-          filename,
-          transform.ast,
-          transform.magicString,
+        if (!compiled || !design) {
+          css.replace(id, []);
+          return magicString.hasChanged() ? { code: magicString } : null;
+        }
+
+        assertCompositionOrder({
+          compositions: references.compositions,
+          rules: styles.rules,
+          design,
+          variants: styleOptions.variants,
+          order: compiled.order,
+        });
+
+        const watchedDesignFiles = design.watchFiles.size;
+        const assets = await compileStyles({
+          design,
           styles,
-          options,
-          cachedDesign?.design.merge
+          scope: compiled.scope,
+          order: compiled.order,
+          shadowHosts: compiled.shadowHosts,
+          variants: styleOptions.variants,
+          ruleClassNames: references.referencedRules,
+        });
+
+        // Compiling can resolve design imports the loader never saw.
+        if (design.watchFiles.size !== watchedDesignFiles) watch();
+
+        const base = compiled.base ? resolve(cwd, compiled.base) : undefined;
+        const modules = cssModules(assets, base);
+
+        if (base) this.addWatchFile(base);
+
+        css.replace(id, modules);
+        insertModuleImports(
+          ast,
+          magicString,
+          modules.map(([publicId]) => `import ${JSON.stringify(publicId)};`)
         );
 
-        if (referencedRules.size === 0) {
-          report();
-          replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
-          return null;
-        }
-
-        if (options.mode === 'css' && options.stylesheet && cachedDesign) {
-          const base = options.stylesheet.base ? resolve(cwd, options.stylesheet.base) : undefined;
-
-          if (diagnosticOptions) {
-            styleDiagnostics.push(
-              ...diagnoseCompiledStyles(styles, cachedDesign.design, referencedRules, options.variants)
-            );
-          }
-
-          report();
-          const assets = await compileStyles({
-            design: cachedDesign.design,
-            styles,
-            ...(options.stylesheet.scope ? { scope: options.stylesheet.scope } : {}),
-            ...(options.variants ? { variants: options.variants } : {}),
-            ruleClassNames: referencedRules,
-          });
-
-          cachedDesign.versions = await fileVersions(cachedDesign.design.watchFiles);
-
-          lifecycle?.onOwnerTransform(id, [...new Set([...styles.watchFiles, ...cachedDesign.design.watchFiles])]);
-
-          for (const file of cachedDesign.design.watchFiles) this.addWatchFile(file);
-
-          const imports: string[] = [];
-          const modules: Array<readonly [string, string]> = [];
-
-          if (base) {
-            this.addWatchFile(base);
-            const source = `@import ${JSON.stringify(base.replaceAll('\\', '/'))};`;
-            const publicId = cssVirtualId('base.css', source);
-
-            modules.push([publicId, source]);
-            imports.push(`import ${JSON.stringify(publicId)};`);
-          }
-
-          for (const [fileName, source] of assets) {
-            const publicId = cssVirtualId(fileName, source);
-
-            modules.push([publicId, source]);
-            imports.push(`import ${JSON.stringify(publicId)};`);
-          }
-
-          replaceVirtualCss(cssById, cssByOwner, id, modules, lifecycle);
-          insertModuleImports(transform.ast, transform.magicString, imports);
-        } else {
-          report();
-          replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
-        }
-
         return {
-          code: transform.magicString,
+          code: magicString,
+          ...(compiled.order
+            ? { meta: mergeModuleBuildMeta(this.getModuleInfo(id)?.meta, { styleOrder: compiled.order }) }
+            : {}),
         };
       },
     },
   };
 
-  return plugin;
+  return Object.assign(plugin, { cssSource: css.source });
 }
 
-function mergeStyleDiagnostics(diagnostics: readonly StyleDiagnostic[]): readonly StyleDiagnostic[] {
-  const merged = new Map<string, StyleDiagnostic>();
+/** The stylesheets one owner imports: its runtime base stylesheet first, then each compiled output file. */
+function cssModules(
+  assets: ReadonlyMap<string, string>,
+  base: string | undefined
+): Array<readonly [id: string, source: string]> {
+  const modules: Array<readonly [string, string]> = [];
 
-  for (const diagnostic of diagnostics) {
-    const key = `${diagnostic.code}:${diagnostic.rule.modulePath}:${diagnostic.rule.tokenPath.join('.')}`;
-    const previous = merged.get(key);
+  if (base) {
+    const source = `@import ${JSON.stringify(toPosixPath(base))};`;
 
-    if (!previous) {
-      merged.set(key, diagnostic);
-      continue;
-    }
-
-    merged.set(key, {
-      ...previous,
-      utilities: [...new Set([...previous.utilities, ...diagnostic.utilities])],
-    });
+    modules.push([createVirtualCssId('base', 'base.css', source), source]);
   }
 
-  return [...merged.values()];
-}
+  for (const [fileName, source] of assets) modules.push([createVirtualCssId('asset', fileName, source), source]);
 
-function reportStyleDiagnostic(
-  diagnostic: StyleDiagnostic,
-  options: StyleDiagnosticsOptions,
-  reportedWarnings: Set<string>,
-  warn: (message: string) => void
-): void {
-  const message = formatStyleDiagnostic(diagnostic);
-  const level = options.complexSelectors ?? 'warn';
-  if (diagnostic.kind === 'error' || level === 'error') throw new Error(message);
-
-  if (level === 'off' || reportedWarnings.has(message)) return;
-
-  reportedWarnings.add(message);
-  warn(message);
-}
-
-function replaceVirtualCss(
-  cssById: Map<string, VirtualCssModule>,
-  cssByOwner: Map<string, ReadonlySet<string>>,
-  owner: string,
-  modules: readonly (readonly [id: string, source: string])[],
-  lifecycle?: StylePluginLifecycle
-): void {
-  const nextIds = new Set(modules.map(([id]) => id));
-
-  for (const id of cssByOwner.get(owner) ?? []) {
-    if (nextIds.has(id)) continue;
-
-    const module = cssById.get(id);
-
-    module?.owners.delete(owner);
-
-    if (module?.owners.size !== 0) continue;
-
-    if (module && lifecycle?.retainReleasedCss) {
-      if (module.source !== '') {
-        module.source = '';
-        lifecycle.onCssChange(id);
-      }
-    } else {
-      cssById.delete(id);
-    }
-  }
-
-  for (const [id, source] of modules) {
-    const module = cssById.get(id);
-
-    if (module) {
-      module.owners.add(owner);
-
-      if (module.source !== source) {
-        module.source = source;
-        lifecycle?.onCssChange(id);
-      }
-    } else {
-      cssById.set(id, { source, owners: new Set([owner]) });
-      lifecycle?.onCssChange(id);
-    }
-  }
-
-  if (nextIds.size > 0) cssByOwner.set(owner, nextIds);
-  else cssByOwner.delete(owner);
-}
-
-function transformStyles(
-  filename: string,
-  ast: Program,
-  magicString: RolldownMagicString,
-  styles: ResolvedStyles,
-  options: StyleTransformOptions,
-  merge?: DesignSystem['merge']
-): ReadonlySet<string> {
-  const bindings = styleBindings(filename, ast, styles);
-  if (bindings.size === 0) return new Set();
-
-  const edits: SourceEdit[] = [];
-  const referencedRules = new Set<string>();
-  const transformedRanges: Array<readonly [number, number]> = [];
-
-  walk(ast, {
-    enter(node, parent) {
-      if (node.type !== 'MemberExpression') return;
-
-      const path = readAccessPath(node);
-      const [root, ...tokenPath] = path ?? [];
-      const binding = root ? bindings.get(root) : undefined;
-      const rule = binding ? ruleForToken(styles, binding.modulePath, tokenPath) : undefined;
-      if (!rule) return;
-
-      edits.push({
-        start: node.start,
-        end: node.end,
-        content: renderStyleRule(rule, options, styleReferenceContext(node, parent), merge),
-      });
-      referencedRules.add(rule.className);
-      transformedRanges.push([node.start, node.end]);
-      this.skip();
-    },
-  });
-
-  assertNoUntransformedReferences(ast, bindings, transformedRanges);
-
-  for (const edit of edits) magicString.overwrite(edit.start, edit.end, edit.content);
-
-  for (const binding of new Set(bindings.values())) {
-    magicString.remove(binding.declaration.start, binding.declaration.end);
-  }
-
-  return referencedRules;
-}
-
-function styleBindings(filename: string, ast: Program, styles: ResolvedStyles): ReadonlyMap<string, StyleBinding> {
-  const bindings = new Map<string, StyleBinding>();
-
-  for (const statement of ast.body) {
-    if (statement.type !== 'ImportDeclaration' || !statement.source.value.startsWith('.')) continue;
-
-    const modulePath = resolveStyleModule(filename, statement.source.value, styles);
-    if (!modulePath) continue;
-
-    const defaults = statement.specifiers.filter((specifier) => specifier.type === 'ImportDefaultSpecifier');
-
-    if (defaults.length !== 1 || statement.specifiers.length !== 1) {
-      throw sourceError(`Style import \`${statement.source.value}\` must use a default import.`, statement.start);
-    }
-
-    bindings.set(defaults[0]!.local.name, { declaration: statement, modulePath });
-  }
-
-  return bindings;
-}
-
-function importedStyleFiles(filename: string, ast: Program): string[] {
-  const files: string[] = [];
-
-  for (const statement of ast.body) {
-    if (statement.type !== 'ImportDeclaration') continue;
-
-    const specifier = statement.source.value;
-    if (!specifier.startsWith('.') || !isStyleModulePath(specifier)) continue;
-
-    const file = resolveStyleModuleFile(filename, specifier);
-
-    if (!file) {
-      throw sourceError(`Cannot resolve style module \`${specifier}\` imported by \`${filename}\`.`, statement.start);
-    }
-
-    files.push(file);
-  }
-
-  return [...new Set(files)];
-}
-
-function readAccessPath(expression: Expression): string[] | undefined {
-  if (expression.type === 'Identifier') return [expression.name];
-
-  if (expression.type !== 'MemberExpression') return undefined;
-
-  const object = readAccessPath(expression.object);
-  if (!object) return undefined;
-
-  if (!expression.computed) return [...object, expression.property.name];
-
-  if (expression.property.type === 'Literal' && typeof expression.property.value === 'string') {
-    return [...object, expression.property.value];
-  }
-
-  return undefined;
-}
-
-type StyleReferenceContext = 'jsx' | 'list' | 'value';
-
-function renderStyleRule(
-  rule: ResolvedStyleRule,
-  options: StyleTransformOptions,
-  context: StyleReferenceContext,
-  merge?: DesignSystem['merge']
-): string {
-  const utilityGroups = utilityGroupsForRule(rule, options.variants, merge);
-  const groups = options.mode === 'css' || utilityGroups.length === 0 ? [rule.className] : utilityGroups;
-  const values = groups.filter(Boolean);
-
-  if (context === 'list') return values.length > 0 ? values.map((value) => JSON.stringify(value)).join(', ') : '""';
-
-  if (context === 'jsx' && values.length > 1) {
-    return `[${values.map((value) => JSON.stringify(value)).join(', ')}]`;
-  }
-
-  return JSON.stringify(values.join(' '));
-}
-
-function styleReferenceContext(expression: Expression, parent: Node | null): StyleReferenceContext {
-  const listItem =
-    (parent?.type === 'ArrayExpression' && parent.elements.includes(expression)) ||
-    (parent?.type === 'CallExpression' && parent.arguments.includes(expression));
-  if (listItem) return 'list';
-
-  return parent?.type === 'JSXExpressionContainer' ? 'jsx' : 'value';
-}
-
-function assertNoUntransformedReferences(
-  ast: Program,
-  bindings: ReadonlyMap<string, StyleBinding>,
-  transformed: readonly (readonly [number, number])[]
-): void {
-  const unresolved = new Map<string, number[]>();
-
-  walk(ast, {
-    enter(node) {
-      if (node.type !== 'Identifier' || !bindings.has(node.name)) return;
-
-      const binding = bindings.get(node.name)!;
-      const inImport = node.start >= binding.declaration.start && node.end <= binding.declaration.end;
-      const inTransform = transformed.some(([start, end]) => node.start >= start && node.end <= end);
-
-      if (!inImport && !inTransform) {
-        const positions = unresolved.get(node.name) ?? [];
-
-        positions.push(node.start);
-        unresolved.set(node.name, positions);
-      }
-    },
-  });
-
-  if (unresolved.size > 0) {
-    throw sourceError(
-      `Styles must use static references. Could not transform: ${[...unresolved]
-        .map(([name, positions]) => `${name} at ${positions.join(', ')}`)
-        .join('; ')}.`,
-      Math.min(...[...unresolved.values()].flat())
-    );
-  }
-}
-
-/** Merge the requested modules from a per-file cache so a shared style module is evaluated once per build. */
-async function cachedStyles(
-  cache: Map<string, Promise<CachedStyleModule>>,
-  files: readonly string[]
-): Promise<ResolvedStyles> {
-  const moduleFiles = [...new Set(files.map((file) => resolve(file)))].sort();
-
-  return createResolvedStyles(await Promise.all(moduleFiles.map((file) => cachedStyleModule(cache, file))));
-}
-
-async function cachedStyleModule(
-  cache: Map<string, Promise<CachedStyleModule>>,
-  file: string
-): Promise<LoadedStyleModule> {
-  const cached = await cache.get(file);
-  if (cached && (await versionsMatch(cached.versions))) return cached.module;
-
-  const loading = loadStyleModule(file).then(async (module) => ({
-    module,
-    versions: await fileVersions(module.watchFiles),
-  }));
-
-  cache.set(file, loading);
-  return (await loading).module;
-}
-
-async function fileVersions(files: Iterable<string>): Promise<ReadonlyMap<string, number>> {
-  return new Map(await Promise.all([...files].map(async (file) => [file, (await stat(file)).mtimeMs] as const)));
-}
-
-async function versionsMatch(versions: ReadonlyMap<string, number>): Promise<boolean> {
-  try {
-    for (const [file, mtimeMs] of versions) {
-      if ((await stat(file)).mtimeMs !== mtimeMs) return false;
-    }
-
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function cachedDesignSystem(
-  cache: Map<string, Promise<CachedDesignSystem>>,
-  input: string
-): Promise<CachedDesignSystem> {
-  const cached = await cache.get(input);
-  if (cached && (await versionsMatch(cached.versions))) return cached;
-
-  const loading = loadDesignSystem(input).then(async (design) => ({
-    design,
-    versions: await fileVersions(design.watchFiles),
-  }));
-
-  cache.set(input, loading);
-  return loading;
-}
-
-interface CandidateManifest {
-  readonly path: string;
-  /** Create the manifest when it does not exist so Tailwind entries can import it before any module resolves. */
-  ensure(): Promise<void>;
-  /** Merge one resolved style set and rewrite the manifest when its candidates change. */
-  record(styles: ResolvedStyles): Promise<void>;
-}
-
-/**
- * Render every utility of the given rules, including variant utilities, as Tailwind `@source inline()` entries. Extra
- * candidates carry over entries from an earlier session so a restart never shrinks the manifest.
- */
-export function renderCandidateManifest(rules: Iterable<ResolvedStyleRule>, extra: Iterable<string> = []): string {
-  const candidates = new Set<string>(extra);
-
-  for (const rule of rules) {
-    for (const utility of rule.utilities) candidates.add(utility);
-
-    for (const utilities of Object.values(rule.variants)) {
-      for (const utility of utilities) candidates.add(utility);
-    }
-  }
-
-  const lines = [...candidates].sort().map((candidate) => `@source inline(${JSON.stringify(candidate)});`);
-
-  return ['/* Generated by vjsc. Style module utilities for Tailwind source scanning. */', ...lines, ''].join('\n');
-}
-
-/** Default manifest location: the Vite cache directory of the package that owns `root`. */
-export function resolveCandidateManifestPath(root: string, cacheDir?: string): string {
-  const cache = cacheDir ? resolve(root, cacheDir) : resolve(packageRoot(root), 'node_modules/.vite');
-
-  return resolve(cache, 'vjsc/candidates.css');
-}
-
-function packageRoot(root: string): string {
-  let directory = resolve(root);
-
-  while (!existsSync(resolve(directory, 'package.json'))) {
-    const parent = dirname(directory);
-    if (parent === directory) return resolve(root);
-
-    directory = parent;
-  }
-
-  return directory;
-}
-
-/** Read the candidates an existing manifest lists. */
-export function parseCandidateManifest(content: string): string[] {
-  return [...content.matchAll(/^@source inline\(("(?:[^"\\]|\\.)*")\);$/gm)].map(([, json]) => JSON.parse(json!));
+  return modules;
 }
 
 function escapeGlobPath(path: string): string {
   return path.replace(/[[\]{}()*?!]/g, '\\$&');
-}
-
-export function createCandidateManifest(path: string): CandidateManifest {
-  const rulesByModule = new Map<string, ReadonlyMap<string, ResolvedStyleRule>>();
-  const persisted = new Set<string>();
-  let written: string | undefined;
-  let queue = Promise.resolve();
-
-  // Modules compile in parallel, so writes queue up and land through a rename: two overlapping writes would interleave
-  // their bytes, and Tailwind must never read a half-written manifest.
-  const write = (content: string): Promise<void> => {
-    queue = queue.then(async () => {
-      if (content === written) return;
-
-      const staging = `${path}.${process.pid}.tmp`;
-
-      await mkdir(dirname(path), { recursive: true });
-      await writeFile(staging, content);
-      await rename(staging, path);
-      written = content;
-    });
-
-    return queue;
-  };
-
-  return {
-    path,
-    async ensure() {
-      if (written !== undefined) return;
-
-      written = await readFile(path, 'utf8').catch(() => undefined);
-
-      if (written === undefined) await write(renderCandidateManifest([]));
-      else for (const candidate of parseCandidateManifest(written)) persisted.add(candidate);
-    },
-    async record(styles) {
-      let changed = written === undefined;
-
-      for (const [modulePath, rules] of styles.modules) {
-        if (rulesByModule.get(modulePath) === rules) continue;
-
-        rulesByModule.set(modulePath, rules);
-        changed = true;
-      }
-
-      if (!changed) return;
-
-      const rules = [...rulesByModule.values()].flatMap((moduleRules) => [...moduleRules.values()]);
-
-      await write(renderCandidateManifest(rules, persisted));
-    },
-  };
-}
-
-function cssVirtualId(fileName: string, source: string): string {
-  const hash = createHash('sha256').update(fileName).update('\0').update(source).digest('hex').slice(0, 12);
-
-  return `virtual:vjsc/css/${hash}/${encodeURIComponent(fileName)}`;
 }

@@ -1,11 +1,10 @@
 import { basename } from 'node:path';
 
-import { type OutputChunk, type Plugin, rolldown } from 'rolldown';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { type ComponentMetaPluginOptions, componentMetaPlugin, readModuleBuildMeta } from '../component-meta';
-
-const MODULE_ID = '\0fixture.tsx?target=react';
+import { readModuleBuildMeta } from '../../graph/build-meta';
+import { type ComponentMetaPluginOptions, componentMetaPlugin } from '../component-meta';
+import { buildFixture } from './helpers/lower';
 
 describe('componentMetaPlugin', () => {
   it('uses the Rolldown AST and MagicString while preserving editable source', async () => {
@@ -44,6 +43,19 @@ describe('componentMetaPlugin', () => {
     });
   });
 
+  it('reads an export whose name is spelled with Unicode escapes', async () => {
+    const result = await build(`export const m\\u0065ta = { title: 'Poster' } as const;`, {
+      defaults: () => ({ name: 'fixture', type: 'component' }),
+    });
+
+    expect(readModuleBuildMeta(result.meta)?.moduleMeta).toEqual({
+      name: 'fixture',
+      type: 'component',
+      title: 'Poster',
+    });
+    expect(result.source).not.toContain('Poster');
+  });
+
   it('rejects metadata that requires evaluation', async () => {
     await expect(build(`const name = 'poster'; export const meta = { name };`)).rejects.toThrow(
       'must contain only static literal values'
@@ -52,40 +64,8 @@ describe('componentMetaPlugin', () => {
 });
 
 async function build(
-  source: string,
+  input: string,
   options: ComponentMetaPluginOptions = {}
 ): Promise<{ code: string; meta: unknown; source: string | undefined }> {
-  let meta: unknown;
-  let transformedSource: string | undefined;
-  const inspect: Plugin = {
-    name: 'fixture:inspect',
-    buildEnd() {
-      const info = this.getModuleInfo(MODULE_ID);
-
-      meta = info?.meta;
-      transformedSource = info?.code ?? undefined;
-    },
-  };
-  const bundle = await rolldown({
-    input: 'fixture',
-    experimental: { nativeMagicString: true },
-    plugins: [fixturePlugin(source), componentMetaPlugin(options), inspect],
-  });
-  const output = await bundle.generate({ format: 'es' });
-  const chunk = output.output.find((item): item is OutputChunk => item.type === 'chunk');
-  if (!chunk) throw new Error('Fixture build did not emit a chunk.');
-
-  return { code: chunk.code, meta, source: transformedSource };
-}
-
-function fixturePlugin(source: string): Plugin {
-  return {
-    name: 'fixture:module',
-    resolveId(id) {
-      return id === 'fixture' ? MODULE_ID : null;
-    },
-    load(id) {
-      return id === MODULE_ID ? { code: source, moduleType: 'tsx' } : null;
-    },
-  };
+  return buildFixture(input, { plugins: [componentMetaPlugin(options)] });
 }

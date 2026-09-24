@@ -1,12 +1,11 @@
-import { type Plugin, rolldown } from 'rolldown';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { defineComponent, defineSchema } from '../../components/definition';
 import { defineComponentTarget } from '../../target/definition';
 import { Host, jsx } from '../../target/jsx-runtime';
-import { type ComponentTargetSelection, componentTargetPlugin } from '../component-target';
-
-const MODULE_ID = '\0fixture.tsx?target=react';
+import type { ComponentTargetSelection } from '../component-target';
+import { targetLowerPlugin } from '../target-lower';
+import { FIXTURE_ID, lowerFixture } from './helpers/lower';
 
 const schema = defineSchema('@fixture/components', {
   PlayButton: defineComponent({ name: 'PlayButton' }),
@@ -56,11 +55,11 @@ const schema = defineSchema('@fixture/components', {
 const reactTarget = defineComponentTarget<typeof schema>()(({ target, element, imported }) => ({
   source: '@fixture/components',
   components: {
-    resolve: ({ component, part }) =>
+    resolve: ({ component, parts }) =>
       imported({
         from: '@fixture/react',
         name: component,
-        ...(part ? { path: part.split('.') } : {}),
+        ...(parts.length > 0 ? { path: parts } : {}),
       }),
     rules: {
       Menu: {
@@ -97,6 +96,7 @@ const htmlTarget = defineComponentTarget<typeof schema>()(({ target, element, un
         }),
       rules: {
         OptionGroup: { Root: unwrap() },
+        Slider: { Thumbnail: { Root: unwrap() } },
         Poster: ({ props, children }) => jsx(Host, { ...props, className: 'poster', children }),
         PlayButton: () =>
           jsx(Svg, {
@@ -128,7 +128,7 @@ const htmlTarget = defineComponentTarget<typeof schema>()(({ target, element, un
   };
 });
 
-describe('componentTargetPlugin', () => {
+describe('lowerComponents', () => {
   it('lowers defaults, structural rules, and source-backed rewrites through Rolldown', async () => {
     const source = await transform(`
       import * as $ from '@fixture/components';
@@ -169,7 +169,7 @@ describe('componentTargetPlugin', () => {
       }
     );
 
-    expect(selectedId).toBe(MODULE_ID);
+    expect(selectedId).toBe(FIXTURE_ID);
     expect(source).toContain('<PlayButtonPrimitive />');
   });
 
@@ -348,6 +348,93 @@ describe('componentTargetPlugin', () => {
     expect(source).not.toContain('<$.');
   });
 
+  it('keys scope identifiers by the module path relative to the scope root', async () => {
+    const source = `
+      import * as $ from '@fixture/components';
+      export const menu = (
+        <$.Menu.Root>
+          <$.Menu.Trigger>Open</$.Menu.Trigger>
+          <$.Menu.Content>Options</$.Menu.Content>
+        </$.Menu.Root>
+      );
+    `;
+    const scopePrefix = (output: string) => /<Scope prefix="([^"]+)"/.exec(output)?.[1];
+    const first = await transform(source, {
+      targets: [htmlTarget],
+      id: '/checkout-a/src/menu.tsx?target=html',
+      root: '/checkout-a/src',
+    });
+    const second = await transform(source, {
+      targets: [htmlTarget],
+      id: '/checkout-b/src/menu.tsx?target=html',
+      root: '/checkout-b/src',
+    });
+    const moved = await transform(source, {
+      targets: [htmlTarget],
+      id: '/checkout-a/src/other.tsx?target=html',
+      root: '/checkout-a/src',
+    });
+
+    expect(scopePrefix(first)).toBeDefined();
+    expect(scopePrefix(second)).toBe(scopePrefix(first));
+    expect(scopePrefix(moved)).not.toBe(scopePrefix(first));
+  });
+
+  it('unwraps parts below the root while keeping their children', async () => {
+    const source = await transform(
+      `
+        import * as $ from '@fixture/components';
+        export const slider = (
+          <$.Slider.Root>
+            <$.Slider.Thumbnail.Root><b>kept</b></$.Slider.Thumbnail.Root>
+          </$.Slider.Root>
+        );
+      `,
+      { targets: [htmlTarget] }
+    );
+
+    expect(source).toContain('<media-slider>');
+    expect(source).toContain('<b>kept</b>');
+    expect(source).not.toContain('Thumbnail');
+  });
+
+  it('keeps unwrapped roots valid where an expression is expected', async () => {
+    const source = await transform(
+      `
+        import * as $ from '@fixture/components';
+        export const group = (
+          <$.OptionGroup.Root>
+            <$.OptionGroup.Value />
+            <$.OptionGroup.Options />
+          </$.OptionGroup.Root>
+        );
+        export const single = <$.OptionGroup.Root><span>Only</span></$.OptionGroup.Root>;
+        export const empty = <$.OptionGroup.Root />;
+      `,
+      { targets: [htmlTarget] }
+    );
+
+    expect(source).toMatch(/export const group = \(\s*<>/);
+    expect(source).toContain('<media-optiongroup />');
+    expect(source).toContain('export const single = <span>Only</span>;');
+    expect(source).toContain('export const empty = null;');
+  });
+
+  it('wraps several expression children forwarded as a render prop', async () => {
+    const source = await transform(`
+      import * as $ from '@fixture/components';
+      export function Poster({ a, b }: { a: unknown; b: unknown }) {
+        return <$.Poster>{a}{b}</$.Poster>;
+      }
+      export function Single({ a }: { a: unknown }) {
+        return <$.Poster>{a}</$.Poster>;
+      }
+    `);
+
+    expect(source).toContain('render={<>{a}{b}</>}');
+    expect(source).toContain('render={a}');
+  });
+
   it('places generated imports after module directives', async () => {
     const source = await transform(`
       'use client';
@@ -364,40 +451,15 @@ describe('componentTargetPlugin', () => {
   });
 });
 
-async function transform(
-  source: string,
-  options: { readonly targets?: ComponentTargetSelection } = {}
-): Promise<string> {
-  let output: string | undefined;
-  const inspect: Plugin = {
-    name: 'fixture:inspect',
-    buildEnd() {
-      output = this.getModuleInfo(MODULE_ID)?.code ?? undefined;
-    },
-  };
-  const bundle = await rolldown({
-    input: 'fixture',
-    experimental: { nativeMagicString: true },
-    external: /^(?:@fixture\/|vjsc\/html-runtime\/)/,
-    transform: { jsx: 'preserve' },
-    plugins: [fixturePlugin(source), componentTargetPlugin({ targets: options.targets ?? [reactTarget] }), inspect],
-  });
-
-  await bundle.generate({ format: 'es' });
-
-  if (output === undefined) throw new Error('Fixture build did not retain editable source.');
-
-  return output;
+interface TransformOptions {
+  readonly targets?: ComponentTargetSelection;
+  readonly id?: string;
+  readonly root?: string;
 }
 
-function fixturePlugin(source: string): Plugin {
-  return {
-    name: 'fixture:module',
-    resolveId(id) {
-      return id === 'fixture' ? MODULE_ID : null;
-    },
-    load(id) {
-      return id === MODULE_ID ? { code: source, moduleType: 'tsx' } : null;
-    },
-  };
+function transform(source: string, options: TransformOptions = {}): Promise<string> {
+  return lowerFixture(source, {
+    id: options.id,
+    plugins: [targetLowerPlugin({ targets: options.targets ?? [reactTarget], root: options.root })],
+  });
 }

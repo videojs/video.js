@@ -1,29 +1,34 @@
 import type {
   Expression,
   ObjectExpression,
-  ObjectProperty,
   Program,
-  PropertyKey,
   VariableDeclaration,
   VariableDeclarator,
 } from '@oxc-project/types';
-import { isPlainObject } from '@videojs/utils/predicate';
+import { isBoolean, isNumber, isPlainObject, isString } from '@videojs/utils/predicate';
 import type { Plugin, RolldownMagicString } from 'rolldown';
 
+import { staticPropertyName } from '../ast/traverse';
 import type { ComponentMeta } from '../components/meta';
+import { mergeModuleBuildMeta } from '../graph/build-meta';
 import { parseModuleId, SCRIPT_MODULE_ID, type TransformModule } from '../utils/module-id';
-
-export interface ModuleBuildMeta {
-  readonly moduleMeta?: ComponentMeta | undefined;
-  /** Whether the metadata export was removed from the transformed source, so the graph can skip re-parsing. */
-  readonly metaRemoved?: boolean | undefined;
-  readonly [key: string]: unknown;
-}
 
 interface ExportedMeta {
   readonly declaration: VariableDeclaration;
   readonly declarator: VariableDeclarator;
   readonly statement: Program['body'][number];
+}
+
+export interface ComponentMetaPluginOptions {
+  /** Metadata export to extract. Defaults to `meta`. */
+  readonly exportName?: string | undefined;
+  /**
+   * Fields every module's metadata starts from, typically derived from its path. The authored export overrides them; a
+   * module without an export still receives metadata when its defaults name it.
+   */
+  readonly defaults?: ((module: TransformModule) => Readonly<Record<string, unknown>>) | undefined;
+  /** Check merged metadata, throwing when it is incomplete, and return the project's metadata shape. */
+  readonly validate?: ((meta: Readonly<Record<string, unknown>>, module: TransformModule) => ComponentMeta) | undefined;
 }
 
 /**
@@ -35,28 +40,33 @@ interface ExportedMeta {
  *   - export const meta = { name: 'play-button' };
  *   export function PlayButton() {}
  *   ```;
- *
- * @param exportName - Metadata export to extract. Defaults to `meta`.
  */
-export interface ComponentMetaPluginOptions {
-  /** Metadata export to extract. Defaults to `meta`. */
-  readonly exportName?: string | undefined;
-  /** Fields a module's metadata starts from, typically derived from its path, which the authored export may override. */
-  readonly defaults?: ((module: TransformModule) => Readonly<Record<string, unknown>>) | undefined;
-}
-
 export function componentMetaPlugin(options: string | ComponentMetaPluginOptions = {}): Plugin {
-  const { exportName = 'meta', defaults } = typeof options === 'string' ? { exportName: options } : options;
+  const { exportName = 'meta', defaults, validate } = isString(options) ? { exportName: options } : options;
 
   return {
     name: 'vjsc:component-meta',
     transform: {
-      filter: { id: SCRIPT_MODULE_ID, code: exportName },
-      handler(_code, id, transform) {
-        const exported = findExportedMeta(transform.ast, exportName);
-        if (!exported?.declarator.init) return null;
+      // Without defaults, only a module that mentions the export can carry metadata.
+      filter: defaults ? { id: SCRIPT_MODULE_ID } : { id: SCRIPT_MODULE_ID, code: exportName },
+      handler(code, id, transform) {
+        const module = parseModuleId(id);
+        // Path defaults apply to every module, but only a module that mentions the export needs parsing. An identifier
+        // can spell the name with Unicode escapes, so such modules are parsed too.
+        const mentioned = code.includes(exportName) || code.includes('\\u');
+        const exported = mentioned ? findExportedMeta(transform.ast, exportName) : undefined;
+        const initial = defaults?.(module) ?? {};
 
-        const moduleMeta = parseComponentMeta(exported.declarator.init, id, exportName, defaults?.(parseModuleId(id)));
+        if (!exported?.declarator.init) {
+          if (!isString(initial.name) || initial.name.length === 0) return null;
+
+          const moduleMeta = validate ? validate(initial, module) : (initial as ComponentMeta);
+
+          return { meta: mergeModuleBuildMeta(this.getModuleInfo(id)?.meta, { moduleMeta }) };
+        }
+
+        const merged = parseComponentMeta(exported.declarator.init, id, exportName, initial);
+        const moduleMeta = validate ? validate(merged, module) : merged;
         const magicString = transform.magicString;
         if (!magicString) throw new Error('vjsc: Rolldown did not provide MagicString to the component metadata pass.');
 
@@ -64,30 +74,10 @@ export function componentMetaPlugin(options: string | ComponentMetaPluginOptions
 
         return {
           code: magicString,
-          meta: mergeModuleBuildMeta(this.getModuleInfo(id)?.meta, { moduleMeta, metaRemoved: true }),
+          meta: mergeModuleBuildMeta(this.getModuleInfo(id)?.meta, { moduleMeta }),
         };
       },
     },
-  };
-}
-
-export function readModuleBuildMeta(meta: unknown): ModuleBuildMeta | undefined {
-  if (!isPlainObject(meta)) return undefined;
-
-  const moduleMeta = isComponentMeta(meta.moduleMeta) ? meta.moduleMeta : undefined;
-  const metaRemoved = meta.metaRemoved === true ? true : undefined;
-  if (!moduleMeta && !metaRemoved) return undefined;
-
-  return { ...meta, moduleMeta, metaRemoved };
-}
-
-export function mergeModuleBuildMeta(
-  meta: unknown,
-  update: Partial<ModuleBuildMeta>
-): Readonly<Record<string, unknown>> {
-  return {
-    ...(isPlainObject(meta) ? meta : {}),
-    ...update,
   };
 }
 
@@ -132,7 +122,7 @@ function parseComponentMeta(
 
   const value = { ...defaults, ...authored };
 
-  if (typeof value.name !== 'string' || value.name.length === 0) {
+  if (!isString(value.name) || value.name.length === 0) {
     throw new Error(`Component metadata \`${exportName}\` in ${id} must contain a non-empty literal \`name\`.`);
   }
 
@@ -143,12 +133,7 @@ function staticValue(expression: Expression, id: string): unknown {
   const value = unwrapExpression(expression);
 
   if (value.type === 'Literal') {
-    if (
-      typeof value.value === 'string' ||
-      typeof value.value === 'number' ||
-      typeof value.value === 'boolean' ||
-      value.value === null
-    ) {
+    if (isString(value.value) || isNumber(value.value) || isBoolean(value.value) || value.value === null) {
       return value.value;
     }
 
@@ -157,7 +142,7 @@ function staticValue(expression: Expression, id: string): unknown {
 
   if (value.type === 'UnaryExpression' && value.operator === '-') {
     const operand = staticValue(value.argument, id);
-    if (typeof operand === 'number') return -operand;
+    if (isNumber(operand)) return -operand;
   }
 
   if (value.type === 'TemplateLiteral' && value.expressions.length === 0) {
@@ -184,20 +169,12 @@ function staticObject(expression: ObjectExpression, id: string): Readonly<Record
         throw nonStaticMeta(id);
       }
 
-      return [staticPropertyName(property, id), staticValue(property.value, id)];
+      const name = staticPropertyName(property);
+      if (name === undefined) throw nonStaticMeta(id);
+
+      return [name, staticValue(property.value, id)];
     })
   );
-}
-
-function staticPropertyName(property: ObjectProperty, id: string): string {
-  const key: PropertyKey = property.key;
-  if (!property.computed && key.type === 'Identifier') return key.name;
-
-  if (key.type === 'Literal' && (typeof key.value === 'string' || typeof key.value === 'number')) {
-    return String(key.value);
-  }
-
-  throw nonStaticMeta(id);
 }
 
 function unwrapExpression(expression: Expression): Expression {
@@ -215,8 +192,4 @@ function unwrapExpression(expression: Expression): Expression {
 
 function nonStaticMeta(id: string): Error {
   return new Error(`Component metadata in ${id} must contain only static literal values.`);
-}
-
-function isComponentMeta(value: unknown): value is ComponentMeta {
-  return isPlainObject(value) && typeof value.name === 'string';
 }

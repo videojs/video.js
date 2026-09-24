@@ -2,23 +2,20 @@ import type {
   CallExpression,
   JSXAttribute,
   JSXOpeningElement,
-  Program,
   VariableDeclaration,
   VariableDeclarator,
 } from '@oxc-project/types';
+import { isString } from '@videojs/utils/predicate';
 import { walk } from 'oxc-walker';
-import type { Plugin } from 'rolldown';
 
-import { jsxNamePath, type ModuleImports, sourceError } from '../ast';
-import { importedName, isComponentImport } from '../target/bindings';
-import type { ComponentTarget, TargetElement, TargetTransformContext } from '../target/definition';
-import { createTargetModuleImports, createTargetTypeImports } from '../target/module-imports';
+import { jsxNamePath, sourceError } from '../ast';
+import { componentExport, isCanonicalBinding, type TargetBindings } from '../target/bindings';
+import { type ComponentTarget, emitsMarkup, type TargetElement } from '../target/definition';
+import { claimGeneratedName, type TargetModule } from '../target/module';
 import { renderTargetElement, renderTargetPropsType } from '../target/render';
 import { renderTargetMarker } from '../target/render-target';
-import { SCRIPT_MODULE_ID } from '../utils/module-id';
-import { type ComponentTargetPluginOptions, selectComponentTargets } from './component-target';
 
-type MagicString = TargetTransformContext['magicString'];
+type MagicString = TargetModule['magicString'];
 
 interface RenderTargetDefinition {
   readonly exported: boolean;
@@ -36,51 +33,30 @@ interface ResolvedRenderTarget {
   readonly name: string;
 }
 
+const RENDER_TARGET_SOURCE = /defineRenderTarget|\$render/;
+
 /** Lower `defineRenderTarget` declarations and `$render` directives for the target that owns them. */
-export function renderTargetPlugin(options: ComponentTargetPluginOptions): Plugin {
-  return {
-    name: 'vjsc:render-target',
-    transform: {
-      filter: { id: SCRIPT_MODULE_ID, code: /defineRenderTarget|\$render/ },
-      handler(code, id, transform) {
-        const targets = selectComponentTargets(options.targets, id);
-        if (targets.length === 0 || !transform.ast || !transform.magicString) return null;
+export function lowerRenderTargets(module: TargetModule): void {
+  if (!RENDER_TARGET_SOURCE.test(module.code)) return;
 
-        const owners = targets.filter((target) => Object.keys(target.renderTargets).length > 0);
-        if (owners.length > 1) throw new Error('Only one component target per module may define render targets.');
+  const owners = module.targets.filter((target) => Object.keys(target.renderTargets).length > 0);
+  if (owners.length > 1) throw new Error('Only one component target per module may define render targets.');
 
-        const changed = lowerRenderTargets(
-          { code, id, ast: transform.ast, magicString: transform.magicString },
-          owners[0] ?? targets[0]!
-        );
-
-        return changed ? { code: transform.magicString } : null;
-      },
-    },
-  };
-}
-
-function lowerRenderTargets(context: TargetTransformContext, target: ComponentTarget): boolean {
-  const definitions = collectDefinitions(context.ast);
-  const imports = collectImportedNames(context.ast);
-  const canonical = collectCanonicalRoots(context.ast, [target]);
-  const runtimeImports = createTargetModuleImports(context.ast, context.magicString);
-  const typeImports = createTargetTypeImports(context.ast, context.magicString);
-  let changed = false;
+  const target = owners[0] ?? module.targets[0]!;
+  const definitions = collectDefinitions(module);
+  const { bindings, magicString } = module;
 
   for (const definition of definitions.values()) {
     const resolved = resolveRenderTarget(definition.name, target, definition.start);
-    const replacement = renderDefinition(definition, resolved, runtimeImports, typeImports);
 
-    context.magicString.overwrite(definition.start, definition.end, replacement);
-    changed = true;
+    magicString.overwrite(definition.start, definition.end, renderDefinition(definition, resolved, module));
   }
 
-  walk(context.ast, {
+  walk(module.ast, {
     enter(node, parent) {
       if (node.type !== 'JSXAttribute' || node.name.type !== 'JSXIdentifier' || node.name.name !== '$render') return;
 
-      if (parent?.type !== 'JSXOpeningElement' || !isCanonicalOpening(parent, canonical)) {
+      if (parent?.type !== 'JSXOpeningElement' || !isCanonicalOpening(parent, bindings)) {
         throw sourceError(
           '`$render` can only be used on a canonical component or part.\n' +
             'Reason: framework targets can only compose render props while lowering known component contracts.\n' +
@@ -90,7 +66,7 @@ function lowerRenderTargets(context: TargetTransformContext, target: ComponentTa
       }
 
       const local = renderTargetIdentifier(node);
-      const name = definitions.get(local)?.name ?? imports.get(local);
+      const name = definitions.get(local)?.name ?? relativeImportName(bindings, local);
 
       if (!name) {
         throw sourceError(
@@ -101,28 +77,28 @@ function lowerRenderTargets(context: TargetTransformContext, target: ComponentTa
         );
       }
 
-      const resolved = resolveRenderTarget(name, target, node.start);
-
-      lowerRenderDirective(context.code, parent, node, local, resolved, context.magicString);
-
-      changed = true;
+      lowerRenderDirective(
+        module.code,
+        parent,
+        node,
+        local,
+        resolveRenderTarget(name, target, node.start),
+        magicString
+      );
       this.skip();
     },
   });
-
-  if (changed) {
-    runtimeImports.commit();
-    typeImports.commit();
-  }
-
-  return changed;
 }
 
-function collectDefinitions(ast: Program): ReadonlyMap<string, RenderTargetDefinition> {
-  const factories = importedFactories(ast);
+function collectDefinitions(module: TargetModule): ReadonlyMap<string, RenderTargetDefinition> {
+  const factories = new Set(
+    [...module.bindings.imports].flatMap(([local, binding]) =>
+      !binding.type && componentExport(module.bindings, local) === 'defineRenderTarget' ? [local] : []
+    )
+  );
   const definitions = new Map<string, RenderTargetDefinition>();
 
-  for (const statement of ast.body) {
+  for (const statement of module.ast.body) {
     const exported = statement.type === 'ExportNamedDeclaration';
     const declaration = exported ? statement.declaration : statement;
     if (declaration?.type !== 'VariableDeclaration') continue;
@@ -187,31 +163,15 @@ function readDefinition(
 }
 
 function readClassName(value: CallExpression['arguments'][number] | undefined): readonly string[] | undefined {
-  if (value?.type === 'Literal' && typeof value.value === 'string') return [value.value];
+  if (value?.type === 'Literal' && isString(value.value)) return [value.value];
 
   if (value?.type !== 'ArrayExpression') return undefined;
 
   const parts = value.elements.map((element) =>
-    element?.type === 'Literal' && typeof element.value === 'string' ? element.value : undefined
+    element?.type === 'Literal' && isString(element.value) ? element.value : undefined
   );
 
   return parts.every((part) => part !== undefined) ? parts : undefined;
-}
-
-function importedFactories(ast: Program): ReadonlySet<string> {
-  const factories = new Set<string>();
-
-  for (const statement of ast.body) {
-    if (!isComponentImport(statement)) continue;
-
-    for (const specifier of statement.specifiers) {
-      if (specifier.type !== 'ImportSpecifier' || specifier.importKind === 'type') continue;
-
-      if (importedName(specifier) === 'defineRenderTarget') factories.add(specifier.local.name);
-    }
-  }
-
-  return factories;
 }
 
 function isDefinitionCall(
@@ -225,53 +185,17 @@ function isDefinitionCall(
   );
 }
 
-function collectImportedNames(ast: Program): ReadonlyMap<string, string> {
-  const imports = new Map<string, string>();
-
-  for (const statement of ast.body) {
-    if (
-      statement.type !== 'ImportDeclaration' ||
-      statement.importKind === 'type' ||
-      !statement.source.value.startsWith('.')
-    ) {
-      continue;
-    }
-
-    for (const specifier of statement.specifiers) {
-      if (specifier.type !== 'ImportSpecifier' || specifier.importKind === 'type') continue;
-
-      imports.set(specifier.local.name, importedName(specifier));
-    }
-  }
-
-  return imports;
-}
-
-function collectCanonicalRoots(ast: Program, targets: readonly ComponentTarget[]): ReadonlySet<string> {
-  const sources = new Set(targets.map((target) => target.source));
-  const roots = new Set<string>();
-
-  for (const statement of ast.body) {
-    if (
-      statement.type !== 'ImportDeclaration' ||
-      statement.importKind === 'type' ||
-      !sources.has(statement.source.value)
-    ) {
-      continue;
-    }
-
-    for (const specifier of statement.specifiers) {
-      if (specifier.type !== 'ImportSpecifier' || specifier.importKind !== 'type') roots.add(specifier.local.name);
-    }
-  }
-
-  return roots;
-}
-
-function isCanonicalOpening(opening: JSXOpeningElement, roots: ReadonlySet<string>): boolean {
+function isCanonicalOpening(opening: JSXOpeningElement, bindings: TargetBindings): boolean {
   const root = jsxNamePath(opening.name)[0];
 
-  return Boolean(root && roots.has(root));
+  return root !== undefined && isCanonicalBinding(bindings, root);
+}
+
+/** The exported name of a named runtime import from a relative module, which names the render target it carries. */
+function relativeImportName(bindings: TargetBindings, local: string): string | undefined {
+  const binding = bindings.imports.get(local);
+
+  return binding && !binding.type && binding.source.startsWith('.') ? binding.imported : undefined;
 }
 
 function renderTargetIdentifier(attribute: JSXAttribute): string {
@@ -307,8 +231,7 @@ function resolveRenderTarget(name: string, target: ComponentTarget, pos: number)
 function renderDefinition(
   definition: RenderTargetDefinition,
   resolved: ResolvedRenderTarget,
-  runtimeImports: ModuleImports,
-  typeImports: ModuleImports
+  module: TargetModule
 ): string {
   const prefix = definition.exported ? 'export ' : '';
 
@@ -321,12 +244,12 @@ function renderDefinition(
     );
   }
 
-  if (resolved.target.jsx.attributes === 'html') {
+  if (emitsMarkup(resolved.target)) {
     return `${prefix}const ${definition.local} = ${JSON.stringify(definition.className.join(' '))};`;
   }
 
-  const element = renderTargetElement(resolved.element, { target: resolved.target, imports: runtimeImports });
-  const props = renderTargetPropsType(resolved.element, typeImports);
+  const element = renderTargetElement(resolved.element, { target: resolved.target, imports: module.imports });
+  const props = renderTargetPropsType(resolved.element, module.typeImports);
 
   if (!props) {
     throw sourceError(
@@ -338,8 +261,9 @@ function renderDefinition(
   }
 
   const classes = [...definition.className.map((className) => JSON.stringify(className)), 'className'];
+  const propsName = claimGeneratedName(module, `${definition.local}Props`, definition.start);
 
-  return `${prefix}type ${definition.local}Props = ${props};\n\n${prefix}function ${definition.local}({ className, ...props }: ${definition.local}Props) {\n  return <${element} className={[${classes.join(', ')}]} {...props} />;\n}`;
+  return `${prefix}type ${propsName} = ${props};\n\n${prefix}function ${definition.local}({ className, ...props }: ${propsName}) {\n  return <${element} className={[${classes.join(', ')}]} {...props} />;\n}`;
 }
 
 function lowerRenderDirective(
@@ -350,7 +274,7 @@ function lowerRenderDirective(
   resolved: ResolvedRenderTarget,
   magicString: MagicString
 ): void {
-  if (resolved.target.jsx.attributes === 'react') {
+  if (!emitsMarkup(resolved.target)) {
     if (
       opening.attributes.some(
         (attribute) => attribute.type === 'JSXAttribute' && jsxAttributeName(attribute) === 'render'

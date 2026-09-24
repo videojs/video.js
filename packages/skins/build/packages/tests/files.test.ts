@@ -1,37 +1,61 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { syncGeneratedFiles } from '../files.ts';
 
-const packageDir = resolve(import.meta.dirname, '../../..');
-
 describe('syncGeneratedFiles', () => {
-  let root: string | undefined;
+  it('writes changed files and removes stale files from owned paths', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'videojs-generated-'));
 
-  afterEach(async () => {
-    if (root) await rm(root, { recursive: true, force: true });
+    mkdirSync(join(workspace, 'out/nested'), { recursive: true });
+    writeFileSync(join(workspace, 'out/kept.ts'), 'kept');
+    writeFileSync(join(workspace, 'out/nested/stale.ts'), 'stale');
+    writeFileSync(join(workspace, 'single.css'), 'old');
 
-    root = undefined;
+    const changed = await syncGeneratedFiles(
+      workspace,
+      [
+        { path: 'out/kept.ts', content: 'kept' },
+        { path: 'out/new.ts', content: 'new' },
+        { path: 'single.css', content: 'new' },
+      ],
+      ['out', 'single.css']
+    );
+
+    expect(changed).toBe(3);
+    expect(existsSync(join(workspace, 'out/nested/stale.ts'))).toBe(false);
+    expect(readFileSync(join(workspace, 'out/new.ts'), 'utf8')).toBe('new');
+    expect(readFileSync(join(workspace, 'single.css'), 'utf8')).toBe('new');
   });
 
-  it('removes stale files matched by an owned glob and leaves unmatched files alone', async () => {
-    root = await mkdtemp(resolve(packageDir, 'node_modules/skins-sync-'));
-    await mkdir(resolve(root, 'presets/video'), { recursive: true });
-    await writeFile(resolve(root, 'presets/video/retired-skin.tsx'), 'stale');
-    await writeFile(resolve(root, 'presets/video/index.ts'), 'authored');
+  it('refuses to write outside the owned paths', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'videojs-generated-'));
 
-    const files = [{ path: 'presets/video/skin.tsx', content: 'generated' }];
-    const owned = ['presets/*/*skin.tsx'];
+    await expect(syncGeneratedFiles(workspace, [{ path: 'elsewhere/file.ts', content: '' }], ['out'])).rejects.toThrow(
+      'Generated files are outside every owned path: `elsewhere/file.ts`.'
+    );
+  });
 
-    expect(await syncGeneratedFiles(root, files, owned)).toBe(2);
-    expect(existsSync(resolve(root, 'presets/video/retired-skin.tsx'))).toBe(false);
-    expect(readFileSync(resolve(root, 'presets/video/skin.tsx'), 'utf8')).toBe('generated');
-    expect(readFileSync(resolve(root, 'presets/video/index.ts'), 'utf8')).toBe('authored');
+  it('checks ownership on normalized paths', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'videojs-generated-'));
 
-    // A glob match that is still generated stays in place rather than being deleted and rewritten.
-    expect(await syncGeneratedFiles(root, files, owned)).toBe(0);
+    await expect(
+      syncGeneratedFiles(workspace, [{ path: 'out/../outside.txt', content: 'escaped' }], ['out'])
+    ).rejects.toThrow('Generated files are outside every owned path: `outside.txt`.');
+    expect(existsSync(join(workspace, 'outside.txt'))).toBe(false);
+  });
+
+  it('rejects paths that leave the workspace', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'videojs-generated-'));
+
+    await expect(syncGeneratedFiles(workspace, [{ path: '/tmp/file.txt', content: '' }], ['out'])).rejects.toThrow(
+      'must be relative to the workspace'
+    );
+    await expect(syncGeneratedFiles(workspace, [{ path: 'out/file.txt', content: '' }], ['../out'])).rejects.toThrow(
+      'must be relative to the workspace'
+    );
   });
 });

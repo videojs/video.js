@@ -8,6 +8,6 @@
     "declarationDir": "types",
     "useDefineForClassFields": false
   },
-  "include": ["src"],
+  "include": ["src", "vjsc"],
   "references": [{ "path": "../core" }, { "path": "../icons" }]
 }

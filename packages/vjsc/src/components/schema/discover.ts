@@ -1,8 +1,11 @@
 import { globSync, readFileSync } from 'node:fs';
 
-import type { CallExpression, ExportDefaultDeclaration, PropertyKey } from '@oxc-project/types';
+import type { CallExpression, ExportDefaultDeclaration, ObjectProperty } from '@oxc-project/types';
+import { isObject, isString } from '@videojs/utils/predicate';
 import { parseSync } from 'oxc-parser';
 
+import { parseError } from '../../ast/errors';
+import { staticPropertyName } from '../../ast/traverse';
 import { toArray } from '../../utils/array';
 import { absolutePath, fileStem } from '../../utils/path';
 import type { ComponentDefinition, ComponentPartDefinition, ComponentParts } from '../definition';
@@ -45,9 +48,7 @@ export interface DiscoveredSchema {
 /** Discover component definitions and their watched source files. */
 export function discoverSchema(options: DiscoverSchemaOptions): DiscoveredSchema {
   const components = options.include.flatMap<SchemaComponent>((source) =>
-    typeof source === 'string'
-      ? discoverDefinitions(source, options.exclude, options.cwd)
-      : discoverFiles(source, options.cwd)
+    isString(source) ? discoverDefinitions(source, options.exclude, options.cwd) : discoverFiles(source, options.cwd)
   );
 
   return {
@@ -81,8 +82,11 @@ function discoverFiles(source: ComponentFileSet, cwd: string): FileSchemaCompone
 }
 
 function parseComponentDefinitionFile(fileName: string): Pick<DefinedSchemaComponent, 'definition' | 'name'> {
-  const parsed = parseSync(fileName, readFileSync(fileName, 'utf8'));
-  if (parsed.errors.length > 0) throw new Error(parsed.errors.map((error) => error.message).join('\n'));
+  const source = readFileSync(fileName, 'utf8');
+  const parsed = parseSync(fileName, source);
+
+  if (parsed.errors.length > 0)
+    throw parseError('Cannot read a component definition.', fileName, source, parsed.errors);
 
   const exported = parsed.program.body.find(
     (statement): statement is ExportDefaultDeclaration =>
@@ -100,10 +104,10 @@ function parseComponentDefinitionFile(fileName: string): Pick<DefinedSchemaCompo
 }
 
 function isDefineComponentCall(node: unknown): node is CallExpression {
-  if (!node || typeof node !== 'object') return false;
+  if (!isObject(node)) return false;
 
   const candidate = node as { readonly type?: unknown; readonly callee?: unknown };
-  if (candidate.type !== 'CallExpression' || !candidate.callee || typeof candidate.callee !== 'object') return false;
+  if (candidate.type !== 'CallExpression' || !isObject(candidate.callee)) return false;
 
   const callee = candidate.callee as { readonly type?: unknown; readonly name?: unknown };
 
@@ -127,10 +131,10 @@ function parseComponentDefinition(call: CallExpression, fileName: string): Parse
   for (const property of argument.properties) {
     if (property.type !== 'Property' || property.kind !== 'init' || property.method) continue;
 
-    const name = staticPropertyName(property.key);
+    const name = requireStaticName(property);
 
     if (name === 'name' || name === 'root') {
-      if (property.value.type !== 'Literal' || typeof property.value.value !== 'string') {
+      if (property.value.type !== 'Literal' || !isString(property.value.value)) {
         throw new Error(`defineComponent() in ${fileName} requires a literal \`${name}:\` field`);
       }
 
@@ -150,7 +154,7 @@ function parseComponentDefinition(call: CallExpression, fileName: string): Parse
           throw new Error(`defineComponent() in ${fileName} requires literal component parts`);
         }
 
-        return [staticPropertyName(part.key), parseComponentDefinition(part.value, fileName)];
+        return [requireStaticName(part), parseComponentDefinition(part.value, fileName)];
       })
     );
   }
@@ -162,12 +166,9 @@ type ParsedComponentDefinition = ComponentPartDefinition<object, ComponentParts 
   readonly name?: string | undefined;
 };
 
-function staticPropertyName(name: PropertyKey): string {
-  if (name.type === 'Identifier') return name.name;
+function requireStaticName(property: ObjectProperty): string {
+  const name = staticPropertyName(property);
+  if (name === undefined) throw new Error('Component definition property names must be static.');
 
-  if (name.type === 'Literal' && (typeof name.value === 'string' || typeof name.value === 'number')) {
-    return String(name.value);
-  }
-
-  throw new Error('Component definition property names must be static.');
+  return name;
 }

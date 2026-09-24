@@ -1,3 +1,4 @@
+import { isString } from '@videojs/utils/predicate';
 import type { InputOption } from 'rolldown';
 
 /** Add named entries without replacing existing Rolldown inputs. */
@@ -9,7 +10,7 @@ export function addInputEntries(
 
   const ids = Object.values(entries);
 
-  if (typeof input === 'string') return [input, ...ids];
+  if (isString(input)) return [input, ...ids];
 
   if (Array.isArray(input)) return [...new Set([...input, ...ids])];
 

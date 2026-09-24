@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import type { GeneratedPackageFile } from './files.ts';
+import type { GeneratedFile } from './files.ts';
 
 export function addGenerated(files: Map<string, string>, path: string, content: string): void {
   const previous = files.get(path);
@@ -25,10 +25,6 @@ export async function addCopiedFiles(
   );
 }
 
-export function generatedFiles(files: ReadonlyMap<string, string>): GeneratedPackageFile[] {
+export function generatedFiles(files: ReadonlyMap<string, string>): GeneratedFile[] {
   return [...files].sort(([left], [right]) => left.localeCompare(right)).map(([path, content]) => ({ path, content }));
-}
-
-export function pascalCase(value: string): string {
-  return value.replace(/(?:^|-)([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 }

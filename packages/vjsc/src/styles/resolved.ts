@@ -1,6 +1,8 @@
 import { realpath } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runInThisContext } from 'node:vm';
 
 import { twMerge } from 'cn';
 import { type OutputChunk, rolldown } from 'rolldown';
@@ -47,13 +49,6 @@ export interface LoadedStyleModule {
   readonly watchFiles: readonly string[];
 }
 
-/** Evaluate controlled style modules and normalize their explicit definitions. */
-export async function resolveStyles(files: readonly string[]): Promise<ResolvedStyles> {
-  const moduleFiles = [...new Set(files.map((file) => resolve(file)))].sort();
-
-  return createResolvedStyles(await Promise.all(moduleFiles.map(loadStyleModule)));
-}
-
 /** Evaluate one style module and normalize its rules independently of the other modules a source imports. */
 export async function loadStyleModule(file: string): Promise<LoadedStyleModule> {
   const modulePath = await realpath(resolve(file));
@@ -90,23 +85,68 @@ export function utilityGroupsForRule(
   return mergeUtilityGroups([...rule.utilityGroups, ...selected], merge);
 }
 
+/** Utilities per rule, by merge function and by the variants of the selection the rule defines. */
+const ruleUtilities = new WeakMap<ResolvedStyleRule, WeakMap<DesignSystem['merge'], Map<string, readonly string[]>>>();
+
+/**
+ * The utilities one rule applies under a variant selection. Rules are immutable once resolved, and every compile,
+ * reference, and diagnostic of an owner asks for the same rules, so results are shared; only the selected variants a
+ * rule defines change them.
+ */
 export function utilitiesForRule(
   rule: ResolvedStyleRule,
   variants: readonly string[] = [],
   merge: DesignSystem['merge'] = twMerge
 ): readonly string[] {
-  return utilityGroupsForRule(rule, variants, merge).flatMap(splitClassNames);
+  const byMerge = ruleUtilities.get(rule) ?? new WeakMap<DesignSystem['merge'], Map<string, readonly string[]>>();
+  const byVariants = byMerge.get(merge) ?? new Map<string, readonly string[]>();
+  const key = variants.filter((variant) => rule.variantGroups[variant]?.length).join('\0');
+  const cached = byVariants.get(key);
+  if (cached) return cached;
+
+  const utilities = utilityGroupsForRule(rule, variants, merge).flatMap(splitClassNames);
+
+  byVariants.set(key, utilities);
+  byMerge.set(merge, byVariants);
+  ruleUtilities.set(rule, byMerge);
+
+  return utilities;
 }
 
 export function isGroupMarker(value: string): boolean {
   return value === 'group' || value.startsWith('group/');
 }
 
+const groupOwners = new WeakMap<
+  readonly ResolvedStyleRule[],
+  WeakMap<DesignSystem['merge'], Map<string, ReadonlyMap<string, readonly string[]>>>
+>();
+
 /** Map each named group marker to the semantic classes that declare it under the selected variants. */
 export function collectGroupOwners(
   rules: readonly ResolvedStyleRule[],
   variants: readonly string[] = [],
   merge: DesignSystem['merge'] = twMerge
+): ReadonlyMap<string, readonly string[]> {
+  const byMerge = groupOwners.get(rules) ?? new WeakMap();
+  const byVariants = byMerge.get(merge) ?? new Map<string, ReadonlyMap<string, readonly string[]>>();
+  const key = variants.join('\0');
+  const cached = byVariants.get(key);
+  if (cached) return cached;
+
+  const owners = collectUncachedGroupOwners(rules, variants, merge);
+
+  byVariants.set(key, owners);
+  byMerge.set(merge, byVariants);
+  groupOwners.set(rules, byMerge);
+
+  return owners;
+}
+
+function collectUncachedGroupOwners(
+  rules: readonly ResolvedStyleRule[],
+  variants: readonly string[],
+  merge: DesignSystem['merge']
 ): ReadonlyMap<string, readonly string[]> {
   const owners = new Map<string, string[]>();
 
@@ -260,6 +300,11 @@ function displayRule(rule: ResolvedStyleRule): string {
   return `${rule.modulePath}#${rule.tokenPath.join('.')}`;
 }
 
+/**
+ * Bundle a style module with its imports and run it as a script. A style module is plain data, so it runs as CommonJS
+ * in a function scope that is collected once its definition is replaced; importing it as an ES module would keep every
+ * evaluated version in Node's module map for the life of the process.
+ */
 async function evaluateStyleModule(
   modulePath: string
 ): Promise<{ module: { default?: unknown }; watchFiles: readonly string[] }> {
@@ -281,19 +326,21 @@ async function evaluateStyleModule(
   });
 
   try {
-    const output = await bundle.generate({ format: 'esm', codeSplitting: false });
+    const output = await bundle.generate({ format: 'cjs', exports: 'named', codeSplitting: false });
     const chunks = output.output.filter((item): item is OutputChunk => item.type === 'chunk');
 
     if (chunks.length !== 1 || !chunks[0]) {
       throw new Error(`Style module \`${modulePath}\` compiled to ${chunks.length} chunks.`);
     }
 
-    const dataUrl = `data:text/javascript;base64,${Buffer.from(chunks[0].code).toString('base64')}`;
+    const module: { exports: { default?: unknown } } = { exports: {} };
+    const run = runInThisContext(`(function (exports, require, module, __filename, __dirname) {${chunks[0].code}\n})`, {
+      filename: modulePath,
+    }) as (...args: unknown[]) => void;
 
-    return {
-      module: (await import(dataUrl)) as { default?: unknown },
-      watchFiles: await bundle.watchFiles,
-    };
+    run(module.exports, createRequire(modulePath), module, modulePath, dirname(modulePath));
+
+    return { module: module.exports, watchFiles: await bundle.watchFiles };
   } finally {
     await bundle.close();
   }

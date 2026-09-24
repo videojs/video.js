@@ -9,19 +9,14 @@ import type {
   TSTypeReference,
 } from '@oxc-project/types';
 import { walk } from 'oxc-walker';
-import type { Plugin, RolldownMagicString } from 'rolldown';
 
-import { createSourceText, jsxNamePath, type ModuleImports, renderSourceRange, type SourceEdit } from '../ast';
+import { createSourceText, jsxNamePath, renderSourceRange, type SourceEdit, sourceError } from '../ast';
 import {
   boundCanonicalPath,
-  type CanonicalBindings,
   canonicalPath,
-  collectCanonicalBindings,
-  collectPrimitiveBindings,
   COMPONENT_SOURCE,
-  configuredRule,
-  importedName,
-  primitiveRule,
+  resolveTargetElement,
+  type TargetBindings,
 } from '../target/bindings';
 import {
   type ComponentTarget,
@@ -32,9 +27,7 @@ import {
   type TargetPropsReference,
   type TargetReference,
 } from '../target/definition';
-import { createTargetModuleImports, createTargetTypeImports } from '../target/module-imports';
-import { SCRIPT_MODULE_ID } from '../utils/module-id';
-import { type ComponentTargetPluginOptions, selectComponentTargets } from './component-target';
+import { claimGeneratedName, type TargetModule } from '../target/module';
 
 interface PropsHelper {
   readonly annotation: TSType;
@@ -54,165 +47,128 @@ interface ResolvedProps {
   readonly children?: string | undefined;
 }
 
-export function targetTypePlugin(options: ComponentTargetPluginOptions): Plugin {
-  return {
-    name: 'vjsc:target-types',
-    transform: {
-      filter: { id: SCRIPT_MODULE_ID, code: 'vjsc/components' },
-      handler(code, id, transform) {
-        const targets = selectComponentTargets(options.targets, id);
-        if (targets.length === 0 || !transform.ast || !transform.magicString) return null;
+const SOURCE_TYPE_NAMES = new Set(['ClassNameValue', 'Props', 'PropsWithChildren', 'PropsOf']);
 
-        const bindings = collectBindings(transform.ast, targets);
-        if (bindings.sourceTypes.size === 0) return null;
-
-        const imports = createTargetModuleImports(transform.ast, transform.magicString);
-        const typeImports = createTargetTypeImports(transform.ast, transform.magicString);
-        const sourceInterfaces = collectSourceInterfaces(transform.ast);
-        let changed = transformSourceTypes(
-          code,
-          transform.ast,
-          bindings,
-          targets,
-          imports,
-          typeImports,
-          transform.magicString
-        );
-
-        walk(transform.ast, {
-          enter(node, parent) {
-            if (node.type !== 'FunctionDeclaration' || !node.id || !node.body) return;
-
-            const helper = propsHelper(node.params[0], sourceInterfaces);
-            if (!helper) return;
-
-            const forwarded = forwardedBinding(node.params[0]);
-            if (!forwarded) return;
-
-            const root = forwardedTarget(node, forwarded, bindings);
-            if (!root) return;
-
-            const props = targetProps(root, imports, typeImports);
-            if (!props) return;
-
-            // Children are typed by the part that renders them. That is usually the root, but a
-            // compound wrapper may hand them to a nested part instead, such as an image's `render`.
-            const childrenPart = helper.includesChildren ? childrenTarget(node, node.params[0], bindings) : undefined;
-            const childrenProps =
-              childrenPart && !sameTargetElement(root, childrenPart)
-                ? targetProps(childrenPart, imports, typeImports)
-                : undefined;
-
-            const interfaceName = helper.sourceInterface?.declaration.id.name ?? `${node.id.name}Props`;
-            const heritage = targetHeritage(props, helper.includesChildren && !childrenProps);
-            const members = helper.inlineMembers
-              .map((type) => rewriteSourceTypeText(code, type, bindings, targets, imports, typeImports))
-              .filter(Boolean);
-
-            if (declaresChildren(helper)) {
-              // The authored props already say what children are; only the heritage needs to make room.
-            } else if (childrenProps) {
-              members.push(
-                `children?: ${childrenProps.type}[${JSON.stringify(childrenProps.children ?? 'children')}];`
-              );
-            } else if (helper.includesChildren && props.children && props.children !== 'children') {
-              members.push(`children?: ${props.type}[${JSON.stringify(props.children)}];`);
-            }
-
-            if (helper.sourceInterface) {
-              const source = helper.sourceInterface;
-
-              if (!source.exported) transform.magicString!.appendLeft(source.declaration.start, 'export ');
-
-              transform.magicString!.overwrite(
-                source.declaration.id.end,
-                source.declaration.body.start,
-                ` extends ${heritage} `
-              );
-
-              if (members.length > 0) {
-                transform.magicString!.appendLeft(source.declaration.body.end - 1, `\n${members.join('\n')}\n`);
-              }
-            } else {
-              const insertion = parent?.type === 'ExportNamedDeclaration' ? parent.start : node.start;
-              const declaration = members.length
-                ? `export interface ${interfaceName} extends ${heritage} {\n${members.join('\n')}\n}\n\n`
-                : `export type ${interfaceName} = ${heritage};\n\n`;
-
-              transform.magicString!.appendLeft(insertion, declaration);
-            }
-
-            transform.magicString!.overwrite(helper.annotation.start, helper.annotation.end, interfaceName);
-            changed = true;
-            this.skip();
-          },
-        });
-
-        if (!changed) return null;
-
-        imports.commit();
-        typeImports.commit();
-        return { code: transform.magicString };
-      },
-    },
-  };
-}
-
-interface TypeBindings extends CanonicalBindings {
-  readonly primitives: ReadonlyMap<string, { readonly name: string; readonly target: ComponentTarget }>;
+interface TypeBindings extends TargetBindings {
+  /** Source types imported from `vjsc/components`, by local name, mapped to the name they import. */
   readonly sourceTypes: ReadonlyMap<string, string>;
 }
 
-function collectBindings(ast: Program, targets: readonly ComponentTarget[]): TypeBindings {
+/** The module the source-type step lowers, with its `vjsc/components` source types indexed. */
+interface TypeModule extends TargetModule {
+  readonly bindings: TypeBindings;
+}
+
+/** An element a target renders, together with that target. */
+interface ResolvedElement {
+  readonly target: ComponentTarget;
+  readonly element: TargetElement;
+}
+
+/**
+ * Rewrite the source types a module imports from `vjsc/components` for its targets, and give each component typed with
+ * `Props` or `PropsWithChildren` an exported props interface that extends the props of the element it forwards to.
+ */
+export function lowerSourceTypes(module: TargetModule): void {
+  if (!module.code.includes(COMPONENT_SOURCE)) return;
+
+  const bindings = typeBindings(module.bindings);
+  if (bindings.sourceTypes.size === 0) return;
+
+  const types: TypeModule = { ...module, bindings };
+  const { ast, magicString } = types;
+  const sourceInterfaces = collectSourceInterfaces(ast);
+
+  transformSourceTypes(types);
+
+  walk(ast, {
+    enter(node, parent) {
+      if (node.type !== 'FunctionDeclaration' || !node.id || !node.body) return;
+
+      const helper = propsHelper(node.params[0], sourceInterfaces, bindings);
+      if (!helper) return;
+
+      const forwarded = forwardedBinding(node.params[0]);
+      if (!forwarded) return;
+
+      const root = forwardedTarget(node, forwarded, types);
+      if (!root) return;
+
+      const props = targetProps(root, types);
+      if (!props) return;
+
+      // Children are typed by the part that renders them. That is usually the root, but a
+      // compound wrapper may hand them to a nested part instead, such as an image's `render`.
+      const childrenPart = helper.includesChildren ? childrenTarget(node, node.params[0], types) : undefined;
+      const childrenProps =
+        childrenPart && !sameTargetElement(root, childrenPart) ? targetProps(childrenPart, types) : undefined;
+
+      const insertion = parent?.type === 'ExportNamedDeclaration' ? parent.start : node.start;
+      const interfaceName =
+        helper.sourceInterface?.declaration.id.name ?? claimGeneratedName(module, `${node.id.name}Props`, insertion);
+      const heritage = targetHeritage(props, helper.includesChildren && !childrenProps);
+      const members = helper.inlineMembers.map((type) => rewriteSourceTypeText(type, types)).filter(Boolean);
+
+      if (declaresChildren(helper)) {
+        // The authored props already say what children are; only the heritage needs to make room.
+      } else if (childrenProps) {
+        members.push(`children?: ${childrenProps.type}[${JSON.stringify(childrenProps.children ?? 'children')}];`);
+      } else if (helper.includesChildren && props.children && props.children !== 'children') {
+        members.push(`children?: ${props.type}[${JSON.stringify(props.children)}];`);
+      }
+
+      if (helper.sourceInterface) {
+        const source = helper.sourceInterface;
+
+        if (!source.exported) magicString.appendLeft(source.declaration.start, 'export ');
+
+        magicString.overwrite(source.declaration.id.end, source.declaration.body.start, ` extends ${heritage} `);
+
+        if (members.length > 0) {
+          magicString.appendLeft(source.declaration.body.end - 1, `\n${members.join('\n')}\n`);
+        }
+      } else {
+        const declaration = members.length
+          ? `export interface ${interfaceName} extends ${heritage} {\n${members.join('\n')}\n}\n\n`
+          : `export type ${interfaceName} = ${heritage};\n\n`;
+
+        magicString.appendLeft(insertion, declaration);
+      }
+
+      magicString.overwrite(helper.annotation.start, helper.annotation.end, interfaceName);
+      this.skip();
+    },
+  });
+}
+
+function typeBindings(bindings: TargetBindings): TypeBindings {
   const sourceTypes = new Map<string, string>();
 
-  for (const statement of ast.body) {
-    if (statement.type !== 'ImportDeclaration' || statement.source.value !== COMPONENT_SOURCE) continue;
+  for (const [local, binding] of bindings.imports) {
+    if (binding.source !== COMPONENT_SOURCE) continue;
 
-    for (const specifier of statement.specifiers) {
-      if (specifier.type !== 'ImportSpecifier') continue;
-
-      const name = importedName(specifier);
-
-      if (
-        name === 'ClassNameValue' ||
-        name === 'Props' ||
-        name === 'PropsWithChildren' ||
-        name === 'PropsOf' ||
-        name.startsWith('Vjsc')
-      ) {
-        sourceTypes.set(specifier.local.name, name);
-      }
+    if (SOURCE_TYPE_NAMES.has(binding.imported) || binding.imported.startsWith('Vjsc')) {
+      sourceTypes.set(local, binding.imported);
     }
   }
 
-  return { ...collectCanonicalBindings(ast, targets), primitives: collectPrimitiveBindings(ast, targets), sourceTypes };
+  return { ...bindings, sourceTypes };
 }
 
-function transformSourceTypes(
-  _code: string,
-  ast: Program,
-  bindings: TypeBindings,
-  targets: readonly ComponentTarget[],
-  imports: ModuleImports,
-  typeImports: ModuleImports,
-  magicString: RolldownMagicString
-): boolean {
-  let changed = false;
+function transformSourceTypes(module: TypeModule): void {
+  const { bindings, magicString } = module;
 
-  walk(ast, {
+  walk(module.ast, {
     enter(node, parent) {
       if (
         node.type === 'TSInterfaceHeritage' &&
         node.expression.type === 'Identifier' &&
         bindings.sourceTypes.get(node.expression.name) === 'PropsOf'
       ) {
-        const query = node.typeArguments?.params[0];
-        const props = propsOfType(query, bindings, targets, imports, typeImports);
+        const props = propsOfReference(node.typeArguments?.params[0], module)?.type;
         if (!props) return;
 
         magicString.overwrite(node.start, node.end, props);
-        changed = true;
         this.skip();
         return;
       }
@@ -223,41 +179,37 @@ function transformSourceTypes(
       if (!sourceType) return;
 
       if (sourceType === 'PropsOf') {
-        const query = node.typeArguments?.params[0];
-        const props = propsOfReference(query, bindings, targets, imports, typeImports);
+        const props = propsOfReference(node.typeArguments?.params[0], module);
         if (!props) return;
 
         for (const edit of propsOfEdits(node, parent, props)) magicString.overwrite(edit.start, edit.end, edit.content);
 
-        changed = true;
         this.skip();
         return;
       }
 
       if (sourceType === 'Props' || sourceType === 'PropsWithChildren') return;
 
-      const targetImport = uniqueTargetType(sourceType, targets);
+      const targetImport = uniqueTargetType(sourceType, module.targets, node.start);
       if (!targetImport) return;
 
-      magicString.overwrite(node.start, node.end, typeImports.reference(targetImport));
-      changed = true;
+      magicString.overwrite(node.start, node.end, module.typeImports.reference(targetImport));
       this.skip();
     },
   });
-
-  return changed;
 }
 
-function uniqueTargetType(name: string, targets: readonly ComponentTarget[]): TargetImport | undefined {
+function uniqueTargetType(name: string, targets: readonly ComponentTarget[], pos: number): TargetImport | undefined {
   const references = targets.flatMap((target) => (target.types[name] ? [target.types[name]!] : []));
-  if (references.length > 1) throw new Error(`More than one component target defines source type \`${name}\`.`);
+  if (references.length > 1) throw sourceError(`More than one component target defines source type \`${name}\`.`, pos);
 
   return references[0];
 }
 
 function propsHelper(
   parameter: OxcFunction['params'][number] | undefined,
-  sourceInterfaces: ReadonlyMap<string, SourcePropsInterface>
+  sourceInterfaces: ReadonlyMap<string, SourcePropsInterface>,
+  bindings: TypeBindings
 ): PropsHelper | undefined {
   const pattern = parameter?.type === 'AssignmentPattern' ? parameter.left : parameter;
   const annotation = pattern && 'typeAnnotation' in pattern ? pattern.typeAnnotation?.typeAnnotation : undefined;
@@ -268,12 +220,14 @@ function propsHelper(
   for (const type of types) {
     if (type.type !== 'TSTypeReference' || type.typeName.type !== 'Identifier') continue;
 
-    if (type.typeName.name !== 'Props' && type.typeName.name !== 'PropsWithChildren') continue;
+    // Match the imported name, so an aliased `Props` counts and an unrelated local `Props` does not.
+    const helper = bindings.sourceTypes.get(type.typeName.name);
+    if (helper !== 'Props' && helper !== 'PropsWithChildren') continue;
 
     return {
       annotation,
       reference: type,
-      includesChildren: type.typeName.name === 'PropsWithChildren',
+      includesChildren: helper === 'PropsWithChildren',
       inlineMembers: [
         ...types.filter((candidate) => candidate.type === 'TSTypeLiteral'),
         ...inlineTypeMembers(type.typeArguments?.params[0]),
@@ -333,25 +287,17 @@ function inlineTypeMembers(type: TSType | undefined): TSType[] {
   return [];
 }
 
-function rewriteSourceTypeText(
-  code: string,
-  type: TSType,
-  bindings: TypeBindings,
-  targets: readonly ComponentTarget[],
-  imports: ModuleImports,
-  typeImports: ModuleImports
-): string {
+function rewriteSourceTypeText(type: TSType, module: TypeModule): string {
   const edits: SourceEdit[] = [];
 
   walk(type, {
     enter(node, parent) {
       if (node.type !== 'TSTypeReference' || node.typeName.type !== 'Identifier') return;
 
-      const name = bindings.sourceTypes.get(node.typeName.name);
+      const name = module.bindings.sourceTypes.get(node.typeName.name);
 
       if (name === 'PropsOf') {
-        const query = node.typeArguments?.params[0];
-        const props = propsOfReference(query, bindings, targets, imports, typeImports);
+        const props = propsOfReference(node.typeArguments?.params[0], module);
         if (!props) return;
 
         edits.push(...propsOfEdits(node, parent, props));
@@ -361,52 +307,34 @@ function rewriteSourceTypeText(
 
       if (name !== 'ClassNameValue' && !name?.startsWith('Vjsc')) return;
 
-      const target = uniqueTargetType(name, targets);
+      const target = uniqueTargetType(name, module.targets, node.start);
       if (!target) return;
 
-      edits.push({ start: node.typeName.start, end: node.typeName.end, content: typeImports.reference(target) });
+      edits.push({ start: node.typeName.start, end: node.typeName.end, content: module.typeImports.reference(target) });
     },
   });
 
-  return renderSourceRange(createSourceText(code, edits), type.start + 1, type.end - 1).value.trim();
+  return renderSourceRange(createSourceText(module.code, edits), type.start + 1, type.end - 1).value.trim();
 }
 
-function propsOfType(
-  type: TSType | undefined,
-  bindings: TypeBindings,
-  targets: readonly ComponentTarget[],
-  imports: ModuleImports,
-  typeImports: ModuleImports
-): string | undefined {
-  return propsOfReference(type, bindings, targets, imports, typeImports)?.type;
-}
-
-function propsOfReference(
-  type: TSType | undefined,
-  bindings: TypeBindings,
-  targets: readonly ComponentTarget[],
-  imports: ModuleImports,
-  typeImports: ModuleImports
-): ResolvedProps | undefined {
+function propsOfReference(type: TSType | undefined, module: TypeModule): ResolvedProps | undefined {
   if (type?.type !== 'TSTypeQuery') return undefined;
 
   const path = typeQueryPath(type.exprName);
-  const canonical = boundCanonicalPath(path, bindings);
+  const canonical = boundCanonicalPath(path, module.bindings);
 
   if (canonical) {
-    const configured = configuredRule(canonical);
-    const rule = isTargetElement(configured) ? configured : canonical.target.components.resolve(canonical);
-    if (!isTargetElement(rule)) return undefined;
+    const element = resolveTargetElement(canonical);
 
-    return targetProps({ target: canonical.target, element: rule }, imports, typeImports);
+    return element ? targetProps({ target: canonical.target, element }, module) : undefined;
   }
 
   if (path.length !== 1) return undefined;
 
-  const target = uniqueTargetType('PropsOf', targets);
+  const target = uniqueTargetType('PropsOf', module.targets, type.start);
   if (!target) return undefined;
 
-  const componentProps = typeImports.reference(target);
+  const componentProps = module.typeImports.reference(target);
 
   return { type: `NonNullable<${componentProps}<typeof ${path[0]}>>` };
 }
@@ -476,12 +404,12 @@ function childrenBinding(parameter: OxcFunction['params'][number] | undefined): 
 function childrenTarget(
   declaration: OxcFunction,
   parameter: OxcFunction['params'][number] | undefined,
-  bindings: TypeBindings
-): { readonly target: ComponentTarget; readonly element: TargetElement } | undefined {
+  module: TypeModule
+): ResolvedElement | undefined {
   const binding = childrenBinding(parameter);
   if (!binding) return undefined;
 
-  const matches: Array<{ target: ComponentTarget; element: TargetElement }> = [];
+  const matches: ResolvedElement[] = [];
 
   walk(declaration, {
     enter(node, parent) {
@@ -494,24 +422,18 @@ function childrenTarget(
         return;
       }
 
-      const resolved = openingTarget(parent.openingElement, bindings);
+      const resolved = openingTarget(parent.openingElement, module.bindings);
 
       if (resolved) matches.push(resolved);
     },
   });
 
-  const first = matches[0];
-  if (!first) return undefined;
-
-  return matches.every((match) => sameTargetElement(first, match)) ? first : undefined;
+  return uniqueElement(matches);
 }
 
-function forwardedTarget(
-  declaration: OxcFunction,
-  binding: string,
-  bindings: TypeBindings
-): { readonly target: ComponentTarget; readonly element: TargetElement } | undefined {
-  const matches: Array<{ target: ComponentTarget; element: TargetElement }> = [];
+/** The single target element the component spreads its forwarded props onto, when exactly one receives them. */
+function forwardedTarget(declaration: OxcFunction, binding: string, module: TypeModule): ResolvedElement | undefined {
+  const matches: ResolvedElement[] = [];
 
   walk(declaration, {
     enter(node, parent) {
@@ -524,55 +446,46 @@ function forwardedTarget(
         return;
       }
 
-      const resolved = openingTarget(parent, bindings);
+      const resolved = openingTarget(parent, module.bindings);
 
       if (resolved) matches.push(resolved);
     },
   });
 
-  const first = matches[0];
-  if (!first) return undefined;
-
-  return matches.every((match) => sameTargetElement(first, match)) ? first : undefined;
+  return uniqueElement(matches);
 }
 
-function openingTarget(
-  opening: JSXOpeningElement,
-  bindings: TypeBindings
-): { readonly target: ComponentTarget; readonly element: TargetElement } | undefined {
+/** The one element every match resolves to, or none when there is no match or the matches disagree. */
+function uniqueElement(matches: readonly ResolvedElement[]): ResolvedElement | undefined {
+  const first = matches[0];
+
+  return first && matches.every((match) => sameTargetElement(first, match)) ? first : undefined;
+}
+
+function openingTarget(opening: JSXOpeningElement, bindings: TypeBindings): ResolvedElement | undefined {
   const path = canonicalPath(opening.name, bindings);
 
   if (path) {
-    const configured = configuredRule(path);
-    if (isTargetElement(configured)) return { target: path.target, element: configured };
+    const element = resolveTargetElement(path);
 
-    const resolved = path.target.components.resolve({ component: path.component, part: path.part });
-
-    return isTargetElement(resolved) ? { target: path.target, element: resolved } : undefined;
+    return element ? { target: path.target, element } : undefined;
   }
 
   const names = jsxNamePath(opening.name);
   const primitive = names.length === 1 ? bindings.primitives.get(names[0]!) : undefined;
   if (!primitive) return undefined;
 
-  const rule = primitiveRule(primitive.target, primitive.name);
-
-  return isTargetElement(rule) ? { target: primitive.target, element: rule } : undefined;
+  return isTargetElement(primitive.rule) ? { target: primitive.target, element: primitive.rule } : undefined;
 }
 
-function targetProps(
-  resolved: { readonly target: ComponentTarget; readonly element: TargetElement },
-  imports: ModuleImports,
-  typeImports: ModuleImports
-): ResolvedProps | undefined {
-  return targetReferenceProps(resolved.element[TARGET_ELEMENT], resolved.target, imports, typeImports, new Set());
+function targetProps(resolved: ResolvedElement, module: TargetModule): ResolvedProps | undefined {
+  return targetReferenceProps(resolved.element[TARGET_ELEMENT], resolved.target, module, new Set());
 }
 
 function targetReferenceProps(
   reference: TargetReference,
   target: ComponentTarget,
-  imports: ModuleImports,
-  typeImports: ModuleImports,
+  module: TargetModule,
   seen: Set<TargetReference>
 ): ResolvedProps | undefined {
   if (seen.has(reference)) throw new Error('vjsc/target: component target references form a cycle.');
@@ -580,16 +493,14 @@ function targetReferenceProps(
   seen.add(reference);
 
   if (reference.kind === 'component') {
-    const resolved = target.components.resolve({ component: reference.component, part: reference.part });
+    const resolved = target.components.resolve({ component: reference.component, parts: reference.parts });
 
-    return isTargetElement(resolved)
-      ? targetReferenceProps(resolved[TARGET_ELEMENT], target, imports, typeImports, seen)
-      : undefined;
+    return isTargetElement(resolved) ? targetReferenceProps(resolved[TARGET_ELEMENT], target, module, seen) : undefined;
   }
 
   if (!reference.props) return undefined;
 
-  const type = renderPropsReference(reference, reference.props, imports, typeImports);
+  const type = renderPropsReference(reference, reference.props, module);
 
   return reference.props.children ? { type, children: reference.props.children } : { type };
 }
@@ -597,8 +508,7 @@ function targetReferenceProps(
 function renderPropsReference(
   reference: Exclude<TargetReference, { kind: 'component' }>,
   props: TargetPropsReference,
-  imports: ModuleImports,
-  typeImports: ModuleImports
+  module: TargetModule
 ): string {
   let local: string;
 
@@ -606,9 +516,9 @@ function renderPropsReference(
     // Component values and their public props commonly live on sibling paths
     // of the same namespace (`Menu.Root` and `Menu.RootProps`). Import the
     // namespace root once instead of appending the props path to the value path.
-    local = imports.reference({ from: reference.import.from, name: reference.import.name });
+    local = module.imports.reference({ from: reference.import.from, name: reference.import.name });
   } else {
-    local = typeImports.reference(props);
+    local = module.typeImports.reference(props);
   }
 
   const path = props.path?.length ? `.${props.path.join('.')}` : '';
@@ -628,9 +538,6 @@ function targetHeritage(props: ResolvedProps, includesChildren: boolean): string
   return `Omit<${props.type}, ${[...omitted].map((name) => JSON.stringify(name)).join(' | ')}>`;
 }
 
-function sameTargetElement(
-  left: { readonly target: ComponentTarget; readonly element: TargetElement },
-  right: { readonly target: ComponentTarget; readonly element: TargetElement }
-): boolean {
+function sameTargetElement(left: ResolvedElement, right: ResolvedElement): boolean {
   return left.target === right.target && left.element[TARGET_ELEMENT] === right.element[TARGET_ELEMENT];
 }

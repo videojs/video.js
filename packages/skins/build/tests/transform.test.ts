@@ -14,7 +14,14 @@ describe('parseVariant', () => {
   });
 
   it('rejects the former vanilla style name', () => {
-    expect(parseVariant(new URLSearchParams('target=react&skin=default-video&style=vanilla&theme=default'))).toBeNull();
+    expect(() =>
+      parseVariant(new URLSearchParams('target=react&skin=default-video&style=vanilla&theme=default'))
+    ).toThrow('needs `style=css` or `style=tailwind`');
+  });
+
+  it('leaves queries without variant parameters to other tools', () => {
+    expect(parseVariant(new URLSearchParams('raw'))).toBeNull();
+    expect(parseVariant(new URLSearchParams())).toBeNull();
   });
 
   it('accepts theme-specific, skin-independent React component transforms', () => {
@@ -23,8 +30,13 @@ describe('parseVariant', () => {
       style: 'css',
       theme: 'neutral',
     });
-    expect(parseVariant(new URLSearchParams('target=html&style=css&theme=default'))).toBeNull();
-    expect(parseVariant(new URLSearchParams('target=react&style=css'))).toBeNull();
+    expect(() => parseVariant(new URLSearchParams('target=html&style=css&theme=default'))).toThrow('needs a `skin`');
+    expect(() => parseVariant(new URLSearchParams('target=react&style=css'))).toThrow(
+      'needs a `theme` of default, neutral, compat, scaffold'
+    );
+    expect(() => parseVariant(new URLSearchParams('target=react&skin=neutral-video&style=css&theme=default'))).toThrow(
+      'wrong theme'
+    );
   });
 });
 
@@ -59,5 +71,20 @@ describe('createStyleOptions', () => {
     expect(
       createStyleOptions({ target: 'html', skin: 'neutral-live-audio', style: 'tailwind', theme: 'neutral' }).variants
     ).toEqual(['neutral', 'live-audio', 'shadow-dom']);
+  });
+
+  it('styles reusable components for their theme alone, whichever skin compiles them', () => {
+    expect(
+      createStyleOptions({ target: 'html', skin: 'neutral-audio', style: 'css', theme: 'neutral' }, 'theme')
+    ).toMatchObject({
+      variants: ['neutral', 'shadow-dom'],
+      stylesheet: { scope: '.media-skin[data-theme="neutral"]' },
+    });
+  });
+
+  it('requires a skin for skin-scoped styles instead of guessing one', () => {
+    expect(() => createStyleOptions({ target: 'react', style: 'css', theme: 'default' })).toThrow(
+      'Skin-scoped styles need a variant that names its skin'
+    );
   });
 });

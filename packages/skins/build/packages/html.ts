@@ -1,34 +1,36 @@
-import type { Graph, GraphModule } from 'vjsc/graph';
-import { bundleStyles, renderHtml } from 'vjsc/graph';
+import { pascalCase } from '@videojs/utils/string';
+import { bundleStyles, generateStaticHtml } from 'vjsc/graph';
 
-import type { SkinModuleMeta } from '../../src/meta.ts';
+import { htmlElementModule, htmlI18nModule, htmlPackageModule } from '../../../html/vjsc/elements.ts';
+import { htmlIconSource, readIconRegistration } from '../../../icons/vjsc/target.ts';
 import { skinCatalogEntry } from '../catalog.ts';
 import { skinBaseStylesheet } from '../skin.ts';
-import { iconImports } from '../target/html-render.ts';
-import { htmlComponentTarget } from '../target/html.tsx';
-import { type SkinRoot, skinRoots } from '../variants.ts';
-import type { GeneratedPackageFile } from './files.ts';
+import { staticHtmlOptions } from '../target/static-html.ts';
+import { type SkinGraph, type SkinGraphModule, type SkinRoot, skinRoots } from '../variants.ts';
+import type { GeneratedFile } from './files.ts';
+import { backgroundPresetCopies, packageInternalRoot } from './outputs.ts';
 import { propertyStyles } from './properties.ts';
-import { addCopiedFiles, addGenerated, generatedFiles, pascalCase } from './utils.ts';
+import { addCopiedFiles, addGenerated, generatedFiles } from './utils.ts';
 
-const packageRoot = 'packages/html/src';
-const internalRoot = `${packageRoot}/internal/skins`;
+const internalRoot = packageInternalRoot.html;
 
 export interface CreateHtmlPackageSkinsOptions {
   readonly workspaceDir: string;
   readonly baseStyles?: readonly string[] | undefined;
 }
 
-export interface RenderedHtmlSkin extends SkinRoot {
+export interface GeneratedHtmlSkin extends SkinRoot {
   readonly template: string;
+  /** Element types the template renders, in document order. */
+  readonly elements: ReadonlySet<string>;
 }
 
 /** Generate package-local HTML Skin templates, registrations, and styles from one finalized VJSC module graph. */
 export async function createHtmlPackageSkins(
-  graph: Graph<SkinModuleMeta>,
+  graph: SkinGraph,
   options: CreateHtmlPackageSkinsOptions
-): Promise<GeneratedPackageFile[]> {
-  const skins = await renderHtmlSkins(graph, { styling: 'css' });
+): Promise<GeneratedFile[]> {
+  const skins = await generateHtmlSkins(graph, { styling: 'css' });
   const generated = new Map<string, string>();
 
   for (const skin of skins) {
@@ -36,7 +38,7 @@ export async function createHtmlPackageSkins(
     const root = `${internalRoot}/${name}`;
 
     addGenerated(generated, `${root}/template.ts`, htmlTemplateModule(skin.template));
-    addGenerated(generated, `${root}/register.ts`, createHtmlSkinRegistration(skin.template, skin.modules, 'package'));
+    addGenerated(generated, `${root}/register.ts`, createHtmlSkinRegistration(skin.elements, skin.modules, 'package'));
     addGenerated(
       generated,
       `${root}/skin.css`,
@@ -56,34 +58,25 @@ export async function createHtmlPackageSkins(
 
   addGenerated(generated, `${internalRoot}/properties.css`, [...new Set(properties)].join('\n'));
 
-  await addCopiedFiles(generated, options.workspaceDir, [
-    ['packages/skins/src/presets/background/html/skin.ts', `${packageRoot}/presets/background/skin.ts`],
-    ['packages/skins/src/presets/background/html/skin.css', `${packageRoot}/define/background/skin.css`],
-  ]);
+  await addCopiedFiles(generated, options.workspaceDir, backgroundPresetCopies.html);
 
   return generatedFiles(generated);
 }
 
-export interface RenderHtmlSkinsOptions {
+export interface HtmlSkinsOptions {
   readonly styling: 'css' | 'tailwind';
 }
 
 /** Renders per finalized module set, so package generation and the registry share one render per build. */
-const renders = new WeakMap<
-  ReadonlyMap<string, GraphModule<SkinModuleMeta>>,
-  Map<string, Promise<RenderedHtmlSkin[]>>
->();
+const renders = new WeakMap<ReadonlyMap<string, SkinGraphModule>, Map<string, Promise<GeneratedHtmlSkin[]>>>();
 
 /** Render the complete static markup for every HTML Skin in one styling catalog, once per build. */
-export function renderHtmlSkins(
-  graph: Graph<SkinModuleMeta>,
-  options: RenderHtmlSkinsOptions
-): Promise<RenderedHtmlSkin[]> {
-  const byStyling = renders.get(graph.modules) ?? new Map<string, Promise<RenderedHtmlSkin[]>>();
+export function generateHtmlSkins(graph: SkinGraph, options: HtmlSkinsOptions): Promise<GeneratedHtmlSkin[]> {
+  const byStyling = renders.get(graph.modules) ?? new Map<string, Promise<GeneratedHtmlSkin[]>>();
   let rendered = byStyling.get(options.styling);
 
   if (!rendered) {
-    rendered = renderHtmlSkinsUncached(graph, options);
+    rendered = generateHtmlSkinsUncached(graph, options);
     byStyling.set(options.styling, rendered);
   }
 
@@ -91,37 +84,24 @@ export function renderHtmlSkins(
   return rendered;
 }
 
-async function renderHtmlSkinsUncached(
-  graph: Graph<SkinModuleMeta>,
-  options: RenderHtmlSkinsOptions
-): Promise<RenderedHtmlSkin[]> {
+async function generateHtmlSkinsUncached(graph: SkinGraph, options: HtmlSkinsOptions): Promise<GeneratedHtmlSkin[]> {
   const skins = skinRoots(graph, { target: 'html', style: options.styling });
-  const render = htmlComponentTarget.render ?? {};
-
-  const templates = await renderHtml(
+  const templates = await generateStaticHtml(
     graph,
     skins.map((skin) => ({
       name: skin.root.meta.name,
       moduleId: skin.root.id,
       exportName: skinCatalogEntry(skin.root.meta.name).exportName,
     })),
-    {
-      aliases: render.aliases,
-      empty: render.empty,
-      modules: render.modules?.(uniqueModules(skins.flatMap((skin) => skin.modules))),
-    }
+    staticHtmlOptions(uniqueModules(skins.flatMap((skin) => skin.modules)))
   );
 
   return skins.map((skin) => {
-    const template = templates.get(skin.root.meta.name);
-    if (template === undefined) throw new Error(`HTML Skin \`${skin.root.meta.name}\` did not render a template.`);
+    const rendered = templates.get(skin.root.meta.name);
+    if (!rendered) throw new Error(`HTML Skin \`${skin.root.meta.name}\` did not render a template.`);
 
-    return { ...skin, template };
+    return { ...skin, template: rendered.html, elements: rendered.elements };
   });
-}
-
-export function htmlPackageSkinOwnedPaths(): string[] {
-  return [internalRoot, `${packageRoot}/presets/background/skin.ts`, `${packageRoot}/define/background/skin.css`];
 }
 
 function htmlTemplateModule(html: string): string {
@@ -136,31 +116,28 @@ export const template = createTemplate(/* html */ \`${template}\`);
 
 /** Create the exact custom-element and icon registration closure used by one rendered HTML Skin. */
 export function createHtmlSkinRegistration(
-  html: string,
-  modules: readonly GraphModule<SkinModuleMeta>[],
+  elements: ReadonlySet<string>,
+  modules: readonly SkinGraphModule[],
   destination: 'package' | 'registry'
 ): string {
   const output: string[] = [];
-  const tags = new Set<string>();
-  const define = (tag: string): string =>
-    destination === 'package' ? `../../../define/ui/${tag}` : `@videojs/html/ui/${tag}`;
-  const i18n = destination === 'package' ? '../../../define/i18n' : '@videojs/html/i18n';
-  const iconsRoot = destination === 'package' ? '../../../icons' : '@videojs/html/icons';
+  const tags = new Set([...elements].flatMap((element) => (element.startsWith('media-') ? [element.slice(6)] : [])));
+  // A package registration sits at `internal/skins/<skin>/register.ts` and imports the package's own sources.
+  const module = (specifier: string): string =>
+    destination === 'package' ? `../../../${htmlPackageModule(specifier)}` : specifier;
 
-  for (const match of html.matchAll(/<media-([a-z0-9-]+)\b/g)) tags.add(match[1]!);
-
-  if (tags.delete('text')) output.push(`import ${quote(i18n)};`);
+  if (tags.delete('text')) output.push(`import ${quote(module(htmlI18nModule))};`);
 
   tags.delete('icon');
-  output.push(...[...tags].map((tag) => `import ${quote(define(tag))};`));
+  output.push(...[...tags].map((tag) => `import ${quote(module(htmlElementModule(tag)))};`));
 
   const families = iconRegistrations(modules);
 
-  if (families.size > 0) output.push(`import { registerIcons } from ${quote(iconsRoot)};`);
+  if (families.size > 0) output.push(`import { registerIcons } from ${quote(module(htmlIconSource('default')))};`);
 
   for (const [family, icons] of sortedEntries(families)) {
     const bindings = [...new Set(icons.values())].sort();
-    const source = family === 'default' ? iconsRoot : `${iconsRoot}/${family}`;
+    const source = module(htmlIconSource(family));
 
     output.push(
       `import {\n${bindings
@@ -199,31 +176,25 @@ export function createSourceOwnedHtml(template: string): string {
     .replaceAll('&lt;', '<');
 }
 
-function iconRegistrations(
-  modules: readonly GraphModule<SkinModuleMeta>[]
-): ReadonlyMap<string, ReadonlyMap<string, string>> {
+/** Fold the icon registrations the icon target recorded on each compiled module, by family. */
+function iconRegistrations(modules: readonly SkinGraphModule[]): ReadonlyMap<string, ReadonlyMap<string, string>> {
   const families = new Map<string, Map<string, string>>();
 
   for (const module of modules) {
-    const imports = iconImports(module);
+    const registration = readIconRegistration(module.annotations);
+    if (!registration) continue;
 
-    for (const match of module.source.matchAll(/registerIcons\(['"]([^'"]+)['"],\s*\{([\s\S]*?)\}\);/g)) {
-      const icons = families.get(match[1]!) ?? new Map<string, string>();
+    const icons = families.get(registration.family) ?? new Map<string, string>();
 
-      for (const pair of match[2]!.matchAll(/(?:['"]([^'"]+)['"]|([A-Za-z_$][\w$]*))\s*:\s*([A-Za-z_$][\w$]*)/g)) {
-        const local = pair[3]!;
+    for (const [name, exportName] of Object.entries(registration.icons)) icons.set(name, exportName);
 
-        icons.set(pair[1] ?? pair[2]!, imports.get(local) ?? local);
-      }
-
-      families.set(match[1]!, icons);
-    }
+    families.set(registration.family, icons);
   }
 
   return families;
 }
 
-function uniqueModules(modules: readonly GraphModule<SkinModuleMeta>[]): GraphModule<SkinModuleMeta>[] {
+function uniqueModules(modules: readonly SkinGraphModule[]): SkinGraphModule[] {
   return [...new Map(modules.map((module) => [module.id, module])).values()];
 }
 

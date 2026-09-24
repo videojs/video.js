@@ -9,16 +9,11 @@ import {
 } from 'vjsc/target';
 import { Host } from 'vjsc/target/jsx-runtime';
 
+import { reactComponentModule } from '../../../react/vjsc/components.ts';
 import { skinClassNameMergeImport } from '../imports.ts';
+import { skinRenderTargets } from './render-targets.ts';
 
 type CoreSchema = typeof coreSchema;
-
-const componentSources = {
-  AudioTrackRadioGroup: '@videojs/react/ui/audio-track-radio-group',
-  CaptionsRadioGroup: '@videojs/react/ui/captions-radio-group',
-  PlaybackRateRadioGroup: '@videojs/react/ui/playback-rate-radio-group',
-  QualityRadioGroup: '@videojs/react/ui/quality-radio-group',
-} as const satisfies Partial<Record<keyof CoreSchema['definitions'], string>>;
 
 export const reactComponentTarget: ComponentTarget<CoreSchema> = defineComponentTarget<CoreSchema>()(({
   target,
@@ -59,10 +54,9 @@ export const reactComponentTarget: ComponentTarget<CoreSchema> = defineComponent
   return {
     source: '@videojs/core/vjsc',
     components: {
-      resolve: ({ component, part }) => {
-        const path = part ? part.split('.') : [];
+      resolve: ({ component, parts: path }) => {
         const propsPath = path.length === 0 ? ['Props'] : [...path.slice(0, -1), `${path.at(-1)}Props`];
-        const source = componentSources[component as keyof typeof componentSources] ?? '@videojs/react';
+        const source = reactComponentModule(component);
 
         return imported({
           from: source,
@@ -145,15 +139,7 @@ export const reactComponentTarget: ComponentTarget<CoreSchema> = defineComponent
       VjscNode: { from: 'react', name: 'ReactNode' },
       VjscElement: { from: 'react', name: 'ReactElement' },
     },
-    renderTargets: {
-      Button: { element: Button },
-      CaptionsButton: { component: true },
-      PlaybackRateButton: { component: true },
-      SliderBuffer: { element: Div },
-      SliderFill: { element: Div },
-      SliderThumb: { element: Div },
-      SliderTrack: { element: Div },
-    },
+    renderTargets: skinRenderTargets({ button: Button, div: Div }),
     jsx: {
       importSource: 'react',
       attributes: 'react',

@@ -1,19 +1,21 @@
 import corePackage from '../../../core/package.json' with { type: 'json' };
 import htmlPackage from '../../../html/package.json' with { type: 'json' };
 import reactPackage from '../../../react/package.json' with { type: 'json' };
-import type { SkinStyle } from '../../src/meta.ts';
+import type { SkinTheme } from '../../src/meta.ts';
+import type { SkinStyling } from '../variants.ts';
 
+/** One published registry catalog. HTML skins ship compiled CSS only. */
 export type RegistryTarget =
   | {
       readonly framework: 'react';
-      readonly styling: 'css' | 'tailwind';
-      readonly theme: SkinStyle['theme'];
+      readonly styling: SkinStyling;
+      readonly theme: SkinTheme;
       readonly output: string;
     }
   | {
       readonly framework: 'html';
       readonly styling: 'css';
-      readonly theme: SkinStyle['theme'];
+      readonly theme: SkinTheme;
       readonly output: string;
     };
 

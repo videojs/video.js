@@ -6,9 +6,6 @@
     "rootDir": ".",
     "declaration": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "paths": {
-      "vjsc/*": ["../vjsc/src/*"]
-    },
     "types": ["node"],
     "jsx": "react-jsx"
   },

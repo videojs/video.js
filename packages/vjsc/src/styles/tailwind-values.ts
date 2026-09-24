@@ -147,29 +147,6 @@ export function inlinePrivateTailwindVariables(
   return output;
 }
 
-export function optimizeSemanticCss(css: string): string {
-  if (!css) return '';
-
-  return decoder
-    .decode(
-      transform({
-        filename: 'emitted.css',
-        code: encoder.encode(css),
-        visitor: {
-          Rule: {
-            style(rule) {
-              const clone = cloneCssAst(rule);
-
-              removeExactDuplicateDeclarations(clone.value.declarations);
-              return withoutNullValues(clone);
-            },
-          },
-        },
-      }).code
-    )
-    .trim();
-}
-
 /** Drop exact duplicate declarations from every style rule in place, keeping the last occurrence. */
 export function dedupeRuleDeclarations(rules: readonly Rule[]): void {
   visitCssRules(rules, (rule) => {

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 import { __unstable__loadDesignSystem, compile, normalizePath } from '@tailwindcss/node';
+import { isString } from '@videojs/utils/predicate';
 import { createTwMerge, defaultConfig } from 'cn/config';
 
 /** Operations style generation needs from a loaded Tailwind v4 design system. */
@@ -35,7 +36,7 @@ export async function loadDesignSystem(cssPath: string): Promise<DesignSystem> {
     if (candidateCache.has(candidate)) return candidateCache.get(candidate);
 
     const css = design.candidatesToCss([candidate])[0];
-    const compiled = typeof css === 'string' && css.trim().length > 0 ? css : undefined;
+    const compiled = isString(css) && css.trim().length > 0 ? css : undefined;
 
     candidateCache.set(candidate, compiled);
     return compiled;

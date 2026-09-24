@@ -6,11 +6,32 @@ import { describe, expect, it } from 'vite-plus/test';
 import { createGraphCapability, graphPlugin } from '../graph';
 
 describe('graphPlugin', () => {
+  it('captures modules in the order of their root-relative identities, whatever order the bundler lists them', async () => {
+    const [zeta, alpha, mid] = ['zeta', 'alpha', 'mid'].map(
+      (name) => `${resolve(import.meta.dirname, `fixtures/order-${name}.ts`)}?target=react`
+    );
+    const graph = createGraphCapability();
+    const bundle = await rolldown({
+      input: [zeta!, alpha!, mid!],
+      plugins: [
+        {
+          name: 'fixture',
+          resolveId: (source) => ([zeta, alpha, mid].includes(source) ? source : null),
+          load: (source) => ([zeta, alpha, mid].includes(source) ? 'export const value = true;' : null),
+        },
+        graphPlugin({ capability: graph }),
+      ],
+    });
+
+    await bundle.generate({ format: 'es' });
+
+    expect([...graph.api.modules.keys()]).toEqual([alpha, mid, zeta]);
+  });
+
   it('reads stylesheet ownership from final transformed imports', async () => {
     const filename = resolve(import.meta.dirname, 'fixtures/graph-entry.ts');
     const id = `${filename}?target=react`;
-    const styleId = 'virtual:vjsc/css/current/audio%2Fbuttons.css';
-    const staleStyleId = 'virtual:vjsc/css/stale/buttons.css';
+    const styleId = 'virtual:vjsc/css/asset/current/audio%2Fbuttons.css';
     const graph = createGraphCapability();
     const bundle = await rolldown({
       input: id,
@@ -31,21 +52,8 @@ describe('graphPlugin', () => {
 
             return null;
           },
-          transform: {
-            filter: { id },
-            handler() {
-              return {
-                meta: {
-                  moduleStyles: {
-                    files: ['buttons.css'],
-                    assets: [staleStyleId],
-                  },
-                },
-              };
-            },
-          },
         },
-        graphPlugin(undefined, graph),
+        graphPlugin({ capability: graph }),
       ],
     });
 

@@ -12,12 +12,7 @@ import { cloneCssAst, collectRuleClasses, hasNestedCssRules, withoutNullValues }
 import type { DesignSystem } from './design-system';
 import type { StyleOutputFile } from './output';
 import { replaceRuleClasses } from './selectors';
-import {
-  collectTailwindDefaults,
-  dedupeRuleDeclarations,
-  inlinePrivateTailwindVariables,
-  optimizeSemanticCss,
-} from './tailwind-values';
+import { collectTailwindDefaults, dedupeRuleDeclarations, inlinePrivateTailwindVariables } from './tailwind-values';
 
 const encoder = new TextEncoder();
 
@@ -35,151 +30,197 @@ interface RenderStylesheetsOptions {
  */
 const ROOT_SENTINEL = '--vjsc-root';
 
+/**
+ * Rendered files per design system, keyed by everything one file's CSS depends on. Owners and variants that select the
+ * same rules for a file share its output. Bounded because a development server keeps editing styles against one
+ * design.
+ */
+const renderedFiles = new WeakMap<DesignSystem, Map<string, Promise<string>>>();
+const RENDERED_FILE_LIMIT = 1024;
+
 export async function renderStylesheets(options: RenderStylesheetsOptions): Promise<Map<string, string>> {
-  const analyzedFiles = new Map<StyleOutputFile, AnalyzedFile>();
-
-  for (const file of options.files) {
-    const source = file.rules
-      .map((rule) => `.${rule.className} {\n  ${ROOT_SENTINEL}: 0;\n  @apply ${rule.candidates.join(' ')};\n}`)
-      .join('\n');
-
-    analyzedFiles.set(file, analyzeCompiledFile(await options.design.compileCss(source), file));
-  }
-
   const files = new Map<string, string>();
 
-  for (const file of options.files) {
-    const analyzed = analyzedFiles.get(file);
-    if (!analyzed) throw new Error(`Style output '${file.name}' was not compiled.`);
-
-    files.set(file.name, wrapFileCss(renderFile(analyzed, file), options.scope, file));
-  }
+  for (const file of options.files) files.set(file.name, await renderStylesheet(options.design, options.scope, file));
 
   return files;
 }
 
+function renderStylesheet(design: DesignSystem, scope: string | undefined, file: StyleOutputFile): Promise<string> {
+  const cache = renderedFiles.get(design) ?? new Map<string, Promise<string>>();
+  const key = renderedFileKey(scope, file);
+  const cached = cache.get(key);
+
+  renderedFiles.set(design, cache);
+
+  if (cached) return cached;
+
+  const rendered = renderUncachedStylesheet(design, scope, file);
+
+  cache.set(key, rendered);
+  rendered.catch(() => {
+    if (cache.get(key) === rendered) cache.delete(key);
+  });
+
+  for (const oldest of cache.keys()) {
+    if (cache.size <= RENDERED_FILE_LIMIT) break;
+
+    cache.delete(oldest);
+  }
+
+  return rendered;
+}
+
+/** A file's name only labels its output, so identical rules under different names render once. */
+function renderedFileKey(scope: string | undefined, file: StyleOutputFile): string {
+  return JSON.stringify([
+    scope ?? null,
+    file.layer,
+    [...file.groupOwners].sort(([left], [right]) => left.localeCompare(right)),
+    [...file.rules]
+      .sort((left, right) => left.className.localeCompare(right.className))
+      .map((rule) => [rule.className, rule.candidates, rule.scopeRoot, rule.shadowHost]),
+  ]);
+}
+
+async function renderUncachedStylesheet(
+  design: DesignSystem,
+  scope: string | undefined,
+  file: StyleOutputFile
+): Promise<string> {
+  const source = file.rules
+    .map((rule) => `.${rule.className} {\n  ${ROOT_SENTINEL}: 0;\n  @apply ${rule.candidates.join(' ')};\n}`)
+    .join('\n');
+  const analyzed = analyzeCompiledFile(await design.compileCss(source), file);
+
+  return wrapFileCss(renderFile(analyzed, file), scope, file);
+}
+
+type StyleRuleNode = Extract<Rule, { type: 'style' }>;
+
+const LOCATION = { source_index: 0, line: 0, column: 0 };
+
+const NO_CLASSES: ReadonlySet<string> = new Set();
+
+/**
+ * Wrap one file's rules in its layer and scope. The CSS is parsed once and the `@layer` and `@scope` blocks are built
+ * as AST nodes, so rules kept outside the scope never receive `:scope` selectors that could not match there.
+ */
 function wrapFileCss(css: string, scope: string | undefined, file: StyleOutputFile): string {
   const relationshipOwners = new Set(file.groupOwners.values());
   const scopeRootClasses = new Set(file.rules.filter((rule) => rule.scopeRoot).map((rule) => rule.className));
   const shadowHostClasses = new Set(file.rules.filter((rule) => rule.shadowHost).map((rule) => rule.className));
-  const split = scope ? splitUnscopedRules(css, scope, shadowHostClasses) : { scoped: css, unscoped: '' };
-  const scoped = scope ? `@scope (${scope}) {\n${split.scoped}\n}` : split.scoped;
-  const wrapped = `@layer ${file.layer} {\n${scoped}\n${split.unscoped}\n}`;
+  const rules = parseCssRules(css);
+  const unscopedRule = (rule: StyleRuleNode) => relationshipScope(rule, relationshipOwners, NO_CLASSES) ?? rule;
+  let layered: Rule[];
 
-  return optimizeSemanticCss(
-    decoder.decode(
-      transform({
-        filename: 'scoped.css',
-        code: encoder.encode(wrapped),
-        visitor: {
-          Rule: {
-            style(rule) {
-              const relationship = relationshipScope(rule, relationshipOwners, scopeRootClasses);
-              if (relationship) return relationship;
+  if (scope) {
+    const scopedRule = (rule: StyleRuleNode) =>
+      relationshipScope(rule, relationshipOwners, scopeRootClasses) ?? withScopeRootSelectors(rule, scopeRootClasses);
+    const isShadowHostRule = (rule: Rule) =>
+      !isSlottedStyleRule(rule) && isShadowHostStyleRule(rule, shadowHostClasses);
+    const scoped = filterNestedRules(rules, (rule) => !isSlottedStyleRule(rule));
+    const slotted = filterNestedRules(rules, isSlottedStyleRule);
+    const shadowHosts = prefixScope(filterNestedRules(rules, isShadowHostRule), scope);
 
-              if (!scope) return;
+    layered = [
+      {
+        type: 'scope',
+        value: { loc: LOCATION, scopeStart: parseSelectorList(scope), rules: mapStyleRules(scoped, scopedRule) },
+      },
+      ...mapStyleRules([...slotted, ...shadowHosts], unscopedRule),
+    ];
+  } else {
+    layered = mapStyleRules(rules, unscopedRule);
+  }
 
-              const selectors = includeScopeRootSelectors(rule.value.selectors, scopeRootClasses);
-              if (selectors === rule.value.selectors) return;
+  // Inlining Tailwind's private variables can make two declarations of one rule identical, so dedupe once, last.
+  dedupeRuleDeclarations(layered);
 
-              return withoutNullValues({
-                ...cloneCssAst(rule),
-                value: { ...cloneCssAst(rule.value), selectors },
-              });
-            },
-          },
-        },
-      }).code
-    )
-  );
+  return serializeRules([
+    { type: 'layer-block', value: { loc: LOCATION, name: file.layer.split('.'), rules: layered } },
+  ]);
 }
 
-/**
- * Keep the rules `@scope` cannot serve outside the scope block. Slotted nodes sit outside a shadow tree's CSS scope, so
+/*
+ * Rules `@scope` cannot serve stay outside the scope block. Slotted nodes sit outside a shadow tree's CSS scope, so
  * their rules move out. WebKit never matches a scoped rule whose subject hosts a shadow root or is slotted into one, so
  * a rule on a shadow host class is emitted twice: the scoped rule stays for engines that match it, and a copy with the
  * scope root as a zero-specificity ancestor follows for WebKit. The copy never outranks the original, so the cascade
  * elsewhere is unchanged. Conditional at-rules retain their conditions when their matching rules move or copy.
  */
-function splitUnscopedRules(css: string, scope: string, shadowHostClasses: ReadonlySet<string>) {
-  let hasSlottedRules = false;
-  let hasShadowHostRules = false;
-  const isShadowHostRule = (rule: Rule) => !isSlottedStyleRule(rule) && isShadowHostStyleRule(rule, shadowHostClasses);
-  const scoped = filterCssRules(css, (rule) => {
-    const slotted = isSlottedStyleRule(rule);
-
-    hasSlottedRules ||= slotted;
-    hasShadowHostRules ||= isShadowHostRule(rule);
-
-    return !slotted;
-  });
-
-  const slotted = hasSlottedRules ? filterCssRules(css, isSlottedStyleRule) : '';
-  const shadowHosts = hasShadowHostRules ? prefixScope(filterCssRules(css, isShadowHostRule), scope) : '';
-
-  return { scoped, unscoped: `${slotted}\n${shadowHosts}` };
-}
 
 /** Prefix every selector with the scope root as a zero-specificity ancestor, standing in for the `@scope` block. */
-function prefixScope(css: string, scope: string): string {
-  const root = parseSelector(`:where(${scope})`);
+function prefixScope(rules: readonly Rule[], scope: string): Rule[] {
+  const root = parseSelectorList(`:where(${scope})`)[0]!;
 
-  return decoder.decode(
-    transform({
-      filename: 'shadow-hosts.css',
-      code: encoder.encode(css),
-      visitor: {
-        Rule: {
-          style(rule) {
-            const selectors = rule.value.selectors.map((selector) => [
-              ...root.map(cloneCssAst),
-              { type: 'combinator', value: 'descendant' } as const,
-              ...selector.map(cloneCssAst),
-            ]);
-
-            return withoutNullValues({ ...cloneCssAst(rule), value: { ...cloneCssAst(rule.value), selectors } });
-          },
-        },
-      },
-    }).code
-  );
+  return mapStyleRules(rules, (rule) => ({
+    ...rule,
+    value: {
+      ...rule.value,
+      selectors: rule.value.selectors.map((selector) => [
+        ...root.map(cloneCssAst),
+        { type: 'combinator', value: 'descendant' } as const,
+        ...selector,
+      ]),
+    },
+  }));
 }
 
-function parseSelector(text: string): Selector {
-  let parsed: Selector | undefined;
+const selectorLists = new Map<string, SelectorList>();
+
+function parseSelectorList(text: string): SelectorList {
+  const cached = selectorLists.get(text);
+  if (cached) return cloneCssAst(cached);
+
+  const [rule] = parseCssRules(`${text} { --vjsc: 0; }`);
+  if (rule?.type !== 'style') throw new Error(`Could not parse the CSS selector '${text}'.`);
+
+  selectorLists.set(text, rule.value.selectors);
+  return cloneCssAst(rule.value.selectors);
+}
+
+function parseCssRules(css: string): Rule[] {
+  let rules: Rule[] = [];
 
   transform({
-    filename: 'selector.css',
-    code: encoder.encode(`${text} { --vjsc: 0; }`),
+    filename: 'semantic.css',
+    code: encoder.encode(css),
     visitor: {
-      Rule: {
-        style(rule) {
-          parsed = cloneCssAst(rule.value.selectors[0]);
-        },
+      StyleSheet(stylesheet) {
+        rules = cloneCssAst(stylesheet.rules);
       },
     },
   });
 
-  if (!parsed) throw new Error(`Could not parse the CSS scope selector '${text}'.`);
-
-  return parsed;
+  return rules;
 }
 
-function filterCssRules(css: string, include: (rule: Rule) => boolean): string {
-  return decoder.decode(
-    transform({
-      filename: 'semantic.css',
-      code: encoder.encode(css),
-      visitor: {
-        StyleSheet(stylesheet) {
-          return withoutNullValues({
-            ...cloneCssAst(stylesheet),
-            rules: filterNestedRules(stylesheet.rules, include),
-          });
+function serializeRules(rules: Rule[]): string {
+  return decoder
+    .decode(
+      transform({
+        filename: 'emitted.css',
+        code: encoder.encode(''),
+        visitor: {
+          StyleSheet(stylesheet) {
+            return withoutNullValues({ ...stylesheet, rules });
+          },
         },
-      },
-    }).code
-  );
+      }).code
+    )
+    .trim();
+}
+
+/** Map every style rule, including those inside conditional and grouping at-rules. */
+function mapStyleRules(rules: readonly Rule[], map: (rule: StyleRuleNode) => Rule): Rule[] {
+  return rules.map((rule) => {
+    if (rule.type === 'style') return map(rule);
+
+    if (!hasNestedCssRules(rule)) return rule;
+
+    return { ...rule, value: { ...rule.value, rules: mapStyleRules(rule.value.rules, map) } } as Rule;
+  });
 }
 
 function filterNestedRules(rules: readonly Rule[], include: (rule: Rule) => boolean): Rule[] {
@@ -238,8 +279,18 @@ function isSlottedStyleRule(rule: Rule): boolean {
   );
 }
 
+function withScopeRootSelectors(rule: StyleRuleNode, scopeRootClasses: ReadonlySet<string>): Rule {
+  const selectors = includeScopeRootSelectors(rule.value.selectors, scopeRootClasses);
+
+  return selectors === rule.value.selectors ? rule : { ...rule, value: { ...rule.value, selectors } };
+}
+
 /** Include a scoped rule when its semantic class is colocated on the scope root. */
 function includeScopeRootSelectors(selectors: SelectorList, scopeRootClasses: ReadonlySet<string>): SelectorList {
+  if (!selectors.some((selector) => selector[0]?.type === 'class' && scopeRootClasses.has(selector[0].name))) {
+    return selectors;
+  }
+
   return selectors.flatMap((selector) => {
     if (selector[0]?.type !== 'class' || !scopeRootClasses.has(selector[0].name)) return [selector];
 
@@ -248,7 +299,7 @@ function includeScopeRootSelectors(selectors: SelectorList, scopeRootClasses: Re
 }
 
 function relationshipScope(
-  rule: Extract<Rule, { type: 'style' }>,
+  rule: StyleRuleNode,
   relationshipOwners: ReadonlySet<string>,
   scopeRootClasses: ReadonlySet<string>
 ): Rule | undefined {
@@ -384,9 +435,6 @@ function semanticRootClass(rule: Rule, semanticClassNames: ReadonlySet<string>):
 
 function renderRuleSet(template: StyleSheet, rules: readonly Rule[]): string {
   const cloned = rules.map(cloneCssAst);
-
-  dedupeRuleDeclarations(cloned);
-
   const result = transform({
     filename: 'rendered.css',
     code: encoder.encode(''),

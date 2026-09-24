@@ -4,26 +4,11 @@ import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
+import { skinCatalog } from '../../catalog.ts';
+
 const workspaceDir = resolve(import.meta.dirname, '../../../../..');
 const outputRoot = resolve(workspaceDir, 'packages/html/src/internal/skins');
-const skins = [
-  'compat-video',
-  'compat-audio',
-  'compat-live-video',
-  'compat-live-audio',
-  'scaffold-video',
-  'scaffold-audio',
-  'scaffold-live-video',
-  'scaffold-live-audio',
-  'default-video',
-  'neutral-video',
-  'default-audio',
-  'neutral-audio',
-  'default-live-video',
-  'neutral-live-video',
-  'default-live-audio',
-  'neutral-live-audio',
-] as const;
+const skins = skinCatalog.map((skin) => skin.name);
 
 describe('generated HTML package skins', () => {
   it.each(skins)('%s has a complete template, exact registration, and stylesheet', (skin) => {

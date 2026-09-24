@@ -1,3 +1,5 @@
+import { isObject, isString } from '@videojs/utils/predicate';
+
 import {
   TARGET_EXPRESSION,
   TARGET_SPREAD,
@@ -29,11 +31,11 @@ export function createTargetCode(): TargetCode {
 }
 
 export function isTargetExpression(value: unknown): value is TargetExpression {
-  return Boolean(value && typeof value === 'object' && (value as Partial<TargetExpression>)[TARGET_EXPRESSION]);
+  return Boolean(isObject(value) && (value as Partial<TargetExpression>)[TARGET_EXPRESSION]);
 }
 
 export function isTargetWithProps(value: unknown): value is TargetWithProps {
-  return Boolean(value && typeof value === 'object' && (value as Partial<TargetWithProps>)[TARGET_WITH_PROPS] === true);
+  return Boolean(isObject(value) && (value as Partial<TargetWithProps>)[TARGET_WITH_PROPS] === true);
 }
 
 export function readTargetExpression(value: TargetExpression): TargetExpressionNode {
@@ -57,7 +59,7 @@ function createBindingPath(code: string): TargetBinding {
 
       if (property === TARGET_SPREAD) return expression;
 
-      if (typeof property === 'string') return createBindingPath(`${code}.${property}`);
+      if (isString(property)) return createBindingPath(`${code}.${property}`);
 
       return (target as TargetBinding & Readonly<Record<PropertyKey, unknown>>)[property];
     },

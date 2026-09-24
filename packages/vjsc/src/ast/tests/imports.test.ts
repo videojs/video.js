@@ -22,4 +22,16 @@ describe('ModuleImports', () => {
       `import { requested as requestedImport, namespace } from "library";\nsetup(requestedImport);`
     );
   });
+
+  it('shares allocated names between value and type collections', () => {
+    const code = `const used = true;`;
+    const ast = parseSync('fixture.ts', code).program;
+    const magicString = new RolldownMagicString(code);
+    const usedNames = new Set(['used']);
+    const values = new ModuleImports(ast, magicString, { usedNames });
+    const types = new ModuleImports(ast, magicString, { kind: 'type', collisionSuffix: 'Type', usedNames });
+
+    expect(values.reference({ from: 'runtime', name: 'Button' })).toBe('Button');
+    expect(types.reference({ from: 'types', name: 'Button' })).toBe('ButtonType');
+  });
 });

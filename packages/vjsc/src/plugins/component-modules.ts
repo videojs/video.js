@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 import type { Plugin } from 'rolldown';
 
+import { withoutModuleBuildMeta } from '../graph/build-meta';
 import {
   isScriptModule,
   moduleFilename,
@@ -13,6 +14,13 @@ import {
 
 export interface ComponentModulesPluginOptions {
   readonly select?: ((module: TransformModule) => boolean | Promise<boolean>) | undefined;
+  /**
+   * The query a relative dependency compiles with when `importer` imports it. Defaults to the importer's whole query;
+   * returning less lets a dependency that ignores part of it compile once for every importer.
+   */
+  readonly inherit?:
+    | ((importer: TransformModule, filename: string) => URLSearchParams | Readonly<Record<string, string>>)
+    | undefined;
 }
 
 /**
@@ -48,6 +56,8 @@ export function componentModulesPlugin(options: ComponentModulesPluginOptions = 
     },
     resolveId: {
       order: 'pre',
+      // A query-bearing id can be selected, and a relative one can inherit its importer's selection.
+      filter: { id: /\?|^\./ },
       async handler(id, importer, resolveOptions) {
         // Only query-bearing ids can be selected, and only relative ids can inherit a selection.
         const relative = id.startsWith('.');
@@ -63,10 +73,13 @@ export function componentModulesPlugin(options: ComponentModulesPluginOptions = 
         });
         if (!resolved || resolved.external || !isScriptModule(resolved.id)) return resolved;
 
-        return {
-          ...resolved,
-          id: moduleId(moduleFilename(resolved.id), selected?.params ?? inherited!.params),
-        };
+        const filename = moduleFilename(resolved.id);
+        const params =
+          selected?.params ?? (options.inherit ? options.inherit(inherited!, filename) : inherited!.params);
+
+        // Each query is a module of its own. It keeps its file's resolver metadata, but as a copy without VJSC's facts:
+        // sharing the file's object would let one variant's build facts leak into the others.
+        return { ...resolved, id: moduleId(filename, params), meta: withoutModuleBuildMeta(resolved.meta) };
       },
     },
     async load(id) {

@@ -1,10 +1,7 @@
-import type { GraphModule } from 'vjsc/graph';
-import type { RegistryModuleItem } from 'vjsc/shadcn';
-
 import type { SkinModuleMeta } from '../../../src/meta.ts';
-import { skinModuleSourcePath } from '../../config.ts';
+import type { SkinGraphModule } from '../../variants.ts';
 import { registryDocsUrl } from '../docs.ts';
-import type { VideojsRegistryMeta } from '../meta.ts';
+import type { SkinRegistryItem, VideojsItemMeta } from '../meta.ts';
 import type { RegistryTarget } from '../targets.ts';
 import { reactHelperDependency } from './support.ts';
 
@@ -21,25 +18,21 @@ const customizationOnlyComponents = new Set([
 ]);
 
 export function componentItem(
-  module: GraphModule<SkinModuleMeta>,
+  module: SkinGraphModule,
   meta: Extract<SkinModuleMeta, { type: 'component' }>,
   target: RegistryTarget
-): RegistryModuleItem<SkinModuleMeta> {
-  const category = componentCategory(module.filename);
+): SkinRegistryItem {
   const registryMeta = {
     role: 'component',
-    framework: 'react',
-    styling: target.styling,
-    theme: target.theme,
     public: true,
-  } satisfies VideojsRegistryMeta;
+  } satisfies VideojsItemMeta;
 
   return {
     name: meta.name,
     type: 'registry:ui',
     title: meta.title,
     description: meta.description,
-    categories: ['media', category],
+    categories: ['media', meta.category],
     docs: componentDocs(module, meta, target),
     registryDependencies: reactHelperDependency(target),
     meta: registryMeta,
@@ -56,24 +49,16 @@ export function componentItem(
   };
 }
 
-export function exportedComponentName(module: GraphModule<SkinModuleMeta>): string {
-  const match = /\bexport\s+(?:const|function)\s+([A-Z][A-Za-z0-9]*)/.exec(module.source);
+/** The component a registry module leads with, such as `PlayButton`: its first exported component. */
+export function exportedComponentName(module: SkinGraphModule): string {
+  const component = module.exports.find((name) => /^[A-Z]/.test(name));
+  if (!component) throw new Error(`Registry module \`${module.sourcePath}\` exports no component.`);
 
-  if (!match) {
-    throw new Error(`Registry component has no exported component: \`${skinModuleSourcePath(module.filename)}\`.`);
-  }
-
-  return match[1]!;
-}
-
-function componentCategory(filename: string): string {
-  const match = /\/components\/([^/]+)\//.exec(filename);
-
-  return match?.[1] ?? 'shared';
+  return component;
 }
 
 function componentDocs(
-  module: GraphModule<SkinModuleMeta>,
+  module: SkinGraphModule,
   meta: Extract<SkinModuleMeta, { type: 'component' }>,
   target: RegistryTarget
 ): string {

@@ -65,6 +65,41 @@ describe('viteOxcPlugin', () => {
     expect(sourceMap?.sources.length).toBeGreaterThan(0);
   });
 
+  it('reuses the AST across passes that leave the source unchanged and parses edited source', async () => {
+    const trees: unknown[] = [];
+    const pass = (name: string, edit: boolean): Plugin => ({
+      name,
+      transform(code, id, meta) {
+        if (id !== ENTRY_ID || !meta.magicString) return null;
+
+        trees.push(meta.ast);
+
+        if (!edit) return null;
+
+        const start = code.indexOf(`'before'`);
+
+        meta.magicString.overwrite(start, start + 8, `'after'`);
+        return { code: meta.magicString };
+      },
+    });
+
+    await build({
+      configFile: false,
+      logLevel: 'silent',
+      plugins: [
+        fixturePlugin(),
+        viteOxcPlugin(pass('read', false)),
+        viteOxcPlugin(pass('edit', true)),
+        viteOxcPlugin(pass('after-edit', false)),
+      ],
+      build: { write: false, rolldownOptions: { input: ENTRY_ID } },
+    });
+
+    expect(trees).toHaveLength(3);
+    expect(trees[1]).toBe(trees[0]);
+    expect(trees[2]).not.toBe(trees[1]);
+  });
+
   it('passes stylesheet modules through without parsing them', async () => {
     let styleAst: unknown = 'unset';
     const transform: Plugin = {

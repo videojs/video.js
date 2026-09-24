@@ -1,3 +1,4 @@
+import { isObject } from '@videojs/utils/predicate';
 import { kebabCase } from '@videojs/utils/string';
 
 import type { StyleVariantName } from './index';
@@ -71,12 +72,10 @@ export function styles<const Rules extends StyleTree>(definition: StyleDefinitio
 }
 
 export function getStyleDefinition(value: unknown): StyleDefinition | undefined {
-  if (!value || typeof value !== 'object') return undefined;
+  if (!isObject(value)) return undefined;
 
   return (value as Partial<DefinedStyles<StyleTree>>)[styleDefinition];
 }
-
-export { isStyleRule };
 
 /** Resolve the class a rule emits, deriving it from the module prefix when the rule declares none. */
 export function ruleClassName(
@@ -121,7 +120,7 @@ function freezeReferences<Rules extends StyleTree>(references: DefinedStyles<Rul
 
 function freezeReferenceValue(value: object): object {
   for (const child of Object.values(value)) {
-    if (child && typeof child === 'object') freezeReferenceValue(child);
+    if (isObject(child)) freezeReferenceValue(child);
   }
 
   return Object.freeze(value);

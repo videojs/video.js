@@ -1,50 +1,34 @@
 import { resolve } from 'node:path';
 
-import type { Plugin } from 'vite';
-import { findGraph, type Graph } from 'vjsc/graph';
+import { defineGraphPlugin } from 'vjsc/graph';
 
 import type { SkinModuleMeta } from '../../src/meta.ts';
-import type { GeneratedPackageFile } from './files.ts';
-import { syncGeneratedFiles } from './files.ts';
-import { createHtmlPackageSkins, htmlPackageSkinOwnedPaths } from './html.ts';
-import { createReactPackageSkins, reactPackageSkinOwnedPaths } from './react.ts';
+import type { SkinVariant } from '../variants.ts';
+import { type GeneratedFile, syncGeneratedFiles } from './files.ts';
+import { createHtmlPackageSkins } from './html.ts';
+import { backgroundPresetCopies, packageOwnedPaths } from './outputs.ts';
+import { createReactPackageSkins } from './react.ts';
 
 export interface PackageSkinsPluginOptions {
   readonly workspaceDir: string;
-  readonly format?: ((source: GeneratedPackageFile) => string | Promise<string>) | undefined;
+  readonly format?: ((source: GeneratedFile) => string | Promise<string>) | undefined;
 }
 
 /** Generate ignored React and HTML package Skin inputs from the finalized VJSC module graph. */
-export function packageSkinsPlugin(options: PackageSkinsPluginOptions): Plugin {
-  let graph: Graph<SkinModuleMeta> | undefined;
-
-  return {
+export function packageSkinsPlugin(options: PackageSkinsPluginOptions): ReturnType<typeof defineGraphPlugin> {
+  return defineGraphPlugin<SkinModuleMeta, SkinVariant>({
     name: 'skins:packages',
-    buildStart(inputOptions) {
-      graph = findGraph<SkinModuleMeta>(inputOptions.plugins);
-
-      if (!graph) this.error('Package Skin generation requires vjscPlugin in the same build.');
-
-      for (const path of [
-        'packages/skins/src/presets/background/react/skin.tsx',
-        'packages/skins/src/presets/background/react/skin.css',
-        'packages/skins/src/presets/background/html/skin.ts',
-        'packages/skins/src/presets/background/html/skin.css',
-      ]) {
-        this.addWatchFile(resolve(options.workspaceDir, path));
-      }
-    },
-    async generateBundle() {
-      const currentGraph = graph;
-
-      if (!currentGraph) this.error('Package Skin generation requires vjscPlugin in the same build.');
-
+    watch: () =>
+      [...backgroundPresetCopies.react, ...backgroundPresetCopies.html].map(([source]) =>
+        resolve(options.workspaceDir, source)
+      ),
+    async generate(graph) {
       const profile = process.env.VIDEOJS_PROFILE_SKINS === '1';
       const generateStarted = performance.now();
 
       const [react, html] = await Promise.all([
-        timed(() => createReactPackageSkins(currentGraph, options)),
-        timed(() => createHtmlPackageSkins(currentGraph, options)),
+        timed(() => createReactPackageSkins(graph, options)),
+        timed(() => createHtmlPackageSkins(graph, options)),
       ]);
 
       const generated = [react.value, html.value];
@@ -61,8 +45,8 @@ export function packageSkinsPlugin(options: PackageSkinsPluginOptions): Plugin {
       const formatEnded = performance.now();
 
       const changed = await syncGeneratedFiles(options.workspaceDir, files, [
-        ...reactPackageSkinOwnedPaths(),
-        ...htmlPackageSkinOwnedPaths(),
+        ...packageOwnedPaths('react'),
+        ...packageOwnedPaths('html'),
       ]);
 
       const syncEnded = performance.now();
@@ -75,7 +59,7 @@ export function packageSkinsPlugin(options: PackageSkinsPluginOptions): Plugin {
 
       if (changed > 0) this.info(`Generated ${changed} changed package Skin file${changed === 1 ? '' : 's'}.`);
     },
-  };
+  });
 }
 
 async function timed<Value>(task: () => Promise<Value>): Promise<{ readonly elapsed: number; readonly value: Value }> {

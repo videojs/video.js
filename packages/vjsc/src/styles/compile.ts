@@ -1,5 +1,6 @@
 import type { DesignSystem } from './design-system';
 import type { StyleOutputFile, StyleOutputRule } from './output';
+import { compareStyleFiles } from './precedence';
 import { renderStylesheets } from './render';
 import {
   collectGroupOwners,
@@ -17,6 +18,10 @@ export interface CompileStylesOptions {
   readonly variants?: readonly string[] | undefined;
   /** Restrict CSS emission to semantic class names referenced by the compiled source graph. */
   readonly ruleClassNames?: ReadonlySet<string> | undefined;
+  /** Cascade order of output files, earliest first. Files are ordered by name without it. */
+  readonly order?: readonly string[] | undefined;
+  /** Whether `shadowHost` rules emit their WebKit copies outside the scope. @default true */
+  readonly shadowHosts?: boolean | undefined;
 }
 
 /** Compiled outputs per design system, keyed by the exact rules, variants, and scope that produced them. */
@@ -53,7 +58,11 @@ function selectRules(options: CompileStylesOptions): ResolvedStyleRule[] {
     .sort((a, b) => a.className.localeCompare(b.className));
 }
 
-/** Everything the compiled CSS depends on besides the design system itself. */
+/**
+ * Everything the compiled CSS depends on besides the design system itself. Variants and referenced class names count
+ * through the rules they select and the utilities they give each one, so owners that differ only in unrelated labels or
+ * references share one result.
+ */
 function compileKey(
   options: CompileStylesOptions,
   selected: readonly ResolvedStyleRule[],
@@ -62,15 +71,16 @@ function compileKey(
 ): string {
   return JSON.stringify([
     options.scope ?? null,
-    variants,
-    options.ruleClassNames ? [...options.ruleClassNames] : null,
+    options.order ?? null,
+    // With references, only the files selected rules land in are emitted; without, every declared file is.
+    options.ruleClassNames !== undefined,
     [...groupOwners].sort(([left], [right]) => left.localeCompare(right)),
     selected.map((rule) => [
       rule.className,
       rule.file,
       rule.layer,
       rule.scopeRoot,
-      rule.shadowHost,
+      rule.shadowHost && options.shadowHosts !== false,
       utilitiesForRule(rule, variants, options.design.merge),
     ]),
     options.ruleClassNames ? null : [...new Set(options.styles.rules.map((rule) => rule.file))].sort(),
@@ -86,7 +96,7 @@ async function compileSelectedStyles(
   const byFile = new Map<string, StyleOutputFile & { rules: StyleOutputRule[] }>();
 
   for (const rule of selected) {
-    const compiled = compileRule(rule, options.design, variants);
+    const compiled = compileRule(rule, options, variants);
     if (compiled.candidates.length === 0) continue;
 
     const existing = byFile.get(rule.file);
@@ -113,34 +123,24 @@ async function compileSelectedStyles(
 
   const outputFiles = options.ruleClassNames
     ? files.map((file) => file.name)
-    : [...new Set(options.styles.rules.map((rule) => rule.file))].sort();
+    : [...new Set(options.styles.rules.map((rule) => rule.file))].sort(compareStyleFiles(options.order));
 
   return new Map(outputFiles.map((file) => [file, rendered.get(file) ?? '']));
 }
 
-/** Order files by their first referenced class so a module's assets follow its class composition, else by name. */
+/** Order files by their declared cascade position so a module's composition order never changes precedence. */
 function orderOutputFiles(files: readonly StyleOutputFile[], options: CompileStylesOptions): StyleOutputFile[] {
-  const byName = (left: StyleOutputFile, right: StyleOutputFile) => left.name.localeCompare(right.name);
+  const compare = compareStyleFiles(options.order);
 
-  if (!options.ruleClassNames) return [...files].sort(byName);
-
-  const fileByClass = new Map(options.styles.rules.map((rule) => [rule.className, rule.file]));
-  const positions = new Map<string, number>();
-
-  for (const className of options.ruleClassNames) {
-    const file = fileByClass.get(className);
-
-    if (file !== undefined && !positions.has(file)) positions.set(file, positions.size);
-  }
-
-  return [...files].sort(
-    (left, right) =>
-      (positions.get(left.name) ?? Number.POSITIVE_INFINITY) -
-        (positions.get(right.name) ?? Number.POSITIVE_INFINITY) || byName(left, right)
-  );
+  return [...files].sort((left, right) => compare(left.name, right.name));
 }
 
-function compileRule(rule: ResolvedStyleRule, design: DesignSystem, variants: readonly string[]): StyleOutputRule {
+function compileRule(
+  rule: ResolvedStyleRule,
+  options: CompileStylesOptions,
+  variants: readonly string[]
+): StyleOutputRule {
+  const design = options.design;
   const candidates: string[] = [];
   const unsupported: string[] = [];
 
@@ -164,7 +164,12 @@ function compileRule(rule: ResolvedStyleRule, design: DesignSystem, variants: re
     );
   }
 
-  return { className: rule.className, candidates, scopeRoot: rule.scopeRoot, shadowHost: rule.shadowHost };
+  return {
+    className: rule.className,
+    candidates,
+    scopeRoot: rule.scopeRoot,
+    shadowHost: rule.shadowHost && options.shadowHosts !== false,
+  };
 }
 
 /** Each relationship marker must have exactly one owner before its consumers can be scoped to it. */

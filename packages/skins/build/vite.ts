@@ -4,9 +4,8 @@ import type { PluginOption } from 'vite-plus';
 import { vjscPlugin } from 'vjsc/vite';
 
 import { iconElementSourcePlugin } from '../../icons/vjsc/vite.ts';
-import { skinMetaDefaults } from './config.ts';
+import { skinCompilerOptions } from './config.ts';
 import { skinClassNameMergeImport } from './imports.ts';
-import { resolveSkinComponents, resolveSkinStyles } from './transform.ts';
 
 const packageDir = resolve(import.meta.dirname, '..');
 const reactSourceDir = resolve(packageDir, '../react/src');
@@ -62,9 +61,10 @@ export function createSkinsSourceConfig(options: SkinsSourceOptions = {}): Skins
   const plugins = [
     iconElementSourcePlugin(),
     ...vjscPlugin({
-      transform: { components: resolveSkinComponents, styles: resolveSkinStyles },
-      meta: { defaults: skinMetaDefaults },
-      candidates: options.tailwind === true,
+      ...skinCompilerOptions,
+      // Record every style module when the build starts: the consumer's Tailwind entry compiles without waiting for
+      // the skins to transform, so a cold build would otherwise miss utilities.
+      candidates: options.tailwind === true && { include: resolve(packageDir, 'src/**/*.styles.ts') },
     }),
   ] as unknown as SkinsSourcePlugin[];
 

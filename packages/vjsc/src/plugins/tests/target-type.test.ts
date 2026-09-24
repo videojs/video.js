@@ -1,13 +1,12 @@
-import { type Plugin, rolldown } from 'rolldown';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { defineComponent, defineSchema } from '../../components/definition';
 import { defineComponentTarget } from '../../target/definition';
-import { componentTargetPlugin } from '../component-target';
-import { targetImportCleanupPlugin } from '../target-import-cleanup';
-import { targetTypePlugin } from '../target-type';
+import { targetFinalizePlugin } from '../target-finalize';
+import { targetLowerPlugin } from '../target-lower';
+import { targetSourcePlugin } from '../target-source';
+import { lowerFixture } from './helpers/lower';
 
-const MODULE_ID = '\0fixture.tsx?target=react';
 const schema = defineSchema('@fixture/components', {
   PlayButton: defineComponent({ name: 'PlayButton' }),
   Tooltip: defineComponent({
@@ -35,7 +34,7 @@ const schema = defineSchema('@fixture/components', {
 const target = defineComponentTarget<typeof schema>()(({ element, imported }) => ({
   source: '@fixture/components',
   components: {
-    resolve: ({ component, part }) =>
+    resolve: ({ component, parts: [part] }) =>
       imported({
         from: '@fixture/react',
         name: component,
@@ -67,7 +66,7 @@ const target = defineComponentTarget<typeof schema>()(({ element, imported }) =>
   jsx: { importSource: 'react', attributes: 'react' },
 }));
 
-describe('targetTypePlugin', () => {
+describe('lowerSourceTypes', () => {
   it('derives public props from the forwarded target and lowers source-only types', async () => {
     const source = await transform(`
       'use client';
@@ -209,43 +208,53 @@ describe('targetTypePlugin', () => {
   });
 });
 
-async function transform(source: string): Promise<string> {
-  let output: string | undefined;
-  const inspect: Plugin = {
-    name: 'fixture:inspect',
-    buildEnd() {
-      output = this.getModuleInfo(MODULE_ID)?.code ?? undefined;
-    },
-  };
-  const bundle = await rolldown({
-    input: 'fixture',
-    experimental: { nativeMagicString: true },
-    external: () => true,
-    transform: { jsx: 'preserve' },
-    plugins: [
-      fixturePlugin(source),
-      targetTypePlugin({ targets: [target] }),
-      componentTargetPlugin({ targets: [target] }),
-      targetImportCleanupPlugin({ targets: [target] }),
-      inspect,
-    ],
+describe('lowerSourceTypes props helpers', () => {
+  it('matches Props by its imported name', async () => {
+    const source = await transform(`
+      import * as $ from '@fixture/components';
+      import { type Props as ButtonHelper } from 'vjsc/components';
+      interface Props { local: true }
+      export function PlayButton({ ...props }: ButtonHelper = {}) {
+        return <$.PlayButton {...props} />;
+      }
+      export function Local({ ...props }: Props) {
+        return <$.PlayButton {...props} />;
+      }
+    `);
+
+    expect(source).toContain('export type PlayButtonProps = Omit<PlayButtonPrimitive.Props, "children">;');
+    expect(source).toContain('function PlayButton({ ...props }: PlayButtonProps = {})');
+    expect(source).toContain('function Local({ ...props }: Props)');
+    expect(source).not.toContain('LocalProps');
   });
 
-  await bundle.generate({ format: 'es' });
+  it('rejects a generated props name the module already declares', async () => {
+    const input = `
+      import * as $ from '@fixture/components';
+      import type { Props } from 'vjsc/components';
+      type PlayButtonProps = { legacy: true };
+      export function PlayButton({ ...props }: Props = {}) {
+        return <$.PlayButton {...props} />;
+      }
+    `;
 
-  if (output === undefined) throw new Error('Fixture build did not retain editable source.');
+    await expect(transform(input)).rejects.toMatchObject({
+      errors: [
+        {
+          message: expect.stringContaining('VJSC needs to declare `PlayButtonProps`'),
+          pos: input.indexOf('export function PlayButton'),
+        },
+      ],
+    });
+  });
+});
 
-  return output;
-}
-
-function fixturePlugin(source: string): Plugin {
-  return {
-    name: 'fixture:module',
-    resolveId(id) {
-      return id === 'fixture' ? MODULE_ID : null;
-    },
-    load(id) {
-      return id === MODULE_ID ? { code: source, moduleType: 'tsx' } : null;
-    },
-  };
+function transform(source: string): Promise<string> {
+  return lowerFixture(source, {
+    plugins: [
+      targetSourcePlugin({ targets: [target] }),
+      targetLowerPlugin({ targets: [target] }),
+      targetFinalizePlugin({ targets: [target] }),
+    ],
+  });
 }

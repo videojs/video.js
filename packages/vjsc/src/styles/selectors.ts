@@ -1,6 +1,6 @@
 import type { Rule, Selector, SelectorComponent, SelectorList } from 'lightningcss';
 
-import { cloneCssAst, visitCssRules } from './css-ast';
+import { cloneCssAst, mapNestedSelectors, visitCssRules } from './css-ast';
 
 function cloneSelectorList(selectors: SelectorList): SelectorList {
   return selectors.map(cloneSelector);
@@ -113,73 +113,9 @@ function mapSelectorList(
   selectors: SelectorList,
   map: (component: SelectorComponent) => SelectorComponent
 ): SelectorList {
-  return selectors.map((selector) => selector.map((component) => mapNestedSelectorComponent(map(component), map)));
+  return selectors.map((selector) => mapSelector(selector, map));
 }
 
-function mapNestedSelectorComponent(
-  component: SelectorComponent,
-  map: (component: SelectorComponent) => SelectorComponent
-): SelectorComponent {
-  if (component.type === 'pseudo-class') {
-    if (
-      component.kind === 'not' ||
-      component.kind === 'where' ||
-      component.kind === 'is' ||
-      component.kind === 'any' ||
-      component.kind === 'has'
-    ) {
-      return {
-        ...component,
-        selectors: mapNestedSelectorList(component.selectors, map),
-      };
-    }
-
-    if (component.kind === 'host') {
-      if (!component.selectors) return component;
-
-      return {
-        ...component,
-        selectors: mapNestedSelector(component.selectors, map),
-      };
-    }
-
-    if (component.kind === 'nth-child' || component.kind === 'nth-last-child') {
-      if (!component.of) return component;
-
-      return {
-        ...component,
-        of: mapNestedSelectorList(component.of, map),
-      };
-    }
-
-    if (component.kind === 'local' || component.kind === 'global') {
-      return {
-        ...component,
-        selector: mapNestedSelector(component.selector, map),
-      };
-    }
-  }
-
-  if (
-    component.type === 'pseudo-element' &&
-    (component.kind === 'slotted' || component.kind === 'cue-function' || component.kind === 'cue-region-function')
-  ) {
-    return {
-      ...component,
-      selector: mapNestedSelector(component.selector, map),
-    };
-  }
-
-  return component;
-}
-
-function mapNestedSelector(selector: Selector, map: (component: SelectorComponent) => SelectorComponent): Selector {
-  return selector.map((child) => mapNestedSelectorComponent(map(child), map));
-}
-
-function mapNestedSelectorList(
-  selectors: SelectorList,
-  map: (component: SelectorComponent) => SelectorComponent
-): SelectorList {
-  return selectors.map((selector) => mapNestedSelector(selector, map));
+function mapSelector(selector: Selector, map: (component: SelectorComponent) => SelectorComponent): Selector {
+  return selector.map((component) => mapNestedSelectors(map(component), (nested) => mapSelector(nested, map)));
 }

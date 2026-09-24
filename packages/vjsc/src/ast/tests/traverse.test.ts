@@ -3,7 +3,7 @@ import { parseSync } from 'oxc-parser';
 import { walk } from 'oxc-walker';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { findJsxAttribute, jsxNamePath } from '..';
+import { findJsxAttribute, jsxNamePath, moduleExportName } from '..';
 
 const source = `
 export function Root() {
@@ -48,3 +48,18 @@ function findElement(name: string): JSXElement {
 
   return found;
 }
+
+describe('moduleExportName', () => {
+  it('reads identifier and string specifier names', () => {
+    const parsed = parseSync('fixture.ts', `import { Menu as Local, "a b" as other } from 'x';`);
+    const declaration = parsed.program.body[0];
+    const names =
+      declaration?.type === 'ImportDeclaration'
+        ? declaration.specifiers.flatMap((specifier) =>
+            specifier.type === 'ImportSpecifier' ? [moduleExportName(specifier.imported)] : []
+          )
+        : [];
+
+    expect(names).toEqual(['Menu', 'a b']);
+  });
+});

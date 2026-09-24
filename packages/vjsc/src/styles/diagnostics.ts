@@ -1,6 +1,9 @@
-import { type Selector, type SelectorComponent, transform } from 'lightningcss';
+import { twMerge } from 'cn';
+import { type Selector, type SelectorComponent, type StyleSheet, transform } from 'lightningcss';
 
+import { nestedSelectors, visitCssRules } from './css-ast';
 import type { DesignSystem } from './design-system';
+import { styleRuleLocation } from './locate';
 import {
   collectGroupOwners,
   isGroupMarker,
@@ -32,11 +35,37 @@ export interface StyleDiagnostic {
   readonly utilities: readonly string[];
 }
 
+// Owners that import the same style modules share one resolved set, so each set is diagnosed once per selection.
+const authoredDiagnostics = new WeakMap<
+  ResolvedStyles,
+  WeakMap<DesignSystem['merge'], Map<string, readonly StyleDiagnostic[]>>
+>();
+
 /** Diagnose relationships and structural selectors using only the resolved local styles. */
 export function diagnoseStyles(
   styles: ResolvedStyles,
   variants: readonly string[] = [],
-  merge?: DesignSystem['merge']
+  merge: DesignSystem['merge'] = twMerge
+): readonly StyleDiagnostic[] {
+  const byMerge = authoredDiagnostics.get(styles) ?? new WeakMap();
+  const byVariants = byMerge.get(merge) ?? new Map<string, readonly StyleDiagnostic[]>();
+  const key = variants.join('\0');
+  const cached = byVariants.get(key);
+  if (cached) return cached;
+
+  const diagnostics = diagnoseStyleRules(styles, variants, merge);
+
+  byVariants.set(key, diagnostics);
+  byMerge.set(merge, byVariants);
+  authoredDiagnostics.set(styles, byMerge);
+
+  return diagnostics;
+}
+
+function diagnoseStyleRules(
+  styles: ResolvedStyles,
+  variants: readonly string[],
+  merge: DesignSystem['merge']
 ): readonly StyleDiagnostic[] {
   const owners = new Set(collectGroupOwners(styles.rules, variants, merge).keys());
   const diagnostics: StyleDiagnostic[] = [];
@@ -77,37 +106,73 @@ export function diagnoseCompiledCandidate(
   css: string,
   groupOwners: ReadonlySet<string>
 ): readonly StyleDiagnostic[] {
-  let scopeEscape = false;
-  let complex = false;
-
-  // Tailwind nests variants under the candidate class (`&[data-open]`) or flattens them onto it
-  // (`.candidate[data-open]`), depending on whether the candidate also sets declarations of its own.
-  transform({
-    filename: 'candidate.css',
-    code: encoder.encode(css),
-    visitor: {
-      Rule: {
-        style(styleRule) {
-          for (const selector of styleRule.value.selectors) {
-            if (isCandidateRoot(selector, candidate)) continue;
-
-            if (!isAnchoredToCandidate(selector, candidate)) scopeEscape = true;
-
-            if (selectorIsComplex(selector, groupOwners)) complex = true;
-          }
-        },
-      },
-    },
-  });
-
+  const analysis = analyzeCandidateCss(candidate, css);
+  const complex = analysis.nested.some((selector) => selectorIsComplex(selector, groupOwners));
   const diagnostics: StyleDiagnostic[] = [];
 
-  if (scopeEscape) diagnostics.push(createDiagnostic('VJSC_STYLE_SCOPE_ESCAPE', rule, [candidate]));
+  if (analysis.scopeEscape) diagnostics.push(createDiagnostic('VJSC_STYLE_SCOPE_ESCAPE', rule, [candidate]));
 
   if (complex) diagnostics.push(createDiagnostic('VJSC_STYLE_COMPLEX_SELECTOR', rule, [candidate]));
 
   return diagnostics;
 }
+
+interface CandidateCssAnalysis {
+  /** Whether some selector is not anchored to the candidate's own element. */
+  readonly scopeEscape: boolean;
+  /** Selectors other than the candidate root, checked against each owner's group names. */
+  readonly nested: readonly Selector[];
+}
+
+// Every owner diagnoses the candidates its rules reference, so parse each expanded candidate once per process.
+const candidateAnalyses = new Map<string, CandidateCssAnalysis>();
+
+function analyzeCandidateCss(candidate: string, css: string): CandidateCssAnalysis {
+  const key = `${candidate}\0${css}`;
+  const cached = candidateAnalyses.get(key);
+  if (cached) return cached;
+
+  let scopeEscape = false;
+  const nested: Selector[] = [];
+
+  let stylesheet: StyleSheet | undefined;
+
+  // One stylesheet callback, walked here: a rule callback would transfer every nested rule again with its parent.
+  transform({
+    filename: 'candidate.css',
+    code: encoder.encode(css),
+    visitor: {
+      StyleSheet(parsed) {
+        stylesheet = parsed;
+      },
+    },
+  });
+
+  // Tailwind nests variants under the candidate class (`&[data-open]`) or flattens them onto it
+  // (`.candidate[data-open]`), depending on whether the candidate also sets declarations of its own.
+  visitCssRules(stylesheet?.rules ?? [], (rule) => {
+    if (rule.type !== 'style') return;
+
+    for (const selector of rule.value.selectors) {
+      if (isCandidateRoot(selector, candidate)) continue;
+
+      if (!isAnchoredToCandidate(selector, candidate)) scopeEscape = true;
+
+      nested.push(selector);
+    }
+  });
+
+  const analysis = { scopeEscape, nested };
+
+  candidateAnalyses.set(key, analysis);
+  return analysis;
+}
+
+// Owners of one style set reference overlapping rules, so each rule's compiled diagnostics are found once per selection.
+const compiledDiagnostics = new WeakMap<
+  ResolvedStyles,
+  WeakMap<DesignSystem, Map<string, Map<ResolvedStyleRule, readonly StyleDiagnostic[]>>>
+>();
 
 /** Diagnose Tailwind-expanded candidates for the semantic rules referenced by one source module. */
 export function diagnoseCompiledStyles(
@@ -116,26 +181,42 @@ export function diagnoseCompiledStyles(
   ruleClassNames: ReadonlySet<string>,
   variants: readonly string[] = []
 ): readonly StyleDiagnostic[] {
+  const byDesign = compiledDiagnostics.get(styles) ?? new WeakMap();
+  const key = variants.join('\0');
+  const byRule = byDesign.get(design)?.get(key) ?? new Map<ResolvedStyleRule, readonly StyleDiagnostic[]>();
   const groupOwners = new Set(collectGroupOwners(styles.rules, variants, design.merge).keys());
   const diagnostics: StyleDiagnostic[] = [];
+
+  byDesign.set(design, (byDesign.get(design) ?? new Map()).set(key, byRule));
+  compiledDiagnostics.set(styles, byDesign);
 
   for (const rule of styles.rules) {
     if (!ruleClassNames.has(rule.className)) continue;
 
-    for (const candidate of utilitiesForRule(rule, variants, design.merge)) {
-      if (isGroupMarker(candidate)) continue;
+    const cached = byRule.get(rule) ?? diagnoseCompiledRule(rule, design, variants, groupOwners);
 
-      const css = design.candidateCss(candidate);
-
-      if (css) diagnostics.push(...diagnoseCompiledCandidate(rule, candidate, css, groupOwners));
-    }
+    byRule.set(rule, cached);
+    diagnostics.push(...cached);
   }
 
   return diagnostics;
 }
 
+function diagnoseCompiledRule(
+  rule: ResolvedStyleRule,
+  design: DesignSystem,
+  variants: readonly string[],
+  groupOwners: ReadonlySet<string>
+): readonly StyleDiagnostic[] {
+  return utilitiesForRule(rule, variants, design.merge).flatMap((candidate) => {
+    const css = isGroupMarker(candidate) ? undefined : design.candidateCss(candidate);
+
+    return css ? diagnoseCompiledCandidate(rule, candidate, css, groupOwners) : [];
+  });
+}
+
 export function formatStyleDiagnostic(diagnostic: StyleDiagnostic): string {
-  const context = `Style rule \`${diagnostic.rule.tokenPath.join('.')}\` in \`${diagnostic.rule.modulePath}\``;
+  const context = `Style rule \`${diagnostic.rule.tokenPath.join('.')}\` at \`${styleRuleLocation(diagnostic.rule)}\``;
   const utilities = diagnostic.utilities.map((utility) => `\`${utility}\``).join(', ');
 
   switch (diagnostic.code) {
@@ -150,6 +231,50 @@ export function formatStyleDiagnostic(diagnostic: StyleDiagnostic): string {
     case 'VJSC_STYLE_COMPLEX_SELECTOR':
       return `[${diagnostic.code}] ${context} uses structural selector utilities: ${utilities}.\nReason: Descendant, sibling, ancestor, or :has() selectors couple the rule to markup outside its own styling hook.\nRecommendation: Prefer an explicit component part, a state attribute on the styled component, or a locally owned named group.`;
   }
+}
+
+/**
+ * Throw the first isolation error and report complex-selector warnings at the configured level, each message once per
+ * `reported` set. Diagnostics naming the same rule and code, such as an authored and a compiled check of one selector,
+ * are reported together.
+ */
+export function reportStyleDiagnostics(
+  diagnostics: readonly StyleDiagnostic[],
+  options: StyleDiagnosticsOptions | false,
+  reported: Set<string>,
+  warn: (message: string) => void
+): void {
+  const level = options ? (options.complexSelectors ?? 'warn') : 'off';
+
+  for (const diagnostic of mergeStyleDiagnostics(diagnostics)) {
+    // Formatting reads the rule's source location, so a warning nobody sees is never formatted.
+    if (diagnostic.kind !== 'error' && level === 'off') continue;
+
+    const message = formatStyleDiagnostic(diagnostic);
+
+    if (diagnostic.kind === 'error' || level === 'error') throw new Error(message);
+
+    if (reported.has(message)) continue;
+
+    reported.add(message);
+    warn(message);
+  }
+}
+
+function mergeStyleDiagnostics(diagnostics: readonly StyleDiagnostic[]): readonly StyleDiagnostic[] {
+  const merged = new Map<string, StyleDiagnostic>();
+
+  for (const diagnostic of diagnostics) {
+    const key = `${diagnostic.code}:${diagnostic.rule.modulePath}:${diagnostic.rule.tokenPath.join('.')}`;
+    const previous = merged.get(key);
+
+    merged.set(
+      key,
+      previous ? { ...previous, utilities: [...new Set([...previous.utilities, ...diagnostic.utilities])] } : diagnostic
+    );
+  }
+
+  return [...merged.values()];
 }
 
 function createDiagnostic(
@@ -196,35 +321,7 @@ function usesComplexSelector(candidate: string): boolean {
 }
 
 function hasCombinator(selector: string): boolean {
-  let squareDepth = 0;
-  let parenthesisDepth = 0;
-  let escaped = false;
-
-  for (const character of selector) {
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-
-    if (character === '\\') {
-      escaped = true;
-      continue;
-    }
-
-    if (character === '[') squareDepth++;
-    else if (character === ']') squareDepth--;
-    else if (character === '(') parenthesisDepth++;
-    else if (character === ')') parenthesisDepth--;
-    else if (
-      squareDepth === 0 &&
-      parenthesisDepth === 0 &&
-      (character === '>' || character === '+' || character === '~')
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+  return scanTopLevel(selector, (character) => character === '>' || character === '+' || character === '~');
 }
 
 function groupOwnerForVariant(variant: string): string | undefined {
@@ -236,30 +333,11 @@ function groupOwnerForVariant(variant: string): string | undefined {
 }
 
 function lastTopLevelSlash(value: string): number {
-  let squareDepth = 0;
-  let parenthesisDepth = 0;
-  let escaped = false;
   let slash = -1;
 
-  for (let index = 0; index < value.length; index++) {
-    const character = value[index]!;
-
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-
-    if (character === '\\') {
-      escaped = true;
-      continue;
-    }
-
-    if (character === '[') squareDepth++;
-    else if (character === ']') squareDepth--;
-    else if (character === '(') parenthesisDepth++;
-    else if (character === ')') parenthesisDepth--;
-    else if (character === '/' && squareDepth === 0 && parenthesisDepth === 0) slash = index;
-  }
+  scanTopLevel(value, (character, index) => {
+    if (character === '/') slash = index;
+  });
 
   return slash;
 }
@@ -271,35 +349,41 @@ function candidateVariants(candidate: string): readonly string[] {
 function splitCandidate(candidate: string): { readonly variants: readonly string[]; readonly utility: string } {
   const parts: string[] = [];
   let start = 0;
-  let squareDepth = 0;
-  let parenthesisDepth = 0;
+
+  scanTopLevel(candidate, (character, index) => {
+    if (character !== ':') return;
+
+    parts.push(candidate.slice(start, index));
+    start = index + 1;
+  });
+
+  parts.push(candidate.slice(start));
+  return { variants: parts.slice(0, -1), utility: parts.at(-1) ?? '' };
+}
+
+/**
+ * Visit each character of a Tailwind candidate outside brackets, parentheses, and escapes, where variant separators and
+ * selector combinators are meaningful. Stops at the first character `visit` accepts and reports whether one did.
+ */
+function scanTopLevel(value: string, visit: (character: string, index: number) => boolean | void): boolean {
+  let depth = 0;
   let escaped = false;
 
-  for (let index = 0; index < candidate.length; index++) {
-    const character = candidate[index]!;
+  for (let index = 0; index < value.length; index++) {
+    const character = value[index]!;
 
     if (escaped) {
       escaped = false;
       continue;
     }
 
-    if (character === '\\') {
-      escaped = true;
-      continue;
-    }
-
-    if (character === '[') squareDepth++;
-    else if (character === ']') squareDepth--;
-    else if (character === '(') parenthesisDepth++;
-    else if (character === ')') parenthesisDepth--;
-    else if (character === ':' && squareDepth === 0 && parenthesisDepth === 0) {
-      parts.push(candidate.slice(start, index));
-      start = index + 1;
-    }
+    if (character === '\\') escaped = true;
+    else if (character === '[' || character === '(') depth++;
+    else if (character === ']' || character === ')') depth--;
+    else if (depth === 0 && visit(character, index)) return true;
   }
 
-  parts.push(candidate.slice(start));
-  return { variants: parts.slice(0, -1), utility: parts.at(-1) ?? '' };
+  return false;
 }
 
 function isCandidateRoot(selector: Selector, candidate: string): boolean {
@@ -339,22 +423,4 @@ function selectorContainsGroupOwner(selector: Selector, groupOwners: ReadonlySet
 
     return nestedSelectors(component).some((nested) => selectorContainsGroupOwner(nested, groupOwners));
   });
-}
-
-function nestedSelectors(component: Extract<SelectorComponent, { type: 'pseudo-class' }>): readonly Selector[] {
-  switch (component.kind) {
-    case 'not':
-    case 'where':
-    case 'is':
-    case 'any':
-    case 'has':
-      return component.selectors;
-    case 'nth-child':
-    case 'nth-last-child':
-      return component.of ?? [];
-    case 'host':
-      return component.selectors ? [component.selectors] : [];
-    default:
-      return [];
-  }
 }

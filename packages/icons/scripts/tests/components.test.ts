@@ -26,10 +26,12 @@ describe('generated icon modules', () => {
       readFile(resolve(distRoot, 'vjsc', family, 'index.d.ts'), 'utf8'),
     ]);
 
-    expect(source).toContain(`import { createComponent } from 'vjsc/components';`);
-    expect(source).toContain(`export const PlayIcon = createComponent({ name: 'PlayIcon' });`);
-    expect(source).toContain(`export const RestartIcon = createComponent({ name: 'RestartIcon' });`);
-    expect(types).toContain(`export declare const PlayIcon: Component<EmptyProps>;`);
+    expect(source).toContain(`import { createComponent, defineSchema } from 'vjsc/components';`);
+    expect(source).toContain(`export const PlayIcon = createComponent(DEFINITIONS.PlayIcon);`);
+    expect(source).toContain(`export const RestartIcon = createComponent(DEFINITIONS.RestartIcon);`);
+    expect(source).toContain(`const schema = defineSchema("@videojs/icons/vjsc", DEFINITIONS);`);
+    expect(types).toContain(`export declare const PlayIcon: ComponentFrom<(typeof DEFINITIONS)['PlayIcon']>;`);
+    expect(types).toContain(`declare const schema: ComponentSchema<typeof DEFINITIONS, "@videojs/icons/vjsc">;`);
   });
 
   it.each(['default', 'neutral'])('builds ref-forwarding React components for the %s family', async (family) => {

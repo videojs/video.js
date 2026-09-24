@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite-plus';
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
+import { vjscComponentSchemaPlugin } from 'vjsc/plugins';
 
 import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
-import { vjscComponentSchemaPlugin } from '../vjsc/src/plugins/component-schema.ts';
 import packageJson from './package.json' with { type: 'json' };
 import { LOCALES, localeAliases } from './src/core/i18n/locales.ts';
 import en from './src/core/i18n/locales/en.ts';

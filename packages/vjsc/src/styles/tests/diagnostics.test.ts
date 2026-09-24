@@ -3,7 +3,12 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { loadDesignSystem } from '../design-system';
-import { diagnoseCompiledCandidate, diagnoseStyles, formatStyleDiagnostic } from '../diagnostics';
+import {
+  diagnoseCompiledCandidate,
+  diagnoseStyles,
+  formatStyleDiagnostic,
+  reportStyleDiagnostics,
+} from '../diagnostics';
 import type { ResolvedStyles, ResolvedStyleRule } from '../resolved';
 
 const designPath = resolve(import.meta.dirname, 'fixtures/diagnostics.css');
@@ -24,7 +29,7 @@ describe('style diagnostics', () => {
       'VJSC_STYLE_UNOWNED_GROUP',
     ]);
     expect(formatStyleDiagnostic(diagnostics[0]!)).toBe(
-      '[VJSC_STYLE_PEER_RELATIONSHIP] Style rule `peer` in `test.styles.ts` uses peer relationship utilities: `peer/dialog`, `peer-data-open/dialog:hidden`.\n' +
+      '[VJSC_STYLE_PEER_RELATIONSHIP] Style rule `peer` at `test.styles.ts` uses peer relationship utilities: `peer/dialog`, `peer-data-open/dialog:hidden`.\n' +
         'Reason: Peer relationships depend on sibling ownership that an isolated module cannot discover safely.\n' +
         'Recommendation: Expose an explicit component part or backdrop, or put the relevant state on the styled component.'
     );
@@ -121,6 +126,40 @@ describe('style diagnostics', () => {
     expect(
       diagnoseCompiledCandidate(rule('flat', ['flat']), 'flat', '.flat[data-open] { display: block; }', new Set())
     ).toEqual([]);
+  });
+});
+
+describe('reportStyleDiagnostics', () => {
+  it('throws isolation errors even when warnings are disabled', () => {
+    const diagnostics = diagnoseStyles(resolvedStyles([rule('peer', ['peer/dialog'])]));
+
+    expect(() => reportStyleDiagnostics(diagnostics, false, new Set(), () => {})).toThrow(
+      '[VJSC_STYLE_PEER_RELATIONSHIP]'
+    );
+  });
+
+  it('merges diagnostics for one rule and warns once per message', () => {
+    const diagnostics = [
+      ...diagnoseStyles(resolvedStyles([rule('root', ['[&_img]:block'])])),
+      ...diagnoseStyles(resolvedStyles([rule('root', ['[&_video]:block'])])),
+    ];
+    const warnings: string[] = [];
+    const reported = new Set<string>();
+
+    reportStyleDiagnostics(diagnostics, {}, reported, (message) => warnings.push(message));
+    reportStyleDiagnostics(diagnostics, {}, reported, (message) => warnings.push(message));
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('`[&_img]:block`, `[&_video]:block`');
+  });
+});
+
+describe('diagnoseStyles', () => {
+  it('diagnoses one resolved set once per variant selection', () => {
+    const styles = resolvedStyles([rule('peer', ['peer/dialog'])]);
+
+    expect(diagnoseStyles(styles, ['a'])).toBe(diagnoseStyles(styles, ['a']));
+    expect(diagnoseStyles(styles, ['b'])).not.toBe(diagnoseStyles(styles, ['a']));
   });
 });
 

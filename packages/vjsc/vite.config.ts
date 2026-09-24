@@ -21,6 +21,7 @@ const pack: PackUserConfig = {
     'target/jsx-dev-runtime': './src/target/jsx-dev-runtime.ts',
     'shadcn/index': './src/shadcn/index.ts',
     'styles/index': './src/styles/index.ts',
+    'tailwind/index': './src/tailwind/index.ts',
     'plugins/index': './src/plugins/index.ts',
     'vite/index': './src/vite/index.ts',
   },

@@ -9,7 +9,7 @@ export type {
   VariableDeclarator,
 } from '@oxc-project/types';
 export { walk } from 'oxc-walker';
-export { type SourceError, sourceError } from './errors';
+export { atSourcePosition, parseError, type SourceError, sourceError } from './errors';
 export {
   collectIdentifierNames,
   insertModuleImports,
@@ -25,4 +25,13 @@ export {
   type SourceText,
   sliceSource,
 } from './source';
-export { findJsxAttribute, jsxNamePath } from './traverse';
+export {
+  analyzeImports,
+  analyzeModule,
+  type ImportBinding,
+  type ImportReference,
+  type ImportReplacement,
+  type ModuleAnalysis,
+  replaceImportSpecifiers,
+} from './module-specifiers';
+export { findJsxAttribute, jsxNamePath, moduleExportName, staticPropertyName } from './traverse';

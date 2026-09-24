@@ -1,22 +1,19 @@
-import type { Graph, GraphModule } from 'vjsc/graph';
-import { bundleStyles, relativeImport, rewriteImports, stripStyleImports } from 'vjsc/graph';
+import { bundleStyles, emitModules, relativeImport, stripStyleImports } from 'vjsc/graph';
 
-import type { SkinModuleMeta } from '../../src/meta.ts';
+import { reactSubpathComponents } from '../../../react/vjsc/components.ts';
+import type { SkinName } from '../../src/meta.ts';
 import { skinCatalogEntry } from '../catalog.ts';
 import { skinClassNameMergeImport } from '../imports.ts';
-import { skinBaseStylesheet, skinSourceDirectory } from '../skin.ts';
-import { type SkinRoot, skinRoots } from '../variants.ts';
-import type { GeneratedPackageFile } from './files.ts';
+import { skinBaseStylesheet } from '../skin.ts';
+import { skinSource } from '../source.ts';
+import { type SkinGraph, type SkinGraphModule, skinRoots } from '../variants.ts';
+import type { GeneratedFile } from './files.ts';
+import { backgroundPresetCopies, packageInternalRoot, packageSourceRoot, reactPresetPath } from './outputs.ts';
 import { addCopiedFiles, addGenerated, generatedFiles } from './utils.ts';
 
-const packageRoot = 'packages/react/src';
-const internalRoot = `${packageRoot}/internal/skins`;
-const radioGroupImports = new Set([
-  '@videojs/react/ui/audio-track-radio-group',
-  '@videojs/react/ui/captions-radio-group',
-  '@videojs/react/ui/playback-rate-radio-group',
-  '@videojs/react/ui/quality-radio-group',
-]);
+const packageRoot = packageSourceRoot.react;
+const internalRoot = packageInternalRoot.react;
+const subpathImports = new Set(Object.values(reactSubpathComponents));
 
 export interface CreateReactPackageSkinsOptions {
   readonly workspaceDir: string;
@@ -25,66 +22,49 @@ export interface CreateReactPackageSkinsOptions {
 
 /** Generate package-local React Skin implementations from one finalized VJSC module graph. */
 export async function createReactPackageSkins(
-  graph: Graph<SkinModuleMeta>,
+  graph: SkinGraph,
   options: CreateReactPackageSkinsOptions
-): Promise<GeneratedPackageFile[]> {
+): Promise<GeneratedFile[]> {
   const skins = skinRoots(graph, { target: 'react', style: 'css' });
-  const sharedSourcePaths = collectSharedSourcePaths(skins);
-  const destinations = new Map<string, string>();
-
-  for (const skin of skins) {
-    for (const module of skin.modules) {
-      destinations.set(module.id, reactModulePath(skin, module, sharedSourcePaths));
-    }
-  }
-
+  const skinNames = new Map(skins.map((skin) => [skin.root.id, skin.root.meta.name]));
   const generated = new Map<string, string>();
+  const modules = emitModules(graph, {
+    roots: skins.map((skin) => skin.root),
+    place: ({ module, root, shared }) => reactModulePath(skinNames.get(root.id)!, module, shared),
+    resolveImport({ reference, destination }) {
+      if (reference.specifier === skinClassNameMergeImport) return '@videojs/utils/style';
 
-  for (const [destination, modules] of modulesByDestination(skins, destinations)) {
-    const stripped = new Set(modules.map((module) => stripStyleImports(module.source)));
-    const candidates = stripped.size === 1 ? [modules[0]!] : modules;
+      const frameworkImport = reactFrameworkImport(reference.specifier);
 
-    for (const module of candidates) {
-      const source = rewriteImports(graph, module, ({ dependency, reference }) => {
-        if (reference.specifier === skinClassNameMergeImport) return '@videojs/utils/style';
+      return frameworkImport ? relativeImport(destination, frameworkImport) : undefined;
+    },
+    // Package skins bundle their CSS into one stylesheet per skin, so only module sources decide sharing.
+    transform: stripStyleImports,
+  });
 
-        const frameworkImport = reactFrameworkImport(reference.specifier);
-        if (frameworkImport) return relativeImport(destination, frameworkImport);
-
-        if (!dependency) return undefined;
-
-        const target = destinations.get(dependency.id);
-        if (!target) throw new Error(`React Skin dependency has no generated target: \`${dependency.sourcePath}\`.`);
-
-        return relativeImport(destination, target);
-      });
-
-      addGenerated(generated, destination, stripStyleImports(source));
-    }
-  }
+  for (const [destination, source] of modules) addGenerated(generated, destination, source);
 
   for (const skin of skins) {
-    const publicRoot = `${packageRoot}/presets/${skin.preset}`;
+    const publicModule = reactPresetPath(skin.preset, skin.theme, 'tsx');
     const entry = skinCatalogEntry(skin.root.meta.name);
-    const publicName = skin.theme === 'default' ? 'skin' : `${skin.theme}-skin`;
     const component = entry.component;
     const generatedComponent = entry.exportName;
-    const generatedRoot = destinations.get(skin.root.id)!;
+    const generatedRoot = reactModulePath(skin.root.meta.name, skin.root, false);
 
     addGenerated(
       generated,
-      `${publicRoot}/${publicName}.tsx`,
+      publicModule,
       reactSkinWrapper({
         component,
         generatedComponent,
-        importSource: relativeImport(`${publicRoot}/${publicName}.tsx`, generatedRoot),
-        video: skin.preset.endsWith('video'),
-        live: skin.preset.startsWith('live'),
+        importSource: relativeImport(publicModule, generatedRoot),
+        video: entry.media === 'video',
+        live: entry.live,
       })
     );
     addGenerated(
       generated,
-      `${publicRoot}/${publicName}.css`,
+      reactPresetPath(skin.preset, skin.theme, 'css'),
       await bundleStyles(graph, skin.modules, {
         label: `${skin.theme}-${skin.preset}`,
         files: options.baseStyles ?? [`./styles/${skinBaseStylesheet(skin.preset, skin.theme)}`],
@@ -94,82 +74,20 @@ export async function createReactPackageSkins(
     );
   }
 
-  await addCopiedFiles(generated, options.workspaceDir, [
-    ['packages/skins/src/presets/background/react/skin.tsx', `${packageRoot}/presets/background/skin.tsx`],
-    ['packages/skins/src/presets/background/react/skin.css', `${packageRoot}/presets/background/skin.css`],
-  ]);
+  await addCopiedFiles(generated, options.workspaceDir, backgroundPresetCopies.react);
 
   return generatedFiles(generated);
 }
 
-export function reactPackageSkinOwnedPaths(): string[] {
-  // Every preset skin wrapper and stylesheet is generated, so a renamed theme's old outputs are removed too.
-  return [internalRoot, `${packageRoot}/presets/*/*skin.tsx`, `${packageRoot}/presets/*/*skin.css`];
-}
+function reactModulePath(skin: SkinName, module: SkinGraphModule, shared: boolean): string {
+  const source = skinSource(module.sourcePath);
+  if (source.kind === 'skin' && source.skin === skin) return `${internalRoot}/${skin}/${source.file}`;
 
-function reactModulePath(
-  skin: SkinRoot,
-  module: GraphModule<SkinModuleMeta>,
-  sharedSourcePaths: ReadonlySet<string>
-): string {
-  const ownedPrefix = `skins/${skinSourceDirectory(skin.root.meta.name)}/`;
-
-  if (module.sourcePath.startsWith(ownedPrefix)) {
-    return `${internalRoot}/${skin.root.meta.name}/${module.sourcePath.slice(ownedPrefix.length)}`;
-  }
-
-  return sharedSourcePaths.has(module.sourcePath)
-    ? `${internalRoot}/shared/${module.sourcePath}`
-    : `${internalRoot}/${skin.root.meta.name}/${module.sourcePath}`;
-}
-
-/**
- * Source paths whose generated module can be emitted once for every skin. A shared module resolves its imports through
- * one skin, so its own source must be identical across skins and every module it imports must be shared as well;
- * otherwise a neutral skin would import the default skin's copy of, say, an icon-bearing button.
- */
-function collectSharedSourcePaths(skins: readonly SkinRoot[]): ReadonlySet<string> {
-  const variants = new Map<string, Set<string>>();
-  const dependencies = new Map<string, Set<string>>();
-
-  for (const skin of skins) {
-    const modules = new Map(skin.modules.map((module) => [module.id, module]));
-
-    for (const module of skin.modules) {
-      const sources = variants.get(module.sourcePath) ?? new Set<string>();
-      const imported = dependencies.get(module.sourcePath) ?? new Set<string>();
-
-      sources.add(stripStyleImports(module.source));
-
-      for (const reference of module.imports) {
-        const dependency = reference.resolvedId === undefined ? undefined : modules.get(reference.resolvedId);
-
-        if (dependency) imported.add(dependency.sourcePath);
-      }
-
-      variants.set(module.sourcePath, sources);
-      dependencies.set(module.sourcePath, imported);
-    }
-  }
-
-  const shared = new Set([...variants].filter(([, sources]) => sources.size === 1).map(([sourcePath]) => sourcePath));
-
-  for (let changed = true; changed;) {
-    changed = false;
-
-    for (const sourcePath of [...shared]) {
-      if ([...(dependencies.get(sourcePath) ?? [])].every((dependency) => shared.has(dependency))) continue;
-
-      shared.delete(sourcePath);
-      changed = true;
-    }
-  }
-
-  return shared;
+  return shared ? `${internalRoot}/shared/${module.sourcePath}` : `${internalRoot}/${skin}/${module.sourcePath}`;
 }
 
 function reactFrameworkImport(specifier: string): string | undefined {
-  if (specifier === '@videojs/react' || radioGroupImports.has(specifier) || specifier === 'cn') {
+  if (specifier === '@videojs/react' || subpathImports.has(specifier) || specifier === 'cn') {
     return `${packageRoot}/internal/skin-primitives.ts`;
   }
 
@@ -204,25 +122,4 @@ export function ${options.component}(props: ${props}) {
   return <Skin {...props} />;
 }
 `;
-}
-
-function modulesByDestination(
-  skins: readonly SkinRoot[],
-  destinations: ReadonlyMap<string, string>
-): Array<readonly [string, readonly GraphModule<SkinModuleMeta>[]]> {
-  const grouped = new Map<string, Map<string, GraphModule<SkinModuleMeta>>>();
-
-  for (const skin of skins) {
-    for (const module of skin.modules) {
-      const destination = destinations.get(module.id)!;
-      const modules = grouped.get(destination) ?? new Map();
-
-      modules.set(module.id, module);
-      grouped.set(destination, modules);
-    }
-  }
-
-  return [...grouped]
-    .sort(([left], [right]) => left.localeCompare(right))
-    .map(([destination, modules]) => [destination, [...modules.values()]] as const);
 }

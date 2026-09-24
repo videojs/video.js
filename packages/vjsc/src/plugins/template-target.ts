@@ -1,8 +1,8 @@
-import type { ImportDeclaration, JSXElement, JSXOpeningElement, Program } from '@oxc-project/types';
+import type { JSXElement, JSXOpeningElement } from '@oxc-project/types';
+import { isFunction, isObject, isString } from '@videojs/utils/predicate';
 import { walk } from 'oxc-walker';
-import type { Plugin } from 'rolldown';
 
-import { findJsxAttribute, type ModuleImports } from '../ast';
+import { atSourcePosition, findJsxAttribute, type SourceEdit, sourceError } from '../ast';
 import {
   type ComponentTarget,
   isTargetElement,
@@ -15,213 +15,200 @@ import {
   type TemplateTargetRule,
 } from '../target/definition';
 import { jsx } from '../target/jsx-runtime';
-import { createTargetModuleImports } from '../target/module-imports';
+import type { TargetModule } from '../target/module';
 import { isTargetNode, renderTargetAttributes, renderTargetOutput } from '../target/render';
-import {
-  createSourceChildren,
-  createSourceProps,
-  type SourceChildrenToken,
-  singleJsxElementChild,
-} from '../target/source';
-import { SCRIPT_MODULE_ID } from '../utils/module-id';
-import { type ComponentTargetPluginOptions, selectComponentTargets } from './component-target';
+import { sourceElement } from '../target/source';
+import { targetId } from './component-target';
 
-interface TemplateBinding {
-  readonly local: string;
-  readonly targets: readonly ComponentTarget[];
+export interface LoweredTemplates {
+  /** Replacements for each lowered `<Template>`, which carry the edits made inside it. */
+  readonly edits: readonly SourceEdit[];
+  /** Host props a template moved onto its parent element, inserted before the parent's opening tag closes. */
+  readonly insertions: readonly SourceEdit[];
 }
 
-interface Replacement {
-  readonly start: number;
-  readonly end: number;
-  readonly code: string;
-}
+/**
+ * Lower each `<Template>` child of an element through the target that defines its name. A template whose rule returns a
+ * host element hands its props to the parent element and disappears; any other output replaces it in place.
+ *
+ * @param edits - Edits already made inside the module, which templates render into their own output.
+ * @param moduleKey - Key that makes generated ids unique to this module.
+ */
+export function lowerTemplates(
+  module: TargetModule,
+  edits: readonly SourceEdit[],
+  moduleKey: string
+): LoweredTemplates {
+  const local = module.bindings.template;
+  if (!local) return { edits: [], insertions: [] };
 
-export function templateTargetPlugin(options: ComponentTargetPluginOptions): Plugin {
-  return {
-    name: 'vjsc:template-target',
-    transform: {
-      filter: { id: SCRIPT_MODULE_ID, code: 'Template' },
-      handler(code, id, transform) {
-        const targets = selectComponentTargets(options.targets, id);
-        if (targets.length === 0 || !transform.ast || !transform.magicString) return null;
+  const { code, targets, imports } = module;
+  const templateEdits: SourceEdit[] = [];
+  const insertions: SourceEdit[] = [];
+  let occurrence = 0;
 
-        const binding = collectTemplateBinding(transform.ast, targets);
-        if (!binding) return null;
+  walk(module.ast, {
+    enter(node) {
+      if (node.type !== 'JSXElement') return;
 
-        const imports = createTargetModuleImports(transform.ast, transform.magicString);
-        let changed = false;
-        let occurrence = 0;
+      // Each template is lowered from its parent, which renders the template's subtree into its output.
+      if (isTemplate(node, local)) {
+        this.skip();
+        return;
+      }
 
-        walk(transform.ast, {
-          enter(node) {
-            if (node.type !== 'JSXElement') return;
+      const templates = node.children.filter(
+        (child): child is JSXElement => child.type === 'JSXElement' && isTemplate(child, local)
+      );
+      if (templates.length === 0) return;
 
-            const templates = node.children.filter(
-              (child): child is JSXElement => child.type === 'JSXElement' && isTemplate(child, binding.local)
-            );
-            if (templates.length === 0) return;
+      for (const template of templates) {
+        atSourcePosition(template.start, () => {
+          const name = staticName(template, code);
+          const owner = templateOwner(targets, name, template.start);
+          const definition = normalizeTemplateRule(owner.rule);
+          const prefix = `${moduleKey}-t${(occurrence++).toString(36)}`;
 
-            for (const template of templates) {
-              const name = staticName(template, code);
-              const owned = binding.targets.flatMap((target) => {
-                const rule = target.primitives.Template?.[name];
+          assertNoNestedTemplates(template, local);
 
-                return rule ? [{ target, rule }] : [];
-              });
+          const parts = templateParts(module, template, local, definition, owner.target, edits, prefix);
+          const inside = [
+            ...within(edits, template).filter((edit) => !parts.some((part) => contains(part, edit))),
+            ...parts,
+          ];
+          const { props, children } = sourceElement<Record<string, unknown>>(code, template, inside, true);
+          const output = applyRule(definition.render, props.omit('name'), children, prefix);
 
-              if (owned.length === 0) {
-                throw new Error(`Component target does not define <Template name=${JSON.stringify(name)}>.`);
-              }
+          if (!isHostOutput(output)) {
+            templateEdits.push({
+              start: template.start,
+              end: template.end,
+              content: renderTargetOutput(output, { target: owner.target, imports }),
+            });
+            return;
+          }
 
-              if (owned.length > 1) {
-                throw new Error(`More than one component target defines <Template name=${JSON.stringify(name)}>.`);
-              }
+          const attributes = renderTargetAttributes(output, { target: owner.target, imports });
 
-              const owner = owned[0]!;
-              const definition = normalizeTemplateRule(owner.rule);
-              const children = templateChildren(code, template, binding.local, definition, owner.target, imports);
-              const props = createSourceProps<Record<string, unknown>>(code, template.openingElement, children).omit(
-                'name'
-              );
-              const output = applyRule(
-                definition.render,
-                props,
-                children as unknown as TargetOutput,
-                `vjsc-template-${occurrence}`
-              );
+          assertAvailableHostAttributes(node.openingElement, attributes, template.start);
 
-              if (isHostOutput(output)) {
-                const attributes = renderTargetAttributes(output, { target: owner.target, imports });
+          if (attributes.length > 0) {
+            const insertion = openingInsertion(node.openingElement, code);
 
-                assertAvailableHostAttributes(node.openingElement, attributes, code);
+            insertions.push({ start: insertion, end: insertion, content: ` ${attributes.join(' ')}` });
+          }
 
-                if (attributes.length > 0) {
-                  transform.magicString!.appendLeft(
-                    openingInsertion(node.openingElement, code),
-                    ` ${attributes.join(' ')}`
-                  );
-                }
-
-                transform.magicString!.remove(template.start, template.end);
-              } else {
-                transform.magicString!.overwrite(
-                  template.start,
-                  template.end,
-                  renderTargetOutput(output, { target: owner.target, imports })
-                );
-              }
-
-              changed = true;
-              occurrence += 1;
-            }
-
-            this.skip();
-          },
+          templateEdits.push({ start: template.start, end: template.end, content: '' });
         });
-
-        if (!changed) return null;
-
-        imports.commit();
-        return { code: transform.magicString };
-      },
+      }
     },
-  };
+  });
+
+  return { edits: templateEdits, insertions };
 }
 
-function collectTemplateBinding(ast: Program, targets: readonly ComponentTarget[]): TemplateBinding | undefined {
-  for (const statement of ast.body) {
-    if (!isComponentImport(statement)) continue;
+/** Edits contained by one element. */
+function within(edits: readonly SourceEdit[], node: JSXElement): SourceEdit[] {
+  return edits.filter((edit) => contains(node, edit));
+}
 
-    for (const specifier of statement.specifiers) {
-      if (specifier.type !== 'ImportSpecifier' || specifier.importKind === 'type') continue;
+function contains(outer: { readonly start: number; readonly end: number }, inner: SourceEdit): boolean {
+  return inner.start >= outer.start && inner.end <= outer.end;
+}
 
-      const imported = specifier.imported.type === 'Identifier' ? specifier.imported.name : specifier.imported.value;
-      if (imported === 'Template') return { local: specifier.local.name, targets };
-    }
+function templateOwner(
+  targets: readonly ComponentTarget[],
+  name: string,
+  pos: number
+): { readonly target: ComponentTarget; readonly rule: TemplateTargetRule } {
+  const owned = targets.flatMap((target) => {
+    const rule = target.primitives.Template?.[name];
+
+    return rule ? [{ target, rule }] : [];
+  });
+
+  if (owned.length === 0)
+    throw sourceError(`Component target does not define <Template name=${JSON.stringify(name)}>.`, pos);
+
+  if (owned.length > 1) {
+    throw sourceError(`More than one component target defines <Template name=${JSON.stringify(name)}>.`, pos);
   }
 
-  return undefined;
-}
-
-function isComponentImport(statement: Program['body'][number]): statement is ImportDeclaration {
-  return (
-    statement.type === 'ImportDeclaration' &&
-    statement.importKind !== 'type' &&
-    statement.source.value === 'vjsc/components'
-  );
+  return owned[0]!;
 }
 
 function normalizeTemplateRule(rule: TemplateTargetRule): TemplateTargetDefinition {
-  if (!isTargetElement(rule) && typeof rule === 'object' && rule !== null && 'render' in rule) return rule;
+  if (!isTargetElement(rule) && isObject(rule) && 'render' in rule) return rule;
 
   return { render: rule };
 }
 
-function templateChildren(
-  code: string,
+/** Replace each `<Template.Part>` inside a template with its target's output. */
+function templateParts(
+  module: TargetModule,
   template: JSXElement,
   local: string,
   definition: TemplateTargetDefinition,
   target: ComponentTarget,
-  imports: ModuleImports
-): SourceChildrenToken {
-  const root = singleJsxElementChild(template);
-  const closingStart = template.closingElement?.start ?? template.openingElement.end;
-  const children = createSourceChildren(code, template.openingElement, closingStart, root?.openingElement);
-  const replacements: Replacement[] = [];
+  edits: readonly SourceEdit[],
+  prefix: string
+): SourceEdit[] {
+  const parts: SourceEdit[] = [];
 
   walk(template, {
     enter(node) {
       if (node === template || node.type !== 'JSXElement' || !isTemplatePart(node, local)) return;
 
-      const name = staticName(node, code);
+      const name = staticName(node, module.code);
       const rule = definition.parts?.[name];
-      if (!rule) throw new Error(`Template target does not define <Template.Part name=${JSON.stringify(name)}>.`);
 
-      const partChildren = createSourceChildren(
-        code,
-        node.openingElement,
-        node.closingElement?.start ?? node.openingElement.end
-      );
-      const props = createSourceProps<Record<string, unknown>>(code, node.openingElement, partChildren).omit('name');
-      const output = applyRule(rule, props, partChildren as unknown as TargetOutput, `vjsc-template-part-${name}`);
+      if (!rule) {
+        throw sourceError(`Template target does not define <Template.Part name=${JSON.stringify(name)}>.`, node.start);
+      }
 
-      replacements.push({
-        start: node.start - template.openingElement.end,
-        end: node.end - template.openingElement.end,
-        code: renderTargetOutput(output, { target, imports }),
+      const { props, children } = sourceElement<Record<string, unknown>>(module.code, node, within(edits, node));
+      const output = applyRule(rule, props.omit('name'), children, `${prefix}-${name}`);
+
+      parts.push({
+        start: node.start,
+        end: node.end,
+        content: renderTargetOutput(output, { target, imports: module.imports }),
       });
       this.skip();
     },
   });
 
-  return { ...children, value: applyReplacements(children.value, replacements) };
+  return parts;
+}
+
+/** Reject a `<Template>` anywhere inside another, including inside its parts, which render their children as source. */
+function assertNoNestedTemplates(template: JSXElement, local: string): void {
+  walk(template, {
+    enter(node) {
+      if (node === template || node.type !== 'JSXElement' || !isTemplate(node, local)) return;
+
+      throw sourceError(
+        '<Template> cannot be nested inside another <Template>.\n' +
+          'Reason: the outer template renders its children as source, so the inner one would never be lowered.\n' +
+          'Recommendation: lift the inner template to an element outside the outer one.',
+        node.start
+      );
+    },
+  });
 }
 
 function applyRule(
   rule: PrimitiveTargetRule<object>,
   props: SourceProps<object>,
   children: TargetOutput,
-  id: string
+  prefix: string
 ): TargetOutput {
-  if (typeof rule === 'function' && !isTargetElement(rule)) {
-    return rule({ props, children, id: (name) => `${id}-${name}` });
-  }
+  if (isFunction(rule) && !isTargetElement(rule))
+    return rule({ props, children, id: (name) => targetId(prefix, name) });
 
   if (isTargetElement(rule)) return jsx(rule, { ...props, children });
 
   throw new Error('Template target rules must be target elements or rewrite functions.');
-}
-
-function applyReplacements(source: string, replacements: readonly Replacement[]): string {
-  let output = source;
-
-  for (const replacement of [...replacements].sort((a, b) => b.start - a.start)) {
-    output = `${output.slice(0, replacement.start)}${replacement.code}${output.slice(replacement.end)}`;
-  }
-
-  return output;
 }
 
 function isTemplate(node: JSXElement, local: string): boolean {
@@ -241,15 +228,16 @@ function isTemplatePart(node: JSXElement, local: string): boolean {
 
 function staticName(node: JSXElement, code: string): string {
   const value = findJsxAttribute(node, 'name')?.value;
-  if (value?.type === 'Literal' && typeof value.value === 'string') return value.value;
+  if (value?.type === 'Literal' && isString(value.value)) return value.value;
 
   if (value?.type === 'JSXExpressionContainer') {
     const expression = value.expression;
-    if (expression.type === 'Literal' && typeof expression.value === 'string') return expression.value;
+    if (expression.type === 'Literal' && isString(expression.value)) return expression.value;
   }
 
-  throw new Error(
-    `<Template> and <Template.Part> require a static string name in ${code.slice(node.start, node.end)}.`
+  throw sourceError(
+    `<Template> and <Template.Part> require a static string name in ${code.slice(node.start, node.end)}.`,
+    node.start
   );
 }
 
@@ -261,7 +249,7 @@ function openingInsertion(opening: JSXOpeningElement, code: string): number {
   return opening.end - (code[opening.end - 2] === '/' ? 2 : 1);
 }
 
-function assertAvailableHostAttributes(opening: JSXOpeningElement, attributes: readonly string[], code: string): void {
+function assertAvailableHostAttributes(opening: JSXOpeningElement, attributes: readonly string[], pos: number): void {
   const declared = new Set(
     opening.attributes.flatMap((attribute) =>
       attribute.type === 'JSXAttribute' && attribute.name.type === 'JSXIdentifier' ? [attribute.name.name] : []
@@ -272,9 +260,7 @@ function assertAvailableHostAttributes(opening: JSXOpeningElement, attributes: r
     const name = /^([:$\w-]+)/.exec(attribute)?.[1];
 
     if (name && declared.has(name)) {
-      throw new Error(
-        `Template parent already declares ${JSON.stringify(name)} in ${code.slice(opening.start, opening.end)}.`
-      );
+      throw sourceError(`The element containing this <Template> already declares ${JSON.stringify(name)}.`, pos);
     }
   }
 }

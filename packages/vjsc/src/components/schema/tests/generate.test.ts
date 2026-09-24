@@ -2,9 +2,10 @@ import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { parseSync } from 'oxc-parser';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { createComponentSchema } from '../generate';
+import { createComponentSchema, renderComponentSchema } from '../generate';
 
 const STUB = 'const defineComponent: any = (manifest?: any) => manifest ?? {};';
 
@@ -117,5 +118,38 @@ describe('createComponentSchema', () => {
 
     expect(result.code).toContain('createComponent(DEFINITIONS.PauseIcon)');
     expect(result.code).toContain('createComponent(DEFINITIONS.PlayIcon)');
+  });
+});
+
+describe('renderComponentSchema', () => {
+  it('renders a JavaScript schema for name-only components', () => {
+    const { code, declaration } = renderComponentSchema({
+      source: '@fixture/icons',
+      components: ['PlayIcon', 'PauseIcon', 'PlayIcon'],
+      language: 'js',
+    });
+
+    expect(parseSync('schema.js', code).errors).toEqual([]);
+    expect(parseSync('schema.d.ts', declaration).errors).toEqual([]);
+    expect(code).toContain(`import { createComponent, defineSchema } from 'vjsc/components';`);
+    expect(code.indexOf('PauseIcon: {')).toBeLessThan(code.indexOf('PlayIcon: {'));
+    expect(code.match(/export const PlayIcon /g)).toHaveLength(1);
+    expect(code).toContain(`const schema = defineSchema("@fixture/icons", DEFINITIONS);`);
+    expect(declaration).toContain(`export declare const PlayIcon: ComponentFrom<(typeof DEFINITIONS)['PlayIcon']>;`);
+    // Name-only components accept no props of their own, rather than inferring none as `never`.
+    expect(declaration).toContain(
+      `readonly PlayIcon: ComponentDefinition<EmptyProps> & { readonly name: 'PlayIcon' };`
+    );
+  });
+
+  it('renders typed TypeScript by default', () => {
+    const { code } = renderComponentSchema({ source: '@fixture/icons', components: ['PlayIcon'] });
+
+    expect(parseSync('schema.ts', code).errors).toEqual([]);
+    expect(code).toContain(`const schema: ComponentSchema<typeof DEFINITIONS, "@fixture/icons">`);
+  });
+
+  it('rejects an empty schema', () => {
+    expect(() => renderComponentSchema({ source: '@fixture/icons', components: [] })).toThrow('declares no components');
   });
 });

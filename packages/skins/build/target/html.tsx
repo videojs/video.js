@@ -8,142 +8,15 @@ import {
   consumeRenderTarget,
   type TargetHelpers,
   defineComponentTarget,
+  htmlJsx,
   type TemplateTargetDefinition,
 } from 'vjsc/target';
 import { Host } from 'vjsc/target/jsx-runtime';
 
-import { htmlIconModule, htmlRenderAliases } from './html-render.ts';
+import { htmlElementModule, htmlElementName, htmlI18nModule, htmlPublicName } from '../../../html/vjsc/elements.ts';
+import { skinRenderTargets } from './render-targets.ts';
 
 type CoreSchema = typeof coreSchema;
-
-interface ComponentPartNameMap {
-  readonly [component: string]: Readonly<Record<string, string>>;
-}
-
-interface PublicNameMap {
-  readonly [component: string]: string;
-}
-
-const componentParts: ComponentPartNameMap = {
-  Controls: {
-    Root: 'Controls',
-    Backdrop: 'ControlsBackdrop',
-    Content: 'ControlsContent',
-    Group: 'ControlsGroup',
-  },
-  ErrorDialog: {
-    Root: 'ErrorDialog',
-    Backdrop: 'DialogBackdrop',
-    Popup: 'DialogPopup',
-    Title: 'DialogTitle',
-    Description: 'DialogDescription',
-    Close: 'DialogClose',
-  },
-  AudioTrackRadioGroup: {
-    Options: 'AudioTrackRadioGroup',
-  },
-  CaptionsRadioGroup: {
-    Options: 'CaptionsRadioGroup',
-  },
-  Menu: {
-    Root: 'Menu',
-    Trigger: 'MenuItem',
-    Popup: 'Menu',
-    Content: 'MenuContent',
-    Group: 'MenuGroup',
-    GroupLabel: 'MenuGroupLabel',
-    Item: 'MenuItem',
-    ItemIndicator: 'MenuItemIndicator',
-    RadioGroup: 'MenuRadioGroup',
-    RadioItem: 'MenuRadioItem',
-    Separator: 'MenuSeparator',
-    CheckboxItem: 'MenuCheckboxItem',
-  },
-  Popover: {
-    Root: 'Popover',
-    Trigger: 'Popover',
-    Popup: 'Popover',
-    Arrow: 'Popover',
-  },
-  Poster: {
-    Root: 'Poster',
-  },
-  PlaybackRateRadioGroup: {
-    Options: 'PlaybackRateRadioGroup',
-  },
-  QualityRadioGroup: {
-    Options: 'QualityRadioGroup',
-  },
-  SeekIndicator: {
-    Root: 'SeekIndicator',
-    Value: 'SeekIndicatorValue',
-  },
-  Slider: {
-    Root: 'Slider',
-    Track: 'SliderTrack',
-    Fill: 'SliderFill',
-    Buffer: 'SliderBuffer',
-    Thumb: 'SliderThumb',
-    'Thumbnail.Root': 'SliderThumbnail',
-    Preview: 'SliderPreview',
-    Value: 'SliderValue',
-  },
-  Thumbnail: {
-    Root: 'Thumbnail',
-  },
-  StatusIndicator: {
-    Root: 'StatusIndicator',
-    Value: 'StatusIndicatorValue',
-  },
-  Time: {
-    Group: 'TimeGroup',
-    Separator: 'TimeSeparator',
-    Value: 'Time',
-  },
-  TimeSlider: {
-    Root: 'TimeSlider',
-    Track: 'SliderTrack',
-    Fill: 'SliderFill',
-    Buffer: 'SliderBuffer',
-    Thumb: 'SliderThumb',
-    Chapters: 'TimeSliderChapters',
-    ChapterTitle: 'TimeSliderChapterTitle',
-    Preview: 'SliderPreview',
-    Value: 'SliderValue',
-  },
-  Tooltip: {
-    Provider: 'TooltipGroup',
-    Root: 'Tooltip',
-    Trigger: 'Tooltip',
-    Popup: 'Tooltip',
-    Arrow: 'Tooltip',
-    Label: 'TooltipLabel',
-    Shortcut: 'TooltipShortcut',
-  },
-  VolumeIndicator: {
-    Root: 'VolumeIndicator',
-    Fill: 'VolumeIndicatorFill',
-    Value: 'VolumeIndicatorValue',
-  },
-  VolumePopover: {
-    Root: 'VolumePopover',
-    Trigger: 'VolumePopover',
-    Popup: 'VolumePopover',
-  },
-  VolumeSlider: {
-    Root: 'VolumeSlider',
-    Track: 'SliderTrack',
-    Fill: 'SliderFill',
-    Thumb: 'SliderThumb',
-    Preview: 'SliderPreview',
-    Value: 'SliderValue',
-  },
-};
-
-const publicNames: PublicNameMap = {
-  AirPlayButton: 'airplay-button',
-  PiPButton: 'pip-button',
-};
 
 export const htmlComponentTarget: ComponentTarget<CoreSchema> = defineComponentTarget<CoreSchema>()(({
   target,
@@ -158,7 +31,7 @@ export const htmlComponentTarget: ComponentTarget<CoreSchema> = defineComponentT
   const Sup = element('sup');
   const HtmlTemplate = element('template');
   const I18nText = element('media-text', {
-    import: { from: '@videojs/html/i18n', sideEffect: true },
+    import: { from: htmlI18nModule, sideEffect: true },
   });
 
   // Both thumbnail elements adopt a light-DOM image and fill in its source, so the part is a plain `img`.
@@ -176,12 +49,8 @@ export const htmlComponentTarget: ComponentTarget<CoreSchema> = defineComponentT
   return {
     source: '@videojs/core/vjsc',
     components: {
-      resolve: ({ component, part }) => {
-        const name = part
-          ? componentParts[component]?.[part]
-          : component === 'Container'
-            ? 'MediaContainer'
-            : component;
+      resolve: ({ component, parts }) => {
+        const name = htmlElementName(component, parts);
 
         return name ? htmlElementTarget(name, element) : undefined;
       },
@@ -313,50 +182,13 @@ export const htmlComponentTarget: ComponentTarget<CoreSchema> = defineComponentT
         'captions-option': optionTemplate,
       },
     },
-    renderTargets: {
-      Button: { element: Button },
-      CaptionsButton: { component: true },
-      PlaybackRateButton: { component: true },
-      SliderBuffer: { element: Div },
-      SliderFill: { element: Div },
-      SliderThumb: { element: Div },
-      SliderTrack: { element: Div },
-    },
-    jsx: {
-      importSource: 'vjsc/html-runtime',
-      attributes: 'html',
-      host: { from: 'vjsc/html-runtime/jsx-runtime', name: 'Host' },
-      scope: { from: 'vjsc/html-runtime/jsx-runtime', name: 'Scope' },
-    },
-    render: {
-      aliases: htmlRenderAliases,
-      // Element registrations, the authoring runtime, and generated stylesheets have no effect on static markup.
-      empty: (specifier) =>
-        specifier.startsWith('@videojs/html/ui/') ||
-        specifier === '@videojs/html/i18n' ||
-        specifier === 'vjsc/components' ||
-        specifier.startsWith('virtual:vjsc/css/'),
-      modules: (modules) => {
-        const icons = htmlIconModule(modules);
-
-        return new Map([
-          ['@videojs/html/icons', icons],
-          ['@videojs/html/icons/compat', icons],
-          ['@videojs/html/icons/scaffold', icons],
-          ['@videojs/html/icons/neutral', icons],
-        ]);
-      },
-    },
+    renderTargets: skinRenderTargets({ button: Button, div: Div }),
+    jsx: htmlJsx,
   };
 });
 
 function htmlElementTarget(name: string, element: TargetHelpers<CoreSchema>['element']) {
-  const publicName = publicNames[name] ?? kebabCase(name === 'MediaContainer' ? 'container' : name);
-  const source = `@videojs/html/ui/${publicName}`;
+  const publicName = htmlPublicName(name);
 
-  return element(`media-${publicName}`, { import: { from: source, sideEffect: true } });
-}
-
-function kebabCase(value: string): string {
-  return value.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+  return element(`media-${publicName}`, { import: { from: htmlElementModule(publicName), sideEffect: true } });
 }

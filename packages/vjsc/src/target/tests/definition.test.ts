@@ -90,7 +90,7 @@ describe('defineComponentTarget', () => {
     expect(PosterTarget?.[TARGET_ELEMENT]).toEqual({
       kind: 'component',
       component: 'Poster',
-      part: null,
+      parts: [],
     });
     expect(Div?.[TARGET_ELEMENT]).toEqual({ kind: 'element', tagName: 'div' });
     expect(ImportedPoster?.[TARGET_ELEMENT]).toEqual({
@@ -112,11 +112,11 @@ function createTarget() {
     return {
       source: '@fixture/components',
       components: {
-        resolve: ({ component, part }) =>
+        resolve: ({ component, parts }) =>
           imported({
             from: '@fixture/react',
             name: component,
-            ...(part ? { path: part.split('.') } : {}),
+            ...(parts.length > 0 ? { path: parts } : {}),
           }),
         rules: {
           Poster: ({ props, children }) => {

@@ -15,18 +15,9 @@ describe('finalizeGraph', () => {
 
   it('rejects module metadata left in transformed source', () => {
     const root = resolve('/project');
+    const module = fixtureModule(root, `const meta = { name: 'root' }; export { meta };`, { exports: ['meta'] });
 
-    expect(() =>
-      finalizeGraph(root, [fixtureModule(root, `export const meta = { name: 'root' };`)], new Map())
-    ).toThrow('Module metadata remains in transformed source');
-  });
-
-  it('trusts the metadata pass instead of re-parsing when it recorded the removal', () => {
-    const root = resolve('/project');
-    const module = fixtureModule(root, `export const meta = { name: 'root' };`, { metaRemoved: true });
-    const graph = finalizeGraph(root, [module], new Map());
-
-    expect(graph.modules.get(module.id)).not.toHaveProperty('metaRemoved');
+    expect(() => finalizeGraph(root, [module], new Map())).toThrow('Module metadata remains in transformed source');
   });
 });
 
@@ -40,6 +31,8 @@ function fixtureModule(root: string, source: string, extra: Partial<GraphModuleI
     source,
     imports: [],
     styles: { files: [], assets: [] },
+    exports: [],
+    annotations: {},
     ...extra,
   };
 }
