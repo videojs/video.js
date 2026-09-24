@@ -1,14 +1,14 @@
 import { existsSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { Worker } from 'node:worker_threads';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { Piscina } from 'piscina';
 
 import type { StyleOutputFile } from './output';
 
 /** One file whose Tailwind output the pool renders into its final CSS. */
 export interface RenderJob {
-  readonly id: number;
   readonly css: string;
   readonly scope: string | undefined;
   readonly file: StyleOutputFile;
@@ -21,27 +21,18 @@ export interface SerializedError {
   readonly stack?: string | undefined;
 }
 
-export type RenderResult =
-  | { readonly id: number; readonly css: string }
-  | { readonly id: number; readonly error: SerializedError };
+/** A worker's answer. Workers report render errors rather than throw them, so a failed job always means a failed worker. */
+export type RenderResult = { readonly css: string } | { readonly error: SerializedError };
 
 export interface RenderPool {
   /** Render one file on a worker, or in process with `fallback` when the workers fail. */
-  render(job: Omit<RenderJob, 'id'>, fallback: () => string): Promise<string>;
-}
-
-interface PooledWorker {
-  readonly worker: Worker;
-  readonly pending: Map<number, PendingJob>;
-}
-
-interface PendingJob {
-  resolve(css: string): void;
-  reject(error: Error): void;
-  readonly fallback: () => string;
+  render(job: RenderJob, fallback: () => string): Promise<string>;
 }
 
 const WORKER_FILE = join(dirname(fileURLToPath(import.meta.url)), 'render-worker.js');
+
+/** Long enough to keep a worker between a build's bursts of renders, short enough to free it in an idle dev server. */
+const IDLE_TIMEOUT = 10_000;
 
 let shared: RenderPool | null | undefined;
 
@@ -63,94 +54,58 @@ function workerCount(): number {
   return Math.min(1, availableParallelism() - 1);
 }
 
-/** A pool of up to `size` workers running `workerFile`, spawned as jobs arrive. */
+/**
+ * A pool of up to `size` workers running `workerFile`, which Piscina starts as jobs arrive and lets idle ones exit with
+ * the process. The first job whose worker cannot start, receive it, or stay alive renders on the main thread, and so
+ * does every job after it.
+ */
 export function createRenderPool(size: number, workerFile: string): RenderPool | null {
   if (size === 0) return null;
 
-  const workers: PooledWorker[] = [];
-  let nextId = 0;
-  let failed = false;
+  // Piscina rejects the jobs of a worker that exits, but a worker that fails to load leaves them pending, so a pool
+  // error aborts every job in flight.
+  const failure = new AbortController();
+  let pool: Piscina<RenderJob, RenderResult> | undefined;
 
-  const spawn = (): PooledWorker => {
-    const pooled: PooledWorker = { worker: new Worker(workerFile), pending: new Map() };
+  const stop = (): void => {
+    if (failure.signal.aborted) return;
 
-    pooled.worker.unref();
-    pooled.worker.on('message', (result: RenderResult) => settle(pooled, result));
-    // A worker that fails or exits takes no more jobs; the ones it held render on the main thread instead.
-    pooled.worker.on('error', () => abandon(pooled));
-    pooled.worker.on('exit', () => abandon(pooled));
-    workers.push(pooled);
-
-    return pooled;
+    failure.abort();
+    pool?.destroy().catch(() => undefined);
   };
-
-  const settle = (pooled: PooledWorker, result: RenderResult): void => {
-    const job = pooled.pending.get(result.id);
-    if (!job) return;
-
-    pooled.pending.delete(result.id);
-
-    // An idle worker must not keep the process alive; a busy one must, or its pending job never settles.
-    if (pooled.pending.size === 0) pooled.worker.unref();
-
-    if ('css' in result) job.resolve(result.css);
-    else job.reject(workerError(result.error));
-  };
-
-  // A crashing worker reports both `error` and `exit`; only the first abandons it.
-  const abandon = (pooled: PooledWorker): void => {
-    const index = workers.indexOf(pooled);
-    if (index < 0) return;
-
-    failed = true;
-    workers.splice(index, 1);
-    pooled.worker.unref();
-    void pooled.worker.terminate();
-
-    for (const job of pooled.pending.values()) runInProcess(job);
-
-    pooled.pending.clear();
-  };
-
-  const pick = (): PooledWorker =>
-    workers.find((candidate) => candidate.pending.size === 0) ??
-    (workers.length < size ? spawn() : workers.reduce((a, b) => (b.pending.size < a.pending.size ? b : a)));
 
   return {
-    render(job, fallback) {
-      if (failed) return Promise.resolve().then(fallback);
+    async render(job, fallback) {
+      if (failure.signal.aborted) return fallback();
 
-      return new Promise<string>((resolve, reject) => {
-        const pending: PendingJob = { resolve, reject, fallback };
-        let pooled: PooledWorker | undefined;
+      let result: RenderResult;
 
-        try {
-          pooled = pick();
+      try {
+        pool ??= createPiscina(size, workerFile, stop);
+        result = await pool.run(job, { signal: failure.signal });
+      } catch {
+        stop();
+        return fallback();
+      }
 
-          const id = nextId++;
+      if ('css' in result) return result.css;
 
-          if (pooled.pending.size === 0) pooled.worker.ref();
-
-          pooled.pending.set(id, pending);
-          pooled.worker.postMessage({ id, ...job } satisfies RenderJob);
-        } catch {
-          // A worker that cannot start or receive a job leaves rendering on the main thread, this job included.
-          failed = true;
-
-          if (pooled) abandon(pooled);
-          else runInProcess(pending);
-        }
-      });
+      throw workerError(result.error);
     },
   };
 }
 
-function runInProcess(job: PendingJob): void {
-  try {
-    job.resolve(job.fallback());
-  } catch (error) {
-    job.reject(error instanceof Error ? error : new Error(String(error)));
-  }
+function createPiscina(size: number, workerFile: string, stop: () => void): Piscina<RenderJob, RenderResult> {
+  const pool = new Piscina<RenderJob, RenderResult>({
+    filename: pathToFileURL(workerFile).href,
+    minThreads: 0,
+    maxThreads: size,
+    idleTimeout: IDLE_TIMEOUT,
+  });
+
+  pool.on('error', stop);
+
+  return pool;
 }
 
 function workerError(serialized: SerializedError): Error {

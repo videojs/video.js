@@ -33,6 +33,16 @@ describe('createRenderPool', () => {
     await expect(pool.render({ css: 'a', scope: undefined, file }, () => 'fallback')).resolves.toBe('fallback');
   });
 
+  it('renders jobs still queued behind a dead worker on the main thread', async () => {
+    const pool = createRenderPool(1, workerFile)!;
+    const results = await Promise.all([
+      pool.render({ css: 'crash', scope: undefined, file }, () => 'crash in process'),
+      pool.render({ css: 'queued', scope: undefined, file }, () => 'queued in process'),
+    ]);
+
+    expect(results).toEqual(['crash in process', 'queued in process']);
+  });
+
   it('renders on the main thread when a worker cannot start', async () => {
     const unstartable = createRenderPool(1, 'relative-worker.js')!;
     const missing = createRenderPool(1, resolve(import.meta.dirname, 'fixtures/missing-worker.mjs'))!;
