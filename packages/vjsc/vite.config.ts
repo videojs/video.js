@@ -21,6 +21,8 @@ const pack: PackUserConfig = {
     'target/jsx-dev-runtime': './src/target/jsx-dev-runtime.ts',
     'shadcn/index': './src/shadcn/index.ts',
     'styles/index': './src/styles/index.ts',
+    // Loaded by path as a worker thread, so nothing imports it.
+    'styles/render-worker': './src/styles/render-worker.ts',
     'tailwind/index': './src/tailwind/index.ts',
     'plugins/index': './src/plugins/index.ts',
     'vite/index': './src/vite/index.ts',
