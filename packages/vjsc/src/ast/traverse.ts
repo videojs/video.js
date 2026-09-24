@@ -1,3 +1,4 @@
+// Core's task config loads this module before workspace packages build, so it cannot import `@videojs/utils`.
 import type {
   JSXAttribute,
   JSXElement,
@@ -6,7 +7,6 @@ import type {
   ModuleExportName,
   ObjectProperty,
 } from '@oxc-project/types';
-import { isNumber, isString } from '@videojs/utils/predicate';
 
 /** Find a named JSX attribute on an element or opening element. */
 export function findJsxAttribute(node: JSXElement | JSXOpeningElement, name: string): JSXAttribute | undefined {
@@ -32,7 +32,7 @@ export function staticPropertyName(property: ObjectProperty): string | undefined
   const key = property.key;
   if (key.type === 'Identifier') return property.computed ? undefined : key.name;
 
-  if (key.type === 'Literal' && (isString(key.value) || isNumber(key.value))) {
+  if (key.type === 'Literal' && (typeof key.value === 'string' || typeof key.value === 'number')) {
     return String(key.value);
   }
 

@@ -1,4 +1,4 @@
-import { isString } from '@videojs/utils/predicate';
+// Core's task config loads this module before workspace packages build, so it cannot import `@videojs/utils`.
 import type { InputOption } from 'rolldown';
 
 /** Add named entries without replacing existing Rolldown inputs. */
@@ -10,7 +10,7 @@ export function addInputEntries(
 
   const ids = Object.values(entries);
 
-  if (isString(input)) return [input, ...ids];
+  if (typeof input === 'string') return [input, ...ids];
 
   if (Array.isArray(input)) return [...new Set([...input, ...ids])];
 

@@ -1,7 +1,7 @@
+// Core's task config loads this module before workspace packages build, so it cannot import `@videojs/utils`.
 import { globSync, readFileSync } from 'node:fs';
 
 import type { CallExpression, ExportDefaultDeclaration, ObjectProperty } from '@oxc-project/types';
-import { isObject, isString } from '@videojs/utils/predicate';
 import { parseSync } from 'oxc-parser';
 
 import { parseError } from '../../ast/errors';
@@ -48,7 +48,9 @@ export interface DiscoveredSchema {
 /** Discover component definitions and their watched source files. */
 export function discoverSchema(options: DiscoverSchemaOptions): DiscoveredSchema {
   const components = options.include.flatMap<SchemaComponent>((source) =>
-    isString(source) ? discoverDefinitions(source, options.exclude, options.cwd) : discoverFiles(source, options.cwd)
+    typeof source === 'string'
+      ? discoverDefinitions(source, options.exclude, options.cwd)
+      : discoverFiles(source, options.cwd)
   );
 
   return {
@@ -104,10 +106,13 @@ function parseComponentDefinitionFile(fileName: string): Pick<DefinedSchemaCompo
 }
 
 function isDefineComponentCall(node: unknown): node is CallExpression {
-  if (!isObject(node)) return false;
+  if (node === null || typeof node !== 'object') return false;
 
   const candidate = node as { readonly type?: unknown; readonly callee?: unknown };
-  if (candidate.type !== 'CallExpression' || !isObject(candidate.callee)) return false;
+
+  if (candidate.type !== 'CallExpression' || candidate.callee === null || typeof candidate.callee !== 'object') {
+    return false;
+  }
 
   const callee = candidate.callee as { readonly type?: unknown; readonly name?: unknown };
 
@@ -134,7 +139,7 @@ function parseComponentDefinition(call: CallExpression, fileName: string): Parse
     const name = requireStaticName(property);
 
     if (name === 'name' || name === 'root') {
-      if (property.value.type !== 'Literal' || !isString(property.value.value)) {
+      if (property.value.type !== 'Literal' || typeof property.value.value !== 'string') {
         throw new Error(`defineComponent() in ${fileName} requires a literal \`${name}:\` field`);
       }
 
