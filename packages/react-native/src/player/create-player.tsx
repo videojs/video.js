@@ -54,6 +54,11 @@ export type UsePlayerHook<PlayerStore extends NativePlayerStore> = {
   <R>(selector: (state: InferStoreState<PlayerStore>) => R): R;
 };
 
+/**
+ * Design notes: This type could be made generic to support more types of EngineAdapter, if we ever wanted to. (Maybe
+ * supporting SPF for instance)
+ */
+
 /** The component and typed hooks produced by {@link createPlayer}. */
 export interface CreatePlayerResult<PlayerStore extends NativePlayerStore> {
   /** Provides a new player store and media adapter to its descendants. Renders no host element. */

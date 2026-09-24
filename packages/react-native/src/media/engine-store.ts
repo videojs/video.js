@@ -7,23 +7,21 @@ declare const NATIVE_ENGINE_HANDLE: unique symbol;
 /**
  * Opaque identifier for one native player.
  *
- * A `number` at runtime — the brand exists only in the type system and is erased on compile. It is declared here rather
- * than on the codegen spec because codegen resolves aliases only within the spec file itself and lowers `Int32` to a
- * Kotlin `Double` / ObjC `NSInteger` regardless, so the name could never reach the native side.
+ * A `number` at runtime — the brand exists only in the type system and is erased on compile. The codegen spec still
+ * speaks in terms of `Int32` because the native module is unaware of the brand, but in ts, we want to distinguish a
+ * handle from some random `number` that happens to be the same value. The brand is a unique symbol so it cannot be
+ * forged outside this package.
  *
  * The brand is one-directional by design: a handle is assignable _to_ `number`, so it passes into the TurboModule and
- * the Fabric view's `playerHandle` prop with no conversion. Only the reverse needs {@link toEngineHandle}, which is why
- * every command site stays cast-free while a stray number still cannot be mistaken for a handle.
+ * the Fabric view's `playerHandle` prop with no conversion. Going the other way requires a cast, which can be safely
+ * done via `toEngineHandle`.
  */
 export type NativeEngineHandle = number & { readonly [NATIVE_ENGINE_HANDLE]: true };
 
 /**
  * Brand a number the engine store allocated as a player handle.
  *
- * The single conversion point in the package, so the assertion lives here instead of at call sites. Deliberately not
- * re-exported from the package entry: minting a handle is only correct immediately after `createPlayer` returns one,
- * and a public cast would let any number pass as a handle. Consumers that need to adopt an existing player read one off
- * `ReactNativeMedia.handle` instead.
+ * Deliberately not exported - the only way to get a handle is through the store, which guarantees it is valid.
  *
  * @param value - Handle as the native module reported it.
  */
