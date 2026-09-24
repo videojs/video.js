@@ -7,6 +7,7 @@ import { type CodegenTypes, type TurboModule, TurboModuleRegistry } from 'react-
  */
 export type PlayerEvent = Readonly<{
   handle: CodegenTypes.Int32;
+  // TODO: Add more event types, and harmonize properly with web media events (playing, paused, seeking, etc) + Adapter events (track changes, etc)
   type: 'playing' | 'paused' | 'ended';
 }>;
 

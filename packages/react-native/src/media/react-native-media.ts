@@ -81,7 +81,7 @@ export function resolveNativeEvent(
  *
  * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` — which is the whole capability surface today.
  *
- * ## Reusing store/features
+ * # Reusing existing playerFeatures
  *
  * Would be possible in a fully-realized implementation, but the TurboModule needs to add a few more features first:
  *
@@ -90,7 +90,8 @@ export function resolveNativeEvent(
  * 2. TurboModule has to report position and duration before any of this can be mirrored.
  * 3. Emit the rest of the standard media events. `resolveNativeEvent` covers `play`, `playing`, `pause` and `ended`; Need
  *    to add: `emptied`, `timeupdate`, `canplay`, `seeking`, `seeked` and `waiting`. Each needs a native counterpart,
- *    which means extending `PlayerEvent['type']` — a codegen spec change.
+ *    which means extending `PlayerEvent['type']` — a codegen spec change, plus some native code, but it's stuff we'd
+ *    want anyway and these events are are derivable from events the native players emit.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>

@@ -5,7 +5,8 @@ import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 const SOURCE_LIVE = 'https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8';
 
 // warning - this asset's encoding doesn't work well in android emulator, but that's just an emulator quirk. It works fine on a real device.
-const SOURCE_VOD = 'https://stream.mux.com/u02xH9SB1ZZNNjPiQp4l6mhzBKJ101uExYx4LU02J5Xm88.m3u8';
+const SOURCE_VOD = 'https://stream.mux.com/Q3ikJX28joohwD02j01Ew7yyPYeraJwRjVVXrwZjt9xUo.m3u8';
+//const SOURCE_VOD = 'https://stream.mux.com/u02xH9SB1ZZNNjPiQp4l6mhzBKJ101uExYx4LU02J5Xm88.m3u8';
 
 /**
  * The original path: a Player that drives the TurboModule through React context.

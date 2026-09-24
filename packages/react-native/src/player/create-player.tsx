@@ -56,7 +56,7 @@ export type UsePlayerHook<PlayerStore extends NativePlayerStore> = {
 
 /**
  * Design notes: This type could be made generic to support more types of EngineAdapter, if we ever wanted to. (Maybe
- * supporting SPF for instance)
+ * supporting SPF for instance, or other native players like RNV/expo-video (though why?))
  */
 
 /** The component and typed hooks produced by {@link createPlayer}. */

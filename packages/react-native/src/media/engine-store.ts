@@ -12,18 +12,13 @@ declare const NATIVE_ENGINE_HANDLE: unique symbol;
  * handle from some random `number` that happens to be the same value. The brand is a unique symbol so it cannot be
  * forged outside this package.
  *
- * The brand is one-directional by design: a handle is assignable _to_ `number`, so it passes into the TurboModule and
- * the Fabric view's `playerHandle` prop with no conversion. Going the other way requires a cast, which can be safely
- * done via `toEngineHandle`.
+ * NativeEngineHandle is assignable to `number` but not _from_ number, since the only way to get a valid handle is via
+ * the engine store TurboModule
  */
 export type NativeEngineHandle = number & { readonly [NATIVE_ENGINE_HANDLE]: true };
 
-/**
- * Brand a number the engine store allocated as a player handle.
- *
- * Deliberately not exported - the only way to get a handle is through the store, which guarantees it is valid.
- *
- * @param value - Handle as the native module reported it.
+/*
+ * Cast a number to a `NativeEngineHandle`. Only the engine store TurboModule can mint a valid handle
  */
 export function toEngineHandle(value: number): NativeEngineHandle {
   // SAFETY: the brand carries no runtime representation, and the engine store allocates this Int32 as a player handle
