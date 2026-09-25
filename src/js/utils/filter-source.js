@@ -32,19 +32,16 @@ const filterSource = function(src) {
       }
     });
 
-    src = newsrc;
-  } else if (typeof src === 'string' && src.trim()) {
+    return newsrc;
+  } if (typeof src === 'string' && src.trim()) {
     // convert string into object
-    src = [fixSource({src})];
-  } else if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
+    return [fixSource({src})];
+  } if (isObject(src) && typeof src.src === 'string' && src.src && src.src.trim()) {
     // src is already valid
-    src = [fixSource(src)];
-  } else {
-    // invalid source, turn it into an empty array
-    src = [];
+    return [fixSource(src)];
   }
-
-  return src;
+  // invalid source, turn it into an empty array
+  return [];
 };
 
 /**
