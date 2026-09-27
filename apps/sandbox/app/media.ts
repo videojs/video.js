@@ -4,6 +4,7 @@ import {
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   getYouTubeSource,
@@ -11,6 +12,7 @@ import {
   MUX_SOURCE_IDS,
   MUX_SPF_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
+  PLAYERJS_SOURCE_IDS,
   type SandboxSource,
   SHAKA_SOURCE_IDS,
   SOURCE_IDS,
@@ -220,9 +222,10 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed but YouTube renders one provider page URL rather than the picker's list. YouTube offers a set of page
-  // URLs instead, covering the caption, short, and live cases its adapter handles differently. The CDN page builds
-  // elements from attributes alone, so the entries that need player parameters stay off it.
+  // Each embed but YouTube and `<playerjs-video>` renders one provider page URL rather than the picker's list. YouTube
+  // offers a set of page URLs instead, covering the caption, short, and live cases its adapter handles differently. The
+  // CDN page builds elements from attributes alone, so the entries that need player parameters stay off it. player.js
+  // is a protocol many providers speak, so its embed picks between their embed pages.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -247,6 +250,15 @@ const MEDIA_MAP = {
     embed: true,
     fixedSource: CLOUDFLARE_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
+  },
+  'playerjs-video': {
+    label: 'Player.js Video',
+    player: 'video',
+    tag: 'playerjs-video',
+    embed: true,
+    sources: PLAYERJS_SOURCE_IDS,
+    fallbackSource: DEFAULT_PLAYERJS_SOURCE,
+    entrySource: DEFAULT_PLAYERJS_SOURCE,
   },
   'spotify-audio': {
     label: 'Spotify Audio',

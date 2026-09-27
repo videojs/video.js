@@ -27,6 +27,7 @@
         "@videojs/mux-data",
         "@videojs/mux-video",
         "@videojs/native-hls-video",
+        "@videojs/playerjs-video",
         "@videojs/react",
         "@videojs/shaka-video",
         "@videojs/skins",
@@ -106,6 +107,9 @@
     },
     "packages/adapters/spotify-audio": {
       "component": "@videojs/spotify-audio"
+    },
+    "packages/adapters/playerjs-video": {
+      "component": "@videojs/playerjs-video"
     },
     "packages/store": {
       "component": "@videojs/store"

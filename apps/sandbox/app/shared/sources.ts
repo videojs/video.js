@@ -15,8 +15,11 @@ export interface SandboxSource {
   label: string;
   /** Plain media URL. Absent when the source needs more than a URL can carry. */
   url?: string;
-  /** `youtube` is a YouTube page URL for `<youtube-video>` rather than a media file or manifest. */
-  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube';
+  /**
+   * `youtube` is a YouTube page URL for `<youtube-video>`, and `playerjs` an embed page URL for `<playerjs-video>`,
+   * rather than a media file or manifest.
+   */
+  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -561,6 +564,48 @@ const SOURCE_MAP = {
     url: '',
     type: 'none',
   },
+  // player.js is a protocol rather than a host, so one media plays every service
+  // below. They implement the spec to different degrees, which is what makes them
+  // worth switching between: Mux Player reports no duration before playback and
+  // keeps its controls, which no parameter hides; FrameRate adds `seeked`; Livid
+  // sticks to the spec, with no `seeked` or `progress`; Bunny adds rate; Streamable
+  // sends no `seeked` and no duration before playback; Gumlet adds rate, seek, and
+  // volume events.
+  // Mux Player's iframe embed, playing the same asset as `hls-1`.
+  'playerjs-mux': {
+    label: 'Player.js - Mux Player (iframe)',
+    url: 'https://player.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    type: 'playerjs',
+  },
+  // A video from a FrameRate user's public profile.
+  'playerjs-framerate': {
+    label: 'Player.js - FrameRate',
+    url: 'https://framerate.tv/embed/361c224a-b10f-483f-811b-8602f46b7be8',
+    type: 'playerjs',
+  },
+  // The demo on Livid's own homepage.
+  'playerjs-livid': {
+    label: 'Player.js - Livid',
+    url: 'https://livid.com/embed/AJPwABnzkTXj',
+    type: 'playerjs',
+  },
+  // A video from Bunny's own public demo library, so it may not stay up for good.
+  'playerjs-bunny': {
+    label: 'Player.js - Bunny Stream',
+    // The current player host; the legacy `iframe.mediadelivery.net` one serves an older player without playback rate.
+    url: 'https://player.mediadelivery.net/embed/759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe',
+    type: 'playerjs',
+  },
+  'playerjs-streamable': {
+    label: 'Player.js - Streamable',
+    url: 'https://streamable.com/e/moo',
+    type: 'playerjs',
+  },
+  'playerjs-gumlet': {
+    label: 'Player.js - Gumlet',
+    url: 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e',
+    type: 'playerjs',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -572,9 +617,13 @@ export const SOURCES: Record<SourceId, SandboxSource> = SOURCE_MAP;
 
 const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 
-/** Sources a media element or streaming engine plays. YouTube page URLs are kept apart for `<youtube-video>`. */
-export const SOURCE_IDS = ALL_SOURCE_IDS.filter((id) => !isYouTubeSource(id));
+/**
+ * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
+ * the player.js services' for `<playerjs-video>`, so every list derived from this one stays free of them.
+ */
+export const SOURCE_IDS = ALL_SOURCE_IDS.filter((id) => !isYouTubeSource(id) && !isPlayerJsSource(id));
 export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
+export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -611,6 +660,7 @@ export const SHAKA_SOURCE_IDS = SOURCE_IDS.filter((id) => !isDrmSource(id) && !i
 export const DEFAULT_SOURCE: SourceId = 'hls-1';
 export const DEFAULT_DASH_SOURCE: SourceId = 'dash-1';
 export const DEFAULT_YOUTUBE_SOURCE: SourceId = 'youtube-1';
+export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -658,6 +708,10 @@ export function isLiveSource(id: SourceId): boolean {
 
 export function isYouTubeSource(id: SourceId): boolean {
   return SOURCES[id].type === 'youtube';
+}
+
+export function isPlayerJsSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'playerjs';
 }
 
 /** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */
