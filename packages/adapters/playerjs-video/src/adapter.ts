@@ -85,6 +85,10 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #events: ReadonlySet<string> = EMPTY_SET;
   // A play asked for before the embed could take one, replayed once it reports ready.
   #playRequested = false;
+  // Whether the frame has loaded the document last pointed at; until then, the outgoing one can still post.
+  #frameLoaded = true;
+  // Identifies the latest seek, so a round trip made for an earlier one does not settle it.
+  #seekCount = 0;
 
   #paused = true;
   #ended = false;
@@ -228,7 +232,14 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     }
 
     // The new document reports `ready`, which is what settles this load.
-    target.src = embedSrc;
+    this.#navigate(target, embedSrc);
+  }
+
+  // Point the frame at a new document. Until it loads, the outgoing document can still post, so `#onReady` checks what
+  // arrives in the meantime against the URL it claims.
+  #navigate(target: HTMLIFrameElement, src: string) {
+    this.#frameLoaded = false;
+    target.src = src;
   }
 
   // Take over as the current load; settling the outgoing barrier releases its waiters.
@@ -471,6 +482,8 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
     // The `src` property resolves an empty attribute to the document URL; only the attribute tells embed from empty.
     if (target.getAttribute('src')) {
+      // The document already there is the one to talk to; there is no earlier one it could be confused with.
+      this.#frameLoaded = true;
       this.dispatchEvent(new Event('loadstart'));
       // The frame may have reported `ready` before anything listened; asking has a ready receiver repeat it.
       this.#requestReady();
@@ -482,10 +495,21 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     // No embed means no `ready` is coming to settle this load.
     if (!initialSrc) {
       this.#loadComplete.resolve();
+
+      // A source that names no embed is an error the first time as much as after a change; `load()` reports the latter.
+      if (this.#src) {
+        this.dispatchEvent(new Event('loadstart'));
+        this.#error = new MediaError(
+          `Unrecognized player.js embed URL: ${this.#src}`,
+          MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+        );
+        this.dispatchEvent(new Event('error'));
+      }
+
       return;
     }
 
-    target.src = initialSrc;
+    this.#navigate(target, initialSrc);
     this.dispatchEvent(new Event('loadstart'));
   }
 
@@ -502,7 +526,14 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
     win.addEventListener('message', (event) => this.#onMessage(event, target, attachId), { signal });
     // Each document the frame loads is a new receiver, which may be ready before its broadcast could be heard.
-    target.addEventListener('load', () => this.#requestReady(), { signal });
+    target.addEventListener(
+      'load',
+      () => {
+        this.#frameLoaded = true;
+        this.#requestReady();
+      },
+      { signal }
+    );
   }
 
   #onMessage(event: MessageEvent, target: HTMLIFrameElement, attachId: number) {
@@ -520,7 +551,13 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
     // `ready` is broadcast when nothing has subscribed to it, so it is the one message taken unaddressed.
     if (type === 'ready') {
-      this.#onReady(isPlayerJsReadyValue(value) ? value : {});
+      const ready = isPlayerJsReadyValue(value) ? value : {};
+      // Before the new document loads, the frame's window still speaks for the outgoing one, whose late `ready` would
+      // settle this load against the wrong receiver. It names its own URL, so one naming another document is dropped;
+      // once the new one loads, it answers the host's request for `ready`, whatever URL a redirect left it at.
+      if (!this.#frameLoaded && isString(ready.src) && !isSameDocument(ready.src, target.getAttribute('src'))) return;
+
+      this.#onReady(ready);
       return;
     }
 
@@ -688,9 +725,21 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     // Its own report settles the seek where the embed has one.
     if (this.#events.has('seeked')) return;
 
-    // Otherwise the next position report does, and a paused embed sends none. Receivers answer in order, so any
-    // answer — even from an embed without `getCurrentTime`, which resolves at once — means the seek was taken.
-    this.#get('getCurrentTime', isNumber).then(() => this.#settleSeek());
+    // Otherwise a round trip does. Receivers answer in order, so the answer is the position after the seek, and any
+    // answer — even from an embed without `getCurrentTime`, which resolves at once — means the seek was taken. Only
+    // the latest seek's answer settles: an earlier one would land on a position the viewer has already left.
+    const seek = ++this.#seekCount;
+
+    this.#get('getCurrentTime', isNumber).then((position) => {
+      if (seek !== this.#seekCount || !this.#seeking) return;
+
+      if (isNumber(position) && position !== this.#currentTime) {
+        this.#currentTime = position;
+        this.dispatchEvent(new Event('timeupdate'));
+      }
+
+      this.#settleSeek();
+    });
   }
 
   #settleSeek() {
@@ -719,30 +768,30 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   }
 
   #onEnded() {
-    this.#onPause();
-    this.#ended = true;
-    this.dispatchEvent(new Event('ended'));
-
-    // An embed that took `setLoop` restarts itself; one without it is restarted here.
+    // An embed that took `setLoop` restarts itself; one without it is restarted here. A looping media element never
+    // ends, so neither does this one: announcing it would flash an end state before playback resumes.
     if (this.#loop && !this.#methods.has('setLoop')) {
       this.#call('setCurrentTime', 0);
       this.#post('play');
+      return;
     }
+
+    this.#onPause();
+    this.#ended = true;
+    this.dispatchEvent(new Event('ended'));
   }
 
   #onTimeUpdate({ seconds, duration }: PlayerJsTimeValue) {
     this.#applyDuration(duration);
 
-    // With a `seeked` report coming, positions from before the seek landed would drag the slider back.
-    if (this.#seeking && this.#events.has('seeked')) return;
+    // Positions from before the seek landed would drag the slider back. The seek settles on the embed's `seeked`
+    // report or the round trip `#seek` makes, and positions resume after that.
+    if (this.#seeking) return;
 
     if (isNumber(seconds) && seconds !== this.#currentTime) {
       this.#currentTime = seconds;
       this.dispatchEvent(new Event('timeupdate'));
     }
-
-    // Without a seek report, the next position is the only sign one landed.
-    this.#settleSeek();
   }
 
   #onProgress({ seconds, duration, percent }: PlayerJsTimeValue) {
@@ -866,6 +915,24 @@ const SUBSCRIBED_EVENTS: readonly PlayerJsEvent[] = [
 ];
 
 const EMPTY_SET: ReadonlySet<string> = new Set();
+
+/**
+ * Whether a URL a receiver reports names the document the frame was pointed at. Receivers report their own location,
+ * which can differ from the iframe `src` in its query (players add or drop parameters) and a trailing slash, so only
+ * the origin and path are compared.
+ */
+function isSameDocument(reported: string, src: string | null): boolean {
+  if (!src) return false;
+
+  try {
+    const a = new URL(reported);
+    const b = new URL(src);
+
+    return a.origin === b.origin && a.pathname.replace(/\/$/, '') === b.pathname.replace(/\/$/, '');
+  } catch {
+    return false;
+  }
+}
 
 function createListenerId() {
   return `videojs-${generateId()}`;

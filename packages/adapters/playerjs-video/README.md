@@ -23,4 +23,4 @@ import '@videojs/html/media/playerjs-video';
 
 ## License
 
-[Apache-2.0](../../LICENSE)
+[Apache-2.0](../../../LICENSE)

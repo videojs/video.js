@@ -680,6 +680,53 @@ describe('PlayerJsAdapter', () => {
       expect(media.currentTime).toBe(0);
     });
 
+    it('ignores a late ready from the outgoing document until the new one loads', async () => {
+      const media = new PlayerJsAdapter();
+      const { iframe } = await attachAndReady(media);
+      const loadcomplete = vi.fn();
+
+      media.src = OTHER_EMBED_SRC;
+      await flush();
+      media.addEventListener('loadcomplete', loadcomplete);
+
+      report(iframe, 'ready', { ...FULL_SUPPORT, src: EMBED_SRC });
+      expect(loadcomplete).not.toHaveBeenCalled();
+      expect(media.readyState).toBe(0);
+
+      // The new document names itself, down to a trailing slash and query of its own.
+      report(iframe, 'ready', { ...FULL_SUPPORT, src: `${OTHER_EMBED_SRC}/?player=1` });
+      expect(loadcomplete).toHaveBeenCalledOnce();
+    });
+
+    it('takes a ready naming another URL once the new document has loaded, as after a redirect', async () => {
+      const media = new PlayerJsAdapter();
+      const iframe = createIframe();
+      const loadcomplete = vi.fn();
+
+      media.addEventListener('loadcomplete', loadcomplete);
+      media.src = EMBED_SRC;
+      media.attach(iframe);
+
+      report(iframe, 'ready', { ...FULL_SUPPORT, src: 'https://cdn.example.com/player/abc123' });
+      expect(loadcomplete).not.toHaveBeenCalled();
+
+      iframe.dispatchEvent(new Event('load'));
+      report(iframe, 'ready', { ...FULL_SUPPORT, src: 'https://cdn.example.com/player/abc123' });
+      expect(loadcomplete).toHaveBeenCalledOnce();
+    });
+
+    it('reports an unrecognized src as an error on the first attach too', () => {
+      const media = new PlayerJsAdapter();
+      const error = vi.fn();
+
+      media.addEventListener('error', error);
+      media.src = 'not-a-url';
+      media.attach(createIframe());
+
+      expect(error).toHaveBeenCalledOnce();
+      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
+    });
+
     it('stops listening on detach', async () => {
       const media = new PlayerJsAdapter();
       const { iframe, listener } = await attachAndReady(media);
@@ -992,6 +1039,9 @@ describe('PlayerJsAdapter', () => {
         events: ['ready', 'ended'],
       });
 
+      const ended = vi.fn();
+
+      media.addEventListener('ended', ended);
       commands.clear();
       report(iframe, 'ended', undefined, listener);
 
@@ -999,6 +1049,9 @@ describe('PlayerJsAdapter', () => {
         ['setCurrentTime', 0],
         ['play', undefined],
       ]);
+      // A looping media element never ends.
+      expect(ended).not.toHaveBeenCalled();
+      expect(media.ended).toBe(false);
     });
   });
 
@@ -1058,6 +1111,45 @@ describe('PlayerJsAdapter', () => {
 
       expect(media.seeking).toBe(false);
       expect(seeked).toHaveBeenCalledOnce();
+    });
+
+    it('ignores positions from before the seek landed where the embed reports no seeked event', async () => {
+      const media = new PlayerJsAdapter();
+      const { iframe, commands, listener } = await attachAndReady(media, {});
+
+      commands.clear();
+      media.currentTime = 30;
+
+      // Posted before the embed took the seek.
+      report(iframe, 'timeupdate', { seconds: 5 }, listener);
+      expect(media.currentTime).toBe(30);
+      expect(media.seeking).toBe(true);
+
+      answer(iframe, commands, { getCurrentTime: 30.1 });
+      await flush();
+
+      expect(media.seeking).toBe(false);
+      expect(media.currentTime).toBe(30.1);
+
+      report(iframe, 'timeupdate', { seconds: 31 }, listener);
+      expect(media.currentTime).toBe(31);
+    });
+
+    it('settles only on the round trip of the latest seek', async () => {
+      const media = new PlayerJsAdapter();
+      const { iframe, commands } = await attachAndReady(media, {});
+
+      commands.clear();
+      media.currentTime = 10;
+      const first = commands.named('getCurrentTime')[0]!;
+
+      media.currentTime = 20;
+
+      report(iframe, 'getCurrentTime', 10, first.listener);
+      await flush();
+
+      expect(media.seeking).toBe(true);
+      expect(media.currentTime).toBe(20);
     });
 
     it('holds a seek asked for before ready and sends it then', async () => {
