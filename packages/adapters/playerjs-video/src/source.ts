@@ -56,7 +56,7 @@ export function parsePlayerJsSource(src: string): URL | null {
 /**
  * Build the iframe `src` URL for a player.js embed from the given props. Empty when `src` is not an embed URL.
  *
- * For the services it recognizes (Mux Player, FrameRate, Livid, Bunny Stream, Streamable, Gumlet), the host writes
+ * For the services it recognizes (Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, Streamable), the host writes
  * `autoplay`, `muted`, `loop`, `controls`, and `preload` in the service's own spelling, and without `controls` hides as
  * much of the service's chrome as its URL allows. A parameter already in `src` is left as written, and
  * `engine.playerJs` overrides both.

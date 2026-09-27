@@ -132,11 +132,11 @@ describe('mediaSources', () => {
   it('offers the player.js embed its provider pages, and nothing else those pages', () => {
     expect(PLAYERJS_SOURCE_IDS).toEqual([
       'playerjs-mux',
+      'playerjs-gumlet',
       'playerjs-framerate',
       'playerjs-livid',
       'playerjs-bunny',
       'playerjs-streamable',
-      'playerjs-gumlet',
     ]);
 
     for (const platform of ['html', 'react', 'cdn'] as const) {

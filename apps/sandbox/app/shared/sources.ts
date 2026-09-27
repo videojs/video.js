@@ -567,14 +567,19 @@ const SOURCE_MAP = {
   // player.js is a protocol rather than a host, so one media plays every service
   // below. They implement the spec to different degrees, which is what makes them
   // worth switching between: Mux Player reports no duration before playback and
-  // keeps its controls, which no parameter hides; FrameRate adds `seeked`; Livid
-  // sticks to the spec, with no `seeked` or `progress`; Bunny adds rate; Streamable
-  // sends no `seeked` and no duration before playback; Gumlet adds rate, seek, and
-  // volume events.
+  // keeps its controls, which no parameter hides; Gumlet adds rate, seek, and
+  // volume events; FrameRate adds `seeked`; Livid sticks to the spec, with no
+  // `seeked` or `progress`; Bunny adds rate; Streamable sends no `seeked` and no
+  // duration before playback.
   // Mux Player's iframe embed, playing the same asset as `hls-1`.
   'playerjs-mux': {
     label: 'Player.js - Mux Player (iframe)',
     url: 'https://player.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    type: 'playerjs',
+  },
+  'playerjs-gumlet': {
+    label: 'Player.js - Gumlet',
+    url: 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e',
     type: 'playerjs',
   },
   // A video from a FrameRate user's public profile.
@@ -599,11 +604,6 @@ const SOURCE_MAP = {
   'playerjs-streamable': {
     label: 'Player.js - Streamable',
     url: 'https://streamable.com/e/moo',
-    type: 'playerjs',
-  },
-  'playerjs-gumlet': {
-    label: 'Player.js - Gumlet',
-    url: 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e',
     type: 'playerjs',
   },
 } satisfies Record<string, SandboxSource>;

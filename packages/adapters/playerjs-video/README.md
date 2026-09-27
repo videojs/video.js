@@ -2,7 +2,7 @@
 
 [player.js](https://github.com/embedly/player.js) embed playback adapter for Video.js. player.js is an iframe
 `postMessage` protocol rather than a hosting service, so this one adapter plays any embed that implements it —
-Mux Player, FrameRate, Livid, Bunny Stream, Streamable, Gumlet, and others. It exposes the adapter, its props, and defaults; the HTML and React
+Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, Streamable, and others. It exposes the adapter, its props, and defaults; the HTML and React
 façades live in `@videojs/html` and `@videojs/react`.
 
 ```bash

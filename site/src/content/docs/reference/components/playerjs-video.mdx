@@ -2,7 +2,7 @@
 title: PlayerJsVideo
 frameworkTitle:
   html: playerjs-video
-description: Video component that plays any embed implementing the player.js protocol, such as Mux Player, FrameRate, Livid, Bunny Stream, Streamable, and Gumlet
+description: Video component that plays any embed implementing the player.js protocol, such as Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, and Streamable
 ---
 
 import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
@@ -23,7 +23,7 @@ import basicUsageHtml from "@/components/docs/demos/playerjs-video/html/css/Basi
 import basicUsageHtmlCss from "@/components/docs/demos/playerjs-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/playerjs-video/html/css/BasicUsage.ts?raw";
 
-[player.js](https://github.com/embedly/player.js/blob/master/SPEC.rst) is a `postMessage` protocol for controlling embedded players, not a video host. Any embed that implements its receiver side plays through this one component: Mux Player's iframe embed, FrameRate, Livid, Bunny Stream, Streamable, Gumlet, and others. Commands are posted to the embed directly, so no third-party script loads.
+[player.js](https://github.com/embedly/player.js/blob/master/SPEC.rst) is a `postMessage` protocol for controlling embedded players, not a video host. Any embed that implements its receiver side plays through this one component: Mux Player's iframe embed, Gumlet, FrameRate, Livid, Bunny Stream, Streamable, and others. Commands are posted to the embed directly, so no third-party script loads.
 
 ## Import
 
@@ -88,11 +88,11 @@ player.js itself can't hide an embed's chrome, but for the services it recognize
 | Service | Without `controls` |
 |---|---|
 | [Mux Player](https://www.mux.com/docs/guides/player) (`player.mux.com`) | Nothing: its controls are hidden with the `--controls` CSS property, which the iframe doesn't expose. Under a skin its control bar still stays out of sight, since the frame never gets the hover that reveals it, but its center play button shows while paused |
+| [Gumlet](https://docs.gumlet.com/video/embed-stream) | `disable_player_controls=true`: only the large center play button stays |
 | FrameRate | `show_controls=0` and `initial_play_btn=0`: no control bar and no large start button |
 | [Livid](https://support.livid.com/article/46-advanced-embedding-parameters) | `controls=0`: no chrome at all, the play button included. Livid applies it to videos on Pro and Premium accounts only |
 | [Bunny Stream](https://bunny.net/docs/stream/embedding) | No parameter hides the control bar, so it's shrunk instead: `compactControls=true`, `showSpeed=false`, `showHeatmap=false`, `chromecast=false`, `disableAirPlay=true` |
 | Streamable | `nocontrols=1`: no chrome at all |
-| [Gumlet](https://docs.gumlet.com/video/embed-stream) | `disable_player_controls=true`: only the large center play button stays |
 
 Other services get their URL untouched; pass whatever they offer under [`source.engine.playerJs`](#engine-options-playerjs).
 

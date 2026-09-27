@@ -33,10 +33,11 @@ import type { PlayerJsAdapterProps } from './props';
 import { buildPlayerJsIframeSrc, type PlayerJsSource } from './source';
 
 /**
- * Plays any embed that implements the player.js receiver — Mux Player, FrameRate, Livid, Bunny Stream, Streamable,
- * Gumlet, and others — through one protocol rather than one adapter per service. Embeds implement the spec to varying
- * degrees, so every command is checked against the list the embed advertises with `ready`: a missing getter leaves its
- * value at the default (`NaN` for `duration`), and a missing setter leaves the value where the embed has it.
+ * Plays any embed that implements the player.js receiver — Mux Player, Gumlet, FrameRate, Livid, Bunny Stream,
+ * Streamable, and others — through one protocol rather than one adapter per service. Embeds implement the spec to
+ * varying degrees, so every command is checked against the list the embed advertises with `ready`: a missing getter
+ * leaves its value at the default (`NaN` for `duration`), and a missing setter leaves the value where the embed has
+ * it.
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
