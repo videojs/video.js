@@ -1,5 +1,5 @@
 ---
-description: ""
+description: "Improves static-site installation, docs navigation, and HLS quality recovery."
 date: 2026-09-26
 version: "10.0.0-rc.4"
 prerelease: true
@@ -7,13 +7,14 @@ breaking: false
 compareUrl: "https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.3...@videojs/core@10.0.0-rc.4"
 ---
 
+This release makes the docs and setup path more reliable, and gives stalled HLS playback a way back to automatic quality selection.
 
-### 🐛 Bug Fixes
-- *(hlsjs-video)* Apply auto quality while playback is stalled ([#2979](https://github.com/videojs/v10/pull/2979)) by [@luwes](https://github.com/luwes)
-- *(installation)* Default a plain HTML page to CDN scripts ([#2983](https://github.com/videojs/v10/pull/2983)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Tighten docs header and switch sidebar sections in place ([#2987](https://github.com/videojs/v10/pull/2987)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Upgrade astro to 7.3.5 ([#2986](https://github.com/videojs/v10/pull/2986)) by [@mihar-22](https://github.com/mihar-22)
+## Docs and installation
 
-### 📚 Documentation
-- *(site)* Add changelog prose for 10.0.0-rc.3 ([#2977](https://github.com/videojs/v10/pull/2977)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(packages)* Fix broken doc links and hls-video source docs ([#2985](https://github.com/videojs/v10/pull/2985)) by [@mihar-22](https://github.com/mihar-22)
+When `@videojs/cli agents init` finds an `index.html` without a `package.json`, it now chooses CDN installation by default. That keeps static, hand-written, and WordPress-style sites from gaining an unnecessary bundler; explicit `--method packaged` choices still work as before ([#2983](https://github.com/videojs/v10/pull/2983)). See the [CDN installation guide](/docs/guides/installation/cdn) for the browser-ready setup.
+
+Docs pages reached through client-side navigation can play their preview media again, and the sidebar now switches between Guides, Components, and API in place, including keyboard navigation and a mobile menu that stays open ([#2986](https://github.com/videojs/v10/pull/2986), [#2987](https://github.com/videojs/v10/pull/2987)). We also corrected package README license links, the Video.js 8 migration example, and the [media sources guide](/docs/guides/media-sources) so it accurately describes the `source` support in `HlsVideo` and `HlsAudio` ([#2985](https://github.com/videojs/v10/pull/2985)).
+
+## HLS quality recovery
+
+Choosing Auto from the quality menu now takes effect while an hls.js stream is stalled, so playback can abandon a slow manual rendition and select a lower one. Manual quality choices also apply when they match the next buffered rendition ([#2979](https://github.com/videojs/v10/pull/2979)). See [Add a quality selector](/docs/guides/quality) for the player-side controls.
