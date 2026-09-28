@@ -1,7 +1,15 @@
 {
   "name": "@videojs/cli",
   "version": "10.0.0-rc.4",
-  "description": "Video.js command line: version-matched installation instructions for coding agents",
+  "description": "Video.js 10 command line: version-matched installation instructions for coding agents",
+  "keywords": [
+    "agents",
+    "ai",
+    "cli",
+    "installation",
+    "video.js",
+    "videojs"
+  ],
   "homepage": "https://videojs.org",
   "license": "Apache-2.0",
   "repository": {

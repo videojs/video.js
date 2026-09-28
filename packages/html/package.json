@@ -1,14 +1,22 @@
 {
   "name": "@videojs/html",
   "version": "10.0.0-rc.4",
-  "description": "HTML library for building media players",
+  "description": "Video.js 10 for HTML, Vue, and Svelte: player custom elements and skins for video and audio",
   "keywords": [
+    "audio",
     "components",
+    "custom-elements",
     "html",
     "media",
     "player",
+    "svelte",
     "ui",
-    "videojs"
+    "video",
+    "video-player",
+    "video.js",
+    "videojs",
+    "vue",
+    "web-components"
   ],
   "homepage": "https://videojs.org",
   "license": "Apache-2.0",

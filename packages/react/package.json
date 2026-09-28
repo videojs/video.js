@@ -1,13 +1,17 @@
 {
   "name": "@videojs/react",
   "version": "10.0.0-rc.4",
-  "description": "React library for building media players",
+  "description": "Video.js 10 for React: player components, skins, and hooks for video and audio",
   "keywords": [
+    "audio",
     "components",
     "hooks",
     "media",
     "player",
     "react",
+    "video",
+    "video-player",
+    "video.js",
     "videojs"
   ],
   "homepage": "https://videojs.org",
