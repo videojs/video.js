@@ -1,5 +1,7 @@
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
+import { cssExclude, cssTargets } from './css-targets.ts';
+
 /** `dev` and `default` outputs consumed by package `exports` conditions. */
 export type PackageBuildMode = 'dev' | 'default';
 
@@ -19,6 +21,14 @@ export const baseConfig = {
   ignoreWatch: [/[/\\]packages[/\\](?:[^/\\]+[/\\])?[^/\\]+[/\\]dist(?:[/\\]|$)/],
   report: process.env.CI === 'true',
 } satisfies PackUserConfig;
+
+/**
+ * CSS options for packs that inline skin CSS through `?inline` imports, which tsdown transforms itself: without targets
+ * it drops the vendor prefixes the skins rely on.
+ */
+export const inlineCssConfig = {
+  lightningcss: { targets: cssTargets, exclude: cssExclude },
+} satisfies PackUserConfig['css'];
 
 /** Shared options for packages that emit `dist/dev` and `dist/default`. */
 export function packageBuildConfig(mode: PackageBuildMode, platform: 'browser' | 'neutral' = 'neutral') {

@@ -30,16 +30,21 @@ export interface CssRequirement {
 }
 
 /**
- * Features found in the generated skin stylesheets. `required` features have no fallback and the skin does not render
- * without them; `degrades` features lose one visual detail; `guarded` features sit inside `@supports` and fall back.
+ * Features found in the generated skin stylesheets after the build lowers them, which removes nesting and `@scope`.
+ * `required` features have no fallback and the skin does not render without them; `degrades` features lose one visual
+ * detail; `guarded` features fall back through `@supports` or a second selector.
  *
- * Only features caniuse tracks belong here. `oklch()`, `light-dark()`, `@property`, relative colors, and
+ * Only features caniuse tracks belong here. `oklch()`, `color-mix()`, `light-dark()`, `@property`, and
  * `contrast-color()` have no caniuse entry (`css-lch-lab` covers `lab()` and `lch()` only), so the guide describes them
  * in prose with MDN data instead.
  */
 export const CSS_REQUIREMENTS: readonly CssRequirement[] = [
-  { id: 'css-cascade-scope', label: '@scope', kind: 'required', effect: 'No component styling' },
-  { id: 'css-nesting', label: 'CSS nesting', kind: 'required', effect: 'No component styling' },
+  {
+    id: 'css-cascade-scope',
+    label: '@scope',
+    kind: 'guarded',
+    effect: 'Packaged skins use :where() selectors instead; registry CSS skins need it',
+  },
   { id: 'css-cascade-layers', label: '@layer', kind: 'required', effect: 'No component styling' },
   { id: 'css-has', label: ':has()', kind: 'required', effect: 'Menu and slider focus states are lost' },
   {
@@ -54,8 +59,18 @@ export const CSS_REQUIREMENTS: readonly CssRequirement[] = [
     kind: 'required',
     effect: 'Large-screen sizing is lost',
   },
-  { id: 'css-dir-pseudo', label: ':dir()', kind: 'required', effect: 'Right-to-left layout is lost' },
-  { id: 'css-relative-colors', label: 'Relative color syntax', kind: 'degrades', effect: 'Adaptive shadows are lost' },
+  {
+    id: 'css-dir-pseudo',
+    label: ':dir()',
+    kind: 'guarded',
+    effect: 'Right-to-left layout follows the dir attribute instead',
+  },
+  {
+    id: 'css-relative-colors',
+    label: 'Relative color syntax',
+    kind: 'degrades',
+    effect: 'Control scrims fall back to color-mix(), and subtle shadows are lost',
+  },
   {
     id: 'css-scrollbar',
     label: 'scrollbar-color and scrollbar-width',
@@ -78,6 +93,8 @@ export interface ResolvedBrowser {
   versions: string[];
   /** Human range such as `150–151` or a single version. */
   range: string;
+  /** The oldest resolved version for display, such as `16.4`, or `null` when the query names none. */
+  minimum: string | null;
 }
 
 /** The browserslist query the repository builds against, from the root `package.json`. */
@@ -110,8 +127,13 @@ export function resolveSupportedBrowsers(query: readonly string[] = BROWSERSLIST
         ? displayVersion(first)
         : `${displayVersion(first)}–${displayVersion(last)}`;
 
-    return { id, name, versions, range };
+    return { id, name, versions, range, minimum: first ? displayVersion(first) : null };
   });
+}
+
+/** Share of global web usage on the browsers the query resolves to, as a percentage. */
+export function supportedCoverage(query: readonly string[] = BROWSERSLIST_QUERY): number {
+  return browserslist.coverage(browserslist([...query]));
 }
 
 export interface FeatureSupport {
@@ -166,48 +188,6 @@ export function featureSupport(requirement: CssRequirement): FeatureSupport {
 /** Support data for every requirement, in table order. */
 export function cssRequirementSupport(requirements: readonly CssRequirement[] = CSS_REQUIREMENTS): FeatureSupport[] {
   return requirements.map(featureSupport);
-}
-
-/**
- * The oldest version of each policy browser that satisfies every `required` feature: the practical floor below which
- * the packaged skins stop rendering.
- */
-export function effectiveFloor(support: readonly FeatureSupport[]): Record<SupportBrowserId, string | null> {
-  const required = support.filter(({ requirement }) => requirement.kind === 'required');
-
-  // SAFETY: the entries are built from SUPPORT_BROWSERS, so every SupportBrowserId key is present exactly once.
-  return Object.fromEntries(
-    SUPPORT_BROWSERS.map(({ id }) => {
-      const versions = required.map((entry) => entry.firstVersion[id]);
-      if (versions.some((version) => version === null)) return [id, null];
-
-      // SAFETY: the guard above returned when any entry was null, so every remaining entry is a string.
-      const floor = (versions as string[]).reduce((max, version) =>
-        versionNumber(version) > versionNumber(max) ? version : max
-      );
-
-      return [id, floor];
-    })
-  ) as Record<SupportBrowserId, string | null>;
-}
-
-/** Share of global web usage on browser versions that support every `required` feature, as a percentage. */
-export function effectiveCoverage(support: readonly FeatureSupport[]): number {
-  const required = support
-    .filter(({ requirement }) => requirement.kind === 'required')
-    .map((entry) => featureData(entry.requirement.id));
-
-  let total = 0;
-
-  for (const [agentId, agent] of Object.entries(caniuse.agents)) {
-    if (!agent) continue;
-
-    for (const [version, usage] of Object.entries(agent.usage_global)) {
-      if (required.every((data) => isFullSupport(data.stats[agentId]?.[version]))) total += usage ?? 0;
-    }
-  }
-
-  return total;
 }
 
 /** The `caniuse-lite` data version the numbers come from. */

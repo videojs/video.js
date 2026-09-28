@@ -73,11 +73,15 @@
     "vite-plus": "catalog:"
   },
   "browserslist": [
-    "last 2 Chrome versions",
-    "last 2 Edge versions",
-    "last 2 Firefox versions",
-    "last 2 Safari versions",
-    "last 2 iOS versions"
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 121",
+    "safari >= 16.4",
+    "ios_saf >= 16.4",
+    "and_chr >= 111",
+    "and_ff >= 121",
+    "samsung >= 22",
+    "opera >= 98"
   ],
   "engines": {
     "node": ">=22.19.0",

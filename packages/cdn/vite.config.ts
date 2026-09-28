@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite-plus';
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
-import { baseConfig } from '../../build/pack.ts';
+import { baseConfig, inlineCssConfig } from '../../build/pack.ts';
 import { copyCssPlugin } from '../../build/plugins/copy-css-plugin.ts';
 import type { BuildPlugin } from '../../build/plugins/types.ts';
 import { cachedTaskInputs, workspaceTaskDependencies } from '../../build/task.ts';
@@ -127,6 +127,7 @@ for (const mode of ['dev', 'prod'] satisfies CdnBuildMode[]) {
 
   cdnPackConfigs.push({
     ...baseConfig,
+    css: inlineCssConfig,
     name: 'cdn',
     entry,
     platform: 'browser',

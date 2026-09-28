@@ -4,11 +4,10 @@ import {
   BROWSERSLIST_QUERY,
   CSS_REQUIREMENTS,
   cssRequirementSupport,
-  effectiveCoverage,
-  effectiveFloor,
   featureSupport,
   resolveSupportedBrowsers,
   SUPPORT_BROWSERS,
+  supportedCoverage,
   versionNumber,
 } from '../browser-support';
 
@@ -30,27 +29,37 @@ describe('resolveSupportedBrowsers', () => {
     expect(chrome.versions).toHaveLength(2);
     expect(versionNumber(chrome.versions[1]!)).toBeGreaterThan(versionNumber(chrome.versions[0]!));
     expect(chrome.range).toBe(`${chrome.versions[0]}–${chrome.versions[1]}`);
+    expect(chrome.minimum).toBe(chrome.versions[0]);
     expect(safari.versions).toHaveLength(1);
     expect(safari.range).toBe(safari.versions[0]);
-    expect(rows.find((row) => row.id === 'firefox')).toMatchObject({ versions: [], range: '—' });
+    expect(rows.find((row) => row.id === 'firefox')).toMatchObject({ versions: [], range: '—', minimum: null });
   });
 
-  it('resolves the repository query to two versions of every policy browser', () => {
+  it('resolves the repository query to a minimum for every policy browser', () => {
     for (const row of resolveSupportedBrowsers(BROWSERSLIST_QUERY)) {
-      expect(row.versions, row.id).toHaveLength(2);
+      expect(row.minimum, row.id).not.toBeNull();
     }
   });
 });
 
 describe('featureSupport', () => {
-  it('reads the first fully supporting version per browser from caniuse-lite', () => {
+  it('reads @scope support, which only the registry CSS skins need', () => {
     const scope = featureSupport(CSS_REQUIREMENTS.find((requirement) => requirement.id === 'css-cascade-scope')!);
 
     expect(scope.firstVersion.chrome).toBe('118');
     expect(scope.firstVersion.safari).toBe('17.4');
     expect(versionNumber(scope.firstVersion.firefox!)).toBeGreaterThanOrEqual(146);
-    expect(scope.globalSupport).toBeGreaterThan(50);
     expect(scope.caniuseUrl).toBe('https://caniuse.com/css-cascade-scope');
+  });
+
+  it('reads the first fully supporting version per browser from caniuse-lite', () => {
+    const has = featureSupport(CSS_REQUIREMENTS.find((requirement) => requirement.id === 'css-has')!);
+
+    expect(has.firstVersion.chrome).toBe('105');
+    expect(has.firstVersion.firefox).toBe('121');
+    expect(has.firstVersion.safari).toBe('15.4');
+    expect(has.globalSupport).toBeGreaterThan(50);
+    expect(has.caniuseUrl).toBe('https://caniuse.com/css-has');
   });
 
   it('rejects unknown feature ids', () => {
@@ -74,35 +83,11 @@ describe('cssRequirementSupport', () => {
   });
 });
 
-describe('effectiveFloor', () => {
-  it('takes the newest first-supporting version across required features only', () => {
-    const support = cssRequirementSupport();
-    const floor = effectiveFloor(support);
-    const required = support.filter((entry) => entry.requirement.kind === 'required');
+describe('supportedCoverage', () => {
+  it('covers more usage than the repository query minus its oldest browsers', () => {
+    const coverage = supportedCoverage();
 
-    for (const browser of SUPPORT_BROWSERS) {
-      const value = floor[browser.id];
-
-      expect(value, browser.id).not.toBeNull();
-
-      for (const entry of required) {
-        expect(versionNumber(value!)).toBeGreaterThanOrEqual(versionNumber(entry.firstVersion[browser.id]!));
-      }
-    }
-
-    expect(versionNumber(floor.safari!)).toBe(17.4);
-  });
-});
-
-describe('effectiveCoverage', () => {
-  it('is no higher than any single required feature and stays a percentage', () => {
-    const support = cssRequirementSupport();
-    const coverage = effectiveCoverage(support);
-
-    expect(coverage).toBeGreaterThan(0);
-
-    for (const entry of support.filter((item) => item.requirement.kind === 'required')) {
-      expect(coverage).toBeLessThanOrEqual(entry.globalSupport + 1e-9);
-    }
+    expect(coverage).toBeGreaterThan(supportedCoverage(['last 1 chrome version']));
+    expect(coverage).toBeLessThanOrEqual(100);
   });
 });

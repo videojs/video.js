@@ -47,13 +47,19 @@
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     .media-skin {
       --media-popover: var(--media-background);
-      --media-scrollbar-thumb-color: oklch(from currentColor l c h / 0.8);
+      --media-scrollbar-thumb-color: color-mix(in oklab, currentColor 80%, transparent);
       --media-backdrop-filter-surface: none;
       --media-backdrop-filter-indicator: none;
       --media-backdrop-filter-dialog: none;
       --media-shadow-surface-inset: inset 0 1px 0 0 rgb(255 255 255 / 0.25), inset 0 0 0 1px rgb(255 255 255 / 0.125);
 
       scrollbar-width: auto;
+    }
+
+    @supports (color: oklch(from currentColor l c h)) {
+      .media-skin {
+        --media-scrollbar-thumb-color: oklch(from currentColor l c h / 0.8);
+      }
     }
   }
 

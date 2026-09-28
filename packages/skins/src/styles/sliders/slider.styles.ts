@@ -51,10 +51,10 @@ export default styles({
     },
     thumb: {
       utilities: [
-        'absolute z-10 top-1/2 left-(--media-slider-fill) size-3 -translate-x-1/2 -translate-y-1/2 rounded-media-control bg-white',
+        'absolute z-10 top-1/2 left-[var(--media-slider-fill,0%)] size-3 -translate-x-1/2 -translate-y-1/2 rounded-media-control bg-white',
         'select-none transition-[opacity,height,width,outline-offset,scale] duration-media-slider ease-out',
         'group-data-dragging/slider:scale-90',
-        'data-[orientation=vertical]:top-[calc(100%-var(--media-slider-fill))] data-[orientation=vertical]:left-1/2',
+        'data-[orientation=vertical]:top-[calc(100%-var(--media-slider-fill,0%))] data-[orientation=vertical]:left-1/2',
         'group-data-dragging/slider:data-[orientation=horizontal]:left-(--media-slider-pointer)',
         'group-data-dragging/slider:data-[orientation=vertical]:top-[calc(100%-var(--media-slider-pointer))]',
         'outline-transparent shadow-media-thumb',

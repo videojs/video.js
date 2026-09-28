@@ -1,23 +1,40 @@
 @layer base.theme, base.preset, base.preferences;
 
 @layer base.preset {
+  /* Light colors for browsers without `light-dark()`; the `@supports` block below adds the dark ones. */
   .media-skin:is([data-preset="audio"], [data-preset="live-audio"]) {
-    --media-background: light-dark(oklch(1 0 0), oklch(0 0 0));
-    --media-foreground: light-dark(oklch(0 0 0), oklch(1 0 0));
-    --media-controls: light-dark(oklch(1 0 0 / 0.5), oklch(0 0 0 / 0.4));
+    --media-background: oklch(1 0 0);
+    --media-foreground: oklch(0 0 0);
+    --media-controls: oklch(1 0 0 / 0.5);
     --media-controls-foreground: var(--media-foreground);
     --media-popover: var(--media-controls);
     --media-popover-foreground: var(--media-foreground);
     --media-surface-border: oklch(0 0 0 / 0.05);
     --media-primary: var(--media-accent-color, var(--media-foreground));
-    --media-primary-foreground: var(--media-accent-text-color, contrast-color(var(--media-primary)));
-    --media-border: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+    --media-border: oklch(0 0 0 / 0.1);
     --media-ring: var(--media-foreground);
-    --media-default-accent-color: light-dark(oklch(0 0 0), oklch(1 0 0));
-    --media-internal-accent-text-fallback: light-dark(oklch(1 0 0), oklch(0 0 0));
+    --media-default-accent-color: oklch(0 0 0);
+    --media-default-accent-text-color: oklch(1 0 0);
+    --media-internal-accent-text-fallback: oklch(1 0 0);
     --media-popover-boundary-offset: calc(var(--media-spacing) * 2);
     --media-popover-side-offset: calc(var(--media-spacing) * 3);
     --media-slider-preview-label-offset: calc(var(--media-spacing) * 10);
+  }
+
+  /*
+   * Keep `light-dark()` behind this check. A build that lowers it for Safari before 17.5, such as Next.js, leaves it
+   * alone here but elsewhere rewrites it into variables that only the app's own `color-scheme` rules define.
+   */
+  @supports (color: light-dark(red, red)) {
+    .media-skin:is([data-preset="audio"], [data-preset="live-audio"]) {
+      --media-background: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-foreground: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-controls: light-dark(oklch(1 0 0 / 0.5), oklch(0 0 0 / 0.4));
+      --media-border: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+      --media-default-accent-color: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-default-accent-text-color: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-internal-accent-text-fallback: light-dark(oklch(1 0 0), oklch(0 0 0));
+    }
   }
 
   .media-skin:is([data-preset="audio"], [data-preset="live-audio"])[data-theme="minimal"] {
@@ -30,7 +47,13 @@
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     .media-skin:is([data-preset="audio"], [data-preset="live-audio"]) {
       --media-controls: var(--media-background);
-      --media-surface-border: light-dark(oklch(0 0 0 / 0.05), transparent);
+      --media-surface-border: oklch(0 0 0 / 0.05);
+    }
+
+    @supports (color: light-dark(red, red)) {
+      .media-skin:is([data-preset="audio"], [data-preset="live-audio"]) {
+        --media-surface-border: light-dark(oklch(0 0 0 / 0.05), transparent);
+      }
     }
   }
 }

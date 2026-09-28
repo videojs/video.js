@@ -1,43 +1,43 @@
 ---
 title: Browser support
-description: Browsers and rendering environments supported by Video.js 10, and what the stylesheets need from them
+description: Browsers and rendering environments supported by Video.js 10, and how the packaged skins reach them
 ---
 
 import BrowserSupportTable from '@/components/docs/BrowserSupportTable.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 
-Video.js 10 supports the **latest two stable versions** of Chrome, Edge, Firefox, Safari, and Safari on iOS. This page shows the versions that means today, what the packaged skins need from a browser, and how to reach older ones.
-
-## Browser baseline
-
-The build reads the policy from a [browserslist](https://browsersl.ist) query in the repository, and this page resolves the same query when the docs are built:
-
 <BrowserSupportTable kind="browsers" />
-
-These are the versions we test in and fix bugs for. We build directly on the web platform, with [custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements), [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope), [container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries), and [anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning), and we do not hold a feature back to keep older versions working. Older versions often work anyway:
 
 <BrowserSupportTable kind="coverage" />
 
+We test in and fix bugs for these versions. Each minimum comes from a feature with no fallback: `:has()` sets Firefox, [`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix) and [`oklch()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) set Chrome and Edge (Chrome 111, Firefox 113, Safari 16.2), and the JavaScript sets Safari, because it uses ES2022 syntax and [`adoptedStyleSheets`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets). Newer JavaScript APIs are feature-detected.
+
 ## CSS requirements
 
-The packaged skins are generated CSS, and a handful of newer features hold a skin together. **Required** features have no fallback: without them the player shows no component styling, and `@scope` alone sets the floor. **Degrades** features lose one visual detail. **Has a fallback** features sit inside [`@supports`](https://developer.mozilla.org/en-US/docs/Web/CSS/@supports); anchor positioning falls back to positions computed in JavaScript.
+The packaged skins are generated CSS, and the build lowers them for the browsers above. It flattens CSS nesting, adds vendor prefixes such as `-webkit-backdrop-filter`, and writes each skin's scope as a [`:where()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where) selector, which adds no specificity, rather than [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope).
 
-The table reads the first fully supporting version of each feature from [caniuse-lite](https://github.com/browserslist/caniuse-lite) when the docs build, and feature names link to [caniuse.com](https://caniuse.com/). The **effective floor** is the newest required version in each column.
+Skins you add as source through the <DocsLink slug="guides/installation-shadcn">Shadcn registry</DocsLink> keep `@scope`, which reads more clearly in files you edit. Their plain CSS versions need Chrome and Edge 118, Firefox 146, and Safari and iOS 17.4 unless you [flatten `@scope` in your build](#flatten-scope-in-registry-skins); the Tailwind versions style elements with utility classes and follow the versions above.
+
+Newer color functions get a fallback, and the original declaration moves inside [`@supports`](https://developer.mozilla.org/en-US/docs/Web/CSS/@supports), so browsers that have the function still use it:
+
+- [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) uses its light color. The audio skins render their light theme, and the video skins keep the light hairline border.
+- [`contrast-color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/contrast-color) uses each theme's default text color on primary buttons and the inherited text color elsewhere. The fallback cannot read a custom accent, so set `--media-accent-text-color` whenever you set `--media-accent-color`; see <DocsLink slug="guides/customize-skins">Customize skins</DocsLink>.
+- [Relative colors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_colors/Relative_colors) that keep their origin's channels, which build the scrims behind the controls, become `color-mix()`. Subtle shadows derived from `currentColor` have no equivalent and are left out.
+
+Tooltips, menus, and popovers use the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) where it exists (Chrome 114, Firefox 125, Safari 17). In older supported versions they stay inside the player instead of the top layer: the skins hide them while closed and position them against the player while open, so on the video skins a menu taller than the player is cut off.
+
+The table reads the first fully supporting version of each feature from [caniuse-lite](https://github.com/browserslist/caniuse-lite) when the docs build, and feature names link to [caniuse.com](https://caniuse.com/). **Required** features have no fallback. **Degrades** features lose one visual detail. **Has a fallback** features keep working another way: anchor positioning falls back to positions computed in JavaScript, `:dir()` sits beside `[dir="rtl"]` selectors, and the packaged skins flatten `@scope` into `:where()` selectors.
 
 <BrowserSupportTable kind="requirements" />
 
-A few features have no caniuse entry. [`oklch()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) is required but older than the floor (Chrome 111, Firefox 113, Safari 15.4). [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark), [relative colors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_colors/Relative_colors), [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property), and [`contrast-color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/contrast-color) each degrade on their own; set `--media-accent-text-color` from <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> if you support browsers without `contrast-color()`. [Firefox ESR](https://www.mozilla.org/en-US/firefox/enterprise/) releases older than 146 lack `@scope`, so the skins render unstyled there.
+Older browsers than the baseline are not tested. Without `:has()`, `@container`, `@layer`, `color-mix()`, or `oklch()`, the skins lose focus states, layout, or colors.
 
-The JavaScript has a lower floor: ES2022 syntax, with newer APIs feature-detected, so it runs in Chrome 102, Firefox 112, and Safari 16.4 or later. The stylesheet decides whether an older browser shows a working player.
-
-### Support older browsers
-
-To reach browsers below the floor, recompile the skin stylesheet with fallbacks. Only a stylesheet your build processes can be recompiled.
+## Build the skin CSS yourself
 
 <FrameworkCase frameworks={["react"]}>
 
-Skins are stylesheets you import, such as `@videojs/react/video/skin.css`, so your bundler's CSS pipeline already sees them and nothing else changes.
+Skins are stylesheets you import, such as `@videojs/react/video/skin.css`, so your bundler's CSS pipeline processes them.
 
 </FrameworkCase>
 
@@ -47,14 +47,28 @@ Packaged HTML skins inline their CSS into JavaScript, so <DocsLink slug="guides/
 
 </FrameworkCase>
 
-[lightningcss](https://lightningcss.dev/transpilation.html) and [postcss-preset-env](https://preset-env.cssdb.org/) both read a browserslist query and add what those browsers lack: they flatten nesting and rewrite `:dir()`, range media queries, `light-dark()`, and `oklch()` in ordinary declarations, and add vendor prefixes. Neither rewrites `@scope` or `:scope`, so a small plugin flattens each block into descendant selectors prefixed with [`:where(root)`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where), which adds no specificity. The PostCSS version, picked up by Vite, Next.js, and most bundlers from `postcss.config.mjs`:
+[Lightning CSS](https://lightningcss.dev/transpilation.html), which Vite uses to minify CSS, rewrites `light-dark()` and `:dir()` for every browser when its targets include older ones, not only for those older browsers. Its `light-dark()` output depends on a `color-scheme` declaration the skins do not make, so the skin colors break. The skins keep `light-dark()` inside `@supports` checks, which Lightning CSS 1.32 and earlier leave alone but 1.33 and later rewrite anyway. The skins already handle both features, so exclude them:
+
+```ts title="vite.config.ts"
+import { Features } from 'lightningcss';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  css: {
+    lightningcss: { exclude: Features.LightDark | Features.DirSelector },
+  },
+});
+```
+
+### Flatten `@scope` in registry skins
+
+Registry skins in plain CSS keep `@scope`, and Lightning CSS passes it through unchanged. To reach browsers without `@scope`, add a PostCSS plugin that rewrites each block into descendant selectors prefixed with [`:where(root)`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where), which adds no specificity. Vite, Next.js, and most bundlers pick it up from `postcss.config.mjs` and run it before Lightning CSS:
 
 ```bash
-npm install --save-dev postcss postcss-preset-env postcss-selector-parser
+npm install --save-dev postcss postcss-selector-parser
 ```
 
 ```js title="postcss.config.mjs"
-import presetEnv from 'postcss-preset-env';
 import selectorParser from 'postcss-selector-parser';
 
 /** Rewrite `@scope (<root>) { … }` into descendant selectors that older browsers understand. */
@@ -66,7 +80,7 @@ function flattenScope() {
 
         sel.walk((node) => {
           if (node.type === 'nesting' || (node.type === 'pseudo' && node.value === ':scope')) {
-            node.replaceWith(selectorParser.string({ value: root }));
+            node.replaceWith(selectorParser.string({ value: `:where(${root})` }));
             referencesRoot = true;
           }
         });
@@ -99,12 +113,15 @@ function flattenScope() {
 }
 flattenScope.postcss = true;
 
-export default {
-  plugins: [flattenScope(), presetEnv({ browsers: 'baseline widely available', stage: 2 })],
-};
+export default { plugins: [flattenScope()] };
 ```
 
-The result renders in Chrome 111, Firefox 121, and Safari 16.4 or later, the floor [Tailwind CSS 4 documents](https://tailwindcss.com/docs/compatibility#browser-support), because `:has()`, `@container`, `@layer`, and `color-mix()` have no fallback. Flattening `@scope` trades scope proximity for source order; the packaged skins never nest a component inside itself, so the output matches. Run `npx browserslist "baseline widely available"` to see what the query resolves to today, or pick another query for your audience.
+Flattening trades scope proximity for source order, the same way the packaged skins do. Keep the Lightning CSS `exclude` setting above so the colors still work.
+
+{/* Reveal inside `<StyleCase styles={['tailwind']}>` once the docs offer a Tailwind style.
+
+Tailwind skins have one more step. Tailwind's Vite plugin runs Lightning CSS only for production builds, so its dev server sends nested rules that Safari before 17.2 drops, and the time slider track disappears. Test older browsers against a production build, or lower dev CSS as well by setting `css.transformer: 'lightningcss'` with `css.lightningcss.targets` from your browserslist.
+*/}
 
 ## Rendering contexts
 

@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 
 import { transform } from 'lightningcss';
 
-import { cssTargets } from '../css-targets.ts';
+import { cssExclude, cssTargets } from '../css-targets.ts';
 import { resolveImports } from './resolve-css-imports.ts';
 import type { BuildPlugin } from './types.ts';
 
@@ -70,14 +70,14 @@ export function copyCssPlugin(options: CopyCssPluginOptions): BuildPlugin {
       const content = readFileSync(source, 'utf-8');
       let output = inline ? resolveImports(content, dirname(source), omitImport) : content;
 
-      if (minify) {
-        output = transform({
-          filename: source,
-          code: Buffer.from(output),
-          minify: true,
-          targets: cssTargets,
-        }).code.toString();
-      }
+      // Lower every copy, minified or not, so published CSS matches the root `browserslist`.
+      output = transform({
+        filename: source,
+        code: Buffer.from(output),
+        minify,
+        targets: cssTargets,
+        exclude: cssExclude,
+      }).code.toString();
 
       const outFile = join(outDir, target);
       if (existsSync(outFile) && readFileSync(outFile, 'utf-8') === output) continue;

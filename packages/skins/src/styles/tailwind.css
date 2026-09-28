@@ -330,7 +330,7 @@
 @utility clip-media-x-* {
   left: calc(var(--media-slider-chapter-start, 0%) + var(--media-spacing) * var(--media-chapter-inset-start, 0));
   right: max(
-    calc(100% - var(--value([*]))),
+    calc(100% - var(--value([*]), 0%)),
     calc(100% - var(--media-slider-chapter-end, 100%) + var(--media-spacing) * var(--media-chapter-inset-end, 0))
   );
   clip-path: inset(-1px 0);
@@ -340,7 +340,7 @@
 @utility clip-media-y-* {
   bottom: calc(var(--media-slider-chapter-start, 0%) + var(--media-spacing) * var(--media-chapter-inset-start, 0));
   top: max(
-    calc(100% - var(--value([*]))),
+    calc(100% - var(--value([*]), 0%)),
     calc(100% - var(--media-slider-chapter-end, 100%) + var(--media-spacing) * var(--media-chapter-inset-end, 0))
   );
   clip-path: inset(0 -1px);

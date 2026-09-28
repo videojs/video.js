@@ -11,15 +11,10 @@
     --media-popover: oklch(1 0 0 / 0.1);
     --media-popover-foreground: var(--media-foreground);
     --media-primary: var(--media-accent-color, var(--media-default-accent-color));
-    --media-primary-foreground: var(
-      --media-accent-text-color,
-      contrast-color(var(--media-accent-color, var(--media-default-accent-color)))
-    );
+    /* Browsers without `contrast-color()` use the theme's default text color; see the `@supports` blocks below. */
+    --media-primary-foreground: var(--media-accent-text-color, var(--media-default-accent-text-color));
     --media-accent: var(--media-accent-color, color-mix(in oklab, var(--media-default-accent-color) 10%, transparent));
-    --media-accent-foreground: var(
-      --media-accent-text-color,
-      contrast-color(var(--media-accent-color, var(--media-internal-accent-text-fallback, oklch(0 0 0))))
-    );
+    --media-accent-foreground: var(--media-accent-text-color, currentColor);
     --media-muted: oklch(1 0 0 / 0.15);
     --media-muted-foreground: oklch(1 0 0 / 0.65);
     --media-border: oklch(0 0 0 / 0.1);
@@ -34,7 +29,7 @@
     --media-shadow-tooltip: 0 0 0 1px var(--media-border), var(--media-shadow-surface);
     --media-shadow-separator: 0 1px 0 0 oklch(1 0 0 / 0.075);
     --media-shadow-current-color: oklch(from currentColor 0 0 0 / clamp(0, calc((l - 0.5) * 0.5), 0.15));
-    --media-shadow-subtle-current-color: oklch(from var(--media-shadow-current-color) l c h / calc(alpha * 0.4));
+    --media-shadow-subtle-current-color: color-mix(in oklab, var(--media-shadow-current-color) 40%, transparent);
     --media-text-shadow-dialog: 0 1px 0 rgb(0 0 0 / 0.25);
     --media-backdrop-filter-surface: blur(16px) saturate(150%);
     --media-backdrop-filter-indicator: blur(8px);
@@ -46,6 +41,7 @@
     --media-control-size: calc(var(--media-spacing) * 9);
     --media-controls-radius: var(--media-control-radius);
     --media-default-accent-color: oklch(1 0 0);
+    --media-default-accent-text-color: oklch(0 0 0);
 
     /* Motion. Preferences collapse durations and neutralize hidden-state values under reduced motion. */
     --media-duration-instant: 50ms;
@@ -92,11 +88,37 @@
     /* Player frame and scale. */
     --media-video-border-radius: var(--media-border-radius, 28px);
     --media-scale: 1;
-    --media-scrollbar-thumb-color: oklch(from currentColor l c h / 0.3);
+    --media-scrollbar-thumb-color: color-mix(in oklab, currentColor 30%, transparent);
     --media-spacing: calc(var(--media-scale-unit, 16px) * var(--media-scale) / 4);
 
     scrollbar-color: var(--media-scrollbar-thumb-color) transparent;
     scrollbar-width: thin;
+  }
+
+  /*
+   * Newer color functions stay behind these checks, and the rule above holds the fallback for browsers without them.
+   * Relative colors that keep their origin's channels fall back to the same color through `color-mix()`.
+   */
+  @supports (color: contrast-color(red)) {
+    .media-skin {
+      --media-primary-foreground: var(--media-accent-text-color, contrast-color(var(--media-primary)));
+      --media-accent-foreground: var(
+        --media-accent-text-color,
+        contrast-color(var(--media-accent-color, var(--media-internal-accent-text-fallback, oklch(0 0 0))))
+      );
+    }
+  }
+
+  @supports (color: oklch(from red l c h)) {
+    .media-skin {
+      --media-shadow-subtle-current-color: oklch(from var(--media-shadow-current-color) l c h / calc(alpha * 0.4));
+    }
+  }
+
+  @supports (color: oklch(from currentColor l c h)) {
+    .media-skin {
+      --media-scrollbar-thumb-color: oklch(from currentColor l c h / 0.3);
+    }
   }
 
   .media-skin::-webkit-scrollbar-thumb {

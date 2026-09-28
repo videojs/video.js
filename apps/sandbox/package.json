@@ -54,6 +54,7 @@
     "diff": "^8.0.4",
     "dir-compare": "^5.0.0",
     "fs-extra": "^11.4.0",
+    "lightningcss": "catalog:",
     "prompts": "^2.4.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

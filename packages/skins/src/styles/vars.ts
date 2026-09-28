@@ -136,6 +136,10 @@ export const vars = {
     kind: 'internal',
     description: 'Skin fallback used when the public accent color is not configured.',
   },
+  '--media-default-accent-text-color': {
+    kind: 'internal',
+    description: 'Skin text color on the default accent, used where `contrast-color()` is unsupported.',
+  },
   '--media-internal-accent-text-fallback': {
     kind: 'internal',
     description: 'Theme color used to derive legible accent text when no public accent is configured.',

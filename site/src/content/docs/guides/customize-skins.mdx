@@ -61,7 +61,7 @@ Packaged skins expose [CSS custom properties](https://developer.mozilla.org/en-U
 | `--media-object-position` | Where the media and poster sit when they do not fill the player | A valid [object-position value](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-position) | `top` |
 | `--media-scale-unit` | The base size for skin spacing, icons, and text | [`<length>`](https://developer.mozilla.org/en-US/docs/Web/CSS/length) | `1rem` |
 
-If you omit `--media-accent-text-color`, the skins choose a contrasting text color from `--media-accent-color` using [`contrast-color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/contrast-color). Set it only when you want a different result.
+If you omit `--media-accent-text-color`, the skins choose a contrasting text color from `--media-accent-color` using [`contrast-color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/contrast-color). Browsers before Chrome 147, Firefox 146, and Safari 26 lack `contrast-color()` and use the theme's default text color instead, which suits only the default accent, so set both properties together if you support those browsers.
 
 The skins use [`Inter`](https://rsms.me/inter/) when your page loads it and fall back to the system UI font. Video.js does not load the webfont for you. Set `--media-font-family` to use another font.
 
