@@ -33,13 +33,20 @@ export default defineConfig({
       build: {
         command: 'vp pack && node scripts/check-exports.mjs',
         dependsOn: workspaceTaskDependencies(),
-        input: cachedTaskInputs,
-        output: ['dist/**'],
+        cache: {
+          input: cachedTaskInputs,
+          output: ['dist/**'],
+        },
       },
       'test:ci': packageTestTask(),
     },
   },
   test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
     include: ['src/**/*.test.{ts,tsx}'],
   },
   pack,

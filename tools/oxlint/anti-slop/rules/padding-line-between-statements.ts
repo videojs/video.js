@@ -1,6 +1,6 @@
-import { defineRule } from "@oxlint/plugins";
+import { defineRule } from "vite-plus/lint/plugins";
 
-import type { ESTree, Fixer, SourceCode } from "@oxlint/plugins";
+import type { ESTree, Fixer, SourceCode } from "vite-plus/lint/plugins";
 
 type Statement = ESTree.Directive | ESTree.Statement;
 

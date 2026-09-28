@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { installationCompatibility, installationDecisionOrderFor, installationOptionDefinitionsFor } from '../options';
 import { QUERY_OPTION_SYNTAX } from '../parameters';

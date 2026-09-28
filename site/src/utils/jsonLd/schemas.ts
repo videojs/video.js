@@ -71,25 +71,23 @@ export function createBlogPostingSchema(params: {
     ...(params.updatedDate && { dateModified: params.updatedDate.toISOString() }),
     ...(params.wordCount && { wordCount: params.wordCount }),
     ...(params.readingTime && { timeRequired: `PT${params.readingTime}M` }),
-    author: params.authors.map(
-      (author): Person => ({
-        '@type': 'Person',
-        name: author.data.name,
-        url: author.data.socialLinks?.website || `${params.siteUrl}blog/authors/${author.id}`,
-        ...(author.data.bio && { description: author.data.bio }),
-        ...(author.data.avatar && { image: author.data.avatar }),
-        ...(author.data.socialLinks && {
-          sameAs: [
-            author.data.socialLinks.x,
-            author.data.socialLinks.bluesky,
-            author.data.socialLinks.mastodon,
-            author.data.socialLinks.github,
-            author.data.socialLinks.linkedin,
-            author.data.socialLinks.website,
-          ].filter(Boolean) as string[],
-        }),
-      })
-    ),
+    author: params.authors.map((author): Person => ({
+      '@type': 'Person',
+      name: author.data.name,
+      url: author.data.socialLinks?.website || `${params.siteUrl}blog/authors/${author.id}`,
+      ...(author.data.bio && { description: author.data.bio }),
+      ...(author.data.avatar && { image: author.data.avatar }),
+      ...(author.data.socialLinks && {
+        sameAs: [
+          author.data.socialLinks.x,
+          author.data.socialLinks.bluesky,
+          author.data.socialLinks.mastodon,
+          author.data.socialLinks.github,
+          author.data.socialLinks.linkedin,
+          author.data.socialLinks.website,
+        ].filter(Boolean) as string[],
+      }),
+    })),
     publisher: {
       '@type': 'Organization',
       name: 'Video.js',

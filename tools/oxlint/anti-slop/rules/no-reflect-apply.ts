@@ -1,4 +1,4 @@
-import { defineRule } from "@oxlint/plugins";
+import { defineRule } from "vite-plus/lint/plugins";
 
 import { isGlobalReflectMethodCall } from "../shared/reflect-method.ts";
 

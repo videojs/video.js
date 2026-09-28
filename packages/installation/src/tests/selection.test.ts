@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { INSTALLATION_DEMO_SOURCES } from '../defaults';
 import { PACKAGE_MANAGERS, type InstallationInput } from '../parameters';

@@ -2,7 +2,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'n
 import { dirname, join, resolve } from 'node:path';
 
 import { isPlainObject, isString } from '@videojs/utils/predicate';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { type DesignSystem, loadDesignSystem } from 'vjsc/graph';
 
 const packageDir = resolve(import.meta.dirname, '../../..');

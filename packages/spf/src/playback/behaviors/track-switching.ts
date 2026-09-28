@@ -357,8 +357,8 @@ type PlayerResolutionCapStateMap<S extends SelectionKey> = TrackSwitchingStateMa
 
 /**
  * State the active-CDN scope reads: the lifecycle map plus an _optional_ `cdnPriority` — the manifest-ordered CDN list
- * (most-preferred first). The signal exists only when the composition includes `deriveCdnPriority` (which materializes
- * + owns it); the scope reads it defensively and passes through when it's absent (no CDN preference).
+ * (most-preferred first). The signal exists only when the composition includes `deriveCdnPriority`, which creates and
+ * owns it. The scope reads it defensively and passes through when it's absent (no CDN preference).
  */
 type CdnScopeStateMap<S extends SelectionKey> = TrackSwitchingStateMap<S> & {
   cdnPriority?: ReadonlySignal<string[] | undefined>;

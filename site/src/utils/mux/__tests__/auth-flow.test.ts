@@ -335,7 +335,7 @@ describe('createEndpointCoordinator', () => {
       openAuthPopup: vi.fn(),
     });
 
-    await expect(coordinator.getEndpoint()).rejects.toThrow('Server error');
+    await expect(coordinator.getEndpoint()).rejects.toMatchObject({ message: 'Server error' });
   });
 
   it('propagates login initiation errors', async () => {
@@ -353,7 +353,7 @@ describe('createEndpointCoordinator', () => {
       openAuthPopup: vi.fn(),
     });
 
-    await expect(coordinator.getEndpoint()).rejects.toThrow('OAuth configuration missing');
+    await expect(coordinator.getEndpoint()).rejects.toMatchObject({ message: 'OAuth configuration missing' });
   });
 
   it('propagates errors from retry after auth', async () => {
@@ -378,6 +378,6 @@ describe('createEndpointCoordinator', () => {
     await vi.waitFor(() => expect(authCallback).not.toBeNull());
     authCallback!();
 
-    await expect(endpointPromise).rejects.toThrow('Server exploded');
+    await expect(endpointPromise).rejects.toMatchObject({ message: 'Server exploded' });
   });
 });

@@ -1,7 +1,7 @@
 import { existsSync, globSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { CDN_MEDIA_SUBPATHS } from '../defaults';
 import { INSTALLATION_EXTENSION_DEFINITIONS } from '../extensions';

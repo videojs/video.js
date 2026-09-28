@@ -7,7 +7,7 @@ import {
   isMediaSourceCapable,
   isMediaVolumeCapable,
 } from '@videojs/media';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import {
   normalizeWistiaPlayer,

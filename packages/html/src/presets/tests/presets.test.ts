@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 describe('HTML preset exports', () => {
   it('do not register custom elements when imported', async () => {

@@ -2,7 +2,7 @@ import { SliderDataAttrs, type SliderState } from '@videojs/core';
 import type { AnyPlayerStore, PlayerTarget } from '@videojs/core/dom';
 import { ContextProvider } from '@videojs/element/context';
 import { createStore } from '@videojs/store';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { playerContext } from '../../../player/context';
 import { sliderContext } from '../../slider/context';

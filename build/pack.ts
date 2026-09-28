@@ -37,7 +37,7 @@ export function packageBuildConfig(mode: PackageBuildMode, platform: 'browser' |
     define: {
       __DEV__: mode === 'dev' ? 'true' : 'false',
     },
-    dts: mode === 'dev' ? ({ tsgo: true, tsconfig: 'tsconfig.dts.json' } as const) : (false as const),
+    dts: mode === 'dev' ? ({ generator: 'tsgo', tsconfig: 'tsconfig.dts.json' } as const) : (false as const),
   };
 }
 
@@ -54,5 +54,5 @@ export const neutralLibraryConfig = {
   clean: !isWatchMode,
   hash: false,
   unbundle: true,
-  dts: { tsgo: true, tsconfig: 'tsconfig.dts.json' } as const,
+  dts: { generator: 'tsgo', tsconfig: 'tsconfig.dts.json' } as const,
 };

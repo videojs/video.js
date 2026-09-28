@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import type { GraphModule } from 'vjsc/graph';
 
 import type { SkinModuleMeta } from '../../../src/meta.ts';

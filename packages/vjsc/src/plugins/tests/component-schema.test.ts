@@ -65,7 +65,7 @@ describe('vjscComponentSchemaPlugin', () => {
       format: 'es',
       platform: 'neutral',
       dts: {
-        tsgo: true,
+        generator: 'tsgo',
         tsconfig: join(process.cwd(), 'tsconfig.json'),
         entry: ['does-not-match.ts'],
       },
@@ -77,7 +77,9 @@ describe('vjscComponentSchemaPlugin', () => {
       clean: false,
       report: false,
     });
-    const declaration = results[0]?.chunks.find((chunk) => /\.d\.[cm]?ts$/.test(chunk.fileName));
+    const declaration = results.bundles
+      .flatMap((bundle) => bundle.chunks)
+      .find((chunk) => /\.d\.[cm]?ts$/.test(chunk.fileName));
     if (declaration?.type !== 'chunk') throw new Error('The host build did not emit the schema declaration');
 
     expect(declaration.code).toContain('declare const PlayButton');

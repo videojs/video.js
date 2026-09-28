@@ -18,13 +18,22 @@ export default defineConfig({
       build: {
         command: 'vp pack',
         dependsOn: workspaceTaskDependencies(),
-        input: cachedTaskInputs,
-        output: ['dist/**'],
+        cache: {
+          input: cachedTaskInputs,
+          output: ['dist/**'],
+        },
       },
       'test:ci': packageTestTask(),
     },
   },
   define: { __DEV__: 'true' },
-  test: { environment: 'jsdom' },
+  test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
+    environment: 'jsdom',
+  },
   pack: packageBuildModes.map(createPackConfig),
 });

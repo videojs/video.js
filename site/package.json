@@ -55,7 +55,7 @@
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "catalog:",
     "video.js": "workspace:*",
-    "vite": "^8.2.2"
+    "vite": "catalog:"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
@@ -70,8 +70,8 @@
     "@types/react-dom": "^19.2.1",
     "@types/turndown": "^5.0.6",
     "@vitejs/plugin-react": "^6.1.1",
-    "@vitest/coverage-v8": "^4.1.10",
-    "@vitest/ui": "^4.1.10",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "browserslist": "^4.29.0",
     "caniuse-lite": "^1.0.30001810",
     "jsdom": "^27.0.0",

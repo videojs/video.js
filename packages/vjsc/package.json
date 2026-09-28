@@ -97,8 +97,7 @@
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
-    "vite": "^8.2.2",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   }
 }

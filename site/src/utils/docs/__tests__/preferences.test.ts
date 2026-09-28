@@ -113,14 +113,13 @@ describe('preferences utilities', () => {
     });
 
     it('should return null when document is undefined (SSR)', () => {
-      const originalDocument = globalThis.document;
+      vi.stubGlobal('document', undefined);
 
-      // @ts-expect-error Testing SSR scenario
-      globalThis.document = undefined;
-
-      expect(getFrameworkPreferenceClient()).toBeNull();
-
-      globalThis.document = originalDocument;
+      try {
+        expect(getFrameworkPreferenceClient()).toBeNull();
+      } finally {
+        vi.unstubAllGlobals();
+      }
     });
   });
 
@@ -173,16 +172,15 @@ describe('preferences utilities', () => {
     });
 
     it('should do nothing when document is undefined (SSR)', () => {
-      const originalDocument = globalThis.document;
+      vi.stubGlobal('document', undefined);
 
-      // @ts-expect-error Testing SSR scenario
-      globalThis.document = undefined;
-
-      expect(() => {
-        setFrameworkPreferenceClient(firstFramework);
-      }).not.toThrow();
-
-      globalThis.document = originalDocument;
+      try {
+        expect(() => {
+          setFrameworkPreferenceClient(firstFramework);
+        }).not.toThrow();
+      } finally {
+        vi.unstubAllGlobals();
+      }
     });
   });
 

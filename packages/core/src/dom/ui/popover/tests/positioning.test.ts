@@ -546,24 +546,24 @@ describe('getFixedContainingBlockOrigin', () => {
   it('measures where a fixed box beside the popup lands, then removes the probe', () => {
     const parent = document.createElement('div');
     const popup = document.createElement('div');
-    const measure = vi
-      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-      .mockImplementation(function (this: HTMLElement) {
-        const left = this.style.position === 'fixed' ? 120 : 0;
-        const top = this.style.position === 'fixed' ? 80 : 0;
+    const measure = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      const left = this.style.position === 'fixed' ? 120 : 0;
+      const top = this.style.position === 'fixed' ? 80 : 0;
 
-        return {
-          left,
-          top,
-          x: left,
-          y: top,
-          width: 0,
-          height: 0,
-          right: left,
-          bottom: top,
-          toJSON: () => ({}),
-        } as DOMRect;
-      });
+      return {
+        left,
+        top,
+        x: left,
+        y: top,
+        width: 0,
+        height: 0,
+        right: left,
+        bottom: top,
+        toJSON: () => ({}),
+      } as DOMRect;
+    });
 
     parent.append(popup);
     document.body.append(parent);

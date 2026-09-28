@@ -261,17 +261,19 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
             ...(hasWorkspace ? ['@videojs/core#build'] : []),
             ...(hasWorkspaceSkins ? ['@videojs/skins#build:shadcn'] : []),
           ],
-          // Setup deterministically mirrors tracked templates into the gitignored
-          // scratch tree. Keep that generated tree out of its own fingerprint.
-          input: [
-            'scripts/setup.ts',
-            'scripts/shared.ts',
-            'scripts/generate-cdn-locale-loaders.ts',
-            'scripts/sync-source-owned-skins.ts',
-            'templates/**',
-            { pattern: 'packages/skins/dist/shadcn/r/**', base: 'workspace' },
-          ],
-          output: ['src/**', 'app/_generated/**', 'app/shared/i18n/cdn-locale-loaders.generated.ts'],
+          cache: {
+            // Setup deterministically mirrors tracked templates into the gitignored
+            // scratch tree. Keep that generated tree out of its own fingerprint.
+            input: [
+              'scripts/setup.ts',
+              'scripts/shared.ts',
+              'scripts/generate-cdn-locale-loaders.ts',
+              'scripts/sync-source-owned-skins.ts',
+              'templates/**',
+              { pattern: 'packages/skins/dist/shadcn/r/**', base: 'workspace' },
+            ],
+            output: ['src/**', 'app/_generated/**', 'app/shared/i18n/cdn-locale-loaders.generated.ts'],
+          },
         },
         'test:ci': {
           command: 'pnpm test',
@@ -282,11 +284,13 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
         build: {
           command: `vp build${workspaceConfig}`,
           dependsOn: ['setup', ...workspaceTaskDependencies(), ...(hasWorkspace ? ['@videojs/cdn#build:cdn'] : [])],
-          // The app-shell plugin creates this file for the build and removes it
-          // afterwards. Workspace dependencies are fingerprinted through the task
-          // graph, not their mutable package-local node_modules links.
-          input: [...cachedTaskInputs, '!src/index.html', '!node_modules/@videojs', '!node_modules/@videojs/**'],
-          output: [...cachedTaskOutputs, '!src/index.html'],
+          cache: {
+            // The app-shell plugin creates this file for the build and removes it
+            // afterwards. Workspace dependencies are fingerprinted through the task
+            // graph, not their mutable package-local node_modules links.
+            input: [...cachedTaskInputs, '!src/index.html', '!node_modules/@videojs', '!node_modules/@videojs/**'],
+            output: [...cachedTaskOutputs, '!src/index.html'],
+          },
         },
       },
     },
@@ -305,6 +309,7 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
       __SANDBOX_COMMIT__: JSON.stringify(describeGit('rev-parse', '--short', 'HEAD')),
     },
     test: {
+      clearMocks: false,
       // The shell's tables and helpers, not the templates: those run under Playwright from `apps/e2e`.
       root: __dirname,
       include: ['app/tests/**/*.test.ts'],

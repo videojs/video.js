@@ -7,7 +7,7 @@ import {
   videoFeatures,
 } from '@videojs/core/dom';
 import { ContextConsumer } from '@videojs/element/context';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { BackgroundVideo } from '../../media/background-video';
 import { MediaAttachMixin } from '../../store/media-attach-mixin';

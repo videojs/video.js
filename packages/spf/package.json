@@ -79,7 +79,8 @@
     "signal-polyfill": "^0.2.2"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "jsdom": "^26.1.0",
     "playwright": "^1.59.1",
     "vite-plus": "catalog:",

@@ -127,7 +127,7 @@ export interface PlaybackAdapter extends EventTarget {
   [key: string]: any;
 }
 
-type CustomMediaConstructor<T extends Constructor<PlaybackAdapter>> = Constructor<
+export type CustomMediaConstructor<T extends Constructor<PlaybackAdapter>> = Constructor<
   HTMLElement &
     InstanceType<T> & {
       readonly adapter: InstanceType<T>;

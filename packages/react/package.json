@@ -193,8 +193,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "6.0.2",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",

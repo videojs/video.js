@@ -136,7 +136,7 @@ describe('pollForPlaybackId', () => {
           signal: controller.signal,
           interval: 0,
         })
-      ).rejects.toThrow('Aborted');
+      ).rejects.toMatchObject({ message: 'Aborted' });
     });
 
     it('throws when signal is aborted during upload status polling', async () => {
@@ -154,7 +154,7 @@ describe('pollForPlaybackId', () => {
           signal: controller.signal,
           interval: 0,
         })
-      ).rejects.toThrow('Aborted');
+      ).rejects.toMatchObject({ message: 'Aborted' });
     });
 
     it('throws when signal is aborted during asset status polling', async () => {
@@ -176,7 +176,7 @@ describe('pollForPlaybackId', () => {
           signal: controller.signal,
           interval: 0,
         })
-      ).rejects.toThrow('Aborted');
+      ).rejects.toMatchObject({ message: 'Aborted' });
     });
   });
 });

@@ -38,15 +38,14 @@
     "dashjs": "^5.2.0",
     "hls.js": "^1.6.7",
     "mux-embed": "5.17.10",
-    "oxfmt": "0.61.0",
+    "oxfmt": "0.70.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "shadcn": "^4.19.0",
     "tailwindcss": "catalog:",
     "typescript": "^6.0.2",
-    "vite": "^8.2.2",
+    "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:",
     "vjsc": "workspace:*"
   }
 }

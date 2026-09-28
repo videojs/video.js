@@ -256,10 +256,10 @@ function createStore<T extends Record<string, unknown>>(initial: T): Store<T>;
 
 ## Testing Type Inference
 
-Use `expectTypeOf` (vitest) or `tsd` to verify inference:
+Use `expectTypeOf` from Vite+ Test or `tsd` to verify inference:
 
 ```ts
-import { expectTypeOf } from 'vitest';
+import { expectTypeOf } from 'vite-plus/test';
 
 test('infers state type', () => {
   const store = createStore({ count: 0 });

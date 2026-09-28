@@ -39,6 +39,6 @@ aborted: 'Has detenido la reproducción del contenido multimedia antes de que te
 ```bash
 pnpm -F @videojs/core run generate:locales     # validates every pack carries every en.ts key
 pnpm lint:fix:file packages/core/src/core/i18n/locales/<tag>.ts
-CI=1 pnpm -F @videojs/core exec vitest run src/core/i18n
+CI=1 pnpm -F @videojs/core exec vp test run src/core/i18n
 git diff --check
 ```

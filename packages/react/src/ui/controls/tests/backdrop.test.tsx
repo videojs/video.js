@@ -1,6 +1,6 @@
 import { cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { createPlayerWrapper } from '../../../testing/mocks';
 import { ControlsBackdrop } from '../backdrop';

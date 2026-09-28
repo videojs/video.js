@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import coreSchema from '@videojs/core/vjsc';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import type { ComponentPartDefinition, ComponentParts } from 'vjsc/components';
 import { type ComponentPath, isTargetElement, readTargetReference } from 'vjsc/target';
 

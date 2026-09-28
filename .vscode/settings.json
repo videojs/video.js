@@ -11,7 +11,6 @@
   },
 
   "editor.defaultFormatter": "oxc.oxc-vscode",
-  "oxc.path.oxlint": "./node_modules/vite-plus/bin/oxlint",
   "oxc.fmt.configPath": "./vite.config.ts",
   "npm.scriptRunner": "vp",
   "js/ts.tsdk.path": "node_modules/typescript/lib",

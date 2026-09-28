@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 
 import { isPlainObject } from '@videojs/utils/predicate';
 import { type RegistryItem, registryItemSchema } from 'shadcn/schema';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 const packageDir = resolve(import.meta.dirname, '../../..');
 const registryDirs = {

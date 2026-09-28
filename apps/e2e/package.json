@@ -37,7 +37,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "shadcn": "^4.19.0",
-    "vite": "^8.2.2",
+    "vite": "catalog:",
     "vite-plus": "catalog:",
     "vjsc": "workspace:*"
   }

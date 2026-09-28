@@ -28,7 +28,6 @@
   "devDependencies": {
     "@types/node": "^22.18.6",
     "typescript": "6.0.2",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }

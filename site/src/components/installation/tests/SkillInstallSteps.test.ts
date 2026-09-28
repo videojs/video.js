@@ -3,7 +3,7 @@ import { getContainerRenderer } from '@astrojs/react/container-renderer';
 import { SKILL_AGENTS, type SkillAgent } from '@videojs/installation';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import SkillInstallSteps from '../SkillInstallSteps.astro';
 

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { CLI_OPTION_SYNTAX, QUERY_OPTION_SYNTAX } from '../parameters';
 

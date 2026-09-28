@@ -105,7 +105,6 @@
     "rolldown": "~1.2.5",
     "tsx": "^4.23.1",
     "typescript": "^6.0.2",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }

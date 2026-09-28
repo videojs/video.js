@@ -88,9 +88,8 @@
     "react": "^19.2.8",
     "svgo": "^4.0.2",
     "tsx": "^4.23.1",
-    "vite": "^8.2.2",
+    "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:",
     "vjsc": "workspace:*"
   }
 }

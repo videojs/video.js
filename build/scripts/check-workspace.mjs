@@ -4,13 +4,9 @@
  * Validates that manually-maintained lists across config files stay in sync with the actual package structure. Run via
  * `pnpm check:workspace`.
  *
- * Checks: 1. CI test coverage — every testable package is tested in CI 2. Commitlint scopes — every package dir is a
- * valid commit scope 3. Root tsconfig references — every composite project is referenced 4. Package metadata —
- * non-private packages have required fields 5. Release-please config — every versioned package is registered 6. Bundled
- * docs — package publishing wires include generated docs 7. Define imports — no bare side-effect imports from relative
- * paths 8. i18n locales — tag lists match locale files and generated stubs 9. Agent context — portable skill metadata,
- * compatibility imports, and budgets 10. Internal records — organized design docs, frontmatter, and lifecycle status
- * 11. mise tool pins — optional mise.toml agrees with the canonical version pins
+ * Checks CI test coverage, commitlint scopes, root tsconfig references, package metadata, release configuration,
+ * bundled docs, relative side-effect imports, i18n locales, agent context, internal records, and optional mise tool
+ * pins.
  */
 import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';

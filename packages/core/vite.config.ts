@@ -22,7 +22,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   dts:
     mode === 'dev'
       ? {
-          tsgo: true,
+          generator: 'tsgo',
           tsconfig: 'tsconfig.dts.json',
           entry: ['src/**/*.ts'],
         }
@@ -54,30 +54,32 @@ export default defineConfig({
         command:
           'node --import tsx ./scripts/generate-i18n-locales.ts && node --import tsx ./scripts/generate-i18n-types.ts && vp pack',
         dependsOn: workspaceTaskDependencies(),
-        // The CDN task consumes Core, but its generated output is not an input
-        // to Core's locale generators or package build.
-        input: [
-          ...cachedTaskInputs,
-          { pattern: '!packages/cdn/*.css', base: 'workspace' },
-          { pattern: '!packages/cdn/*.d.ts', base: 'workspace' },
-          { pattern: '!packages/cdn/*.js', base: 'workspace' },
-          { pattern: '!packages/cdn/*.js.map', base: 'workspace' },
-          { pattern: '!packages/cdn/archive/**', base: 'workspace' },
-          { pattern: '!packages/cdn/chunks/**', base: 'workspace' },
-          { pattern: '!packages/cdn/extensions/**', base: 'workspace' },
-          { pattern: '!packages/cdn/locales/**', base: 'workspace' },
-          { pattern: '!packages/cdn/media/**', base: 'workspace' },
-          { pattern: '!packages/cdn/src/locales/**', base: 'workspace' },
-        ],
-        output: [
-          'dist/**',
-          'src/core/i18n/load-locale.ts',
-          'src/core/i18n/locales/all.ts',
-          'src/core/i18n/params.generated.ts',
-          'src/core/i18n/text/**',
-          { pattern: 'packages/html/src/i18n/locales/**', base: 'workspace' },
-          { pattern: 'packages/react/src/i18n/locales/**', base: 'workspace' },
-        ],
+        cache: {
+          // The CDN task consumes Core, but its generated output is not an input
+          // to Core's locale generators or package build.
+          input: [
+            ...cachedTaskInputs,
+            { pattern: '!packages/cdn/*.css', base: 'workspace' },
+            { pattern: '!packages/cdn/*.d.ts', base: 'workspace' },
+            { pattern: '!packages/cdn/*.js', base: 'workspace' },
+            { pattern: '!packages/cdn/*.js.map', base: 'workspace' },
+            { pattern: '!packages/cdn/archive/**', base: 'workspace' },
+            { pattern: '!packages/cdn/chunks/**', base: 'workspace' },
+            { pattern: '!packages/cdn/extensions/**', base: 'workspace' },
+            { pattern: '!packages/cdn/locales/**', base: 'workspace' },
+            { pattern: '!packages/cdn/media/**', base: 'workspace' },
+            { pattern: '!packages/cdn/src/locales/**', base: 'workspace' },
+          ],
+          output: [
+            'dist/**',
+            'src/core/i18n/load-locale.ts',
+            'src/core/i18n/locales/all.ts',
+            'src/core/i18n/params.generated.ts',
+            'src/core/i18n/text/**',
+            { pattern: 'packages/html/src/i18n/locales/**', base: 'workspace' },
+            { pattern: 'packages/react/src/i18n/locales/**', base: 'workspace' },
+          ],
+        },
       },
       'test:ci': packageTestTask('pnpm run test:types && vp test run'),
     },
@@ -86,6 +88,16 @@ export default defineConfig({
     __DEV__: 'true',
   },
   test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
+    // Vitest v4 compatibility: keep separate Vite servers for inline projects.
+    // Remove when plugins and config hooks can run once for shared projects.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#inline-projects-share-the-vite-server-by-default
+    sharedViteServer: false,
     projects: [
       {
         extends: true,

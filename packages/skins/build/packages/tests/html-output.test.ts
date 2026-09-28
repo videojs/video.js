@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 const workspaceDir = resolve(import.meta.dirname, '../../../../..');
 const outputRoot = resolve(workspaceDir, 'packages/html/src/internal/skins');

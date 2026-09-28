@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { isObject, isString, isUndefined } from '@videojs/utils/predicate';
 import react from '@vitejs/plugin-react';
 import { createServer, type ViteDevServer } from 'vite';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 import { vjscPlugin } from 'vjsc/vite';
 
 const packageDir = resolve(import.meta.dirname, '../..');

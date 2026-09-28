@@ -1,5 +1,5 @@
 import version from '@app/version';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { buildReport, describeError, PREFERENCE_QUERIES, type Preferences } from '../shell/report';
 

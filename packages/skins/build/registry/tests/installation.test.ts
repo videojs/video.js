@@ -5,7 +5,7 @@ import {
   REGISTRY_INSTALL_DIRECTORY,
   registryStylings,
 } from '@videojs/installation';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { skinCatalog } from '../../catalog.ts';
 import { registryTargets } from '../targets.ts';

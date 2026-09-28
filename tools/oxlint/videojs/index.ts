@@ -1,4 +1,4 @@
-import { eslintCompatPlugin } from "@oxlint/plugins";
+import { eslintCompatPlugin } from "vite-plus/lint/plugins";
 
 import { noOrphanCoreMutationRule } from "./rules/no-orphan-core-mutation.ts";
 

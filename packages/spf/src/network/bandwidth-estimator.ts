@@ -161,8 +161,7 @@ export function getBandwidthEstimate(
 /**
  * Check if the estimator has enough data to provide a reliable estimate.
  *
- * Requires both: - Enough total bytes sampled (minTotalBytes threshold) - At least one valid EWMA sample (totalWeight >
- * 0)
+ * Requires both: - Enough total bytes sampled (minTotalBytes threshold) - At least one valid EWMA sample (totalWeight > 0)
  *
  * @example
  *   if (hasGoodEstimate(state)) {

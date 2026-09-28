@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:https": "vite --host --config vite.config.https.ts",
+    "dev:https": "vp dev --host --config vite.config.https.ts",
     "preview": "vp preview",
     "reset": "tsx scripts/reset.ts",
     "sync": "tsx scripts/sync.ts",
@@ -61,9 +61,8 @@
     "shadcn": "^4.16.2",
     "tailwindcss": "catalog:",
     "tsx": "^4.23.1",
-    "vite": "^8.2.2",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "packageManager": "pnpm@12.6.0",
   "stackblitz": {

@@ -62,8 +62,7 @@
     "jsdom": "^26.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@videojs/element": "workspace:*",

@@ -5,20 +5,31 @@ import { cachedTaskInputs, workspaceTaskDependencies } from '../../build/task.ts
 const testInputs = [...cachedTaskInputs, '!playwright-report/**', '!test-results/**', '!suites/registry/.generated/**'];
 
 export default defineConfig({
+  test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
+  },
   run: {
     tasks: {
       typecheck: {
         command: 'tsgo --project tsconfig.json --noEmit',
         dependsOn: workspaceTaskDependencies(),
-        input: testInputs,
-        output: [],
+        cache: {
+          input: testInputs,
+          output: [],
+        },
       },
       'prepare:player': {
         command: 'pnpm generate-pages',
         // The CDN pages import the bundles the cdn package packs, which its plain `build` task does not produce.
         dependsOn: [...workspaceTaskDependencies(), '@videojs/cdn#build:cdn'],
-        input: testInputs,
-        output: ['suites/player/app/src/index.html', 'suites/player/app/src/pages/**'],
+        cache: {
+          input: testInputs,
+          output: ['suites/player/app/src/index.html', 'suites/player/app/src/pages/**'],
+        },
       },
       'test:player': {
         command: 'playwright test --config suites/player/playwright.config.ts',
@@ -46,8 +57,10 @@ export default defineConfig({
       'test:registry': {
         command: 'playwright test --config suites/registry/playwright.config.ts',
         dependsOn: ['@videojs/skins#build:shadcn', '@videojs/react#build', '@videojs/html#build'],
-        input: testInputs,
-        output: [],
+        cache: {
+          input: testInputs,
+          output: [],
+        },
       },
       'test:registry:full': {
         command: 'playwright test --config suites/registry/playwright.config.ts',

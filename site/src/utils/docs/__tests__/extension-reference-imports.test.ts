@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 const referenceDirectory = resolve(process.cwd(), 'src/content/docs/reference/components');
 const extensions = [

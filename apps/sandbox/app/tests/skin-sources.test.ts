@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { defaultSkinSource, skinSourceAvailable, skinStylings, tailwindSkinAvailable } from '../shared/skin-sources';
 

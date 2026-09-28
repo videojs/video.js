@@ -54,7 +54,6 @@
   },
   "devDependencies": {
     "happy-dom": "^20.11.1",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }

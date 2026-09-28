@@ -1,4 +1,4 @@
-import { defineRule } from "@oxlint/plugins";
+import { defineRule } from "vite-plus/lint/plugins";
 
 import {
 	classifyUnsafeDictionary,
@@ -7,7 +7,7 @@ import {
 	type TypeEnvironment,
 } from "../shared/dictionary-types.ts";
 
-import type { ESTree } from "@oxlint/plugins";
+import type { ESTree } from "vite-plus/lint/plugins";
 
 const typeNodeKinds: ReadonlySet<string> = new Set([
 	"JSDocNonNullableType",

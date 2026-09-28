@@ -1,4 +1,4 @@
-import { RuleTester } from "oxlint/plugins-dev";
+import { RuleTester } from "vite-plus/lint/plugins-dev";
 import { describe, it } from "vite-plus/test";
 
 import { noOrphanCoreMutationRule } from "../no-orphan-core-mutation.ts";

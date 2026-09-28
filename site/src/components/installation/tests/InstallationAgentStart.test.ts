@@ -2,7 +2,7 @@
 import { getContainerRenderer } from '@astrojs/react/container-renderer';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import InstallationAgentStart from '../InstallationAgentStart.astro';
 
