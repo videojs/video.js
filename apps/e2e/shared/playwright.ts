@@ -13,6 +13,13 @@ const RETRIES = process.env.GITHUB_EVENT_NAME === 'pull_request' ? 1 : 2;
 const GLOBAL_TIMEOUT = 12 * 60_000;
 const e2eDir = resolve(import.meta.dirname, '..');
 
+/**
+ * Stop a suite's web server with SIGTERM before Playwright falls back to SIGKILL. pnpm 12.6 starts the command it runs
+ * in a process group of its own, so the SIGKILL Playwright sends to the server's group ends pnpm alone; the orphaned
+ * dev server keeps the output pipes open and teardown waits on them until the global timeout. pnpm forwards SIGTERM.
+ */
+export const WEB_SERVER_SHUTDOWN = { signal: 'SIGTERM', timeout: 10_000 } as const;
+
 /** Apply the shared reporting, retry, trace, and screenshot policy to one E2E suite. */
 export function suiteConfig(name: string): PlaywrightTestConfig {
   return {

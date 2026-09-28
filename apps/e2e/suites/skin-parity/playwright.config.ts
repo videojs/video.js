@@ -2,7 +2,7 @@ import { resolve } from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-import { suiteConfig } from '../../shared/playwright.ts';
+import { suiteConfig, WEB_SERVER_SHUTDOWN } from '../../shared/playwright.ts';
 
 /** CI shards the suite per preset; one value restricts the run to that preset's spec. */
 const preset = process.env.VJSC_SKIN_PRESET;
@@ -36,5 +36,6 @@ export default defineConfig({
     port: 5190,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
+    gracefulShutdown: WEB_SERVER_SHUTDOWN,
   },
 });

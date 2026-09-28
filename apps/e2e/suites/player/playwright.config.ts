@@ -2,7 +2,7 @@ import { resolve } from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-import { suiteConfig } from '../../shared/playwright.ts';
+import { suiteConfig, WEB_SERVER_SHUTDOWN } from '../../shared/playwright.ts';
 
 /**
  * Product behavior and visual regression of the built packages, served by the e2e app on Chromium and WebKit. A test
@@ -36,5 +36,6 @@ export default defineConfig({
     stderr: 'pipe',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    gracefulShutdown: WEB_SERVER_SHUTDOWN,
   },
 });
