@@ -66,6 +66,22 @@ describe('bundleStyles', () => {
     expect(css).toContain('color: red');
   });
 
+  it('keeps `@scope` unless asked to flatten it into `:where()` selectors', async () => {
+    const module = fixtureModule('root', ['virtual:vjsc/css/1/buttons.css']);
+    const graph: Graph = {
+      root: '/project',
+      modules: new Map([[module.id, module]]),
+      assets: new Map([['virtual:vjsc/css/1/buttons.css', '@scope (.media-skin) { .media-button { color: red; } }']]),
+    };
+
+    const scoped = await bundleStyles(graph, [module], { label: 'test' });
+    const flattened = await bundleStyles(graph, [module], { label: 'test', flattenScopes: true });
+
+    expect(scoped).toContain('@scope (.media-skin)');
+    expect(flattened).not.toContain('@scope');
+    expect(flattened).toContain(':where(.media-skin) .media-button');
+  });
+
   it('ignores imports outside the bundled module set', async () => {
     const root = fixtureModule('root', ['virtual:vjsc/css/1/root.css'], ['missing']);
     const graph: Graph = {

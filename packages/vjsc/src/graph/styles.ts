@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { type ReturnedRule, transform as transformCss } from 'lightningcss';
 
 import type { ModuleMeta } from '../components/meta';
+import { flattenScopes } from '../styles/scope';
 import { setUnique } from '../utils/map';
 import { isInsideRoot } from '../utils/path';
 import type { GraphModule, Graph } from './types';
@@ -19,6 +20,11 @@ export interface BundleStylesOptions {
   readonly asset?: string | undefined;
   /** Whether captured virtual stylesheet assets should be included. */
   readonly includeAssets?: boolean | undefined;
+  /**
+   * Rewrite `@scope` blocks into zero-specificity `:where()` selectors, for bundles that must render in browsers
+   * without `@scope`. Registry output keeps `@scope`, which reads better in the files consumers edit.
+   */
+  readonly flattenScopes?: boolean | undefined;
 }
 
 /** Merge exact authored and transformed styles used by a set of module graph modules. */
@@ -71,7 +77,9 @@ export async function bundleStyles<Node extends ModuleMeta>(
     source += `${trimmed}\n\n`;
   }
 
-  return mergeStyles(source.trimEnd() + '\n', `${options.label}.css`, options.label, pieces);
+  const merged = mergeStyles(source.trimEnd() + '\n', `${options.label}.css`, options.label, pieces);
+
+  return options.flattenScopes ? flattenScopes(merged) : merged;
 }
 
 /** One authored file or generated asset within a bundle, located by the line where its CSS starts. */

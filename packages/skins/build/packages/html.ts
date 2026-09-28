@@ -43,6 +43,8 @@ export async function createHtmlPackageSkins(
       await bundleStyles(graph, skin.modules, {
         label: name,
         files: options.baseStyles ?? [`./styles/${skinBaseStylesheet(skin.preset, skin.theme)}`],
+        // Packaged skins reach browsers without `@scope`; the registry keeps it.
+        flattenScopes: true,
       })
     );
   }

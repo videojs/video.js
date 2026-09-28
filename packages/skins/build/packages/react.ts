@@ -88,6 +88,8 @@ export async function createReactPackageSkins(
       await bundleStyles(graph, skin.modules, {
         label: `${skin.theme}-${skin.preset}`,
         files: options.baseStyles ?? [`./styles/${skinBaseStylesheet(skin.preset, skin.theme)}`],
+        // Packaged skins reach browsers without `@scope`; the registry keeps it.
+        flattenScopes: true,
       })
     );
   }
