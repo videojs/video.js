@@ -329,7 +329,13 @@ class LiveTracker extends Component {
     const seekableEnd = this.seekableEnd();
 
     if (this.lastSeekEnd_ !== -1 && seekableEnd !== this.lastSeekEnd_) {
-      this.pastSeekEnd_ = 0;
+      // When seekable end moves forward by less than the time counted since it
+      // last moved (a late playlist refresh, for example), keep the difference
+      // so liveCurrentTime does not jump backwards. Any other change, such as
+      // seekable end moving back, starts the count again.
+      const carried = this.lastSeekEnd_ + this.pastSeekEnd_ - seekableEnd;
+
+      this.pastSeekEnd_ = seekableEnd > this.lastSeekEnd_ && carried > 0 ? carried : 0;
     }
     this.lastSeekEnd_ = seekableEnd;
     return this.pastSeekEnd_;
