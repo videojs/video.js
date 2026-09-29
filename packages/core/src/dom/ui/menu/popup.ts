@@ -42,6 +42,7 @@ interface RegisteredContent extends MenuContentRegistration {
 /** Coordinates sibling Contents and sizes their shared Popup. */
 export function createMenuPopup(): MenuPopupApi {
   const contents = new Set<RegisteredContent>();
+  const exitFrames = new Map<RegisteredContent, number>();
   let element: HTMLElement | null = null;
   let frame = 0;
 
@@ -65,11 +66,48 @@ export function createMenuPopup(): MenuPopupApi {
     );
   }
 
+  function getClosingChild(parent: MenuApi): RegisteredContent | null {
+    return (
+      getChildren(parent).find(({ menu }) => {
+        const input = menu.input.current;
+
+        return input.active && input.status === 'ending';
+      }) ?? null
+    );
+  }
+
+  function cancelChildExit(content: RegisteredContent): void {
+    cancelAnimationFrame(exitFrames.get(content) ?? 0);
+    exitFrames.delete(content);
+  }
+
+  function scheduleChildExit(content: RegisteredContent): void {
+    if (exitFrames.has(content)) return;
+
+    // Keep the closing page current for one paint so the parent transitions
+    // from its child-open styles instead of jumping to its resting styles.
+    const exitFrame = requestAnimationFrame(() => {
+      exitFrames.set(
+        content,
+        requestAnimationFrame(() => {
+          exitFrames.delete(content);
+
+          if (!contents.has(content) || getActiveChild(content.menu)) return;
+
+          content.element.removeAttribute(MenuContentDataAttrs.childOpen);
+          sync();
+        })
+      );
+    });
+
+    exitFrames.set(content, exitFrame);
+  }
+
   function getCurrentContent(): RegisteredContent | null {
     let current = [...contents].find((content) => content.parent === null) ?? null;
 
     while (current) {
-      const child = getActiveChild(current.menu);
+      const child = getActiveChild(current.menu) ?? (exitFrames.has(current) ? getClosingChild(current.menu) : null);
       if (!child) return current;
 
       current = child;
@@ -172,9 +210,13 @@ export function createMenuPopup(): MenuPopupApi {
       const activeChild = getActiveChild(content.menu);
 
       if (activeChild) {
+        cancelChildExit(content);
         content.menu.highlight(null);
         content.element.setAttribute(MenuContentDataAttrs.childOpen, '');
+      } else if (getClosingChild(content.menu) && content.element.hasAttribute(MenuContentDataAttrs.childOpen)) {
+        scheduleChildExit(content);
       } else {
+        cancelChildExit(content);
         content.element.removeAttribute(MenuContentDataAttrs.childOpen);
       }
 
@@ -242,6 +284,7 @@ export function createMenuPopup(): MenuPopupApi {
     scheduleSync();
 
     return () => {
+      cancelChildExit(registered);
       contents.delete(registered);
       registered.unsubscribe();
       registered.stopObserving();
@@ -256,6 +299,10 @@ export function createMenuPopup(): MenuPopupApi {
 
   function destroy(): void {
     cancelAnimationFrame(frame);
+
+    for (const exitFrame of exitFrames.values()) cancelAnimationFrame(exitFrame);
+
+    exitFrames.clear();
 
     for (const content of contents) {
       content.unsubscribe();

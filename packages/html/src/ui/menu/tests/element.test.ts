@@ -245,6 +245,8 @@ describe('MenuElement', () => {
     await waitForAssertion(() => {
       expect(submenu.hasAttribute('data-ending-style')).toBe(true);
       expect(submenu.hasAttribute('inert')).toBe(true);
+    });
+    await waitForAssertion(() => {
       expect(content.hasAttribute('data-child-open')).toBe(false);
       expect(content.hasAttribute('inert')).toBe(false);
     });

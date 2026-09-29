@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { MenuContentDataAttrs } from '../../../../core/ui/menu/data';
 import { MenuCSSVars } from '../../../../core/ui/menu/vars';
 import { createMenuPopup } from '../popup';
 import { createTestMenu } from './helpers';
@@ -10,6 +11,63 @@ afterEach(() => {
 });
 
 describe('createMenuPopup', () => {
+  it('removes the child-open state after the closing submenu paints', async () => {
+    const popupElement = document.createElement('div');
+    const rootElement = document.createElement('div');
+    const childElement = document.createElement('div');
+    const { menu: rootMenu } = createTestMenu();
+    const { menu: childMenu } = createTestMenu();
+    const popup = createMenuPopup();
+
+    popupElement.append(rootElement, childElement);
+    document.body.append(popupElement);
+    popup.setElement(popupElement);
+    popup.registerContent({ menu: rootMenu, parent: null, element: rootElement });
+    popup.registerContent({ menu: childMenu, parent: rootMenu, element: childElement });
+
+    childMenu.open();
+    popup.sync();
+    expect(rootElement.hasAttribute(MenuContentDataAttrs.childOpen)).toBe(true);
+
+    childMenu.close();
+    popup.sync();
+    expect(rootElement.hasAttribute(MenuContentDataAttrs.childOpen)).toBe(true);
+
+    await vi.waitFor(() => expect(rootElement.hasAttribute(MenuContentDataAttrs.childOpen)).toBe(false));
+
+    popup.destroy();
+    rootMenu.destroy();
+    childMenu.destroy();
+  });
+
+  it('keeps the child-open state when a closing submenu reopens', async () => {
+    const popupElement = document.createElement('div');
+    const rootElement = document.createElement('div');
+    const childElement = document.createElement('div');
+    const { menu: rootMenu } = createTestMenu();
+    const { menu: childMenu } = createTestMenu();
+    const popup = createMenuPopup();
+
+    popupElement.append(rootElement, childElement);
+    document.body.append(popupElement);
+    popup.setElement(popupElement);
+    popup.registerContent({ menu: rootMenu, parent: null, element: rootElement });
+    popup.registerContent({ menu: childMenu, parent: rootMenu, element: childElement });
+
+    childMenu.open();
+    popup.sync();
+    childMenu.close();
+    childMenu.open();
+    popup.sync();
+
+    await vi.waitFor(() => expect(childMenu.input.current.status).toBe('idle'));
+    expect(rootElement.hasAttribute(MenuContentDataAttrs.childOpen)).toBe(true);
+
+    popup.destroy();
+    rootMenu.destroy();
+    childMenu.destroy();
+  });
+
   it('includes the vertical scrollbar when sizing the popup', () => {
     const popupElement = document.createElement('div');
     const content = document.createElement('div');
