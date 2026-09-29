@@ -1,4 +1,12 @@
-import type { Expression, ImportDeclaration, Node, Program } from '@oxc-project/types';
+import type {
+  Expression,
+  ImportDeclaration,
+  JSXAttribute,
+  LogicalExpression,
+  Node,
+  Program,
+  SpreadElement,
+} from '@oxc-project/types';
 import { isString } from '@videojs/utils/predicate';
 import { walk } from 'oxc-walker';
 import type { RolldownMagicString } from 'rolldown';
@@ -18,11 +26,16 @@ interface StyleBinding {
 export interface TransformedStyleReferences {
   /** Semantic classes of every rule the source references. */
   readonly referencedRules: ReadonlySet<string>;
-  /** Class lists that compose two or more style references on one element. */
+  /**
+   * `className` and `class` arrays that compose two or more style references on one element. Other arrays and call
+   * arguments can hold alternatives, which never meet on one element, so they compose nothing.
+   */
   readonly compositions: readonly StyleComposition[];
 }
 
 type StyleReferenceContext = 'jsx' | 'list' | 'value';
+
+const CLASS_ATTRIBUTES: ReadonlySet<string> = new Set(['className', 'class']);
 
 /** The style modules a source imports, as absolute paths in import order. */
 export function importedStyleFiles(filename: string, ast: Program): string[] {
@@ -63,11 +76,17 @@ export function transformStyleReferences(
 
   const edits: SourceEdit[] = [];
   const referencedRules = new Set<string>();
+  const classLists = new Map<Node, Node>();
   const lists = new Map<Node, { readonly pos: number; readonly classNames: string[] }>();
   const transformedRanges: Array<readonly [number, number]> = [];
 
   walk(ast, {
     enter(node, parent) {
+      if (node.type === 'JSXAttribute') {
+        collectClassLists(node, classLists);
+        return;
+      }
+
       if (node.type !== 'MemberExpression') return;
 
       const path = readAccessPath(node);
@@ -82,11 +101,13 @@ export function transformStyleReferences(
       referencedRules.add(rule.className);
       transformedRanges.push([node.start, node.end]);
 
-      if (context === 'list' && parent) {
-        const list = lists.get(parent) ?? { pos: parent.start, classNames: [] };
+      const classList = parent ? classLists.get(parent) : undefined;
+
+      if (classList) {
+        const list = lists.get(classList) ?? { pos: classList.start, classNames: [] };
 
         list.classNames.push(rule.className);
-        lists.set(parent, list);
+        lists.set(classList, list);
       }
 
       this.skip();
@@ -171,6 +192,80 @@ function styleReferenceContext(expression: Expression, parent: Node | null): Sty
   if (listItem) return 'list';
 
   return parent?.type === 'JSXExpressionContainer' ? 'jsx' : 'value';
+}
+
+/**
+ * Map every array a `className` or `class` attribute composes on one element, and every type wrapper inside one, to the
+ * class list it belongs to. Nested and spread arrays join their enclosing list, and each branch of a conditional is a
+ * list of its own.
+ */
+function collectClassLists(attribute: JSXAttribute, lists: Map<Node, Node>): void {
+  if (attribute.name.type !== 'JSXIdentifier' || !CLASS_ATTRIBUTES.has(attribute.name.name)) return;
+
+  if (attribute.value?.type === 'JSXExpressionContainer' && attribute.value.expression.type !== 'JSXEmptyExpression') {
+    collectClassList(attribute.value.expression, lists, undefined);
+  }
+}
+
+function collectClassList(
+  expression: Expression | SpreadElement,
+  lists: Map<Node, Node>,
+  list: Node | undefined
+): void {
+  switch (expression.type) {
+    case 'ArrayExpression': {
+      const owner = list ?? expression;
+
+      lists.set(expression, owner);
+
+      for (const element of expression.elements) if (element) collectClassList(element, lists, owner);
+
+      return;
+    }
+    case 'SpreadElement':
+      if (list) collectClassList(expression.argument, lists, list);
+
+      return;
+    case 'ParenthesizedExpression':
+    case 'TSAsExpression':
+    case 'TSSatisfiesExpression':
+    case 'TSNonNullExpression':
+    case 'TSTypeAssertion':
+      // A wrapped reference still belongs to the list around it.
+      if (list) lists.set(expression, list);
+
+      collectClassList(expression.expression, lists, list);
+      return;
+    case 'ConditionalExpression':
+      // Branches are alternatives, so each is a list of its own and none joins the list around it.
+      collectClassList(expression.consequent, lists, undefined);
+      collectClassList(expression.alternate, lists, undefined);
+      return;
+    case 'LogicalExpression':
+      for (const operand of valueOperands(expression)) collectClassList(operand, lists, undefined);
+
+      return;
+  }
+}
+
+/** Operands that can be a logical expression's value. An array literal is truthy and never nullish. */
+function valueOperands(expression: LogicalExpression): readonly Expression[] {
+  if (withoutTypeWrappers(expression.left).type !== 'ArrayExpression') return [expression.left, expression.right];
+
+  return expression.operator === '&&' ? [expression.right] : [expression.left];
+}
+
+function withoutTypeWrappers(expression: Expression): Expression {
+  switch (expression.type) {
+    case 'ParenthesizedExpression':
+    case 'TSAsExpression':
+    case 'TSSatisfiesExpression':
+    case 'TSNonNullExpression':
+    case 'TSTypeAssertion':
+      return withoutTypeWrappers(expression.expression);
+    default:
+      return expression;
+  }
 }
 
 function assertNoUntransformedReferences(

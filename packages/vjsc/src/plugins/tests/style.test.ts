@@ -181,6 +181,40 @@ describe('stylePlugin', () => {
     expect(css).toContain('pointer-events: none');
   });
 
+  it('rejects a class list that composes an override the CSS output emits first', async () => {
+    for (const classList of [
+      '[styles.first, styles.second]',
+      '[...[styles.first, styles.second]]',
+      '[styles.first, [styles.second]]',
+      '[styles.first, styles.second] as const',
+      '[styles.first as string, styles.second]',
+      'open ? [styles.first, styles.second] : []',
+      '[...(open ? [styles.first, styles.second] : [])]',
+      '[open && [styles.first, styles.second]]',
+    ]) {
+      await expect(
+        transform(
+          `import styles from './fixtures/choice.styles'; export const root = (open) => <div className={${classList}} />;`,
+          cssPlugin()
+        )
+      ).rejects.toThrow('`.media-a` is composed after `.media-z` to override it');
+    }
+  });
+
+  it('does not compose alternatives: other arrays, call arguments, and conditional branches', async () => {
+    const { source } = await transform(
+      `import styles from './fixtures/choice.styles';
+      const choose = (first, second) => (Math.random() > 0.5 ? first : second);
+      export const alternatives = [styles.first, styles.second];
+      export const chosen = <div className={choose(styles.first, styles.second)} />;
+      export const toggled = (open) => <div className={open ? [styles.first] : [styles.second]} />;
+      export const unreachable = <div className={[styles.first, styles.second] && []} />;`,
+      cssPlugin()
+    );
+
+    expect(source).toContain('alternatives = ["media-z", "media-a"]');
+  });
+
   it('rejects non-static style binding usage', async () => {
     const source = `import styles from './fixtures/utilities.styles'; export const value = styles;`;
 
@@ -357,6 +391,10 @@ async function transform(
     warnings,
     watchFiles: await bundle.watchFiles,
   };
+}
+
+function cssPlugin(): StylePlugin {
+  return stylePlugin({ transform: { mode: 'css', stylesheet: { input: designPath } }, diagnostics: false });
 }
 
 function virtualCssIds(source: string): string[] {

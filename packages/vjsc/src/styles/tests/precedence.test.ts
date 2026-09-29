@@ -66,6 +66,47 @@ describe('assertCompositionOrder', () => {
     ).toThrow('both are emitted to `sliders.css`');
   });
 
+  it('accepts compositions whose rules style attribute states no element can be in at once', async () => {
+    const design = await loadDesignSystem(designPath);
+    const closed = rule('media-z-closed', 'states.css', ['data-[state=closed]:bg-red-500']);
+    const open = rule('media-a-open', 'states.css', ['data-[state=open]:bg-blue-500']);
+    const pip = rule('media-z-pip', 'states.css', ['data-[pip]:bg-red-500']);
+    const inline = rule('media-a-inline', 'states.css', ['not-data-[pip]:bg-blue-500']);
+    const presentAfter = rule('media-z-closed-present', 'states.css', [
+      '[&[data-state=closed][data-state]]:bg-red-500',
+    ]);
+    const presentBefore = rule('media-z-present-closed', 'states.css', [
+      '[&[data-state][data-state=closed]]:bg-red-500',
+    ]);
+
+    expect(() =>
+      assertCompositionOrder({
+        design,
+        rules: [closed, open, pip, inline, presentAfter, presentBefore],
+        compositions: [
+          { classNames: ['media-z-closed', 'media-a-open'], pos: 0 },
+          { classNames: ['media-z-pip', 'media-a-inline'], pos: 0 },
+          { classNames: ['media-z-closed-present', 'media-a-open'], pos: 0 },
+          { classNames: ['media-z-present-closed', 'media-a-open'], pos: 0 },
+        ],
+      })
+    ).not.toThrow();
+  });
+
+  it('rejects compositions whose attribute states can hold together', async () => {
+    const design = await loadDesignSystem(designPath);
+    const open = rule('media-z-open', 'states.css', ['data-[state=open]:bg-red-500']);
+    const expanded = rule('media-a-expanded', 'states.css', ['aria-expanded:bg-blue-500']);
+
+    expect(() =>
+      assertCompositionOrder({
+        design,
+        rules: [open, expanded],
+        compositions: [{ classNames: ['media-z-open', 'media-a-expanded'], pos: 0 }],
+      })
+    ).toThrow('both are emitted to `states.css`');
+  });
+
   it('treats a shorthand as overlapping its longhands', async () => {
     const design = await loadDesignSystem(designPath);
     const padding = rule('media-padding', 'b.css', ['p-2']);
