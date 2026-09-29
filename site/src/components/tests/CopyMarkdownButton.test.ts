@@ -21,6 +21,7 @@ async function expectAssistantLinks(prompt: string): Promise<void> {
   for (const [name, origin, parameter] of [
     ['Open in ChatGPT', 'https://chatgpt.com', 'prompt'],
     ['Open in Claude', 'https://claude.ai', 'q'],
+    ['Open in Cursor', 'https://cursor.com', 'text'],
   ]) {
     const link = await screen.findByRole('menuitem', { name });
 

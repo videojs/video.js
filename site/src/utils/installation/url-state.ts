@@ -70,10 +70,11 @@ function methodForRoute(route: InstallationRouteSegment | ''): InstallationMetho
 }
 
 /**
- * Resolve URL input with the shared installation rules. A reader can land on any hand-edited link, so each rejected
- * choice is dropped in parameter order until the rest resolves, and the page shows that choice's default instead.
+ * Resolve input with the shared installation rules, keeping its method and framework. A reader can land on any
+ * hand-edited link, so each rejected choice is dropped in parameter order until the rest resolves, and the page shows
+ * that choice's default instead.
  */
-function resolveUrlInput(input: InstallationInput): InstallationSelection {
+export function resolveInstallationInputWithFallbacks(input: InstallationInput): InstallationSelection {
   let remaining = input;
 
   for (;;) {
@@ -112,7 +113,7 @@ export function parseInstallationSearch(search: string, options: ParseOptions = 
     if (value !== null && key !== 'method' && key !== 'framework' && key !== 'sourceUrl') input[key] = value;
   }
 
-  const selection = resolveUrlInput(input);
+  const selection = resolveInstallationInputWithFallbacks(input);
   const requestedSourceUrl = params.get(SOURCE_URL_QUERY) ?? '';
   // The CLI's explicit demo choice is the page's empty source, so the URL drops it like any other default.
   const sourceUrl = requestedSourceUrl === INSTALLATION_DEMO_SOURCE_URL ? '' : requestedSourceUrl;

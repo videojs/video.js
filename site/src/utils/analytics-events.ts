@@ -37,6 +37,8 @@ export const AGENT_HANDOFF_METHODS = [
   'view-markdown',
   'open-in-chatgpt',
   'open-in-claude',
+  'open-in-cursor',
+  'copy-agent-command',
 ] as const;
 
 export type AgentHandoffMethod = (typeof AGENT_HANDOFF_METHODS)[number];

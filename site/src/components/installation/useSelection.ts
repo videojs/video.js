@@ -12,6 +12,22 @@ export function useSelection<K extends keyof InstallationUiSelection>(
   return useHydratedStore(selectionAtoms[key], serverValue);
 }
 
+/** Read every installation pick, for islands that pass the whole selection on, such as to build a guide's URL. */
+export function useInstallationSelection(): InstallationUiSelection {
+  return {
+    framework: useSelection('framework'),
+    template: useSelection('template'),
+    project: useSelection('project'),
+    useCase: useSelection('useCase'),
+    skin: useSelection('skin'),
+    media: useSelection('media'),
+    extensions: useSelection('extensions'),
+    sourceUrl: useSelection('sourceUrl'),
+    installMethod: useSelection('installMethod'),
+    styling: useSelection('styling'),
+  };
+}
+
 function subscribeToNothing(): () => void {
   return () => {};
 }
