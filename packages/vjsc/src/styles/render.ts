@@ -40,12 +40,20 @@ const renderedFiles = new WeakMap<DesignSystem, Map<string, Promise<string>>>();
 const RENDERED_FILE_LIMIT = 1024;
 
 export async function renderStylesheets(options: RenderStylesheetsOptions): Promise<Map<string, string>> {
-  // Files render independently, so a render pool can work on all of them at once; the map keeps their order.
-  const rendered = await Promise.all(
+  // Files render independently, so a render pool can work on all of them at once. The map keeps their order, and a
+  // failure reports the earliest failed file in that order, as rendering them one by one would.
+  const rendered = await Promise.allSettled(
     options.files.map((file) => renderStylesheet(options.design, options.scope, file))
   );
+  const files = new Map<string, string>();
 
-  return new Map(options.files.map((file, index) => [file.name, rendered[index]!]));
+  for (const [index, result] of rendered.entries()) {
+    if (result.status === 'rejected') throw result.reason;
+
+    files.set(options.files[index]!.name, result.value);
+  }
+
+  return files;
 }
 
 function renderStylesheet(design: DesignSystem, scope: string | undefined, file: StyleOutputFile): Promise<string> {

@@ -18,12 +18,15 @@ describe('createRenderPool', () => {
     expect(results).toEqual(['.skin{a}', '.skin{b}', '.skin{c}']);
   });
 
-  it('rejects with the error the worker threw, keeping its name and message', async () => {
+  it('renders a job whose render failed on the main thread, which throws its error, and keeps the worker', async () => {
     const pool = createRenderPool(1, workerFile)!;
-    const failure = pool.render({ css: 'throw', scope: undefined, file }, () => 'in-process');
+    const error = new TypeError('Tailwind did not emit the semantic style.');
+    const failure = pool.render({ css: 'throw', scope: undefined, file }, () => {
+      throw error;
+    });
 
-    await expect(failure).rejects.toThrow('Tailwind did not emit the semantic style.');
-    await expect(failure).rejects.toMatchObject({ name: 'TypeError' });
+    await expect(failure).rejects.toBe(error);
+    await expect(pool.render({ css: 'a', scope: undefined, file }, () => 'in-process')).resolves.toBe('{a}');
   });
 
   it('renders on the main thread when a worker dies', async () => {
@@ -43,14 +46,15 @@ describe('createRenderPool', () => {
     expect(results).toEqual(['crash in process', 'queued in process']);
   });
 
-  it('renders on the main thread when a worker cannot start', async () => {
-    const unstartable = createRenderPool(1, 'relative-worker.js')!;
-    const missing = createRenderPool(1, resolve(import.meta.dirname, 'fixtures/missing-worker.mjs'))!;
+  it('renders on the main thread when a worker cannot load or exits while loading', async () => {
+    for (const worker of ['missing-worker.mjs', 'exiting-worker.mjs']) {
+      const pool = createRenderPool(1, resolve(import.meta.dirname, 'fixtures', worker))!;
+      const results = await Promise.all(
+        ['a', 'b'].map((css) => pool.render({ css, scope: undefined, file }, () => `${css} in process`))
+      );
 
-    await expect(unstartable.render({ css: 'a', scope: undefined, file }, () => 'in-process')).resolves.toBe(
-      'in-process'
-    );
-    await expect(missing.render({ css: 'a', scope: undefined, file }, () => 'in-process')).resolves.toBe('in-process');
+      expect(results).toEqual(['a in process', 'b in process']);
+    }
   });
 
   it('renders on the main thread when a job cannot be sent', async () => {

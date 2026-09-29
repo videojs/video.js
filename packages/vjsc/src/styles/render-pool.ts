@@ -14,19 +14,18 @@ export interface RenderJob {
   readonly file: StyleOutputFile;
 }
 
-/** An error a worker threw, in a form that crosses threads with its stack intact. */
-export interface SerializedError {
-  readonly name: string;
-  readonly message: string;
-  readonly stack?: string | undefined;
-}
-
-/** A worker's answer. Workers report render errors rather than throw them, so a failed job always means a failed worker. */
-export type RenderResult = { readonly css: string } | { readonly error: SerializedError };
+/**
+ * A worker's answer: the file's CSS, or `failed` when rendering it threw. Workers report render errors rather than
+ * throw them, so a rejected job always means a failed worker.
+ */
+export type RenderResult = { readonly css: string } | { readonly failed: true };
 
 export interface RenderPool {
-  /** Render one file on a worker, or in process with `fallback` when the workers fail. */
-  render(job: RenderJob, fallback: () => string): Promise<string>;
+  /**
+   * Render one file on a worker. `renderInProcess` renders it on the main thread instead: every job once the workers
+   * fail, and a job whose render failed, so its error is thrown there with its own class and fields.
+   */
+  render(job: RenderJob, renderInProcess: () => string): Promise<string>;
 }
 
 const WORKER_FILE = join(dirname(fileURLToPath(import.meta.url)), 'render-worker.js');
@@ -62,8 +61,8 @@ function workerCount(): number {
 export function createRenderPool(size: number, workerFile: string): RenderPool | null {
   if (size === 0) return null;
 
-  // Piscina rejects the jobs of a worker that exits, but a worker that fails to load leaves them pending, so a pool
-  // error aborts every job in flight.
+  // Piscina rejects the jobs of a worker that exits, but a worker that fails to load or exits before it is ready leaves
+  // them pending, so either aborts every job in flight.
   const failure = new AbortController();
   let pool: Piscina<RenderJob, RenderResult> | undefined;
 
@@ -75,8 +74,8 @@ export function createRenderPool(size: number, workerFile: string): RenderPool |
   };
 
   return {
-    async render(job, fallback) {
-      if (failure.signal.aborted) return fallback();
+    async render(job, renderInProcess) {
+      if (failure.signal.aborted) return renderInProcess();
 
       let result: RenderResult;
 
@@ -85,12 +84,11 @@ export function createRenderPool(size: number, workerFile: string): RenderPool |
         result = await pool.run(job, { signal: failure.signal });
       } catch {
         stop();
-        return fallback();
+        return renderInProcess();
       }
 
-      if ('css' in result) return result.css;
-
-      throw workerError(result.error);
+      // Rendering is pure, so the main thread fails the same way and throws the error itself.
+      return 'css' in result ? result.css : renderInProcess();
     },
   };
 }
@@ -103,17 +101,20 @@ function createPiscina(size: number, workerFile: string, stop: () => void): Pisc
     idleTimeout: IDLE_TIMEOUT,
   });
 
+  let ready = 0;
+  let removed = 0;
+
+  // Piscina announces each worker once it is ready and every worker it removes, so removing more than it announced
+  // means one was lost before it was ready.
+  pool.on('workerCreate', () => {
+    ready += 1;
+  });
+  pool.on('workerDestroy', () => {
+    removed += 1;
+
+    if (removed > ready) stop();
+  });
   pool.on('error', stop);
 
   return pool;
-}
-
-function workerError(serialized: SerializedError): Error {
-  const error = new Error(serialized.message);
-
-  error.name = serialized.name;
-
-  if (serialized.stack) error.stack = serialized.stack;
-
-  return error;
 }

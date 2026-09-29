@@ -5,9 +5,7 @@ import type { RenderJob, RenderResult } from './render-pool';
 export default function renderJob(job: RenderJob): RenderResult {
   try {
     return { css: renderCompiledFile(job.css, job.scope, job.file) };
-  } catch (error) {
-    const failure = error instanceof Error ? error : new Error(String(error));
-
-    return { error: { name: failure.name, message: failure.message, stack: failure.stack } };
+  } catch {
+    return { failed: true };
   }
 }
