@@ -16,19 +16,24 @@ export const baseConfig = {
     experimental: {
       nativeMagicString: true,
     },
-    // Every pack is unbundled, so each source file maps to one output file and
-    // `'use client'` stays at the top of it. The warning only applies to
-    // directives that get merged into a shared chunk.
-    onLog(level, log, defaultHandler) {
-      if (log.code === 'MODULE_LEVEL_DIRECTIVE') return;
-
-      defaultHandler(level, log);
-    },
   },
   // Matches `packages/<name>/dist` and bucketed `packages/<bucket>/<name>/dist`.
   ignoreWatch: [/[/\\]packages[/\\](?:[^/\\]+[/\\])?[^/\\]+[/\\]dist(?:[/\\]|$)/],
   report: process.env.CI === 'true',
 } satisfies PackUserConfig;
+
+/**
+ * Input options for unbundled packs. Each source file maps to one output file, so `'use client'` stays at the top of
+ * it; Rolldown's warning only applies to directives merged into a shared chunk. Bundled packs keep the warning.
+ */
+const unbundledInputOptions = {
+  ...baseConfig.inputOptions,
+  onLog(level, log, defaultHandler) {
+    if (log.code === 'MODULE_LEVEL_DIRECTIVE') return;
+
+    defaultHandler(level, log);
+  },
+} satisfies PackUserConfig['inputOptions'];
 
 /**
  * CSS options for packs that inline skin CSS through `?inline` imports, which tsdown transforms itself: without targets
@@ -42,6 +47,7 @@ export const inlineCssConfig = {
 export function packageBuildConfig(mode: PackageBuildMode, platform: 'browser' | 'neutral' = 'neutral') {
   return {
     ...baseConfig,
+    inputOptions: unbundledInputOptions,
     platform,
     format: 'es' as const,
     // The default build is unminified, so source maps add ~1,400 files to the
@@ -66,6 +72,7 @@ export function isDevBuildMode(mode: PackageBuildMode): boolean {
 /** Single-output packages (e.g. `@videojs/utils`) without dev/default splits. */
 export const neutralLibraryConfig = {
   ...baseConfig,
+  inputOptions: unbundledInputOptions,
   platform: 'neutral' as const,
   format: 'es' as const,
   sourcemap: true,
