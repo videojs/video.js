@@ -226,6 +226,121 @@ describe('parseStreamInfo', () => {
 
     expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(0.5);
   });
+  it('prefers HOLD-BACK over the TARGETDURATION fallback', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:2',
+      '#EXT-X-SERVER-CONTROL:HOLD-BACK=12',
+      '#EXTINF:2,',
+      'a.ts',
+    ].join('\n');
+
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(12);
+  });
+
+  it('prefers PART-HOLD-BACK over the PART-TARGET fallback', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:2',
+      '#EXT-X-SERVER-CONTROL:CAN-BLOCK-RELOAD=YES,PART-HOLD-BACK=2.171',
+      '#EXT-X-PART-INF:PART-TARGET=1.034',
+      '#EXTINF:2,',
+      'a.ts',
+    ].join('\n');
+
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(2.171);
+  });
+
+  it('ignores PART-HOLD-BACK when the playlist is not low latency', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:4',
+      '#EXT-X-SERVER-CONTROL:PART-HOLD-BACK=1.5',
+      '#EXTINF:4,',
+      'a.ts',
+    ].join('\n');
+
+    // No PART-INF, so the regular-latency rule applies and PART-HOLD-BACK is not the value to use.
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(12);
+  });
+
+  it('falls back to the multiples when SERVER-CONTROL carries neither hold-back', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:6',
+      '#EXT-X-SERVER-CONTROL:CAN-SKIP-UNTIL=36',
+      '#EXTINF:6,',
+      'a.ts',
+    ].join('\n');
+
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(18);
+  });
+
+  it('reads a hold-back written with surrounding whitespace', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:2',
+      '#EXT-X-SERVER-CONTROL: HOLD-BACK = 9 ',
+      '#EXTINF:2,',
+      'a.ts',
+    ].join('\n');
+
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(9);
+  });
+
+  it('does not read PART-HOLD-BACK as HOLD-BACK', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:3',
+      '#EXT-X-SERVER-CONTROL:PART-HOLD-BACK=1.5,HOLD-BACK=10',
+      '#EXTINF:3,',
+      'a.ts',
+    ].join('\n');
+
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(10);
+  });
+
+  it('leaves an on-demand playlist without an edge offset even with SERVER-CONTROL', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:2',
+      '#EXT-X-SERVER-CONTROL:HOLD-BACK=12',
+      '#EXTINF:2,',
+      'a.ts',
+      '#EXT-X-ENDLIST',
+    ].join('\n');
+
+    expect(parseStreamInfo(playlist)).toEqual({
+      targetLiveWindow: Number.NaN,
+      liveEdgeStartOffset: undefined,
+    });
+  });
+
+  it('falls back to the multiple when the declared hold-back is zero', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:4',
+      '#EXT-X-SERVER-CONTROL:HOLD-BACK=0',
+      '#EXTINF:4,',
+      'a.ts',
+    ].join('\n');
+
+    // The hls.js adapter reads an undeclared hold-back as 0, so a zero has to lose to the multiple on both paths.
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(12);
+  });
+
+  it('treats a hold-back that is not a plain number as absent', () => {
+    const playlist = [
+      '#EXTM3U',
+      '#EXT-X-TARGETDURATION:4',
+      '#EXT-X-SERVER-CONTROL:HOLD-BACK=1e1',
+      '#EXTINF:4,',
+      'a.ts',
+    ].join('\n');
+
+    // Reading the leading digits would silently yield 1 instead of the intended 10.
+    expect(parseStreamInfo(playlist).liveEdgeStartOffset).toBe(12);
+  });
 });
 
 describe('getStreamInfoFromSrc', () => {

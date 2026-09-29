@@ -60,13 +60,38 @@ export function resolveFirstMediaPlaylistUrl(multivariant: string, baseUrl: stri
 }
 
 /**
+ * Matches one attribute of a tag's comma-separated `key=value` list. The name is anchored to a delimiter so `HOLD-BACK`
+ * cannot read the value of `PART-HOLD-BACK`, and the value must run to a delimiter so a malformed one (`1e1`) reads as
+ * absent rather than silently truncating to its leading digits.
+ */
+function attributePattern(name: string): RegExp {
+  return new RegExp(String.raw`(?:^|[:,\s])${name}\s*=\s*([0-9.]+)\s*(?=[,]|$)`, 'i');
+}
+
+const PART_TARGET = attributePattern('PART-TARGET');
+const HOLD_BACK = attributePattern('HOLD-BACK');
+const PART_HOLD_BACK = attributePattern('PART-HOLD-BACK');
+
+/** Reads a numeric attribute out of one tag line, or `undefined` when it is absent or not a plain number. */
+function readAttribute(line: string, pattern: RegExp): number | undefined {
+  const match = pattern.exec(line);
+  if (!match) return undefined;
+
+  const value = Number(match[1]);
+
+  return Number.isFinite(value) ? value : undefined;
+}
+
+/**
  * Parses the subset of media-playlist tags needed to derive live edge state: `#EXT-X-PLAYLIST-TYPE`, `#EXT-X-ENDLIST`,
- * `#EXT-X-TARGETDURATION`, `#EXT-X-PART-INF`.
+ * `#EXT-X-TARGETDURATION`, `#EXT-X-PART-INF`, `#EXT-X-SERVER-CONTROL`.
  *
  * See spec: - VOD or `#EXT-X-ENDLIST` present → on-demand, `targetLiveWindow = NaN`. - `EVENT` playlist → DVR,
  * `targetLiveWindow = Infinity`. - Otherwise → standard live sliding window, `targetLiveWindow = 0`.
  *
- * The edge offset is `PART-TARGET * 2` for low-latency live and `TARGETDURATION * 3` otherwise.
+ * The edge offset is the hold-back the server declares, falling back to `PART-TARGET * 2` for low-latency live and
+ * `TARGETDURATION * 3` otherwise. A client is not meant to play closer to the end than the declared hold-back, so a
+ * declared value always wins over the multiple.
  */
 export function parseStreamInfo(playlist: string): StreamInfo {
   const lines = playlist.split(/\r?\n/);
@@ -75,6 +100,8 @@ export function parseStreamInfo(playlist: string): StreamInfo {
   let hasEndList = false;
   let targetDuration: number | undefined;
   let partTarget: number | undefined;
+  let holdBack: number | undefined;
+  let partHoldBack: number | undefined;
 
   for (const raw of lines) {
     const line = raw.trim();
@@ -88,13 +115,10 @@ export function parseStreamInfo(playlist: string): StreamInfo {
 
       if (Number.isFinite(value)) targetDuration = value;
     } else if (line.startsWith('#EXT-X-PART-INF')) {
-      const match = /PART-TARGET\s*=\s*([0-9.]+)/i.exec(line);
-
-      if (match) {
-        const value = Number(match[1]);
-
-        if (Number.isFinite(value)) partTarget = value;
-      }
+      partTarget = readAttribute(line, PART_TARGET) ?? partTarget;
+    } else if (line.startsWith('#EXT-X-SERVER-CONTROL')) {
+      partHoldBack = readAttribute(line, PART_HOLD_BACK) ?? partHoldBack;
+      holdBack = readAttribute(line, HOLD_BACK) ?? holdBack;
     }
   }
 
@@ -104,8 +128,13 @@ export function parseStreamInfo(playlist: string): StreamInfo {
 
   const targetLiveWindow = playlistType === 'EVENT' ? Number.POSITIVE_INFINITY : 0;
 
+  // Falsy rather than nullish, matching the hls.js adapter: its LevelDetails reads an undeclared hold-back as 0, so
+  // the multiple has to win over a zero. Low latency follows PART-INF here, where the hls.js path keys off the parsed
+  // part list; the two agree except on a playlist that declares PART-INF before publishing any part.
   const liveEdgeStartOffset =
-    partTarget !== undefined ? partTarget * 2 : targetDuration !== undefined ? targetDuration * 3 : undefined;
+    partTarget !== undefined
+      ? partHoldBack || partTarget * 2
+      : holdBack || (targetDuration !== undefined ? targetDuration * 3 : undefined);
 
   return { targetLiveWindow, liveEdgeStartOffset };
 }
