@@ -7,9 +7,7 @@ import { CaptionsButtonCore } from '../core';
 function createMediaState(overrides: Partial<MediaTextTrackState> = {}): MediaTextTrackState {
   return {
     chaptersCues: [],
-    thumbnailCues: [],
-    thumbnailTrackSrc: null,
-    thumbnailTrackCrossOrigin: null,
+    thumbnailsTrack: null,
     textTrackList: [],
     subtitlesShowing: false,
     toggleSubtitles: vi.fn(() => true),

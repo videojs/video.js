@@ -3,6 +3,7 @@ import type {
   MediaTextTrack,
   MediaTextTrackCapability,
   MediaTextTrackState,
+  MediaThumbnailsTrack,
   TextTrackLike,
 } from '@videojs/media';
 import {
@@ -11,8 +12,8 @@ import {
   isMediaTextTrackCapable,
   isQuerySelectorAllCapable,
 } from '@videojs/media';
-import { findTrackElement, isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
-import { isNil } from '@videojs/utils/predicate';
+import { findTrackElement, getCaptionOrSubtitleTracks, isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
+import { isNil, isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getCanonicalLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
@@ -20,6 +21,7 @@ import { clampCuesToDuration } from '../text-cues';
 
 interface IdentifiedTrack {
   id: string;
+  kind: string;
   track: TextTrackLike;
 }
 
@@ -27,15 +29,11 @@ function getTrackId(track: TextTrackLike, index: number): string {
   return track.id || `track:${index}:${track.kind}:${track.language}:${track.label}`;
 }
 
-/**
- * Caption/subtitle tracks paired with the ids exposed through `textTrackList`, ordered like the captions menu so
- * index-based fallbacks agree with the UI.
- */
+/** Caption/subtitle tracks paired with the ids exposed through `textTrackList`, in captions menu order. */
 function getSubtitlesTracks(media: MediaTextTrackCapability): IdentifiedTrack[] {
-  return Array.from(media.textTracks)
-    .map((track, index) => ({ id: getTrackId(track, index), track }))
-    .filter(({ track }) => isCaptionOrSubtitleTrack(track))
-    .sort((a, b) => (a.track.kind > b.track.kind ? 1 : a.track.kind < b.track.kind ? -1 : 0));
+  return getCaptionOrSubtitleTracks(
+    Array.from(media.textTracks, (track, index) => ({ id: getTrackId(track, index), kind: track.kind, track }))
+  );
 }
 
 /** Show at most one caption/subtitle track; passing `null` disables them all. */
@@ -51,7 +49,7 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
  * Map a media element's `crossOrigin` to a CORS mode. Per the CORS-settings attribute, any value other than
  * `use-credentials` is Anonymous — including the empty string and unknown keywords.
  */
-function toCorsMode(value: string | null | undefined): MediaTextTrackState['thumbnailTrackCrossOrigin'] {
+function toCorsMode(value: string | null | undefined): MediaThumbnailsTrack['crossOrigin'] {
   if (isNil(value)) return null;
 
   return value.toLowerCase() === 'use-credentials' ? 'use-credentials' : 'anonymous';
@@ -83,10 +81,6 @@ export const textTrackFeature = definePlayerFeature({
     let lastShownId: string | null = null;
 
     return {
-      chaptersCues: [],
-      thumbnailCues: [],
-      thumbnailTrackSrc: null,
-      thumbnailTrackCrossOrigin: null,
       textTrackList: [],
       subtitlesShowing: false,
       toggleSubtitles(forceShow?: boolean) {
@@ -119,14 +113,14 @@ export const textTrackFeature = definePlayerFeature({
 
         return true;
       },
-      selectSubtitlesTrack(value: string) {
+      selectSubtitlesTrack(id: string | null) {
         const { media } = target();
         if (!isMediaTextTrackCapable(media)) return;
 
         const subtitlesTracks = getSubtitlesTracks(media);
         if (!subtitlesTracks.length) return;
 
-        if (value === 'off') {
+        if (isNull(id)) {
           const showing = subtitlesTracks.find(({ track }) => track.mode === 'showing');
 
           if (showing) lastShownId = showing.id;
@@ -135,12 +129,14 @@ export const textTrackFeature = definePlayerFeature({
           return;
         }
 
-        const active = subtitlesTracks.find(({ id }) => id === value);
+        const active = subtitlesTracks.find((entry) => entry.id === id);
         if (!active) return;
 
         lastShownId = active.id;
         showOnly(subtitlesTracks, active.track);
       },
+      chaptersCues: [],
+      thumbnailsTrack: null,
     };
   },
 
@@ -155,7 +151,7 @@ export const textTrackFeature = definePlayerFeature({
       trackCleanup = new AbortController();
 
       let chaptersTrack: TextTrackLike | null = null;
-      let thumbnailTrack: TextTrackLike | null = null;
+      let thumbnailsTextTrack: TextTrackLike | null = null;
       const textTrackList: MediaTextTrack[] = [];
       let subtitlesShowing = false;
 
@@ -164,7 +160,9 @@ export const textTrackFeature = definePlayerFeature({
 
         if (!chaptersTrack && track.kind === 'chapters') chaptersTrack = track;
 
-        if (!thumbnailTrack && track.kind === 'metadata' && track.label === 'thumbnails') thumbnailTrack = track;
+        if (!thumbnailsTextTrack && track.kind === 'metadata' && track.label === 'thumbnails') {
+          thumbnailsTextTrack = track;
+        }
 
         textTrackList.push({
           id: getTrackId(track, i),
@@ -182,22 +180,19 @@ export const textTrackFeature = definePlayerFeature({
       // The last chapter of an in-stream chapters document is open-ended on the
       // track; consumers read it ending where the media does.
       const chaptersCues = clampCuesToDuration(chaptersTrack?.cues, isMediaSeekCapable(media) ? media.duration : NaN);
-      // VTTCue extends TextTrackCue with `text` — cast via `unknown` since
-      // the CueList is typed as TextTrackCue which doesn't expose `text`.
-      const thumbnailCues: MediaTextCue[] = thumbnailTrack?.cues
-        ? (Array.from(thumbnailTrack.cues) as unknown as MediaTextCue[])
-        : [];
 
-      let thumbnailTrackSrc: string | null = null;
-      let thumbnailTrackCrossOrigin: MediaTextTrackState['thumbnailTrackCrossOrigin'] = null;
+      let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
-      if (thumbnailTrack) {
-        const el = findTrackElement(media, thumbnailTrack);
-
-        thumbnailTrackSrc = el?.src ?? null;
-        // Read the host rather than any inner native element: for a custom media
-        // element the attribute lives on the host and is forwarded inward.
-        thumbnailTrackCrossOrigin = isMediaSourceCapable(media) ? toCorsMode(media.crossOrigin) : null;
+      if (thumbnailsTextTrack) {
+        thumbnailsTrack = {
+          // VTTCue extends TextTrackCue with `text` — cast via `unknown` since
+          // the CueList is typed as TextTrackCue which doesn't expose `text`.
+          cues: thumbnailsTextTrack.cues ? (Array.from(thumbnailsTextTrack.cues) as unknown as MediaTextCue[]) : [],
+          src: findTrackElement(media, thumbnailsTextTrack)?.src ?? null,
+          // Read the host rather than any inner native element: for a custom media
+          // element the attribute lives on the host and is forwarded inward.
+          crossOrigin: isMediaSourceCapable(media) ? toCorsMode(media.crossOrigin) : null,
+        };
       }
 
       // Listen for <track> load events on tracks that don't have cues yet.
@@ -213,12 +208,10 @@ export const textTrackFeature = definePlayerFeature({
       }
 
       set({
-        chaptersCues,
-        thumbnailCues,
-        thumbnailTrackSrc,
-        thumbnailTrackCrossOrigin,
         textTrackList,
         subtitlesShowing,
+        chaptersCues,
+        thumbnailsTrack,
       });
     };
 

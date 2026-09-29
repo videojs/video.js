@@ -82,10 +82,15 @@ const {
       pause: vi.fn(),
     },
     mockTextTrackState: {
+      textTrackList: [],
+      subtitlesShowing: false,
+      toggleSubtitles: vi.fn(() => false),
+      selectSubtitlesTrack: vi.fn(),
       chaptersCues: [
         { id: 'first', startTime: 0, endTime: 40, text: 'First' },
         { id: 'second', startTime: 60, endTime: 120, text: 'Second' },
       ],
+      thumbnailsTrack: null,
     },
     mockNoBuffer: { value: false },
     capturedSliderOptions,

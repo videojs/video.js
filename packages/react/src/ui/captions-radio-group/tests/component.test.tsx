@@ -27,7 +27,7 @@ function renderCaptionsRadioGroup({
 }: {
   textTrackList?: readonly { id: string; kind: string; label: string; language: string; mode: string }[];
   subtitlesShowing?: boolean;
-  selectSubtitlesTrack?: (value: string) => void;
+  selectSubtitlesTrack?: (id: string | null) => void;
   locale?: string;
   group?: React.ReactNode;
 } = {}) {
@@ -36,9 +36,7 @@ function renderCaptionsRadioGroup({
     subtitlesShowing,
     selectSubtitlesTrack,
     chaptersCues: [],
-    thumbnailCues: [],
-    thumbnailTrackSrc: null,
-    thumbnailTrackCrossOrigin: null,
+    thumbnailsTrack: null,
     toggleSubtitles: vi.fn(),
   });
   const content = (

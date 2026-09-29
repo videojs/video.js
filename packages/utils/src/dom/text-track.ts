@@ -5,6 +5,14 @@ export function isCaptionOrSubtitleTrack(track: { kind: string }): track is { ki
   return track.kind === 'captions' || track.kind === 'subtitles';
 }
 
+/**
+ * Captions and subtitles tracks in the order menus present them: grouped by kind, keeping source order within a kind.
+ * Shared so selection fallbacks pick the same track the captions menu lists first.
+ */
+export function getCaptionOrSubtitleTracks<Track extends { kind: string }>(tracks: Iterable<Track>): Track[] {
+  return Array.from(tracks).filter(isCaptionOrSubtitleTrack).sort(sortByKind);
+}
+
 /** Find the `<track>` element that owns the given `TextTrack`. */
 export function findTrackElement(media: EventTarget, track: unknown): HTMLTrackElement | null {
   if (!(media instanceof HTMLElement)) return null;

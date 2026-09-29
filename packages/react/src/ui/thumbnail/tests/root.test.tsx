@@ -1,5 +1,5 @@
 import { cleanup, render } from '@testing-library/react';
-import type { MediaTextTrackState } from '@videojs/media';
+import type { MediaThumbnailsTrack } from '@videojs/media';
 import { createRef, type ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -8,12 +8,10 @@ import { createPlayerWrapper } from '../../../testing/mocks';
 
 afterEach(cleanup);
 
-function wrapper(thumbnailTrackCrossOrigin: MediaTextTrackState['thumbnailTrackCrossOrigin'] = null) {
+function wrapper(crossOrigin: MediaThumbnailsTrack['crossOrigin'] = null) {
   return createPlayerWrapper({
     chaptersCues: [],
-    thumbnailCues: [],
-    thumbnailTrackSrc: null,
-    thumbnailTrackCrossOrigin,
+    thumbnailsTrack: { cues: [], src: null, crossOrigin },
     textTrackList: [],
     subtitlesShowing: false,
     toggleSubtitles: vi.fn(),
@@ -40,12 +38,12 @@ function DefaultThumbnail({
 
 /** Render a thumbnail and return the `crossorigin` attribute on its image. */
 function renderCrossOrigin(
-  thumbnailTrackCrossOrigin: MediaTextTrackState['thumbnailTrackCrossOrigin'],
+  crossOrigin: MediaThumbnailsTrack['crossOrigin'],
   imageProps: Thumbnail.ImageProps = {},
   rootProps: Thumbnail.RootProps = {}
 ): string | null {
   const { container } = render(<DefaultThumbnail rootProps={rootProps} imageProps={imageProps} />, {
-    wrapper: wrapper(thumbnailTrackCrossOrigin),
+    wrapper: wrapper(crossOrigin),
   });
 
   return container.querySelector('[data-testid="image"]')!.getAttribute('crossorigin');

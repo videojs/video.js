@@ -162,9 +162,11 @@ export class ThumbnailElement extends UIElement {
       this.#thumbnails = this.#externalThumbnails;
     } else if (textTrack !== this.#lastTextTrack) {
       this.#lastTextTrack = textTrack;
+      const thumbnailsTrack = textTrack?.thumbnailsTrack;
+
       this.#thumbnails =
-        textTrack && textTrack.thumbnailCues.length > 0
-          ? mapCuesToThumbnails(textTrack.thumbnailCues, textTrack.thumbnailTrackSrc ?? undefined)
+        thumbnailsTrack && thumbnailsTrack.cues.length > 0
+          ? mapCuesToThumbnails(thumbnailsTrack.cues, thumbnailsTrack.src ?? undefined)
           : [];
     }
 
@@ -211,7 +213,7 @@ export class ThumbnailElement extends UIElement {
    * may point at a host that has nothing to do with the media element.
    */
   #inheritedCrossOrigin(textTrack: MediaTextTrackState | undefined): ThumbnailCore.Props['crossOrigin'] {
-    return this.#externalThumbnails ? undefined : textTrack?.thumbnailTrackCrossOrigin;
+    return this.#externalThumbnails ? undefined : textTrack?.thumbnailsTrack?.crossOrigin;
   }
 
   /** Sync image attributes from element properties, leaving the ones the author put on the image alone. */

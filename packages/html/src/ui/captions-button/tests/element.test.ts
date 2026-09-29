@@ -39,9 +39,7 @@ function createTextTrackStore(textTrackList: MediaTextTrackState['textTrackList'
     name: 'textTrack',
     state: () => ({
       chaptersCues: [],
-      thumbnailCues: [],
-      thumbnailTrackSrc: null,
-      thumbnailTrackCrossOrigin: null,
+      thumbnailsTrack: null,
       textTrackList,
       subtitlesShowing: false,
       toggleSubtitles: vi.fn(),

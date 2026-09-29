@@ -1,5 +1,4 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { CAPTIONS_OFF_VALUE } from '@videojs/core';
 import { registerI18n, resetI18nRegistry } from '@videojs/core/i18n';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
@@ -26,7 +25,7 @@ function renderCaptionsMenu({
 }: {
   textTrackList?: readonly { id: string; kind: string; label: string; language: string; mode: string }[];
   subtitlesShowing?: boolean;
-  selectSubtitlesTrack?: (value: string) => void;
+  selectSubtitlesTrack?: (id: string | null) => void;
   locale?: string | undefined;
 } = {}) {
   const { Wrapper } = createPlayerWrapper({
@@ -34,9 +33,7 @@ function renderCaptionsMenu({
     subtitlesShowing,
     selectSubtitlesTrack,
     chaptersCues: [],
-    thumbnailCues: [],
-    thumbnailTrackSrc: null,
-    thumbnailTrackCrossOrigin: null,
+    thumbnailsTrack: null,
     toggleSubtitles: vi.fn(),
   });
   const content = (
@@ -165,15 +162,13 @@ describe('useCaptionsOptions', () => {
 
     fireEvent.click(screen.getByRole('menuitemradio', { name: 'Off' }));
 
-    expect(selectSubtitlesTrack).toHaveBeenCalledWith(CAPTIONS_OFF_VALUE);
+    expect(selectSubtitlesTrack).toHaveBeenCalledWith(null);
   });
 
   it('updates when caption tracks become available', () => {
     const { Wrapper, updateState } = createReactiveTextTrackWrapper({
       chaptersCues: [],
-      thumbnailCues: [],
-      thumbnailTrackSrc: null,
-      thumbnailTrackCrossOrigin: null,
+      thumbnailsTrack: null,
       textTrackList: [],
       subtitlesShowing: false,
       selectSubtitlesTrack: vi.fn(),
@@ -187,9 +182,7 @@ describe('useCaptionsOptions', () => {
     act(() => {
       updateState({
         chaptersCues: [],
-        thumbnailCues: [],
-        thumbnailTrackSrc: null,
-        thumbnailTrackCrossOrigin: null,
+        thumbnailsTrack: null,
         textTrackList: [
           { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
           { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },

@@ -1,6 +1,6 @@
 import type { AnyPlayerStore } from '@videojs/core/dom';
 import { ContextProvider } from '@videojs/element/context';
-import type { MediaTextTrackState } from '@videojs/media';
+import type { MediaTextTrackState, MediaThumbnailsTrack } from '@videojs/media';
 import { createStore } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -8,16 +8,12 @@ import { playerContext } from '../../../player/context';
 import { UIElement } from '../../ui-element';
 import { ThumbnailElement } from '../element';
 
-function createTextTrackStore(
-  thumbnailTrackCrossOrigin: MediaTextTrackState['thumbnailTrackCrossOrigin']
-): AnyPlayerStore {
+function createTextTrackStore(crossOrigin: MediaThumbnailsTrack['crossOrigin']): AnyPlayerStore {
   return createStore<unknown>()<MediaTextTrackState>({
     name: 'textTrack',
     state: () => ({
       chaptersCues: [],
-      thumbnailCues: [],
-      thumbnailTrackSrc: null,
-      thumbnailTrackCrossOrigin,
+      thumbnailsTrack: { cues: [], src: null, crossOrigin },
       textTrackList: [],
       subtitlesShowing: false,
       toggleSubtitles: vi.fn(),
@@ -52,7 +48,7 @@ function nextFrame(): Promise<void> {
  * than reading the first one.
  */
 async function renderCrossOrigin(
-  mediaCrossOrigin: MediaTextTrackState['thumbnailTrackCrossOrigin'],
+  mediaCrossOrigin: MediaThumbnailsTrack['crossOrigin'],
   configure?: (el: ThumbnailElement) => void
 ): Promise<string | null> {
   const provider = document.createElement('test-thumbnail-player') as TestPlayerProviderElement;

@@ -23,9 +23,7 @@ function renderCaptionsTrigger({
     subtitlesShowing: true,
     selectSubtitlesTrack: vi.fn(),
     chaptersCues: [],
-    thumbnailCues: [],
-    thumbnailTrackSrc: null,
-    thumbnailTrackCrossOrigin: null,
+    thumbnailsTrack: null,
     toggleSubtitles,
   });
 
@@ -49,9 +47,7 @@ describe('CaptionsButton', () => {
       subtitlesShowing: false,
       selectSubtitlesTrack: vi.fn(),
       chaptersCues: [],
-      thumbnailCues: [],
-      thumbnailTrackSrc: null,
-      thumbnailTrackCrossOrigin: null,
+      thumbnailsTrack: null,
       toggleSubtitles: vi.fn(),
     });
 
@@ -91,9 +87,7 @@ describe('CaptionsButton', () => {
       subtitlesShowing: true,
       selectSubtitlesTrack: vi.fn(),
       chaptersCues: [],
-      thumbnailCues: [],
-      thumbnailTrackSrc: null,
-      thumbnailTrackCrossOrigin: null,
+      thumbnailsTrack: null,
       toggleSubtitles,
     });
 

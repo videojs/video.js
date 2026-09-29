@@ -310,30 +310,40 @@ export interface MediaTextTrack<Kind extends string = TextTrackKind> {
   mode: TextTrackMode;
 }
 
-export interface MediaTextTrackState {
-  /** Cues from the first `kind="chapters"` track. */
-  chaptersCues: MediaTextCue[];
-  /** Cues from the first `kind="metadata" label="thumbnails"` track. */
-  thumbnailCues: MediaTextCue[];
+/** The first `kind="metadata" label="thumbnails"` track. */
+export interface MediaThumbnailsTrack {
+  /** The track's cues, whose text points at thumbnail images. */
+  cues: MediaTextCue[];
   /** The `<track>` element's `src` for resolving relative cue text URLs. */
-  thumbnailTrackSrc: string | null;
+  src: string | null;
   /**
    * The media element's CORS mode, mapped through the CORS-settings-attribute rules, or `null` when it is not in CORS
    * mode. Thumbnail UI fetches the sprite sheets the cues point at with this mode, since a cross-origin `<track>` only
    * loads at all when the media element is CORS-enabled.
    */
-  thumbnailTrackCrossOrigin: 'anonymous' | 'use-credentials' | null;
+  crossOrigin: 'anonymous' | 'use-credentials' | null;
+}
+
+/**
+ * Text track state. Member prefixes follow the authored track identity: `subtitles` covers `kind="captions"` and
+ * `kind="subtitles"`, `chapters` is `kind="chapters"`, and `thumbnails` is `label="thumbnails"`.
+ */
+export interface MediaTextTrackState {
   /** All text tracks available on the media element. */
   textTrackList: MediaTextTrack[];
-  /** Whether captions/subtitles are currently enabled. */
+  /** Whether a captions/subtitles track is showing. */
   subtitlesShowing: boolean;
   /**
    * Toggle captions/subtitles visibility. Showing restores the track that was last showing, or the first
    * caption/subtitle track when there is none. Returns the new enabled value.
    */
   toggleSubtitles(forceShow?: boolean): boolean;
-  /** Select a captions/subtitles track by `id`, or disable with `"off"`. */
-  selectSubtitlesTrack(id: string): void;
+  /** Show the captions/subtitles track with `id`, or turn captions/subtitles off with `null`. */
+  selectSubtitlesTrack(id: string | null): void;
+  /** Cues from the first `kind="chapters"` track, with cue ends clamped to a finite media duration. */
+  chaptersCues: MediaTextCue[];
+  /** The first thumbnails track, or `null` when there is none. */
+  thumbnailsTrack: MediaThumbnailsTrack | null;
 }
 
 export interface MediaErrorState {

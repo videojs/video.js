@@ -202,7 +202,7 @@ function CaptionsPersistence() {
       if (saved && (desired || saved === 'off')) {
         const applied = subtitles.every((t) => (t.mode === 'showing') === (t.id === desired?.id));
         if (!applied) {
-          store.selectSubtitlesTrack(desired?.id ?? 'off');
+          store.selectSubtitlesTrack(desired?.id ?? null);
           return;
         }
       }
@@ -222,7 +222,7 @@ function CaptionsPersistence() {
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Apply the same pattern with `selectTextTrack(store.state)` inside `store.subscribe`: until `canPlay` is true, re-apply the saved preference by passing the matching track's `id` (or `'off'`) to `selectSubtitlesTrack` whenever the modes drift; afterward, save the showing track's `language`, or `'off'` when none is showing, on every change.
+Apply the same pattern with `selectTextTrack(store.state)` inside `store.subscribe`: until `canPlay` is true, re-apply the saved preference by passing the matching track's `id` (or `null`) to `selectSubtitlesTrack` whenever the modes drift; afterward, save the showing track's `language`, or `'off'` when none is showing, on every change.
 
 </FrameworkCase>
 

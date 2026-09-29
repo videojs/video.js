@@ -6,9 +6,7 @@ import { CAPTIONS_OFF_VALUE, CaptionsRadioGroupCore, type CaptionsRadioGroupStat
 function createMediaState(overrides: Partial<MediaTextTrackState> = {}): MediaTextTrackState {
   return {
     chaptersCues: [],
-    thumbnailCues: [],
-    thumbnailTrackSrc: null,
-    thumbnailTrackCrossOrigin: null,
+    thumbnailsTrack: null,
     textTrackList: [],
     subtitlesShowing: false,
     toggleSubtitles: vi.fn(() => true),
@@ -210,7 +208,7 @@ describe('CaptionsRadioGroupCore', () => {
       });
 
       core.select(media, CAPTIONS_OFF_VALUE);
-      expect(media.selectSubtitlesTrack).toHaveBeenCalledWith(CAPTIONS_OFF_VALUE);
+      expect(media.selectSubtitlesTrack).toHaveBeenCalledWith(null);
     });
 
     it('does nothing when disabled', () => {

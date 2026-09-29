@@ -12,7 +12,7 @@ Manages subtitles, captions, chapters, and thumbnail tracks.
 
 A default `kind="chapters"` track can also divide the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> into chapter ranges and label the chapter at the current interaction position.
 
-When a thumbnail track is present, `thumbnailTrackCrossOrigin` reports the media element's CORS mode, or `null` when the media is not CORS-enabled. <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink> reads it to fetch sprite sheets the same way the browser fetched the track.
+`thumbnailsTrack` is the first `kind="metadata"` track labeled `thumbnails`, or `null` when there is none. Its `crossOrigin` reports the media element's CORS mode, or `null` when the media is not CORS-enabled. <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink> reads it to fetch sprite sheets the same way the browser fetched the track.
 
 ## Import
 

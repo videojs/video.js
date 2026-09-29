@@ -63,8 +63,10 @@ export const ThumbnailRoot = forwardRef(function ThumbnailRoot(
   const thumbnails = useMemo(() => {
     if (externalThumbnails && externalThumbnails.length > 0) return externalThumbnails;
 
-    return textTrack && textTrack.thumbnailCues.length > 0
-      ? mapCuesToThumbnails(textTrack.thumbnailCues, textTrack.thumbnailTrackSrc ?? undefined)
+    const thumbnailsTrack = textTrack?.thumbnailsTrack;
+
+    return thumbnailsTrack && thumbnailsTrack.cues.length > 0
+      ? mapCuesToThumbnails(thumbnailsTrack.cues, thumbnailsTrack.src ?? undefined)
       : [];
   }, [externalThumbnails, textTrack]);
 
@@ -105,7 +107,7 @@ export const ThumbnailRoot = forwardRef(function ThumbnailRoot(
         src: thumbnail?.url,
         imageStyle,
         // Only `<track>`-sourced thumbnails follow the media element's CORS mode.
-        inheritedCrossOrigin: externalThumbnails?.length ? undefined : textTrack?.thumbnailTrackCrossOrigin,
+        inheritedCrossOrigin: externalThumbnails?.length ? undefined : textTrack?.thumbnailsTrack?.crossOrigin,
         imageRef,
       }}
     >

@@ -61,8 +61,8 @@ The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsL
 
 - `textTrackList` holds every track with its `id`, `kind`, `label`, `language`, and `mode`.
 - `subtitlesShowing` is `true` when any caption or subtitle track is showing.
-- `toggleSubtitles(forceShow?)` shows or hides all caption and subtitle tracks.
-- `selectSubtitlesTrack(id)` shows one track and disables the rest; pass `'off'` to disable all.
+- `toggleSubtitles(forceShow?)` hides every caption and subtitle track, or shows one: the last track shown, a track matching the browser language, or the first track.
+- `selectSubtitlesTrack(id)` shows one track and disables the rest; pass `null` to disable all.
 
 Tracks don't have to come from `<track>` elements: tracks that streaming media exposes (for example in-manifest HLS captions) appear in `textTrackList` the same way.
 

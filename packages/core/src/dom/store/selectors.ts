@@ -46,7 +46,7 @@ export const selectRemotePlayback = createSelector(remotePlaybackFeature);
 export const selectSource = createSelector(sourceFeature);
 /** Select the stream type state (`'on-demand' | 'live' | 'unknown'`). */
 export const selectStreamType = createSelector(streamTypeFeature);
-/** Select the text track state (chapters cues, thumbnail cues). */
+/** Select the text track state (textTrackList, subtitles, chaptersCues, thumbnailsTrack). */
 export const selectTextTrack = createSelector(textTrackFeature);
 /** Select the time state (currentTime, duration, seek). */
 export const selectTime = createSelector(timeFeature);

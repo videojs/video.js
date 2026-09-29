@@ -96,13 +96,13 @@ Compose `Slider.Thumbnail.Root` around `Slider.Thumbnail.Image`, and put image s
 ## How it works
 
 <FrameworkCase frameworks={["react"]}>
-- Previews come from a storyboard: a `kind="metadata"` text track labeled `thumbnails` whose WebVTT cues map time ranges to image URLs (optionally with sprite coordinates). The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> exposes these as `thumbnailCues` and `thumbnailTrackSrc`.
+- Previews come from a storyboard: a `kind="metadata"` text track labeled `thumbnails` whose WebVTT cues map time ranges to image URLs (optionally with sprite coordinates). The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> exposes this track as `thumbnailsTrack`, with its `cues` and `src`.
 - The slider thumbnail renders the storyboard frame for the slider's pointer position. While the pointer is over the slider, the slider sets `data-pointing` and the `--media-slider-pointer` CSS variable; the example's CSS uses them to reveal the preview and position it over the pointer.
 - To render a storyboard frame outside the slider — a fixed preview for a chapter list, for example — use the standalone <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink> component with an explicit `time`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-- Previews come from a storyboard: a `kind="metadata"` text track labeled `thumbnails` whose WebVTT cues map time ranges to image URLs (optionally with sprite coordinates). The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> exposes these as `thumbnailCues` and `thumbnailTrackSrc`.
+- Previews come from a storyboard: a `kind="metadata"` text track labeled `thumbnails` whose WebVTT cues map time ranges to image URLs (optionally with sprite coordinates). The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> exposes this track as `thumbnailsTrack`, with its `cues` and `src`.
 - The slider thumbnail renders the storyboard frame for the slider's pointer position. While the pointer is over the slider, the slider sets `data-pointing` and the `--media-slider-pointer` CSS variable; the example's CSS uses them to reveal the preview and position it over the pointer.
 - To render a storyboard frame outside the slider — a fixed preview for a chapter list, for example — use the standalone <DocsLink slug="reference/components/thumbnail">`<media-thumbnail>`</DocsLink> element with an explicit `time`.
 </FrameworkCase>

@@ -60,33 +60,64 @@ describe('textTrackFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.chaptersCues).toEqual([]);
-      expect(store.state.thumbnailCues).toEqual([]);
-      expect(store.state.thumbnailTrackSrc).toBeNull();
-      expect(store.state.thumbnailTrackCrossOrigin).toBeNull();
       expect(store.state.textTrackList).toEqual([]);
       expect(store.state.subtitlesShowing).toBe(false);
+      expect(store.state.chaptersCues).toEqual([]);
+      expect(store.state.thumbnailsTrack).toBeNull();
     });
   });
 
-  describe('thumbnailTrackCrossOrigin', () => {
+  describe('thumbnailsTrack', () => {
     /**
-     * Resolve the state for a media element carrying a thumbnail track. Uses `mockTextTracks` rather than
-     * `addTextTrack`, which jsdom implements as a no-op that never populates `textTracks`.
+     * Attach to a media element carrying the given tracks. Uses `mockTextTracks` rather than `addTextTrack`, which
+     * jsdom implements as a no-op that never populates `textTracks`.
      */
-    function crossOriginFor(crossOrigin: string | undefined, kind: TextTrackKind = 'metadata') {
+    function attachWithTracks(tracks: TextTrack[], crossOrigin?: string) {
       const video = createVideo();
 
       if (crossOrigin !== undefined) video.setAttribute('crossorigin', crossOrigin);
 
-      mockTextTracks(video, [createMockTrack(kind, 'disabled', { label: 'thumbnails' })]);
+      mockTextTracks(video, tracks);
 
       const store = createStore<PlayerTarget>()(textTrackFeature);
 
       store.attach({ media: video, container: null });
 
-      return store.state.thumbnailTrackCrossOrigin;
+      return store;
     }
+
+    function crossOriginFor(crossOrigin: string | undefined) {
+      const store = attachWithTracks([createMockTrack('metadata', 'disabled', { label: 'thumbnails' })], crossOrigin);
+
+      return store.state.thumbnailsTrack?.crossOrigin;
+    }
+
+    it('exposes the cues of a metadata track labeled thumbnails', () => {
+      const cues = [createCue(0, 5, 'sprite.jpg#xywh=0,0,160,90')];
+      const store = attachWithTracks([createMockTrack('metadata', 'hidden', { label: 'thumbnails', cues })]);
+
+      expect(store.state.thumbnailsTrack).toEqual({ cues, src: null, crossOrigin: null });
+    });
+
+    it('is null when no metadata track is labeled thumbnails', () => {
+      const store = attachWithTracks([
+        createMockTrack('metadata', 'hidden', { label: 'ad-cues' }),
+        createMockTrack('subtitles', 'disabled', { label: 'thumbnails' }),
+      ]);
+
+      expect(store.state.thumbnailsTrack).toBeNull();
+    });
+
+    it('uses the first thumbnails track when several exist', () => {
+      const first = [createCue(0, 5, 'first.jpg')];
+      const second = [createCue(0, 5, 'second.jpg')];
+      const store = attachWithTracks([
+        createMockTrack('metadata', 'hidden', { label: 'thumbnails', cues: first }),
+        createMockTrack('metadata', 'hidden', { label: 'thumbnails', cues: second }),
+      ]);
+
+      expect(store.state.thumbnailsTrack?.cues).toEqual(first);
+    });
 
     it('reports the media element CORS mode', () => {
       expect(crossOriginFor('anonymous')).toBe('anonymous');
@@ -102,12 +133,8 @@ describe('textTrackFeature', () => {
       expect(crossOriginFor('USE-CREDENTIALS')).toBe('use-credentials');
     });
 
-    it('is null when the media element is not in CORS mode', () => {
+    it('reports a null CORS mode when the media element is not in CORS mode', () => {
       expect(crossOriginFor(undefined)).toBeNull();
-    });
-
-    it('is null when there is no thumbnail track to inherit for', () => {
-      expect(crossOriginFor('anonymous', 'subtitles')).toBeNull();
     });
   });
 
@@ -201,40 +228,11 @@ describe('textTrackFeature', () => {
       expect(store.state.chaptersCues).toEqual([]);
     });
 
-    it('detects thumbnail track by kind and label', () => {
-      const video = createVideo();
-
-      video.addTextTrack('metadata', 'thumbnails', 'en');
-
-      const store = createStore<PlayerTarget>()(textTrackFeature);
-
-      store.attach({ media: video, container: null });
-
-      // Track detected, but no cues or <track> element for src
-      expect(store.state.thumbnailCues).toEqual([]);
-      expect(store.state.thumbnailTrackSrc).toBeNull();
-    });
-
-    it('ignores metadata tracks without thumbnails label', () => {
-      const video = createVideo();
-
-      video.addTextTrack('metadata', 'ad-cues', 'en');
-
-      const store = createStore<PlayerTarget>()(textTrackFeature);
-
-      store.attach({ media: video, container: null });
-
-      expect(store.state.thumbnailCues).toEqual([]);
-      expect(store.state.thumbnailTrackSrc).toBeNull();
-    });
-
-    it('prefers first matching track when multiple exist', () => {
+    it('prefers first matching chapters track when multiple exist', () => {
       const video = createVideo();
 
       video.addTextTrack('chapters', 'Ch1', 'en');
       video.addTextTrack('chapters', 'Ch2', 'fr');
-      video.addTextTrack('metadata', 'thumbnails', 'en');
-      video.addTextTrack('metadata', 'thumbnails', 'fr');
 
       const store = createStore<PlayerTarget>()(textTrackFeature);
 
@@ -242,7 +240,6 @@ describe('textTrackFeature', () => {
 
       // Should not error with multiple matching tracks
       expect(store.state.chaptersCues).toEqual([]);
-      expect(store.state.thumbnailCues).toEqual([]);
     });
 
     it('resyncs on loadstart event', () => {
@@ -252,18 +249,13 @@ describe('textTrackFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      // Add a track programmatically (won't trigger textTracks event in jsdom)
-      video.addTextTrack('metadata', 'thumbnails', 'en');
-
-      // Dispatch loadstart to trigger resync
+      mockTextTracks(video, [createMockTrack('metadata', 'hidden', { label: 'thumbnails' })]);
       video.dispatchEvent(new Event('loadstart'));
 
-      // After loadstart, the new track should be detected
-      expect(store.state.thumbnailCues).toEqual([]);
-      expect(store.state.thumbnailTrackSrc).toBeNull();
+      expect(store.state.thumbnailsTrack).not.toBeNull();
     });
 
-    it('resolves thumbnailTrackSrc from track element', () => {
+    it('resolves the thumbnails track src from its track element', () => {
       const video = createVideo();
       const trackEl = document.createElement('track');
 
@@ -284,8 +276,10 @@ describe('textTrackFeature', () => {
       // entries, so check if the src was resolved.
       // Note: jsdom support for this varies; the feature is validated
       // in real browsers via Playwright.
-      if (store.state.thumbnailTrackSrc !== null) {
-        expect(store.state.thumbnailTrackSrc).toBe('https://cdn.example.com/thumbnails.vtt');
+      const src = store.state.thumbnailsTrack?.src;
+
+      if (src) {
+        expect(src).toBe('https://cdn.example.com/thumbnails.vtt');
       }
     });
 
@@ -448,7 +442,7 @@ describe('textTrackFeature', () => {
       store.attach({ media: video, container: null });
 
       store.state.selectSubtitlesTrack('subtitles-de');
-      store.state.selectSubtitlesTrack('off');
+      store.state.selectSubtitlesTrack(null);
 
       expect(store.state.toggleSubtitles()).toBe(true);
       expect(englishTrack.mode).toBe('disabled');
@@ -523,7 +517,7 @@ describe('textTrackFeature', () => {
       expect(spanishTrack.mode).toBe('showing');
     });
 
-    it('selectSubtitlesTrack("off") disables all caption tracks', () => {
+    it('selectSubtitlesTrack(null) disables all caption tracks', () => {
       const video = createVideo();
       const englishTrack = createMockTrack('subtitles', 'showing');
       const spanishTrack = createMockTrack('subtitles', 'disabled');
@@ -534,10 +528,25 @@ describe('textTrackFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      store.state.selectSubtitlesTrack('off');
+      store.state.selectSubtitlesTrack(null);
 
       expect(englishTrack.mode).toBe('disabled');
       expect(spanishTrack.mode).toBe('disabled');
+    });
+
+    it('selectSubtitlesTrack() selects a track whose id is "off"', () => {
+      const video = createVideo();
+      const offTrack = createMockTrack('subtitles', 'disabled', { id: 'off' });
+
+      mockTextTracks(video, [offTrack]);
+
+      const store = createStore<PlayerTarget>()(textTrackFeature);
+
+      store.attach({ media: video, container: null });
+
+      store.state.selectSubtitlesTrack('off');
+
+      expect(offTrack.mode).toBe('showing');
     });
 
     it('stops updating after destroy', () => {
@@ -548,12 +557,10 @@ describe('textTrackFeature', () => {
 
       store.destroy();
 
-      // Add tracks after destroy
-      video.addTextTrack('metadata', 'thumbnails', 'en');
+      mockTextTracks(video, [createMockTrack('metadata', 'hidden', { label: 'thumbnails' })]);
       video.dispatchEvent(new Event('loadstart'));
 
-      // State remains at defaults
-      expect(store.state.thumbnailTrackSrc).toBeNull();
+      expect(store.state.thumbnailsTrack).toBeNull();
     });
   });
 });
