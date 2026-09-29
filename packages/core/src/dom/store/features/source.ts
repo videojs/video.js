@@ -1,25 +1,14 @@
 import type { MediaSourceState } from '@videojs/media';
-import { isMediaSourceCapable } from '@videojs/media';
+import { isMediaSourceCapable, MediaReadyState } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
 
 import { definePlayerFeature } from '../../feature';
 
 export const sourceFeature = definePlayerFeature({
   name: 'source',
-  state: ({ target, signals }): MediaSourceState => ({
-    source: null,
+  state: (): MediaSourceState => ({
+    currentSrc: '',
     canPlay: false,
-    loadSource(src: string) {
-      signals.clear();
-
-      const { media } = target();
-      if (!isMediaSourceCapable(media)) return src;
-
-      media.src = src;
-      media.load();
-
-      return src;
-    },
   }),
 
   attach({ target, signal, set }) {
@@ -28,8 +17,8 @@ export const sourceFeature = definePlayerFeature({
 
     const sync = () =>
       set({
-        source: media.currentSrc || media.src || null,
-        canPlay: media.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA,
+        currentSrc: media.currentSrc,
+        canPlay: media.readyState >= MediaReadyState.HAVE_FUTURE_DATA,
       });
 
     sync();

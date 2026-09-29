@@ -29,7 +29,7 @@ describe('StatusIndicatorCore', () => {
     const core = new StatusIndicatorCore();
 
     core.setProps({ closeDelay: 100 });
-    core.processEvent({ action: 'toggleFullscreen' }, { fullscreen: false });
+    core.processEvent({ action: 'toggleFullscreen' }, { isFullscreen: false });
 
     vi.advanceTimersByTime(100);
 

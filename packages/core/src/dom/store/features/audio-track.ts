@@ -8,9 +8,9 @@ function getTrackValue(track: AudioTrackLike, index: number): string {
   return track.id || String(index);
 }
 
-function toMediaTrack(track: AudioTrackLike): MediaAudioTrack {
+function toMediaTrack(track: AudioTrackLike, index: number): MediaAudioTrack {
   return {
-    ...(track.id !== undefined && { id: track.id }),
+    id: getTrackValue(track, index),
     ...(track.kind !== undefined && { kind: track.kind }),
     label: track.label,
     language: track.language,

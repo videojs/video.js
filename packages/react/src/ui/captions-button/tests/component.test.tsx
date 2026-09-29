@@ -10,12 +10,12 @@ afterEach(cleanup);
 
 function renderCaptionsTrigger({
   textTrackList = [
-    { kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
-    { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+    { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
+    { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
   ] as const,
   toggleSubtitles = vi.fn(() => true),
 }: {
-  textTrackList?: readonly { kind: string; label: string; language: string; mode: string }[];
+  textTrackList?: readonly { id: string; kind: string; label: string; language: string; mode: string }[];
   toggleSubtitles?: () => boolean;
 } = {}) {
   const { Wrapper } = createPlayerWrapper({
@@ -85,8 +85,8 @@ describe('CaptionsButton', () => {
     const toggleSubtitles = vi.fn(() => true);
     const { Wrapper } = createPlayerWrapper({
       textTrackList: [
-        { kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
-        { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
+        { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
       ],
       subtitlesShowing: true,
       selectSubtitlesTrack: vi.fn(),

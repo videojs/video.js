@@ -11,7 +11,7 @@ const availableVolume = {
   volumeAvailability: 'available',
   mutedAvailability: 'available',
   setVolume: () => 1,
-  toggleMuted: () => false,
+  setMuted: () => false,
 };
 
 afterEach(cleanup);

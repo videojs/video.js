@@ -52,7 +52,7 @@ export function createTapGesture(
  *   const cleanup = createDoubleTapGesture(
  *     container,
  *     (event) => {
- *       store.fullscreen ? store.exitFullscreen() : store.requestFullscreen();
+ *       store.isFullscreen ? store.exitFullscreen() : store.requestFullscreen();
  *     },
  *     { region: 'center' }
  *   );

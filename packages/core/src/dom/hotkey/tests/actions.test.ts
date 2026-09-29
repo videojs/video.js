@@ -68,19 +68,31 @@ describe('togglePaused', () => {
 });
 
 describe('toggleMuted', () => {
-  it('calls toggleMuted()', () => {
-    const toggleMuted = vi.fn();
-    const store = mockStore({
-      volume: 1,
-      muted: false,
-      volumeAvailability: 'available',
-      setVolume: vi.fn(),
-      toggleMuted,
-    });
+  it('calls setMuted(true) when unmuted', () => {
+    const setMuted = vi.fn();
+    const store = mockStore({ volume: 1, muted: false, volumeAvailability: 'available', setVolume: vi.fn(), setMuted });
 
     resolveHotkeyAction('toggleMuted')!({ store, key: '' });
 
-    expect(toggleMuted).toHaveBeenCalledOnce();
+    expect(setMuted).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it('calls setMuted(false) when muted', () => {
+    const setMuted = vi.fn();
+    const store = mockStore({ volume: 1, muted: true, volumeAvailability: 'available', setVolume: vi.fn(), setMuted });
+
+    resolveHotkeyAction('toggleMuted')!({ store, key: '' });
+
+    expect(setMuted).toHaveBeenCalledExactlyOnceWith(false);
+  });
+
+  it('calls setMuted(false) when volume is 0', () => {
+    const setMuted = vi.fn();
+    const store = mockStore({ volume: 0, muted: false, volumeAvailability: 'available', setVolume: vi.fn(), setMuted });
+
+    resolveHotkeyAction('toggleMuted')!({ store, key: '' });
+
+    expect(setMuted).toHaveBeenCalledExactlyOnceWith(false);
   });
 });
 
@@ -88,7 +100,7 @@ describe('toggleFullscreen', () => {
   it('calls requestFullscreen() when not fullscreen', () => {
     const requestFullscreen = vi.fn();
     const store = mockStore({
-      fullscreen: false,
+      isFullscreen: false,
       fullscreenAvailability: 'available',
       requestFullscreen,
       exitFullscreen: vi.fn(),
@@ -102,7 +114,7 @@ describe('toggleFullscreen', () => {
   it('calls exitFullscreen() when fullscreen', () => {
     const exitFullscreen = vi.fn();
     const store = mockStore({
-      fullscreen: true,
+      isFullscreen: true,
       fullscreenAvailability: 'available',
       requestFullscreen: vi.fn(),
       exitFullscreen,
@@ -111,6 +123,40 @@ describe('toggleFullscreen', () => {
     resolveHotkeyAction('toggleFullscreen')!({ store, key: '' });
 
     expect(exitFullscreen).toHaveBeenCalledOnce();
+  });
+});
+
+describe('togglePictureInPicture', () => {
+  it('calls requestPictureInPicture() when not in PiP', () => {
+    const requestPictureInPicture = vi.fn();
+    const exitPictureInPicture = vi.fn();
+    const store = mockStore({
+      isPictureInPicture: false,
+      pictureInPictureAvailability: 'available',
+      requestPictureInPicture,
+      exitPictureInPicture,
+    });
+
+    resolveHotkeyAction('togglePictureInPicture')!({ store, key: '' });
+
+    expect(requestPictureInPicture).toHaveBeenCalledOnce();
+    expect(exitPictureInPicture).not.toHaveBeenCalled();
+  });
+
+  it('calls exitPictureInPicture() when in PiP', () => {
+    const requestPictureInPicture = vi.fn();
+    const exitPictureInPicture = vi.fn();
+    const store = mockStore({
+      isPictureInPicture: true,
+      pictureInPictureAvailability: 'available',
+      requestPictureInPicture,
+      exitPictureInPicture,
+    });
+
+    resolveHotkeyAction('togglePictureInPicture')!({ store, key: '' });
+
+    expect(exitPictureInPicture).toHaveBeenCalledOnce();
+    expect(requestPictureInPicture).not.toHaveBeenCalled();
   });
 });
 
@@ -178,7 +224,7 @@ describe('volumeStep', () => {
       muted: false,
       volumeAvailability: 'available',
       setVolume,
-      toggleMuted: vi.fn(),
+      setMuted: vi.fn(),
     });
 
     resolveHotkeyAction('volumeStep')!({ store, key: 'ArrowUp' });
@@ -193,7 +239,7 @@ describe('volumeStep', () => {
       muted: false,
       volumeAvailability: 'available',
       setVolume,
-      toggleMuted: vi.fn(),
+      setMuted: vi.fn(),
     });
 
     resolveHotkeyAction('volumeStep')!({ store, key: 'ArrowDown' });
@@ -208,7 +254,7 @@ describe('volumeStep', () => {
       muted: false,
       volumeAvailability: 'available',
       setVolume,
-      toggleMuted: vi.fn(),
+      setMuted: vi.fn(),
     });
 
     resolveHotkeyAction('volumeStep')!({ store, value: 0.05, key: '' });
@@ -223,7 +269,7 @@ describe('volumeStep', () => {
       muted: false,
       volumeAvailability: 'available',
       setVolume,
-      toggleMuted: vi.fn(),
+      setMuted: vi.fn(),
     });
 
     resolveHotkeyAction('volumeStep')!({ store, value: -0.05, key: '' });

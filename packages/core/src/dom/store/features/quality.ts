@@ -15,9 +15,9 @@ function getRenditionValue(rendition: VideoRenditionLike, index: number): string
   return rendition.id || String(index);
 }
 
-function toMediaRendition(rendition: VideoRenditionLike): MediaVideoRendition {
+function toMediaRendition(rendition: VideoRenditionLike, index: number): MediaVideoRendition {
   return {
-    ...(rendition.id !== undefined && { id: rendition.id }),
+    id: getRenditionValue(rendition, index),
     ...(rendition.width !== undefined && { width: rendition.width }),
     ...(rendition.height !== undefined && { height: rendition.height }),
     ...(rendition.bitrate !== undefined && { bitrate: rendition.bitrate }),
@@ -80,11 +80,12 @@ export const qualityFeature = definePlayerFeature({
     };
 
     const sync = (list = getVideoRenditions()) => {
+      const renditions = list ? [...list] : [];
       const active = getActiveRendition(list);
 
       set({
-        videoRenditionList: list ? [...list].map(toMediaRendition) : [],
-        activeVideoRendition: active ? toMediaRendition(active) : null,
+        videoRenditionList: renditions.map(toMediaRendition),
+        activeVideoRendition: active ? toMediaRendition(active, renditions.indexOf(active)) : null,
       });
     };
 

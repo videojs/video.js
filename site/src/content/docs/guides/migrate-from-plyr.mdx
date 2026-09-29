@@ -419,12 +419,13 @@ Control everything through the player's store. Every Plyr call has a matching st
 
 | Plyr | Video.js v10 store action |
 |---|---|
-| `player.play()`, `player.pause()` | `play()`, `pause()`, or `togglePaused()` |
+| `player.play()`, `player.pause()` | `play()`, `pause()` |
 | `player.currentTime = 10` | `seek(10)` |
 | `player.volume = 0.5` | `setVolume(0.5)` |
-| `player.muted = true` | `toggleMuted()` |
+| `player.muted = true` | `setMuted(true)` |
 | `player.speed = 1.5` | `setPlaybackRate(1.5)` |
-| `player.fullscreen.enter()` | `requestFullscreen()` |
+| `player.fullscreen.enter()`, `player.fullscreen.exit()` | `requestFullscreen()`, `exitFullscreen()` |
+| `player.fullscreen.toggle()` | `isFullscreen ? exitFullscreen() : requestFullscreen()` |
 | `player.toggleCaptions()` | `toggleSubtitles()` |
 
 <FrameworkCase frameworks={["react"]}>
@@ -459,13 +460,13 @@ export function AppVideoPlayer() {
 }
 ```
 
-The same hook selects actions: `usePlayer((state) => state.togglePaused)` returns a function you can call from your own UI.
+The same hook selects actions: `usePlayer((state) => state.play)` returns a function you can call from your own UI.
 
 When you need the element itself, put a `ref` on the media component; its value is the rendered `HTMLVideoElement`, so `ref.current.play()` works the way Plyr's underlying element did. For the Video.js media object, call `useMedia` from a component inside the player; media that wrap a playback engine expose it there through the `engine` escape hatch.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The store's actions live on the player element's `store.state`: query `<video-player>` and call `player.store.state.togglePaused()`. Your media element is also a plain child in your markup, so you can query and drive it directly. To keep a custom element in sync with player state, use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>:
+The store's actions live on the player element's `store.state`: query `<video-player>` and call `player.store.state.play()`. Your media element is also a plain child in your markup, so you can query and drive it directly. To keep a custom element in sync with player state, use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>:
 
 ```js
 import { PlayerController, playerContext, ReactiveElement, selectTime } from '@videojs/html';

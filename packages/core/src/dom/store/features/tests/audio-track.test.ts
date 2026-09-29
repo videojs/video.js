@@ -120,6 +120,19 @@ describe('audioTrackFeature', () => {
     ]);
   });
 
+  it('assigns positional ids to tracks without a media id', () => {
+    const media = createMedia([
+      createTrack({ label: 'English', enabled: true }),
+      createTrack({ id: 'commentary', label: 'Commentary' }),
+      createTrack({ label: 'Spanish' }),
+    ]);
+    const store = createStore<PlayerTarget>()(audioTrackFeature);
+
+    store.attach({ media, container: null });
+
+    expect(store.state.audioTrackList.map((track) => track.id)).toEqual(['0', 'commentary', '2']);
+  });
+
   it('ignores unknown audio track values', () => {
     const media = createMedia([createTrack({ id: '0', label: 'English', enabled: true })]);
     const store = createStore<PlayerTarget>()(audioTrackFeature);

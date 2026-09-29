@@ -43,7 +43,7 @@ describe('fullscreenFeature', () => {
 
       store.attach({ media: video, container });
 
-      expect(selectFullscreen(store.state)?.fullscreen).toBe(false);
+      expect(selectFullscreen(store.state)?.isFullscreen).toBe(false);
     });
 
     it('syncs initial state on attach', () => {
@@ -54,7 +54,7 @@ describe('fullscreenFeature', () => {
 
       store.attach({ media: video, container });
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
 
     it('detects fullscreen availability when supported', () => {
@@ -130,19 +130,19 @@ describe('fullscreenFeature', () => {
 
       store.attach({ media: video, container });
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
 
       // Simulate entering fullscreen via WebKit presentation mode
       video.webkitPresentationMode = 'fullscreen';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
 
       // Simulate exiting
       video.webkitPresentationMode = 'inline';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
 
     it('updates fullscreen on fullscreenchange event', () => {
@@ -159,7 +159,7 @@ describe('fullscreenFeature', () => {
 
       store.attach({ media: video, container });
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
 
       // Simulate entering fullscreen
       Object.defineProperty(document, 'fullscreenElement', {
@@ -169,7 +169,7 @@ describe('fullscreenFeature', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
 
       // Simulate exiting fullscreen
       Object.defineProperty(document, 'fullscreenElement', {
@@ -179,7 +179,7 @@ describe('fullscreenFeature', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
 
     it('detects fullscreen via :fullscreen pseudo-class when container is in a shadow tree', () => {
@@ -209,7 +209,7 @@ describe('fullscreenFeature', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
 
       matchesSpy.mockReturnValue(false);
       Object.defineProperty(document, 'fullscreenElement', {
@@ -219,7 +219,7 @@ describe('fullscreenFeature', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
       matchesSpy.mockRestore();
     });
 
@@ -251,7 +251,7 @@ describe('fullscreenFeature', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
       matchesSpy.mockRestore();
     });
 
@@ -280,7 +280,7 @@ describe('fullscreenFeature', () => {
       document.dispatchEvent(new Event('fullscreenchange'));
 
       // State should not update after destroy
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
   });
 
@@ -383,7 +383,7 @@ describe('fullscreenFeature', () => {
   });
 
   describe('transitions', () => {
-    it('toggleFullscreen() exits PiP first when entering fullscreen', async () => {
+    it('requestFullscreen() exits PiP first when entering fullscreen', async () => {
       Object.defineProperty(document, 'fullscreenEnabled', {
         value: true,
         writable: true,
@@ -409,7 +409,7 @@ describe('fullscreenFeature', () => {
 
       store.attach({ media: video, container });
 
-      await store.toggleFullscreen();
+      await store.requestFullscreen();
 
       expect(document.exitPictureInPicture).toHaveBeenCalled();
       expect(container.requestFullscreen).toHaveBeenCalled();
@@ -520,7 +520,7 @@ describe('fullscreenFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container });
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
 
     it('reflects host.isFullscreen when document.fullscreenElement is the underlying video', () => {
@@ -539,7 +539,7 @@ describe('fullscreenFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container: null });
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
     });
 
     it('updates fullscreen on fullscreenchange when container matches', () => {
@@ -559,7 +559,7 @@ describe('fullscreenFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container });
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
 
       Object.defineProperty(document, 'fullscreenElement', {
         value: container,
@@ -568,7 +568,7 @@ describe('fullscreenFeature with HTMLVideoAdapter', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
 
       Object.defineProperty(document, 'fullscreenElement', {
         value: null,
@@ -577,7 +577,7 @@ describe('fullscreenFeature with HTMLVideoAdapter', () => {
       });
       document.dispatchEvent(new Event('fullscreenchange'));
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
 
     it('syncs fullscreen on webkitpresentationmodechanged forwarded from target (iOS Safari)', () => {
@@ -593,17 +593,17 @@ describe('fullscreenFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container });
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
 
       video.webkitPresentationMode = 'fullscreen';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.fullscreen).toBe(true);
+      expect(store.state.isFullscreen).toBe(true);
 
       video.webkitPresentationMode = 'inline';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.fullscreen).toBe(false);
+      expect(store.state.isFullscreen).toBe(false);
     });
   });
 

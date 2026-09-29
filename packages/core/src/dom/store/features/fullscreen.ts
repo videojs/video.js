@@ -8,7 +8,7 @@ import { exitPictureInPicture, isPictureInPicture } from '../../presentation/pip
 export const fullscreenFeature = definePlayerFeature({
   name: 'fullscreen',
   state: ({ target }): MediaFullscreenState => ({
-    fullscreen: false,
+    isFullscreen: false,
     fullscreenAvailability: 'unavailable',
 
     async requestFullscreen() {
@@ -27,17 +27,6 @@ export const fullscreenFeature = definePlayerFeature({
 
       return exitFullscreen(media);
     },
-
-    async toggleFullscreen() {
-      const { media, container } = target();
-      if (isFullscreen(container, media)) return exitFullscreen(media);
-
-      if (isPictureInPicture(media)) {
-        await exitPictureInPicture(media);
-      }
-
-      return requestFullscreen(container, media);
-    },
   }),
 
   attach({ target, signal, set }) {
@@ -49,7 +38,7 @@ export const fullscreenFeature = definePlayerFeature({
 
     const sync = () =>
       set({
-        fullscreen: isFullscreen(container, media),
+        isFullscreen: isFullscreen(container, media),
       });
 
     sync();

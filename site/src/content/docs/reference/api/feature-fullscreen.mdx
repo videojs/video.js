@@ -35,8 +35,8 @@ function FullscreenButton() {
   if (!fs || fs.fullscreenAvailability !== 'available') return null;
 
   return (
-    <button onClick={fs.toggleFullscreen}>
-      {fs.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+    <button onClick={() => (fs.isFullscreen ? fs.exitFullscreen() : fs.requestFullscreen())}>
+      {fs.isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
     </button>
   );
 }

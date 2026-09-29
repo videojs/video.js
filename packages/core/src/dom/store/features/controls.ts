@@ -33,9 +33,9 @@ export const controlsFeature = definePlayerFeature({
       set({ controlsVisible: true });
       return () => {};
     };
-    const fallbackToggleControls = () => {
+    const fallbackToggleControls = (forceShow?: boolean) => {
       // Fallback before attach — no idle timer, just flip state.
-      const next = !get().userActive;
+      const next = forceShow ?? !get().userActive;
 
       set({ userActive: next, controlsVisible: next });
       return next as boolean;
@@ -126,11 +126,11 @@ export const controlsFeature = definePlayerFeature({
       };
     }
 
-    function toggleControls(): boolean {
-      if (get().controlsVisible) {
-        setInactive();
-      } else {
+    function toggleControls(forceShow?: boolean): boolean {
+      if (forceShow ?? !get().controlsVisible) {
         setActive();
+      } else {
+        setInactive();
       }
 
       return get().controlsVisible;
@@ -322,7 +322,7 @@ function createControlsActions(
     };
   };
 
-  const toggleControls = () => toggleControlsDelegate();
+  const toggleControls = (forceShow?: boolean) => toggleControlsDelegate(forceShow);
 
   const actions: ControlsActions = {
     requestControlsLock,

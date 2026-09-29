@@ -38,7 +38,7 @@ function CastButton() {
   if (!remotePlayback || remotePlayback.remotePlaybackAvailability !== 'available') return null;
 
   return (
-    <button onClick={remotePlayback.toggleRemotePlayback}>
+    <button onClick={remotePlayback.promptRemotePlayback}>
       {remotePlayback.remotePlaybackState === 'connected' ? 'Disconnect' : 'Cast'}
     </button>
   );

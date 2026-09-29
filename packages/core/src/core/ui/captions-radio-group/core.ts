@@ -98,8 +98,8 @@ export class CaptionsRadioGroupCore {
     const showingIndex = captionTracks.findIndex((track) => track.mode === 'showing');
     const options: CaptionsRadioGroupOption[] = [
       { value: CAPTIONS_OFF_VALUE, label: offText, disabled: false },
-      ...captionTracks.map((track, index) => ({
-        value: track.id || String(index),
+      ...captionTracks.map((track) => ({
+        value: track.id,
         label: this.getTrackLabel(track),
         disabled: false,
       })),
@@ -110,7 +110,7 @@ export class CaptionsRadioGroupCore {
 
     this.state.patch({
       options,
-      value: showingIndex === -1 ? CAPTIONS_OFF_VALUE : captionTracks[showingIndex]!.id || String(showingIndex),
+      value: showingIndex === -1 ? CAPTIONS_OFF_VALUE : captionTracks[showingIndex]!.id,
       subtitlesShowing: media.subtitlesShowing,
       disabled: this.#props.disabled || captionTracks.length === 0,
       hidden: availability === 'unavailable',
@@ -132,7 +132,7 @@ export class CaptionsRadioGroupCore {
       return;
     }
 
-    if (!captionTracks.some((track, index) => (track.id || String(index)) === value)) return;
+    if (!captionTracks.some((track) => track.id === value)) return;
 
     media.selectSubtitlesTrack(value);
   }

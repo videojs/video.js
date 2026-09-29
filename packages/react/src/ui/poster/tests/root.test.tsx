@@ -17,7 +17,6 @@ function wrapper(state: { started?: boolean; poster?: string } = {}) {
     waiting: false,
     play: async () => {},
     pause: () => {},
-    togglePaused: () => true,
     // Part of the metadata state this mock stands in for, and nothing here reads it.
     title: '',
     poster,

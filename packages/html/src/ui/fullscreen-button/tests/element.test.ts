@@ -13,11 +13,10 @@ class TestFullscreenProvider extends UIElement {
   readonly store = createStore<unknown>()<MediaFullscreenState>({
     name: 'fullscreen',
     state: () => ({
-      fullscreen: false,
+      isFullscreen: false,
       fullscreenAvailability: 'available',
       requestFullscreen: this.requestFullscreen,
       exitFullscreen: vi.fn(),
-      toggleFullscreen: vi.fn(),
     }),
   }) as unknown as AnyPlayerStore;
   readonly containerProvider: ContextProvider<typeof containerContext> = new ContextProvider(this, {

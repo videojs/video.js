@@ -6,11 +6,10 @@ import { FullscreenButtonCore } from '../core';
 
 function createMediaState(overrides: Partial<MediaFullscreenState> = {}): MediaFullscreenState {
   return {
-    fullscreen: false,
+    isFullscreen: false,
     fullscreenAvailability: 'available',
     requestFullscreen: vi.fn(async () => {}),
     exitFullscreen: vi.fn(async () => {}),
-    toggleFullscreen: vi.fn(async () => {}),
     ...overrides,
   };
 }
@@ -40,7 +39,7 @@ describe('FullscreenButtonCore', () => {
   describe('getState', () => {
     it('projects fullscreen and availability', () => {
       const core = new FullscreenButtonCore();
-      const media = createMediaState({ fullscreen: true });
+      const media = createMediaState({ isFullscreen: true });
 
       core.setMedia(media);
       const state = core.getState();
@@ -144,7 +143,7 @@ describe('FullscreenButtonCore', () => {
   describe('toggle', () => {
     it('calls requestFullscreen when not fullscreen', async () => {
       const core = new FullscreenButtonCore();
-      const media = createMediaState({ fullscreen: false });
+      const media = createMediaState({ isFullscreen: false });
 
       await core.toggle(media);
       expect(media.requestFullscreen).toHaveBeenCalled();
@@ -152,7 +151,7 @@ describe('FullscreenButtonCore', () => {
 
     it('calls exitFullscreen when fullscreen', async () => {
       const core = new FullscreenButtonCore();
-      const media = createMediaState({ fullscreen: true });
+      const media = createMediaState({ isFullscreen: true });
 
       await core.toggle(media);
       expect(media.exitFullscreen).toHaveBeenCalled();

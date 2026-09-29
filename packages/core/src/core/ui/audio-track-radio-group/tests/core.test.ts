@@ -66,19 +66,19 @@ describe('AudioTrackRadioGroupCore', () => {
       ]);
     });
 
-    it('uses index values when ids are missing', () => {
+    it('uses track ids as option values', () => {
       const core = new AudioTrackRadioGroupCore();
       const media = createMediaState({
         audioTrackList: [
-          { label: 'English', language: 'en', enabled: false },
-          { label: 'Spanish', language: 'es', enabled: true },
+          { id: 'audio-en', label: 'English', language: 'en', enabled: false },
+          { id: 'audio-es', label: 'Spanish', language: 'es', enabled: true },
         ],
       });
 
       core.setMedia(media);
 
-      expect(core.getState().options.map((track) => track.value)).toEqual(['0', '1']);
-      expect(core.getState().value).toBe('1');
+      expect(core.getState().options.map((track) => track.value)).toEqual(['audio-en', 'audio-es']);
+      expect(core.getState().value).toBe('audio-es');
     });
 
     it('marks availability unavailable with one track', () => {
@@ -112,7 +112,7 @@ describe('AudioTrackRadioGroupCore', () => {
         formatTrack: (track) => `${track.language}: ${track.label}`,
       });
 
-      expect(core.getTrackLabel({ label: 'English', language: 'en', enabled: false })).toBe('en: English');
+      expect(core.getTrackLabel({ id: '0', label: 'English', language: 'en', enabled: false })).toBe('en: English');
     });
   });
 

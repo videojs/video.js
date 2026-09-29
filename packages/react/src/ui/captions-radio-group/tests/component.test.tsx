@@ -14,8 +14,8 @@ afterEach(() => {
 });
 
 const defaultTextTrackList = [
-  { kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-  { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
+  { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+  { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
 ] as const;
 
 function renderCaptionsRadioGroup({
@@ -25,7 +25,7 @@ function renderCaptionsRadioGroup({
   locale,
   group,
 }: {
-  textTrackList?: readonly { kind: string; label: string; language: string; mode: string }[];
+  textTrackList?: readonly { id: string; kind: string; label: string; language: string; mode: string }[];
   subtitlesShowing?: boolean;
   selectSubtitlesTrack?: (value: string) => void;
   locale?: string;
@@ -77,8 +77,8 @@ describe('CaptionsRadioGroup', () => {
     expect(screen.getByRole('menuitemradio', { name: 'Spanish' }).getAttribute('aria-checked')).toBe('true');
     expect(states.slice(-3)).toEqual([
       expect.objectContaining({ value: 'off', label: 'Off', checked: false }),
-      expect.objectContaining({ value: '0', label: 'English', checked: false }),
-      expect.objectContaining({ value: '1', label: 'Spanish', checked: true }),
+      expect.objectContaining({ value: 'subtitles-en', label: 'English', checked: false }),
+      expect.objectContaining({ value: 'subtitles-es', label: 'Spanish', checked: true }),
     ]);
   });
 
@@ -89,7 +89,7 @@ describe('CaptionsRadioGroup', () => {
 
     fireEvent.click(screen.getByRole('menuitemradio', { name: 'English' }));
 
-    expect(selectSubtitlesTrack).toHaveBeenCalledWith('0');
+    expect(selectSubtitlesTrack).toHaveBeenCalledWith('subtitles-en');
   });
 
   it('exposes group state through attributes and callbacks', () => {
@@ -145,7 +145,7 @@ describe('CaptionsRadioGroup', () => {
     const group = screen.getByRole('group', { name: 'Captions' });
 
     expect(group.tagName).toBe('SECTION');
-    expect(group.getAttribute('data-value')).toBe('1');
+    expect(group.getAttribute('data-value')).toBe('subtitles-es');
     expect(screen.getByRole('menuitemradio', { name: 'Spanish' }).querySelector('[aria-hidden="true"]')).toBeTruthy();
   });
 

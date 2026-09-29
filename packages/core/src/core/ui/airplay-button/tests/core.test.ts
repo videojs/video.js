@@ -21,7 +21,7 @@ function createMediaState(overrides: Partial<MediaRemotePlaybackState> = {}): Me
   return {
     remotePlaybackState: 'disconnected',
     remotePlaybackAvailability: 'available',
-    toggleRemotePlayback: vi.fn(async () => {}),
+    promptRemotePlayback: vi.fn(async () => {}),
     ...overrides,
   };
 }
@@ -175,20 +175,20 @@ describe('AirPlayButtonCore', () => {
   });
 
   describe('toggle', () => {
-    it('calls toggleRemotePlayback when disconnected', async () => {
+    it('calls promptRemotePlayback when disconnected', async () => {
       const core = new AirPlayButtonCore();
       const media = createMediaState({ remotePlaybackState: 'disconnected' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).toHaveBeenCalled();
+      expect(media.promptRemotePlayback).toHaveBeenCalled();
     });
 
-    it('calls toggleRemotePlayback when connected', async () => {
+    it('calls promptRemotePlayback when connected', async () => {
       const core = new AirPlayButtonCore();
       const media = createMediaState({ remotePlaybackState: 'connected' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).toHaveBeenCalled();
+      expect(media.promptRemotePlayback).toHaveBeenCalled();
     });
 
     it('does nothing when disabled', async () => {
@@ -196,7 +196,7 @@ describe('AirPlayButtonCore', () => {
       const media = createMediaState();
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).not.toHaveBeenCalled();
+      expect(media.promptRemotePlayback).not.toHaveBeenCalled();
     });
 
     it('does nothing when unavailable', async () => {
@@ -204,7 +204,7 @@ describe('AirPlayButtonCore', () => {
       const media = createMediaState({ remotePlaybackAvailability: 'unavailable' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).not.toHaveBeenCalled();
+      expect(media.promptRemotePlayback).not.toHaveBeenCalled();
     });
 
     it('does nothing when unsupported', async () => {
@@ -212,13 +212,13 @@ describe('AirPlayButtonCore', () => {
       const media = createMediaState({ remotePlaybackAvailability: 'unsupported' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).not.toHaveBeenCalled();
+      expect(media.promptRemotePlayback).not.toHaveBeenCalled();
     });
 
     it('catches AirPlay errors silently', async () => {
       const core = new AirPlayButtonCore();
       const media = createMediaState({
-        toggleRemotePlayback: vi.fn(async () => {
+        promptRemotePlayback: vi.fn(async () => {
           throw new Error('user cancelled');
         }),
       });

@@ -12,7 +12,7 @@ afterEach(() => {
 function setup() {
   const requestFullscreen = vi.fn();
   const { value, Wrapper } = createPlayerWrapper({
-    fullscreen: false,
+    isFullscreen: false,
     fullscreenAvailability: 'available',
     requestFullscreen,
     exitFullscreen: vi.fn(),

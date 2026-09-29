@@ -31,10 +31,6 @@ function formatTrackLabel(track: MediaAudioTrack): Text | string {
   return audioText;
 }
 
-function getTrackValue(track: MediaAudioTrack, index: number): string {
-  return track.id || String(index);
-}
-
 export class AudioTrackRadioGroupCore {
   static readonly defaultProps: NonNullableObject<AudioTrackRadioGroupProps> = {
     label: '',
@@ -88,8 +84,8 @@ export class AudioTrackRadioGroupCore {
   getState(): AudioTrackRadioGroupState {
     const media = this.#media!;
     const enabledIndex = media.audioTrackList.findIndex((track) => track.enabled);
-    const options = media.audioTrackList.map((track, index) => ({
-      value: getTrackValue(track, index),
+    const options = media.audioTrackList.map((track) => ({
+      value: track.id,
       label: this.getTrackLabel(track),
       disabled: false,
     }));
@@ -97,7 +93,7 @@ export class AudioTrackRadioGroupCore {
 
     this.state.patch({
       options,
-      value: enabledIndex === -1 ? '' : getTrackValue(media.audioTrackList[enabledIndex]!, enabledIndex),
+      value: enabledIndex === -1 ? '' : media.audioTrackList[enabledIndex]!.id,
       disabled: this.#props.disabled || availability === 'unavailable',
       hidden: availability === 'unavailable',
       availability,
@@ -110,7 +106,7 @@ export class AudioTrackRadioGroupCore {
   select(media: MediaAudioTrackState, value: string): void {
     if (this.#props.disabled) return;
 
-    const hasValue = media.audioTrackList.some((track, index) => getTrackValue(track, index) === value);
+    const hasValue = media.audioTrackList.some((track) => track.id === value);
     if (!hasValue) return;
 
     media.selectAudioTrack(value);

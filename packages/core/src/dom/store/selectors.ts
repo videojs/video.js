@@ -34,7 +34,7 @@ export const selectLive = createSelector(liveFeature);
 export const selectMetadata = createSelector(metadataFeature);
 /** Select the PiP state (picture-in-picture active, availability). */
 export const selectPiP = createSelector(pipFeature);
-/** Select the playback state (paused, ended, play, pause, toggle). */
+/** Select the playback state (paused, ended, play, pause). */
 export const selectPlayback = createSelector(playbackFeature);
 /** Select the playback rate state (playbackRate, playbackRates, setPlaybackRate). */
 export const selectPlaybackRate = createSelector(playbackRateFeature);

@@ -12,7 +12,7 @@ export const remotePlaybackFeature = definePlayerFeature({
     remotePlaybackState: 'disconnected',
     remotePlaybackAvailability: 'unsupported',
 
-    async toggleRemotePlayback() {
+    async promptRemotePlayback() {
       const { media, container } = target();
       if (isRemotePlaybackConnected(media)) return requestRemotePlayback(media);
 

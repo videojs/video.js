@@ -27,11 +27,11 @@ export interface MediaSnapshot {
   volume?: number | undefined;
   muted?: boolean | undefined;
   playbackRate?: number | undefined;
-  fullscreen?: boolean | undefined;
+  isFullscreen?: boolean | undefined;
   subtitlesShowing?: boolean | undefined;
   /** When false, caption toggles are unavailable and status feedback is suppressed. */
   subtitlesAvailable?: boolean | undefined;
-  pip?: boolean | undefined;
+  isPictureInPicture?: boolean | undefined;
   currentTime?: number | undefined;
   duration?: number | undefined;
   seeking?: boolean | undefined;

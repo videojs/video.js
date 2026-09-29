@@ -612,11 +612,11 @@ Use a ref for imperative browser media APIs or for custom events that do not hav
 
 | Mux Player | Video.js v10 |
 |---|---|
-| `player.play()`, `player.pause()` | the player's `play`, `pause`, `togglePaused`, or `media.play()`, `media.pause()` |
+| `player.play()`, `player.pause()` | the player's `play`, `pause`, or `media.play()`, `media.pause()` |
 | `player.currentTime = 10` | the player's `seek(10)`, or `media.currentTime = 10` |
-| `player.volume`, `player.muted` | the player's `setVolume`, `toggleMuted`, or `media.volume`, `media.muted` |
+| `player.volume`, `player.muted` | the player's `setVolume`, `setMuted`, or `media.volume`, `media.muted` |
 | `player.playbackRate` | the player's `setPlaybackRate`, or `media.playbackRate` |
-| `player.requestFullscreen()` | the player's `requestFullscreen`, `exitFullscreen`, `toggleFullscreen` |
+| `player.requestFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
 | `player.addChapters([…])` | a `<track kind="chapters">`, covered below |
 
 Control everything through the player: "the player's" entries are store actions, reached the same way you read state above. Setting a standard media property directly works too — player state derives from the native media events, so the UI stays in sync either way.

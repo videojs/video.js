@@ -33,7 +33,8 @@ import { selectPlayback, usePlayer } from '@videojs/react';
 function PlayButton() {
   const playback = usePlayer(selectPlayback);
   if (!playback) return null;
-  return <button onClick={playback.togglePaused}>{playback.paused ? 'Play' : 'Pause'}</button>;
+  const toggle = () => (playback.paused ? playback.play() : playback.pause());
+  return <button onClick={toggle}>{playback.paused ? 'Play' : 'Pause'}</button>;
 }
 ```
 </FrameworkCase>

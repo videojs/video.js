@@ -17,14 +17,14 @@ afterEach(() => {
 
 function renderCaptionsMenu({
   textTrackList = [
-    { kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-    { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
+    { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+    { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
   ] as const,
   subtitlesShowing = true,
   selectSubtitlesTrack = vi.fn(),
   locale,
 }: {
-  textTrackList?: readonly { kind: string; label: string; language: string; mode: string }[];
+  textTrackList?: readonly { id: string; kind: string; label: string; language: string; mode: string }[];
   subtitlesShowing?: boolean;
   selectSubtitlesTrack?: (value: string) => void;
   locale?: string | undefined;
@@ -139,7 +139,7 @@ describe('useCaptionsOptions', () => {
 
     fireEvent.click(screen.getByRole('menuitemradio', { name: 'English' }));
 
-    expect(selectSubtitlesTrack).toHaveBeenCalledWith('0');
+    expect(selectSubtitlesTrack).toHaveBeenCalledWith('subtitles-en');
   });
 
   it('translates default track labels', () => {
@@ -149,8 +149,8 @@ describe('useCaptionsOptions', () => {
 
     renderCaptionsMenu({
       textTrackList: [
-        { kind: 'captions', label: '', language: '', mode: 'disabled' },
-        { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
+        { id: 'captions', kind: 'captions', label: '', language: '', mode: 'disabled' },
+        { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
       ],
       locale: 'xx',
     });
@@ -191,8 +191,8 @@ describe('useCaptionsOptions', () => {
         thumbnailTrackSrc: null,
         thumbnailTrackCrossOrigin: null,
         textTrackList: [
-          { kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-          { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
+          { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+          { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
         ],
         subtitlesShowing: true,
         selectSubtitlesTrack: vi.fn(),

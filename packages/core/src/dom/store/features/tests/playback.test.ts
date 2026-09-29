@@ -221,6 +221,62 @@ describe('playbackFeature', () => {
       expect(video.play).toHaveBeenCalled();
     });
 
+    it('play() publishes the new state without waiting for the play event', async () => {
+      const video = createMockVideo({ paused: true });
+
+      // The mock changes `paused` like the media does and fires no events, so only the action can update the store.
+      video.play = vi.fn(() => {
+        Object.defineProperty(video, 'paused', { value: false, configurable: true });
+        return Promise.resolve();
+      });
+
+      const store = createStore<PlayerTarget>()(playbackFeature);
+
+      store.attach({ media: video, container: null });
+
+      const playing = store.play();
+
+      expect(store.state.paused).toBe(false);
+      expect(store.state.started).toBe(true);
+
+      await playing;
+    });
+
+    it('play() clears ended before the media does on replay', async () => {
+      const video = createMockVideo({ paused: true, ended: true });
+
+      // `ended` stays true until the replay's seek back to the start lands.
+      video.play = vi.fn(() => {
+        Object.defineProperty(video, 'paused', { value: false, configurable: true });
+        return Promise.resolve();
+      });
+
+      const store = createStore<PlayerTarget>()(playbackFeature);
+
+      store.attach({ media: video, container: null });
+
+      expect(store.state.ended).toBe(true);
+
+      await store.play();
+
+      expect(store.state.ended).toBe(false);
+    });
+
+    it('pause() publishes the new state without waiting for the pause event', () => {
+      const video = createMockVideo({ paused: false });
+
+      video.pause = vi.fn(() => {
+        Object.defineProperty(video, 'paused', { value: true, configurable: true });
+      });
+
+      const store = createStore<PlayerTarget>()(playbackFeature);
+
+      store.attach({ media: video, container: null });
+      store.pause();
+
+      expect(store.state.paused).toBe(true);
+    });
+
     it('pause() calls pause on target', () => {
       const video = createMockVideo({});
 

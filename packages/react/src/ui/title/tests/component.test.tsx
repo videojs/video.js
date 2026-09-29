@@ -29,7 +29,6 @@ function playbackState(paused: boolean): Record<string, unknown> {
     waiting: false,
     play: vi.fn(async () => {}),
     pause: vi.fn(),
-    togglePaused: vi.fn(() => true),
   };
 }
 

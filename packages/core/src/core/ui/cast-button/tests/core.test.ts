@@ -8,7 +8,7 @@ function createMediaState(overrides: Partial<MediaRemotePlaybackState> = {}): Me
   return {
     remotePlaybackState: 'disconnected',
     remotePlaybackAvailability: 'available',
-    toggleRemotePlayback: vi.fn(async () => {}),
+    promptRemotePlayback: vi.fn(async () => {}),
     ...overrides,
   };
 }
@@ -149,13 +149,13 @@ describe('CastButtonCore', () => {
   });
 
   describe('toggle', () => {
-    it('calls toggleRemotePlayback when available', async () => {
+    it('calls promptRemotePlayback when available', async () => {
       stubCastSupport();
       const core = new CastButtonCore();
       const media = createMediaState({ remotePlaybackState: 'disconnected' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).toHaveBeenCalled();
+      expect(media.promptRemotePlayback).toHaveBeenCalled();
     });
 
     it('does nothing when the disabled prop is set', async () => {
@@ -164,7 +164,7 @@ describe('CastButtonCore', () => {
       const media = createMediaState();
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).not.toHaveBeenCalled();
+      expect(media.promptRemotePlayback).not.toHaveBeenCalled();
     });
 
     it('does nothing when no cast device is available', async () => {
@@ -173,7 +173,7 @@ describe('CastButtonCore', () => {
       const media = createMediaState({ remotePlaybackAvailability: 'unavailable' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).not.toHaveBeenCalled();
+      expect(media.promptRemotePlayback).not.toHaveBeenCalled();
     });
 
     it('does nothing when unsupported', async () => {
@@ -181,14 +181,14 @@ describe('CastButtonCore', () => {
       const media = createMediaState({ remotePlaybackAvailability: 'unsupported' });
 
       await core.toggle(media);
-      expect(media.toggleRemotePlayback).not.toHaveBeenCalled();
+      expect(media.promptRemotePlayback).not.toHaveBeenCalled();
     });
 
-    it('propagates errors from toggleRemotePlayback', async () => {
+    it('propagates errors from promptRemotePlayback', async () => {
       stubCastSupport();
       const core = new CastButtonCore();
       const media = createMediaState({
-        toggleRemotePlayback: vi.fn(async () => {
+        promptRemotePlayback: vi.fn(async () => {
           throw new Error('user cancelled');
         }),
       });

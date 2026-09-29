@@ -104,14 +104,14 @@ describe('renderElement', () => {
     });
 
     it('forwards a popover trigger ref through the generated mute button to its <button>', () => {
-      const toggleMuted = vi.fn(() => false);
+      const setMuted = vi.fn((muted: boolean) => muted);
       const { Wrapper } = createPlayerWrapper({
         volume: 1,
         muted: false,
         volumeAvailability: 'available',
         mutedAvailability: 'available',
         setVolume: () => 1,
-        toggleMuted,
+        setMuted,
       });
       const ref = createRef<HTMLButtonElement>();
 
@@ -127,7 +127,7 @@ describe('renderElement', () => {
 
       fireEvent.click(ref.current!);
 
-      expect(toggleMuted).toHaveBeenCalledOnce();
+      expect(setMuted).toHaveBeenCalledExactlyOnceWith(true);
     });
   });
 });

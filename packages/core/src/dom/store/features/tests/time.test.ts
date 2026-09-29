@@ -202,6 +202,40 @@ describe('timeFeature', () => {
         expect(result).toBe(45);
       });
 
+      it('settles a pending seek when the source is emptied', async () => {
+        const video = createMockVideo({ readyState: HTMLMediaElement.HAVE_METADATA });
+        const store = createStore<PlayerTarget>()(timeFeature);
+
+        store.attach({ media: video, container: null });
+
+        const resultPromise = store.seek(30);
+
+        // A new source never fires `seeked` for the abandoned seek.
+        video.dispatchEvent(new Event('emptied'));
+
+        expect(await resultPromise).toBe(30);
+      });
+
+      it('abandons a seek waiting for metadata when the source is emptied', async () => {
+        const video = createMockVideo({ readyState: HTMLMediaElement.HAVE_NOTHING });
+        const store = createStore<PlayerTarget>()(timeFeature);
+
+        store.attach({ media: video, container: null });
+
+        const resultPromise = store.seek(30);
+
+        video.dispatchEvent(new Event('emptied'));
+
+        expect(await resultPromise).toBe(0);
+
+        // The new source's metadata must not receive the old target time.
+        Object.defineProperty(video, 'readyState', { value: HTMLMediaElement.HAVE_METADATA, configurable: true });
+        video.dispatchEvent(new Event('loadedmetadata'));
+
+        expect(video.currentTime).toBe(0);
+        expect(store.state.seeking).toBe(false);
+      });
+
       it('supersedes previous seek when new seek starts', async () => {
         const video = createMockVideo({ readyState: HTMLMediaElement.HAVE_METADATA });
         const store = createStore<PlayerTarget>()(timeFeature);

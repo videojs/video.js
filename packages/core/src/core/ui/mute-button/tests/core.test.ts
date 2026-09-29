@@ -11,7 +11,7 @@ function createMediaState(overrides: Partial<MediaVolumeState> = {}): MediaVolum
     volumeAvailability: 'available',
     mutedAvailability: 'available',
     setVolume: vi.fn((v: number) => v),
-    toggleMuted: vi.fn(() => false),
+    setMuted: vi.fn((muted: boolean) => muted),
     ...overrides,
   };
 }
@@ -35,7 +35,7 @@ describe('MuteButtonCore', () => {
 
       core.toggle(media);
 
-      expect(media.toggleMuted).not.toHaveBeenCalled();
+      expect(media.setMuted).not.toHaveBeenCalled();
     });
   });
   describe('getState', () => {
@@ -166,12 +166,31 @@ describe('MuteButtonCore', () => {
   });
 
   describe('toggle', () => {
-    it('calls toggleMuted', () => {
+    it('mutes when unmuted', () => {
       const core = new MuteButtonCore();
-      const media = createMediaState();
+      const media = createMediaState({ muted: false, volume: 0.8 });
 
       core.toggle(media);
-      expect(media.toggleMuted).toHaveBeenCalled();
+
+      expect(media.setMuted).toHaveBeenCalledExactlyOnceWith(true);
+    });
+
+    it('unmutes when muted', () => {
+      const core = new MuteButtonCore();
+      const media = createMediaState({ muted: true, volume: 0.8 });
+
+      core.toggle(media);
+
+      expect(media.setMuted).toHaveBeenCalledExactlyOnceWith(false);
+    });
+
+    it('unmutes when volume is 0 and not muted', () => {
+      const core = new MuteButtonCore();
+      const media = createMediaState({ muted: false, volume: 0 });
+
+      core.toggle(media);
+
+      expect(media.setMuted).toHaveBeenCalledExactlyOnceWith(false);
     });
 
     it('does nothing when disabled', () => {
@@ -179,7 +198,7 @@ describe('MuteButtonCore', () => {
       const media = createMediaState();
 
       core.toggle(media);
-      expect(media.toggleMuted).not.toHaveBeenCalled();
+      expect(media.setMuted).not.toHaveBeenCalled();
     });
   });
 });

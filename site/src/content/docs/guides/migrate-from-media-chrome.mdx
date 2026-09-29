@@ -400,7 +400,7 @@ React skins do not use Shadow DOM. Use `render` props when you build individual 
 
 ## Control the player imperatively
 
-Control everything through the player's store. Media Chrome had no player object; Video.js gives you one, with an action for every operation — `play`, `togglePaused`, `seek`, `setVolume`, `toggleFullscreen` — so one mental model covers playback and the state the browser doesn't own, such as fullscreen, captions, and quality.
+Control everything through the player's store. Media Chrome had no player object; Video.js gives you one, with an action for every operation — `play`, `pause`, `seek`, `setVolume`, `requestFullscreen`, `exitFullscreen` — so one mental model covers playback and the state the browser doesn't own, such as fullscreen, captions, and quality.
 
 <FrameworkCase frameworks={["html"]}>
 Hold a reference to the player element and call actions on its store:
@@ -408,7 +408,9 @@ Hold a reference to the player element and call actions on its store:
 ```js
 const player = document.querySelector('video-player');
 
-player.store.state.toggleFullscreen();
+player.store.state.requestFullscreen();
+// Later, leave fullscreen:
+player.store.state.exitFullscreen();
 ```
 </FrameworkCase>
 
@@ -419,8 +421,9 @@ Select an action with the same <DocsLink slug="reference/api/use-player">`usePla
 import { usePlayer } from '@videojs/react/video';
 
 function FullscreenShortcut() {
-  const toggleFullscreen = usePlayer((state) => state.toggleFullscreen);
-  // Call toggleFullscreen() from your own UI.
+  const requestFullscreen = usePlayer((state) => state.requestFullscreen);
+  const exitFullscreen = usePlayer((state) => state.exitFullscreen);
+  // Call requestFullscreen() and exitFullscreen() from your own UI.
   return null;
 }
 ```

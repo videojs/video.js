@@ -6,11 +6,10 @@ import { PiPButtonCore } from '../core';
 
 function createMediaState(overrides: Partial<MediaPictureInPictureState> = {}): MediaPictureInPictureState {
   return {
-    pip: false,
-    pipAvailability: 'available',
+    isPictureInPicture: false,
+    pictureInPictureAvailability: 'available',
     requestPictureInPicture: vi.fn(async () => {}),
     exitPictureInPicture: vi.fn(async () => {}),
-    togglePictureInPicture: vi.fn(async () => {}),
     ...overrides,
   };
 }
@@ -40,7 +39,7 @@ describe('PiPButtonCore', () => {
   describe('getState', () => {
     it('projects pip and availability', () => {
       const core = new PiPButtonCore();
-      const media = createMediaState({ pip: true });
+      const media = createMediaState({ isPictureInPicture: true });
 
       core.setMedia(media);
       const state = core.getState();
@@ -54,7 +53,7 @@ describe('PiPButtonCore', () => {
     it('marks disabled and hidden when unsupported', () => {
       const core = new PiPButtonCore();
 
-      core.setMedia(createMediaState({ pipAvailability: 'unsupported' }));
+      core.setMedia(createMediaState({ pictureInPictureAvailability: 'unsupported' }));
       const state = core.getState();
 
       expect(state.availability).toBe('unsupported');
@@ -65,7 +64,7 @@ describe('PiPButtonCore', () => {
     it('marks disabled and hidden when unavailable', () => {
       const core = new PiPButtonCore();
 
-      core.setMedia(createMediaState({ pipAvailability: 'unavailable' }));
+      core.setMedia(createMediaState({ pictureInPictureAvailability: 'unavailable' }));
       const state = core.getState();
 
       expect(state.availability).toBe('unavailable');
@@ -76,7 +75,7 @@ describe('PiPButtonCore', () => {
     it('keeps active PiP enabled and visible when entry is unavailable', () => {
       const core = new PiPButtonCore();
 
-      core.setMedia(createMediaState({ pip: true, pipAvailability: 'unavailable' }));
+      core.setMedia(createMediaState({ isPictureInPicture: true, pictureInPictureAvailability: 'unavailable' }));
       const state = core.getState();
 
       expect(state.availability).toBe('unavailable');
@@ -87,7 +86,7 @@ describe('PiPButtonCore', () => {
     it('marks disabled when the disabled prop is set', () => {
       const core = new PiPButtonCore({ disabled: true });
 
-      core.setMedia(createMediaState({ pipAvailability: 'available' }));
+      core.setMedia(createMediaState({ pictureInPictureAvailability: 'available' }));
       const state = core.getState();
 
       expect(state.disabled).toBe(true);
@@ -155,7 +154,7 @@ describe('PiPButtonCore', () => {
   describe('toggle', () => {
     it('calls requestPictureInPicture when not in PiP', async () => {
       const core = new PiPButtonCore();
-      const media = createMediaState({ pip: false });
+      const media = createMediaState({ isPictureInPicture: false });
 
       await core.toggle(media);
       expect(media.requestPictureInPicture).toHaveBeenCalled();
@@ -163,7 +162,7 @@ describe('PiPButtonCore', () => {
 
     it('calls exitPictureInPicture when in PiP', async () => {
       const core = new PiPButtonCore();
-      const media = createMediaState({ pip: true });
+      const media = createMediaState({ isPictureInPicture: true });
 
       await core.toggle(media);
       expect(media.exitPictureInPicture).toHaveBeenCalled();
@@ -171,7 +170,7 @@ describe('PiPButtonCore', () => {
 
     it('calls exitPictureInPicture when entry becomes unavailable', async () => {
       const core = new PiPButtonCore();
-      const media = createMediaState({ pip: true, pipAvailability: 'unavailable' });
+      const media = createMediaState({ isPictureInPicture: true, pictureInPictureAvailability: 'unavailable' });
 
       await core.toggle(media);
 
@@ -188,7 +187,7 @@ describe('PiPButtonCore', () => {
 
     it('does nothing when unsupported', async () => {
       const core = new PiPButtonCore();
-      const media = createMediaState({ pipAvailability: 'unsupported' });
+      const media = createMediaState({ pictureInPictureAvailability: 'unsupported' });
 
       await core.toggle(media);
       expect(media.requestPictureInPicture).not.toHaveBeenCalled();

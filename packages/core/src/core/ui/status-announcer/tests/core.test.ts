@@ -105,16 +105,16 @@ describe('StatusAnnouncerCore', () => {
       paused: true,
       subtitlesShowing: false,
       subtitlesAvailable: true,
-      fullscreen: false,
-      pip: false,
+      isFullscreen: false,
+      isPictureInPicture: false,
       playbackRate: 1,
     });
 
     for (const [partial, label] of [
       [{ paused: false }, 'Playing'],
       [{ subtitlesShowing: true }, 'Captions on'],
-      [{ fullscreen: true }, 'Fullscreen'],
-      [{ pip: true }, 'Picture in picture'],
+      [{ isFullscreen: true }, 'Fullscreen'],
+      [{ isPictureInPicture: true }, 'Picture in picture'],
       [{ playbackRate: 1.5 }, 'Playback rate 1.5×'],
     ] as const) {
       expect(process(partial)).toBe(true);

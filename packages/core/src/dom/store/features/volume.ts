@@ -34,26 +34,22 @@ export const volumeFeature = definePlayerFeature({
       return media.volume;
     },
 
-    toggleMuted() {
+    setMuted(muted: boolean) {
       const { media } = target();
       if (!isMediaMutedCapable(media)) return false;
 
-      // A media that mutes but reports no level has nothing to restore, so the
-      // mute is simply flipped.
-      if (!isMediaVolumeCapable(media)) {
-        media.muted = !media.muted;
-        return media.muted;
+      media.muted = muted;
+
+      // Unmuting at zero would stay silent. A media that reports no level has
+      // nothing to restore.
+      const volumeCapable = isMediaVolumeCapable(media);
+
+      if (!muted && volumeCapable && media.volume === 0) {
+        media.volume = UNMUTE_VOLUME;
       }
 
-      const effectivelyMuted = media.muted || media.volume === 0;
-
-      if (effectivelyMuted) {
-        media.muted = false;
-
-        if (media.volume === 0) media.volume = UNMUTE_VOLUME;
-      } else {
-        media.muted = true;
-      }
+      // `volumechange` is queued, so sync now, or an immediate second toggle would read the old value.
+      set({ volume: volumeCapable ? media.volume : 1, muted: media.muted });
 
       return media.muted;
     },

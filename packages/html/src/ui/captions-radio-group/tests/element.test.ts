@@ -39,7 +39,7 @@ async function waitForAssertion(assertion: () => void): Promise<void> {
 }
 
 function createTextTrackStore({
-  textTrackList = [{ kind: 'captions', label: '', language: '', mode: 'disabled' }],
+  textTrackList = [{ id: 'captions', kind: 'captions', label: '', language: '', mode: 'disabled' }],
   subtitlesShowing = false,
   selectSubtitlesTrack = vi.fn(),
 }: {

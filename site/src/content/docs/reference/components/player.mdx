@@ -154,7 +154,7 @@ function PlayPauseButton() {
   if (!playback) return null;
 
   return (
-    <button onClick={() => playback.togglePaused()}>
+    <button onClick={() => (playback.paused ? playback.play() : playback.pause())}>
       {playback.paused ? 'Play' : 'Pause'}
     </button>
   );
@@ -183,7 +183,12 @@ class PlayPauseButton extends UIElement {
     super.disconnectedCallback();
   }
 
-  readonly #togglePlayback = () => this.#playback.value?.togglePaused();
+  readonly #togglePlayback = () => {
+    const playback = this.#playback.value;
+    if (!playback) return;
+
+    playback.paused ? playback.play() : playback.pause();
+  };
 }
 
 customElements.define('play-pause-button', PlayPauseButton);

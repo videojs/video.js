@@ -22,6 +22,9 @@ export const timeFeature = definePlayerFeature({
         signal = signals.supersede(signalKeys.seek);
       if (!isMediaSeekCapable(media) || !isMediaSourceCapable(media)) return 0;
 
+      // A new source abandons the seek at any stage, so `emptied` cancels it like a superseding seek.
+      listen(media, 'emptied', () => signals.supersede(signalKeys.seek), { signal, once: true });
+
       if (!hasMetadata(media)) {
         const loaded = await onEvent(media, 'loadedmetadata', { signal }).catch(() => false);
         if (!loaded) return media.currentTime;

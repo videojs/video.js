@@ -4,15 +4,7 @@ import { isUndefined } from '@videojs/utils/predicate';
 import type { HotkeyActionName } from '../../core/ui/hotkey/core';
 import { MEDIA_INPUT_ACTION_OVERRIDES } from '../media-actions';
 import type { AnyPlayerStore } from '../player';
-import {
-  selectBuffer,
-  selectFullscreen,
-  selectPiP,
-  selectPlayback,
-  selectTextTrack,
-  selectTime,
-  selectVolume,
-} from '../store/selectors';
+import { selectBuffer, selectTextTrack, selectTime } from '../store/selectors';
 
 export type { HotkeyActionName } from '../../core/ui/hotkey/core';
 
@@ -30,34 +22,17 @@ export function isHotkeyToggleAction(action: string): boolean {
 }
 
 const HOTKEY_ACTIONS: Record<HotkeyActionName, HotkeyActionResolver> = {
-  togglePaused({ store }) {
-    const playback = selectPlayback(store.state);
-    if (!playback) return;
+  togglePaused: MEDIA_INPUT_ACTION_OVERRIDES.togglePaused,
 
-    playback.paused ? playback.play() : playback.pause();
-  },
+  toggleMuted: MEDIA_INPUT_ACTION_OVERRIDES.toggleMuted,
 
-  toggleMuted({ store }) {
-    selectVolume(store.state)?.toggleMuted();
-  },
-
-  toggleFullscreen({ store }) {
-    const fs = selectFullscreen(store.state);
-    if (!fs) return;
-
-    fs.fullscreen ? fs.exitFullscreen() : fs.requestFullscreen();
-  },
+  toggleFullscreen: MEDIA_INPUT_ACTION_OVERRIDES.toggleFullscreen,
 
   toggleSubtitles({ store }) {
     selectTextTrack(store.state)?.toggleSubtitles();
   },
 
-  togglePictureInPicture({ store }) {
-    const pip = selectPiP(store.state);
-    if (!pip) return;
-
-    pip.pip ? pip.exitPictureInPicture() : pip.requestPictureInPicture();
-  },
+  togglePictureInPicture: MEDIA_INPUT_ACTION_OVERRIDES.togglePictureInPicture,
 
   seekStep: MEDIA_INPUT_ACTION_OVERRIDES.seekStep,
 

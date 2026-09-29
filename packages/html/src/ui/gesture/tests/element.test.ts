@@ -17,7 +17,7 @@ afterEach(() => {
 
 class TestGestureProvider extends UIElement {
   readonly #store = {
-    state: { togglePaused: vi.fn() },
+    state: { paused: true, play: vi.fn(), pause: vi.fn() },
     subscribe: () => () => {},
   } as unknown as AnyPlayerStore;
   readonly containerProvider = new ContextProvider(this, {

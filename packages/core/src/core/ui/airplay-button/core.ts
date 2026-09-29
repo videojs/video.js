@@ -101,7 +101,7 @@ export class AirPlayButtonCore {
     if (this.getState().disabled) return;
 
     try {
-      await media.toggleRemotePlayback();
+      await media.promptRemotePlayback();
     } catch {
       // AirPlay requests can fail (user cancelled, permissions, etc.)
     }

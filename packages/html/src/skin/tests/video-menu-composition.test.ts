@@ -50,8 +50,8 @@ function createMenuStore(overrides: Partial<MenuMediaState> = {}): AnyPlayerStor
       thumbnailTrackSrc: null,
       thumbnailTrackCrossOrigin: null,
       textTrackList: [
-        { kind: 'captions', label: 'English', language: 'en', mode: 'showing' },
-        { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'showing' },
+        { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
       ],
       subtitlesShowing: true,
       toggleSubtitles: vi.fn(),

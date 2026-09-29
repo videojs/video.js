@@ -307,7 +307,6 @@ describe('TimeSliderCore', () => {
         waiting: false,
         play: vi.fn(async () => {}),
         pause: vi.fn(),
-        togglePaused: vi.fn(() => false),
         ...overrides,
       };
     }

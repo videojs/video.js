@@ -111,6 +111,19 @@ describe('qualityFeature', () => {
     ]);
   });
 
+  it('assigns positional ids to renditions without a media id', () => {
+    const media = createMedia([createRendition({ height: 1080 }), createRendition({ height: 720, active: true })]);
+    const store = createStore<PlayerTarget>()(qualityFeature);
+
+    store.attach({ media, container: null });
+
+    expect(store.state.videoRenditionList).toEqual([
+      { id: '0', height: 1080, selected: false },
+      { id: '1', height: 720, selected: false },
+    ]);
+    expect(store.state.activeVideoRendition).toEqual(store.state.videoRenditionList[1]);
+  });
+
   it('selects automatic quality', () => {
     const media = createMedia([
       createRendition({ id: '0', height: 1080, selected: true }),

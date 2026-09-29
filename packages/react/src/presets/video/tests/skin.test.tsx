@@ -16,7 +16,6 @@ function wrapper(overrides: Record<string, unknown> = {}) {
     waiting: false,
     play: async () => {},
     pause: () => {},
-    togglePaused: () => true,
     title: '',
     poster: 'poster.jpg',
     ...overrides,

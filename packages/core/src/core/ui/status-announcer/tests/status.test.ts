@@ -11,16 +11,16 @@ describe('deriveStatusAnnouncement', () => {
           paused: true,
           subtitlesShowing: false,
           subtitlesAvailable: true,
-          fullscreen: false,
-          pip: false,
+          isFullscreen: false,
+          isPictureInPicture: false,
           playbackRate: 1,
         },
         {
           paused: false,
           subtitlesShowing: true,
           subtitlesAvailable: true,
-          fullscreen: true,
-          pip: true,
+          isFullscreen: true,
+          isPictureInPicture: true,
           playbackRate: 1.25,
         }
       )

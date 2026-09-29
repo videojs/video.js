@@ -6,30 +6,29 @@ import { definePlayerFeature } from '../../feature';
 
 export const playbackFeature = definePlayerFeature({
   name: 'playback',
-  state: ({ target }): MediaPlaybackState => ({
+  state: ({ target, set }): MediaPlaybackState => ({
     paused: true,
     ended: false,
     started: false,
     waiting: false,
     play() {
-      return target().media.play();
+      const { media } = target();
+      const playing = media.play();
+
+      // The `play` event is queued, so sync now, or an immediate second toggle would read the old state. A refused
+      // `play()` leaves `paused` true, and `media.ended` can lag behind a replay.
+      if (isMediaPauseCapable(media) && !media.paused) set({ paused: false, ended: false, started: true });
+
+      return playing;
     },
     pause() {
       const { media } = target();
 
-      if (isMediaPauseCapable(media)) media.pause();
-    },
-    togglePaused() {
-      const media = target().media;
-      if (!isMediaPauseCapable(media)) return false;
-
-      if (media.paused) {
-        media.play();
-        return true;
+      if (isMediaPauseCapable(media)) {
+        media.pause();
+        // The `pause` event is queued, so sync now, or an immediate second toggle would read the old state.
+        set({ paused: media.paused });
       }
-
-      media.pause();
-      return false;
     },
   }),
 

@@ -16,7 +16,7 @@ const unavailableVolume: MediaVolumeState = {
   volumeAvailability: 'unsupported',
   mutedAvailability: 'unsupported',
   setVolume: () => 0,
-  toggleMuted: () => false,
+  setMuted: () => false,
 };
 
 export interface VolumePopoverRootProps extends PopoverRootProps {}

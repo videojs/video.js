@@ -123,6 +123,24 @@ describe('QualityRadioGroupCore', () => {
       });
     });
 
+    it('matches the active rendition by id', () => {
+      const core = new QualityRadioGroupCore();
+      const media = createMediaState({
+        videoRenditionList: [
+          { id: 'hd', height: 1080, selected: false },
+          { id: 'sd', height: 480, selected: false },
+        ],
+        activeVideoRendition: { id: 'sd', height: 480, selected: false },
+      });
+
+      core.setMedia(media);
+
+      expect(core.getState().options[0]).toMatchObject({
+        label: { key: 'menu.autoWithLabel' },
+        labelParams: { label: '480p' },
+      });
+    });
+
     it('marks availability unavailable with one rendition', () => {
       const core = new QualityRadioGroupCore();
 
@@ -150,32 +168,32 @@ describe('QualityRadioGroupCore', () => {
     it('formats height labels by default', () => {
       const core = new QualityRadioGroupCore();
 
-      expect(core.getRenditionLabel({ height: 1080, selected: false })).toBe('1080p');
+      expect(core.getRenditionLabel({ id: '0', height: 1080, selected: false })).toBe('1080p');
     });
 
     it('formats portrait labels using the shorter dimension', () => {
       const core = new QualityRadioGroupCore();
 
-      expect(core.getRenditionLabel({ width: 1080, height: 1920, selected: false })).toBe('1080p');
+      expect(core.getRenditionLabel({ id: '0', width: 1080, height: 1920, selected: false })).toBe('1080p');
     });
 
     it('formats cinematic landscape labels using matching widescreen classes', () => {
       const core = new QualityRadioGroupCore();
 
-      expect(core.getRenditionLabel({ width: 1920, height: 800, selected: false })).toBe('1080p');
-      expect(core.getRenditionLabel({ width: 3840, height: 1600, selected: false })).toBe('2160p');
+      expect(core.getRenditionLabel({ id: '0', width: 1920, height: 800, selected: false })).toBe('1080p');
+      expect(core.getRenditionLabel({ id: '0', width: 3840, height: 1600, selected: false })).toBe('2160p');
     });
 
     it('formats non-standard wide landscape labels using height', () => {
       const core = new QualityRadioGroupCore();
 
-      expect(core.getRenditionLabel({ width: 1234, height: 567, selected: false })).toBe('567p');
+      expect(core.getRenditionLabel({ id: '0', width: 1234, height: 567, selected: false })).toBe('567p');
     });
 
     it('formats bitrate labels when height is missing', () => {
       const core = new QualityRadioGroupCore();
 
-      expect(core.getRenditionLabel({ bitrate: 1_500_000, selected: false })).toBe('1.5 Mbps');
+      expect(core.getRenditionLabel({ id: '0', bitrate: 1_500_000, selected: false })).toBe('1.5 Mbps');
     });
 
     it('uses a custom formatter', () => {
@@ -183,7 +201,7 @@ describe('QualityRadioGroupCore', () => {
         formatRendition: (rendition) => `${rendition.width}×${rendition.height}`,
       });
 
-      expect(core.getRenditionLabel({ width: 1920, height: 1080, selected: false })).toBe('1920×1080');
+      expect(core.getRenditionLabel({ id: '0', width: 1920, height: 1080, selected: false })).toBe('1920×1080');
     });
   });
 

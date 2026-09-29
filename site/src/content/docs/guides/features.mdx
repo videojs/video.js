@@ -198,7 +198,7 @@ You can also check availability in JS:
 <FrameworkCase frameworks={["react"]}>
 ```tsx title="PiPControl.tsx"
 function PiPControl() {
-  const availability = usePlayer((s) => s.pipAvailability);
+  const availability = usePlayer((s) => s.pictureInPictureAvailability);
 
   if (availability !== 'available') return null;
 
@@ -210,7 +210,7 @@ function PiPControl() {
 ```ts
 const media = this.#pip.value;
 
-if (media?.pipAvailability !== 'available') {
+if (media?.pictureInPictureAvailability !== 'available') {
   this.hidden = true;
 }
 ```

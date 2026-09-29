@@ -19,7 +19,7 @@ function createVolumeStore(volumeAvailability: MediaVolumeState['volumeAvailabil
       volumeAvailability,
       mutedAvailability: 'available',
       setVolume: vi.fn(),
-      toggleMuted: vi.fn(),
+      setMuted: vi.fn(),
     }),
   }) as unknown as AnyPlayerStore;
 }

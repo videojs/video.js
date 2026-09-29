@@ -54,7 +54,7 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
     });
 
     it('detects PiP availability when supported', () => {
@@ -65,7 +65,7 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.pipAvailability).toBe('available');
+      expect(store.state.pictureInPictureAvailability).toBe('available');
     });
 
     it('keeps PiP unavailable until metadata is loaded', () => {
@@ -81,7 +81,7 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.pipAvailability).toBe('unavailable');
+      expect(store.state.pictureInPictureAvailability).toBe('unavailable');
 
       Object.defineProperty(video, 'readyState', {
         value: HTMLMediaElement.HAVE_METADATA,
@@ -89,7 +89,7 @@ describe('pipFeature', () => {
       });
       video.dispatchEvent(new Event('loadedmetadata'));
 
-      expect(store.state.pipAvailability).toBe('available');
+      expect(store.state.pictureInPictureAvailability).toBe('available');
     });
 
     it('reports media that cannot enter PiP as unsupported', () => {
@@ -102,7 +102,7 @@ describe('pipFeature', () => {
 
       store.attach({ media, container: null });
 
-      expect(store.state.pipAvailability).toBe('unsupported');
+      expect(store.state.pictureInPictureAvailability).toBe('unsupported');
     });
 
     it('reports WebKit presentation mode as available', () => {
@@ -117,7 +117,7 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.pipAvailability).toBe('available');
+      expect(store.state.pictureInPictureAvailability).toBe('available');
     });
 
     it('updates pip on PiP events', () => {
@@ -133,7 +133,7 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
 
       // Simulate entering PiP
       Object.defineProperty(document, 'pictureInPictureElement', {
@@ -143,7 +143,7 @@ describe('pipFeature', () => {
       });
       video.dispatchEvent(new Event('enterpictureinpicture'));
 
-      expect(store.state.pip).toBe(true);
+      expect(store.state.isPictureInPicture).toBe(true);
 
       // Simulate exiting PiP
       Object.defineProperty(document, 'pictureInPictureElement', {
@@ -153,7 +153,7 @@ describe('pipFeature', () => {
       });
       video.dispatchEvent(new Event('leavepictureinpicture'));
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
     });
 
     it('syncs pip on webkitpresentationmodechanged event (iOS Safari)', () => {
@@ -167,24 +167,24 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
 
       // Simulate entering PiP via WebKit presentation mode
       video.webkitPresentationMode = 'picture-in-picture';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.pip).toBe(true);
+      expect(store.state.isPictureInPicture).toBe(true);
 
       // Simulate exiting
       video.webkitPresentationMode = 'inline';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
     });
   });
 
   describe('actions', () => {
-    it('requestPictureInPicture() does nothing before metadata is loaded', async () => {
+    it('requestPictureInPicture() rejects before metadata is loaded', async () => {
       const video = createPipCapableVideo();
 
       Object.defineProperty(video, 'readyState', {
@@ -196,9 +196,36 @@ describe('pipFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      await store.requestPictureInPicture();
-
+      await expect(store.requestPictureInPicture()).rejects.toMatchObject({ name: 'InvalidStateError' });
       expect(video.requestPictureInPicture).not.toHaveBeenCalled();
+    });
+
+    it('requestPictureInPicture() stays in fullscreen when it rejects before metadata is loaded', async () => {
+      const originalExit = document.exitFullscreen;
+      const video = createPipCapableVideo();
+      const container = document.createElement('div');
+
+      document.exitFullscreen = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(video, 'readyState', {
+        value: HTMLMediaElement.HAVE_NOTHING,
+        configurable: true,
+      });
+      Object.defineProperty(document, 'fullscreenElement', {
+        value: container,
+        writable: true,
+        configurable: true,
+      });
+      const store = createStore<PlayerTarget>()(pipFeature);
+
+      store.attach({ media: video, container });
+
+      try {
+        await expect(store.requestPictureInPicture()).rejects.toMatchObject({ name: 'InvalidStateError' });
+        expect(document.exitFullscreen).not.toHaveBeenCalled();
+      } finally {
+        document.exitFullscreen = originalExit;
+        Object.defineProperty(document, 'fullscreenElement', { value: null, writable: true, configurable: true });
+      }
     });
 
     it('requestPictureInPicture() calls requestPictureInPicture on video', async () => {
@@ -367,7 +394,7 @@ describe('pipFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container: null });
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
     });
 
     it('reflects host.isPictureInPicture when document PiP element is the underlying video', () => {
@@ -392,7 +419,7 @@ describe('pipFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container: null });
 
-      expect(store.state.pip).toBe(true);
+      expect(store.state.isPictureInPicture).toBe(true);
     });
 
     it('updates pip on PiP events forwarded from target', () => {
@@ -411,7 +438,7 @@ describe('pipFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container: null });
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
 
       Object.defineProperty(document, 'pictureInPictureElement', {
         value: video,
@@ -420,7 +447,7 @@ describe('pipFeature with HTMLVideoAdapter', () => {
       });
       video.dispatchEvent(new Event('enterpictureinpicture'));
 
-      expect(store.state.pip).toBe(true);
+      expect(store.state.isPictureInPicture).toBe(true);
 
       Object.defineProperty(document, 'pictureInPictureElement', {
         value: null,
@@ -429,7 +456,7 @@ describe('pipFeature with HTMLVideoAdapter', () => {
       });
       video.dispatchEvent(new Event('leavepictureinpicture'));
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
     });
 
     it('syncs pip on webkitpresentationmodechanged forwarded from target (iOS Safari)', () => {
@@ -444,17 +471,17 @@ describe('pipFeature with HTMLVideoAdapter', () => {
 
       store.attach({ media: host, container: null });
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
 
       video.webkitPresentationMode = 'picture-in-picture';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.pip).toBe(true);
+      expect(store.state.isPictureInPicture).toBe(true);
 
       video.webkitPresentationMode = 'inline';
       video.dispatchEvent(new Event('webkitpresentationmodechanged'));
 
-      expect(store.state.pip).toBe(false);
+      expect(store.state.isPictureInPicture).toBe(false);
     });
   });
 

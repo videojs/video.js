@@ -18,12 +18,12 @@ export function deriveStatusAnnouncement(
     announcements.push(snapshot.subtitlesShowing ? labels.captionsOn : labels.captionsOff);
   }
 
-  if (hasChanged(previous.fullscreen, snapshot.fullscreen)) {
-    announcements.push(snapshot.fullscreen ? labels.fullscreen : labels.exitFullscreen);
+  if (hasChanged(previous.isFullscreen, snapshot.isFullscreen)) {
+    announcements.push(snapshot.isFullscreen ? labels.fullscreen : labels.exitFullscreen);
   }
 
-  if (hasChanged(previous.pip, snapshot.pip)) {
-    announcements.push(snapshot.pip ? labels.pictureInPicture : labels.exitPictureInPicture);
+  if (hasChanged(previous.isPictureInPicture, snapshot.isPictureInPicture)) {
+    announcements.push(snapshot.isPictureInPicture ? labels.pictureInPicture : labels.exitPictureInPicture);
   }
 
   if (hasChanged(previous.playbackRate, snapshot.playbackRate)) {

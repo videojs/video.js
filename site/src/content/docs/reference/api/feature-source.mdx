@@ -8,7 +8,7 @@ import FeatureReference from "@/components/docs/api-reference/FeatureReference.a
 import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 
-Tracks the current media source and readiness.
+Tracks the loaded media resource and how much of it is ready. To change the source, set `src` or `source` on the media element, which also carries type and engine configuration.
 
 ## Import
 
@@ -34,7 +34,7 @@ function SourceInfo() {
   const source = usePlayer(selectSource);
   if (!source) return null;
 
-  return <span>{source.source ?? 'No source'}</span>;
+  return <span>{source.currentSrc || 'No source'}</span>;
 }
 ```
 </FrameworkCase>

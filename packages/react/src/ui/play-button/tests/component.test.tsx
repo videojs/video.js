@@ -23,7 +23,6 @@ describe('PlayButton', () => {
       waiting: false,
       play: vi.fn(),
       pause: vi.fn(),
-      togglePaused: vi.fn(),
     });
 
     const { rerender } = render(
@@ -57,7 +56,6 @@ describe('PlayButton', () => {
       waiting: false,
       play: vi.fn(),
       pause: vi.fn(),
-      togglePaused: vi.fn(),
     });
 
     render(

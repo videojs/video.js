@@ -35,7 +35,7 @@ describe('CaptionsButtonCore', () => {
       const core = new CaptionsButtonCore();
       const media = createMediaState({
         subtitlesShowing: true,
-        textTrackList: [{ kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' }],
+        textTrackList: [{ id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' }],
       });
 
       core.setMedia(media);
@@ -50,8 +50,8 @@ describe('CaptionsButtonCore', () => {
       core.setMedia(
         createMediaState({
           textTrackList: [
-            { kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-            { kind: 'metadata', label: 'thumbnails', language: '', mode: 'hidden' },
+            { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+            { id: 'metadata', kind: 'metadata', label: 'thumbnails', language: '', mode: 'hidden' },
           ],
         })
       );
@@ -67,7 +67,7 @@ describe('CaptionsButtonCore', () => {
 
       core.setMedia(
         createMediaState({
-          textTrackList: [{ kind: 'metadata', label: 'thumbnails', language: '', mode: 'hidden' }],
+          textTrackList: [{ id: 'metadata', kind: 'metadata', label: 'thumbnails', language: '', mode: 'hidden' }],
         })
       );
       const state = core.getState();
@@ -82,7 +82,9 @@ describe('CaptionsButtonCore', () => {
 
       core.setMedia(
         createMediaState({
-          textTrackList: [{ kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' }],
+          textTrackList: [
+            { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+          ],
         })
       );
       const state = core.getState();
@@ -153,7 +155,7 @@ describe('CaptionsButtonCore', () => {
     it('calls toggleSubtitles when caption tracks are present', () => {
       const core = new CaptionsButtonCore();
       const media = createMediaState({
-        textTrackList: [{ kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' }],
+        textTrackList: [{ id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' }],
       });
 
       core.toggle(media);
@@ -172,8 +174,8 @@ describe('CaptionsButtonCore', () => {
       const core = new CaptionsButtonCore({ menuTrigger: true });
       const media = createMediaState({
         textTrackList: [
-          { kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
-          { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+          { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
+          { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
         ],
       });
 
@@ -184,7 +186,7 @@ describe('CaptionsButtonCore', () => {
     it('does nothing when the disabled prop is set', () => {
       const core = new CaptionsButtonCore({ disabled: true });
       const media = createMediaState({
-        textTrackList: [{ kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' }],
+        textTrackList: [{ id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' }],
       });
 
       core.toggle(media);
@@ -194,7 +196,7 @@ describe('CaptionsButtonCore', () => {
     it('still toggles as a menu trigger with a single track', () => {
       const core = new CaptionsButtonCore({ menuTrigger: true });
       const media = createMediaState({
-        textTrackList: [{ kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' }],
+        textTrackList: [{ id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' }],
       });
 
       core.toggle(media);

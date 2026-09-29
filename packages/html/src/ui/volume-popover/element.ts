@@ -13,7 +13,7 @@ const unavailableVolume: MediaVolumeState = {
   volumeAvailability: 'unsupported',
   mutedAvailability: 'unsupported',
   setVolume: () => 0,
-  toggleMuted: () => false,
+  setMuted: () => false,
 };
 
 /** A volume-aware popover that keeps its adjacent mute trigger available as a fallback. */

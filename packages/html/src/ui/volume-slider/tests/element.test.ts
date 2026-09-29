@@ -33,7 +33,7 @@ function createVolumeStore(volumeAvailability: MediaVolumeState['volumeAvailabil
       // these tests vary that one and leave the mute available throughout.
       mutedAvailability: 'available',
       setVolume: vi.fn(),
-      toggleMuted: vi.fn(),
+      setMuted: vi.fn(),
     }),
   }) as unknown as AnyPlayerStore;
 }

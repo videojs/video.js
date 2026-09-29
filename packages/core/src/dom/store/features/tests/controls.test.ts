@@ -732,6 +732,39 @@ describe('controlsFeature', () => {
       expect(store.state.controlsVisible).toBe(true);
       expect(result).toBe(true);
     });
+
+    it('hides controls when forced off', () => {
+      const video = createMockVideo({ paused: false });
+      const { store } = createPlayerStore(video);
+
+      expect(store.state.toggleControls(false)).toBe(false);
+      expect(store.state.toggleControls(false)).toBe(false);
+    });
+
+    it('restarts the idle timer when forced on, even if already visible', () => {
+      const video = createMockVideo({ paused: false });
+      const { store } = createPlayerStore(video);
+
+      vi.advanceTimersByTime(IDLE_DELAY - 500);
+
+      expect(store.state.toggleControls(true)).toBe(true);
+
+      vi.advanceTimersByTime(500);
+      flush();
+      expect(store.state.controlsVisible).toBe(true);
+
+      vi.advanceTimersByTime(IDLE_DELAY - 500);
+      flush();
+      expect(store.state.controlsVisible).toBe(false);
+    });
+
+    it('applies force before attach', () => {
+      const store = createStore<PlayerTarget>()(controlsFeature);
+
+      expect(store.state.toggleControls(false)).toBe(false);
+      expect(store.state.toggleControls(false)).toBe(false);
+      expect(store.state.toggleControls(true)).toBe(true);
+    });
   });
 
   describe('cast interaction', () => {

@@ -17,7 +17,7 @@ const { mockSliderApi, mockVolumeState, mutableVolume } = vi.hoisted(() => {
     muted: false,
     volumeAvailability: 'available' as const,
     setVolume: vi.fn(),
-    toggleMuted: vi.fn(),
+    setMuted: vi.fn(),
   };
 
   return {
@@ -89,7 +89,7 @@ afterEach(() => {
   cleanup();
   mutableVolume.current = mockVolumeState;
   mockVolumeState.setVolume.mockClear();
-  mockVolumeState.toggleMuted.mockClear();
+  mockVolumeState.setMuted.mockClear();
 });
 
 // --- Tests ---

@@ -13,7 +13,7 @@ function renderAirPlayButton(props: AirPlayButton.Props = {}) {
   const { Wrapper } = createPlayerWrapper({
     remotePlaybackState: 'disconnected',
     remotePlaybackAvailability: 'available',
-    toggleRemotePlayback: vi.fn(),
+    promptRemotePlayback: vi.fn(),
   });
 
   render(<AirPlayButton data-testid="airplay" {...props} />, { wrapper: Wrapper });

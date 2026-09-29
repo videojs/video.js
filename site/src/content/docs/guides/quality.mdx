@@ -73,7 +73,7 @@ The <DocsLink slug="reference/api/feature-quality">quality feature</DocsLink> mi
 
 - `videoRenditionList` holds each rendition's `id`, `width`, `height`, `bitrate`, `frameRate`, `codec`, and whether it's `selected`.
 - `activeVideoRendition` is the rendition currently playing. When the engine doesn't report one directly, the player matches it from the video's current dimensions.
-- `selectVideoRendition(value)` pins one rendition; pass `'auto'` to return control to the engine's adaptive selection.
+- `selectVideoRendition(id)` pins one rendition by its `id` from `videoRenditionList`; pass `'auto'` to return control to the engine's adaptive selection.
 
 <FrameworkCase frameworks={["react"]}>
 
@@ -117,7 +117,7 @@ function PinLowestRendition() {
   const lowest = [...renditions].sort((a, b) => (a.height ?? 0) - (b.height ?? 0))[0];
 
   return (
-    <button type="button" onClick={() => lowest?.id && store.selectVideoRendition(lowest.id)}>
+    <button type="button" onClick={() => lowest && store.selectVideoRendition(lowest.id)}>
       Data saver
     </button>
   );

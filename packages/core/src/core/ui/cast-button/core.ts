@@ -95,7 +95,7 @@ export class CastButtonCore {
 
     if (this.getState().disabled) return;
 
-    return media.toggleRemotePlayback();
+    return media.promptRemotePlayback();
   }
 }
 

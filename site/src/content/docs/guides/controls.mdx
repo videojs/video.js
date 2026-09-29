@@ -61,7 +61,7 @@ The <DocsLink slug="reference/api/feature-controls">controls feature</DocsLink> 
 
 - `userActive` is `true` while the user interacts — pointer movement, keyboard input, or focus — and flips to `false` after two seconds of inactivity.
 - `controlsVisible` derives from activity and playback: controls stay visible while paused or while a remote playback session is connecting or connected, regardless of idle state.
-- `toggleControls()` flips visibility, for wiring to custom triggers.
+- `toggleControls(forceShow?)` flips visibility for custom triggers, or shows (`true`) or hides (`false`) the controls. Hiding counts as going idle, so controls stay visible while paused or casting.
 
 On touch devices, a tap on the media toggles the controls instead of relying on pointer movement, and mid-gesture movement doesn't flicker visibility.
 

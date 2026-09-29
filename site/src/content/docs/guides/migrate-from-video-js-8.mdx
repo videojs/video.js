@@ -557,13 +557,13 @@ You can also write to the media element directly. That is safe because player st
 <FrameworkCase frameworks={["react"]}>
 | Video.js 8 | Video.js v10 |
 |---|---|
-| `player.play()`, `player.pause()` | the player's `play`, `pause`, `togglePaused`, or `media.play()`, `media.pause()` |
+| `player.play()`, `player.pause()` | the player's `play`, `pause`, or `media.play()`, `media.pause()` |
 | `player.currentTime()` / `player.currentTime(10)` | `currentTime` in player state, the player's `seek(10)`, or `media.currentTime` |
 | `player.duration()` | `duration` in player state, or `media.duration` |
-| `player.volume()`, `player.muted()` | the player's `setVolume`, `toggleMuted`, or `media.volume`, `media.muted` |
+| `player.volume()`, `player.muted()` | the player's `setVolume`, `setMuted`, or `media.volume`, `media.muted` |
 | `player.playbackRate()` | the player's `setPlaybackRate`, or `media.playbackRate` |
 | `player.src({ src, type })` | set `src` on the media or replace the media component (`Video`, `HlsJsVideo`, `DashVideo`, etc) |
-| `player.requestFullscreen()`, `exitFullscreen()` | the player's `requestFullscreen`, `exitFullscreen`, `toggleFullscreen` |
+| `player.requestFullscreen()`, `exitFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
 | `player.textTracks()`, `addRemoteTextTrack()` | `<track>` elements, and `textTrackList` in player state, `textTracks` in media |
 | `player.audioTracks()` | `audioTrackList` in player state, `audioTracks` in media |
 | `player.error()` | `error` in player state |
@@ -575,13 +575,13 @@ You can also write to the media element directly. That is safe because player st
 <FrameworkCase frameworks={["html"]}>
 | Video.js 8 | Video.js v10 |
 |---|---|
-| `player.play()`, `player.pause()` | the player's `play`, `pause`, `togglePaused`, or `media.play()`, `media.pause()` |
+| `player.play()`, `player.pause()` | the player's `play`, `pause`, or `media.play()`, `media.pause()` |
 | `player.currentTime()` / `player.currentTime(10)` | `currentTime` in player state, the player's `seek(10)`, or `media.currentTime` |
 | `player.duration()` | `duration` in player state, or `media.duration` |
-| `player.volume()`, `player.muted()` | the player's `setVolume`, `toggleMuted`, or `media.volume`, `media.muted` |
+| `player.volume()`, `player.muted()` | the player's `setVolume`, `setMuted`, or `media.volume`, `media.muted` |
 | `player.playbackRate()` | the player's `setPlaybackRate`, or `media.playbackRate` |
 | `player.src({ src, type })` | set `src` on the media or replace the media element (`<video>` tag, `<hlsjs-video>`, `<dash-video>`, etc) |
-| `player.requestFullscreen()`, `exitFullscreen()` | the player's `requestFullscreen`, `exitFullscreen`, `toggleFullscreen` |
+| `player.requestFullscreen()`, `exitFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
 | `player.textTracks()`, `addRemoteTextTrack()` | `<track>` elements, and `textTrackList` in player state, `textTracks` in media |
 | `player.audioTracks()` | `audioTrackList` in player state, `audioTracks` in media |
 | `player.error()` | `error` in player state |
@@ -596,12 +596,12 @@ Everything the table describes as "the player's" lives on the player element's s
 ```js
 const player = document.querySelector('video-player');
 
-player.store.state.toggleFullscreen();
+player.store.state.requestFullscreen();
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-Where v8 had you keep the `videojs()` return value in a ref, put the ref on the media component instead; its value is the rendered `HTMLVideoElement`, ready for every `media.*` entry in the table. The player's actions come from the same `usePlayer` hook you read state with — select `togglePaused`, `setPlaybackRate`, or `toggleFullscreen` from state and call it. Where `player.tech()` habits linger, `useMedia` returns the Video.js media object.
+Where v8 had you keep the `videojs()` return value in a ref, put the ref on the media component instead; its value is the rendered `HTMLVideoElement`, ready for every `media.*` entry in the table. The player's actions come from the same `usePlayer` hook you read state with — select `play`, `setPlaybackRate`, or `requestFullscreen` from state and call it. Where `player.tech()` habits linger, `useMedia` returns the Video.js media object.
 </FrameworkCase>
 
 Swapping sources is the change most likely to surprise you. There's no `player.src()`; you set `src` on the media element, or replace the media element entirely, and the UI follows. Changing formats is changing tags.

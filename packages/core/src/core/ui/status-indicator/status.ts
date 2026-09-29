@@ -56,7 +56,7 @@ export function deriveStatus(
       };
     }
     case 'toggleFullscreen': {
-      const fullscreen = snapshot.fullscreen !== undefined ? !snapshot.fullscreen : true;
+      const fullscreen = snapshot.isFullscreen !== undefined ? !snapshot.isFullscreen : true;
 
       return {
         status: fullscreen ? 'fullscreen' : 'exit-fullscreen',
@@ -65,7 +65,7 @@ export function deriveStatus(
       };
     }
     case 'togglePictureInPicture': {
-      const pip = snapshot.pip !== undefined ? !snapshot.pip : true;
+      const pip = snapshot.isPictureInPicture !== undefined ? !snapshot.isPictureInPicture : true;
 
       return {
         status: pip ? 'pip' : 'exit-pip',

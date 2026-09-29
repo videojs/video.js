@@ -15,9 +15,11 @@ export interface PiPButtonProps {
   disabled?: boolean | undefined;
 }
 
-export interface PiPButtonState extends Pick<MediaPictureInPictureState, 'pip'>, ButtonState {
+export interface PiPButtonState extends ButtonState {
+  /** Whether picture-in-picture mode is currently active. */
+  pip: boolean;
   /** Whether picture-in-picture can be requested on this platform. */
-  availability: MediaPictureInPictureState['pipAvailability'];
+  availability: MediaPictureInPictureState['pictureInPictureAvailability'];
   /** Non-interactive but still focusable (mirrors `aria-disabled`). */
   disabled: boolean;
   /** Whether the button is hidden until picture-in-picture is available. */
@@ -70,11 +72,11 @@ export class PiPButtonCore {
 
   getState(): PiPButtonState {
     const media = this.#media!;
-    const availability = media.pipAvailability;
-    const actionable = media.pip || availability === 'available';
+    const availability = media.pictureInPictureAvailability;
+    const actionable = media.isPictureInPicture || availability === 'available';
 
     this.state.patch({
-      pip: media.pip,
+      pip: media.isPictureInPicture,
       availability,
       disabled: this.#props.disabled || !actionable,
       hidden: !actionable,
@@ -89,7 +91,7 @@ export class PiPButtonCore {
 
     if (this.getState().disabled) return;
 
-    return media.pip ? media.exitPictureInPicture() : media.requestPictureInPicture();
+    return media.isPictureInPicture ? media.exitPictureInPicture() : media.requestPictureInPicture();
   }
 }
 
