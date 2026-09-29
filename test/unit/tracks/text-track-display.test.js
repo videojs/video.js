@@ -577,6 +577,46 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 
+  QUnit.test('keeps the caption layer on-screen (bottom: 0) on a Smart TV without inset support', function(assert) {
+    // Set conditions for the use of the style modifications: no CSS `inset`
+    // support (Chromium < 87) on a Smart TV. This is the case that previously
+    // set `bottom` to the full player height and pushed captions off-screen.
+    window.CSS.supports = () => false;
+    browser.IS_SMART_TV = () => true;
+
+    const player = TestHelpers.makePlayer();
+
+    // A real Smart TV reports a non-zero player height; jsdom returns 0, which
+    // would let a `bottom: <playerHeight>px` regression collapse to '0px' and
+    // hide itself. Force a non-zero height so the assertion is meaningful.
+    player.el_.getBoundingClientRect = () => ({height: 400});
+
+    const track1 = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      src: 'en.vtt',
+      default: true
+    };
+
+    // Add the text track
+    player.addRemoteTextTrack(track1, true);
+
+    player.src({type: 'video/mp4', src: 'http://google.com'});
+    player.play();
+
+    // as if metadata was loaded
+    player.textTrackDisplay.updateDisplay();
+
+    // Make sure the ready handler runs
+    this.clock.tick(1);
+
+    const textTrack = window.document.querySelector('.vjs-text-track-display');
+
+    assert.ok(textTrack.style.bottom === '0px', 'Style of bottom for vjs-text-track-display element should be 0px, not the player height');
+    player.dispose();
+  });
+
   QUnit.test('track cue should use values of top, right, botton, left if browser does not support inset property', function(assert) {
     // Set conditions for the use of the style modifications
     window.CSS.supports = () => false;
