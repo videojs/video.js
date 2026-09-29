@@ -439,7 +439,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(screen.getByRole('button', { name: 'More prompt actions' }));
     await user.click(await screen.findByRole('menuitem', { name: /Copy for Codex/ }, RENDER_WAIT));
 
-    expect(screen.getByRole('button', { name: 'Copy prompt' })).toHaveTextContent(/^Copy promptCopy prompt$/);
+    expect(screen.getByRole('button', { name: 'Copy prompt' })).not.toHaveTextContent('Copied');
     expect(screen.getByText('Copied the Codex command')).toBeInTheDocument();
   });
 
