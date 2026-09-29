@@ -5,7 +5,6 @@ import Component from '../component';
 import * as Fn from '../utils/fn.js';
 import * as Dom from '../utils/dom.js';
 import window from 'global/window';
-import * as browser from '../utils/browser';
 
 /** @import Player from '../player' */
 
@@ -340,11 +339,7 @@ class TextTrackDisplay extends Component {
       tryUpdateStyle(textTrackDisplay, 'height', (playerHeight - controlBarHeight) + 'px');
       tryUpdateStyle(textTrackDisplay, 'top', 'unset');
 
-      if (browser.IS_SMART_TV) {
-        tryUpdateStyle(textTrackDisplay, 'bottom', playerHeight + 'px');
-      } else {
-        tryUpdateStyle(textTrackDisplay, 'bottom', '0px');
-      }
+      tryUpdateStyle(textTrackDisplay, 'bottom', '0px');
 
       // vjsTextTrackCue style updates
       if (vjsTextTrackCues.length > 0) {
