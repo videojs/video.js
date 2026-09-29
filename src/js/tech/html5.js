@@ -556,6 +556,17 @@ class Html5 extends Tech {
    *        Set the current time of the media to this.
    */
   setCurrentTime(seconds) {
+    // On iOS, a seek made while the video is paused and has no frame data yet
+    // is dropped if it is still pending when playback starts: the video plays
+    // from the beginning while currentTime keeps reporting the requested time,
+    // seeking stays true and timeupdate stops. A seek made once playback has
+    // started is honoured, so hold the time until then.
+    if (browser.IS_IOS && this.el_.paused && this.el_.readyState < 2) {
+      this.holdSeekUntilPlayback_(seconds);
+      return;
+    }
+    this.clearHeldSeek_();
+
     try {
       if (this.isScrubbing_ && this.el_.fastSeek && browser.IS_ANY_SAFARI) {
         this.el_.fastSeek(seconds);
@@ -566,6 +577,63 @@ class Html5 extends Tech {
       log(e, 'Video is not ready. (Video.js)');
       // this.warning(VideoJS.warnings.videoNotReady);
     }
+  }
+
+  /**
+   * Keep a seek to apply once playback starts or frame data arrives.
+   * See `setCurrentTime`.
+   *
+   * @param {number} seconds
+   *        The time to seek to.
+   *
+   * @private
+   */
+  holdSeekUntilPlayback_(seconds) {
+    this.heldSeek_ = seconds;
+
+    if (!this.applyHeldSeek_) {
+      this.applyHeldSeek_ = () => {
+        const held = this.heldSeek_;
+
+        this.clearHeldSeek_();
+        this.setCurrentTime(held);
+      };
+      this.clearHeldSeekOnLoad_ = () => this.clearHeldSeek_();
+      this.on(this.el_, ['play', 'loadeddata'], this.applyHeldSeek_);
+      this.on(this.el_, 'loadstart', this.clearHeldSeekOnLoad_);
+    }
+  }
+
+  /**
+   * Drop a held seek. See `setCurrentTime`.
+   *
+   * @private
+   */
+  clearHeldSeek_() {
+    if (!this.applyHeldSeek_) {
+      return;
+    }
+    this.off(this.el_, ['play', 'loadeddata'], this.applyHeldSeek_);
+    this.off(this.el_, 'loadstart', this.clearHeldSeekOnLoad_);
+    this.applyHeldSeek_ = null;
+    this.clearHeldSeekOnLoad_ = null;
+    this.heldSeek_ = undefined;
+  }
+
+  /**
+   * Get the value of `currentTime` from the media element, or the time of a
+   * seek that is being held until playback starts (see `setCurrentTime`).
+   *
+   * @return {number}
+   *         The current second that the media is at in playback.
+   *
+   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-currenttime}
+   */
+  currentTime() {
+    if (typeof this.heldSeek_ === 'number') {
+      return this.heldSeek_;
+    }
+    return this.el_.currentTime;
   }
 
   /**
@@ -1629,7 +1697,7 @@ Html5.resetMediaElement = function(el) {
 
 // Wrap native properties with a getter
 // The list is as followed
-// paused, currentTime, buffered, volume, poster, preload, error, seeking
+// paused, buffered, volume, poster, preload, error, seeking
 // seekable, ended, playbackRate, defaultPlaybackRate, disablePictureInPicture
 // played, networkState, readyState, videoWidth, videoHeight, crossOrigin
 [
@@ -1644,18 +1712,6 @@ Html5.resetMediaElement = function(el) {
    * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-paused}
    */
   'paused',
-
-  /**
-   * Get the value of `currentTime` from the media element. `currentTime` indicates
-   * the current second that the media is at in playback.
-   *
-   * @method Html5#currentTime
-   * @return {number}
-   *         The value of `currentTime` from the media element.
-   *
-   * @see [Spec]{@link https://www.w3.org/TR/html5/embedded-content-0.html#dom-media-currenttime}
-   */
-  'currentTime',
 
   /**
    * Get the value of `buffered` from the media element. `buffered` is a `TimeRange`
