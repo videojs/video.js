@@ -22,7 +22,7 @@ import {
   type InstallationDiscoveryCompatibility,
   type InstallationOptionDefinition,
 } from './options';
-import { INSTALLATION_PARAMETERS, type InstallationInput } from './parameters';
+import { INSTALLATION_PARAMETERS, type InstallationInput, type InstallationInputKey } from './parameters';
 import {
   INSTALLATION_FRAMEWORKS,
   INSTALLATION_NEW_APP_DIRECTORY,
@@ -176,19 +176,39 @@ function shellQuote(value: string): string {
   return /^[a-z0-9_./:@-]+$/i.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
 }
 
-export function installationCommand(input?: InstallationInput, packageVersion: string | null = null): string {
+export interface InstallationCommandOption {
+  key: InstallationInputKey;
+  flag: `--${string}`;
+  /** The value as the command prints it, quoted when a shell would otherwise split or expand it. */
+  value: string;
+}
+
+export interface InstallationCommandParts {
+  /** The `agents init` invocation without options. */
+  command: string;
+  /** The options with a value, in flag order. */
+  options: readonly InstallationCommandOption[];
+}
+
+/** The pieces {@link installationCommand} joins, for interfaces that present each option on its own. */
+export function installationCommandParts(
+  input?: InstallationInput,
+  packageVersion: string | null = null
+): InstallationCommandParts {
   const packageSpecifier = packageVersion ? `${INSTALLATION_CLI_PACKAGE}@${packageVersion}` : INSTALLATION_CLI_PACKAGE;
-  const parts = [`npx ${packageSpecifier} agents init`];
+  const options = INSTALLATION_PARAMETERS.flatMap(({ key, flag }) => {
+    const value = input?.[key];
 
-  if (!input) return parts[0]!;
+    return value ? [{ key, flag, value: shellQuote(value) }] : [];
+  });
 
-  for (const { key, flag } of INSTALLATION_PARAMETERS) {
-    const value = input[key];
+  return { command: `npx ${packageSpecifier} agents init`, options };
+}
 
-    if (value) parts.push(`${flag} ${shellQuote(value)}`);
-  }
+export function installationCommand(input?: InstallationInput, packageVersion: string | null = null): string {
+  const { command, options } = installationCommandParts(input, packageVersion);
 
-  return parts.join(' ');
+  return [command, ...options.map(({ flag, value }) => `${flag} ${value}`)].join(' ');
 }
 
 /** Every choice that applies to a resolved selection, so a rerun never depends on defaults or project detection. */

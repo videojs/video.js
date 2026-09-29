@@ -22,6 +22,7 @@ import {
   INSTALLATION_BLOCK_PLACEMENTS,
   INSTALLATION_STEP_CONDITIONS,
   installationCommand,
+  installationCommandParts,
 } from '../plan';
 import { INSTALLATION_FRAMEWORKS } from '../projects';
 import { installationMethodsForFramework, installationTemplatesForMethod, sourceFrameworkFor } from '../selection';
@@ -59,6 +60,30 @@ describe('installationCommand', () => {
     expect(installationCommand({ framework: 'react', media: 'hls' }, '10.0.0')).toBe(
       'npx @videojs/cli@10.0.0 agents init --framework react --media hls'
     );
+  });
+});
+
+describe('installationCommandParts', () => {
+  it('lists supplied options in flag order with the values the command prints', () => {
+    const parts = installationCommandParts(
+      { template: 'vite', framework: 'html', extensions: '', sourceUrl: 'https://example.com/a video.mp4' },
+      '10.0.0'
+    );
+
+    expect(parts).toEqual({
+      command: 'npx @videojs/cli@10.0.0 agents init',
+      options: [
+        { key: 'framework', flag: '--framework', value: 'html' },
+        { key: 'sourceUrl', flag: '--source-url', value: "'https://example.com/a video.mp4'" },
+        { key: 'template', flag: '--template', value: 'vite' },
+      ],
+    });
+    expect(
+      installationCommand(
+        { template: 'vite', framework: 'html', sourceUrl: 'https://example.com/a video.mp4' },
+        '10.0.0'
+      )
+    ).toBe([parts.command, ...parts.options.map(({ flag, value }) => `${flag} ${value}`)].join(' '));
   });
 });
 

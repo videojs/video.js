@@ -1,5 +1,5 @@
 import { INSTALLATION_DEMO_SOURCE_URL } from './defaults';
-import { INSTALLATION_EXTENSIONS } from './extensions';
+import { GOOGLE_CAST_RENDERERS, INSTALLATION_EXTENSIONS } from './extensions';
 import {
   CLI_OPTION_SYNTAX,
   INSTALLATION_PROJECTS,
@@ -135,13 +135,26 @@ export function installationCompatibilityFor(
   };
 }
 
-function formatChoices(values: readonly string[]): string {
+function formatChoices(values: readonly string[], conjunction: 'or' | 'and' = 'or'): string {
   if (values.length < 2) return values[0] ?? '';
 
-  if (values.length === 2) return `${values[0]} or ${values[1]}`;
+  if (values.length === 2) return `${values[0]} ${conjunction} ${values[1]}`;
 
-  return `${values.slice(0, -1).join(', ')}, or ${values.at(-1)}`;
+  return `${values.slice(0, -1).join(', ')}, ${conjunction} ${values.at(-1)}`;
 }
+
+/**
+ * Media hosted on another platform, whose adapter stays on the platform's standard player even for a live broadcast:
+ * the live players take only streams the page controls.
+ */
+const PLATFORM_VIDEO_RENDERERS = [
+  'youtube',
+  'vimeo',
+  'twitch',
+  'tiktok',
+  'cloudflare',
+] as const satisfies readonly Renderer[];
+const PLATFORM_AUDIO_RENDERERS = ['spotify'] as const satisfies readonly Renderer[];
 
 function unique<Choice extends string>(values: readonly Choice[]): Choice[] {
   return [...new Set(values)];
@@ -192,8 +205,7 @@ export function installationDecisionOrderFor(
     },
     {
       title: 'Choose the player',
-      guidance:
-        'Use video unless the request signals another experience: audio, music, or podcasts use audio; a live stream uses live-video or live-audio; a muted, looping decorative video uses background-video. Ask only when those signals conflict.',
+      guidance: `Use video unless the request signals another experience: audio, music, or podcasts use audio; a live stream uses live-video (${formatChoices(INSTALLATION_PRESETS['live-video'].renderers)}) or live-audio (${formatChoices(INSTALLATION_PRESETS['live-audio'].renderers)} only); a muted, looping decorative video uses background-video. Content hosted on another platform keeps that platform's player even when it is live: ${formatChoices(PLATFORM_VIDEO_RENDERERS, 'and')} use video, and ${formatChoices(PLATFORM_AUDIO_RENDERERS, 'and')} uses audio. Treat comparisons to other products, such as "like Netflix", as describing the experience rather than the media source: build only what Video.js provides, and name anything out of scope, such as chat, playlists, or DRM. Ask only when those signals conflict.`,
     },
     {
       title: 'Choose the skin',
@@ -202,12 +214,11 @@ export function installationDecisionOrderFor(
     {
       title: 'Choose the media',
       guidance:
-        'Infer the adapter from the source when possible. Mux wins for Mux playback URLs: stream.mux.com/<playback-id>.m3u8 or a bare playback ID uses mux-video, mux-audio, or mux-background-video rather than hls. Mux static renditions such as .mp4 or .m4a files use html5-video or html5-audio. Other .m3u8 URLs use hls.',
+        'Infer the adapter from the source when possible. Mux wins for Mux playback URLs: stream.mux.com/<playback-id>.m3u8 or a bare playback ID uses mux-video, mux-audio, or mux-background-video rather than hls. Mux static renditions such as .mp4 or .m4a files use html5-video or html5-audio. Other .m3u8 URLs use hls. Choose a platform adapter only when the content is hosted there, not when the request compares itself to that platform. Without a URL, use hls or dash for a player that should cast, since the default html5-video cannot.',
     },
     {
       title: 'Choose extensions',
-      guidance:
-        'Mux Data is included by default for Mux video and audio sources. Add Google Cast when a standard or live video player with a ready-made skin should cast a compatible source. Use none when no extension is needed.',
+      guidance: `Mux Data is included by default for Mux video and audio sources. Add Google Cast when a standard or live video player with a ready-made skin plays ${formatChoices(GOOGLE_CAST_RENDERERS)} media. Use none when no extension is needed.`,
     },
     { title: 'Choose how to install', guidance: methodGuidance },
     ...stylingDecisions,

@@ -99,6 +99,17 @@ describe('installationDecisionOrderFor', () => {
     expect(shadcn.find(({ title }) => title === 'Choose the skin')?.guidance).not.toContain('none');
   });
 
+  it('keeps platform media on its standard player and names the sources the live players and Google Cast take', () => {
+    const decisions = installationDecisionOrderFor({ methods: ['packaged'], frameworks: ['react'] });
+    const guidance = (title: string) => decisions.find((decision) => decision.title === title)?.guidance;
+
+    expect(guidance('Choose the player')).toContain('live-video (hls or mux-video) or live-audio (mux-audio only)');
+    expect(guidance('Choose the player')).toContain('youtube, vimeo, twitch, tiktok, and cloudflare use video');
+    expect(guidance('Choose the player')).toContain('as describing the experience rather than the media source');
+    expect(guidance('Choose the media')).toContain('only when the content is hosted there');
+    expect(guidance('Choose extensions')).toContain('plays hls, dash, or mux-video media');
+  });
+
   it('explains every installation method when all frameworks are available', () => {
     const decisions = installationDecisionOrderFor({
       methods: ['packaged', 'shadcn', 'cdn'],
