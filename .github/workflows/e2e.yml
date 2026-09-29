@@ -147,6 +147,78 @@ jobs:
           path: apps/e2e/test-results/
           retention-days: 7
 
+  # The oldest engines the root browserslist supports, each driven by the playwright-core release that shipped it. The
+  # job runs on the host rather than in the Playwright image so Docker can start both releases' images.
+  floor:
+    name: Floor engines
+    needs: [changes, build]
+    if: ${{ !cancelled() && needs.build.result == 'success' && (github.event_name == 'push' || needs.changes.outputs.player == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
+    runs-on: ubuntu-latest
+    # The build job runs in the Playwright image, so its Task cache may not replay at the host's paths.
+    timeout-minutes: 20
+
+    steps:
+      - name: Start the floor engines
+        # Host networking lets the runner reach each engine on 127.0.0.1. Starting in the background lets the image
+        # pulls overlap the install and build replay; the wait step below reports a failed start.
+        run: |
+          nohup sh -c '
+            docker run -d --name floor-1-31 --network host --init --ipc=host mcr.microsoft.com/playwright:v1.31.2-focal \
+              /bin/sh -c "cd /tmp && npx -y playwright@1.31.2 run-server --port 3131"
+            docker run -d --name floor-1-41 --network host --init --ipc=host mcr.microsoft.com/playwright:v1.41.2-jammy \
+              /bin/sh -c "cd /tmp && npx -y playwright@1.41.2 run-server --port 3141"
+          ' > /tmp/floor-engines.log 2>&1 &
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Vite Task cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-e2e-${{ github.sha }}-${{ github.run_attempt }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-e2e-
+            vite-task-${{ runner.os }}-${{ runner.arch }}-packages-
+
+      - name: Replay the build
+        run: pnpm build:packages && pnpm exec vp run '@videojs/e2e#prepare:player'
+
+      - name: Wait for the floor engines
+        run: |
+          for name in floor-1-31 floor-1-41; do
+            timeout 300 sh -c "until docker logs $name 2>&1 | grep -q Listening; do sleep 2; done" ||
+              { cat /tmp/floor-engines.log; docker logs "$name"; exit 1; }
+          done
+
+      - name: Run floor tests
+        env:
+          # IPv4 literals: `localhost` can resolve to ::1 first, where the engines do not listen.
+          FLOOR_WS_CHROMIUM: ws://127.0.0.1:3131/
+          FLOOR_WS_WEBKIT: ws://127.0.0.1:3131/
+          FLOOR_WS_FIREFOX: ws://127.0.0.1:3141/
+        run: pnpm -F @videojs/e2e test:floor
+
+      - name: Upload floor screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: floor-screenshots
+          path: apps/e2e/test-results/floor/
+          retention-days: 14
+
   sandbox:
     name: Sandbox
     needs: [changes, build]

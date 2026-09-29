@@ -18,6 +18,8 @@
     "test:webkit": "playwright test --config suites/player/playwright.config.ts --project=vite-webkit",
     "test:vite": "vp run test:player",
     "test:all": "vp run test:player && vp run test:skin-parity && vp run test:sandbox",
+    "install:floor": "node node_modules/playwright-core-1-31/cli.js install chromium webkit && node node_modules/playwright-core-1-41/cli.js install firefox",
+    "test:floor": "tsx suites/floor/run.ts",
     "report": "playwright show-report"
   },
   "devDependencies": {
@@ -34,6 +36,9 @@
     "@videojs/store": "workspace:*",
     "@videojs/utils": "workspace:*",
     "@vitejs/plugin-react": "^6.0.4",
+    "playwright-core": "^1.52.0",
+    "playwright-core-1-31": "npm:playwright-core@1.31.2",
+    "playwright-core-1-41": "npm:playwright-core@1.41.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "shadcn": "^4.19.0",

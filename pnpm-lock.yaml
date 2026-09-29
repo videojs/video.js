@@ -305,6 +305,15 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^6.0.4
         version: 6.1.1(@voidzero-dev/vite-plus-core@1.0.0(@types/node@22.19.15)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0))(babel-plugin-react-compiler@1.0.0)(oxc-transform-react@0.145.0)
+      playwright-core:
+        specifier: ^1.52.0
+        version: 1.59.1
+      playwright-core-1-31:
+        specifier: npm:playwright-core@1.31.2
+        version: playwright-core@1.31.2
+      playwright-core-1-41:
+        specifier: npm:playwright-core@1.41.2
+        version: playwright-core@1.41.2
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -1166,6 +1175,9 @@ importers:
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.3.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0))
+      '@types/caniuse-lite':
+        specifier: ^1.0.5
+        version: 1.0.5
       '@types/node':
         specifier: ^22.18.6
         version: 22.20.1
@@ -1190,6 +1202,12 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^6.0.4
         version: 6.1.1(@voidzero-dev/vite-plus-core@1.0.0(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0))(babel-plugin-react-compiler@1.0.0)(oxc-transform-react@0.145.0)
+      browserslist:
+        specifier: ^4.29.0
+        version: 4.29.0
+      caniuse-lite:
+        specifier: ^1.0.30001810
+        version: 1.0.30001810
       cn:
         specifier: ^0.2.5
         version: 0.2.5
@@ -1199,6 +1217,9 @@ importers:
       hls.js:
         specifier: ^1.6.7
         version: 1.6.7
+      lightningcss:
+        specifier: 'catalog:'
+        version: 1.32.0
       mux-embed:
         specifier: 5.17.10
         version: 5.17.10
@@ -8699,6 +8720,16 @@ packages:
   pkg-up@3.1.0:
     resolution: {integrity: sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==}
     engines: {node: '>=8'}
+
+  playwright-core@1.31.2:
+    resolution: {integrity: sha512-a1dFgCNQw4vCsG7bnojZjDnPewZcw7tZUNFN0ZkcLYKj+mPmXvg4MpaaKZ5SgqPsOmqIf2YsVRkgqiRDxD+fDQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+
+  playwright-core@1.41.2:
+    resolution: {integrity: sha512-VaTvwCA4Y8kxEe+kfm2+uUUw5Lubf38RxF7FpBxLPmGe5sdNkSg5e3ChEigaGrX7qdqT3pt2m/98LiyvU2x6CA==}
+    engines: {node: '>=16'}
+    hasBin: true
 
   playwright-core@1.59.1:
     resolution: {integrity: sha512-HBV/RJg81z5BiiZ9yPzIiClYV/QMsDCKUyogwH9p3MCP6IYjUFu/MActgYAvK0oWyV9NlwM3GLBjADyWgydVyg==}
@@ -17618,6 +17649,10 @@ snapshots:
   pkg-up@3.1.0:
     dependencies:
       find-up: 3.0.0
+
+  playwright-core@1.31.2: {}
+
+  playwright-core@1.41.2: {}
 
   playwright-core@1.59.1: {}
 
