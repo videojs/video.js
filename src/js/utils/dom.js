@@ -515,6 +515,21 @@ export function findPosition(el) {
   let left = 0;
   let top = 0;
 
+  // offsetLeft and offsetTop do not include how far a scrollable ancestor has
+  // been scrolled, so take that off. Page scroll is left alone, because the
+  // touch pageX and pageY this is compared against already include it.
+  let ancestor = el.parentElement;
+
+  while (ancestor && ancestor !== document.body && ancestor !== document.documentElement) {
+    left -= ancestor.scrollLeft;
+    top -= ancestor.scrollTop;
+
+    if (ancestor === document[fs.fullscreenElement]) {
+      break;
+    }
+    ancestor = ancestor.parentElement;
+  }
+
   while (el.offsetParent && el !== document[fs.fullscreenElement]) {
     left += el.offsetLeft;
     top += el.offsetTop;
