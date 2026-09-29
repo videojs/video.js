@@ -4,8 +4,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 import { suiteConfig, WEB_SERVER_SHUTDOWN } from '../../shared/playwright.ts';
 
-/** CI shards the suite per preset; one value restricts the run to that preset's spec. */
-const preset = process.env.VJSC_SKIN_PRESET;
+/** CI shards the suite by preset; a comma-separated list restricts the run to those presets' specs. */
+const presets = process.env.VJSC_SKIN_PRESET?.split(',').filter(Boolean) ?? [];
 /** The video preset carries twice the cases of the others, so CI splits it further as `current/total`. */
 const shard = /^(\d+)\/(\d+)$/.exec(process.env.VJSC_SKIN_SHARD ?? '');
 
@@ -17,7 +17,7 @@ const shard = /^(\d+)\/(\d+)$/.exec(process.env.VJSC_SKIN_SHARD ?? '');
 export default defineConfig({
   ...suiteConfig('skin-parity'),
   testDir: resolve(import.meta.dirname, 'tests'),
-  testMatch: preset ? `**/vjsc-${preset}-skin-styling.spec.ts` : '**/*.spec.ts',
+  testMatch: presets.length > 0 ? presets.map((preset) => `**/vjsc-${preset}-skin-styling.spec.ts`) : '**/*.spec.ts',
   shard: shard ? { current: Number(shard[1]), total: Number(shard[2]) } : null,
   // The warm-up compiles every skin and the Tailwind entry before the first case, so workers never race cold transforms.
   globalSetup: resolve(import.meta.dirname, 'setup/global.ts'),

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'release-please--branches--main'
   pull_request:
     types: [opened, labeled, synchronize]
 
@@ -13,7 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Pull requests run the browser suites when they touch code the suites render; the `test:e2e` label forces them.
+  # Pull requests run the browser suites when they touch code the suites render; the `test:e2e` label forces them. The
+  # release pull request only bumps versions and changelogs on top of `main`, whose push already ran every suite.
   changes:
     name: Changed areas
     if: github.event_name == 'pull_request'
@@ -28,7 +28,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.head_ref }}
         run: |
+          if [ "$HEAD_REF" = 'release-please--branches--main' ]; then
+            printf 'player=false\nskins=false\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           files=$(gh api "repos/$GH_REPO/pulls/$NUMBER/files" --paginate --jq '.[].filename')
           flag() {
             if grep -Eq "$2" <<<"$files"; then echo "$1=true" >> "$GITHUB_OUTPUT"; else echo "$1=false" >> "$GITHUB_OUTPUT"; fi
@@ -273,7 +278,7 @@ jobs:
           retention-days: 7
 
   skin-parity:
-    name: Skin parity (${{ matrix.preset }}${{ matrix.shards > 1 && format(' {0}/{1}', matrix.shard, matrix.shards) || '' }})
+    name: Skin parity (${{ matrix.name }}${{ matrix.shards > 1 && format(' {0}/{1}', matrix.shard, matrix.shards) || '' }})
     needs: [changes, build]
     if: ${{ !cancelled() && needs.build.result == 'success' && (github.event_name == 'push' || needs.changes.outputs.skins == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
     runs-on: ubuntu-latest
@@ -283,13 +288,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The video preset carries twice the cases of the others, so it runs as two slices.
+        # Slices take about the same time: the video preset carries twice the cases of live-video, and the two audio
+        # presets together about as many as one video slice. Each job costs a runner slot and a minute of setup.
         include:
-          - { preset: video, shard: 1, shards: 2 }
-          - { preset: video, shard: 2, shards: 2 }
-          - { preset: live-video, shard: 1, shards: 1 }
-          - { preset: audio, shard: 1, shards: 1 }
-          - { preset: live-audio, shard: 1, shards: 1 }
+          - { name: video, presets: video, shard: 1, shards: 2 }
+          - { name: video, presets: video, shard: 2, shards: 2 }
+          - { name: live-video, presets: live-video, shard: 1, shards: 1 }
+          - { name: audio, presets: 'audio,live-audio', shard: 1, shards: 1 }
 
     steps:
       - name: Checkout code
@@ -319,14 +324,14 @@ jobs:
       - name: Run skin parity E2E tests
         run: pnpm exec vp run '@videojs/e2e#test:skin-parity'
         env:
-          VJSC_SKIN_PRESET: ${{ matrix.preset }}
+          VJSC_SKIN_PRESET: ${{ matrix.presets }}
           VJSC_SKIN_SHARD: ${{ matrix.shard }}/${{ matrix.shards }}
 
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-skin-parity-${{ matrix.preset }}${{ matrix.shards > 1 && format('-{0}', matrix.shard) || '' }}
+          name: playwright-report-skin-parity-${{ matrix.name }}${{ matrix.shards > 1 && format('-{0}', matrix.shard) || '' }}
           path: apps/e2e/playwright-report/skin-parity/
           retention-days: 14
 
@@ -334,7 +339,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-skin-parity-${{ matrix.preset }}${{ matrix.shards > 1 && format('-{0}', matrix.shard) || '' }}
+          name: playwright-traces-skin-parity-${{ matrix.name }}${{ matrix.shards > 1 && format('-{0}', matrix.shard) || '' }}
           path: apps/e2e/test-results/skin-parity/
           retention-days: 7
 
