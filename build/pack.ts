@@ -16,6 +16,14 @@ export const baseConfig = {
     experimental: {
       nativeMagicString: true,
     },
+    // Every pack is unbundled, so each source file maps to one output file and
+    // `'use client'` stays at the top of it. The warning only applies to
+    // directives that get merged into a shared chunk.
+    onLog(level, log, defaultHandler) {
+      if (log.code === 'MODULE_LEVEL_DIRECTIVE') return;
+
+      defaultHandler(level, log);
+    },
   },
   // Matches `packages/<name>/dist` and bucketed `packages/<bucket>/<name>/dist`.
   ignoreWatch: [/[/\\]packages[/\\](?:[^/\\]+[/\\])?[^/\\]+[/\\]dist(?:[/\\]|$)/],
