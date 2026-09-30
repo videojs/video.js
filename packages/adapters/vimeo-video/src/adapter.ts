@@ -8,11 +8,14 @@ import {
   type TextTrackListLike,
   type Video,
 } from '@videojs/media';
+import { parseVimeoSource } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin, serializeEmbedParams } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
 import { isNull, isString, isUndefined } from '@videojs/utils/predicate';
 import VimeoPlayer, { type LoadVideoOptions, type VimeoEmbedParameters, type VimeoUrl } from '@vimeo/player';
+
+export { type ParsedVimeoSource, parseVimeoSource, parseVimeoVideoId } from '@videojs/media';
 
 export type { default as VimeoPlayerApi } from '@vimeo/player';
 
@@ -34,15 +37,6 @@ export interface VimeoSource {
 export interface VimeoSourceEngineConfig {
   /** Vimeo's own embed parameters, passed through untouched. */
   vimeo?: VimeoEngineConfig | undefined;
-}
-
-/** Parsed pieces of a Vimeo source URL. */
-export interface ParsedVimeoSource {
-  id: number;
-  /** `'video'` for regular clips, `'event'` for live events. */
-  kind: 'video' | 'event';
-  /** Unlisted-video / event hash (the `h` parameter). */
-  hash: string | null;
 }
 
 export interface VimeoAdapterProps {
@@ -686,35 +680,6 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   }
 }
 
-/** Extract a Vimeo video id from a numeric id, vimeo.com URL, or player URL. */
-export function parseVimeoVideoId(src: string) {
-  return parseVimeoSource(src)?.id ?? null;
-}
-
-/**
- * Parse a Vimeo source: a numeric id, `vimeo.com/<id>`, `vimeo.com/video/<id>`, `player.vimeo.com/video/<id>`, or
- * `vimeo.com/event/<id>` (live events), plus unlisted/event hashes from `?h=` or a `/<hash>` segment.
- */
-export function parseVimeoSource(src: string): ParsedVimeoSource | null {
-  if (!src) return null;
-
-  if (/^\d+$/.test(src)) return { id: Number(src), kind: 'video', hash: null };
-
-  const match = MATCH_SRC.exec(src);
-  if (!match) return null;
-
-  const kind = match[1] === 'event/' ? 'event' : 'video';
-  let queryHash: string | null = null;
-
-  try {
-    queryHash = new URL(src).searchParams.get('h');
-  } catch {
-    // Bare ids and paths are not valid URLs.
-  }
-
-  return { id: Number(match[2]), kind, hash: queryHash ?? match[3] ?? null };
-}
-
 /** Build the iframe `src` URL for an initial Vimeo embed from the given props. */
 export function buildVimeoIframeSrc(src: string, props: Partial<VimeoAdapterProps> = {}) {
   const parsed = parseVimeoSource(src);
@@ -746,7 +711,6 @@ export function buildVimeoIframeSrc(src: string, props: Partial<VimeoAdapterProp
 
 const EMBED_VIDEO_BASE = 'https://player.vimeo.com/video';
 const EMBED_EVENT_BASE = 'https://vimeo.com/event';
-const MATCH_SRC = /vimeo\.com\/(video\/|event\/)?(\d+)(?:\/([\w-]+))?/;
 
 const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;

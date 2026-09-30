@@ -31,5 +31,8 @@ export default defineConfig({
       index: './src/index.ts',
       node: './src/node.ts',
     },
+    // The site's installation Markdown edge function loads `dist/index.js` through an import map, and Netlify's edge
+    // bundler can't resolve workspace packages from there.
+    deps: { alwaysBundle: ['@videojs/media'] },
   },
 });

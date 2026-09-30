@@ -1,0 +1,49 @@
+---
+title: resolveMimeType
+description: Resolve a source's MIME type from its file extension
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { resolveMimeType } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { resolveMimeType } from '@videojs/html';
+```
+</FrameworkCase>
+
+`resolveMimeType` returns the MIME type a source URL's file extension implies, ignoring the query string and hash. It returns `null` when the URL has no extension or one it doesn't recognize.
+
+```ts
+resolveMimeType('https://example.com/live/stream.m3u8?token=abc'); // 'application/x-mpegurl'
+resolveMimeType('/media/podcast.mp3'); // 'audio/mpeg'
+resolveMimeType('https://youtu.be/_cMxraX_5RE'); // null
+```
+
+| Extension | MIME type |
+|---|---|
+| `.m3u8` | `application/x-mpegurl` |
+| `.mpd` | `application/dash+xml` |
+| `.mp4` | `video/mp4` |
+| `.webm` | `video/webm` |
+| `.mov` | `video/quicktime` |
+| `.ogv` | `video/ogg` |
+| `.mp3` | `audio/mpeg` |
+| `.m4a` | `audio/mp4` |
+| `.wav` | `audio/wav` |
+| `.ogg` | `audio/ogg` |
+| `.flac` | `audio/flac` |
+| `.aac` | `audio/aac` |
+
+To find which media component plays a source, use <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink>.
+
+<UtilReference util="resolveMimeType" />

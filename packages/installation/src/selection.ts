@@ -1,6 +1,5 @@
 import { rendererSupportsCdn } from './cdn-code';
 import { CDN_MEDIA_SUBPATHS, cdnBaseForVersion, INSTALLATION_DEMO_SOURCE_URL } from './defaults';
-import { detectRenderer, detectRendererCandidates } from './detect-renderer';
 import {
   defaultInstallationExtensions,
   INSTALLATION_EXTENSIONS,
@@ -36,6 +35,7 @@ import {
   type InstallationTemplate,
 } from './projects';
 import { RENDERERS, type Renderer } from './renderers';
+import { resolveRenderer, resolveRendererCandidates } from './resolve-renderer';
 import { defaultRegistryStyling, registryStylings, type RegistryFramework, type RegistryStyling } from './shadcn';
 
 export const INSTALLATION_METHODS = ['packaged', 'shadcn', 'cdn'] as const;
@@ -349,10 +349,10 @@ export function resolveInstallationSelection(
   if (sourceUrlError) errors.push({ field: 'sourceUrl', value: sourceUrl, message: sourceUrlError });
 
   const availableMedia = getInstallationPreset(useCase).renderers;
-  const detectedCandidates = validSourceUrl ? detectRendererCandidates(sourceUrl) : [];
-  const compatibleDetectedCandidates = detectedCandidates.filter((candidate) => availableMedia.includes(candidate));
-  const detectedMedia = validSourceUrl ? detectRenderer(sourceUrl, useCase)?.renderer : undefined;
-  const mediaValue = defaultValue('media', detectedMedia ?? availableMedia[0]!);
+  const sourceCandidates = validSourceUrl ? resolveRendererCandidates(sourceUrl) : [];
+  const compatibleSourceCandidates = sourceCandidates.filter((candidate) => availableMedia.includes(candidate));
+  const sourceMedia = validSourceUrl ? resolveRenderer(sourceUrl, useCase) : null;
+  const mediaValue = defaultValue('media', sourceMedia ?? availableMedia[0]!);
   const mediaValid = includes(RENDERERS, mediaValue);
   const media = resolveChoice('media', mediaValue, RENDERERS, availableMedia[0]!, errors);
   const mediaAvailable = presetValid && mediaValid && availableMedia.includes(media);
@@ -368,9 +368,9 @@ export function resolveInstallationSelection(
     });
   }
 
-  if (presetValid && validSourceUrl && detectedCandidates.length > 0 && (mediaAvailable || !mediaValid)) {
-    if (!detectedMedia) {
-      const candidate = detectedCandidates[0]!;
+  if (presetValid && validSourceUrl && sourceCandidates.length > 0 && (mediaAvailable || !mediaValid)) {
+    if (!sourceMedia) {
+      const candidate = sourceCandidates[0]!;
       const hint = presetHint(candidate, syntax);
 
       errors.push({
@@ -379,11 +379,11 @@ export function resolveInstallationSelection(
         message: `Does not match a media source available for the ${preset} preset.`,
         ...(hint ? { hint: `The URL matches ${candidate}. ${hint}` } : {}),
       });
-    } else if (input.media !== undefined && mediaAvailable && !compatibleDetectedCandidates.includes(media)) {
+    } else if (input.media !== undefined && mediaAvailable && !compatibleSourceCandidates.includes(media)) {
       errors.push({
         field: 'media',
         value: media,
-        message: `Does not match the supplied source URL. Expected one of: ${compatibleDetectedCandidates.join(', ')}`,
+        message: `Does not match the supplied source URL. Expected one of: ${compatibleSourceCandidates.join(', ')}`,
       });
     }
   }

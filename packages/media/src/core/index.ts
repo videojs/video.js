@@ -5,5 +5,6 @@ export { KeySystems } from './drm';
 export { MediaError } from './media-error';
 
 export * from './predicate';
+export * from './source';
 export * from './state';
 export * from './types';

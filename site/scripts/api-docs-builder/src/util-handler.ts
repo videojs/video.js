@@ -56,6 +56,7 @@ const UTIL_ENTRY_POINTS: EntryPoint[] = [
   { index: 'packages/core/src/core/i18n/index.ts', framework: null },
   { index: 'packages/core/src/dom/store/selectors.ts', framework: null },
   { index: 'packages/core/src/dom/store/features/orientation-lock.ts', framework: null },
+  { index: 'packages/media/src/core/source/adapter-type.ts', framework: null },
   { index: 'packages/store/src/core/selector.ts', framework: null },
 ];
 

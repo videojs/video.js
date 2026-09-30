@@ -13,6 +13,7 @@ export type {
 export { DestroyMixin, ReactiveElement } from '@videojs/element';
 // Media predicates
 export {
+  type AdapterType,
   hasMetadata,
   isMediaAudioTrackCapable,
   isMediaBufferCapable,
@@ -30,6 +31,8 @@ export {
   isMediaVolumeCapable,
   isQuerySelectorAllCapable,
   type NodeListLike,
+  resolveAdapterType,
+  resolveMimeType,
 } from '@videojs/media';
 // Media
 export * from '@videojs/media/dom';

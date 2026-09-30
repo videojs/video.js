@@ -1,10 +1,10 @@
 import { Input } from '@base-ui/react/input';
 import {
   articleFor,
-  detectRenderer,
   getInstallationPreset,
   getInstallationRenderer,
   type Renderer,
+  resolveRenderer,
 } from '@videojs/installation';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -118,24 +118,23 @@ function MediaSourcePicker({ supportedRenderers }: Props) {
     : presetRenderers;
   const firstRenderer = renderers[0];
   const rendererSupported = renderers.includes($renderer);
-  const detection = detectRenderer($sourceUrl, $useCase);
-  const detectedRenderer = detection && renderers.includes(detection.renderer) ? detection.renderer : null;
+  const sourceRenderer = resolveRenderer($sourceUrl, $useCase);
+  const sourceLabel = sourceRenderer ? getInstallationRenderer(sourceRenderer).label : null;
+  const supportedSourceRenderer = sourceRenderer && renderers.includes(sourceRenderer) ? sourceRenderer : null;
 
   useEffect(() => {
     if (!rendererSupported && firstRenderer) media.set(firstRenderer);
   }, [firstRenderer, rendererSupported]);
 
-  // Follow the detected renderer for a pasted URL. Uses the primitive `detectedRenderer` string instead of the
-  // `detection` object so the effect does not re-fire on every render and override a manual selection. Fitting the
-  // renderer to the use case lives in the store.
+  // Follow the renderer a pasted URL resolves to. Fitting the renderer to the use case lives in the store.
   useEffect(() => {
-    if (detectedRenderer) media.set(detectedRenderer);
-  }, [detectedRenderer]);
+    if (supportedSourceRenderer) media.set(supportedSourceRenderer);
+  }, [supportedSourceRenderer]);
 
   const hasUrl = $sourceUrl.trim().length > 0;
-  const showDetectionMatch = hasUrl && detection && detection.renderer === $renderer;
-  const showDetectionSuggestion = hasUrl && detection && detectedRenderer && detection.renderer !== $renderer;
-  const showNoMatch = hasUrl && !detection;
+  const showSourceMatch = hasUrl && sourceRenderer && sourceRenderer === $renderer;
+  const showSourceSuggestion = hasUrl && supportedSourceRenderer && sourceRenderer !== $renderer;
+  const showNoMatch = hasUrl && !sourceRenderer;
 
   return (
     <div className="flex flex-col gap-8">
@@ -173,20 +172,20 @@ function MediaSourcePicker({ supportedRenderers }: Props) {
           />
         </div>
         <p className="text-p4 dark:text-muted" aria-live="polite">
-          {showDetectionMatch ? (
+          {showSourceMatch ? (
             <>
-              This looks like {articleFor(detection.renderer)}{' '}
-              <strong className="font-semibold">{detection.label}</strong> link, selected below.
+              This looks like {articleFor(sourceRenderer)} <strong className="font-semibold">{sourceLabel}</strong>{' '}
+              link, selected below.
             </>
-          ) : showDetectionSuggestion ? (
+          ) : showSourceSuggestion ? (
             <>
-              This looks like {articleFor(detection.renderer)} {detection.label} link.{' '}
+              This looks like {articleFor(supportedSourceRenderer)} {sourceLabel} link.{' '}
               <button
                 type="button"
-                onClick={() => media.set(detection.renderer)}
+                onClick={() => media.set(supportedSourceRenderer)}
                 className="intent:decoration-gold cursor-pointer underline"
               >
-                Select {detection.label}
+                Select {sourceLabel}
               </button>
             </>
           ) : showNoMatch ? (

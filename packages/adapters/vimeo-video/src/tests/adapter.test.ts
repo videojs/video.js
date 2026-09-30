@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { buildVimeoIframeSrc, parseVimeoSource, parseVimeoVideoId, VimeoAdapter } from '..';
+import { buildVimeoIframeSrc, VimeoAdapter } from '..';
 
 vi.mock('@vimeo/player', () => {
   class MockPlayer {
@@ -132,46 +132,6 @@ interface MockPlayerLike {
   destroy: ReturnType<typeof vi.fn>;
 }
 
-describe('parseVimeoVideoId', () => {
-  it('extracts numeric id from numeric string', () => {
-    expect(parseVimeoVideoId('76979871')).toBe(76979871);
-  });
-
-  it('extracts id from vimeo.com URL', () => {
-    expect(parseVimeoVideoId('https://vimeo.com/76979871')).toBe(76979871);
-  });
-
-  it('extracts id from player.vimeo.com URL', () => {
-    expect(parseVimeoVideoId('https://player.vimeo.com/video/76979871')).toBe(76979871);
-  });
-
-  it('extracts id from vimeo.com/video URL', () => {
-    expect(parseVimeoVideoId('https://vimeo.com/video/76979871')).toBe(76979871);
-  });
-
-  it('returns null for empty input', () => {
-    expect(parseVimeoVideoId('')).toBe(null);
-  });
-
-  it('returns null for non-Vimeo URLs', () => {
-    expect(parseVimeoVideoId('https://example.com/video.mp4')).toBe(null);
-  });
-});
-
-describe('parseVimeoSource', () => {
-  it('detects events', () => {
-    expect(parseVimeoSource('https://vimeo.com/event/12345')).toEqual({ id: 12345, kind: 'event', hash: null });
-  });
-
-  it('extracts h param from query string', () => {
-    expect(parseVimeoSource('https://vimeo.com/12345?h=abc')).toEqual({ id: 12345, kind: 'video', hash: 'abc' });
-  });
-
-  it('extracts hash from event path', () => {
-    expect(parseVimeoSource('https://vimeo.com/event/12345/abc')).toEqual({ id: 12345, kind: 'event', hash: 'abc' });
-  });
-});
-
 describe('buildVimeoIframeSrc', () => {
   it('builds embed URL from id with default playsinline and hidden controls', () => {
     const src = buildVimeoIframeSrc('76979871');
@@ -216,6 +176,13 @@ describe('buildVimeoIframeSrc', () => {
 
   it('embeds h hash for unlisted videos', () => {
     expect(buildVimeoIframeSrc('https://vimeo.com/12345?h=secret')).toContain('h=secret');
+  });
+
+  it('embeds vimeo/<id> shorthands', () => {
+    const src = buildVimeoIframeSrc('vimeo/12345/secret');
+
+    expect(src).toContain('https://player.vimeo.com/video/12345?');
+    expect(src).toContain('h=secret');
   });
 
   it('builds event embed URL with hashPath', () => {

@@ -1,7 +1,6 @@
 export * from './cdn-code';
 export * from './codegen';
 export * from './defaults';
-export * from './detect-renderer';
 export * from './extensions';
 export * from './markdown';
 export * from './options';
@@ -10,6 +9,7 @@ export * from './plan';
 export * from './presets';
 export * from './projects';
 export * from './renderers';
+export * from './resolve-renderer';
 export * from './selection';
 export * from './shadcn';
 export * from './skills';

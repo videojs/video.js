@@ -1,0 +1,146 @@
+---
+title: resolveAdapterType
+description: Resolve which type of adapter plays a source URL, from its host, MIME type, or file extension
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { resolveAdapterType } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { resolveAdapterType } from '@videojs/html';
+```
+</FrameworkCase>
+
+`resolveAdapterType` reads a source URL and returns the type of adapter that plays it, so an app that plays sources from a catalog or from user input can pick the matching <DocsLink slug="guides/media-sources">media component</DocsLink>. It returns `null` for sources it doesn't recognize.
+
+Resolution is a pure string check. It doesn't fetch the source, load an engine, or touch the DOM. It doesn't rewrite the source either: every source it recognizes, [shorthands](#shorthands) included, is one the matching media component accepts as its `src`.
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+Switch on the result and render the media component for it with the same `src`:
+
+```tsx
+import { resolveAdapterType } from '@videojs/react';
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+import { VimeoVideo } from '@videojs/react/media/vimeo-video';
+import { YouTubeVideo } from '@videojs/react/media/youtube-video';
+import { Video } from '@videojs/react/video';
+
+function Media({ src }: { src: string }) {
+  switch (resolveAdapterType(src)) {
+    case 'youtube':
+      return <YouTubeVideo src={src} />;
+    case 'vimeo':
+      return <VimeoVideo src={src} />;
+    case 'hls':
+      return <HlsJsVideo src={src} playsInline />;
+    case 'video':
+      return <Video src={src} playsInline />;
+    default:
+      return null;
+  }
+}
+```
+
+Each media component you import adds its engine to your bundle, so load the rarely used ones with `React.lazy`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Look up the media element for the result and give it the same `src`:
+
+```ts
+import { resolveAdapterType } from '@videojs/html';
+import '@videojs/html/media/hlsjs-video';
+import '@videojs/html/media/vimeo-video';
+import '@videojs/html/media/youtube-video';
+
+const TAGS = { youtube: 'youtube-video', vimeo: 'vimeo-video', hls: 'hlsjs-video', video: 'video' } as const;
+
+function createMedia(src: string) {
+  const type = resolveAdapterType(src);
+  const tag = type && type in TAGS ? TAGS[type as keyof typeof TAGS] : null;
+  if (!tag) return null;
+
+  const media = document.createElement(tag);
+  media.setAttribute('src', src);
+  return media;
+}
+```
+
+Each media module you import adds its engine to your bundle, so import the rarely used ones dynamically.
+</FrameworkCase>
+
+### Adapter types
+
+<FrameworkCase frameworks={["react"]}>
+| Adapter type | Recognized sources | Media component |
+|---|---|---|
+| `youtube` | `youtube.com`, `youtu.be`, and `youtube-nocookie.com` video and playlist URLs | `YouTubeVideo` |
+| `vimeo` | `vimeo.com` and `player.vimeo.com` URLs | `VimeoVideo` |
+| `wistia` | `wistia.com`, `wistia.net`, and `wi.st` URLs, and pages with a `wvideo` parameter | `WistiaVideo` |
+| `mux` | `stream.mux.com` stream URLs, with or without `.m3u8` | `MuxVideo` or `MuxAudio` |
+| `cloudflare` | `cloudflarestream.com` and `videodelivery.net` URLs | `CloudflareVideo` |
+| `spotify` | `open.spotify.com` URLs and `spotify:` URIs | `SpotifyAudio` |
+| `tiktok` | `tiktok.com` video URLs | `TikTokVideo` |
+| `twitch` | `twitch.tv` video and channel URLs | `TwitchVideo` |
+| `hls` | `.m3u8` files and HLS MIME types | `HlsVideo`, `HlsJsVideo`, or `NativeHlsVideo` |
+| `dash` | `.mpd` files and `application/dash+xml` | `DashVideo` or `ShakaVideo` |
+| `video` | `.mp4`, `.webm`, `.mov`, and `.ogv` files, and `video/*` MIME types | `Video` |
+| `audio` | `.mp3`, `.m4a`, `.wav`, `.ogg`, `.flac`, and `.aac` files, and `audio/*` MIME types | `Audio` |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Adapter type | Recognized sources | Media element |
+|---|---|---|
+| `youtube` | `youtube.com`, `youtu.be`, and `youtube-nocookie.com` video and playlist URLs | `<youtube-video>` |
+| `vimeo` | `vimeo.com` and `player.vimeo.com` URLs | `<vimeo-video>` |
+| `wistia` | `wistia.com`, `wistia.net`, and `wi.st` URLs, and pages with a `wvideo` parameter | `<wistia-video>` |
+| `mux` | `stream.mux.com` stream URLs, with or without `.m3u8` | `<mux-video>` or `<mux-audio>` |
+| `cloudflare` | `cloudflarestream.com` and `videodelivery.net` URLs | `<cloudflare-video>` |
+| `spotify` | `open.spotify.com` URLs and `spotify:` URIs | `<spotify-audio>` |
+| `tiktok` | `tiktok.com` video URLs | `<tiktok-video>` |
+| `twitch` | `twitch.tv` video and channel URLs | `<twitch-video>` |
+| `hls` | `.m3u8` files and HLS MIME types | `<hls-video>`, `<hlsjs-video>`, or `<native-hls-video>` |
+| `dash` | `.mpd` files and `application/dash+xml` | `<dash-video>` or `<shaka-video>` |
+| `video` | `.mp4`, `.webm`, `.mov`, and `.ogv` files, and `video/*` MIME types | `<video>` |
+| `audio` | `.mp3`, `.m4a`, `.wav`, `.ogg`, `.flac`, and `.aac` files, and `audio/*` MIME types | `<audio>` |
+</FrameworkCase>
+
+`hls` covers every HLS adapter and `dash` every DASH adapter, so an HLS stream comes back as `hls` whichever one you play it with; see <DocsLink slug="guides/media-sources">Media sources</DocsLink> to choose one. Mux streams served from a custom domain are recognized as plain `hls`.
+
+### MIME types
+
+Pass a MIME type as the second argument when the URL doesn't end in a file extension, such as an extensionless manifest or a `blob:` URL. The MIME type takes precedence over the extension; service URLs, such as YouTube or Mux, resolve the same either way.
+
+```ts
+resolveAdapterType('https://example.com/manifest', 'application/vnd.apple.mpegurl'); // 'hls'
+```
+
+To get the MIME type a file extension implies, use <DocsLink slug="reference/api/resolve-mime-type">`resolveMimeType`</DocsLink>.
+
+### Bare ids
+
+A bare id returns `null`. An 11-character YouTube id and a 10-character Wistia id look alike, so services are only recognized from URLs, `spotify:` URIs, and [shorthands](#shorthands). If you already know the service, pass the id to its media component directly.
+
+### Shorthands
+
+`resolveAdapterType` recognizes these shorthands, and the YouTube and Vimeo media accept them as `src`:
+
+| Shorthand | Plays |
+|---|---|
+| `youtube/<id>`, `youtube/shorts/<id>` | The YouTube video, from the privacy-enhanced `youtube-nocookie.com` host |
+| `vimeo/<id>` | The Vimeo video |
+| `vimeo/<id>?hash=<hash>`, `vimeo/<id>?h=<hash>`, `vimeo/<id>/<hash>` | The unlisted Vimeo video |
+
+<UtilReference util="resolveAdapterType" />
