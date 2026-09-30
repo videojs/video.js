@@ -32,6 +32,7 @@ import * as path from 'node:path';
 
 import { parseSync } from 'oxc-parser';
 
+import { featureDocsSlug } from './feature-handler.js';
 import type { SourceFile } from './oxc-project.js';
 import { getJSDocDescription, staticName, unwrapExpression } from './oxc-project.js';
 import type { PresetFeatureRef, PresetReference, PresetSkinDef } from './types.js';
@@ -365,23 +366,6 @@ function findReactMediaElement(filePath: string): string | undefined {
 }
 
 // ─── Feature Bundle Resolution ──────────────────────────────────────
-
-/**
- * Feature names whose kebab-cased form doesn't match the docs page slug. Example: `textTrack` →
- * `feature-text-tracks.mdx`.
- */
-const FEATURE_SLUG_OVERRIDES: Record<string, string> = {
-  textTrack: 'text-tracks',
-};
-
-function featureDocsSlug(featureName: string): string {
-  const override = FEATURE_SLUG_OVERRIDES[featureName];
-  if (override) return `reference/api/feature-${override}`;
-
-  const kebab = featureName.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
-
-  return `reference/api/feature-${kebab}`;
-}
 
 function featureReferenceExists(monorepoRoot: string, slug: string): boolean {
   const mdxPath = path.join(monorepoRoot, 'site/src/content/docs', `${slug}.mdx`);

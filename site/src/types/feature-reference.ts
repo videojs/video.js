@@ -22,6 +22,8 @@ export const FeatureConfigDefSchema = PropDefSchema.extend({
 export const FeatureReferenceSchema = z.object({
   name: z.string(),
   slug: z.string(),
+  /** Docs page slug of the feature's reference page, e.g. `reference/api/feature-playback`. */
+  docsSlug: z.string(),
   description: z.string().optional(),
   state: z.record(z.string(), FeatureStateDefSchema),
   actions: z.record(z.string(), FeatureActionDefSchema),

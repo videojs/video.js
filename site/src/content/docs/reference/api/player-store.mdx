@@ -1,0 +1,42 @@
+---
+title: Player store
+description: Every state field and action on the player store, grouped by the feature that adds it
+---
+
+import PlayerStoreReference from "@/components/docs/api-reference/PlayerStoreReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+The player store combines the state and actions of every feature the player includes. A field or action exists only when its feature is included. This page lists the whole store; each feature's reference page adds its selector and examples.
+
+## Access
+
+<FrameworkCase frameworks={["react"]}>
+<DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink> returns the store without a selector and the selected state with one. State fields and actions are properties of the store.
+
+```tsx
+const store = usePlayer();
+const paused = usePlayer((s) => s.paused);
+
+store.play();
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The player element exposes the store as `store`. State fields and actions are properties of the store, and `store.subscribe()` reports changes. `store.state` is a frozen snapshot of the current state, which is the object selectors take. Inside a custom element, <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink> subscribes to a selection and updates its host.
+
+```ts
+const player = document.querySelector('video-player');
+
+player.store.paused;
+player.store.play();
+
+const unsubscribe = player.store.subscribe(() => {
+  console.log(player.store.currentTime);
+});
+```
+</FrameworkCase>
+
+Each feature also exports a selector, such as `selectPlayback`, that returns its state and actions, or `undefined` when the player doesn't include the feature. See <DocsLink slug="reference/api/create-selector">`createSelector`</DocsLink> to write your own.
+
+<PlayerStoreReference />

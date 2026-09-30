@@ -591,12 +591,12 @@ You can also write to the media element directly. That is safe because player st
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Everything the table describes as "the player's" lives on the player element's store. Hold a reference to `<video-player>` the way you held a v8 player instance, and call actions on its `store.state`:
+Everything the table describes as "the player's" lives on the player element's store. Hold a reference to `<video-player>` the way you held a v8 player instance, and call actions on its `store`:
 
 ```js
 const player = document.querySelector('video-player');
 
-player.store.state.requestFullscreen();
+player.store.requestFullscreen();
 ```
 </FrameworkCase>
 

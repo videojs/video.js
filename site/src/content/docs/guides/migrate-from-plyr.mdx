@@ -466,7 +466,7 @@ When you need the element itself, put a `ref` on the media component; its value 
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The store's actions live on the player element's `store.state`: query `<video-player>` and call `player.store.state.play()`. Your media element is also a plain child in your markup, so you can query and drive it directly. To keep a custom element in sync with player state, use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>:
+The store's actions live on the player element's `store`: query `<video-player>` and call `player.store.play()`. Your media element is also a plain child in your markup, so you can query and drive it directly. To keep a custom element in sync with player state, use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>:
 
 ```js
 import { PlayerController, playerContext, ReactiveElement, selectTime } from '@videojs/html';

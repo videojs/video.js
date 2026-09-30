@@ -24,6 +24,24 @@ import { log } from './utils.js';
 const SKIP_FILES = new Set(['index.ts', 'presets.ts', 'feature.parts.ts']);
 const UNRESOLVED_TYPE = 'unknown';
 
+/**
+ * Feature names whose kebab-cased form doesn't match the docs page slug. Example: `textTrack` →
+ * `feature-text-tracks.mdx`.
+ */
+const FEATURE_SLUG_OVERRIDES: Record<string, string> = {
+  textTrack: 'text-tracks',
+};
+
+/** Docs page slug for a feature's reference page, shared by feature and preset references. */
+export function featureDocsSlug(featureName: string): string {
+  const override = FEATURE_SLUG_OVERRIDES[featureName];
+  if (override) return `reference/api/feature-${override}`;
+
+  const kebab = featureName.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+
+  return `reference/api/feature-${kebab}`;
+}
+
 interface FeatureSource {
   file: SourceFile;
   name: string;
@@ -89,6 +107,7 @@ export function generateFeatureReferences(monorepoRoot: string): FeatureResult[]
     const reference: FeatureReference = {
       name: source.name,
       slug: source.name,
+      docsSlug: featureDocsSlug(source.name),
       state: shape.state,
       actions: shape.actions,
       config,

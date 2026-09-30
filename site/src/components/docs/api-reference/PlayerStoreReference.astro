@@ -1,0 +1,118 @@
+---
+import { getCollection } from 'astro:content';
+
+import ContentWidth from '@/components/frames/ContentWidth.astro';
+
+import H2 from '@/components/typography/H2Markdown.astro';
+import MarkdownCode from '@/components/typography/MarkdownCode.astro';
+import P from '@/components/typography/P.astro';
+import Table from '@/components/typography/Table.astro';
+import Tbody from '@/components/typography/Tbody.astro';
+import Td from '@/components/typography/Td.astro';
+import Th from '@/components/typography/Th.astro';
+import Thead from '@/components/typography/Thead.astro';
+import Tr from '@/components/typography/Tr.astro';
+import { isValidFramework } from '@/types/docs';
+import { findGuideBySlug } from '@/utils/docs/sidebar';
+import { createPlayerStoreReferenceModel, type PlayerStoreFeature } from '@/utils/playerStoreReferenceModel';
+import DocsLink from '../DocsLink.astro';
+import AnchorLink from './AnchorLink.astro';
+import ApiTable from './ApiTable.astro';
+import DetailRow from './DetailRow.astro';
+
+const { framework } = Astro.params;
+if (!framework || !isValidFramework(framework)) throw new Error(`Invalid or missing framework param.`);
+
+const model = createPlayerStoreReferenceModel(
+  (await getCollection('featureReference')).map((entry) => entry.data),
+  (await getCollection('presetReference')).map((entry) => entry.data)
+);
+
+const createPlayerSlug = framework === 'react' ? 'reference/api/create-player' : 'reference/api/html-create-player';
+const hasPage = (feature: PlayerStoreFeature) => Boolean(findGuideBySlug(feature.docsSlug));
+const toggleColumn = model.members.some((member) => Boolean(member.description));
+---
+
+<ContentWidth>
+
+  <H2 id={model.headings.members.id}>{model.headings.members.text}</H2>
+  <P>Each feature links to the same entry on its reference page.</P>
+  <ApiTable columns={["Name", "Type", "Feature"]} toggle={toggleColumn}>
+    {
+      model.members.map((member) => (
+        <DetailRow
+          id={member.id}
+          name={member.name}
+          description={member.description}
+          colspan={3}
+          toggleColumn={toggleColumn}
+        >
+          <td>
+            <span class="inline-flex items-center whitespace-nowrap">
+              <MarkdownCode>{member.name}</MarkdownCode>
+              <AnchorLink id={member.id} name={member.name} />
+            </span>
+          </td>
+
+          <td class="w-full" data-apiref-cell="type">
+            <MarkdownCode code={member.type} />
+          </td>
+          <td class="whitespace-nowrap">
+            {hasPage(member.feature) ? (
+              <DocsLink slug={member.feature.docsSlug} anchor={member.id}>
+                <MarkdownCode>{member.feature.exportName}</MarkdownCode>
+              </DocsLink>
+            ) : (
+              <MarkdownCode>{member.feature.exportName}</MarkdownCode>
+            )}
+          </td>
+        </DetailRow>
+      ))
+    }
+  </ApiTable>
+
+  <H2 id={model.headings.presets.id}>{model.headings.presets.text}</H2>
+  <P>
+    Each column is a preset's feature bundle. A feature no bundle includes is opt-in: add it to your{' '}
+    <DocsLink slug={createPlayerSlug}><MarkdownCode>createPlayer</MarkdownCode></DocsLink> features yourself.
+  </P>
+
+  <Table maxWidth={false} outerClass="my-6">
+    <Thead>
+      <Tr>
+        <Th>Feature</Th>
+        {
+          model.presets.map((preset) => (
+            <Th class="whitespace-nowrap text-center">
+              <MarkdownCode>{preset.featureBundle}</MarkdownCode>
+            </Th>
+          ))
+        }
+      </Tr>
+    </Thead>
+    <Tbody>
+      {
+        model.features.map((feature) => (
+          <Tr>
+            <Td>
+              {hasPage(feature) ? (
+                <DocsLink slug={feature.docsSlug}>
+                  <MarkdownCode>{feature.exportName}</MarkdownCode>
+                </DocsLink>
+              ) : (
+                <MarkdownCode>{feature.exportName}</MarkdownCode>
+              )}
+            </Td>
+            {model.presets.map((preset) =>
+              feature.presets.includes(preset.name) ? (
+                <Td class="text-center">✓</Td>
+              ) : (
+                <Td class="text-center text-muted">–</Td>
+              )
+            )}
+          </Tr>
+        ))
+      }
+    </Tbody>
+  </Table>
+</ContentWidth>

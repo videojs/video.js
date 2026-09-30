@@ -1362,6 +1362,11 @@ describe('Feature pipeline (end-to-end)', () => {
       expect(playback!.reference.slug).toBe('playback');
     });
 
+    it('emits the docs slug of its reference page', () => {
+      expect(findFeature('playback')!.reference.docsSlug).toBe('reference/api/feature-playback');
+      expect(findFeature('orientationLock')!.reference.docsSlug).toBe('reference/api/feature-orientation-lock');
+    });
+
     it('has no description (no interface-level JSDoc)', () => {
       const ref = findFeature('playback')!.reference;
 
