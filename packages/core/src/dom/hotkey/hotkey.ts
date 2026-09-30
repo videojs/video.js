@@ -1,6 +1,7 @@
 import { isMacOS } from '@videojs/utils/dom';
 
 import type { HotkeyProps } from '../../core/ui/hotkey/core';
+import type { InputAction } from '../../core/ui/input-action';
 import { getMediaInputActionValue } from '../media-action-value';
 import { HotkeyCoordinator } from './coordinator';
 
@@ -19,7 +20,7 @@ export interface HotkeyOptions extends Pick<HotkeyProps, 'keys' | 'target' | 'di
   /** Whether `event.repeat` should fire the callback. */
   repeatable?: boolean | undefined;
   /** Action name for the ARIA registry and subscriber events. */
-  action?: HotkeyProps['action'] | undefined;
+  action?: InputAction | undefined;
 }
 
 const MODIFIER_KEYS = new Set(['shift', 'ctrl', 'alt', 'meta']);

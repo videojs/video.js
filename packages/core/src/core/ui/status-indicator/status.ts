@@ -2,7 +2,7 @@ import { DEFAULT_INPUT_INDICATOR_LABELS, type InputIndicatorLabels } from '../in
 import type { InputActionEvent, MediaSnapshot } from '../input-action';
 import { deriveVolumeStatus } from '../volume-indicator/status';
 
-export type IndicatorStatus =
+export type BuiltInIndicatorStatus =
   | 'pause'
   | 'play'
   | 'volume-off'
@@ -15,13 +15,16 @@ export type IndicatorStatus =
   | 'pip'
   | 'exit-pip';
 
-/** Predicted display details for a supported status-indicator action. */
-export interface StatusDetails {
-  /** Visual status corresponding to the predicted post-action state. */
-  status: IndicatorStatus;
-  /** Translated label for the predicted status. */
+/** Built-in indicator statuses plus any custom status returned by `deriveCustomStatus`. */
+export type IndicatorStatus = BuiltInIndicatorStatus | (string & {});
+
+/** Display details for a status-indicator update. */
+export interface StatusDetails<Status extends IndicatorStatus = BuiltInIndicatorStatus> {
+  /** Visual status reflected on `data-status`. */
+  status: Status;
+  /** Label for the predicted status. Built-in statuses use translated labels. */
   label: string;
-  /** Predicted volume percentage for volume actions, otherwise `null`. */
+  /** Shown instead of `label` when not `null`. Built-in statuses use it for the predicted volume percentage. */
   value: string | null;
 }
 

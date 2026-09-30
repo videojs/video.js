@@ -3,6 +3,7 @@ title: useHotkey
 description: Hook that registers a keyboard shortcut for the current Player
 ---
 
+import DocsLink from "@/components/docs/DocsLink.astro";
 import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
 
 ## Import
@@ -22,10 +23,30 @@ function CustomPlayHotkey() {
     onActivate: (_event, key) => console.log(`Activated by ${key}`),
   });
 
+  // The hook must run inside a component, but this one has no UI to render.
   return null;
 }
 ```
 
-Shortcuts target the player by default and accept repeated keydown events. Set `target` to `"document"`, `repeatable` to `false`, or `disabled` to change those behaviors. The hook still requires a surrounding `Player` for its coordinator.
+Shortcuts target the player by default and accept repeated keydown events, unless `action` names a toggle such as `togglePaused`. Set `target`, `repeatable`, or `disabled` to change those behaviors. The hook still requires a surrounding `Player` for its coordinator.
+
+## Report an action
+
+Pass `action`, and optionally `value`, to report the shortcut to input indicators and to <DocsLink slug="reference/api/use-hotkey-shortcut">`useHotkeyShortcut`</DocsLink>. The callback still performs the action.
+
+```tsx
+function NextChapterHotkey() {
+  useHotkey({
+    keys: "n",
+    action: "nextChapter",
+    onActivate: () => goToNextChapter(),
+  });
+
+  // The hook must run inside a component, but this one has no UI to render.
+  return null;
+}
+```
+
+Custom action names reach indicators unchanged. A <DocsLink slug="reference/components/status-indicator" anchor="custom-actions">`StatusIndicator`</DocsLink> shows feedback for them when you derive a custom status. Built-in names keep their built-in feedback: `action: "seekStep"` shows the default seek step unless you pass a matching `value`.
 
 <UtilReference util="useHotkey" />

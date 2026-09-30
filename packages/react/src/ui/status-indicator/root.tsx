@@ -15,13 +15,14 @@ export const StatusIndicatorRoot = forwardRef(function StatusIndicatorRoot(
   componentProps: StatusIndicatorRootProps,
   forwardedRef: ForwardedRef<HTMLDivElement>
 ) {
-  const { render, className, style, actions, closeDelay, ...elementProps } = componentProps;
+  const { render, className, style, actions, closeDelay, deriveCustomStatus, ...elementProps } = componentProps;
   const translator = useTranslator();
   const { elementRef, present, state } = useInputIndicatorRoot(
     () => new StatusIndicatorCore(),
     {
       actions,
       closeDelay,
+      deriveCustomStatus,
       labels: createInputIndicatorLabels(translator),
     },
     { replayOnUpdate: false }

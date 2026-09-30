@@ -4,6 +4,7 @@ import {
   type InputAction,
   StatusIndicatorCore,
   StatusIndicatorDataAttrs,
+  type DeriveCustomStatus,
 } from '@videojs/core';
 import { createTransition } from '@videojs/core/dom';
 import type { PropertyDeclarationMap } from '@videojs/element';
@@ -33,6 +34,20 @@ export class StatusIndicatorElement extends InputIndicatorElement<StatusIndicato
     render: renderStatusIndicator,
   });
   readonly #options = { replayOnUpdate: false } satisfies InputIndicatorOptions;
+  #deriveCustomStatus: DeriveCustomStatus | undefined;
+
+  /**
+   * Derives display details for actions without built-in feedback, such as custom hotkey actions. Called only when the
+   * built-in derivation returns `null`. Set as a JavaScript property; it has no attribute.
+   */
+  get deriveCustomStatus(): DeriveCustomStatus | undefined {
+    return this.#deriveCustomStatus;
+  }
+
+  set deriveCustomStatus(value: DeriveCustomStatus | undefined) {
+    this.#deriveCustomStatus = value;
+    this.requestUpdate();
+  }
 
   protected get core() {
     return this.#core;
@@ -55,6 +70,7 @@ export class StatusIndicatorElement extends InputIndicatorElement<StatusIndicato
       actions: parseActions(this.actions),
       closeDelay: this.closeDelay,
       labels: createInputIndicatorLabels(this.#i18n.value),
+      deriveCustomStatus: this.#deriveCustomStatus,
     });
   }
 }

@@ -66,7 +66,7 @@ The input event arrives before its action is resolved. The indicator uses the me
 | `toggleFullscreen` | `"fullscreen"` or `"exit-fullscreen"` | Translated fullscreen label |
 | `togglePictureInPicture` | `"pip"` or `"exit-pip"` | Translated picture-in-picture label |
 
-`toggleSubtitles` is ignored when the player reports that no captions or subtitles are available. Seek actions, `toggleControls`, playback-rate actions, and custom actions do not open this indicator.
+`toggleSubtitles` is ignored when the player reports that no captions or subtitles are available. Seek actions, `toggleControls`, playback-rate actions, and custom actions do not open this indicator unless you [derive a custom status](#custom-actions).
 
 Use `actions` to allow only some of the supported actions. Omitting it allows all supported actions.
 
@@ -100,12 +100,82 @@ The indicator closes after `closeDelay`, which defaults to 800 milliseconds. A r
 The element remains in the document with `hidden` until the next handled action.
 </FrameworkCase>
 
+## Custom actions
+
+Use `deriveCustomStatus` to give custom hotkey or gesture actions the same feedback as built-in actions. The indicator calls it only when an allowed action has no built-in status. It receives the input event and the pre-action media snapshot. Return `{ status, label, value }` to open the indicator, or `null` to leave it closed. The returned `status` becomes `data-status`, and the Value part shows `value` when it is not `null` and `label` otherwise. Because the snapshot is taken before the action runs, predict the post-action state the way built-in statuses do.
+
+<FrameworkCase frameworks={["react"]}>
+Register the custom action with <DocsLink slug="reference/api/use-hotkey">`useHotkey`</DocsLink> and pass `action` so the indicator receives it. `Hotkey` only accepts built-in actions.
+
+```tsx
+import { selectPlaybackRate, StatusIndicator, useHotkey, usePlayer } from "@videojs/react";
+
+const rates = [0.5, 1, 1.5, 2];
+
+function getNextRate(rate = 1) {
+  const index = rates.indexOf(rate);
+
+  return rates[Math.min(index + 1, rates.length - 1)] ?? rate;
+}
+
+function RateHotkey() {
+  const rate = usePlayer(selectPlaybackRate);
+
+  useHotkey({
+    keys: ">",
+    action: "stepRate",
+    onActivate: () => rate?.setPlaybackRate(getNextRate(rate.playbackRate)),
+  });
+
+  // The hook must run inside a component, but this one has no UI to render.
+  return null;
+}
+
+function RateIndicator() {
+  return (
+    <StatusIndicator.Root
+      actions={["stepRate"]}
+      deriveCustomStatus={(event, snapshot) =>
+        event.action === "stepRate"
+          ? { status: "rate-up", label: `${getNextRate(snapshot.playbackRate)}×`, value: null }
+          : null
+      }
+    >
+      <StatusIndicator.Value />
+    </StatusIndicator.Root>
+  );
+}
+```
+
+Render both components inside the same player `Container`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`deriveCustomStatus` is a JavaScript property with no attribute:
+
+```ts
+const rates = [0.5, 1, 1.5, 2];
+const indicator = document.querySelector("media-status-indicator");
+
+function getNextRate(rate = 1) {
+  const index = rates.indexOf(rate);
+
+  return rates[Math.min(index + 1, rates.length - 1)] ?? rate;
+}
+
+indicator.deriveCustomStatus = (event, snapshot) =>
+  event.action === "stepRate"
+    ? { status: "rate-up", label: `${getNextRate(snapshot.playbackRate)}×`, value: null }
+    : null;
+```
+</FrameworkCase>
+
 ## Styling
 
 | Attribute | Values | Description |
 | --- | --- | --- |
 | `data-open` | Present / absent | Present while the indicator is open |
-| `data-status` | `"play"`, `"pause"`, `"volume-off"`, `"volume-low"`, `"volume-high"`, `"captions-on"`, `"captions-off"`, `"fullscreen"`, `"exit-fullscreen"`, `"pip"`, or `"exit-pip"` | Predicted status for the handled action |
+| `data-status` | `"play"`, `"pause"`, `"volume-off"`, `"volume-low"`, `"volume-high"`, `"captions-on"`, `"captions-off"`, `"fullscreen"`, `"exit-fullscreen"`, `"pip"`, `"exit-pip"`, or a custom status | Predicted status for the handled action |
 | `data-starting-style` | Present / absent | Present during the open transition |
 | `data-ending-style` | Present / absent | Present during the close transition |
 
