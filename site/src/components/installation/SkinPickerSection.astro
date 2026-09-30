@@ -1,5 +1,5 @@
 ---
-import H2Markdown from '../typography/H2Markdown.astro';
+import H3Markdown from '../typography/H3Markdown.astro';
 import P from '../typography/P.astro';
 import SkinPickerSectionClient from './SkinPickerSectionClient.tsx';
 
@@ -13,7 +13,7 @@ const { includeNoSkin = true, source = false } = Astro.props;
 
 <div class="contents" data-installation-skin-section>
   <SkinPickerSectionClient client:idle includeNoSkin={includeNoSkin}>
-    <H2Markdown id="choose-your-skin">Choose your skin</H2Markdown>
+    <H3Markdown id="choose-your-skin">Choose your skin</H3Markdown>
     <P>
       {
         source
