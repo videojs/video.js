@@ -349,7 +349,7 @@ describe('agentPromptExamplePicks', () => {
       media: 'dash',
       extensions: ['google-cast'],
     });
-    expect(agentPromptExamplePicks(example('Mux uploads'), demo)).toMatchObject({ extensions: ['mux-data'] });
+    expect(agentPromptExamplePicks(example('Mux'), demo)).toMatchObject({ extensions: ['mux-data'] });
     expect(agentPromptExamplePicks(example('Product pages'), demo)).toMatchObject({ skin: 'minimal-video' });
   });
 

@@ -396,14 +396,14 @@ export const AGENT_PROMPT_REQUEST_EXAMPLES: readonly AgentPromptRequestExampleGr
         features: ['autoplay'],
       },
       {
-        label: 'Mux uploads',
-        request: 'User-uploaded videos on Mux, with viewer analytics',
-        keywords: ['ugc', 'mux data', 'analytics'],
+        label: 'Mux',
+        request: 'Videos hosted on Mux, with analytics included',
+        keywords: ['uploads', 'ugc', 'mux data', 'analytics'],
         media: 'mux-video',
       },
       {
         label: 'Cloudflare Stream',
-        request: 'Customer videos hosted on Cloudflare Stream',
+        request: 'Videos hosted on Cloudflare Stream',
         keywords: ['cloudflare'],
         media: 'cloudflare',
       },
